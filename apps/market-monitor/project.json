@@ -8,16 +8,12 @@
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/market-monitor",
+        "outputPath": "dist/apps/market-monitor/browser",
         "index": "apps/market-monitor/src/index.html",
         "main": "apps/market-monitor/src/main.ts",
-        "polyfills": [
-          "zone.js"
-        ],
+        "polyfills": ["zone.js"],
         "tsConfig": "apps/market-monitor/tsconfig.app.json",
         "assets": [
           "apps/market-monitor/src/favicon.ico",
@@ -76,9 +72,7 @@
     },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
           "apps/market-monitor/**/*.ts",
@@ -88,9 +82,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "apps/market-monitor/jest.config.ts",
         "passWithNoTests": true
@@ -107,6 +99,41 @@
       "options": {
         "buildTarget": "market-monitor:build"
       }
+    },
+    "server": {
+      "executor": "@angular-devkit/build-angular:server",
+      "options": {
+        "outputPath": "dist/market-monitor/server",
+        "main": "apps/market-monitor/src/main.server.ts",
+        "tsConfig": "apps/market-monitor/tsconfig.server.json"
+      },
+      "configurations": {
+        "production": {
+          "outputHashing": "media"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "sourceMap": true,
+          "extractLicenses": false,
+          "vendorChunk": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve-ssr": {
+      "executor": "@nguniversal/builders:ssr-dev-server",
+      "configurations": {
+        "development": {
+          "browserTarget": "market-monitor:build:development",
+          "serverTarget": "market-monitor:server:development"
+        },
+        "production": {
+          "browserTarget": "market-monitor:build:production",
+          "serverTarget": "market-monitor:server:production"
+        }
+      },
+      "defaultConfiguration": "development"
     }
   }
 }

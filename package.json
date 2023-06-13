@@ -2,7 +2,10 @@
   "name": "@market-monitor/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "mm:serve": "nx run  market-monitor:serve",
+    "mm:ssr": "nx run market-monitor:serve-ssr"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "~16.0.0",
@@ -14,7 +17,9 @@
     "@angular/material": "^16.0.4",
     "@angular/platform-browser": "~16.0.0",
     "@angular/platform-browser-dynamic": "~16.0.0",
+    "@angular/platform-server": "~16.0.0",
     "@angular/router": "~16.0.0",
+    "@nguniversal/express-engine": "^16.0.2",
     "@nx/angular": "16.3.2",
     "date-fns": "^2.30.0",
     "highcharts": "^11.1.0",
@@ -33,6 +38,7 @@
     "@angular/cli": "~16.0.0",
     "@angular/compiler-cli": "~16.0.0",
     "@angular/language-service": "~16.0.0",
+    "@nguniversal/builders": "^16.0.2",
     "@nx/cypress": "16.3.2",
     "@nx/eslint-plugin": "16.3.2",
     "@nx/jest": "16.3.2",
