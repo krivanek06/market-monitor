@@ -1,5 +1,5 @@
 // environments
-export const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
+export const DATABASE_URL = 'https://stock-tracker-2-prod-1db91.firebaseio.com';
 export const FINANCIAL_MODELING_KEY = 'f12e9d44e3170501b45157946e3b58d2';
 export const FINANCIAL_MODELING_URL = 'https://financialmodelingprep.com/api';
 

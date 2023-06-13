@@ -1,0 +1,34 @@
+{
+  "database": {
+    "rules": "apps/market-monitor-cloud-functions/database.rules.json"
+  },
+  "firestore": {
+    "rules": "apps/market-monitor-cloud-functions/firestore.rules",
+    "indexes": "apps/market-monitor-cloud-functions/firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "apps/market-monitor-cloud-functions/public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "storage": {
+    "rules": "apps/market-monitor-cloud-functions/storage.rules"
+  },
+  "functions": {
+    "codebase": "market-monitor-cloud-functions",
+    "predeploy": ["npx nx build market-monitor-cloud-functions"],
+    "runtime": "nodejs16",
+    "source": "dist/apps/market-monitor-cloud-functions"
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "singleProjectMode": true
+  }
+}

@@ -1,55 +1,73 @@
 {
   "name": "market-monitor-cloud-functions",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "application",
   "sourceRoot": "apps/market-monitor-cloud-functions/src",
+  "projectType": "application",
   "targets": {
+    "build": {
+      "executor": "@simondotm/nx-firebase:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/market-monitor-cloud-functions",
+        "main": "apps/market-monitor-cloud-functions/src/index.ts",
+        "tsConfig": "apps/market-monitor-cloud-functions/tsconfig.app.json",
+        "packageJson": "apps/market-monitor-cloud-functions/package.json",
+        "assets": []
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx run market-monitor-cloud-functions:build --watch",
+          "nx run market-monitor-cloud-functions:emulate"
+        ]
+      }
+    },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/market-monitor-cloud-functions/**/*.ts"],
-        "fix": true
+        "lintFilePatterns": ["apps/market-monitor-cloud-functions/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["coverage/apps/market-monitor-cloud-functions"],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "apps/market-monitor-cloud-functions/jest.config.ts",
-        "passWithNoTests": true,
-        "coverageDirectory": "coverage/apps/market-monitor-cloud-functions"
-      }
-    },
-    "build": {
-      "executor": "@nrwl/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
-      "options": {
-        "main": "apps/market-monitor-cloud-functions/src/index.ts",
-        "outputPath": "dist/apps/market-monitor-cloud-functions",
-        "outputFileName": "index.js",
-        "project": "apps/market-monitor-cloud-functions/package.json",
-        "tsConfig": "apps/market-monitor-cloud-functions/tsconfig.json",
-        "assets": [],
-        "platform": "node",
-        "dependenciesFieldType": "dependencies",
-        "thirdParty": false
+        "passWithNoTests": true
       },
       "configurations": {
-        "development": {
-          "minify": false
-        },
-        "production": {
-          "minify": true
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
         }
       }
     },
-    "serve": {
-      "command": "firebase emulators:start --only functions"
-    },
     "deploy": {
-      "command": "firebase deploy --only functions"
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "firebase deploy --config firebase.market-monitor-cloud-functions.json"
+      }
+    },
+    "getconfig": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "firebase functions:config:get --config firebase.market-monitor-cloud-functions.json > apps/market-monitor-cloud-functions/.runtimeconfig.json"
+      }
+    },
+    "emulate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "node -e \"setTimeout(()=>{},5000)\"",
+          "kill-port --port 9099,5001,8080,9000,5000,8085,9199,9299,4000,4400,4500",
+          "firebase functions:config:get  --config firebase.market-monitor-cloud-functions.json > dist/apps/market-monitor-cloud-functions/.runtimeconfig.json",
+          "firebase emulators:start  --config firebase.market-monitor-cloud-functions.json"
+        ],
+        "parallel": false
+      }
     }
   },
   "tags": []
