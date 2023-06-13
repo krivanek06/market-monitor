@@ -1,0 +1,56 @@
+{
+  "name": "market-monitor-cloud-functions",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/market-monitor-cloud-functions/src",
+  "targets": {
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/market-monitor-cloud-functions/**/*.ts"],
+        "fix": true
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["coverage/apps/market-monitor-cloud-functions"],
+      "options": {
+        "jestConfig": "apps/market-monitor-cloud-functions/jest.config.ts",
+        "passWithNoTests": true,
+        "coverageDirectory": "coverage/apps/market-monitor-cloud-functions"
+      }
+    },
+    "build": {
+      "executor": "@nrwl/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "main": "apps/market-monitor-cloud-functions/src/index.ts",
+        "outputPath": "dist/apps/market-monitor-cloud-functions",
+        "outputFileName": "index.js",
+        "project": "apps/market-monitor-cloud-functions/package.json",
+        "tsConfig": "apps/market-monitor-cloud-functions/tsconfig.json",
+        "assets": [],
+        "platform": "node",
+        "dependenciesFieldType": "dependencies",
+        "thirdParty": false
+      },
+      "configurations": {
+        "development": {
+          "minify": false
+        },
+        "production": {
+          "minify": true
+        }
+      }
+    },
+    "serve": {
+      "command": "firebase emulators:start --only functions"
+    },
+    "deploy": {
+      "command": "firebase deploy --only functions"
+    }
+  },
+  "tags": []
+}

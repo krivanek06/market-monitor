@@ -1,0 +1,8 @@
+{
+  "name": "market-monitor-cloud-functions",
+  "version": "0.0.0",
+  "main": "index.js",
+  "engines": {
+    "node": "16"
+  }
+}

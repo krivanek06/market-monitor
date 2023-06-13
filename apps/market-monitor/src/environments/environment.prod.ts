@@ -1,16 +1,16 @@
 export const environment = {
-	firebase: {
-		locationId: 'europe-central2',
-		apiKey: 'AIzaSyBQ8yAoD6mk2_027qKbdAa7bH4s53QsyQc',
-		authDomain: 'stock-tracker-2-prod-cb8e7.firebaseapp.com',
-		projectId: 'stock-tracker-2-prod-cb8e7',
-		storageBucket: 'stock-tracker-2-prod-cb8e7.appspot.com',
-		messagingSenderId: '477051729145',
-		appId: '1:477051729145:web:4585e7d151c82cd7a5de28',
-		measurementId: 'G-6EFYXEPY8V',
-	},
-	endpointFunctions: 'https://europe-central2-stock-tracker-2-prod-cb8e7.cloudfunctions.net',
+  firebase: {
+    projectId: 'market-monitor-prod',
+    appId: '1:185409661855:web:0c3e2fbdd4f05709f6ebaa',
+    storageBucket: 'market-monitor-prod.appspot.com',
+    apiKey: 'AIzaSyAv5SuzwrwGv0Z5RzFYHf5bdkjb60ucOAk',
+    authDomain: 'market-monitor-prod.firebaseapp.com',
+    messagingSenderId: '185409661855',
+    measurementId: 'G-82FD6D7MMR',
+  },
+  endpointFunctions:
+    'https://europe-central2-market-monitor-prod.cloudfunctions.net',
 
-	production: true,
-	version: '1.0.0',
+  production: true,
+  version: '1.0.0',
 };

@@ -33,6 +33,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(provideFirestore(() => getFirestore())),
     importProvidersFrom(provideFunctions(() => getFunctions())),
     importProvidersFrom(provideStorage(() => getStorage())),
+
     provideHttpClient(),
     provideRouter(
       appRoutes,
