@@ -40,3 +40,8 @@ Thumbs.db
 
 .angular
 yarn.lock
+
+# Firebase
+.firebase
+*-debug.log
+.runtimeconfig.json

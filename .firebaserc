@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "stock-tracker-2-prod-cb8e7": {
+      "hosting": {
+        "market-monitor": [
+          "stock-tracker-2-prod-cb8e7"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "stock-tracker-2-prod-cb8e7"
+  }
+}
