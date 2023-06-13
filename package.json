@@ -5,7 +5,7 @@
   "scripts": {
     "mm:serve": "nx run  market-monitor:serve",
     "mm:ssr": "nx run market-monitor:serve-ssr",
-    "mm:cloud-function:serve": "nx serve market-monitor-cloud-functions",
+    "mm:cloud-function:serve": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --config firebase.market-monitor-cloud-functions.json",
     "mm:cloud-function:deploy": "nx build market-monitor-cloud-functions && firebase deploy --only functions --config firebase.market-monitor-cloud-functions.json"
   },
   "private": true,

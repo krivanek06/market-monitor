@@ -1,10 +1,7 @@
-import { TestingInterface } from '@market-monitor/shared-types';
-// The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
-import * as functions from 'firebase-functions';
-
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
 import * as admin from 'firebase-admin';
 import { DATABASE_URL } from './environments';
+export * from './functions-fetching';
 
 const serviceAccount: admin.ServiceAccount = {
   projectId: 'market-monitor-prod',
@@ -25,17 +22,4 @@ admin.initializeApp({
 // inside objects rather than rejecting the API call.
 admin.firestore().settings({
   ignoreUndefinedProperties: true,
-});
-
-// Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
-
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info('Hello logs!', { structuredData: true });
-
-  const test: TestingInterface = {
-    name: 'yolo - test',
-  };
-
-  response.send(test);
 });
