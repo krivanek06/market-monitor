@@ -1,0 +1,9 @@
+.mat-mdc-paginator-range-actions {
+	button {
+		display: none !important;
+	}
+}
+
+.mat-mdc-tab-header-pagination-controls-enabled .mat-mdc-tab-header-pagination {
+	background: var(--primary) !important;
+}

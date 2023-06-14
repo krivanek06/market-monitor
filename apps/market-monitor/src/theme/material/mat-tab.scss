@@ -1,0 +1,20 @@
+.mat-mdc-tab-link .mdc-tab__text-label {
+	color: var(--gray-light) !important;
+	// flex: 1 !important;
+}
+
+.mdc-tab--active .mdc-tab__text-label {
+	color: var(--primary) !important;
+}
+
+.mat-mdc-tab-list {
+	margin-bottom: 24px !important;
+}
+
+.mat-mdc-tab-body {
+	padding: 8px !important;
+}
+
+.mat-mdc-tab .mdc-tab__text-label {
+	color: var(--gray-medium) !important;
+}

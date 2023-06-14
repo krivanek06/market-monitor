@@ -8,7 +8,7 @@ export const environment = {
     messagingSenderId: '185409661855',
     measurementId: 'G-82FD6D7MMR',
   },
-  endpointFunctions:
+  endpointFunctionsURL:
     'https://europe-central2-market-monitor-prod.cloudfunctions.net',
 
   production: true,

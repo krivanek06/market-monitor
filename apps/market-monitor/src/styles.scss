@@ -1,8 +1,16 @@
+/* You can add global styles to this file, and also import other style files */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* You can add global styles to this file, and also import other style files */
+// custom material scss
+@import './theme/custom-material';
+@import './theme/global.scss';
+@import './theme/variables.scss';
+
+// fonts
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,700,900');
 
 html,
 body {
@@ -11,4 +19,5 @@ body {
 body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--background-dashboard);
 }

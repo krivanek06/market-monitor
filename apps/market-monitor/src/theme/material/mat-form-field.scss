@@ -1,0 +1,82 @@
+// decreasing height of form field with font-size
+.mat-mdc-form-field {
+	font-size: 12px !important;
+
+	input,
+	textarea,
+	.mat-mdc-select-placeholder,
+	mat-select {
+		font-size: 1rem;
+	}
+
+	.mat-mdc-form-field-infix {
+		label {
+			// font-size: 1rem !important;
+			margin-top: -4px !important;
+			color: var(--gray-medium) !important;
+		}
+	}
+
+	.mat-form-field-prefix {
+		mat-icon {
+			font-size: 18px;
+			color: var(--gray-light) !important;
+		}
+	}
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
+mat-form-field.mat-form-field-should-float label {
+	font-size: 1rem !important;
+	margin-top: -0.25rem !important;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
+.mat-form-field-appearance-outline .mat-form-field-outline {
+	font-size: 14px !important;
+	color: var(--gray-light) !important;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
+mat-form-field span.mat-form-field-label-wrapper label {
+	font-size: 14px !important;
+	color: var(--gray-light) !important;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
+mat-form-field.mat-focused span.mat-form-field-label-wrapper label {
+	color: var(--primary) !important;
+}
+
+// on Error
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
+.mat-form-field-appearance-outline.mat-form-field-invalid.mat-form-field-invalid .mat-form-field-outline-thick {
+	color: var(--primary) !important;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
+.mat-mdc-form-field.mat-form-field-invalid .mat-form-field-label {
+	color: var(--primary) !important;
+}
+
+mat-hint {
+	color: var(--gray-light) !important;
+}
+
+mat-divider {
+	background-color: var(--background-medium) !important;
+}
+
+.mat-mdc-form-field-error {
+	font-size: 11px !important;
+}
+
+.mat-mdc-text-field-wrapper {
+	// background: var(--background-medium) !important;
+	border-radius: 20px !important;
+}
+
+.mat-mdc-option .mat-icon,
+.mat-mdc-option .mat-pseudo-checkbox-full {
+	margin-right: 8px !important;
+}

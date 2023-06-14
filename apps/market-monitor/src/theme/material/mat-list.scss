@@ -1,0 +1,27 @@
+mat-list-option,
+mat-list-item {
+	color: var(--gray-light) !important;
+}
+
+mat-selection-list > .mdc-list-group__subheader,
+mat-list > .mdc-list-group__subheader {
+	color: var(--primary) !important;
+}
+
+.mdc-list-item__secondary-text {
+	color: var(--gray-medium) !important;
+}
+
+.mdc-list-item--with-leading-icon .mdc-list-item__start {
+	color: var(--gray-medium) !important;
+}
+
+mat-list-option {
+	overflow-y: visible !important;
+	overflow-x: clip !important;
+
+	.mdc-list-item__content {
+		overflow-y: visible !important;
+		overflow-x: clip !important;
+	}
+}

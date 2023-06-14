@@ -21,6 +21,7 @@ import {
   withInMemoryScrolling,
   withPreloading,
 } from '@angular/router';
+import { ENDPOINT_FUNCTION_URL } from '@market-monitor/shared-types';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 
@@ -66,6 +67,10 @@ export const appConfig: ApplicationConfig = {
         }
       },
       multi: true,
+    },
+    {
+      provide: ENDPOINT_FUNCTION_URL,
+      useValue: environment.endpointFunctionsURL,
     },
   ],
 };

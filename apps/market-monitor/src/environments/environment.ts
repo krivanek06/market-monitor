@@ -9,7 +9,7 @@ export const environment = {
     measurementId: 'G-82FD6D7MMR',
   },
 
-  endpointFunctions: 'http://localhost:5001/market-monitor-prod/us-central1',
+  endpointFunctionsURL: 'http://localhost:5001/market-monitor-prod/us-central1',
 
   production: false,
   version: '1.0.0',
