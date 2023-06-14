@@ -1,0 +1,12 @@
+:host {
+	display: block;
+}
+
+::ng-deep .mdc-menu-surface.mat-mdc-autocomplete-panel {
+	max-height: 452px !important;
+}
+
+::ng-deep .mdc-menu-surface.mat-mdc-autocomplete-panel {
+	width: 95% !important;
+	margin: auto !important;
+}

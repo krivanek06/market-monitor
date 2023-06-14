@@ -1,0 +1,43 @@
+<div class="grid mt-2">
+	<!-- first line -->
+	<div class="flex items-center justify-between">
+		<!-- image and symbol -->
+		<div class="flex items-center gap-3">
+			<img appDefaultImg [src]="stockSummary.profile.image" alt="stock image" class="w-7 h-7" />
+			<span>{{ stockSummary.quote.symbol }}</span>
+		</div>
+		<!-- price -->
+		<div class="flex items-center gap-3">
+			<span *ngIf="displaySecondLine">Price:</span>
+			<span>{{ stockSummary.quote.price | currency }}</span>
+			<span
+				appPercentageIncrease
+				[useCurrencySign]="true"
+				[changeValues]="{
+          change: stockSummary.quote.change,
+          changePercentage: stockSummary.quote.changesPercentage,
+      }"
+			></span>
+		</div>
+	</div>
+	<!-- second line -->
+	<div *ngIf="displaySecondLine" class="flex items-center justify-between">
+		<!-- market cap -->
+		<div class="space-x-2">
+			<span>Market Cap.:</span>
+			<span>{{ stockSummary.quote.marketCap | largeNumberFormatter }}</span>
+		</div>
+		<!-- volume -->
+		<div class="flex items-center gap-3">
+			<span>Volume:</span>
+			<span>{{ stockSummary.quote.avgVolume | largeNumberFormatter }}</span>
+			<span
+				appPercentageIncrease
+				[currentValues]="{
+          value: stockSummary.quote.avgVolume,
+          valueToCompare: stockSummary.quote.volume,
+      }"
+			></span>
+		</div>
+	</div>
+</div>

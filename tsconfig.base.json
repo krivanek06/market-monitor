@@ -15,7 +15,16 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@market-monitor/shared-types": ["libs/shared-types/src/index.ts"]
+      "@market-monitor/api": ["libs/api/src/index.ts"],
+      "@market-monitor/components": ["libs/components/src/index.ts"],
+      "@market-monitor/directives": ["libs/directives/src/index.ts"],
+      "@market-monitor/modules/stock-visualization": [
+        "libs/modules/stock-visualization/src/index.ts"
+      ],
+      "@market-monitor/pipes": ["libs/pipes/src/index.ts"],
+      "@market-monitor/services": ["libs/services/src/index.ts"],
+      "@market-monitor/shared-types": ["libs/shared-types/src/index.ts"],
+      "@market-monitor/utils": ["libs/utils/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

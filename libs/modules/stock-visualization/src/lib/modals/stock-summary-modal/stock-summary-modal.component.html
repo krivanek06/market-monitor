@@ -1,0 +1,13 @@
+<app-dialog-close-header (dialogCloseEmitter)="onCancel()" title="Stock Summary"></app-dialog-close-header>
+
+<mat-dialog-content>
+	<!-- price & volume chart -->
+	<ng-container *ngIf="stockHistoricalPrice$ | async as stockHistoricalPrice; else chartSkeleton">
+		<app-asset-price-chart [historicalPrice]="stockHistoricalPrice" [heightPx]="420"></app-asset-price-chart>
+	</ng-container>
+</mat-dialog-content>
+
+<!-- skeleton chart -->
+<ng-template #chartSkeleton>
+	<div class="g-skeleton h-[420px]"></div>
+</ng-template>
