@@ -1,11 +1,8 @@
-import {
-  MostPerformingStocks,
-  StockPriceChange,
-} from './financial-modeling-starter.model';
+import { MostPerformingStocks, PriceChange } from './financial-modeling-starter.model';
 import { StockSummary } from './firebase-stock-data.model';
 
 export type MarketOverview = {
-  sp500Change: StockPriceChange;
+  sp500Change: PriceChange;
   lastUpdate: string;
   stockTopGainers: MostPerformingStocks[];
   stockTopLosers: MostPerformingStocks[];
@@ -13,7 +10,7 @@ export type MarketOverview = {
 };
 
 export type MarketOverviewResponse = {
-  sp500Change: StockPriceChange;
+  sp500Change: PriceChange;
   lastUpdate: string;
   stockTopGainers: StockSummary[];
   stockTopLosers: StockSummary[];

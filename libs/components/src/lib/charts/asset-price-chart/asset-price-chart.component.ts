@@ -1,12 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ColorScheme, HistoricalPrice } from '@market-monitor/shared-types';
 import { ChartConstructor, GeneralFunctionUtil } from '@market-monitor/utils';
 
@@ -29,10 +22,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
     </highcharts-chart>
   `,
 })
-export class AssetPriceChartComponent
-  extends ChartConstructor
-  implements OnInit, OnChanges
-{
+export class AssetPriceChartComponent extends ChartConstructor implements OnInit, OnChanges {
   @Input() heightPx = 550;
   @Input() historicalPrice!: HistoricalPrice[];
 
@@ -64,6 +54,9 @@ export class AssetPriceChartComponent
       },
       yAxis: [
         {
+          visible: false,
+        },
+        {
           title: {
             text: '',
           },
@@ -76,20 +69,6 @@ export class AssetPriceChartComponent
           tickPixelInterval: 40,
           minorGridLineWidth: 0,
           visible: true,
-        },
-        {
-          title: {
-            text: '',
-          },
-          startOnTick: false,
-          endOnTick: false,
-          gridLineColor: '#66666655',
-          opposite: true,
-          gridLineWidth: 1,
-          minorTickInterval: 'auto',
-          tickPixelInterval: 40,
-          minorGridLineWidth: 0,
-          visible: false,
         },
       ],
       xAxis: {
@@ -112,7 +91,7 @@ export class AssetPriceChartComponent
           color: '#bababa',
           fontSize: '13px',
         },
-        y: 20,
+        y: 15,
       },
       scrollbar: {
         enabled: false,
@@ -134,8 +113,7 @@ export class AssetPriceChartComponent
         },
         shared: true,
         //useHTML: true,
-        headerFormat:
-          '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
+        headerFormat: '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
 
         pointFormatter: function () {
           const that = this as any;
@@ -193,7 +171,7 @@ export class AssetPriceChartComponent
           type: 'area',
           name: 'Price',
           data: price,
-          yAxis: 0,
+          yAxis: 1,
           color: ColorScheme.PRIMARY_VAR,
         },
         {
@@ -201,7 +179,8 @@ export class AssetPriceChartComponent
           name: 'Volume',
           data: volume,
           color: '#f48605',
-          yAxis: 1,
+          yAxis: 0,
+          opacity: 0.75,
         },
       ],
     };

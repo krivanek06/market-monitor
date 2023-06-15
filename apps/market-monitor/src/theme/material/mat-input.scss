@@ -1,29 +1,29 @@
 .mat-mdc-input-element:disabled,
 .mat-mdc-form-field-type-mat-native-select.mat-mdc-form-field-disabled .mat-mdc-form-field-infix::after {
-	color: var(--disable-default) !important;
+  color: var(--disable-default) !important;
 }
 
 fieldset:disabled {
-	mat-form-field {
-		.mat-mdc-text-field-wrapper {
-			background-color: var(--disable-default) !important;
-		}
-	}
+  mat-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: var(--disable-default) !important;
+    }
+  }
 }
 
 .mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__input {
-	color: var(--gray-medium) !important;
+  color: var(--gray-medium) !important;
 }
 
 input,
 textarea {
-	font-size: 16px !important;
+  font-size: 16px !important;
 }
 
 .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-	background-color: var(--background-light) !important;
+  background-color: var(--background-medium) !important;
 }
 
 ::-webkit-input-placeholder {
-	color: var(--gray-light) !important;
+  color: var(--gray-light) !important;
 }

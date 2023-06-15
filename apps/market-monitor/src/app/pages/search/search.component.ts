@@ -1,10 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  inject,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -15,7 +10,7 @@ import {
   StockStorageService,
   StockSummaryModalComponent,
 } from '@market-monitor/modules/stock-visualization';
-import { StockSummary } from '@market-monitor/shared-types';
+import { SCREEN_DIALOGS, StockSummary } from '@market-monitor/shared-types';
 import { Observable } from 'rxjs';
 @Component({
   selector: 'app-search',
@@ -38,10 +33,8 @@ export class SearchComponent implements OnInit {
   stockStorageService = inject(StockStorageService);
   dialog = inject(MatDialog);
 
-  favoriteStocks$: Observable<StockSummary[]> =
-    this.stockStorageService.getFavoriteStocks();
-  searchedStocks$: Observable<StockSummary[]> =
-    this.stockStorageService.getLastSearchedStocks();
+  favoriteStocks$: Observable<StockSummary[]> = this.stockStorageService.getFavoriteStocks();
+  searchedStocks$: Observable<StockSummary[]> = this.stockStorageService.getLastSearchedStocks();
 
   searchControl = new FormControl<StockSummary | null>(null);
 
@@ -60,7 +53,7 @@ export class SearchComponent implements OnInit {
       data: {
         symbol: summary.id,
       },
-      panelClass: ['g-mat-dialog-big'],
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });
   }
 }

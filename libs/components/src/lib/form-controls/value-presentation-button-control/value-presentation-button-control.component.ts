@@ -4,7 +4,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { DefaultImgDirective } from '@market-monitor/directives';
 import { InArrayPipe } from '@market-monitor/pipes';
-import { ValuePresentItem } from '@market-monitor/shared-types';
+import { ValuePresentItem } from './value-present-item.model';
 
 @Component({
   selector: 'app-value-presentation-button-control',

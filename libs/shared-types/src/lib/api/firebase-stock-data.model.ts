@@ -3,11 +3,11 @@ import {
   CompanyOutlook,
   ESGDataQuarterly,
   ESGDataRatingYearly,
+  PriceChange,
   PriceTarget,
   Profile,
   SectorPeers,
   StockNews,
-  StockPriceChange,
   SymbolQuote,
   UpgradesDowngrades,
 } from './financial-modeling-starter.model';
@@ -18,7 +18,7 @@ export type StockSummary = {
   reloadData: boolean;
   quote: SymbolQuote;
   profile: Profile;
-  priceChange: StockPriceChange;
+  priceChange: PriceChange;
   summaryLastUpdate: string;
 };
 

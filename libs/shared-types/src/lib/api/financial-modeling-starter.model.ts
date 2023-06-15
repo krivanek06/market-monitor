@@ -468,18 +468,18 @@ export type SectorPeers = {
   peersList: string[];
 };
 
-export type StockPriceChange = {
+export type PriceChange = {
   symbol: string;
-  '1D': number;
-  '5D': number;
-  '1M': number;
-  '3M': number;
-  '6M': number;
-  ytd: number;
-  '1Y': number;
-  '3Y': number;
-  '5Y': number;
-  '10Y': number;
+  '1D': number | null;
+  '5D': number | null;
+  '1M': number | null;
+  '3M': number | null;
+  '6M': number | null;
+  ytd: number | null;
+  '1Y': number | null;
+  '3Y': number | null;
+  '5Y': number | null;
+  '10Y': number | null;
   max: number;
 };
 

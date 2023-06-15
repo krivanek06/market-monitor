@@ -1,0 +1,19 @@
+<div class="flex items-center justify-around">
+  <div *ngFor="let keys of priceChangeKeys">
+    <span class="text-center">{{ keys.label }}</span>
+    <div class="flex items-center justify-center">
+      <span
+        appPercentageIncrease
+        [changeValues]="{ changePercentage: mainSymbolPriceChange | priceChangeItemSelector : keys.key }"
+      ></span>
+      <span *ngIf="additionalSymbolPriceChange">/</span>
+      <span
+        *ngIf="additionalSymbolPriceChange"
+        appPercentageIncrease
+        [changeValues]="{ changePercentage: additionalSymbolPriceChange | priceChangeItemSelector : keys.key }"
+      ></span>
+    </div>
+  </div>
+</div>
+
+{{ additionalSymbolPriceChange?.['1D'] }}

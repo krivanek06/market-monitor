@@ -1,18 +1,43 @@
-<app-dialog-close-header (dialogCloseEmitter)="onCancel()" title="Stock Summary"></app-dialog-close-header>
+<ng-container *ngIf="stockSummary$ | async as stockSummary">
+  <!-- heading -->
+  <div class="flex items-center justify-between p-4">
+    <div class="flex items-center gap-3">
+      <img appDefaultImg [src]="stockSummary.profile.image" alt="Stock Image" class="w-11 h-11" />
+      <div class="grid">
+        <span class="text-md text-wt-gray-light">{{ stockSummary.id }}</span>
+        <span class="text-lg text-wt-gray-medium">{{ stockSummary.profile.companyName }}</span>
+      </div>
+    </div>
 
-<mat-dialog-content>
-  <ng-container *ngIf="stockSummary$ | async as stockSummary">
+    <div>
+      <button mat-icon-button color="warn" type="button" (click)="onCancel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <mat-dialog-content>
     <!-- display main metrics -->
     <div class="mb-4">
       <app-summary-main-metrics [stockSummary]="stockSummary"></app-summary-main-metrics>
     </div>
 
+    <!-- time period change -->
+    <div class="my-4">
+      <app-price-change-items [mainSymbolPriceChange]="stockSummary.priceChange"></app-price-change-items>
+    </div>
+
+    <!-- time period form control -->
+    <div class="my-4">
+      <app-time-period-buttons [formControl]="timePeriodFormControl"></app-time-period-buttons>
+    </div>
+
     <!-- price & volume chart -->
-    <ng-container *ngIf="stockHistoricalPrice$ | async as stockHistoricalPrice; else chartSkeleton">
-      <app-asset-price-chart [historicalPrice]="stockHistoricalPrice" [heightPx]="420"></app-asset-price-chart>
+    <ng-container *ngIf="stockHistoricalPrice().length > 0; else chartSkeleton">
+      <app-asset-price-chart [historicalPrice]="stockHistoricalPrice()" [heightPx]="420"></app-asset-price-chart>
     </ng-container>
-  </ng-container>
-</mat-dialog-content>
+  </mat-dialog-content>
+</ng-container>
 
 <!-- skeleton chart -->
 <ng-template #chartSkeleton>
