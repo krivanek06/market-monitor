@@ -1,0 +1,20 @@
+@layer components {
+  .g-screen-size-max-xl {
+    max-width: 1980px;
+
+    @screen lg {
+      margin: auto;
+      width: 95%;
+    }
+
+    @screen 2xl {
+      margin: auto;
+      width: 90%;
+    }
+
+    @screen 2xl {
+      margin: auto;
+      width: 85%;
+    }
+  }
+}
