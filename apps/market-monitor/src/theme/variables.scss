@@ -1,64 +1,66 @@
 :root {
-	/* primary */
-	--primary: #0e71c3;
+  --screen-max-width: 1680px;
 
-	/* success */
-	--success: #03aa06;
+  /* primary */
+  --primary: #0e71c3;
 
-	/* danger */
-	--danger: #d42626;
+  /* success */
+  --success: #03aa06;
 
-	/* gray */
-	--gray-dark: #181818;
-	--gray-medium: #3a3a3a;
-	--gray-light: #5d5d5d;
+  /* danger */
+  --danger: #d42626;
 
-	/* table */
-	--table-hover: #01383855;
-	--table-border: #002424;
+  /* gray */
+  --gray-dark: #181818;
+  --gray-medium: #3a3a3a;
+  --gray-light: #5d5d5d;
 
-	/* background */
-	--background-dark: #a5a5a5;
-	--background-medium: #d5d5d5;
-	--background-light: #f6f6f6;
+  /* table */
+  --table-hover: #01383855;
+  --table-border: #002424;
 
-	--background-dashboard: #eaeaea;
+  /* background */
+  --background-dark: #a5a5a5;
+  --background-medium: #d5d5d5;
+  --background-light: #f6f6f6;
 
-	--disable-default: #3e5156;
+  --background-dashboard: #eaeaea;
+
+  --disable-default: #3e5156;
 }
 
 :root .dark-theme {
-	/* primary */
-	--primary: #12aaaa;
+  /* primary */
+  --primary: #12aaaa;
 
-	/* success */
-	--success: #25b329;
+  /* success */
+  --success: #25b329;
 
-	/* danger */
-	--danger: #d42626;
+  /* danger */
+  --danger: #d42626;
 
-	/* gray */
-	--gray-dark: #818690;
-	--gray-medium: #9ca3af;
-	--gray-light: #dcdcdc;
+  /* gray */
+  --gray-dark: #818690;
+  --gray-medium: #9ca3af;
+  --gray-light: #dcdcdc;
 
-	/* table */
-	--table-hover: #01383855;
-	--table-border: #002424;
+  /* table */
+  --table-hover: #01383855;
+  --table-border: #002424;
 
-	/* background */
-	--background-dark: #031e1e;
-	--background-medium: #013838;
-	--background-light: #064d4d;
+  /* background */
+  --background-dark: #031e1e;
+  --background-medium: #013838;
+  --background-light: #064d4d;
 
-	--background-dashboard: linear-gradient(
-		168.19deg,
-		#000607 1.34%,
-		#000808 1.35%,
-		#031b1b 33.36%,
-		#021a1a 52.32%,
-		#030000 98.93%
-	);
+  --background-dashboard: linear-gradient(
+    168.19deg,
+    #000607 1.34%,
+    #000808 1.35%,
+    #031b1b 33.36%,
+    #021a1a 52.32%,
+    #030000 98.93%
+  );
 
-	--disable-default: #3e5156;
+  --disable-default: #3e5156;
 }

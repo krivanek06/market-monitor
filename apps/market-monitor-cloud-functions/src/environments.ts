@@ -1,6 +1,6 @@
 // environments
 export const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
-export const FINANCIAL_MODELING_KEY = 'f12e9d44e3170501b45157946e3b58d2';
+export const FINANCIAL_MODELING_KEY = '645c1db245d983df8a2d31bc39b92c32';
 export const FINANCIAL_MODELING_URL = 'https://financialmodelingprep.com/api';
 
 /*

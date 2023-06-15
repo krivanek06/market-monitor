@@ -1,4 +1,7 @@
 :host {
   display: block;
-  @apply g-screen-size-max-xl;
+  max-width: var(--screen-max-width);
+  padding-left: 8px;
+  padding-right: 8px;
+  margin: auto;
 }

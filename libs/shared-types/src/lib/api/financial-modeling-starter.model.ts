@@ -16,8 +16,8 @@ export type SymbolQuote = {
   avgVolume: number;
   open: number;
   previousClose: number;
-  eps: number;
-  pe: number;
+  eps: number | null;
+  pe: number | null;
   earningsAnnouncement: string;
   sharesOutstanding: number;
   timestamp: number;
