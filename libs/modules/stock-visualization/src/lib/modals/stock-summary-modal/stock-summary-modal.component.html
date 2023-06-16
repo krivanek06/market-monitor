@@ -10,7 +10,7 @@
     </div>
 
     <div>
-      <button mat-icon-button color="warn" type="button" (click)="onCancel()">
+      <button mat-icon-button mat-dialog-close color="warn" type="button">
         <mat-icon>close</mat-icon>
       </button>
     </div>
@@ -34,6 +34,13 @@
 
     <!-- price & volume chart -->
     <ng-container *ngIf="stockHistoricalPrice().length > 0; else chartSkeleton">
+      <div class="flex justify-between text-wt-gray-light">
+        <span>Historical Prices</span>
+        <span
+          >{{ stockHistoricalPrice()[0].date | date : 'h:mm a MMMM d, y' }} -
+          {{ stockHistoricalPrice()[stockHistoricalPrice().length - 1].date | date : 'h:mm a MMMM d, y' }}</span
+        >
+      </div>
       <app-asset-price-chart [historicalPrice]="stockHistoricalPrice()" [heightPx]="420"></app-asset-price-chart>
     </ng-container>
   </mat-dialog-content>

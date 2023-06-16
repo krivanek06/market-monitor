@@ -56,7 +56,7 @@ export class StockSummaryModalComponent {
         .pipe(
           startWith(this.timePeriodFormControl.value),
           tap(() => this.stockHistoricalPrice.set([])),
-          switchMap((period) => this.stocksApiService.getSymbolHistoricalPrices(this.data.symbol, period)),
+          switchMap((period) => this.stocksApiService.getStockHistoricalPrices(this.data.symbol, period)),
           takeUntilDestroyed(),
           catchError((err) => {
             console.error(err);
@@ -66,9 +66,5 @@ export class StockSummaryModalComponent {
         .subscribe((prices) => {
           this.stockHistoricalPrice.set(prices);
         });
-  }
-
-  onCancel() {
-    this.dialogRef.close();
   }
 }

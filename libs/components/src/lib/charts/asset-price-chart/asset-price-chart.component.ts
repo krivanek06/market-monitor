@@ -25,6 +25,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
 export class AssetPriceChartComponent extends ChartConstructor implements OnInit, OnChanges {
   @Input() heightPx = 550;
   @Input() historicalPrice!: HistoricalPrice[];
+  @Input() showTitle = false;
 
   ngOnInit(): void {}
   ngOnChanges(changes: SimpleChanges): void {
@@ -36,10 +37,9 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
   }
 
   private initChart(data: HistoricalPrice[]) {
-    const reveresData = data.reverse();
-    const price = reveresData.map((d) => d.close);
-    const volume = reveresData.map((d) => d.volume);
-    const dates = reveresData.map((d) => d.date);
+    const price = data.map((d) => d.close);
+    const volume = data.map((d) => d.volume);
+    const dates = data.map((d) => d.date);
     console.log({ price, volume, dates });
 
     this.chartOptions = {
@@ -85,7 +85,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         },
       },
       title: {
-        text: 'Historical Price Chart',
+        text: this.showTitle ? 'Historical Price Chart' : '',
         align: 'left',
         style: {
           color: '#bababa',
