@@ -1,4 +1,4 @@
-<ng-container *ngIf="stockSummary$ | async as stockSummary">
+<ng-container *ngIf="stockSummary$ | async as stockSummary; else showModalSkeleton">
   <!-- heading -->
   <div class="flex items-center justify-between p-4">
     <div class="flex items-center gap-3">
@@ -26,7 +26,7 @@
       type="button"
     >
       <mat-icon>do_not_disturb_on</mat-icon>
-      Remove from favorite
+      favorites - remove
     </button>
     <button
       *ngIf="!isSymbolInFavoriteSignal()"
@@ -36,12 +36,11 @@
       type="button"
     >
       <mat-icon>star</mat-icon>
-      Add to favorite
+      favorite - add
     </button>
 
     <button type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
-      Go to Details
-      <mat-icon>chevron_right</mat-icon>
+      <div class="flex gap-2"><span class="hidden sm:block">Go to</span> <span>Details</span></div>
     </button>
   </mat-dialog-actions>
 
@@ -64,11 +63,15 @@
     <!-- price & volume chart -->
     <ng-container *ngIf="stockHistoricalPrice().length > 0; else chartSkeleton">
       <div class="flex justify-between text-wt-gray-light">
-        <span>Historical Prices</span>
-        <span
-          >{{ stockHistoricalPrice()[0].date | date : 'h:mm a MMMM d, y' }} -
-          {{ stockHistoricalPrice()[stockHistoricalPrice().length - 1].date | date : 'h:mm a MMMM d, y' }}</span
-        >
+        <span class="hidden sm:block">Historical Prices</span>
+        <span class="hidden sm:block">
+          {{ stockHistoricalPrice()[0].date | date : 'h:mm a MMMM d, y' }} -
+          {{ stockHistoricalPrice()[stockHistoricalPrice().length - 1].date | date : 'h:mm a MMMM d, y' }}
+        </span>
+        <span class="block sm:hidden">
+          {{ stockHistoricalPrice()[0].date | date : 'MMM d, y' }} -
+          {{ stockHistoricalPrice()[stockHistoricalPrice().length - 1].date | date : 'MMM d, y' }}
+        </span>
       </div>
       <app-asset-price-chart [historicalPrice]="stockHistoricalPrice()" [heightPx]="420"></app-asset-price-chart>
     </ng-container>
@@ -78,4 +81,9 @@
 <!-- skeleton chart -->
 <ng-template #chartSkeleton>
   <div class="g-skeleton h-[420px]"></div>
+</ng-template>
+
+<!-- skeleton modal -->
+<ng-template #showModalSkeleton>
+  <app-summary-modal-skeleton></app-summary-modal-skeleton>
 </ng-template>

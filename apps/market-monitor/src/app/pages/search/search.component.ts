@@ -46,12 +46,12 @@ export class SearchComponent implements OnInit {
       console.log(value);
       if (value) {
         this.stockStorageService.addSearchStock(value.id);
+        this.onSummaryClick(value);
       }
     });
   }
 
   onSummaryClick(summary: StockSummary) {
-    console.log(summary);
     this.dialog.open(StockSummaryModalComponent, {
       data: {
         symbol: summary.id,

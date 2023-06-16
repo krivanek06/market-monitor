@@ -16,7 +16,7 @@ export class PriceChangeItemsComponent {
   @Input() additionalSymbolPriceChange?: PriceChange | null = null;
 
   priceChangeKeys: Array<{ key: keyof PriceChange; label: string }> = [
-    { key: '1D', label: '1 day' },
+    //{ key: '1D', label: '1 day' },
     { key: '1M', label: '1 month' },
     { key: '3M', label: '3 months' },
     { key: '6M', label: '6 months' },

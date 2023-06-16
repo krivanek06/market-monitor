@@ -18,6 +18,7 @@ import { DialogServiceUtil } from '@market-monitor/utils';
 import { Observable, catchError, startWith, switchMap, tap } from 'rxjs';
 import { StockStorageService } from '../../services';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
+import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-modal-skeleton.component';
 @Component({
   selector: 'app-stock-summary-modal',
   standalone: true,
@@ -33,6 +34,7 @@ import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main
     TimePeriodButtonsComponent,
     PriceChangeItemsComponent,
     MatTooltipModule,
+    SummaryModalSkeletonComponent,
   ],
   templateUrl: './stock-summary-modal.component.html',
   styleUrls: ['./stock-summary-modal.component.scss'],
