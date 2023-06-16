@@ -16,6 +16,35 @@
     </div>
   </div>
 
+  <!-- action buttons -->
+  <mat-dialog-actions class="flex justify-between px-4">
+    <button
+      *ngIf="isSymbolInFavoriteSignal()"
+      mat-stroked-button
+      color="accent"
+      (click)="onAddToFavorite()"
+      type="button"
+    >
+      <mat-icon>do_not_disturb_on</mat-icon>
+      Remove from favorite
+    </button>
+    <button
+      *ngIf="!isSymbolInFavoriteSignal()"
+      mat-stroked-button
+      color="accent"
+      (click)="onAddToFavorite()"
+      type="button"
+    >
+      <mat-icon>star</mat-icon>
+      Add to favorite
+    </button>
+
+    <button type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
+      Go to Details
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </mat-dialog-actions>
+
   <mat-dialog-content>
     <!-- display main metrics -->
     <div class="mb-4">

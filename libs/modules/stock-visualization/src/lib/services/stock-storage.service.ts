@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { StocksApiService } from '@market-monitor/api';
 import { StorageService } from '@market-monitor/services';
 import { StockSummary } from '@market-monitor/shared-types';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { StockStorageData } from '../models';
 
 // TODO: if user authenticated - saved these data into firestore
@@ -22,11 +22,16 @@ export class StockStorageService extends StorageService<StockStorageData> {
   }
 
   getLastSearchedStocks(): Observable<StockSummary[]> {
-    return this.favoriteStocks$.asObservable();
+    return this.lastSearchedStocks$.asObservable();
   }
 
-  getFavoriteStocks(): Observable<StockSummary[]> {
-    return this.lastSearchedStocks$.asObservable();
+  toggleSearchStock(symbol: string): boolean {
+    if (this.isSymbolInLastSearched(symbol)) {
+      this.removeLastSearchedStock(symbol);
+      return false;
+    }
+    this.addSearchStock(symbol);
+    return true;
   }
 
   addSearchStock(symbol: string): void {
@@ -38,10 +43,7 @@ export class StockStorageService extends StorageService<StockStorageData> {
 
     // load data from api
     this.stocksApiService.getStockSummary(symbol).subscribe((stockSummary) => {
-      this.lastSearchedStocks$.next([
-        ...this.lastSearchedStocks$.getValue(),
-        stockSummary,
-      ]);
+      this.lastSearchedStocks$.next([...this.lastSearchedStocks$.getValue(), stockSummary]);
     });
 
     // save into storage
@@ -59,17 +61,28 @@ export class StockStorageService extends StorageService<StockStorageData> {
     const savedData = this.getData();
 
     // remove from lastSearchedStocks$
-    this.lastSearchedStocks$.next(
-      this.lastSearchedStocks$.getValue().filter((s) => s.id !== symbol)
-    );
+    this.lastSearchedStocks$.next(this.lastSearchedStocks$.getValue().filter((s) => s.id !== symbol));
 
     // remove from storage
     this.saveData({
       ...savedData,
-      lastSearchedStocks: savedData.lastSearchedStocks.filter(
-        (s) => s !== symbol
-      ),
+      lastSearchedStocks: savedData.lastSearchedStocks.filter((s) => s !== symbol),
     });
+  }
+
+  // -----------------------------
+
+  getFavoriteStocks(): Observable<StockSummary[]> {
+    return this.favoriteStocks$.asObservable();
+  }
+
+  toggleFavoriteSymbol(symbol: string): boolean {
+    if (this.isSymbolInFavorite(symbol)) {
+      this.removeFavoriteStock(symbol);
+      return false;
+    }
+    this.addFavoriteSymbol(symbol);
+    return true;
   }
 
   addFavoriteSymbol(symbol: string): void {
@@ -81,10 +94,7 @@ export class StockStorageService extends StorageService<StockStorageData> {
 
     // load data from api
     this.stocksApiService.getStockSummary(symbol).subscribe((stockSummary) => {
-      this.favoriteStocks$.next([
-        ...this.favoriteStocks$.getValue(),
-        stockSummary,
-      ]);
+      this.favoriteStocks$.next([...this.favoriteStocks$.getValue(), stockSummary]);
     });
 
     // save into storage
@@ -98,13 +108,18 @@ export class StockStorageService extends StorageService<StockStorageData> {
     return this.getData().favoriteStocks.includes(symbol);
   }
 
+  isSymbolInFavoriteObs(symbol: string): Observable<boolean> {
+    return this.favoriteStocks$.asObservable().pipe(
+      map((values) => values.map((d) => d.id)),
+      map((symbols) => symbols.includes(symbol))
+    );
+  }
+
   removeFavoriteStock(symbol: string): void {
     const savedData = this.getData();
 
     // remove from favoriteStocks$
-    this.favoriteStocks$.next(
-      this.favoriteStocks$.getValue().filter((s) => s.id !== symbol)
-    );
+    this.favoriteStocks$.next(this.favoriteStocks$.getValue().filter((s) => s.id !== symbol));
 
     // remove from storage
     this.saveData({
@@ -117,19 +132,15 @@ export class StockStorageService extends StorageService<StockStorageData> {
     const data = this.getData();
 
     // load favorite stocks from api
-    this.stocksApiService
-      .getStockSummaries(data.favoriteStocks)
-      .subscribe((stockSummaries) => {
-        console.log('stockSummaries', stockSummaries);
-        this.favoriteStocks$.next(stockSummaries);
-      });
+    this.stocksApiService.getStockSummaries(data.favoriteStocks).subscribe((stockSummaries) => {
+      console.log('stockSummaries', stockSummaries);
+      this.favoriteStocks$.next(stockSummaries);
+    });
 
     // load last searched stocks from api
-    this.stocksApiService
-      .getStockSummaries(data.lastSearchedStocks)
-      .subscribe((stockSummaries) => {
-        console.log('stockSummaries', stockSummaries);
-        this.lastSearchedStocks$.next(stockSummaries);
-      });
+    this.stocksApiService.getStockSummaries(data.lastSearchedStocks).subscribe((stockSummaries) => {
+      console.log('stockSummaries', stockSummaries);
+      this.lastSearchedStocks$.next(stockSummaries);
+    });
   }
 }

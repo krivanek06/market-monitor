@@ -29,14 +29,19 @@ export const getassethistoricalprices = onRequest(async (request, response: Resp
   // resolve what data we have to load
   const loadingPeriod = resolveLoadingPeriod(period);
   // load data
-  const data = await getHistoricalPrices(symbol, loadingPeriod.loadingPeriod, loadingPeriod.from, loadingPeriod.to);
+  const historicalPriceData = await getHistoricalPrices(
+    symbol,
+    loadingPeriod.loadingPeriod,
+    loadingPeriod.from,
+    loadingPeriod.to
+  );
   // save data to firestore
   await firestoreCollectionRef.set({
-    data,
+    data: historicalPriceData,
     lastUpdate: new Date().toISOString(),
   });
   // return data
-  const reveredData = firestoreData.data.reverse();
+  const reveredData = historicalPriceData.reverse();
   response.send(reveredData);
 });
 

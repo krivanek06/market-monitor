@@ -6,7 +6,7 @@ import {
   StockSummary,
   SymbolHistoricalPeriods,
 } from '@market-monitor/shared-types';
-import { Observable } from 'rxjs';
+import { Observable, retry } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -30,8 +30,8 @@ export class StocksApiService {
   }
 
   getStockHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {
-    return this.http.get<HistoricalPrice[]>(
-      `${this.endpointFunctions}/getassethistoricalprices?symbol=${symbol}&period=${period}`
-    );
+    return this.http
+      .get<HistoricalPrice[]>(`${this.endpointFunctions}/getassethistoricalprices?symbol=${symbol}&period=${period}`)
+      .pipe(retry(3));
   }
 }

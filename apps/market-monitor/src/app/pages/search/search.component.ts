@@ -11,6 +11,7 @@ import {
   StockSummaryModalComponent,
 } from '@market-monitor/modules/stock-visualization';
 import { SCREEN_DIALOGS, StockSummary } from '@market-monitor/shared-types';
+import { DialogServiceModule } from '@market-monitor/utils';
 import { Observable } from 'rxjs';
 @Component({
   selector: 'app-search',
@@ -24,6 +25,7 @@ import { Observable } from 'rxjs';
     MatButtonModule,
     StockSummaryModalComponent,
     MatDialogModule,
+    DialogServiceModule,
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
@@ -42,7 +44,7 @@ export class SearchComponent implements OnInit {
     this.searchControl.valueChanges.subscribe((value) => {
       console.log(value);
       if (value) {
-        this.stockStorageService.addFavoriteSymbol(value?.id);
+        this.stockStorageService.addSearchStock(value.id);
       }
     });
   }

@@ -1,38 +1,39 @@
 <div class="grid pt-20 xl:grid-cols-4 gap-x-10 gap-y-10">
-	<div>Stock News</div>
-	<div class="xl:col-span-2 w-full max-w-[640px] mx-auto">
-		<h1 class="text-center">Search Stock</h1>
-		<app-stock-basic-search [formControl]="searchControl"></app-stock-basic-search>
-	</div>
+  <div>Stock News</div>
+  <div class="xl:col-span-2 w-full max-w-[640px] mx-auto">
+    <h1 class="text-center">Search Stock</h1>
+    <app-stock-basic-search [formControl]="searchControl"></app-stock-basic-search>
+  </div>
 
-	<div class="hidden gap-8 sm:flex max-xl:justify-around xl:flex-col max-xl:px-5">
-		<!-- favorite stocks -->
-		<div class="flex-1">
-			<app-general-card title="Favorite Stocks" *ngIf="favoriteStocks$ | async as favoriteStocks">
-				<ng-container *ngIf="favoriteStocks.length > 0">
-					<button mat-button *ngFor="let summary of favoriteStocks" class="w-full" type="button">
-						<app-stock-display-item [displaySecondLine]="false" [stockSummary]="summary"></app-stock-display-item>
-					</button>
-				</ng-container>
-				<div *ngIf="favoriteStocks.length === 0">No favorite stock exists</div>
-			</app-general-card>
-		</div>
-		<!-- Last searched stocks -->
-		<div class="flex-1">
-			<app-general-card title="Last Searched Stocks" *ngIf="searchedStocks$ | async as searchedStocks">
-				<ng-container *ngIf="searchedStocks.length > 0">
-					<button
-						mat-button
-						*ngFor="let summary of searchedStocks"
-						(click)="onSummaryClick(summary)"
-						class="w-full"
-						type="button"
-					>
-						<app-stock-display-item [displaySecondLine]="false" [stockSummary]="summary"></app-stock-display-item>
-					</button>
-				</ng-container>
-				<div *ngIf="searchedStocks.length === 0">No searched stock exists</div>
-			</app-general-card>
-		</div>
-	</div>
+  <div class="hidden gap-8 sm:flex max-xl:justify-around xl:flex-col max-xl:px-5">
+    <!-- favorite stocks -->
+    <div class="flex-1">
+      <app-general-card title="Favorite Stocks" *ngIf="favoriteStocks$ | async as favoriteStocks">
+        <ng-container *ngIf="favoriteStocks.length > 0">
+          <button mat-button *ngFor="let summary of favoriteStocks" class="w-full" type="button">
+            <app-stock-display-item [displaySecondLine]="false" [stockSummary]="summary"></app-stock-display-item>
+          </button>
+        </ng-container>
+        <div *ngIf="favoriteStocks.length === 0">No favorite stock exists</div>
+      </app-general-card>
+    </div>
+
+    <!-- Last searched stocks -->
+    <div class="flex-1">
+      <app-general-card title="Last Searched Stocks" *ngIf="searchedStocks$ | async as searchedStocks">
+        <ng-container *ngIf="searchedStocks.length > 0">
+          <button
+            mat-button
+            *ngFor="let summary of searchedStocks"
+            (click)="onSummaryClick(summary)"
+            class="w-full"
+            type="button"
+          >
+            <app-stock-display-item [displaySecondLine]="false" [stockSummary]="summary"></app-stock-display-item>
+          </button>
+        </ng-container>
+        <div *ngIf="searchedStocks.length === 0">No searched stock exists</div>
+      </app-general-card>
+    </div>
+  </div>
 </div>

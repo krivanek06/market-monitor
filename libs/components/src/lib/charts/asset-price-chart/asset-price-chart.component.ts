@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ColorScheme, HistoricalPrice } from '@market-monitor/shared-types';
 import { ChartConstructor, GeneralFunctionUtil } from '@market-monitor/utils';
-
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({
@@ -73,11 +72,12 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
       ],
       xAxis: {
         visible: true,
-        //crosshair: true,
+        crosshair: true,
         type: 'category',
         categories: dates,
+        gridLineColor: '#66666644',
         labels: {
-          rotation: -20,
+          rotation: -12,
           style: {
             color: '#8e8e8e',
             font: '10px Trebuchet MS, Verdana, sans-serif',
