@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { StocksApiService } from '@market-monitor/api';
 import { StorageService } from '@market-monitor/services';
 import { StockSummary } from '@market-monitor/shared-types';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { BehaviorSubject, Observable, forkJoin, map } from 'rxjs';
 import { StockStorageData } from '../models';
 
 // TODO: if user authenticated - saved these data into firestore
@@ -12,6 +12,7 @@ import { StockStorageData } from '../models';
 export class StockStorageService extends StorageService<StockStorageData> {
   private favoriteStocks$ = new BehaviorSubject<StockSummary[]>([]);
   private lastSearchedStocks$ = new BehaviorSubject<StockSummary[]>([]);
+  private loadedData$ = new BehaviorSubject<boolean>(false);
 
   constructor(private stocksApiService: StocksApiService) {
     super('STORAGE_STOCK_SERVICE', {
@@ -20,6 +21,11 @@ export class StockStorageService extends StorageService<StockStorageData> {
     });
     this.initService();
   }
+  isDataLoaded(): Observable<boolean> {
+    return this.loadedData$.asObservable();
+  }
+
+  // -----------------------------
 
   getLastSearchedStocks(): Observable<StockSummary[]> {
     return this.lastSearchedStocks$.asObservable();
@@ -131,16 +137,14 @@ export class StockStorageService extends StorageService<StockStorageData> {
   private initService(): void {
     const data = this.getData();
 
-    // load favorite stocks from api
-    this.stocksApiService.getStockSummaries(data.favoriteStocks).subscribe((stockSummaries) => {
-      console.log('stockSummaries', stockSummaries);
-      this.favoriteStocks$.next(stockSummaries);
-    });
-
-    // load last searched stocks from api
-    this.stocksApiService.getStockSummaries(data.lastSearchedStocks).subscribe((stockSummaries) => {
-      console.log('stockSummaries', stockSummaries);
-      this.lastSearchedStocks$.next(stockSummaries);
+    // load favorite stocks from api and last searched stocks from api
+    forkJoin([
+      this.stocksApiService.getStockSummaries(data.favoriteStocks),
+      this.stocksApiService.getStockSummaries(data.lastSearchedStocks),
+    ]).subscribe(([favoriteStocks, lastSearchedStocks]) => {
+      this.favoriteStocks$.next(favoriteStocks);
+      this.lastSearchedStocks$.next(lastSearchedStocks);
+      this.loadedData$.next(true);
     });
   }
 }

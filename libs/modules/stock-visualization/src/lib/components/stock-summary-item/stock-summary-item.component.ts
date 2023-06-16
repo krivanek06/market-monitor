@@ -5,18 +5,18 @@ import { LargeNumberFormatterPipe } from '@market-monitor/pipes';
 import { StockSummary } from '@market-monitor/shared-types';
 
 @Component({
-  selector: 'app-stock-display-item',
+  selector: 'app-stock-summary-item',
   standalone: true,
   imports: [
     CommonModule,
     PercentageIncreaseDirective,
     LargeNumberFormatterPipe,
   ],
-  templateUrl: './stock-display-item.component.html',
-  styleUrls: ['./stock-display-item.component.scss'],
+  templateUrl: './stock-summary-item.component.html',
+  styleUrls: ['./stock-summary-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockDisplayItemComponent {
+export class StockSummaryItemComponent {
   @Input({ required: true }) stockSummary!: StockSummary;
   @Input() displaySecondLine = false;
 }

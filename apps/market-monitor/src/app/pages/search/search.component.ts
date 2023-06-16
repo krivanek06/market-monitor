@@ -6,8 +6,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { GeneralCardComponent } from '@market-monitor/components';
 import {
   StockBasicSearchComponent,
-  StockDisplayItemComponent,
   StockStorageService,
+  StockSummaryItemTableComponent,
   StockSummaryModalComponent,
 } from '@market-monitor/modules/stock-visualization';
 import { SCREEN_DIALOGS, StockSummary } from '@market-monitor/shared-types';
@@ -20,12 +20,12 @@ import { Observable } from 'rxjs';
     CommonModule,
     StockBasicSearchComponent,
     GeneralCardComponent,
-    StockDisplayItemComponent,
     ReactiveFormsModule,
     MatButtonModule,
     StockSummaryModalComponent,
     MatDialogModule,
     DialogServiceModule,
+    StockSummaryItemTableComponent,
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
@@ -37,6 +37,7 @@ export class SearchComponent implements OnInit {
 
   favoriteStocks$: Observable<StockSummary[]> = this.stockStorageService.getFavoriteStocks();
   searchedStocks$: Observable<StockSummary[]> = this.stockStorageService.getLastSearchedStocks();
+  isStockSummaryLoaded$: Observable<boolean> = this.stockStorageService.isDataLoaded();
 
   searchControl = new FormControl<StockSummary | null>(null);
 

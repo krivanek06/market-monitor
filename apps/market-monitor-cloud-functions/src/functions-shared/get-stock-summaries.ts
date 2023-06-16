@@ -2,7 +2,6 @@ import { StockSummary } from '@market-monitor/shared-types';
 import { isBefore, subMinutes } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { getCompanyQuote, getDatabaseStockSummaryRef, getProfile, getSymbolsPriceChanges } from '../api';
-import { ensureFind } from '../utils';
 
 /**
  * check symbols against database if data not older than 3 min return, else fetch new data
@@ -44,25 +43,33 @@ export const getSummaries = async (symbolsArray: string[]): Promise<StockSummary
   ]);
 
   // map to correct data structure
-  const newData = symbolsToUpdate.map((symbol) => {
-    // find data from loaded API - ensureFind throws error if not found
-    const quote = ensureFind(updatedQuotes.find((q) => q.symbol === symbol));
-    const profile = ensureFind(updatedProfiles.find((p) => p.symbol === symbol));
-    const priceChange = ensureFind(stockPriceChange.find((p) => p.symbol === symbol));
+  const newData = symbolsToUpdate
+    .map((symbol) => {
+      // find data from loaded API - ensureFind throws error if not found
+      const quote = updatedQuotes.find((q) => q.symbol === symbol);
+      const profile = updatedProfiles.find((p) => p.symbol === symbol);
+      const priceChange = stockPriceChange.find((p) => p.symbol === symbol);
 
-    // get data from DB or set to null
-    const firebaseRecord = firebaseData.find((d) => d.id === symbol);
+      // if any of the data is missing, return undefined
+      if (!quote || !profile || !priceChange) {
+        return undefined;
+      }
 
-    const stockSummary: StockSummary = {
-      id: symbol,
-      quote,
-      profile,
-      priceChange,
-      reloadData: firebaseRecord?.reloadData ?? false,
-      summaryLastUpdate: new Date().toISOString(),
-    };
-    return stockSummary;
-  });
+      // get data from DB or set to null
+      const firebaseRecord = firebaseData.find((d) => d.id === symbol);
+
+      const stockSummary: StockSummary = {
+        id: symbol,
+        quote,
+        profile,
+        priceChange,
+        reloadData: firebaseRecord?.reloadData ?? false,
+        summaryLastUpdate: new Date().toISOString(),
+      };
+      return stockSummary;
+    })
+    // filter out undefined values
+    .filter((d) => !!d);
 
   // save updated data to DB by batch
   const batch = firestore().batch();

@@ -82,9 +82,13 @@ export const searchTicker = async (symbolPrefix: string, isCrypto = false): Prom
   const cryptoExchange = 'CRYPTO';
   const ignoredSymbols = ['.', '-']; // if symbol con any of the ignored symbols, filter them out
   const usedExchange = isCrypto ? cryptoExchange : stockExchange;
-  const url = `${FINANCIAL_MODELING_URL}/v3/search-ticker?query=${symbolPrefix}&limit=20&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const url = `${FINANCIAL_MODELING_URL}/v3/search-ticker?query=${symbolPrefix}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<TickerSearch[]>(url);
-  const filteredResponse = response.data.filter((ticker) => !ignoredSymbols.includes(ticker.symbol));
+
+  // check if symbol contains any of the ignored symbols
+  const filteredResponse = response.data.filter((ticker) => {
+    return !ignoredSymbols.some((ignoredSymbol) => ticker.symbol.includes(ignoredSymbol));
+  });
   return filteredResponse;
 };
 
