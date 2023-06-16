@@ -1,1 +1,2 @@
-export * from './stock-display-item/stock-display-item.component';
+export * from './stock-summary-item/stock-summary-item.component';
+export * from './tables';

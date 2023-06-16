@@ -1,0 +1,21 @@
+<app-general-card [title]="tableTitle">
+  <ng-container *ngIf="stockSummaries && !showSkeleton">
+    <ng-container *ngIf="stockSummaries.length > 0">
+      <button
+        mat-button
+        *ngFor="let summary of stockSummaries"
+        (click)="onSummaryClick(summary)"
+        class="w-full"
+        type="button"
+      >
+        <app-stock-summary-item [displaySecondLine]="false" [stockSummary]="summary"></app-stock-summary-item>
+      </button>
+    </ng-container>
+    <div *ngIf="stockSummaries.length === 0">No searched stock exists</div>
+  </ng-container>
+
+  <!-- skeleton -->
+  <ng-container *ngIf="showSkeleton">
+    <div *ngRange="10" class="h-10 mb-1 g-skeleton"></div>
+  </ng-container>
+</app-general-card>

@@ -1,18 +1,12 @@
-import {
-  Directive,
-  Input,
-  OnInit,
-  Renderer2,
-  ViewContainerRef,
-} from '@angular/core';
+import { Directive, Input, OnInit, Renderer2, ViewContainerRef } from '@angular/core';
 import { GeneralFunctionUtil } from '@market-monitor/utils';
 
 /**
  * Use this if you already have the prct diff & diff
  */
 export type ChangeValues = {
-  change?: number;
-  changePercentage?: number;
+  change?: number | null;
+  changePercentage?: number | null;
 };
 
 /**
@@ -44,9 +38,7 @@ export class PercentageIncreaseDirective implements OnInit {
 
   ngOnInit(): void {
     if (this.changeValues) {
-      const change = this.changeValues.change
-        ? this.round2Dec(this.changeValues.change)
-        : null;
+      const change = this.changeValues.change ? this.round2Dec(this.changeValues.change) : null;
       const changesPercentage = this.changeValues.changePercentage
         ? this.round2Dec(this.changeValues.changePercentage)
         : null;
@@ -55,20 +47,15 @@ export class PercentageIncreaseDirective implements OnInit {
     }
 
     if (this.currentValues) {
-      const value =
-        this.currentValues.value - this.currentValues.valueToCompare;
+      const value = this.currentValues.value - this.currentValues.valueToCompare;
       const change = this.round2Dec(value);
-      const changesPercentage = this.round2Dec(
-        (value / this.currentValues.valueToCompare) * 100
-      );
+      const changesPercentage = this.round2Dec((value / this.currentValues.valueToCompare) * 100);
       const hideValue = this.currentValues.hideValue;
       this.createElement(change, changesPercentage, hideValue);
       return;
     }
 
-    throw new Error(
-      '[PerceptageIncreaseDirective]: define changeValues or currentValues'
-    );
+    throw new Error('[PerceptageIncreaseDirective]: define changeValues or currentValues');
   }
 
   /**
@@ -77,11 +64,7 @@ export class PercentageIncreaseDirective implements OnInit {
    * @param change - changed value between the current and compared to item
    * @param changesPercentage - changed prct between the current and compared to item
    */
-  private createElement(
-    change: number | null,
-    changesPercentage: number | null,
-    hideValue = false
-  ): void {
+  private createElement(change: number | null, changesPercentage: number | null, hideValue = false): void {
     // create elements
     const wrapper = this.vr.element.nativeElement;
 
@@ -95,9 +78,7 @@ export class PercentageIncreaseDirective implements OnInit {
 
     // color to use
     const color =
-      (!!change && change > 0) || (!!changesPercentage && changesPercentage > 0)
-        ? 'text-wt-success'
-        : 'text-wt-danger';
+      (!!change && change > 0) || (!!changesPercentage && changesPercentage > 0) ? 'text-wt-success' : 'text-wt-danger';
 
     // add scss classes
     this.rederer2.addClass(wrapper, 'flex');
@@ -116,16 +97,12 @@ export class PercentageIncreaseDirective implements OnInit {
 
       // percentage
       const changesPercentageSpan = this.rederer2.createElement('span');
-      const changesPercentageText = this.rederer2.createText(
-        `${String(changesPercentage)}%`
-      );
+      const changesPercentageText = this.rederer2.createText(`${String(changesPercentage)}%`);
 
       // mat-icon
       const matIcon = this.rederer2.createElement('mat-icon');
       const matIconText =
-        changesPercentage > 0
-          ? this.rederer2.createText('trending_up')
-          : this.rederer2.createText('trending_down');
+        changesPercentage > 0 ? this.rederer2.createText('trending_up') : this.rederer2.createText('trending_down');
 
       // have value and icon in one div for 'col' styling
       this.rederer2.addClass(valueChangeAndIconWrapper, 'flex');
@@ -141,17 +118,12 @@ export class PercentageIncreaseDirective implements OnInit {
       this.rederer2.addClass(changesPercentageSpan, color);
 
       // additional classes
-      this.changesPercentageSpanClasses.forEach((c) =>
-        this.rederer2.addClass(changesPercentageSpan, c)
-      );
+      this.changesPercentageSpanClasses.forEach((c) => this.rederer2.addClass(changesPercentageSpan, c));
 
       // attach to each other
       this.rederer2.appendChild(matIcon, matIconText);
       this.rederer2.appendChild(changesPercentageSpan, changesPercentageText);
-      this.rederer2.appendChild(
-        valueChangeAndIconWrapper,
-        changesPercentageSpan
-      );
+      this.rederer2.appendChild(valueChangeAndIconWrapper, changesPercentageSpan);
       this.rederer2.appendChild(valueChangeAndIconWrapper, matIcon);
       this.rederer2.appendChild(wrapper, valueChangeAndIconWrapper);
     }
@@ -162,17 +134,13 @@ export class PercentageIncreaseDirective implements OnInit {
 
       const changeSpan = this.rederer2.createElement('span');
       const text = `${sign} ${GeneralFunctionUtil.formatLargeNumber(change)}`;
-      const changeText = !!changesPercentage
-        ? this.rederer2.createText(`(${text})`)
-        : this.rederer2.createText(text);
+      const changeText = !!changesPercentage ? this.rederer2.createText(`(${text})`) : this.rederer2.createText(text);
 
       // changesPercentage does not exist -> changeSpan will be color
       this.rederer2.addClass(changeSpan, color);
 
       // additional classes
-      this.changesSpanClasses.forEach((c) =>
-        this.rederer2.addClass(changeSpan, c)
-      );
+      this.changesSpanClasses.forEach((c) => this.rederer2.addClass(changeSpan, c));
 
       // show on DOM
       this.rederer2.appendChild(changeSpan, changeText);

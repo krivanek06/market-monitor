@@ -1,3 +1,16 @@
 :host {
   display: block;
+  max-width: var(--screen-max-width);
+  padding-left: 8px;
+  padding-right: 8px;
+  margin: auto;
+  padding: 16px;
+
+  @screen sm {
+    padding: 32px;
+  }
+
+  @screen xl {
+    padding: 16px;
+  }
 }

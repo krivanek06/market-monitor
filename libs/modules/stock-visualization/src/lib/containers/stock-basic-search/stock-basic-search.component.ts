@@ -35,7 +35,7 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { StockDisplayItemComponent } from '../../components';
+import { StockSummaryItemComponent } from '../../components';
 @Component({
   selector: 'app-stock-basic-search',
   standalone: true,
@@ -50,7 +50,7 @@ import { StockDisplayItemComponent } from '../../components';
     DefaultImgDirective,
     MatDividerModule,
     MatIconModule,
-    StockDisplayItemComponent,
+    StockSummaryItemComponent,
   ],
   templateUrl: './stock-basic-search.component.html',
   styleUrls: ['./stock-basic-search.component.scss'],

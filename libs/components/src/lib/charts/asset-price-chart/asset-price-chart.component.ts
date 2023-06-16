@@ -1,15 +1,7 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ColorScheme, HistoricalPrice } from '@market-monitor/shared-types';
 import { ChartConstructor, GeneralFunctionUtil } from '@market-monitor/utils';
-
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({
@@ -29,12 +21,10 @@ import { HighchartsChartModule } from 'highcharts-angular';
     </highcharts-chart>
   `,
 })
-export class AssetPriceChartComponent
-  extends ChartConstructor
-  implements OnInit, OnChanges
-{
+export class AssetPriceChartComponent extends ChartConstructor implements OnInit, OnChanges {
   @Input() heightPx = 550;
   @Input() historicalPrice!: HistoricalPrice[];
+  @Input() showTitle = false;
 
   ngOnInit(): void {}
   ngOnChanges(changes: SimpleChanges): void {
@@ -46,10 +36,9 @@ export class AssetPriceChartComponent
   }
 
   private initChart(data: HistoricalPrice[]) {
-    const reveresData = data.reverse();
-    const price = reveresData.map((d) => d.close);
-    const volume = reveresData.map((d) => d.volume);
-    const dates = reveresData.map((d) => d.date);
+    const price = data.map((d) => d.close);
+    const volume = data.map((d) => d.volume);
+    const dates = data.map((d) => d.date);
     console.log({ price, volume, dates });
 
     this.chartOptions = {
@@ -64,18 +53,7 @@ export class AssetPriceChartComponent
       },
       yAxis: [
         {
-          title: {
-            text: '',
-          },
-          startOnTick: false,
-          endOnTick: false,
-          gridLineColor: '#66666655',
-          opposite: true,
-          gridLineWidth: 1,
-          minorTickInterval: 'auto',
-          tickPixelInterval: 40,
-          minorGridLineWidth: 0,
-          visible: true,
+          visible: false,
         },
         {
           title: {
@@ -83,22 +61,23 @@ export class AssetPriceChartComponent
           },
           startOnTick: false,
           endOnTick: false,
-          gridLineColor: '#66666655',
+          gridLineColor: '#66666644',
           opposite: false,
           gridLineWidth: 1,
           minorTickInterval: 'auto',
           tickPixelInterval: 40,
           minorGridLineWidth: 0,
-          visible: false,
+          visible: true,
         },
       ],
       xAxis: {
         visible: true,
-        //crosshair: true,
+        crosshair: true,
         type: 'category',
         categories: dates,
+        gridLineColor: '#66666644',
         labels: {
-          rotation: -20,
+          rotation: -12,
           style: {
             color: '#8e8e8e',
             font: '10px Trebuchet MS, Verdana, sans-serif',
@@ -106,13 +85,13 @@ export class AssetPriceChartComponent
         },
       },
       title: {
-        text: 'Historical Price Chart',
+        text: this.showTitle ? 'Historical Price Chart' : '',
         align: 'left',
         style: {
           color: '#bababa',
           fontSize: '13px',
         },
-        y: 20,
+        y: 15,
       },
       scrollbar: {
         enabled: false,
@@ -134,8 +113,7 @@ export class AssetPriceChartComponent
         },
         shared: true,
         //useHTML: true,
-        headerFormat:
-          '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
+        headerFormat: '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
 
         pointFormatter: function () {
           const that = this as any;
@@ -193,7 +171,7 @@ export class AssetPriceChartComponent
           type: 'area',
           name: 'Price',
           data: price,
-          yAxis: 0,
+          yAxis: 1,
           color: ColorScheme.PRIMARY_VAR,
         },
         {
@@ -201,7 +179,8 @@ export class AssetPriceChartComponent
           name: 'Volume',
           data: volume,
           color: '#f48605',
-          yAxis: 1,
+          yAxis: 0,
+          opacity: 0.75,
         },
       ],
     };

@@ -1,0 +1,17 @@
+<div class="flex flex-col justify-around gap-4 sm:flex-row sm:flex-wrap">
+  <div *ngFor="let keys of priceChangeKeys" class="flex flex-row sm:flex-col max-sm:justify-between">
+    <span class="text-center">{{ keys.label }}</span>
+    <div class="flex items-center justify-center">
+      <span
+        appPercentageIncrease
+        [changeValues]="{ changePercentage: mainSymbolPriceChange | priceChangeItemSelector : keys.key }"
+      ></span>
+      <span *ngIf="additionalSymbolPriceChange">/</span>
+      <span
+        *ngIf="additionalSymbolPriceChange"
+        appPercentageIncrease
+        [changeValues]="{ changePercentage: additionalSymbolPriceChange | priceChangeItemSelector : keys.key }"
+      ></span>
+    </div>
+  </div>
+</div>

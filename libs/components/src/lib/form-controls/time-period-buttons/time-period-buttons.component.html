@@ -1,0 +1,23 @@
+<!-- large screen buttons -->
+<div class="flex-wrap items-center hidden gap-3 md:flex">
+  <button
+    *ngFor="let period of displayTimePeriods"
+    mat-stroked-button
+    type="button"
+    class="flex-1"
+    [color]="period.value === activeTimePeriod.value ? 'primary' : ''"
+    (click)="onTimePeriodSelect(period.value)"
+  >
+    {{ period.labelButton }}
+  </button>
+</div>
+
+<!-- select on small screen -->
+<mat-form-field class="block w-full md:hidden">
+  <mat-label>Time Period</mat-label>
+  <mat-select [value]="activeTimePeriod.value" (selectionChange)="onTimePeriodSelect($event.value)">
+    <mat-option *ngFor="let period of displayTimePeriods" [value]="period.value">
+      {{ period.labelSelect }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>

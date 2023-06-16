@@ -1,0 +1,50 @@
+<div class="flex justify-around">
+  <!-- price -->
+  <app-value-presentation-card title="Price" additionalClasses="h-full" class="max-sm:w-full min-w-[275px]">
+    <div class="flex items-center justify-center gap-3">
+      <span>{{ stockSummary.quote.price | currency }}</span>
+      <span
+        appPercentageIncrease
+        [useCurrencySign]="true"
+        [changeValues]="{
+        change: stockSummary.quote.change,
+        changePercentage: stockSummary.quote.changesPercentage,
+    }"
+      ></span>
+    </div>
+  </app-value-presentation-card>
+
+  <!-- market cap -->
+  <app-value-presentation-card title="Market Cap." additionalClasses="h-full" class="hidden sm:block min-w-[150px]">
+    <div class="text-center">{{ stockSummary.profile.mktCap | largeNumberFormatter }}</div>
+  </app-value-presentation-card>
+
+  <!-- volume -->
+  <!-- <app-value-presentation-card title="Volume" additionalClasses="h-full" class="hidden lg:block">
+    <div>
+      <span>{{ stockSummary.quote.volume | largeNumberFormatter }}</span>
+      <span
+        appPercentageIncrease
+        [currentValues]="{
+        value: stockSummary.quote.volume,
+        valueToCompare: stockSummary.quote.avgVolume,
+    }"
+      ></span>
+    </div>
+  </app-value-presentation-card> -->
+
+  <!-- PE -->
+  <app-value-presentation-card additionalClasses="h-full" title="PE" class="hidden md:block min-w-[100px]">
+    <div class="text-center">{{ stockSummary.quote.pe ?? 'N/A' }}</div>
+  </app-value-presentation-card>
+
+  <!-- EPS -->
+  <app-value-presentation-card additionalClasses="h-full" title="EPS" class="hidden lg:block min-w-[100px]">
+    <div class="text-center">{{ stockSummary.quote.eps ?? 'N/A' }}</div>
+  </app-value-presentation-card>
+
+  <!-- Sector -->
+  <app-value-presentation-card title="Sector" additionalClasses="h-full" class="hidden xl:block">
+    <div>{{ stockSummary.profile.industry }}</div>
+  </app-value-presentation-card>
+</div>

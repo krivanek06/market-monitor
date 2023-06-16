@@ -1,13 +1,89 @@
-<app-dialog-close-header (dialogCloseEmitter)="onCancel()" title="Stock Summary"></app-dialog-close-header>
+<ng-container *ngIf="stockSummary$ | async as stockSummary; else showModalSkeleton">
+  <!-- heading -->
+  <div class="flex items-center justify-between p-4">
+    <div class="flex items-center gap-3">
+      <img appDefaultImg [src]="stockSummary.profile.image" alt="Stock Image" class="w-11 h-11" />
+      <div class="grid">
+        <span class="text-md text-wt-gray-light">{{ stockSummary.id }}</span>
+        <span class="text-lg text-wt-gray-medium">{{ stockSummary.profile.companyName }}</span>
+      </div>
+    </div>
 
-<mat-dialog-content>
-	<!-- price & volume chart -->
-	<ng-container *ngIf="stockHistoricalPrice$ | async as stockHistoricalPrice; else chartSkeleton">
-		<app-asset-price-chart [historicalPrice]="stockHistoricalPrice" [heightPx]="420"></app-asset-price-chart>
-	</ng-container>
-</mat-dialog-content>
+    <div>
+      <button mat-icon-button mat-dialog-close color="warn" type="button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- action buttons -->
+  <mat-dialog-actions class="flex justify-between px-4">
+    <button
+      *ngIf="isSymbolInFavoriteSignal()"
+      mat-stroked-button
+      color="accent"
+      (click)="onAddToFavorite()"
+      type="button"
+    >
+      <mat-icon>do_not_disturb_on</mat-icon>
+      favorites - remove
+    </button>
+    <button
+      *ngIf="!isSymbolInFavoriteSignal()"
+      mat-stroked-button
+      color="accent"
+      (click)="onAddToFavorite()"
+      type="button"
+    >
+      <mat-icon>star</mat-icon>
+      favorite - add
+    </button>
+
+    <button type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
+      <div class="flex gap-2"><span class="hidden sm:block">Go to</span> <span>Details</span></div>
+    </button>
+  </mat-dialog-actions>
+
+  <mat-dialog-content>
+    <!-- display main metrics -->
+    <div class="mb-4">
+      <app-summary-main-metrics [stockSummary]="stockSummary"></app-summary-main-metrics>
+    </div>
+
+    <!-- time period change -->
+    <div class="my-4">
+      <app-price-change-items [mainSymbolPriceChange]="stockSummary.priceChange"></app-price-change-items>
+    </div>
+
+    <!-- time period form control -->
+    <div class="my-4">
+      <app-time-period-buttons [formControl]="timePeriodFormControl"></app-time-period-buttons>
+    </div>
+
+    <!-- price & volume chart -->
+    <ng-container *ngIf="stockHistoricalPrice().length > 0; else chartSkeleton">
+      <div class="flex justify-between text-wt-gray-light">
+        <span class="hidden sm:block">Historical Prices</span>
+        <span class="hidden sm:block">
+          {{ stockHistoricalPrice()[0].date | date : 'h:mm a MMMM d, y' }} -
+          {{ stockHistoricalPrice()[stockHistoricalPrice().length - 1].date | date : 'h:mm a MMMM d, y' }}
+        </span>
+        <span class="block sm:hidden">
+          {{ stockHistoricalPrice()[0].date | date : 'MMM d, y' }} -
+          {{ stockHistoricalPrice()[stockHistoricalPrice().length - 1].date | date : 'MMM d, y' }}
+        </span>
+      </div>
+      <app-asset-price-chart [historicalPrice]="stockHistoricalPrice()" [heightPx]="420"></app-asset-price-chart>
+    </ng-container>
+  </mat-dialog-content>
+</ng-container>
 
 <!-- skeleton chart -->
 <ng-template #chartSkeleton>
-	<div class="g-skeleton h-[420px]"></div>
+  <div class="g-skeleton h-[420px]"></div>
+</ng-template>
+
+<!-- skeleton modal -->
+<ng-template #showModalSkeleton>
+  <app-summary-modal-skeleton></app-summary-modal-skeleton>
 </ng-template>

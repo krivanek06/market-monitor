@@ -7,25 +7,20 @@ import {
   ESGDataRatingYearly,
   Earnings,
   HistoricalPrice,
+  PriceChange,
   PriceTarget,
   Profile,
   SectorPeers,
   StockNews,
-  StockPriceChange,
   SymbolQuote,
   TickerSearch,
   UpgradesDowngrades,
 } from '@market-monitor/shared-types';
 import axios from 'axios';
-import {
-  FINANCIAL_MODELING_KEY,
-  FINANCIAL_MODELING_URL,
-} from '../environments';
+import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from '../environments';
 import { StockDataHistoricalLoadingPeriods } from '../model';
 
-export const getCompanyQuote = async (
-  symbols: string[]
-): Promise<SymbolQuote[]> => {
+export const getCompanyQuote = async (symbols: string[]): Promise<SymbolQuote[]> => {
   const symbol = symbols.join(',');
   const url = `${FINANCIAL_MODELING_URL}/v3/quote/${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<SymbolQuote[]>(url);
@@ -39,9 +34,7 @@ export const getProfile = async (symbols: string[]): Promise<Profile[]> => {
   return response.data;
 };
 
-export const getCompanyOutlook = async (
-  symbol: string
-): Promise<CompanyOutlook> => {
+export const getCompanyOutlook = async (symbol: string): Promise<CompanyOutlook> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/company-outlook?symbol=${symbol}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<CompanyOutlook>(url);
   return response.data;
@@ -84,19 +77,18 @@ export const getHistoricalPrices = async (
     "exchangeShortName": "CRYPTO"
   }]
  */
-export const searchTicker = async (
-  symbolPrefix: string,
-  isCrypto = false
-): Promise<TickerSearch[]> => {
+export const searchTicker = async (symbolPrefix: string, isCrypto = false): Promise<TickerSearch[]> => {
   const stockExchange = 'NASDAQ,NYSE';
   const cryptoExchange = 'CRYPTO';
   const ignoredSymbols = ['.', '-']; // if symbol con any of the ignored symbols, filter them out
   const usedExchange = isCrypto ? cryptoExchange : stockExchange;
-  const url = `${FINANCIAL_MODELING_URL}/v3/search-ticker?query=${symbolPrefix}&limit=20&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const url = `${FINANCIAL_MODELING_URL}/v3/search-ticker?query=${symbolPrefix}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<TickerSearch[]>(url);
-  const filteredResponse = response.data.filter(
-    (ticker) => !ignoredSymbols.includes(ticker.symbol)
-  );
+
+  // check if symbol contains any of the ignored symbols
+  const filteredResponse = response.data.filter((ticker) => {
+    return !ignoredSymbols.some((ignoredSymbol) => ticker.symbol.includes(ignoredSymbol));
+  });
   return filteredResponse;
 };
 
@@ -114,9 +106,7 @@ export const searchTicker = async (
     "industryRank": "7 out of 7"
   }]
  */
-export const getEsgRatingYearly = async (
-  symbol: string
-): Promise<ESGDataRatingYearly[]> => {
+export const getEsgRatingYearly = async (symbol: string): Promise<ESGDataRatingYearly[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/esg-environmental-social-governance-data-ratings?symbol=${symbol}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<ESGDataRatingYearly[]>(url);
   return response.data;
@@ -140,9 +130,7 @@ export const getEsgRatingYearly = async (
     "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019323000006/0000320193-23-000006-index.htm"
   }]
  */
-export const getEsgDataQuarterly = async (
-  symbol: string
-): Promise<ESGDataQuarterly[]> => {
+export const getEsgDataQuarterly = async (symbol: string): Promise<ESGDataQuarterly[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/esg-environmental-social-governance-data?symbol=${symbol}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<ESGDataQuarterly[]>(url);
   return response.data;
@@ -164,9 +152,7 @@ export const getEsgDataQuarterly = async (
     "priceWhenPosted": 178.6999
  * }]
  */
-export const getUpgradesDowngrades = async (
-  symbol: string
-): Promise<UpgradesDowngrades[]> => {
+export const getUpgradesDowngrades = async (symbol: string): Promise<UpgradesDowngrades[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/upgrades-downgrades?symbol=${symbol}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<UpgradesDowngrades[]>(url);
   return response.data;
@@ -188,9 +174,7 @@ export const getUpgradesDowngrades = async (
     "analystCompany": "Needham"
  }]
  */
-export const getPriceTarget = async (
-  symbol: string
-): Promise<PriceTarget[]> => {
+export const getPriceTarget = async (symbol: string): Promise<PriceTarget[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/price-target?symbol=${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<PriceTarget[]>(url);
   return response.data;
@@ -207,9 +191,7 @@ export const getPriceTarget = async (
     "estimatedEarning": 1.43
  }]
  */
-export const getCompanyEarnings = async (
-  symbol: string
-): Promise<Earnings[]> => {
+export const getCompanyEarnings = async (symbol: string): Promise<Earnings[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/earnings-surprise/${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<Earnings[]>(url);
   return response.data;
@@ -270,9 +252,7 @@ export const getAnalystEstimates = async (
     "fiscalDateEnding": "2023-07-01"
   }]
  */
-export const getAnalystEstimatesEarnings = async (
-  symbol: string
-): Promise<AnalystEstimatesEarnings[]> => {
+export const getAnalystEstimatesEarnings = async (symbol: string): Promise<AnalystEstimatesEarnings[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v3/historical/earning_calendar/${symbol}?limit=80&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<AnalystEstimatesEarnings[]>(url);
   // last 3 data have null as epsEstimated
@@ -292,9 +272,7 @@ export const getAnalystEstimatesEarnings = async (
     "peersList": ["LPL", ...]
   }]
  */
-export const getSectorPeersForSymbols = async (
-  symbols: string[]
-): Promise<SectorPeers[]> => {
+export const getSectorPeersForSymbols = async (symbols: string[]): Promise<SectorPeers[]> => {
   const symbolString = symbols.join(',');
   const url = `${FINANCIAL_MODELING_URL}/v4/stock_peers?symbol=${symbolString}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<SectorPeers[]>(url);
@@ -319,13 +297,16 @@ export const getSectorPeersForSymbols = async (
     "max": 182407.02924
   }]
  */
-export const getStockPriceChange = async (
-  symbols: string[]
-): Promise<StockPriceChange[]> => {
+export const getSymbolsPriceChanges = async (symbols: string[]): Promise<PriceChange[]> => {
   const symbolString = symbols.join(',');
   const url = `${FINANCIAL_MODELING_URL}/v3/stock-price-change/${symbolString}?apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<StockPriceChange[]>(url);
+  const response = await axios.get<PriceChange[]>(url);
   return response.data;
+};
+
+export const getSymbolPrice = async (symbol: string): Promise<PriceChange> => {
+  const response = await getSymbolsPriceChanges([symbol]);
+  return response[0];
 };
 
 /**
