@@ -1,0 +1,20 @@
+<!-- tabs -->
+<div class="md:flex md:justify-end">
+  <mat-tab-group
+    *ngIf="observedChange$ | async; else showSelect"
+    [selectedIndex]="selectedValueSignal()?.index"
+    (selectedTabChange)="onSelectTabChange($event)"
+  >
+    <mat-tab *ngFor="let option of displayOptions" [label]="option.label"></mat-tab>
+  </mat-tab-group>
+</div>
+
+<!-- select -->
+<ng-template #showSelect>
+  <mat-form-field class="w-full">
+    <mat-label>Options</mat-label>
+    <mat-select [value]="selectedValueSignal()?.value" (selectionChange)="onSelectChange($event)">
+      <mat-option *ngFor="let option of displayOptions" [value]="option.value">{{ option.label }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>

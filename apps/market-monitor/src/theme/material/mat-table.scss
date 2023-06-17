@@ -1,76 +1,76 @@
 table[mat-table] {
-	background: transparent;
-	width: 100%;
+  background: transparent;
+  width: 100%;
 
-	thead {
-		tr {
-			th {
-				@apply text-sm text-wt-gray-dark;
-			}
-		}
-	}
+  thead {
+    tr {
+      th {
+        @apply text-sm text-wt-gray-dark;
+      }
+    }
+  }
 
-	tbody {
-		tr {
-			td {
-				@apply text-wt-gray-medium text-base;
-				border-bottom: 1px solid var(--table-border);
+  tbody {
+    tr {
+      td {
+        @apply text-wt-gray-medium text-base;
+        border-bottom: 1px solid var(--table-border);
 
-				&:first-child {
-					@apply pl-0 sm:pl-4;
-				}
-			}
-		}
-	}
+        &:first-child {
+          @apply pl-0 sm:pl-4;
+        }
+      }
+    }
+  }
 
-	.mat-mdc-row {
-		transition: All 0.3s ease-out;
-		cursor: pointer;
-		border-radius: 8px;
-		height: 60px;
+  .mat-mdc-row {
+    transition: All 0.3s ease-out;
+    cursor: pointer;
+    border-radius: 8px;
+    height: 60px;
 
-		@screen md {
-			height: 50px;
-		}
+    @screen md {
+      height: 50px;
+    }
 
-		&:hover {
-			background-color: var(--table-hover);
-		}
-	}
+    &:hover {
+      background-color: var(--table-hover) !important;
+    }
+  }
 
-	th.mat-mdc-header-cell:last-of-type,
-	td.mat-mdc-cell:last-of-type,
-	td.mat-mdc-footer-cell:last-of-type {
-		padding-right: 8px !important;
-	}
+  th.mat-mdc-header-cell:last-of-type,
+  td.mat-mdc-cell:last-of-type,
+  td.mat-mdc-footer-cell:last-of-type {
+    padding-right: 8px !important;
+  }
 }
 
 table[mat-table] tbody tr td {
-	color: var(--gray-medium);
+  color: var(--gray-medium);
 }
 
 .mat-mdc-table {
-	background: transparent !important;
+  background: transparent !important;
 }
 
 .g-table-disabled-row {
-	opacity: 0.55 !important;
-	pointer-events: none !important;
+  opacity: 0.55 !important;
+  pointer-events: none !important;
 }
 
 .mdc-data-table__cell,
 .mdc-data-table__header-cell {
-	padding: 0 !important;
+  padding: 0 !important;
 
-	@screen sm {
-		padding: 0 16px 0 16px !important;
-	}
+  @screen sm {
+    padding: 0 16px 0 16px !important;
+  }
 }
 
 .mdc-data-table__cell {
-	color: var(--gray-light) !important;
+  color: var(--gray-light) !important;
 }
 
 .mdc-data-table__header-cell {
-	color: var(--gray-medium) !important;
+  color: var(--gray-medium) !important;
 }

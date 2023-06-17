@@ -1,9 +1,6 @@
 import { MostPerformingStocks } from '@market-monitor/shared-types';
 import axios from 'axios';
-import {
-  FINANCIAL_MODELING_KEY,
-  FINANCIAL_MODELING_URL,
-} from '../environments';
+import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from '../environments';
 
 /**
  *
@@ -16,10 +13,8 @@ import {
     "changesPercentage": 111.7225
   }]
  */
-export const getMostPerformingStocks = async (
-  type: 'gainers' | 'losers' | 'actives'
-) => {
+export const getMostPerformingStocks = async (type: 'gainers' | 'losers' | 'actives') => {
   const url = `${FINANCIAL_MODELING_URL}/v3/stock_market/${type}?apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<MostPerformingStocks[]>(url);
-  return response.data.slice(0, 10);
+  return response.data.slice(0, 20);
 };

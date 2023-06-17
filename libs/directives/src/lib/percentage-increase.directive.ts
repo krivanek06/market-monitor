@@ -16,6 +16,7 @@ export type CurrentValues = {
   value: number;
   valueToCompare: number;
 
+  // whether to hide value and display only percentage change
   hideValue?: boolean;
 };
 

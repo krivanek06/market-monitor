@@ -1,18 +1,28 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { GeneralCardComponent } from '@market-monitor/components';
+import { MarketApiService } from '@market-monitor/api';
+import { GeneralCardComponent, TabSelectControlComponent } from '@market-monitor/components';
+import { RangeDirective } from '@market-monitor/directives';
 import {
   StockBasicSearchComponent,
   StockStorageService,
   StockSummaryItemTableComponent,
   StockSummaryModalComponent,
+  StockSummaryTableComponent,
 } from '@market-monitor/modules/stock-visualization';
-import { SCREEN_DIALOGS, StockSummary } from '@market-monitor/shared-types';
+import {
+  LabelValue,
+  MarketOverTopStocks,
+  MarketOverviewResponse,
+  SCREEN_DIALOGS,
+  StockSummary,
+} from '@market-monitor/shared-types';
 import { DialogServiceModule } from '@market-monitor/utils';
 import { Observable } from 'rxjs';
+
 @Component({
   selector: 'app-search',
   standalone: true,
@@ -26,6 +36,9 @@ import { Observable } from 'rxjs';
     MatDialogModule,
     DialogServiceModule,
     StockSummaryItemTableComponent,
+    StockSummaryTableComponent,
+    TabSelectControlComponent,
+    RangeDirective,
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
@@ -33,13 +46,31 @@ import { Observable } from 'rxjs';
 })
 export class SearchComponent implements OnInit {
   stockStorageService = inject(StockStorageService);
+  marketApiService = inject(MarketApiService);
   dialog = inject(MatDialog);
 
   favoriteStocks$: Observable<StockSummary[]> = this.stockStorageService.getFavoriteStocks();
   searchedStocks$: Observable<StockSummary[]> = this.stockStorageService.getLastSearchedStocks();
   isStockSummaryLoaded$: Observable<boolean> = this.stockStorageService.isDataLoaded();
+  marketOverview$: Observable<MarketOverviewResponse> = this.marketApiService.getMarketOverview();
 
+  /**
+   * form control for stock search
+   */
   searchControl = new FormControl<StockSummary | null>(null);
+
+  /**
+   * form control for top stocks
+   */
+  topStockDisplayControl = new FormControl<keyof MarketOverTopStocks<unknown>>('stockTopActive', { nonNullable: true });
+
+  displayInfoMobile = signal(false);
+
+  marketTopStocksOptions: LabelValue<keyof MarketOverTopStocks<unknown>>[] = [
+    { label: 'Most Active', value: 'stockTopActive' },
+    { label: 'Gainers', value: 'stockTopGainers' },
+    { label: 'Losers', value: 'stockTopLosers' },
+  ];
 
   ngOnInit(): void {
     this.searchControl.valueChanges.subscribe((value) => {
@@ -49,6 +80,10 @@ export class SearchComponent implements OnInit {
         this.onSummaryClick(value);
       }
     });
+  }
+
+  toggleDisplayedValues(): void {
+    this.displayInfoMobile.set(!this.displayInfoMobile());
   }
 
   onSummaryClick(summary: StockSummary) {
