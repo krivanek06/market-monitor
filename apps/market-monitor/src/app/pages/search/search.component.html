@@ -1,6 +1,6 @@
 <div>Stock News</div>
 
-<div class="grid md:grid-cols-2 xl:grid-cols-7 gap-x-10 gap-y-4">
+<div class="grid mb-10 md:grid-cols-2 xl:grid-cols-7 gap-x-10 gap-y-4">
   <!-- favorite stocks -->
   <div class="xl:col-span-2">
     <app-stock-summary-item-table
@@ -11,7 +11,7 @@
     ></app-stock-summary-item-table>
   </div>
 
-  <div class="md:col-span-2 xl:col-span-3 max-xl:order-first">
+  <div class="pt-20 md:col-span-2 xl:col-span-3 max-xl:order-first">
     <h1 class="text-center">Search Stock</h1>
     <app-stock-basic-search [formControl]="searchControl"></app-stock-basic-search>
   </div>
@@ -27,6 +27,24 @@
   </div>
 </div>
 
-<div *ngIf="marketOverview$ | async as marketOverview">
-  <app-stock-summary-table [stockSummaries]="marketOverview.stockTopActive"></app-stock-summary-table>
+<div class="">
+  <div class="flex items-start gap-3 mb-2 sm:justify-end">
+    <!-- select / tabs -->
+    <app-tab-select-control
+      [formControl]="topStockDisplayControl"
+      class="max-md:w-full"
+      [displayOptions]="marketTopStocksOptions"
+    ></app-tab-select-control>
+
+    <!-- button on small screen -->
+    <div class="w-full mt-2 sm:hidden">
+      <button mat-stroked-button class="w-full text-sm" (click)="toggleDisplayedValues()">
+        {{ showPriceSignal() ? 'Price +/-' : 'Info' }}
+      </button>
+    </div>
+  </div>
+
+  <ng-container *ngIf="marketOverview$ | async as marketOverview">
+    <app-stock-summary-table [stockSummaries]="marketOverview[topStockDisplayControl.value]"></app-stock-summary-table>
+  </ng-container>
 </div>

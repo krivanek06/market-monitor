@@ -56,13 +56,16 @@ export const getmarketoverview = onRequest(async (_, response: Response<MarketOv
     getSummaries(activesSymbols),
   ]);
 
+  // limit data in fireabase
+  const limit = 15;
+
   // construct response
   const responseData: MarketOverviewResponse = {
     sp500Change,
     lastUpdate: new Date().toISOString(),
-    stockTopGainers: gainersData,
-    stockTopLosers: losersData,
-    stockTopActive: activesData,
+    stockTopGainers: gainersData.slice(0, limit),
+    stockTopLosers: losersData.slice(0, limit),
+    stockTopActive: activesData.slice(0, limit),
   };
 
   // send response

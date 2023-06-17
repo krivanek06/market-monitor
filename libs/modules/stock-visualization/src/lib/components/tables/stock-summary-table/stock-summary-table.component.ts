@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, TrackByFunction, ViewChild, signal } from '@angular/core';
+import { Component, Input, TrackByFunction, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
@@ -53,13 +53,7 @@ export class StockSummaryTableComponent {
     '52WeekRange',
   ];
 
-  showDailyChangeSignal = signal(false);
-
   identity: TrackByFunction<StockSummary> = (index: number, item: StockSummary) => item.id;
-
-  toggleDailyChange(): void {
-    this.showDailyChangeSignal.set(!this.showDailyChangeSignal());
-  }
 
   onItemClicked(item: StockSummary): void {
     console.log(item);

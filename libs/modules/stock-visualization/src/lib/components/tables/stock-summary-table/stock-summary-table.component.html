@@ -1,12 +1,3 @@
-<div class="flex items-center justify-between mb-4 sm:p-2 md:hidden">
-  <div class="g-section-title">Holdings</div>
-
-  <!-- button on small screen -->
-  <button mat-stroked-button class="text-sm" (click)="toggleDailyChange()">
-    {{ showDailyChangeSignal() ? 'Daily +/-' : 'Invested +/-' }}
-  </button>
-</div>
-
 <table mat-table [dataSource]="dataSource" class="w-full" [trackBy]="identity">
   <!-- image & name -->
   <ng-container matColumnDef="symbol">
