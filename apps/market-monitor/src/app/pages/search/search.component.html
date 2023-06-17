@@ -26,3 +26,7 @@
     ></app-stock-summary-item-table>
   </div>
 </div>
+
+<div *ngIf="marketOverview$ | async as marketOverview">
+  <app-stock-summary-table [stockSummaries]="marketOverview.stockTopActive"></app-stock-summary-table>
+</div>

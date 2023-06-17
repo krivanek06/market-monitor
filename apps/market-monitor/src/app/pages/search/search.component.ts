@@ -3,14 +3,16 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MarketApiService } from '@market-monitor/api';
 import { GeneralCardComponent } from '@market-monitor/components';
 import {
   StockBasicSearchComponent,
   StockStorageService,
   StockSummaryItemTableComponent,
   StockSummaryModalComponent,
+  StockSummaryTableComponent,
 } from '@market-monitor/modules/stock-visualization';
-import { SCREEN_DIALOGS, StockSummary } from '@market-monitor/shared-types';
+import { MarketOverviewResponse, SCREEN_DIALOGS, StockSummary } from '@market-monitor/shared-types';
 import { DialogServiceModule } from '@market-monitor/utils';
 import { Observable } from 'rxjs';
 @Component({
@@ -26,6 +28,7 @@ import { Observable } from 'rxjs';
     MatDialogModule,
     DialogServiceModule,
     StockSummaryItemTableComponent,
+    StockSummaryTableComponent,
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
@@ -33,11 +36,13 @@ import { Observable } from 'rxjs';
 })
 export class SearchComponent implements OnInit {
   stockStorageService = inject(StockStorageService);
+  marketApiService = inject(MarketApiService);
   dialog = inject(MatDialog);
 
   favoriteStocks$: Observable<StockSummary[]> = this.stockStorageService.getFavoriteStocks();
   searchedStocks$: Observable<StockSummary[]> = this.stockStorageService.getLastSearchedStocks();
   isStockSummaryLoaded$: Observable<boolean> = this.stockStorageService.isDataLoaded();
+  marketOverview$: Observable<MarketOverviewResponse> = this.marketApiService.getMarketOverview();
 
   searchControl = new FormControl<StockSummary | null>(null);
 
