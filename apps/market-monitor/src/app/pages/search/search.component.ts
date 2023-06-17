@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MarketApiService } from '@market-monitor/api';
 import { GeneralCardComponent, TabSelectControlComponent } from '@market-monitor/components';
+import { RangeDirective } from '@market-monitor/directives';
 import {
   StockBasicSearchComponent,
   StockStorageService,
@@ -37,6 +38,7 @@ import { Observable } from 'rxjs';
     StockSummaryItemTableComponent,
     StockSummaryTableComponent,
     TabSelectControlComponent,
+    RangeDirective,
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],

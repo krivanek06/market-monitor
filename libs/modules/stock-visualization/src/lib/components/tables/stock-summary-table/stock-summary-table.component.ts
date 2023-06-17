@@ -46,10 +46,10 @@ export class StockSummaryTableComponent {
 
   displayedColumns: string[] = [
     'symbol',
+    'marketCap',
     'price',
     'priceMobile',
     'volume',
-    'marketCap',
     'shares',
     'pe',
     'eps',

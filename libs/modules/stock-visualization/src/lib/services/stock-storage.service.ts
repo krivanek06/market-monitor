@@ -49,7 +49,8 @@ export class StockStorageService extends StorageService<StockStorageData> {
 
     // load data from api
     this.stocksApiService.getStockSummary(symbol).subscribe((stockSummary) => {
-      this.lastSearchedStocks$.next([...this.lastSearchedStocks$.getValue(), stockSummary]);
+      // save data into array, limit to 12
+      this.lastSearchedStocks$.next([stockSummary, ...this.lastSearchedStocks$.getValue()].slice(0, 12));
     });
 
     // save into storage
@@ -100,7 +101,8 @@ export class StockStorageService extends StorageService<StockStorageData> {
 
     // load data from api
     this.stocksApiService.getStockSummary(symbol).subscribe((stockSummary) => {
-      this.favoriteStocks$.next([...this.favoriteStocks$.getValue(), stockSummary]);
+      // save data into array, limit to 12
+      this.favoriteStocks$.next([stockSummary, ...this.favoriteStocks$.getValue()].slice(0, 12));
     });
 
     // save into storage
