@@ -39,12 +39,15 @@
     <!-- button on small screen -->
     <div class="w-full mt-2 sm:hidden">
       <button mat-stroked-button class="w-full text-sm" (click)="toggleDisplayedValues()">
-        {{ showPriceSignal() ? 'Price +/-' : 'Info' }}
+        {{ displayInfoMobile() ? 'Info' : 'Price +/-' }}
       </button>
     </div>
   </div>
 
   <ng-container *ngIf="marketOverview$ | async as marketOverview">
-    <app-stock-summary-table [stockSummaries]="marketOverview[topStockDisplayControl.value]"></app-stock-summary-table>
+    <app-stock-summary-table
+      [displayInfoMobile]="displayInfoMobile()"
+      [stockSummaries]="marketOverview[topStockDisplayControl.value]"
+    ></app-stock-summary-table>
   </ng-container>
 </div>

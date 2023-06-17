@@ -62,7 +62,7 @@ export class SearchComponent implements OnInit {
    */
   topStockDisplayControl = new FormControl<keyof MarketOverTopStocks<unknown>>('stockTopActive', { nonNullable: true });
 
-  showPriceSignal = signal(true);
+  displayInfoMobile = signal(false);
 
   marketTopStocksOptions: LabelValue<keyof MarketOverTopStocks<unknown>>[] = [
     { label: 'Most Active', value: 'stockTopActive' },
@@ -81,7 +81,7 @@ export class SearchComponent implements OnInit {
   }
 
   toggleDisplayedValues(): void {
-    this.showPriceSignal.set(!this.showPriceSignal());
+    this.displayInfoMobile.set(!this.displayInfoMobile());
   }
 
   onSummaryClick(summary: StockSummary) {

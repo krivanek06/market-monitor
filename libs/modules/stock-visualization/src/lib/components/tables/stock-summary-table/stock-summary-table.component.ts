@@ -39,11 +39,14 @@ export class StockSummaryTableComponent {
     this.dataSource.paginator = this.paginator;
   }
 
+  @Input() displayInfoMobile = false;
+
   dataSource!: MatTableDataSource<StockSummary>;
 
   displayedColumns: string[] = [
     'symbol',
     'price',
+    'priceMobile',
     'volume',
     'marketCap',
     'shares',
@@ -51,6 +54,7 @@ export class StockSummaryTableComponent {
     'eps',
     'sector',
     '52WeekRange',
+    'infoMobile',
   ];
 
   identity: TrackByFunction<StockSummary> = (index: number, item: StockSummary) => item.id;
