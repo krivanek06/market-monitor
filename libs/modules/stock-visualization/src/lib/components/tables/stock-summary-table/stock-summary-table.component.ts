@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, TrackByFunction, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, TrackByFunction, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
@@ -33,6 +33,7 @@ import { StockSummary } from '@market-monitor/shared-types';
   styleUrls: ['./stock-summary-table.component.scss'],
 })
 export class StockSummaryTableComponent {
+  @Output() itemClickedEmitter = new EventEmitter<StockSummary>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @Input({ required: true }) set stockSummaries(data: StockSummary[] | null) {
     this.dataSource = new MatTableDataSource(data ?? []);
@@ -60,6 +61,6 @@ export class StockSummaryTableComponent {
   identity: TrackByFunction<StockSummary> = (index: number, item: StockSummary) => item.id;
 
   onItemClicked(item: StockSummary): void {
-    console.log(item);
+    this.itemClickedEmitter.emit(item);
   }
 }

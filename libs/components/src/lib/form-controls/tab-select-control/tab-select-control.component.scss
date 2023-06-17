@@ -2,3 +2,7 @@
   padding-left: 60px !important;
   padding-right: 60px !important;
 }
+
+::ng-deep .mat-mdc-tab-list {
+  margin-bottom: 8px !important;
+}

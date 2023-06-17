@@ -46,6 +46,7 @@
 
   <ng-container *ngIf="marketOverview$ | async as marketOverview">
     <app-stock-summary-table
+      (itemClickedEmitter)="onSummaryClick($event)"
       [displayInfoMobile]="displayInfoMobile()"
       [stockSummaries]="marketOverview[topStockDisplayControl.value]"
     ></app-stock-summary-table>
