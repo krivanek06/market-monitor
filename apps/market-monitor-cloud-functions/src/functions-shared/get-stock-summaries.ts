@@ -1,7 +1,8 @@
-import { StockSummary } from '@market-monitor/shared-types';
+import { getCompanyQuote, getProfile, getSymbolsPriceChanges } from '@market-monitor/api-external';
+import { getDatabaseStockSummaryRef } from '@market-monitor/api-firebase';
+import { StockSummary } from '@market-monitor/api-types';
 import { isBefore, subMinutes } from 'date-fns';
 import { firestore } from 'firebase-admin';
-import { getCompanyQuote, getDatabaseStockSummaryRef, getProfile, getSymbolsPriceChanges } from '../api';
 
 /**
  * check symbols against database if data not older than 3 min return, else fetch new data

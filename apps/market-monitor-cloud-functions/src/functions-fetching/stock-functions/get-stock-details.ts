@@ -1,12 +1,6 @@
-import { StockDetails } from '@market-monitor/shared-types';
-import { isBefore, subDays, subHours } from 'date-fns';
-import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
-
 import {
   getAnalystEstimatesEarnings,
   getCompanyOutlook,
-  getDatabaseStockDetailsRef,
   getEsgDataQuarterly,
   getEsgRatingYearly,
   getPriceTarget,
@@ -14,81 +8,67 @@ import {
   getSectorPeersForSymbols,
   getStockNews,
   getUpgradesDowngrades,
-} from '../../api';
+} from '@market-monitor/api-external';
+import { getDatabaseStockDetailsRef } from '@market-monitor/api-firebase';
+import { StockDetails } from '@market-monitor/api-types';
+import { isBefore, subDays, subHours } from 'date-fns';
+import { Response } from 'express';
+import { onRequest } from 'firebase-functions/v2/https';
 
 /**
  * returns symbols details based on provided symbol in query
  */
-export const getstockdetails = onRequest(
-  async (request, response: Response<StockDetails | null>) => {
-    const symbolString = request.query.symbol as string;
+export const getstockdetails = onRequest(async (request, response: Response<StockDetails | null>) => {
+  const symbolString = request.query.symbol as string;
 
-    // throw error if no symbols
-    if (!symbolString) {
-      response.send(null);
-      return;
-    }
-
-    // create DB calls
-    const databaseStockDetailsRef = getDatabaseStockDetailsRef(symbolString);
-
-    // map to data format
-    let databaseStockDetailsData = (await databaseStockDetailsRef.get()).data();
-
-    if (
-      // data exists
-      databaseStockDetailsData &&
-      // no need to reload data
-      !databaseStockDetailsData.reloadData &&
-      // data is not older than 7 days
-      !isBefore(
-        new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate),
-        subDays(new Date(), 7)
-      ) &&
-      // news are not older than 12h
-      !isBefore(
-        new Date(databaseStockDetailsData.lastUpdate.newsLastUpdate),
-        subHours(new Date(), 12)
-      )
-    ) {
-      response.send(databaseStockDetailsData);
-      return;
-    }
-
-    if (
-      // no data in DB
-      !databaseStockDetailsData ||
-      // admin force reload
-      databaseStockDetailsData.reloadData ||
-      // data is older than 7 days
-      isBefore(
-        new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate),
-        subDays(new Date(), 7)
-      )
-    ) {
-      databaseStockDetailsData = await reloadDetails(symbolString);
-    }
-
-    // check if new are not older than 12h
-    if (
-      isBefore(
-        new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate),
-        subHours(new Date(), 12)
-      )
-    ) {
-      databaseStockDetailsData = await reloadNews(
-        symbolString,
-        databaseStockDetailsData
-      );
-    }
-
-    // save data into firestore
-    await databaseStockDetailsRef.set(databaseStockDetailsData);
-
-    // return data from DB
-    response.send(databaseStockDetailsData);
+  // throw error if no symbols
+  if (!symbolString) {
+    response.send(null);
+    return;
   }
-);
+
+  // create DB calls
+  const databaseStockDetailsRef = getDatabaseStockDetailsRef(symbolString);
+
+  // map to data format
+  let databaseStockDetailsData = (await databaseStockDetailsRef.get()).data();
+
+  if (
+    // data exists
+    databaseStockDetailsData &&
+    // no need to reload data
+    !databaseStockDetailsData.reloadData &&
+    // data is not older than 7 days
+    !isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7)) &&
+    // news are not older than 12h
+    !isBefore(new Date(databaseStockDetailsData.lastUpdate.newsLastUpdate), subHours(new Date(), 12))
+  ) {
+    response.send(databaseStockDetailsData);
+    return;
+  }
+
+  if (
+    // no data in DB
+    !databaseStockDetailsData ||
+    // admin force reload
+    databaseStockDetailsData.reloadData ||
+    // data is older than 7 days
+    isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7))
+  ) {
+    databaseStockDetailsData = await reloadDetails(symbolString);
+  }
+
+  // check if new are not older than 12h
+  if (isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subHours(new Date(), 12))) {
+    databaseStockDetailsData = await reloadNews(symbolString, databaseStockDetailsData);
+  }
+
+  // save data into firestore
+  await databaseStockDetailsRef.set(databaseStockDetailsData);
+
+  // return data from DB
+  response.send(databaseStockDetailsData);
+});
 
 /**
  *
@@ -96,10 +76,7 @@ export const getstockdetails = onRequest(
  * @param stockDetails
  * @returns reloaded news for symbol from APIs
  */
-const reloadNews = async (
-  symbol: string,
-  stockDetails: StockDetails
-): Promise<StockDetails> => {
+const reloadNews = async (symbol: string, stockDetails: StockDetails): Promise<StockDetails> => {
   const stockNews = await getStockNews(symbol);
   const result = {
     ...stockDetails,

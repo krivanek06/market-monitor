@@ -1,4 +1,3 @@
-export * from './lib/api';
 export * from './lib/color-scheme.model';
 export * from './lib/errors.model';
 export * from './lib/forms.model';

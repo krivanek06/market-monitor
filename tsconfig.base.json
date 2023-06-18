@@ -15,7 +15,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@market-monitor/api": ["libs/api/src/index.ts"],
+      "@market-monitor/api-cloud-functions": ["libs/api/api-cloud-functions/src/index.ts"],
+      "@market-monitor/api-external": ["libs/api/api-external/src/index.ts"],
+      "@market-monitor/api-firebase": ["libs/api/api-firebase/src/index.ts"],
+      "@market-monitor/api-types": ["libs/api/api-types/src/index.ts"],
       "@market-monitor/components": ["libs/components/src/index.ts"],
       "@market-monitor/directives": ["libs/directives/src/index.ts"],
       "@market-monitor/modules/stock-visualization": ["libs/modules/stock-visualization/src/index.ts"],
