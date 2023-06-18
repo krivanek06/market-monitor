@@ -1,40 +1,17 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  ControlValueAccessor,
-  FormControl,
-  NG_VALUE_ACCESSOR,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import {
-  MatAutocompleteModule,
-  MatAutocompleteSelectedEvent,
-} from '@angular/material/autocomplete';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { StocksApiService } from '@market-monitor/api';
-import {
-  DefaultImgDirective,
-  RangeDirective,
-} from '@market-monitor/directives';
-import { StockSummary } from '@market-monitor/shared-types';
-import {
-  catchError,
-  debounceTime,
-  distinctUntilChanged,
-  filter,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { StocksApiService } from '@market-monitor/api-cloud-functions';
+import { StockSummary } from '@market-monitor/api-types';
+import { DefaultImgDirective, RangeDirective } from '@market-monitor/shared-directives';
+import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 import { StockSummaryItemComponent } from '../../components';
 @Component({
   selector: 'app-stock-basic-search',

@@ -6,10 +6,10 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { ProgressCurrencyComponent } from '@market-monitor/components';
-import { DefaultImgDirective, PercentageIncreaseDirective, RangeDirective } from '@market-monitor/directives';
-import { LargeNumberFormatterPipe, TruncatePipe } from '@market-monitor/pipes';
-import { StockSummary } from '@market-monitor/shared-types';
+import { StockSummary } from '@market-monitor/api-types';
+import { ProgressCurrencyComponent } from '@market-monitor/shared-components';
+import { DefaultImgDirective, PercentageIncreaseDirective, RangeDirective } from '@market-monitor/shared-directives';
+import { LargeNumberFormatterPipe, TruncatePipe } from '@market-monitor/shared-pipes';
 
 @Component({
   selector: 'app-stock-summary-table',

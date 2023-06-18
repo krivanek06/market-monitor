@@ -1,0 +1,11 @@
+:host {
+	@apply relative;
+
+	.expand-icon {
+		@apply absolute right-0 z-10;
+		&:hover {
+			transform: scale(0.9);
+			color: white !important;
+		}
+	}
+}

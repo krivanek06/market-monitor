@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RangeDirective } from '@market-monitor/directives';
+import { RangeDirective } from '@market-monitor/shared-directives';
 
 @Component({
   selector: 'app-summary-modal-skeleton',

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { StocksApiService } from '@market-monitor/api';
-import { StorageService } from '@market-monitor/services';
-import { StockSummary } from '@market-monitor/shared-types';
+import { StocksApiService } from '@market-monitor/api-cloud-functions';
+import { StockSummary } from '@market-monitor/api-types';
+import { StorageService } from '@market-monitor/shared-services';
 import { BehaviorSubject, Observable, forkJoin, map } from 'rxjs';
 import { StockStorageData } from '../models';
 

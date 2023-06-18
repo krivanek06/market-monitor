@@ -19,13 +19,12 @@
       "@market-monitor/api-external": ["libs/api/api-external/src/index.ts"],
       "@market-monitor/api-firebase": ["libs/api/api-firebase/src/index.ts"],
       "@market-monitor/api-types": ["libs/api/api-types/src/index.ts"],
-      "@market-monitor/components": ["libs/components/src/index.ts"],
-      "@market-monitor/directives": ["libs/directives/src/index.ts"],
+      "@market-monitor/shared-components": ["libs/shared/components/src/index.ts"],
+      "@market-monitor/shared-directives": ["libs/shared/directives/src/index.ts"],
+      "@market-monitor/shared-pipes": ["libs/shared/pipes/src/index.ts"],
+      "@market-monitor/shared-services": ["libs/shared/services/src/index.ts"],
+      "@market-monitor/shared-utils": ["libs/shared/utils/src/index.ts"],
       "@market-monitor/modules/stock-visualization": ["libs/modules/stock-visualization/src/index.ts"],
-      "@market-monitor/pipes": ["libs/pipes/src/index.ts"],
-      "@market-monitor/services": ["libs/services/src/index.ts"],
-      "@market-monitor/shared-types": ["libs/shared-types/src/index.ts"],
-      "@market-monitor/utils": ["libs/utils/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

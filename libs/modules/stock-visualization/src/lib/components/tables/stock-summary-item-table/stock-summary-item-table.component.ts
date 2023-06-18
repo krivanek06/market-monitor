@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { GeneralCardComponent } from '@market-monitor/components';
-import { RangeDirective } from '@market-monitor/directives';
-import { StockSummary } from '@market-monitor/shared-types';
+import { StockSummary } from '@market-monitor/api-types';
+import { GeneralCardComponent } from '@market-monitor/shared-components';
+import { RangeDirective } from '@market-monitor/shared-directives';
 import { StockSummaryItemComponent } from '../../stock-summary-item/stock-summary-item.component';
 
 @Component({

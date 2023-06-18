@@ -3,9 +3,8 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MarketApiService } from '@market-monitor/api';
-import { GeneralCardComponent, TabSelectControlComponent } from '@market-monitor/components';
-import { RangeDirective } from '@market-monitor/directives';
+import { MarketApiService } from '@market-monitor/api-cloud-functions';
+import { MarketOverTopStocks, MarketOverviewResponse, StockSummary } from '@market-monitor/api-types';
 import {
   StockBasicSearchComponent,
   StockStorageService,
@@ -13,16 +12,10 @@ import {
   StockSummaryModalComponent,
   StockSummaryTableComponent,
 } from '@market-monitor/modules/stock-visualization';
-import {
-  LabelValue,
-  MarketOverTopStocks,
-  MarketOverviewResponse,
-  SCREEN_DIALOGS,
-  StockSummary,
-} from '@market-monitor/shared-types';
-import { DialogServiceModule } from '@market-monitor/utils';
+import { GeneralCardComponent, LabelValue, TabSelectControlComponent } from '@market-monitor/shared-components';
+import { RangeDirective } from '@market-monitor/shared-directives';
+import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared-utils';
 import { Observable } from 'rxjs';
-
 @Component({
   selector: 'app-search',
   standalone: true,
