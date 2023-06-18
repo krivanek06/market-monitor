@@ -1,10 +1,10 @@
-import { MarketOverviewResponse } from '@market-monitor/shared-types';
+import { getMostPerformingStocks, getSymbolPrice } from '@market-monitor/api-external';
+import { getDatabaseMarketOverviewRef } from '@market-monitor/api-firebase';
+import { MarketOverviewResponse, SYMBOL_SP500 } from '@market-monitor/api-types';
 import { isBefore, subMinutes } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
-import { getDatabaseMarketOverviewRef, getMostPerformingStocks, getSymbolPrice } from '../../api';
 import { getSummaries } from '../../functions-shared';
-import { SYMBOL_SP500 } from '../../model';
 
 export const getmarketoverview = onRequest(async (_, response: Response<MarketOverviewResponse>) => {
   // load data from firestore

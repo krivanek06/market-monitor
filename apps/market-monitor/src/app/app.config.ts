@@ -15,21 +15,14 @@ import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import {
-  PreloadAllModules,
-  provideRouter,
-  withInMemoryScrolling,
-  withPreloading,
-} from '@angular/router';
-import { ENDPOINT_FUNCTION_URL } from '@market-monitor/shared-types';
+import { PreloadAllModules, provideRouter, withInMemoryScrolling, withPreloading } from '@angular/router';
+import { ENDPOINT_FUNCTION_URL } from '@market-monitor/api-cloud-functions';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    importProvidersFrom(
-      provideFirebaseApp(() => initializeApp(environment.firebase))
-    ),
+    importProvidersFrom(provideFirebaseApp(() => initializeApp(environment.firebase))),
     importProvidersFrom(provideAuth(() => getAuth())),
     importProvidersFrom(provideFirestore(() => getFirestore())),
     importProvidersFrom(provideFunctions(() => getFunctions())),
