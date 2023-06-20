@@ -1,0 +1,33 @@
+<app-stock-search-basic
+  (inputHasValue)="checkToDisplayOverlay(null, $event)"
+  (inputFocused)="checkToDisplayOverlay($event, null)"
+  [formControl]="searchControl"
+  cdkOverlayOrigin
+  #trigger
+  #origin="cdkOverlayOrigin"
+></app-stock-search-basic>
+
+<ng-template
+  cdkConnectedOverlay
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  [cdkConnectedOverlayMinWidth]="overlayWidth()"
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="overlayIsOpen().isInputFocused && !overlayIsOpen().inputHasValue"
+>
+  <div
+    [style.max-width.px]="overlayWidth() - 20"
+    class="min-h-[200px] max-h-[400px] bg-wt-background-light -mt-5 rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
+  >
+    <ng-container *ngIf="searchedStocks$ | async as stockSummaries">
+      <button
+        mat-button
+        *ngFor="let summary of stockSummaries"
+        (click)="onSummaryClick(summary)"
+        class="w-full h-12"
+        type="button"
+      >
+        <app-stock-summary-item [displaySecondLine]="false" [stockSummary]="summary"></app-stock-summary-item>
+      </button>
+    </ng-container>
+  </div>
+</ng-template>

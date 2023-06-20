@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -41,6 +41,15 @@ import { StockSummaryItemComponent } from '../../components';
   ],
 })
 export class StockSearchBasicComponent implements ControlValueAccessor {
+  /**
+   * emit when input is focused
+   */
+  @Output() inputFocused = new EventEmitter<boolean>();
+  /**
+   * emit whether searchControl has any value
+   */
+  @Output() inputHasValue = new EventEmitter<boolean>();
+
   searchControl = new FormControl<string>('', { nonNullable: true });
 
   StocksApiService = inject(StocksApiService);
@@ -57,9 +66,10 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
       .pipe(
         // check if type is string and not empty
         filter((d) => typeof d === 'string'),
-        tap(() => {
+        tap((value) => {
           this.showLoadingIndicator.set(true);
           this.options.set([]);
+          this.inputHasValue.emit(!!value.length);
         }),
         debounceTime(400),
         distinctUntilChanged(),
@@ -80,6 +90,15 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
     console.log(stock);
     this.onChange(stock);
     this.searchControl.setValue('', { emitEvent: false });
+  }
+
+  onInputFocus(): void {
+    this.inputFocused.emit(true);
+    this.inputHasValue.emit(!!this.searchControl.value);
+  }
+
+  onInputBlur(): void {
+    this.inputFocused.emit(false);
   }
 
   displayProperty = (stock: StockSummary) => stock.id;

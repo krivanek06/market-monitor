@@ -11,7 +11,8 @@
 
   <div class="max-w-[620px] mx-auto">
     <h1 class="text-center">Search Stock</h1>
-    <app-stock-search-basic [formControl]="searchControl"></app-stock-search-basic>
+    <!-- <app-stock-search-basic [formControl]="searchControl"></app-stock-search-basic> -->
+    <app-stock-search-basic-customized></app-stock-search-basic-customized>
   </div>
 
   <!-- Last searched stocks -->
@@ -24,17 +25,17 @@
     ></app-stock-summary-item-table>
   </div> -->
 </div>
-
+<!--
 <div class="">
   <div class="flex items-start gap-3 mb-2 sm:justify-end">
-    <!-- select / tabs -->
+
     <app-tab-select-control
       [formControl]="topStockDisplayControl"
       class="max-md:w-full"
       [displayOptions]="marketTopStocksOptions"
     ></app-tab-select-control>
 
-    <!-- button on small screen -->
+
     <div class="w-full mt-2 sm:hidden">
       <button mat-stroked-button class="w-full text-sm" (click)="toggleDisplayedValues()">
         {{ displayInfoMobile() ? 'Info' : 'Price +/-' }}
@@ -42,7 +43,7 @@
     </div>
   </div>
 
-  <!-- display top stocks in table -->
+
   <ng-container *ngIf="marketOverview$ | async as marketOverview; else stockSummaryTableSkeleton">
     <app-stock-summary-table
       (itemClickedEmitter)="onSummaryClick($event)"
@@ -51,8 +52,8 @@
     ></app-stock-summary-table>
   </ng-container>
 
-  <!-- skeleton for stock summary -->
+
   <ng-template #stockSummaryTableSkeleton>
     <div *ngRange="15" class="h-12 mb-1 g-skeleton"></div>
   </ng-template>
-</div>
+</div> -->
