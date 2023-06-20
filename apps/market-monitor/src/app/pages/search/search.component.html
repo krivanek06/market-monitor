@@ -1,30 +1,28 @@
-<div>Stock News</div>
-
-<div class="grid mb-10 md:grid-cols-2 xl:grid-cols-7 gap-x-10 gap-y-4">
+<div class="pt-[240px] pb-[300px]">
   <!-- favorite stocks -->
-  <div class="xl:col-span-2">
+  <!-- <div class="xl:col-span-2">
     <app-stock-summary-item-table
       tableTitle="Favorite Stocks"
       (summaryClickEmitter)="onSummaryClick($event)"
       [showSkeleton]="(isStockSummaryLoaded$ | async) === false"
       [stockSummaries]="favoriteStocks$ | async"
     ></app-stock-summary-item-table>
-  </div>
+  </div> -->
 
-  <div class="pt-20 md:col-span-2 xl:col-span-3 max-xl:order-first">
+  <div class="max-w-[620px] mx-auto">
     <h1 class="text-center">Search Stock</h1>
-    <app-stock-basic-search [formControl]="searchControl"></app-stock-basic-search>
+    <app-stock-search-basic [formControl]="searchControl"></app-stock-search-basic>
   </div>
 
   <!-- Last searched stocks -->
-  <div class="xl:col-span-2">
+  <!-- <div class="xl:col-span-2">
     <app-stock-summary-item-table
       tableTitle="Last Searched Stocks"
       (summaryClickEmitter)="onSummaryClick($event)"
       [showSkeleton]="(isStockSummaryLoaded$ | async) === false"
       [stockSummaries]="searchedStocks$ | async"
     ></app-stock-summary-item-table>
-  </div>
+  </div> -->
 </div>
 
 <div class="">

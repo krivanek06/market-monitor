@@ -14,7 +14,7 @@ import { DefaultImgDirective, RangeDirective } from '@market-monitor/shared-dire
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 import { StockSummaryItemComponent } from '../../components';
 @Component({
-  selector: 'app-stock-basic-search',
+  selector: 'app-stock-search-basic',
   standalone: true,
   imports: [
     CommonModule,
@@ -29,18 +29,18 @@ import { StockSummaryItemComponent } from '../../components';
     MatIconModule,
     StockSummaryItemComponent,
   ],
-  templateUrl: './stock-basic-search.component.html',
-  styleUrls: ['./stock-basic-search.component.scss'],
+  templateUrl: './stock-search-basic.component.html',
+  styleUrls: ['./stock-search-basic.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: StockBasicSearchComponent,
+      useExisting: StockSearchBasicComponent,
       multi: true,
     },
   ],
 })
-export class StockBasicSearchComponent implements ControlValueAccessor {
+export class StockSearchBasicComponent implements ControlValueAccessor {
   searchControl = new FormControl<string>('', { nonNullable: true });
 
   StocksApiService = inject(StocksApiService);
@@ -92,14 +92,14 @@ export class StockBasicSearchComponent implements ControlValueAccessor {
   /*
     method to notify parent that the value (disabled state) has been changed
   */
-  registerOnChange(fn: StockBasicSearchComponent['onChange']): void {
+  registerOnChange(fn: StockSearchBasicComponent['onChange']): void {
     this.onChange = fn;
   }
 
   /*
     method to notify parent that form control has been touched
   */
-  registerOnTouched(fn: StockBasicSearchComponent['onTouched']): void {
+  registerOnTouched(fn: StockSearchBasicComponent['onTouched']): void {
     this.onTouched = fn;
   }
 }

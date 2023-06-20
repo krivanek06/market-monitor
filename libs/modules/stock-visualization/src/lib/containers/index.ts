@@ -1,1 +1,1 @@
-export * from './stock-basic-search/stock-basic-search.component';
+export * from './stock-search-basic/stock-search-basic.component';

@@ -6,7 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
 import { MarketOverTopStocks, MarketOverviewResponse, StockSummary } from '@market-monitor/api-types';
 import {
-  StockBasicSearchComponent,
+  StockSearchBasicComponent,
   StockStorageService,
   StockSummaryItemTableComponent,
   StockSummaryModalComponent,
@@ -21,7 +21,7 @@ import { Observable } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    StockBasicSearchComponent,
+    StockSearchBasicComponent,
     GeneralCardComponent,
     ReactiveFormsModule,
     MatButtonModule,
