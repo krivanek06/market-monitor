@@ -7,8 +7,6 @@
     matInput
     [formControl]="searchControl"
     [matAutocomplete]="auto"
-    (focus)="onInputFocus()"
-    (blur)="onInputBlur()"
   />
   <mat-icon matPrefix>search</mat-icon>
   <mat-autocomplete
@@ -16,6 +14,8 @@
     (optionSelected)="onStockSelect($event)"
     [displayWith]="displayProperty"
     [hideSingleSelectionIndicator]="true"
+    [autofocus]="false"
+    [autoActiveFirstOption]="false"
   >
     <!-- loading skeleton -->
     <ng-container *ngIf="showLoadingIndicator()">

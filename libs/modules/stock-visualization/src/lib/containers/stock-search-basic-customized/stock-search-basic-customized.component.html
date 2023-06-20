@@ -1,6 +1,7 @@
 <app-stock-search-basic
+  appElementFocus
+  (insideClick)="checkToDisplayOverlay(true, null)"
   (inputHasValue)="checkToDisplayOverlay(null, $event)"
-  (inputFocused)="checkToDisplayOverlay($event, null)"
   [formControl]="searchControl"
   cdkOverlayOrigin
   #trigger
@@ -16,18 +17,28 @@
 >
   <div
     [style.max-width.px]="overlayWidth() - 20"
+    appElementFocus
+    (outsideClick)="checkToDisplayOverlay(false, null)"
     class="min-h-[200px] max-h-[400px] bg-wt-background-light -mt-5 rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
   >
-    <ng-container *ngIf="searchedStocks$ | async as stockSummaries">
-      <button
-        mat-button
-        *ngFor="let summary of stockSummaries"
-        (click)="onSummaryClick(summary)"
-        class="w-full h-12"
-        type="button"
-      >
-        <app-stock-summary-item [displaySecondLine]="false" [stockSummary]="summary"></app-stock-summary-item>
-      </button>
-    </ng-container>
+    <!-- checkbox changing displayed stock summaries -->
+    <div class="flex items-center justify-between mb-1">
+      <span class="text-base text-wt-gray-light">
+        <ng-container *ngIf="!showFavoriteStocks.value">Last Searched</ng-container>
+        <ng-container *ngIf="showFavoriteStocks.value">Favorite Stocks</ng-container>
+      </span>
+      <mat-checkbox color="primary" [formControl]="showFavoriteStocks"> Show Favorites </mat-checkbox>
+    </div>
+
+    <!-- display summaries as buttons -->
+    <button
+      mat-button
+      *ngFor="let summary of displayedStocksSignal()"
+      (click)="onSummaryClick(summary)"
+      class="w-full h-12"
+      type="button"
+    >
+      <app-stock-summary-item [displaySecondLine]="false" [stockSummary]="summary"></app-stock-summary-item>
+    </button>
   </div>
 </ng-template>

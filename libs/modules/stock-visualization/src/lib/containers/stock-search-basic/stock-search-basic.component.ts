@@ -42,10 +42,6 @@ import { StockSummaryItemComponent } from '../../components';
 })
 export class StockSearchBasicComponent implements ControlValueAccessor {
   /**
-   * emit when input is focused
-   */
-  @Output() inputFocused = new EventEmitter<boolean>();
-  /**
    * emit whether searchControl has any value
    */
   @Output() inputHasValue = new EventEmitter<boolean>();
@@ -89,16 +85,7 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
     const stock = event.option.value as StockSummary;
     console.log(stock);
     this.onChange(stock);
-    this.searchControl.setValue('', { emitEvent: false });
-  }
-
-  onInputFocus(): void {
-    this.inputFocused.emit(true);
-    this.inputHasValue.emit(!!this.searchControl.value);
-  }
-
-  onInputBlur(): void {
-    this.inputFocused.emit(false);
+    this.searchControl.setValue('', { emitEvent: true });
   }
 
   displayProperty = (stock: StockSummary) => stock.id;

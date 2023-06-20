@@ -43,6 +43,7 @@ export class StockStorageService extends StorageService<StockStorageData> {
   addSearchStock(symbol: string): void {
     const savedData = this.getData();
 
+    // if already in last searched, do nothing
     if (savedData.lastSearchedStocks.includes(symbol)) {
       return;
     }
