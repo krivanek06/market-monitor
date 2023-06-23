@@ -1,14 +1,12 @@
 import { getNewsCrypto, getNewsForex, getNewsGeneral, getNewsStock } from '@market-monitor/api-external';
 import {
   DataSnapshot,
-  FirebaseNewsTypes,
-  firebaseNewsAcceptableTypes,
   getDatabaseCryptoDetailsNews,
   getDatabaseForexDetailsNews,
   getDatabaseMarketNewsRef,
   getDatabaseStockDetailsNews,
 } from '@market-monitor/api-firebase';
-import { News } from '@market-monitor/api-types';
+import { FirebaseNewsTypes, News, firebaseNewsAcceptableTypes } from '@market-monitor/api-types';
 import { subHours } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';

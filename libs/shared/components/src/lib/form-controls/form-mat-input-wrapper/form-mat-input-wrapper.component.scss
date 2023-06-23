@@ -4,6 +4,11 @@
     cursor: default;
   }
 
+  // bottom margin removed
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+  }
+
   fieldset {
     clear: both;
 

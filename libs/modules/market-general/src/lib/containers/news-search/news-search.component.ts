@@ -1,27 +1,66 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
 import { FirebaseNewsTypes, News, firebaseNewsAcceptableTypes } from '@market-monitor/api-types';
 import { FormMatInputWrapperComponent, InputSource } from '@market-monitor/shared-components';
+import { RangeDirective } from '@market-monitor/shared-directives';
+import { debounceTime, distinctUntilChanged, map, pairwise, startWith, switchMap, tap } from 'rxjs';
 import { NewsBodyComponent } from '../../components';
+
 @Component({
   selector: 'app-news-search',
   standalone: true,
-  imports: [CommonModule, NewsBodyComponent, FormMatInputWrapperComponent, MatButtonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    NewsBodyComponent,
+    FormMatInputWrapperComponent,
+    MatButtonModule,
+    ReactiveFormsModule,
+    RangeDirective,
+  ],
   templateUrl: './news-search.component.html',
   styleUrls: ['./news-search.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewsSearchComponent {
   marketApiService = inject(MarketApiService);
-  marketStockNewsSignal = signal<News[]>([]);
 
   newSearchFormGroup = new FormGroup({
     newsType: new FormControl<FirebaseNewsTypes>('stocks', { nonNullable: true }),
     symbol: new FormControl('', { nonNullable: true }),
   });
 
+  showLoadingSignal = signal<boolean>(true);
+  marketStockNewsSignal = toSignal<News[]>(
+    this.newSearchFormGroup.valueChanges.pipe(
+      startWith(this.newSearchFormGroup.getRawValue()),
+      debounceTime(500),
+      distinctUntilChanged(),
+      tap(() => this.showLoadingSignal.set(true)),
+      pairwise(),
+      map(([prev, curr]) => {
+        // console.log('prev', prev);
+        // console.log('curr', curr);
+        // reset symbol if newsType changed
+        const symbol = prev.newsType === curr.newsType ? curr.symbol : '';
+        const newsType = curr.newsType ?? 'stocks';
+        return [symbol, newsType] as [string, FirebaseNewsTypes];
+      }),
+      // save maybe modified symbol if newsType changed
+      tap(([symbol, _]) => this.newSearchFormGroup.controls.symbol.setValue(symbol, { emitEvent: false })),
+      // load news
+      switchMap(([symbol, newsType]) => this.marketApiService.getNews(newsType, symbol)),
+      // set loading to false
+      tap(() => this.showLoadingSignal.set(false))
+    )
+  );
+
+  /**
+   * input source to display in select
+   */
   newsTypesInputSource = firebaseNewsAcceptableTypes.map((d) => {
     const inputSource: InputSource<FirebaseNewsTypes> = {
       caption: d.toUpperCase(),
@@ -31,20 +70,11 @@ export class NewsSearchComponent {
   });
 
   constructor() {
-    this.newSearchFormGroup.valueChanges.subscribe((d) => {
-      console.log('newSearchFormGroup', d);
-    });
-
-    // load news with initial data from newSearchFormGroup
-    this.onFormSubmit();
-  }
-
-  onFormSubmit(): void {
-    console.log('onFormSubmit');
-    const controls = this.newSearchFormGroup.getRawValue();
-    this.marketApiService.getNews(controls.newsType, controls.symbol).subscribe((res) => {
-      console.log('new news', res);
-      this.marketStockNewsSignal.set(res);
-    });
+    /**
+     * TODO for some reason marketStockNewsSignal is not triggered on init
+     */
+    setTimeout(() => {
+      this.newSearchFormGroup.setValue(this.newSearchFormGroup.getRawValue());
+    }, 600);
   }
 }
