@@ -25,15 +25,26 @@
     "@nguniversal/express-engine": "^16.0.2",
     "@nx/angular": "16.3.2",
     "@simondotm/nx-firebase": "^1.1.0-beta.0",
+    "assert": "^2.0.0",
     "axios": "^1.0.0",
+    "browserify-zlib": "^0.2.0",
+    "crypto-browserify": "^3.12.0",
     "date-fns": "^2.30.0",
     "firebase": "^9.14.0",
     "firebase-admin": "^11.4.1",
     "firebase-functions": "^4.1.1",
     "highcharts": "^11.1.0",
     "highcharts-angular": "^3.1.2",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "querystring-es3": "^0.2.1",
     "rxjs": "~7.8.0",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
     "tslib": "^2.3.0",
+    "url": "^0.11.1",
+    "util": "^0.12.5",
     "zone.js": "~0.13.0"
   },
   "devDependencies": {
@@ -90,5 +101,14 @@
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "typescript": "~5.0.2"
+  },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false,
+    "net": false,
+    "tls": false,
+    "child_process": false,
+    "crypto": false
   }
 }

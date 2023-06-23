@@ -13,11 +13,26 @@
         "outputPath": "dist/apps/market-monitor/browser",
         "index": "apps/market-monitor/src/index.html",
         "main": "apps/market-monitor/src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": ["apps/market-monitor/src/polyfills.ts"],
         "tsConfig": "apps/market-monitor/tsconfig.app.json",
         "assets": ["apps/market-monitor/src/favicon.ico", "apps/market-monitor/src/assets"],
         "styles": ["@angular/material/prebuilt-themes/indigo-pink.css", "apps/market-monitor/src/styles.scss"],
-        "scripts": []
+        "scripts": [],
+        "allowedCommonJsDependencies": [
+          "utils/",
+          "assert/",
+          "https-browserify",
+          "stream-http",
+          "querystring-es3",
+          "stream-browserify",
+          "url/",
+          "crypto-browserify",
+          "browserify-zlib",
+          "path-browserify",
+          "os-browserify",
+          "highcharts",
+          "highcharts/modules/no-data-to-display"
+        ]
       },
       "configurations": {
         "production": {
