@@ -1,5 +1,5 @@
 import { getHistoricalPrices } from '@market-monitor/api-external';
-import { StockDataHistoricalPeriods, getDatabaseStockDetailsHistorical } from '@market-monitor/api-firebase';
+import { HistoricalPricePeriods, getDatabaseStockDetailsHistorical } from '@market-monitor/api-firebase';
 import { HistoricalLoadingPeriods, HistoricalPrice } from '@market-monitor/api-types';
 import { format, isBefore, subDays, subMinutes } from 'date-fns';
 import { Response } from 'express';
@@ -7,8 +7,8 @@ import { onRequest } from 'firebase-functions/v2/https';
 
 export const getassethistoricalprices = onRequest(async (request, response: Response<HistoricalPrice[]>) => {
   const symbol = request.query.symbol as string;
-  const period = request.query.period as keyof typeof StockDataHistoricalPeriods;
-  const usedPeriod = StockDataHistoricalPeriods[period];
+  const period = request.query.period as keyof typeof HistoricalPricePeriods;
+  const usedPeriod = HistoricalPricePeriods[period];
 
   // throw error if no symbol, period or period not acceptable
   if (!symbol || !period || !usedPeriod) {
@@ -48,7 +48,7 @@ export const getassethistoricalprices = onRequest(async (request, response: Resp
 const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
 const resolveLoadingPeriod = (
-  period: keyof typeof StockDataHistoricalPeriods
+  period: keyof typeof HistoricalPricePeriods
 ): {
   loadingPeriod: HistoricalLoadingPeriods;
   from: string;

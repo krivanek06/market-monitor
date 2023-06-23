@@ -1,3 +1,3 @@
-export * from './firestore-market.api';
-export * from './firestore-stock.api';
-export * from './models/data-stock.model';
+export * from './firebase-market.api';
+export * from './firebase-stock.api';
+export * from './models/exposed-types.model';

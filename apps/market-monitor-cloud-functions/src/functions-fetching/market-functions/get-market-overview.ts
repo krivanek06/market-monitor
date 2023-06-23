@@ -1,12 +1,12 @@
 import { getMostPerformingStocks, getSymbolPrice } from '@market-monitor/api-external';
 import { getDatabaseMarketOverviewRef } from '@market-monitor/api-firebase';
-import { MarketOverviewResponse, SYMBOL_SP500 } from '@market-monitor/api-types';
+import { MarketTopPerformanceOverviewResponse, SYMBOL_SP500 } from '@market-monitor/api-types';
 import { isBefore, subMinutes } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 import { getSummaries } from '../../functions-shared';
 
-export const getmarketoverview = onRequest(async (_, response: Response<MarketOverviewResponse>) => {
+export const getmarketoverview = onRequest(async (_, response: Response<MarketTopPerformanceOverviewResponse>) => {
   // load data from firestore
   const marketOverviewRef = getDatabaseMarketOverviewRef();
   const marketOverviewData = (await marketOverviewRef.get()).data();
@@ -60,7 +60,7 @@ export const getmarketoverview = onRequest(async (_, response: Response<MarketOv
   const limit = 15;
 
   // construct response
-  const responseData: MarketOverviewResponse = {
+  const responseData: MarketTopPerformanceOverviewResponse = {
     sp500Change,
     lastUpdate: new Date().toISOString(),
     stockTopGainers: gainersData.slice(0, limit),
