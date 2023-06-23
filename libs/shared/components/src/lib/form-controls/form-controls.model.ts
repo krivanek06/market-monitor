@@ -1,17 +1,17 @@
-export interface InputSourceWrapper {
+export interface InputSourceWrapper<T> {
   name: string;
-  items: InputSource[];
+  items: InputSource<T>[];
 }
 
-export interface InputSource {
+export interface InputSource<T> {
   image?: string;
-  value: string | number;
+  value: T;
   caption: string;
   additionalData?: unknown;
 }
 
 export const NONE_INPUT_SOURCE_VALUE = -99;
-export const NONE_INPUT_SOURCE: InputSource = {
+export const NONE_INPUT_SOURCE: InputSource<number> = {
   caption: 'None',
   value: NONE_INPUT_SOURCE_VALUE,
 };
