@@ -18,3 +18,10 @@ export const getMostPerformingStocks = async (type: 'gainers' | 'losers' | 'acti
   const response = await axios.get<MostPerformingStocks[]>(url);
   return response.data.slice(0, 20);
 };
+
+export const getNewsForex = async (symbol: string = '') => {
+  const ticker = symbol ? `tickers=${symbol}&` : '';
+  const url = `${FINANCIAL_MODELING_URL}/v4/forex_news?${ticker}limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get(url);
+  return response.data;
+};

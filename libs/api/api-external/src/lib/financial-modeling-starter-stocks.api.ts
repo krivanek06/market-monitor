@@ -8,11 +8,11 @@ import {
   Earnings,
   HistoricalLoadingPeriods,
   HistoricalPrice,
+  News,
   PriceChange,
   PriceTarget,
   Profile,
   SectorPeers,
-  StockNews,
   SymbolQuote,
   TickerSearch,
   UpgradesDowngrades,
@@ -322,8 +322,8 @@ export const getSymbolPrice = async (symbol: string): Promise<PriceChange> => {
     "url": "https://www.fool.com/investing/2023/06/09/a-bull-market-is-coming-2-reasons-to-buy-apple-sto/"
   }]
  */
-export const getStockNews = async (symbol: string): Promise<StockNews[]> => {
+export const getStockNews = async (symbol: string): Promise<News[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v3/stock_news/?tickers=${symbol}&limit=15&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<StockNews[]>(url);
+  const response = await axios.get<News[]>(url);
   return response.data;
 };

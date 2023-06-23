@@ -1,24 +1,24 @@
-import { StockDataFields } from './firebase-stock.model';
+import { FirebaseStockDataFields } from './firebase-stock.model';
 
 export type StockDataHistorical =
-  | StockDataFields.stock_historical_1d
-  | StockDataFields.stock_historical_1wk
-  | StockDataFields.stock_historical_1mo
-  | StockDataFields.stock_historical_3mo
-  | StockDataFields.stock_historical_6mo
-  | StockDataFields.stock_historical_ytd
-  | StockDataFields.stock_historical_1yr
-  | StockDataFields.stock_historical_5yr
-  | StockDataFields.stock_historical_all;
+  | FirebaseStockDataFields.stock_historical_1d
+  | FirebaseStockDataFields.stock_historical_1wk
+  | FirebaseStockDataFields.stock_historical_1mo
+  | FirebaseStockDataFields.stock_historical_3mo
+  | FirebaseStockDataFields.stock_historical_6mo
+  | FirebaseStockDataFields.stock_historical_ytd
+  | FirebaseStockDataFields.stock_historical_1yr
+  | FirebaseStockDataFields.stock_historical_5yr
+  | FirebaseStockDataFields.stock_historical_all;
 
 export const StockDataHistoricalPeriods = {
-  '1d': StockDataFields.stock_historical_1d,
-  '1w': StockDataFields.stock_historical_1wk,
-  '1mo': StockDataFields.stock_historical_1mo,
-  '3mo': StockDataFields.stock_historical_3mo,
-  '6mo': StockDataFields.stock_historical_6mo,
-  '1y': StockDataFields.stock_historical_1yr,
-  '5y': StockDataFields.stock_historical_5yr,
-  ytd: StockDataFields.stock_historical_ytd,
-  all: StockDataFields.stock_historical_all,
+  '1d': FirebaseStockDataFields.stock_historical_1d,
+  '1w': FirebaseStockDataFields.stock_historical_1wk,
+  '1mo': FirebaseStockDataFields.stock_historical_1mo,
+  '3mo': FirebaseStockDataFields.stock_historical_3mo,
+  '6mo': FirebaseStockDataFields.stock_historical_6mo,
+  '1y': FirebaseStockDataFields.stock_historical_1yr,
+  '5y': FirebaseStockDataFields.stock_historical_5yr,
+  ytd: FirebaseStockDataFields.stock_historical_ytd,
+  all: FirebaseStockDataFields.stock_historical_all,
 } as const;

@@ -1,4 +1,4 @@
-export enum MarketDataFields {
+export enum FirebaseMarketDataFields {
   // collections
   market_data = 'market_data',
 

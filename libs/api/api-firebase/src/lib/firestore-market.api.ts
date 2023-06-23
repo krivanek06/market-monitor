@@ -1,10 +1,10 @@
 import { MarketOverview } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
-import { MarketDataFields } from './models';
+import { FirebaseMarketDataFields } from './models';
 
 export const getDatabaseMarketOverviewRef = () =>
   firestore()
-    .collection(MarketDataFields.market_data)
-    .doc(MarketDataFields.market_top_performance)
+    .collection(FirebaseMarketDataFields.market_data)
+    .doc(FirebaseMarketDataFields.market_top_performance)
     .withConverter(assignTypes<MarketOverview>());
