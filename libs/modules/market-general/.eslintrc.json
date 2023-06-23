@@ -17,7 +17,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "market-monitor",
+            "prefix": "app",
             "style": "kebab-case"
           }
         ]

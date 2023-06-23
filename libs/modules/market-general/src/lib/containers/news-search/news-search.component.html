@@ -1,0 +1,7 @@
+<p>news-search works!</p>
+
+<div class="m-2 columns-1 lg:columns-2">
+  <div *ngFor="let news of marketStockNews()?.slice(0, 10)" class="inline-block">
+    <app-news-body [news]="news" additionalClasses="m-2"></app-news-body>
+  </div>
+</div>

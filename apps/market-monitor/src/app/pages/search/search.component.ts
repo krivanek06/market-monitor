@@ -1,24 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
-import { StockSearchBasicCustomizedComponent, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks';
-import { TabSelectControlComponent } from '@market-monitor/shared-components';
-import { RangeDirective } from '@market-monitor/shared-directives';
+import { NewsSearchComponent } from '@market-monitor/modules/market-general';
+import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks';
 import { DialogServiceModule } from '@market-monitor/shared-utils';
 @Component({
   selector: 'app-search',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    // ReactiveFormsModule,
     MatButtonModule,
     DialogServiceModule,
-    StockSummaryTableComponent,
-    TabSelectControlComponent,
-    RangeDirective,
+    // StockSummaryTableComponent,
+    // TabSelectControlComponent,
+    // RangeDirective,
+    NewsSearchComponent,
     StockSearchBasicCustomizedComponent,
   ],
   templateUrl: './search.component.html',

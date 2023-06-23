@@ -1,1 +1,1 @@
-export * from './lib/modules-market-general.module';
+export * from './lib';
