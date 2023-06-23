@@ -1,7 +1,25 @@
 <p>news-search works!</p>
 
+TODO: display filtering articles
+<!-- <app-form-mat-input-wrapper [formControl]="test1Control"></app-form-mat-input-wrapper>
+<app-form-mat-input-wrapper
+  [formControl]="test2Control"
+  inputType="SELECT"
+  [inputSource]="test2InputSource()"
+></app-form-mat-input-wrapper> -->
+
+<form class="flex items-center gap-3" [formGroup]="newSearchFormGroup">
+  <app-form-mat-input-wrapper
+    formControlName="newsType"
+    inputType="SELECT"
+    [inputSource]="newsTypesInputSource"
+  ></app-form-mat-input-wrapper>
+
+  <app-form-mat-input-wrapper formControlName="symbol"></app-form-mat-input-wrapper>
+</form>
+
 <div class="columns-1 lg:columns-2">
-  <article *ngFor="let news of marketStockNews()?.slice(0, 10)" class="inline-block m-2">
+  <article *ngFor="let news of marketStockNewsSignal()?.slice(0, 10)" class="inline-block m-2">
     <app-news-body [news]="news"></app-news-body>
   </article>
 </div>

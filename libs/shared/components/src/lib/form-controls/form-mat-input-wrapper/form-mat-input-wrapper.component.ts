@@ -1,6 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, signal } from '@angular/core';
-import { ControlContainer, ControlValueAccessor, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, Input, OnInit, Optional, forwardRef, signal } from '@angular/core';
+import {
+  ControlContainer,
+  ControlValueAccessor,
+  FormControl,
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -38,6 +45,13 @@ import { InputSource, InputSourceWrapper, InputType, InputTypeEnum } from '../fo
     MatButtonModule,
     DefaultImgDirective,
   ],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => FormMatInputWrapperComponent),
+      multi: true,
+    },
+  ],
 })
 export class FormMatInputWrapperComponent<T> implements OnInit, ControlValueAccessor {
   @Input() controlName!: string;
@@ -66,7 +80,7 @@ export class FormMatInputWrapperComponent<T> implements OnInit, ControlValueAcce
    */
   @Input() inputSourceWrapper?: InputSourceWrapper<T>[] | null = [];
 
-  onChange: (value: T) => void = () => {};
+  onChange: (value: T | null) => void = () => {};
   onTouched = () => {};
 
   InputType = InputTypeEnum;
@@ -77,11 +91,11 @@ export class FormMatInputWrapperComponent<T> implements OnInit, ControlValueAcce
    */
   internalSelectFormControl = signal<InputSource<T> | null>(null);
 
-  private parentFormControl!: FormControl;
+  private parentFormControl?: FormControl;
 
-  constructor(private controlContainer: ControlContainer) {}
+  constructor(@Optional() private controlContainer: ControlContainer) {}
 
-  get usedFormControl(): FormControl {
+  get usedFormControl(): FormControl | undefined {
     return this.parentFormControl;
   }
 
@@ -94,7 +108,13 @@ export class FormMatInputWrapperComponent<T> implements OnInit, ControlValueAcce
   }
 
   ngOnInit(): void {
-    this.parentFormControl = this.controlContainer.control?.get(this.controlName) as FormControl;
+    if (this.controlContainer) {
+      this.parentFormControl = this.controlContainer.control?.get(this.controlName) as FormControl;
+    }
+
+    this.internalFormControl.valueChanges.subscribe((value) => {
+      this.onChange(value);
+    });
   }
 
   onSelectChange(inputSource: InputSource<T>, e: MatOptionSelectionChange) {

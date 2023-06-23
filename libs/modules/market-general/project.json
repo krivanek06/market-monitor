@@ -2,7 +2,7 @@
   "name": "modules-market-general",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/modules/market-general/src",
-  "prefix": "market-monitor",
+  "prefix": "app",
   "tags": [],
   "projectType": "library",
   "targets": {

@@ -6,7 +6,7 @@
         else fieldWhichCannotBeInFormField
       "
       appearance="fill"
-      [ngClass]="{ 'errors-showed': usedFormControl.touched && usedFormControl.invalid }"
+      [ngClass]="{ 'errors-showed': usedFormControl?.touched && usedFormControl?.invalid }"
     >
       <!-- label -->
       <mat-label> {{ inputCaption }}</mat-label>
@@ -105,7 +105,7 @@
       />
 
       <!-- errors -->
-      <mat-error *ngFor="let inputError of usedFormControl.errors | keyvalue" [id]="''">
+      <mat-error *ngFor="let inputError of usedFormControl?.errors | keyvalue" [id]="''">
         {{ inputError.value.errorText }}
       </mat-error>
 
@@ -151,7 +151,7 @@
         </ng-container>
         <!-- errors -->
         <ng-container *ngIf="shouldBeErrorsShowed">
-          <mat-error *ngFor="let inputError of usedFormControl.errors | keyvalue" [id]="''">
+          <mat-error *ngFor="let inputError of usedFormControl?.errors | keyvalue" [id]="''">
             {{ inputError.value.errorText }}
           </mat-error>
         </ng-container>

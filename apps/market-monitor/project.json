@@ -15,14 +15,8 @@
         "main": "apps/market-monitor/src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "apps/market-monitor/tsconfig.app.json",
-        "assets": [
-          "apps/market-monitor/src/favicon.ico",
-          "apps/market-monitor/src/assets"
-        ],
-        "styles": [
-          "@angular/material/prebuilt-themes/indigo-pink.css",
-          "apps/market-monitor/src/styles.scss"
-        ],
+        "assets": ["apps/market-monitor/src/favicon.ico", "apps/market-monitor/src/assets"],
+        "styles": ["@angular/material/prebuilt-themes/indigo-pink.css", "apps/market-monitor/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
@@ -74,10 +68,7 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/market-monitor/**/*.ts",
-          "apps/market-monitor/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/market-monitor/**/*.ts", "apps/market-monitor/**/*.html"]
       }
     },
     "test": {
