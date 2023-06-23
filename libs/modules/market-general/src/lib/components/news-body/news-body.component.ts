@@ -13,5 +13,4 @@ import { DateAgoPipe } from '@market-monitor/shared-pipes';
 })
 export class NewsBodyComponent {
   @Input({ required: true }) news!: News;
-  @Input() additionalClasses: string = '';
 }
