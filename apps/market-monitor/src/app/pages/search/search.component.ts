@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
-import { MarketOverTopStocks, MarketOverviewResponse } from '@market-monitor/api-types';
+import { MarketTopPerformanceOverviewResponse } from '@market-monitor/api-types';
 import {
   StockSearchBasicCustomizedComponent,
   StockSummaryTableComponent,
 } from '@market-monitor/modules/stock-visualization';
-import { LabelValue, TabSelectControlComponent } from '@market-monitor/shared-components';
+import { TabSelectControlComponent } from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
 import { DialogServiceModule } from '@market-monitor/shared-utils';
 import { Observable } from 'rxjs';
@@ -32,20 +32,20 @@ import { Observable } from 'rxjs';
 export class SearchComponent implements OnInit {
   marketApiService = inject(MarketApiService);
 
-  marketOverview$: Observable<MarketOverviewResponse> = this.marketApiService.getMarketOverview();
+  marketOverview$: Observable<MarketTopPerformanceOverviewResponse> = this.marketApiService.getMarketOverview();
 
   /**
    * form control for top stocks
    */
-  topStockDisplayControl = new FormControl<keyof MarketOverTopStocks<unknown>>('stockTopActive', { nonNullable: true });
+  // topStockDisplayControl = new FormControl<keyof MarketOverTopStocks<unknown>>('stockTopActive', { nonNullable: true });
 
   displayInfoMobile = signal(false);
 
-  marketTopStocksOptions: LabelValue<keyof MarketOverTopStocks<unknown>>[] = [
-    { label: 'Most Active', value: 'stockTopActive' },
-    { label: 'Gainers', value: 'stockTopGainers' },
-    { label: 'Losers', value: 'stockTopLosers' },
-  ];
+  // marketTopStocksOptions: LabelValue<keyof MarketOverTopStocks<unknown>>[] = [
+  //   { label: 'Most Active', value: 'stockTopActive' },
+  //   { label: 'Gainers', value: 'stockTopGainers' },
+  //   { label: 'Losers', value: 'stockTopLosers' },
+  // ];
 
   ngOnInit(): void {}
 

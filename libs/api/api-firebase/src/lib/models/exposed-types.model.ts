@@ -1,4 +1,21 @@
 import { HistoricalPriceFields } from './firebase-generic.model';
+import { FirebaseMarketDataFields } from './firebase-market.model';
+
+export interface DataSnapshot<T> {
+  lastUpdate: string;
+  data: T;
+}
+
+export type HistoricalPriceTypes =
+  | HistoricalPriceFields.historical_1d
+  | HistoricalPriceFields.historical_1wk
+  | HistoricalPriceFields.historical_1mo
+  | HistoricalPriceFields.historical_3mo
+  | HistoricalPriceFields.historical_6mo
+  | HistoricalPriceFields.historical_ytd
+  | HistoricalPriceFields.historical_1yr
+  | HistoricalPriceFields.historical_5yr
+  | HistoricalPriceFields.historical_all;
 
 export const HistoricalPricePeriods = {
   '1d': HistoricalPriceFields.historical_1d,
@@ -11,3 +28,18 @@ export const HistoricalPricePeriods = {
   ytd: HistoricalPriceFields.historical_ytd,
   all: HistoricalPriceFields.historical_all,
 } as const;
+
+export const firebaseNewsAcceptableTypes = ['general', 'stocks', 'forex', 'crypto'] as const;
+export type FirebaseNewsTypes = (typeof firebaseNewsAcceptableTypes)[number];
+export const FirebaseNewsTypesCollectionResolver = (category: FirebaseNewsTypes) => {
+  switch (category) {
+    case 'general':
+      return FirebaseMarketDataFields.market_news_general;
+    case 'stocks':
+      return FirebaseMarketDataFields.market_news_stocks;
+    case 'forex':
+      return FirebaseMarketDataFields.market_news_forex;
+    case 'crypto':
+      return FirebaseMarketDataFields.market_news_crypto;
+  }
+};

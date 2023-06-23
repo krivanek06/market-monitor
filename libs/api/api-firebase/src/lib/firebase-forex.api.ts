@@ -1,9 +1,9 @@
-import { HistoricalPrice } from '@market-monitor/api-types';
+import { HistoricalPrice, News } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
 import { DataSnapshot, FirebaseForexDataFields, HistoricalPriceTypes } from './models';
 
-export const getDatabaseCryptoDetailsHistorical = (symbol: string, historical: HistoricalPriceTypes) =>
+export const getDatabaseForexDetailsHistorical = (symbol: string, historical: HistoricalPriceTypes) =>
   firestore()
     .collection(FirebaseForexDataFields.market_data_forex)
     .doc(symbol)
@@ -11,10 +11,10 @@ export const getDatabaseCryptoDetailsHistorical = (symbol: string, historical: H
     .doc(historical)
     .withConverter(assignTypes<DataSnapshot<HistoricalPrice[]>>());
 
-export const getDatabaseCryptoDetailsNews = (symbol: string) =>
+export const getDatabaseForexDetailsNews = (symbol: string) =>
   firestore()
     .collection(FirebaseForexDataFields.market_data_forex)
     .doc(symbol)
     .collection(FirebaseForexDataFields.more_information)
     .doc(FirebaseForexDataFields.forex_news)
-    .withConverter(assignTypes<DataSnapshot<HistoricalPrice[]>>());
+    .withConverter(assignTypes<DataSnapshot<News[]>>());
