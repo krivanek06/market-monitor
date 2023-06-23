@@ -6,5 +6,5 @@ import { MarketDataFields } from './models';
 export const getDatabaseMarketOverviewRef = () =>
   firestore()
     .collection(MarketDataFields.market_data)
-    .doc(MarketDataFields.market_overview)
+    .doc(MarketDataFields.market_top_performance)
     .withConverter(assignTypes<MarketOverview>());

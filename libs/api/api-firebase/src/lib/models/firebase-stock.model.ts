@@ -1,6 +1,6 @@
 export enum StockDataFields {
   // collection names
-  stock_data = 'market_stock_data',
+  stock_data = 'market_data_stocks',
   more_information = 'more_information',
 
   // document names
@@ -18,4 +18,5 @@ export enum StockDataFields {
   stock_ratios = 'stock_ratios',
   stock_financial_statements = 'stock_financial_statements',
   stock_financial_growth = 'stock_financial_growth',
+  stock_news = 'stock_news',
 }
