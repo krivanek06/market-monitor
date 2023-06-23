@@ -1,7 +1,7 @@
 {
-  "name": "modules-stock-visualization",
+  "name": "modules-market-stocks",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/modules/stock-visualization/src",
+  "sourceRoot": "libs/modules/market-stocks/src",
   "prefix": "app",
   "tags": [],
   "projectType": "library",
@@ -10,7 +10,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/modules/stock-visualization/jest.config.ts",
+        "jestConfig": "libs/modules/market-stocks/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {
@@ -24,10 +24,7 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/modules/stock-visualization/**/*.ts",
-          "libs/modules/stock-visualization/**/*.html"
-        ]
+        "lintFilePatterns": ["libs/modules/market-stocks/**/*.ts", "libs/modules/market-stocks/**/*.html"]
       }
     }
   }

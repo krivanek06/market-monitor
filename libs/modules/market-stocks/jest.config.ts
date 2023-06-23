@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'modules-stock-visualization',
+  displayName: 'modules-market-stocks',
   preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../../coverage/libs/modules/stock-visualization',
+  coverageDirectory: '../../../coverage/libs/modules/market-stocks',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

@@ -1,17 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
-import { MarketTopPerformanceOverviewResponse } from '@market-monitor/api-types';
-import {
-  StockSearchBasicCustomizedComponent,
-  StockSummaryTableComponent,
-} from '@market-monitor/modules/stock-visualization';
+import { StockSearchBasicCustomizedComponent, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks';
 import { TabSelectControlComponent } from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
 import { DialogServiceModule } from '@market-monitor/shared-utils';
-import { Observable } from 'rxjs';
 @Component({
   selector: 'app-search',
   standalone: true,
@@ -32,7 +28,8 @@ import { Observable } from 'rxjs';
 export class SearchComponent implements OnInit {
   marketApiService = inject(MarketApiService);
 
-  marketOverview$: Observable<MarketTopPerformanceOverviewResponse> = this.marketApiService.getMarketOverview();
+  marketStockNews = toSignal(this.marketApiService.getNews('stocks'));
+  //  marketOverview$: Observable<MarketTopPerformanceOverviewResponse> = this.marketApiService.getMarketOverview();
 
   /**
    * form control for top stocks
