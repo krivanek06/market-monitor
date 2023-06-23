@@ -12,3 +12,6 @@ export type MarketTopPerformance<T> = {
 export type MarketTopPerformanceOverview = MarketTopPerformance<MostPerformingStocks> & {};
 
 export type MarketTopPerformanceOverviewResponse = MarketTopPerformance<StockSummary> & {};
+
+export const firebaseNewsAcceptableTypes = ['general', 'stocks', 'forex', 'crypto'] as const;
+export type FirebaseNewsTypes = (typeof firebaseNewsAcceptableTypes)[number];

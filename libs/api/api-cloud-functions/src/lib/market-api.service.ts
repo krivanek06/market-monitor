@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { FirebaseNewsTypes } from '@market-monitor/api-firebase';
-import { MarketTopPerformanceOverviewResponse, News } from '@market-monitor/api-types';
+import { FirebaseNewsTypes, MarketTopPerformanceOverviewResponse, News } from '@market-monitor/api-types';
 import { Observable } from 'rxjs';
 import { ENDPOINT_FUNCTION_URL } from './api-url.token';
 

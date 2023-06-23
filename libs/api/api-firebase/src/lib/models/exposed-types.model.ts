@@ -1,9 +1,21 @@
-import { HistoricalPriceFields } from './firebase-generic.model';
+import { FirebaseNewsTypes } from '@market-monitor/api-types';
 import { FirebaseMarketDataFields } from './firebase-market.model';
 
 export interface DataSnapshot<T> {
   lastUpdate: string;
   data: T;
+}
+
+export enum HistoricalPriceFields {
+  historical_1d = 'historical_1d',
+  historical_1wk = 'historical_1wk',
+  historical_1mo = 'historical_1mo',
+  historical_3mo = 'historical_3mo',
+  historical_6mo = 'historical_6mo',
+  historical_ytd = 'historical_ytd',
+  historical_1yr = 'historical_1yr',
+  historical_5yr = 'historical_5yr',
+  historical_all = 'historical_all',
 }
 
 export type HistoricalPriceTypes =
@@ -29,8 +41,6 @@ export const HistoricalPricePeriods = {
   all: HistoricalPriceFields.historical_all,
 } as const;
 
-export const firebaseNewsAcceptableTypes = ['general', 'stocks', 'forex', 'crypto'] as const;
-export type FirebaseNewsTypes = (typeof firebaseNewsAcceptableTypes)[number];
 export const FirebaseNewsTypesCollectionResolver = (category: FirebaseNewsTypes) => {
   switch (category) {
     case 'general':

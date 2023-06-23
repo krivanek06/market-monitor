@@ -3,8 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
-import { FirebaseNewsTypes, firebaseNewsAcceptableTypes } from '@market-monitor/api-firebase';
-import { News } from '@market-monitor/api-types';
+import { FirebaseNewsTypes, News, firebaseNewsAcceptableTypes } from '@market-monitor/api-types';
 import { FormMatInputWrapperComponent, InputSource } from '@market-monitor/shared-components';
 import { NewsBodyComponent } from '../../components';
 @Component({
