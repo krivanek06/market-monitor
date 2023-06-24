@@ -1,0 +1,12 @@
+:host {
+  a {
+    @apply transition-all duration-300 text-sm;
+    &:hover {
+      @apply text-wt-gray-medium;
+    }
+
+    &.is-active {
+      @apply text-wt-gray-dark;
+    }
+  }
+}

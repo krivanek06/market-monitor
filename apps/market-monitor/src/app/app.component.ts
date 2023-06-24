@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { ROUTES_TOP_LEVEL } from './routes.model';
 
 @Component({
   standalone: true,
   imports: [CommonModule, RouterModule],
-  selector: 'market-monitor-root',
+  selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'market-monitor';
+  ROUTES_TOP_LEVEL = ROUTES_TOP_LEVEL;
 }

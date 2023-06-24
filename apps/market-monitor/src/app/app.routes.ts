@@ -1,11 +1,9 @@
 import { Routes } from '@angular/router';
-import { AppComponent } from './app.component';
 import { ROUTES_TOP_LEVEL } from './routes.model';
 
 export const appRoutes: Routes = [
   {
     path: '',
-    component: AppComponent,
     children: [
       {
         path: '',
@@ -39,7 +37,7 @@ export const appRoutes: Routes = [
       {
         path: ROUTES_TOP_LEVEL.DASHBOARD,
         loadChildren: () => import('./pages/dashboard/dashboard.routes').then((m) => m.route),
-      }
+      },
     ],
   },
 ];
