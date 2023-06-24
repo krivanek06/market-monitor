@@ -13,8 +13,8 @@ export class MarketApiService {
     @Inject(ENDPOINT_FUNCTION_URL) private readonly endpointFunctions: string
   ) {}
 
-  getMarketOverview(): Observable<MarketTopPerformanceOverviewResponse> {
-    return this.http.get<MarketTopPerformanceOverviewResponse>(`${this.endpointFunctions}/getmarketoverview`);
+  getMarketTopPerformance(): Observable<MarketTopPerformanceOverviewResponse> {
+    return this.http.get<MarketTopPerformanceOverviewResponse>(`${this.endpointFunctions}/getmarkettopperformance`);
   }
 
   getNews(newsType: FirebaseNewsTypes, symbol: string = ''): Observable<News[]> {
