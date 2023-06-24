@@ -1,63 +1,11 @@
 <div class="pt-[240px] pb-[300px]">
-  <!-- favorite stocks -->
-  <!-- <div class="xl:col-span-2">
-    <app-stock-summary-item-table
-      tableTitle="Favorite Stocks"
-      (summaryClickEmitter)="onSummaryClick($event)"
-      [showSkeleton]="(isStockSummaryLoaded$ | async) === false"
-      [stockSummaries]="favoriteStocks$ | async"
-    ></app-stock-summary-item-table>
-  </div> -->
-
   <div class="max-w-[620px] mx-auto">
     <h1 class="text-center">Search Stock</h1>
-    <!-- <app-stock-search-basic [formControl]="searchControl"></app-stock-search-basic> -->
     <app-stock-search-basic-customized></app-stock-search-basic-customized>
   </div>
-
-  <!-- Last searched stocks -->
-  <!-- <div class="xl:col-span-2">
-    <app-stock-summary-item-table
-      tableTitle="Last Searched Stocks"
-      (summaryClickEmitter)="onSummaryClick($event)"
-      [showSkeleton]="(isStockSummaryLoaded$ | async) === false"
-      [stockSummaries]="searchedStocks$ | async"
-    ></app-stock-summary-item-table>
-  </div> -->
 </div>
-<div class="max-w-[1280px] mx-auto">
+
+<!-- news -->
+<div class="g-width-lg">
   <app-news-search></app-news-search>
 </div>
-
-<!--
-<div class="">
-  <div class="flex items-start gap-3 mb-2 sm:justify-end">
-
-    <app-tab-select-control
-      [formControl]="topStockDisplayControl"
-      class="max-md:w-full"
-      [displayOptions]="marketTopStocksOptions"
-    ></app-tab-select-control>
-
-
-    <div class="w-full mt-2 sm:hidden">
-      <button mat-stroked-button class="w-full text-sm" (click)="toggleDisplayedValues()">
-        {{ displayInfoMobile() ? 'Info' : 'Price +/-' }}
-      </button>
-    </div>
-  </div>
-
-
-  <ng-container *ngIf="marketOverview$ | async as marketOverview; else stockSummaryTableSkeleton">
-    <app-stock-summary-table
-      (itemClickedEmitter)="onSummaryClick($event)"
-      [displayInfoMobile]="displayInfoMobile()"
-      [stockSummaries]="marketOverview[topStockDisplayControl.value]"
-    ></app-stock-summary-table>
-  </ng-container>
-
-
-  <ng-template #stockSummaryTableSkeleton>
-    <div *ngRange="15" class="h-12 mb-1 g-skeleton"></div>
-  </ng-template>
-</div> -->

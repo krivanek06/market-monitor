@@ -1,16 +1,37 @@
 .g-section-title {
-	color: var(--primary) !important;
-	@apply text-2xl;
+  color: var(--primary) !important;
+  @apply text-2xl;
 }
 
 .g-banner-error {
-	@apply text-lg text-center text-white bg-red-500 p-2 rounded-lg;
+  @apply text-lg text-center text-white bg-red-500 p-2 rounded-lg;
 }
 
 .g-banner-default {
-	@apply p-4 text-lg text-center bg-wt-gray-dark rounded-lg;
+  @apply p-4 text-lg text-center bg-wt-gray-dark rounded-lg;
 }
 
 .g-skeleton {
-	@apply rounded-lg bg-wt-gray-light animate-pulse;
+  @apply rounded-lg bg-wt-gray-light animate-pulse;
+}
+
+.g-width-lg {
+  @apply max-w-[1280px] mx-auto;
+}
+
+.g-screen-size-default {
+  display: block;
+  max-width: var(--screen-max-width);
+  padding-left: 8px;
+  padding-right: 8px;
+  margin: auto;
+  padding: 16px;
+
+  @screen sm {
+    padding: 32px;
+  }
+
+  // @screen xl {
+  //   padding: 16px;
+  // }
 }

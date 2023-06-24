@@ -3,7 +3,7 @@ import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
 import { DataSnapshot, FirebaseMarketDataFields, FirebaseNewsTypesCollectionResolver } from './models';
 
-export const getDatabaseMarketOverviewRef = () =>
+export const getDatabaseMarketTopPerformanceRef = () =>
   firestore()
     .collection(FirebaseMarketDataFields.market_data)
     .doc(FirebaseMarketDataFields.market_top_performance)
