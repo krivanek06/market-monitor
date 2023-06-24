@@ -13,6 +13,6 @@
       <span>●</span>
       <span>{{ news.publishedDate | dateAgo }}</span>
     </div>
-    <div class="hidden text-xs sm:block text-wt-gray-light">{{ news.text }}</div>
+    <div class="hidden text-xs sm:block text-wt-gray-light">{{ news.text | truncateWords : 30 }}</div>
   </div>
 </a>
