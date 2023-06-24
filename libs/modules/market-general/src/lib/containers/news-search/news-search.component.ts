@@ -41,7 +41,10 @@ export class NewsSearchComponent {
       startWith(this.newSearchFormGroup.getRawValue()),
       debounceTime(500),
       distinctUntilChanged(),
-      tap(() => this.showLoadingSignal.set(true)),
+      tap(() => {
+        this.showLoadingSignal.set(true);
+        this.maximumNewsDisplayed.set(10);
+      }),
       pairwise(),
       map(([prev, curr]) => {
         // console.log('prev', prev);
