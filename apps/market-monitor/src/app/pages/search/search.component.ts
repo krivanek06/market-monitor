@@ -6,6 +6,7 @@ import { MarketApiService } from '@market-monitor/api-cloud-functions';
 import { NewsSearchComponent } from '@market-monitor/modules/market-general';
 import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks';
 import { DialogServiceModule } from '@market-monitor/shared-utils';
+
 @Component({
   selector: 'app-search',
   standalone: true,
