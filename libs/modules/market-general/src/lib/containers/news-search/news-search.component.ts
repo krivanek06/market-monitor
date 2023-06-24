@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
 import { FirebaseNewsTypes, News, firebaseNewsAcceptableTypes } from '@market-monitor/api-types';
 import { FormMatInputWrapperComponent, InputSource } from '@market-monitor/shared-components';
-import { RangeDirective } from '@market-monitor/shared-directives';
+import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared-directives';
 import { debounceTime, distinctUntilChanged, map, pairwise, startWith, switchMap, tap } from 'rxjs';
 import { NewsBodyComponent } from '../../components';
 
@@ -20,6 +20,7 @@ import { NewsBodyComponent } from '../../components';
     MatButtonModule,
     ReactiveFormsModule,
     RangeDirective,
+    ScrollNearEndDirective,
   ],
   templateUrl: './news-search.component.html',
   styleUrls: ['./news-search.component.scss'],
@@ -33,6 +34,7 @@ export class NewsSearchComponent {
     symbol: new FormControl('', { nonNullable: true }),
   });
 
+  maximumNewsDisplayed = signal(10);
   showLoadingSignal = signal<boolean>(true);
   marketStockNewsSignal = toSignal<News[]>(
     this.newSearchFormGroup.valueChanges.pipe(
@@ -76,5 +78,9 @@ export class NewsSearchComponent {
     setTimeout(() => {
       this.newSearchFormGroup.setValue(this.newSearchFormGroup.getRawValue());
     }, 600);
+  }
+
+  onNearEndScroll(): void {
+    this.maximumNewsDisplayed.set(this.maximumNewsDisplayed() + 10);
   }
 }

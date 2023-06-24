@@ -25,12 +25,10 @@
 </div>
 
 <!-- loaded news -->
-<div *ngIf="!showLoadingSignal()" class="columns-1 lg:columns-2">
-  <article *ngFor="let news of marketStockNewsSignal()?.slice(0, 10)" class="inline-block m-2">
-    <app-news-body [news]="news"></app-news-body>
-  </article>
+<div appScrollNearEnd (nearEnd)="onNearEndScroll()" class="grid grid-cols-1 lg:grid-cols-2">
+  <ng-container *ngIf="!showLoadingSignal()">
+    <article *ngFor="let news of marketStockNewsSignal()?.slice(0, maximumNewsDisplayed())" class="inline-block m-2">
+      <app-news-body [news]="news"></app-news-body>
+    </article>
+  </ng-container>
 </div>
-
-- ADD VIRTUAL SCROLLING ON BOTTOM OF THE PAGE 
-- IF News_Type changed, start again
-- ALLOW only 255 charts for news description 
