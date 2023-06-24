@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { MarketOverviewResponse } from '@market-monitor/api-types';
+import { FirebaseNewsTypes, MarketTopPerformanceOverviewResponse, News } from '@market-monitor/api-types';
 import { Observable } from 'rxjs';
 import { ENDPOINT_FUNCTION_URL } from './api-url.token';
 
@@ -13,7 +13,11 @@ export class MarketApiService {
     @Inject(ENDPOINT_FUNCTION_URL) private readonly endpointFunctions: string
   ) {}
 
-  getMarketOverview(): Observable<MarketOverviewResponse> {
-    return this.http.get<MarketOverviewResponse>(`${this.endpointFunctions}/getmarketoverview`);
+  getMarketOverview(): Observable<MarketTopPerformanceOverviewResponse> {
+    return this.http.get<MarketTopPerformanceOverviewResponse>(`${this.endpointFunctions}/getmarketoverview`);
+  }
+
+  getNews(newsType: FirebaseNewsTypes, symbol: string = ''): Observable<News[]> {
+    return this.http.get<News[]>(`${this.endpointFunctions}/getmarketnews?news_types=${newsType}&symbol=${symbol}`);
   }
 }

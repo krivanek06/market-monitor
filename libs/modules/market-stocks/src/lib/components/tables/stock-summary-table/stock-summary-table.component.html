@@ -1,0 +1,188 @@
+<table mat-table [dataSource]="dataSource" class="w-full" [trackBy]="identity">
+  <!-- image & name -->
+  <ng-container matColumnDef="symbol">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Symbol</th>
+    <td mat-cell *matCellDef="let row">
+      <!-- logo + symbol -->
+      <div class="flex items-center gap-2">
+        <img appDefaultImg [src]="row.profile.image" class="w-10 h-10" />
+        <div class="flex flex-col">
+          <!-- asset symbol + sector -->
+          <div>{{ row.id }}</div>
+        </div>
+      </div>
+    </td>
+  </ng-container>
+
+  <!-- price desktop -->
+  <ng-container matColumnDef="price">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Price +/-</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      <div class="text-base text-wt-gray-light">
+        {{ row.quote.price | currency }}
+      </div>
+    </td>
+  </ng-container>
+
+  <!-- price change desktop -->
+  <ng-container matColumnDef="priceChange">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Price Change</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      <div
+        appPercentageIncrease
+        [useCurrencySign]="false"
+        [changeValues]="{
+          changePercentage: row.quote.changesPercentage
+        }"
+      ></div>
+    </td>
+  </ng-container>
+
+  <!-- price mobile -->
+  <ng-container matColumnDef="priceMobile">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
+    <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
+      <ng-container *ngIf="!displayInfoMobile">
+        <div class="flex justify-end text-base text-wt-gray-light">
+          {{ row.quote.price | currency }}
+        </div>
+        <div
+          class="flex justify-end"
+          appPercentageIncrease
+          [useCurrencySign]="true"
+          [changeValues]="{
+            change: row.quote.change,
+            changePercentage: row.quote.changesPercentage
+          }"
+        ></div>
+      </ng-container>
+    </td>
+  </ng-container>
+
+  <!-- info mobile -->
+  <ng-container matColumnDef="infoMobile">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
+    <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
+      <ng-container *ngIf="displayInfoMobile">
+        <div class="grid grid-cols-1 pl-5 xs:grid-cols-2 gap-x-4 xs:text-center">
+          <!-- market cap -->
+          <div>
+            <span class="text-wt-gray-dark">Market Cap.:</span>
+            <span> {{ row.quote.marketCap | largeNumberFormatter }}</span>
+          </div>
+          <!-- PE -->
+          <div class="hidden xs:block">
+            <span class="text-wt-gray-dark">PE:</span>
+            <span> {{ row.quote.pe ? (row.quote.pe | number : '1.2-2') : 'N/A' }}</span>
+          </div>
+          <!-- shares -->
+          <div>
+            <span class="text-wt-gray-dark">Shares:</span>
+            <span> {{ row.quote.sharesOutstanding | largeNumberFormatter }}</span>
+          </div>
+          <!-- EPS -->
+          <div class="hidden xs:block">
+            <span class="text-wt-gray-dark">EPS:</span>
+            <span> {{ row.quote.eps ? (row.quote.eps | number : '1.2-2') : 'N/A' }}</span>
+          </div>
+        </div>
+      </ng-container>
+    </td>
+  </ng-container>
+
+  <!-- volume -->
+  <ng-container matColumnDef="volume">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Volume +/-</th>
+    <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
+      <div class="text-base text-wt-gray-light">
+        {{ row.quote.volume | largeNumberFormatter }}
+      </div>
+    </td>
+  </ng-container>
+
+  <!-- volume -->
+  <ng-container matColumnDef="volumeChange">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Volume Change</th>
+    <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
+      <div
+        appPercentageIncrease
+        [useCurrencySign]="false"
+        [currentValues]="{
+          hideValue: true,
+          value: row.quote.volume,
+          valueToCompare: row.quote.avgVolume
+        }"
+      ></div>
+    </td>
+  </ng-container>
+
+  <!-- Market Cap -->
+  <ng-container matColumnDef="marketCap">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Market Cap.</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      {{ row.quote.marketCap | largeNumberFormatter }}
+    </td>
+  </ng-container>
+
+  <!-- shares -->
+  <ng-container matColumnDef="shares">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Shares</th>
+    <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
+      {{ row.quote.sharesOutstanding | largeNumberFormatter }}
+    </td>
+  </ng-container>
+
+  <!-- PE -->
+  <ng-container matColumnDef="pe">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">PE</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      {{ row.quote.pe ? (row.quote.pe | number : '1.2-2') : 'N/A' }}
+    </td>
+  </ng-container>
+
+  <!-- EPS -->
+  <ng-container matColumnDef="eps">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">EPS</th>
+    <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
+      {{ row.quote.eps ? (row.quote.eps | number : '1.2-2') : 'N/A' }}
+    </td>
+  </ng-container>
+
+  <!-- sector -->
+  <ng-container matColumnDef="sector">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden 2xl:table-cell">Sector</th>
+    <td mat-cell *matCellDef="let row" class="hidden 2xl:table-cell">
+      <mat-chip-listbox aria-label="Asset sector">
+        <mat-chip>
+          <!-- todo add image of sector -->
+          {{ row.profile.sector }}
+        </mat-chip>
+      </mat-chip-listbox>
+    </td>
+  </ng-container>
+
+  <!-- 52WeekRange -->
+  <ng-container matColumnDef="52WeekRange">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">52 Week Range</th>
+    <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
+      <app-progress-currency
+        [min]="row.quote.yearLow"
+        [max]="row.quote.yearHigh"
+        [value]="row.quote.price"
+      ></app-progress-currency>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+  <tr
+    mat-row
+    *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"
+    [ngClass]="{ 'bg-wt-background-light': even }"
+    (click)="onItemClicked(row)"
+  ></tr>
+
+  <!-- Row shown when there is no matching data. -->
+  <tr class="mat-row" *matNoDataRow>
+    <td class="mat-cell" colspan="10">No data has been found</td>
+  </tr>
+</table>

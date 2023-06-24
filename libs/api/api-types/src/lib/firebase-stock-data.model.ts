@@ -3,11 +3,11 @@ import {
   CompanyOutlook,
   ESGDataQuarterly,
   ESGDataRatingYearly,
+  News,
   PriceChange,
   PriceTarget,
   Profile,
   SectorPeers,
-  StockNews,
   SymbolQuote,
   UpgradesDowngrades,
 } from './financial-modeling-starter.model';
@@ -34,7 +34,7 @@ export type StockDetails = {
   analystEstimatesEarnings: AnalystEstimatesEarnings[];
   sectorPeers: SectorPeers[];
   recommendationTrends: RecommendationTrends[];
-  stockNews: StockNews[];
+  stockNews: News[];
   lastUpdate: {
     newsLastUpdate: string;
     detailsLastUpdate: string;

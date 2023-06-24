@@ -32,7 +32,7 @@ export type CompanyOutlook = {
   KeyExecutive: KeyExecutive[];
   splitsHistory: SplitsHistory[];
   stockDividend: StockDividend[];
-  stockNews: StockNews[];
+  stockNews: News[];
   rating: Rating[];
   financialsAnnual: FinancialsReport;
   financialsQuarter: FinancialsReport;
@@ -190,7 +190,7 @@ export type StockDividend = {
   declarationDate: string;
 };
 
-export type StockNews = {
+export type News = {
   symbol: string;
   publishedDate: string;
   title: string;

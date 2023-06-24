@@ -78,6 +78,7 @@
     "jest-environment-node": "^29.4.1",
     "jest-preset-angular": "~13.1.0",
     "kill-port": "^2.0.1",
+    "lodash": "^4.17.21",
     "ng-packagr": "~16.0.0",
     "nx": "16.3.2",
     "nx-cloud": "latest",
@@ -90,5 +91,14 @@
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "typescript": "~5.0.2"
+  },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false,
+    "net": false,
+    "tls": false,
+    "child_process": false,
+    "crypto": false
   }
 }

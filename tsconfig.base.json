@@ -19,12 +19,13 @@
       "@market-monitor/api-external": ["libs/api/api-external/src/index.ts"],
       "@market-monitor/api-firebase": ["libs/api/api-firebase/src/index.ts"],
       "@market-monitor/api-types": ["libs/api/api-types/src/index.ts"],
+      "@market-monitor/modules/market-general": ["libs/modules/market-general/src/index.ts"],
+      "@market-monitor/modules/market-stocks": ["libs/modules/market-stocks/src/index.ts"],
       "@market-monitor/shared-components": ["libs/shared/components/src/index.ts"],
       "@market-monitor/shared-directives": ["libs/shared/directives/src/index.ts"],
       "@market-monitor/shared-pipes": ["libs/shared/pipes/src/index.ts"],
       "@market-monitor/shared-services": ["libs/shared/services/src/index.ts"],
-      "@market-monitor/shared-utils": ["libs/shared/utils/src/index.ts"],
-      "@market-monitor/modules/stock-visualization": ["libs/modules/stock-visualization/src/index.ts"],
+      "@market-monitor/shared-utils": ["libs/shared/utils/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
