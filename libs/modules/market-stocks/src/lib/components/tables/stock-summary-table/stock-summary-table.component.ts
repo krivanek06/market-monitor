@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, TrackByFunction, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, TrackByFunction, ViewChild, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
@@ -39,8 +39,14 @@ export class StockSummaryTableComponent {
     this.dataSource = new MatTableDataSource(data ?? []);
     this.dataSource.paginator = this.paginator;
   }
+  @Input() tableTitle = '';
+  @Input() showMobileInfoButton = true;
 
-  @Input() displayInfoMobile = false;
+  displayInfoMobile = signal(false);
+
+  toggleDisplayedValues(): void {
+    this.displayInfoMobile.set(!this.displayInfoMobile());
+  }
 
   dataSource!: MatTableDataSource<StockSummary>;
 
