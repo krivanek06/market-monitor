@@ -21,10 +21,14 @@ export type FirebaseNewsTypes = (typeof firebaseNewsAcceptableTypes)[number];
 // ------------------ Market Overview ------------------
 
 export type MarketOverviewData = {
-  name: string;
-  description: string;
-  data: [string, number];
+  data: number[];
+  dates: string[];
   frequency: string;
   start_date: string;
   end_date: string;
+  lastUpdate: string;
 };
+
+// TODO: create endpoint to load data from quandl
+// TODO: targeting endpoint will resolve by 'provider' which endpoint to target
+// TODO - data refeesh rate
