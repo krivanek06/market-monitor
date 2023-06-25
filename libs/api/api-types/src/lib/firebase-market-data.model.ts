@@ -18,6 +18,8 @@ export type MarketTopPerformanceOverviewResponse = MarketTopPerformance<StockSum
 export const firebaseNewsAcceptableTypes = ['general', 'stocks', 'forex', 'crypto'] as const;
 export type FirebaseNewsTypes = (typeof firebaseNewsAcceptableTypes)[number];
 
+// ------------------ Market Overview ------------------
+
 export type MarketOverviewData = {
   name: string;
   description: string;
