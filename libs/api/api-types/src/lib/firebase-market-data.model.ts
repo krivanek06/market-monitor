@@ -28,7 +28,3 @@ export type MarketOverviewData = {
   end_date: string;
   lastUpdate: string;
 };
-
-// TODO: create endpoint to load data from quandl
-// TODO: targeting endpoint will resolve by 'provider' which endpoint to target
-// TODO - data refeesh rate
