@@ -1,3 +1,12 @@
+<div *ngIf="tableTitle" class="flex justify-between mb-2">
+  <h2>{{ tableTitle }}</h2>
+  <div *ngIf="showMobileInfoButton" class="sm:hidden">
+    <button mat-stroked-button class="w-[150px] text-sm" (click)="toggleDisplayedValues()">
+      {{ displayInfoMobile() ? 'Info' : 'Price +/-' }}
+    </button>
+  </div>
+</div>
+
 <table mat-table [dataSource]="dataSource" class="w-full" [trackBy]="identity">
   <!-- image & name -->
   <ng-container matColumnDef="symbol">
@@ -26,7 +35,7 @@
 
   <!-- price change desktop -->
   <ng-container matColumnDef="priceChange">
-    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Daily Change</th>
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Daily %</th>
     <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
       <div
         appPercentageIncrease
@@ -40,7 +49,7 @@
 
   <!-- price change week desktop -->
   <ng-container matColumnDef="priceChangeMonthly">
-    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden 2xl:table-cell">Monthly Change</th>
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden 2xl:table-cell">Monthly %</th>
     <td mat-cell *matCellDef="let row" class="hidden 2xl:table-cell">
       <div
         appPercentageIncrease
@@ -56,7 +65,7 @@
   <ng-container matColumnDef="priceMobile">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
     <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
-      <ng-container *ngIf="!displayInfoMobile">
+      <ng-container *ngIf="!displayInfoMobile()">
         <div class="flex justify-end text-base text-wt-gray-light">
           {{ row.quote.price | currency }}
         </div>
@@ -77,7 +86,7 @@
   <ng-container matColumnDef="infoMobile">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
     <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
-      <ng-container *ngIf="displayInfoMobile">
+      <ng-container *ngIf="displayInfoMobile()">
         <div class="grid grid-cols-1 pl-5 xs:grid-cols-2 gap-x-4 xs:text-center">
           <!-- market cap -->
           <div>
@@ -116,7 +125,7 @@
 
   <!-- volume -->
   <ng-container matColumnDef="volumeChange">
-    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Volume Change</th>
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Volume %</th>
     <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
       <div
         appPercentageIncrease
@@ -164,8 +173,8 @@
 
   <!-- Beta -->
   <ng-container matColumnDef="beta">
-    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Beta</th>
-    <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">Beta</th>
+    <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
       {{ row.profile.beta ? (row.profile.beta | number : '1.2-2') : 'N/A' }}
     </td>
   </ng-container>

@@ -1,23 +1,23 @@
 <div *ngIf="marketTopPerformanceSignal() as marketOverview; else stockSummaryTableSkeleton" class="grid pt-20 gap-y-14">
   <div>
-    <h2>Top Active Stocks</h2>
     <app-stock-summary-table
+      tableTitle="Top Active Stocks"
       (itemClickedEmitter)="onSummaryClick($event)"
       [stockSummaries]="marketOverview.stockTopActive"
     ></app-stock-summary-table>
   </div>
 
   <div>
-    <h2>Top Gainer Stocks</h2>
     <app-stock-summary-table
+      tableTitle="Top Gainer Stocks"
       (itemClickedEmitter)="onSummaryClick($event)"
       [stockSummaries]="marketOverview.stockTopGainers"
     ></app-stock-summary-table>
   </div>
 
   <div>
-    <h2>Top Losers Stocks</h2>
     <app-stock-summary-table
+      tableTitle="Top Losers Stocks"
       (itemClickedEmitter)="onSummaryClick($event)"
       [stockSummaries]="marketOverview.stockTopLosers"
     ></app-stock-summary-table>

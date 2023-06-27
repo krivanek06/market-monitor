@@ -8,4 +8,5 @@ export enum FirebaseMarketDataFields {
   market_news_crypto = 'market_news_crypto',
   market_news_forex = 'market_news_forex',
   market_news_stocks = 'market_news_stocks',
+  market_overview = 'market_overview',
 }

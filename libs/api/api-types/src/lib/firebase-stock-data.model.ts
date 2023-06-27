@@ -10,8 +10,8 @@ import {
   SectorPeers,
   SymbolQuote,
   UpgradesDowngrades,
-} from './financial-modeling-starter.model';
-import { RecommendationTrends } from './finnhub.model';
+} from './external-api/financial-modeling-starter.model';
+import { RecommendationTrends } from './external-api/finnhub.model';
 
 export type StockSummary = {
   id: string;
