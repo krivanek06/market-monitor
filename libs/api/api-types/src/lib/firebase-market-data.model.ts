@@ -217,12 +217,12 @@ export const MARKET_OVERVIEW_DATABASE_ENDPOINTS = {
     },
     euCpi: {
       document: 'qundal_consumer_price_index__euro_area_value',
-      url: 'RATEINF/CPI_EU',
+      url: 'RATEINF/CPI_EUR',
       provider: 'quandl',
     },
     ukCpi: {
       document: 'qundal_consumer_price_index__uk_value',
-      url: 'RATEINF/CPI_UK',
+      url: 'RATEINF/CPI_GBR',
       provider: 'quandl',
     },
     jpCpi: {

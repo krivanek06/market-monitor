@@ -19,13 +19,17 @@ import { zip } from 'lodash';
  */
 
 import { firestore } from 'firebase-admin';
+import { delaySeconds } from '../utils';
 
 // TODO: update data if older than 7 days
 export const loadMarketOverviewData = async (
   key: MarketOverviewDatabaseKeys,
   subKey: string,
-  hardReload = false
+  hardReload = false,
+  waitSeconds = 0
 ): Promise<MarketOverviewData | null> => {
+  await delaySeconds(waitSeconds);
+
   // get document and url from database: {qundal_treasury_yield_curve_rates_1_mo, USTREASURY/YIELD}
   const { document, url } = MARKET_OVERVIEW_DATABASE_ENDPOINTS[key]?.[subKey] as { document: string; url: string };
   console.log(key, subKey, document, url);
@@ -45,6 +49,7 @@ export const loadMarketOverviewData = async (
   }
 
   // resolve endpoint
+  console.log(`API call for ${key} - ${subKey}`);
   const apiData = await loadDataFromEndpoint(subKey, url);
 
   // save data to DB
