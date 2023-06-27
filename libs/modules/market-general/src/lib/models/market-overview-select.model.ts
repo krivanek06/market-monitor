@@ -160,51 +160,51 @@ export const MARKET_OVERVIEW_DATA = [
     data: [
       {
         name: 'Consumer price index - USA',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.usCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.usCpi,
       },
       {
         name: 'Consumer price index - Europe',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.euCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.euCpi,
       },
       {
         name: 'Consumer price index - UK',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.ukCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.ukCpi,
       },
       {
         name: 'Consumer price index - Japan',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.jpCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.jpCpi,
       },
       {
         name: 'Consumer price index - Canada',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.caCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.caCpi,
       },
       {
         name: 'Consumer price index - Switzerland',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.cheCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.cheCpi,
       },
       {
         name: 'Consumer price index - Russia',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.rusCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.rusCpi,
       },
       {
         name: 'Consumer price index - Australia',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.ausCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.ausCpi,
       },
       {
         name: 'Consumer price index - Germany',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.gerCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.gerCpi,
       },
       {
         name: 'Consumer price index - France',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.fraCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.fraCpi,
       },
       {
         name: 'Consumer price index - Italy',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.itaCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.itaCpi,
       },
       {
         name: 'Consumer price index - New Zealand',
-        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerPriceIndex.nzlCpi,
+        databaseKey: MARKET_OVERVIEW_DATABASE_KEYS.consumerIndex.nzlCpi,
       },
     ],
   },

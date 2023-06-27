@@ -1,4 +1,10 @@
-import { FirebaseNewsTypes, MarketOverviewData, MarketTopPerformanceOverview, News } from '@market-monitor/api-types';
+import {
+  FirebaseNewsTypes,
+  MarketOverview,
+  MarketOverviewData,
+  MarketTopPerformanceOverview,
+  News,
+} from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
 import { DataSnapshot, FirebaseMarketDataFields, FirebaseNewsTypesCollectionResolver } from './models';
@@ -15,7 +21,13 @@ export const getDatabaseMarketNewsRef = (category: FirebaseNewsTypes) =>
     .doc(FirebaseNewsTypesCollectionResolver(category))
     .withConverter(assignTypes<DataSnapshot<News[]>>());
 
-export const getDatabaseMarketOverviewRef = (path: string) =>
+export const getDatabaseMarketOverviewRef = () =>
+  firestore()
+    .collection(FirebaseMarketDataFields.market_data)
+    .doc(FirebaseMarketDataFields.market_overview)
+    .withConverter(assignTypes<MarketOverview>());
+
+export const getDatabaseMarketOverviewDataRef = (path: string) =>
   firestore()
     .collection(FirebaseMarketDataFields.market_data)
     .doc(path)
