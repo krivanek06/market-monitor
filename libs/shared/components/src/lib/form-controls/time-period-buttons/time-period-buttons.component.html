@@ -4,7 +4,7 @@
     *ngFor="let period of displayTimePeriods"
     mat-stroked-button
     type="button"
-    class="flex-1"
+    class="flex-1 min-h-[36px]"
     [color]="period.value === activeTimePeriod.value ? 'primary' : ''"
     (click)="onTimePeriodSelect(period.value)"
   >

@@ -17,6 +17,10 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
 })
 export class AssetPriceChartInteractiveComponent implements OnInit {
   @Input({ required: true }) symbol!: string;
+  @Input() chartHeightPx = 420;
+  @Input() priceName = 'price';
+  @Input() priceShowSign = true;
+
   stockHistoricalPrice = signal<HistoricalPrice[]>([]);
 
   marketApiService = inject(MarketApiService);

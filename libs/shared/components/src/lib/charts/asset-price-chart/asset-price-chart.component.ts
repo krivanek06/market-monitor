@@ -25,6 +25,8 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
   @Input() heightPx = 550;
   @Input() historicalPrice!: HistoricalPrice[];
   @Input() showTitle = false;
+  @Input() priceName = 'price';
+  @Input() priceShowSign = true;
 
   ngOnInit(): void {}
   ngOnChanges(changes: SimpleChanges): void {
@@ -39,6 +41,9 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
     const price = data.map((d) => d.close);
     const volume = data.map((d) => d.volume);
     const dates = data.map((d) => d.date);
+    const priceNameLocal = this.priceName;
+    const priceShowSignLocal = this.priceShowSign;
+
     console.log({ price, volume, dates });
 
     this.chartOptions = {
@@ -117,10 +122,15 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
 
         pointFormatter: function () {
           const that = this as any;
-          const value = GeneralFunctionUtil.formatLargeNumber(that.y);
 
-          const name = that.series.name.toLowerCase();
-          const valueFormatter = name === 'price' ? `$${value}` : `${value}`;
+          const castedName = that.series.name.toLowerCase();
+          const isPrice = castedName === 'price';
+
+          const value = isPrice
+            ? GeneralFunctionUtil.roundNDigits(that.y, 2)
+            : GeneralFunctionUtil.formatLargeNumber(that.y);
+          const name = isPrice ? priceNameLocal : castedName;
+          const valueFormatter = isPrice && priceShowSignLocal ? `$${value}` : `${value}`;
 
           return `
             <p>

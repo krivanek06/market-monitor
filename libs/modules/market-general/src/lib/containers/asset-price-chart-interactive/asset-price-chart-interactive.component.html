@@ -17,7 +17,12 @@
     </span>
   </div>
   <!-- price & volume chart -->
-  <app-asset-price-chart [historicalPrice]="stockHistoricalPrice()" [heightPx]="420"></app-asset-price-chart>
+  <app-asset-price-chart
+    [priceShowSign]="priceShowSign"
+    [priceName]="priceName"
+    [historicalPrice]="stockHistoricalPrice()"
+    [heightPx]="chartHeightPx"
+  ></app-asset-price-chart>
 </ng-container>
 
 <!-- skeleton chart -->
@@ -28,5 +33,5 @@
     <div class="g-skeleton w-[350px] h-6"></div>
   </div>
 
-  <div class="g-skeleton h-[420px]"></div>
+  <div [style.height.px]="chartHeightPx" class="g-skeleton"></div>
 </ng-template>

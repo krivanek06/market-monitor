@@ -4,12 +4,11 @@ export class GeneralFunctionUtil {
   }
 
   static isNumber = (value: string | number | unknown): boolean => {
-    return (
-      value != null &&
-      value !== '' &&
-      typeof value === 'number' &&
-      !isNaN(Number(value.toString()))
-    );
+    return value != null && value !== '' && typeof value === 'number' && !isNaN(Number(value.toString()));
+  };
+
+  static roundNDigits = (value: number, n: number): number => {
+    return Math.round(value * Math.pow(10, n)) / Math.pow(10, n);
   };
 
   static formatLargeNumber = (
@@ -56,11 +55,7 @@ export class GeneralFunctionUtil {
     return result;
   };
 
-  static compare(
-    a?: number | string | null,
-    b?: number | string | null,
-    isAsc = true
-  ): number {
+  static compare(a?: number | string | null, b?: number | string | null, isAsc = true): number {
     if (!!a && !b) {
       return 1;
     }

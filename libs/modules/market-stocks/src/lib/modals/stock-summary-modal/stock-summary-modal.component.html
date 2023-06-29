@@ -46,12 +46,12 @@
 
   <mat-dialog-content>
     <!-- display main metrics -->
-    <div class="mb-4">
+    <div>
       <app-summary-main-metrics [stockSummary]="stockSummary"></app-summary-main-metrics>
     </div>
 
     <!-- time period change -->
-    <div class="my-4">
+    <div class="my-8">
       <app-price-change-items [mainSymbolPriceChange]="stockSummary.priceChange"></app-price-change-items>
     </div>
 
