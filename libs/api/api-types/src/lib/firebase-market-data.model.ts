@@ -368,8 +368,6 @@ export const MARKET_OVERVIEW_DATABASE_ENDPOINTS = {
 } as const;
 
 export type MarketOverviewDatabaseKeys = keyof typeof MARKET_OVERVIEW_DATABASE_ENDPOINTS;
-export type MarketOverviewDatabaseKeySubKeys<T extends MarketOverviewDatabaseKeys> =
-  keyof (typeof MARKET_OVERVIEW_DATABASE_ENDPOINTS)[T];
 
 export const MARKET_OVERVIEW_DATABASE_KEYS = Object.entries(MARKET_OVERVIEW_DATABASE_ENDPOINTS)
   .map(([key, value]) => {
@@ -382,12 +380,15 @@ export const MARKET_OVERVIEW_DATABASE_KEYS = Object.entries(MARKET_OVERVIEW_DATA
       },
     } as {
       [K in MarketOverviewDatabaseKeys]: {
-        [S in MarketOverviewDatabaseKeySubKeys<K>]: S;
+        [S in keyof (typeof MARKET_OVERVIEW_DATABASE_ENDPOINTS)[K]]: S;
       };
     };
     return result;
   })
   .reduce((acc, curr) => ({ ...acc, ...curr }));
+
+export type MarketOverviewDatabaseKeySubKeys<T extends MarketOverviewDatabaseKeys> =
+  keyof (typeof MARKET_OVERVIEW_DATABASE_KEYS)[T];
 
 export type MarketOverviewData = {
   data: number[];

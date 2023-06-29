@@ -1,22 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, signal } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { StocksApiService } from '@market-monitor/api-cloud-functions';
-import { HistoricalPrice, StockSummary, SymbolHistoricalPeriods } from '@market-monitor/api-types';
-import {
-  AssetPriceChartComponent,
-  PriceChangeItemsComponent,
-  TimePeriodButtonsComponent,
-} from '@market-monitor/shared-components';
+import { StockSummary } from '@market-monitor/api-types';
+import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
+import { PriceChangeItemsComponent } from '@market-monitor/shared-components';
 import { DefaultImgDirective } from '@market-monitor/shared-directives';
 import { DialogServiceUtil } from '@market-monitor/shared-utils';
-import { Observable, catchError, startWith, switchMap, tap } from 'rxjs';
-import { ErrorEnum } from '../../models';
+import { Observable } from 'rxjs';
 import { StockStorageService } from '../../services';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
 import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-modal-skeleton.component';
@@ -29,13 +23,10 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    ReactiveFormsModule,
-    AssetPriceChartComponent,
     SummaryMainMetricsComponent,
-    TimePeriodButtonsComponent,
     PriceChangeItemsComponent,
-    MatTooltipModule,
     SummaryModalSkeletonComponent,
+    AssetPriceChartInteractiveComponent,
   ],
   templateUrl: './stock-summary-modal.component.html',
   styleUrls: ['./stock-summary-modal.component.scss'],
@@ -43,11 +34,6 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
 })
 export class StockSummaryModalComponent {
   stockSummary$!: Observable<StockSummary>;
-  stockHistoricalPrice = signal<HistoricalPrice[]>([]);
-
-  timePeriodFormControl = new FormControl<SymbolHistoricalPeriods>(SymbolHistoricalPeriods.week, {
-    nonNullable: true,
-  });
 
   isSymbolInFavoriteSignal = toSignal(this.stockStorageService.isSymbolInFavoriteObs(this.data.symbol));
 
@@ -58,23 +44,7 @@ export class StockSummaryModalComponent {
     private stockStorageService: StockStorageService,
     private dialogServiceUtil: DialogServiceUtil
   ) {
-    (this.stockSummary$ = this.stocksApiService.getStockSummary(this.data.symbol)),
-      // load prices by selected time period
-      this.timePeriodFormControl.valueChanges
-        .pipe(
-          startWith(this.timePeriodFormControl.value),
-          tap(() => this.stockHistoricalPrice.set([])),
-          switchMap((period) => this.stocksApiService.getStockHistoricalPrices(this.data.symbol, period)),
-          takeUntilDestroyed(),
-          catchError((err) => {
-            console.log(err);
-            this.dialogServiceUtil.showNotificationBar(ErrorEnum.CLIENT_GENERAL_ERROR, 'error');
-            return [];
-          })
-        )
-        .subscribe((prices) => {
-          this.stockHistoricalPrice.set(prices);
-        });
+    this.stockSummary$ = this.stocksApiService.getStockSummary(this.data.symbol);
   }
 
   onAddToFavorite(): void {

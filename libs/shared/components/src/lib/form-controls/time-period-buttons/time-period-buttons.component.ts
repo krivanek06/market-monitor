@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, forwardRef } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { SymbolHistoricalPeriods } from '@market-monitor/api-types';
@@ -20,7 +20,7 @@ import { timePeriodDefaultButtons } from './time-period-buttons.model';
     },
   ],
 })
-export class TimePeriodButtonsComponent {
+export class TimePeriodButtonsComponent implements ControlValueAccessor {
   @Input() displayTimePeriods = timePeriodDefaultButtons;
 
   activeTimePeriod = new FormControl<SymbolHistoricalPeriods | null>(null);

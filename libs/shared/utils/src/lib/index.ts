@@ -3,6 +3,7 @@ export * from './color-scheme.util';
 export * from './custom-form-field-validators';
 export * from './date-service.util';
 export * from './dialogs';
+export * from './general-errors.util';
 export * from './general-function.util';
 export * from './operators';
 export * from './screen-layout.util';
