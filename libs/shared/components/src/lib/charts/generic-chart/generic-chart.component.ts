@@ -28,7 +28,7 @@ import { ChartType, GenericChartSeries, GenericChartSeriesPie } from './generic-
       <button
         mat-icon-button
         *ngIf="showExpandableButton"
-        class="text-wt-gray-medium hover:text-wt-gray-light z-10 absolute"
+        class="text-wt-gray-medium hover:text-wt-gray-light z-10 absolute right-0 top-0"
         (click)="expand()"
         matTooltip="Expand chart"
       >
@@ -61,8 +61,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   @Input() showTooltip = true;
   @Input() showDataLabel = false;
   @Input() categories: string[] = [];
-  @Input() timestamp: number[] = [];
-  //@Input() enable3D = false;
   @Input() showYAxis = true;
   @Input() showXAxis = true;
 
@@ -116,10 +114,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
     if (this.categories.length > 0) {
       this.initCategories();
     }
-
-    if (this.timestamp.length > 0) {
-      this.initTimestamp();
-    }
   }
 
   ngOnInit() {
@@ -141,21 +135,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         type: 'category',
         labels: {
           rotation: -20,
-        },
-      };
-    }
-  }
-
-  private initTimestamp() {
-    //this.chartOptions.plotOptions.series.dataLabels.enabled = false;
-    if (this.chartOptions.xAxis) {
-      this.chartOptions.xAxis = {
-        ...this.chartOptions.xAxis,
-        categories: this.timestamp.map((d) => String(d)),
-        type: 'datetime',
-        labels: {
-          rotation: -20,
-          format: '{value:%e %b %Y}',
         },
       };
     }
@@ -229,6 +208,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           color: '#bababa',
           fontSize: '13px',
         },
+        y: 15,
       },
       subtitle: {
         text: '',
@@ -282,9 +262,14 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
             return '';
           }
 
+          // additional data from above
+          const additionalData = that.series.userOptions.additionalData;
+
           const line1 = `<span style="color: ${that.series.color}">● ${that.series.name}:</span>`;
-          const line2 = `<span>$${that.y} USD</b></span>`;
-          return `<div class="space-x-2">${line1} ${line2}</div>`;
+          const line2 = additionalData?.showCurrencySign
+            ? `<span>$${that.y} USD</b></span>`
+            : `<span>${that.y}</b></span>`;
+          return `<div class="space-x-1">${line1} ${line2}</div>`;
         },
         valueDecimals: 2,
       },

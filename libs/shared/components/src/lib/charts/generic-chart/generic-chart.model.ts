@@ -17,8 +17,11 @@ export interface GenericChartSeries {
   /**
    * example: [value, value, ...] or [[timestamp, value], [timestamp, value], ...]
    */
-  data: (number | null)[] | [Date | number | string | null, number | null][];
+  data: (number | null)[] | [number | null, number | null][];
   color?: string;
+  additionalData?: {
+    showCurrencySign?: boolean;
+  };
 }
 
 // Used only for Pie charts
