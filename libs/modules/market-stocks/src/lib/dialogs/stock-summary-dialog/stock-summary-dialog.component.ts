@@ -14,8 +14,9 @@ import { Observable } from 'rxjs';
 import { StockStorageService } from '../../services';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
 import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-modal-skeleton.component';
+
 @Component({
-  selector: 'app-stock-summary-modal',
+  selector: 'app-stock-summary-dialog',
   standalone: true,
   imports: [
     CommonModule,
@@ -28,17 +29,17 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
     SummaryModalSkeletonComponent,
     AssetPriceChartInteractiveComponent,
   ],
-  templateUrl: './stock-summary-modal.component.html',
-  styleUrls: ['./stock-summary-modal.component.scss'],
+  templateUrl: './stock-summary-dialog.component.html',
+  styleUrls: ['./stock-summary-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockSummaryModalComponent {
+export class StockSummaryDialogComponent {
   stockSummary$!: Observable<StockSummary>;
 
   isSymbolInFavoriteSignal = toSignal(this.stockStorageService.isSymbolInFavoriteObs(this.data.symbol));
 
   constructor(
-    private dialogRef: MatDialogRef<StockSummaryModalComponent>,
+    private dialogRef: MatDialogRef<StockSummaryDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { symbol: string },
     private stocksApiService: StocksApiService,
     private stockStorageService: StockStorageService,

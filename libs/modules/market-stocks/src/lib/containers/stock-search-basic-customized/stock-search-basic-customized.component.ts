@@ -11,7 +11,7 @@ import { ElementFocusDirective } from '@market-monitor/shared-directives';
 import { SCREEN_DIALOGS } from '@market-monitor/shared-utils';
 import { Observable, iif, startWith, switchMap } from 'rxjs';
 import { StockSummaryItemComponent } from '../../components';
-import { StockSummaryModalComponent } from '../../modals';
+import { StockSummaryDialogComponent } from '../../dialogs';
 import { StockStorageService } from '../../services';
 import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-basic.component';
 
@@ -93,7 +93,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     // weird bug: if we don't set isInputFocused to false, the overlay will not close
     this.overlayIsOpen.update((d) => ({ ...d, isInputFocused: false }));
 
-    this.dialog.open(StockSummaryModalComponent, {
+    this.dialog.open(StockSummaryDialogComponent, {
       data: {
         symbol: summary.id,
       },
