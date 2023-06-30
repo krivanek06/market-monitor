@@ -4,7 +4,7 @@ import {
   MarketOverviewDatabaseKeys,
 } from '@market-monitor/api-types';
 
-type MarketOverviewData<T extends MarketOverviewDatabaseKeys> = {
+type MarketOverviewDataLocal<T extends MarketOverviewDatabaseKeys> = {
   name: string;
   key: T;
   data: {
@@ -13,7 +13,7 @@ type MarketOverviewData<T extends MarketOverviewDatabaseKeys> = {
   }[];
 };
 
-const sp500: MarketOverviewData<'sp500'> = {
+const sp500: MarketOverviewDataLocal<'sp500'> = {
   name: 'S&P 500',
   key: 'sp500',
   data: [
@@ -72,7 +72,7 @@ const sp500: MarketOverviewData<'sp500'> = {
   ],
 };
 
-const bonds: MarketOverviewData<'bonds'> = {
+const bonds: MarketOverviewDataLocal<'bonds'> = {
   name: 'Bonds',
   key: 'bonds',
   data: [
@@ -115,7 +115,7 @@ const bonds: MarketOverviewData<'bonds'> = {
   ],
 };
 
-const treasury: MarketOverviewData<'treasury'> = {
+const treasury: MarketOverviewDataLocal<'treasury'> = {
   name: 'Treasury yield',
   key: 'treasury',
   data: [
@@ -170,7 +170,7 @@ const treasury: MarketOverviewData<'treasury'> = {
   ],
 };
 
-const consumerPriceIndex: MarketOverviewData<'consumerIndex'> = {
+const consumerPriceIndex: MarketOverviewDataLocal<'consumerIndex'> = {
   name: 'Consumer price index states',
   key: 'consumerIndex',
   data: [
@@ -225,7 +225,7 @@ const consumerPriceIndex: MarketOverviewData<'consumerIndex'> = {
   ],
 };
 
-const inflationRate: MarketOverviewData<'inflationRate'> = {
+const inflationRate: MarketOverviewDataLocal<'inflationRate'> = {
   name: 'Inflation rate',
   key: 'inflationRate',
   data: [
@@ -280,7 +280,7 @@ const inflationRate: MarketOverviewData<'inflationRate'> = {
   ],
 };
 
-const bitcoin: MarketOverviewData<'bitcoin'> = {
+const bitcoin: MarketOverviewDataLocal<'bitcoin'> = {
   name: 'Bitcoin',
   key: 'bitcoin',
   data: [

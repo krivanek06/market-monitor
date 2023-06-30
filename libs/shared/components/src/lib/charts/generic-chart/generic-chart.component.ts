@@ -20,11 +20,34 @@ import { ChartType, GenericChartSeries, GenericChartSeriesPie } from './generic-
 
 @Component({
   selector: 'app-generic-chart',
-  templateUrl: './generic-chart.component.html',
-  styleUrls: ['./generic-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [CommonModule, HighchartsChartModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  template: `
+    <div class="block relative">
+      <button
+        mat-icon-button
+        *ngIf="showExpandableButton"
+        class="text-wt-gray-medium hover:text-wt-gray-light z-10 absolute"
+        (click)="expand()"
+        matTooltip="Expand chart"
+      >
+        <mat-icon>open_with</mat-icon>
+      </button>
+
+      <highcharts-chart
+        *ngIf="isHighcharts"
+        [Highcharts]="Highcharts"
+        [options]="chartOptions"
+        [callbackFunction]="chartCallback"
+        [(update)]="updateFromInput"
+        [oneToOne]="true"
+        style="width: 100%; display: block"
+        [style.height.px]="heightPx"
+      >
+      </highcharts-chart>
+    </div>
+  `,
 })
 export class GenericChartComponent extends ChartConstructor implements OnInit, OnChanges, OnDestroy {
   @Output() expandEmitter: EventEmitter<any> = new EventEmitter<any>();

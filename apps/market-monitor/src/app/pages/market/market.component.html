@@ -1,7 +1,16 @@
-<div class="mx-auto mt-10 mb-10 sm:w-10/12">
+<div class="grid mt-10 mb-10 lg:grid-cols-3 gap-x-10">
   <app-asset-price-chart-interactive
+    class="lg:col-span-2"
     priceName="Value"
     [priceShowSign]="false"
     [symbol]="SYMBOL_SP500"
+    [chartHeightPx]="350"
   ></app-asset-price-chart-interactive>
+
+  <div class="w-full h-full bg-red-200"></div>
+</div>
+
+<h2>SP500 stats</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+  <app-generic-chart ></app-generic-chart>
 </div>
