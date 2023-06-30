@@ -18,7 +18,12 @@ export interface GenericChartSeries {
    * example: [value, value, ...] or [[timestamp, value], [timestamp, value], ...]
    */
   data: (number | null)[] | [number | null, number | null][];
-  color?: string;
+  color?:
+    | string
+    | {
+        linearGradient: { x1: number; x2: number; y1: number; y2: number };
+        stops: (number | string)[][];
+      };
   additionalData?: {
     showCurrencySign?: boolean;
   };

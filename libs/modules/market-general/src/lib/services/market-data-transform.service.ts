@@ -17,6 +17,8 @@ export class MarketDataTransformService {
       name: string
     ): MarketOverviewChartDataBody => {
       const overviewData = marketOverview[mainKey][subKey] as MarketOverviewData;
+      const isSp500 = mainKey === 'sp500';
+
       return {
         marketOverview: overviewData,
         name: name,
@@ -25,6 +27,7 @@ export class MarketDataTransformService {
           additionalData: {
             showCurrencySign: false,
           },
+          //color: color,
           data: zip(overviewData.dates, overviewData.data)
             .filter((values): values is [string, number] => !!values[0] && !!values[1])
             .reduce((acc, [date, value]) => [...acc, [new Date(date).getTime(), value]], [] as [number, number][]),

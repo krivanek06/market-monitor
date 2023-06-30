@@ -6,10 +6,11 @@ import { SYMBOL_SP500 } from '@market-monitor/api-types';
 import {
   AssetPriceChartInteractiveComponent,
   MarketDataTransformService,
+  MarketOverviewChartDataBody,
 } from '@market-monitor/modules/market-general';
+import { GenericChartComponent } from '@market-monitor/shared-components';
 import { DialogServiceModule } from '@market-monitor/shared-utils';
 import { map } from 'rxjs';
-import { GenericChartComponent } from './../../../../../../libs/shared/components/src/lib/charts/generic-chart/generic-chart.component';
 
 @Component({
   selector: 'app-market',
@@ -29,4 +30,8 @@ export class MarketComponent {
       .getMarketOverview()
       .pipe(map((marketOverview) => this.marketDataTransformService.getMarketOverviewChartData(marketOverview)))
   );
+
+  onExpandChart(marketOverviewData: MarketOverviewChartDataBody): void {
+    console.log(marketOverviewData);
+  }
 }
