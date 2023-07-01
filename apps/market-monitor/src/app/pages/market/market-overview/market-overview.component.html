@@ -1,0 +1,203 @@
+<div class="grid mb-10 lg:grid-cols-3 gap-x-10">
+  <app-asset-price-chart-interactive
+    class="lg:col-span-2"
+    priceName="Value"
+    [priceShowSign]="false"
+    [symbol]="SYMBOL_SP500"
+    [chartHeightPx]="350"
+  ></app-asset-price-chart-interactive>
+
+  <div class="w-full h-full bg-red-200"></div>
+</div>
+
+<ng-container *ngIf="marketOverviewSignal() as marketOverviewSignalValues">
+  <h2>SP500 stats</h2>
+  <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.sp500.peRatio.name"
+      [heightPx]="275"
+      [series]="[marketOverviewSignalValues.sp500.peRatio.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.sp500.shillerPeRatio.name"
+      [heightPx]="275"
+      [series]="[marketOverviewSignalValues.sp500.shillerPeRatio.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.sp500.priceToBook.name"
+      [heightPx]="275"
+      [series]="[marketOverviewSignalValues.sp500.priceToBook.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.sp500.priceToSales.name"
+      [heightPx]="275"
+      [series]="[marketOverviewSignalValues.sp500.priceToSales.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.sp500.earningsYield.name"
+      [heightPx]="275"
+      [series]="[marketOverviewSignalValues.sp500.earningsYield.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.sp500.dividendYield.name"
+      [heightPx]="275"
+      [series]="[marketOverviewSignalValues.sp500.dividendYield.chartData]"
+    ></app-generic-chart>
+  </div>
+
+  <div class="grid mt-10 mb-10 lg:grid-cols-2 gap-x-10">
+    <app-asset-price-chart-interactive
+      priceName="Value"
+      [priceShowSign]="false"
+      [symbol]="SYMBOL_NASDAQ"
+      [chartHeightPx]="280"
+    ></app-asset-price-chart-interactive>
+
+    <app-asset-price-chart-interactive
+      priceName="Value"
+      [priceShowSign]="false"
+      [symbol]="SYMBOL_DOW_JONES"
+      [chartHeightPx]="280"
+    ></app-asset-price-chart-interactive>
+  </div>
+
+  <h2>Inflation Rate</h2>
+  <div class="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2 lg:grid-cols-4">
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.inflationRate.usInflationRate.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.inflationRate.usInflationRate.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.inflationRate.euInflationRate.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.inflationRate.euInflationRate.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.inflationRate.ukInflationRate.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.inflationRate.ukInflationRate.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.inflationRate.gerInflationRate.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.inflationRate.gerInflationRate.chartData]"
+    ></app-generic-chart>
+  </div>
+
+  <h2>Treasury</h2>
+  <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.treasury.us1Month.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.treasury.us1Month.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.treasury.us3Month.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.treasury.us3Month.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.treasury.us1Year.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.treasury.us1Year.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.treasury.us5Year.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.treasury.us5Year.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.treasury.us10Year.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.treasury.us10Year.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.treasury.us30Year.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.treasury.us30Year.chartData]"
+    ></app-generic-chart>
+  </div>
+
+  <h2>Bonds</h2>
+  <div class="grid grid-cols-1 gap-4 mb-3 sm:grid-cols-2 lg:grid-cols-4">
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.bonds.usAAAYield.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.bonds.usAAAYield.chartData]"
+    ></app-generic-chart>
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.bonds.usAAYield.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.bonds.usAAYield.chartData]"
+    ></app-generic-chart>
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.bonds.usBBYield.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.bonds.usBBYield.chartData]"
+    ></app-generic-chart>
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.bonds.usCCCYield.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.bonds.usCCCYield.chartData]"
+    ></app-generic-chart>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2 lg:grid-cols-3">
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.bonds.usCorporateYield.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.bonds.usCorporateYield.chartData]"
+    ></app-generic-chart>
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.bonds.usHighYield.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.bonds.usHighYield.chartData]"
+    ></app-generic-chart>
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.bonds.usEmergingMarket.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.bonds.usEmergingMarket.chartData]"
+    ></app-generic-chart>
+  </div>
+
+  <h2>Consumer Price Index</h2>
+  <div class="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2 lg:grid-cols-4">
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.consumerIndex.usCpi.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.consumerIndex.usCpi.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.consumerIndex.euCpi.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.consumerIndex.euCpi.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.consumerIndex.ukCpi.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.consumerIndex.ukCpi.chartData]"
+    ></app-generic-chart>
+
+    <app-generic-chart
+      [chartTitle]="marketOverviewSignalValues.consumerIndex.gerCpi.name"
+      [heightPx]="250"
+      [series]="[marketOverviewSignalValues.consumerIndex.gerCpi.chartData]"
+    ></app-generic-chart>
+  </div>
+</ng-container>

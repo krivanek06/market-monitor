@@ -1,0 +1,28 @@
+<!-- chart -->
+<div class="h-[350px] w-full bg-red-200 mb-10"></div>
+
+<!-- options -->
+<div class="columns-2">
+  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[0] }"></ng-container>
+  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[1] }"></ng-container>
+  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[2] }"></ng-container>
+  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[3] }"></ng-container>
+  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[4] }"></ng-container>
+  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[5] }"></ng-container>
+</div>
+
+<ng-template #overviewSection let-section="section">
+  <div class="inline-block mb-6">
+    <h2 class="mb-0 text-lg text-wt-primary">{{ section.name }}</h2>
+    <div class="flex flex-wrap items-center gap-x-2">
+      <button
+        mat-button
+        type="button"
+        *ngFor="let data of section.data"
+        class="text-sm transition-all duration-300 text-wt-gray-light hover:text-wt-gray-dark"
+      >
+        {{ data.name }}
+      </button>
+    </div>
+  </div>
+</ng-template>

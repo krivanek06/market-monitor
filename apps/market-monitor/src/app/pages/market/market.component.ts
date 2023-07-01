@@ -1,37 +1,35 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { MarketApiService } from '@market-monitor/api-cloud-functions';
-import { SYMBOL_SP500 } from '@market-monitor/api-types';
-import {
-  AssetPriceChartInteractiveComponent,
-  MarketDataTransformService,
-  MarketOverviewChartDataBody,
-} from '@market-monitor/modules/market-general';
-import { GenericChartComponent } from '@market-monitor/shared-components';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DialogServiceModule } from '@market-monitor/shared-utils';
-import { map } from 'rxjs';
+import { ROUTES_MARKET, ROUTES_TOP_LEVEL } from '../../routes.model';
 
 @Component({
   selector: 'app-market',
   standalone: true,
-  imports: [CommonModule, AssetPriceChartInteractiveComponent, DialogServiceModule, GenericChartComponent],
+  imports: [CommonModule, MatCheckboxModule, RouterModule, DialogServiceModule, ReactiveFormsModule],
   templateUrl: './market.component.html',
   styleUrls: ['./market.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MarketComponent {
-  marketApiService = inject(MarketApiService);
-  marketDataTransformService = inject(MarketDataTransformService);
-  SYMBOL_SP500 = SYMBOL_SP500;
+export class MarketComponent implements OnInit {
+  router = inject(Router);
+  route = inject(ActivatedRoute);
 
-  marketOverviewSignal = toSignal(
-    this.marketApiService
-      .getMarketOverview()
-      .pipe(map((marketOverview) => this.marketDataTransformService.getMarketOverviewChartData(marketOverview)))
-  );
+  isCustomCheckedControl = new FormControl(false, { nonNullable: true });
 
-  onExpandChart(marketOverviewData: MarketOverviewChartDataBody): void {
-    console.log(marketOverviewData);
+  ngOnInit(): void {
+    // check if custom route is selected and set checkbox accordingly
+    const lastSegment = this.router.url.split('/').pop();
+    this.isCustomCheckedControl.patchValue(lastSegment === ROUTES_MARKET.CUSTOM);
+    this.isCustomCheckedControl.valueChanges.subscribe((value) => {
+      if (value) {
+        this.router.navigate([`${ROUTES_TOP_LEVEL.MARKET}/${ROUTES_MARKET.CUSTOM}`]);
+      } else {
+        this.router.navigate([`${ROUTES_TOP_LEVEL.MARKET}/${ROUTES_MARKET.OVERVIEW}`]);
+      }
+    });
   }
 }

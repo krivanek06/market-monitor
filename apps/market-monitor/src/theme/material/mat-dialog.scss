@@ -9,6 +9,11 @@
   @screen sm {
     padding: 24px !important;
   }
+
+  @screen lg {
+    // max-height: 100% !important;
+    max-height: 94vh !important;
+  }
 }
 
 mat-dialog-content {
@@ -25,9 +30,9 @@ mat-dialog-content {
   .mat-mdc-dialog-content {
     max-height: none;
 
-    @screen md {
-      max-height: 80vh;
-    }
+    // @screen md {
+    //   min-height: 80vh;
+    // }
   }
 
   .mat-mdc-dialog-container {
@@ -62,9 +67,9 @@ mat-dialog-content {
   .mat-mdc-dialog-content {
     max-height: none;
 
-    @screen sm {
-      max-height: 70vh;
-    }
+    // @screen sm {
+    //   max-height: 70vh;
+    // }
   }
 
   .mat-mdc-dialog-container {
@@ -95,9 +100,9 @@ mat-dialog-content {
   .mat-mdc-dialog-content {
     max-height: none;
 
-    @screen sm {
-      max-height: 70vh;
-    }
+    // @screen sm {
+    //   max-height: 70vh;
+    // }
   }
 
   .mat-mdc-dialog-container {
