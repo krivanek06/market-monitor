@@ -25,6 +25,7 @@ export interface GenericChartSeries {
         stops: (number | string)[][];
       };
   additionalData?: {
+    id?: string;
     showCurrencySign?: boolean;
   };
 }

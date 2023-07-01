@@ -1,13 +1,15 @@
 <!-- chart -->
-<div class="w-full mb-10">
+<div class="relative w-full mb-10" [ngClass]="{ 'g-shadow-background': showLoadingScreenSignal() }">
   <app-generic-chart
-    [series]="selectedChartDataSignal()"
+    [series]="selectedOverviewSignal() | objectArrayValuesByKey : 'chartData'"
     [heightPx]="400"
     [showTimelineSlider]="true"
     [enableLegendTogging]="true"
     [showLegend]="true"
     [showLegendLatestValue]="true"
   ></app-generic-chart>
+
+  <mat-spinner *ngIf="showLoadingScreenSignal()" class="g-absolute-center" diameter="80"></mat-spinner>
 </div>
 
 <!-- options -->
@@ -20,7 +22,7 @@
         (click)="onDataClick(section.key, data.subKey, data.name)"
         mat-button
         type="button"
-        [color]="(selectedSubKeysSignal() | inArray : data.subKey) ? 'primary' : ''"
+        [color]="(selectedOverviewSubKeys() | inArray : data.subKey) ? 'primary' : ''"
         class="text-sm"
       >
         {{ data.name }}

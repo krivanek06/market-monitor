@@ -22,7 +22,8 @@ export class MarketComponent implements OnInit {
 
   ngOnInit(): void {
     // check if custom route is selected and set checkbox accordingly
-    const lastSegment = this.router.url.split('/').pop();
+    const lastSegment = this.router.url.split('/').pop()?.split('?')[0] ?? '';
+
     this.isCustomCheckedControl.patchValue(lastSegment === ROUTES_MARKET.CUSTOM);
     this.isCustomCheckedControl.valueChanges.subscribe((value) => {
       if (value) {

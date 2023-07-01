@@ -1,18 +1,26 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
 import { MARKET_OVERVIEW_DATA, MarketOverviewDatabaseKeys, getMarketOverKeyBySubKey } from '@market-monitor/api-types';
-import { MarketDataTransformService } from '@market-monitor/modules/market-general';
-import { GenericChartComponent, GenericChartSeries } from '@market-monitor/shared-components';
-import { InArrayPipe } from '@market-monitor/shared-pipes';
+import { MarketDataTransformService, MarketOverviewChartDataBody } from '@market-monitor/modules/market-general';
+import { GenericChartComponent } from '@market-monitor/shared-components';
+import { InArrayPipe, ObjectArrayValueByKeyPipe } from '@market-monitor/shared-pipes';
 import { forkJoin, map } from 'rxjs';
 
 @Component({
   selector: 'app-market-custom',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, InArrayPipe, GenericChartComponent],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    InArrayPipe,
+    GenericChartComponent,
+    MatProgressSpinnerModule,
+    ObjectArrayValueByKeyPipe,
+  ],
   templateUrl: './market-custom.component.html',
   styleUrls: ['./market-custom.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,34 +36,40 @@ export class MarketCustomComponent implements OnInit {
   /**
    * both signals keep the selected data and values
    */
-  selectedChartDataSignal = signal<GenericChartSeries[]>([]);
-  selectedSubKeysSignal = signal<string[]>([]);
+  selectedOverviewSignal = signal<MarketOverviewChartDataBody[]>([]);
+  selectedOverviewSubKeys = computed(() => this.selectedOverviewSignal().map((data) => data.subKey));
+  showLoadingScreenSignal = signal<boolean>(false);
 
   ngOnInit(): void {
     this.loadQueryParams();
   }
 
-  onDataClick<T extends MarketOverviewDatabaseKeys>(key: T, subKey: string, sectionName: string): void {
+  onDataClick(key: MarketOverviewDatabaseKeys, subKey: string, sectionName: string): void {
     console.log(key, subKey, sectionName);
-    const subKeyCasted = String(subKey);
 
     // if subKey is already selected, remove it
-    if (this.selectedSubKeysSignal().includes(subKeyCasted)) {
-      this.selectedChartDataSignal.update((prev) => prev.filter((data) => data.name !== sectionName));
-      this.selectedSubKeysSignal.update((prev) => prev.filter((value) => value !== subKeyCasted));
+    if (this.selectedOverviewSubKeys().includes(subKey)) {
+      this.selectedOverviewSignal.update((prev) => prev.filter((data) => data.subKey !== subKey));
     } else {
       // else add it and load data
-      this.selectedSubKeysSignal.update((prev) => [...prev, String(subKey)]);
+      this.showLoadingScreenSignal.set(true);
       this.marketApiService.getMarketOverviewData(key, subKey).subscribe((marketOverviewData) => {
-        const data = this.marketDataTransformService.transformMarketOverviewData(sectionName, marketOverviewData);
-        this.selectedChartDataSignal.update((prev) => [...prev, data.chartData]);
+        const data = this.marketDataTransformService.transformMarketOverviewData(
+          sectionName,
+          marketOverviewData,
+          subKey
+        );
+        this.selectedOverviewSignal.update((prev) => [...prev, data]);
+        this.showLoadingScreenSignal.set(false);
       });
     }
     this.updateQueryParams();
   }
 
   private updateQueryParams(): void {
-    const queryParams: Params = { sections: this.selectedSubKeysSignal().join(',') };
+    const queryParams: Params = {
+      sections: this.selectedOverviewSubKeys().join(','),
+    };
     this.router.navigate([], { relativeTo: this.route, queryParams });
   }
 
@@ -64,13 +78,14 @@ export class MarketCustomComponent implements OnInit {
     const subKeys = this.route.snapshot.queryParams['sections'];
     if (subKeys) {
       const subKeysArray = subKeys.split(',') as string[];
-      this.selectedSubKeysSignal.update(() => subKeysArray);
+      this.showLoadingScreenSignal.set(true);
 
       // load all market overview data at once
       forkJoin(
         subKeysArray
           .map((subKey) => getMarketOverKeyBySubKey(subKey))
           .filter(
+            // ignoring unknown subKeys
             (overview): overview is { key: MarketOverviewDatabaseKeys; name: string; subKey: string } => !!overview
           )
           .map((overview) =>
@@ -78,13 +93,18 @@ export class MarketCustomComponent implements OnInit {
               .getMarketOverviewData(overview.key, overview.subKey)
               .pipe(
                 map((marketOverviewData) =>
-                  this.marketDataTransformService.transformMarketOverviewData(overview.name, marketOverviewData)
+                  this.marketDataTransformService.transformMarketOverviewData(
+                    overview.name,
+                    marketOverviewData,
+                    overview.subKey
+                  )
                 )
               )
           )
       ).subscribe((marketOverviewData) => {
         console.log(marketOverviewData);
-        this.selectedChartDataSignal.update((prev) => [...prev, ...marketOverviewData.map((data) => data.chartData)]);
+        this.showLoadingScreenSignal.set(false);
+        this.selectedOverviewSignal.update((prev) => [...prev, ...marketOverviewData]);
       });
     }
   }

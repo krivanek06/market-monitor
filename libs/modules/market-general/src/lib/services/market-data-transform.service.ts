@@ -9,10 +9,15 @@ import { MarketOverviewChartData, MarketOverviewChartDataBody } from '../models'
 export class MarketDataTransformService {
   constructor() {}
 
-  transformMarketOverviewData(name: string, overviewData: MarketOverviewData): MarketOverviewChartDataBody {
+  transformMarketOverviewData(
+    name: string,
+    overviewData: MarketOverviewData,
+    subKey: string
+  ): MarketOverviewChartDataBody {
     return {
       marketOverview: overviewData,
       name: name,
+      subKey: subKey,
       chartData: {
         name: name,
         additionalData: {
@@ -34,7 +39,7 @@ export class MarketDataTransformService {
       name: string
     ): MarketOverviewChartDataBody => {
       const overviewData = marketOverview[mainKey][subKey] as MarketOverviewData;
-      return this.transformMarketOverviewData(name, overviewData);
+      return this.transformMarketOverviewData(name, overviewData, String(subKey));
     };
 
     const result: MarketOverviewChartData = {

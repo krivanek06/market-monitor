@@ -5,6 +5,7 @@ export type MarketOverviewChartDataBody = {
   marketOverview: MarketOverviewData;
   chartData: GenericChartSeries;
   name: string;
+  subKey: string;
 };
 export type MarketOverviewChartData = {
   [S in keyof MarketOverview]: {
