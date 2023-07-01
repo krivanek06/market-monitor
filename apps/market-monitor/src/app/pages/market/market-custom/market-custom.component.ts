@@ -3,12 +3,8 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
-import { MarketOverviewDatabaseKeys } from '@market-monitor/api-types';
-import {
-  MARKET_OVERVIEW_DATA,
-  MarketDataTransformService,
-  getMarketOverKeyBySubKey,
-} from '@market-monitor/modules/market-general';
+import { MARKET_OVERVIEW_DATA, MarketOverviewDatabaseKeys, getMarketOverKeyBySubKey } from '@market-monitor/api-types';
+import { MarketDataTransformService } from '@market-monitor/modules/market-general';
 import { GenericChartComponent, GenericChartSeries } from '@market-monitor/shared-components';
 import { InArrayPipe } from '@market-monitor/shared-pipes';
 import { forkJoin, map } from 'rxjs';
@@ -87,6 +83,7 @@ export class MarketCustomComponent implements OnInit {
               )
           )
       ).subscribe((marketOverviewData) => {
+        console.log(marketOverviewData);
         this.selectedChartDataSignal.update((prev) => [...prev, ...marketOverviewData.map((data) => data.chartData)]);
       });
     }

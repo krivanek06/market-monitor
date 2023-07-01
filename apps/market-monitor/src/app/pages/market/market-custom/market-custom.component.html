@@ -12,16 +12,7 @@
 
 <!-- options -->
 <div class="columns-2">
-  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[0] }"></ng-container>
-  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[1] }"></ng-container>
-  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[2] }"></ng-container>
-  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[3] }"></ng-container>
-  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[4] }"></ng-container>
-  <ng-container *ngTemplateOutlet="overviewSection; context: { section: MARKET_OVERVIEW_DATA[5] }"></ng-container>
-</div>
-
-<ng-template #overviewSection let-section="section">
-  <div class="inline-block mb-6">
+  <div *ngFor="let section of MARKET_OVERVIEW_DATA" class="inline-block mb-6">
     <h2 class="mb-0 text-lg text-wt-gray-dark">{{ section.name }}</h2>
     <div class="flex flex-wrap items-center gap-x-2">
       <button
@@ -36,4 +27,4 @@
       </button>
     </div>
   </div>
-</ng-template>
+</div>
