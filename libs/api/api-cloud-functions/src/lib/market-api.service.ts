@@ -5,7 +5,6 @@ import {
   HistoricalPrice,
   MarketOverview,
   MarketOverviewData,
-  MarketOverviewDatabaseKeySubKeys,
   MarketOverviewDatabaseKeys,
   MarketTopPerformanceOverviewResponse,
   News,
@@ -41,12 +40,9 @@ export class MarketApiService {
     return this.http.get<MarketOverview>(`${this.endpointFunctions}/getmarketoverview`);
   }
 
-  getMarketOverviewData<T extends MarketOverviewDatabaseKeys>(
-    key: T,
-    subKey: MarketOverviewDatabaseKeySubKeys<T>
-  ): Observable<MarketOverviewData> {
+  getMarketOverviewData<T extends MarketOverviewDatabaseKeys>(key: T, subKey: string): Observable<MarketOverviewData> {
     return this.http.get<MarketOverviewData>(
-      `${this.endpointFunctions}/getmarketoverviewdata?key=${key}&subKey=${String(subKey)}`
+      `${this.endpointFunctions}/getmarketoverviewdata?key=${key}&subKey=${subKey}`
     );
   }
 }

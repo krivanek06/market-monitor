@@ -1,5 +1,14 @@
 <!-- chart -->
-<div class="h-[350px] w-full bg-red-200 mb-10"></div>
+<div class="w-full mb-10">
+  <app-generic-chart
+    [series]="selectedChartDataSignal()"
+    [heightPx]="400"
+    [showTimelineSlider]="true"
+    [enableLegendTogging]="true"
+    [showLegend]="true"
+    [showLegendLatestValue]="true"
+  ></app-generic-chart>
+</div>
 
 <!-- options -->
 <div class="columns-2">
@@ -13,13 +22,15 @@
 
 <ng-template #overviewSection let-section="section">
   <div class="inline-block mb-6">
-    <h2 class="mb-0 text-lg text-wt-primary">{{ section.name }}</h2>
+    <h2 class="mb-0 text-lg text-wt-gray-dark">{{ section.name }}</h2>
     <div class="flex flex-wrap items-center gap-x-2">
       <button
+        *ngFor="let data of section.data"
+        (click)="onDataClick(section.key, data.subKey, data.name)"
         mat-button
         type="button"
-        *ngFor="let data of section.data"
-        class="text-sm transition-all duration-300 text-wt-gray-light hover:text-wt-gray-dark"
+        [color]="(selectedSubKeysSignal() | inArray : data.subKey) ? 'primary' : ''"
+        class="text-sm"
       >
         {{ data.name }}
       </button>

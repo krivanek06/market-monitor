@@ -368,6 +368,8 @@ export const MARKET_OVERVIEW_DATABASE_ENDPOINTS = {
 } as const;
 
 export type MarketOverviewDatabaseKeys = keyof typeof MARKET_OVERVIEW_DATABASE_ENDPOINTS;
+export type MarketOverviewDatabaseKeysSubDocuments<T extends MarketOverviewDatabaseKeys> =
+  keyof (typeof MARKET_OVERVIEW_DATABASE_ENDPOINTS)[T];
 
 export const MARKET_OVERVIEW_DATABASE_KEYS = Object.entries(MARKET_OVERVIEW_DATABASE_ENDPOINTS)
   .map(([key, value]) => {

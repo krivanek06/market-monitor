@@ -28,6 +28,6 @@ export class MarketOverviewComponent {
   marketOverviewSignal = toSignal(
     this.marketApiService
       .getMarketOverview()
-      .pipe(map((marketOverview) => this.marketDataTransformService.getMarketOverviewChartData(marketOverview)))
+      .pipe(map((marketOverview) => this.marketDataTransformService.transformMarketOverview(marketOverview)))
   );
 }

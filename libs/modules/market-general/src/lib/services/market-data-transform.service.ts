@@ -9,7 +9,24 @@ import { MarketOverviewChartData, MarketOverviewChartDataBody } from '../models'
 export class MarketDataTransformService {
   constructor() {}
 
-  getMarketOverviewChartData(marketOverview: MarketOverview): MarketOverviewChartData {
+  transformMarketOverviewData(name: string, overviewData: MarketOverviewData): MarketOverviewChartDataBody {
+    return {
+      marketOverview: overviewData,
+      name: name,
+      chartData: {
+        name: name,
+        additionalData: {
+          showCurrencySign: false,
+        },
+        //color: color,
+        data: zip(overviewData.dates, overviewData.data)
+          .filter((values): values is [string, number] => !!values[0] && !!values[1])
+          .reduce((acc, [date, value]) => [...acc, [new Date(date).getTime(), value]], [] as [number, number][]),
+      },
+    };
+  }
+
+  transformMarketOverview(marketOverview: MarketOverview): MarketOverviewChartData {
     // helper method to construct parts of MarketOverviewChartData
     const helper = <T extends keyof MarketOverview>(
       mainKey: T,
@@ -17,22 +34,7 @@ export class MarketDataTransformService {
       name: string
     ): MarketOverviewChartDataBody => {
       const overviewData = marketOverview[mainKey][subKey] as MarketOverviewData;
-      const isSp500 = mainKey === 'sp500';
-
-      return {
-        marketOverview: overviewData,
-        name: name,
-        chartData: {
-          name: name,
-          additionalData: {
-            showCurrencySign: false,
-          },
-          //color: color,
-          data: zip(overviewData.dates, overviewData.data)
-            .filter((values): values is [string, number] => !!values[0] && !!values[1])
-            .reduce((acc, [date, value]) => [...acc, [new Date(date).getTime(), value]], [] as [number, number][]),
-        },
-      };
+      return this.transformMarketOverviewData(name, overviewData);
     };
 
     const result: MarketOverviewChartData = {

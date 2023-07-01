@@ -48,15 +48,21 @@ button[mat-stroked-button] {
   }
 }
 
-// .mat-mdc-unelevated-button.mat-primary {
-// 	color: rgb(229, 229, 229) !important;
-// }
+.mat-mdc-button.mat-unthemed {
+  color: var(--gray-light) !important;
+}
 
 .mat-mdc-button:not(:disabled) {
-  color: var(--gray-medium) !important;
+  transition-property: all !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-duration: 200ms !important;
+
+  &:hover {
+    color: var(--gray-medium) !important;
+  }
 }
 
 .mat-mdc-button,
 .mat-mdc-outlined-button {
-  --mat-mdc-button-persistent-ripple-color: var(--gray-dark) !important;
+  --mat-mdc-button-persistent-ripple-color: var(--gray-medium) !important;
 }

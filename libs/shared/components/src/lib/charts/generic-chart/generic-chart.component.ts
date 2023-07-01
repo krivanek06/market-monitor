@@ -13,7 +13,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ChartConstructor } from '@market-monitor/shared-utils';
+import { ChartConstructor, GeneralFunctionUtil } from '@market-monitor/shared-utils';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { ChartType, GenericChartSeries, GenericChartSeriesPie } from './generic-chart.model';
@@ -52,7 +52,7 @@ import { ChartType, GenericChartSeries, GenericChartSeriesPie } from './generic-
 export class GenericChartComponent extends ChartConstructor implements OnInit, OnChanges, OnDestroy {
   @Output() expandEmitter: EventEmitter<any> = new EventEmitter<any>();
 
-  @Input() series!: GenericChartSeries[] | GenericChartSeriesPie[];
+  @Input({ required: true }) series!: GenericChartSeries[] | GenericChartSeriesPie[];
   @Input() heightPx = 400;
   @Input() chartType: ChartType = ChartType.line;
   @Input() chartTitle = '';
@@ -255,7 +255,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
 
         pointFormatter: function () {
           const that = this as any;
-          const value = that.y;
+          const value = GeneralFunctionUtil.roundNDigits(that.y, 2);
 
           // do not show 0 value in tooltip
           if (value === 0) {
@@ -267,8 +267,8 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
 
           const line1 = `<span style="color: ${that.series.color}">● ${that.series.name}:</span>`;
           const line2 = additionalData?.showCurrencySign
-            ? `<span>$${that.y} USD</b></span>`
-            : `<span>${that.y}</b></span>`;
+            ? `<span>$${value} USD</b></span>`
+            : `<span>${value}</b></span>`;
           return `<div class="space-x-1">${line1} ${line2}</div>`;
         },
         valueDecimals: 2,

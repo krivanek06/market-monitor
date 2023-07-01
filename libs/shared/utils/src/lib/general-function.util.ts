@@ -7,7 +7,7 @@ export class GeneralFunctionUtil {
     return value != null && value !== '' && typeof value === 'number' && !isNaN(Number(value.toString()));
   };
 
-  static roundNDigits = (value: number, n: number): number => {
+  static roundNDigits = (value: number, n: number = 2): number => {
     return Math.round(value * Math.pow(10, n)) / Math.pow(10, n);
   };
 
