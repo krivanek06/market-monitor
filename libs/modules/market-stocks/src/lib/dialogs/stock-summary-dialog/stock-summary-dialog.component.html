@@ -56,7 +56,11 @@
     </div>
 
     <!-- price & volume -->
-    <app-asset-price-chart-interactive [symbol]="data.symbol"></app-asset-price-chart-interactive>
+    <app-asset-price-chart-interactive
+      [imageUrl]="stockSummary.profile.image"
+      [title]="data.symbol"
+      [symbol]="data.symbol"
+    ></app-asset-price-chart-interactive>
   </mat-dialog-content>
 </ng-container>
 

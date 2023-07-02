@@ -4,13 +4,20 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
 import { HistoricalPrice, SymbolHistoricalPeriods } from '@market-monitor/api-types';
 import { AssetPriceChartComponent, TimePeriodButtonsComponent } from '@market-monitor/shared-components';
+import { DefaultImgDirective } from '@market-monitor/shared-directives';
 import { DialogServiceUtil, ErrorEnum } from '@market-monitor/shared-utils';
 import { catchError, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-asset-price-chart-interactive',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AssetPriceChartComponent, TimePeriodButtonsComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    AssetPriceChartComponent,
+    TimePeriodButtonsComponent,
+    DefaultImgDirective,
+  ],
   templateUrl: './asset-price-chart-interactive.component.html',
   styleUrls: ['./asset-price-chart-interactive.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,6 +27,8 @@ export class AssetPriceChartInteractiveComponent implements OnInit {
   @Input() chartHeightPx = 420;
   @Input() priceName = 'price';
   @Input() priceShowSign = true;
+  @Input() title = 'Historical Prices';
+  @Input() imageUrl = '';
 
   stockHistoricalPrice = signal<HistoricalPrice[]>([]);
 

@@ -211,6 +211,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         style: {
           color: ColorScheme.GRAY_LIGHT_VAR,
           fontSize: '13px',
+          fontWeight: 'normal',
         },
         y: 15,
       },
