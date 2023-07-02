@@ -14,6 +14,7 @@ export enum ChartType {
 export interface GenericChartSeries {
   type?: ChartType;
   name?: string;
+  showInNavigator?: boolean;
   /**
    * example: [value, value, ...] or [[timestamp, value], [timestamp, value], ...]
    */

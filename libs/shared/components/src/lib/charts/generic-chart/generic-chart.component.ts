@@ -13,7 +13,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ChartConstructor, GeneralFunctionUtil } from '@market-monitor/shared-utils';
+import { ChartConstructor, ColorScheme, GeneralFunctionUtil } from '@market-monitor/shared-utils';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import HC_stock from 'highcharts/modules/stock';
@@ -199,7 +199,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         labels: {
           rotation: 0,
           style: {
-            color: '#a4a4a4',
+            color: ColorScheme.GRAY_LIGHT_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
@@ -208,7 +208,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         text: this.chartTitle,
         align: 'left',
         style: {
-          color: '#bababa',
+          color: ColorScheme.GRAY_LIGHT_VAR,
           fontSize: '13px',
         },
         y: 15,
@@ -222,14 +222,14 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
       legend: {
         enabled: this.showLegend,
         itemStyle: {
-          color: '#acacac',
+          color: ColorScheme.GRAY_LIGHT_VAR,
           cursor: this.enableLegendTogging ? 'pointer' : 'default',
         },
         itemHoverStyle: {
-          color: this.enableLegendTogging ? '#241eaa' : '#acacac',
+          color: this.enableLegendTogging ? ColorScheme.GRAY_MEDIUM_VAR : ColorScheme.GRAY_LIGHT_VAR,
         },
         itemHiddenStyle: {
-          color: this.enableLegendTogging ? '#494949' : '#acacac',
+          color: this.enableLegendTogging ? ColorScheme.GRAY_DARK_VAR : ColorScheme.GRAY_LIGHT_VAR,
         },
         verticalAlign: this.legendVerticalAlign,
         align: this.legendAlign,
@@ -299,9 +299,10 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           // 	fontSize: '12px',
           // 	color: '#D9D8D8',
           // },
+          showInNavigator: true,
           borderWidth: 0,
           dataLabels: {
-            color: '#cecece',
+            color: ColorScheme.GRAY_LIGHT_VAR,
             enabled: this.showDataLabel,
             format: undefined,
           },
