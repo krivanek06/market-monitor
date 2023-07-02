@@ -186,6 +186,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         visible: this.showYAxis,
         labels: {
           style: {
+            color: ColorScheme.GRAY_LIGHT_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },

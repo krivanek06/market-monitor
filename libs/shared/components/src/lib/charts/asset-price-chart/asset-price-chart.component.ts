@@ -73,6 +73,12 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
           tickPixelInterval: 40,
           minorGridLineWidth: 0,
           visible: true,
+          labels: {
+            style: {
+              color: ColorScheme.GRAY_LIGHT_VAR,
+              font: '10px Trebuchet MS, Verdana, sans-serif',
+            },
+          },
         },
       ],
       xAxis: {
@@ -84,7 +90,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         labels: {
           rotation: -12,
           style: {
-            color: '#8e8e8e',
+            color: ColorScheme.GRAY_LIGHT_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
@@ -131,6 +137,11 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
             : GeneralFunctionUtil.formatLargeNumber(that.y);
           const name = isPrice ? priceNameLocal : castedName;
           const valueFormatter = isPrice && priceShowSignLocal ? `$${value}` : `${value}`;
+
+          // if value 0, don't show tooltip
+          if (String(value) === 'N/A') {
+            return '';
+          }
 
           return `
             <p>
@@ -190,7 +201,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
           data: volume,
           color: '#f48605',
           yAxis: 0,
-          opacity: 0.75,
+          opacity: 0.6,
         },
       ],
     };

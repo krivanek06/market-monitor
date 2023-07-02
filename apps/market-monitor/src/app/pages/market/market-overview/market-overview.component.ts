@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
-import { SYMBOL_DOW_JONES, SYMBOL_NASDAQ, SYMBOL_SP500 } from '@market-monitor/api-types';
+import { SYMBOL_SP500, SymbolQuote } from '@market-monitor/api-types';
 import {
   AssetPriceChartInteractiveComponent,
   MarketDataTransformService,
+  QuoteSearchBasicComponent,
 } from '@market-monitor/modules/market-general';
 import { GenericChartComponent } from '@market-monitor/shared-components';
 import { map } from 'rxjs';
@@ -13,7 +15,13 @@ import { map } from 'rxjs';
 @Component({
   selector: 'app-market-overview',
   standalone: true,
-  imports: [CommonModule, AssetPriceChartInteractiveComponent, GenericChartComponent],
+  imports: [
+    CommonModule,
+    AssetPriceChartInteractiveComponent,
+    GenericChartComponent,
+    QuoteSearchBasicComponent,
+    ReactiveFormsModule,
+  ],
   templateUrl: './market-overview.component.html',
   styleUrls: ['./market-overview.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,9 +29,9 @@ import { map } from 'rxjs';
 export class MarketOverviewComponent {
   marketApiService = inject(MarketApiService);
   marketDataTransformService = inject(MarketDataTransformService);
+  selectedIndexSymbolQuoteControl = new FormControl<SymbolQuote | null>(null);
+
   SYMBOL_SP500 = SYMBOL_SP500;
-  SYMBOL_DOW_JONES = SYMBOL_DOW_JONES;
-  SYMBOL_NASDAQ = SYMBOL_NASDAQ;
 
   marketOverviewSignal = toSignal(
     this.marketApiService

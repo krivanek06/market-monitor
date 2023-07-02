@@ -2,20 +2,21 @@
   <!-- first line -->
   <div class="flex items-center justify-between">
     <!-- image and symbol -->
-    <div class="flex items-center gap-3">
-      <img appDefaultImg [src]="stockSummary.profile.image" alt="stock image" class="w-7 h-7" />
-      <span>{{ stockSummary.quote.symbol }}</span>
+    <div class="flex items-center gap-3 max-w-[60%]">
+      <img *ngIf="assetUrl" appDefaultImg [src]="assetUrl" alt="stock image" class="w-7 h-7" />
+      <span class="block sm:hidden">{{ symbolQuote.symbol }}</span>
+      <span class="hidden sm:block">{{ symbolQuote.name }}</span>
     </div>
     <!-- price & price change -->
     <div class="flex flex-col items-end xs:items-center gap-x-3 xs:flex-row">
       <span *ngIf="displaySecondLine">Price:</span>
-      <span class="text-base text-wt-gray-ligh">{{ stockSummary.quote.price | currency }}</span>
+      <span class="text-base text-wt-gray-ligh">{{ symbolQuote.price | currency }}</span>
       <span
         appPercentageIncrease
         [useCurrencySign]="true"
         [changeValues]="{
-          change: stockSummary.quote.change,
-          changePercentage: stockSummary.quote.changesPercentage,
+          change: symbolQuote.change,
+          changePercentage: symbolQuote.changesPercentage,
       }"
       ></span>
     </div>
@@ -25,17 +26,17 @@
     <!-- market cap -->
     <div class="space-x-2">
       <span>Market Cap.:</span>
-      <span>{{ stockSummary.quote.marketCap | largeNumberFormatter }}</span>
+      <span>{{ symbolQuote.marketCap | largeNumberFormatter }}</span>
     </div>
     <!-- volume -->
     <div class="flex items-center gap-3">
       <span>Volume:</span>
-      <span>{{ stockSummary.quote.avgVolume | largeNumberFormatter }}</span>
+      <span>{{ symbolQuote.avgVolume | largeNumberFormatter }}</span>
       <span
         appPercentageIncrease
         [currentValues]="{
-          value: stockSummary.quote.avgVolume,
-          valueToCompare: stockSummary.quote.volume,
+          value: symbolQuote.avgVolume,
+          valueToCompare: symbolQuote.volume,
       }"
       ></span>
     </div>

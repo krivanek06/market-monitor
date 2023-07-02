@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import {
+  AvailableQuotes,
   FirebaseNewsTypes,
   HistoricalPrice,
   MarketOverview,
@@ -9,8 +10,9 @@ import {
   MarketTopPerformanceOverviewResponse,
   News,
   SymbolHistoricalPeriods,
+  SymbolQuote,
 } from '@market-monitor/api-types';
-import { Observable, retry } from 'rxjs';
+import { Observable, map, retry } from 'rxjs';
 import { ENDPOINT_FUNCTION_URL } from './api-url.token';
 
 @Injectable({
@@ -44,5 +46,11 @@ export class MarketApiService {
     return this.http.get<MarketOverviewData>(
       `${this.endpointFunctions}/getmarketoverviewdata?key=${key}&subKey=${subKey}`
     );
+  }
+
+  getQuotesByType(quoteType: AvailableQuotes): Observable<SymbolQuote[]> {
+    return this.http
+      .get<SymbolQuote[]>(`${this.endpointFunctions}/getquotesbytype?type=${quoteType}`)
+      .pipe(map((data) => data.filter((quote) => !!quote.price && !!quote.name)));
   }
 }

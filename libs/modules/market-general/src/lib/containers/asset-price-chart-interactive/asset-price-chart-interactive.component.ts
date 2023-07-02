@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
 import { HistoricalPrice, SymbolHistoricalPeriods } from '@market-monitor/api-types';
@@ -22,7 +31,7 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
   styleUrls: ['./asset-price-chart-interactive.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AssetPriceChartInteractiveComponent implements OnInit {
+export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
   @Input({ required: true }) symbol!: string;
   @Input() chartHeightPx = 420;
   @Input() priceName = 'price';
@@ -54,5 +63,12 @@ export class AssetPriceChartInteractiveComponent implements OnInit {
       .subscribe((prices) => {
         this.stockHistoricalPrice.set(prices);
       });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // trigger time period selection to load prices
+    if (changes?.['symbol']?.currentValue) {
+      this.timePeriodFormControl.setValue(SymbolHistoricalPeriods.week);
+    }
   }
 }
