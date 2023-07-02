@@ -31,7 +31,7 @@ export const loadMarketOverviewData = async (
   await delaySeconds(waitSeconds);
 
   // get document and url from database: {qundal_treasury_yield_curve_rates_1_mo, USTREASURY/YIELD}
-  const { document, url } = MARKET_OVERVIEW_DATABASE_ENDPOINTS[key]?.[subKey] as { document: string; url: string };
+  const { document, url } = MARKET_OVERVIEW_DATABASE_ENDPOINTS[key].data?.[subKey];
   console.log(key, subKey, document, url);
 
   if (!document || !url) {
