@@ -485,14 +485,15 @@ export const getMarketOverKeyBySubKey = <T extends MarketOverviewDatabaseKeys>(
   subKey: string;
 } | null => {
   const section = MARKET_OVERVIEW_DATA.find((overview) => overview.data.find((d) => d.subKey === subKey));
+  const data = section?.data.find((d) => d.subKey === subKey);
 
-  if (!section) {
+  if (!section || !data) {
     return null;
   }
 
   return {
     key: section.key as T,
-    name: section.name,
+    name: `${section.name} - ${data.name}`,
     subKey,
   };
 };

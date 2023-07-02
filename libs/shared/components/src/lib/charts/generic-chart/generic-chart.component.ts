@@ -16,8 +16,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChartConstructor, GeneralFunctionUtil } from '@market-monitor/shared-utils';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
+import HC_stock from 'highcharts/modules/stock';
 import { ChartType, GenericChartSeries, GenericChartSeriesPie } from './generic-chart.model';
 
+HC_stock(Highcharts);
 @Component({
   selector: 'app-generic-chart',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -151,11 +153,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         panning: {
           enabled: true,
         },
-        options3d: {
-          enabled: false, // this.enable3D,
-          alpha: 45,
-          beta: 0,
-        },
       },
       navigator: {
         enabled: this.showTimelineSlider,
@@ -166,6 +163,12 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
             },
           },
         },
+      },
+      scrollbar: {
+        enabled: this.showTimelineSlider,
+      },
+      rangeSelector: {
+        enabled: false,
       },
       yAxis: {
         title: {
@@ -212,9 +215,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
       },
       subtitle: {
         text: '',
-      },
-      scrollbar: {
-        enabled: false,
       },
       credits: {
         enabled: false,
@@ -272,9 +272,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           return `<div class="space-x-1">${line1} ${line2}</div>`;
         },
         valueDecimals: 2,
-      },
-      rangeSelector: {
-        enabled: false,
       },
       plotOptions: {
         line: {

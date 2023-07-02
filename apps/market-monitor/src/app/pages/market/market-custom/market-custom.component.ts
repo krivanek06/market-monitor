@@ -50,20 +50,18 @@ export class MarketCustomComponent implements OnInit {
     // if subKey is already selected, remove it
     if (this.selectedOverviewSubKeys().includes(subKey)) {
       this.selectedOverviewSignal.update((prev) => prev.filter((data) => data.subKey !== subKey));
-    } else {
-      // else add it and load data
-      this.showLoadingScreenSignal.set(true);
-      this.marketApiService.getMarketOverviewData(key, subKey).subscribe((marketOverviewData) => {
-        const data = this.marketDataTransformService.transformMarketOverviewData(
-          sectionName,
-          marketOverviewData,
-          subKey
-        );
-        this.selectedOverviewSignal.update((prev) => [...prev, data]);
-        this.showLoadingScreenSignal.set(false);
-      });
+      this.updateQueryParams();
+      return;
     }
-    this.updateQueryParams();
+
+    // else add it and load data
+    this.showLoadingScreenSignal.set(true);
+    this.marketApiService.getMarketOverviewData(key, subKey).subscribe((marketOverviewData) => {
+      const data = this.marketDataTransformService.transformMarketOverviewData(sectionName, marketOverviewData, subKey);
+      this.selectedOverviewSignal.update((prev) => [...prev, data]);
+      this.showLoadingScreenSignal.set(false);
+      this.updateQueryParams();
+    });
   }
 
   private updateQueryParams(): void {
@@ -105,6 +103,7 @@ export class MarketCustomComponent implements OnInit {
         console.log(marketOverviewData);
         this.showLoadingScreenSignal.set(false);
         this.selectedOverviewSignal.update((prev) => [...prev, ...marketOverviewData]);
+        console.log(this.selectedOverviewSignal());
       });
     }
   }
