@@ -65,6 +65,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   @Input() categories: string[] = [];
   @Input() showYAxis = true;
   @Input() showXAxis = true;
+  @Input() shareTooltip = true;
 
   // legend
   @Input() showLegend = false;
@@ -248,7 +249,8 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           fontSize: '14px',
           color: '#D9D8D8',
         },
-        shared: true,
+        shared: this.shareTooltip,
+        outside: false,
         useHTML: true,
         xDateFormat: '%Y-%m-%d',
         headerFormat: '<span>{point.key}</span>',

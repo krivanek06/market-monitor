@@ -493,7 +493,7 @@ export const getMarketOverKeyBySubKey = <T extends MarketOverviewDatabaseKeys>(
 
   return {
     key: section.key as T,
-    name: `${section.name} - ${data.name}`,
+    name: data.name,
     subKey,
   };
 };

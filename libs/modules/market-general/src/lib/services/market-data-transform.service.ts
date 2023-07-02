@@ -26,7 +26,7 @@ export class MarketDataTransformService {
         //color: color,
         data: zip(overviewData.dates, overviewData.data)
           .filter((values): values is [string, number] => !!values[0] && !!values[1])
-          .reduce((acc, [date, value]) => [...acc, [new Date(date).getTime(), value]], [] as [number, number][]),
+          .reduce((acc, [date, value]) => [[new Date(date).getTime(), value], ...acc], [] as [number, number][]),
       },
     };
   }
