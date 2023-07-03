@@ -500,7 +500,7 @@ export const getMarketOverKeyBySubKey = <T extends MarketOverviewDatabaseKeys>(
 
 export const MARKET_OVERVIEW_DATABASE_KEYS = Object.entries(MARKET_OVERVIEW_DATABASE_ENDPOINTS)
   .map(([key, value]) => {
-    const subkeys = Object.keys(value)
+    const subkeys = Object.keys(value.data)
       .map((d) => ({ [d]: d }))
       .reduce((acc2, cur2) => ({ ...acc2, ...cur2 }), {});
     const result = {
