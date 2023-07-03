@@ -53,4 +53,15 @@ export class MarketApiService {
       .get<SymbolQuote[]>(`${this.endpointFunctions}/getquotesbytype?type=${quoteType}`)
       .pipe(map((data) => data.filter((quote) => !!quote.price && !!quote.name)));
   }
+
+  getQuotesBySymbols(symbols: string[]): Observable<SymbolQuote[]> {
+    const symbolString = symbols.join(',');
+    return this.http
+      .get<SymbolQuote[]>(`${this.endpointFunctions}/getquotesbysymbols?symbol=${symbolString}`)
+      .pipe(map((data) => data.filter((quote) => !!quote.price && !!quote.name)));
+  }
+
+  getQuoteBySymbol(symbol: string): Observable<SymbolQuote | null> {
+    return this.http.get<SymbolQuote>(`${this.endpointFunctions}/getquotebysymbol?symbol=${symbol}`);
+  }
 }

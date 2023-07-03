@@ -26,6 +26,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
   @Input() historicalPrice!: HistoricalPrice[];
   @Input() showTitle = false;
   @Input() priceName = 'price';
+  @Input() displayVolume = true;
   @Input() priceShowSign = true;
 
   ngOnInit(): void {}
@@ -198,7 +199,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         {
           type: 'column',
           name: 'Volume',
-          data: volume,
+          data: this.displayVolume ? volume : [],
           color: '#f48605',
           yAxis: 0,
           opacity: 0.6,

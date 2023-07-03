@@ -51,3 +51,10 @@ export const getQuotesByType = async (type: AvailableQuotes) => {
   const response = await axios.get<SymbolQuote[]>(url);
   return response.data;
 };
+
+export const getQuotesBySymbols = async (symbols: string[]) => {
+  const symbolsString = symbols.join(',');
+  const url = `${FINANCIAL_MODELING_URL}/v3/quote/${symbolsString}?apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<SymbolQuote[]>(url);
+  return response.data;
+};
