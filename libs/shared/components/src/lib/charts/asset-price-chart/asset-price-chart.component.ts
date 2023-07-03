@@ -44,6 +44,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
     const dates = data.map((d) => d.date);
     const priceNameLocal = this.priceName;
     const priceShowSignLocal = this.priceShowSign;
+    const color = !!price[0] && price[0] < price[price.length - 1] ? ColorScheme.SUCCESS_VAR : ColorScheme.DANGER_VAR;
 
     console.log({ price, volume, dates });
 
@@ -167,11 +168,11 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
           fillColor: {
             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
             stops: [
-              [0, ColorScheme.PRIMARY_VAR],
+              [0, color],
               [1, 'transparent'],
             ],
           },
-          lineColor: ColorScheme.PRIMARY_VAR,
+          lineColor: color,
           marker: {
             radius: 3,
           },
@@ -194,7 +195,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
           name: 'Price',
           data: price,
           yAxis: 1,
-          color: ColorScheme.PRIMARY_VAR,
+          color: color,
         },
         {
           type: 'column',

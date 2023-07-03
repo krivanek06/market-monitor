@@ -77,6 +77,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   @Input() floatingLegend = false;
 
   @Input() showExpandableButton = false;
+  @Input() applyFancyColor = 0;
   constructor() {
     super();
   }
@@ -85,6 +86,10 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (this.applyFancyColor > 0) {
+      this.fancyColoring();
+    }
+
     this.initChart();
 
     if (this.floatingLegend && this.chartOptions.legend) {
@@ -268,8 +273,9 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
 
           // additional data from above
           const additionalData = that.series.userOptions.additionalData;
+          const color = typeof that.series.color === 'string' ? that.series.color : that.series.color?.stops[1][1];
 
-          const line1 = `<span style="color: ${that.series.color}">● ${that.series.name}:</span>`;
+          const line1 = `<span style="color: ${color}">● ${that.series.name}:</span>`;
           const line2 = additionalData?.showCurrencySign
             ? `<span>$${value} USD</b></span>`
             : `<span>${value}</b></span>`;
@@ -398,6 +404,25 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
       },
       series: [...this.series] as Highcharts.SeriesOptionsType[],
     };
+  }
+
+  private fancyColoring() {
+    let count = this.applyFancyColor;
+    this.series = this.series.map((s) => {
+      const data: GenericChartSeries = {
+        name: s.name,
+        data: s.data,
+        color: {
+          linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+          stops: [
+            [0, (Highcharts.getOptions().colors as any[])[(count % 5) + 2]], // '#25aedd'
+            [1, (Highcharts.getOptions().colors as any[])[count % 10]],
+          ],
+        },
+      } as GenericChartSeries;
+      count += 1;
+      return data;
+    });
   }
 
   private initAreaChange() {

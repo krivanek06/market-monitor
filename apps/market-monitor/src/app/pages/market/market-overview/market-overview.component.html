@@ -20,10 +20,10 @@
   </ng-container>
 </div>
 
-<div class="flex">
+<div class="flex max-sm:w-full">
   <app-quote-search-basic
     [formControl]="selectedIndexSymbolQuoteControl"
-    class="min-w-[300px]"
+    class="min-w-[300px] max-sm:w-full"
     type="index"
   ></app-quote-search-basic>
 </div>
@@ -39,42 +39,48 @@
   ></app-asset-price-chart-interactive>
 </div>
 
-<ng-container *ngIf="marketOverviewSignal() as marketOverviewSignalValues">
+<div *ngIf="marketOverviewSignal() as marketOverviewSignalValues" class="w-full mx-auto max-sm:pr-3 lg:w-11/12">
   <h2>SP500 stats</h2>
   <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
     <app-generic-chart
       [chartTitle]="marketOverviewSignalValues.sp500.peRatio.name"
       [heightPx]="275"
+      [applyFancyColor]="2"
       [series]="[marketOverviewSignalValues.sp500.peRatio.chartData]"
     ></app-generic-chart>
 
     <app-generic-chart
       [chartTitle]="marketOverviewSignalValues.sp500.shillerPeRatio.name"
       [heightPx]="275"
+      [applyFancyColor]="2"
       [series]="[marketOverviewSignalValues.sp500.shillerPeRatio.chartData]"
     ></app-generic-chart>
 
     <app-generic-chart
       [chartTitle]="marketOverviewSignalValues.sp500.priceToBook.name"
       [heightPx]="275"
+      [applyFancyColor]="2"
       [series]="[marketOverviewSignalValues.sp500.priceToBook.chartData]"
     ></app-generic-chart>
 
     <app-generic-chart
       [chartTitle]="marketOverviewSignalValues.sp500.priceToSales.name"
       [heightPx]="275"
+      [applyFancyColor]="2"
       [series]="[marketOverviewSignalValues.sp500.priceToSales.chartData]"
     ></app-generic-chart>
 
     <app-generic-chart
       [chartTitle]="marketOverviewSignalValues.sp500.earningsYield.name"
       [heightPx]="275"
+      [applyFancyColor]="2"
       [series]="[marketOverviewSignalValues.sp500.earningsYield.chartData]"
     ></app-generic-chart>
 
     <app-generic-chart
       [chartTitle]="marketOverviewSignalValues.sp500.dividendYield.name"
       [heightPx]="275"
+      [applyFancyColor]="2"
       [series]="[marketOverviewSignalValues.sp500.dividendYield.chartData]"
     ></app-generic-chart>
   </div>
@@ -183,4 +189,4 @@
       [series]="[marketOverviewSignalValues.consumerIndex.gerCpi.chartData]"
     ></app-generic-chart>
   </div>
-</ng-container>
+</div>
