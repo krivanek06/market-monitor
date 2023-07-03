@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -40,6 +41,7 @@ import { tap } from 'rxjs';
     QuoteItemComponent,
     MatProgressSpinnerModule,
     FormsModule,
+    ScrollingModule,
   ],
   templateUrl: './quote-search-basic.component.html',
   styleUrls: ['./quote-search-basic.component.scss'],
