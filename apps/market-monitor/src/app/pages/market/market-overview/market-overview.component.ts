@@ -13,6 +13,7 @@ import {
 import { GenericChartComponent, ValuePresentationCardComponent } from '@market-monitor/shared-components';
 import { PercentageIncreaseDirective } from '@market-monitor/shared-directives';
 import { map } from 'rxjs';
+import { MarketOverviewSkeletonComponent } from './market-overview-skeleton.component';
 
 @Component({
   selector: 'app-market-overview',
@@ -26,6 +27,7 @@ import { map } from 'rxjs';
     MatButtonModule,
     ValuePresentationCardComponent,
     PercentageIncreaseDirective,
+    MarketOverviewSkeletonComponent,
   ],
   templateUrl: './market-overview.component.html',
   styleUrls: ['./market-overview.component.scss'],
