@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MarketApiService } from '@market-monitor/api-cloud-functions';
+import { MarketApiService } from '@market-monitor/api-client';
 import { StockSummary } from '@market-monitor/api-types';
 import { StockSummaryDialogComponent, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks';
 import { RangeDirective } from '@market-monitor/shared-directives';

@@ -1,7 +1,7 @@
 {
-  "name": "api-cloud-functions",
+  "name": "api-client",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/api/api-cloud-functions/src",
+  "sourceRoot": "libs/api/api-client/src",
   "prefix": "market-monitor",
   "tags": [],
   "projectType": "library",
@@ -10,14 +10,14 @@
       "executor": "@nx/angular:ng-packagr-lite",
       "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
-        "project": "libs/api/api-cloud-functions/ng-package.json"
+        "project": "libs/api/api-client/ng-package.json"
       },
       "configurations": {
         "production": {
-          "tsConfig": "libs/api/api-cloud-functions/tsconfig.lib.prod.json"
+          "tsConfig": "libs/api/api-client/tsconfig.lib.prod.json"
         },
         "development": {
-          "tsConfig": "libs/api/api-cloud-functions/tsconfig.lib.json"
+          "tsConfig": "libs/api/api-client/tsconfig.lib.json"
         }
       },
       "defaultConfiguration": "production"
@@ -26,7 +26,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/api/api-cloud-functions/jest.config.ts",
+        "jestConfig": "libs/api/api-client/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {
@@ -40,7 +40,7 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/api/api-cloud-functions/**/*.ts", "libs/api/api-cloud-functions/**/*.html"]
+        "lintFilePatterns": ["libs/api/api-client/**/*.ts", "libs/api/api-client/**/*.html"]
       }
     }
   }

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { MarketApiService } from '@market-monitor/api-cloud-functions';
+import { MarketApiService } from '@market-monitor/api-client';
 import { MARKET_OVERVIEW_DATA, MarketOverviewDatabaseKeys, getMarketOverKeyBySubKey } from '@market-monitor/api-types';
 import { MarketDataTransformService, MarketOverviewChartDataBody } from '@market-monitor/modules/market-general';
 import { GenericChartComponent } from '@market-monitor/shared-components';

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MarketApiService } from '@market-monitor/api-cloud-functions';
+import { MarketApiService } from '@market-monitor/api-client';
 import { FirebaseNewsTypes, News, firebaseNewsAcceptableTypes } from '@market-monitor/api-types';
 import { FormMatInputWrapperComponent, InputSource } from '@market-monitor/shared-components';
 import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared-directives';

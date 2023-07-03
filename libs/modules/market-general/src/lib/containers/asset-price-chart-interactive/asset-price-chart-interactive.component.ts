@@ -10,7 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MarketApiService } from '@market-monitor/api-cloud-functions';
+import { MarketApiService } from '@market-monitor/api-client';
 import { HistoricalPrice, SymbolHistoricalPeriods } from '@market-monitor/api-types';
 import { AssetPriceChartComponent, TimePeriodButtonsComponent } from '@market-monitor/shared-components';
 import { DefaultImgDirective } from '@market-monitor/shared-directives';

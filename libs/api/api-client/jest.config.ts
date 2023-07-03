@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'api-cloud-functions',
+  displayName: 'api-client',
   preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../../coverage/libs/api/api-cloud-functions',
+  coverageDirectory: '../../../coverage/libs/api/api-client',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',
