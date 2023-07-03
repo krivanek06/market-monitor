@@ -8,6 +8,10 @@ export enum ROUTES_TOP_LEVEL {
   DASHBOARD = 'dashboard',
 }
 
+export enum ROUTES_MARKET {
+  OVERVIEW = 'overview',
+  CUSTOM = 'custom',
+}
 
 export enum ROUTES_DASHBOARD {
   WATCHLIST = 'watchlist',

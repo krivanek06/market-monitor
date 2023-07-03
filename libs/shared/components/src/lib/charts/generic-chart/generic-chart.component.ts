@@ -13,23 +13,48 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ChartConstructor } from '@market-monitor/shared-utils';
+import { ChartConstructor, ColorScheme, GeneralFunctionUtil } from '@market-monitor/shared-utils';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
+import HC_stock from 'highcharts/modules/stock';
 import { ChartType, GenericChartSeries, GenericChartSeriesPie } from './generic-chart.model';
 
+HC_stock(Highcharts);
 @Component({
   selector: 'app-generic-chart',
-  templateUrl: './generic-chart.component.html',
-  styleUrls: ['./generic-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [CommonModule, HighchartsChartModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  template: `
+    <div class="block relative">
+      <button
+        mat-icon-button
+        *ngIf="showExpandableButton"
+        class="text-wt-gray-medium hover:text-wt-gray-light z-10 absolute right-0 top-0"
+        (click)="expand()"
+        matTooltip="Expand chart"
+      >
+        <mat-icon>open_with</mat-icon>
+      </button>
+
+      <highcharts-chart
+        *ngIf="isHighcharts"
+        [Highcharts]="Highcharts"
+        [options]="chartOptions"
+        [callbackFunction]="chartCallback"
+        [(update)]="updateFromInput"
+        [oneToOne]="true"
+        style="width: 100%; display: block"
+        [style.height.px]="heightPx"
+      >
+      </highcharts-chart>
+    </div>
+  `,
 })
 export class GenericChartComponent extends ChartConstructor implements OnInit, OnChanges, OnDestroy {
   @Output() expandEmitter: EventEmitter<any> = new EventEmitter<any>();
 
-  @Input() series!: GenericChartSeries[] | GenericChartSeriesPie[];
+  @Input({ required: true }) series!: GenericChartSeries[] | GenericChartSeriesPie[];
   @Input() heightPx = 400;
   @Input() chartType: ChartType = ChartType.line;
   @Input() chartTitle = '';
@@ -38,10 +63,9 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   @Input() showTooltip = true;
   @Input() showDataLabel = false;
   @Input() categories: string[] = [];
-  @Input() timestamp: number[] = [];
-  //@Input() enable3D = false;
   @Input() showYAxis = true;
   @Input() showXAxis = true;
+  @Input() shareTooltip = true;
 
   // legend
   @Input() showLegend = false;
@@ -53,6 +77,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   @Input() floatingLegend = false;
 
   @Input() showExpandableButton = false;
+  @Input() applyFancyColor = 0;
   constructor() {
     super();
   }
@@ -61,6 +86,10 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (this.applyFancyColor > 0) {
+      this.fancyColoring();
+    }
+
     this.initChart();
 
     if (this.floatingLegend && this.chartOptions.legend) {
@@ -93,10 +122,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
     if (this.categories.length > 0) {
       this.initCategories();
     }
-
-    if (this.timestamp.length > 0) {
-      this.initTimestamp();
-    }
   }
 
   ngOnInit() {
@@ -123,21 +148,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
     }
   }
 
-  private initTimestamp() {
-    //this.chartOptions.plotOptions.series.dataLabels.enabled = false;
-    if (this.chartOptions.xAxis) {
-      this.chartOptions.xAxis = {
-        ...this.chartOptions.xAxis,
-        categories: this.timestamp.map((d) => String(d)),
-        type: 'datetime',
-        labels: {
-          rotation: -20,
-          format: '{value:%e %b %Y}',
-        },
-      };
-    }
-  }
-
   private initChart() {
     this.chartOptions = {
       chart: {
@@ -149,11 +159,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         panning: {
           enabled: true,
         },
-        options3d: {
-          enabled: false, // this.enable3D,
-          alpha: 45,
-          beta: 0,
-        },
       },
       navigator: {
         enabled: this.showTimelineSlider,
@@ -164,6 +169,12 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
             },
           },
         },
+      },
+      scrollbar: {
+        enabled: this.showTimelineSlider,
+      },
+      rangeSelector: {
+        enabled: false,
       },
       yAxis: {
         title: {
@@ -180,6 +191,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         visible: this.showYAxis,
         labels: {
           style: {
+            color: ColorScheme.GRAY_LIGHT_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
@@ -194,7 +206,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         labels: {
           rotation: 0,
           style: {
-            color: '#a4a4a4',
+            color: ColorScheme.GRAY_LIGHT_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
@@ -203,15 +215,14 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         text: this.chartTitle,
         align: 'left',
         style: {
-          color: '#bababa',
+          color: ColorScheme.GRAY_LIGHT_VAR,
           fontSize: '13px',
+          fontWeight: 'normal',
         },
+        y: 15,
       },
       subtitle: {
         text: '',
-      },
-      scrollbar: {
-        enabled: false,
       },
       credits: {
         enabled: false,
@@ -219,14 +230,14 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
       legend: {
         enabled: this.showLegend,
         itemStyle: {
-          color: '#acacac',
+          color: ColorScheme.GRAY_LIGHT_VAR,
           cursor: this.enableLegendTogging ? 'pointer' : 'default',
         },
         itemHoverStyle: {
-          color: this.enableLegendTogging ? '#241eaa' : '#acacac',
+          color: this.enableLegendTogging ? ColorScheme.GRAY_MEDIUM_VAR : ColorScheme.GRAY_LIGHT_VAR,
         },
         itemHiddenStyle: {
-          color: this.enableLegendTogging ? '#494949' : '#acacac',
+          color: this.enableLegendTogging ? ColorScheme.GRAY_DARK_VAR : ColorScheme.GRAY_LIGHT_VAR,
         },
         verticalAlign: this.legendVerticalAlign,
         align: this.legendAlign,
@@ -245,28 +256,32 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           fontSize: '14px',
           color: '#D9D8D8',
         },
-        shared: true,
+        shared: this.shareTooltip,
+        outside: false,
         useHTML: true,
         xDateFormat: '%Y-%m-%d',
         headerFormat: '<span>{point.key}</span>',
 
         pointFormatter: function () {
           const that = this as any;
-          const value = that.y;
+          const value = GeneralFunctionUtil.roundNDigits(that.y, 2);
 
           // do not show 0 value in tooltip
           if (value === 0) {
             return '';
           }
 
-          const line1 = `<span style="color: ${that.series.color}">● ${that.series.name}:</span>`;
-          const line2 = `<span>$${that.y} USD</b></span>`;
-          return `<div class="space-x-2">${line1} ${line2}</div>`;
+          // additional data from above
+          const additionalData = that.series.userOptions.additionalData;
+          const color = typeof that.series.color === 'string' ? that.series.color : that.series.color?.stops[1][1];
+
+          const line1 = `<span style="color: ${color}">● ${that.series.name}:</span>`;
+          const line2 = additionalData?.showCurrencySign
+            ? `<span>$${value} USD</b></span>`
+            : `<span>${value}</b></span>`;
+          return `<div class="space-x-1">${line1} ${line2}</div>`;
         },
         valueDecimals: 2,
-      },
-      rangeSelector: {
-        enabled: false,
       },
       plotOptions: {
         line: {
@@ -294,9 +309,10 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           // 	fontSize: '12px',
           // 	color: '#D9D8D8',
           // },
+          showInNavigator: true,
           borderWidth: 0,
           dataLabels: {
-            color: '#cecece',
+            color: ColorScheme.GRAY_LIGHT_VAR,
             enabled: this.showDataLabel,
             format: undefined,
           },
@@ -388,6 +404,25 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
       },
       series: [...this.series] as Highcharts.SeriesOptionsType[],
     };
+  }
+
+  private fancyColoring() {
+    let count = this.applyFancyColor;
+    this.series = this.series.map((s) => {
+      const data: GenericChartSeries = {
+        name: s.name,
+        data: s.data,
+        color: {
+          linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+          stops: [
+            [0, (Highcharts.getOptions().colors as any[])[(count % 5) + 2]], // '#25aedd'
+            [1, (Highcharts.getOptions().colors as any[])[count % 10]],
+          ],
+        },
+      } as GenericChartSeries;
+      count += 1;
+      return data;
+    });
   }
 
   private initAreaChange() {

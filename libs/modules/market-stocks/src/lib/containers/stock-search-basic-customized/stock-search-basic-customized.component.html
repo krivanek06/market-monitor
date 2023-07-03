@@ -38,7 +38,11 @@
       class="w-full h-12"
       type="button"
     >
-      <app-stock-summary-item [displaySecondLine]="false" [stockSummary]="summary"></app-stock-summary-item>
+      <app-quote-item
+        [symbolQuote]="summary.quote"
+        [assetUrl]="summary.profile.image"
+        [displaySecondLine]="false"
+      ></app-quote-item>
     </button>
   </div>
 </ng-template>

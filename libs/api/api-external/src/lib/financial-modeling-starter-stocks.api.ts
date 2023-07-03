@@ -282,20 +282,23 @@ export const getSectorPeersForSymbols = async (symbols: string[]): Promise<Secto
 /**
  *
  * @param symbols
- * @returns array of percentage data [{
-    "symbol": "AAPL",
-    "1D": 0.6523,
-    "5D": 0.39650887,
-    "1M": 5.95516,
-    "3M": 20.85743,
-    "6M": 28.21965,
-    "ytd": 45.74005,
-    "1Y": 28.17796,
-    "3Y": 115.25808,
-    "5Y": 297.79824,
-    "10Y": 1235.5288,
-    "max": 182407.02924
+ * @returns array of percentage data
+ * ```JSON
+ * [{
+      "symbol": "AAPL",
+      "1D": 0.6523,
+      "5D": 0.39650887,
+      "1M": 5.95516,
+      "3M": 20.85743,
+      "6M": 28.21965,
+      "ytd": 45.74005,
+      "1Y": 28.17796,
+      "3Y": 115.25808,
+      "5Y": 297.79824,
+      "10Y": 1235.5288,
+      "max": 182407.02924
   }]
+  ```
  */
 export const getSymbolsPriceChanges = async (symbols: string[]): Promise<PriceChange[]> => {
   const symbolString = symbols.join(',');

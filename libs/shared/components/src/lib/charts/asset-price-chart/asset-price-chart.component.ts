@@ -25,6 +25,9 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
   @Input() heightPx = 550;
   @Input() historicalPrice!: HistoricalPrice[];
   @Input() showTitle = false;
+  @Input() priceName = 'price';
+  @Input() displayVolume = true;
+  @Input() priceShowSign = true;
 
   ngOnInit(): void {}
   ngOnChanges(changes: SimpleChanges): void {
@@ -39,6 +42,10 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
     const price = data.map((d) => d.close);
     const volume = data.map((d) => d.volume);
     const dates = data.map((d) => d.date);
+    const priceNameLocal = this.priceName;
+    const priceShowSignLocal = this.priceShowSign;
+    const color = !!price[0] && price[0] < price[price.length - 1] ? ColorScheme.SUCCESS_VAR : ColorScheme.DANGER_VAR;
+
     console.log({ price, volume, dates });
 
     this.chartOptions = {
@@ -68,6 +75,12 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
           tickPixelInterval: 40,
           minorGridLineWidth: 0,
           visible: true,
+          labels: {
+            style: {
+              color: ColorScheme.GRAY_LIGHT_VAR,
+              font: '10px Trebuchet MS, Verdana, sans-serif',
+            },
+          },
         },
       ],
       xAxis: {
@@ -79,7 +92,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         labels: {
           rotation: -12,
           style: {
-            color: '#8e8e8e',
+            color: ColorScheme.GRAY_LIGHT_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
@@ -117,10 +130,20 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
 
         pointFormatter: function () {
           const that = this as any;
-          const value = GeneralFunctionUtil.formatLargeNumber(that.y);
 
-          const name = that.series.name.toLowerCase();
-          const valueFormatter = name === 'price' ? `$${value}` : `${value}`;
+          const castedName = that.series.name.toLowerCase();
+          const isPrice = castedName === 'price';
+
+          const value = isPrice
+            ? GeneralFunctionUtil.roundNDigits(that.y, 2)
+            : GeneralFunctionUtil.formatLargeNumber(that.y);
+          const name = isPrice ? priceNameLocal : castedName;
+          const valueFormatter = isPrice && priceShowSignLocal ? `$${value}` : `${value}`;
+
+          // if value 0, don't show tooltip
+          if (String(value) === 'N/A') {
+            return '';
+          }
 
           return `
             <p>
@@ -145,11 +168,11 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
           fillColor: {
             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
             stops: [
-              [0, ColorScheme.PRIMARY_VAR],
+              [0, color],
               [1, 'transparent'],
             ],
           },
-          lineColor: ColorScheme.PRIMARY_VAR,
+          lineColor: color,
           marker: {
             radius: 3,
           },
@@ -172,15 +195,15 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
           name: 'Price',
           data: price,
           yAxis: 1,
-          color: ColorScheme.PRIMARY_VAR,
+          color: color,
         },
         {
           type: 'column',
           name: 'Volume',
-          data: volume,
+          data: this.displayVolume ? volume : [],
           color: '#f48605',
           yAxis: 0,
-          opacity: 0.75,
+          opacity: 0.6,
         },
       ],
     };

@@ -19,6 +19,25 @@
   @apply max-w-[1280px] mx-auto;
 }
 
+.g-absolute-center {
+  position: absolute !important;
+  @apply top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
+}
+
+.g-shadow-background {
+  background: #73737354 !important;
+  border-radius: 6px;
+  pointer-events: none;
+
+  &:not(mat-spinner) > * {
+    opacity: 0.6 !important;
+  }
+
+  mat-spinner {
+    opacity: 1 !important;
+  }
+}
+
 .g-screen-size-default {
   display: block;
   max-width: var(--screen-max-width);

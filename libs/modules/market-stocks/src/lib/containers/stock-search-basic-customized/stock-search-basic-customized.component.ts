@@ -7,11 +7,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { StockSummary } from '@market-monitor/api-types';
+import { QuoteItemComponent } from '@market-monitor/shared-components';
 import { ElementFocusDirective } from '@market-monitor/shared-directives';
 import { SCREEN_DIALOGS } from '@market-monitor/shared-utils';
 import { Observable, iif, startWith, switchMap } from 'rxjs';
-import { StockSummaryItemComponent } from '../../components';
-import { StockSummaryModalComponent } from '../../modals';
+import { StockSummaryDialogComponent } from '../../dialogs';
 import { StockStorageService } from '../../services';
 import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-basic.component';
 
@@ -23,7 +23,7 @@ import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-ba
     ReactiveFormsModule,
     StockSearchBasicComponent,
     OverlayModule,
-    StockSummaryItemComponent,
+    QuoteItemComponent,
     MatButtonModule,
     MatCheckboxModule,
     ElementFocusDirective,
@@ -93,7 +93,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     // weird bug: if we don't set isInputFocused to false, the overlay will not close
     this.overlayIsOpen.update((d) => ({ ...d, isInputFocused: false }));
 
-    this.dialog.open(StockSummaryModalComponent, {
+    this.dialog.open(StockSummaryDialogComponent, {
       data: {
         symbol: summary.id,
       },

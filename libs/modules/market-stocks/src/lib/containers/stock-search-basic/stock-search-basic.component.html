@@ -25,7 +25,11 @@
     <!-- loaded data -->
     <ng-container *ngIf="!showLoadingIndicator()">
       <mat-option *ngFor="let summary of options(); let last = last" [value]="summary" class="py-2 rounded-md">
-        <app-stock-summary-item [stockSummary]="summary" [displaySecondLine]="true"></app-stock-summary-item>
+        <app-quote-item
+          [symbolQuote]="summary.quote"
+          [assetUrl]="summary.profile.image"
+          [displaySecondLine]="true"
+        ></app-quote-item>
         <mat-divider *ngIf="!last"></mat-divider>
       </mat-option>
     </ng-container>

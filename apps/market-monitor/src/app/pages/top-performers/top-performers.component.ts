@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MarketApiService } from '@market-monitor/api-cloud-functions';
 import { StockSummary } from '@market-monitor/api-types';
-import { StockSummaryModalComponent, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks';
+import { StockSummaryDialogComponent, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks';
 import { RangeDirective } from '@market-monitor/shared-directives';
 import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared-utils';
 
@@ -30,7 +30,7 @@ export class TopPerformersComponent {
   marketTopPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance());
 
   onSummaryClick(summary: StockSummary) {
-    this.dialog.open(StockSummaryModalComponent, {
+    this.dialog.open(StockSummaryDialogComponent, {
       data: {
         symbol: summary.id,
       },

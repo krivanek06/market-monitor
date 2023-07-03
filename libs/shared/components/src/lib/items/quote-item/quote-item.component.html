@@ -1,0 +1,44 @@
+<div class="grid mt-2">
+  <!-- first line -->
+  <div class="flex items-center justify-between">
+    <!-- image and symbol -->
+    <div class="flex items-center gap-3 max-w-[60%]">
+      <img *ngIf="assetUrl" appDefaultImg [src]="assetUrl" alt="stock image" class="w-7 h-7" />
+      <span class="block sm:hidden">{{ symbolQuote.symbol }}</span>
+      <span class="hidden sm:block">{{ symbolQuote.name }}</span>
+    </div>
+    <!-- price & price change -->
+    <div class="flex flex-col items-end xs:items-center gap-x-3 xs:flex-row min-w-max">
+      <span *ngIf="displaySecondLine">Price:</span>
+      <span class="text-base text-wt-gray-ligh">{{ symbolQuote.price | currency }}</span>
+      <span
+        appPercentageIncrease
+        [useCurrencySign]="true"
+        [changeValues]="{
+          change: symbolQuote.change,
+          changePercentage: symbolQuote.changesPercentage,
+      }"
+      ></span>
+    </div>
+  </div>
+  <!-- second line -->
+  <div *ngIf="displaySecondLine" class="items-center justify-between hidden xs:flex">
+    <!-- market cap -->
+    <div class="space-x-2">
+      <span>Market Cap.:</span>
+      <span>{{ symbolQuote.marketCap | largeNumberFormatter }}</span>
+    </div>
+    <!-- volume -->
+    <div class="flex items-center gap-3">
+      <span>Volume:</span>
+      <span>{{ symbolQuote.avgVolume | largeNumberFormatter }}</span>
+      <span
+        appPercentageIncrease
+        [currentValues]="{
+          value: symbolQuote.avgVolume,
+          valueToCompare: symbolQuote.volume,
+      }"
+      ></span>
+    </div>
+  </div>
+</div>

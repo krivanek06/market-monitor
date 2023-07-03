@@ -1,58 +1,68 @@
 button {
-	border-radius: 12px !important;
-	min-height: 42px !important;
-	text-transform: capitalize !important;
+  border-radius: 12px !important;
+  min-height: 42px !important;
+  text-transform: capitalize !important;
 
-	&:disabled {
-		opacity: 0.7 !important;
-	}
+  &:disabled {
+    opacity: 0.7 !important;
+  }
 }
 
 button[mat-stroked-button] {
-	border: 1px solid !important;
+  border: 1px solid var(--background-medium) !important;
 
-	&.mat-mdc-outlined-button.mat-unthemed {
-		background-color: #4044741c;
-		color: unset !important;
-		opacity: 0.7;
+  &.mat-mdc-outlined-button.mat-unthemed {
+    background-color: var(--background-light);
+    color: unset !important;
+    opacity: 0.7;
 
-		&:hover {
-			background-color: #40447472;
-		}
-	}
+    &:hover {
+      background-color: var(--background-medium);
+    }
+  }
+
+  &.mat-primary {
+    border: 1px solid var(--primary) !important;
+  }
 }
 
 .mdc-button__label {
-	width: 100% !important;
+  width: 100% !important;
 }
 
 .mat-mdc-outlined-button:disabled {
-	color: var(--gray-dark) !important;
-	background-color: #4b55636b !important;
-	pointer-events: none !important;
+  color: var(--gray-dark) !important;
+  background-color: #4b55636b !important;
+  pointer-events: none !important;
 }
 
 .mat-mdc-unelevated-button[disabled][disabled] {
-	background: var(--gray-dark) !important;
-	color: white !important;
+  background: var(--gray-dark) !important;
+  color: white !important;
 }
 
 @layer utilities {
-	.g-button-size-lg {
-		min-width: 220px !important;
-		min-height: 50px !important;
-	}
+  .g-button-size-lg {
+    min-width: 220px !important;
+    min-height: 50px !important;
+  }
 }
 
-// .mat-mdc-unelevated-button.mat-primary {
-// 	color: rgb(229, 229, 229) !important;
-// }
+.mat-mdc-button.mat-unthemed {
+  color: var(--gray-light) !important;
+}
 
 .mat-mdc-button:not(:disabled) {
-	color: var(--gray-medium) !important;
+  transition-property: all !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-duration: 200ms !important;
+
+  &:hover {
+    color: var(--gray-medium) !important;
+  }
 }
 
 .mat-mdc-button,
 .mat-mdc-outlined-button {
-	--mat-mdc-button-persistent-ripple-color: var(--gray-dark) !important;
+  --mat-mdc-button-persistent-ripple-color: var(--gray-medium) !important;
 }

@@ -46,48 +46,23 @@
 
   <mat-dialog-content>
     <!-- display main metrics -->
-    <div class="mb-4">
+    <div>
       <app-summary-main-metrics [stockSummary]="stockSummary"></app-summary-main-metrics>
     </div>
 
     <!-- time period change -->
-    <div class="my-4">
+    <div class="my-8">
       <app-price-change-items [mainSymbolPriceChange]="stockSummary.priceChange"></app-price-change-items>
     </div>
 
-    <!-- time period form control -->
-    <div class="my-4">
-      <app-time-period-buttons [formControl]="timePeriodFormControl"></app-time-period-buttons>
-    </div>
-
-    <!-- price & volume chart -->
-    <ng-container *ngIf="stockHistoricalPrice().length > 0; else chartSkeleton">
-      <div class="flex justify-between text-wt-gray-light">
-        <span class="hidden sm:block">Historical Prices</span>
-        <span class="hidden sm:block">
-          {{ stockHistoricalPrice()[0].date | date : 'h:mm a MMMM d, y' }} -
-          {{ stockHistoricalPrice()[stockHistoricalPrice().length - 1].date | date : 'h:mm a MMMM d, y' }}
-        </span>
-        <span class="block sm:hidden">
-          {{ stockHistoricalPrice()[0].date | date : 'MMM d, y' }} -
-          {{ stockHistoricalPrice()[stockHistoricalPrice().length - 1].date | date : 'MMM d, y' }}
-        </span>
-      </div>
-      <app-asset-price-chart [historicalPrice]="stockHistoricalPrice()" [heightPx]="420"></app-asset-price-chart>
-    </ng-container>
+    <!-- price & volume -->
+    <app-asset-price-chart-interactive
+      [imageUrl]="stockSummary.profile.image"
+      [title]="data.symbol"
+      [symbol]="data.symbol"
+    ></app-asset-price-chart-interactive>
   </mat-dialog-content>
 </ng-container>
-
-<!-- skeleton chart -->
-<ng-template #chartSkeleton>
-  <!-- chart title and date range -->
-  <div class="flex justify-between mb-3 max-sm:pl-4">
-    <div class="g-skeleton w-[125px] h-6"></div>
-    <div class="g-skeleton w-[350px] h-6"></div>
-  </div>
-
-  <div class="g-skeleton h-[420px]"></div>
-</ng-template>
 
 <!-- skeleton modal -->
 <ng-template #showModalSkeleton>

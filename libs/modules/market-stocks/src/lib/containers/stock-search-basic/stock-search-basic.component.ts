@@ -10,9 +10,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { StocksApiService } from '@market-monitor/api-cloud-functions';
 import { StockSummary } from '@market-monitor/api-types';
+import { QuoteItemComponent } from '@market-monitor/shared-components';
 import { DefaultImgDirective, RangeDirective } from '@market-monitor/shared-directives';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
-import { StockSummaryItemComponent } from '../../components';
+
 @Component({
   selector: 'app-stock-search-basic',
   standalone: true,
@@ -27,7 +28,7 @@ import { StockSummaryItemComponent } from '../../components';
     DefaultImgDirective,
     MatDividerModule,
     MatIconModule,
-    StockSummaryItemComponent,
+    QuoteItemComponent,
   ],
   templateUrl: './stock-search-basic.component.html',
   styleUrls: ['./stock-search-basic.component.scss'],
@@ -49,8 +50,6 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
   searchControl = new FormControl<string>('', { nonNullable: true });
 
   StocksApiService = inject(StocksApiService);
-
-  selectedSummary = signal<StockSummary | null>(null);
   showLoadingIndicator = signal<boolean>(false);
   options = signal<StockSummary[]>([]);
 
