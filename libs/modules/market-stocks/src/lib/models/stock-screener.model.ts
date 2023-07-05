@@ -61,10 +61,10 @@ export const STOCK_SCREENER_EXCHANGE: InputSource<string>[] = [
   { value: 'NYSE', caption: 'NYSE' },
 ];
 
-export type StockScreenerArray = [number | null, number | null];
+export type StockScreenerArray = [number | null, number | null] | null;
 
 export const STOCK_SCREENER_MARKET_CAP: InputSource<StockScreenerArray>[] = [
-  { value: [null, null], caption: 'All' },
+  { value: null, caption: 'All' },
   { value: [200_000_000_000, null], caption: 'Mega ($200bln and more)' },
   { value: [50_000_000_000, 200_000_000_000], caption: 'Large ($50bln to $200bln)' },
   { value: [15_000_000_000, 15_000_000_000], caption: 'Large ($15bln to $50bln)' },
@@ -78,7 +78,7 @@ export const STOCK_SCREENER_MARKET_CAP: InputSource<StockScreenerArray>[] = [
   { value: [null, 30_000_00], caption: 'Nano (less than $30mln)' },
 ];
 export const STOCK_SCREENER_PRICE: InputSource<StockScreenerArray>[] = [
-  { value: [null, null], caption: 'All' },
+  { value: null, caption: 'All' },
   { value: [200, null], caption: 'Over $200' },
   { value: [100, 200], caption: '$100 to $200' },
   { value: [50, 100], caption: '$50 to $100' },
@@ -90,7 +90,7 @@ export const STOCK_SCREENER_PRICE: InputSource<StockScreenerArray>[] = [
   { value: [null, 1], caption: 'Under $1' },
 ];
 export const STOCK_SCREENER_VOLUME: InputSource<StockScreenerArray>[] = [
-  { value: [null, null], caption: 'All' },
+  { value: null, caption: 'All' },
   { value: [100_000_000, null], caption: 'Over 100M' },
   { value: [50_000_000, 100_000_000], caption: '50M to 100M' },
   { value: [20_000_000, 50_000_000], caption: '20M to 50M' },
@@ -106,7 +106,7 @@ export const STOCK_SCREENER_VOLUME: InputSource<StockScreenerArray>[] = [
   { value: [null, 20_000], caption: 'under 20K' },
 ];
 export const STOCK_SCREENER_DIVIDENDS: InputSource<StockScreenerArray>[] = [
-  { value: [null, null], caption: 'All' },
+  { value: null, caption: 'All' },
   { value: [3, null], caption: 'Over $3' },
   { value: [2, 3], caption: '$2 to $3' },
   { value: [1, 2], caption: '$1 to $2' },
@@ -114,3 +114,25 @@ export const STOCK_SCREENER_DIVIDENDS: InputSource<StockScreenerArray>[] = [
   { value: [0.1, 0.5], caption: '$0.1 to $0.5' },
   { value: [null, 0.1], caption: 'Under $0.1' },
 ];
+
+export type StockScreenerFormValues = {
+  country: string | null;
+  industry: string | null;
+  sector: string | null;
+  exchange: string | null;
+  marketCap: StockScreenerArray;
+  price: StockScreenerArray;
+  volume: StockScreenerArray;
+  dividends: StockScreenerArray;
+};
+
+export const stockScreenerDefaultValues: StockScreenerFormValues = {
+  country: null,
+  industry: null,
+  sector: null,
+  exchange: null,
+  marketCap: STOCK_SCREENER_MARKET_CAP[1].value,
+  price: null,
+  volume: null,
+  dividends: null,
+};
