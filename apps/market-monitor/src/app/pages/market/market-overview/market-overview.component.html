@@ -194,6 +194,6 @@
 </ng-container>
 
 <!-- skeleton loading -->
-<ng-container *ngIf="!marketOverviewSignal()">
+<ng-container *ngIf="!(marketOverviewSignal() && marketTopIndexQuotesSignal())">
   <app-market-overview-skeleton></app-market-overview-skeleton>
 </ng-container>

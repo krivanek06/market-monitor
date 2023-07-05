@@ -13,7 +13,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ChartConstructor, ColorScheme, GeneralFunctionUtil } from '@market-monitor/shared-utils';
+import { ChartConstructor, ColorScheme, GeneralFunctionUtil } from '@market-monitor/shared-utils-client';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import HC_stock from 'highcharts/modules/stock';

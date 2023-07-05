@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MarketApiService } from '@market-monitor/api-cloud-functions';
+import { MarketApiService } from '@market-monitor/api-client';
 import { NewsSearchComponent } from '@market-monitor/modules/market-general';
 import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks';
-import { DialogServiceModule } from '@market-monitor/shared-utils';
+import { DialogServiceModule } from '@market-monitor/shared-utils-client';
 
 @Component({
   selector: 'app-search',

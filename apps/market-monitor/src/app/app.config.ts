@@ -16,7 +16,7 @@ import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { PreloadAllModules, provideRouter, withInMemoryScrolling, withPreloading } from '@angular/router';
-import { ENDPOINT_FUNCTION_URL } from '@market-monitor/api-cloud-functions';
+import { ENDPOINT_FUNCTION_URL } from '@market-monitor/api-client';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 

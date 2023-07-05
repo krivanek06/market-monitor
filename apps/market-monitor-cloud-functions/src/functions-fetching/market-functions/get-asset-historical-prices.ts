@@ -1,14 +1,17 @@
 import { getHistoricalPrices } from '@market-monitor/api-external';
 import { HistoricalPricePeriods, getDatabaseStockDetailsHistorical } from '@market-monitor/api-firebase';
 import { HistoricalLoadingPeriods, HistoricalPrice } from '@market-monitor/api-types';
-import { format, isBefore, subDays, subMinutes } from 'date-fns';
+import { format, startOfDay, subDays } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 
 export const getassethistoricalprices = onRequest(async (request, response: Response<HistoricalPrice[]>) => {
   const symbol = request.query.symbol as string;
   const period = request.query.period as keyof typeof HistoricalPricePeriods;
+  const isCrypto = request.query.isCrypto as string;
+
   const usedPeriod = HistoricalPricePeriods[period];
+  const isCryptoBool = isCrypto === 'true';
 
   // throw error if no symbol, period or period not acceptable
   if (!symbol || !period || !usedPeriod) {
@@ -19,15 +22,25 @@ export const getassethistoricalprices = onRequest(async (request, response: Resp
   const firestoreCollectionRef = getDatabaseStockDetailsHistorical(symbol, usedPeriod);
   const firestoreData = (await firestoreCollectionRef.get()).data();
 
-  // if data exists and not older than 5 min, return data
-  if (firestoreData && isBefore(subMinutes(new Date(), 5), new Date(firestoreData.lastUpdate))) {
-    const reveredData = firestoreData.data.reverse();
-    response.send(reveredData);
-    return;
+  // if data exists
+  if (firestoreData) {
+    // and not older than 5 min, return data
+    // if (isBefore(subMinutes(new Date(), 5), new Date(firestoreData.lastUpdate))) {
+    //   const reveredData = firestoreData.data.reverse();
+    //   response.send(reveredData);
+    //   return;
+    // }
+    // if stock market is closed, return data
+    // if (isStockMarketOpen()) {
+    //   const reveredData = firestoreData.data.reverse() ?? [];
+    //   response.send(reveredData);
+    //   return;
+    // }
   }
 
   // resolve what data we have to load
   const loadingPeriod = resolveLoadingPeriod(period);
+  console.log(loadingPeriod);
   // load data
   const historicalPriceData = await getHistoricalPrices(
     symbol,
@@ -55,11 +68,11 @@ const resolveLoadingPeriod = (
   to: string;
 } => {
   const today = new Date();
-
+  // TODO: check what data will I receive if stock market is closed
   if (period === '1d') {
     return {
       loadingPeriod: '1min',
-      from: formatDate(subDays(today, 1)),
+      from: formatDate(startOfDay(today)),
       to: formatDate(today),
     };
   }
