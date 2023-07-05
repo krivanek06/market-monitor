@@ -1,4 +1,5 @@
 <form class="flex items-center gap-3 mb-2" [formGroup]="newSearchFormGroup">
+  <!-- news type -->
   <app-form-mat-input-wrapper
     inputCaption="Select News Type"
     formControlName="newsType"
@@ -6,7 +7,12 @@
     [inputSource]="newsTypesInputSource"
   ></app-form-mat-input-wrapper>
 
-  <app-form-mat-input-wrapper formControlName="symbol" inputCaption="Enter Symbol"></app-form-mat-input-wrapper>
+  <!-- symbol -->
+  <app-form-mat-input-wrapper
+    *ngIf="!isNewsTypeGeneral"
+    formControlName="symbol"
+    inputCaption="Enter Symbol"
+  ></app-form-mat-input-wrapper>
 </form>
 
 <!-- loading screen -->

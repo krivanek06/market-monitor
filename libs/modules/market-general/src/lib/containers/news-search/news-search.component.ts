@@ -34,6 +34,10 @@ export class NewsSearchComponent {
     symbol: new FormControl('', { nonNullable: true }),
   });
 
+  get isNewsTypeGeneral(): boolean {
+    return this.newSearchFormGroup.controls.newsType.value === 'general';
+  }
+
   maximumNewsDisplayed = signal(10);
   showLoadingSignal = signal<boolean>(true);
   marketStockNewsSignal = toSignal<News[]>(
@@ -50,7 +54,9 @@ export class NewsSearchComponent {
         // console.log('prev', prev);
         // console.log('curr', curr);
         // reset symbol if newsType changed
-        const symbol = prev.newsType === curr.newsType ? curr.symbol : '';
+        const symbol = (
+          prev.newsType === curr.newsType ? (curr.newsType === 'crypto' ? `${curr.symbol}USD` : curr.symbol) : ''
+        )?.toUpperCase();
         const newsType = curr.newsType ?? 'stocks';
         return [symbol, newsType] as [string, FirebaseNewsTypes];
       }),
