@@ -31,6 +31,7 @@ export class MarketDataTransformService {
         //color: color,
         data: zip(overviewData.dates, overviewData.data)
           .filter((values): values is [string, number] => !!values[0] && !!values[1])
+          // changing the order of the data to be ascending
           .reduce((acc, [date, value]) => [[new Date(date).getTime(), value], ...acc], [] as [number, number][]),
       },
     };
