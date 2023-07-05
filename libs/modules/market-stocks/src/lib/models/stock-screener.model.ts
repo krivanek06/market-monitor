@@ -72,7 +72,7 @@ export const STOCK_SCREENER_MARKET_CAP: InputSource<StockScreenerArray>[] = [
   { value: null, caption: 'All' },
   { value: [200_000_000_000, null], caption: 'Mega ($200bln and more)' },
   { value: [50_000_000_000, 200_000_000_000], caption: 'Large ($50bln to $200bln)' },
-  { value: [15_000_000_000, 15_000_000_000], caption: 'Large ($15bln to $50bln)' },
+  { value: [15_000_000_000, 50_000_000_000], caption: 'Large ($15bln to $50bln)' },
   { value: [5_000_000_000, 15_000_000_000], caption: 'Mid + ($5bln to $15bln)' },
   { value: [3_000_000_000, 5_000_000_000], caption: 'Mid ($3bln to $5bln)' },
   { value: [1_000_000_000, 3_000_000_000], caption: 'Small+ ($1bln to $3bln)' },

@@ -63,8 +63,8 @@ export class StockSummaryTableComponent {
     'pe',
     'eps',
     'beta',
-    'sector',
     '52WeekRange',
+    'sector',
     'infoMobile',
   ];
 

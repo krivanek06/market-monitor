@@ -1,4 +1,4 @@
-import { StockScreenerValues } from '@market-monitor/api-types';
+import { StockScreenerResults, StockScreenerValues } from '@market-monitor/api-types';
 /* eslint-disable max-len */
 import {
   AnalystEstimates,
@@ -394,11 +394,19 @@ const getStockScreeningSearchParams = (values: StockScreenerValues): URLSearchPa
 
   return searchParams;
 };
-export const getStockScreening = async (values: StockScreenerValues): Promise<StockScreenerValues[]> => {
+export const getStockScreening = async (values: StockScreenerValues): Promise<StockScreenerResults[]> => {
   const searchParams = getStockScreeningSearchParams(values);
   const searchParamsValues = String(searchParams).length > 0 ? `${searchParams}&` : '';
+  const ignoredSymbols = ['.', '-']; // if symbol con any of the ignored symbols, filter them out
 
-  const url = `${FINANCIAL_MODELING_URL}/v3/stock-screener?${searchParamsValues}limit=200&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<StockScreenerValues[]>(url);
-  return response.data;
+  const url = `${FINANCIAL_MODELING_URL}/v3/stock-screener?${searchParamsValues}limit=300&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<StockScreenerResults[]>(url);
+
+  // check if symbol contains any of the ignored symbols
+  const filteredResponse = response.data
+    .filter((screenerData) => {
+      return !ignoredSymbols.some((ignoredSymbol) => screenerData.symbol.includes(ignoredSymbol));
+    })
+    .filter((d) => !d.isEtf && !!d.sector);
+  return filteredResponse;
 };

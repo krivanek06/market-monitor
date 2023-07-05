@@ -1,7 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { StockScreenerArray, StockScreenerValues } from '@market-monitor/api-types';
+import {
+  StockExchangeTypes,
+  StockIndustryTypes,
+  StockScreenerArray,
+  StockScreenerValues,
+  StockSectorTypes,
+} from '@market-monitor/api-types';
 import { FormMatInputWrapperComponent } from '@market-monitor/shared-components';
 import {
   STOCK_SCREENER_COUNTRIES,
@@ -42,9 +48,9 @@ export class StockScreenerFormComponent implements OnInit, ControlValueAccessor 
 
   screenerFormGroup = new FormGroup({
     country: new FormControl<string | null>(null),
-    industry: new FormControl<string | null>(null),
-    sector: new FormControl<string | null>(null),
-    exchange: new FormControl<string | null>(null),
+    industry: new FormControl<StockIndustryTypes | null>(null),
+    sector: new FormControl<StockSectorTypes | null>(null),
+    exchange: new FormControl<StockExchangeTypes | null>(null),
     marketCap: new FormControl<StockScreenerArray | null>(null),
     price: new FormControl<StockScreenerArray | null>(null),
     volume: new FormControl<StockScreenerArray | null>(null),
