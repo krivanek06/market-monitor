@@ -5,6 +5,7 @@ import {
   MarketOverviewData,
   MarketOverviewDatabaseKeys,
 } from '@market-monitor/api-types';
+import { delaySeconds } from '@market-monitor/shared-utils-general';
 import { zip } from 'lodash';
 
 /**
@@ -19,7 +20,6 @@ import { zip } from 'lodash';
  */
 
 import { firestore } from 'firebase-admin';
-import { delaySeconds } from '../utils';
 
 // TODO: update data if older than 7 days
 export const loadMarketOverviewData = async (

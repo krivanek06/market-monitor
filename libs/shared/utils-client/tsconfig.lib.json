@@ -13,5 +13,5 @@
     "jest.config.ts",
     "src/**/*.test.ts"
   ],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "../utils-general/src/lib/date-service.util.ts", "../utils-general/src/lib/general-function.util.ts"]
 }

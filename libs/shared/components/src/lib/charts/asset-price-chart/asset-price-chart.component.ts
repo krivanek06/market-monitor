@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { HistoricalPrice } from '@market-monitor/api-types';
-import { ChartConstructor, ColorScheme, GeneralFunctionUtil } from '@market-monitor/shared-utils-client';
+import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-client';
+import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({
@@ -134,9 +135,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
           const castedName = that.series.name.toLowerCase();
           const isPrice = castedName === 'price';
 
-          const value = isPrice
-            ? GeneralFunctionUtil.roundNDigits(that.y, 2)
-            : GeneralFunctionUtil.formatLargeNumber(that.y);
+          const value = isPrice ? roundNDigits(that.y, 2) : formatLargeNumber(that.y);
           const name = isPrice ? priceNameLocal : castedName;
           const valueFormatter = isPrice && priceShowSignLocal ? `$${value}` : `${value}`;
 

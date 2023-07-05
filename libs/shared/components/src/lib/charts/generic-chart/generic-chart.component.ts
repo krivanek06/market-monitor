@@ -13,7 +13,8 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ChartConstructor, ColorScheme, GeneralFunctionUtil } from '@market-monitor/shared-utils-client';
+import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-client';
+import { roundNDigits } from '@market-monitor/shared-utils-general';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import HC_stock from 'highcharts/modules/stock';
@@ -264,7 +265,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
 
         pointFormatter: function () {
           const that = this as any;
-          const value = GeneralFunctionUtil.roundNDigits(that.y, 2);
+          const value = roundNDigits(that.y, 2);
 
           // do not show 0 value in tooltip
           if (value === 0) {
