@@ -1,3 +1,10 @@
+import {
+  StockExchangeTypes,
+  StockIndustryTypes,
+  StockScreenerArray,
+  StockScreenerValues,
+  StockSectorTypes,
+} from '@market-monitor/api-types';
 import { InputSource } from '@market-monitor/shared-components';
 
 export const STOCK_SCREENER_COUNTRIES: InputSource<string>[] = [
@@ -27,7 +34,7 @@ export const STOCK_SCREENER_COUNTRIES: InputSource<string>[] = [
   { value: 'GB', caption: 'United Kingdom' },
 ];
 
-export const STOCK_SCREENER_INDUSTRIES: InputSource<string>[] = [
+export const STOCK_SCREENER_INDUSTRIES: InputSource<StockIndustryTypes>[] = [
   { value: 'Autos', caption: 'Autos' },
   { value: 'Banks', caption: 'Banks' },
   { value: 'Banks Diversified', caption: 'Banks Diversified' },
@@ -37,7 +44,7 @@ export const STOCK_SCREENER_INDUSTRIES: InputSource<string>[] = [
   { value: 'Beverages Brewers', caption: 'Beverages Brewers' },
   { value: 'Beverages Non-Alcoholic', caption: 'Beverages Non-Alcoholic' },
 ];
-export const STOCK_SCREENER_SECTORS: InputSource<string>[] = [
+export const STOCK_SCREENER_SECTORS: InputSource<StockSectorTypes>[] = [
   { value: 'Consumer Cyclical', caption: 'Consumer Cyclical' },
   { value: 'Energy', caption: 'Energy' },
   { value: 'Technology', caption: 'Technology' },
@@ -55,13 +62,11 @@ export const STOCK_SCREENER_SECTORS: InputSource<string>[] = [
   { value: 'Conglomerates', caption: 'Conglomerates' },
 ];
 
-export const STOCK_SCREENER_EXCHANGE: InputSource<string>[] = [
-  { value: 'AMEX', caption: 'AMEX' },
-  { value: 'NASDAQ', caption: 'NASDAQ' },
-  { value: 'NYSE', caption: 'NYSE' },
+export const STOCK_SCREENER_EXCHANGE: InputSource<StockExchangeTypes>[] = [
+  { value: 'amex', caption: 'AMEX' },
+  { value: 'nasdaq', caption: 'NASDAQ' },
+  { value: 'nyse', caption: 'NYSE' },
 ];
-
-export type StockScreenerArray = [number | null, number | null] | null;
 
 export const STOCK_SCREENER_MARKET_CAP: InputSource<StockScreenerArray>[] = [
   { value: null, caption: 'All' },
@@ -115,18 +120,7 @@ export const STOCK_SCREENER_DIVIDENDS: InputSource<StockScreenerArray>[] = [
   { value: [null, 0.1], caption: 'Under $0.1' },
 ];
 
-export type StockScreenerFormValues = {
-  country: string | null;
-  industry: string | null;
-  sector: string | null;
-  exchange: string | null;
-  marketCap: StockScreenerArray;
-  price: StockScreenerArray;
-  volume: StockScreenerArray;
-  dividends: StockScreenerArray;
-};
-
-export const stockScreenerDefaultValues: StockScreenerFormValues = {
+export const stockScreenerDefaultValues: StockScreenerValues = {
   country: null,
   industry: null,
   sector: null,

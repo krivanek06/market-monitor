@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { StockScreenerArray, StockScreenerValues } from '@market-monitor/api-types';
 import { FormMatInputWrapperComponent } from '@market-monitor/shared-components';
 import {
   STOCK_SCREENER_COUNTRIES,
@@ -11,8 +12,6 @@ import {
   STOCK_SCREENER_PRICE,
   STOCK_SCREENER_SECTORS,
   STOCK_SCREENER_VOLUME,
-  StockScreenerArray,
-  StockScreenerFormValues,
 } from '../../models';
 
 @Component({
@@ -52,7 +51,7 @@ export class StockScreenerFormComponent implements OnInit, ControlValueAccessor 
     dividends: new FormControl<StockScreenerArray | null>(null),
   });
 
-  onChange: (value: StockScreenerFormValues) => void = () => {};
+  onChange: (value: StockScreenerValues) => void = () => {};
   onTouched = () => {};
 
   ngOnInit(): void {
@@ -62,7 +61,7 @@ export class StockScreenerFormComponent implements OnInit, ControlValueAccessor 
     });
   }
 
-  writeValue(obj: StockScreenerFormValues): void {
+  writeValue(obj: StockScreenerValues): void {
     this.screenerFormGroup.patchValue(obj, { emitEvent: false });
   }
   /**
