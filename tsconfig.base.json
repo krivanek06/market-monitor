@@ -25,7 +25,8 @@
       "@market-monitor/shared-directives": ["libs/shared/directives/src/index.ts"],
       "@market-monitor/shared-pipes": ["libs/shared/pipes/src/index.ts"],
       "@market-monitor/shared-services": ["libs/shared/services/src/index.ts"],
-      "@market-monitor/shared-utils-client": ["libs/shared/utils-client/src/index.ts"]
+      "@market-monitor/shared-utils-client": ["libs/shared/utils-client/src/index.ts"],
+      "@market-monitor/shared-utils-general": ["libs/shared/utils-general/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

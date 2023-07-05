@@ -1,7 +1,8 @@
 import { getHistoricalPrices } from '@market-monitor/api-external';
 import { HistoricalPricePeriods, getDatabaseStockDetailsHistorical } from '@market-monitor/api-firebase';
 import { HistoricalLoadingPeriods, HistoricalPrice } from '@market-monitor/api-types';
-import { format, startOfDay, subDays } from 'date-fns';
+import { dateGetDateOfOpenStockMarket } from '@market-monitor/shared-utils-general';
+import { format, isBefore, subDays, subMinutes } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 
@@ -22,20 +23,12 @@ export const getassethistoricalprices = onRequest(async (request, response: Resp
   const firestoreCollectionRef = getDatabaseStockDetailsHistorical(symbol, usedPeriod);
   const firestoreData = (await firestoreCollectionRef.get()).data();
 
-  // if data exists
-  if (firestoreData) {
-    // and not older than 5 min, return data
-    // if (isBefore(subMinutes(new Date(), 5), new Date(firestoreData.lastUpdate))) {
-    //   const reveredData = firestoreData.data.reverse();
-    //   response.send(reveredData);
-    //   return;
-    // }
-    // if stock market is closed, return data
-    // if (isStockMarketOpen()) {
-    //   const reveredData = firestoreData.data.reverse() ?? [];
-    //   response.send(reveredData);
-    //   return;
-    // }
+  //TODO: what if the stock market was closed and opened again?
+  // if data exists and not older than 5 min, return data
+  if (firestoreData && isBefore(subMinutes(new Date(), 5), new Date(firestoreData.lastUpdate))) {
+    const reveredData = firestoreData.data.reverse();
+    response.send(reveredData);
+    return;
   }
 
   // resolve what data we have to load
@@ -68,11 +61,11 @@ const resolveLoadingPeriod = (
   to: string;
 } => {
   const today = new Date();
-  // TODO: check what data will I receive if stock market is closed
   if (period === '1d') {
+    const from = dateGetDateOfOpenStockMarket(today);
     return {
       loadingPeriod: '1min',
-      from: formatDate(startOfDay(today)),
+      from: formatDate(from),
       to: formatDate(today),
     };
   }

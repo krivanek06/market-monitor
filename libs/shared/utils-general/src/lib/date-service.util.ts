@@ -1,0 +1,154 @@
+import {
+  differenceInBusinessDays,
+  differenceInDays,
+  format,
+  getDay,
+  getMonth,
+  getWeek,
+  getWeeksInMonth,
+  getYear,
+  isAfter,
+  isBefore,
+  isSameDay,
+  isWeekend,
+  setHours,
+  setMinutes,
+  setSeconds,
+  startOfDay,
+  subDays,
+  subYears,
+} from 'date-fns';
+import { zonedTimeToUtc } from 'date-fns-tz';
+import { STOCK_MARKET_CLOSED_DATES } from './constants';
+
+export type DateServiceUtilDateInformation = {
+  year: number;
+  month: number;
+  week: number;
+  day: number;
+};
+
+type DateInput = string | number | Date;
+
+export const dateGetDetailsInformationFromDate = (input: string | Date | number): DateServiceUtilDateInformation => {
+  const date = new Date(input);
+
+  return {
+    year: getYear(date),
+    month: getMonth(date),
+    week: getWeek(date),
+    day: getDay(date),
+  };
+};
+
+/**
+ * const one = new Date(2022, 10, 20);
+ * const second = new Date(2022, 10, 22);
+ * result will be 2
+ *
+ * @param first
+ * @param second
+ * @returns the day difference in two dates
+ */
+export const dateGetDayDifference = (first: DateInput, second: DateInput): number => {
+  const firstDate = new Date(first);
+  const secondDate = new Date(second);
+  return Math.abs(differenceInDays(firstDate, secondDate));
+};
+
+export const dateIsStockMarketOpen = (input: DateInput) => {
+  const currentDate = new Date(input);
+  if (isWeekend(currentDate)) {
+    return false; // Market is closed on weekends
+  }
+
+  const timeZone = 'America/New_York';
+  const utcCurrentDate = zonedTimeToUtc(currentDate, timeZone);
+
+  const marketOpeningTime = setHours(setMinutes(setSeconds(utcCurrentDate, 0), 30), 13); // 9:30 AM ET -> 13:30 UTC
+  const marketClosingTime = setHours(setMinutes(setSeconds(utcCurrentDate, 0), 0), 20); // 4:00 PM ET -> 20:00 UTC
+
+  return isAfter(utcCurrentDate, marketOpeningTime) && isBefore(utcCurrentDate, marketClosingTime);
+};
+
+export const isStockMarketClosed = (input: DateInput): boolean => {
+  const formattedDate = new Date(input);
+
+  // check if it's a holiday when the market is closed
+  for (let i = 0; i < STOCK_MARKET_CLOSED_DATES.length; i++) {
+    const monthFormatted = format(formattedDate, 'MM'); //  01, 02, ..., 12
+    const dayFormatted = format(formattedDate, 'dd'); // 	01, 02, ..., 31
+    const comparedDate = `${monthFormatted}-${dayFormatted}`;
+    //console.log(comparedDate, STOCK_MARKET_CLOSED_DATES[i]);
+    if (comparedDate === STOCK_MARKET_CLOSED_DATES[i]) {
+      return true;
+    }
+  }
+  return false;
+};
+
+export const dateGetDateOfOpenStockMarket = (input: DateInput): Date => {
+  const date = new Date(input);
+
+  if (dateIsStockMarketOpen(date) && !isStockMarketClosed(date) && !isWeekend(date)) {
+    return startOfDay(date);
+  }
+
+  // from today subtract 1 day and return the correct date
+  for (let i = 1; i < 30; i++) {
+    const dateToCheck = subDays(date, i);
+    console.log('dateToCheck', dateToCheck, isStockMarketClosed(dateToCheck), isWeekend(dateToCheck));
+    if (!isStockMarketClosed(dateToCheck) && !isWeekend(dateToCheck)) {
+      return startOfDay(dateToCheck);
+    }
+  }
+
+  return startOfDay(date);
+};
+
+/**
+ * Docs: https://date-fns.org/v2.14.0/docs/format
+ *
+ * @param inputDate
+ * @param formatOptions
+ * @returns
+ */
+export const dateFormatDate = (inputDate: DateInput, formateStr: string = 'yyyy-MM-dd'): string => {
+  const date = new Date(inputDate);
+  return format(date, formateStr);
+};
+
+export const dateIsNotWeekend = (date: DateInput): boolean => {
+  return !isWeekend(new Date(date));
+};
+
+export const dateDifferenceInBusinessDays = (date1: DateInput, date2: DateInput): number => {
+  return Math.abs(differenceInBusinessDays(new Date(date1), new Date(date2)));
+};
+
+export const dateGetWeeksInMonth = (inputDate: DateInput): number => {
+  return getWeeksInMonth(new Date(inputDate));
+};
+
+export const dateSplitter = (dateFormat: string): [number, number, number | undefined] => {
+  const [year, month, week] = dateFormat.split('-').map((d) => Number(d));
+  return [year, month, week] as [number, number, number | undefined];
+};
+
+export const dateIsSameDay = (date1: DateInput, date2: DateInput): boolean => {
+  return isSameDay(new Date(Number(date1)), new Date(Number(date2)));
+};
+
+export const dateSubYears = (date: Date | number, amount: number): Date => {
+  return subYears(date, amount);
+};
+
+export const dateIsBefore = (date: Date | number, dateToCompare: Date | number): boolean => {
+  return isBefore(date, dateToCompare);
+};
+
+export const dateFormatDateWithHours = (date: Date) => {
+  const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+  const hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+  return `${hours}:${minutes}, ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+};

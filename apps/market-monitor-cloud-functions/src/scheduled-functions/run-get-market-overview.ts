@@ -1,9 +1,9 @@
 import { getDatabaseMarketOverviewRef } from '@market-monitor/api-firebase';
 import { MarketOverview, MarketOverviewData, marketOverviewToLoad } from '@market-monitor/api-types';
+import { delaySeconds } from '@market-monitor/shared-utils-general';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 import { loadMarketOverviewData } from '../functions-shared';
-import { delaySeconds } from '../utils';
 
 export const rungetmarketoverview = onRequest(async (request, response: Response<string>) => {
   const hardReload = request.query.hardReload as string;
