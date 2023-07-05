@@ -51,8 +51,7 @@ export class NewsSearchComponent {
       }),
       pairwise(),
       map(([prev, curr]) => {
-        // console.log('prev', prev);
-        // console.log('curr', curr);
+        // console.log('prev', prev, 'curr', curr);
         // reset symbol if newsType changed
         const symbol = (
           prev.newsType === curr.newsType ? (curr.newsType === 'crypto' ? `${curr.symbol}USD` : curr.symbol) : ''
