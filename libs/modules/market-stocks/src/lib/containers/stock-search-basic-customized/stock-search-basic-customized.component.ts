@@ -9,7 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { StockSummary } from '@market-monitor/api-types';
 import { QuoteItemComponent } from '@market-monitor/shared-components';
 import { ElementFocusDirective } from '@market-monitor/shared-directives';
-import { SCREEN_DIALOGS } from '@market-monitor/shared-utils';
+import { SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
 import { Observable, iif, startWith, switchMap } from 'rxjs';
 import { StockSummaryDialogComponent } from '../../dialogs';
 import { StockStorageService } from '../../services';

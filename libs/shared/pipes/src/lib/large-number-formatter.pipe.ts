@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { GeneralFunctionUtil } from '@market-monitor/shared-utils';
+import { GeneralFunctionUtil } from '@market-monitor/shared-utils-client';
 
 @Pipe({
   name: 'largeNumberFormatter',

@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component, Input, forwardRef, inject, signal }
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
-import { SCREEN_LAYOUT } from '@market-monitor/shared-utils';
+import { SCREEN_LAYOUT } from '@market-monitor/shared-utils-client';
 import { map } from 'rxjs';
 import { LabelValue } from '../form-controls.model';
 

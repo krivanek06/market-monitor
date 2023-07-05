@@ -7,7 +7,7 @@ import { MarketApiService } from '@market-monitor/api-client';
 import { StockSummary } from '@market-monitor/api-types';
 import { StockSummaryDialogComponent, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks';
 import { RangeDirective } from '@market-monitor/shared-directives';
-import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared-utils';
+import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
 
 @Component({
   selector: 'app-top-performers',

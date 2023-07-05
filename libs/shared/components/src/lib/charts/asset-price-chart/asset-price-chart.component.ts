@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { HistoricalPrice } from '@market-monitor/api-types';
-import { ChartConstructor, ColorScheme, GeneralFunctionUtil } from '@market-monitor/shared-utils';
+import { ChartConstructor, ColorScheme, GeneralFunctionUtil } from '@market-monitor/shared-utils-client';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({

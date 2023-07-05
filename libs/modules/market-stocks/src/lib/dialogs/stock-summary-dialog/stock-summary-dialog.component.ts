@@ -9,7 +9,7 @@ import { StockSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
 import { PriceChangeItemsComponent } from '@market-monitor/shared-components';
 import { DefaultImgDirective } from '@market-monitor/shared-directives';
-import { DialogServiceUtil } from '@market-monitor/shared-utils';
+import { DialogServiceUtil } from '@market-monitor/shared-utils-client';
 import { Observable } from 'rxjs';
 import { StockStorageService } from '../../services';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
