@@ -1,3 +1,4 @@
+import { StockScreenerResults, StockScreenerValues } from '@market-monitor/api-types';
 /* eslint-disable max-len */
 import {
   AnalystEstimates,
@@ -326,7 +327,86 @@ export const getSymbolPrice = async (symbol: string): Promise<PriceChange> => {
   }]
  */
 export const getStockNews = async (symbol: string): Promise<News[]> => {
-  const url = `${FINANCIAL_MODELING_URL}/v3/stock_news/?tickers=${symbol}&limit=15&apikey=${FINANCIAL_MODELING_KEY}`;
+  const url = `${FINANCIAL_MODELING_URL}/v3/stock_news?tickers=${symbol}&limit=15&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<News[]>(url);
   return response.data;
+};
+
+/**
+ *
+ * @param values
+ * @returns an URLSearchParams from the provided StockScreenerValues object. Ignores keys that are
+ * not part of the object
+ */
+const getStockScreeningSearchParams = (values: StockScreenerValues): URLSearchParams => {
+  const searchParams = new URLSearchParams({});
+  if (values.country) {
+    searchParams.append('country', values.country);
+  }
+  if (values.sector) {
+    searchParams.append('sector', values.sector);
+  }
+  if (values.industry) {
+    searchParams.append('industry', values.industry);
+  }
+  if (values.exchange) {
+    searchParams.append('exchange', values.exchange);
+  }
+  if (values.marketCap) {
+    const [marketCapMoreThan, marketCapLowerThan] = values.marketCap;
+    if (marketCapMoreThan) {
+      searchParams.append('marketCapMoreThan', String(marketCapMoreThan));
+    }
+    if (marketCapLowerThan) {
+      searchParams.append('marketCapLowerThan', String(marketCapLowerThan));
+    }
+  }
+
+  if (values.price) {
+    const [priceMoreThan, priceLowerThan] = values.price;
+    if (priceMoreThan) {
+      searchParams.append('priceMoreThan', String(priceMoreThan));
+    }
+    if (priceLowerThan) {
+      searchParams.append('priceLowerThan', String(priceLowerThan));
+    }
+  }
+
+  if (values.volume) {
+    const [volumeMoreThan, volumeLowerThan] = values.volume;
+    if (volumeMoreThan) {
+      searchParams.append('volumeMoreThan', String(volumeMoreThan));
+    }
+    if (volumeLowerThan) {
+      searchParams.append('volumeLowerThan', String(volumeLowerThan));
+    }
+  }
+
+  if (values.dividends) {
+    const [dividendMoreThan, dividendLowerThan] = values.dividends;
+    if (dividendMoreThan) {
+      searchParams.append('dividendMoreThan', String(dividendMoreThan));
+    }
+    if (dividendLowerThan) {
+      searchParams.append('dividendLowerThan', String(dividendLowerThan));
+    }
+  }
+
+  return searchParams;
+};
+export const getStockScreening = async (values: StockScreenerValues): Promise<StockScreenerResults[]> => {
+  const searchParams = getStockScreeningSearchParams(values);
+  const searchParamsValues = String(searchParams).length > 0 ? `${searchParams}&` : '';
+  const ignoredSymbols = ['.', '-']; // if symbol con any of the ignored symbols, filter them out
+
+  const url = `${FINANCIAL_MODELING_URL}/v3/stock-screener?${searchParamsValues}limit=300&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<StockScreenerResults[]>(url);
+
+  // check if symbol contains any of the ignored symbols
+  const filteredResponse = response.data
+    .filter((screenerData) => {
+      return !ignoredSymbols.some((ignoredSymbol) => screenerData.symbol.includes(ignoredSymbol));
+    })
+    .filter((d) => !d.isEtf && !!d.sector);
+  return filteredResponse;
 };

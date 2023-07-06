@@ -6,6 +6,7 @@
     "mm:serve": "nx run market-monitor:serve",
     "mm:ssr": "nx run market-monitor:serve-ssr",
     "mm:cloud-function:serve": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --config firebase.market-monitor-cloud-functions.json",
+    "mm:cloud-functions:kill": "kill -9 $(lsof -ti:4000,4001)",
     "mm:cloud-function:debug": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --inspect-functions --config firebase.market-monitor-cloud-functions.json",
     "mm:cloud-function:deploy": "nx build market-monitor-cloud-functions && firebase deploy --only functions --config firebase.market-monitor-cloud-functions.json"
   },
@@ -29,6 +30,7 @@
     "axios": "^1.0.0",
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
+    "express": "^4.18.2",
     "firebase": "^9.14.0",
     "firebase-admin": "^11.4.1",
     "firebase-functions": "^4.1.1",

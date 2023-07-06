@@ -509,3 +509,66 @@ export interface MostPerformingStocks {
   price: number;
   changesPercentage: number;
 }
+
+export interface StockScreenerResults {
+  symbol: string;
+  companyName: string;
+  marketCap: number;
+  sector: string;
+  industry: string;
+  beta: number;
+  price: number;
+  lastAnnualDividend: number;
+  volume: number;
+  exchange: string;
+  exchangeShortName: string;
+  country: string;
+  isEtf: boolean;
+  isActivelyTrading: boolean;
+}
+
+export const STOCK_SECTORS = [
+  'Consumer Cyclical',
+  'Energy',
+  'Technology',
+  'Industrials',
+  'Financial Services',
+  'Basic Materials',
+  'Communication Services',
+  'Consumer Defensive',
+  'Healthcare',
+  'Real Estate',
+  'Utilities',
+  'Industrial Goods',
+  'Financial',
+  'Services',
+  'Conglomerates',
+] as const;
+
+export const STOCK_INDUSTRIES = [
+  'Autos',
+  'Banks',
+  'Banks Diversified',
+  'Software',
+  'Banks Regional',
+  'Beverages Alcoholic',
+  'Beverages Brewers',
+  'Beverages Non-Alcoholic',
+] as const;
+
+export const STOCK_EXCHANGES = ['nyse', 'nasdaq', 'amex'] as const;
+
+export type StockSectorTypes = (typeof STOCK_SECTORS)[number];
+export type StockIndustryTypes = (typeof STOCK_INDUSTRIES)[number];
+export type StockExchangeTypes = (typeof STOCK_EXCHANGES)[number];
+export type StockScreenerArray = [number | null, number | null] | null;
+export type StockScreenerValues = {
+  country: string | null;
+  industry: StockIndustryTypes | null;
+  sector: StockSectorTypes | null;
+  exchange: StockExchangeTypes | null;
+  marketCap: StockScreenerArray;
+  price: StockScreenerArray;
+  volume: StockScreenerArray;
+  dividends: StockScreenerArray;
+};

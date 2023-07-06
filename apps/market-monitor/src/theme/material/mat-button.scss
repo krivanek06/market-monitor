@@ -9,7 +9,7 @@ button {
 }
 
 button[mat-stroked-button] {
-  border: 1px solid var(--background-medium) !important;
+  // border: 1px solid !important; // var(--background-medium)
 
   &.mat-mdc-outlined-button.mat-unthemed {
     background-color: var(--background-light);
@@ -19,6 +19,10 @@ button[mat-stroked-button] {
     &:hover {
       background-color: var(--background-medium);
     }
+  }
+
+  &.g-border-apply {
+    border: 1px solid !important;
   }
 
   &.mat-primary {
