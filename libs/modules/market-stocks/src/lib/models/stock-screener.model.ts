@@ -7,7 +7,8 @@ import {
 } from '@market-monitor/api-types';
 import { InputSource } from '@market-monitor/shared-components';
 
-export const STOCK_SCREENER_COUNTRIES: InputSource<string>[] = [
+export const STOCK_SCREENER_COUNTRIES: InputSource<string | null>[] = [
+  { value: null, caption: 'All' },
   { value: 'USA', caption: 'United States' },
   { value: 'AT', caption: 'Austria' },
   { value: 'AU', caption: 'Australia' },
@@ -34,7 +35,8 @@ export const STOCK_SCREENER_COUNTRIES: InputSource<string>[] = [
   { value: 'GB', caption: 'United Kingdom' },
 ];
 
-export const STOCK_SCREENER_INDUSTRIES: InputSource<StockIndustryTypes>[] = [
+export const STOCK_SCREENER_INDUSTRIES: InputSource<StockIndustryTypes | null>[] = [
+  { value: null, caption: 'All' },
   { value: 'Autos', caption: 'Autos' },
   { value: 'Banks', caption: 'Banks' },
   { value: 'Banks Diversified', caption: 'Banks Diversified' },
@@ -44,7 +46,8 @@ export const STOCK_SCREENER_INDUSTRIES: InputSource<StockIndustryTypes>[] = [
   { value: 'Beverages Brewers', caption: 'Beverages Brewers' },
   { value: 'Beverages Non-Alcoholic', caption: 'Beverages Non-Alcoholic' },
 ];
-export const STOCK_SCREENER_SECTORS: InputSource<StockSectorTypes>[] = [
+export const STOCK_SCREENER_SECTORS: InputSource<StockSectorTypes | null>[] = [
+  { value: null, caption: 'All' },
   { value: 'Consumer Cyclical', caption: 'Consumer Cyclical' },
   { value: 'Energy', caption: 'Energy' },
   { value: 'Technology', caption: 'Technology' },
@@ -62,7 +65,8 @@ export const STOCK_SCREENER_SECTORS: InputSource<StockSectorTypes>[] = [
   { value: 'Conglomerates', caption: 'Conglomerates' },
 ];
 
-export const STOCK_SCREENER_EXCHANGE: InputSource<StockExchangeTypes>[] = [
+export const STOCK_SCREENER_EXCHANGE: InputSource<StockExchangeTypes | null>[] = [
+  { value: null, caption: 'All' },
   { value: 'amex', caption: 'AMEX' },
   { value: 'nasdaq', caption: 'NASDAQ' },
   { value: 'nyse', caption: 'NYSE' },
@@ -120,7 +124,7 @@ export const STOCK_SCREENER_DIVIDENDS: InputSource<StockScreenerArray>[] = [
   { value: [null, 0.1], caption: 'Under $0.1' },
 ];
 
-export const stockScreenerDefaultValues: StockScreenerValues = {
+export const STOCK_SCREENER_DEFAULT_VALUES: StockScreenerValues = {
   country: null,
   industry: null,
   sector: null,
@@ -129,4 +133,25 @@ export const stockScreenerDefaultValues: StockScreenerValues = {
   price: null,
   volume: null,
   dividends: null,
+};
+
+export const STOCK_SCREENER_INPUT_SOURCE_TO_KEY: { [key in keyof StockScreenerValues]: InputSource<unknown>[] } = {
+  country: STOCK_SCREENER_COUNTRIES,
+  industry: STOCK_SCREENER_INDUSTRIES,
+  sector: STOCK_SCREENER_SECTORS,
+  exchange: STOCK_SCREENER_EXCHANGE,
+  marketCap: STOCK_SCREENER_MARKET_CAP,
+  price: STOCK_SCREENER_PRICE,
+  volume: STOCK_SCREENER_VOLUME,
+  dividends: STOCK_SCREENER_DIVIDENDS,
+};
+
+export const getScreenerInputIndexByKey = (key: keyof StockScreenerValues, value: unknown): number => {
+  const inputSource = STOCK_SCREENER_INPUT_SOURCE_TO_KEY[key];
+  return inputSource.findIndex((item) => item.value === value);
+};
+
+export const getScreenerInputValueByKey = (key: keyof StockScreenerValues, index: number): unknown => {
+  const inputSource = STOCK_SCREENER_INPUT_SOURCE_TO_KEY[key];
+  return inputSource[index].value;
 };

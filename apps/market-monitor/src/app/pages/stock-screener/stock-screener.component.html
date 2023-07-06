@@ -1,12 +1,16 @@
-<section class="pt-16 mb-10">
+<section class="pt-16 mx-auto mb-10 md:w-11/12 lg:w-10/12 xl:w-9/12">
   <app-stock-screener-form [formControl]="screenerFormControl"></app-stock-screener-form>
+
+  <div class="flex items-center justify-between mt-8">
+    <h3>Total found: {{ loadingSignal() ? 'Loading...' : screenerResults()?.length }}</h3>
+
+    <button (click)="onFormReset()" mat-stroked-button color="warn" class="g-border-apply">Reset Form</button>
+  </div>
 </section>
 
 <!-- table of results -->
 <ng-container *ngIf="!loadingSignal()">
   <ng-container *ngIf="screenerResults() as screenerResults">
-    <h3>Total found: {{ screenerResults.length }}</h3>
-
     <section class="mt-6">
       <app-stock-summary-table
         appScrollNearEnd
