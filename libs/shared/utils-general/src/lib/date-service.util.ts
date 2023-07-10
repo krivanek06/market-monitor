@@ -1,6 +1,8 @@
 import {
   differenceInBusinessDays,
   differenceInDays,
+  eachDayOfInterval,
+  endOfMonth,
   format,
   getDay,
   getMonth,
@@ -15,6 +17,7 @@ import {
   setMinutes,
   setSeconds,
   startOfDay,
+  startOfMonth,
   subDays,
   subYears,
 } from 'date-fns';
@@ -151,4 +154,12 @@ export const dateFormatDateWithHours = (date: Date) => {
   const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
   const hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
   return `${hours}:${minutes}, ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+};
+
+export const generateDatesArray = (year: number, month: number): string[] => {
+  const startDate = startOfMonth(new Date(year, month - 1)); // month is zero-based
+  const endDate = endOfMonth(startDate);
+  const datesArray = eachDayOfInterval({ start: startDate, end: endDate });
+  const datesArrayFormatted = datesArray.map((date) => dateFormatDate(date));
+  return datesArrayFormatted;
 };

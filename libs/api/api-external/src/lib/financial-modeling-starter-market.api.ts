@@ -86,7 +86,6 @@ export const getCalendarStockIPOs = async (month: number | string, year: number 
 
 export const getCalendarStockEarnings = async (month: number | string, year: number | string) => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
-  console.log(from, to);
   const url = `${FINANCIAL_MODELING_URL}/v3/earning_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<CalendarStockEarning[]>(url);
   const filteredOutResponse = filterOutSymbols(response.data, ['epsEstimated']);

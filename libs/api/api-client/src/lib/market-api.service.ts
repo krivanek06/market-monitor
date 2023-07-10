@@ -2,6 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import {
   AvailableQuotes,
+  CalendarStockDividend,
+  CalendarStockEarning,
+  CalendarStockIPO,
   FirebaseNewsTypes,
   HistoricalPrice,
   MarketOverview,
@@ -63,5 +66,23 @@ export class MarketApiService {
 
   getQuoteBySymbol(symbol: string): Observable<SymbolQuote | null> {
     return this.http.get<SymbolQuote>(`${this.endpointFunctions}/getquotebysymbol?symbol=${symbol}`);
+  }
+
+  getMarketCalendarDividends(month: string | number, year: string | number): Observable<CalendarStockDividend[]> {
+    return this.http.get<CalendarStockDividend[]>(
+      `${this.endpointFunctions}/getcalendarstockdividends?month=${month}&year=${year}`
+    );
+  }
+
+  getMarketCalendarEarnings(month: string | number, year: string | number): Observable<CalendarStockEarning[]> {
+    return this.http.get<CalendarStockEarning[]>(
+      `${this.endpointFunctions}/getcalendarstockearnigns?month=${month}&year=${year}`
+    );
+  }
+
+  getMarketCalendarIPOs(month: string | number, year: string | number): Observable<CalendarStockIPO[]> {
+    return this.http.get<CalendarStockIPO[]>(
+      `${this.endpointFunctions}/getcalendarstockipos?month=${month}&year=${year}`
+    );
   }
 }

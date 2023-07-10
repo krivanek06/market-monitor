@@ -3,6 +3,7 @@ export enum ROUTES_TOP_LEVEL {
   STOCK_DETAILS = 'stock-details',
   STOCK_SCREENER = 'stock-screener',
   MARKET = 'market',
+  MARKET_CALENDAR = 'calendar',
   TOP_PERFORMERS = 'top-performers',
   CRYPTO = 'crypto',
   DASHBOARD = 'dashboard',

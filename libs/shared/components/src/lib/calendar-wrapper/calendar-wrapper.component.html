@@ -1,0 +1,41 @@
+<div class="flex justify-between mb-10">
+  <!-- current date range -->
+  <div class="space-x-4">
+    <span>{{ dateRangeSignal()[0] | date : 'MMMM d, y (EEEE)' }}</span>
+    <span>-</span>
+    <span>{{ dateRangeSignal()[dateRangeSignal().length - 1] | date : 'MMMM d, y (EEEE)' }}</span>
+  </div>
+
+  <!-- left / right button -->
+  <div class="flex items-center gap-4">
+    <button (click)="onMonthChange('previous')" mat-button type="button">
+      <mat-icon>navigate_before</mat-icon>
+      Previous Month
+    </button>
+    <button (click)="onMonthChange('previous')" mat-button type="button">
+      Next Month
+      <mat-icon iconPositionEnd>navigate_next</mat-icon>
+    </button>
+  </div>
+</div>
+
+<div class="grid grid-cols-5">
+  <!-- display day name -->
+  <div *ngRange="5; let i = index" class="mb-4 text-base text-center text-wt-gray-dark">
+    {{ dateRangeSignal()[i] | date : 'EEEE' }}
+  </div>
+
+  <!-- showing border if not last line on the bottom -->
+  <div
+    *ngFor="let date of dateRangeSignal(); let i = index"
+    class="h-[240px] p-2 border-gray-200 border-solid"
+    [ngClass]="{
+      'border-r': i % 5 !== 4,
+      'border-b':
+        dateRangeSignal().length % 5 < dateRangeSignal().length - i &&
+        (dateRangeSignal().length % 5 !== 0 || i < dateRangeSignal().length - 5)
+    }"
+  >
+    {{ date }} {{ i }}
+  </div>
+</div>
