@@ -4,7 +4,7 @@ export const filterOutSymbols = <T extends { symbol: string }>(data: T[], nonNul
   // if symbol con any of the ignored symbols, filter them out
   const ignoredSymbols = ['.', '-', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
   return data
-    .filter((d) => !ignoredSymbols.every((ignoredSymbol) => d.symbol.includes(ignoredSymbol)))
+    .filter((d) => !ignoredSymbols.some((ignoredSymbol) => d.symbol.includes(ignoredSymbol)))
     .filter((d) => nonNullableKeys.every((key) => !!d[key]));
 };
 
