@@ -1,4 +1,7 @@
 export * from './get-asset-historical-prices';
+export * from './get-calendar-stock-dividends';
+export * from './get-calendar-stock-earnings';
+export * from './get-calendar-stock-ipos';
 export * from './get-market-news';
 export * from './get-market-overview';
 export * from './get-market-top-performers';

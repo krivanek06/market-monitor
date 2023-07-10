@@ -572,3 +572,42 @@ export type StockScreenerValues = {
   volume: StockScreenerArray;
   dividends: StockScreenerArray;
 };
+
+export type CalendarStockDividend = {
+  date: string;
+  label: string;
+  adjDividend: number;
+  symbol: string;
+  dividend: number;
+  recordDate: string | null;
+  paymentDate: string | null;
+  declarationDate: string | null;
+};
+
+export type CalendarStockIPO = {
+  symbol: string;
+  cik: string;
+  acceptedDate: string;
+  filingDate: string;
+  pricePublicPerShare: number;
+  pricePublicTotal: number;
+  discountsAndCommissionsPerShare: number;
+  discountsAndCommissionsTotal: number;
+  proceedsBeforeExpensesPerShare: number;
+  proceedsBeforeExpensesTotal: number;
+  form: string;
+  ipoDate: string;
+  url: string;
+};
+
+export type CalendarStockEarning = {
+  date: string;
+  symbol: string;
+  eps: string | null;
+  epsEstimated: string | null;
+  time: string;
+  revenue: string | null;
+  revenueEstimated: string | null;
+  fiscalDateEnding: string;
+  updatedFromDate: string;
+};

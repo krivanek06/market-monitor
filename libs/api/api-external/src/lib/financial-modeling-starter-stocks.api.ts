@@ -1,4 +1,3 @@
-import { StockScreenerResults, StockScreenerValues } from '@market-monitor/api-types';
 /* eslint-disable max-len */
 import {
   AnalystEstimates,
@@ -14,12 +13,15 @@ import {
   PriceTarget,
   Profile,
   SectorPeers,
+  StockScreenerResults,
+  StockScreenerValues,
   SymbolQuote,
   TickerSearch,
   UpgradesDowngrades,
 } from '@market-monitor/api-types';
 import axios from 'axios';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
+import { filterOutSymbols } from './helpers';
 
 export const getCompanyQuote = async (symbols: string[]): Promise<SymbolQuote[]> => {
   const symbol = symbols.join(',');
@@ -81,15 +83,12 @@ export const getHistoricalPrices = async (
 export const searchTicker = async (symbolPrefix: string, isCrypto = false): Promise<TickerSearch[]> => {
   const stockExchange = 'NASDAQ,NYSE';
   const cryptoExchange = 'CRYPTO';
-  const ignoredSymbols = ['.', '-']; // if symbol con any of the ignored symbols, filter them out
   const usedExchange = isCrypto ? cryptoExchange : stockExchange;
   const url = `${FINANCIAL_MODELING_URL}/v3/search-ticker?query=${symbolPrefix}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<TickerSearch[]>(url);
 
   // check if symbol contains any of the ignored symbols
-  const filteredResponse = response.data.filter((ticker) => {
-    return !ignoredSymbols.some((ignoredSymbol) => ticker.symbol.includes(ignoredSymbol));
-  });
+  const filteredResponse = filterOutSymbols(response.data);
   return filteredResponse;
 };
 
@@ -397,16 +396,11 @@ const getStockScreeningSearchParams = (values: StockScreenerValues): URLSearchPa
 export const getStockScreening = async (values: StockScreenerValues): Promise<StockScreenerResults[]> => {
   const searchParams = getStockScreeningSearchParams(values);
   const searchParamsValues = String(searchParams).length > 0 ? `${searchParams}&` : '';
-  const ignoredSymbols = ['.', '-']; // if symbol con any of the ignored symbols, filter them out
 
   const url = `${FINANCIAL_MODELING_URL}/v3/stock-screener?${searchParamsValues}limit=300&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<StockScreenerResults[]>(url);
 
   // check if symbol contains any of the ignored symbols
-  const filteredResponse = response.data
-    .filter((screenerData) => {
-      return !ignoredSymbols.some((ignoredSymbol) => screenerData.symbol.includes(ignoredSymbol));
-    })
-    .filter((d) => !d.isEtf && !!d.sector);
+  const filteredResponse = filterOutSymbols(response.data, ['isEtf', 'sector']);
   return filteredResponse;
 };

@@ -1,6 +1,15 @@
-import { AvailableQuotes, MostPerformingStocks, News, SymbolQuote } from '@market-monitor/api-types';
+import {
+  AvailableQuotes,
+  CalendarStockDividend,
+  CalendarStockEarning,
+  CalendarStockIPO,
+  MostPerformingStocks,
+  News,
+  SymbolQuote,
+} from '@market-monitor/api-types';
 import axios from 'axios';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
+import { getDateRangeByMonthAndYear } from './helpers';
 
 /**
  *
@@ -56,5 +65,35 @@ export const getQuotesBySymbols = async (symbols: string[]) => {
   const symbolsString = symbols.join(',');
   const url = `${FINANCIAL_MODELING_URL}/v3/quote/${symbolsString}?apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<SymbolQuote[]>(url);
+  return response.data;
+};
+
+export const getCalendarStockDividends = async (
+  month: number | string,
+  year: number | string
+): Promise<CalendarStockDividend[]> => {
+  const [from, to] = getDateRangeByMonthAndYear(month, year);
+  const url = `${FINANCIAL_MODELING_URL}/v3/stock_dividend_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get(url);
+  return response.data;
+};
+
+export const getCalendarStockIPOs = async (
+  month: number | string,
+  year: number | string
+): Promise<CalendarStockIPO[]> => {
+  const [from, to] = getDateRangeByMonthAndYear(month, year);
+  const url = `${FINANCIAL_MODELING_URL}/v4/ipo-calendar-prospectus?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get(url);
+  return response.data;
+};
+
+export const getCalendarStockEarnings = async (
+  month: number | string,
+  year: number | string
+): Promise<CalendarStockEarning[]> => {
+  const [from, to] = getDateRangeByMonthAndYear(month, year);
+  const url = `${FINANCIAL_MODELING_URL}/v3/earning_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get(url);
   return response.data;
 };
