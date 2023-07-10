@@ -1,5 +1,4 @@
 import { FirebaseNewsTypes } from '@market-monitor/api-types';
-import { FirebaseMarketDataFields } from './firebase-market.model';
 
 export interface DataSnapshot<T> {
   lastUpdate: string;
@@ -44,12 +43,12 @@ export const HistoricalPricePeriods = {
 export const FirebaseNewsTypesCollectionResolver = (category: FirebaseNewsTypes) => {
   switch (category) {
     case 'general':
-      return FirebaseMarketDataFields.market_news_general;
+      return 'market_news_general';
     case 'stocks':
-      return FirebaseMarketDataFields.market_news_stocks;
+      return 'market_news_stocks';
     case 'forex':
-      return FirebaseMarketDataFields.market_news_forex;
+      return 'market_news_forex';
     case 'crypto':
-      return FirebaseMarketDataFields.market_news_crypto;
+      return 'market_news_crypto';
   }
 };

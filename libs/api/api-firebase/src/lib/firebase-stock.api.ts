@@ -1,34 +1,21 @@
 import { HistoricalPrice, News, StockDetails, StockSummary } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
-import { DataSnapshot, FirebaseStockDataFields, HistoricalPriceTypes } from './models';
+import { DataSnapshot, HistoricalPriceTypes } from './models';
 
 export const getDatabaseStockSummaryRef = (symbol: string) =>
-  firestore()
-    .collection(FirebaseStockDataFields.market_data_stocks)
-    .doc(symbol)
-    .withConverter(assignTypes<StockSummary>());
+  firestore().collection('market_data_stocks').doc(symbol).withConverter(assignTypes<StockSummary>());
+
+export const getDatabaseStockMoreInformationRef = (symbol: string) =>
+  getDatabaseStockSummaryRef(symbol).collection('more_information');
 
 export const getDatabaseStockDetailsRef = (symbol: string) =>
-  firestore()
-    .collection(FirebaseStockDataFields.market_data_stocks)
-    .doc(symbol)
-    .collection(FirebaseStockDataFields.more_information)
-    .doc(FirebaseStockDataFields.stock_details)
-    .withConverter(assignTypes<StockDetails>());
+  getDatabaseStockMoreInformationRef(symbol).doc('details').withConverter(assignTypes<StockDetails>());
 
 export const getDatabaseStockDetailsHistorical = (symbol: string, historical: HistoricalPriceTypes) =>
-  firestore()
-    .collection(FirebaseStockDataFields.market_data_stocks)
-    .doc(symbol)
-    .collection(FirebaseStockDataFields.more_information)
+  getDatabaseStockMoreInformationRef(symbol)
     .doc(historical)
     .withConverter(assignTypes<DataSnapshot<HistoricalPrice[]>>());
 
 export const getDatabaseStockDetailsNews = (symbol: string) =>
-  firestore()
-    .collection(FirebaseStockDataFields.market_data_stocks)
-    .doc(symbol)
-    .collection(FirebaseStockDataFields.more_information)
-    .doc(FirebaseStockDataFields.stock_news)
-    .withConverter(assignTypes<DataSnapshot<News[]>>());
+  getDatabaseStockMoreInformationRef(symbol).doc('news').withConverter(assignTypes<DataSnapshot<News[]>>());

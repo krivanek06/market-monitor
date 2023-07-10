@@ -9,7 +9,7 @@ import {
 } from '@market-monitor/api-types';
 import axios from 'axios';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
-import { getDateRangeByMonthAndYear } from './helpers';
+import { filterOutSymbols, getDateRangeByMonthAndYear } from './helpers';
 
 /**
  *
@@ -68,32 +68,26 @@ export const getQuotesBySymbols = async (symbols: string[]) => {
   return response.data;
 };
 
-export const getCalendarStockDividends = async (
-  month: number | string,
-  year: number | string
-): Promise<CalendarStockDividend[]> => {
+export const getCalendarStockDividends = async (month: number | string, year: number | string) => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v3/stock_dividend_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get(url);
-  return response.data;
+  const response = await axios.get<CalendarStockDividend[]>(url);
+  const filteredOutResponse = filterOutSymbols(response.data);
+  return filteredOutResponse;
 };
 
-export const getCalendarStockIPOs = async (
-  month: number | string,
-  year: number | string
-): Promise<CalendarStockIPO[]> => {
+export const getCalendarStockIPOs = async (month: number | string, year: number | string) => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v4/ipo-calendar-prospectus?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get(url);
-  return response.data;
+  const response = await axios.get<CalendarStockIPO[]>(url);
+  const filteredOutResponse = filterOutSymbols(response.data);
+  return filteredOutResponse;
 };
 
-export const getCalendarStockEarnings = async (
-  month: number | string,
-  year: number | string
-): Promise<CalendarStockEarning[]> => {
+export const getCalendarStockEarnings = async (month: number | string, year: number | string) => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v3/earning_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get(url);
-  return response.data;
+  const response = await axios.get<CalendarStockEarning[]>(url);
+  const filteredOutResponse = filterOutSymbols(response.data);
+  return filteredOutResponse;
 };
