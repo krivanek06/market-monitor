@@ -182,16 +182,6 @@ export type SplitsHistory = {
   denominator: number;
 };
 
-export type StockDividend = {
-  date: string;
-  label: string;
-  adjDividend: number;
-  dividend: number;
-  recordDate: string;
-  paymentDate: string;
-  declarationDate: string;
-};
-
 export type News = {
   symbol: string;
   publishedDate: string;
@@ -573,7 +563,7 @@ export type StockScreenerValues = {
   dividends: StockScreenerArray;
 };
 
-export type CalendarStockDividend = {
+export type StockDividend = {
   date: string;
   label: string;
   adjDividend: number;

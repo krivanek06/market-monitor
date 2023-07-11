@@ -30,6 +30,10 @@ button[mat-stroked-button] {
   }
 }
 
+button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
+  border: 1px solid var(--background-medium) !important;
+}
+
 .mdc-button__label {
   width: 100% !important;
 }

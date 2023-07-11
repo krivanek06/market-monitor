@@ -1,5 +1,4 @@
 import {
-  CalendarStockDividend,
   CalendarStockEarning,
   CalendarStockIPO,
   FirebaseNewsTypes,
@@ -7,6 +6,7 @@ import {
   MarketOverviewData,
   MarketTopPerformanceOverview,
   News,
+  StockDividend,
 } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
@@ -32,7 +32,7 @@ export const getDatabaseMarketCalendarDividendsRef = (month: string | number, ye
   firestore()
     .collection('market_data_calendar_dividends')
     .doc(`${year}-${month}`)
-    .withConverter(assignTypes<DataSnapshot<CalendarStockDividend[]>>());
+    .withConverter(assignTypes<DataSnapshot<StockDividend[]>>());
 
 export const getDatabaseMarketCalendarIPOsRef = (month: string | number, year: string | number) =>
   firestore()

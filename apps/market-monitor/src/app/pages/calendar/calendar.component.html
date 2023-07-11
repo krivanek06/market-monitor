@@ -1,3 +1,20 @@
-<p>market-calendar works!</p>
+<div class="mt-10">
+  <app-calendar-wrapper [minHeight]="275" [formControl]="currentDateRangeControl">
+    <ng-container *ngIf="!loadingSignal()">
+      <ng-template marker *ngFor="let dividendsData of calendarDividendsSignal() ?? []">
+        <app-dividend-item
+          *ngFor="let data of dividendsData.data | slice : 0 : 5; let last = last"
+          [showBorder]="!last"
+          [stockDividend]="data"
+        ></app-dividend-item>
+      </ng-template>
+    </ng-container>
 
-<app-calendar-wrapper></app-calendar-wrapper>
+    <!-- loading skeletons -->
+    <ng-container *ngIf="loadingSignal()">
+      <ng-template marker *ngRange="datesInMonthSignal() ?? 0">
+        <div *ngRange="5" class="w-full h-10 mb-1 g-skeleton"></div>
+      </ng-template>
+    </ng-container>
+  </app-calendar-wrapper>
+</div>

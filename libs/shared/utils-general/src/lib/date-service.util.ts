@@ -156,10 +156,39 @@ export const dateFormatDateWithHours = (date: Date) => {
   return `${hours}:${minutes}, ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
 };
 
-export const generateDatesArray = (year: number, month: number): string[] => {
-  const startDate = startOfMonth(new Date(year, month - 1)); // month is zero-based
+export const generateDatesArray = (data: { year: number; month: number }): string[] => {
+  const startDate = startOfMonth(new Date(data.year, data.month - 1)); // month is zero-based
   const endDate = endOfMonth(startDate);
   const datesArray = eachDayOfInterval({ start: startDate, end: endDate });
   const datesArrayFormatted = datesArray.map((date) => dateFormatDate(date));
   return datesArrayFormatted;
+};
+
+/**
+ * based on provided array of objects, it will fill out missing dates for
+ * the current month
+ * @param dates
+ */
+export const fillOutMissingDatesForMonth = <T extends { date: string }>(input: T[], ignoreWeekend = true): T[] => {
+  if (input.length === 0) {
+    return input;
+  }
+  const first = input[0];
+  // get the year and month of the element we are working
+  const [year, month] = dateSplitter(first.date);
+
+  const dateRange = generateDatesArray({ year, month });
+  const filteredDates = dateRange.filter((date) => !ignoreWeekend || !isWeekend(new Date(date)));
+
+  // create empty object that will fill out the missing space
+  const emptyValue = Object.keys(first).reduce((acc, key) => ({ ...acc, [key]: null }), {}) as T;
+
+  // find date in provided input else use emptyValue
+  return filteredDates.map((date) => {
+    const dataInInput = input.find((d) => d.date === date);
+    if (dataInInput) {
+      return dataInInput;
+    }
+    return emptyValue;
+  });
 };

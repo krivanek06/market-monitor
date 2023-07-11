@@ -1,10 +1,10 @@
 import {
   AvailableQuotes,
-  CalendarStockDividend,
   CalendarStockEarning,
   CalendarStockIPO,
   MostPerformingStocks,
   News,
+  StockDividend,
   SymbolQuote,
 } from '@market-monitor/api-types';
 import axios from 'axios';
@@ -71,8 +71,8 @@ export const getQuotesBySymbols = async (symbols: string[]) => {
 export const getCalendarStockDividends = async (month: number | string, year: number | string) => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v3/stock_dividend_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<CalendarStockDividend[]>(url);
-  const filteredOutResponse = filterOutSymbols(response.data);
+  const response = await axios.get<StockDividend[]>(url);
+  const filteredOutResponse = filterOutSymbols(response.data, ['adjDividend']);
   return filteredOutResponse;
 };
 

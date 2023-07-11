@@ -1,18 +1,22 @@
-<div class="flex justify-between mb-10">
-  <!-- current date range -->
-  <div class="space-x-4">
-    <span>{{ dateRangeSignal()[0] | date : 'MMMM d, y (EEEE)' }}</span>
-    <span>-</span>
-    <span>{{ dateRangeSignal()[dateRangeSignal().length - 1] | date : 'MMMM d, y (EEEE)' }}</span>
+<div class="flex justify-between px-6 mb-10">
+  <div class="flex items-center gap-10">
+    <!-- current date range -->
+    <div class="space-x-4 text-wt-gray-light">
+      <span>{{ dateRangeSignal()[0] | date : 'MMMM d, y' }}</span>
+      <span>-</span>
+      <span>{{ dateRangeSignal()[dateRangeSignal().length - 1] | date : 'MMMM d, y' }}</span>
+    </div>
+    <!-- current month button -->
+    <button (click)="onCurrentMonthClick()" type="button" mat-stroked-button>Current Date</button>
   </div>
 
   <!-- left / right button -->
-  <div class="flex items-center gap-4">
+  <div class="flex items-center gap-10">
     <button (click)="onMonthChange('previous')" mat-button type="button">
       <mat-icon>navigate_before</mat-icon>
       Previous Month
     </button>
-    <button (click)="onMonthChange('previous')" mat-button type="button">
+    <button (click)="onMonthChange('next')" mat-button type="button">
       Next Month
       <mat-icon iconPositionEnd>navigate_next</mat-icon>
     </button>
@@ -21,14 +25,15 @@
 
 <div class="grid grid-cols-5">
   <!-- display day name -->
-  <div *ngRange="5; let i = index" class="mb-4 text-base text-center text-wt-gray-dark">
+  <div *ngRange="5; let i = index" class="mb-4 text-base text-center text-wt-gray-light">
     {{ dateRangeSignal()[i] | date : 'EEEE' }}
   </div>
 
   <!-- showing border if not last line on the bottom -->
   <div
     *ngFor="let date of dateRangeSignal(); let i = index"
-    class="h-[240px] p-2 border-gray-200 border-solid"
+    class="p-2 g-border"
+    [style.min-height.px]="minHeight"
     [ngClass]="{
       'border-r': i % 5 !== 4,
       'border-b':
@@ -36,6 +41,19 @@
         (dateRangeSignal().length % 5 !== 0 || i < dateRangeSignal().length - 5)
     }"
   >
-    {{ date }} {{ i }}
+    <!-- display day -->
+    <div class="flex justify-end mb-2">
+      <span class="p-2 text-center rounded-full text-wt-gray-light w-9 h-9 bg-wt-background-light-super">
+        {{ dateRangeSignal()[i] | date : 'd' }}
+      </span>
+    </div>
+
+    <!-- using an ng-container allows us to render the template without any additional wrapping -->
+    <div *ngIf="templates.length >= i">
+      <!-- using this hacky way because  templates[index] does not work -->
+      <ng-container *ngFor="let tmpl of templates; let tmplIndex = index">
+        <ng-container *ngIf="tmplIndex === i" [ngTemplateOutlet]="tmpl"></ng-container>
+      </ng-container>
+    </div>
   </div>
 </div>

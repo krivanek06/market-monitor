@@ -9,28 +9,26 @@ import {
   getDatabaseMarketCalendarEarningsRef,
   getDatabaseMarketCalendarIPOsRef,
 } from '@market-monitor/api-firebase';
-import { CalendarStockDividend, CalendarStockEarning, CalendarStockIPO } from '@market-monitor/api-types';
+import { CalendarStockEarning, CalendarStockIPO, StockDividend } from '@market-monitor/api-types';
 import { Response } from 'express';
 import { firestore } from 'firebase-admin';
 import { onRequest } from 'firebase-functions/v2/https';
 
 type CalendarTypes = 'dividends' | 'earnings' | 'ipo';
-type CalendarDataTypes = CalendarStockDividend | CalendarStockIPO | CalendarStockEarning;
+type CalendarDataTypes = StockDividend | CalendarStockIPO | CalendarStockEarning;
 
-export const getcalendarstockdividends = onRequest(
-  async (request, response: Response<CalendarStockDividend[] | string>) => {
-    const year = request.query.year as string;
-    const month = request.query.month as string;
+export const getcalendarstockdividends = onRequest(async (request, response: Response<StockDividend[] | string>) => {
+  const year = request.query.year as string;
+  const month = request.query.month as string;
 
-    // missing data
-    if (!year || !month) {
-      response.status(400).send('Missing year or month from the request');
-    }
-
-    const data = await getDataForCalendar<CalendarStockDividend>('dividends', year, month);
-    response.send(data);
+  // missing data
+  if (!year || !month) {
+    response.status(400).send('Missing year or month from the request');
   }
-);
+
+  const data = await getDataForCalendar<StockDividend>('dividends', year, month);
+  response.send(data);
+});
 
 export const getcalendarstockearnigns = onRequest(
   async (request, response: Response<CalendarStockEarning[] | string>) => {

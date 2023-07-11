@@ -16,6 +16,7 @@ module.exports = {
         'wt-background-dark': 'var(--background-dark)',
         'wt-background-medium': 'var(--background-medium)',
         'wt-background-light': 'var(--background-light)',
+        'wt-background-light-super': 'var(--background-light-super)',
 
         /* primary */
         'wt-primary': 'var(--primary)',
