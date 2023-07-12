@@ -1,7 +1,7 @@
 import { StockSummary } from '@market-monitor/api-types';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
-import { getSummaries } from '../../functions-shared';
+import { getSummaries } from '../../shared';
 
 /**
  * query.symbols contains a comma-separated list of stock symbols 'symbols=MSFT,AAPL,GOOG'

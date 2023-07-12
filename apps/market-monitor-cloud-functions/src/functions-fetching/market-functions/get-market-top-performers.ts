@@ -4,7 +4,7 @@ import { MarketTopPerformanceOverviewResponse, SYMBOL_SP500 } from '@market-moni
 import { isBefore, subMinutes } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
-import { getSummaries } from '../../functions-shared';
+import { getSummaries } from '../../shared';
 
 export const getmarkettopperformance = onRequest(
   async (_, response: Response<MarketTopPerformanceOverviewResponse>) => {
