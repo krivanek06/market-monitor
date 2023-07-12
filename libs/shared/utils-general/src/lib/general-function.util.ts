@@ -1,7 +1,7 @@
 export const delaySeconds = (seconds: number) => new Promise((res) => setTimeout(res, seconds * 1000));
 
 export const getAssetUrl = (asset: string): string => {
-  return `https://financialmodelingprep.com/image-stock/${asset}.png`;
+  return `https://get-asset-url.krivanek1234.workers.dev/${asset}`;
 };
 
 export const isNumber = (value: string | number | unknown): boolean => {

@@ -1,4 +1,3 @@
-export * from './asset-url.pipe';
 export * from './date-ago.pipe';
 export * from './in-array.pipe';
 export * from './large-number-formatter.pipe';

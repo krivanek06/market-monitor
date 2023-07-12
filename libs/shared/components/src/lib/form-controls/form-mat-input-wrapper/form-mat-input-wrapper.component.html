@@ -30,7 +30,12 @@
           [ngClass]="{ 'disabled-element': disabled }"
         >
           <mat-select-trigger *ngIf="internalSelectFormControl() as selectedOption" class="flex items-center gap-2">
-            <img appDefaultImg *ngIf="selectedOption?.image" [src]="selectedOption.image" alt="Option image" />
+            <img
+              appDefaultImg
+              *ngIf="selectedOption?.image as selectedOptionImage"
+              [src]="selectedOptionImage"
+              alt="Option image"
+            />
             {{ selectedOption.caption }}
           </mat-select-trigger>
           <mat-optgroup *ngFor="let source of inputSourceWrapper" [label]="source.name">
@@ -67,7 +72,12 @@
           [multiple]="inputType === InputType.MULTISELECT"
         >
           <mat-select-trigger *ngIf="internalSelectFormControl() as selectedOption" class="flex items-center gap-2">
-            <img appDefaultImg *ngIf="selectedOption?.image" [src]="selectedOption.image" alt="Option image" />
+            <img
+              appDefaultImg
+              *ngIf="selectedOption.image as selectedOptionImage"
+              [src]="selectedOptionImage"
+              alt="Option image"
+            />
             {{ selectedOption.caption }}
           </mat-select-trigger>
           <input
