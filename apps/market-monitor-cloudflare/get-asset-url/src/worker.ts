@@ -45,7 +45,7 @@ export async function handleRequest(request: Request, env: Env, ctx: ExecutionCo
 
 	try {
 		// check image in bucket
-		const object = await env.MY_BUCKET.get(`${symbolUpper}.png`);
+		const object = await env.MY_BUCKET.get(symbolUpper);
 
 		// image exists in bucket, return it
 		if (object) {
