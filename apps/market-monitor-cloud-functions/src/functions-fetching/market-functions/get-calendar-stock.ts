@@ -10,6 +10,7 @@ import {
   getDatabaseMarketCalendarIPOsRef,
 } from '@market-monitor/api-firebase';
 import { CalendarStockEarning, CalendarStockIPO, StockDividend } from '@market-monitor/api-types';
+import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
 import { firestore } from 'firebase-admin';
 import { onRequest } from 'firebase-functions/v2/https';
@@ -66,13 +67,21 @@ const getDataForCalendar = async <T extends CalendarDataTypes>(
   const firebaseRef = databaseRefFunction(month, year) as firestore.DocumentReference<DataSnapshot<T[]>>;
   const firebaseData = (await firebaseRef.get()).data() as DataSnapshot<T[]>;
 
-  // if data exists, send to the client
-  if (firebaseData) {
+  // if data exists and not older than 4 days
+  if (firebaseData && isBefore(subDays(new Date(), 4), new Date(firebaseData.lastUpdate))) {
     return firebaseData.data;
   }
 
   // update data from endpoint and save to firebase
   const data = await resultAPIbyType<T>(type, year, month);
+
+  // limit max data to save into firebase, to 65 000 reaching 1MB
+  const dataLimit = 65_000;
+  if (data.length > dataLimit) {
+    console.log(`Data limit reached 65 000 records [year=${year}, month=${month}, data length = ${data.length}]`);
+    return data;
+  }
+
   firebaseRef.set({
     lastUpdate: new Date().toISOString(),
     data,
@@ -105,4 +114,16 @@ const resolveDatabaseByType = (type: CalendarTypes) => {
     case 'ipo':
       return getDatabaseMarketCalendarIPOsRef;
   }
+};
+
+const isDividendType = (data: CalendarDataTypes): data is StockDividend => {
+  return (data as StockDividend).dividend !== undefined;
+};
+
+const isEarningsType = (data: CalendarDataTypes): data is CalendarStockEarning => {
+  return (data as CalendarStockEarning).epsEstimated !== undefined;
+};
+
+const isIPOType = (data: CalendarDataTypes): data is CalendarStockIPO => {
+  return (data as CalendarStockIPO).ipoDate !== undefined;
 };

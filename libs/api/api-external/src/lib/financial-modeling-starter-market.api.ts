@@ -1,10 +1,12 @@
 import {
   AvailableQuotes,
+  CalendarDividend,
   CalendarStockEarning,
   CalendarStockIPO,
   MostPerformingStocks,
   News,
   StockDividend,
+  StockEarning,
   SymbolQuote,
 } from '@market-monitor/api-types';
 import axios from 'axios';
@@ -68,11 +70,18 @@ export const getQuotesBySymbols = async (symbols: string[]) => {
   return response.data;
 };
 
-export const getCalendarStockDividends = async (month: number | string, year: number | string) => {
+export const getCalendarStockDividends = async (
+  month: number | string,
+  year: number | string
+): Promise<CalendarDividend[]> => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v3/stock_dividend_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<StockDividend[]>(url);
-  const filteredOutResponse = filterOutSymbols(response.data, ['adjDividend']);
+  const filteredOutResponse = filterOutSymbols(
+    response.data,
+    [],
+    ['recordDate', 'paymentDate', 'declarationDate', 'label']
+  );
   return filteredOutResponse;
 };
 
@@ -84,10 +93,13 @@ export const getCalendarStockIPOs = async (month: number | string, year: number 
   return filteredOutResponse;
 };
 
-export const getCalendarStockEarnings = async (month: number | string, year: number | string) => {
+export const getCalendarStockEarnings = async (
+  month: number | string,
+  year: number | string
+): Promise<CalendarStockEarning[]> => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v3/earning_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<CalendarStockEarning[]>(url);
-  const filteredOutResponse = filterOutSymbols(response.data, ['epsEstimated']);
+  const response = await axios.get<StockEarning[]>(url);
+  const filteredOutResponse = filterOutSymbols(response.data, [], ['fiscalDateEnding', 'updatedFromDate', 'time']);
   return filteredOutResponse;
 };

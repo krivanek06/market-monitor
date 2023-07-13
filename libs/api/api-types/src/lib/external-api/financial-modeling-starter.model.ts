@@ -566,13 +566,28 @@ export type StockScreenerValues = {
 export type StockDividend = {
   date: string;
   label: string;
-  adjDividend: number;
+  adjDividend: number | null;
   symbol: string;
-  dividend: number;
+  dividend: number | null;
   recordDate: string | null;
   paymentDate: string | null;
   declarationDate: string | null;
 };
+
+export type StockEarning = {
+  date: string;
+  symbol: string;
+  eps: string | null;
+  epsEstimated: string | null;
+  time: string;
+  revenue: string | null;
+  revenueEstimated: string | null;
+  fiscalDateEnding: string;
+  updatedFromDate: string;
+};
+
+export type CalendarDividend = Omit<StockDividend, 'recordDate' | 'paymentDate' | 'declarationDate' | 'label'>;
+export type CalendarStockEarning = Omit<StockEarning, 'fiscalDateEnding' | 'updatedFromDate' | 'time'>;
 
 export type CalendarStockIPO = {
   symbol: string;
@@ -588,16 +603,4 @@ export type CalendarStockIPO = {
   form: string;
   ipoDate: string;
   url: string;
-};
-
-export type CalendarStockEarning = {
-  date: string;
-  symbol: string;
-  eps: string | null;
-  epsEstimated: string | null;
-  time: string;
-  revenue: string | null;
-  revenueEstimated: string | null;
-  fiscalDateEnding: string;
-  updatedFromDate: string;
 };

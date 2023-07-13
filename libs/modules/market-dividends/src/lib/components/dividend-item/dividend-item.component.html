@@ -5,6 +5,6 @@
       <span>{{ stockDividend.symbol }}</span>
     </div>
 
-    <div>{{ stockDividend.adjDividend | currency }}</div>
+    <div>{{ stockDividend.adjDividend ? (stockDividend.adjDividend | currency) : 'N/A' }}</div>
   </div>
 </button>
