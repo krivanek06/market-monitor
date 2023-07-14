@@ -1,7 +1,7 @@
 export const delaySeconds = (seconds: number) => new Promise((res) => setTimeout(res, seconds * 1000));
 
 export const getAssetUrl = (asset: string): string => {
-  return `https://financialmodelingprep.com/image-stock/${asset}.png`;
+  return `https://get-asset-url.krivanek1234.workers.dev/${asset}`;
 };
 
 export const isNumber = (value: string | number | unknown): boolean => {
@@ -10,6 +10,22 @@ export const isNumber = (value: string | number | unknown): boolean => {
 
 export const roundNDigits = (value: number, n: number = 2): number => {
   return Math.round(value * Math.pow(10, n)) / Math.pow(10, n);
+};
+
+export const groupValuesByDate = <T extends { date: string }>(data: T[]): { data: T[]; date: string }[] => {
+  return data.reduce((acc, curr) => {
+    const date = curr.date.split('T')[0];
+    const dateArrayIndex = acc.findIndex((d) => d.date === date);
+
+    // date not in array, create new entry
+    if (dateArrayIndex === -1) {
+      return [{ date, data: [curr] }, ...acc];
+    }
+
+    // add data to the right position
+    acc[dateArrayIndex].data = [...acc[dateArrayIndex].data, curr];
+    return acc;
+  }, [] as { data: T[]; date: string }[]);
 };
 
 export const formatLargeNumber = (

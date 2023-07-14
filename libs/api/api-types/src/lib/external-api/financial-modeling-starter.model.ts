@@ -182,16 +182,6 @@ export type SplitsHistory = {
   denominator: number;
 };
 
-export type StockDividend = {
-  date: string;
-  label: string;
-  adjDividend: number;
-  dividend: number;
-  recordDate: string;
-  paymentDate: string;
-  declarationDate: string;
-};
-
 export type News = {
   symbol: string;
   publishedDate: string;
@@ -571,4 +561,43 @@ export type StockScreenerValues = {
   price: StockScreenerArray;
   volume: StockScreenerArray;
   dividends: StockScreenerArray;
+};
+
+export type StockDividend = {
+  date: string;
+  label: string;
+  adjDividend: number | null;
+  symbol: string;
+  dividend: number | null;
+  recordDate: string | null;
+  paymentDate: string | null;
+  declarationDate: string | null;
+};
+
+export type StockEarning = {
+  date: string;
+  symbol: string;
+  eps: number | null;
+  epsEstimated: number | null;
+  time: string;
+  revenue: number | null;
+  revenueEstimated: number | null;
+  fiscalDateEnding: string;
+  updatedFromDate: string;
+};
+
+export type CalendarStockIPO = {
+  symbol: string;
+  cik: string;
+  acceptedDate: string;
+  filingDate: string;
+  pricePublicPerShare: number;
+  pricePublicTotal: number;
+  discountsAndCommissionsPerShare: number;
+  discountsAndCommissionsTotal: number;
+  proceedsBeforeExpensesPerShare: number;
+  proceedsBeforeExpensesTotal: number;
+  form: string;
+  date: string;
+  url: string;
 };

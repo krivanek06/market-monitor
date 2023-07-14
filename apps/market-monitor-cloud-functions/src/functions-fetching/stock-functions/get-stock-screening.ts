@@ -3,7 +3,7 @@ import { StockScreenerValues, StockSummary } from '@market-monitor/api-types';
 import express, { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 import { chunk, flatten } from 'lodash';
-import { getSummaries } from '../../functions-shared';
+import { getSummaries } from '../../shared';
 
 const app = express();
 

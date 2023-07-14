@@ -27,6 +27,10 @@ export const appRoutes: Routes = [
         loadChildren: () => import('./pages/market/market.routes').then((m) => m.route),
       },
       {
+        path: ROUTES_TOP_LEVEL.MARKET_CALENDAR,
+        loadChildren: () => import('./pages/calendar/calendar.routes').then((m) => m.route),
+      },
+      {
         path: ROUTES_TOP_LEVEL.TOP_PERFORMERS,
         loadChildren: () => import('./pages/top-performers/top-performers.routes').then((m) => m.route),
       },

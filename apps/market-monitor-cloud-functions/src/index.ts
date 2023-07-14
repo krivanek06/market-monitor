@@ -1,7 +1,7 @@
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
 import * as admin from 'firebase-admin';
 export * from './functions-fetching';
-export * from './scheduled-functions';
+export * from './functions-scheduled';
 
 const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
 

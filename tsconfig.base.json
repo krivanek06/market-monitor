@@ -19,6 +19,8 @@
       "@market-monitor/api-external": ["libs/api/api-external/src/index.ts"],
       "@market-monitor/api-firebase": ["libs/api/api-firebase/src/index.ts"],
       "@market-monitor/api-types": ["libs/api/api-types/src/index.ts"],
+      "@market-monitor/modules/market-dividends": ["libs/modules/market-dividends/src/index.ts"],
+      "@market-monitor/modules/market-earnings": ["libs/modules/market-earnings/src/index.ts"],
       "@market-monitor/modules/market-general": ["libs/modules/market-general/src/index.ts"],
       "@market-monitor/modules/market-stocks": ["libs/modules/market-stocks/src/index.ts"],
       "@market-monitor/shared-components": ["libs/shared/components/src/index.ts"],

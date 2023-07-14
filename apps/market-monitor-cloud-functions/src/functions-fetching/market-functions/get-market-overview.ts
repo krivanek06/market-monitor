@@ -2,7 +2,7 @@ import { getDatabaseMarketOverviewRef } from '@market-monitor/api-firebase';
 import { MarketOverview, MarketOverviewData, MarketOverviewDatabaseKeys } from '@market-monitor/api-types';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
-import { loadMarketOverviewData } from '../../functions-shared';
+import { loadMarketOverviewData } from '../../shared';
 
 /**
  * Get market overview data from database, data always exists in database

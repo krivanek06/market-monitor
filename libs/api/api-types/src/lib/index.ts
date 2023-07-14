@@ -1,3 +1,4 @@
+export * from './calendar-asset.model';
 export * from './constants.model';
 export * from './external-api';
 export * from './firebase-market-data.model';

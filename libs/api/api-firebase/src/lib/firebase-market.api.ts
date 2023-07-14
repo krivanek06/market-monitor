@@ -1,34 +1,47 @@
 import {
+  CalendarStockEarning,
+  CalendarStockIPO,
   FirebaseNewsTypes,
   MarketOverview,
   MarketOverviewData,
   MarketTopPerformanceOverview,
   News,
+  StockDividend,
 } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
-import { DataSnapshot, FirebaseMarketDataFields, FirebaseNewsTypesCollectionResolver } from './models';
+import { DataSnapshot, FirebaseNewsTypesCollectionResolver } from './models';
+
+export const getDatabaseMarketDataRef = () => firestore().collection('market_data');
 
 export const getDatabaseMarketTopPerformanceRef = () =>
-  firestore()
-    .collection(FirebaseMarketDataFields.market_data)
-    .doc(FirebaseMarketDataFields.market_top_performance)
-    .withConverter(assignTypes<MarketTopPerformanceOverview>());
+  getDatabaseMarketDataRef().doc('market_top_performance').withConverter(assignTypes<MarketTopPerformanceOverview>());
 
 export const getDatabaseMarketNewsRef = (category: FirebaseNewsTypes) =>
-  firestore()
-    .collection(FirebaseMarketDataFields.market_data)
+  getDatabaseMarketDataRef()
     .doc(FirebaseNewsTypesCollectionResolver(category))
     .withConverter(assignTypes<DataSnapshot<News[]>>());
 
 export const getDatabaseMarketOverviewRef = () =>
-  firestore()
-    .collection(FirebaseMarketDataFields.market_data)
-    .doc(FirebaseMarketDataFields.market_overview)
-    .withConverter(assignTypes<MarketOverview>());
+  getDatabaseMarketDataRef().doc('market_overview').withConverter(assignTypes<MarketOverview>());
 
 export const getDatabaseMarketOverviewDataRef = (path: string) =>
+  getDatabaseMarketDataRef().doc(path).withConverter(assignTypes<MarketOverviewData>());
+
+export const getDatabaseMarketCalendarDividendsRef = (month: string | number, year: string | number) =>
   firestore()
-    .collection(FirebaseMarketDataFields.market_data)
-    .doc(path)
-    .withConverter(assignTypes<MarketOverviewData>());
+    .collection('market_data_calendar_dividends')
+    .doc(`${year}-${month}`)
+    .withConverter(assignTypes<DataSnapshot<StockDividend[]>>());
+
+export const getDatabaseMarketCalendarIPOsRef = (month: string | number, year: string | number) =>
+  firestore()
+    .collection('market_data_calendar_ipos')
+    .doc(`${year}-${month}`)
+    .withConverter(assignTypes<DataSnapshot<CalendarStockIPO[]>>());
+
+export const getDatabaseMarketCalendarEarningsRef = (month: string | number, year: string | number) =>
+  firestore()
+    .collection('market_data_calendar_earnings')
+    .doc(`${year}-${month}`)
+    .withConverter(assignTypes<DataSnapshot<CalendarStockEarning[]>>());

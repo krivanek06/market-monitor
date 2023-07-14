@@ -1,0 +1,46 @@
+<button type="button" mat-button class="w-full">
+  <div class="flex items-center justify-between py-1 g-border" [ngClass]="{ 'border-b': showBorder }">
+    <div class="flex items-center gap-3">
+      <img appDefaultImg imageType="symbol" [src]="earning.symbol" alt="asset url" class="h-7 w-7" />
+      <span>{{ earning.symbol }}</span>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <!-- earnings -->
+      <div class="flex items-center gap-1">
+        <span>{{ earning.eps ? (earning.eps | currency) : 'N/A' }}</span>
+        <div *ngIf="earning.eps && earning.epsEstimated" class="flex items-center">
+          <span>(</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: earning.eps,
+              valueToCompare: earning.epsEstimated,
+              hideValue: true
+            }"
+          ></span>
+          <span>)</span>
+        </div>
+      </div>
+
+      <div *ngIf="showRevenue">/</div>
+
+      <!-- revenue -->
+      <div *ngIf="showRevenue" class="items-center gap-1 hiddem sm:flex">
+        <span>{{ earning.revenue ? (earning.revenue | largeNumberFormatter) : 'N/A' }}</span>
+        <div *ngIf="earning.revenue && earning.revenueEstimated" class="flex items-center">
+          <span>(</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: earning.revenue,
+              valueToCompare: earning.revenueEstimated,
+              hideValue: true
+            }"
+          ></span>
+          <span>)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</button>

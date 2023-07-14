@@ -1,0 +1,10 @@
+<button type="button" mat-button class="w-full">
+  <div class="flex items-center justify-between py-1 g-border" [ngClass]="{ 'border-b': showBorder }">
+    <div class="flex items-center gap-3">
+      <img appDefaultImg imageType="symbol" [src]="dividend.symbol" alt="asset url" class="h-7 w-7" />
+      <span>{{ dividend.symbol }}</span>
+    </div>
+
+    <div>{{ dividend.dividend ? (dividend.dividend | currency) : 'N/A' }}</div>
+  </div>
+</button>
