@@ -586,9 +586,6 @@ export type StockEarning = {
   updatedFromDate: string;
 };
 
-export type CalendarDividend = Omit<StockDividend, 'recordDate' | 'paymentDate' | 'declarationDate' | 'label'>;
-export type CalendarStockEarning = Omit<StockEarning, 'fiscalDateEnding' | 'updatedFromDate' | 'time'>;
-
 export type CalendarStockIPO = {
   symbol: string;
   cik: string;
@@ -601,6 +598,6 @@ export type CalendarStockIPO = {
   proceedsBeforeExpensesPerShare: number;
   proceedsBeforeExpensesTotal: number;
   form: string;
-  ipoDate: string;
+  date: string;
   url: string;
 };

@@ -85,11 +85,21 @@ export const getCalendarStockDividends = async (
   return filteredOutResponse;
 };
 
-export const getCalendarStockIPOs = async (month: number | string, year: number | string) => {
+export const getCalendarStockIPOs = async (
+  month: number | string,
+  year: number | string
+): Promise<CalendarStockIPO[]> => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v4/ipo-calendar-prospectus?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<CalendarStockIPO[]>(url);
+  const response = await axios.get<(CalendarStockIPO & { ipoDate: string })[]>(url);
   const filteredOutResponse = filterOutSymbols(response.data);
+
+  // change key name 'ipoDate' to 'date';
+  filteredOutResponse.forEach((item) => {
+    item.date = item.ipoDate;
+    delete item.ipoDate;
+  });
+
   return filteredOutResponse;
 };
 

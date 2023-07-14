@@ -9,14 +9,17 @@ import {
   getDatabaseMarketCalendarEarningsRef,
   getDatabaseMarketCalendarIPOsRef,
 } from '@market-monitor/api-firebase';
-import { CalendarStockEarning, CalendarStockIPO, StockDividend } from '@market-monitor/api-types';
+import {
+  CalendarAssetDataTypes,
+  CalendarAssetTypes,
+  CalendarStockEarning,
+  CalendarStockIPO,
+  StockDividend,
+} from '@market-monitor/api-types';
 import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
 import { firestore } from 'firebase-admin';
 import { onRequest } from 'firebase-functions/v2/https';
-
-type CalendarTypes = 'dividends' | 'earnings' | 'ipo';
-type CalendarDataTypes = StockDividend | CalendarStockIPO | CalendarStockEarning;
 
 export const getcalendarstockdividends = onRequest(async (request, response: Response<StockDividend[] | string>) => {
   const year = request.query.year as string;
@@ -57,8 +60,8 @@ export const getcalendarstockipos = onRequest(async (request, response: Response
   response.send(data);
 });
 
-const getDataForCalendar = async <T extends CalendarDataTypes>(
-  type: CalendarTypes,
+const getDataForCalendar = async <T extends CalendarAssetDataTypes>(
+  type: CalendarAssetTypes,
   year: string,
   month: string
 ): Promise<T[]> => {
@@ -90,8 +93,8 @@ const getDataForCalendar = async <T extends CalendarDataTypes>(
   return data;
 };
 
-const resultAPIbyType = <T extends CalendarDataTypes>(
-  type: CalendarTypes,
+const resultAPIbyType = <T extends CalendarAssetDataTypes>(
+  type: CalendarAssetTypes,
   year: string,
   month: string
 ): Promise<T[]> => {
@@ -105,7 +108,7 @@ const resultAPIbyType = <T extends CalendarDataTypes>(
   }
 };
 
-const resolveDatabaseByType = (type: CalendarTypes) => {
+const resolveDatabaseByType = (type: CalendarAssetTypes) => {
   switch (type) {
     case 'dividends':
       return getDatabaseMarketCalendarDividendsRef;
@@ -114,16 +117,4 @@ const resolveDatabaseByType = (type: CalendarTypes) => {
     case 'ipo':
       return getDatabaseMarketCalendarIPOsRef;
   }
-};
-
-const isDividendType = (data: CalendarDataTypes): data is StockDividend => {
-  return (data as StockDividend).dividend !== undefined;
-};
-
-const isEarningsType = (data: CalendarDataTypes): data is CalendarStockEarning => {
-  return (data as CalendarStockEarning).epsEstimated !== undefined;
-};
-
-const isIPOType = (data: CalendarDataTypes): data is CalendarStockIPO => {
-  return (data as CalendarStockIPO).ipoDate !== undefined;
 };

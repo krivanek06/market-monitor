@@ -31,7 +31,9 @@ export class MarkerDirective {}
 })
 export class CalendarWrapperComponent implements OnInit, ControlValueAccessor {
   @Input() minHeight = 250;
+
   @ContentChildren(MarkerDirective, { read: TemplateRef }) templates!: TemplateRef<any>[];
+
   selectedDate = { year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
   dateRangeSignal = signal<string[]>([]);
 

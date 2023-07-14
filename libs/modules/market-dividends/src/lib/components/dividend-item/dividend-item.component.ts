@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { StockDividend } from '@market-monitor/api-types';
+import { CalendarDividend, StockDividend } from '@market-monitor/api-types';
 import { DefaultImgDirective } from '@market-monitor/shared-directives';
 
 @Component({
@@ -13,6 +13,6 @@ import { DefaultImgDirective } from '@market-monitor/shared-directives';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DividendItemComponent {
-  @Input({ required: true }) stockDividend!: StockDividend;
+  @Input({ required: true }) stockDividend!: StockDividend | CalendarDividend;
   @Input() showBorder = false;
 }
