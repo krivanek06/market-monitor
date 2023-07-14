@@ -16,7 +16,7 @@
     <!-- Dividends -->
     <ng-template marker *ngFor="let dividendsData of calendarDataDividendSignal()">
       <ng-container *ngFor="let data of dividendsData.data | slice : 0 : 5; let last = last">
-        <app-dividend-item [showBorder]="!last" [stockDividend]="data"></app-dividend-item>
+        <app-dividend-item [showBorder]="!last" [dividend]="data"></app-dividend-item>
       </ng-container>
     </ng-template>
 

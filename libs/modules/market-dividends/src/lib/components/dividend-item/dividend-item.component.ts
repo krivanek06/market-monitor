@@ -13,6 +13,6 @@ import { DefaultImgDirective } from '@market-monitor/shared-directives';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DividendItemComponent {
-  @Input({ required: true }) stockDividend!: StockDividend | CalendarDividend;
+  @Input({ required: true }) dividend!: StockDividend | CalendarDividend;
   @Input() showBorder = false;
 }
