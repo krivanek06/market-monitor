@@ -189,6 +189,6 @@ export const fillOutMissingDatesForMonth = <T extends { date: string }>(input: T
     if (dataInInput) {
       return dataInInput;
     }
-    return emptyValue;
+    return { ...emptyValue, date };
   });
 };

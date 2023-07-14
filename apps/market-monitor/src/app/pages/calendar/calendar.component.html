@@ -23,7 +23,7 @@
     <!-- Earnings -->
     <ng-template marker *ngFor="let earningsData of calendarDataEarningsSignal()">
       <ng-container *ngFor="let data of earningsData.data | slice : 0 : 5; let last = last">
-        Earnings: {{ data.eps }}
+        <app-earnings-item [showBorder]="!last" [earning]="data"></app-earnings-item>
       </ng-container>
     </ng-template>
   </ng-container>

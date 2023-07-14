@@ -12,6 +12,7 @@ import {
   resolveCalendarType,
 } from '@market-monitor/api-types';
 import { DividendItemComponent } from '@market-monitor/modules/market-dividends';
+import { EarningsItemComponent } from '@market-monitor/modules/market-earnings';
 import { CalendarRange, CalendarWrapperComponent, MarkerDirective } from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
 import {
@@ -33,6 +34,7 @@ import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs'
     RangeDirective,
     MatSelectModule,
     MatFormFieldModule,
+    EarningsItemComponent,
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],

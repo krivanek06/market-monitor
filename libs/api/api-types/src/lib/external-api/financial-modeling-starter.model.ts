@@ -577,11 +577,11 @@ export type StockDividend = {
 export type StockEarning = {
   date: string;
   symbol: string;
-  eps: string | null;
-  epsEstimated: string | null;
+  eps: number | null;
+  epsEstimated: number | null;
   time: string;
-  revenue: string | null;
-  revenueEstimated: string | null;
+  revenue: number | null;
+  revenueEstimated: number | null;
   fiscalDateEnding: string;
   updatedFromDate: string;
 };

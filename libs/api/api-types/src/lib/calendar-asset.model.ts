@@ -16,8 +16,7 @@ export const resolveCalendarType = <T extends CalendarAssetDataTypes>(
   data: T[];
   date: string;
 }[] => {
-  console.log(data);
-  const existingData = data.filter((item) => item.data.length > 0);
+  const existingData = data.filter((item) => item.data && item.data.length > 0);
   return existingData.length > 0 && existingData[0].data.length > 0 && objectKey in existingData[0].data[0]
     ? (data as {
         data: T[];
