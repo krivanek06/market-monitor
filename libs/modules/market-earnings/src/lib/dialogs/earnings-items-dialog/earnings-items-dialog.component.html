@@ -1,0 +1,9 @@
+<app-dialog-close-header (dialogCloseEmitter)="onDialogClose()" [title]="dialogTitle"></app-dialog-close-header>
+
+<mat-dialog-content>
+  <app-earnings-item
+    *ngFor="let earning of data.earnings; let last = last"
+    [earning]="earning"
+    [showBorder]="!last"
+  ></app-earnings-item>
+</mat-dialog-content>

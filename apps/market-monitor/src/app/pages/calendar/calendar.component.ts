@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MarketApiService } from '@market-monitor/api-client';
@@ -11,10 +13,11 @@ import {
   CalendarStockEarning,
   resolveCalendarType,
 } from '@market-monitor/api-types';
-import { DividendItemComponent } from '@market-monitor/modules/market-dividends';
-import { EarningsItemComponent } from '@market-monitor/modules/market-earnings';
+import { DividendItemComponent, DividendItemsDialogComponent } from '@market-monitor/modules/market-dividends';
+import { EarningsItemComponent, EarningsItemsDialogComponent } from '@market-monitor/modules/market-earnings';
 import { CalendarRange, CalendarWrapperComponent, MarkerDirective } from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
+import { SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
 import {
   fillOutMissingDatesForMonth,
   generateDatesArray,
@@ -35,6 +38,10 @@ import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs'
     MatSelectModule,
     MatFormFieldModule,
     EarningsItemComponent,
+    MatButtonModule,
+    DividendItemsDialogComponent,
+    MatDialogModule,
+    EarningsItemsDialogComponent,
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
@@ -42,6 +49,8 @@ import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs'
 })
 export class CalendarComponent {
   marketApiService = inject(MarketApiService);
+  dialog = inject(MatDialog);
+
   currentDateRangeControl = new FormControl<CalendarRange>(
     {
       year: new Date().getFullYear(),
@@ -49,6 +58,8 @@ export class CalendarComponent {
     },
     { nonNullable: true }
   );
+
+  displayElements = 5;
 
   calendarTypeInputSource = [
     { value: 'dividends', caption: 'Dividends' },
@@ -74,6 +85,26 @@ export class CalendarComponent {
   calendarDataEarningsSignal = computed(() =>
     resolveCalendarType<CalendarStockEarning>(this.calendarDataSignal(), 'eps')
   );
+
+  onMoreDividends(data: CalendarDividend[]): void {
+    this.dialog.open(DividendItemsDialogComponent, {
+      data: {
+        dividends: data,
+        showDate: true,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+    });
+  }
+
+  onMoreEarnings(data: CalendarStockEarning[]): void {
+    this.dialog.open(EarningsItemsDialogComponent, {
+      data: {
+        earnings: data,
+        showDate: true,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+    });
+  }
 
   private calendarDataSignal = toSignal(
     combineLatest([

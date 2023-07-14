@@ -65,9 +65,9 @@ button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
   transition-duration: 200ms !important;
 
-  &:hover {
-    color: var(--gray-medium) !important;
-  }
+  // &:hover {
+  //   color: var(--gray-medium) !important;
+  // }
 }
 
 .mat-mdc-button,

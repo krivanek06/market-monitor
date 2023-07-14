@@ -7,7 +7,8 @@
 
     <div class="flex items-center gap-1">
       <span>{{ earning.eps ? (earning.eps | currency) : 'N/A' }}</span>
-      <ng-container *ngIf="earning.eps && earning.epsEstimated">
+      <div *ngIf="earning.eps && earning.epsEstimated" class="flex items-center">
+        <span>(</span>
         <span
           appPercentageIncrease
           [currentValues]="{
@@ -16,7 +17,8 @@
             hideValue: true
           }"
         ></span>
-      </ng-container>
+        <span>)</span>
+      </div>
     </div>
   </div>
 </button>

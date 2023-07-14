@@ -11,27 +11,51 @@
   </mat-form-field>
 </div>
 
-<app-calendar-wrapper [minHeight]="275" [formControl]="currentDateRangeControl">
+<app-calendar-wrapper [minHeight]="300" [formControl]="currentDateRangeControl">
   <ng-container *ngIf="!loadingSignal()">
     <!-- Dividends -->
     <ng-template marker *ngFor="let dividendsData of calendarDataDividendSignal()">
-      <ng-container *ngFor="let data of dividendsData.data | slice : 0 : 5; let last = last">
+      <ng-container *ngFor="let data of dividendsData.data | slice : 0 : displayElements; let last = last">
         <app-dividend-item [showBorder]="!last" [dividend]="data"></app-dividend-item>
       </ng-container>
+      <!-- more button -->
+      <div class="flex justify-end">
+        <button
+          *ngIf="dividendsData.data.length > displayElements"
+          (click)="onMoreDividends(dividendsData.data)"
+          mat-button
+          type="button"
+          color="primary"
+        >
+          {{ dividendsData.data.length - displayElements }} more
+        </button>
+      </div>
     </ng-template>
 
     <!-- Earnings -->
     <ng-template marker *ngFor="let earningsData of calendarDataEarningsSignal()">
-      <ng-container *ngFor="let data of earningsData.data | slice : 0 : 5; let last = last">
+      <ng-container *ngFor="let data of earningsData.data | slice : 0 : displayElements; let last = last">
         <app-earnings-item [showBorder]="!last" [earning]="data"></app-earnings-item>
       </ng-container>
+      <!-- more button -->
+      <div class="flex justify-end">
+        <button
+          *ngIf="earningsData.data.length > displayElements"
+          (click)="onMoreEarnings(earningsData.data)"
+          mat-button
+          type="button"
+          color="primary"
+        >
+          {{ earningsData.data.length - displayElements }} more
+        </button>
+      </div>
     </ng-template>
   </ng-container>
 
   <!-- loading skeletons -->
   <ng-container *ngIf="loadingSignal()">
     <ng-template marker *ngRange="datesInMonthSignal() ?? 0">
-      <div *ngRange="5" class="w-full h-10 mb-1 g-skeleton"></div>
+      <div *ngRange="displayElements" class="w-full h-10 mb-1 g-skeleton"></div>
     </ng-template>
   </ng-container>
 </app-calendar-wrapper>
