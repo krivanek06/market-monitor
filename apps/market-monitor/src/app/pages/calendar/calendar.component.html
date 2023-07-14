@@ -21,7 +21,7 @@
       <!-- more button -->
       <div class="flex justify-end">
         <button
-          *ngIf="dividendsData.data.length > displayElements"
+          *ngIf="dividendsData.data && dividendsData.data.length > displayElements"
           (click)="onMoreDividends(dividendsData.data)"
           mat-button
           type="button"
@@ -40,7 +40,7 @@
       <!-- more button -->
       <div class="flex justify-end">
         <button
-          *ngIf="earningsData.data.length > displayElements"
+          *ngIf="earningsData.data && earningsData.data.length > displayElements"
           (click)="onMoreEarnings(earningsData.data)"
           mat-button
           type="button"

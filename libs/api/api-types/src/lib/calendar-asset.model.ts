@@ -1,6 +1,9 @@
 import { CalendarStockIPO, StockDividend, StockEarning } from './external-api';
 
-export type CalendarDividend = Omit<StockDividend, 'recordDate' | 'paymentDate' | 'declarationDate' | 'label'>;
+export type CalendarDividend = Omit<
+  StockDividend,
+  'recordDate' | 'paymentDate' | 'declarationDate' | 'label' | 'adjDividend'
+>;
 export type CalendarStockEarning = Omit<StockEarning, 'fiscalDateEnding' | 'updatedFromDate' | 'time'>;
 
 export type CalendarAssetTypes = 'dividends' | 'earnings' | 'ipo';

@@ -80,7 +80,7 @@ export const getCalendarStockDividends = async (
   const filteredOutResponse = filterOutSymbols(
     response.data,
     [],
-    ['recordDate', 'paymentDate', 'declarationDate', 'label']
+    ['recordDate', 'paymentDate', 'declarationDate', 'label', 'adjDividend']
   );
   return filteredOutResponse;
 };
