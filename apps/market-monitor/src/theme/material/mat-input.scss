@@ -12,7 +12,7 @@ fieldset:disabled {
 }
 
 .mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__input {
-  color: var(--gray-medium) !important;
+  color: var(--gray-medium-strong) !important;
 }
 
 input,
@@ -21,10 +21,10 @@ textarea {
 }
 
 .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-  background-color: var(--background-light) !important;
-  border: 1px solid var(--background-medium) !important;
+  background-color: var(--gray-light) !important;
+  border: 1px solid var(--gray-light-strong) !important;
 }
 
 ::-webkit-input-placeholder {
-  color: var(--gray-light) !important;
+  color: var(--gray-medium) !important;
 }

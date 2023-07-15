@@ -1,30 +1,30 @@
 /* TODO(mdc-migration): The following rule targets internal classes of chips that may no longer apply for the MDC version. */
 mat-chip {
-	*,
-	::before,
-	::after {
-		border-color: transparent;
-	}
+  *,
+  ::before,
+  ::after {
+    border-color: transparent;
+  }
 }
 .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) .mdc-evolution-chip__text-label {
-	color: var(--primary) !important;
+  color: var(--primary) !important;
 }
 
 .mat-mdc-standard-chip:not(.mdc-evolution-chip--selected) .mdc-evolution-chip__action--primary:before {
-	border: transparent !important;
+  border: transparent !important;
 }
 
 mat-chip-option > span > button,
 mat-chip > .mat-ripple {
-	border: 2px solid var(--primary) !important;
-	color: var(--primary) !important;
+  border: 2px solid var(--primary) !important;
+  color: var(--primary) !important;
 }
 
 mat-chip-option,
 mat-chip {
-	background-color: transparent !important;
-	cursor: pointer !important;
+  background-color: transparent !important;
+  cursor: pointer !important;
 }
 .mat-mdc-chip-selected {
-	background-color: var(--background-light) !important;
+  background-color: var(--gray-light) !important;
 }

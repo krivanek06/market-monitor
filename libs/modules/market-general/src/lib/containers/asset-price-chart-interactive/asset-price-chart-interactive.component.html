@@ -5,7 +5,7 @@
 
 <ng-container *ngIf="stockHistoricalPrice().length > 0; else chartSkeleton">
   <!-- time data about chart -->
-  <div class="flex justify-between text-wt-gray-light">
+  <div class="flex justify-between text-wt-gray-medium">
     <div class="flex items-center gap-2">
       <img *ngIf="imageUrl" appDefaultImg [src]="imageUrl" alt="Asset Image" class="h-6 w-6" />
       <span class="hidden sm:block">{{ title }}</span>

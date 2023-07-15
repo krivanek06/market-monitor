@@ -3,7 +3,7 @@
 .mat-mdc-select-arrow {
   font-family: 'Material Icons';
   border: 0 !important;
-  color: var(--gray-light) !important;
+  color: var(--gray-medium) !important;
 
   &:before {
     font-size: 16px;
@@ -33,7 +33,7 @@ mat-select-trigger {
 }
 
 .mat-mdc-select-value {
-  color: var(--gray-light) !important;
+  color: var(--gray-medium) !important;
 }
 
 .mat-mdc-select-min-line {
@@ -41,7 +41,7 @@ mat-select-trigger {
 }
 
 .mdc-menu-surface.mat-mdc-select-panel {
-  background: var(--background-light) !important;
+  background: var(--gray-light) !important;
 }
 
 .select-input {
@@ -51,21 +51,21 @@ mat-select-trigger {
 
 .mat-mdc-optgroup-label {
   span {
-    color: var(--gray-medium) !important;
+    color: var(--gray-medium-strong) !important;
     font-size: 14px !important;
   }
 }
 
 /* hover */
 .mat-mdc-option:hover:not(.mdc-list-item--disabled),
-.mat-mdc-option:focus:not(.mdc-list-item--disabled),
-.mat-mdc-option.mat-mdc-option-active,
+.mat-mdc-option:focus.mdc-list-item,
+.mat-mdc-option.mat-mdc-option-active.mdc-list-item,
 .mat-mdc-option.mdc-list-item--selected:not(.mat-mdc-option-multiple):not(.mdc-list-item--disabled) {
-  background: var(--background-medium) !important;
+  background: rgb(27 27 27 / 8%) !important;
 }
 
 .mdc-menu-surface.mat-mdc-autocomplete-panel.mat-mdc-autocomplete-visible {
-  background: var(--background-light) !important;
+  background: var(--gray-medium) !important;
 }
 
 /* distance between content and scroll bar */

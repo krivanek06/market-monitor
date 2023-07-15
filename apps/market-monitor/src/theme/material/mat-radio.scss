@@ -1,9 +1,9 @@
 .mdc-form-field > label {
-  color: var(--gray-medium) !important;
+  color: var(--gray-medium-strong) !important;
 }
 
 mat-radio-button {
-  border: 1px solid var(--gray-light);
+  border: 1px solid var(--gray-medium);
   border-radius: 8px;
   padding: 2px 16px;
 
@@ -21,12 +21,12 @@ mat-radio-button {
   .mdc-radio__native-control:enabled:not(:checked)
   + .mdc-radio__background
   .mdc-radio__outer-circle {
-  border-color: var(--gray-light) !important;
+  border-color: var(--gray-medium) !important;
 }
 
 // disabled state
 .mat-mdc-radio-button.mat-radio-disabled .mat-radio-label-content {
-  color: var(--gray-medium) !important;
+  color: var(--gray-medium-strong) !important;
 }
 
 fieldset:disabled {

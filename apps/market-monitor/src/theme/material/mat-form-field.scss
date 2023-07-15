@@ -13,14 +13,14 @@
     label {
       // font-size: 1rem !important;
       margin-top: -4px !important;
-      color: var(--gray-medium) !important;
+      color: var(--gray-medium-strong) !important;
     }
   }
 
   .mat-form-field-prefix {
     mat-icon {
       font-size: 18px;
-      color: var(--gray-light) !important;
+      color: var(--gray-medium) !important;
     }
   }
 }
@@ -34,13 +34,13 @@ mat-form-field.mat-form-field-should-float label {
 /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
 .mat-form-field-appearance-outline .mat-form-field-outline {
   font-size: 14px !important;
-  color: var(--gray-light) !important;
+  color: var(--gray-medium) !important;
 }
 
 /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
 mat-form-field span.mat-form-field-label-wrapper label {
   font-size: 14px !important;
-  color: var(--gray-light) !important;
+  color: var(--gray-medium) !important;
 }
 
 /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
@@ -60,11 +60,11 @@ mat-form-field.mat-focused span.mat-form-field-label-wrapper label {
 }
 
 mat-hint {
-  color: var(--gray-light) !important;
+  color: var(--gray-medium) !important;
 }
 
 mat-divider {
-  background-color: var(--background-medium) !important;
+  background-color: var(--gray-medium) !important;
 }
 
 .mat-mdc-form-field-error {
@@ -72,7 +72,7 @@ mat-divider {
 }
 
 .mat-mdc-text-field-wrapper {
-  // background: var(--background-medium) !important;
+  // background: var(--gray-medium) !important;
   border-radius: 20px !important;
 }
 

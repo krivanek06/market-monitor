@@ -19,11 +19,11 @@
     [style.max-width.px]="overlayWidth() - 20"
     appElementFocus
     (outsideClick)="checkToDisplayOverlay(false, null)"
-    class="min-h-[200px] max-h-[400px] bg-wt-background-light -mt-4 w-full rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
+    class="min-h-[200px] max-h-[400px] bg-wt-gray-light -mt-4 w-full rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
   >
     <!-- checkbox changing displayed stock summaries -->
     <div class="flex items-center justify-between mb-1">
-      <span class="text-base text-wt-gray-light">
+      <span class="text-base text-wt-gray-medium">
         <ng-container *ngIf="!showFavoriteStocks.value">Last Searched</ng-container>
         <ng-container *ngIf="showFavoriteStocks.value">Favorite Stocks</ng-container>
       </span>

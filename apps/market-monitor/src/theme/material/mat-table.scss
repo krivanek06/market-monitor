@@ -13,7 +13,7 @@ table[mat-table] {
   tbody {
     tr {
       td {
-        @apply text-wt-gray-medium text-base;
+        @apply text-wt-gray-medium-strong text-base;
         border-bottom: 1px solid var(--table-border);
 
         &:first-child {
@@ -46,7 +46,7 @@ table[mat-table] {
 }
 
 table[mat-table] tbody tr td {
-  color: var(--gray-medium);
+  color: var(--gray-medium-strong);
 }
 
 .mat-mdc-table {
@@ -68,9 +68,9 @@ table[mat-table] tbody tr td {
 }
 
 .mdc-data-table__cell {
-  color: var(--gray-light) !important;
+  color: var(--gray-medium) !important;
 }
 
 .mdc-data-table__header-cell {
-  color: var(--gray-medium) !important;
+  color: var(--gray-medium-strong) !important;
 }

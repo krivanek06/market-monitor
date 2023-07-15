@@ -12,12 +12,12 @@ button[mat-stroked-button] {
   // border: 1px solid !important; // var(--background-medium)
 
   &.mat-mdc-outlined-button.mat-unthemed {
-    background-color: var(--background-light);
+    background-color: var(--gray-light);
     color: unset !important;
     opacity: 0.7;
 
     &:hover {
-      background-color: var(--background-medium);
+      background-color: var(--gray-medium);
     }
   }
 
@@ -31,7 +31,7 @@ button[mat-stroked-button] {
 }
 
 button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
-  border: 1px solid var(--background-medium) !important;
+  border: 1px solid var(--gray-medium) !important;
 }
 
 .mdc-button__label {
@@ -57,7 +57,7 @@ button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
 }
 
 .mat-mdc-button.mat-unthemed {
-  color: var(--gray-light) !important;
+  color: var(--gray-medium) !important;
 }
 
 .mat-mdc-button:not(:disabled) {
@@ -72,5 +72,5 @@ button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
 
 .mat-mdc-button,
 .mat-mdc-outlined-button {
-  --mat-mdc-button-persistent-ripple-color: var(--gray-medium) !important;
+  --mat-mdc-button-persistent-ripple-color: var(--gray-medium-strong) !important;
 }

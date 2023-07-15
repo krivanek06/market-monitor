@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ChartConstructor, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
+import { ChartConstructor, ColorScheme, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import { formatLargeNumber } from '@market-monitor/shared-utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
 
@@ -35,13 +35,13 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
     const epsEstSeries = workingData
       .map((x) => x.valueEst)
       .map((d) => {
-        return { y: d, name: 'Expected', color: 'var(--background-dark)' };
+        return { y: d, name: 'Expected', color: ColorScheme.GRAY_MEDIUM_VAR };
       });
 
     const epsActualSeries = workingData
       .map((x) => x.valueActual)
       .map((d, index) => {
-        const color = (d ?? 0) > (epsEstSeries[index]?.y ?? 0) ? 'var(--success)' : 'var(--danger)';
+        const color = (d ?? 0) > (epsEstSeries[index]?.y ?? 0) ? ColorScheme.SUCCESS_VAR : ColorScheme.DANGER_VAR;
         return { y: d, name: 'Actual', color: color };
       });
 
@@ -59,7 +59,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         text: 'Revenue',
         align: 'left',
         style: {
-          color: 'var(--gray-light)',
+          color: ColorScheme.GRAY_MEDIUM_VAR,
           fontSize: '12px',
         },
       },
@@ -71,12 +71,12 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         borderWidth: 1,
         enabled: true,
         shared: true,
-        backgroundColor: 'var(--background-dark-super)',
+        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
         style: {
           fontSize: '15px',
-          color: 'var(--gray-light)',
+          color: ColorScheme.GRAY_MEDIUM_VAR,
         },
-        headerFormat: '<p style="color:#909592; font-size: 12px">{point.x}</p><br/>',
+        headerFormat: `<p style="color: ${ColorScheme.GRAY_MEDIUM}; font-size: 12px">{point.x}</p><br/>`,
         pointFormatter: function () {
           const that = this as any;
           const name = that.name;
@@ -101,7 +101,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
               return formatLargeNumber(this.y, false, true);
             },
             style: {
-              color: 'var(--primary)',
+              color: ColorScheme.PRIMARY_VAR,
               fontWeight: 'normal',
               fontSize: '12px',
               textOutline: '0px',
@@ -143,7 +143,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         gridLineColor: '#66666655',
         labels: {
           style: {
-            color: 'var(--gray-light)',
+            color: ColorScheme.GRAY_LIGHT_VAR,
             fontSize: '10px',
           },
         },

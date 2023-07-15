@@ -1,8 +1,8 @@
 <div
   class="-mb-3 text-sm text-center"
   [ngClass]="{
-    'text-wt-gray-medium': isDisabled,
-    'text-wt-gray-light': !isDisabled
+    'text-wt-gray-medium-strong': isDisabled,
+    'text-wt-gray-medium': !isDisabled
   }"
 >
   {{ selectedValue.value | currency }}
@@ -23,7 +23,7 @@
   class="flex items-center justify-between -mt-5 text-sm"
   [ngClass]="{
     'text-wt-gray-dark': isDisabled,
-    'text-wt-gray-medium': !isDisabled
+    'text-wt-gray-medium-strong': !isDisabled
   }"
 >
   <span>{{ config.min | currency }}</span>

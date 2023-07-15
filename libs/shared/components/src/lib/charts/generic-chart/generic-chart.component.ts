@@ -31,7 +31,7 @@ HC_stock(Highcharts);
       <button
         mat-icon-button
         *ngIf="showExpandableButton"
-        class="text-wt-gray-medium hover:text-wt-gray-light z-10 absolute right-0 top-0"
+        class="text-wt-gray-medium hover:text-wt-gray-medium z-10 absolute right-0 top-0"
         (click)="expand()"
         matTooltip="Expand chart"
       >

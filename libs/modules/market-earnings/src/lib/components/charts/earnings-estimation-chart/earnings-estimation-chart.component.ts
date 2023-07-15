@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ChartConstructor, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
+import { ChartConstructor, ColorScheme, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import HC_more from 'highcharts/highcharts-more';
@@ -38,13 +38,13 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
     const epsEstSeries = workingData
       .map((x) => x.valueEst)
       .map((d) => {
-        return { y: d, z: 25, name: 'Expected', color: 'var(--background-dark)' };
+        return { y: d, z: 25, name: 'Expected', color: ColorScheme.GRAY_MEDIUM_VAR };
       });
 
     const epsActualSeries = workingData
       .map((x) => x.valueActual)
       .map((d, index) => {
-        const color = (d ?? -99) > (epsEstSeries[index]?.y ?? -99) ? 'var(--success)' : 'var(--danger)';
+        const color = (d ?? -99) > (epsEstSeries[index]?.y ?? -99) ? ColorScheme.SUCCESS_VAR : ColorScheme.DANGER_VAR;
         return { y: d, z: 25, name: 'Actual', color: color };
       });
 
@@ -57,7 +57,7 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         text: 'Earnings',
         align: 'left',
         style: {
-          color: 'var(--gray-light)',
+          color: ColorScheme.GRAY_MEDIUM_VAR,
           fontSize: '12px',
         },
       },
@@ -69,10 +69,10 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         borderWidth: 1,
         enabled: true,
         shared: true,
-        backgroundColor: 'var(--background-dark-super)',
+        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
         style: {
           fontSize: '15px',
-          color: 'var(--gray-light)',
+          color: ColorScheme.GRAY_MEDIUM_VAR,
         },
         headerFormat: '<p style="color:#909592; font-size: 12px">{point.x}</p><br/>',
         pointFormatter: function () {
@@ -123,7 +123,7 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         gridLineColor: '#66666655',
         labels: {
           style: {
-            color: 'var(--gray-light)',
+            color: ColorScheme.GRAY_MEDIUM_VAR,
             fontSize: '10px',
           },
         },
@@ -144,7 +144,7 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
           data: epsEstSeries,
           opacity: 0.7,
           marker: {
-            fillColor: 'var(--background-medium)',
+            fillColor: ColorScheme.GRAY_MEDIUM_VAR,
           },
         },
       ],
