@@ -21,3 +21,9 @@ export abstract class ChartConstructor {
     NoDataToDisplay(Highcharts);
   }
 }
+
+export type EstimatedChartDataType = {
+  date: string;
+  valueActual: number | null;
+  valueEst: number | null;
+};

@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { ChartConstructor } from '@market-monitor/shared-utils-client';
+import { ChartConstructor, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import HC_more from 'highcharts/highcharts-more';
-import { EarningsChartDataType } from '../../models';
+
 HC_more(Highcharts);
 
 @Component({
@@ -25,7 +25,7 @@ HC_more(Highcharts);
   `,
 })
 export class EarningsChartComponent extends ChartConstructor implements OnInit {
-  @Input({ required: true }) data!: EarningsChartDataType[];
+  @Input({ required: true }) data!: EstimatedChartDataType[];
   @Input() heightPx = 400;
 
   ngOnInit(): void {
@@ -38,13 +38,13 @@ export class EarningsChartComponent extends ChartConstructor implements OnInit {
     const dates = workingData.map((x) => x.date);
 
     const epsEstSeries = workingData
-      .map((x) => x.epsEst)
+      .map((x) => x.valueEst)
       .map((d) => {
         return { y: d, z: 25, name: 'Expected', color: 'var(--background-dark)' };
       });
 
     const epsActualSeries = workingData
-      .map((x) => x.epsActual)
+      .map((x) => x.valueActual)
       .map((d, index) => {
         const color = (d ?? -99) > (epsEstSeries[index]?.y ?? -99) ? 'var(--success)' : 'var(--danger)';
         return { y: d, z: 25, name: 'Actual', color: color };
