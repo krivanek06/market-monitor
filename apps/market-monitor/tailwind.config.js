@@ -13,6 +13,7 @@ module.exports = {
     },
     extend: {
       colors: {
+        'wt-background-dark-super': 'var(--background-dark-super)',
         'wt-background-dark': 'var(--background-dark)',
         'wt-background-medium': 'var(--background-medium)',
         'wt-background-light': 'var(--background-light)',

@@ -14,7 +14,11 @@ import {
   resolveCalendarType,
 } from '@market-monitor/api-types';
 import { DividendItemComponent, DividendItemsDialogComponent } from '@market-monitor/modules/market-dividends';
-import { EarningsItemComponent, EarningsItemsDialogComponent } from '@market-monitor/modules/market-earnings';
+import {
+  EarningsHistoricalDialogComponent,
+  EarningsItemComponent,
+  EarningsItemsDialogComponent,
+} from '@market-monitor/modules/market-earnings';
 import { CalendarRange, CalendarWrapperComponent, MarkerDirective } from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
 import { SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
@@ -42,6 +46,7 @@ import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs'
     DividendItemsDialogComponent,
     MatDialogModule,
     EarningsItemsDialogComponent,
+    EarningsHistoricalDialogComponent,
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
@@ -102,6 +107,13 @@ export class CalendarComponent {
         earnings: data,
         showDate: true,
       },
+      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+    });
+  }
+
+  onEarningsClicked(data: CalendarStockEarning | null): void {
+    this.dialog.open(EarningsHistoricalDialogComponent, {
+      data: {},
       panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
     });
   }

@@ -120,7 +120,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         borderWidth: 1,
         padding: 12,
         enabled: true,
-        backgroundColor: '#232323',
+        backgroundColor: 'var(--background-dark-super)',
         style: {
           fontSize: '16px',
           color: '#D9D8D8',

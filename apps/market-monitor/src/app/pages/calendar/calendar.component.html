@@ -1,3 +1,5 @@
+<button mat-button (click)="onEarningsClicked(null)">Test</button>
+
 <div class="flex items-center justify-between mb-10 sm:pl-4">
   <h2>Calendar type: {{ calendarTypeFormControl.value.caption }}</h2>
   <!-- calendar change select -->
@@ -35,7 +37,11 @@
     <!-- Earnings -->
     <ng-template marker *ngFor="let earningsData of calendarDataEarningsSignal()">
       <ng-container *ngFor="let data of earningsData.data | slice : 0 : displayElements; let last = last">
-        <app-earnings-item [showBorder]="!last" [earning]="data"></app-earnings-item>
+        <app-earnings-item
+          (itemClickedEmitter)="onEarningsClicked(data)"
+          [showBorder]="!last"
+          [earning]="data"
+        ></app-earnings-item>
       </ng-container>
       <!-- more button -->
       <div class="flex justify-end">
