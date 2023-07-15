@@ -19,9 +19,10 @@ import {
   EarningsItemComponent,
   EarningsItemsDialogComponent,
 } from '@market-monitor/modules/market-earnings';
+import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks';
 import { CalendarRange, CalendarWrapperComponent, MarkerDirective } from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
-import { SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
+import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
 import {
   fillOutMissingDatesForMonth,
   generateDatesArray,
@@ -47,6 +48,8 @@ import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs'
     MatDialogModule,
     EarningsItemsDialogComponent,
     EarningsHistoricalDialogComponent,
+    StockSummaryDialogComponent,
+    DialogServiceModule,
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
@@ -72,7 +75,7 @@ export class CalendarComponent {
   ] as const;
 
   calendarTypeFormControl = new FormControl<(typeof this.calendarTypeInputSource)[number]>(
-    this.calendarTypeInputSource[1],
+    this.calendarTypeInputSource[0],
     { nonNullable: true }
   );
 
@@ -113,6 +116,15 @@ export class CalendarComponent {
 
   onEarningsClicked(data: CalendarStockEarning): void {
     this.dialog.open(EarningsHistoricalDialogComponent, {
+      data: {
+        symbol: data.symbol,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
+  }
+
+  onDividendClick(data: CalendarDividend): void {
+    this.dialog.open(StockSummaryDialogComponent, {
       data: {
         symbol: data.symbol,
       },
