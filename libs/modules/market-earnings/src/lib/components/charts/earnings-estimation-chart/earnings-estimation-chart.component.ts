@@ -29,10 +29,10 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
     this.initChart(values);
   }
   @Input() heightPx = 400;
+  @Input() limitValues = 30;
 
   private initChart(values: EstimatedChartDataType[]): void {
-    const limitValues = 30;
-    const workingData = values.slice(-limitValues);
+    const workingData = values.slice(-this.limitValues);
     const dates = workingData.map((x) => x.date);
 
     const epsEstSeries = workingData

@@ -29,12 +29,29 @@ import { EarningsEstimationChartComponent, RevenueEstimationChartComponent } fro
 export class EarningsHistoricalDialogComponent {
   selectedChartTypeControl = new FormControl<'earnings' | 'revenue'>('earnings');
 
+  limitValues = 30;
+
   get isEarningsSelected(): boolean {
     return this.selectedChartTypeControl.value === 'earnings';
   }
 
   get isRevenueSelected(): boolean {
     return this.selectedChartTypeControl.value === 'revenue';
+  }
+
+  get beatings(): number | undefined {
+    if (!this.stockEarningsEstimationSignal() || !this.stockRevenueEstimationSignal()) {
+      return 0;
+    }
+
+    const earnings = this.stockEarningsEstimationSignal()
+      ?.slice(-this.limitValues)
+      ?.reduce((acc, curr) => ((curr?.valueActual ?? -99) > (curr?.valueEst ?? -99) ? acc + 1 : acc), 0);
+    const revenue = this.stockRevenueEstimationSignal()
+      ?.slice(-this.limitValues)
+      ?.reduce((acc, curr) => ((curr?.valueActual ?? -99) > (curr?.valueEst ?? -99) ? acc + 1 : acc), 0);
+
+    return this.isEarningsSelected ? earnings : revenue;
   }
 
   stockEarningsEstimationSignal = toSignal(
