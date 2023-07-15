@@ -1,14 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ChartConstructor, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
-import * as Highcharts from 'highcharts';
+import { formatLargeNumber } from '@market-monitor/shared-utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
-import HC_more from 'highcharts/highcharts-more';
-
-HC_more(Highcharts);
 
 @Component({
-  selector: 'app-earnings-estimation-chart',
+  selector: 'app-revenue-estimation-chart',
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,7 +21,7 @@ HC_more(Highcharts);
     </highcharts-chart>
   `,
 })
-export class EarningsEstimationChartComponent extends ChartConstructor {
+export class RevenueEstimationChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(values: EstimatedChartDataType[]) {
     this.initChart(values);
   }
@@ -38,25 +35,28 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
     const epsEstSeries = workingData
       .map((x) => x.valueEst)
       .map((d) => {
-        return { y: d, z: 25, name: 'Expected', color: 'var(--background-dark)' };
+        return { y: d, name: 'Expected', color: 'var(--background-dark)' };
       });
 
     const epsActualSeries = workingData
       .map((x) => x.valueActual)
       .map((d, index) => {
-        const color = (d ?? -99) > (epsEstSeries[index]?.y ?? -99) ? 'var(--success)' : 'var(--danger)';
-        return { y: d, z: 25, name: 'Actual', color: color };
+        const color = (d ?? 0) > (epsEstSeries[index]?.y ?? 0) ? 'var(--success)' : 'var(--danger)';
+        return { y: d, name: 'Actual', color: color };
       });
 
-    console.log(dates, epsEstSeries, epsActualSeries);
+    const epsActualSeriesLine = epsActualSeries.map((d) => ({
+      ...d,
+      color: 'var(--primary)',
+    }));
 
     this.chartOptions = {
       chart: {
-        type: 'bubble',
+        type: 'column',
         backgroundColor: 'transparent',
       },
       title: {
-        text: 'Earnings',
+        text: 'Revenue',
         align: 'left',
         style: {
           color: 'var(--gray-light)',
@@ -80,7 +80,7 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         pointFormatter: function () {
           const that = this as any;
           const name = that.name;
-          const value = that.y;
+          const value = formatLargeNumber(that.y, false, true);
 
           return `
             <p>
@@ -94,10 +94,28 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         enabled: false,
       },
       plotOptions: {
-        bubble: {
-          minSize: 12,
-          maxSize: 30,
-          enableMouseTracking: true,
+        line: {
+          dataLabels: {
+            enabled: true,
+            formatter: function () {
+              return formatLargeNumber(this.y, false, true);
+            },
+            style: {
+              color: 'var(--primary)',
+              fontWeight: 'normal',
+              fontSize: '12px',
+              textOutline: '0px',
+            },
+          },
+          marker: {
+            radius: 3,
+          },
+          lineWidth: 2,
+          states: {
+            hover: {
+              lineWidth: 3,
+            },
+          },
         },
       },
       xAxis: {
@@ -120,7 +138,7 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         opposite: false,
         gridLineWidth: 1,
         minorTickInterval: 'auto',
-        tickPixelInterval: 25,
+        tickPixelInterval: 30,
         visible: true,
         gridLineColor: '#66666655',
         labels: {
@@ -132,22 +150,23 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
       },
       series: [
         {
-          type: 'bubble',
-          name: 'Expected',
-          data: epsEstSeries,
-          opacity: 0.7,
-          marker: {
-            fillColor: 'var(--background-medium)',
-          },
+          type: 'line',
+          name: 'Actual',
+          data: epsActualSeriesLine,
         },
         {
-          type: 'bubble',
+          type: 'column',
           name: 'Actual',
           data: epsActualSeries,
-          opacity: 0.6,
-          // marker: {
-          //   fillColor: 'var(--background-medium)',
-          // },
+          opacity: 0.8,
+          id: 'main',
+        },
+        {
+          type: 'column',
+          name: 'Expected',
+          data: epsEstSeries,
+          opacity: 0.8,
+          linkedTo: 'main',
         },
       ],
     };

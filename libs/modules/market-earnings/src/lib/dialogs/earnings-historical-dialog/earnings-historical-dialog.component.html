@@ -1,11 +1,37 @@
 <app-dialog-close-header [title]="'Earnings: ' + (data.symbol | uppercase)"></app-dialog-close-header>
 
+<mat-radio-group
+  [formControl]="selectedChartTypeControl"
+  color="primary"
+  aria-label="Select an option"
+  class="flex justify-end gap-x-4"
+>
+  <mat-radio-button value="earnings">Earnings</mat-radio-button>
+  <mat-radio-button value="revenue">Revenue</mat-radio-button>
+</mat-radio-group>
+
 <mat-dialog-content>
-  <ng-container *ngIf="stockEarningsSignal() as stockEarningsSignal; else loadingSkeleton">
-    <app-earnings-estimation-chart [heightPx]="450" [data]="stockEarningsSignal"></app-earnings-estimation-chart>
+  <ng-container *ngIf="stockEarningsEstimationSignal() && stockRevenueEstimationSignal(); else loadingSkeleton">
+    <!-- earnings -->
+    <ng-container *ngIf="isEarningsSelected">
+      <app-earnings-estimation-chart
+        *ngIf="stockEarningsEstimationSignal() as data"
+        [heightPx]="500"
+        [data]="data"
+      ></app-earnings-estimation-chart>
+    </ng-container>
+
+    <!-- revenue -->
+    <ng-container *ngIf="isRevenueSelected">
+      <app-revenue-estimation-chart
+        *ngIf="stockRevenueEstimationSignal() as data"
+        [heightPx]="500"
+        [data]="data"
+      ></app-revenue-estimation-chart>
+    </ng-container>
   </ng-container>
 
   <ng-template #loadingSkeleton>
-    <div class="g-skeleton h-[450px] w-full"></div>
+    <div class="g-skeleton h-[500px] w-full mt-2"></div>
   </ng-template>
 </mat-dialog-content>
