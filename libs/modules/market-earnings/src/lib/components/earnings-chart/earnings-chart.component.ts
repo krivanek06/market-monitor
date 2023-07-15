@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { ChartConstructor } from '@market-monitor/shared-utils-client';
-import { HighchartsChartModule } from 'highcharts-angular';
-//import HighchartsMoreModule from 'highcharts/highcharts-more';
 import * as Highcharts from 'highcharts';
-// HighchartsMoreModule(Highcharts);
+import { HighchartsChartModule } from 'highcharts-angular';
 import HC_more from 'highcharts/highcharts-more';
+import { EarningsChartDataType } from '../../models';
 HC_more(Highcharts);
 
 @Component({
@@ -26,12 +25,33 @@ HC_more(Highcharts);
   `,
 })
 export class EarningsChartComponent extends ChartConstructor implements OnInit {
+  @Input({ required: true }) data!: EarningsChartDataType[];
   @Input() heightPx = 400;
+
   ngOnInit(): void {
     this.initChart();
   }
 
   private initChart(): void {
+    const limitValues = 30;
+    const workingData = this.data.slice(-limitValues);
+    const dates = workingData.map((x) => x.date);
+
+    const epsEstSeries = workingData
+      .map((x) => x.epsEst)
+      .map((d) => {
+        return { y: d, z: 25, name: 'Expected', color: 'var(--background-dark)' };
+      });
+
+    const epsActualSeries = workingData
+      .map((x) => x.epsActual)
+      .map((d, index) => {
+        const color = (d ?? -99) > (epsEstSeries[index]?.y ?? -99) ? 'var(--success)' : 'var(--danger)';
+        return { y: d, z: 25, name: 'Actual', color: color };
+      });
+
+    console.log(dates, epsEstSeries, epsActualSeries);
+
     this.chartOptions = {
       chart: {
         type: 'bubble',
@@ -41,7 +61,7 @@ export class EarningsChartComponent extends ChartConstructor implements OnInit {
         text: 'Earnings',
         align: 'left',
         style: {
-          color: '#bababa',
+          color: 'var(--gray-light)',
           fontSize: '12px',
         },
       },
@@ -55,8 +75,8 @@ export class EarningsChartComponent extends ChartConstructor implements OnInit {
         shared: true,
         backgroundColor: 'var(--background-dark-super)',
         style: {
-          fontSize: '12px',
-          color: '#D9D8D8',
+          fontSize: '15px',
+          color: 'var(--gray-light)',
         },
         headerFormat: '<p style="color:#909592; font-size: 12px">{point.x}</p><br/>',
         pointFormatter: function () {
@@ -74,8 +94,12 @@ export class EarningsChartComponent extends ChartConstructor implements OnInit {
       },
       legend: {
         enabled: false,
-        itemStyle: {
-          color: '#8f8f8f',
+      },
+      plotOptions: {
+        bubble: {
+          minSize: 12,
+          maxSize: 30,
+          enableMouseTracking: true,
         },
       },
       xAxis: {
@@ -87,7 +111,7 @@ export class EarningsChartComponent extends ChartConstructor implements OnInit {
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
-        categories: [],
+        categories: dates,
       },
       yAxis: {
         title: {
@@ -103,6 +127,7 @@ export class EarningsChartComponent extends ChartConstructor implements OnInit {
         gridLineColor: '#66666655',
         labels: {
           style: {
+            color: 'var(--gray-light)',
             fontSize: '10px',
           },
         },
@@ -111,28 +136,21 @@ export class EarningsChartComponent extends ChartConstructor implements OnInit {
         {
           type: 'bubble',
           name: 'Expected',
-          data: [
-            { y: 3, z: 3, name: 'Expected', color: '#499d89' },
-            { y: 6, z: 3, name: 'Expected', color: '#499d89' },
-          ],
-          // marker: {
-          //   fillColor: '#9d9d9d',
-          // },
+          data: epsEstSeries,
+          opacity: 0.7,
+          marker: {
+            fillColor: 'var(--background-medium)',
+          },
         },
         {
           type: 'bubble',
           name: 'Actual',
-          data: [
-            { y: 6, z: 3, name: 'Expected', color: '#499d89' },
-            { y: 8, z: 3, name: 'Expected', color: '#499d89' },
-          ],
+          data: epsActualSeries,
+          opacity: 0.6,
+          // marker: {
+          //   fillColor: 'var(--background-medium)',
+          // },
         },
-        // {
-        // 	name: 'Actual',
-        // 	data: this.actualEarnings.map((x) => {
-        // 		return { y: x?.y, z: 3, name: 'Actual', color: x.color };
-        // 	}),
-        // },
       ],
     };
   }

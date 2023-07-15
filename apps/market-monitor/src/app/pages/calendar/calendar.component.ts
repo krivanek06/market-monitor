@@ -72,7 +72,7 @@ export class CalendarComponent {
   ] as const;
 
   calendarTypeFormControl = new FormControl<(typeof this.calendarTypeInputSource)[number]>(
-    this.calendarTypeInputSource[0],
+    this.calendarTypeInputSource[1],
     { nonNullable: true }
   );
 
@@ -111,10 +111,12 @@ export class CalendarComponent {
     });
   }
 
-  onEarningsClicked(data: CalendarStockEarning | null): void {
+  onEarningsClicked(data: CalendarStockEarning): void {
     this.dialog.open(EarningsHistoricalDialogComponent, {
-      data: {},
-      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+      data: {
+        symbol: data.symbol,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });
   }
 

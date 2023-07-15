@@ -1,5 +1,4 @@
 import {
-  AnalystEstimatesEarnings,
   CompanyOutlook,
   ESGDataQuarterly,
   ESGDataRatingYearly,
@@ -8,6 +7,7 @@ import {
   PriceTarget,
   Profile,
   SectorPeers,
+  StockEarning,
   SymbolQuote,
   UpgradesDowngrades,
 } from './external-api/financial-modeling-starter.model';
@@ -31,13 +31,14 @@ export type StockDetails = {
   esgDataQuarterly: ESGDataQuarterly | null;
   upgradesDowngrades: UpgradesDowngrades[];
   priceTarget: PriceTarget[];
-  analystEstimatesEarnings: AnalystEstimatesEarnings[];
+  stockEarnings: StockEarning[];
   sectorPeers: SectorPeers[];
   recommendationTrends: RecommendationTrends[];
   stockNews: News[];
   lastUpdate: {
     newsLastUpdate: string;
     detailsLastUpdate: string;
+    earningLastUpdate: string;
   };
 };
 

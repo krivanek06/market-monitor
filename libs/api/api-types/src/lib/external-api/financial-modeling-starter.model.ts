@@ -443,18 +443,6 @@ export type AnalystEstimates = {
   numberAnalystsEstimatedEps: number;
 };
 
-export type AnalystEstimatesEarnings = {
-  date: string;
-  symbol: string;
-  eps: number | null;
-  epsEstimated: number;
-  time: string;
-  revenue: number | null;
-  revenueEstimated: number;
-  updatedFromDate: string;
-  fiscalDateEnding: string;
-};
-
 export type SectorPeers = {
   symbol: string;
   peersList: string[];

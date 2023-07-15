@@ -1,6 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { HistoricalPrice, StockScreenerValues, StockSummary, SymbolHistoricalPeriods } from '@market-monitor/api-types';
+import {
+  HistoricalPrice,
+  StockEarning,
+  StockScreenerValues,
+  StockSummary,
+  SymbolHistoricalPeriods,
+} from '@market-monitor/api-types';
 import { Observable, retry } from 'rxjs';
 import { ENDPOINT_FUNCTION_URL } from './api-url.token';
 
@@ -33,5 +39,9 @@ export class StocksApiService {
 
   getStockScreening(screeningValue: StockScreenerValues): Observable<StockSummary[]> {
     return this.http.post<StockSummary[]>(`${this.endpointFunctions}/getstockscreening`, screeningValue);
+  }
+
+  getStockEarnings(symbol: string): Observable<StockEarning[]> {
+    return this.http.get<StockEarning[]>(`${this.endpointFunctions}/getstockearnings?symbol=${symbol}`);
   }
 }

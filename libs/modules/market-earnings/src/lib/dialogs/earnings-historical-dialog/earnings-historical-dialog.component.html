@@ -1,5 +1,7 @@
-<app-dialog-close-header title="Earnings"></app-dialog-close-header>
+<app-dialog-close-header [title]="'Earnings: ' + (data.symbol | uppercase)"></app-dialog-close-header>
 
 <mat-dialog-content>
-  <app-earnings-chart></app-earnings-chart>
+  <ng-container *ngIf="stockEarningsSignal() as stockEarningsSignal">
+    <app-earnings-chart [data]="stockEarningsSignal"></app-earnings-chart>
+  </ng-container>
 </mat-dialog-content>
