@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ChartConstructor, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -8,7 +8,7 @@ import HC_more from 'highcharts/highcharts-more';
 HC_more(Highcharts);
 
 @Component({
-  selector: 'app-earnings-chart',
+  selector: 'app-earnings-estimation-chart',
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,17 +24,15 @@ HC_more(Highcharts);
     </highcharts-chart>
   `,
 })
-export class EarningsChartComponent extends ChartConstructor implements OnInit {
-  @Input({ required: true }) data!: EstimatedChartDataType[];
+export class EarningsEstimationChartComponent extends ChartConstructor {
+  @Input({ required: true }) set data(values: EstimatedChartDataType[]) {
+    this.initChart(values);
+  }
   @Input() heightPx = 400;
 
-  ngOnInit(): void {
-    this.initChart();
-  }
-
-  private initChart(): void {
+  private initChart(values: EstimatedChartDataType[]): void {
     const limitValues = 30;
-    const workingData = this.data.slice(-limitValues);
+    const workingData = values.slice(-limitValues);
     const dates = workingData.map((x) => x.date);
 
     const epsEstSeries = workingData

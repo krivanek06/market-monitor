@@ -1,7 +1,11 @@
 <app-dialog-close-header [title]="'Earnings: ' + (data.symbol | uppercase)"></app-dialog-close-header>
 
 <mat-dialog-content>
-  <ng-container *ngIf="stockEarningsSignal() as stockEarningsSignal">
-    <app-earnings-chart [data]="stockEarningsSignal"></app-earnings-chart>
+  <ng-container *ngIf="stockEarningsSignal() as stockEarningsSignal; else loadingSkeleton">
+    <app-earnings-estimation-chart [heightPx]="450" [data]="stockEarningsSignal"></app-earnings-estimation-chart>
   </ng-container>
+
+  <ng-template #loadingSkeleton>
+    <div class="g-skeleton h-[450px] w-full"></div>
+  </ng-template>
 </mat-dialog-content>
