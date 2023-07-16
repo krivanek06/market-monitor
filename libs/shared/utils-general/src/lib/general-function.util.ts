@@ -8,7 +8,10 @@ export const isNumber = (value: string | number | unknown): boolean => {
   return value != null && value !== '' && typeof value === 'number' && !isNaN(Number(value.toString()));
 };
 
-export const roundNDigits = (value: number, n: number = 2): number => {
+export const roundNDigits = (value?: number | null, n: number = 2): number => {
+  if (value === undefined || value === null) {
+    return 0;
+  }
   return Math.round(value * Math.pow(10, n)) / Math.pow(10, n);
 };
 

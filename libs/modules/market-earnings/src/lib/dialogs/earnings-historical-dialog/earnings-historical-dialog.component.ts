@@ -45,6 +45,10 @@ export class EarningsHistoricalDialogComponent {
       : this.stockEarningsEstimationSignal()?.length
   );
 
+  isDataLoading = computed(
+    () => this.stockEarningsEstimationSignal().length === 0 && this.stockRevenueEstimationSignal().length === 0
+  );
+
   get beatings(): number | undefined {
     if (!this.stockEarningsEstimationSignal() || !this.stockRevenueEstimationSignal()) {
       return 0;
@@ -53,6 +57,7 @@ export class EarningsHistoricalDialogComponent {
     const earnings = this.stockEarningsEstimationSignal()
       ?.slice(-this.limitValues)
       ?.reduce((acc, curr) => ((curr?.valueActual ?? -99) > (curr?.valueEst ?? -99) ? acc + 1 : acc), 0);
+
     const revenue = this.stockRevenueEstimationSignal()
       ?.slice(-this.limitValues)
       ?.reduce((acc, curr) => ((curr?.valueActual ?? -99) > (curr?.valueEst ?? -99) ? acc + 1 : acc), 0);

@@ -1,4 +1,5 @@
 import { Directive, Input, OnInit, Renderer2, ViewContainerRef } from '@angular/core';
+import { formatLargeNumber } from '@market-monitor/shared-utils-general';
 
 /**
  * Use this if you already have the prct diff & diff
@@ -49,7 +50,7 @@ export class PercentageIncreaseDirective implements OnInit {
     if (this.currentValues) {
       const value = this.currentValues.value - this.currentValues.valueToCompare;
       const change = this.round2Dec(value);
-      const changesPercentage = this.round2Dec((value / this.currentValues.valueToCompare) * 100);
+      const changesPercentage = this.round2Dec((value / Math.abs(this.currentValues.valueToCompare)) * 100);
       const hideValue = this.currentValues.hideValue;
       this.createElement(change, changesPercentage, hideValue);
       return;
@@ -133,7 +134,7 @@ export class PercentageIncreaseDirective implements OnInit {
       const sign = this.useCurrencySign ? '$' : '';
 
       const changeSpan = this.rederer2.createElement('span');
-      const text = `${sign} ${this.formatLargeNumber(change)}`;
+      const text = `${sign} ${formatLargeNumber(change)}`;
       const changeText = !!changesPercentage ? this.rederer2.createText(`(${text})`) : this.rederer2.createText(text);
 
       // changesPercentage does not exist -> changeSpan will be color
@@ -152,49 +153,4 @@ export class PercentageIncreaseDirective implements OnInit {
   private round2Dec(value: number): number {
     return Math.round(value * 100) / 100;
   }
-
-  private formatLargeNumber = (
-    value?: string | number | null | unknown,
-    isPercent = false,
-    showDollarSign = false
-  ): string => {
-    // check if value exists and is number
-    if (!value || typeof value !== 'number') {
-      return 'N/A';
-    }
-
-    let castedValue = Number(value);
-
-    if (isPercent) {
-      const rounded = Math.round(castedValue * 100 * 100) / 100;
-      return `${rounded}%`;
-    }
-
-    let symbol = '';
-    if (Math.abs(castedValue) >= 1000) {
-      castedValue = castedValue / 1000;
-      symbol = 'K';
-    }
-
-    if (Math.abs(castedValue) >= 1000) {
-      castedValue = castedValue / 1000;
-      symbol = 'M';
-    }
-
-    if (Math.abs(castedValue) >= 1000) {
-      castedValue = castedValue / 1000;
-      symbol = 'B';
-    }
-
-    if (Math.abs(castedValue) >= 1000) {
-      castedValue = castedValue / 1000;
-      symbol = 'T';
-    }
-    let result = castedValue.toFixed(2) + symbol;
-
-    if (showDollarSign) {
-      result = `$${result}`;
-    }
-    return result;
-  };
 }

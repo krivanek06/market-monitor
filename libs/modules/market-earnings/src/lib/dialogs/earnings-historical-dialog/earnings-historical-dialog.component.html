@@ -14,7 +14,7 @@
 </div>
 
 <mat-dialog-content>
-  <ng-container *ngIf="stockEarningsEstimationSignal() && stockRevenueEstimationSignal(); else loadingSkeleton">
+  <ng-container *ngIf="!isDataLoading()">
     <!-- earnings -->
     <ng-container *ngIf="isEarningsSelected">
       <app-earnings-estimation-chart
@@ -36,7 +36,7 @@
     </ng-container>
   </ng-container>
 
-  <ng-template #loadingSkeleton>
+  <ng-container *ngIf="isDataLoading()">
     <div class="g-skeleton h-[500px] w-full mt-2"></div>
-  </ng-template>
+  </ng-container>
 </mat-dialog-content>

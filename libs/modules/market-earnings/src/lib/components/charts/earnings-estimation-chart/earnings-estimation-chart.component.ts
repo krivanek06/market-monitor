@@ -49,6 +49,11 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         return { y: d, z: 25, name: 'Actual', color: color };
       });
 
+    const epsActualSeriesLine = epsActualSeries.map((d) => ({
+      ...d,
+      color: 'var(--primary)',
+    }));
+
     this.chartOptions = {
       chart: {
         type: 'bubble',
@@ -98,6 +103,29 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
           maxSize: 30,
           enableMouseTracking: true,
         },
+        line: {
+          dataLabels: {
+            enabled: true,
+            formatter: function () {
+              return roundNDigits(this.y, 2);
+            },
+            style: {
+              color: ColorScheme.PRIMARY_VAR,
+              fontWeight: 'normal',
+              fontSize: '12px',
+              textOutline: '0px',
+            },
+          },
+          marker: {
+            radius: 3,
+          },
+          lineWidth: 2,
+          states: {
+            hover: {
+              lineWidth: 3,
+            },
+          },
+        },
       },
       xAxis: {
         labels: {
@@ -130,6 +158,12 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         },
       },
       series: [
+        {
+          type: 'line',
+          name: 'Actual',
+          data: epsActualSeriesLine,
+          opacity: 0.7,
+        },
         {
           type: 'bubble',
           name: 'Actual',

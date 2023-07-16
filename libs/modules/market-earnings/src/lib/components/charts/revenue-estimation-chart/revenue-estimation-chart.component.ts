@@ -32,20 +32,20 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
     const workingData = values.slice(-this.limitValues);
     const dates = workingData.map((x) => x.date);
 
-    const epsEstSeries = workingData
+    const revenueEstSeries = workingData
       .map((x) => x.valueEst)
       .map((d) => {
         return { y: d, name: 'Expected', color: ColorScheme.GRAY_MEDIUM_VAR };
       });
 
-    const epsActualSeries = workingData
+    const revenueActualSeries = workingData
       .map((x) => x.valueActual)
       .map((d, index) => {
-        const color = (d ?? 0) > (epsEstSeries[index]?.y ?? 0) ? ColorScheme.SUCCESS_VAR : ColorScheme.DANGER_VAR;
+        const color = (d ?? 0) > (revenueEstSeries[index]?.y ?? 0) ? ColorScheme.SUCCESS_VAR : ColorScheme.DANGER_VAR;
         return { y: d, name: 'Actual', color: color };
       });
 
-    const epsActualSeriesLine = epsActualSeries.map((d) => ({
+    const revenueActualSeriesLine = revenueActualSeries.map((d) => ({
       ...d,
       color: 'var(--primary)',
     }));
@@ -143,7 +143,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         gridLineColor: '#66666655',
         labels: {
           style: {
-            color: ColorScheme.GRAY_LIGHT_VAR,
+            color: ColorScheme.GRAY_MEDIUM_VAR,
             fontSize: '10px',
           },
         },
@@ -152,19 +152,20 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         {
           type: 'line',
           name: 'Actual',
-          data: epsActualSeriesLine,
+          data: revenueActualSeriesLine,
+          opacity: 0.7,
         },
         {
           type: 'column',
           name: 'Actual',
-          data: epsActualSeries,
+          data: revenueActualSeries,
           opacity: 0.8,
           id: 'main',
         },
         {
           type: 'column',
           name: 'Expected',
-          data: epsEstSeries,
+          data: revenueEstSeries,
           opacity: 0.8,
           linkedTo: 'main',
         },
