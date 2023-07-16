@@ -4,4 +4,5 @@ export * from './custom-form-field-validators';
 export * from './dialogs';
 export * from './general-errors.util';
 export * from './operators';
+export * from './router.util';
 export * from './screen-layout.util';

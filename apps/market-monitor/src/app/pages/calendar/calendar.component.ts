@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
 import {
   CalendarAssetDataTypes,
@@ -20,9 +21,14 @@ import {
   EarningsItemsDialogComponent,
 } from '@market-monitor/modules/market-earnings';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks';
-import { CalendarRange, CalendarWrapperComponent, MarkerDirective } from '@market-monitor/shared-components';
+import {
+  CalendarRageToday,
+  CalendarRange,
+  CalendarWrapperComponent,
+  MarkerDirective,
+} from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
-import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
+import { DialogServiceModule, RouterManagement, SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
 import {
   fillOutMissingDatesForMonth,
   generateDatesArray,
@@ -55,17 +61,13 @@ import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs'
   styleUrls: ['./calendar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CalendarComponent {
+export class CalendarComponent implements OnInit, RouterManagement {
   marketApiService = inject(MarketApiService);
   dialog = inject(MatDialog);
+  router = inject(Router);
+  route = inject(ActivatedRoute);
 
-  currentDateRangeControl = new FormControl<CalendarRange>(
-    {
-      year: new Date().getFullYear(),
-      month: new Date().getMonth() + 1,
-    },
-    { nonNullable: true }
-  );
+  currentDateRangeControl = new FormControl<CalendarRange>(CalendarRageToday, { nonNullable: true });
 
   displayElements = 5;
 
@@ -92,6 +94,30 @@ export class CalendarComponent {
   );
   calendarDataEarningsSignal = computed(() =>
     resolveCalendarType<CalendarStockEarning>(this.calendarDataSignal(), 'eps')
+  );
+
+  ngOnInit(): void {
+    this.loadQueryParams();
+  }
+
+  private calendarDataSignal = toSignal(
+    combineLatest([this.currentDateRangeControl.valueChanges, this.calendarTypeFormControl.valueChanges]).pipe(
+      tap(([dateRange, calendarType]) => {
+        this.loadingSignal.set(true);
+        this.updateQueryParams(calendarType.value, dateRange);
+      }),
+      switchMap(([dateRange, calendarType]) =>
+        this.resolveCalendarAPICall(calendarType.value, dateRange.month, dateRange.year).pipe(
+          map((res) => groupValuesByDate(res)),
+          map((res) => fillOutMissingDatesForMonth(res))
+        )
+      ),
+      tap((e) => {
+        console.log(e);
+        this.loadingSignal.set(false);
+      })
+    ),
+    { initialValue: [] }
   );
 
   onMoreDividends(data: CalendarDividend[]): void {
@@ -132,25 +158,37 @@ export class CalendarComponent {
     });
   }
 
-  private calendarDataSignal = toSignal(
-    combineLatest([
-      this.currentDateRangeControl.valueChanges.pipe(startWith(this.currentDateRangeControl.value)),
-      this.calendarTypeFormControl.valueChanges.pipe(startWith(this.calendarTypeFormControl.value)),
-    ]).pipe(
-      tap(() => this.loadingSignal.set(true)),
-      switchMap(([dateRange, calendarType]) =>
-        this.resolveCalendarAPICall(calendarType.value, dateRange.month, dateRange.year).pipe(
-          map((res) => groupValuesByDate(res)),
-          map((res) => fillOutMissingDatesForMonth(res))
-        )
-      ),
-      tap((e) => {
-        console.log(e);
-        this.loadingSignal.set(false);
-      })
-    ),
-    { initialValue: [] }
-  );
+  loadQueryParams(): void {
+    const type = this.route.snapshot.queryParams?.['type'];
+    const year = Number(this.route.snapshot.queryParams?.['year']);
+    const month = Number(this.route.snapshot.queryParams?.['month']);
+    const selectedType = this.calendarTypeInputSource.find((e) => e.value === type);
+
+    // all of them must be present
+    if (!type || !selectedType || isNaN(year) || isNaN(month)) {
+      // trigger value change for both
+      this.calendarTypeFormControl.setValue(this.calendarTypeInputSource[0]);
+      this.currentDateRangeControl.setValue(CalendarRageToday);
+      return;
+    }
+
+    this.calendarTypeFormControl.setValue(selectedType);
+    this.currentDateRangeControl.setValue({
+      year,
+      month,
+    });
+  }
+
+  updateQueryParams(data: (typeof this.calendarTypeInputSource)[number]['value'], range: CalendarRange): void {
+    this.router.navigate([], {
+      queryParams: {
+        type: data,
+        month: range.month,
+        year: range.year,
+      },
+      queryParamsHandling: 'merge',
+    });
+  }
 
   private resolveCalendarAPICall(
     type: (typeof this.calendarTypeInputSource)[number]['value'],
