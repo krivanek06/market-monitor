@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -39,6 +39,12 @@ export class EarningsHistoricalDialogComponent {
     return this.selectedChartTypeControl.value === 'revenue';
   }
 
+  displayDataNumberSignal = computed(() =>
+    this.stockEarningsEstimationSignal().length > this.limitValues
+      ? this.limitValues
+      : this.stockEarningsEstimationSignal()?.length
+  );
+
   get beatings(): number | undefined {
     if (!this.stockEarningsEstimationSignal() || !this.stockRevenueEstimationSignal()) {
       return 0;
@@ -68,7 +74,8 @@ export class EarningsHistoricalDialogComponent {
           )
           .reverse()
       )
-    )
+    ),
+    { initialValue: [] }
   );
 
   stockRevenueEstimationSignal = toSignal(
@@ -85,7 +92,8 @@ export class EarningsHistoricalDialogComponent {
           )
           .reverse()
       )
-    )
+    ),
+    { initialValue: [] }
   );
 
   constructor(

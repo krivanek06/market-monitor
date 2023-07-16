@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ChartConstructor, ColorScheme, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
+import { roundNDigits } from '@market-monitor/shared-utils-general';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import HC_more from 'highcharts/highcharts-more';
@@ -78,7 +79,7 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         pointFormatter: function () {
           const that = this as any;
           const name = that.name;
-          const value = that.y;
+          const value = roundNDigits(that.y, 2);
 
           return `
             <p>

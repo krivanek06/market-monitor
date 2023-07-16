@@ -1,7 +1,7 @@
 <app-dialog-close-header [title]="'Earnings: ' + data.symbol"></app-dialog-close-header>
 
 <div class="flex items-center justify-between sm:pr-3 sm:pl-6">
-  <h2>Beat: {{ beatings ?? 0 }} / {{ limitValues }}</h2>
+  <h2>Beat: {{ beatings ?? 0 }} / {{ displayDataNumberSignal() }}</h2>
   <mat-radio-group
     [formControl]="selectedChartTypeControl"
     color="primary"

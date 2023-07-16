@@ -9,18 +9,31 @@ export type CalendarStockEarning = Omit<StockEarning, 'fiscalDateEnding' | 'upda
 export type CalendarAssetTypes = 'dividends' | 'earnings' | 'ipo';
 export type CalendarAssetDataTypes = CalendarStockIPO | CalendarStockEarning | CalendarDividend;
 
+/**
+ * based on the provided type T it will resolve to correct TS type
+ *
+ * @param data
+ * @param objectKey
+ * @returns
+ */
 export const resolveCalendarType = <T extends CalendarAssetDataTypes>(
   data: {
-    data: CalendarAssetDataTypes[];
+    data: CalendarAssetDataTypes[] | null;
     date: string;
   }[],
   objectKey: keyof T
 ): {
-  data: T[];
+  data: T[] | null;
   date: string;
 }[] => {
   const existingData = data.filter((item) => item.data && item.data.length > 0);
-  return existingData.length > 0 && existingData[0].data.length > 0 && objectKey in existingData[0].data[0]
+  const isResolve =
+    existingData.length > 0 &&
+    existingData[0].data && // null or array
+    existingData[0].data.length > 0 && // length of array > 0
+    objectKey in existingData[0].data[0];
+
+  return isResolve
     ? (data as {
         data: T[];
         date: string;
