@@ -7,6 +7,10 @@ import { RangeDirective } from '@market-monitor/shared-directives';
 import { dateIsNotWeekend, generateDatesArray } from '@market-monitor/shared-utils-general';
 
 export type CalendarRange = { year: number; month: number };
+export const CalendarRageToday = {
+  year: new Date().getFullYear(),
+  month: new Date().getMonth() + 1,
+};
 
 @Directive({
   selector: '[marker]',
@@ -34,7 +38,7 @@ export class CalendarWrapperComponent implements OnInit, ControlValueAccessor {
 
   @ContentChildren(MarkerDirective, { read: TemplateRef }) templates!: TemplateRef<any>[];
 
-  selectedDate = { year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
+  selectedDate = CalendarRageToday;
   dateRangeSignal = signal<string[]>([]);
 
   onChange: (value: CalendarRange) => void = () => {};

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Optional, Output, SkipSelf } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -10,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex items-center justify-between p-4">
-      <h2 class="text-xl text-wt-primary mb-0">{{ title | titlecase }}</h2>
+      <h2 class="text-xl text-wt-primary mb-0">{{ title }}</h2>
 
       <div>
         <button mat-icon-button color="warn" type="button" (click)="onDialogClose()">
@@ -24,7 +25,13 @@ export class DialogCloseHeaderComponent {
   @Output() dialogCloseEmitter = new EventEmitter<void>();
   @Input() title!: string;
 
+  constructor(@Optional() @SkipSelf() private dialogRef: MatDialogRef<unknown>) {}
+
   onDialogClose(): void {
     this.dialogCloseEmitter.emit();
+    if (this.dialogRef) {
+      console.log('Close');
+      this.dialogRef.close();
+    }
   }
 }

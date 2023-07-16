@@ -1,7 +1,6 @@
 /* eslint-disable max-len */
 import {
   AnalystEstimates,
-  AnalystEstimatesEarnings,
   CompanyOutlook,
   ESGDataQuarterly,
   ESGDataRatingYearly,
@@ -13,6 +12,7 @@ import {
   PriceTarget,
   Profile,
   SectorPeers,
+  StockEarning,
   StockScreenerResults,
   StockScreenerValues,
   SymbolQuote,
@@ -198,7 +198,6 @@ export const getCompanyEarnings = async (symbol: string): Promise<Earnings[]> =>
 };
 
 /**
- * @deprecated - use getAnalystEstimatesEarnings instead
  *
  * @param symbol
  * @param period
@@ -252,11 +251,13 @@ export const getAnalystEstimates = async (
     "fiscalDateEnding": "2023-07-01"
   }]
  */
-export const getAnalystEstimatesEarnings = async (symbol: string): Promise<AnalystEstimatesEarnings[]> => {
-  const url = `${FINANCIAL_MODELING_URL}/v3/historical/earning_calendar/${symbol}?limit=80&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<AnalystEstimatesEarnings[]>(url);
-  // last 3 data have null as epsEstimated
-  return response.data.filter((d) => !!d.epsEstimated);
+export const getStockHistoricalEarnings = async (symbol: string): Promise<StockEarning[]> => {
+  const url = `${FINANCIAL_MODELING_URL}/v3/historical/earning_calendar/${symbol}?limit=50&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<StockEarning[]>(url);
+  // remove first 3 items if epsEstimated is undefined
+  const filteredResponse = response.data.slice(0, 3).filter((item) => item.epsEstimated);
+  console.log(filteredResponse);
+  return [...response.data.slice(3), ...filteredResponse];
 };
 
 /**

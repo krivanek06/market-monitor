@@ -14,7 +14,7 @@
     <td mat-cell *matCellDef="let row">
       <!-- logo + symbol -->
       <div class="flex items-center gap-2">
-        <img appDefaultImg [src]="row.profile.image" class="w-10 h-10" />
+        <img appDefaultImg imageType="symbol" [src]="row.id" class="w-10 h-10" />
         <div class="flex flex-col">
           <!-- asset symbol + sector -->
           <div>{{ row.id }}</div>
@@ -27,7 +27,7 @@
   <ng-container matColumnDef="price">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Price +/-</th>
     <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-      <div class="text-base text-wt-gray-light">
+      <div class="text-base text-wt-gray-medium">
         {{ row.quote.price | currency }}
       </div>
     </td>
@@ -66,7 +66,7 @@
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
     <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
       <ng-container *ngIf="!displayInfoMobile()">
-        <div class="flex justify-end text-base text-wt-gray-light">
+        <div class="flex justify-end text-base text-wt-gray-medium">
           {{ row.quote.price | currency }}
         </div>
         <div
@@ -117,7 +117,7 @@
   <ng-container matColumnDef="volume">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Volume +/-</th>
     <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
-      <div class="text-base text-wt-gray-light">
+      <div class="text-base text-wt-gray-medium">
         {{ row.quote.volume | largeNumberFormatter }}
       </div>
     </td>
@@ -208,7 +208,7 @@
   <tr
     mat-row
     *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"
-    [ngClass]="{ 'bg-wt-background-light': even }"
+    [ngClass]="{ 'bg-wt-gray-light': even }"
     (click)="onItemClicked(row)"
   ></tr>
 

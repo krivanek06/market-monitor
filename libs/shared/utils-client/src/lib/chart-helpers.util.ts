@@ -19,5 +19,17 @@ export abstract class ChartConstructor {
   constructor() {
     // used in constructor to avoid SSR error
     NoDataToDisplay(Highcharts);
+
+    Highcharts.setOptions({
+      lang: {
+        numericSymbols: ['k', 'M', 'B', 'T', 'P', 'E'],
+      },
+    });
   }
 }
+
+export type EstimatedChartDataType = {
+  date: string;
+  valueActual: number | null;
+  valueEst: number | null;
+};

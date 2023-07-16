@@ -6,7 +6,7 @@ import { DialogCloseHeaderComponent } from '@market-monitor/shared-components';
 import { EarningsItemComponent } from '../../components';
 
 @Component({
-  selector: 'market-monitor-earnings-items-dialog',
+  selector: 'app-earnings-items-dialog',
   standalone: true,
   imports: [CommonModule, MatDialogModule, DialogCloseHeaderComponent, EarningsItemComponent],
   templateUrl: './earnings-items-dialog.component.html',
@@ -25,9 +25,5 @@ export class EarningsItemsDialogComponent {
     return this.data.showDate && this.data.earnings.length > 0
       ? `Earnings: ${this.datePipe.transform(this.data.earnings[0].date, 'd. MMMM, y (EEEE)')}`
       : 'Earnings';
-  }
-
-  onDialogClose(): void {
-    this.dialogRef.close();
   }
 }

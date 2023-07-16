@@ -1,11 +1,11 @@
 import {
-  getAnalystEstimatesEarnings,
   getCompanyOutlook,
   getEsgDataQuarterly,
   getEsgRatingYearly,
   getPriceTarget,
   getRecommendationTrends,
   getSectorPeersForSymbols,
+  getStockHistoricalEarnings,
   getStockNews,
   getUpgradesDowngrades,
 } from '@market-monitor/api-external';
@@ -114,7 +114,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetails> => {
     getEsgDataQuarterly(symbol),
     getUpgradesDowngrades(symbol),
     getPriceTarget(symbol),
-    getAnalystEstimatesEarnings(symbol),
+    getStockHistoricalEarnings(symbol),
     getSectorPeersForSymbols([symbol]),
     getRecommendationTrends(symbol),
     getStockNews(symbol),
@@ -126,7 +126,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetails> => {
     esgDataQuarterlyArray: eSGDataQuarterly.slice(-10),
     esgDataRatingYearly: esgRatingYearly.at(-1) ?? null,
     esgDataRatingYearlyArray: esgRatingYearly.slice(-10),
-    analystEstimatesEarnings: analystEstimatesEarnings.slice(-10),
+    stockEarnings: analystEstimatesEarnings,
     stockNews: stockNews.slice(-15),
     priceTarget,
     sectorPeers,
@@ -136,6 +136,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetails> => {
     lastUpdate: {
       detailsLastUpdate: new Date().toISOString(),
       newsLastUpdate: new Date().toISOString(),
+      earningLastUpdate: new Date().toISOString(),
     },
   };
 

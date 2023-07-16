@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { CalendarStockEarning, StockEarning } from '@market-monitor/api-types';
 import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared-directives';
@@ -14,7 +14,12 @@ import { LargeNumberFormatterPipe } from '@market-monitor/shared-pipes';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EarningsItemComponent {
+  @Output() itemClickedEmitter = new EventEmitter<void>();
   @Input({ required: true }) earning!: StockEarning | CalendarStockEarning;
   @Input() showBorder = false;
   @Input() showRevenue = false;
+
+  onItemClick(): void {
+    this.itemClickedEmitter.emit();
+  }
 }

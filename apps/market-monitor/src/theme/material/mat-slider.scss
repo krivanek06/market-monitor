@@ -1,12 +1,12 @@
 .mdc-slider__track--inactive {
-	background-color: #ffffff !important;
+  background-color: #ffffff !important;
 }
 
 .mat-mdc-slider.mdc-slider--disabled .mdc-slider__track--active_fill {
-	border-color: var(--gray-medium) !important;
+  border-color: var(--gray-medium-strong) !important;
 }
 
 .mat-mdc-slider.mdc-slider--disabled .mdc-slider__thumb-knob {
-	background-color: var(--gray-medium) !important;
-	border-color: var(--gray-medium) !important;
+  background-color: var(--gray-medium-strong) !important;
+  border-color: var(--gray-medium-strong) !important;
 }

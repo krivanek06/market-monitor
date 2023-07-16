@@ -26,8 +26,4 @@ export class DividendItemsDialogComponent {
       ? `Dividends: ${this.datePipe.transform(this.data.dividends[0].date, 'd. MMMM, y (EEEE)')}`
       : 'Dividends';
   }
-
-  onDialogClose(): void {
-    this.dialogRef.close();
-  }
 }

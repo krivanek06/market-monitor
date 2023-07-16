@@ -23,6 +23,7 @@ import {
 } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
 import { STOCK_MARKET_CLOSED_DATES } from './constants';
+import { Spread } from './typescript.util';
 
 export type DateServiceUtilDateInformation = {
   year: number;
@@ -169,7 +170,10 @@ export const generateDatesArray = (data: { year: number; month: number }): strin
  * the current month
  * @param dates
  */
-export const fillOutMissingDatesForMonth = <T extends { date: string }>(input: T[], ignoreWeekend = true): T[] => {
+export const fillOutMissingDatesForMonth = <T extends { date: string }>(
+  input: T[],
+  ignoreWeekend = true
+): (T | Spread<[{ [key in keyof T]: null }, { date: string }]>)[] => {
   if (input.length === 0) {
     return input;
   }

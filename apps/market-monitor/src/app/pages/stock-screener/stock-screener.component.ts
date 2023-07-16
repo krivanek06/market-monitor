@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { StockScreenerValues, StockSummary } from '@market-monitor/api-types';
 import {
@@ -16,7 +16,7 @@ import {
   getScreenerInputValueByKey,
 } from '@market-monitor/modules/market-stocks';
 import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared-directives';
-import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
+import { DialogServiceModule, RouterManagement, SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
 import { switchMap, tap } from 'rxjs';
 
 @Component({
@@ -37,7 +37,7 @@ import { switchMap, tap } from 'rxjs';
   styleUrls: ['./stock-screener.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockScreenerComponent implements OnInit {
+export class StockScreenerComponent implements OnInit, RouterManagement {
   private screenerDefault = 30;
   stocksApiService = inject(StocksApiService);
   dialog = inject(MatDialog);
@@ -94,7 +94,7 @@ export class StockScreenerComponent implements OnInit {
   /**
    * method triggers the this.screenerFormControl.valueChanges observable
    */
-  private loadQueryParams(): void {
+  loadQueryParams(): void {
     const queryParamSection = this.route.snapshot.queryParams?.['sections'];
     if (queryParamSection) {
       const sections = queryParamSection.split('_') as string[];
@@ -104,14 +104,14 @@ export class StockScreenerComponent implements OnInit {
 
         return { ...acc, [key]: value };
       }, {} as StockScreenerValues);
-      console.log(formValue);
+
       this.screenerFormControl.setValue(formValue);
     } else {
       this.screenerFormControl.setValue(STOCK_SCREENER_DEFAULT_VALUES);
     }
   }
 
-  private updateQueryParams(formValue: StockScreenerValues): void {
+  updateQueryParams(formValue: StockScreenerValues): void {
     // creates a string to save into query params: sections=marketCap:1_price:3_
     const dataToSave = Object.entries(formValue)
       .reduce((acc, [key, value]) => {
@@ -126,9 +126,11 @@ export class StockScreenerComponent implements OnInit {
       // join with underscore
       .join('_');
 
-    const queryParams: Params = {
-      sections: dataToSave,
-    };
-    this.router.navigate([], { relativeTo: this.route, queryParams });
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        sections: dataToSave,
+      },
+    });
   }
 }

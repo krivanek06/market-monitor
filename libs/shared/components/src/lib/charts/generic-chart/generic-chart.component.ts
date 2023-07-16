@@ -31,7 +31,7 @@ HC_stock(Highcharts);
       <button
         mat-icon-button
         *ngIf="showExpandableButton"
-        class="text-wt-gray-medium hover:text-wt-gray-light z-10 absolute right-0 top-0"
+        class="text-wt-gray-medium hover:text-wt-gray-medium z-10 absolute right-0 top-0"
         (click)="expand()"
         matTooltip="Expand chart"
       >
@@ -231,14 +231,14 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
       legend: {
         enabled: this.showLegend,
         itemStyle: {
-          color: ColorScheme.GRAY_LIGHT_VAR,
+          color: ColorScheme.GRAY_MEDIUM_VAR,
           cursor: this.enableLegendTogging ? 'pointer' : 'default',
         },
         itemHoverStyle: {
-          color: this.enableLegendTogging ? ColorScheme.GRAY_MEDIUM_VAR : ColorScheme.GRAY_LIGHT_VAR,
+          color: this.enableLegendTogging ? ColorScheme.GRAY_MEDIUM_STRONG_VAR : ColorScheme.GRAY_MEDIUM_VAR,
         },
         itemHiddenStyle: {
-          color: this.enableLegendTogging ? ColorScheme.GRAY_DARK_VAR : ColorScheme.GRAY_LIGHT_VAR,
+          color: this.enableLegendTogging ? ColorScheme.GRAY_DARK_VAR : ColorScheme.GRAY_MEDIUM_VAR,
         },
         verticalAlign: this.legendVerticalAlign,
         align: this.legendAlign,

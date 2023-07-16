@@ -1,5 +1,5 @@
 <a
-  class="flex items-start gap-3 pt-2 pb-4 pl-2 pr-4 transition-all duration-500 rounded-md hover:bg-wt-background-light group"
+  class="flex items-start gap-3 pt-2 pb-4 pl-2 pr-4 transition-all duration-500 rounded-md hover:bg-wt-gray-light group"
   target="_blank"
   [href]="news.url"
 >
@@ -13,6 +13,6 @@
       <span>●</span>
       <span>{{ news.publishedDate | dateAgo }}</span>
     </div>
-    <div class="hidden text-xs sm:block text-wt-gray-light">{{ news.text | truncateWords : 25 }}</div>
+    <div class="hidden text-xs sm:block text-wt-gray-medium">{{ news.text | truncateWords : 25 }}</div>
   </div>
 </a>

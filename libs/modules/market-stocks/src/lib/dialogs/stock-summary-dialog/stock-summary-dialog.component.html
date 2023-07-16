@@ -2,10 +2,10 @@
   <!-- heading -->
   <div class="flex items-center justify-between p-4">
     <div class="flex items-center gap-3">
-      <img appDefaultImg [src]="stockSummary.profile.image" alt="Stock Image" class="w-11 h-11" />
+      <img appDefaultImg imageType="symbol" [src]="stockSummary.id" alt="Stock Image" class="w-11 h-11" />
       <div class="grid">
-        <span class="text-md text-wt-gray-light">{{ stockSummary.id }}</span>
-        <span class="text-lg text-wt-gray-medium">{{ stockSummary.profile.companyName }}</span>
+        <span class="text-md text-wt-gray-medium">{{ stockSummary.id }}</span>
+        <span class="text-lg text-wt-gray-medium-strong">{{ stockSummary.profile.companyName }}</span>
       </div>
     </div>
 
@@ -59,7 +59,7 @@
 
     <!-- price & volume -->
     <app-asset-price-chart-interactive
-      [imageUrl]="stockSummary.profile.image"
+      [showImage]="true"
       [title]="data.symbol"
       [symbol]="data.symbol"
     ></app-asset-price-chart-interactive>

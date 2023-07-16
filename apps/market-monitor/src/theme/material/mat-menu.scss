@@ -1,24 +1,24 @@
 .mat-mdc-menu-panel {
-	background-color: var(--background-dark) !important;
+  background-color: var(--gray-dark) !important;
 
-	.mat-mdc-menu-content {
-		button {
-			color: var(--gray-light) !important;
+  .mat-mdc-menu-content {
+    button {
+      color: var(--gray-medium) !important;
 
-			mat-icon {
-				color: var(--gray-light) !important;
-			}
-		}
-	}
+      mat-icon {
+        color: var(--gray-medium) !important;
+      }
+    }
+  }
 }
 
 .mat-mdc-menu-item:hover:not([disabled]),
 .mat-mdc-menu-item.cdk-program-focused:not([disabled]),
 .mat-mdc-menu-item.cdk-keyboard-focused:not([disabled]),
 .mat-mdc-menu-item-highlighted:not([disabled]) {
-	background-color: var(--background-medium) !important;
+  background-color: var(--background-medium) !important;
 }
 
 .mdc-list-item__primary-text {
-	color: var(--gray-medium) !important;
+  color: var(--gray-medium-strong) !important;
 }

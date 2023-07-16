@@ -1,6 +1,6 @@
 .mat-mdc-dialog-container .mdc-dialog__surface {
   background: var(--background-dialog) !important;
-  color: var(--gray-medium) !important;
+  color: var(--gray-medium-strong) !important;
   padding-left: 16px !important;
   padding-right: 16px !important;
   padding-bottom: 16px !important;
@@ -21,7 +21,7 @@ mat-dialog-content {
 }
 
 .mat-mdc-dialog-container .mdc-dialog__content {
-  color: var(--gray-medium) !important;
+  color: var(--gray-medium-strong) !important;
 }
 
 /* TODO(mdc-migration): The following rule targets internal classes of dialog that may no longer apply for the MDC version.*/
