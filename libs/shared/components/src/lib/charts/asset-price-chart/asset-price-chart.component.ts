@@ -73,12 +73,11 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
           opposite: false,
           gridLineWidth: 1,
           minorTickInterval: 'auto',
-          tickPixelInterval: 40,
-          minorGridLineWidth: 0,
+          tickPixelInterval: 30,
           visible: true,
           labels: {
             style: {
-              color: ColorScheme.GRAY_LIGHT_VAR,
+              color: ColorScheme.GRAY_MEDIUM_VAR,
               font: '10px Trebuchet MS, Verdana, sans-serif',
             },
           },
@@ -93,7 +92,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         labels: {
           rotation: -12,
           style: {
-            color: ColorScheme.GRAY_LIGHT_VAR,
+            color: ColorScheme.GRAY_MEDIUM_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
@@ -102,7 +101,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         text: this.showTitle ? 'Historical Price Chart' : '',
         align: 'left',
         style: {
-          color: '#bababa',
+          color: ColorScheme.GRAY_MEDIUM_VAR,
           fontSize: '13px',
         },
         y: 15,
@@ -123,11 +122,11 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
         style: {
           fontSize: '16px',
-          color: '#D9D8D8',
+          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
         shared: true,
         //useHTML: true,
-        headerFormat: '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
+        headerFormat: `<p style="color: ${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p><br/>`,
 
         pointFormatter: function () {
           const that = this as any;

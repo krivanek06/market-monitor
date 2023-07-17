@@ -74,9 +74,9 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
         style: {
           fontSize: '15px',
-          color: ColorScheme.GRAY_MEDIUM_VAR,
+          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
-        headerFormat: `<p style="color: ${ColorScheme.GRAY_MEDIUM}; font-size: 12px">{point.x}</p><br/>`,
+        headerFormat: `<p style="color: ${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.x}</p><br/>`,
         pointFormatter: function () {
           const that = this as any;
           const name = that.name;
@@ -154,6 +154,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
           name: 'Actual',
           data: revenueActualSeriesLine,
           opacity: 0.7,
+          enableMouseTracking: false,
         },
         {
           type: 'column',

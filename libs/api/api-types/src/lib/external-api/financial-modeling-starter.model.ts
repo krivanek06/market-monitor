@@ -10,7 +10,6 @@ export type SymbolQuote = {
   dayHigh: number;
   yearHigh: number;
   yearLow: number;
-  marketCap: number;
   priceAvg50: number;
   priceAvg200: number;
   exchange: string;
@@ -21,8 +20,11 @@ export type SymbolQuote = {
   eps: number | null;
   pe: number | null;
   earningsAnnouncement: string;
-  sharesOutstanding: number;
   timestamp: number;
+
+  // value can be null if it is ETF or index
+  marketCap: number;
+  sharesOutstanding: number;
 };
 
 export type CompanyOutlook = {
@@ -60,7 +62,6 @@ export type Profile = {
   website: string;
   description: string;
   ceo: string;
-  sector: string;
   country: string;
   fullTimeEmployees: string;
   phone: string;
@@ -77,6 +78,7 @@ export type Profile = {
   isActivelyTrading: boolean;
   isAdr: boolean;
   isFund: boolean;
+  sector: string; // can be empty
 };
 
 export type Metrics = {

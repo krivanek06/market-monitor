@@ -78,9 +78,9 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
         style: {
           fontSize: '15px',
-          color: ColorScheme.GRAY_MEDIUM_VAR,
+          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
-        headerFormat: '<p style="color:#909592; font-size: 12px">{point.x}</p><br/>',
+        headerFormat: `<p style="color: ${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.x}</p><br/>`,
         pointFormatter: function () {
           const that = this as any;
           const name = that.name;
@@ -162,7 +162,8 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
           type: 'line',
           name: 'Actual',
           data: epsActualSeriesLine,
-          opacity: 0.7,
+          opacity: 0.8,
+          enableMouseTracking: true,
         },
         {
           type: 'bubble',
