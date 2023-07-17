@@ -8,15 +8,22 @@ import { getSummaries } from '../../shared';
 const app = express();
 
 app.post('/', async (req, res: Response<StockSummary[] | string>) => {
-  const requestBody = (req.body ?? {}) as StockScreenerValues;
+  const requestBody = req.body ?? ({} as StockScreenerValues);
 
   if (!requestBody) {
     res.status(400).send('Missing request body');
     return;
   }
-  console.log(requestBody);
-  const stockScreeningResults = await getStockScreening(requestBody);
-  console.log(`stockScreeningResults: ${stockScreeningResults.length}`);
+
+  let screenerValues: StockScreenerValues;
+  try {
+    screenerValues = JSON.parse(requestBody);
+  } catch {
+    screenerValues = requestBody;
+  }
+
+  // const requestBodyJson = JSON.parse(requestBody) as StockScreenerValues;
+  const stockScreeningResults = await getStockScreening(screenerValues);
 
   // create multiple requests
   const symbolsChunks = chunk(

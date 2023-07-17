@@ -186,7 +186,7 @@
       <mat-chip-listbox aria-label="Asset sector">
         <mat-chip>
           <!-- todo add image of sector -->
-          {{ row.profile.sector }}
+          {{ row.profile.sector || 'N/A' }}
         </mat-chip>
       </mat-chip-listbox>
     </td>

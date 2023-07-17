@@ -78,7 +78,7 @@ export type Profile = {
   isActivelyTrading: boolean;
   isAdr: boolean;
   isFund: boolean;
-  sector: string; // can be empty
+  sector?: string; // can be empty
 };
 
 export type Metrics = {
