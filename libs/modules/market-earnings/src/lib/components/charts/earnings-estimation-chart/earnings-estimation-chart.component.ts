@@ -132,7 +132,7 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
           rotation: -20,
           enabled: true,
           style: {
-            color: '#a4a4a4',
+            color: ColorScheme.GRAY_MEDIUM_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },

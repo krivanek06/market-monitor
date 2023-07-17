@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,6 +27,7 @@ import { NewsBodyComponent } from '../../components';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewsSearchComponent {
+  @Input() showForm = false;
   marketApiService = inject(MarketApiService);
 
   newSearchFormGroup = new FormGroup({

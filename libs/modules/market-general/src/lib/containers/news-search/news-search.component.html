@@ -1,4 +1,4 @@
-<form class="flex items-center gap-3 mb-2" [formGroup]="newSearchFormGroup">
+<form *ngIf="showForm" class="flex items-center gap-3 mb-2" [formGroup]="newSearchFormGroup">
   <!-- news type -->
   <app-form-mat-input-wrapper
     inputCaption="Select News Type"
