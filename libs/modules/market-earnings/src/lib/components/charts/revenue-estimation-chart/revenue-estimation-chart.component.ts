@@ -47,7 +47,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
 
     const revenueActualSeriesLine = revenueActualSeries.map((d) => ({
       ...d,
-      color: 'var(--primary)',
+      color: ColorScheme.PRIMARY_VAR,
     }));
 
     this.chartOptions = {
@@ -74,17 +74,16 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
         style: {
           fontSize: '15px',
-          color: ColorScheme.GRAY_MEDIUM_VAR,
+          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
-        headerFormat: `<p style="color: ${ColorScheme.GRAY_MEDIUM}; font-size: 12px">{point.x}</p><br/>`,
+        headerFormat: `<p style="color: ${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.x}</p><br/>`,
         pointFormatter: function () {
-          const that = this as any;
-          const name = that.name;
-          const value = formatLargeNumber(that.y, false, true);
+          const name = this.name;
+          const value = formatLargeNumber(this.y, false, true);
 
           return `
             <p>
-              <span style="color: ${that.color}; font-weight: bold" class="capitalize">● ${name}: </span>
+              <span style="color: ${this.color}; font-weight: bold" class="capitalize">● ${name}: </span>
               <span>${value}</span>
             </p><br/>
           `;
@@ -123,7 +122,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
           rotation: -20,
           enabled: true,
           style: {
-            color: '#a4a4a4',
+            color: ColorScheme.GRAY_MEDIUM_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
@@ -154,6 +153,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
           name: 'Actual',
           data: revenueActualSeriesLine,
           opacity: 0.7,
+          enableMouseTracking: false,
         },
         {
           type: 'column',

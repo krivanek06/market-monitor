@@ -25,15 +25,13 @@ export const getSummaries = async (symbolsArray: string[]): Promise<StockSummary
     return isBefore(threeMinAgo, new Date(data.summaryLastUpdate));
   });
 
-  // map to symbols
-  const filteredDatabaseSymbolsNotUpdate = filteredDatabaseDataNotUpdate.map((d) => d.id);
-
   // symbols to update in DB
-  const symbolsToUpdate = symbolsArray.filter((symbol) => !filteredDatabaseSymbolsNotUpdate.includes(symbol));
-  console.log('Summary update:', symbolsToUpdate);
+  const symbolsToUpdate = symbolsArray.filter(
+    (symbol) => !filteredDatabaseDataNotUpdate.map((d) => d.id).includes(symbol)
+  );
 
   if (symbolsToUpdate.length === 0) {
-    return filteredDatabaseDataNotUpdate.filter((d) => d.quote.marketCap > 0 && d.quote.sharesOutstanding > 0);
+    return filteredDatabaseDataNotUpdate;
   }
 
   // load data from api - quote, profile, stock price change
@@ -80,7 +78,5 @@ export const getSummaries = async (symbolsArray: string[]): Promise<StockSummary
   await batch.commit();
 
   // return data for all searched quotes
-  return [...filteredDatabaseDataNotUpdate, ...newData].filter(
-    (d) => d.quote.marketCap > 0 && d.quote.sharesOutstanding > 0
-  );
+  return [...filteredDatabaseDataNotUpdate, ...newData];
 };

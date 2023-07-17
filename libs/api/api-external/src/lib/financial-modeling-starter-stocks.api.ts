@@ -402,6 +402,6 @@ export const getStockScreening = async (values: StockScreenerValues): Promise<St
   const response = await axios.get<StockScreenerResults[]>(url);
 
   // check if symbol contains any of the ignored symbols
-  const filteredResponse = filterOutSymbols(response.data, ['isEtf', 'sector']);
+  const filteredResponse = filterOutSymbols(response.data, ['sector']);
   return filteredResponse;
 };

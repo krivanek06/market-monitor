@@ -44,7 +44,7 @@
   </app-value-presentation-card>
 
   <!-- Sector -->
-  <app-value-presentation-card title="Sector" additionalClasses="h-full" class="hidden xl:block">
-    <div>{{ stockSummary.profile.sector }}</div>
+  <app-value-presentation-card title="Sector" additionalClasses="h-full" class="hidden text-center xl:block">
+    <div>{{ stockSummary.profile.sector || 'N/A' }}</div>
   </app-value-presentation-card>
 </div>

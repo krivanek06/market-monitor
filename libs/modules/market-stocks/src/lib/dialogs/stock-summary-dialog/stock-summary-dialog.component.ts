@@ -1,16 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { StocksApiService } from '@market-monitor/api-client';
-import { StockSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
 import { PriceChangeItemsComponent } from '@market-monitor/shared-components';
 import { DefaultImgDirective } from '@market-monitor/shared-directives';
 import { DialogServiceUtil } from '@market-monitor/shared-utils-client';
-import { Observable } from 'rxjs';
 import { StockStorageService } from '../../services';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
 import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-modal-skeleton.component';
@@ -34,8 +32,26 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSummaryDialogComponent {
-  stockSummary$!: Observable<StockSummary>;
+  stockSummarySignal = toSignal(this.stocksApiService.getStockSummary(this.data.symbol));
+  stockSummaryType = computed(() => {
+    const data = this.stockSummarySignal();
+    if (!data) {
+      return '';
+    }
+    if (data.profile.isAdr) {
+      return 'ADR';
+    }
 
+    if (data.profile.isEtf) {
+      return 'ETF';
+    }
+
+    if (data.profile.isFund) {
+      return 'Fund';
+    }
+
+    return 'Stock';
+  });
   isSymbolInFavoriteSignal = toSignal(this.stockStorageService.isSymbolInFavoriteObs(this.data.symbol));
 
   constructor(
@@ -44,9 +60,7 @@ export class StockSummaryDialogComponent {
     private stocksApiService: StocksApiService,
     private stockStorageService: StockStorageService,
     private dialogServiceUtil: DialogServiceUtil
-  ) {
-    this.stockSummary$ = this.stocksApiService.getStockSummary(this.data.symbol);
-  }
+  ) {}
 
   onAddToFavorite(): void {
     if (this.stockStorageService.toggleFavoriteSymbol(this.data.symbol)) {

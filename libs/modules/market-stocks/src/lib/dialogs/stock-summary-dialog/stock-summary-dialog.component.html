@@ -1,10 +1,14 @@
-<ng-container *ngIf="stockSummary$ | async as stockSummary; else showModalSkeleton">
+<ng-container *ngIf="stockSummarySignal() as stockSummary; else showModalSkeleton">
   <!-- heading -->
   <div class="flex items-center justify-between p-4">
     <div class="flex items-center gap-3">
       <img appDefaultImg imageType="symbol" [src]="stockSummary.id" alt="Stock Image" class="w-11 h-11" />
       <div class="grid">
-        <span class="text-md text-wt-gray-medium">{{ stockSummary.id }}</span>
+        <div class="flex gap-4 text-base text-wt-gray-medium">
+          <span>{{ stockSummary.id }}</span>
+          <span>|</span>
+          <span>{{ stockSummaryType() }}</span>
+        </div>
         <span class="text-lg text-wt-gray-medium-strong">{{ stockSummary.profile.companyName }}</span>
       </div>
     </div>

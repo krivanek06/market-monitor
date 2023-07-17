@@ -16,8 +16,13 @@ import {
   getScreenerInputValueByKey,
 } from '@market-monitor/modules/market-stocks';
 import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared-directives';
-import { DialogServiceModule, RouterManagement, SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
-import { switchMap, tap } from 'rxjs';
+import {
+  DialogServiceModule,
+  DialogServiceUtil,
+  RouterManagement,
+  SCREEN_DIALOGS,
+} from '@market-monitor/shared-utils-client';
+import { catchError, of, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-stock-screener',
@@ -32,6 +37,7 @@ import { switchMap, tap } from 'rxjs';
     MatDialogModule,
     DialogServiceModule,
     MatButtonModule,
+    DialogServiceModule,
   ],
   templateUrl: './stock-screener.component.html',
   styleUrls: ['./stock-screener.component.scss'],
@@ -40,6 +46,7 @@ import { switchMap, tap } from 'rxjs';
 export class StockScreenerComponent implements OnInit, RouterManagement {
   private screenerDefault = 30;
   stocksApiService = inject(StocksApiService);
+  dialogServiceUtil = inject(DialogServiceUtil);
   dialog = inject(MatDialog);
   router = inject(Router);
   route = inject(ActivatedRoute);
@@ -62,7 +69,12 @@ export class StockScreenerComponent implements OnInit, RouterManagement {
           // set loading to false
           tap(() => this.loadingSignal.set(false))
         )
-      )
+      ),
+      catchError(() => {
+        this.dialogServiceUtil.showNotificationBar('Error loading screener results', 'error');
+        this.loadingSignal.set(false);
+        return of([]);
+      })
     )
   );
 

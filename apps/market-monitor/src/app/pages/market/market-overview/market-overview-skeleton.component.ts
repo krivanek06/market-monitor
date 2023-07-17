@@ -16,7 +16,7 @@ import { RangeDirective } from '@market-monitor/shared-directives';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex gap-3 p-2 mb-6 xl:justify-around md:grid-cols-2 max-md:overflow-x-scroll md:grid xl:flex">
-      <div *ngRange="4" class="min-w-[320px] h-[115px] g-skeleton"></div>
+      <div *ngRange="4" class="w-[320px] h-[115px] g-skeleton"></div>
     </div>
 
     <!-- index select -->

@@ -187,12 +187,12 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         opposite: false,
         gridLineWidth: 1,
         minorTickInterval: 'auto',
-        tickPixelInterval: 40,
-        minorGridLineWidth: 0,
+        tickPixelInterval: 30,
+        //minorGridLineWidth: 0, // gray-ish grid lines
         visible: this.showYAxis,
         labels: {
           style: {
-            color: ColorScheme.GRAY_LIGHT_VAR,
+            color: ColorScheme.GRAY_MEDIUM_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
@@ -207,7 +207,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         labels: {
           rotation: 0,
           style: {
-            color: ColorScheme.GRAY_LIGHT_VAR,
+            color: ColorScheme.GRAY_MEDIUM_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
@@ -216,7 +216,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         text: this.chartTitle,
         align: 'left',
         style: {
-          color: ColorScheme.GRAY_LIGHT_VAR,
+          color: ColorScheme.GRAY_MEDIUM_VAR,
           fontSize: '13px',
           fontWeight: 'normal',
         },
