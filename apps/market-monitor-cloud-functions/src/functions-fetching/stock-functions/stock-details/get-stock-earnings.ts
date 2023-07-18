@@ -1,6 +1,6 @@
 import { getStockHistoricalEarnings } from '@market-monitor/api-external';
 import { getDatabaseStockDetailsRef } from '@market-monitor/api-firebase';
-import { StockDetails, StockEarning } from '@market-monitor/api-types';
+import { StockDetailsAPI, StockEarning } from '@market-monitor/api-types';
 import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
@@ -30,7 +30,7 @@ export const getstockearnings = onRequest(async (request, response: Response<Sto
   // reload data
   const stockEarnings = await getStockHistoricalEarnings(symbol);
 
-  const dataToSave: Partial<StockDetails> = {
+  const dataToSave: Partial<StockDetailsAPI> = {
     stockEarnings,
   };
 

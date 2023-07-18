@@ -1,1 +1,80 @@
-<p>stock-rating works!</p>
+<div class="grid gap-2">
+  <div class="flex justify-between p-3 border-b g-border">
+    <div>Overall</div>
+    <div class="flex items-center gap-2">
+      <span>{{ data?.rating }}</span>
+      <div>(<span [appRecommendation]="data?.ratingScore ?? 0"></span>)</div>
+    </div>
+  </div>
+
+  <div class="flex justify-between p-3 border-b g-border">
+    <div>Discounted Cash Flow</div>
+    <ng-container
+      *ngTemplateOutlet="
+        valueTemplate;
+        context: { value: data?.ratingDetailsDCFScoreValue, score: data?.ratingDetailsDCFScore }
+      "
+    ></ng-container>
+  </div>
+
+  <div class="flex justify-between p-3 border-b g-border">
+    <div>Price to Earnings</div>
+    <ng-container
+      *ngTemplateOutlet="
+        valueTemplate;
+        context: { value: data?.ratingDetailsPEScoreValue, score: data?.ratingDetailsPEScore }
+      "
+    ></ng-container>
+  </div>
+
+  <div class="flex justify-between p-3 border-b g-border">
+    <div>Price to Book</div>
+    <ng-container
+      *ngTemplateOutlet="
+        valueTemplate;
+        context: { value: data?.ratingDetailsPBScoreValue, score: data?.ratingDetailsPBScore }
+      "
+    ></ng-container>
+  </div>
+
+  <div class="flex justify-between p-3 border-b g-border">
+    <div>Return on Equity</div>
+    <ng-container
+      *ngTemplateOutlet="
+        valueTemplate;
+        context: { value: data?.ratingDetailsROEScoreValue, score: data?.ratingDetailsROEScore }
+      "
+    ></ng-container>
+  </div>
+
+  <div class="flex justify-between p-3 border-b g-border">
+    <div>Return on Assets</div>
+    <ng-container
+      *ngTemplateOutlet="
+        valueTemplate;
+        context: { value: data?.ratingDetailsROAScoreValue, score: data?.ratingDetailsROAScore }
+      "
+    ></ng-container>
+  </div>
+
+  <div class="flex justify-between p-3 border-b g-border">
+    <div>Debt to Equity</div>
+    <ng-container
+      *ngTemplateOutlet="
+        valueTemplate;
+        context: { value: data?.ratingDetailsDEScoreValue, score: data?.ratingDetailsDEScore }
+      "
+    ></ng-container>
+  </div>
+</div>
+
+<ng-template #valueTemplate let-value="value" let-score="score">
+  <!-- data -->
+  <div *ngIf="value && score" class="flex items-center gap-2">
+    <div>{{ value | largeNumberFormatter : false : true }}</div>
+    <div>(<span [appRecommendation]="score"></span>)</div>
+  </div>
+
+  <!-- no data -->
+  <div *ngIf="!(value && score)">N/A</div>
+</ng-template>

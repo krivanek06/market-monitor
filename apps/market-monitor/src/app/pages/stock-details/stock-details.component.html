@@ -1,1 +1,7 @@
-<p>stock-details works!</p>
+<div class="mb-10 text-lg">loading: {{ loadingSignal() }}</div>
+
+<ng-container *ngIf="stockDetailsSignal() && companyRatingSignal()">
+  <app-general-card>
+    <app-stock-rating-table [data]="companyRatingSignal()"></app-stock-rating-table>
+  </app-general-card>
+</ng-container>

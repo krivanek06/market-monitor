@@ -9,28 +9,60 @@ import {
   getUpgradesDowngrades,
 } from '@market-monitor/api-external';
 import { getDatabaseStockDetailsRef } from '@market-monitor/api-firebase';
-import { StockDetails } from '@market-monitor/api-types';
+import { StockDetails, StockDetailsAPI } from '@market-monitor/api-types';
 import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
+import { getSummary } from '../../../shared';
 
 /**
  * returns symbols details based on provided symbol in query
  */
-export const getstockdetails = onRequest(async (request, response: Response<StockDetails | null>) => {
+export const getstockdetails = onRequest(async (request, response: Response<StockDetails | string>) => {
   const symbolString = request.query.symbol as string;
 
   // throw error if no symbols
   if (!symbolString) {
-    response.send(null);
+    response.status(400).send('No symbol found in query params');
     return;
   }
 
+  // load summary
+  const summary = await getSummary(symbolString);
+
+  // prevent loading data for etf and funds
+  if (summary.profile.isEtf || summary.profile.isFund) {
+    response.status(400).send('Unable to get details for FUND or ETF');
+    return;
+  }
+
+  try {
+    const details = await getStockDetailsAPI(symbolString);
+    const result = {
+      ...summary,
+      ...details,
+      ratio: details.companyOutlook.ratios[0] ?? null,
+      rating: details.companyOutlook.rating[0] ?? null,
+    } satisfies StockDetails;
+
+    response.send(result);
+  } catch (e) {
+    console.log(e);
+    response.status(500).send(`Error happened loading data for ${symbolString}`);
+  }
+});
+
+/**
+ *
+ * @param symbol
+ * @returns data from database or reload them from API and update DB
+ */
+const getStockDetailsAPI = async (symbol: string): Promise<StockDetailsAPI> => {
   // create DB calls
-  const databaseStockDetailsRef = getDatabaseStockDetailsRef(symbolString);
+  const databaseStockDetailsRef = getDatabaseStockDetailsRef(symbol);
 
   // map to data format
-  let databaseStockDetailsData = (await databaseStockDetailsRef.get()).data();
+  const databaseStockDetailsData = (await databaseStockDetailsRef.get()).data();
 
   if (
     // data exists
@@ -40,34 +72,24 @@ export const getstockdetails = onRequest(async (request, response: Response<Stoc
     // data is not older than 7 days
     !isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7))
   ) {
-    response.send(databaseStockDetailsData);
-    return;
+    return databaseStockDetailsData;
   }
 
-  if (
-    // no data in DB
-    !databaseStockDetailsData ||
-    // admin force reload
-    databaseStockDetailsData.reloadData ||
-    // data is older than 7 days
-    isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7))
-  ) {
-    databaseStockDetailsData = await reloadDetails(symbolString);
-  }
+  const fetchedStockDetailsData = await reloadDetails(symbol);
 
   // save data into firestore
-  await databaseStockDetailsRef.set(databaseStockDetailsData);
+  await databaseStockDetailsRef.set(fetchedStockDetailsData);
 
   // return data from DB
-  response.send(databaseStockDetailsData);
-});
+  return fetchedStockDetailsData;
+};
 
 /**
  *
  * @param symbol
  * @returns reloaded all details for symbol from APIs
  */
-const reloadDetails = async (symbol: string): Promise<StockDetails> => {
+const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
   const [
     companyOutlook,
     esgRatingYearly,
@@ -88,7 +110,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetails> => {
     getRecommendationTrends(symbol),
   ]);
 
-  const result: StockDetails = {
+  const result: StockDetailsAPI = {
     companyOutlook,
     esgDataQuarterly: eSGDataQuarterly.at(-1) ?? null,
     esgDataQuarterlyArray: eSGDataQuarterly.slice(-10),

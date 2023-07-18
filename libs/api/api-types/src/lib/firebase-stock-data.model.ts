@@ -1,6 +1,9 @@
+import { ChangeFields } from '@market-monitor/shared-utils-general';
 import {
   CompanyOutlook,
   CompanyProfile,
+  CompanyRating,
+  CompanyRatio,
   ESGDataQuarterly,
   ESGDataRatingYearly,
   PriceChange,
@@ -21,9 +24,9 @@ export type StockSummary = {
   summaryLastUpdate: string;
 };
 
-export type StockDetails = {
+export type StockDetailsAPI = {
   reloadData: boolean;
-  companyOutlook: Omit<CompanyOutlook, 'profile'>;
+  companyOutlook: CompanyOutlook;
   esgDataRatingYearlyArray: ESGDataRatingYearly[];
   esgDataRatingYearly: ESGDataRatingYearly | null;
   esgDataQuarterlyArray: ESGDataQuarterly[];
@@ -38,6 +41,17 @@ export type StockDetails = {
     earningLastUpdate: string;
   };
 };
+
+export type StockDetails = StockSummary &
+  ChangeFields<
+    StockDetailsAPI,
+    {
+      companyOutlook: Omit<CompanyOutlook, 'ratios' | 'rating'>;
+    }
+  > & {
+    ratio: CompanyRatio | null;
+    rating: CompanyRating | null;
+  };
 
 export enum SymbolHistoricalPeriods {
   day = '1d',

@@ -15,7 +15,7 @@ export const appRoutes: Routes = [
         loadChildren: () => import('./pages/search/search.routes').then((m) => m.route),
       },
       {
-        path: `${ROUTES_TOP_LEVEL.STOCK_DETAILS}:symbol`,
+        path: `${ROUTES_TOP_LEVEL.STOCK_DETAILS}/:symbol`,
         loadChildren: () => import('./pages/stock-details/stock-details.routes').then((m) => m.route),
       },
       {

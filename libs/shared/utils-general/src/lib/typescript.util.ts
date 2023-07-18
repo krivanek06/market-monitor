@@ -18,3 +18,5 @@ type Foo = Spread<[{ a: string }, { a?: number }]>;
 export function merge<A extends object[]>(...a: [...A]) {
   return Object.assign({}, ...a) as Spread<A>;
 }
+
+export type ChangeFields<T, R> = Omit<T, keyof R> & R;
