@@ -29,20 +29,20 @@ export type SymbolQuote = {
 
 export type CompanyOutlook = {
   // data exists, however removed TS to access it from summary
-  profile: Profile;
-  metrics: Metrics;
-  ratios: Ratio[];
-  insideTrades: InsideTrade[];
-  KeyExecutive: KeyExecutive[];
-  splitsHistory: SplitsHistory[];
-  stockDividend: StockDividend[];
+  profile: CompanyProfile;
+  metrics: CompanyMetrics;
+  ratios: CompanyRatio[];
+  insideTrades: CompanyInsideTrade[];
+  KeyExecutive: CompanyKeyExecutive[];
+  splitsHistory: CompanySplitsHistory[];
+  stockDividend: CompanyStockDividend[];
   stockNews: News[];
-  rating: Rating[];
-  financialsAnnual: FinancialsReport;
-  financialsQuarter: FinancialsReport;
+  rating: CompanyRating[];
+  financialsAnnual: CompanyFinancialsReport;
+  financialsQuarter: CompanyFinancialsReport;
 };
 
-export type Profile = {
+export type CompanyProfile = {
   symbol: string;
   price: number;
   beta: number;
@@ -81,14 +81,14 @@ export type Profile = {
   sector?: string; // can be empty
 };
 
-export type Metrics = {
+export type CompanyMetrics = {
   dividendYielTTM: number;
   volume: number;
   yearHigh: number;
   yearLow: number;
 };
 
-export type Ratio = {
+export type CompanyRatio = {
   dividendYielTTM: number;
   dividendYielPercentageTTM: number;
   peRatioTTM: number;
@@ -149,7 +149,7 @@ export type Ratio = {
   dividendPerShareTTM: number;
 };
 
-export type InsideTrade = {
+export type CompanyInsideTrade = {
   symbol: string;
   filingDate: string;
   transactionDate: string;
@@ -167,7 +167,7 @@ export type InsideTrade = {
   link: string;
 };
 
-export type KeyExecutive = {
+export type CompanyKeyExecutive = {
   title: string;
   name: string;
   pay?: number;
@@ -177,7 +177,7 @@ export type KeyExecutive = {
   titleSince?: number;
 };
 
-export type SplitsHistory = {
+export type CompanySplitsHistory = {
   date: string;
   label: string;
   numerator: number;
@@ -194,7 +194,7 @@ export type News = {
   url: string;
 };
 
-export type Rating = {
+export type CompanyRating = {
   symbol: string;
   date: string;
   rating: string;
@@ -214,7 +214,7 @@ export type Rating = {
   ratingDetailsPBRecommendation: string;
 };
 
-export type FinancialsReport = {
+export type CompanyFinancialsReport = {
   income: FinancialIncome[];
   balance: FinancialBalance[];
   cash: FinancialCash[];
@@ -553,7 +553,7 @@ export type StockScreenerValues = {
   dividends: StockScreenerArray;
 };
 
-export type StockDividend = {
+export type CompanyStockDividend = {
   date: string;
   label: string;
   adjDividend: number | null;

@@ -1,7 +1,7 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { CalendarDividend, StockDividend } from '@market-monitor/api-types';
+import { CalendarDividend, CompanyStockDividend } from '@market-monitor/api-types';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared-components';
 import { DividendItemComponent } from '../../components';
 
@@ -17,7 +17,7 @@ import { DividendItemComponent } from '../../components';
 export class DividendItemsDialogComponent {
   constructor(
     private dialogRef: MatDialogRef<DividendItemsDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { dividends: (CalendarDividend | StockDividend)[]; showDate: boolean },
+    @Inject(MAT_DIALOG_DATA) public data: { dividends: (CalendarDividend | CompanyStockDividend)[]; showDate: boolean },
     private datePipe: DatePipe
   ) {}
 

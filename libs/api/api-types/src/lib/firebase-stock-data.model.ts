@@ -1,10 +1,10 @@
 import {
   CompanyOutlook,
+  CompanyProfile,
   ESGDataQuarterly,
   ESGDataRatingYearly,
   PriceChange,
   PriceTarget,
-  Profile,
   SectorPeers,
   StockEarning,
   SymbolQuote,
@@ -16,7 +16,7 @@ export type StockSummary = {
   id: string;
   reloadData: boolean;
   quote: SymbolQuote;
-  profile: Profile;
+  profile: CompanyProfile;
   priceChange: PriceChange;
   summaryLastUpdate: string;
 };

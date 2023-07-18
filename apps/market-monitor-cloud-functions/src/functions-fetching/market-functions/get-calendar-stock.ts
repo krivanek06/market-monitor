@@ -14,25 +14,27 @@ import {
   CalendarAssetTypes,
   CalendarStockEarning,
   CalendarStockIPO,
-  StockDividend,
+  CompanyStockDividend,
 } from '@market-monitor/api-types';
 import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
 import { firestore } from 'firebase-admin';
 import { onRequest } from 'firebase-functions/v2/https';
 
-export const getcalendarstockdividends = onRequest(async (request, response: Response<StockDividend[] | string>) => {
-  const year = request.query.year as string;
-  const month = request.query.month as string;
+export const getcalendarstockdividends = onRequest(
+  async (request, response: Response<CompanyStockDividend[] | string>) => {
+    const year = request.query.year as string;
+    const month = request.query.month as string;
 
-  // missing data
-  if (!year || !month) {
-    response.status(400).send('Missing year or month from the request');
+    // missing data
+    if (!year || !month) {
+      response.status(400).send('Missing year or month from the request');
+    }
+
+    const data = await getDataForCalendar<CompanyStockDividend>('dividends', year, month);
+    response.send(data);
   }
-
-  const data = await getDataForCalendar<StockDividend>('dividends', year, month);
-  response.send(data);
-});
+);
 
 export const getcalendarstockearnigns = onRequest(
   async (request, response: Response<CalendarStockEarning[] | string>) => {

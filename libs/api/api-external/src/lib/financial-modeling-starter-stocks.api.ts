@@ -2,6 +2,7 @@
 import {
   AnalystEstimates,
   CompanyOutlook,
+  CompanyProfile,
   ESGDataQuarterly,
   ESGDataRatingYearly,
   Earnings,
@@ -10,7 +11,6 @@ import {
   News,
   PriceChange,
   PriceTarget,
-  Profile,
   SectorPeers,
   StockEarning,
   StockScreenerResults,
@@ -30,10 +30,10 @@ export const getCompanyQuote = async (symbols: string[]): Promise<SymbolQuote[]>
   return response.data;
 };
 
-export const getProfile = async (symbols: string[]): Promise<Profile[]> => {
+export const getProfile = async (symbols: string[]): Promise<CompanyProfile[]> => {
   const symbol = symbols.join(',');
   const url = `${FINANCIAL_MODELING_URL}/v3/profile/${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<Profile[]>(url);
+  const response = await axios.get<CompanyProfile[]>(url);
   return response.data;
 };
 

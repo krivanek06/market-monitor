@@ -38,7 +38,7 @@ export const getstockdetails = onRequest(async (request, response: Response<Stoc
     // no need to reload data
     !databaseStockDetailsData.reloadData &&
     // data is not older than 7 days
-    !isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7)) &&
+    !isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7))
   ) {
     response.send(databaseStockDetailsData);
     return;
