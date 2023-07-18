@@ -2,20 +2,20 @@
 
 <ng-container *ngIf="stockDetailsSignal() as stockDetailsSignal">
   <div class="grid mb-6 lg:grid-cols-3 gap-x-6 gap-y-4">
-    <app-general-card>
+    <app-general-card [showDataInCard]="true">
       <app-stock-rating-table [data]="companyRatingSignal()"></app-stock-rating-table>
     </app-general-card>
 
-    <app-general-card>
+    <app-general-card [showDataInCard]="true">
       <app-stock-recommendation
-        [heightPx]="365"
+        [heightPx]="363"
         [data]="stockDetailsSignal.recommendationTrends"
       ></app-stock-recommendation>
     </app-general-card>
   </div>
 
   <div>
-    <app-general-card>
+    <app-general-card [showDataInCard]="true">
       <app-stock-insider-trades [data]="stockDetailsSignal.companyOutlook.insideTrades"></app-stock-insider-trades>
     </app-general-card>
   </div>

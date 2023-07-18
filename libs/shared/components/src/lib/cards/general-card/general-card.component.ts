@@ -27,7 +27,7 @@ import { MatCardModule } from '@angular/material/card';
       appearance="outlined"
       [class]="additionalClasses"
       [ngClass]="{
-        'shadow-lg': showDataInCard,
+        'shadow-md': showDataInCard,
         'bg-wt-gray-light': showDataInCard,
         'bg-wt-gray-light-strong': !showDataInCard
       }"
