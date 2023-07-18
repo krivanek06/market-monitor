@@ -6,12 +6,11 @@ import {
   getRecommendationTrends,
   getSectorPeersForSymbols,
   getStockHistoricalEarnings,
-  getStockNews,
   getUpgradesDowngrades,
 } from '@market-monitor/api-external';
 import { getDatabaseStockDetailsRef } from '@market-monitor/api-firebase';
 import { StockDetails } from '@market-monitor/api-types';
-import { isBefore, subDays, subHours } from 'date-fns';
+import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 
@@ -40,8 +39,6 @@ export const getstockdetails = onRequest(async (request, response: Response<Stoc
     !databaseStockDetailsData.reloadData &&
     // data is not older than 7 days
     !isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7)) &&
-    // news are not older than 12h
-    !isBefore(new Date(databaseStockDetailsData.lastUpdate.newsLastUpdate), subHours(new Date(), 12))
   ) {
     response.send(databaseStockDetailsData);
     return;
@@ -58,39 +55,12 @@ export const getstockdetails = onRequest(async (request, response: Response<Stoc
     databaseStockDetailsData = await reloadDetails(symbolString);
   }
 
-  // check if new are not older than 12h
-  if (isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subHours(new Date(), 12))) {
-    databaseStockDetailsData = await reloadNews(symbolString, databaseStockDetailsData);
-  }
-
   // save data into firestore
   await databaseStockDetailsRef.set(databaseStockDetailsData);
 
   // return data from DB
   response.send(databaseStockDetailsData);
 });
-
-/**
- *
- * @param symbol
- * @param stockDetails
- * @returns reloaded news for symbol from APIs
- */
-const reloadNews = async (symbol: string, stockDetails: StockDetails): Promise<StockDetails> => {
-  const stockNews = await getStockNews(symbol);
-  const result = {
-    ...stockDetails,
-    stockNews: stockNews.slice(-15),
-    ...{
-      lastUpdate: {
-        ...stockDetails.lastUpdate,
-        newsLastUpdate: new Date().toISOString(),
-      },
-    },
-  };
-
-  return result;
-};
 
 /**
  *
@@ -107,7 +77,6 @@ const reloadDetails = async (symbol: string): Promise<StockDetails> => {
     analystEstimatesEarnings,
     sectorPeers,
     recommendationTrends,
-    stockNews,
   ] = await Promise.all([
     getCompanyOutlook(symbol),
     getEsgRatingYearly(symbol),
@@ -117,7 +86,6 @@ const reloadDetails = async (symbol: string): Promise<StockDetails> => {
     getStockHistoricalEarnings(symbol),
     getSectorPeersForSymbols([symbol]),
     getRecommendationTrends(symbol),
-    getStockNews(symbol),
   ]);
 
   const result: StockDetails = {
@@ -127,7 +95,6 @@ const reloadDetails = async (symbol: string): Promise<StockDetails> => {
     esgDataRatingYearly: esgRatingYearly.at(-1) ?? null,
     esgDataRatingYearlyArray: esgRatingYearly.slice(-10),
     stockEarnings: analystEstimatesEarnings,
-    stockNews: stockNews.slice(-15),
     priceTarget,
     sectorPeers,
     upgradesDowngrades,
@@ -135,7 +102,6 @@ const reloadDetails = async (symbol: string): Promise<StockDetails> => {
     reloadData: false,
     lastUpdate: {
       detailsLastUpdate: new Date().toISOString(),
-      newsLastUpdate: new Date().toISOString(),
       earningLastUpdate: new Date().toISOString(),
     },
   };

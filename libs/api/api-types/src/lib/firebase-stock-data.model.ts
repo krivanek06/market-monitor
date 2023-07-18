@@ -2,7 +2,6 @@ import {
   CompanyOutlook,
   ESGDataQuarterly,
   ESGDataRatingYearly,
-  News,
   PriceChange,
   PriceTarget,
   Profile,
@@ -34,9 +33,7 @@ export type StockDetails = {
   stockEarnings: StockEarning[];
   sectorPeers: SectorPeers[];
   recommendationTrends: RecommendationTrends[];
-  stockNews: News[];
   lastUpdate: {
-    newsLastUpdate: string;
     detailsLastUpdate: string;
     earningLastUpdate: string;
   };
