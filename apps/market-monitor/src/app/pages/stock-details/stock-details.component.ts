@@ -7,6 +7,7 @@ import { StockDetails } from '@market-monitor/api-types';
 import {
   CompanyRatingTable,
   StockRatingTableComponent,
+  StockRecommendationComponent,
   StockTransformService,
 } from '@market-monitor/modules/market-stocks';
 import { GeneralCardComponent } from '@market-monitor/shared-components';
@@ -16,7 +17,13 @@ import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
 @Component({
   selector: 'app-stock-details',
   standalone: true,
-  imports: [CommonModule, GeneralCardComponent, StockRatingTableComponent, DialogServiceModule],
+  imports: [
+    CommonModule,
+    GeneralCardComponent,
+    DialogServiceModule,
+    StockRatingTableComponent,
+    StockRecommendationComponent,
+  ],
   templateUrl: './stock-details.component.html',
   styleUrls: ['./stock-details.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

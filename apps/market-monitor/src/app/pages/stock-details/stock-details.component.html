@@ -1,7 +1,16 @@
 <div class="mb-10 text-lg">loading: {{ loadingSignal() }}</div>
 
-<ng-container *ngIf="stockDetailsSignal() && companyRatingSignal()">
-  <app-general-card>
-    <app-stock-rating-table [data]="companyRatingSignal()"></app-stock-rating-table>
-  </app-general-card>
+<ng-container *ngIf="stockDetailsSignal() as stockDetailsSignal">
+  <div class="grid lg:grid-cols-3 gap-x-6 gap-y-4">
+    <app-general-card>
+      <app-stock-rating-table [data]="companyRatingSignal()"></app-stock-rating-table>
+    </app-general-card>
+
+    <app-general-card>
+      <app-stock-recommendation
+        [heightPx]="365"
+        [data]="stockDetailsSignal.recommendationTrends"
+      ></app-stock-recommendation>
+    </app-general-card>
+  </div>
 </ng-container>
