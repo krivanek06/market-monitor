@@ -6,6 +6,7 @@ import { StocksApiService } from '@market-monitor/api-client';
 import { StockDetails } from '@market-monitor/api-types';
 import {
   CompanyRatingTable,
+  StockInsiderTradesComponent,
   StockRatingTableComponent,
   StockRecommendationComponent,
   StockTransformService,
@@ -19,10 +20,11 @@ import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    GeneralCardComponent,
     DialogServiceModule,
     StockRatingTableComponent,
     StockRecommendationComponent,
+    StockInsiderTradesComponent,
+    GeneralCardComponent,
   ],
   templateUrl: './stock-details.component.html',
   styleUrls: ['./stock-details.component.scss'],

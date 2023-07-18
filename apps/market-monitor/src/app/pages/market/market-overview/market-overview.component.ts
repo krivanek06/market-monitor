@@ -10,7 +10,7 @@ import {
   MarketDataTransformService,
   QuoteSearchBasicComponent,
 } from '@market-monitor/modules/market-general';
-import { GenericChartComponent, ValuePresentationCardComponent } from '@market-monitor/shared-components';
+import { GenericChartComponent, GeneralCardComponent } from '@market-monitor/shared-components';
 import { PercentageIncreaseDirective } from '@market-monitor/shared-directives';
 import { map } from 'rxjs';
 import { MarketOverviewSkeletonComponent } from './market-overview-skeleton.component';
@@ -25,7 +25,7 @@ import { MarketOverviewSkeletonComponent } from './market-overview-skeleton.comp
     QuoteSearchBasicComponent,
     ReactiveFormsModule,
     MatButtonModule,
-    ValuePresentationCardComponent,
+    GeneralCardComponent,
     PercentageIncreaseDirective,
     MarketOverviewSkeletonComponent,
   ],

@@ -1,6 +1,6 @@
 <div class="flex justify-around">
   <!-- price -->
-  <app-value-presentation-card title="Price" additionalClasses="h-full" class="max-sm:w-full min-w-[275px]">
+  <app-general-card [titleCenter]="true" title="Price" additionalClasses="h-full" class="max-sm:w-full min-w-[275px]">
     <div class="flex items-center justify-center gap-3">
       <span>{{ stockSummary.quote.price | currency }}</span>
       <span
@@ -12,15 +12,20 @@
     }"
       ></span>
     </div>
-  </app-value-presentation-card>
+  </app-general-card>
 
   <!-- market cap -->
-  <app-value-presentation-card title="Market Cap." additionalClasses="h-full" class="hidden sm:block min-w-[150px]">
+  <app-general-card
+    [titleCenter]="true"
+    title="Market Cap."
+    additionalClasses="h-full"
+    class="hidden sm:block min-w-[150px]"
+  >
     <div class="text-center">{{ stockSummary.profile.mktCap | largeNumberFormatter }}</div>
-  </app-value-presentation-card>
+  </app-general-card>
 
   <!-- volume -->
-  <!-- <app-value-presentation-card title="Volume" additionalClasses="h-full" class="hidden lg:block">
+  <!-- <app-general-card [titleCenter]="true" title="Volume" additionalClasses="h-full" class="hidden lg:block">
     <div>
       <span>{{ stockSummary.quote.volume | largeNumberFormatter }}</span>
       <span
@@ -31,20 +36,20 @@
     }"
       ></span>
     </div>
-  </app-value-presentation-card> -->
+  </app-general-card> -->
 
   <!-- PE -->
-  <app-value-presentation-card additionalClasses="h-full" title="PE" class="hidden md:block min-w-[100px]">
+  <app-general-card [titleCenter]="true" additionalClasses="h-full" title="PE" class="hidden md:block min-w-[100px]">
     <div class="text-center">{{ stockSummary.quote.pe }}</div>
-  </app-value-presentation-card>
+  </app-general-card>
 
   <!-- EPS -->
-  <app-value-presentation-card additionalClasses="h-full" title="EPS" class="hidden lg:block min-w-[100px]">
+  <app-general-card [titleCenter]="true" additionalClasses="h-full" title="EPS" class="hidden lg:block min-w-[100px]">
     <div class="text-center">{{ stockSummary.quote.eps ?? 'N/A' }}</div>
-  </app-value-presentation-card>
+  </app-general-card>
 
   <!-- Sector -->
-  <app-value-presentation-card title="Sector" additionalClasses="h-full" class="hidden text-center xl:block">
+  <app-general-card [titleCenter]="true" title="Sector" additionalClasses="h-full" class="hidden text-center xl:block">
     <div>{{ stockSummary.profile.sector || 'N/A' }}</div>
-  </app-value-presentation-card>
+  </app-general-card>
 </div>

@@ -38,6 +38,15 @@ table[mat-table] {
     }
   }
 
+  &.not-hover {
+    .mat-mdc-row {
+      cursor: default !important;
+      &:hover {
+        background-color: transparent !important;
+      }
+    }
+  }
+
   th.mat-mdc-header-cell:last-of-type,
   td.mat-mdc-cell:last-of-type,
   td.mat-mdc-footer-cell:last-of-type {
