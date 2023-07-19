@@ -33,7 +33,7 @@ export type CompanyOutlook = {
   metrics: CompanyMetrics;
   ratios: CompanyRatio[];
   insideTrades: CompanyInsideTrade[];
-  KeyExecutive: CompanyKeyExecutive[];
+  keyExecutives: CompanyKeyExecutive[];
   splitsHistory: CompanySplitsHistory[];
   stockDividend: CompanyStockDividend[];
   stockNews: News[];

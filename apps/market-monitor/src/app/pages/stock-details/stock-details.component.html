@@ -55,6 +55,14 @@
     </app-general-card>
   </div>
 
+  <div class="flex flex-col md:flex-row gap-x-6 gap-y-4">
+    <app-general-card title="Key Executives" class="basis-2/5">
+      <app-stock-key-executives-table
+        [data]="stockDetailsSignal.companyOutlook.keyExecutives"
+      ></app-stock-key-executives-table>
+    </app-general-card>
+  </div>
+
   <div class="flex flex-col gap-6 md:flex-row">
     <!-- esg quarterly -->
     <app-general-card title="ESG data" class="md:basis-2/3" additionalClasses="h-full">
