@@ -1,5 +1,6 @@
 import { ChangeFields } from '@market-monitor/shared-utils-general';
 import {
+  CompanyKeyMetrics as CompanyKeyMetricsTTM,
   CompanyOutlook,
   CompanyProfile,
   CompanyRating,
@@ -36,6 +37,7 @@ export type StockDetailsAPI = {
   stockEarnings: StockEarning[];
   sectorPeers: SectorPeers[];
   recommendationTrends: RecommendationTrends[];
+  companyKeyMetricsTTM: CompanyKeyMetricsTTM;
   lastUpdate: {
     detailsLastUpdate: string;
     earningLastUpdate: string;

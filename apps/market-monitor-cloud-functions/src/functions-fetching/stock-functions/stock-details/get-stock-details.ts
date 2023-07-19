@@ -1,4 +1,5 @@
 import {
+  getCompanyKeyMetricsTTM,
   getCompanyOutlook,
   getEsgDataQuarterly,
   getEsgRatingYearly,
@@ -20,6 +21,7 @@ import { getSummary } from '../../../shared';
  */
 export const getstockdetails = onRequest(async (request, response: Response<StockDetails | string>) => {
   const symbolString = request.query.symbol as string;
+  const reload = request.query.reload === 'true' ? true : false;
 
   // throw error if no symbols
   if (!symbolString) {
@@ -27,17 +29,17 @@ export const getstockdetails = onRequest(async (request, response: Response<Stoc
     return;
   }
 
-  // load summary
-  const summary = await getSummary(symbolString);
-
-  // prevent loading data for etf and funds
-  if (summary.profile.isEtf || summary.profile.isFund) {
-    response.status(400).send('Unable to get details for FUND or ETF');
-    return;
-  }
-
   try {
-    const details = await getStockDetailsAPI(symbolString);
+    // load summary
+    const summary = await getSummary(symbolString);
+
+    // prevent loading data for etf and funds
+    if (summary.profile.isEtf || summary.profile.isFund) {
+      response.status(400).send('Unable to get details for FUND or ETF');
+      return;
+    }
+
+    const details = await getStockDetailsAPI(symbolString, reload);
     const result = {
       ...summary,
       ...details,
@@ -48,7 +50,7 @@ export const getstockdetails = onRequest(async (request, response: Response<Stoc
     response.send(result);
   } catch (e) {
     console.log(e);
-    response.status(500).send(`Error happened loading data for ${symbolString}`);
+    response.status(500).send(`Unable to load data for ${symbolString}`);
   }
 });
 
@@ -57,7 +59,7 @@ export const getstockdetails = onRequest(async (request, response: Response<Stoc
  * @param symbol
  * @returns data from database or reload them from API and update DB
  */
-const getStockDetailsAPI = async (symbol: string): Promise<StockDetailsAPI> => {
+const getStockDetailsAPI = async (symbol: string, reload: boolean = false): Promise<StockDetailsAPI> => {
   // create DB calls
   const databaseStockDetailsRef = getDatabaseStockDetailsRef(symbol);
 
@@ -67,6 +69,8 @@ const getStockDetailsAPI = async (symbol: string): Promise<StockDetailsAPI> => {
   if (
     // data exists
     databaseStockDetailsData &&
+    // no manual reload
+    !reload &&
     // no need to reload data
     !databaseStockDetailsData.reloadData &&
     // data is not older than 7 days
@@ -99,6 +103,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
     analystEstimatesEarnings,
     sectorPeers,
     recommendationTrends,
+    companyKeyMetricsTTM,
   ] = await Promise.all([
     getCompanyOutlook(symbol),
     getEsgRatingYearly(symbol),
@@ -108,6 +113,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
     getStockHistoricalEarnings(symbol),
     getSectorPeersForSymbols([symbol]),
     getRecommendationTrends(symbol),
+    getCompanyKeyMetricsTTM(symbol),
   ]);
 
   const result: StockDetailsAPI = {
@@ -121,6 +127,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
     sectorPeers,
     upgradesDowngrades,
     recommendationTrends,
+    companyKeyMetricsTTM,
     reloadData: false,
     lastUpdate: {
       detailsLastUpdate: new Date().toISOString(),

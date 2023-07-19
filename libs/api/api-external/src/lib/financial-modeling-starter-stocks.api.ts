@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import {
   AnalystEstimates,
+  CompanyKeyMetrics,
   CompanyOutlook,
   CompanyProfile,
   ESGDataQuarterly,
@@ -233,6 +234,12 @@ export const getAnalystEstimates = async (
   const url = `${FINANCIAL_MODELING_URL}/v4/analyst-estimates/${symbol}?period=${period}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<AnalystEstimates[]>(url);
   return response.data;
+};
+
+export const getCompanyKeyMetricsTTM = async (symbol: string): Promise<CompanyKeyMetrics> => {
+  const url = `${FINANCIAL_MODELING_URL}/v3/key-metrics-ttm/${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<CompanyKeyMetrics[]>(url);
+  return response.data[0];
 };
 
 /**

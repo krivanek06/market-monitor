@@ -19,6 +19,9 @@ export const getSummary = async (symbol: string): Promise<StockSummary> => {
  * check symbols against database if data not older than 3 min return, else fetch new data
  * and persist in DB
  *
+ * return empty array if symbols does not exists in exchange
+ * returns data for ETF, funds too
+ *
  * @param symbolsArray
  * @returns
  */
