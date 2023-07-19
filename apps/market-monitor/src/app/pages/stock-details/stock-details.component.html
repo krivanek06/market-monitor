@@ -1,6 +1,18 @@
 <div class="mb-10 text-lg">loading: {{ loadingSignal() }}</div>
 
 <div class="grid gap-y-6" *ngIf="stockDetailsSignal() as stockDetailsSignal">
+  <div *ngIf="estimationChartDataSignal() as estimationChartDataSignal" class="grid grid-cols-2 gap-x-6 gap-y-4">
+    <!-- earnings -->
+    <app-general-card title="Earnings">
+      <app-earnings-estimation-chart [data]="estimationChartDataSignal.earnings"></app-earnings-estimation-chart>
+    </app-general-card>
+
+    <!-- revenue est. -->
+    <app-general-card title="Revenue">
+      <app-revenue-estimation-chart [data]="estimationChartDataSignal.revenue"></app-revenue-estimation-chart>
+    </app-general-card>
+  </div>
+
   <div class="grid lg:grid-cols-3 gap-x-6 gap-y-4">
     <!-- rating table -->
     <app-general-card title="Rating">

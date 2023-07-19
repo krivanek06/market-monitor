@@ -5,6 +5,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { StockDetails } from '@market-monitor/api-types';
 import {
+  EarningsEstimationChartComponent,
+  RevenueEstimationChartComponent,
+} from '@market-monitor/modules/market-earnings';
+import {
   CompanyRatingTable,
   StockEsgDataTableComponent,
   StockInsiderTradesComponent,
@@ -13,7 +17,7 @@ import {
   StockTransformService,
 } from '@market-monitor/modules/market-stocks';
 import { GeneralCardComponent, GenericChartComponent } from '@market-monitor/shared-components';
-import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared-utils-client';
+import { DialogServiceModule, DialogServiceUtil, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -28,6 +32,8 @@ import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
     StockRecommendationComponent,
     StockInsiderTradesComponent,
     StockEsgDataTableComponent,
+    EarningsEstimationChartComponent,
+    RevenueEstimationChartComponent,
   ],
   templateUrl: './stock-details.component.html',
   styleUrls: ['./stock-details.component.scss'],
@@ -42,6 +48,9 @@ export class StockDetailsComponent {
 
   stockDetailsSignal = signal<StockDetails | null>(null);
   companyRatingSignal = signal<CompanyRatingTable | null>(null);
+  estimationChartDataSignal = signal<{ earnings: EstimatedChartDataType[]; revenue: EstimatedChartDataType[] } | null>(
+    null
+  );
   loadingSignal = signal(true);
 
   constructor() {
@@ -54,12 +63,20 @@ export class StockDetailsComponent {
           }
         }),
         filter((symbol): symbol is string => !!symbol),
+        // display loading
         tap(() => this.loadingSignal.set(true)),
         switchMap((symbol) =>
           this.stocksApiService.getStockDetails(symbol).pipe(
             tap((data) => {
+              // save details
               this.stockDetailsSignal.set(data);
+              //  modify data for rating
               this.companyRatingSignal.set(this.stockTransformService.createCompanyRatingTable(data));
+
+              // modify data for estimation chart
+              this.estimationChartDataSignal.set(this.stockTransformService.createEstimationData(data));
+
+              // remove loading
               this.loadingSignal.set(false);
             }),
             catchError((err) => {

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { StockDetails } from '@market-monitor/api-types';
+import { EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import { CompanyRatingTable } from '../models';
 
 @Injectable({
@@ -34,5 +35,24 @@ export class StockTransformService {
     } satisfies CompanyRatingTable;
 
     return result;
+  }
+
+  createEstimationData(stockDetails: StockDetails): {
+    earnings: EstimatedChartDataType[];
+    revenue: EstimatedChartDataType[];
+  } {
+    const earnings = stockDetails.stockEarnings.map((earning) => ({
+      date: earning.date,
+      valueEst: earning.epsEstimated,
+      valueActual: earning.eps,
+    }));
+
+    const revenue = stockDetails.stockEarnings.map((earning) => ({
+      date: earning.date,
+      valueEst: earning.revenueEstimated,
+      valueActual: earning.revenue,
+    }));
+
+    return { earnings, revenue };
   }
 }
