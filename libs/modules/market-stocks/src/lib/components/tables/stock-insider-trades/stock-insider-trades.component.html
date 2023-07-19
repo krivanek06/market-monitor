@@ -29,7 +29,7 @@
         [ngClass]="{
         'text-wt-success': row.transactionType === 'G-Gift',
         'text-wt-danger': row.transactionType === 'S-Sale',
-        'text-wt-gray-dark': row.transactionType === 'M-Exempt',
+        'text-wt-gray-dark': row.transactionType !== 'G-Gift' && row.transactionType !== 'S-Sale',
       }"
       >
         {{ row.transactionType }}

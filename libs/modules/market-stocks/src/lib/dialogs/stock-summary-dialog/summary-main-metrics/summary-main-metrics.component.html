@@ -1,6 +1,13 @@
 <div class="flex justify-around">
   <!-- price -->
-  <app-general-card [titleCenter]="true" title="Price" additionalClasses="h-full" class="max-sm:w-full min-w-[275px]">
+  <app-general-card
+    [showDataInCard]="false"
+    [titleCenter]="true"
+    titleScale="large"
+    title="Price"
+    additionalClasses="h-full"
+    class="max-sm:w-full min-w-[275px]"
+  >
     <div class="flex items-center justify-center gap-3">
       <span>{{ stockSummary.quote.price | currency }}</span>
       <span
@@ -16,7 +23,9 @@
 
   <!-- market cap -->
   <app-general-card
+    [showDataInCard]="false"
     [titleCenter]="true"
+    titleScale="large"
     title="Market Cap."
     additionalClasses="h-full"
     class="hidden sm:block min-w-[150px]"
@@ -39,17 +48,38 @@
   </app-general-card> -->
 
   <!-- PE -->
-  <app-general-card [titleCenter]="true" additionalClasses="h-full" title="PE" class="hidden md:block min-w-[100px]">
+  <app-general-card
+    [showDataInCard]="false"
+    [titleCenter]="true"
+    titleScale="large"
+    additionalClasses="h-full"
+    title="PE"
+    class="hidden md:block min-w-[100px]"
+  >
     <div class="text-center">{{ stockSummary.quote.pe }}</div>
   </app-general-card>
 
   <!-- EPS -->
-  <app-general-card [titleCenter]="true" additionalClasses="h-full" title="EPS" class="hidden lg:block min-w-[100px]">
+  <app-general-card
+    [showDataInCard]="false"
+    [titleCenter]="true"
+    titleScale="large"
+    additionalClasses="h-full"
+    title="EPS"
+    class="hidden lg:block min-w-[100px]"
+  >
     <div class="text-center">{{ stockSummary.quote.eps ?? 'N/A' }}</div>
   </app-general-card>
 
   <!-- Sector -->
-  <app-general-card [titleCenter]="true" title="Sector" additionalClasses="h-full" class="hidden text-center xl:block">
+  <app-general-card
+    [showDataInCard]="false"
+    [titleCenter]="true"
+    titleScale="large"
+    title="Sector"
+    additionalClasses="h-full"
+    class="hidden text-center xl:block"
+  >
     <div>{{ stockSummary.profile.sector || 'N/A' }}</div>
   </app-general-card>
 </div>

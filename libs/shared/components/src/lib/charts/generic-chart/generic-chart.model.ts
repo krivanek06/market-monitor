@@ -11,14 +11,18 @@ export enum ChartType {
   histogram = 'histogram',
   packedbubble = 'packedbubble',
 }
+
+export type ChartTypeKeys = keyof typeof ChartType;
+
 export interface GenericChartSeries {
   type?: ChartType;
   name?: string;
   showInNavigator?: boolean;
+  colorByPoint?: boolean;
   /**
    * example: [value, value, ...] or [[timestamp, value], [timestamp, value], ...]
    */
-  data: (number | null)[] | [number | null, number | null][];
+  data: (number | null)[] | [number | null, number | null][] | { name: string; y: number; color?: string }[];
   color?:
     | string
     | {
@@ -28,6 +32,8 @@ export interface GenericChartSeries {
   additionalData?: {
     id?: string;
     showCurrencySign?: boolean;
+    showPercentageSign?: boolean;
+    colorTooltipDefault?: boolean;
   };
 }
 

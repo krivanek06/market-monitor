@@ -39,12 +39,13 @@ export const getstockdetails = onRequest(async (request, response: Response<Stoc
       return;
     }
 
+    // data will be always present, if symbol does not exist, it already failed on summary
     const details = await getStockDetailsAPI(symbolString, reload);
     const result = {
       ...summary,
       ...details,
-      ratio: details.companyOutlook.ratios[0] ?? null,
-      rating: details.companyOutlook.rating[0] ?? null,
+      ratio: details.companyOutlook.ratios[0],
+      rating: details.companyOutlook.rating[0],
     } satisfies StockDetails;
 
     response.send(result);

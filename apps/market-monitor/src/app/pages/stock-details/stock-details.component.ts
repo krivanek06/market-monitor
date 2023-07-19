@@ -11,7 +11,7 @@ import {
   StockRecommendationComponent,
   StockTransformService,
 } from '@market-monitor/modules/market-stocks';
-import { GeneralCardComponent } from '@market-monitor/shared-components';
+import { GeneralCardComponent, GenericChartComponent } from '@market-monitor/shared-components';
 import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared-utils-client';
 import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
 
@@ -21,6 +21,7 @@ import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
   imports: [
     CommonModule,
     DialogServiceModule,
+    GenericChartComponent,
     StockRatingTableComponent,
     StockRecommendationComponent,
     StockInsiderTradesComponent,

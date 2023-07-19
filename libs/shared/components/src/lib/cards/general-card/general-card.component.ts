@@ -34,9 +34,18 @@ import { MatCardModule } from '@angular/material/card';
     >
       <!-- title -->
       <mat-card-header *ngIf="title" [ngClass]="{ 'justify-center': titleCenter }">
-        <mat-card-title class="mb-0">
+        <mat-card-title class="mb-2">
           <img *ngIf="titleImgUrl" appDefaultImg [src]="titleImgUrl" />
-          <h3 class="mb-0 text-xl xl:text-2xl text-wt-primary">{{ title }}</h3>
+          <h3
+            class="mb-0 text-wt-primary"
+            [ngClass]="{
+              'text-xl': titleScale === 'large',
+              'text-base': titleScale === 'medium',
+              'text-sm': titleScale === 'small'
+            }"
+          >
+            {{ title }}
+          </h3>
         </mat-card-title>
       </mat-card-header>
 
@@ -53,7 +62,8 @@ import { MatCardModule } from '@angular/material/card';
 export class GeneralCardComponent {
   @Input() title: string | null = null;
   @Input() titleImgUrl?: string;
-  @Input() showDataInCard = false;
+  @Input() titleScale: 'small' | 'medium' | 'large' = 'medium';
+  @Input() showDataInCard = true;
   @Input() additionalClasses = '';
   @Input() titleCenter = false;
 }

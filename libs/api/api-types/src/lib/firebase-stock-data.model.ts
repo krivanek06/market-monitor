@@ -51,8 +51,8 @@ export type StockDetails = StockSummary &
       companyOutlook: Omit<CompanyOutlook, 'ratios' | 'rating'>;
     }
   > & {
-    ratio: CompanyRatio | null;
-    rating: CompanyRating | null;
+    ratio: CompanyRatio;
+    rating: CompanyRating;
   };
 
 export enum SymbolHistoricalPeriods {
