@@ -32,7 +32,7 @@
   <!-- showing border if not last line on the bottom -->
   <div
     *ngFor="let date of dateRangeSignal(); let i = index"
-    class="p-2 g-border"
+    class="p-2 g-border-bottom"
     [style.min-height.px]="minHeight"
     [ngClass]="{
       'border-r': i % 5 !== 4,

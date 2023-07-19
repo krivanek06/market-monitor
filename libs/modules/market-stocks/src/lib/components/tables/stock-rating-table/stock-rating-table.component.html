@@ -1,5 +1,5 @@
 <div class="grid gap-2">
-  <div class="flex justify-between p-3 g-border">
+  <div class="flex justify-between p-3 g-border-bottom">
     <div>Overall</div>
     <div class="flex items-center gap-2">
       <span>{{ data?.rating }}</span>
@@ -7,7 +7,7 @@
     </div>
   </div>
 
-  <div class="flex justify-between p-3 g-border">
+  <div class="flex justify-between p-3 g-border-bottom">
     <div>Discounted Cash Flow</div>
     <div class="flex items-center gap-2">
       <div>{{ data?.ratingDetailsDCFScoreValue | largeNumberFormatter : false : true }}</div>
@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <div class="flex justify-between p-3 g-border">
+  <div class="flex justify-between p-3 g-border-bottom">
     <div>Price to Earnings</div>
     <div class="flex items-center gap-2">
       <div>{{ data?.ratingDetailsPEScoreValue | largeNumberFormatter : false : false }}</div>
@@ -23,7 +23,7 @@
     </div>
   </div>
 
-  <div class="flex justify-between p-3 g-border">
+  <div class="flex justify-between p-3 g-border-bottom">
     <div>Price to Book</div>
     <div class="flex items-center gap-2">
       <div>{{ data?.ratingDetailsPBScoreValue | largeNumberFormatter : false : false }}</div>
@@ -31,7 +31,7 @@
     </div>
   </div>
 
-  <div class="flex justify-between p-3 g-border">
+  <div class="flex justify-between p-3 g-border-bottom">
     <div>Return on Equity</div>
     <div class="flex items-center gap-2">
       <div>{{ data?.ratingDetailsROEScoreValue | largeNumberFormatter : true : false }}</div>
@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <div class="flex justify-between p-3 g-border">
+  <div class="flex justify-between p-3 g-border-bottom">
     <div>Return on Assets</div>
     <div class="flex items-center gap-2">
       <div>{{ data?.ratingDetailsROAScoreValue | largeNumberFormatter : true : false }}</div>

@@ -10,7 +10,8 @@ import {
   getUpgradesDowngrades,
 } from '@market-monitor/api-external';
 import { getDatabaseStockDetailsRef } from '@market-monitor/api-firebase';
-import { StockDetails, StockDetailsAPI } from '@market-monitor/api-types';
+import { CompanyOutlook, StockDetails, StockDetailsAPI, StockSummary } from '@market-monitor/api-types';
+import { ForcefullyOmit } from '@market-monitor/shared-utils-general';
 import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
@@ -41,14 +42,9 @@ export const getstockdetails = onRequest(async (request, response: Response<Stoc
 
     // data will be always present, if symbol does not exist, it already failed on summary
     const details = await getStockDetailsAPI(symbolString, reload);
-    const result = {
-      ...summary,
-      ...details,
-      ratio: details.companyOutlook.ratios[0],
-      rating: details.companyOutlook.rating[0],
-    } satisfies StockDetails;
+    const formattedDetails = modifyDetailsAPItoStockDetails(summary, details);
 
-    response.send(result);
+    response.send(formattedDetails);
   } catch (e) {
     console.log(e);
     response.status(500).send(`Unable to load data for ${symbolString}`);
@@ -89,6 +85,33 @@ const getStockDetailsAPI = async (symbol: string, reload: boolean = false): Prom
   return fetchedStockDetailsData;
 };
 
+const modifyDetailsAPItoStockDetails = (summary: StockSummary, details: StockDetailsAPI): StockDetails => {
+  const ratio = details.companyOutlook.ratios[0];
+  const rating = details.companyOutlook.rating[0];
+  const companyOutlook = details.companyOutlook as ForcefullyOmit<CompanyOutlook, 'ratios' | 'rating'>;
+
+  const result = {
+    ...summary,
+    reloadData: false,
+    companyOutlook,
+    ratio,
+    rating,
+    upgradesDowngrades: details.upgradesDowngrades,
+    priceTarget: details.priceTarget,
+    stockEarnings: details.stockEarnings,
+    sectorPeers: details.sectorPeers,
+    recommendationTrends: details.recommendationTrends,
+    companyKeyMetricsTTM: details.companyKeyMetricsTTM,
+    esgDataQuarterly: details.esgDataQuarterly,
+    esgDataQuarterlyArray: details.esgDataQuarterlyArray,
+    esgDataRatingYearly: details.esgDataRatingYearly,
+    esgDataRatingYearlyArray: details.esgDataRatingYearlyArray,
+    lastUpdate: details.lastUpdate,
+  } satisfies StockDetails;
+
+  return result;
+};
+
 /**
  *
  * @param symbol
@@ -119,10 +142,10 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
 
   const result: StockDetailsAPI = {
     companyOutlook,
-    esgDataQuarterly: eSGDataQuarterly.at(-1) ?? null,
-    esgDataQuarterlyArray: eSGDataQuarterly.slice(-10),
-    esgDataRatingYearly: esgRatingYearly.at(-1) ?? null,
-    esgDataRatingYearlyArray: esgRatingYearly.slice(-10),
+    esgDataQuarterlyArray: eSGDataQuarterly.slice(0, 10),
+    esgDataQuarterly: eSGDataQuarterly[0],
+    esgDataRatingYearlyArray: esgRatingYearly.slice(0, 10),
+    esgDataRatingYearly: esgRatingYearly[0],
     stockEarnings: analystEstimatesEarnings,
     priceTarget,
     sectorPeers,

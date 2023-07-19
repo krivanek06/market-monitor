@@ -1,4 +1,4 @@
-import { ChangeFields } from '@market-monitor/shared-utils-general';
+import { ChangeFields, ForcefullyOmit } from '@market-monitor/shared-utils-general';
 import {
   CompanyKeyMetrics as CompanyKeyMetricsTTM,
   CompanyOutlook,
@@ -48,7 +48,7 @@ export type StockDetails = StockSummary &
   ChangeFields<
     StockDetailsAPI,
     {
-      companyOutlook: Omit<CompanyOutlook, 'ratios' | 'rating'>;
+      companyOutlook: ForcefullyOmit<CompanyOutlook, 'ratios' | 'rating'>;
     }
   > & {
     ratio: CompanyRatio;

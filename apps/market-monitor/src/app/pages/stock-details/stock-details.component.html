@@ -1,7 +1,7 @@
 <div class="mb-10 text-lg">loading: {{ loadingSignal() }}</div>
 
-<ng-container *ngIf="stockDetailsSignal() as stockDetailsSignal">
-  <div class="grid mb-6 lg:grid-cols-3 gap-x-6 gap-y-4">
+<div class="grid gap-y-6" *ngIf="stockDetailsSignal() as stockDetailsSignal">
+  <div class="grid lg:grid-cols-3 gap-x-6 gap-y-4">
     <!-- rating table -->
     <app-general-card title="Rating">
       <app-stock-rating-table [data]="companyRatingSignal()"></app-stock-rating-table>
@@ -43,9 +43,33 @@
     </app-general-card>
   </div>
 
+  <div class="flex flex-col gap-6 md:flex-row">
+    <!-- esg quarterly -->
+    <app-general-card title="ESG data" class="md:basis-2/3" additionalClasses="h-full">
+      <app-stock-esg-data-table
+        [data]="stockDetailsSignal.esgDataQuarterlyArray | slice : 0 : 8"
+      ></app-stock-esg-data-table>
+    </app-general-card>
+
+    <!-- esg yearly -->
+    <app-general-card title="ESG data" class="md:basis-1/3">
+      <div
+        *ngFor="let data of stockDetailsSignal.esgDataRatingYearlyArray; let last = last"
+        class="flex justify-between p-3"
+        [ngClass]="{ 'g-border-bottom': !last }"
+      >
+        <div>{{ data.year }}</div>
+        <div class="space-x-2">
+          <span class="text-wt-gray-medium">{{ data.industryRank }}</span>
+          <span> ({{ data.ESGRiskRating }})</span>
+        </div>
+      </div>
+    </app-general-card>
+  </div>
+
   <div>
     <app-general-card title="Insider trades">
       <app-stock-insider-trades [data]="stockDetailsSignal.companyOutlook.insideTrades"></app-stock-insider-trades>
     </app-general-card>
   </div>
-</ng-container>
+</div>
