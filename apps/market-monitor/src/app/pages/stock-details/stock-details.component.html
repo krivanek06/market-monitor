@@ -56,10 +56,25 @@
   </div>
 
   <div class="flex flex-col md:flex-row gap-x-6 gap-y-4">
+    <!-- key executives -->
     <app-general-card title="Key Executives" class="basis-2/5">
       <app-stock-key-executives-table
         [data]="stockDetailsSignal.companyOutlook.keyExecutives"
       ></app-stock-key-executives-table>
+    </app-general-card>
+  </div>
+
+  <div class="flex flex-col md:flex-row gap-x-6 gap-y-4">
+    <!-- upgrades & downgrades -->
+    <app-general-card title="Upgrades & Downgrades" class="basis-2/3">
+      <app-stock-upgrades-downgrades-table
+        [data]="stockDetailsSignal.upgradesDowngrades | slice : 0 : 10"
+        [currentPrice]="stockDetailsSignal.quote.price"
+      ></app-stock-upgrades-downgrades-table>
+    </app-general-card>
+
+    <app-general-card title="TODO" class="basis-1/3">
+      <div>TODO</div>
     </app-general-card>
   </div>
 

@@ -16,6 +16,7 @@ import {
   StockRatingTableComponent,
   StockRecommendationComponent,
   StockTransformService,
+  StockUpgradesDowngradesTableComponent,
 } from '@market-monitor/modules/market-stocks';
 import { GeneralCardComponent, GenericChartComponent } from '@market-monitor/shared-components';
 import { DialogServiceModule, DialogServiceUtil, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
@@ -36,6 +37,7 @@ import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
     EarningsEstimationChartComponent,
     RevenueEstimationChartComponent,
     StockKeyExecutivesTableComponent,
+    StockUpgradesDowngradesTableComponent,
   ],
   templateUrl: './stock-details.component.html',
   styleUrls: ['./stock-details.component.scss'],

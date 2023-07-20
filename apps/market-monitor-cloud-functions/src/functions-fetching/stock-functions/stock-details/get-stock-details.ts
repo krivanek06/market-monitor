@@ -149,7 +149,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
     stockEarnings: analystEstimatesEarnings,
     priceTarget,
     sectorPeers,
-    upgradesDowngrades,
+    upgradesDowngrades: upgradesDowngrades.slice(0, 15),
     recommendationTrends,
     companyKeyMetricsTTM,
     reloadData: false,
