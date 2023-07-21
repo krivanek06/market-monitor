@@ -1,16 +1,36 @@
 <div class="mb-10 text-lg">loading: {{ loadingSignal() }}</div>
 
 <div class="grid gap-y-6" *ngIf="stockDetailsSignal() as stockDetailsSignal">
-  <div *ngIf="estimationChartDataSignal() as estimationChartDataSignal" class="grid grid-cols-2 gap-x-6 gap-y-4">
+  <div class="grid gap-6 lg:grid-cols-3">
     <!-- earnings -->
-    <app-general-card title="Earnings">
-      <app-earnings-estimation-chart [data]="estimationChartDataSignal.earnings"></app-earnings-estimation-chart>
+    <app-general-card class="lg:col-span-2" title="Earnings">
+      <app-earnings-estimation-chart
+        *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
+        [data]="estimationChartDataSignal.earnings"
+        [heightPx]="400"
+      ></app-earnings-estimation-chart>
     </app-general-card>
 
-    <!-- revenue est. -->
-    <app-general-card title="Revenue">
-      <app-revenue-estimation-chart [data]="estimationChartDataSignal.revenue"></app-revenue-estimation-chart>
+    <!-- recommendation -->
+    <app-general-card title="Recommendation">
+      <app-stock-recommendation
+        [heightPx]="400"
+        [data]="stockDetailsSignal.recommendationTrends"
+      ></app-stock-recommendation>
     </app-general-card>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <!-- revenue est. -->
+    <app-general-card class="lg:col-span-2" title="Revenue">
+      <app-revenue-estimation-chart
+        *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
+        class
+        [data]="estimationChartDataSignal.revenue"
+      ></app-revenue-estimation-chart>
+    </app-general-card>
+
+    <app-general-card title="TODO"> TODO </app-general-card>
   </div>
 
   <div class="grid lg:grid-cols-3 gap-x-6 gap-y-4">
@@ -19,12 +39,31 @@
       <app-stock-rating-table [data]="companyRatingSignal()"></app-stock-rating-table>
     </app-general-card>
 
-    <!-- recommendation -->
-    <app-general-card title="Recommendation">
-      <app-stock-recommendation
+    <!-- profit margin -->
+    <app-general-card title="Profit Margin">
+      <app-generic-chart
+        chartType="column"
         [heightPx]="363"
-        [data]="stockDetailsSignal.recommendationTrends"
-      ></app-stock-recommendation>
+        [showTooltipHeader]="false"
+        [series]="[
+        {
+          colorByPoint: true,
+          additionalData: {
+            colorTooltipDefault: true,
+            showPercentageSign: true,
+          },
+          data: [
+            { name: 'Operating Profit', y: stockDetailsSignal.ratio.operatingProfitMarginTTM * 100 },
+            { name: 'Gross Profit', y: stockDetailsSignal.ratio.grossProfitMarginTTM * 100 },
+            { name: 'Pretax Profit', y: stockDetailsSignal.ratio.pretaxProfitMarginTTM * 100 },
+            { name: 'Net Profit', y: stockDetailsSignal.ratio.netProfitMarginTTM * 100 },
+            { name: 'Effective Tax Rate', y: stockDetailsSignal.ratio.effectiveTaxRateTTM * 100 },
+          ]
+        }
+      ]"
+        [showDataLabel]="true"
+      >
+      </app-generic-chart>
     </app-general-card>
 
     <!-- return on something -->
@@ -64,13 +103,27 @@
     </app-general-card>
   </div>
 
-  <div class="flex flex-col md:flex-row gap-x-6 gap-y-4">
+  <div class="grid gap-6 lg:grid-cols-3">
     <!-- upgrades & downgrades -->
-    <app-general-card title="Upgrades & Downgrades" class="basis-2/3">
+    <app-general-card title="Upgrades & Downgrades" class="lg:col-span-2">
       <app-stock-upgrades-downgrades-table
         [data]="stockDetailsSignal.upgradesDowngrades | slice : 0 : 10"
         [currentPrice]="stockDetailsSignal.quote.price"
       ></app-stock-upgrades-downgrades-table>
+    </app-general-card>
+
+    <app-general-card title="TODO" class="basis-1/3">
+      <div>TODO</div>
+    </app-general-card>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-2">
+    <!-- price target -->
+    <app-general-card title="Price Target">
+      <app-stock-price-target-table
+        [data]="stockDetailsSignal.priceTarget | slice : 0 : 10"
+        [currentPrice]="stockDetailsSignal.quote.price"
+      ></app-stock-price-target-table>
     </app-general-card>
 
     <app-general-card title="TODO" class="basis-1/3">

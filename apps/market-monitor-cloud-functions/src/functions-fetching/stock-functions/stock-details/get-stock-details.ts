@@ -89,6 +89,10 @@ const modifyDetailsAPItoStockDetails = (summary: StockSummary, details: StockDet
   const ratio = details.companyOutlook.ratios[0];
   const rating = details.companyOutlook.rating[0];
   const companyOutlook = details.companyOutlook as ForcefullyOmit<CompanyOutlook, 'ratios' | 'rating'>;
+  const sheetIncomeYearly = details.companyOutlook.financialsAnnual.income[0];
+  const sheetBalanceQuarter = details.companyOutlook.financialsQuarter.balance[0];
+  const sheetCashYearly = details.companyOutlook.financialsAnnual.cash[0];
+  const sheetCashflowQuarter = details.companyOutlook.financialsQuarter.cash[0];
 
   const result = {
     ...summary,
@@ -100,13 +104,31 @@ const modifyDetailsAPItoStockDetails = (summary: StockSummary, details: StockDet
     priceTarget: details.priceTarget,
     stockEarnings: details.stockEarnings,
     sectorPeers: details.sectorPeers,
-    recommendationTrends: details.recommendationTrends,
+    recommendationTrends: details.recommendationTrends.slice().reverse(),
     companyKeyMetricsTTM: details.companyKeyMetricsTTM,
     esgDataQuarterly: details.esgDataQuarterly,
     esgDataQuarterlyArray: details.esgDataQuarterlyArray,
     esgDataRatingYearly: details.esgDataRatingYearly,
     esgDataRatingYearlyArray: details.esgDataRatingYearlyArray,
     lastUpdate: details.lastUpdate,
+    additionalFinancialData: {
+      cashOnHand: sheetBalanceQuarter.cashAndShortTermInvestments,
+      costOfRevenue: sheetIncomeYearly.costOfRevenue,
+      freeCashFlow: sheetCashflowQuarter.freeCashFlow,
+      netIncome: sheetIncomeYearly.netIncome,
+      revenue: sheetIncomeYearly.revenue,
+      operatingCashFlow: sheetCashflowQuarter.operatingCashFlow,
+      totalAssets: sheetBalanceQuarter.totalAssets,
+      totalDebt: sheetBalanceQuarter.totalDebt,
+      stockBasedCompensation: sheetCashflowQuarter.stockBasedCompensation,
+      dividends: {
+        dividendsPaid: sheetCashYearly.dividendsPaid,
+        dividendPerShareTTM: ratio.dividendPerShareTTM,
+        dividendYielPercentageTTM: ratio.dividendYielPercentageTTM,
+        dividendYielTTM: ratio.dividendYielTTM,
+        payoutRatioTTM: ratio.payoutRatioTTM,
+      },
+    },
   } satisfies StockDetails;
 
   return result;
@@ -147,7 +169,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
     esgDataRatingYearlyArray: esgRatingYearly.slice(0, 10),
     esgDataRatingYearly: esgRatingYearly[0],
     stockEarnings: analystEstimatesEarnings,
-    priceTarget,
+    priceTarget: priceTarget.slice(0, 15),
     sectorPeers,
     upgradesDowngrades: upgradesDowngrades.slice(0, 15),
     recommendationTrends,

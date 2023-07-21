@@ -176,7 +176,7 @@ export const getUpgradesDowngrades = async (symbol: string): Promise<UpgradesDow
  }]
  */
 export const getPriceTarget = async (symbol: string): Promise<PriceTarget[]> => {
-  const url = `${FINANCIAL_MODELING_URL}/v4/price-target?symbol=${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
+  const url = `${FINANCIAL_MODELING_URL}/v4/price-target?symbol=${symbol}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<PriceTarget[]>(url);
   return response.data;
 };

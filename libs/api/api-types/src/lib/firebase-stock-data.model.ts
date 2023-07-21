@@ -53,7 +53,27 @@ export type StockDetails = StockSummary &
   > & {
     ratio: CompanyRatio;
     rating: CompanyRating;
+    additionalFinancialData: {
+      revenue: number;
+      costOfRevenue: number;
+      netIncome: number;
+      totalAssets: number;
+      totalDebt: number;
+      cashOnHand: number;
+      freeCashFlow: number;
+      operatingCashFlow: number;
+      stockBasedCompensation: number;
+      dividends: StockDetailsDividends;
+    };
   };
+
+export type StockDetailsDividends = {
+  dividendsPaid: number;
+  dividendYielPercentageTTM: number;
+  dividendYielTTM: number;
+  payoutRatioTTM: number;
+  dividendPerShareTTM: number;
+};
 
 export enum SymbolHistoricalPeriods {
   day = '1d',
