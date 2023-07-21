@@ -12,12 +12,12 @@
 <ng-container *ngIf="!loadingSignal()">
   <ng-container *ngIf="screenerResults() as screenerResults">
     <section class="mt-6">
-      <app-stock-summary-table
+      <app-stock-summary-list
         appScrollNearEnd
         (nearEnd)="onNearEndScroll()"
         (itemClickedEmitter)="onSummaryClick($event)"
         [stockSummaries]="screenerResults | slice : 0 : maxScreenerResults()"
-      ></app-stock-summary-table>
+      ></app-stock-summary-list>
     </section>
   </ng-container>
 </ng-container>

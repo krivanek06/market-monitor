@@ -8,6 +8,7 @@ import {
   EarningsEstimationChartComponent,
   RevenueEstimationChartComponent,
 } from '@market-monitor/modules/market-earnings';
+import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
 import {
   CompanyRatingTable,
   StockEsgDataTableComponent,
@@ -16,10 +17,16 @@ import {
   StockPriceTargetTableComponent,
   StockRatingTableComponent,
   StockRecommendationComponent,
+  StockSummaryListComponent,
   StockTransformService,
   StockUpgradesDowngradesTableComponent,
 } from '@market-monitor/modules/market-stocks';
-import { GeneralCardComponent, GenericChartComponent } from '@market-monitor/shared-components';
+import {
+  GeneralCardComponent,
+  GenericChartComponent,
+  NameValueListComponent,
+  PriceChangeItemsComponent,
+} from '@market-monitor/shared-components';
 import { DialogServiceModule, DialogServiceUtil, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
 
@@ -40,6 +47,10 @@ import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
     StockKeyExecutivesTableComponent,
     StockUpgradesDowngradesTableComponent,
     StockPriceTargetTableComponent,
+    PriceChangeItemsComponent,
+    AssetPriceChartInteractiveComponent,
+    NameValueListComponent,
+    StockSummaryListComponent,
   ],
   templateUrl: './stock-details.component.html',
   styleUrls: ['./stock-details.component.scss'],

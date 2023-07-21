@@ -12,7 +12,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective, RangeDirective } from
 import { LargeNumberFormatterPipe, TruncatePipe } from '@market-monitor/shared-pipes';
 
 @Component({
-  selector: 'app-stock-summary-table',
+  selector: 'app-stock-summary-list',
   standalone: true,
   imports: [
     CommonModule,

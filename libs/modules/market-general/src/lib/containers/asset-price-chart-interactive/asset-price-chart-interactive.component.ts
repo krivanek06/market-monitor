@@ -37,7 +37,7 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
   @Input() priceName = 'price';
   @Input() priceShowSign = true;
   @Input() title = 'Historical Prices';
-  @Input() showImage = false;
+  @Input() imageName = '';
   @Input() displayVolume = true;
 
   stockHistoricalPrice = signal<HistoricalPrice[]>([]);

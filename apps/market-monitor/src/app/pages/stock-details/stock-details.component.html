@@ -1,6 +1,23 @@
 <div class="mb-10 text-lg">loading: {{ loadingSignal() }}</div>
 
-<div class="grid gap-y-6" *ngIf="stockDetailsSignal() as stockDetailsSignal">
+<div class="grid gap-6" *ngIf="stockDetailsSignal() as stockDetailsSignal">
+  <div class="grid gap-6 xl:grid-cols-3">
+    <div class="xl:col-span-2">
+      <!-- price & volume -->
+      <app-asset-price-chart-interactive
+        [imageName]="stockDetailsSignal.quote.symbol"
+        [title]="stockDetailsSignal.quote.name"
+        [symbol]="stockDetailsSignal.quote.symbol"
+        [chartHeightPx]="480"
+      ></app-asset-price-chart-interactive>
+    </div>
+
+    <!-- summary -->
+    <app-general-card title="Summary">
+      <app-stock-summary-list [stockDetails]="stockDetailsSignal"></app-stock-summary-list>
+    </app-general-card>
+  </div>
+
   <div class="grid gap-6 lg:grid-cols-3">
     <!-- earnings -->
     <app-general-card class="lg:col-span-2" title="Earnings">

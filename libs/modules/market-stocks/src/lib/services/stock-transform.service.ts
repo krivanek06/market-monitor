@@ -55,4 +55,13 @@ export class StockTransformService {
 
     return { earnings, revenue };
   }
+
+  // createSummaryData(stockDetails: StockDetails): NameValueItem[]{
+  //   const companyName = ;
+  //   return [
+  //     {name: 'Company Name', value: stockDetails.profile.companyName},
+  //     {name: 'CEO', value: stockDetails.profile.ceo},
+  //   ]
+
+  // }
 }

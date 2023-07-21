@@ -62,3 +62,19 @@
 h2 {
   margin-bottom: 0px !important;
 }
+
+.g-item-wrapper {
+  @apply flex justify-between items-center p-3 gap-4;
+
+  & > :first-child {
+    @apply flex-1 text-wt-gray-dark;
+  }
+
+  & > :last-child {
+    @apply text-wt-gray-medium;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--table-border);
+  }
+}

@@ -1,0 +1,92 @@
+<div class="flex flex-wrap justify-between p-3">
+  <ng-container *ngTemplateOutlet="priceChange; context: { name: '5 days', key: '5D' }"></ng-container>
+  <ng-container *ngTemplateOutlet="priceChange; context: { name: '6 months', key: '6M' }"></ng-container>
+  <ng-container *ngTemplateOutlet="priceChange; context: { name: '1 year', key: '1Y' }"></ng-container>
+  <ng-container *ngTemplateOutlet="priceChange; context: { name: '5 years', key: '5Y' }"></ng-container>
+</div>
+
+<div class="g-item-wrapper">
+  <div>Company Name</div>
+  <div>{{ stockDetails.profile.companyName }}</div>
+</div>
+
+<div class="g-item-wrapper">
+  <span>CEO</span>
+  <span>{{ stockDetails.profile.ceo }}</span>
+</div>
+
+<div class="g-item-wrapper">
+  <span>Market Cap.</span>
+  <span>{{ stockDetails.quote.price * stockDetails.quote.sharesOutstanding | largeNumberFormatter }}</span>
+</div>
+
+<div class="g-item-wrapper">
+  <span>Sector</span>
+  <mat-chip-listbox>
+    <mat-chip color="primary">{{ stockDetails.profile.sector }}</mat-chip>
+  </mat-chip-listbox>
+</div>
+
+<div class="g-item-wrapper">
+  <span>Price</span>
+  <div class="flex items-center gap-2">
+    <span>{{ stockDetails.quote.price }}</span>
+    <span
+      appPercentageIncrease
+      [useCurrencySign]="false"
+      [currentValues]="{
+        hideValue: false,
+        value: stockDetails.quote.price,
+        valueToCompare: stockDetails.quote.previousClose
+      }"
+    ></span>
+  </div>
+</div>
+
+<div class="g-item-wrapper">
+  <span>Volume</span>
+  <div class="flex items-center gap-2">
+    <span>{{ stockDetails.quote.volume | largeNumberFormatter }}</span>
+    <span
+      appPercentageIncrease
+      [useCurrencySign]="false"
+      [currentValues]="{
+        hideValue: false,
+        value: stockDetails.quote.volume,
+        valueToCompare: stockDetails.quote.avgVolume
+      }"
+    ></span>
+  </div>
+</div>
+
+<div class="g-item-wrapper">
+  <span>PE</span>
+  <span>{{ stockDetails.quote.pe }}</span>
+</div>
+
+<div class="g-item-wrapper">
+  <span>EPS</span>
+  <span>{{ stockDetails.quote.eps }}</span>
+</div>
+
+<div class="g-item-wrapper">
+  <span>Rating</span>
+  <div class="flex items-center gap-2">
+    <span>{{ stockDetails.rating.rating }}</span>
+    <div>(<span [appRecommendation]="stockDetails.rating.ratingScore"></span>)</div>
+  </div>
+</div>
+
+<!-- template render price change -->
+<ng-template #priceChange let-name="name" let-key="key">
+  <div class="grid items-center justify-center gap-2">
+    <span>{{ name }}</span>
+    <span
+      appPercentageIncrease
+      [useCurrencySign]="false"
+      [changeValues]="{
+        changePercentage: stockDetails.priceChange | priceChangeItemSelector : key
+      }"
+    ></span>
+  </div>
+</ng-template>
