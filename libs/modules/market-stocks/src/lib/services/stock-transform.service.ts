@@ -226,4 +226,26 @@ export class StockTransformService {
       { name: 'Cash Conversion Cycle days', value: roundNDigits(data.ratio.cashConversionCycleTTM, 2) },
     ];
   }
+
+  createFinancialDividends(data?: StockDetails): NameValueItem[] {
+    if (!data || data.companyOutlook.stockDividend.length === 0) {
+      return [];
+    }
+
+    const dividendData = data.additionalFinancialData.dividends;
+    const stockDividends = data.companyOutlook.stockDividend;
+
+    const dividendPaid = `${formatLargeNumber(Math.abs(dividendData.dividendsPaid))} (${roundNDigits(
+      dividendData.payoutRatioTTM,
+      2,
+      true
+    )}%)`;
+
+    return [
+      { name: 'Paid Dividends (Percent)', value: dividendPaid },
+      { name: 'Dividend / Share', value: dividendData.dividendPerShareTTM },
+      { name: 'Dividend Yield', value: `${roundNDigits(dividendData.dividendYielPercentageTTM, 2)}%` },
+      ...stockDividends.map((d) => ({ name: d.label, value: d.dividend })),
+    ];
+  }
 }

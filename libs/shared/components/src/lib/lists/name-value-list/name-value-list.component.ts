@@ -4,7 +4,7 @@ import { WordsUpPipe } from '@market-monitor/shared-pipes';
 
 export type NameValueItem = {
   name: string;
-  value: string | number;
+  value: string | number | null;
   hint?: string;
 };
 
@@ -23,7 +23,7 @@ export type NameValueItem = {
   template: `
     <div *ngFor="let item of items" class="g-item-wrapper">
       <span>{{ item.name | wordsUp }}</span>
-      <span>{{ item.value }}</span>
+      <span>{{ item.value === null ? 'N/A' : item.value }}</span>
     </div>
   `,
 })

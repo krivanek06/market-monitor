@@ -25,7 +25,6 @@ module.exports = {
         /* gray */
         'wt-gray-dark-strong': 'var(--gray-dark-strong)',
         'wt-gray-dark': 'var(--gray-dark)',
-        'wt-gray-medium-strong': 'var(gray-medium-strong)',
         'wt-gray-medium': 'var(--gray-medium)',
         'wt-gray-light-strong': 'var(--gray-light-strong)',
         'wt-gray-light': 'var(--gray-light)',

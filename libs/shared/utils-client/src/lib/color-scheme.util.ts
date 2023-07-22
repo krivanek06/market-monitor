@@ -5,7 +5,6 @@ export enum ColorScheme {
 
   GRAY_DARK_STRONG_VAR = 'var(--gray-dark-strong)',
   GRAY_DARK_VAR = 'var(--gray-dark)',
-  GRAY_MEDIUM_STRONG_VAR = 'var(--gray-medium-strong)',
   GRAY_MEDIUM_VAR = 'var(--gray-medium)',
   GRAY_LIGHT_STRONG_VAR = 'var(--gray-light-strong)',
   GRAY_LIGHT_VAR = 'var(--gray-light)',

@@ -97,6 +97,9 @@ export class StockDetailsComponent {
   financialOperatingSignal = computed(() =>
     this.stockTransformService.createFinancialOperatingData(this.stockDetailsSignal())
   );
+  financialDividendsSignal = computed(() =>
+    this.stockTransformService.createFinancialDividends(this.stockDetailsSignal())
+  );
 
   constructor() {}
 }

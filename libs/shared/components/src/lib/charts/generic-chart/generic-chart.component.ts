@@ -224,7 +224,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           cursor: this.enableLegendTogging ? 'pointer' : 'default',
         },
         itemHoverStyle: {
-          color: this.enableLegendTogging ? ColorScheme.GRAY_MEDIUM_STRONG_VAR : ColorScheme.GRAY_MEDIUM_VAR,
+          color: this.enableLegendTogging ? ColorScheme.GRAY_MEDIUM_VAR : ColorScheme.GRAY_MEDIUM_VAR,
         },
         itemHiddenStyle: {
           color: this.enableLegendTogging ? ColorScheme.GRAY_DARK_VAR : ColorScheme.GRAY_MEDIUM_VAR,
