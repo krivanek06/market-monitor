@@ -56,9 +56,12 @@ export type StockDetails = StockSummary &
     additionalFinancialData: {
       revenue: number;
       costOfRevenue: number;
+      EBITDA: number;
       netIncome: number;
       totalAssets: number;
+      totalCurrentAssets: number;
       totalDebt: number;
+      shortTermDebt: number;
       cashOnHand: number;
       freeCashFlow: number;
       operatingCashFlow: number;

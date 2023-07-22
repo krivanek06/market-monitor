@@ -11,6 +11,13 @@
 </div>
 
 <div class="g-item-wrapper">
+  <span>Sector</span>
+  <mat-chip-listbox>
+    <mat-chip class="m-0" color="primary">{{ stockDetails.profile.sector }}</mat-chip>
+  </mat-chip-listbox>
+</div>
+
+<div class="g-item-wrapper">
   <span>CEO</span>
   <span>{{ stockDetails.profile.ceo }}</span>
 </div>
@@ -21,19 +28,12 @@
 </div>
 
 <div class="g-item-wrapper">
-  <span>Sector</span>
-  <mat-chip-listbox>
-    <mat-chip color="primary">{{ stockDetails.profile.sector }}</mat-chip>
-  </mat-chip-listbox>
-</div>
-
-<div class="g-item-wrapper">
   <span>Price</span>
   <div class="flex items-center gap-2">
-    <span>{{ stockDetails.quote.price }}</span>
+    <span>{{ stockDetails.quote.price | currency }}</span>
     <span
       appPercentageIncrease
-      [useCurrencySign]="false"
+      [useCurrencySign]="true"
       [currentValues]="{
         hideValue: false,
         value: stockDetails.quote.price,
@@ -60,13 +60,8 @@
 </div>
 
 <div class="g-item-wrapper">
-  <span>PE</span>
-  <span>{{ stockDetails.quote.pe }}</span>
-</div>
-
-<div class="g-item-wrapper">
-  <span>EPS</span>
-  <span>{{ stockDetails.quote.eps }}</span>
+  <span>PE / EPS</span>
+  <span>{{ stockDetails.quote.pe }} / {{ stockDetails.quote.eps }}</span>
 </div>
 
 <div class="g-item-wrapper">
@@ -75,6 +70,11 @@
     <span>{{ stockDetails.rating.rating }}</span>
     <div>(<span [appRecommendation]="stockDetails.rating.ratingScore"></span>)</div>
   </div>
+</div>
+
+<div class="g-item-wrapper">
+  <span>Earnings</span>
+  <span>{{ stockDetails.quote.earningsAnnouncement | date : 'MMMM d, y' }}</span>
 </div>
 
 <!-- template render price change -->

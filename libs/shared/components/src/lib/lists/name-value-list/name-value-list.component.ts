@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { WordsUpPipe } from '@market-monitor/shared-pipes';
 
 export type NameValueItem = {
   name: string;
@@ -10,7 +11,7 @@ export type NameValueItem = {
 @Component({
   selector: 'app-name-value-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, WordsUpPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
     `
@@ -20,8 +21,8 @@ export type NameValueItem = {
     `,
   ],
   template: `
-    <div *ngFor="let item of items" class="p-4 flex justify-between items-center">
-      <span class="text-wt-gray-dark">{{ item.name }}</span>
+    <div *ngFor="let item of items" class="g-item-wrapper">
+      <span>{{ item.name | wordsUp }}</span>
       <span>{{ item.value }}</span>
     </div>
   `,

@@ -1,4 +1,4 @@
-<div class="mb-10 text-lg">loading: {{ loadingSignal() }}</div>
+<div class="mb-10 text-lg">loading: {{ !stockDetailsSignal() }}</div>
 
 <div class="grid gap-6" *ngIf="stockDetailsSignal() as stockDetailsSignal">
   <div class="grid gap-6 xl:grid-cols-3">
@@ -13,8 +13,25 @@
     </div>
 
     <!-- summary -->
-    <app-general-card title="Summary">
+    <app-general-card class="-mt-6" title="Summary">
       <app-stock-summary-list [stockDetails]="stockDetailsSignal"></app-stock-summary-list>
+    </app-general-card>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <!-- financial strength -->
+    <app-general-card additionalClasses="h-full" title="Financial Strength">
+      <app-name-value-list [items]="financialStrengthSignal()"></app-name-value-list>
+    </app-general-card>
+
+    <!-- financial ratio 1 -->
+    <app-general-card additionalClasses="h-full" title="Financial Ratio">
+      <app-name-value-list [items]="financialRatio1Signal()"></app-name-value-list>
+    </app-general-card>
+
+    <!-- financial ratio 2 -->
+    <app-general-card additionalClasses="h-full" title="Financial Ratio">
+      <app-name-value-list [items]="financialRatio2Signal()"></app-name-value-list>
     </app-general-card>
   </div>
 
@@ -38,16 +55,34 @@
   </div>
 
   <div class="grid gap-6 lg:grid-cols-3">
+    <!-- financial per share -->
+    <app-general-card additionalClasses="h-full" title="Financial Per Share">
+      <app-name-value-list [items]="financialPerShareSignal()"></app-name-value-list>
+    </app-general-card>
+
+    <!-- financial operating -->
+    <app-general-card additionalClasses="h-full" title="Financial Operating">
+      <app-name-value-list [items]="financialOperatingSignal()"></app-name-value-list>
+    </app-general-card>
+
+    <!-- dividends -->
+    <app-general-card additionalClasses="h-full" title="Dividends">
+      <div>TODO</div>
+    </app-general-card>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
     <!-- revenue est. -->
-    <app-general-card class="lg:col-span-2" title="Revenue">
+    <app-general-card class="lg:col-span-3" title="Revenue">
       <app-revenue-estimation-chart
         *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
         class
         [data]="estimationChartDataSignal.revenue"
+        [heightPx]="450"
       ></app-revenue-estimation-chart>
     </app-general-card>
 
-    <app-general-card title="TODO"> TODO </app-general-card>
+    <!-- <app-general-card title="TODO"> TODO </app-general-card> -->
   </div>
 
   <div class="grid lg:grid-cols-3 gap-x-6 gap-y-4">

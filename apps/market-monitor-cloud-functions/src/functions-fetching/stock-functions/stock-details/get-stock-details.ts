@@ -114,12 +114,15 @@ const modifyDetailsAPItoStockDetails = (summary: StockSummary, details: StockDet
     additionalFinancialData: {
       cashOnHand: sheetBalanceQuarter.cashAndShortTermInvestments,
       costOfRevenue: sheetIncomeYearly.costOfRevenue,
+      EBITDA: sheetIncomeYearly.ebitda,
       freeCashFlow: sheetCashflowQuarter.freeCashFlow,
       netIncome: sheetIncomeYearly.netIncome,
       revenue: sheetIncomeYearly.revenue,
       operatingCashFlow: sheetCashflowQuarter.operatingCashFlow,
       totalAssets: sheetBalanceQuarter.totalAssets,
+      totalCurrentAssets: sheetBalanceQuarter.totalCurrentAssets,
       totalDebt: sheetBalanceQuarter.totalDebt,
+      shortTermDebt: sheetBalanceQuarter.shortTermDebt,
       stockBasedCompensation: sheetCashflowQuarter.stockBasedCompensation,
       dividends: {
         dividendsPaid: sheetCashYearly.dividendsPaid,

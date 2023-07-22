@@ -5,3 +5,4 @@ export * from './object-value-by-key.pipe';
 export * from './sort-by-key.pipe';
 export * from './split-string.pipe';
 export * from './truncate.pipe';
+export * from './words-up.pipe';
