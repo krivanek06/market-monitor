@@ -1,3 +1,4 @@
+export * from './bubble-pagination.directive';
 export * from './default-img.directive';
 export * from './element-focus.directive';
 export * from './ng-for-track-by-id.directive';
