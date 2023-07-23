@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ChartConstructor, ColorScheme, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
-import { formatLargeNumber } from '@market-monitor/shared-utils-general';
+import { RecommendationTrends } from '@market-monitor/api-types';
+import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-client';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { Recommendation } from '../../../models';
 
 @Component({
-  selector: 'app-revenue-estimation-chart',
+  selector: 'app-stock-recommendation-chart',
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
+  styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <highcharts-chart
@@ -21,43 +23,20 @@ import { HighchartsChartModule } from 'highcharts-angular';
     </highcharts-chart>
   `,
 })
-export class RevenueEstimationChartComponent extends ChartConstructor {
-  @Input({ required: true }) set data(values: EstimatedChartDataType[]) {
+export class StockRecommendationChartComponent extends ChartConstructor {
+  @Input({ required: true }) set data(values: RecommendationTrends[]) {
     this.initChart(values);
   }
   @Input() heightPx = 400;
-  @Input() limitValues = 30;
-  @Input() showTitle = false;
 
-  private initChart(values: EstimatedChartDataType[]): void {
-    const workingData = values.slice(-this.limitValues);
-    const dates = workingData.map((x) => x.date);
-
-    const revenueEstSeries = workingData
-      .map((x) => x.valueEst)
-      .map((d) => {
-        return { y: d, name: 'Expected', color: ColorScheme.GRAY_MEDIUM_VAR };
-      });
-
-    const revenueActualSeries = workingData
-      .map((x) => x.valueActual)
-      .map((d, index) => {
-        const color = (d ?? 0) > (revenueEstSeries[index]?.y ?? 0) ? ColorScheme.SUCCESS_VAR : ColorScheme.DANGER_VAR;
-        return { y: d, name: 'Actual', color: color };
-      });
-
-    const revenueActualSeriesLine = revenueActualSeries.map((d) => ({
-      ...d,
-      color: ColorScheme.PRIMARY_VAR,
-    }));
-
+  private initChart(data: RecommendationTrends[]): void {
     this.chartOptions = {
       chart: {
         type: 'column',
         backgroundColor: 'transparent',
       },
       title: {
-        text: this.showTitle ? 'Revenue' : '',
+        text: '',
         align: 'left',
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,
@@ -79,8 +58,8 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         },
         headerFormat: `<p style="color: ${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.x}</p><br/>`,
         pointFormatter: function () {
-          const name = this.name;
-          const value = formatLargeNumber(this.y, false, true);
+          const name = this.series.name;
+          const value = this.y;
 
           return `
             <p>
@@ -93,31 +72,6 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
       legend: {
         enabled: false,
       },
-      plotOptions: {
-        line: {
-          dataLabels: {
-            enabled: true,
-            formatter: function () {
-              return formatLargeNumber(this.y, false, true);
-            },
-            style: {
-              color: ColorScheme.PRIMARY_VAR,
-              fontWeight: 'normal',
-              fontSize: '12px',
-              textOutline: '0px',
-            },
-          },
-          marker: {
-            radius: 3,
-          },
-          lineWidth: 2,
-          states: {
-            hover: {
-              lineWidth: 3,
-            },
-          },
-        },
-      },
       xAxis: {
         labels: {
           rotation: -20,
@@ -127,7 +81,15 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
-        categories: dates,
+        categories: data.map((rec) => rec.period),
+      },
+      plotOptions: {
+        column: {
+          stacking: 'normal',
+          dataLabels: {
+            enabled: true,
+          },
+        },
       },
       yAxis: {
         title: {
@@ -138,7 +100,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         opposite: false,
         gridLineWidth: 1,
         minorTickInterval: 'auto',
-        tickPixelInterval: 30,
+        tickPixelInterval: 25,
         visible: true,
         gridLineColor: '#66666655',
         labels: {
@@ -150,25 +112,34 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
       },
       series: [
         {
-          type: 'line',
-          name: 'Actual',
-          data: revenueActualSeriesLine,
-          opacity: 0.7,
-          enableMouseTracking: false,
+          type: 'column',
+          name: Recommendation.StrongBuy.value,
+          color: Recommendation.StrongBuy.color,
+          data: data.map((rec) => rec.strongBuy),
         },
         {
           type: 'column',
-          name: 'Actual',
-          data: revenueActualSeries,
-          opacity: 0.8,
-          id: 'main',
+          name: Recommendation.Buy.value,
+          color: Recommendation.Buy.color,
+          data: data.map((rec) => rec.buy),
         },
         {
           type: 'column',
-          name: 'Expected',
-          data: revenueEstSeries,
-          opacity: 0.8,
-          linkedTo: 'main',
+          name: Recommendation.Hold.value,
+          color: Recommendation.Hold.color,
+          data: data.map((rec) => rec.hold),
+        },
+        {
+          type: 'column',
+          name: Recommendation.Sell.value,
+          color: Recommendation.Sell.color,
+          data: data.map((rec) => rec.sell),
+        },
+        {
+          type: 'column',
+          name: Recommendation.StrongSell.value,
+          color: Recommendation.StrongSell.color,
+          data: data.map((rec) => rec.strongSell),
         },
       ],
     };

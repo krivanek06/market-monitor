@@ -1,20 +1,21 @@
 import { ChangeFields, ForcefullyOmit } from '@market-monitor/shared-utils-general';
 import {
-  CompanyKeyMetrics as CompanyKeyMetricsTTM,
+  CompanyKeyMetricsTTM,
   CompanyOutlook,
   CompanyProfile,
   CompanyRating,
   CompanyRatio,
   ESGDataQuarterly,
   ESGDataRatingYearly,
+  EnterpriseValue,
   PriceChange,
   PriceTarget,
+  RecommendationTrends,
   SectorPeers,
   StockEarning,
   SymbolQuote,
   UpgradesDowngrades,
-} from './external-api/financial-modeling-starter.model';
-import { RecommendationTrends } from './external-api/finnhub.model';
+} from './external-api';
 
 export type StockSummary = {
   id: string;
@@ -38,6 +39,7 @@ export type StockDetailsAPI = {
   sectorPeers: SectorPeers[];
   recommendationTrends: RecommendationTrends[];
   companyKeyMetricsTTM: CompanyKeyMetricsTTM;
+  enterpriseValue: EnterpriseValue[];
   lastUpdate: {
     detailsLastUpdate: string;
     earningLastUpdate: string;

@@ -32,6 +32,8 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
   @Input() heightPx = 400;
   @Input() limitValues = 30;
 
+  @Input() showTitle = false;
+
   private initChart(values: EstimatedChartDataType[]): void {
     const workingData = values.slice(-this.limitValues);
     const dates = workingData.map((x) => x.date);
@@ -60,7 +62,7 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         backgroundColor: 'transparent',
       },
       title: {
-        text: 'Earnings',
+        text: this.showTitle ? 'Earnings' : '',
         align: 'left',
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,

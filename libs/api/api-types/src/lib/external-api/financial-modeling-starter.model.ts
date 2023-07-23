@@ -88,7 +88,7 @@ export type CompanyMetrics = {
   yearLow: number;
 };
 
-export type CompanyKeyMetrics = {
+export type CompanyKeyMetricsTTM = {
   revenuePerShareTTM: number;
   netIncomePerShareTTM: number;
   operatingCashFlowPerShareTTM: number;
@@ -423,6 +423,17 @@ export type FinancialCash = {
   link: string;
   finalLink: string;
 };
+
+export interface EnterpriseValue {
+  symbol: string;
+  date: string;
+  stockPrice: number;
+  numberOfShares: number;
+  marketCapitalization: number;
+  minusCashAndCashEquivalents: number;
+  addTotalDebt: number;
+  enterpriseValue: number;
+}
 
 export type ESGDataRatingYearly = {
   symbol: string;

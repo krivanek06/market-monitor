@@ -1,15 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { RecommendationTrends } from '@market-monitor/api-types';
+import { EnterpriseValue } from '@market-monitor/api-types';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-client';
+import { formatLargeNumber } from '@market-monitor/shared-utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { Recommendation } from '../../../models';
 
 @Component({
-  selector: 'app-stock-recommendation',
+  selector: 'app-stock-enterprise-chart',
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
-  styles: [],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <highcharts-chart
@@ -23,21 +30,20 @@ import { Recommendation } from '../../../models';
     </highcharts-chart>
   `,
 })
-export class StockRecommendationComponent extends ChartConstructor {
-  @Input({ required: true }) set data(values: RecommendationTrends[]) {
-    this.initChart(values);
+export class StockEnterpriseChartComponent extends ChartConstructor {
+  @Input({ required: true }) set data(values: EnterpriseValue[]) {
+    this.initChart(values.reverse());
   }
   @Input() heightPx = 400;
-  @Input() title = '';
 
-  private initChart(data: RecommendationTrends[]): void {
+  private initChart(data: EnterpriseValue[]): void {
     this.chartOptions = {
       chart: {
         type: 'column',
         backgroundColor: 'transparent',
       },
       title: {
-        text: this.title,
+        text: '',
         align: 'left',
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,
@@ -60,7 +66,7 @@ export class StockRecommendationComponent extends ChartConstructor {
         headerFormat: `<p style="color: ${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.x}</p><br/>`,
         pointFormatter: function () {
           const name = this.series.name;
-          const value = this.y;
+          const value = formatLargeNumber(this.y, false, false);
 
           return `
             <p>
@@ -82,65 +88,92 @@ export class StockRecommendationComponent extends ChartConstructor {
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
-        categories: data.map((rec) => rec.period),
+        categories: data.map((d) => d.date),
       },
       plotOptions: {
         column: {
           stacking: 'normal',
           dataLabels: {
-            enabled: true,
+            enabled: false,
           },
         },
-      },
-      yAxis: {
-        title: {
-          text: '',
+        line: {
+          marker: {
+            radius: 3,
+          },
+          lineWidth: 2,
+          states: {
+            hover: {
+              lineWidth: 2,
+            },
+          },
+          threshold: null,
         },
-        startOnTick: false,
-        endOnTick: false,
-        opposite: false,
-        gridLineWidth: 1,
-        minorTickInterval: 'auto',
-        tickPixelInterval: 25,
-        visible: true,
-        gridLineColor: '#66666655',
-        labels: {
-          style: {
-            color: ColorScheme.GRAY_MEDIUM_VAR,
-            fontSize: '10px',
+      },
+      yAxis: [
+        {
+          title: {
+            text: '',
+          },
+          startOnTick: false,
+          endOnTick: false,
+          opposite: false,
+          gridLineWidth: 1,
+          minorTickInterval: 'auto',
+          tickPixelInterval: 25,
+          visible: true,
+          gridLineColor: '#66666655',
+          labels: {
+            style: {
+              color: ColorScheme.GRAY_MEDIUM_VAR,
+              fontSize: '10px',
+            },
           },
         },
-      },
+        {
+          title: {
+            text: '',
+          },
+          startOnTick: false,
+          endOnTick: false,
+          opposite: true,
+          gridLineWidth: 1,
+          minorTickInterval: 'auto',
+          tickPixelInterval: 25,
+          visible: true,
+          gridLineColor: '#66666655',
+          labels: {
+            style: {
+              color: ColorScheme.GRAY_MEDIUM_VAR,
+              fontSize: '10px',
+            },
+          },
+        },
+        {
+          visible: false,
+        },
+      ],
       series: [
         {
           type: 'column',
-          name: Recommendation.StrongBuy.value,
+          name: 'Total Debt',
+          data: data.map((d) => d.addTotalDebt),
+          yAxis: 0,
+          opacity: 0.85,
+        },
+        {
+          type: 'line',
+          name: 'Enterprise Value',
           color: Recommendation.StrongBuy.color,
-          data: data.map((rec) => rec.strongBuy),
+          data: data.map((d) => d.enterpriseValue),
+          yAxis: 1,
         },
         {
-          type: 'column',
-          name: Recommendation.Buy.value,
-          color: Recommendation.Buy.color,
-          data: data.map((rec) => rec.buy),
-        },
-        {
-          type: 'column',
-          name: Recommendation.Hold.value,
+          type: 'line',
+          name: 'Total Shares',
           color: Recommendation.Hold.color,
-          data: data.map((rec) => rec.hold),
-        },
-        {
-          type: 'column',
-          name: Recommendation.Sell.value,
-          color: Recommendation.Sell.color,
-          data: data.map((rec) => rec.sell),
-        },
-        {
-          type: 'column',
-          name: Recommendation.StrongSell.value,
-          color: Recommendation.StrongSell.color,
-          data: data.map((rec) => rec.strongSell),
+          data: data.map((d) => d.numberOfShares),
+          yAxis: 2,
         },
       ],
     };

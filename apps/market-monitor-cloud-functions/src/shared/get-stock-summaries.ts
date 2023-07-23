@@ -9,7 +9,7 @@ export const getSummary = async (symbol: string): Promise<StockSummary> => {
   const summary = data[0];
 
   if (!summary) {
-    throw new Error(`Unable to load summary for symbol ${symbol}`);
+    throw new Error(`Unable to load summary for symbol ${symbol}, most likely does not exist`);
   }
 
   return summary;

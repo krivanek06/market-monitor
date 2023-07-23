@@ -36,6 +36,7 @@ export const getstocksummary = onRequest(async (request, response: Response<Stoc
     const data = await getSummary(symbolString);
     response.send(data);
   } catch (e) {
+    console.log(e);
     response.status(400).send(`Unable to load summary for symbol ${symbolString}`);
   }
 });

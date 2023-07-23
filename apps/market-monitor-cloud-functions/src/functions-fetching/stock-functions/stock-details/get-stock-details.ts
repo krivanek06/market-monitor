@@ -1,6 +1,7 @@
 import {
   getCompanyKeyMetricsTTM,
   getCompanyOutlook,
+  getEnterpriseValue,
   getEsgDataQuarterly,
   getEsgRatingYearly,
   getPriceTarget,
@@ -110,6 +111,7 @@ const modifyDetailsAPItoStockDetails = (summary: StockSummary, details: StockDet
     esgDataQuarterlyArray: details.esgDataQuarterlyArray,
     esgDataRatingYearly: details.esgDataRatingYearly,
     esgDataRatingYearlyArray: details.esgDataRatingYearlyArray,
+    enterpriseValue: details.enterpriseValue,
     lastUpdate: details.lastUpdate,
     additionalFinancialData: {
       cashOnHand: sheetBalanceQuarter.cashAndShortTermInvestments,
@@ -153,6 +155,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
     sectorPeers,
     recommendationTrends,
     companyKeyMetricsTTM,
+    enterpriseValue,
   ] = await Promise.all([
     getCompanyOutlook(symbol),
     getEsgRatingYearly(symbol),
@@ -163,6 +166,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
     getSectorPeersForSymbols([symbol]),
     getRecommendationTrends(symbol),
     getCompanyKeyMetricsTTM(symbol),
+    getEnterpriseValue(symbol),
   ]);
 
   const result: StockDetailsAPI = {
@@ -177,6 +181,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
     upgradesDowngrades: upgradesDowngrades.slice(0, 15),
     recommendationTrends,
     companyKeyMetricsTTM,
+    enterpriseValue,
     reloadData: false,
     lastUpdate: {
       detailsLastUpdate: new Date().toISOString(),
