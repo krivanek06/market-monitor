@@ -19,8 +19,8 @@ import {
   EarningsHistoricalDialogComponent,
   EarningsItemComponent,
   EarningsItemsDialogComponent,
-} from '@market-monitor/modules/market-earnings';
-import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks';
+  StockSummaryDialogComponent,
+} from '@market-monitor/modules/market-stocks';
 import {
   CalendarRageToday,
   CalendarRange,

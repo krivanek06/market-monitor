@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LabelValue, TabSelectControlComponent } from '@market-monitor/shared-components';
@@ -34,7 +35,7 @@ export class StockDetailsComponent {
   constructor() {
     this.resolveUrl();
 
-    this.routesStockDetailsControl.valueChanges.subscribe((value) => {
+    this.routesStockDetailsControl.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
       this.router.navigate([value], { relativeTo: this.route });
     });
   }
