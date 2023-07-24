@@ -1,0 +1,205 @@
+<div class="grid gap-6" *ngIf="stockDetailsSignal() as stockDetailsSignal">
+  <div class="grid gap-6 xl:grid-cols-3">
+    <div class="xl:col-span-2">
+      <!-- price & volume -->
+      <app-asset-price-chart-interactive
+        [imageName]="stockDetailsSignal.quote.symbol"
+        [title]="stockDetailsSignal.quote.name"
+        [symbol]="stockDetailsSignal.quote.symbol"
+        [chartHeightPx]="480"
+      ></app-asset-price-chart-interactive>
+    </div>
+
+    <!-- summary -->
+    <app-general-card class="-mt-6" title="Summary">
+      <app-stock-summary-list [stockDetails]="stockDetailsSignal"></app-stock-summary-list>
+    </app-general-card>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <!-- financial strength -->
+    <app-general-card additionalClasses="h-full" title="Financial Strength">
+      <app-name-value-list [items]="financialStrengthSignal()"></app-name-value-list>
+    </app-general-card>
+
+    <!-- financial ratio 1 -->
+    <app-general-card additionalClasses="h-full" title="Financial Ratio">
+      <app-name-value-list [items]="financialRatio1Signal()"></app-name-value-list>
+    </app-general-card>
+
+    <!-- financial ratio 2 -->
+    <app-general-card additionalClasses="h-full" title="Financial Ratio">
+      <app-name-value-list [items]="financialRatio2Signal()"></app-name-value-list>
+    </app-general-card>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <!-- earnings -->
+    <app-general-card class="lg:col-span-2" title="Earnings Chart">
+      <app-earnings-estimation-chart
+        *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
+        [data]="estimationChartDataSignal.earnings"
+        [heightPx]="400"
+      ></app-earnings-estimation-chart>
+    </app-general-card>
+
+    <!-- recommendation -->
+    <app-general-card title="Recommendation Chart">
+      <app-stock-recommendation-chart
+        [heightPx]="400"
+        [data]="stockDetailsSignal.recommendationTrends"
+      ></app-stock-recommendation-chart>
+    </app-general-card>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <!-- financial per share -->
+    <app-general-card additionalClasses="h-full" title="Financial Per Share">
+      <app-name-value-list [items]="financialPerShareSignal()"></app-name-value-list>
+    </app-general-card>
+
+    <!-- financial operating -->
+    <app-general-card additionalClasses="h-full" title="Financial Operating">
+      <app-name-value-list [items]="financialOperatingSignal()"></app-name-value-list>
+    </app-general-card>
+
+    <!-- dividends -->
+    <app-general-card additionalClasses="h-full" title="Dividends">
+      <app-name-value-list [items]="financialDividendsSignal()"></app-name-value-list>
+    </app-general-card>
+  </div>
+
+  <div>
+    <!-- revenue est. -->
+    <app-general-card title="Revenue Chart">
+      <app-revenue-estimation-chart
+        *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
+        class
+        [data]="estimationChartDataSignal.revenue"
+        [heightPx]="450"
+      ></app-revenue-estimation-chart>
+    </app-general-card>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-x-6 gap-y-4">
+    <!-- rating table -->
+    <app-general-card title="Rating">
+      <app-stock-rating-table [data]="companyRatingSignal()"></app-stock-rating-table>
+    </app-general-card>
+
+    <!-- profit margin -->
+    <app-general-card title="Profit Margin Chart">
+      <app-generic-chart
+        chartType="column"
+        [heightPx]="363"
+        [showTooltipHeader]="false"
+        [series]="[
+        {
+          colorByPoint: true,
+          additionalData: {
+            colorTooltipDefault: true,
+            showPercentageSign: true,
+          },
+          data: [
+            { name: 'Operating Profit', y: stockDetailsSignal.ratio.operatingProfitMarginTTM * 100 },
+            { name: 'Gross Profit', y: stockDetailsSignal.ratio.grossProfitMarginTTM * 100 },
+            { name: 'Pretax Profit', y: stockDetailsSignal.ratio.pretaxProfitMarginTTM * 100 },
+            { name: 'Net Profit', y: stockDetailsSignal.ratio.netProfitMarginTTM * 100 },
+            { name: 'Effective Tax Rate', y: stockDetailsSignal.ratio.effectiveTaxRateTTM * 100 },
+          ]
+        }
+      ]"
+        [showDataLabel]="true"
+      >
+      </app-generic-chart>
+    </app-general-card>
+
+    <!-- return on something -->
+    <app-general-card title="Return on Chart">
+      <app-generic-chart
+        chartType="column"
+        [heightPx]="363"
+        [showTooltipHeader]="false"
+        [series]="[
+          {
+            colorByPoint: true,
+            additionalData: {
+              colorTooltipDefault: true,
+              showPercentageSign: true,
+            },
+            data: [
+              { name: 'Equity', y: stockDetailsSignal.ratio.returnOnEquityTTM * 100 },
+              { name: 'Assets', y: stockDetailsSignal.ratio.returnOnAssetsTTM * 100 },
+              { name: 'Tangible Assets', y: stockDetailsSignal.companyKeyMetricsTTM.returnOnTangibleAssetsTTM * 100 },
+              { name: 'Capital Employed', y: stockDetailsSignal.ratio.returnOnCapitalEmployedTTM * 100 },
+              { name: 'Invested Capital', y: stockDetailsSignal.companyKeyMetricsTTM.roicTTM * 100 },
+            ]
+          }
+        ]"
+        [showDataLabel]="true"
+      >
+      </app-generic-chart>
+    </app-general-card>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <!-- upgrades & downgrades -->
+    <app-general-card title="Upgrades & Downgrades" class="lg:col-span-2">
+      <app-stock-upgrades-downgrades-table
+        [data]="stockDetailsSignal.upgradesDowngrades | slice : 0 : 12"
+        [currentPrice]="stockDetailsSignal.quote.price"
+      ></app-stock-upgrades-downgrades-table>
+    </app-general-card>
+
+    <!-- peers -->
+    <app-general-card additionalClasses="h-full" title="Peers" class="basis-1/3">
+      <ng-container *ngIf="stockPeersSignal() as stockPeersSignal">
+        <app-stock-peers-list [peers]="stockPeersSignal | slice : 0 : 12"></app-stock-peers-list>
+      </ng-container>
+    </app-general-card>
+  </div>
+
+  <div class="grid gap-6 2xl:grid-cols-2">
+    <!-- price target -->
+    <app-general-card title="Price Target">
+      <app-stock-price-target-table
+        [data]="stockDetailsSignal.priceTarget | slice : 0 : 10"
+        [currentPrice]="stockDetailsSignal.quote.price"
+      ></app-stock-price-target-table>
+    </app-general-card>
+
+    <!-- enterprise chart -->
+    <app-general-card title="Enterprise Chart" additionalClasses="h-full">
+      <app-stock-enterprise-chart
+        [heightPx]="520"
+        [data]="stockDetailsSignal.enterpriseValue"
+      ></app-stock-enterprise-chart>
+    </app-general-card>
+  </div>
+
+  <div class="flex flex-col gap-6 md:flex-row">
+    <!-- esg quarterly -->
+    <app-general-card title="ESG data" class="md:basis-2/3" additionalClasses="h-full">
+      <app-stock-esg-data-table
+        [data]="stockDetailsSignal.esgDataQuarterlyArray | slice : 0 : 8"
+      ></app-stock-esg-data-table>
+    </app-general-card>
+
+    <!-- esg yearly -->
+    <app-general-card title="ESG data" class="md:basis-1/3">
+      <div *ngFor="let data of stockDetailsSignal.esgDataRatingYearlyArray" class="g-item-wrapper">
+        <div>{{ data.year }}</div>
+        <div class="space-x-2">
+          <span>{{ data.industryRank }}</span>
+          <span class="text-wt-gray-dark"> ({{ data.ESGRiskRating }})</span>
+        </div>
+      </div>
+    </app-general-card>
+  </div>
+
+  <div>
+    <app-general-card title="Insider trades">
+      <app-stock-insider-trades [data]="stockDetailsSignal.companyOutlook.insideTrades"></app-stock-insider-trades>
+    </app-general-card>
+  </div>
+</div>

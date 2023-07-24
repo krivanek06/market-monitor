@@ -25,3 +25,10 @@ export enum ROUTES_DASHBOARD {
   TRADING = 'trading',
   SETTINGS = 'settings',
 }
+
+export enum ROUTES_STOCK_DETAILS {
+  OVERVIEW = 'overview',
+  FINANCIALS = 'financials',
+  RATIOS = 'ratios',
+  TRADES = 'trades',
+}
