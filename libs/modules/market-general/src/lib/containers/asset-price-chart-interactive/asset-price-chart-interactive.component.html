@@ -7,7 +7,7 @@
   <!-- time data about chart -->
   <div class="flex justify-between text-wt-gray-medium">
     <div class="flex items-center gap-2">
-      <img *ngIf="showImage" appDefaultImg imageType="symbol" [src]="symbol" alt="Asset Image" class="h-6 w-6" />
+      <img *ngIf="imageName" appDefaultImg imageType="symbol" [src]="imageName" alt="Asset Image" class="w-6 h-6" />
       <span class="hidden sm:block">{{ title }}</span>
     </div>
     <span class="block">
@@ -34,5 +34,5 @@
     <div class="g-skeleton w-[350px] h-6"></div>
   </div>
 
-  <div [style.height.px]="chartHeightPx" class="g-skeleton"></div>
+  <div [style.height.px]="chartHeightPx - 35" class="g-skeleton"></div>
 </ng-template>

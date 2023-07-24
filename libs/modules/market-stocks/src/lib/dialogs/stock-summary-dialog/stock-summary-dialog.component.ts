@@ -4,6 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
 import { PriceChangeItemsComponent } from '@market-monitor/shared-components';
@@ -59,7 +60,8 @@ export class StockSummaryDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: { symbol: string },
     private stocksApiService: StocksApiService,
     private stockStorageService: StockStorageService,
-    private dialogServiceUtil: DialogServiceUtil
+    private dialogServiceUtil: DialogServiceUtil,
+    private route: Router
   ) {}
 
   onAddToFavorite(): void {
@@ -71,6 +73,8 @@ export class StockSummaryDialogComponent {
   }
 
   onDetailsRedirect(): void {
-    this.dialogRef.close({ redirect: true });
+    // routing kept here, because component is used in multiple places
+    this.route.navigate(['stock-details', this.data.symbol]);
+    this.dialogRef.close();
   }
 }

@@ -1,5 +1,5 @@
 import { Directive, Input, OnInit, Renderer2, ViewContainerRef } from '@angular/core';
-import { formatLargeNumber } from '@market-monitor/shared-utils-general';
+import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
 
 /**
  * Use this if you already have the prct diff & diff
@@ -39,9 +39,9 @@ export class PercentageIncreaseDirective implements OnInit {
 
   ngOnInit(): void {
     if (this.changeValues) {
-      const change = this.changeValues.change ? this.round2Dec(this.changeValues.change) : null;
+      const change = this.changeValues.change ? roundNDigits(this.changeValues.change, 2) : null;
       const changesPercentage = this.changeValues.changePercentage
-        ? this.round2Dec(this.changeValues.changePercentage)
+        ? roundNDigits(this.changeValues.changePercentage, 2)
         : null;
       this.createElement(change, changesPercentage);
       return;
@@ -49,8 +49,8 @@ export class PercentageIncreaseDirective implements OnInit {
 
     if (this.currentValues) {
       const value = this.currentValues.value - this.currentValues.valueToCompare;
-      const change = this.round2Dec(value);
-      const changesPercentage = this.round2Dec((value / Math.abs(this.currentValues.valueToCompare)) * 100);
+      const change = roundNDigits(value, 2);
+      const changesPercentage = roundNDigits((value / Math.abs(this.currentValues.valueToCompare)) * 100, 2);
       const hideValue = this.currentValues.hideValue;
       this.createElement(change, changesPercentage, hideValue);
       return;
@@ -148,9 +148,5 @@ export class PercentageIncreaseDirective implements OnInit {
 
       this.rederer2.appendChild(wrapper, changeSpan);
     }
-  }
-
-  private round2Dec(value: number): number {
-    return Math.round(value * 100) / 100;
   }
 }

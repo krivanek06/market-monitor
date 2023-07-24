@@ -1,30 +1,34 @@
+import { ChangeFields, ForcefullyOmit } from '@market-monitor/shared-utils-general';
 import {
+  CompanyKeyMetricsTTM,
   CompanyOutlook,
+  CompanyProfile,
+  CompanyRating,
+  CompanyRatio,
   ESGDataQuarterly,
   ESGDataRatingYearly,
-  News,
+  EnterpriseValue,
   PriceChange,
   PriceTarget,
-  Profile,
+  RecommendationTrends,
   SectorPeers,
   StockEarning,
   SymbolQuote,
   UpgradesDowngrades,
-} from './external-api/financial-modeling-starter.model';
-import { RecommendationTrends } from './external-api/finnhub.model';
+} from './external-api';
 
 export type StockSummary = {
   id: string;
   reloadData: boolean;
   quote: SymbolQuote;
-  profile: Profile;
+  profile: CompanyProfile;
   priceChange: PriceChange;
   summaryLastUpdate: string;
 };
 
-export type StockDetails = {
+export type StockDetailsAPI = {
   reloadData: boolean;
-  companyOutlook: Omit<CompanyOutlook, 'profile'>;
+  companyOutlook: CompanyOutlook;
   esgDataRatingYearlyArray: ESGDataRatingYearly[];
   esgDataRatingYearly: ESGDataRatingYearly | null;
   esgDataQuarterlyArray: ESGDataQuarterly[];
@@ -32,14 +36,48 @@ export type StockDetails = {
   upgradesDowngrades: UpgradesDowngrades[];
   priceTarget: PriceTarget[];
   stockEarnings: StockEarning[];
-  sectorPeers: SectorPeers[];
+  sectorPeers: SectorPeers;
   recommendationTrends: RecommendationTrends[];
-  stockNews: News[];
+  companyKeyMetricsTTM: CompanyKeyMetricsTTM;
+  enterpriseValue: EnterpriseValue[];
   lastUpdate: {
-    newsLastUpdate: string;
     detailsLastUpdate: string;
     earningLastUpdate: string;
   };
+};
+
+export type StockDetails = StockSummary &
+  ChangeFields<
+    StockDetailsAPI,
+    {
+      companyOutlook: ForcefullyOmit<CompanyOutlook, 'ratios' | 'rating'>;
+    }
+  > & {
+    ratio: CompanyRatio;
+    rating: CompanyRating;
+    additionalFinancialData: {
+      revenue: number;
+      costOfRevenue: number;
+      EBITDA: number;
+      netIncome: number;
+      totalAssets: number;
+      totalCurrentAssets: number;
+      totalDebt: number;
+      shortTermDebt: number;
+      cashOnHand: number;
+      freeCashFlow: number;
+      operatingCashFlow: number;
+      stockBasedCompensation: number;
+      dividends: StockDetailsDividends;
+    };
+  };
+
+export type StockDetailsDividends = {
+  dividendsPaid: number;
+  dividendYielPercentageTTM: number;
+  dividendYielTTM: number;
+  payoutRatioTTM: number;
+  dividendPerShareTTM: number;
 };
 
 export enum SymbolHistoricalPeriods {

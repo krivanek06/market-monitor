@@ -18,3 +18,10 @@ type Foo = Spread<[{ a: string }, { a?: number }]>;
 export function merge<A extends object[]>(...a: [...A]) {
   return Object.assign({}, ...a) as Spread<A>;
 }
+
+export type ChangeFields<T, R> = Omit<T, keyof R> & R;
+
+/* ------------ OMIT --------------------- */
+
+//type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type ForcefullyOmit<T, K extends keyof T> = Omit<T, K> & Partial<Record<K, never>>;

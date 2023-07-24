@@ -32,6 +32,8 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
   @Input() heightPx = 400;
   @Input() limitValues = 30;
 
+  @Input() showTitle = false;
+
   private initChart(values: EstimatedChartDataType[]): void {
     const workingData = values.slice(-this.limitValues);
     const dates = workingData.map((x) => x.date);
@@ -60,7 +62,7 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         backgroundColor: 'transparent',
       },
       title: {
-        text: 'Earnings',
+        text: this.showTitle ? 'Earnings' : '',
         align: 'left',
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,
@@ -162,14 +164,14 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
           type: 'line',
           name: 'Actual',
           data: epsActualSeriesLine,
-          opacity: 0.8,
+          opacity: 0.75,
           enableMouseTracking: true,
         },
         {
           type: 'bubble',
           name: 'Actual',
           data: epsActualSeries,
-          opacity: 0.6,
+          opacity: 0.7,
           // marker: {
           //   fillColor: 'var(--background-medium)',
           // },
@@ -178,7 +180,7 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
           type: 'bubble',
           name: 'Expected',
           data: epsEstSeries,
-          opacity: 0.7,
+          opacity: 0.6,
           marker: {
             fillColor: ColorScheme.GRAY_MEDIUM_VAR,
           },

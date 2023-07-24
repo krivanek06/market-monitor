@@ -1,5 +1,5 @@
 .mdc-form-field > label {
-  color: var(--gray-medium-strong) !important;
+  color: var(--gray-medium) !important;
 }
 
 mat-radio-button {
@@ -26,7 +26,7 @@ mat-radio-button {
 
 // disabled state
 .mat-mdc-radio-button.mat-radio-disabled .mat-radio-label-content {
-  color: var(--gray-medium-strong) !important;
+  color: var(--gray-medium) !important;
 }
 
 fieldset:disabled {

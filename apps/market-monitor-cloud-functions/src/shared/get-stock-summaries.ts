@@ -4,9 +4,23 @@ import { StockSummary } from '@market-monitor/api-types';
 import { isBefore, subMinutes } from 'date-fns';
 import { firestore } from 'firebase-admin';
 
+export const getSummary = async (symbol: string): Promise<StockSummary> => {
+  const data = await getSummaries([symbol]);
+  const summary = data[0];
+
+  if (!summary) {
+    throw new Error(`Unable to load summary for symbol ${symbol}, most likely does not exist`);
+  }
+
+  return summary;
+};
+
 /**
  * check symbols against database if data not older than 3 min return, else fetch new data
  * and persist in DB
+ *
+ * return empty array if symbols does not exists in exchange
+ * returns data for ETF, funds too
  *
  * @param symbolsArray
  * @returns

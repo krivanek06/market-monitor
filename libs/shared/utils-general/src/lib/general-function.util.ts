@@ -8,11 +8,13 @@ export const isNumber = (value: string | number | unknown): boolean => {
   return value != null && value !== '' && typeof value === 'number' && !isNaN(Number(value.toString()));
 };
 
-export const roundNDigits = (value?: number | null, n: number = 2): number => {
+export const roundNDigits = (value?: number | null, n: number = 2, isPercent = false): number => {
   if (value === undefined || value === null) {
     return 0;
   }
-  return Math.round(value * Math.pow(10, n)) / Math.pow(10, n);
+
+  const usedValue = isPercent ? value * 100 : value;
+  return Math.round(usedValue * Math.pow(10, n)) / Math.pow(10, n);
 };
 
 export const groupValuesByDate = <T extends { date: string }>(data: T[]): { data: T[]; date: string }[] => {

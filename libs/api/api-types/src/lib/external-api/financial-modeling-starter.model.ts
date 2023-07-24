@@ -18,7 +18,7 @@ export type SymbolQuote = {
   open: number;
   previousClose: number;
   eps: number | null;
-  pe: number | null;
+  pe: number;
   earningsAnnouncement: string;
   timestamp: number;
 
@@ -29,20 +29,20 @@ export type SymbolQuote = {
 
 export type CompanyOutlook = {
   // data exists, however removed TS to access it from summary
-  profile: Profile;
-  metrics: Metrics;
-  ratios: Ratio[];
-  insideTrades: InsideTrade[];
-  KeyExecutive: KeyExecutive[];
-  splitsHistory: SplitsHistory[];
-  stockDividend: StockDividend[];
+  profile: CompanyProfile;
+  metrics: CompanyMetrics;
+  ratios: CompanyRatio[];
+  insideTrades: CompanyInsideTrade[];
+  keyExecutives: CompanyKeyExecutive[];
+  splitsHistory: CompanySplitsHistory[];
+  stockDividend: CompanyStockDividend[];
   stockNews: News[];
-  rating: Rating[];
-  financialsAnnual: FinancialsReport;
-  financialsQuarter: FinancialsReport;
+  rating: CompanyRating[];
+  financialsAnnual: CompanyFinancialsReport;
+  financialsQuarter: CompanyFinancialsReport;
 };
 
-export type Profile = {
+export type CompanyProfile = {
   symbol: string;
   price: number;
   beta: number;
@@ -81,14 +81,77 @@ export type Profile = {
   sector?: string; // can be empty
 };
 
-export type Metrics = {
+export type CompanyMetrics = {
   dividendYielTTM: number;
   volume: number;
   yearHigh: number;
   yearLow: number;
 };
 
-export type Ratio = {
+export type CompanyKeyMetricsTTM = {
+  revenuePerShareTTM: number;
+  netIncomePerShareTTM: number;
+  operatingCashFlowPerShareTTM: number;
+  freeCashFlowPerShareTTM: number;
+  cashPerShareTTM: number;
+  bookValuePerShareTTM: number;
+  tangibleBookValuePerShareTTM: number;
+  shareholdersEquityPerShareTTM: number;
+  interestDebtPerShareTTM: number;
+  marketCapTTM: number;
+  enterpriseValueTTM: number;
+  peRatioTTM: number;
+  priceToSalesRatioTTM: number;
+  pocfratioTTM: number;
+  pfcfRatioTTM: number;
+  pbRatioTTM: number;
+  ptbRatioTTM: number;
+  evToSalesTTM: number;
+  enterpriseValueOverEBITDATTM: number;
+  evToOperatingCashFlowTTM: number;
+  evToFreeCashFlowTTM: number;
+  earningsYieldTTM: number;
+  freeCashFlowYieldTTM: number;
+  debtToEquityTTM: number;
+  debtToAssetsTTM: number;
+  netDebtToEBITDATTM: number;
+  currentRatioTTM: number;
+  interestCoverageTTM: number;
+  incomeQualityTTM: number;
+  dividendYieldTTM: number;
+  dividendYieldPercentageTTM: number;
+  payoutRatioTTM: number;
+  salesGeneralAndAdministrativeToRevenueTTM: number;
+  researchAndDevelopementToRevenueTTM: number;
+  intangiblesToTotalAssetsTTM: number;
+  capexToOperatingCashFlowTTM: number;
+  capexToRevenueTTM: number;
+  capexToDepreciationTTM: number;
+  stockBasedCompensationToRevenueTTM: number;
+  grahamNumberTTM: number;
+  roicTTM: number;
+  returnOnTangibleAssetsTTM: number;
+  grahamNetNetTTM: number;
+  workingCapitalTTM: number;
+  tangibleAssetValueTTM: number;
+  netCurrentAssetValueTTM: number;
+  investedCapitalTTM: number;
+  averageReceivablesTTM: number;
+  averagePayablesTTM: number;
+  averageInventoryTTM: number;
+  daysSalesOutstandingTTM: number;
+  daysPayablesOutstandingTTM: number;
+  daysOfInventoryOnHandTTM: number;
+  receivablesTurnoverTTM: number;
+  payablesTurnoverTTM: number;
+  inventoryTurnoverTTM: number;
+  roeTTM: number;
+  capexPerShareTTM: number;
+  dividendPerShareTTM: number;
+  debtToMarketCapTTM: number;
+};
+
+export type CompanyRatio = {
   dividendYielTTM: number;
   dividendYielPercentageTTM: number;
   peRatioTTM: number;
@@ -149,7 +212,7 @@ export type Ratio = {
   dividendPerShareTTM: number;
 };
 
-export type InsideTrade = {
+export type CompanyInsideTrade = {
   symbol: string;
   filingDate: string;
   transactionDate: string;
@@ -167,7 +230,7 @@ export type InsideTrade = {
   link: string;
 };
 
-export type KeyExecutive = {
+export type CompanyKeyExecutive = {
   title: string;
   name: string;
   pay?: number;
@@ -177,7 +240,7 @@ export type KeyExecutive = {
   titleSince?: number;
 };
 
-export type SplitsHistory = {
+export type CompanySplitsHistory = {
   date: string;
   label: string;
   numerator: number;
@@ -194,7 +257,7 @@ export type News = {
   url: string;
 };
 
-export type Rating = {
+export type CompanyRating = {
   symbol: string;
   date: string;
   rating: string;
@@ -214,7 +277,7 @@ export type Rating = {
   ratingDetailsPBRecommendation: string;
 };
 
-export type FinancialsReport = {
+export type CompanyFinancialsReport = {
   income: FinancialIncome[];
   balance: FinancialBalance[];
   cash: FinancialCash[];
@@ -360,6 +423,17 @@ export type FinancialCash = {
   link: string;
   finalLink: string;
 };
+
+export interface EnterpriseValue {
+  symbol: string;
+  date: string;
+  stockPrice: number;
+  numberOfShares: number;
+  marketCapitalization: number;
+  minusCashAndCashEquivalents: number;
+  addTotalDebt: number;
+  enterpriseValue: number;
+}
 
 export type ESGDataRatingYearly = {
   symbol: string;
@@ -553,7 +627,7 @@ export type StockScreenerValues = {
   dividends: StockScreenerArray;
 };
 
-export type StockDividend = {
+export type CompanyStockDividend = {
   date: string;
   label: string;
   adjDividend: number | null;

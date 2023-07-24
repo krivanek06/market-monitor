@@ -13,7 +13,7 @@ table[mat-table] {
   tbody {
     tr {
       td {
-        @apply text-wt-gray-medium-strong text-base;
+        @apply text-wt-gray-medium text-base;
         border-bottom: 1px solid var(--table-border);
 
         &:first-child {
@@ -38,6 +38,15 @@ table[mat-table] {
     }
   }
 
+  &.not-hover {
+    .mat-mdc-row {
+      cursor: default !important;
+      &:hover {
+        background-color: transparent !important;
+      }
+    }
+  }
+
   th.mat-mdc-header-cell:last-of-type,
   td.mat-mdc-cell:last-of-type,
   td.mat-mdc-footer-cell:last-of-type {
@@ -46,7 +55,7 @@ table[mat-table] {
 }
 
 table[mat-table] tbody tr td {
-  color: var(--gray-medium-strong);
+  color: var(--gray-medium);
 }
 
 .mat-mdc-table {
@@ -72,5 +81,5 @@ table[mat-table] tbody tr td {
 }
 
 .mdc-data-table__header-cell {
-  color: var(--gray-medium-strong) !important;
+  color: var(--gray-medium) !important;
 }

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import {
   HistoricalPrice,
+  StockDetails,
   StockEarning,
   StockScreenerValues,
   StockSummary,
@@ -19,7 +20,7 @@ export class StocksApiService {
     @Inject(ENDPOINT_FUNCTION_URL) private readonly endpointFunctions: string
   ) {}
 
-  getStockSummariesByTicker(ticker: string): Observable<StockSummary[]> {
+  searchStockSummariesByPrefix(ticker: string): Observable<StockSummary[]> {
     return this.http.get<StockSummary[]>(`${this.endpointFunctions}/searchstocksbasic?symbol=${ticker}`);
   }
 
@@ -29,6 +30,10 @@ export class StocksApiService {
 
   getStockSummary(symbol: string): Observable<StockSummary> {
     return this.http.get<StockSummary>(`${this.endpointFunctions}/getstocksummary?symbol=${symbol}`);
+  }
+
+  getStockDetails(symbol: string): Observable<StockDetails> {
+    return this.http.get<StockDetails>(`${this.endpointFunctions}/getstockdetails?symbol=${symbol}`);
   }
 
   getStockHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {

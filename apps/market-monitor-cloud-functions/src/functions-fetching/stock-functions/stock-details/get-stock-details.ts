@@ -1,93 +1,140 @@
 import {
+  getCompanyKeyMetricsTTM,
   getCompanyOutlook,
+  getEnterpriseValue,
   getEsgDataQuarterly,
   getEsgRatingYearly,
   getPriceTarget,
   getRecommendationTrends,
   getSectorPeersForSymbols,
   getStockHistoricalEarnings,
-  getStockNews,
   getUpgradesDowngrades,
 } from '@market-monitor/api-external';
 import { getDatabaseStockDetailsRef } from '@market-monitor/api-firebase';
-import { StockDetails } from '@market-monitor/api-types';
-import { isBefore, subDays, subHours } from 'date-fns';
+import { CompanyOutlook, StockDetails, StockDetailsAPI, StockSummary } from '@market-monitor/api-types';
+import { ForcefullyOmit } from '@market-monitor/shared-utils-general';
+import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
+import { getSummary } from '../../../shared';
 
 /**
  * returns symbols details based on provided symbol in query
  */
-export const getstockdetails = onRequest(async (request, response: Response<StockDetails | null>) => {
+export const getstockdetails = onRequest(async (request, response: Response<StockDetails | string>) => {
   const symbolString = request.query.symbol as string;
+  const reload = request.query.reload === 'true' ? true : false;
 
   // throw error if no symbols
   if (!symbolString) {
-    response.send(null);
+    response.status(400).send('No symbol found in query params');
     return;
   }
 
-  // create DB calls
-  const databaseStockDetailsRef = getDatabaseStockDetailsRef(symbolString);
+  try {
+    // load summary
+    const summary = await getSummary(symbolString);
 
-  // map to data format
-  let databaseStockDetailsData = (await databaseStockDetailsRef.get()).data();
+    // prevent loading data for etf and funds
+    if (summary.profile.isEtf || summary.profile.isFund) {
+      response.status(400).send('Unable to get details for FUND or ETF');
+      return;
+    }
 
-  if (
-    // data exists
-    databaseStockDetailsData &&
-    // no need to reload data
-    !databaseStockDetailsData.reloadData &&
-    // data is not older than 7 days
-    !isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7)) &&
-    // news are not older than 12h
-    !isBefore(new Date(databaseStockDetailsData.lastUpdate.newsLastUpdate), subHours(new Date(), 12))
-  ) {
-    response.send(databaseStockDetailsData);
-    return;
+    // data will be always present, if symbol does not exist, it already failed on summary
+    const details = await getStockDetailsAPI(symbolString, reload);
+    const formattedDetails = modifyDetailsAPItoStockDetails(summary, details);
+
+    response.send(formattedDetails);
+  } catch (e) {
+    console.log(e);
+    response.status(500).send(`Unable to load data for ${symbolString}`);
   }
-
-  if (
-    // no data in DB
-    !databaseStockDetailsData ||
-    // admin force reload
-    databaseStockDetailsData.reloadData ||
-    // data is older than 7 days
-    isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7))
-  ) {
-    databaseStockDetailsData = await reloadDetails(symbolString);
-  }
-
-  // check if new are not older than 12h
-  if (isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subHours(new Date(), 12))) {
-    databaseStockDetailsData = await reloadNews(symbolString, databaseStockDetailsData);
-  }
-
-  // save data into firestore
-  await databaseStockDetailsRef.set(databaseStockDetailsData);
-
-  // return data from DB
-  response.send(databaseStockDetailsData);
 });
 
 /**
  *
  * @param symbol
- * @param stockDetails
- * @returns reloaded news for symbol from APIs
+ * @returns data from database or reload them from API and update DB
  */
-const reloadNews = async (symbol: string, stockDetails: StockDetails): Promise<StockDetails> => {
-  const stockNews = await getStockNews(symbol);
+const getStockDetailsAPI = async (symbol: string, reload: boolean = false): Promise<StockDetailsAPI> => {
+  // create DB calls
+  const databaseStockDetailsRef = getDatabaseStockDetailsRef(symbol);
+
+  // map to data format
+  const databaseStockDetailsData = (await databaseStockDetailsRef.get()).data();
+
+  if (
+    // data exists
+    databaseStockDetailsData &&
+    // no manual reload
+    !reload &&
+    // no need to reload data
+    !databaseStockDetailsData.reloadData &&
+    // data is not older than 7 days
+    !isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7))
+  ) {
+    return databaseStockDetailsData;
+  }
+
+  const fetchedStockDetailsData = await reloadDetails(symbol);
+
+  // save data into firestore
+  await databaseStockDetailsRef.set(fetchedStockDetailsData);
+
+  // return data from DB
+  return fetchedStockDetailsData;
+};
+
+const modifyDetailsAPItoStockDetails = (summary: StockSummary, details: StockDetailsAPI): StockDetails => {
+  const ratio = details.companyOutlook.ratios[0];
+  const rating = details.companyOutlook.rating[0];
+  const companyOutlook = details.companyOutlook as ForcefullyOmit<CompanyOutlook, 'ratios' | 'rating'>;
+  const sheetIncomeYearly = details.companyOutlook.financialsAnnual.income[0];
+  const sheetBalanceQuarter = details.companyOutlook.financialsQuarter.balance[0];
+  const sheetCashYearly = details.companyOutlook.financialsAnnual.cash[0];
+  const sheetCashflowQuarter = details.companyOutlook.financialsQuarter.cash[0];
+
   const result = {
-    ...stockDetails,
-    stockNews: stockNews.slice(-15),
-    ...{
-      lastUpdate: {
-        ...stockDetails.lastUpdate,
-        newsLastUpdate: new Date().toISOString(),
+    ...summary,
+    reloadData: false,
+    companyOutlook,
+    ratio,
+    rating,
+    upgradesDowngrades: details.upgradesDowngrades,
+    priceTarget: details.priceTarget,
+    stockEarnings: details.stockEarnings,
+    sectorPeers: details.sectorPeers,
+    recommendationTrends: details.recommendationTrends.slice().reverse(),
+    companyKeyMetricsTTM: details.companyKeyMetricsTTM,
+    esgDataQuarterly: details.esgDataQuarterly,
+    esgDataQuarterlyArray: details.esgDataQuarterlyArray,
+    esgDataRatingYearly: details.esgDataRatingYearly,
+    esgDataRatingYearlyArray: details.esgDataRatingYearlyArray,
+    enterpriseValue: details.enterpriseValue,
+    lastUpdate: details.lastUpdate,
+    additionalFinancialData: {
+      cashOnHand: sheetBalanceQuarter.cashAndShortTermInvestments,
+      costOfRevenue: sheetIncomeYearly.costOfRevenue,
+      EBITDA: sheetIncomeYearly.ebitda,
+      freeCashFlow: sheetCashflowQuarter.freeCashFlow,
+      netIncome: sheetIncomeYearly.netIncome,
+      revenue: sheetIncomeYearly.revenue,
+      operatingCashFlow: sheetCashflowQuarter.operatingCashFlow,
+      totalAssets: sheetBalanceQuarter.totalAssets,
+      totalCurrentAssets: sheetBalanceQuarter.totalCurrentAssets,
+      totalDebt: sheetBalanceQuarter.totalDebt,
+      shortTermDebt: sheetBalanceQuarter.shortTermDebt,
+      stockBasedCompensation: sheetCashflowQuarter.stockBasedCompensation,
+      dividends: {
+        dividendsPaid: sheetCashYearly.dividendsPaid,
+        dividendPerShareTTM: ratio.dividendPerShareTTM,
+        dividendYielPercentageTTM: ratio.dividendYielPercentageTTM,
+        dividendYielTTM: ratio.dividendYielTTM,
+        payoutRatioTTM: ratio.payoutRatioTTM,
       },
     },
-  };
+  } satisfies StockDetails;
 
   return result;
 };
@@ -97,7 +144,7 @@ const reloadNews = async (symbol: string, stockDetails: StockDetails): Promise<S
  * @param symbol
  * @returns reloaded all details for symbol from APIs
  */
-const reloadDetails = async (symbol: string): Promise<StockDetails> => {
+const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
   const [
     companyOutlook,
     esgRatingYearly,
@@ -107,7 +154,8 @@ const reloadDetails = async (symbol: string): Promise<StockDetails> => {
     analystEstimatesEarnings,
     sectorPeers,
     recommendationTrends,
-    stockNews,
+    companyKeyMetricsTTM,
+    enterpriseValue,
   ] = await Promise.all([
     getCompanyOutlook(symbol),
     getEsgRatingYearly(symbol),
@@ -117,25 +165,26 @@ const reloadDetails = async (symbol: string): Promise<StockDetails> => {
     getStockHistoricalEarnings(symbol),
     getSectorPeersForSymbols([symbol]),
     getRecommendationTrends(symbol),
-    getStockNews(symbol),
+    getCompanyKeyMetricsTTM(symbol),
+    getEnterpriseValue(symbol),
   ]);
 
-  const result: StockDetails = {
+  const result: StockDetailsAPI = {
     companyOutlook,
-    esgDataQuarterly: eSGDataQuarterly.at(-1) ?? null,
-    esgDataQuarterlyArray: eSGDataQuarterly.slice(-10),
-    esgDataRatingYearly: esgRatingYearly.at(-1) ?? null,
-    esgDataRatingYearlyArray: esgRatingYearly.slice(-10),
+    esgDataQuarterlyArray: eSGDataQuarterly.slice(0, 10),
+    esgDataQuarterly: eSGDataQuarterly[0],
+    esgDataRatingYearlyArray: esgRatingYearly.slice(0, 10),
+    esgDataRatingYearly: esgRatingYearly[0],
     stockEarnings: analystEstimatesEarnings,
-    stockNews: stockNews.slice(-15),
-    priceTarget,
-    sectorPeers,
-    upgradesDowngrades,
+    priceTarget: priceTarget.slice(0, 15),
+    sectorPeers: sectorPeers[0],
+    upgradesDowngrades: upgradesDowngrades.slice(0, 15),
     recommendationTrends,
+    companyKeyMetricsTTM,
+    enterpriseValue,
     reloadData: false,
     lastUpdate: {
       detailsLastUpdate: new Date().toISOString(),
-      newsLastUpdate: new Date().toISOString(),
       earningLastUpdate: new Date().toISOString(),
     },
   };

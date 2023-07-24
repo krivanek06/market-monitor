@@ -18,7 +18,7 @@ import { roundNDigits } from '@market-monitor/shared-utils-general';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import HC_stock from 'highcharts/modules/stock';
-import { ChartType, GenericChartSeries, GenericChartSeriesPie } from './generic-chart.model';
+import { ChartType, ChartTypeKeys, GenericChartSeries, GenericChartSeriesPie } from './generic-chart.model';
 
 HC_stock(Highcharts);
 @Component({
@@ -57,7 +57,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
 
   @Input({ required: true }) series!: GenericChartSeries[] | GenericChartSeriesPie[];
   @Input() heightPx = 400;
-  @Input() chartType: ChartType = ChartType.line;
+  @Input() chartType: ChartType | ChartTypeKeys = ChartType.line;
   @Input() chartTitle = '';
   @Input() chartTitlePosition = 'left';
   @Input() showTimelineSlider = false;
@@ -67,6 +67,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   @Input() showYAxis = true;
   @Input() showXAxis = true;
   @Input() shareTooltip = true;
+  @Input() showTooltipHeader = true;
 
   // legend
   @Input() showLegend = false;
@@ -106,10 +107,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
       this.chartOptions.xAxis = {
         ...this.chartOptions.xAxis,
         type: 'category',
-        labels: {
-          // ...this.chartOptions.xAxis.labels,
-          rotation: -20,
-        },
       };
     } else if (this.chartType === ChartType.bar && this.chartOptions.xAxis) {
       this.chartOptions.xAxis = {
@@ -142,9 +139,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         ...this.chartOptions.xAxis,
         categories: [...this.categories],
         type: 'category',
-        labels: {
-          rotation: -20,
-        },
       };
     }
   }
@@ -152,14 +146,8 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   private initChart() {
     this.chartOptions = {
       chart: {
-        plotBackgroundColor: undefined,
-        plotBorderWidth: undefined,
-        plotShadow: false,
         type: this.chartType === ChartType.areaChange ? ChartType.areaspline : this.chartType,
         backgroundColor: 'transparent',
-        panning: {
-          enabled: true,
-        },
       },
       navigator: {
         enabled: this.showTimelineSlider,
@@ -205,7 +193,8 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           day: '%e of %b',
         },
         labels: {
-          rotation: 0,
+          rotation: -20,
+          enabled: true,
           style: {
             color: ColorScheme.GRAY_MEDIUM_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
@@ -235,7 +224,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           cursor: this.enableLegendTogging ? 'pointer' : 'default',
         },
         itemHoverStyle: {
-          color: this.enableLegendTogging ? ColorScheme.GRAY_MEDIUM_STRONG_VAR : ColorScheme.GRAY_MEDIUM_VAR,
+          color: this.enableLegendTogging ? ColorScheme.GRAY_MEDIUM_VAR : ColorScheme.GRAY_MEDIUM_VAR,
         },
         itemHiddenStyle: {
           color: this.enableLegendTogging ? ColorScheme.GRAY_DARK_VAR : ColorScheme.GRAY_MEDIUM_VAR,
@@ -252,33 +241,43 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
       tooltip: {
         borderWidth: 1,
         padding: 12,
-        backgroundColor: '#232323',
+        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
         style: {
-          fontSize: '14px',
-          color: '#D9D8D8',
+          fontSize: '15px',
+          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
         shared: this.shareTooltip,
         outside: false,
         useHTML: true,
         xDateFormat: '%Y-%m-%d',
-        headerFormat: '<span>{point.key}</span>',
+        headerFormat: this.showTooltipHeader ? '<span>{point.key}</span>' : '',
 
         pointFormatter: function () {
           const that = this as any;
-          const value = roundNDigits(that.y, 2);
+          const value = roundNDigits(this.y, 2);
+          const index = this.category;
+          const name = this.name ?? this.series.name;
 
           // do not show 0 value in tooltip
           if (value === 0) {
             return '';
           }
-
+          //console.log(this);
           // additional data from above
           const additionalData = that.series.userOptions.additionalData;
-          const color = typeof that.series.color === 'string' ? that.series.color : that.series.color?.stops[1][1];
 
-          const line1 = `<span style="color: ${color}">● ${that.series.name}:</span>`;
+          let color = typeof this.series.color === 'string' ? this.series.color : that.series.color?.stops[1][1];
+
+          // if color is not provided, default is gray but we want to use colors form highcharts
+          if (additionalData.colorTooltipDefault && Highcharts?.defaultOptions?.colors) {
+            color = Highcharts.defaultOptions.colors[Number(index)];
+          }
+
+          const line1 = `<span style="color: ${color}">● ${name}:</span>`;
           const line2 = additionalData?.showCurrencySign
             ? `<span>$${value} USD</b></span>`
+            : additionalData?.showPercentageSign
+            ? `<span>${value}%</b></span>`
             : `<span>${value}</b></span>`;
           return `<div class="space-x-1">${line1} ${line2}</div>`;
         },
@@ -300,9 +299,9 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
         column: {
           pointPadding: 0.2,
           stacking: this.chartType === ChartType.columnStack ? 'normal' : undefined,
-          dataLabels: {
-            enabled: this.showDataLabel,
-          },
+          // dataLabels: {
+          //   enabled: this.showDataLabel,
+          // },
         },
         series: {
           //headerFormat: {},
@@ -315,7 +314,9 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           dataLabels: {
             color: ColorScheme.GRAY_LIGHT_VAR,
             enabled: this.showDataLabel,
-            format: undefined,
+            formatter: function () {
+              return roundNDigits(this.y, 2);
+            },
           },
           enableMouseTracking: this.showTooltip,
           events: {
@@ -339,9 +340,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           threshold: null,
         },
         bar: {
-          dataLabels: {
-            enabled: true,
-          },
           tooltip: {
             headerFormat: '',
             pointFormat: '<span style="color:{point.color};">{point.name}</span>: <b>{point.y}</b><br/>',
@@ -365,7 +363,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
 
               const result = `
               <div class="text-sm">
-                  <span style="color: ${that.color}">● ${that.name}: </span>
+                  <span style="color: ${this.color}">● ${this.name}: </span>
                   <span>${rounded}%</span>
               </div>
                 `;

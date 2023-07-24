@@ -13,7 +13,7 @@
     label {
       // font-size: 1rem !important;
       margin-top: -4px !important;
-      color: var(--gray-medium-strong) !important;
+      color: var(--gray-medium) !important;
     }
   }
 
@@ -64,7 +64,7 @@ mat-hint {
 }
 
 mat-divider {
-  background-color: var(--gray-medium) !important;
+  background-color: var(--table-border) !important;
 }
 
 .mat-mdc-form-field-error {

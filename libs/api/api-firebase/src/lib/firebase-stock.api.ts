@@ -1,4 +1,4 @@
-import { HistoricalPrice, News, StockDetails, StockSummary } from '@market-monitor/api-types';
+import { HistoricalPrice, News, StockDetailsAPI, StockSummary } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
 import { DataSnapshot, HistoricalPriceTypes } from './models';
@@ -10,7 +10,7 @@ export const getDatabaseStockMoreInformationRef = (symbol: string) =>
   getDatabaseStockSummaryRef(symbol).collection('more_information');
 
 export const getDatabaseStockDetailsRef = (symbol: string) =>
-  getDatabaseStockMoreInformationRef(symbol).doc('details').withConverter(assignTypes<StockDetails>());
+  getDatabaseStockMoreInformationRef(symbol).doc('details').withConverter(assignTypes<StockDetailsAPI>());
 
 export const getDatabaseStockDetailsHistorical = (symbol: string, historical: HistoricalPriceTypes) =>
   getDatabaseStockMoreInformationRef(symbol)

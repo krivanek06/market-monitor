@@ -27,6 +27,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
   }
   @Input() heightPx = 400;
   @Input() limitValues = 30;
+  @Input() showTitle = false;
 
   private initChart(values: EstimatedChartDataType[]): void {
     const workingData = values.slice(-this.limitValues);
@@ -56,7 +57,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         backgroundColor: 'transparent',
       },
       title: {
-        text: 'Revenue',
+        text: this.showTitle ? 'Revenue' : '',
         align: 'left',
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,

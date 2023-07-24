@@ -1,0 +1,69 @@
+<table mat-table [dataSource]="dataSource" class="not-hover">
+  <!-- date -->
+  <ng-container matColumnDef="date">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Date</th>
+    <td mat-cell *matCellDef="let row">
+      <span class="text-wt-gray-dark">{{ row.date | date : 'MMMM d, y' }}</span>
+    </td>
+  </ng-container>
+
+  <!-- formType -->
+  <ng-container matColumnDef="formType">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Form</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      <span>{{ row.formType }}</span>
+    </td>
+  </ng-container>
+
+  <!-- ESGScore -->
+  <ng-container matColumnDef="ESGScore">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">ESG</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      <span>
+        {{ row.ESGScore }}
+      </span>
+    </td>
+  </ng-container>
+
+  <!-- socialScore -->
+  <ng-container matColumnDef="socialScore">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Social</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      {{ row.socialScore }}
+    </td>
+  </ng-container>
+
+  <!-- governanceScore -->
+  <ng-container matColumnDef="governanceScore">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Governance</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      {{ row.governanceScore }}
+    </td>
+  </ng-container>
+
+  <!-- environmentalScore -->
+  <ng-container matColumnDef="environmentalScore">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Environmental</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      {{ row.environmentalScore }}
+    </td>
+  </ng-container>
+
+  <!-- redirect -->
+  <ng-container matColumnDef="redirect">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Redirect</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      <button mat-icon-button>
+        <mat-icon>open_in_new</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"></tr>
+
+  <!-- Row shown when there is no matching data. -->
+  <tr class="mat-row" *matNoDataRow>
+    <td class="mat-cell" colspan="10">No data has been found</td>
+  </tr>
+</table>
