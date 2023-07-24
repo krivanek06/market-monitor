@@ -14,8 +14,9 @@ import {
   CalendarStockEarning,
   resolveCalendarType,
 } from '@market-monitor/api-types';
-import { DividendItemComponent, DividendItemsDialogComponent } from '@market-monitor/modules/market-dividends';
 import {
+  DividendItemComponent,
+  DividendItemsDialogComponent,
   EarningsHistoricalDialogComponent,
   EarningsItemComponent,
   EarningsItemsDialogComponent,
