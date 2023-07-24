@@ -144,26 +144,20 @@
     </app-general-card>
   </div>
 
-  <div class="flex flex-col md:flex-row gap-x-6 gap-y-4">
-    <!-- key executives -->
-    <app-general-card title="Key Executives" class="basis-2/5">
-      <app-stock-key-executives-table
-        [data]="stockDetailsSignal.companyOutlook.keyExecutives"
-      ></app-stock-key-executives-table>
-    </app-general-card>
-  </div>
-
   <div class="grid gap-6 lg:grid-cols-3">
     <!-- upgrades & downgrades -->
     <app-general-card title="Upgrades & Downgrades" class="lg:col-span-2">
       <app-stock-upgrades-downgrades-table
-        [data]="stockDetailsSignal.upgradesDowngrades | slice : 0 : 10"
+        [data]="stockDetailsSignal.upgradesDowngrades | slice : 0 : 12"
         [currentPrice]="stockDetailsSignal.quote.price"
       ></app-stock-upgrades-downgrades-table>
     </app-general-card>
 
-    <app-general-card title="TODO" class="basis-1/3">
-      <div>TODO</div>
+    <!-- peers -->
+    <app-general-card additionalClasses="h-full" title="Peers" class="basis-1/3">
+      <ng-container *ngIf="stockPeersSignal() as stockPeersSignal">
+        <app-stock-peers-list [peers]="stockPeersSignal | slice : 0 : 12"></app-stock-peers-list>
+      </ng-container>
     </app-general-card>
   </div>
 
@@ -176,9 +170,10 @@
       ></app-stock-price-target-table>
     </app-general-card>
 
+    <!-- enterprise chart -->
     <app-general-card title="Enterprise Chart" additionalClasses="h-full">
       <app-stock-enterprise-chart
-        [heightPx]="500"
+        [heightPx]="520"
         [data]="stockDetailsSignal.enterpriseValue"
       ></app-stock-enterprise-chart>
     </app-general-card>

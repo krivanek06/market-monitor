@@ -13,6 +13,7 @@ import {
   StockEsgDataTableComponent,
   StockInsiderTradesComponent,
   StockKeyExecutivesTableComponent,
+  StockPeersListComponent,
   StockPriceTargetTableComponent,
   StockRatingTableComponent,
   StockRecommendationChartComponent,
@@ -51,6 +52,7 @@ import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
     NameValueListComponent,
     StockSummaryListComponent,
     StockEnterpriseChartComponent,
+    StockPeersListComponent,
   ],
   templateUrl: './stock-details.component.html',
   styleUrls: ['./stock-details.component.scss'],
@@ -63,23 +65,33 @@ export class StockDetailsComponent {
   stockTransformService = inject(StockTransformService);
   dialogServiceUtil = inject(DialogServiceUtil);
 
-  stockDetailsSignal = toSignal(
-    this.route.params.pipe(
-      map((params) => params['symbol'] as string | undefined),
-      tap((symbol) => {
-        if (!symbol) {
+  private stockDetails$ = this.route.params.pipe(
+    map((params) => params['symbol'] as string | undefined),
+    tap((symbol) => {
+      if (!symbol) {
+        this.router.navigate(['/']);
+      }
+    }),
+    filter((symbol): symbol is string => !!symbol),
+    switchMap((symbol) =>
+      this.stocksApiService.getStockDetails(symbol).pipe(
+        catchError((err) => {
+          this.dialogServiceUtil.showNotificationBar(`An error happened getting data for symbol: ${symbol}`, 'error');
           this.router.navigate(['/']);
-        }
-      }),
-      filter((symbol): symbol is string => !!symbol),
-      switchMap((symbol) =>
-        this.stocksApiService.getStockDetails(symbol).pipe(
-          catchError((err) => {
-            this.dialogServiceUtil.showNotificationBar(`An error happened getting data for symbol: ${symbol}`, 'error');
-            this.router.navigate(['/']);
-            return of(undefined);
-          })
-        )
+          return of(undefined);
+        })
+      )
+    )
+  );
+
+  stockDetailsSignal = toSignal(this.stockDetails$);
+
+  stockPeersSignal = toSignal(
+    this.stockDetails$.pipe(
+      switchMap((details) =>
+        this.stocksApiService
+          .getStockSummaries(details?.sectorPeers.peersList ?? [])
+          .pipe(map((summaries) => summaries ?? []))
       )
     )
   );

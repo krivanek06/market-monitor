@@ -115,13 +115,10 @@ export class StockEnterpriseChartComponent extends ChartConstructor {
           title: {
             text: '',
           },
-          startOnTick: false,
-          endOnTick: false,
           opposite: false,
           gridLineWidth: 1,
           minorTickInterval: 'auto',
           tickPixelInterval: 25,
-          visible: true,
           gridLineColor: '#66666655',
           labels: {
             style: {
@@ -134,13 +131,10 @@ export class StockEnterpriseChartComponent extends ChartConstructor {
           title: {
             text: '',
           },
-          startOnTick: false,
-          endOnTick: false,
           opposite: true,
           gridLineWidth: 1,
           minorTickInterval: 'auto',
           tickPixelInterval: 25,
-          visible: true,
           gridLineColor: '#66666655',
           labels: {
             style: {
@@ -157,9 +151,10 @@ export class StockEnterpriseChartComponent extends ChartConstructor {
         {
           type: 'column',
           name: 'Total Debt',
+          color: ColorScheme.PRIMARY_VAR,
           data: data.map((d) => d.addTotalDebt),
           yAxis: 0,
-          opacity: 0.85,
+          opacity: 0.7,
         },
         {
           type: 'line',

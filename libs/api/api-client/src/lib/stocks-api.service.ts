@@ -20,7 +20,7 @@ export class StocksApiService {
     @Inject(ENDPOINT_FUNCTION_URL) private readonly endpointFunctions: string
   ) {}
 
-  getStockSummariesByTicker(ticker: string): Observable<StockSummary[]> {
+  searchStockSummariesByPrefix(ticker: string): Observable<StockSummary[]> {
     return this.http.get<StockSummary[]>(`${this.endpointFunctions}/searchstocksbasic?symbol=${ticker}`);
   }
 

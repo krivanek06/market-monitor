@@ -69,7 +69,7 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
         debounceTime(400),
         distinctUntilChanged(),
         switchMap((value) =>
-          this.StocksApiService.getStockSummariesByTicker(value).pipe(
+          this.StocksApiService.searchStockSummariesByPrefix(value).pipe(
             tap(() => this.showLoadingIndicator.set(false)),
             catchError(() => [])
           )
