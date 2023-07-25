@@ -45,14 +45,3 @@ export const recommendationDefault = {
   value: 'N/A',
   color: ColorScheme.GRAY_MEDIUM_VAR,
 };
-
-export type SheetData = {
-  timePeriods: string[];
-  data: {
-    name: string;
-    values: number[];
-    isPercentage?: boolean;
-  }[];
-};
-
-export type SheetDataPeriod = 'financialsAnnual' | 'financialsQuarter';
