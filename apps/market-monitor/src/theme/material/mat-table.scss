@@ -1,3 +1,48 @@
+table:not([mat-table]) {
+  width: 100%;
+
+  thead {
+    tr {
+      th {
+        @apply text-sm text-wt-gray-medium text-start;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      td {
+        @apply text-wt-gray-medium h-[50px] cursor-pointer;
+
+        &:first-child {
+          @apply pl-4;
+        }
+
+        &:last-child {
+          @apply pr-4;
+        }
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px solid var(--table-border);
+      }
+    }
+  }
+
+  &.not-hover {
+    tbody {
+      tr {
+        td {
+          cursor: default !important;
+          &:hover {
+            background-color: transparent !important;
+          }
+        }
+      }
+    }
+  }
+}
+
 table[mat-table] {
   background: transparent;
   width: 100%;

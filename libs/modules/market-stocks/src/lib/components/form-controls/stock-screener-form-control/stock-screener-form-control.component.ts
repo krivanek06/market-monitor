@@ -18,24 +18,24 @@ import {
   STOCK_SCREENER_PRICE,
   STOCK_SCREENER_SECTORS,
   STOCK_SCREENER_VOLUME,
-} from '../../models';
+} from '../../../models';
 
 @Component({
-  selector: 'app-stock-screener-form',
+  selector: 'app-stock-screener-form-control',
   standalone: true,
   imports: [CommonModule, FormMatInputWrapperComponent, ReactiveFormsModule],
-  templateUrl: './stock-screener-form.component.html',
-  styleUrls: ['./stock-screener-form.component.scss'],
+  templateUrl: './stock-screener-form-control.component.html',
+  styleUrls: ['./stock-screener-form-control.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => StockScreenerFormComponent),
+      useExisting: forwardRef(() => StockScreenerFormControlComponent),
       multi: true,
     },
   ],
 })
-export class StockScreenerFormComponent implements OnInit, ControlValueAccessor {
+export class StockScreenerFormControlComponent implements OnInit, ControlValueAccessor {
   STOCK_SCREENER_COUNTRIES = STOCK_SCREENER_COUNTRIES;
   STOCK_SCREENER_INDUSTRIES = STOCK_SCREENER_INDUSTRIES;
   STOCK_SCREENER_SECTORS = STOCK_SCREENER_SECTORS;
@@ -73,14 +73,14 @@ export class StockScreenerFormComponent implements OnInit, ControlValueAccessor 
   /**
    * Register Component's ControlValueAccessor onChange callback
    */
-  registerOnChange(fn: StockScreenerFormComponent['onChange']): void {
+  registerOnChange(fn: StockScreenerFormControlComponent['onChange']): void {
     this.onChange = fn;
   }
 
   /**
    * Register Component's ControlValueAccessor onTouched callback
    */
-  registerOnTouched(fn: StockScreenerFormComponent['onTouched']): void {
+  registerOnTouched(fn: StockScreenerFormControlComponent['onTouched']): void {
     this.onTouched = fn;
   }
 }

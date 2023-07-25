@@ -3,7 +3,7 @@ import { StockDetails } from '@market-monitor/api-types';
 import { NameValueItem } from '@market-monitor/shared-components';
 import { EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
-import { CompanyRatingTable } from '../models';
+import { CompanyRatingTable, SheetData, SheetDataPeriod } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -247,5 +247,56 @@ export class StockTransformService {
       { name: 'Dividend Yield', value: `${roundNDigits(dividendData.dividendYielPercentageTTM, 2)}%` },
       ...stockDividends.map((d) => ({ name: d.label, value: d.dividend })),
     ];
+  }
+
+  createSheetDataFromBalanceSheet(period: SheetDataPeriod, data?: StockDetails): SheetData | null {
+    if (!data) {
+      return null;
+    }
+    const balanceSheet = data.companyOutlook[period].balance;
+    const timePeriods = balanceSheet.map((d) => `${d.period}, ${d.calendarYear}`);
+
+    return {
+      timePeriods,
+      data: [
+        { name: 'Total Assets', values: balanceSheet.map((d) => d.totalAssets) },
+        { name: 'Cash & Short-Term Investments', values: balanceSheet.map((d) => d.cashAndShortTermInvestments) },
+        { name: 'Cash On Hand', values: balanceSheet.map((d) => d.cashAndCashEquivalents) },
+        // { name: 'Other Assets', values: balanceSheet.map((d) => d.otherAssets), },
+        { name: 'Goodwill', values: balanceSheet.map((d) => d.goodwill) },
+        { name: 'Intangible Assets', values: balanceSheet.map((d) => d.intangibleAssets) },
+        { name: 'Total Investments', values: balanceSheet.map((d) => d.totalInvestments) },
+        { name: 'Long-Term Investments', values: balanceSheet.map((d) => d.longTermInvestments) },
+        { name: 'Short-Term Investments', values: balanceSheet.map((d) => d.shortTermInvestments) },
+        { name: 'Total Non-Current Assets', values: balanceSheet.map((d) => d.totalNonCurrentAssets) },
+        { name: 'Other Non-Current Assets', values: balanceSheet.map((d) => d.otherNonCurrentAssets) },
+        { name: 'Total Equity', values: balanceSheet.map((d) => d.totalEquity) },
+        { name: 'Total Debt', values: balanceSheet.map((d) => d.totalDebt) },
+        { name: 'Long-Term Debt', values: balanceSheet.map((d) => d.longTermDebt) },
+        { name: 'Short-Term Debt', values: balanceSheet.map((d) => d.shortTermDebt) },
+        { name: 'Net Debt', values: balanceSheet.map((d) => d.netDebt) },
+        { name: 'Total Liabilities', values: balanceSheet.map((d) => d.totalLiabilities) },
+        { name: 'Current Liabilities', values: balanceSheet.map((d) => d.totalCurrentLiabilities) },
+        { name: 'Non Current Liabilities', values: balanceSheet.map((d) => d.totalNonCurrentLiabilities) },
+        { name: 'Account Payables', values: balanceSheet.map((d) => d.accountPayables) },
+        { name: 'Net Receivables', values: balanceSheet.map((d) => d.netReceivables) },
+        { name: 'Tax Payables', values: balanceSheet.map((d) => d.taxPayables) },
+        { name: 'Deferred Tax Liabilities', values: balanceSheet.map((d) => d.deferredTaxLiabilitiesNonCurrent) },
+        { name: 'Deferred Revenue', values: balanceSheet.map((d) => d.deferredRevenue) },
+        { name: 'Non-Current Deferred Revenue', values: balanceSheet.map((d) => d.deferredRevenueNonCurrent) },
+        { name: 'Preferred Stock', values: balanceSheet.map((d) => d.preferredStock) },
+        { name: 'Property Plan Equipment', values: balanceSheet.map((d) => d.propertyPlantEquipmentNet) },
+        { name: 'Retained Earnings', values: balanceSheet.map((d) => d.retainedEarnings) },
+        { name: 'Minority Interest', values: balanceSheet.map((d) => d.minorityInterest) },
+        { name: 'Inventory', values: balanceSheet.map((d) => d.inventory) },
+        { name: 'Capital Lease Obligations', values: balanceSheet.map((d) => d.capitalLeaseObligations) },
+        { name: 'Common Stock', values: balanceSheet.map((d) => d.commonStock) },
+        { name: 'Retained Earnings', values: balanceSheet.map((d) => d.retainedEarnings) },
+        {
+          name: 'Accumulated Comprehensive IncomeLoss',
+          values: balanceSheet.map((d) => d.accumulatedOtherComprehensiveIncomeLoss),
+        },
+      ],
+    };
   }
 }

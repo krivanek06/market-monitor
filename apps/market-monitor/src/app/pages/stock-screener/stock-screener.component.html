@@ -1,5 +1,5 @@
 <section class="pt-16 mx-auto mb-10 md:w-11/12 lg:w-10/12 xl:w-9/12">
-  <app-stock-screener-form [formControl]="screenerFormControl"></app-stock-screener-form>
+  <app-stock-screener-form-control [formControl]="screenerFormControl"></app-stock-screener-form-control>
 
   <div class="flex items-center justify-between mt-8">
     <h3>Total found: {{ loadingSignal() ? 'Loading...' : screenerResults()?.length }}</h3>

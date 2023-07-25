@@ -9,7 +9,7 @@ import { StocksApiService } from '@market-monitor/api-client';
 import { StockScreenerValues, StockSummary } from '@market-monitor/api-types';
 import {
   STOCK_SCREENER_DEFAULT_VALUES,
-  StockScreenerFormComponent,
+  StockScreenerFormControlComponent,
   StockSummaryDialogComponent,
   StockSummaryTableComponent,
   getScreenerInputIndexByKey,
@@ -29,7 +29,7 @@ import { catchError, of, switchMap, tap } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    StockScreenerFormComponent,
+    StockScreenerFormControlComponent,
     ReactiveFormsModule,
     StockSummaryTableComponent,
     RangeDirective,
