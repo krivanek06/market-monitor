@@ -1,5 +1,13 @@
 <section class="g-screen-size-default">
-  <div class="mb-6">
+  <div class="flex justify-between mb-6 items-center">
+    <div>
+      <button type="button" mat-stroked-button class="min-w-[120px]" (click)="onHomeClick()">
+        <mat-icon>home</mat-icon>
+        Home
+      </button>
+    </div>
+
+    <!-- main navigation -->
     <app-tab-select-control
       [formControl]="routesStockDetailsControl"
       [displayOptions]="routesStockDetails"

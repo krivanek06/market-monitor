@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LabelValue, TabSelectControlComponent } from '@market-monitor/shared-components';
 import { DialogServiceModule } from '@market-monitor/shared-utils-client';
@@ -10,13 +12,21 @@ import { ROUTES_STOCK_DETAILS } from '../../routes.model';
 @Component({
   selector: 'app-stock-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, TabSelectControlComponent, DialogServiceModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    TabSelectControlComponent,
+    DialogServiceModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
   templateUrl: './stock-details.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
     `
       :host {
-        @apply mt-14 block;
+        @apply mt-6 block;
       }
     `,
   ],
@@ -38,6 +48,10 @@ export class StockDetailsComponent {
     this.routesStockDetailsControl.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
       this.router.navigate([value], { relativeTo: this.route });
     });
+  }
+
+  onHomeClick(): void {
+    this.router.navigate(['']);
   }
 
   /**
