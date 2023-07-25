@@ -1,0 +1,12 @@
+<nav class="flex justify-center gap-4 pt-8 text-wt-gray-medium">
+  <a [routerLink]="ROUTES_PUBLIC_ROUTES.SEARCH" routerLinkActive="is-active">Search</a>
+  <a [routerLink]="ROUTES_PUBLIC_ROUTES.STOCK_SCREENER" routerLinkActive="is-active">Screener</a>
+  <a [routerLink]="ROUTES_PUBLIC_ROUTES.TOP_PERFORMERS" routerLinkActive="is-active">Top Performers</a>
+  <a [routerLink]="ROUTES_PUBLIC_ROUTES.MARKET" routerLinkActive="is-active">Market</a>
+  <a [routerLink]="ROUTES_PUBLIC_ROUTES.MARKET_CALENDAR" routerLinkActive="is-active">Calendar</a>
+  <a [routerLink]="ROUTES_PUBLIC_ROUTES.CRYPTO" routerLinkActive="is-active">Crypto</a>
+</nav>
+
+<section class="g-screen-size-default">
+  <router-outlet></router-outlet>
+</section>

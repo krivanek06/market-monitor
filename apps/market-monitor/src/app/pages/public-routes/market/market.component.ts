@@ -4,7 +4,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DialogServiceModule } from '@market-monitor/shared-utils-client';
-import { ROUTES_MARKET, ROUTES_TOP_LEVEL } from '../../routes.model';
+import { ROUTES_MARKET, ROUTES_PUBLIC_ROUTES } from '../../../routes.model';
 
 @Component({
   selector: 'app-market',
@@ -27,9 +27,9 @@ export class MarketComponent implements OnInit {
     this.isCustomCheckedControl.patchValue(lastSegment === ROUTES_MARKET.CUSTOM);
     this.isCustomCheckedControl.valueChanges.subscribe((value) => {
       if (value) {
-        this.router.navigate([`${ROUTES_TOP_LEVEL.MARKET}/${ROUTES_MARKET.CUSTOM}`]);
+        this.router.navigate([`${ROUTES_PUBLIC_ROUTES.MARKET}/${ROUTES_MARKET.CUSTOM}`]);
       } else {
-        this.router.navigate([`${ROUTES_TOP_LEVEL.MARKET}/${ROUTES_MARKET.OVERVIEW}`]);
+        this.router.navigate([`${ROUTES_PUBLIC_ROUTES.MARKET}/${ROUTES_MARKET.OVERVIEW}`]);
       }
     });
   }

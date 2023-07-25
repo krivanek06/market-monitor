@@ -24,7 +24,13 @@ import { combineLatest, map, startWith } from 'rxjs';
     ReactiveFormsModule,
   ],
   templateUrl: './stock-details-financials.component.html',
-  styles: [],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockDetailsFinancialsComponent {
@@ -60,8 +66,4 @@ export class StockDetailsFinancialsComponent {
       })
     )
   );
-
-  constructor() {
-    this.timePeriodControl.valueChanges.subscribe(console.log);
-  }
 }

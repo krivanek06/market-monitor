@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { ROUTES_MARKET } from '../../routes.model';
+import { ROUTES_MARKET } from '../../../routes.model';
 import { MarketCustomComponent } from './market-custom/market-custom.component';
 import { MarketOverviewComponent } from './market-overview/market-overview.component';
 import { MarketComponent } from './market.component';
