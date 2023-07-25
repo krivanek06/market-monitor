@@ -11,7 +11,7 @@ import {
   StockTransformService,
 } from '@market-monitor/modules/market-stocks';
 import { GeneralCardComponent } from '@market-monitor/shared-components';
-import { map } from 'rxjs';
+import { combineLatest, map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-stock-details-financials',
@@ -42,9 +42,22 @@ export class StockDetailsFinancialsComponent {
   private stockDetails$ = (this.route.parent as ActivatedRoute).data.pipe(
     map((data) => data['stockDetails'] as StockDetails)
   );
-  balanceSheetDataSignal = toSignal(
-    this.stockDetails$.pipe(
-      map((data) => this.stockTransformService.createSheetDataFromBalanceSheet('financialsAnnual', data))
+  sheetDataSignal = toSignal(
+    combineLatest([
+      this.stockDetails$,
+      this.timePeriodControl.valueChanges.pipe(startWith(this.timePeriodControl.value)),
+    ]).pipe(
+      map(([stockDetails, timePeriod]) => {
+        const time = timePeriod.timePeriod;
+        const key = timePeriod.sheetKey;
+        if (key === 'cash') {
+          return this.stockTransformService.createSheetDataFromCashFlow(time, stockDetails);
+        }
+        if (key === 'income') {
+          return this.stockTransformService.createSheetDataFromIncomeStatement(time, stockDetails);
+        }
+        return this.stockTransformService.createSheetDataFromBalanceSheet(time, stockDetails);
+      })
     )
   );
 

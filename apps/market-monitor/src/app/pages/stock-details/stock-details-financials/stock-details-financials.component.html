@@ -4,7 +4,7 @@
 
 <app-general-card additionalClasses="py-4 px-6">
   <app-stock-sheet-data-table
-    *ngIf="balanceSheetDataSignal() as balanceSheetDataSignal"
+    *ngIf="sheetDataSignal() as balanceSheetDataSignal"
     [data]="balanceSheetDataSignal"
   ></app-stock-sheet-data-table>
 </app-general-card>
