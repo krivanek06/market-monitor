@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RangeDirective } from '@market-monitor/shared-directives';
 
 @Component({
-  selector: 'app-market-overview-skeleton',
+  selector: 'app-page-market-overview-skeleton',
   standalone: true,
   imports: [CommonModule, RangeDirective],
   styles: [
@@ -62,4 +62,4 @@ import { RangeDirective } from '@market-monitor/shared-directives';
     </div>
   `,
 })
-export class MarketOverviewSkeletonComponent {}
+export class PageMarketOverviewSkeletonComponent {}

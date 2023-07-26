@@ -11,7 +11,13 @@ import { ROUTES_MARKET, ROUTES_PUBLIC_ROUTES } from '../../../routes.model';
   standalone: true,
   imports: [CommonModule, MatCheckboxModule, RouterModule, DialogServiceModule, ReactiveFormsModule],
   templateUrl: './market.component.html',
-  styleUrls: ['./market.component.scss'],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarketComponent implements OnInit {

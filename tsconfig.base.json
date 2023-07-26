@@ -21,6 +21,7 @@
       "@market-monitor/api-types": ["libs/api/api-types/src/index.ts"],
       "@market-monitor/modules/market-general": ["libs/modules/market-general/src/index.ts"],
       "@market-monitor/modules/market-stocks": ["libs/modules/market-stocks/src/index.ts"],
+      "@market-monitor/modules/page-builder": ["libs/modules/page-builder/src/index.ts"],
       "@market-monitor/shared-components": ["libs/shared/components/src/index.ts"],
       "@market-monitor/shared-directives": ["libs/shared/directives/src/index.ts"],
       "@market-monitor/shared-pipes": ["libs/shared/pipes/src/index.ts"],

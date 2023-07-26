@@ -13,10 +13,6 @@ export const appRoutes: Routes = [
         path: `${ROUTES_TOP_LEVEL.STOCK_DETAILS}/:symbol`,
         loadChildren: () => import('./pages/stock-details/stock-details.routes').then((m) => m.route),
       },
-      {
-        path: ROUTES_TOP_LEVEL.DASHBOARD,
-        loadChildren: () => import('./pages/dashboard/dashboard.routes').then((m) => m.route),
-      },
     ],
   },
 ];
