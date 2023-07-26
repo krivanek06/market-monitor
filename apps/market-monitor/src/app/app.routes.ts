@@ -7,11 +7,11 @@ export const appRoutes: Routes = [
     children: [
       {
         path: '',
-        loadChildren: () => import('./pages/public-routes/public-routes.routes').then((m) => m.route),
+        loadChildren: () => import('./pages/public-routes/public-routes.component').then((m) => m.route),
       },
       {
         path: `${ROUTES_TOP_LEVEL.STOCK_DETAILS}/:symbol`,
-        loadChildren: () => import('./pages/stock-details/stock-details.routes').then((m) => m.route),
+        loadChildren: () => import('./pages/stock-details/stock-details.component').then((m) => m.route),
       },
     ],
   },

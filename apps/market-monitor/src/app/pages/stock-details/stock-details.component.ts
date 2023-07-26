@@ -4,10 +4,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
+import { stockDetailsResolver } from '@market-monitor/modules/page-builder';
 import { LabelValue, TabSelectControlComponent } from '@market-monitor/shared-components';
 import { DialogServiceModule } from '@market-monitor/shared-utils-client';
 import { ROUTES_STOCK_DETAILS } from '../../routes.model';
+import { StockDetailsFinancialsComponent } from './subpages/stock-details-financials.component';
+import { StockDetailsOverviewComponent } from './subpages/stock-details-overview.component';
+import { StockDetailsRatiosComponent } from './subpages/stock-details-ratios.component';
+import { StockDetailsTradesComponent } from './subpages/stock-details-trades.component';
 
 @Component({
   selector: 'app-stock-details',
@@ -21,7 +26,26 @@ import { ROUTES_STOCK_DETAILS } from '../../routes.model';
     MatButtonModule,
     MatIconModule,
   ],
-  templateUrl: './stock-details.component.html',
+  template: `
+    <section class="g-screen-size-default">
+      <div class="flex justify-between mb-6 items-center">
+        <div>
+          <button type="button" mat-stroked-button class="min-w-[120px]" (click)="onHomeClick()">
+            <mat-icon>home</mat-icon>
+            Home
+          </button>
+        </div>
+
+        <!-- main navigation -->
+        <app-tab-select-control
+          [formControl]="routesStockDetailsControl"
+          [displayOptions]="routesStockDetails"
+        ></app-tab-select-control>
+      </div>
+
+      <router-outlet></router-outlet>
+    </section>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
     `
@@ -64,3 +88,36 @@ export class StockDetailsComponent {
     }
   }
 }
+
+export const route: Routes = [
+  {
+    path: '',
+    component: StockDetailsComponent,
+    resolve: {
+      stockDetails: stockDetailsResolver,
+    },
+    children: [
+      {
+        path: '',
+        redirectTo: ROUTES_STOCK_DETAILS.OVERVIEW,
+        pathMatch: 'full',
+      },
+      {
+        path: ROUTES_STOCK_DETAILS.OVERVIEW,
+        component: StockDetailsOverviewComponent,
+      },
+      {
+        path: ROUTES_STOCK_DETAILS.TRADES,
+        component: StockDetailsTradesComponent,
+      },
+      {
+        path: ROUTES_STOCK_DETAILS.FINANCIALS,
+        component: StockDetailsFinancialsComponent,
+      },
+      {
+        path: ROUTES_STOCK_DETAILS.RATIOS,
+        component: StockDetailsRatiosComponent,
+      },
+    ],
+  },
+];

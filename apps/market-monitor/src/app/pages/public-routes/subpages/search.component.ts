@@ -1,0 +1,27 @@
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Routes } from '@angular/router';
+import { PageSearchComponent } from '@market-monitor/modules/page-builder';
+
+@Component({
+  selector: 'app-search',
+  standalone: true,
+  imports: [CommonModule, PageSearchComponent],
+  template: `<app-page-search></app-page-search>`,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class SearchComponent {}
+
+export const route: Routes = [
+  {
+    path: '',
+    component: SearchComponent,
+  },
+];
