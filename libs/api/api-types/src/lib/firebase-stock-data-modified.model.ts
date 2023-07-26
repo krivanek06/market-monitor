@@ -29,6 +29,7 @@ export type StockDetails = StockSummary &
   };
 
 export type StockMetricsHistoricalBasic = {
+  dates: string[];
   marketCap: number[];
   enterpriseValue: number[];
   ratios: {

@@ -1,1 +1,299 @@
-<p>stock-details-ratios works!</p>
+<div class="mb-4">
+  <h2>Company Ratios Quarterly</h2>
+</div>
+
+<div *ngIf="stockHistoricalMetricsSignal() as data" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Market Cap."
+    [series]="[
+      {
+        name: 'Market Cap.',
+        data: data.marketCap
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Enterprise Value"
+    [series]="[
+      {
+        name: 'Enterprise Value',
+        data: data.enterpriseValue
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="PE Ratio"
+    [series]="[
+      {
+        name: 'PE Ratio',
+        data: data.ratios.peRatio
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Current Ratio"
+    [series]="[
+      {
+        name: 'Current Ratio',
+        data: data.ratios.currentRatio
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Quick Ratio"
+    [series]="[
+      {
+        name: 'Quick Ratio',
+        data: data.ratios.quickRatio
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Cash Ratio"
+    [series]="[
+      {
+        name: 'Cash Ratio',
+        data: data.ratios.cashRatio
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Price to Sales Ratio"
+    [series]="[
+      {
+        name: 'Price to Sales Ratio',
+        data: data.ratios.priceToSalesRatio
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Price to Cash Flow Ratio"
+    [series]="[
+      {
+        name: 'Price to Cash Flow Ratio',
+        data: data.ratios.pocfratio
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Price to Free Cash Flow Ratio"
+    [series]="[
+      {
+        name: 'Price to Free Cash Flow Ratio',
+        data: data.ratios.pfcfRatio
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Price to Book Ratio"
+    [series]="[
+      {
+        name: 'Price to Book Ratio',
+        data: data.ratios.pbRatio
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Debt Ratio"
+    [series]="[
+      {
+        name: 'Debt Ratio',
+        data: data.ratios.debtRatio
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Debt to Equity Ratio"
+    [series]="[
+      {
+        name: 'Debt to Equity Ratio',
+        data: data.ratios.debtToEquity
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Debt to Assets Ratio"
+    [series]="[
+      {
+        name: 'Debt to Assets Ratio',
+        data: data.ratios.debtToAssets
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Dividend Yield"
+    [series]="[
+      {
+        name: 'Dividend Yield',
+        data: data.ratios.dividendYield
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Stock Compensation to Revenue Ratio"
+    [series]="[
+      {
+        name: 'Stock Compensation to Revenue Ratio',
+        data: data.ratios.stockBasedCompensationToRevenue
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Gross Margin"
+    [series]="[
+      {
+        name: 'Gross Margin',
+        data: data.margin.grossProfitMargin
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Net Profit Margin"
+    [series]="[
+      {
+        name: 'Net Profit Margin',
+        data: data.margin.netProfitMargin
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Revenue per Share"
+    [series]="[
+      {
+        name: 'Revenue per Share',
+        data: data.perShare.revenuePerShare
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Net Income per Share"
+    [series]="[
+      {
+        name: 'Net Income per Share',
+        data: data.perShare.netIncomePerShare
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Cash per Share"
+    [series]="[
+      {
+        name: 'Cash per Share',
+        data: data.perShare.cashPerShare
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Book Value per Share"
+    [series]="[
+      {
+        name: 'Book Value per Share',
+        data: data.perShare.bookValuePerShare
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Free Cash Flow per Share"
+    [series]="[
+      {
+        name: 'Free Cash Flow per Share',
+        data: data.perShare.freeCashFlowPerShare
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Payout Ratio"
+    [series]="[
+      {
+        name: 'Payout Ratio',
+        data: data.dividends.dividendPayoutRatio,
+        additionalData: {
+          showPercentageSign: true
+        }
+      }
+    ]"
+  ></app-generic-chart>
+
+  <app-generic-chart
+    [categories]="data.dates"
+    [heightPx]="300"
+    chartTitle="Dividend Yield"
+    [series]="[
+      {
+        name: 'Dividend Yield',
+        data: data.dividends.dividendYield,
+        additionalData: {
+          showPercentageSign: true
+        }
+      }
+    ]"
+  ></app-generic-chart>
+</div>

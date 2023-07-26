@@ -31,10 +31,11 @@ export const getstockhistoricalmetrics = onRequest(
 );
 
 const formatData = (data: StockMetricsHistoricalAPI, timePeriod: DataTimePeriod): StockMetricsHistoricalBasic => {
-  const keyMetrics = data[timePeriod].keyMetrics;
-  const ratios = data[timePeriod].ratios;
+  const keyMetrics = data[timePeriod].keyMetrics.reverse();
+  const ratios = data[timePeriod].ratios.reverse();
 
   return {
+    dates: keyMetrics.map((d) => d.date),
     marketCap: keyMetrics.map((d) => d.marketCap),
     enterpriseValue: keyMetrics.map((d) => d.enterpriseValue),
     ratios: {
