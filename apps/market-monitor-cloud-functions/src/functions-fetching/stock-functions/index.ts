@@ -1,3 +1,4 @@
+export * from './get-stock-historical-metrics-basic';
 export * from './get-stock-screening';
 export * from './get-stock-summary';
 export * from './search-stock-basic';

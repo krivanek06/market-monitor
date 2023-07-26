@@ -1,9 +1,9 @@
-import { ChangeFields, ForcefullyOmit } from '@market-monitor/shared-utils-general';
+import { DataTimePeriodEnum } from './constants-symbols.model';
 import {
+  CompanyKeyMetrics,
   CompanyKeyMetricsTTM,
   CompanyOutlook,
   CompanyProfile,
-  CompanyRating,
   CompanyRatio,
   ESGDataQuarterly,
   ESGDataRatingYearly,
@@ -46,38 +46,24 @@ export type StockDetailsAPI = {
   };
 };
 
-export type StockDetails = StockSummary &
-  ChangeFields<
-    StockDetailsAPI,
-    {
-      companyOutlook: ForcefullyOmit<CompanyOutlook, 'ratios' | 'rating'>;
-    }
-  > & {
-    ratio: CompanyRatio;
-    rating: CompanyRating;
-    additionalFinancialData: {
-      revenue: number;
-      costOfRevenue: number;
-      EBITDA: number;
-      netIncome: number;
-      totalAssets: number;
-      totalCurrentAssets: number;
-      totalDebt: number;
-      shortTermDebt: number;
-      cashOnHand: number;
-      freeCashFlow: number;
-      operatingCashFlow: number;
-      stockBasedCompensation: number;
-      dividends: StockDetailsDividends;
-    };
-  };
-
 export type StockDetailsDividends = {
   dividendsPaid: number;
   dividendYielPercentageTTM: number;
   dividendYielTTM: number;
   payoutRatioTTM: number;
   dividendPerShareTTM: number;
+};
+
+export type StockMetricsHistoricalAPI = {
+  [DataTimePeriodEnum.QUARTER]: {
+    ratios: CompanyRatio[];
+    keyMetrics: CompanyKeyMetrics[];
+  };
+  [DataTimePeriodEnum.YEAR]: {
+    ratios: CompanyRatio[];
+    keyMetrics: CompanyKeyMetrics[];
+  };
+  lastUpdate: string;
 };
 
 export enum SymbolHistoricalPeriods {
