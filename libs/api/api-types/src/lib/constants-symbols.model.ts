@@ -25,3 +25,9 @@ export const INDEXES_DEFAULT = [
 ];
 
 export const INDEXES_DEFAULT_SYMBOLS = INDEXES_DEFAULT.map((index) => index.symbol);
+
+export enum DataTimePeriodEnum {
+  QUARTER = 'quarter',
+  YEAR = 'year',
+}
+export type DataTimePeriod = `${DataTimePeriodEnum}`;

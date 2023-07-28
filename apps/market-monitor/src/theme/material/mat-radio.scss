@@ -3,7 +3,7 @@
 }
 
 mat-radio-button {
-  border: 1px solid var(--gray-medium);
+  border: 1px solid var(--table-border);
   border-radius: 8px;
   padding: 2px 16px;
 
@@ -21,7 +21,7 @@ mat-radio-button {
   .mdc-radio__native-control:enabled:not(:checked)
   + .mdc-radio__background
   .mdc-radio__outer-circle {
-  border-color: var(--gray-medium) !important;
+  border-color: var(--table-border) !important;
 }
 
 // disabled state

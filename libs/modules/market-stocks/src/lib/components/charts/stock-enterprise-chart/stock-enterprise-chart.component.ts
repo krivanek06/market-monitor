@@ -78,6 +78,19 @@ export class StockEnterpriseChartComponent extends ChartConstructor {
       },
       legend: {
         enabled: false,
+        itemStyle: {
+          color: ColorScheme.GRAY_MEDIUM_VAR,
+          cursor: 'pointer',
+        },
+        itemHoverStyle: {
+          color: ColorScheme.GRAY_MEDIUM_VAR,
+        },
+        itemHiddenStyle: {
+          color: ColorScheme.GRAY_DARK_VAR,
+        },
+        verticalAlign: 'top',
+        align: 'right',
+        layout: 'horizontal',
       },
       xAxis: {
         labels: {
@@ -161,6 +174,13 @@ export class StockEnterpriseChartComponent extends ChartConstructor {
           name: 'Enterprise Value',
           color: Recommendation.StrongBuy.color,
           data: data.map((d) => d.enterpriseValue),
+          yAxis: 1,
+        },
+        {
+          type: 'line',
+          name: 'Market Capitalization',
+          color: Recommendation.Buy.color,
+          data: data.map((d) => d.marketCapitalization),
           yAxis: 1,
         },
         {

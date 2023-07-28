@@ -1,119 +1,123 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
-import { StocksApiService } from '@market-monitor/api-client';
-import {
-  EarningsEstimationChartComponent,
-  RevenueEstimationChartComponent,
-} from '@market-monitor/modules/market-earnings';
-import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
-import {
-  StockEnterpriseChartComponent,
-  StockEsgDataTableComponent,
-  StockInsiderTradesComponent,
-  StockKeyExecutivesTableComponent,
-  StockPeersListComponent,
-  StockPriceTargetTableComponent,
-  StockRatingTableComponent,
-  StockRecommendationChartComponent,
-  StockSummaryListComponent,
-  StockTransformService,
-  StockUpgradesDowngradesTableComponent,
-} from '@market-monitor/modules/market-stocks';
-import {
-  GeneralCardComponent,
-  GenericChartComponent,
-  NameValueListComponent,
-  PriceChangeItemsComponent,
-} from '@market-monitor/shared-components';
-import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared-utils-client';
-import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
+import { stockDetailsResolver } from '@market-monitor/modules/page-builder';
+import { LabelValue, TabSelectControlComponent } from '@market-monitor/shared-components';
+import { DialogServiceModule } from '@market-monitor/shared-utils-client';
+import { ROUTES_STOCK_DETAILS } from '../../routes.model';
+import { StockDetailsFinancialsComponent } from './subpages/stock-details-financials.component';
+import { StockDetailsOverviewComponent } from './subpages/stock-details-overview.component';
+import { StockDetailsRatiosComponent } from './subpages/stock-details-ratios.component';
+import { StockDetailsTradesComponent } from './subpages/stock-details-trades.component';
 
 @Component({
   selector: 'app-stock-details',
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
+    TabSelectControlComponent,
     DialogServiceModule,
-    GenericChartComponent,
-    GeneralCardComponent,
-    StockRatingTableComponent,
-    StockRecommendationChartComponent,
-    StockInsiderTradesComponent,
-    StockEsgDataTableComponent,
-    EarningsEstimationChartComponent,
-    RevenueEstimationChartComponent,
-    StockKeyExecutivesTableComponent,
-    StockUpgradesDowngradesTableComponent,
-    StockPriceTargetTableComponent,
-    PriceChangeItemsComponent,
-    AssetPriceChartInteractiveComponent,
-    NameValueListComponent,
-    StockSummaryListComponent,
-    StockEnterpriseChartComponent,
-    StockPeersListComponent,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatIconModule,
   ],
-  templateUrl: './stock-details.component.html',
-  styleUrls: ['./stock-details.component.scss'],
+  template: `
+    <section class="g-screen-size-default">
+      <div class="flex justify-between mb-6 items-center">
+        <div>
+          <button type="button" mat-stroked-button class="min-w-[120px]" (click)="onHomeClick()">
+            <mat-icon>home</mat-icon>
+            Home
+          </button>
+        </div>
+
+        <!-- main navigation -->
+        <app-tab-select-control
+          [formControl]="routesStockDetailsControl"
+          [displayOptions]="routesStockDetails"
+        ></app-tab-select-control>
+      </div>
+
+      <router-outlet></router-outlet>
+    </section>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [
+    `
+      :host {
+        @apply mt-6 block;
+      }
+    `,
+  ],
 })
 export class StockDetailsComponent {
-  route = inject(ActivatedRoute);
   router = inject(Router);
-  stocksApiService = inject(StocksApiService);
-  stockTransformService = inject(StockTransformService);
-  dialogServiceUtil = inject(DialogServiceUtil);
+  route = inject(ActivatedRoute);
+  routesStockDetailsControl = new FormControl<string>(ROUTES_STOCK_DETAILS.OVERVIEW);
+  routesStockDetails: LabelValue<string>[] = [
+    { label: 'Overview', value: ROUTES_STOCK_DETAILS.OVERVIEW },
+    { label: 'Trades', value: ROUTES_STOCK_DETAILS.TRADES },
+    { label: 'Financials', value: ROUTES_STOCK_DETAILS.FINANCIALS },
+    { label: 'Ratios', value: ROUTES_STOCK_DETAILS.RATIOS },
+  ];
 
-  private stockDetails$ = this.route.params.pipe(
-    map((params) => params['symbol'] as string | undefined),
-    tap((symbol) => {
-      if (!symbol) {
-        this.router.navigate(['/']);
-      }
-    }),
-    filter((symbol): symbol is string => !!symbol),
-    switchMap((symbol) =>
-      this.stocksApiService.getStockDetails(symbol).pipe(
-        catchError((err) => {
-          this.dialogServiceUtil.showNotificationBar(`An error happened getting data for symbol: ${symbol}`, 'error');
-          this.router.navigate(['/']);
-          return of(undefined);
-        })
-      )
-    )
-  );
+  constructor() {
+    this.resolveUrl();
 
-  stockDetailsSignal = toSignal(this.stockDetails$);
+    this.routesStockDetailsControl.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
+      this.router.navigate([value], { relativeTo: this.route });
+    });
+  }
 
-  stockPeersSignal = toSignal(
-    this.stockDetails$.pipe(
-      switchMap((details) =>
-        this.stocksApiService
-          .getStockSummaries(details?.sectorPeers.peersList ?? [])
-          .pipe(map((summaries) => summaries ?? []))
-      )
-    )
-  );
+  onHomeClick(): void {
+    this.router.navigate(['']);
+  }
 
-  companyRatingSignal = computed(() => this.stockTransformService.createCompanyRatingTable(this.stockDetailsSignal()));
-  estimationChartDataSignal = computed(
-    computed(() => this.stockTransformService.createEstimationData(this.stockDetailsSignal()))
-  );
-  financialStrengthSignal = computed(() =>
-    this.stockTransformService.createFinancialStrength(this.stockDetailsSignal())
-  );
-  financialRatio1Signal = computed(() => this.stockTransformService.createFinancialRatio1(this.stockDetailsSignal()));
-  financialRatio2Signal = computed(() => this.stockTransformService.createFinancialRatio2(this.stockDetailsSignal()));
-  financialPerShareSignal = computed(() =>
-    this.stockTransformService.createFinancialPerShare(this.stockDetailsSignal())
-  );
-  financialOperatingSignal = computed(() =>
-    this.stockTransformService.createFinancialOperatingData(this.stockDetailsSignal())
-  );
-  financialDividendsSignal = computed(() =>
-    this.stockTransformService.createFinancialDividends(this.stockDetailsSignal())
-  );
-
-  constructor() {}
+  /**
+   * may happen that url is different than default value in routesStockDetailsControl
+   */
+  private resolveUrl(): void {
+    const lastUrlSegment = this.router.url.split('?')[0].split('/').pop();
+    if (lastUrlSegment) {
+      this.routesStockDetailsControl.patchValue(lastUrlSegment);
+    }
+  }
 }
+
+export const route: Routes = [
+  {
+    path: '',
+    component: StockDetailsComponent,
+    resolve: {
+      stockDetails: stockDetailsResolver,
+    },
+    children: [
+      {
+        path: '',
+        redirectTo: ROUTES_STOCK_DETAILS.OVERVIEW,
+        pathMatch: 'full',
+      },
+      {
+        path: ROUTES_STOCK_DETAILS.OVERVIEW,
+        component: StockDetailsOverviewComponent,
+      },
+      {
+        path: ROUTES_STOCK_DETAILS.TRADES,
+        component: StockDetailsTradesComponent,
+      },
+      {
+        path: ROUTES_STOCK_DETAILS.FINANCIALS,
+        component: StockDetailsFinancialsComponent,
+      },
+      {
+        path: ROUTES_STOCK_DETAILS.RATIOS,
+        component: StockDetailsRatiosComponent,
+      },
+    ],
+  },
+];

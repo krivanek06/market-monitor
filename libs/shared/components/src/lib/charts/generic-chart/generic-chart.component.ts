@@ -14,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-client';
-import { roundNDigits } from '@market-monitor/shared-utils-general';
+import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import HC_stock from 'highcharts/modules/stock';
@@ -209,7 +209,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           fontSize: '13px',
           fontWeight: 'normal',
         },
-        y: 15,
+        y: 10,
       },
       subtitle: {
         text: '',
@@ -247,39 +247,41 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
           color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
         shared: this.shareTooltip,
-        outside: false,
+        outside: true,
         useHTML: true,
         xDateFormat: '%Y-%m-%d',
         headerFormat: this.showTooltipHeader ? '<span>{point.key}</span>' : '',
 
         pointFormatter: function () {
           const that = this as any;
-          const value = roundNDigits(this.y, 2);
-          const index = this.category;
-          const name = this.name ?? this.series.name;
+          const additionalData = that.series.userOptions.additionalData;
 
           // do not show 0 value in tooltip
-          if (value === 0) {
+          if (this.y === 0) {
             return '';
           }
-          //console.log(this);
-          // additional data from above
-          const additionalData = that.series.userOptions.additionalData;
+
+          const isPercent = !!additionalData?.showPercentageSign;
+          const showDollar = !!additionalData?.showCurrencySign;
+
+          const value = formatLargeNumber(this.y, isPercent, showDollar);
+          const index = this.category;
+          const name = this.name ?? this.series.name;
 
           let color = typeof this.series.color === 'string' ? this.series.color : that.series.color?.stops[1][1];
 
           // if color is not provided, default is gray but we want to use colors form highcharts
-          if (additionalData.colorTooltipDefault && Highcharts?.defaultOptions?.colors) {
+          if (additionalData && additionalData.colorTooltipDefault && Highcharts?.defaultOptions?.colors) {
             color = Highcharts.defaultOptions.colors[Number(index)];
           }
 
-          const line1 = `<span style="color: ${color}">● ${name}:</span>`;
-          const line2 = additionalData?.showCurrencySign
-            ? `<span>$${value} USD</b></span>`
-            : additionalData?.showPercentageSign
-            ? `<span>${value}%</b></span>`
-            : `<span>${value}</b></span>`;
-          return `<div class="space-x-1">${line1} ${line2}</div>`;
+          const currency = showDollar ? '$' : '';
+
+          return `
+          <div class="space-x-1">
+            <span style="color: ${color}">● ${name}:</span>
+             <span>${value} ${currency}</b></span>
+          </div>`;
         },
         valueDecimals: 2,
       },

@@ -1,9 +1,12 @@
 /* eslint-disable max-len */
 import {
   AnalystEstimates,
+  CompanyKeyMetrics,
   CompanyKeyMetricsTTM,
   CompanyOutlook,
   CompanyProfile,
+  CompanyRatio,
+  DataTimePeriod,
   ESGDataQuarterly,
   ESGDataRatingYearly,
   Earnings,
@@ -230,7 +233,7 @@ export const getCompanyEarnings = async (symbol: string): Promise<Earnings[]> =>
  */
 export const getAnalystEstimates = async (
   symbol: string,
-  period: 'yearly' | 'quarter' = 'quarter'
+  period: DataTimePeriod = 'quarter'
 ): Promise<AnalystEstimates[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/analyst-estimates/${symbol}?period=${period}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<AnalystEstimates[]>(url);
@@ -241,6 +244,23 @@ export const getCompanyKeyMetricsTTM = async (symbol: string): Promise<CompanyKe
   const url = `${FINANCIAL_MODELING_URL}/v3/key-metrics-ttm/${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<CompanyKeyMetricsTTM[]>(url);
   return response.data[0];
+};
+
+export const getCompanyKeyMetrics = async (
+  symbol: string,
+  period: DataTimePeriod = 'quarter'
+): Promise<CompanyKeyMetrics[]> => {
+  const limit = period === 'quarter' ? 60 : 30;
+  const url = `${FINANCIAL_MODELING_URL}/v3/key-metrics/${symbol}?period=${period}&limit=${limit}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<CompanyKeyMetrics[]>(url);
+  return response.data;
+};
+
+export const getCompanyRatios = async (symbol: string, period: DataTimePeriod = 'quarter'): Promise<CompanyRatio[]> => {
+  const limit = period === 'quarter' ? 60 : 30;
+  const url = `${FINANCIAL_MODELING_URL}/v3/ratios/${symbol}?period=${period}&limit=${limit}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<CompanyRatio[]>(url);
+  return response.data;
 };
 
 export const getEnterpriseValue = async (symbol: string): Promise<EnterpriseValue[]> => {

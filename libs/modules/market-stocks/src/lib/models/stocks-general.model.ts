@@ -1,4 +1,4 @@
 export type StockStorageData = {
-	lastSearchedStocks: string[];
-	favoriteStocks: string[];
+  lastSearchedStocks: string[];
+  favoriteStocks: string[];
 };

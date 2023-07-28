@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import {
+  DataTimePeriod,
   HistoricalPrice,
   StockDetails,
   StockEarning,
+  StockMetricsHistoricalBasic,
   StockScreenerValues,
   StockSummary,
   SymbolHistoricalPeriods,
@@ -48,5 +50,14 @@ export class StocksApiService {
 
   getStockEarnings(symbol: string): Observable<StockEarning[]> {
     return this.http.get<StockEarning[]>(`${this.endpointFunctions}/getstockearnings?symbol=${symbol}`);
+  }
+
+  getStockHistoricalMetrics(
+    symbol: string,
+    period: DataTimePeriod = 'quarter'
+  ): Observable<StockMetricsHistoricalBasic> {
+    return this.http.get<StockMetricsHistoricalBasic>(
+      `${this.endpointFunctions}/getstockhistoricalmetrics?symbol=${symbol}&timePeriod=${period}`
+    );
   }
 }

@@ -1,0 +1,69 @@
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { StockDetails } from '@market-monitor/api-types';
+import {
+  SheetDataTimePeriodForm,
+  StockSheetDataTableComponent,
+  StockSheetDataTimePeriodComponent,
+  StockTransformService,
+} from '@market-monitor/modules/market-stocks';
+import { GeneralCardComponent } from '@market-monitor/shared-components';
+import { combineLatest, map, startWith } from 'rxjs';
+
+@Component({
+  selector: 'app-page-stock-details-financials',
+  standalone: true,
+  imports: [
+    CommonModule,
+    StockSheetDataTableComponent,
+    GeneralCardComponent,
+    StockSheetDataTimePeriodComponent,
+    ReactiveFormsModule,
+  ],
+  templateUrl: './page-stock-details-financials.component.html',
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class PageStockDetailsFinancialsComponent {
+  route = inject(ActivatedRoute);
+  stockTransformService = inject(StockTransformService);
+
+  timePeriodControl = new FormControl<SheetDataTimePeriodForm>(
+    {
+      timePeriod: 'financialsAnnual',
+      sheetKey: 'balance',
+    },
+    { nonNullable: true }
+  );
+
+  private stockDetails$ = (this.route.parent as ActivatedRoute).data.pipe(
+    map((data) => data['stockDetails'] as StockDetails)
+  );
+  sheetDataSignal = toSignal(
+    combineLatest([
+      this.stockDetails$,
+      this.timePeriodControl.valueChanges.pipe(startWith(this.timePeriodControl.value)),
+    ]).pipe(
+      map(([stockDetails, timePeriod]) => {
+        const time = timePeriod.timePeriod;
+        const key = timePeriod.sheetKey;
+        if (key === 'cash') {
+          return this.stockTransformService.createSheetDataFromCashFlow(time, stockDetails);
+        }
+        if (key === 'income') {
+          return this.stockTransformService.createSheetDataFromIncomeStatement(time, stockDetails);
+        }
+        return this.stockTransformService.createSheetDataFromBalanceSheet(time, stockDetails);
+      })
+    )
+  );
+}

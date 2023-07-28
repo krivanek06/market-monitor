@@ -3,7 +3,7 @@ import { StockDetails } from '@market-monitor/api-types';
 import { NameValueItem } from '@market-monitor/shared-components';
 import { EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
-import { CompanyRatingTable } from '../models';
+import { CompanyRatingTable, SheetData, SheetDataPeriod } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -247,5 +247,145 @@ export class StockTransformService {
       { name: 'Dividend Yield', value: `${roundNDigits(dividendData.dividendYielPercentageTTM, 2)}%` },
       ...stockDividends.map((d) => ({ name: d.label, value: d.dividend })),
     ];
+  }
+
+  createSheetDataFromBalanceSheet(period: SheetDataPeriod, data?: StockDetails): SheetData | null {
+    if (!data) {
+      return null;
+    }
+    const balanceSheet = data.companyOutlook[period].balance;
+    const timePeriods = balanceSheet.map((d) => `${d.period}, ${d.calendarYear}`);
+
+    return {
+      timePeriods,
+      data: [
+        { name: 'Total Assets', values: balanceSheet.map((d) => d.totalAssets) },
+        { name: 'Cash & Short-Term Investments', values: balanceSheet.map((d) => d.cashAndShortTermInvestments) },
+        { name: 'Cash On Hand', values: balanceSheet.map((d) => d.cashAndCashEquivalents) },
+        // { name: 'Other Assets', values: balanceSheet.map((d) => d.otherAssets), },
+        { name: 'Goodwill', values: balanceSheet.map((d) => d.goodwill) },
+        { name: 'Intangible Assets', values: balanceSheet.map((d) => d.intangibleAssets) },
+        { name: 'Total Investments', values: balanceSheet.map((d) => d.totalInvestments) },
+        { name: 'Long-Term Investments', values: balanceSheet.map((d) => d.longTermInvestments) },
+        { name: 'Short-Term Investments', values: balanceSheet.map((d) => d.shortTermInvestments) },
+        { name: 'Total Non-Current Assets', values: balanceSheet.map((d) => d.totalNonCurrentAssets) },
+        { name: 'Other Non-Current Assets', values: balanceSheet.map((d) => d.otherNonCurrentAssets) },
+        { name: 'Total Equity', values: balanceSheet.map((d) => d.totalEquity) },
+        { name: 'Total Debt', values: balanceSheet.map((d) => d.totalDebt) },
+        { name: 'Long-Term Debt', values: balanceSheet.map((d) => d.longTermDebt) },
+        { name: 'Short-Term Debt', values: balanceSheet.map((d) => d.shortTermDebt) },
+        { name: 'Net Debt', values: balanceSheet.map((d) => d.netDebt) },
+        { name: 'Total Liabilities', values: balanceSheet.map((d) => d.totalLiabilities) },
+        { name: 'Current Liabilities', values: balanceSheet.map((d) => d.totalCurrentLiabilities) },
+        { name: 'Non Current Liabilities', values: balanceSheet.map((d) => d.totalNonCurrentLiabilities) },
+        { name: 'Account Payables', values: balanceSheet.map((d) => d.accountPayables) },
+        { name: 'Net Receivables', values: balanceSheet.map((d) => d.netReceivables) },
+        { name: 'Tax Payables', values: balanceSheet.map((d) => d.taxPayables) },
+        { name: 'Deferred Tax Liabilities', values: balanceSheet.map((d) => d.deferredTaxLiabilitiesNonCurrent) },
+        { name: 'Deferred Revenue', values: balanceSheet.map((d) => d.deferredRevenue) },
+        { name: 'Non-Current Deferred Revenue', values: balanceSheet.map((d) => d.deferredRevenueNonCurrent) },
+        { name: 'Preferred Stock', values: balanceSheet.map((d) => d.preferredStock) },
+        { name: 'Property Plan Equipment', values: balanceSheet.map((d) => d.propertyPlantEquipmentNet) },
+        { name: 'Retained Earnings', values: balanceSheet.map((d) => d.retainedEarnings) },
+        { name: 'Minority Interest', values: balanceSheet.map((d) => d.minorityInterest) },
+        { name: 'Inventory', values: balanceSheet.map((d) => d.inventory) },
+        { name: 'Capital Lease Obligations', values: balanceSheet.map((d) => d.capitalLeaseObligations) },
+        { name: 'Common Stock', values: balanceSheet.map((d) => d.commonStock) },
+        { name: 'Retained Earnings', values: balanceSheet.map((d) => d.retainedEarnings) },
+        {
+          name: 'Accumulated Comprehensive IncomeLoss',
+          values: balanceSheet.map((d) => d.accumulatedOtherComprehensiveIncomeLoss),
+        },
+      ],
+    };
+  }
+
+  createSheetDataFromCashFlow(period: SheetDataPeriod, data?: StockDetails): SheetData | null {
+    if (!data) {
+      return null;
+    }
+    const cashFlow = data.companyOutlook[period].cash;
+    const timePeriods = cashFlow.map((d) => `${d.period}, ${d.calendarYear}`);
+
+    return {
+      timePeriods,
+      data: [
+        { name: 'Net Income', values: cashFlow.map((d) => d.netIncome) },
+        { name: 'Depreciation & Amortization', values: cashFlow.map((d) => d.depreciationAndAmortization) },
+        { name: 'Deferred Income Tax', values: cashFlow.map((d) => d.deferredIncomeTax) },
+        { name: 'Cash at Beginning of Period', values: cashFlow.map((d) => d.cashAtBeginningOfPeriod) },
+        { name: 'Cash at End of Period', values: cashFlow.map((d) => d.cashAtEndOfPeriod) },
+        { name: 'Net Change in Cash', values: cashFlow.map((d) => d.netChangeInCash) },
+        { name: 'Operating Cash Flow', values: cashFlow.map((d) => d.operatingCashFlow) },
+        { name: 'Capital Expenditure', values: cashFlow.map((d) => d.capitalExpenditure) },
+        { name: 'Free Cash Flow', values: cashFlow.map((d) => d.freeCashFlow) },
+        { name: 'Operating Activities', values: cashFlow.map((d) => d.netCashProvidedByOperatingActivities) },
+        { name: 'Investing Activites', values: cashFlow.map((d) => d.netCashUsedForInvestingActivites) },
+        { name: 'Other Investment Activities', values: cashFlow.map((d) => d.otherInvestingActivites) },
+        { name: 'Financing Activities', values: cashFlow.map((d) => d.netCashUsedProvidedByFinancingActivities) },
+        { name: 'Other Financial Activities', values: cashFlow.map((d) => d.otherFinancingActivites) },
+        { name: 'Stock Based Compensation', values: cashFlow.map((d) => d.stockBasedCompensation) },
+        { name: 'Change in Working Capital', values: cashFlow.map((d) => d.changeInWorkingCapital) },
+        { name: 'Other Working Capital', values: cashFlow.map((d) => d.otherWorkingCapital) },
+        { name: 'Accounts Receivables', values: cashFlow.map((d) => d.accountsReceivables) },
+        { name: 'Inventory', values: cashFlow.map((d) => d.inventory) },
+        { name: 'Accounts Payables', values: cashFlow.map((d) => d.accountsPayables) },
+        { name: 'Other Non-Cash Items', values: cashFlow.map((d) => d.otherNonCashItems) },
+        { name: 'Property, Plant & Equipment', values: cashFlow.map((d) => d.investmentsInPropertyPlantAndEquipment) },
+        { name: 'Acquisitions, Net', values: cashFlow.map((d) => d.acquisitionsNet) },
+        { name: 'Purchases of Investments', values: cashFlow.map((d) => d.purchasesOfInvestments) },
+        { name: 'Sales/Maturities of Investments', values: cashFlow.map((d) => d.salesMaturitiesOfInvestments) },
+        { name: 'Debt Repayment', values: cashFlow.map((d) => d.debtRepayment) },
+        { name: 'Common Stock Issued', values: cashFlow.map((d) => d.commonStockIssued) },
+        { name: 'Common Stock Repurchased', values: cashFlow.map((d) => d.commonStockRepurchased) },
+        { name: 'Dividends Paid', values: cashFlow.map((d) => d.dividendsPaid) },
+        { name: 'Effect of Forex Changes on Cash', values: cashFlow.map((d) => d.effectOfForexChangesOnCash) },
+      ],
+    };
+  }
+
+  createSheetDataFromIncomeStatement(period: SheetDataPeriod, data?: StockDetails): SheetData | null {
+    if (!data) {
+      return null;
+    }
+    const incomeStatement = data.companyOutlook[period].income;
+    const timePeriods = incomeStatement.map((d) => `${d.period}, ${d.calendarYear}`);
+
+    return {
+      timePeriods,
+      data: [
+        { name: 'Revenue', values: incomeStatement.map((d) => d.revenue) },
+        { name: 'Cost of Revenue', values: incomeStatement.map((d) => d.costOfRevenue) },
+        { name: 'Gross Profit', values: incomeStatement.map((d) => d.grossProfit) },
+        { name: 'Research & Development', values: incomeStatement.map((d) => d.researchAndDevelopmentExpenses) },
+        {
+          name: 'Selling, General & Admin',
+          values: incomeStatement.map((d) => d.sellingGeneralAndAdministrativeExpenses),
+        },
+        { name: 'General & Administrative', values: incomeStatement.map((d) => d.generalAndAdministrativeExpenses) },
+        { name: 'Selling & Marketing', values: incomeStatement.map((d) => d.sellingAndMarketingExpenses) },
+        { name: 'Operating Expenses', values: incomeStatement.map((d) => d.operatingExpenses) },
+        { name: 'Cost And Expenses', values: incomeStatement.map((d) => d.costAndExpenses) },
+        { name: 'Other Expenses', values: incomeStatement.map((d) => d.otherExpenses) },
+        { name: 'Interest Expense', values: incomeStatement.map((d) => d.interestExpense) },
+        { name: 'Total Other Income Expenses', values: incomeStatement.map((d) => d.totalOtherIncomeExpensesNet) },
+        { name: 'Interest Income', values: incomeStatement.map((d) => d.interestIncome) },
+        { name: 'EBITDA', values: incomeStatement.map((d) => d.ebitda) },
+        { name: 'EBITDA Ratio', values: incomeStatement.map((d) => d.ebitdaratio) },
+        { name: 'Operating Income', values: incomeStatement.map((d) => d.operatingIncome) },
+        { name: 'Operating Income Ratio', values: incomeStatement.map((d) => d.operatingIncomeRatio) },
+        { name: 'Income Before Tax', values: incomeStatement.map((d) => d.incomeBeforeTax) },
+        { name: 'Income Before Tax Ratio', values: incomeStatement.map((d) => d.incomeBeforeTaxRatio) },
+        { name: 'Income Tax Expense', values: incomeStatement.map((d) => d.incomeTaxExpense) },
+        { name: 'Gross Profit', values: incomeStatement.map((d) => d.grossProfit) },
+        { name: 'Gross Profit Ratio', values: incomeStatement.map((d) => d.grossProfitRatio) },
+        { name: 'Net Income', values: incomeStatement.map((d) => d.netIncome) },
+        { name: 'Net Income Ratio', values: incomeStatement.map((d) => d.netIncomeRatio) },
+        { name: 'EPS', values: incomeStatement.map((d) => d.eps) },
+        { name: 'EPS Diluted', values: incomeStatement.map((d) => d.epsdiluted) },
+        { name: 'Weighted Average Shares', values: incomeStatement.map((d) => d.weightedAverageShsOut) },
+        { name: 'Weighted Average Shares', values: incomeStatement.map((d) => d.weightedAverageShsOut) },
+      ],
+    };
   }
 }

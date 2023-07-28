@@ -14,7 +14,7 @@ export type ChangeValues = {
  */
 export type CurrentValues = {
   value: number;
-  valueToCompare: number;
+  valueToCompare?: number;
 
   // whether to hide value and display only percentage change
   hideValue?: boolean;
@@ -48,6 +48,9 @@ export class PercentageIncreaseDirective implements OnInit {
     }
 
     if (this.currentValues) {
+      if (!this.currentValues.valueToCompare) {
+        return;
+      }
       const value = this.currentValues.value - this.currentValues.valueToCompare;
       const change = roundNDigits(value, 2);
       const changesPercentage = roundNDigits((value / Math.abs(this.currentValues.valueToCompare)) * 100, 2);

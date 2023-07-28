@@ -1,0 +1,14 @@
+<form [formGroup]="timePeriodGroup" class="flex items-center justify-between">
+  <!-- time period -->
+  <mat-radio-group formControlName="timePeriod" color="primary" aria-label="Select an option" class="flex gap-x-4">
+    <mat-radio-button value="financialsAnnual">Annual</mat-radio-button>
+    <mat-radio-button value="financialsQuarter">Quarter</mat-radio-button>
+  </mat-radio-group>
+
+  <!-- keys -->
+  <mat-radio-group formControlName="sheetKey" color="primary" aria-label="Select an option" class="flex gap-x-4">
+    <mat-radio-button value="balance">Balance Sheet</mat-radio-button>
+    <mat-radio-button value="income">Income Statement</mat-radio-button>
+    <mat-radio-button value="cash">Cash Flow</mat-radio-button>
+  </mat-radio-group>
+</form>
