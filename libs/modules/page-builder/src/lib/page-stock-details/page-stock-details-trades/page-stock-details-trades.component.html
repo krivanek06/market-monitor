@@ -1,1 +1,8 @@
-<p>stock-details-trades works!</p>
+<ng-container *ngIf="ownershipInstitutionalToQuarterSignal() as ownershipInstitutional">
+  <ng-container *ngIf="enterpriseValueToQuarterSignal() as enterpriseValue">
+    <app-stock-ownership-institutional-card
+      [enterpriseValue]="enterpriseValue"
+      [ownershipInstitutional]="ownershipInstitutional"
+    ></app-stock-ownership-institutional-card>
+  </ng-container>
+</ng-container>

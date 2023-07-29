@@ -20,7 +20,7 @@ export const getownershipinstitutional = onRequest(
     const databaseData = (await databaseRef.get()).data();
 
     // check if the provided data is not older than 7 days
-    const reloadData = databaseData && isBefore(new Date(databaseData.lastUpdate), subDays(new Date(), 7));
+    const reloadData = !databaseData || isBefore(new Date(databaseData.lastUpdate), subDays(new Date(), 7));
 
     // no need for reload
     if (!reloadData) {

@@ -27,7 +27,7 @@ export const getownershipholderstodate = onRequest(async (request, response: Res
   const databaseData = (await databaseRef.get()).data();
 
   // check if the provided data is not older than 7 days
-  const reloadData = databaseData && isBefore(new Date(databaseData.lastUpdate), subDays(new Date(), 7));
+  const reloadData = !databaseData || isBefore(new Date(databaseData.lastUpdate), subDays(new Date(), 7));
 
   // return data if exists
   if (!reloadData) {
