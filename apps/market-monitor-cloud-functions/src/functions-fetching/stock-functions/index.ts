@@ -1,3 +1,5 @@
+export * from './get-ownership-holders-to-date';
+export * from './get-ownership-institutional';
 export * from './get-stock-historical-metrics-basic';
 export * from './get-stock-screening';
 export * from './get-stock-summary';
