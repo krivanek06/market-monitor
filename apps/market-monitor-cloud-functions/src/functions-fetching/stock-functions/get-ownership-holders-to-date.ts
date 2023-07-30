@@ -36,7 +36,13 @@ export const getownershipholderstodate = onRequest(async (request, response: Res
   }
 
   // reload data
-  const data = await getSymbolOwnershipHolders(symbolString, dateQuarter);
+  const [page0, page1, page2] = await Promise.all([
+    getSymbolOwnershipHolders(symbolString, dateQuarter, 0),
+    getSymbolOwnershipHolders(symbolString, dateQuarter, 1),
+    getSymbolOwnershipHolders(symbolString, dateQuarter, 2),
+  ]);
+  const data = [...page0, ...page1, ...page2];
+
   databaseRef.set({
     data,
     lastUpdate: new Date().toISOString(),

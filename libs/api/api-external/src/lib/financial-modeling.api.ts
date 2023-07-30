@@ -561,8 +561,12 @@ export const getSymbolOwnershipInstitutional = async (symbol: string): Promise<S
  * @param date - quarters in format YYYY-MM-DD: 2023-03-31, 2023-06-30, 2023-09-30, 2023-12-31
  * @returns
  */
-export const getSymbolOwnershipHolders = async (symbol: string, date: string): Promise<SymbolOwnershipHolders[]> => {
-  const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/institutional-holders/symbol-ownership-percent?symbol=${symbol}&date=${date}&&apikey=${FINANCIAL_MODELING_KEY}`;
+export const getSymbolOwnershipHolders = async (
+  symbol: string,
+  date: string,
+  page = 0
+): Promise<SymbolOwnershipHolders[]> => {
+  const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/institutional-holders/symbol-ownership-percent?symbol=${symbol}&page=${page}&date=${date}&&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<SymbolOwnershipHolders[]>(url);
   return response.data;
 };
