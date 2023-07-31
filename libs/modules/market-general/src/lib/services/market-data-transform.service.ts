@@ -5,6 +5,8 @@ import {
   MarketOverviewData,
   getMarketOverKeyBySubKey,
 } from '@market-monitor/api-types';
+import { InputSource } from '@market-monitor/shared-components';
+import { dateFormatDate } from '@market-monitor/shared-utils-general';
 import { zip } from 'lodash';
 import { MarketOverviewChartData, MarketOverviewChartDataBody } from '../models';
 
@@ -13,6 +15,16 @@ import { MarketOverviewChartData, MarketOverviewChartDataBody } from '../models'
 })
 export class MarketDataTransformService {
   constructor() {}
+
+  transformDatesIntoInputSource(dates: string[]): InputSource<string>[] {
+    return dates.map(
+      (date) =>
+        ({
+          caption: dateFormatDate(date, 'MMMM d, yyyy'),
+          value: date,
+        } as InputSource<string>)
+    );
+  }
 
   transformMarketOverviewData(
     name: string,

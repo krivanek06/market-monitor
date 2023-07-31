@@ -97,7 +97,9 @@ export const searchTicker = async (symbolPrefix: string, isCrypto = false): Prom
   const stockExchange = 'NASDAQ,NYSE';
   const cryptoExchange = 'CRYPTO';
   const usedExchange = isCrypto ? cryptoExchange : stockExchange;
-  const url = `${FINANCIAL_MODELING_URL}/v3/search-ticker?query=${symbolPrefix}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const prefixUppercase = symbolPrefix.toUpperCase();
+  const url = `${FINANCIAL_MODELING_URL}/v3/search?query=${prefixUppercase}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+
   const response = await axios.get<TickerSearch[]>(url);
 
   // check if symbol contains any of the ignored symbols
@@ -566,7 +568,13 @@ export const getSymbolOwnershipHolders = async (
   date: string,
   page = 0
 ): Promise<SymbolOwnershipHolders[]> => {
-  const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/institutional-holders/symbol-ownership-percent?symbol=${symbol}&page=${page}&date=${date}&&apikey=${FINANCIAL_MODELING_KEY}`;
+  const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/institutional-holders/symbol-ownership-percent?symbol=${symbol}&page=${page}&date=${date}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<SymbolOwnershipHolders[]>(url);
   return response.data;
+};
+
+export const getInstitutionalPortfolioDates = async (cik: string = '0000093751'): Promise<string[]> => {
+  const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/portfolio-date?cik=${cik}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<{ date: string }[]>(url);
+  return response.data.map((d) => d.date);
 };

@@ -85,4 +85,8 @@ export class MarketApiService {
       `${this.endpointFunctions}/getcalendarstockipos?month=${month}&year=${year}`
     );
   }
+
+  getInstitutionalPortfolioDates(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.endpointFunctions}/getinstitutionalportfoliodates`);
+  }
 }

@@ -25,6 +25,9 @@ export const getDatabaseMarketNewsRef = (category: FirebaseNewsTypes) =>
 export const getDatabaseMarketOverviewRef = () =>
   getDatabaseMarketDataRef().doc('market_overview').withConverter(assignTypes<MarketOverview>());
 
+export const getDatabaseInstitutionalPortfolioDatesRef = () =>
+  getDatabaseMarketDataRef().doc('institutional_portfolio_dates').withConverter(assignTypes<DataSnapshot<string[]>>());
+
 export const getDatabaseMarketOverviewDataRef = (path: string) =>
   getDatabaseMarketDataRef().doc(path).withConverter(assignTypes<MarketOverviewData>());
 

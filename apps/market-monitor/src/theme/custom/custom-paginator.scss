@@ -1,5 +1,10 @@
+.g-bubble-container {
+  display: flex;
+  gap: 4px;
+}
+
 .g-bubble {
-  background-color: var(--gray-medium);
+  background-color: #aeaeae;
   border-radius: 50%;
   width: 34px;
   height: 34px;

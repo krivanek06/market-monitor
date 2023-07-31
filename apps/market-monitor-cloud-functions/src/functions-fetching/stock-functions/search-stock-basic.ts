@@ -16,6 +16,7 @@ export const searchstocksbasic = onRequest(async (request, response: Response<St
 
     const searchedTickers = await searchTicker(symbolString);
     const searchedSymbol = searchedTickers.map((d) => d.symbol);
+    console.log('searchedSymbol', searchedSymbol);
 
     // add symbols to query
     request.query.symbol = searchedSymbol.join(',');

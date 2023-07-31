@@ -29,6 +29,18 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
   @Output() pageIndexChangeEmitter: EventEmitter<number> = new EventEmitter<number>();
 
   /**
+   * whether we want to display first/last button and dots
+   */
+  @Input() showFirstButton = true;
+  @Input() showLastButton = true;
+
+  /**
+   * how many buttons to display before and after
+   * the selected button
+   */
+  @Input() renderButtonsNumber = 2;
+
+  /**
    * how many elements are in the table
    */
   @Input() appCustomLength: number = 0;
@@ -97,8 +109,14 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
     const previouslyActive = this.buttonsRef[previousIndex];
     const currentActive = this.buttonsRef[newIndex];
 
+    if (!previouslyActive && !currentActive) {
+      return;
+    }
+
     // remove active style from previously active button
-    this.ren.removeClass(previouslyActive, 'g-bubble__active');
+    if (previouslyActive) {
+      this.ren.removeClass(previouslyActive, 'g-bubble__active');
+    }
 
     // add active style to new active button
     this.ren.addClass(currentActive, 'g-bubble__active');
@@ -106,8 +124,8 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
     // hide all buttons
     this.buttonsRef.forEach((button) => this.ren.setStyle(button, 'display', 'none'));
 
-    // show 2 previous buttons and 2 next buttons
-    const renderElements = 2;
+    // show N previous buttons and X next buttons
+    const renderElements = this.renderButtonsNumber;
     const endDots = newIndex < this.buttonsRef.length - renderElements - 1;
     const startDots = newIndex - renderElements > 0;
 
@@ -115,15 +133,20 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
     const lastButton = this.buttonsRef[this.buttonsRef.length - 1];
 
     // last bubble and dots
-    this.ren.setStyle(this.dotsEndRef, 'display', endDots ? 'block' : 'none');
-    this.ren.setStyle(lastButton, 'display', endDots ? 'flex' : 'none');
+    if (this.showLastButton) {
+      this.ren.setStyle(this.dotsEndRef, 'display', endDots ? 'block' : 'none');
+      this.ren.setStyle(lastButton, 'display', endDots ? 'flex' : 'none');
+    }
 
     // first bubble and dots
-    this.ren.setStyle(this.dotsStartRef, 'display', startDots ? 'block' : 'none');
-    this.ren.setStyle(firstButton, 'display', startDots ? 'flex' : 'none');
+    if (this.showFirstButton) {
+      this.ren.setStyle(this.dotsStartRef, 'display', startDots ? 'block' : 'none');
+      this.ren.setStyle(firstButton, 'display', startDots ? 'flex' : 'none');
+    }
 
     // resolve starting and ending index to show buttons
     const startingIndex = startDots ? newIndex - renderElements : 0;
+
     const endingIndex = endDots ? newIndex + renderElements : this.buttonsRef.length - 1;
 
     // display starting buttons
@@ -148,7 +171,7 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
 
     // style text of how many elements are currently displayed
     this.ren.setStyle(howManyDisplayedEl, 'position', 'absolute');
-    this.ren.setStyle(howManyDisplayedEl, 'left', '0');
+    this.ren.setStyle(howManyDisplayedEl, 'left', '20px');
     this.ren.setStyle(howManyDisplayedEl, 'color', '#919191');
     this.ren.setStyle(howManyDisplayedEl, 'font-size', '14px');
 

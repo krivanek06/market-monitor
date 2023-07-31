@@ -54,8 +54,8 @@ import { InputSource, InputSourceWrapper, InputType, InputTypeEnum } from '../fo
   ],
 })
 export class FormMatInputWrapperComponent<T> implements OnInit, ControlValueAccessor {
-  @Input() controlName!: string;
-  @Input() inputCaption!: string;
+  @Input({ required: true }) inputCaption!: string;
+  @Input() controlName?: string;
   @Input() prefixIcon?: string;
   @Input() inputType: InputTypeEnum | InputType = 'TEXT';
 
@@ -108,7 +108,7 @@ export class FormMatInputWrapperComponent<T> implements OnInit, ControlValueAcce
   }
 
   ngOnInit(): void {
-    if (this.controlContainer) {
+    if (this.controlContainer && this.controlName) {
       this.parentFormControl = this.controlContainer.control?.get(this.controlName) as FormControl;
     }
 

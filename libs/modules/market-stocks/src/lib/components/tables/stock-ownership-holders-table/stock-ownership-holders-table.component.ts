@@ -1,14 +1,25 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, TrackByFunction, ViewChild } from '@angular/core';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { SymbolOwnershipHolders } from '@market-monitor/api-types';
-import { PercentageIncreaseDirective } from '@market-monitor/shared-directives';
+import { BubblePaginationDirective, PercentageIncreaseDirective } from '@market-monitor/shared-directives';
 import { LargeNumberFormatterPipe, TruncateWordsPipe } from '@market-monitor/shared-pipes';
 
 @Component({
   selector: 'app-stock-ownership-holders-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, PercentageIncreaseDirective, TruncateWordsPipe, LargeNumberFormatterPipe],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    PercentageIncreaseDirective,
+    TruncateWordsPipe,
+    LargeNumberFormatterPipe,
+    MatPaginatorModule,
+    BubblePaginationDirective,
+    MatSortModule,
+  ],
   templateUrl: './stock-ownership-holders-table.component.html',
   styles: [
     `
@@ -20,18 +31,25 @@ import { LargeNumberFormatterPipe, TruncateWordsPipe } from '@market-monitor/sha
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockOwnershipHoldersTableComponent {
-  @Input({ required: true }) set data(values: SymbolOwnershipHolders[]) {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  @Input({ required: true }) set data(values: SymbolOwnershipHolders[] | undefined) {
     this.dataSource = new MatTableDataSource(values ?? []);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
   dataSource!: MatTableDataSource<SymbolOwnershipHolders>;
 
   displayedColumns: string[] = [
     'investorName',
     'weight',
+    'avgPricePaid',
     'marketValue',
     'sharesNumber',
-    'avgPricePaid',
     'holdingPeriod',
     'firstAdded',
-  ]; // performance
+  ];
+
+  identity: TrackByFunction<SymbolOwnershipHolders> = (index: number, item: SymbolOwnershipHolders) => item.cik;
 }
