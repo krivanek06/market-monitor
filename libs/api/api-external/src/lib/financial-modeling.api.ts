@@ -5,6 +5,7 @@ import {
   CalendarDividend,
   CalendarStockEarning,
   CalendarStockIPO,
+  CompanyInsideTrade,
   CompanyKeyMetrics,
   CompanyKeyMetricsTTM,
   CompanyOutlook,
@@ -577,4 +578,10 @@ export const getInstitutionalPortfolioDates = async (cik: string = '0000093751')
   const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/portfolio-date?cik=${cik}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<{ date: string }[]>(url);
   return response.data.map((d) => d.date);
+};
+
+export const getInsiderTrading = async (symbol: string, page = 0): Promise<CompanyInsideTrade[]> => {
+  const url = `${FINANCIAL_MODELING_URL}/v4/insider-trading?symbol=${symbol}&page=${page}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<CompanyInsideTrade[]>(url);
+  return response.data;
 };

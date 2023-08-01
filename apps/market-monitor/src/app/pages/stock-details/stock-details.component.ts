@@ -10,6 +10,7 @@ import { LabelValue, TabSelectControlComponent } from '@market-monitor/shared-co
 import { DialogServiceModule } from '@market-monitor/shared-utils-client';
 import { ROUTES_STOCK_DETAILS } from '../../routes.model';
 import { StockDetailsFinancialsComponent } from './subpages/stock-details-financials.component';
+import { StockDetailsHoldersComponent } from './subpages/stock-details-holders.component';
 import { StockDetailsOverviewComponent } from './subpages/stock-details-overview.component';
 import { StockDetailsRatiosComponent } from './subpages/stock-details-ratios.component';
 import { StockDetailsTradesComponent } from './subpages/stock-details-trades.component';
@@ -61,9 +62,10 @@ export class StockDetailsComponent {
   routesStockDetailsControl = new FormControl<string>(ROUTES_STOCK_DETAILS.OVERVIEW);
   routesStockDetails: LabelValue<string>[] = [
     { label: 'Overview', value: ROUTES_STOCK_DETAILS.OVERVIEW },
-    { label: 'Trades', value: ROUTES_STOCK_DETAILS.TRADES },
     { label: 'Financials', value: ROUTES_STOCK_DETAILS.FINANCIALS },
     { label: 'Ratios', value: ROUTES_STOCK_DETAILS.RATIOS },
+    { label: 'Holders', value: ROUTES_STOCK_DETAILS.HOLDERS },
+    { label: 'Trades', value: ROUTES_STOCK_DETAILS.TRADES },
   ];
 
   constructor() {
@@ -105,6 +107,10 @@ export const route: Routes = [
       {
         path: ROUTES_STOCK_DETAILS.OVERVIEW,
         component: StockDetailsOverviewComponent,
+      },
+      {
+        path: ROUTES_STOCK_DETAILS.HOLDERS,
+        component: StockDetailsHoldersComponent,
       },
       {
         path: ROUTES_STOCK_DETAILS.TRADES,

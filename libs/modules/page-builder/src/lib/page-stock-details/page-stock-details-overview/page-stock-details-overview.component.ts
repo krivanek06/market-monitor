@@ -10,7 +10,6 @@ import {
   RevenueEstimationChartComponent,
   StockEnterpriseChartComponent,
   StockEsgDataTableComponent,
-  StockInsiderTradesComponent,
   StockKeyExecutivesTableComponent,
   StockPeersListComponent,
   StockPriceTargetTableComponent,
@@ -18,7 +17,7 @@ import {
   StockRecommendationChartComponent,
   StockSummaryListComponent,
   StockTransformService,
-  StockUpgradesDowngradesTableComponent,
+  StockUpgradesDowngradesTableComponent
 } from '@market-monitor/modules/market-stocks';
 import {
   GeneralCardComponent,
@@ -39,7 +38,6 @@ import { map, switchMap } from 'rxjs';
     GeneralCardComponent,
     StockRatingTableComponent,
     StockRecommendationChartComponent,
-    StockInsiderTradesComponent,
     StockEsgDataTableComponent,
     EarningsEstimationChartComponent,
     RevenueEstimationChartComponent,

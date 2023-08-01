@@ -1,21 +1,4 @@
-<ng-container *ngIf="ownershipInstitutionalToQuarterSignal() as ownershipInstitutional">
-  <div *ngIf="enterpriseValueToQuarterSignal() as enterpriseValue" class="flex items-start justify-between gap-8 mb-6">
-    <app-stock-ownership-institutional-card
-      [enterpriseValue]="enterpriseValue"
-      [ownershipInstitutional]="ownershipInstitutional"
-    ></app-stock-ownership-institutional-card>
 
-    <div class="w-full">
-      <app-form-mat-input-wrapper
-        [formControl]="quarterFormControl"
-        inputCaption="Available Quarters"
-        inputType="SELECT"
-        [inputSource]="institutionalPortfolioInputSourceSignal()"
-      ></app-form-mat-input-wrapper>
-    </div>
-  </div>
-
-  <app-general-card title="Ownership Holders">
-    <app-stock-ownership-holders-table [data]="ownershipHoldersToDateSignal()"></app-stock-ownership-holders-table>
+  <app-general-card title="Insider trades">
+    <app-stock-insider-trades [data]="stockDetailsSignal.companyOutlook.insideTrades"></app-stock-insider-trades>
   </app-general-card>
-</ng-container>
