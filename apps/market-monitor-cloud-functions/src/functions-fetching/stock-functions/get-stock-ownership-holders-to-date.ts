@@ -1,8 +1,7 @@
 import { getSymbolOwnershipHolders } from '@market-monitor/api-external';
 import { getDatabaseStockOwnershipHoldersRef } from '@market-monitor/api-firebase';
 import { SymbolOwnershipHolders } from '@market-monitor/api-types';
-import { isDateValidQuarter } from '@market-monitor/shared-utils-general';
-import { isBefore, subDays } from 'date-fns';
+import { checkDataValidity, isDateValidQuarter } from '@market-monitor/shared-utils-general';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 
@@ -26,11 +25,8 @@ export const getownershipholderstodate = onRequest(async (request, response: Res
   const databaseRef = getDatabaseStockOwnershipHoldersRef(symbolString, dateQuarter);
   const databaseData = (await databaseRef.get()).data();
 
-  // check if the provided data is not older than 7 days
-  const reloadData = !databaseData || isBefore(new Date(databaseData.lastUpdate), subDays(new Date(), 7));
-
   // return data if exists
-  if (!reloadData) {
+  if (!checkDataValidity(databaseData)) {
     response.send(databaseData.data);
     return;
   }

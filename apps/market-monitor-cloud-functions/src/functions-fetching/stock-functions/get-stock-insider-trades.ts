@@ -1,7 +1,7 @@
 import { getInsiderTrading } from '@market-monitor/api-external';
 import { getDatabaseStockInsiderTradingRef } from '@market-monitor/api-firebase';
 import { CompanyInsideTrade } from '@market-monitor/api-types';
-import { isBefore, subDays } from 'date-fns';
+import { checkDataValidity } from '@market-monitor/shared-utils-general';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 
@@ -17,11 +17,8 @@ export const getstockinsidertrades = onRequest(async (request, response: Respons
   const databaseRef = getDatabaseStockInsiderTradingRef(symbol);
   const databaseData = (await databaseRef.get()).data();
 
-  // check if the provided data is not older than 7 days
-  const reloadData = !databaseData || isBefore(new Date(databaseData.lastUpdate), subDays(new Date(), 7));
-
   // no need for reload
-  if (!reloadData) {
+  if (!checkDataValidity(databaseData)) {
     response.send(databaseData.data);
     return;
   }
