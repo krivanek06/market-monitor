@@ -12,7 +12,7 @@ table:not([mat-table]) {
   tbody {
     tr {
       td {
-        @apply text-wt-gray-medium h-[50px] cursor-pointer;
+        @apply text-wt-gray-medium h-[50px];
 
         &:first-child {
           @apply pl-4;
@@ -25,19 +25,6 @@ table:not([mat-table]) {
 
       &:not(:last-child) {
         border-bottom: 1px solid var(--table-border);
-      }
-    }
-  }
-
-  &.not-hover {
-    tbody {
-      tr {
-        td {
-          cursor: default !important;
-          &:hover {
-            background-color: transparent !important;
-          }
-        }
       }
     }
   }
@@ -70,24 +57,20 @@ table[mat-table] {
 
   .mat-mdc-row {
     transition: All 0.3s ease-out;
-    cursor: pointer;
+    cursor: default;
     border-radius: 8px;
     height: 60px;
 
     @screen md {
       height: 50px;
     }
-
-    &:hover {
-      background-color: var(--table-hover) !important;
-    }
   }
 
-  &.not-hover {
+  &.table-hover {
     .mat-mdc-row {
-      cursor: default !important;
+      cursor: pointer !important;
       &:hover {
-        background-color: transparent !important;
+        background-color: var(--table-hover) !important;
       }
     }
   }

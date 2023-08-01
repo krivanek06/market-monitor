@@ -2,7 +2,7 @@
   "name": "modules-page-builder",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/modules/page-builder/src",
-  "prefix": "market-monitor",
+  "prefix": "app",
   "tags": [],
   "projectType": "library",
   "targets": {

@@ -190,7 +190,10 @@
     [series]="[
       {
         name: 'Gross Margin',
-        data: data.margin.grossProfitMargin
+        data: data.margin.grossProfitMargin,
+        additionalData: {
+          showPercentageSign: true
+        }
       }
     ]"
   ></app-generic-chart>
@@ -202,7 +205,10 @@
     [series]="[
       {
         name: 'Net Profit Margin',
-        data: data.margin.netProfitMargin
+        data: data.margin.netProfitMargin,
+        additionalData: {
+          showPercentageSign: true
+        }
       }
     ]"
   ></app-generic-chart>

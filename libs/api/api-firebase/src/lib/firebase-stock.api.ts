@@ -1,9 +1,12 @@
 import {
+  CompanyInsideTrade,
   HistoricalPrice,
   News,
   StockDetailsAPI,
   StockMetricsHistoricalAPI,
   StockSummary,
+  SymbolOwnershipHolders,
+  SymbolOwnershipInstitutional,
 } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
@@ -23,6 +26,11 @@ export const getDatabaseStockMetricHistoricalRef = (symbol: string) =>
     .doc('historical_metrics')
     .withConverter(assignTypes<StockMetricsHistoricalAPI>());
 
+export const getDatabaseStockInsiderTradingRef = (symbol: string) =>
+  getDatabaseStockMoreInformationRef(symbol)
+    .doc('insider_trading')
+    .withConverter(assignTypes<DataSnapshot<CompanyInsideTrade[]>>());
+
 export const getDatabaseStockDetailsHistorical = (symbol: string, historical: HistoricalPriceTypes) =>
   getDatabaseStockMoreInformationRef(symbol)
     .doc(historical)
@@ -30,3 +38,13 @@ export const getDatabaseStockDetailsHistorical = (symbol: string, historical: Hi
 
 export const getDatabaseStockDetailsNews = (symbol: string) =>
   getDatabaseStockMoreInformationRef(symbol).doc('news').withConverter(assignTypes<DataSnapshot<News[]>>());
+
+export const getDatabaseStockOwnershipInstitutionalRef = (symbol: string) =>
+  getDatabaseStockMoreInformationRef(symbol)
+    .doc('ownership_institutional')
+    .withConverter(assignTypes<DataSnapshot<SymbolOwnershipInstitutional[]>>());
+
+export const getDatabaseStockOwnershipHoldersRef = (symbol: string, date: string) =>
+  getDatabaseStockMoreInformationRef(symbol)
+    .doc(`ownership_holders_${date}`)
+    .withConverter(assignTypes<DataSnapshot<SymbolOwnershipHolders[]>>());

@@ -1,4 +1,4 @@
-import { MostPerformingStocks, PriceChange } from './external-api/financial-modeling-starter.model';
+import { MostPerformingStocks, PriceChange } from './external-api/financial-modeling.model';
 import { StockSummary } from './firebase-stock-data.model';
 
 export type MarketTopPerformance<T> = {

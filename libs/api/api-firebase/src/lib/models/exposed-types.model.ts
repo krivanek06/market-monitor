@@ -6,15 +6,15 @@ export interface DataSnapshot<T> {
 }
 
 export enum HistoricalPriceFields {
-  historical_1d = 'historical_1d',
-  historical_1wk = 'historical_1wk',
-  historical_1mo = 'historical_1mo',
-  historical_3mo = 'historical_3mo',
-  historical_6mo = 'historical_6mo',
-  historical_ytd = 'historical_ytd',
-  historical_1yr = 'historical_1yr',
-  historical_5yr = 'historical_5yr',
-  historical_all = 'historical_all',
+  historical_1d = 'historical_price_1d',
+  historical_1wk = 'historical_price_1wk',
+  historical_1mo = 'historical_price_1mo',
+  historical_3mo = 'historical_price_3mo',
+  historical_6mo = 'historical_price_6mo',
+  historical_ytd = 'historical_price_ytd',
+  historical_1yr = 'historical_price_1yr',
+  historical_5yr = 'historical_price_5yr',
+  historical_all = 'historical_price_all',
 }
 
 export type HistoricalPriceTypes =

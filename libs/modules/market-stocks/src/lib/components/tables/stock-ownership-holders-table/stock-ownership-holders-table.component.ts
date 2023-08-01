@@ -1,28 +1,26 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, Input, TrackByFunction, ViewChild } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { CompanyInsideTrade } from '@market-monitor/api-types';
-import { BubblePaginationDirective } from '@market-monitor/shared-directives';
-import { LargeNumberFormatterPipe } from '@market-monitor/shared-pipes';
+import { SymbolOwnershipHolders } from '@market-monitor/api-types';
+import { BubblePaginationDirective, PercentageIncreaseDirective } from '@market-monitor/shared-directives';
+import { LargeNumberFormatterPipe, TruncateWordsPipe } from '@market-monitor/shared-pipes';
 
 @Component({
-  selector: 'app-stock-insider-trades',
+  selector: 'app-stock-ownership-holders-table',
   standalone: true,
   imports: [
     CommonModule,
     MatTableModule,
+    PercentageIncreaseDirective,
+    TruncateWordsPipe,
     LargeNumberFormatterPipe,
     MatPaginatorModule,
     BubblePaginationDirective,
     MatSortModule,
-    MatButtonModule,
-    MatIconModule,
   ],
-  templateUrl: './stock-insider-trades.component.html',
+  templateUrl: './stock-ownership-holders-table.component.html',
   styles: [
     `
       :host {
@@ -32,24 +30,23 @@ import { LargeNumberFormatterPipe } from '@market-monitor/shared-pipes';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockInsiderTradesComponent implements AfterViewInit {
+export class StockOwnershipHoldersTableComponent implements AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  @Input({ required: true }) set data(values: CompanyInsideTrade[]) {
+  @Input({ required: true }) set data(values: SymbolOwnershipHolders[]) {
     this.dataSource = new MatTableDataSource(values);
   }
-  dataSource!: MatTableDataSource<CompanyInsideTrade>;
+  dataSource!: MatTableDataSource<SymbolOwnershipHolders>;
 
   displayedColumns: string[] = [
-    'person',
-    'securityName',
-    'transactionType',
-    'price',
-    'securitiesTransacted',
-    'total',
-    'date',
-    'redirect',
+    'investorName',
+    'weight',
+    'avgPricePaid',
+    'marketValue',
+    'sharesNumber',
+    'holdingPeriod',
+    'firstAdded',
   ];
 
   ngAfterViewInit(): void {
@@ -57,7 +54,5 @@ export class StockInsiderTradesComponent implements AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
-  identity: TrackByFunction<CompanyInsideTrade> = (index: number, item: CompanyInsideTrade) => item.filingDate;
-
-  onRedirect(data: CompanyInsideTrade): void {}
+  identity: TrackByFunction<SymbolOwnershipHolders> = (index: number, item: SymbolOwnershipHolders) => item.cik;
 }

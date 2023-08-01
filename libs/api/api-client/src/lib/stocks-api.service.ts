@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import {
+  CompanyInsideTrade,
   DataTimePeriod,
   HistoricalPrice,
   StockDetails,
@@ -9,6 +10,8 @@ import {
   StockScreenerValues,
   StockSummary,
   SymbolHistoricalPeriods,
+  SymbolOwnershipHolders,
+  SymbolOwnershipInstitutional,
 } from '@market-monitor/api-types';
 import { Observable, retry } from 'rxjs';
 import { ENDPOINT_FUNCTION_URL } from './api-url.token';
@@ -59,5 +62,21 @@ export class StocksApiService {
     return this.http.get<StockMetricsHistoricalBasic>(
       `${this.endpointFunctions}/getstockhistoricalmetrics?symbol=${symbol}&timePeriod=${period}`
     );
+  }
+
+  getStockOwnershipHoldersToDate(symbol: string, date: string): Observable<SymbolOwnershipHolders[]> {
+    return this.http.get<SymbolOwnershipHolders[]>(
+      `${this.endpointFunctions}/getownershipholderstodate?symbol=${symbol}&date=${date}`
+    );
+  }
+
+  getStockOwnershipInstitutional(symbol: string): Observable<SymbolOwnershipInstitutional[]> {
+    return this.http.get<SymbolOwnershipInstitutional[]>(
+      `${this.endpointFunctions}/getownershipinstitutional?symbol=${symbol}`
+    );
+  }
+
+  getStockInsiderTrades(symbol: string): Observable<CompanyInsideTrade[]> {
+    return this.http.get<CompanyInsideTrade[]>(`${this.endpointFunctions}/getstockinsidertrades?symbol=${symbol}`);
   }
 }

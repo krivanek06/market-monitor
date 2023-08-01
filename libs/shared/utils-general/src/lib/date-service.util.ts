@@ -115,7 +115,7 @@ export const dateGetDateOfOpenStockMarket = (input: DateInput): Date => {
  *
  * @param inputDate
  * @param formatOptions
- * @returns
+ * @returns - months: [1,2...12]
  */
 export const dateFormatDate = (inputDate: DateInput, formateStr: string = 'yyyy-MM-dd'): string => {
   const date = new Date(inputDate);
@@ -196,3 +196,78 @@ export const fillOutMissingDatesForMonth = <T extends { date: string }>(
     return { ...emptyValue, date };
   });
 };
+
+/**
+ * check if date is in format: yyyy-MM-dd and match
+ * yyyy-03-31, yyyy-06-30, yyyy-09-30, yyyy-12-31
+ *
+ * @param date
+ * @returns
+ */
+export const isDateValidQuarter = (date: DateInput): boolean => {
+  const dateFormatted = dateFormatDate(date);
+  const [year, month, day] = dateFormatted.split('-').map((d) => Number(d));
+
+  if (day === 31 && [3, 12].includes(month)) {
+    return true;
+  }
+
+  if (day === 30 && [6, 9].includes(month)) {
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * from the provided date will return the most recent quarter
+ * example: 2021-04-03 -> 2021-03-31
+ *
+ * @param date
+ */
+export const getMostRecentQuarter = (date: DateInput): string => {
+  const dateFormatted = dateFormatDate(date);
+  const [year, month, day] = dateFormatted.split('-').map((d) => Number(d));
+
+  if (month > 1 && month <= 3) {
+    return `${year}-03-31`;
+  }
+
+  if (month > 3 && month <= 6) {
+    return `${year}-06-30`;
+  }
+
+  if (month > 6 && month <= 9) {
+    return `${year}-09-30`;
+  }
+
+  return `${year}-12-31`;
+};
+
+export const getPreviousQuarter = (date: DateInput): string => {
+  const dateFormatted = dateFormatDate(date);
+  const [year, month, day] = dateFormatted.split('-').map((d) => Number(d));
+
+  if (month > 1 && month <= 3) {
+    return `${year - 1}-12-31`;
+  }
+
+  if (month > 3 && month <= 6) {
+    return `${year}-03-31`;
+  }
+
+  if (month > 6 && month <= 9) {
+    return `${year}-06-30`;
+  }
+
+  return `${year}-09-30`;
+};
+
+export const DATA_VALIDITY = 7;
+/**
+ *
+ * @param data
+ * @returns whether data is is not older than N days
+ */
+export const checkDataValidity = <T extends { lastUpdate: string }>(data?: T, days = DATA_VALIDITY) =>
+  !data || isBefore(new Date(data.lastUpdate), subDays(new Date(), days));

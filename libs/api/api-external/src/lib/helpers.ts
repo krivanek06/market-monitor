@@ -12,7 +12,7 @@ export const filterOutSymbols = <T extends { symbol: string }>(
       // filter out symbols that contain any of the ignored symbols
       .filter((d) => !ignoredSymbols.some((ignoredSymbol) => d.symbol.includes(ignoredSymbol)))
       // filter out symbols if multiple one in the array
-      .filter((d, index) => data.indexOf(d) !== index)
+      // .filter((d, index) => data.indexOf(d) === index)
       // filter out symbols if keys are null
       .filter((d) => nonNullableKeys.every((key) => !!d[key]))
       .map((d) => {

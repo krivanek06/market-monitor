@@ -16,7 +16,7 @@ import { ForcefullyOmit } from '@market-monitor/shared-utils-general';
 import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
-import { getSummary } from '../../../shared';
+import { getSummary } from '../../shared';
 
 /**
  * returns symbols details based on provided symbol in query

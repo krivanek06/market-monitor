@@ -1,0 +1,182 @@
+<div class="flex items-start gap-6">
+  <!-- institutional data -->
+  <app-general-card title="Institution" additionalClasses="min-w-[350px]">
+    <div>
+      <div class="g-item-wrapper">
+        <div>Total Invested</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.totalInvested | largeNumberFormatter }}</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.totalInvested,
+              valueToCompare: ownershipInstitutional.lastTotalInvested,
+              hideValue: true
+            }"
+          ></span>
+          <span>/</span>
+          <span>{{ enterpriseValue.marketCapitalization | largeNumberFormatter }}</span>
+        </div>
+      </div>
+      <div class="g-item-wrapper">
+        <div>Held Shares</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.numberOf13Fshares | largeNumberFormatter }}</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.numberOf13Fshares,
+              valueToCompare: ownershipInstitutional.lastNumberOf13Fshares,
+              hideValue: true
+            }"
+          ></span>
+          <span>/</span>
+          <span>{{ enterpriseValue.numberOfShares | largeNumberFormatter }}</span>
+        </div>
+      </div>
+      <div class="g-item-wrapper">
+        <div>Ownership</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.ownershipPercent | largeNumberFormatter }}%</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.ownershipPercent,
+              valueToCompare: ownershipInstitutional.lastOwnershipPercent,
+              hideValue: true
+            }"
+          ></span>
+        </div>
+      </div>
+      <div class="g-item-wrapper">
+        <div>Investors</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.investorsHolding }}</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.investorsHolding,
+              valueToCompare: ownershipInstitutional.lastInvestorsHolding,
+              hideValue: true
+            }"
+          ></span>
+        </div>
+      </div>
+    </div>
+  </app-general-card>
+
+  <!-- positions -->
+  <app-general-card title="Position" additionalClasses="min-w-[300px]">
+    <div>
+      <!-- line 1 -->
+      <div class="g-item-wrapper">
+        <div>Increased</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.increasedPositions }}</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.increasedPositions,
+              valueToCompare: ownershipInstitutional.lastIncreasedPositions,
+              hideValue: true
+            }"
+          ></span>
+        </div>
+      </div>
+
+      <!-- line 2-->
+      <div class="g-item-wrapper">
+        <div>Decreased</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.reducedPositions }}</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.reducedPositions,
+              valueToCompare: ownershipInstitutional.lastReducedPositions,
+              hideValue: true
+            }"
+          ></span>
+        </div>
+      </div>
+
+      <div class="g-item-wrapper">
+        <div>New</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.newPositions }}</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.newPositions,
+              valueToCompare: ownershipInstitutional.lastNewPositions,
+              hideValue: true
+            }"
+          ></span>
+        </div>
+      </div>
+
+      <div class="g-item-wrapper">
+        <div>Sold</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.closedPositions }}</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.closedPositions,
+              valueToCompare: ownershipInstitutional.lastClosedPositions,
+              hideValue: true
+            }"
+          ></span>
+        </div>
+      </div>
+    </div>
+  </app-general-card>
+
+  <!-- Options -->
+  <app-general-card title="Option" additionalClasses="min-w-[350px]">
+    <div>
+      <div class="g-item-wrapper">
+        <div>Calls</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.totalCalls | largeNumberFormatter }}</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.totalCalls,
+              valueToCompare: ownershipInstitutional.lastTotalCalls,
+              hideValue: false
+            }"
+          ></span>
+        </div>
+      </div>
+      <div class="g-item-wrapper">
+        <div>Puts</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.totalPuts | largeNumberFormatter }}</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.totalPuts,
+              valueToCompare: ownershipInstitutional.lastTotalPuts,
+              hideValue: false
+            }"
+          ></span>
+        </div>
+      </div>
+      <div class="g-item-wrapper">
+        <div>Put/Call Ratio</div>
+        <div class="flex items-center gap-2">
+          <span>{{ ownershipInstitutional.putCallRatio | largeNumberFormatter }}</span>
+          <span
+            appPercentageIncrease
+            [currentValues]="{
+              value: ownershipInstitutional.putCallRatio,
+              valueToCompare: ownershipInstitutional.lastPutCallRatio,
+              hideValue: true
+            }"
+          ></span>
+        </div>
+      </div>
+    </div>
+  </app-general-card>
+</div>

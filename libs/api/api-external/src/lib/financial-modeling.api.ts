@@ -1,11 +1,17 @@
 /* eslint-disable max-len */
 import {
   AnalystEstimates,
+  AvailableQuotes,
+  CalendarDividend,
+  CalendarStockEarning,
+  CalendarStockIPO,
+  CompanyInsideTrade,
   CompanyKeyMetrics,
   CompanyKeyMetricsTTM,
   CompanyOutlook,
   CompanyProfile,
   CompanyRatio,
+  CompanyStockDividend,
   DataTimePeriod,
   ESGDataQuarterly,
   ESGDataRatingYearly,
@@ -13,6 +19,7 @@ import {
   EnterpriseValue,
   HistoricalLoadingPeriods,
   HistoricalPrice,
+  MostPerformingStocks,
   News,
   PriceChange,
   PriceTarget,
@@ -20,13 +27,15 @@ import {
   StockEarning,
   StockScreenerResults,
   StockScreenerValues,
+  SymbolOwnershipHolders,
+  SymbolOwnershipInstitutional,
   SymbolQuote,
   TickerSearch,
   UpgradesDowngrades,
 } from '@market-monitor/api-types';
 import axios from 'axios';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
-import { filterOutSymbols } from './helpers';
+import { filterOutSymbols, getDateRangeByMonthAndYear } from './helpers';
 
 export const getCompanyQuote = async (symbols: string[]): Promise<SymbolQuote[]> => {
   const symbol = symbols.join(',');
@@ -89,7 +98,9 @@ export const searchTicker = async (symbolPrefix: string, isCrypto = false): Prom
   const stockExchange = 'NASDAQ,NYSE';
   const cryptoExchange = 'CRYPTO';
   const usedExchange = isCrypto ? cryptoExchange : stockExchange;
-  const url = `${FINANCIAL_MODELING_URL}/v3/search-ticker?query=${symbolPrefix}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const prefixUppercase = symbolPrefix.toUpperCase();
+  const url = `${FINANCIAL_MODELING_URL}/v3/search?query=${prefixUppercase}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+
   const response = await axios.get<TickerSearch[]>(url);
 
   // check if symbol contains any of the ignored symbols
@@ -438,4 +449,139 @@ export const getStockScreening = async (values: StockScreenerValues): Promise<St
   // check if symbol contains any of the ignored symbols
   const filteredResponse = filterOutSymbols(response.data, ['sector']);
   return filteredResponse;
+};
+
+/**
+ *
+ * @param type
+ * @returns array of [{
+    "symbol": "CYXT",
+    "name": "Cyxtera Technologies, Inc.",
+    "change": 0.0467,
+    "price": 0.0885,
+    "changesPercentage": 111.7225
+  }]
+ */
+export const getMostPerformingStocks = async (type: 'gainers' | 'losers' | 'actives') => {
+  const url = `${FINANCIAL_MODELING_URL}/v3/stock_market/${type}?apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<MostPerformingStocks[]>(url);
+  return response.data.slice(0, 20);
+};
+
+export const getNewsForex = async (symbol: string = '') => {
+  const ticker = symbol ? `tickers=${symbol}&` : '';
+  const url = `${FINANCIAL_MODELING_URL}/v4/forex_news?${ticker}limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<News[]>(url);
+  return response.data;
+};
+
+export const getNewsStock = async (symbol: string = '') => {
+  const ticker = symbol ? `tickers=${symbol}&` : '';
+  const url = `${FINANCIAL_MODELING_URL}/v3/stock_news?${ticker}limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<News[]>(url);
+  return response.data;
+};
+
+export const getNewsCrypto = async (symbol: string = '') => {
+  const ticker = symbol ? `tickers=${symbol}&` : '';
+  const url = `${FINANCIAL_MODELING_URL}/v4/crypto_news?${ticker}limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<News[]>(url);
+  return response.data;
+};
+
+export const getNewsGeneral = async () => {
+  const url = `${FINANCIAL_MODELING_URL}/v4/general_news?limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<News[]>(url);
+  return response.data;
+};
+
+export const getQuotesByType = async (type: AvailableQuotes) => {
+  const url = `${FINANCIAL_MODELING_URL}/v3/quotes/${type}?apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<SymbolQuote[]>(url);
+  return response.data;
+};
+
+export const getQuotesBySymbols = async (symbols: string[]) => {
+  const symbolsString = symbols.join(',');
+  const url = `${FINANCIAL_MODELING_URL}/v3/quote/${symbolsString}?apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<SymbolQuote[]>(url);
+  return response.data;
+};
+
+export const getCalendarStockDividends = async (
+  month: number | string,
+  year: number | string
+): Promise<CalendarDividend[]> => {
+  const [from, to] = getDateRangeByMonthAndYear(month, year);
+  const url = `${FINANCIAL_MODELING_URL}/v3/stock_dividend_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<CompanyStockDividend[]>(url);
+  const filteredOutResponse = filterOutSymbols(
+    response.data,
+    [],
+    ['recordDate', 'paymentDate', 'declarationDate', 'label', 'adjDividend']
+  );
+  return filteredOutResponse;
+};
+
+export const getCalendarStockIPOs = async (
+  month: number | string,
+  year: number | string
+): Promise<CalendarStockIPO[]> => {
+  const [from, to] = getDateRangeByMonthAndYear(month, year);
+  const url = `${FINANCIAL_MODELING_URL}/v4/ipo-calendar-prospectus?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<(CalendarStockIPO & { ipoDate: string })[]>(url);
+  const filteredOutResponse = filterOutSymbols(response.data);
+
+  // change key name 'ipoDate' to 'date';
+  filteredOutResponse.forEach((item) => {
+    item.date = item.ipoDate;
+    delete item.ipoDate;
+  });
+
+  return filteredOutResponse;
+};
+
+export const getCalendarStockEarnings = async (
+  month: number | string,
+  year: number | string
+): Promise<CalendarStockEarning[]> => {
+  const [from, to] = getDateRangeByMonthAndYear(month, year);
+  const url = `${FINANCIAL_MODELING_URL}/v3/earning_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<StockEarning[]>(url);
+  const filteredOutResponse = filterOutSymbols(response.data, [], ['fiscalDateEnding', 'updatedFromDate', 'time']);
+  return filteredOutResponse;
+};
+
+export const getSymbolOwnershipInstitutional = async (symbol: string): Promise<SymbolOwnershipInstitutional[]> => {
+  const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/symbol-ownership?symbol=${symbol}&includeCurrentQuarter=true&&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<SymbolOwnershipInstitutional[]>(url);
+  return response.data;
+};
+
+/**
+ *
+ * @param symbol
+ * @param date - quarters in format YYYY-MM-DD: 2023-03-31, 2023-06-30, 2023-09-30, 2023-12-31
+ * @returns
+ */
+export const getSymbolOwnershipHolders = async (
+  symbol: string,
+  date: string,
+  page = 0
+): Promise<SymbolOwnershipHolders[]> => {
+  const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/institutional-holders/symbol-ownership-percent?symbol=${symbol}&page=${page}&date=${date}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<SymbolOwnershipHolders[]>(url);
+  return response.data;
+};
+
+export const getInstitutionalPortfolioDates = async (cik: string = '0000093751'): Promise<string[]> => {
+  const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/portfolio-date?cik=${cik}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<{ date: string }[]>(url);
+  return response.data.map((d) => d.date);
+};
+
+export const getInsiderTrading = async (symbol: string, page = 0): Promise<CompanyInsideTrade[]> => {
+  const url = `${FINANCIAL_MODELING_URL}/v4/insider-trading?symbol=${symbol}&page=${page}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<CompanyInsideTrade[]>(url);
+  return response.data;
 };
