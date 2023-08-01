@@ -1,4 +1,6 @@
-
-  <app-general-card title="Insider trades">
-    <app-stock-insider-trades [data]="stockDetailsSignal.companyOutlook.insideTrades"></app-stock-insider-trades>
-  </app-general-card>
+<app-general-card title="Insider trades">
+  <app-stock-insider-trades
+    *ngIf="stockInsiderTradesSignal() as stockInsiderTrades"
+    [data]="stockInsiderTrades"
+  ></app-stock-insider-trades>
+</app-general-card>

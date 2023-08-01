@@ -6,7 +6,7 @@ import { StocksApiService } from '@market-monitor/api-client';
 import { StockDetails } from '@market-monitor/api-types';
 import { StockInsiderTradesComponent } from '@market-monitor/modules/market-stocks';
 import { GeneralCardComponent } from '@market-monitor/shared-components';
-import { map } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-page-stock-details-trades',
@@ -24,5 +24,7 @@ export class PageStockDetailsTradesComponent {
     map((data) => data['stockDetails'] as StockDetails)
   );
 
-  stockDetailsSignal = toSignal(this.stockDetails$);
+  stockInsiderTradesSignal = toSignal(
+    this.stockDetails$.pipe(switchMap((details) => this.stocksApiService.getStockInsiderTrades(details.id)))
+  );
 }

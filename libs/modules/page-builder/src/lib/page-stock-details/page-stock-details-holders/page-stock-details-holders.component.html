@@ -16,6 +16,9 @@
   </div>
 
   <app-general-card title="Ownership Holders">
-    <app-stock-ownership-holders-table [data]="ownershipHoldersToDateSignal()"></app-stock-ownership-holders-table>
+    <app-stock-ownership-holders-table
+      *ngIf="ownershipHoldersToDateSignal() as data"
+      [data]="data"
+    ></app-stock-ownership-holders-table>
   </app-general-card>
 </ng-container>

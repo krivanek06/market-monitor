@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import {
+  CompanyInsideTrade,
   DataTimePeriod,
   HistoricalPrice,
   StockDetails,
@@ -73,5 +74,9 @@ export class StocksApiService {
     return this.http.get<SymbolOwnershipInstitutional[]>(
       `${this.endpointFunctions}/getownershipinstitutional?symbol=${symbol}`
     );
+  }
+
+  getStockInsiderTrades(symbol: string): Observable<CompanyInsideTrade[]> {
+    return this.http.get<CompanyInsideTrade[]>(`${this.endpointFunctions}/getstockinsidertrades?symbol=${symbol}`);
   }
 }

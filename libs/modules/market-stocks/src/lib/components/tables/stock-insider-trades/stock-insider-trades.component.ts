@@ -1,20 +1,43 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, Input, TrackByFunction, ViewChild } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CompanyInsideTrade } from '@market-monitor/api-types';
+import { BubblePaginationDirective } from '@market-monitor/shared-directives';
 import { LargeNumberFormatterPipe } from '@market-monitor/shared-pipes';
 
 @Component({
   selector: 'app-stock-insider-trades',
   standalone: true,
-  imports: [CommonModule, MatTableModule, LargeNumberFormatterPipe],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    LargeNumberFormatterPipe,
+    MatPaginatorModule,
+    BubblePaginationDirective,
+    MatSortModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
   templateUrl: './stock-insider-trades.component.html',
-  styleUrls: ['./stock-insider-trades.component.scss'],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockInsiderTradesComponent {
-  @Input({ required: true }) set data(values: CompanyInsideTrade[] | null) {
-    this.dataSource = new MatTableDataSource(values ?? []);
+export class StockInsiderTradesComponent implements AfterViewInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  @Input({ required: true }) set data(values: CompanyInsideTrade[]) {
+    this.dataSource = new MatTableDataSource(values);
   }
   dataSource!: MatTableDataSource<CompanyInsideTrade>;
 
@@ -26,5 +49,15 @@ export class StockInsiderTradesComponent {
     'securitiesTransacted',
     'total',
     'date',
+    'redirect',
   ];
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+
+  identity: TrackByFunction<CompanyInsideTrade> = (index: number, item: CompanyInsideTrade) => item.filingDate;
+
+  onRedirect(data: CompanyInsideTrade): void {}
 }

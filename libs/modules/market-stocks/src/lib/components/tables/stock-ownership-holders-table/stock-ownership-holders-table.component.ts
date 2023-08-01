@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, TrackByFunction, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, Input, TrackByFunction, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -30,14 +30,12 @@ import { LargeNumberFormatterPipe, TruncateWordsPipe } from '@market-monitor/sha
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockOwnershipHoldersTableComponent {
+export class StockOwnershipHoldersTableComponent implements AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  @Input({ required: true }) set data(values: SymbolOwnershipHolders[] | undefined) {
-    this.dataSource = new MatTableDataSource(values ?? []);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+  @Input({ required: true }) set data(values: SymbolOwnershipHolders[]) {
+    this.dataSource = new MatTableDataSource(values);
   }
   dataSource!: MatTableDataSource<SymbolOwnershipHolders>;
 
@@ -50,6 +48,11 @@ export class StockOwnershipHoldersTableComponent {
     'holdingPeriod',
     'firstAdded',
   ];
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
 
   identity: TrackByFunction<SymbolOwnershipHolders> = (index: number, item: SymbolOwnershipHolders) => item.cik;
 }
