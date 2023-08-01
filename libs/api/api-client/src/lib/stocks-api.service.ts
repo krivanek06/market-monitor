@@ -4,6 +4,7 @@ import {
   CompanyInsideTrade,
   DataTimePeriod,
   HistoricalPrice,
+  News,
   StockDetails,
   StockEarning,
   StockMetricsHistoricalBasic,
@@ -78,5 +79,9 @@ export class StocksApiService {
 
   getStockInsiderTrades(symbol: string): Observable<CompanyInsideTrade[]> {
     return this.http.get<CompanyInsideTrade[]>(`${this.endpointFunctions}/getstockinsidertrades?symbol=${symbol}`);
+  }
+
+  getStockNews(symbol: string): Observable<News[]> {
+    return this.http.get<News[]>(`${this.endpointFunctions}/getmarketnews?news_types=stocks&symbol=${symbol}`);
   }
 }

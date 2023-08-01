@@ -2,8 +2,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { StockDetails } from '@market-monitor/api-types';
 import {
   SheetDataTimePeriodForm,
   StockSheetDataTableComponent,
@@ -11,7 +9,8 @@ import {
   StockTransformService,
 } from '@market-monitor/modules/market-stocks';
 import { GeneralCardComponent } from '@market-monitor/shared-components';
-import { combineLatest, map, startWith } from 'rxjs';
+import { map, startWith } from 'rxjs';
+import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
   selector: 'app-page-stock-details-financials',
@@ -33,8 +32,7 @@ import { combineLatest, map, startWith } from 'rxjs';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageStockDetailsFinancialsComponent {
-  route = inject(ActivatedRoute);
+export class PageStockDetailsFinancialsComponent extends PageStockDetailsBase {
   stockTransformService = inject(StockTransformService);
 
   timePeriodControl = new FormControl<SheetDataTimePeriodForm>(
@@ -45,25 +43,24 @@ export class PageStockDetailsFinancialsComponent {
     { nonNullable: true }
   );
 
-  private stockDetails$ = (this.route.parent as ActivatedRoute).data.pipe(
-    map((data) => data['stockDetails'] as StockDetails)
-  );
   sheetDataSignal = toSignal(
-    combineLatest([
-      this.stockDetails$,
-      this.timePeriodControl.valueChanges.pipe(startWith(this.timePeriodControl.value)),
-    ]).pipe(
-      map(([stockDetails, timePeriod]) => {
+    this.timePeriodControl.valueChanges.pipe(
+      startWith(this.timePeriodControl.value),
+      map((timePeriod) => {
         const time = timePeriod.timePeriod;
         const key = timePeriod.sheetKey;
         if (key === 'cash') {
-          return this.stockTransformService.createSheetDataFromCashFlow(time, stockDetails);
+          return this.stockTransformService.createSheetDataFromCashFlow(time, this.stockDetailsSignal());
         }
         if (key === 'income') {
-          return this.stockTransformService.createSheetDataFromIncomeStatement(time, stockDetails);
+          return this.stockTransformService.createSheetDataFromIncomeStatement(time, this.stockDetailsSignal());
         }
-        return this.stockTransformService.createSheetDataFromBalanceSheet(time, stockDetails);
+        return this.stockTransformService.createSheetDataFromBalanceSheet(time, this.stockDetailsSignal());
       })
     )
   );
+
+  constructor() {
+    super();
+  }
 }

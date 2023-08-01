@@ -1,11 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
-import { StocksApiService } from '@market-monitor/api-client';
-import { StockDetails } from '@market-monitor/api-types';
 import { GenericChartComponent } from '@market-monitor/shared-components';
-import { map, switchMap } from 'rxjs';
+import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
   selector: 'app-page-stock-details-ratios',
@@ -15,14 +12,10 @@ import { map, switchMap } from 'rxjs';
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageStockDetailsRatiosComponent {
-  stocksApiService = inject(StocksApiService);
-  route = inject(ActivatedRoute);
-  private stockDetails$ = (this.route.parent as ActivatedRoute).data.pipe(
-    map((data) => data['stockDetails'] as StockDetails)
-  );
+export class PageStockDetailsRatiosComponent extends PageStockDetailsBase {
+  stockHistoricalMetricsSignal = toSignal(this.stocksApiService.getStockHistoricalMetrics(this.stockSymbolSignal()));
 
-  stockHistoricalMetricsSignal = toSignal(
-    this.stockDetails$.pipe(switchMap((details) => this.stocksApiService.getStockHistoricalMetrics(details.id)))
-  );
+  constructor() {
+    super();
+  }
 }

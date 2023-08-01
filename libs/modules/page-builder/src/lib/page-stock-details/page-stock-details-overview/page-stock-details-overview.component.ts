@@ -1,9 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
-import { StocksApiService } from '@market-monitor/api-client';
-import { StockDetails } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
 import {
   EarningsEstimationChartComponent,
@@ -17,7 +14,7 @@ import {
   StockRecommendationChartComponent,
   StockSummaryListComponent,
   StockTransformService,
-  StockUpgradesDowngradesTableComponent
+  StockUpgradesDowngradesTableComponent,
 } from '@market-monitor/modules/market-stocks';
 import {
   GeneralCardComponent,
@@ -25,8 +22,9 @@ import {
   NameValueListComponent,
   PriceChangeItemsComponent,
 } from '@market-monitor/shared-components';
-import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared-utils-client';
-import { map, switchMap } from 'rxjs';
+import { DialogServiceModule } from '@market-monitor/shared-utils-client';
+import { map } from 'rxjs';
+import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
   selector: 'app-page-details-overview',
@@ -61,27 +59,13 @@ import { map, switchMap } from 'rxjs';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageStockDetailsOverviewComponent {
-  route = inject(ActivatedRoute);
-  router = inject(Router);
-  stocksApiService = inject(StocksApiService);
+export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   stockTransformService = inject(StockTransformService);
-  dialogServiceUtil = inject(DialogServiceUtil);
-
-  private stockDetails$ = (this.route.parent as ActivatedRoute).data.pipe(
-    map((data) => data['stockDetails'] as StockDetails)
-  );
-
-  stockDetailsSignal = toSignal(this.stockDetails$);
 
   stockPeersSignal = toSignal(
-    this.stockDetails$.pipe(
-      switchMap((details) =>
-        this.stocksApiService
-          .getStockSummaries(details?.sectorPeers.peersList ?? [])
-          .pipe(map((summaries) => summaries ?? []))
-      )
-    )
+    this.stocksApiService
+      .getStockSummaries(this.stockDetailsSignal().sectorPeers.peersList ?? [])
+      .pipe(map((summaries) => summaries ?? []))
   );
 
   companyRatingSignal = computed(() => this.stockTransformService.createCompanyRatingTable(this.stockDetailsSignal()));
@@ -103,5 +87,7 @@ export class PageStockDetailsOverviewComponent {
     this.stockTransformService.createFinancialDividends(this.stockDetailsSignal())
   );
 
-  constructor() {}
+  constructor() {
+    super();
+  }
 }

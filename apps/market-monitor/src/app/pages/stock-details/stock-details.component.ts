@@ -9,11 +9,6 @@ import { stockDetailsResolver } from '@market-monitor/modules/page-builder';
 import { LabelValue, TabSelectControlComponent } from '@market-monitor/shared-components';
 import { DialogServiceModule } from '@market-monitor/shared-utils-client';
 import { ROUTES_STOCK_DETAILS } from '../../routes.model';
-import { StockDetailsFinancialsComponent } from './subpages/stock-details-financials.component';
-import { StockDetailsHoldersComponent } from './subpages/stock-details-holders.component';
-import { StockDetailsOverviewComponent } from './subpages/stock-details-overview.component';
-import { StockDetailsRatiosComponent } from './subpages/stock-details-ratios.component';
-import { StockDetailsTradesComponent } from './subpages/stock-details-trades.component';
 
 @Component({
   selector: 'app-stock-details',
@@ -64,6 +59,7 @@ export class StockDetailsComponent {
     { label: 'Overview', value: ROUTES_STOCK_DETAILS.OVERVIEW },
     { label: 'Financials', value: ROUTES_STOCK_DETAILS.FINANCIALS },
     { label: 'Ratios', value: ROUTES_STOCK_DETAILS.RATIOS },
+    { label: 'News', value: ROUTES_STOCK_DETAILS.NEWS },
     { label: 'Holders', value: ROUTES_STOCK_DETAILS.HOLDERS },
     { label: 'Trades', value: ROUTES_STOCK_DETAILS.TRADES },
   ];
@@ -106,23 +102,32 @@ export const route: Routes = [
       },
       {
         path: ROUTES_STOCK_DETAILS.OVERVIEW,
-        component: StockDetailsOverviewComponent,
+        loadComponent: () =>
+          import('./subpages/stock-details-overview.component').then((m) => m.StockDetailsOverviewComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.HOLDERS,
-        component: StockDetailsHoldersComponent,
+        loadComponent: () =>
+          import('./subpages/stock-details-holders.component').then((m) => m.StockDetailsHoldersComponent),
+      },
+      {
+        path: ROUTES_STOCK_DETAILS.NEWS,
+        loadComponent: () => import('./subpages/stock-details-news.component').then((m) => m.StockDetailsNewsComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.TRADES,
-        component: StockDetailsTradesComponent,
+        loadComponent: () =>
+          import('./subpages/stock-details-trades.component').then((m) => m.StockDetailsTradesComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.FINANCIALS,
-        component: StockDetailsFinancialsComponent,
+        loadComponent: () =>
+          import('./subpages/stock-details-financials.component').then((m) => m.StockDetailsFinancialsComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.RATIOS,
-        component: StockDetailsRatiosComponent,
+        loadComponent: () =>
+          import('./subpages/stock-details-ratios.component').then((m) => m.StockDetailsRatiosComponent),
       },
     ],
   },

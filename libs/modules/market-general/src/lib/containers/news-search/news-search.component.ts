@@ -28,6 +28,13 @@ import { NewsBodyComponent } from '../../components';
 })
 export class NewsSearchComponent {
   @Input() showForm = false;
+  @Input() newDisplay = 16;
+  @Input() set searchData(value: { newsType: FirebaseNewsTypes; symbol?: string }) {
+    this.newSearchFormGroup.patchValue({
+      newsType: value.newsType,
+      symbol: value.symbol ?? '',
+    });
+  }
   marketApiService = inject(MarketApiService);
 
   newSearchFormGroup = new FormGroup({
@@ -39,7 +46,7 @@ export class NewsSearchComponent {
     return this.newSearchFormGroup.controls.newsType.value === 'general';
   }
 
-  maximumNewsDisplayed = signal(10);
+  maximumNewsDisplayed = signal(this.newDisplay);
   showLoadingSignal = signal<boolean>(true);
   marketStockNewsSignal = toSignal<News[]>(
     this.newSearchFormGroup.valueChanges.pipe(
@@ -48,7 +55,7 @@ export class NewsSearchComponent {
       distinctUntilChanged(),
       tap(() => {
         this.showLoadingSignal.set(true);
-        this.maximumNewsDisplayed.set(10);
+        this.maximumNewsDisplayed.set(this.newDisplay);
       }),
       pairwise(),
       map(([prev, curr]) => {
@@ -90,6 +97,6 @@ export class NewsSearchComponent {
   }
 
   onNearEndScroll(): void {
-    this.maximumNewsDisplayed.set(this.maximumNewsDisplayed() + 10);
+    this.maximumNewsDisplayed.set(this.maximumNewsDisplayed() + this.newDisplay);
   }
 }
