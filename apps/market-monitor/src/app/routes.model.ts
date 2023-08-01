@@ -36,4 +36,5 @@ export enum ROUTES_STOCK_DETAILS {
   HOLDERS = 'holders',
   RATIOS = 'ratios',
   TRADES = 'trades',
+  NEWS = 'news',
 }

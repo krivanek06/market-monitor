@@ -2,21 +2,21 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { MarketApiService, StocksApiService } from '@market-monitor/api-client';
-import { StockDetails } from '@market-monitor/api-types';
+import { MarketApiService } from '@market-monitor/api-client';
 import { MarketDataTransformService } from '@market-monitor/modules/market-general';
 import {
   StockOwnershipHoldersTableComponent,
   StockOwnershipInstitutionalCardComponent,
 } from '@market-monitor/modules/market-stocks';
 import { FormMatInputWrapperComponent, GeneralCardComponent } from '@market-monitor/shared-components';
-import { combineLatest, filter, map, switchMap, tap } from 'rxjs';
+import { filter, map, switchMap, tap } from 'rxjs';
+import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
   selector: 'app-page-stock-details-holders',
   standalone: true,
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     StockOwnershipInstitutionalCardComponent,
     StockOwnershipHoldersTableComponent,
     GeneralCardComponent,
@@ -33,27 +33,19 @@ import { combineLatest, filter, map, switchMap, tap } from 'rxjs';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageStockDetailsHoldersComponent {
-  route = inject(ActivatedRoute);
-  stocksApiService = inject(StocksApiService);
+export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   marketApiService = inject(MarketApiService);
   marketDataTransformService = inject(MarketDataTransformService);
 
   quarterFormControl = new FormControl<string | null>(null);
   quarterFormControlSignal = toSignal(this.quarterFormControl.valueChanges);
-
-  private stockDetails$ = (this.route.parent as ActivatedRoute).data.pipe(
-    map((data) => data['stockDetails'] as StockDetails)
-  );
-
-  stockDetailsSignal = toSignal(this.stockDetails$);
   ownershipInstitutionalSignal = toSignal(
-    this.stockDetails$.pipe(switchMap((details) => this.stocksApiService.getStockOwnershipInstitutional(details.id)))
+    this.stocksApiService.getStockOwnershipInstitutional(this.stockSymbolSignal())
   );
   ownershipHoldersToDateSignal = toSignal(
-    combineLatest([this.stockDetails$, this.quarterFormControl.valueChanges]).pipe(
-      filter((data): data is [StockDetails, string] => !!data[1]),
-      switchMap(([details, quarter]) => this.stocksApiService.getStockOwnershipHoldersToDate(details.id, quarter))
+    this.quarterFormControl.valueChanges.pipe(
+      filter((data): data is string => !!data),
+      switchMap((quarter) => this.stocksApiService.getStockOwnershipHoldersToDate(this.stockSymbolSignal(), quarter))
     )
   );
   institutionalPortfolioInputSourceSignal = toSignal(
@@ -69,4 +61,8 @@ export class PageStockDetailsHoldersComponent {
   ownershipInstitutionalToQuarterSignal = computed(() =>
     this.ownershipInstitutionalSignal()?.find((d) => d.date === this.quarterFormControlSignal())
   );
+
+  constructor() {
+    super();
+  }
 }
