@@ -26,6 +26,17 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
       :host {
         display: block;
       }
+
+      a {
+        @apply transition-all duration-300 text-sm;
+        &:hover {
+          @apply text-wt-gray-medium;
+        }
+
+        &.is-active {
+          @apply text-wt-gray-dark-strong;
+        }
+      }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
