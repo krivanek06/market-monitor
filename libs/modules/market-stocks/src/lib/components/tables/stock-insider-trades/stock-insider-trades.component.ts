@@ -58,6 +58,4 @@ export class StockInsiderTradesComponent implements AfterViewInit {
   }
 
   identity: TrackByFunction<CompanyInsideTrade> = (index: number, item: CompanyInsideTrade) => item.filingDate;
-
-  onRedirect(data: CompanyInsideTrade): void {}
 }

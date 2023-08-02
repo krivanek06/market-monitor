@@ -65,7 +65,10 @@
 
     <!-- dividends -->
     <app-general-card additionalClasses="h-full" title="Dividends">
-      <app-name-value-list [items]="financialDividendsSignal()"></app-name-value-list>
+      <app-name-value-list
+        *ngIf="financialDividendsSignal().length > 0"
+        [items]="financialDividendsSignal()"
+      ></app-name-value-list>
     </app-general-card>
   </div>
 
