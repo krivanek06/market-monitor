@@ -1,33 +1,21 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { API_URL } from './api-url.token';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Optional } from '@angular/core';
+import { isBefore } from 'date-fns';
+import { Observable, of, retry, tap } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
-export class ApiService {
-  constructor(private http: HttpClient, @Inject(API_URL) private api_url: string) {}
+export abstract class ApiCacheService {
+  private validityOneMinute = 1000 * 60;
+  private cache = new Map<string, { data: any; validity: number }>();
 
-  get<T>(url: string, params: HttpParams = new HttpParams()): Observable<T> {
-    return this.http.get<T>(`${this.api_url}${url}`, {
-      headers: this.headers,
-      params,
-    });
-  }
-
-  post<T, D>(url: string, data?: D): Observable<T> {
-    return this.http.post<T>(`${this.api_url}${url}`, JSON.stringify(data), { headers: this.headers });
-  }
-
-  put<T, D>(url: string, data: D): Observable<T> {
-    return this.http.put<T>(`${this.api_url}${url}`, JSON.stringify(data), {
-      headers: this.headers,
-    });
-  }
-
-  delete<T>(url: string): Observable<T> {
-    return this.http.delete<T>(`${this.api_url}${url}`, {
-      headers: this.headers,
-    });
+  validity1Min = 1;
+  validity2Min = 2;
+  validity5Min = 5;
+  validity10Min = 10;
+  validity30Min = 30;
+  constructor(@Optional() private readonly httpClient: HttpClient) {
+    if (!this.httpClient) {
+      throw new Error('HttpClient is required');
+    }
   }
 
   get headers(): HttpHeaders {
@@ -37,5 +25,60 @@ export class ApiService {
     };
 
     return new HttpHeaders(headersConfig);
+  }
+
+  getData<T>(url: string, validityDefault = this.validity1Min): Observable<T> {
+    // data cached
+    if (this.checkDataAndValidity(url)) {
+      const data = this.cache.get(url) as { data: any; validity: number };
+      return of(data.data);
+    }
+
+    // no data cached
+    const validity = validityDefault * this.validityOneMinute;
+    return this.get<T>(url).pipe(
+      retry(3),
+      tap((data) => {
+        console.log('save to cache');
+        this.cache.set(url, {
+          data,
+          validity: Date.now() + validity,
+        });
+      })
+    );
+  }
+
+  get<T>(url: string): Observable<T> {
+    return this.httpClient.get<T>(`${url}`, {
+      headers: this.headers,
+    });
+  }
+
+  post<T, D>(url: string, data?: D): Observable<T> {
+    return this.httpClient.post<T>(`${url}`, JSON.stringify(data), { headers: this.headers });
+  }
+
+  put<T, D>(url: string, data: D): Observable<T> {
+    return this.httpClient.put<T>(`${url}`, JSON.stringify(data), {
+      headers: this.headers,
+    });
+  }
+
+  delete<T>(url: string): Observable<T> {
+    return this.httpClient.delete<T>(`${url}`, {
+      headers: this.headers,
+    });
+  }
+
+  clearCache(): void {
+    this.cache.clear();
+  }
+
+  private checkDataAndValidity(url: string): boolean {
+    const data = this.cache.get(url);
+    if (!data) {
+      return false;
+    }
+    return isBefore(Date.now(), data.validity);
   }
 }
