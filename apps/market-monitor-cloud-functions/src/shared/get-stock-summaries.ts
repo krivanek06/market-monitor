@@ -3,6 +3,7 @@ import { getDatabaseStockSummaryRef } from '@market-monitor/api-firebase';
 import { StockSummary } from '@market-monitor/api-types';
 import { isBefore, subMinutes } from 'date-fns';
 import { firestore } from 'firebase-admin';
+import { uniqBy } from 'lodash';
 
 export const getSummary = async (symbol: string): Promise<StockSummary> => {
   const data = await getSummaries([symbol]);
@@ -27,7 +28,9 @@ export const getSummary = async (symbol: string): Promise<StockSummary> => {
  */
 export const getSummaries = async (symbolsArray: string[]): Promise<StockSummary[]> => {
   // create DB calls
-  const databaseCallsForSymbol = symbolsArray.map((symbol) => getDatabaseStockSummaryRef(symbol));
+  const databaseCallsForSymbol = uniqBy(symbolsArray, (d) => d)
+    .filter((d) => !!d)
+    .map((symbol) => getDatabaseStockSummaryRef(symbol));
 
   // get data from DB
   const databasePromises = await Promise.all(databaseCallsForSymbol.map((doc) => doc.get()));

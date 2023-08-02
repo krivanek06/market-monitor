@@ -2,7 +2,6 @@ import { StockSummary } from '@market-monitor/api-types';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 import { getSummaries, getSummary } from '../../shared';
-
 /**
  * query.symbols contains a comma-separated list of stock symbols 'symbols=MSFT,AAPL,GOOG'
  *
@@ -16,8 +15,8 @@ export const getstocksummaries = onRequest(async (request, response: Response<St
     return;
   }
 
-  // get distinct symbols
-  const symbolsArray = symbolString.split(',').filter((value, index, self) => self.indexOf(value) === index);
+  // get distinct symbols and remove '' from array
+  const symbolsArray = symbolString.split(',');
 
   const allData = await getSummaries(symbolsArray);
   response.send(allData);
