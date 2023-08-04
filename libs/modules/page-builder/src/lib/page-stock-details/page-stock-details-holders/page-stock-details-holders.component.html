@@ -1,9 +1,31 @@
 <ng-container *ngIf="ownershipInstitutionalToQuarterSignal() as ownershipInstitutional">
-  <div *ngIf="enterpriseValueToQuarterSignal() as enterpriseValue" class="flex items-start justify-between gap-8 mb-6">
-    <app-stock-ownership-institutional-card
-      [enterpriseValue]="enterpriseValue"
-      [ownershipInstitutional]="ownershipInstitutional"
-    ></app-stock-ownership-institutional-card>
+  <div
+    *ngIf="enterpriseValueToQuarterSignal() as enterpriseValue"
+    class="grid gap-8 mb-6 md:grid-cols-2 xl:grid-cols-4"
+  >
+    <app-general-card title="Institution" additionalClasses="max-xl:w-full xl:min-w-[350px]">
+      <app-stock-ownership-institutional-list
+        displayType="institution"
+        [enterpriseValue]="enterpriseValue"
+        [ownershipInstitutional]="ownershipInstitutional"
+      ></app-stock-ownership-institutional-list>
+    </app-general-card>
+
+    <app-general-card title="Position" additionalClasses="max-xl:w-full xl:min-w-[250px]">
+      <app-stock-ownership-institutional-list
+        displayType="position"
+        [enterpriseValue]="enterpriseValue"
+        [ownershipInstitutional]="ownershipInstitutional"
+      ></app-stock-ownership-institutional-list>
+    </app-general-card>
+
+    <app-general-card title="Option" additionalClasses="max-xl:w-full xl:min-w-[300px]">
+      <app-stock-ownership-institutional-list
+        displayType="option"
+        [enterpriseValue]="enterpriseValue"
+        [ownershipInstitutional]="ownershipInstitutional"
+      ></app-stock-ownership-institutional-list>
+    </app-general-card>
 
     <div class="w-full">
       <app-form-mat-input-wrapper
@@ -16,9 +38,16 @@
   </div>
 
   <app-general-card title="Ownership Holders">
-    <app-stock-ownership-holders-table
-      *ngIf="ownershipHoldersToDateSignal() as data"
-      [data]="data"
-    ></app-stock-ownership-holders-table>
+    <!-- skeleton -->
+    <div *ngIf="loadingSignal(); else showData" class="grid gap-2">
+      <div *ngRange="25" class="g-skeleton h-[50px]"></div>
+    </div>
+
+    <ng-template #showData>
+      <app-stock-ownership-holders-table
+        *ngIf="ownershipHoldersToDateSignal() as data"
+        [data]="data"
+      ></app-stock-ownership-holders-table>
+    </ng-template>
   </app-general-card>
 </ng-container>

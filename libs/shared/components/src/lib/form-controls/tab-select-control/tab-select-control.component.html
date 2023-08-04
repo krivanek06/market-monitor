@@ -1,7 +1,7 @@
 <!-- tabs -->
 <div class="md:flex md:justify-end">
   <mat-tab-group
-    *ngIf="observedChange$ | async; else showSelect"
+    *ngIf="observedChangeSignal(); else showSelect"
     [selectedIndex]="selectedValueSignal()?.index"
     (selectedTabChange)="onSelectTabChange($event)"
   >

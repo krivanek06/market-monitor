@@ -36,6 +36,8 @@ export class StockOwnershipHoldersTableComponent implements AfterViewInit {
 
   @Input({ required: true }) set data(values: SymbolOwnershipHolders[]) {
     this.dataSource = new MatTableDataSource(values);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
   dataSource!: MatTableDataSource<SymbolOwnershipHolders>;
 

@@ -1,6 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, forwardRef, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
@@ -35,9 +36,11 @@ export class TabSelectControlComponent<T> implements ControlValueAccessor {
   /**
    * value true if screen is larger than provided screenLayoutSplit
    */
-  observedChange$ = inject(BreakpointObserver)
-    .observe(this.screenLayoutSplit)
-    .pipe(map((d) => d.matches));
+  observedChangeSignal = toSignal(
+    inject(BreakpointObserver)
+      .observe(this.screenLayoutSplit)
+      .pipe(map((d) => d.matches))
+  );
 
   onSelectTabChange(event: MatTabChangeEvent): void {
     const item = this.displayOptions[event.index];

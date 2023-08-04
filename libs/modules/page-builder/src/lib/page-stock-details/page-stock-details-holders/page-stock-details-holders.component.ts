@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MarketApiService } from '@market-monitor/api-client';
 import { MarketDataTransformService } from '@market-monitor/modules/market-general';
 import {
   StockOwnershipHoldersTableComponent,
-  StockOwnershipInstitutionalCardComponent,
+  StockOwnershipInstitutionalListComponent,
 } from '@market-monitor/modules/market-stocks';
 import { FormMatInputWrapperComponent, GeneralCardComponent } from '@market-monitor/shared-components';
+import { RangeDirective } from '@market-monitor/shared-directives';
 import { filter, map, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
@@ -17,11 +18,12 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   standalone: true,
   imports: [
     CommonModule,
-    StockOwnershipInstitutionalCardComponent,
+    StockOwnershipInstitutionalListComponent,
     StockOwnershipHoldersTableComponent,
     GeneralCardComponent,
     FormMatInputWrapperComponent,
     ReactiveFormsModule,
+    RangeDirective,
   ],
   templateUrl: './page-stock-details-holders.component.html',
   styles: [
@@ -45,7 +47,12 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   ownershipHoldersToDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
       filter((data): data is string => !!data),
-      switchMap((quarter) => this.stocksApiService.getStockOwnershipHoldersToDate(this.stockSymbolSignal(), quarter))
+      tap(() => this.loadingSignal.set(true)),
+      switchMap((quarter) =>
+        this.stocksApiService
+          .getStockOwnershipHoldersToDate(this.stockSymbolSignal(), quarter)
+          .pipe(tap(() => this.loadingSignal.set(false)))
+      )
     )
   );
   institutionalPortfolioInputSourceSignal = toSignal(
@@ -61,6 +68,7 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   ownershipInstitutionalToQuarterSignal = computed(() =>
     this.ownershipInstitutionalSignal()?.find((d) => d.date === this.quarterFormControlSignal())
   );
+  loadingSignal = signal(false);
 
   constructor() {
     super();

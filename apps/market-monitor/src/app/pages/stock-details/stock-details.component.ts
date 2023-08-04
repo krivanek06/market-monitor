@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
 import { stockDetailsResolver } from '@market-monitor/modules/page-builder';
 import { LabelValue, TabSelectControlComponent } from '@market-monitor/shared-components';
-import { DialogServiceModule } from '@market-monitor/shared-utils-client';
+import { DialogServiceModule, SCREEN_LAYOUT } from '@market-monitor/shared-utils-client';
 import { ROUTES_STOCK_DETAILS } from '../../routes.model';
 
 @Component({
@@ -36,6 +36,7 @@ import { ROUTES_STOCK_DETAILS } from '../../routes.model';
         <app-tab-select-control
           [formControl]="routesStockDetailsControl"
           [displayOptions]="routesStockDetails"
+          [screenLayoutSplit]="screenLayoutSplit"
         ></app-tab-select-control>
       </div>
 
@@ -64,9 +65,12 @@ export class StockDetailsComponent {
     { label: 'Trades', value: ROUTES_STOCK_DETAILS.TRADES },
   ];
 
+  screenLayoutSplit = SCREEN_LAYOUT.LAYOUT_2XL;
+
   constructor() {
     this.resolveUrl();
 
+    // navigate to selected tab
     this.routesStockDetailsControl.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
       this.router.navigate([value], { relativeTo: this.route });
     });

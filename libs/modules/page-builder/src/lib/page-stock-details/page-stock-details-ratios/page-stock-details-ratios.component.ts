@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { GenericChartComponent } from '@market-monitor/shared-components';
+import { RangeDirective } from '@market-monitor/shared-directives';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
   selector: 'app-page-stock-details-ratios',
   standalone: true,
-  imports: [CommonModule, GenericChartComponent],
+  imports: [CommonModule, GenericChartComponent, RangeDirective],
   templateUrl: './page-stock-details-ratios.component.html',
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,

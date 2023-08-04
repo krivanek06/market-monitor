@@ -38,6 +38,8 @@ export class StockInsiderTradesComponent implements AfterViewInit {
 
   @Input({ required: true }) set data(values: CompanyInsideTrade[]) {
     this.dataSource = new MatTableDataSource(values);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
   dataSource!: MatTableDataSource<CompanyInsideTrade>;
 
