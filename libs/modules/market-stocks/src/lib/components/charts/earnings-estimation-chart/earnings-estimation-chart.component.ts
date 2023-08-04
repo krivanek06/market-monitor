@@ -60,6 +60,9 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
       chart: {
         type: 'bubble',
         backgroundColor: 'transparent',
+        zooming: {
+          mouseWheel: false,
+        },
       },
       title: {
         text: this.showTitle ? 'Earnings' : '',

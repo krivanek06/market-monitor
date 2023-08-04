@@ -148,6 +148,9 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
       chart: {
         type: this.chartType === ChartType.areaChange ? ChartType.areaspline : this.chartType,
         backgroundColor: 'transparent',
+        zooming: {
+          mouseWheel: false,
+        },
       },
       navigator: {
         enabled: this.showTimelineSlider,

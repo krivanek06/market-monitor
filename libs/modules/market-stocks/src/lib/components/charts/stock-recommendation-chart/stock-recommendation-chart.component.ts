@@ -34,6 +34,9 @@ export class StockRecommendationChartComponent extends ChartConstructor {
       chart: {
         type: 'column',
         backgroundColor: 'transparent',
+        zooming: {
+          mouseWheel: false,
+        },
       },
       title: {
         text: '',

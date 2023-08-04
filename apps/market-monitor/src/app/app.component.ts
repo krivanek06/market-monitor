@@ -1,30 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import {
-  NavigationCancel,
-  NavigationEnd,
-  NavigationError,
-  NavigationStart,
-  Router,
-  RouterEvent,
-  RouterModule,
-} from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { NgShowDirective } from '@market-monitor/shared-directives';
+import { LoaderMainService } from '@market-monitor/shared-services';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterModule, MatProgressSpinnerModule],
+  imports: [CommonModule, RouterModule, MatProgressSpinnerModule, NgShowDirective],
   selector: 'app-root',
   template: `
     <main class="min-h-screen min-w-full">
-      <div *ngIf="loadingSignal(); else showRoute" class="grid place-content-center pb-[15%] min-h-screen min-w-full">
+      <div *ngIf="loadingSignal()" class="grid place-content-center pb-[15%] min-h-screen min-w-full">
         <mat-spinner></mat-spinner>
       </div>
 
-      <ng-template #showRoute>
-        <router-outlet></router-outlet>
-      </ng-template>
+      <router-outlet></router-outlet>
     </main>
   `,
   styles: [
@@ -36,25 +28,5 @@ import {
   ],
 })
 export class AppComponent {
-  loadingSignal = signal(false);
-
-  constructor(private router: Router) {
-    this.router.events.pipe(takeUntilDestroyed()).subscribe((routerEvent) => {
-      this.checkRouterEvent(routerEvent as RouterEvent);
-    });
-  }
-
-  checkRouterEvent(routerEvent: RouterEvent): void {
-    if (routerEvent instanceof NavigationStart) {
-      this.loadingSignal.set(true);
-    }
-
-    if (
-      routerEvent instanceof NavigationEnd ||
-      routerEvent instanceof NavigationCancel ||
-      routerEvent instanceof NavigationError
-    ) {
-      this.loadingSignal.set(false);
-    }
-  }
+  loadingSignal = toSignal(inject(LoaderMainService).getLoading());
 }
