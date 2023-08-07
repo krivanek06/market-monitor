@@ -1,20 +1,52 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, forwardRef, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { SCREEN_LAYOUT } from '@market-monitor/shared-utils-client';
-import { map } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs';
 import { LabelValue } from '../form-controls.model';
 
 @Component({
   selector: 'app-tab-select-control',
   standalone: true,
   imports: [CommonModule, MatTabsModule, MatSelectModule],
-  templateUrl: './tab-select-control.component.html',
-  styleUrls: ['./tab-select-control.component.scss'],
+  styles: [
+    `
+      ::ng-deep .mat-mdc-tab-group.mat-mdc-tab-group-stretch-tabs > .mat-mdc-tab-header .mat-mdc-tab {
+        padding-left: 60px !important;
+        padding-right: 60px !important;
+      }
+
+      ::ng-deep .mat-mdc-tab-list {
+        margin-bottom: 8px !important;
+      }
+    `,
+  ],
+  template: `
+    <!-- tabs -->
+    <div class="md:flex md:justify-end">
+      <mat-tab-group
+        *ngIf="showTabsSignal(); else showSelect"
+        [selectedIndex]="selectedValueSignal()?.index"
+        (selectedTabChange)="onSelectTabChange($event)"
+      >
+        <mat-tab *ngFor="let option of displayOptions" [label]="option.label"></mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <!-- select -->
+    <ng-template #showSelect>
+      <mat-form-field class="w-full">
+        <mat-label>Options</mat-label>
+        <mat-select [value]="selectedValueSignal()?.value" (selectionChange)="onSelectChange($event)">
+          <mat-option *ngFor="let option of displayOptions" [value]="option.value">{{ option.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-template>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
@@ -26,20 +58,32 @@ import { LabelValue } from '../form-controls.model';
 })
 export class TabSelectControlComponent<T> implements ControlValueAccessor {
   @Input({ required: true }) displayOptions: LabelValue<T>[] = [];
-  @Input() screenLayoutSplit: SCREEN_LAYOUT = SCREEN_LAYOUT.LAYOUT_SM;
+  @Input() set screenLayoutSplit(value: SCREEN_LAYOUT) {
+    this.screenLayoutSplitSignal.set(value);
+  }
 
   onChange: (data: T) => void = () => {};
   onTouched = () => {};
 
   selectedValueSignal = signal<{ value: T; index: number } | null>(null);
 
+  private screenLayoutSplitSignal = signal<SCREEN_LAYOUT>(SCREEN_LAYOUT.LAYOUT_SM);
+  private observer = inject(BreakpointObserver);
+
   /**
    * value true if screen is larger than provided screenLayoutSplit
+   *
+   * wasn't working correctly, when screenLayoutSplit was changed
    */
-  observedChangeSignal = toSignal(
-    inject(BreakpointObserver)
-      .observe(this.screenLayoutSplit)
-      .pipe(map((d) => d.matches))
+  showTabsSignal = toSignal(
+    toObservable(this.screenLayoutSplitSignal).pipe(
+      switchMap((screenLayoutSplit) =>
+        this.observer.observe(screenLayoutSplit).pipe(
+          map((d) => d.matches),
+          tap((x) => console.log('x', x, screenLayoutSplit))
+        )
+      )
+    )
   );
 
   onSelectTabChange(event: MatTabChangeEvent): void {

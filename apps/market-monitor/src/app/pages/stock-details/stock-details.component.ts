@@ -65,7 +65,7 @@ export class StockDetailsComponent {
     { label: 'Trades', value: ROUTES_STOCK_DETAILS.TRADES },
   ];
 
-  screenLayoutSplit = SCREEN_LAYOUT.LAYOUT_2XL;
+  screenLayoutSplit = SCREEN_LAYOUT.LAYOUT_XL;
 
   constructor() {
     this.resolveUrl();
