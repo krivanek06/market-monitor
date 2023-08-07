@@ -57,6 +57,12 @@ export class StocksApiService extends ApiCacheService {
     );
   }
 
+  getStockHistoricalPricesOnDate(symbol: string, date: string): Observable<HistoricalPrice> {
+    return this.getData<HistoricalPrice>(
+      `${this.endpointFunctions}/getassethistoricalpricesondate?symbol=${symbol}&date=${date}`
+    );
+  }
+
   getStockScreening(screeningValue: StockScreenerValues): Observable<StockSummary[]> {
     return this.http.post<StockSummary[]>(`${this.endpointFunctions}/getstockscreening`, screeningValue);
   }

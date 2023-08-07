@@ -3,6 +3,7 @@
     *ngIf="enterpriseValueToQuarterSignal() as enterpriseValue"
     class="grid gap-8 mb-6 md:grid-cols-2 xl:grid-cols-4"
   >
+    <!-- Institution -->
     <app-general-card title="Institution" additionalClasses="max-xl:w-full xl:min-w-[350px]">
       <app-stock-ownership-institutional-list
         displayType="institution"
@@ -11,6 +12,7 @@
       ></app-stock-ownership-institutional-list>
     </app-general-card>
 
+    <!-- Position -->
     <app-general-card title="Position" additionalClasses="max-xl:w-full xl:min-w-[250px]">
       <app-stock-ownership-institutional-list
         displayType="position"
@@ -19,6 +21,7 @@
       ></app-stock-ownership-institutional-list>
     </app-general-card>
 
+    <!-- Option -->
     <app-general-card title="Option" additionalClasses="max-xl:w-full xl:min-w-[300px]">
       <app-stock-ownership-institutional-list
         displayType="option"
@@ -28,12 +31,25 @@
     </app-general-card>
 
     <div class="w-full">
+      <!-- Available Quarters -->
       <app-form-mat-input-wrapper
         [formControl]="quarterFormControl"
         inputCaption="Available Quarters"
         inputType="SELECT"
         [inputSource]="institutionalPortfolioInputSourceSignal()"
       ></app-form-mat-input-wrapper>
+
+      <!-- additional data -->
+      <div class="grid gap-2 p-4 mt-2">
+        <div class="text-base g-item-wrapper">
+          <span> Date: </span>
+          <span>{{ quarterFormControl.value | date : 'MMMM d, y' }}</span>
+        </div>
+        <div class="text-base g-item-wrapper">
+          <span> Close Price: </span>
+          <span *ngIf="historicalPriceOnDateSignal() as data">{{ data ? (data.close | currency) : 'N/A' }}</span>
+        </div>
+      </div>
     </div>
   </div>
 

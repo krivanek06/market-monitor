@@ -10,7 +10,8 @@ import {
 } from '@market-monitor/modules/market-stocks';
 import { FormMatInputWrapperComponent, GeneralCardComponent } from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
-import { filter, map, switchMap, tap } from 'rxjs';
+import { getPreviousDate, isStockMarketClosedDate } from '@market-monitor/shared-utils-general';
+import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
@@ -59,6 +60,18 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
     this.marketApiService.getInstitutionalPortfolioDates().pipe(
       map((d) => this.marketDataTransformService.transformDatesIntoInputSource(d)),
       tap((data) => this.quarterFormControl.setValue(data[0].value))
+    )
+  );
+  historicalPriceOnDateSignal = toSignal(
+    this.quarterFormControl.valueChanges.pipe(
+      filter((data): data is string => !!data),
+      // if date is YYYY-12-31 then it is a closed date -> subtract 1 day
+      map((quarter) => (isStockMarketClosedDate(quarter) ? getPreviousDate(quarter) : quarter)),
+      switchMap((quarter) =>
+        this.stocksApiService
+          .getStockHistoricalPricesOnDate(this.stockSymbolSignal(), quarter)
+          .pipe(catchError((e) => of(null)))
+      )
     )
   );
 

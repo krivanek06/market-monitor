@@ -75,7 +75,7 @@ export const dateIsStockMarketOpen = (input: DateInput) => {
   return isAfter(utcCurrentDate, marketOpeningTime) && isBefore(utcCurrentDate, marketClosingTime);
 };
 
-export const isStockMarketClosed = (input: DateInput): boolean => {
+export const isStockMarketClosedDate = (input: DateInput): boolean => {
   const formattedDate = new Date(input);
 
   // check if it's a holiday when the market is closed
@@ -94,15 +94,15 @@ export const isStockMarketClosed = (input: DateInput): boolean => {
 export const dateGetDateOfOpenStockMarket = (input: DateInput): Date => {
   const date = new Date(input);
 
-  if (dateIsStockMarketOpen(date) && !isStockMarketClosed(date) && !isWeekend(date)) {
+  if (dateIsStockMarketOpen(date) && !isStockMarketClosedDate(date) && !isWeekend(date)) {
     return startOfDay(date);
   }
 
   // from today subtract 1 day and return the correct date
   for (let i = 1; i < 30; i++) {
     const dateToCheck = subDays(date, i);
-    console.log('dateToCheck', dateToCheck, isStockMarketClosed(dateToCheck), isWeekend(dateToCheck));
-    if (!isStockMarketClosed(dateToCheck) && !isWeekend(dateToCheck)) {
+    console.log('dateToCheck', dateToCheck, isStockMarketClosedDate(dateToCheck), isWeekend(dateToCheck));
+    if (!isStockMarketClosedDate(dateToCheck) && !isWeekend(dateToCheck)) {
       return startOfDay(dateToCheck);
     }
   }
@@ -271,3 +271,7 @@ export const DATA_VALIDITY = 7;
  */
 export const checkDataValidity = <T extends { lastUpdate: string }>(data?: T, days = DATA_VALIDITY) =>
   !data || isBefore(new Date(data.lastUpdate), subDays(new Date(), days));
+
+export const getPreviousDate = (date: DateInput): string => {
+  return subDays(new Date(date), 1).toDateString();
+};
