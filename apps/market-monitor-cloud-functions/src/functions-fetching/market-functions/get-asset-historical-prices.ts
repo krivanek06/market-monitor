@@ -1,10 +1,26 @@
-import { getHistoricalPrices } from '@market-monitor/api-external';
+import { getHistoricalPrices, getHistoricalPricesOnDate } from '@market-monitor/api-external';
 import { HistoricalPricePeriods, getDatabaseStockDetailsHistorical } from '@market-monitor/api-firebase';
 import { HistoricalLoadingPeriods, HistoricalPrice } from '@market-monitor/api-types';
 import { dateGetDateOfOpenStockMarket } from '@market-monitor/shared-utils-general';
 import { format, isBefore, subDays, subMinutes } from 'date-fns';
 import { Response } from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
+
+export const getassethistoricalpricesondate = onRequest(
+  async (request, response: Response<HistoricalPrice | string>) => {
+    const symbol = request.query.symbol as string | undefined;
+    const date = request.query.date as string | undefined;
+
+    // throw error if no symbol or date
+    if (!symbol || !date) {
+      response.status(400).send('missing symbol or date');
+      return;
+    }
+
+    const data = await getHistoricalPricesOnDate(symbol, date);
+    response.send(data);
+  }
+);
 
 export const getassethistoricalprices = onRequest(async (request, response: Response<HistoricalPrice[]>) => {
   const symbol = request.query.symbol as string;

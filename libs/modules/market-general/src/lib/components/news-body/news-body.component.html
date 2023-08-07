@@ -5,14 +5,14 @@
 >
   <img appDefaultImg [src]="news.image" [alt]="news.title" class="h-20 w-36" />
   <div class="flex flex-col">
-    <div class="text-base text-wt-gray-medium group-hover:text-wt-gray-dark">
+    <div class="text-base text-wt-gray-dark group-hover:text-wt-gray-dark-strong">
       {{ news.title }}
     </div>
-    <div class="space-x-1 text-xs text-wt-gray-medium group-hover:text-wt-gray-dark">
-      <span>{{ news.site }}</span>
+    <div class="space-x-1 text-xs text-wt-gray-medium group-hover:text-wt-gray-dark-strong">
+      <span class="text-wt-gray-dark">{{ news.site }}</span>
       <span>●</span>
       <span>{{ news.publishedDate | dateAgo }}</span>
     </div>
-    <div class="hidden text-xs sm:block text-wt-gray-medium">{{ news.text | truncateWords : 25 }}</div>
+    <div class="hidden text-sm sm:block text-wt-gray-medium">{{ news.text | truncateWords : 25 }}</div>
   </div>
 </a>

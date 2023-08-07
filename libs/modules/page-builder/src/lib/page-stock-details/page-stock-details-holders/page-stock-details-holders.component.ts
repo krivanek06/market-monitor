@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MarketApiService } from '@market-monitor/api-client';
 import { MarketDataTransformService } from '@market-monitor/modules/market-general';
 import {
   StockOwnershipHoldersTableComponent,
-  StockOwnershipInstitutionalCardComponent,
+  StockOwnershipInstitutionalListComponent,
 } from '@market-monitor/modules/market-stocks';
 import { FormMatInputWrapperComponent, GeneralCardComponent } from '@market-monitor/shared-components';
-import { filter, map, switchMap, tap } from 'rxjs';
+import { RangeDirective } from '@market-monitor/shared-directives';
+import { getPreviousDate, isStockMarketClosedDate } from '@market-monitor/shared-utils-general';
+import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
@@ -17,11 +19,12 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   standalone: true,
   imports: [
     CommonModule,
-    StockOwnershipInstitutionalCardComponent,
+    StockOwnershipInstitutionalListComponent,
     StockOwnershipHoldersTableComponent,
     GeneralCardComponent,
     FormMatInputWrapperComponent,
     ReactiveFormsModule,
+    RangeDirective,
   ],
   templateUrl: './page-stock-details-holders.component.html',
   styles: [
@@ -45,13 +48,30 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   ownershipHoldersToDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
       filter((data): data is string => !!data),
-      switchMap((quarter) => this.stocksApiService.getStockOwnershipHoldersToDate(this.stockSymbolSignal(), quarter))
+      tap(() => this.loadingSignal.set(true)),
+      switchMap((quarter) =>
+        this.stocksApiService
+          .getStockOwnershipHoldersToDate(this.stockSymbolSignal(), quarter)
+          .pipe(tap(() => this.loadingSignal.set(false)))
+      )
     )
   );
   institutionalPortfolioInputSourceSignal = toSignal(
     this.marketApiService.getInstitutionalPortfolioDates().pipe(
       map((d) => this.marketDataTransformService.transformDatesIntoInputSource(d)),
       tap((data) => this.quarterFormControl.setValue(data[0].value))
+    )
+  );
+  historicalPriceOnDateSignal = toSignal(
+    this.quarterFormControl.valueChanges.pipe(
+      filter((data): data is string => !!data),
+      // if date is YYYY-12-31 then it is a closed date -> subtract 1 day
+      map((quarter) => (isStockMarketClosedDate(quarter) ? getPreviousDate(quarter) : quarter)),
+      switchMap((quarter) =>
+        this.stocksApiService
+          .getStockHistoricalPricesOnDate(this.stockSymbolSignal(), quarter)
+          .pipe(catchError((e) => of(null)))
+      )
     )
   );
 
@@ -61,6 +81,7 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   ownershipInstitutionalToQuarterSignal = computed(() =>
     this.ownershipInstitutionalSignal()?.find((d) => d.date === this.quarterFormControlSignal())
   );
+  loadingSignal = signal(false);
 
   constructor() {
     super();

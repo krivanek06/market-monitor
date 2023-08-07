@@ -84,6 +84,18 @@ export const getHistoricalPrices = async (
 
 /**
  *
+ * @param symbol
+ * @param date format YYYY-MM-DD
+ * @returns
+ */
+export const getHistoricalPricesOnDate = async (symbol: string, date: string): Promise<HistoricalPrice> => {
+  const url = `${FINANCIAL_MODELING_URL}/v3/historical-price-full/${symbol}?from=${date}&to=${date}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await axios.get<{ historical: HistoricalPrice[] }>(url);
+  return response.data.historical[0];
+};
+
+/**
+ *
  * @param symbolPrefix
  * @param isCrypto
  * @returns array of ticker search results [{

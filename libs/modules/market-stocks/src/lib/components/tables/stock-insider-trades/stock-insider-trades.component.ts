@@ -38,6 +38,8 @@ export class StockInsiderTradesComponent implements AfterViewInit {
 
   @Input({ required: true }) set data(values: CompanyInsideTrade[]) {
     this.dataSource = new MatTableDataSource(values);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
   dataSource!: MatTableDataSource<CompanyInsideTrade>;
 
@@ -58,6 +60,4 @@ export class StockInsiderTradesComponent implements AfterViewInit {
   }
 
   identity: TrackByFunction<CompanyInsideTrade> = (index: number, item: CompanyInsideTrade) => item.filingDate;
-
-  onRedirect(data: CompanyInsideTrade): void {}
 }

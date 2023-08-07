@@ -2,7 +2,7 @@
   <h2>Company Ratios Quarterly</h2>
 </div>
 
-<div *ngIf="stockHistoricalMetricsSignal() as data" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+<div *ngIf="stockHistoricalMetricsSignal() as data; else showSkeleton" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
   <app-generic-chart
     [categories]="data.dates"
     [heightPx]="300"
@@ -303,3 +303,9 @@
     ]"
   ></app-generic-chart>
 </div>
+
+<ng-template #showSkeleton>
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div *ngRange="24" class="g-skeleton h-[300px]"></div>
+  </div>
+</ng-template>

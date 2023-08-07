@@ -2,6 +2,7 @@ export * from './bubble-pagination.directive';
 export * from './default-img.directive';
 export * from './element-focus.directive';
 export * from './ng-for-track-by-id.directive';
+export * from './ng-show.directive';
 export * from './percentage-increase.directive';
 export * from './range.directive';
 export * from './scroll-near-end.directive';

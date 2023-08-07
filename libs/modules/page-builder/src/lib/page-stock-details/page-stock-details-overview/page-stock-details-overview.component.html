@@ -1,6 +1,6 @@
 <div class="grid gap-6" *ngIf="stockDetailsSignal() as stockDetailsSignal">
-  <div class="grid gap-6 xl:grid-cols-3">
-    <div class="xl:col-span-2">
+  <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <div class="md:col-span-2">
       <!-- price & volume -->
       <app-asset-price-chart-interactive
         [imageName]="stockDetailsSignal.quote.symbol"
@@ -11,12 +11,10 @@
     </div>
 
     <!-- summary -->
-    <app-general-card class="-mt-6" title="Summary">
+    <app-general-card class="xl:-mt-6" title="Summary">
       <app-stock-summary-list [stockDetails]="stockDetailsSignal"></app-stock-summary-list>
     </app-general-card>
-  </div>
 
-  <div class="grid gap-6 lg:grid-cols-3">
     <!-- financial strength -->
     <app-general-card additionalClasses="h-full" title="Financial Strength">
       <app-name-value-list [items]="financialStrengthSignal()"></app-name-value-list>
@@ -31,11 +29,9 @@
     <app-general-card additionalClasses="h-full" title="Financial Ratio">
       <app-name-value-list [items]="financialRatio2Signal()"></app-name-value-list>
     </app-general-card>
-  </div>
 
-  <div class="grid gap-6 lg:grid-cols-3">
     <!-- earnings -->
-    <app-general-card class="lg:col-span-2" title="Earnings Chart">
+    <app-general-card class="md:col-span-2" title="Earnings Chart">
       <app-earnings-estimation-chart
         *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
         [data]="estimationChartDataSignal.earnings"
@@ -50,9 +46,7 @@
         [data]="stockDetailsSignal.recommendationTrends"
       ></app-stock-recommendation-chart>
     </app-general-card>
-  </div>
 
-  <div class="grid gap-6 lg:grid-cols-3">
     <!-- financial per share -->
     <app-general-card additionalClasses="h-full" title="Financial Per Share">
       <app-name-value-list [items]="financialPerShareSignal()"></app-name-value-list>
@@ -65,25 +59,26 @@
 
     <!-- dividends -->
     <app-general-card additionalClasses="h-full" title="Dividends">
-      <app-name-value-list [items]="financialDividendsSignal()"></app-name-value-list>
+      <app-name-value-list
+        *ngIf="financialDividendsSignal().length > 0"
+        [items]="financialDividendsSignal()"
+      ></app-name-value-list>
     </app-general-card>
   </div>
 
-  <div>
-    <!-- revenue est. -->
-    <app-general-card title="Revenue Chart">
-      <app-revenue-estimation-chart
-        *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
-        class
-        [data]="estimationChartDataSignal.revenue"
-        [heightPx]="450"
-      ></app-revenue-estimation-chart>
-    </app-general-card>
-  </div>
+  <!-- revenue est. -->
+  <app-general-card title="Revenue Chart">
+    <app-revenue-estimation-chart
+      *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
+      class
+      [data]="estimationChartDataSignal.revenue"
+      [heightPx]="450"
+    ></app-revenue-estimation-chart>
+  </app-general-card>
 
-  <div class="grid lg:grid-cols-3 gap-x-6 gap-y-4">
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
     <!-- rating table -->
-    <app-general-card title="Rating">
+    <app-general-card class="sm:max-lg:col-span-2" title="Rating">
       <app-stock-rating-table [data]="companyRatingSignal()"></app-stock-rating-table>
     </app-general-card>
 
@@ -152,7 +147,7 @@
     </app-general-card>
 
     <!-- peers -->
-    <app-general-card additionalClasses="h-full" title="Peers" class="basis-1/3">
+    <app-general-card additionalClasses="h-full" title="Peers" class="hidden lg:block">
       <ng-container *ngIf="stockPeersSignal() as stockPeersSignal">
         <app-stock-peers-list [peers]="stockPeersSignal | slice : 0 : 12"></app-stock-peers-list>
       </ng-container>
@@ -177,16 +172,16 @@
     </app-general-card>
   </div>
 
-  <div class="flex flex-col gap-6 md:flex-row">
+  <div class="grid gap-6 xl:grid-cols-3">
     <!-- esg quarterly -->
-    <app-general-card title="ESG data" class="md:basis-2/3" additionalClasses="h-full">
+    <app-general-card title="ESG data" class="xl:col-span-2" additionalClasses="h-full">
       <app-stock-esg-data-table
         [data]="stockDetailsSignal.esgDataQuarterlyArray | slice : 0 : 8"
       ></app-stock-esg-data-table>
     </app-general-card>
 
     <!-- esg yearly -->
-    <app-general-card title="ESG data" class="md:basis-1/3">
+    <app-general-card title="ESG data" class="hidden xl:block">
       <div *ngFor="let data of stockDetailsSignal.esgDataRatingYearlyArray" class="g-item-wrapper">
         <div>{{ data.year }}</div>
         <div class="space-x-2">

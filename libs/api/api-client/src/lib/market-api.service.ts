@@ -15,39 +15,50 @@ import {
   SymbolHistoricalPeriods,
   SymbolQuote,
 } from '@market-monitor/api-types';
-import { Observable, map, retry } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ENDPOINT_FUNCTION_URL } from './api-url.token';
+import { ApiCacheService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class MarketApiService {
+export class MarketApiService extends ApiCacheService {
   constructor(
     private readonly http: HttpClient,
     @Inject(ENDPOINT_FUNCTION_URL) private readonly endpointFunctions: string
-  ) {}
+  ) {
+    super(http);
+  }
 
   getHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {
-    return this.http
-      .get<HistoricalPrice[]>(`${this.endpointFunctions}/getassethistoricalprices?symbol=${symbol}&period=${period}`)
-      .pipe(retry(3));
+    return this.getData<HistoricalPrice[]>(
+      `${this.endpointFunctions}/getassethistoricalprices?symbol=${symbol}&period=${period}`,
+      this.validity2Min
+    );
   }
 
   getMarketTopPerformance(): Observable<MarketTopPerformanceOverviewResponse> {
-    return this.http.get<MarketTopPerformanceOverviewResponse>(`${this.endpointFunctions}/getmarkettopperformance`);
+    return this.getData<MarketTopPerformanceOverviewResponse>(
+      `${this.endpointFunctions}/getmarkettopperformance`,
+      this.validity10Min
+    );
   }
 
   getNews(newsType: FirebaseNewsTypes, symbol: string = ''): Observable<News[]> {
-    return this.http.get<News[]>(`${this.endpointFunctions}/getmarketnews?news_types=${newsType}&symbol=${symbol}`);
+    return this.getData<News[]>(
+      `${this.endpointFunctions}/getmarketnews?news_types=${newsType}&symbol=${symbol}`,
+      this.validity30Min
+    );
   }
 
   getMarketOverview(): Observable<MarketOverview> {
-    return this.http.get<MarketOverview>(`${this.endpointFunctions}/getmarketoverview`);
+    return this.getData<MarketOverview>(`${this.endpointFunctions}/getmarketoverview`, this.validity30Min);
   }
 
   getMarketOverviewData<T extends MarketOverviewDatabaseKeys>(key: T, subKey: string): Observable<MarketOverviewData> {
-    return this.http.get<MarketOverviewData>(
-      `${this.endpointFunctions}/getmarketoverviewdata?key=${key}&subKey=${subKey}`
+    return this.getData<MarketOverviewData>(
+      `${this.endpointFunctions}/getmarketoverviewdata?key=${key}&subKey=${subKey}`,
+      this.validity30Min
     );
   }
 
@@ -69,24 +80,27 @@ export class MarketApiService {
   }
 
   getMarketCalendarDividends(month: string | number, year: string | number): Observable<CalendarDividend[]> {
-    return this.http.get<CalendarDividend[]>(
-      `${this.endpointFunctions}/getcalendarstockdividends?month=${month}&year=${year}`
+    return this.getData<CalendarDividend[]>(
+      `${this.endpointFunctions}/getcalendarstockdividends?month=${month}&year=${year}`,
+      this.validity30Min
     );
   }
 
   getMarketCalendarEarnings(month: string | number, year: string | number): Observable<CalendarStockEarning[]> {
-    return this.http.get<CalendarStockEarning[]>(
-      `${this.endpointFunctions}/getcalendarstockearnigns?month=${month}&year=${year}`
+    return this.getData<CalendarStockEarning[]>(
+      `${this.endpointFunctions}/getcalendarstockearnigns?month=${month}&year=${year}`,
+      this.validity30Min
     );
   }
 
   getMarketCalendarIPOs(month: string | number, year: string | number): Observable<CalendarStockIPO[]> {
-    return this.http.get<CalendarStockIPO[]>(
-      `${this.endpointFunctions}/getcalendarstockipos?month=${month}&year=${year}`
+    return this.getData<CalendarStockIPO[]>(
+      `${this.endpointFunctions}/getcalendarstockipos?month=${month}&year=${year}`,
+      this.validity30Min
     );
   }
 
   getInstitutionalPortfolioDates(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.endpointFunctions}/getinstitutionalportfoliodates`);
+    return this.getData<string[]>(`${this.endpointFunctions}/getinstitutionalportfoliodates`, this.validity30Min);
   }
 }

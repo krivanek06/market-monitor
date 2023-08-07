@@ -55,6 +55,9 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         plotBorderWidth: undefined,
         plotShadow: false,
         backgroundColor: 'transparent',
+        zooming: {
+          mouseWheel: false,
+        },
         panning: {
           enabled: true,
         },

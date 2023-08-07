@@ -54,17 +54,21 @@ export class StockTransformService {
       };
     }
 
-    const earnings = data.stockEarnings.map((earning) => ({
-      date: earning.date,
-      valueEst: earning.epsEstimated,
-      valueActual: earning.eps,
-    }));
+    const earnings = data.stockEarnings
+      .map((earning) => ({
+        date: earning.date,
+        valueEst: earning.epsEstimated,
+        valueActual: earning.eps,
+      }))
+      .reverse();
 
-    const revenue = data.stockEarnings.map((earning) => ({
-      date: earning.date,
-      valueEst: earning.revenueEstimated,
-      valueActual: earning.revenue,
-    }));
+    const revenue = data.stockEarnings
+      .map((earning) => ({
+        date: earning.date,
+        valueEst: earning.revenueEstimated,
+        valueActual: earning.revenue,
+      }))
+      .reverse();
 
     return { earnings, revenue };
   }

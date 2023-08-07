@@ -26,7 +26,7 @@ import { RangeDirective } from '@market-monitor/shared-directives';
 
     <!-- chart -->
     <div class="mb-10">
-      <div class="h-[350px] w-full g-skeleton"></div>
+      <div class="h-[400px] w-full g-skeleton"></div>
     </div>
 
     <div class="w-full mx-auto max-sm:pr-3 lg:w-11/12">

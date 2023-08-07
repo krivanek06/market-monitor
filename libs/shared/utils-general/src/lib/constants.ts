@@ -12,4 +12,5 @@ export const STOCK_MARKET_CLOSED_DATES = [
   '11-24', // Thanksgiving Day - U.S.
   '12-25', // Christmas Holiday - U.S.
   '12-26', // Christmas Holiday - U.S.
+  '12-31', // New Year's Eve (observed)
 ];

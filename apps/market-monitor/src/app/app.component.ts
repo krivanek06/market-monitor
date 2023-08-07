@@ -1,15 +1,32 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
-import { ROUTES_TOP_LEVEL } from './routes.model';
+import { NgShowDirective } from '@market-monitor/shared-directives';
+import { LoaderMainService } from '@market-monitor/shared-services';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatProgressSpinnerModule, NgShowDirective],
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  template: `
+    <main class="min-h-screen min-w-full">
+      <div *ngIf="loadingSignal()" class="grid place-content-center pb-[15%] min-h-screen min-w-full">
+        <mat-spinner></mat-spinner>
+      </div>
+
+      <router-outlet></router-outlet>
+    </main>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
 })
 export class AppComponent {
-  ROUTES_TOP_LEVEL = ROUTES_TOP_LEVEL;
+  loadingSignal = toSignal(inject(LoaderMainService).getLoading());
 }

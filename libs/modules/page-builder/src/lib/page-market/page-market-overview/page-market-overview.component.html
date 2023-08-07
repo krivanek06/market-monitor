@@ -4,7 +4,9 @@
       <app-general-card
         *ngFor="let index of marketTopIndexQuotesSignal"
         [title]="index.name"
+        [titleCenter]="true"
         additionalClasses="min-w-max px-6 py-3"
+        titleScale="large"
       >
         <div class="flex items-center justify-center gap-3 text-base">
           <span>{{ index.quote.price | number : '1.2-2' }}</span>
@@ -34,7 +36,7 @@
       priceName="Value"
       [priceShowSign]="false"
       [symbol]="selectedIndexSymbolQuoteControl.value?.symbol ?? SYMBOL_SP500"
-      [chartHeightPx]="350"
+      [chartHeightPx]="400"
       [displayVolume]="false"
       [title]="selectedIndexSymbolQuoteControl.value?.name ?? 'S&P 500'"
     ></app-asset-price-chart-interactive>
