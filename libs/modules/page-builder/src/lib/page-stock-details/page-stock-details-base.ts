@@ -1,4 +1,5 @@
 import { Directive, computed, inject, signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { StockDetails } from '@market-monitor/api-types';
@@ -8,6 +9,7 @@ import { DialogServiceUtil } from '@market-monitor/shared-utils-client';
 export class PageStockDetailsBase {
   route = inject(ActivatedRoute);
   router = inject(Router);
+  dialog = inject(MatDialog);
   dialogServiceUtil = inject(DialogServiceUtil);
   stocksApiService = inject(StocksApiService);
 
