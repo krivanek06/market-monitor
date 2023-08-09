@@ -4,7 +4,9 @@
   "license": "MIT",
   "scripts": {
     "mm:serve": "nx run market-monitor:serve",
-    "mm:ssr": "nx run market-monitor:serve-ssr",
+    "mm:dev:ssr": "nx run market-monitor:serve-ssr",
+    "mm:serve:ssr": "node dist/apps/market-monitor/server/main.js",
+    "mm:build:ssr": "nx build market-monitor && market-monitor:server",
     "mm:cloud-function:serve": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --config firebase.market-monitor-cloud-functions.json",
     "mm:cloud-functions:kill": "kill -9 $(lsof -ti:4000,4001)",
     "mm:cloud-function:debug": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --inspect-functions --config firebase.market-monitor-cloud-functions.json",
