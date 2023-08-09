@@ -28,14 +28,11 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
       }
 
       a {
-        @apply transition-all duration-300 text-sm;
-        &:hover {
-          @apply text-wt-gray-medium;
-        }
+        @apply transition-all duration-300 text-sm hover:text-wt-gray-dark-strong;
+      }
 
-        &.is-active {
-          @apply text-wt-gray-dark-strong;
-        }
+      a.is-active {
+        @apply text-wt-gray-dark-strong;
       }
     `,
   ],
