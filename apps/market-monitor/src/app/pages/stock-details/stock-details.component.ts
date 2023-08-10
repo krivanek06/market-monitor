@@ -84,7 +84,11 @@ export class StockDetailsComponent {
    * may happen that url is different than default value in routesStockDetailsControl
    */
   private resolveUrl(): void {
-    const lastUrlSegment = this.router.url.split('?')[0].split('/').pop();
+    const slittedUrl = this.router.url.split('?');
+    if (!slittedUrl[0]) {
+      return;
+    }
+    const lastUrlSegment = slittedUrl[0].split('/').pop();
     if (lastUrlSegment) {
       this.routesStockDetailsControl.patchValue(lastUrlSegment);
     }

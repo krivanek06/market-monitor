@@ -3,27 +3,29 @@
   <app-time-period-buttons [formControl]="timePeriodFormControl"></app-time-period-buttons>
 </div>
 
-<ng-container *ngIf="stockHistoricalPrice().length > 0; else chartSkeleton">
-  <!-- time data about chart -->
-  <div class="flex justify-between text-wt-gray-medium">
-    <div class="flex items-center gap-2">
-      <img *ngIf="imageName" appDefaultImg imageType="symbol" [src]="imageName" alt="Asset Image" class="w-6 h-6" />
-      <span class="hidden sm:block">{{ title }}</span>
+<ng-container *ngIf="stockHistoricalPrice() as historicalPrice">
+  <ng-container *ngIf="historicalPrice.length > 0; else chartSkeleton">
+    <!-- time data about chart -->
+    <div class="flex justify-between text-wt-gray-medium">
+      <div class="flex items-center gap-2">
+        <img *ngIf="imageName" appDefaultImg imageType="symbol" [src]="imageName" alt="Asset Image" class="w-6 h-6" />
+        <span class="hidden sm:block">{{ title }}</span>
+      </div>
+      <span class="block">
+        {{ historicalPrice[0].date | date: 'MMMM d, y' }} -
+        {{ historicalPrice[historicalPrice.length - 1].date | date: 'MMMM d, y' }}
+      </span>
     </div>
-    <span class="block">
-      {{ stockHistoricalPrice()[0].date | date : 'MMMM d, y' }} -
-      {{ stockHistoricalPrice()[stockHistoricalPrice().length - 1].date | date : 'MMMM d, y' }}
-    </span>
-  </div>
 
-  <!-- price & volume chart -->
-  <app-asset-price-chart
-    [priceShowSign]="priceShowSign"
-    [priceName]="priceName"
-    [displayVolume]="displayVolume"
-    [historicalPrice]="stockHistoricalPrice()"
-    [heightPx]="chartHeightPx"
-  ></app-asset-price-chart>
+    <!-- price & volume chart -->
+    <app-asset-price-chart
+      [priceShowSign]="priceShowSign"
+      [priceName]="priceName"
+      [displayVolume]="displayVolume"
+      [historicalPrice]="historicalPrice"
+      [heightPx]="chartHeightPx"
+    ></app-asset-price-chart>
+  </ng-container>
 </ng-container>
 
 <!-- skeleton chart -->

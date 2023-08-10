@@ -151,7 +151,7 @@ export const getScreenerInputIndexByKey = (key: keyof StockScreenerValues, value
   return inputSource.findIndex((item) => item.value === value);
 };
 
-export const getScreenerInputValueByKey = (key: keyof StockScreenerValues, index: number): unknown => {
+export const getScreenerInputValueByKey = (key: keyof StockScreenerValues, index: number): unknown | null => {
   const inputSource = STOCK_SCREENER_INPUT_SOURCE_TO_KEY[key];
-  return inputSource[index].value;
+  return inputSource[index]?.value ?? null;
 };
