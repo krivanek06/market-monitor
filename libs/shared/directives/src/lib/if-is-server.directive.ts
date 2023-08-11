@@ -3,6 +3,7 @@ import { IS_SERVER_PLATFORM } from '@market-monitor/shared-services';
 
 @Directive({
   selector: '[ifIsServer]',
+  standalone: true,
 })
 export class IfIsServerDirective {
   constructor(

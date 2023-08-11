@@ -7,20 +7,21 @@ import { MarketApiService } from '@market-monitor/api-client';
 import { FirebaseNewsTypes, News, firebaseNewsAcceptableTypes } from '@market-monitor/api-types';
 import { FormMatInputWrapperComponent, InputSource } from '@market-monitor/shared-components';
 import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared-directives';
+import { DateAgoPipe, TruncateWordsPipe } from '@market-monitor/shared-pipes';
 import { debounceTime, distinctUntilChanged, map, pairwise, startWith, switchMap, tap } from 'rxjs';
-import { NewsBodyComponent } from '../../components';
 
 @Component({
   selector: 'app-news-search',
   standalone: true,
   imports: [
     CommonModule,
-    NewsBodyComponent,
     FormMatInputWrapperComponent,
     MatButtonModule,
     ReactiveFormsModule,
     RangeDirective,
     ScrollNearEndDirective,
+    DateAgoPipe,
+    TruncateWordsPipe,
   ],
   templateUrl: './news-search.component.html',
   styleUrls: ['./news-search.component.scss'],
@@ -47,14 +48,12 @@ export class NewsSearchComponent {
   }
 
   maximumNewsDisplayed = signal(this.newDisplay);
-  showLoadingSignal = signal<boolean>(true);
   marketStockNewsSignal = toSignal<News[]>(
     this.newSearchFormGroup.valueChanges.pipe(
       startWith(this.newSearchFormGroup.getRawValue()),
       debounceTime(500),
       distinctUntilChanged(),
       tap(() => {
-        this.showLoadingSignal.set(true);
         this.maximumNewsDisplayed.set(this.newDisplay);
       }),
       pairwise(),
@@ -71,9 +70,7 @@ export class NewsSearchComponent {
       tap(([symbol, _]) => this.newSearchFormGroup.controls.symbol.setValue(symbol, { emitEvent: false })),
       // load news
       switchMap(([symbol, newsType]) => this.marketApiService.getNews(newsType, symbol)),
-      // set loading to false
-      tap(() => this.showLoadingSignal.set(false))
-    )
+    ),
   );
 
   /**
