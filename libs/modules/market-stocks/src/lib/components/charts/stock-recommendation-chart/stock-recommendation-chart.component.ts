@@ -9,10 +9,18 @@ import { Recommendation } from '../../../models';
   selector: 'app-stock-recommendation-chart',
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
-  styles: [],
+  host: { ngSkipHydration: 'true' },
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <highcharts-chart
+      *ngIf="isHighcharts"
       [(update)]="updateFromInput"
       [Highcharts]="Highcharts"
       [callbackFunction]="chartCallback"
@@ -30,6 +38,10 @@ export class StockRecommendationChartComponent extends ChartConstructor {
   @Input() heightPx = 400;
 
   private initChart(data: RecommendationTrends[]): void {
+    if (!this.Highcharts) {
+      return;
+    }
+
     this.chartOptions = {
       chart: {
         type: 'column',

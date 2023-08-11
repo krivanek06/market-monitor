@@ -10,6 +10,14 @@ import { HighchartsChartModule } from 'highcharts-angular';
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { ngSkipHydration: 'true' },
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   template: `
     <highcharts-chart
       *ngIf="isHighcharts"
@@ -40,14 +48,16 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
   }
 
   private initChart(data: HistoricalPrice[]) {
+    if (!this.Highcharts) {
+      return;
+    }
+
     const price = data.map((d) => d.close);
     const volume = data.map((d) => d.volume);
     const dates = data.map((d) => d.date);
     const priceNameLocal = this.priceName;
     const priceShowSignLocal = this.priceShowSign;
     const color = !!price[0] && price[0] < price[price.length - 1] ? ColorScheme.SUCCESS_VAR : ColorScheme.DANGER_VAR;
-
-    console.log({ price, volume, dates });
 
     this.chartOptions = {
       chart: {

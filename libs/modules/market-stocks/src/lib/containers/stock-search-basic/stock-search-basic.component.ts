@@ -40,6 +40,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
       multi: true,
     },
   ],
+  host: { ngSkipHydration: 'true' },
 })
 export class StockSearchBasicComponent implements ControlValueAccessor {
   /**
@@ -71,11 +72,11 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
         switchMap((value) =>
           this.StocksApiService.searchStockSummariesByPrefix(value).pipe(
             tap(() => this.showLoadingIndicator.set(false)),
-            catchError(() => [])
-          )
+            catchError(() => []),
+          ),
         ),
         tap((data) => this.options.set(data)),
-        takeUntilDestroyed()
+        takeUntilDestroyed(),
       )
       .subscribe();
   }

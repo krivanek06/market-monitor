@@ -9,8 +9,17 @@ import { HighchartsChartModule } from 'highcharts-angular';
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { ngSkipHydration: 'true' },
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   template: `
     <highcharts-chart
+      *ngIf="isHighcharts"
       [(update)]="updateFromInput"
       [Highcharts]="Highcharts"
       [callbackFunction]="chartCallback"
@@ -30,6 +39,10 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
   @Input() showTitle = false;
 
   private initChart(values: EstimatedChartDataType[]): void {
+    if (!this.Highcharts) {
+      return;
+    }
+
     const workingData = values.slice(-this.limitValues);
     const dates = workingData.map((x) => x.date);
 

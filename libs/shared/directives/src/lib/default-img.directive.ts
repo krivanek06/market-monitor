@@ -1,4 +1,5 @@
 import { Directive, ElementRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { PlatformService } from '@market-monitor/shared-services';
 
 @Directive({
   selector: '[appDefaultImg]',
@@ -11,13 +12,20 @@ export class DefaultImgDirective implements OnChanges {
   private symbolURL = 'https://get-asset-url.krivanek1234.workers.dev';
   private defaultLocalImage = 'assets/image-placeholder.jpg';
 
-  constructor(private imageRef: ElementRef) {}
+  constructor(
+    private imageRef: ElementRef,
+    private platformService: PlatformService,
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     this.initImage();
   }
 
   private initImage() {
+    if (this.platformService.isServer) {
+      return;
+    }
+
     const img = new Image();
 
     if (!this.src) {
