@@ -13,5 +13,7 @@
     "jest.config.ts",
     "src/**/*.test.ts"
   ],
-  "include": ["src/**/*.ts", "../user/src/lib/services/user-un-authenticated.service.spec.ts"]
+  "include": [
+    "src/**/*.ts"
+  ]
 }

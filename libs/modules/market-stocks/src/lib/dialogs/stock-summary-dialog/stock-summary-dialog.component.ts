@@ -7,10 +7,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
+import { UserUnauthenticatedService } from '@market-monitor/modules/user';
 import { PriceChangeItemsComponent } from '@market-monitor/shared-components';
 import { DefaultImgDirective } from '@market-monitor/shared-directives';
 import { DialogServiceUtil } from '@market-monitor/shared-utils-client';
-import { StockStorageService } from '../../services';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
 import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-modal-skeleton.component';
 
@@ -53,19 +53,19 @@ export class StockSummaryDialogComponent {
 
     return 'Stock';
   });
-  isSymbolInFavoriteSignal = toSignal(this.stockStorageService.isSymbolInFavoriteObs(this.data.symbol));
+  isSymbolInFavoriteSignal = toSignal(this.userUnauthenticatedService.isSymbolInFavoriteObs(this.data.symbol));
 
   constructor(
     private dialogRef: MatDialogRef<StockSummaryDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { symbol: string },
     private stocksApiService: StocksApiService,
-    private stockStorageService: StockStorageService,
+    private userUnauthenticatedService: UserUnauthenticatedService,
     private dialogServiceUtil: DialogServiceUtil,
-    private route: Router
+    private route: Router,
   ) {}
 
   onAddToFavorite(): void {
-    if (this.stockStorageService.toggleFavoriteSymbol(this.data.symbol)) {
+    if (this.userUnauthenticatedService.toggleFavoriteSymbol(this.data.symbol)) {
       this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.data.symbol} has been added into favorites`);
     } else {
       this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.data.symbol} has been removed from favorites`);

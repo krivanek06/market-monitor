@@ -1,4 +1,4 @@
-export type StockStorageData = {
+export type UserUnauthenticated = {
   lastSearchedStocks: string[];
   favoriteStocks: string[];
 };

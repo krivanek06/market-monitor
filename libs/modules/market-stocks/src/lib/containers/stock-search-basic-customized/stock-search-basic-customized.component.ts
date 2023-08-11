@@ -7,12 +7,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { StockSummary } from '@market-monitor/api-types';
+import { UserUnauthenticatedService } from '@market-monitor/modules/user';
 import { QuoteItemComponent } from '@market-monitor/shared-components';
 import { ElementFocusDirective } from '@market-monitor/shared-directives';
 import { SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
 import { Observable, iif, startWith, switchMap } from 'rxjs';
 import { StockSummaryDialogComponent } from '../../dialogs';
-import { StockStorageService } from '../../services';
 import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-basic.component';
 
 @Component({
@@ -46,8 +46,8 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     inputHasValue: false,
   });
   dialog = inject(MatDialog);
-  stockStorageService = inject(StockStorageService);
-  isStockSummaryLoaded$: Observable<boolean> = this.stockStorageService.isDataLoaded();
+  userUnauthenticatedService = inject(UserUnauthenticatedService);
+  isStockSummaryLoaded$: Observable<boolean> = this.userUnauthenticatedService.isDataLoaded();
 
   /**
    * display stock summaries based on whether showFavoriteStocks is true or false
@@ -58,17 +58,17 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
       switchMap((showFavoriteStocks) =>
         iif(
           () => showFavoriteStocks,
-          this.stockStorageService.getFavoriteStocks(),
-          this.stockStorageService.getLastSearchedStocks()
-        )
-      )
-    )
+          this.userUnauthenticatedService.getFavoriteStocks(),
+          this.userUnauthenticatedService.getLastSearchedStocks(),
+        ),
+      ),
+    ),
   );
 
   ngOnInit(): void {
     this.searchControl.valueChanges.subscribe((value) => {
       if (value) {
-        this.stockStorageService.addSearchStock(value.id);
+        this.userUnauthenticatedService.addSearchStock(value.id);
         this.onSummaryClick(value);
       }
     });

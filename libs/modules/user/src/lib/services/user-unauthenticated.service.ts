@@ -3,19 +3,18 @@ import { StocksApiService } from '@market-monitor/api-client';
 import { StockSummary } from '@market-monitor/api-types';
 import { StorageService } from '@market-monitor/shared-services';
 import { BehaviorSubject, Observable, forkJoin, map } from 'rxjs';
-import { StockStorageData } from '../models';
+import { UserUnauthenticated } from '../models';
 
-// TODO: if user authenticated - saved these data into firestore
 @Injectable({
   providedIn: 'root',
 })
-export class StockStorageService extends StorageService<StockStorageData> {
+export class UserUnauthenticatedService extends StorageService<UserUnauthenticated> {
   private favoriteStocks$ = new BehaviorSubject<StockSummary[]>([]);
   private lastSearchedStocks$ = new BehaviorSubject<StockSummary[]>([]);
   private loadedData$ = new BehaviorSubject<boolean>(false);
 
   constructor(private stocksApiService: StocksApiService) {
-    super('STORAGE_STOCK_SERVICE', {
+    super('USER_UNAUTHENTICATED', {
       favoriteStocks: [],
       lastSearchedStocks: [],
     });
@@ -120,7 +119,7 @@ export class StockStorageService extends StorageService<StockStorageData> {
   isSymbolInFavoriteObs(symbol: string): Observable<boolean> {
     return this.favoriteStocks$.asObservable().pipe(
       map((values) => values.map((d) => d.id)),
-      map((symbols) => symbols.includes(symbol))
+      map((symbols) => symbols.includes(symbol)),
     );
   }
 
@@ -137,6 +136,9 @@ export class StockStorageService extends StorageService<StockStorageData> {
     });
   }
 
+  /**
+   * load necessary data from api
+   */
   private initService(): void {
     const data = this.getData();
 
