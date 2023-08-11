@@ -1,6 +1,7 @@
 export * from './bubble-pagination.directive';
 export * from './default-img.directive';
 export * from './element-focus.directive';
+export * from './if-is-server.directive';
 export * from './ng-for-track-by-id.directive';
 export * from './ng-show.directive';
 export * from './percentage-increase.directive';
