@@ -11,6 +11,7 @@ export const appRoutes: Routes = [
       },
       {
         path: `${ROUTES_TOP_LEVEL.STOCK_DETAILS}/:symbol`,
+        title: 'Stock Details',
         loadChildren: () => import('./pages/stock-details/stock-details.component').then((m) => m.route),
       },
     ],
