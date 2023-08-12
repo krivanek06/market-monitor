@@ -72,11 +72,11 @@ export class NewsSearchComponent {
       tap(([symbol, _]) => this.newSearchFormGroup.controls.symbol.setValue(symbol, { emitEvent: false })),
       // load news
       switchMap(([symbol, newsType]) =>
-        // save general news into local storage to avoid api call
         newsType === 'general' && this.userCommonService.getData().news.length > 0
           ? of(this.userCommonService.getData().news)
           : this.marketApiService.getNews(newsType, symbol).pipe(
               tap((news) => {
+                // save general news into local storage to avoid api call
                 this.userCommonService.saveData({
                   ...this.userCommonService.getData(),
                   news,

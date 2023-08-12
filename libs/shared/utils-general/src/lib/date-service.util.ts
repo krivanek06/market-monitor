@@ -39,7 +39,7 @@ export const dateGetDetailsInformationFromDate = (input: string | Date | number)
 
   return {
     year: getYear(date),
-    month: getMonth(date),
+    month: getMonth(date) + 1,
     week: getWeek(date),
     day: getDay(date),
   };

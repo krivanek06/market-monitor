@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Directive, ElementRef, Input, OnChanges, Renderer2, SimpleChanges } from '@angular/core';
 import { PlatformService } from '@market-monitor/shared-services';
 
 @Directive({
@@ -15,6 +15,7 @@ export class DefaultImgDirective implements OnChanges {
   constructor(
     private imageRef: ElementRef,
     private platformService: PlatformService,
+    private renderer: Renderer2,
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -26,21 +27,27 @@ export class DefaultImgDirective implements OnChanges {
       return;
     }
 
+    // show skeleton before image is loaded
+    this.renderer.addClass(this.imageRef.nativeElement, 'g-skeleton');
+
     const img = new Image();
 
     if (!this.src) {
       this.setImage(this.defaultLocalImage);
+      this.renderer.removeClass(this.imageRef.nativeElement, 'g-skeleton');
       return;
     }
 
     // if possible to load image, set it to img
     img.onload = () => {
       this.setImage(this.resolveImage(this.src));
+      this.renderer.removeClass(this.imageRef.nativeElement, 'g-skeleton');
     };
 
     img.onerror = () => {
       // Set a placeholder image
       this.setImage(this.defaultLocalImage);
+      this.renderer.removeClass(this.imageRef.nativeElement, 'g-skeleton');
     };
 
     // triggers http request to load image
