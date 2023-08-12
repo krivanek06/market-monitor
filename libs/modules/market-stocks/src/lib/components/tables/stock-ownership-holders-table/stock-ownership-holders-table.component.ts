@@ -4,7 +4,11 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { SymbolOwnershipHolders } from '@market-monitor/api-types';
-import { BubblePaginationDirective, PercentageIncreaseDirective } from '@market-monitor/shared-directives';
+import {
+  BubblePaginationDirective,
+  PercentageIncreaseDirective,
+  RenderClientDirective,
+} from '@market-monitor/shared-directives';
 import { LargeNumberFormatterPipe, TruncateWordsPipe } from '@market-monitor/shared-pipes';
 
 @Component({
@@ -19,6 +23,7 @@ import { LargeNumberFormatterPipe, TruncateWordsPipe } from '@market-monitor/sha
     MatPaginatorModule,
     BubblePaginationDirective,
     MatSortModule,
+    RenderClientDirective,
   ],
   templateUrl: './stock-ownership-holders-table.component.html',
   styles: [

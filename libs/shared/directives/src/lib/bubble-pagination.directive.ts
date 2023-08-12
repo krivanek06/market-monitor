@@ -13,6 +13,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { PlatformService } from '@market-monitor/shared-services';
 import { map, startWith } from 'rxjs';
 
 /**
@@ -64,9 +65,13 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
     @Host() @Self() @Optional() private readonly matPag: MatPaginator,
     private elementRef: ElementRef,
     private ren: Renderer2,
+    private platform: PlatformService,
   ) {}
 
   ngAfterViewInit(): void {
+    if (this.platform.isServer) {
+      return;
+    }
     this.styleDefaultPagination();
     this.createBubbleDivRef();
     this.renderButtons();
@@ -76,6 +81,10 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
    * react on parent component changing the appCustomLength - rerender bubbles
    */
   ngOnChanges(changes: SimpleChanges): void {
+    if (this.platform.isServer) {
+      return;
+    }
+
     if (!changes?.['appCustomLength']?.firstChange) {
       // remove buttons before creating new ones
       this.removeButtons();

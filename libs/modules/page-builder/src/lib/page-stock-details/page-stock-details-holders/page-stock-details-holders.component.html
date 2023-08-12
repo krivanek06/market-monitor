@@ -70,18 +70,23 @@
 
 <!-- skeleton -->
 <ng-template #skeleton>
-  <div class="grid gap-8 mb-6 md:grid-cols-2 xl:grid-cols-4">
-    <div class="g-skeleton h-[290px] max-xl:w-full xl:min-w-[350px]"></div>
-    <div class="g-skeleton h-[290px] max-xl:w-full xl:min-w-[250px]"></div>
-    <div class="g-skeleton h-[290px] max-xl:w-full xl:min-w-[300px]"></div>
-    <div class="w-full">
-      <!-- select -->
-      <div class="g-skeleton h-[60px] w-full"></div>
-      <!-- additional data -->
-      <div class="grid gap-2 p-4 mt-2">
-        <div class="h-[50px] g-skeleton"></div>
-        <div class="h-[50px] g-skeleton"></div>
+  <div>
+    <div class="grid gap-8 mb-6 md:grid-cols-2 xl:grid-cols-4">
+      <div class="g-skeleton h-[290px] max-xl:w-full xl:min-w-[350px]"></div>
+      <div class="g-skeleton h-[290px] max-xl:w-full xl:min-w-[250px]"></div>
+      <div class="g-skeleton h-[290px] max-xl:w-full xl:min-w-[300px]"></div>
+      <div class="w-full">
+        <!-- select -->
+        <div class="g-skeleton h-[60px] w-full"></div>
+        <!-- additional data -->
+        <div class="grid gap-2 p-4 mt-2">
+          <div class="h-[50px] g-skeleton"></div>
+          <div class="h-[50px] g-skeleton"></div>
+        </div>
       </div>
+    </div>
+    <div class="grid gap-2">
+      <div *ngRange="25" class="g-skeleton h-[50px]"></div>
     </div>
   </div>
 </ng-template>

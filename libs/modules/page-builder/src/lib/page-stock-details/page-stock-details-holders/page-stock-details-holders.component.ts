@@ -41,6 +41,8 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   marketDataTransformService = inject(MarketDataTransformService);
 
   quarterFormControl = new FormControl<string | null>(null);
+  loadingSignal = signal(false);
+
   quarterFormControlSignal = toSignal(this.quarterFormControl.valueChanges);
   ownershipInstitutionalSignal = toSignal(
     this.stocksApiService.getStockOwnershipInstitutional(this.stockSymbolSignal()),
@@ -81,7 +83,6 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   ownershipInstitutionalToQuarterSignal = computed(
     () => this.ownershipInstitutionalSignal()?.find((d) => d.date === this.quarterFormControlSignal()),
   );
-  loadingSignal = signal(false);
 
   constructor() {
     super();

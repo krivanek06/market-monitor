@@ -1,4 +1,5 @@
 import { Directive, Input, OnInit, Renderer2, ViewContainerRef } from '@angular/core';
+import { PlatformService } from '@market-monitor/shared-services';
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
 
 /**
@@ -35,9 +36,17 @@ export class PercentageIncreaseDirective implements OnInit {
   @Input() changesPercentageSpanClasses: string[] = [];
   @Input() changesSpanClasses: string[] = [];
 
-  constructor(private rederer2: Renderer2, private vr: ViewContainerRef) {}
+  constructor(
+    private rederer2: Renderer2,
+    private vr: ViewContainerRef,
+    private platform: PlatformService,
+  ) {}
 
   ngOnInit(): void {
+    if (this.platform.isServer) {
+      return;
+    }
+
     if (this.changeValues) {
       const change = this.changeValues.change ? roundNDigits(this.changeValues.change, 2) : null;
       const changesPercentage = this.changeValues.changePercentage

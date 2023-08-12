@@ -51,10 +51,12 @@ export class NewsSearchComponent {
   }
 
   maximumNewsDisplayed = signal(this.newDisplay);
+  loadingSignal = signal(false);
   marketStockNewsSignal = toSignal<News[]>(
     this.newSearchFormGroup.valueChanges.pipe(
       startWith(this.newSearchFormGroup.getRawValue()),
       tap(() => {
+        this.loadingSignal.set(true);
         this.maximumNewsDisplayed.set(this.newDisplay);
       }),
       pairwise(),
@@ -84,6 +86,7 @@ export class NewsSearchComponent {
               }),
             ),
       ),
+      tap(() => this.loadingSignal.set(false)),
     ),
   );
 
