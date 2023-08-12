@@ -1,6 +1,13 @@
 <app-general-card title="Insider trades">
   <app-stock-insider-trades
-    *ngIf="stockInsiderTradesSignal() as stockInsiderTrades"
+    *ngIf="stockInsiderTradesSignal() as stockInsiderTrades; else showSkeleton"
     [data]="stockInsiderTrades"
   ></app-stock-insider-trades>
 </app-general-card>
+
+<!-- skeleton -->
+<ng-template #showSkeleton>
+  <div>
+    <div *ngRange="25" class="h-[50px] mb-1 g-skeleton"></div>
+  </div>
+</ng-template>

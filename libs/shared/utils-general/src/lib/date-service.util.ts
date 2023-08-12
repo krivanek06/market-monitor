@@ -4,7 +4,7 @@ import {
   eachDayOfInterval,
   endOfMonth,
   format,
-  getDay,
+  getDaysInMonth,
   getMonth,
   getWeek,
   getWeeksInMonth,
@@ -41,7 +41,7 @@ export const dateGetDetailsInformationFromDate = (input: string | Date | number)
     year: getYear(date),
     month: getMonth(date) + 1,
     week: getWeek(date),
-    day: getDay(date),
+    day: getDaysInMonth(date),
   };
 };
 
