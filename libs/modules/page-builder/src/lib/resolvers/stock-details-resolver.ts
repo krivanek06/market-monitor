@@ -7,7 +7,7 @@ import { catchError, of, tap } from 'rxjs';
 
 export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
   route: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot
+  state: RouterStateSnapshot,
 ) => {
   const symbol = route.params['symbol'];
 
@@ -31,6 +31,6 @@ export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
       // dialogServiceUtil.showNotificationBar(`An error happened getting data for symbol: ${symbol}`, 'error');
       router.navigate(['/']);
       return of(null);
-    })
+    }),
   );
 };

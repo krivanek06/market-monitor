@@ -1,21 +1,23 @@
-import { Directive, computed, inject, signal } from '@angular/core';
+import { Directive, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { StockDetails } from '@market-monitor/api-types';
-import { ShowStockDialogDirective } from '@market-monitor/modules/market-stocks';
 import { DialogServiceUtil } from '@market-monitor/shared-utils-client';
+import { Observable, map } from 'rxjs';
 
 @Directive()
 export class PageStockDetailsBase {
   route = inject(ActivatedRoute);
   router = inject(Router);
-  showStockDialogDirective = inject(ShowStockDialogDirective);
   dialogServiceUtil = inject(DialogServiceUtil);
   stocksApiService = inject(StocksApiService);
 
-  // get stock details from route data
-  stockDetails = this.route.parent?.snapshot.data?.['stockDetails'] as StockDetails;
+  // get stock details from route data - can change from stock peers
+  stockDetails$ = this.route.parent?.data?.pipe(map((d) => d['stockDetails'])) as Observable<StockDetails>;
 
-  stockDetailsSignal = signal(this.stockDetails);
-  stockSymbolSignal = computed(() => this.stockDetailsSignal().id);
+  stockDetailsSignal = toSignal(this.stockDetails$, {
+    initialValue: this.route.parent?.snapshot.data['stockDetails'] as StockDetails,
+  });
+  stockSymbolSignal = computed(() => this.stockDetailsSignal()?.id);
 }
