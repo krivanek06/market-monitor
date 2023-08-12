@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MarketApiService } from '@market-monitor/api-client';
 import { StockSummary } from '@market-monitor/api-types';
-import { StockSummaryDialogComponent, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks';
+import { ShowStockDialogDirective, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks';
 import { RangeDirective } from '@market-monitor/shared-directives';
-import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
+import { DialogServiceModule } from '@market-monitor/shared-utils-client';
 
 @Component({
   selector: 'app-page-market-top-performers',
@@ -23,18 +23,14 @@ import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared-util
   templateUrl: './page-market-top-performers.component.html',
   styleUrls: ['./page-market-top-performers.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [ShowStockDialogDirective],
 })
 export class PageMarketTopPerformersComponent {
   marketApiService = inject(MarketApiService);
-  dialog = inject(MatDialog);
+  showStockDialogDirective = inject(ShowStockDialogDirective);
   marketTopPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance());
 
   onSummaryClick(summary: StockSummary) {
-    this.dialog.open(StockSummaryDialogComponent, {
-      data: {
-        symbol: summary.id,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
+    this.showStockDialogDirective.onShowSummary(summary.id);
   }
 }

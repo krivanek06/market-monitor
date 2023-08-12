@@ -6,6 +6,7 @@ import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/mar
 import {
   EarningsEstimationChartComponent,
   RevenueEstimationChartComponent,
+  ShowStockDialogDirective,
   StockEnterpriseChartComponent,
   StockEsgDataTableComponent,
   StockKeyExecutivesTableComponent,
@@ -13,7 +14,6 @@ import {
   StockPriceTargetTableComponent,
   StockRatingTableComponent,
   StockRecommendationChartComponent,
-  StockSummaryDialogComponent,
   StockSummaryListComponent,
   StockTransformService,
   StockUpgradesDowngradesTableComponent,
@@ -24,7 +24,7 @@ import {
   NameValueListComponent,
   PriceChangeItemsComponent,
 } from '@market-monitor/shared-components';
-import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
+import { DialogServiceModule } from '@market-monitor/shared-utils-client';
 import { map } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
@@ -60,6 +60,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [ShowStockDialogDirective],
 })
 export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   stockTransformService = inject(StockTransformService);
@@ -94,11 +95,6 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   }
 
   onShowSummary(summary: StockSummary) {
-    this.dialog.open(StockSummaryDialogComponent, {
-      data: {
-        symbol: summary.id,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
+    this.showStockDialogDirective.onShowSummary(summary.id);
   }
 }
