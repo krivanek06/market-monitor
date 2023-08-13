@@ -159,7 +159,7 @@
 
   <div class="grid gap-6 2xl:grid-cols-2">
     <!-- price target -->
-    <app-general-card title="Price Target">
+    <app-general-card *ngIf="stockDetailsSignal.priceTarget.length > 0" title="Price Target">
       <app-stock-price-target-table
         [data]="stockDetailsSignal.priceTarget | slice: 0 : 10"
         [currentPrice]="stockDetailsSignal.quote.price"
@@ -167,7 +167,11 @@
     </app-general-card>
 
     <!-- enterprise chart -->
-    <app-general-card title="Enterprise Chart" additionalClasses="h-full">
+    <app-general-card
+      title="Enterprise Chart"
+      additionalClasses="h-full"
+      [ngClass]="{ '2xl:col-span-2': stockDetailsSignal.priceTarget.length === 0 }"
+    >
       <app-stock-enterprise-chart
         [heightPx]="520"
         [data]="stockDetailsSignal.enterpriseValue"
