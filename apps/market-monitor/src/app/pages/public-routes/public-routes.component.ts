@@ -14,7 +14,7 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
       <a [routerLink]="ROUTES_PUBLIC_ROUTES.TOP_PERFORMERS" routerLinkActive="is-active">Top Performers</a>
       <a [routerLink]="ROUTES_PUBLIC_ROUTES.MARKET" routerLinkActive="is-active">Market</a>
       <a [routerLink]="ROUTES_PUBLIC_ROUTES.MARKET_CALENDAR" routerLinkActive="is-active">Calendar</a>
-      <a [routerLink]="ROUTES_PUBLIC_ROUTES.CRYPTO" routerLinkActive="is-active">Crypto</a>
+      <!-- <a [routerLink]="ROUTES_PUBLIC_ROUTES.CRYPTO" routerLinkActive="is-active">Crypto</a> -->
     </nav>
 
     <section class="g-screen-size-default">
@@ -28,14 +28,11 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
       }
 
       a {
-        @apply transition-all duration-300 text-sm;
-        &:hover {
-          @apply text-wt-gray-medium;
-        }
+        @apply transition-all duration-300 text-sm hover:text-wt-gray-dark-strong;
+      }
 
-        &.is-active {
-          @apply text-wt-gray-dark-strong;
-        }
+      a.is-active {
+        @apply text-wt-gray-dark-strong;
       }
     `,
   ],
@@ -52,31 +49,38 @@ export const route: Routes = [
     children: [
       {
         path: '',
-        loadChildren: () => import('./subpages/search.component').then((m) => m.route),
+        title: 'Search',
+        loadComponent: () => import('./subpages/search.component').then((m) => m.SearchComponent),
       },
       {
         path: ROUTES_PUBLIC_ROUTES.SEARCH,
-        loadChildren: () => import('./subpages/search.component').then((m) => m.route),
+        title: 'Search',
+        loadComponent: () => import('./subpages/search.component').then((m) => m.SearchComponent),
       },
       {
         path: ROUTES_PUBLIC_ROUTES.STOCK_SCREENER,
-        loadChildren: () => import('./subpages/stock-screener.component').then((m) => m.route),
+        title: 'Stock Screener',
+        loadComponent: () => import('./subpages/stock-screener.component').then((m) => m.StockScreenerComponent),
       },
       {
         path: ROUTES_PUBLIC_ROUTES.MARKET,
+        title: 'Market',
         loadChildren: () => import('./subpages/market.component').then((m) => m.route),
       },
       {
         path: ROUTES_PUBLIC_ROUTES.MARKET_CALENDAR,
-        loadChildren: () => import('./subpages/calendar.component').then((m) => m.route),
+        title: 'Market Calendar',
+        loadComponent: () => import('./subpages/calendar.component').then((m) => m.CalendarComponent),
       },
       {
         path: ROUTES_PUBLIC_ROUTES.TOP_PERFORMERS,
-        loadChildren: () => import('./subpages/top-performers.component').then((m) => m.route),
+        title: 'Top Performers',
+        loadComponent: () => import('./subpages/top-performers.component').then((m) => m.TopPerformersComponent),
       },
       {
         path: ROUTES_PUBLIC_ROUTES.CRYPTO,
-        loadChildren: () => import('./subpages/crypto.component').then((m) => m.route),
+        title: 'Crypto',
+        loadComponent: () => import('./subpages/crypto.component').then((m) => m.CryptoComponent),
       },
     ],
   },

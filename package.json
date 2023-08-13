@@ -4,7 +4,9 @@
   "license": "MIT",
   "scripts": {
     "mm:serve": "nx run market-monitor:serve",
-    "mm:ssr": "nx run market-monitor:serve-ssr",
+    "mm:dev:ssr": "nx run market-monitor:serve-ssr",
+    "mm:serve:ssr": "node dist/apps/market-monitor/server/main.js",
+    "mm:build:ssr": "nx build market-monitor && market-monitor:server",
     "mm:cloud-function:serve": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --config firebase.market-monitor-cloud-functions.json",
     "mm:cloud-functions:kill": "kill -9 $(lsof -ti:4000,4001)",
     "mm:cloud-function:debug": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --inspect-functions --config firebase.market-monitor-cloud-functions.json",
@@ -71,6 +73,7 @@
     "@typescript-eslint/parser": "^6.3.0",
     "autoprefixer": "^10.4.14",
     "cypress": "^12.17.3",
+    "domino": "^2.1.6",
     "esbuild": "^0.19.0",
     "eslint": "~8.46.0",
     "eslint-config-prettier": "9.0.0",

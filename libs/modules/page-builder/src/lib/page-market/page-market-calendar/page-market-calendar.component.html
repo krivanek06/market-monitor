@@ -15,7 +15,7 @@
   <ng-container *ngIf="!loadingSignal()">
     <!-- Dividends -->
     <ng-template marker *ngFor="let dividendsData of calendarDataDividendSignal()">
-      <ng-container *ngFor="let data of dividendsData.data | slice : 0 : displayElements; let last = last">
+      <ng-container *ngFor="let data of dividendsData.data | slice: 0 : displayElements; let last = last">
         <app-dividend-item
           (itemClickedEmitter)="onDividendClick(data)"
           [showBorder]="!last"
@@ -38,7 +38,7 @@
 
     <!-- Earnings -->
     <ng-template marker *ngFor="let earningsData of calendarDataEarningsSignal()">
-      <ng-container *ngFor="let data of earningsData.data | slice : 0 : displayElements; let last = last">
+      <ng-container *ngFor="let data of earningsData.data | slice: 0 : displayElements; let last = last">
         <app-earnings-item
           (itemClickedEmitter)="onEarningsClicked(data)"
           [showBorder]="!last"

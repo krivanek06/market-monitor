@@ -2,15 +2,12 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "tasksRunnerOptions": {
     "default": {
-      "runner": "nx-cloud",
+      "runner": "nx/tasks-runners/default",
       "options": {
         "cacheableOperations": [
           "build",
-          "lint",
-          "test",
-          "e2e"
-        ],
-        "accessToken": "NTVjNGFmMmYtYzIyYi00MTcyLWEzMmMtMjNlNDQ5MWJlNjJifHJlYWQtd3JpdGU="
+          "test"
+        ]
       }
     }
   },
@@ -71,7 +68,16 @@
       "unitTestRunner": "jest"
     },
     "@nx/angular:component": {
-      "style": "scss"
+      "style": "scss",
+      "changeDetection": "OnPush",
+      "displayBlock": true,
+      "inlineStyle": true
+    },
+    "@nx/angular:directive": {
+      "standalone": true
+    },
+    "@nx/angular:pipe": {
+      "standalone": true
     }
   }
 }

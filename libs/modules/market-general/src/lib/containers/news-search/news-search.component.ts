@@ -5,22 +5,24 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-client';
 import { FirebaseNewsTypes, News, firebaseNewsAcceptableTypes } from '@market-monitor/api-types';
+import { UserCommonService } from '@market-monitor/modules/user';
 import { FormMatInputWrapperComponent, InputSource } from '@market-monitor/shared-components';
 import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared-directives';
-import { debounceTime, distinctUntilChanged, map, pairwise, startWith, switchMap, tap } from 'rxjs';
-import { NewsBodyComponent } from '../../components';
+import { DateAgoPipe, TruncateWordsPipe } from '@market-monitor/shared-pipes';
+import { map, of, pairwise, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-news-search',
   standalone: true,
   imports: [
     CommonModule,
-    NewsBodyComponent,
     FormMatInputWrapperComponent,
     MatButtonModule,
     ReactiveFormsModule,
     RangeDirective,
     ScrollNearEndDirective,
+    DateAgoPipe,
+    TruncateWordsPipe,
   ],
   templateUrl: './news-search.component.html',
   styleUrls: ['./news-search.component.scss'],
@@ -29,13 +31,15 @@ import { NewsBodyComponent } from '../../components';
 export class NewsSearchComponent {
   @Input() showForm = false;
   @Input() newDisplay = 16;
-  @Input() set searchData(value: { newsType: FirebaseNewsTypes; symbol?: string }) {
+  @Input({ required: true }) set searchData(value: { newsType: FirebaseNewsTypes; symbol?: string }) {
     this.newSearchFormGroup.patchValue({
       newsType: value.newsType,
       symbol: value.symbol ?? '',
     });
   }
+
   marketApiService = inject(MarketApiService);
+  userCommonService = inject(UserCommonService);
 
   newSearchFormGroup = new FormGroup({
     newsType: new FormControl<FirebaseNewsTypes>('stocks', { nonNullable: true }),
@@ -47,20 +51,19 @@ export class NewsSearchComponent {
   }
 
   maximumNewsDisplayed = signal(this.newDisplay);
-  showLoadingSignal = signal<boolean>(true);
+  loadingSignal = signal(false);
   marketStockNewsSignal = toSignal<News[]>(
     this.newSearchFormGroup.valueChanges.pipe(
       startWith(this.newSearchFormGroup.getRawValue()),
-      debounceTime(500),
-      distinctUntilChanged(),
       tap(() => {
-        this.showLoadingSignal.set(true);
+        this.loadingSignal.set(true);
         this.maximumNewsDisplayed.set(this.newDisplay);
       }),
       pairwise(),
       map(([prev, curr]) => {
         // console.log('prev', prev, 'curr', curr);
         // reset symbol if newsType changed
+        // example previously it was 'stocks', now it is 'forex', we want to reset the symbol then
         const symbol = (
           prev.newsType === curr.newsType ? (curr.newsType === 'crypto' ? `${curr.symbol}USD` : curr.symbol) : ''
         )?.toUpperCase();
@@ -70,10 +73,21 @@ export class NewsSearchComponent {
       // save maybe modified symbol if newsType changed
       tap(([symbol, _]) => this.newSearchFormGroup.controls.symbol.setValue(symbol, { emitEvent: false })),
       // load news
-      switchMap(([symbol, newsType]) => this.marketApiService.getNews(newsType, symbol)),
-      // set loading to false
-      tap(() => this.showLoadingSignal.set(false))
-    )
+      switchMap(([symbol, newsType]) =>
+        newsType === 'general' && this.userCommonService.getData().news.length > 0
+          ? of(this.userCommonService.getData().news)
+          : this.marketApiService.getNews(newsType, symbol).pipe(
+              tap((news) => {
+                // save general news into local storage to avoid api call
+                this.userCommonService.saveData({
+                  ...this.userCommonService.getData(),
+                  news,
+                });
+              }),
+            ),
+      ),
+      tap(() => this.loadingSignal.set(false)),
+    ),
   );
 
   /**
@@ -86,15 +100,6 @@ export class NewsSearchComponent {
     };
     return inputSource;
   });
-
-  constructor() {
-    /**
-     * TODO for some reason marketStockNewsSignal is not triggered on init
-     */
-    setTimeout(() => {
-      this.newSearchFormGroup.setValue(this.newSearchFormGroup.getRawValue());
-    }, 600);
-  }
 
   onNearEndScroll(): void {
     this.maximumNewsDisplayed.set(this.maximumNewsDisplayed() + this.newDisplay);

@@ -3,25 +3,20 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { StockScreenerValues, StockSummary } from '@market-monitor/api-types';
 import {
   STOCK_SCREENER_DEFAULT_VALUES,
+  ShowStockDialogDirective,
   StockScreenerFormControlComponent,
-  StockSummaryDialogComponent,
   StockSummaryTableComponent,
   getScreenerInputIndexByKey,
   getScreenerInputValueByKey,
 } from '@market-monitor/modules/market-stocks';
 import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared-directives';
-import {
-  DialogServiceModule,
-  DialogServiceUtil,
-  RouterManagement,
-  SCREEN_DIALOGS,
-} from '@market-monitor/shared-utils-client';
+import { DialogServiceModule, DialogServiceUtil, RouterManagement } from '@market-monitor/shared-utils-client';
 import { catchError, of, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -42,12 +37,13 @@ import { catchError, of, switchMap, tap } from 'rxjs';
   templateUrl: './page-stock-screener.component.html',
   styleUrls: ['./page-stock-screener.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [ShowStockDialogDirective],
 })
 export class PageStockScreenerComponent implements OnInit, RouterManagement {
   private screenerDefault = 30;
   stocksApiService = inject(StocksApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
-  dialog = inject(MatDialog);
+  showStockDialogDirective = inject(ShowStockDialogDirective);
   router = inject(Router);
   route = inject(ActivatedRoute);
 
@@ -67,15 +63,15 @@ export class PageStockScreenerComponent implements OnInit, RouterManagement {
       switchMap((values) =>
         this.stocksApiService.getStockScreening(values).pipe(
           // set loading to false
-          tap(() => this.loadingSignal.set(false))
-        )
+          tap(() => this.loadingSignal.set(false)),
+        ),
       ),
       catchError(() => {
         this.dialogServiceUtil.showNotificationBar('Error loading screener results', 'error');
         this.loadingSignal.set(false);
         return of([]);
-      })
-    )
+      }),
+    ),
   );
 
   ngOnInit(): void {
@@ -95,12 +91,7 @@ export class PageStockScreenerComponent implements OnInit, RouterManagement {
   }
 
   onSummaryClick(summary: StockSummary): void {
-    this.dialog.open(StockSummaryDialogComponent, {
-      data: {
-        symbol: summary.id,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
+    this.showStockDialogDirective.onShowSummary(summary.id);
   }
 
   /**

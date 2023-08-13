@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Meta } from '@angular/platform-browser';
 import { PageStockDetailsOverviewComponent } from '@market-monitor/modules/page-builder';
 
 @Component({
@@ -16,4 +17,19 @@ import { PageStockDetailsOverviewComponent } from '@market-monitor/modules/page-
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockDetailsOverviewComponent {}
+export class StockDetailsOverviewComponent implements OnInit {
+  constructor(private metaTagService: Meta) {}
+
+  ngOnInit(): void {
+    this.metaTagService.addTags([
+      {
+        name: 'keywords',
+        content: 'Company overview',
+      },
+      {
+        name: 'description',
+        content: 'In depth overview about publicly traded companies.',
+      },
+    ]);
+  }
+}

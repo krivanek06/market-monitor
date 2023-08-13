@@ -15,26 +15,48 @@
   ></app-form-mat-input-wrapper>
 </form>
 
-<!-- loading screen -->
-<div *ngIf="showLoadingSignal()" class="columns-1 lg:columns-2">
-  <div *ngRange="newDisplay" class="flex items-start gap-3 pt-2 pb-4 pl-2 pr-4">
-    <!-- image -->
-    <div class="h-20 w-36 g-skeleton"></div>
-    <div class="flex flex-col w-full gap-1">
-      <!-- title -->
-      <div class="w-full h-6 g-skeleton"></div>
-      <!-- creator -->
-      <div class="w-full h-6 g-skeleton"></div>
-      <div class="hidden w-full h-20 sm:block g-skeleton"></div>
-    </div>
-  </div>
+<!-- loaded news -->
+<div
+  *ngIf="!loadingSignal(); else showSkeleton"
+  appScrollNearEnd
+  (nearEnd)="onNearEndScroll()"
+  class="grid grid-cols-1 lg:grid-cols-2"
+>
+  <article *ngFor="let news of marketStockNewsSignal()?.slice(0, maximumNewsDisplayed())" class="inline-block m-2">
+    <a
+      class="flex items-start gap-3 pt-2 pb-4 pl-2 pr-4 transition-all duration-500 rounded-md hover:bg-wt-gray-light group"
+      target="_blank"
+      [href]="news.url"
+    >
+      <img appDefaultImg [src]="news.image" [alt]="news.title" class="h-20 w-36" />
+      <div class="flex flex-col">
+        <div class="text-base text-wt-gray-dark group-hover:text-wt-gray-dark-strong">
+          {{ news.title }}
+        </div>
+        <div class="space-x-1 text-xs text-wt-gray-medium group-hover:text-wt-gray-dark-strong">
+          <span class="text-wt-gray-dark">{{ news.site }}</span>
+          <span>●</span>
+          <span>{{ news.publishedDate | dateAgo }}</span>
+        </div>
+        <div class="hidden text-sm sm:block text-wt-gray-medium">{{ news.text | truncateWords: 25 }}</div>
+      </div>
+    </a>
+  </article>
 </div>
 
-<!-- loaded news -->
-<div appScrollNearEnd (nearEnd)="onNearEndScroll()" class="grid grid-cols-1 lg:grid-cols-2">
-  <ng-container *ngIf="!showLoadingSignal()">
-    <article *ngFor="let news of marketStockNewsSignal()?.slice(0, maximumNewsDisplayed())" class="inline-block m-2">
-      <app-news-body [news]="news"></app-news-body>
-    </article>
-  </ng-container>
-</div>
+<!-- loading screen -->
+<ng-template #showSkeleton>
+  <div class="columns-1 lg:columns-2">
+    <div *ngRange="newDisplay" class="flex items-start gap-3 pt-2 pb-4 pl-2 pr-4">
+      <!-- image -->
+      <div class="h-20 w-36 g-skeleton"></div>
+      <div class="flex flex-col w-full gap-1">
+        <!-- title -->
+        <div class="w-full h-6 g-skeleton"></div>
+        <!-- creator -->
+        <div class="w-full h-6 g-skeleton"></div>
+        <div class="hidden w-full h-20 sm:block g-skeleton"></div>
+      </div>
+    </div>
+  </div>
+</ng-template>

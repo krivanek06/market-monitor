@@ -11,11 +11,19 @@ export class RecommendationDirective {
   }
   @Input() recommendationText?: string;
 
-  constructor(private elementRef: ElementRef, private ren: Renderer2) {}
+  constructor(
+    private elementRef: ElementRef,
+    private ren: Renderer2,
+  ) {}
 
   initRendering(value?: number | null): void {
     if (!value) {
       return;
+    }
+
+    // remove previous child
+    if (this.elementRef.nativeElement.firstChild) {
+      this.ren.removeChild(this.elementRef.nativeElement, this.elementRef.nativeElement.firstChild);
     }
 
     const recommendation = recommendationData[value - 1] ?? recommendationDefault;

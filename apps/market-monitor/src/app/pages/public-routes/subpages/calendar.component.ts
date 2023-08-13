@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Routes } from '@angular/router';
 import { PageMarketCalendarComponent } from '@market-monitor/modules/page-builder';
 
 @Component({
@@ -18,10 +17,3 @@ import { PageMarketCalendarComponent } from '@market-monitor/modules/page-builde
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarComponent {}
-
-export const route: Routes = [
-  {
-    path: '',
-    component: CalendarComponent,
-  },
-];

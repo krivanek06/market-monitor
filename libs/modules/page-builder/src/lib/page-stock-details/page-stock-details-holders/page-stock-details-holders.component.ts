@@ -41,9 +41,11 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   marketDataTransformService = inject(MarketDataTransformService);
 
   quarterFormControl = new FormControl<string | null>(null);
+  loadingSignal = signal(false);
+
   quarterFormControlSignal = toSignal(this.quarterFormControl.valueChanges);
   ownershipInstitutionalSignal = toSignal(
-    this.stocksApiService.getStockOwnershipInstitutional(this.stockSymbolSignal())
+    this.stocksApiService.getStockOwnershipInstitutional(this.stockSymbolSignal()),
   );
   ownershipHoldersToDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
@@ -52,15 +54,15 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
       switchMap((quarter) =>
         this.stocksApiService
           .getStockOwnershipHoldersToDate(this.stockSymbolSignal(), quarter)
-          .pipe(tap(() => this.loadingSignal.set(false)))
-      )
-    )
+          .pipe(tap(() => this.loadingSignal.set(false))),
+      ),
+    ),
   );
   institutionalPortfolioInputSourceSignal = toSignal(
     this.marketApiService.getInstitutionalPortfolioDates().pipe(
       map((d) => this.marketDataTransformService.transformDatesIntoInputSource(d)),
-      tap((data) => this.quarterFormControl.setValue(data[0].value))
-    )
+      tap((data) => this.quarterFormControl.setValue(data[0].value)),
+    ),
   );
   historicalPriceOnDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
@@ -70,18 +72,17 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
       switchMap((quarter) =>
         this.stocksApiService
           .getStockHistoricalPricesOnDate(this.stockSymbolSignal(), quarter)
-          .pipe(catchError((e) => of(null)))
-      )
-    )
+          .pipe(catchError((e) => of(null))),
+      ),
+    ),
   );
 
   enterpriseValueToQuarterSignal = computed(() =>
-    this.stockDetailsSignal()?.enterpriseValue.find((d) => d.date === this.quarterFormControlSignal())
+    this.stockDetailsSignal().enterpriseValue.find((d) => d.date === this.quarterFormControlSignal()),
   );
-  ownershipInstitutionalToQuarterSignal = computed(() =>
-    this.ownershipInstitutionalSignal()?.find((d) => d.date === this.quarterFormControlSignal())
+  ownershipInstitutionalToQuarterSignal = computed(
+    () => this.ownershipInstitutionalSignal()?.find((d) => d.date === this.quarterFormControlSignal()),
   );
-  loadingSignal = signal(false);
 
   constructor() {
     super();

@@ -1,8 +1,4 @@
-import {
-  ApplicationConfig,
-  enableProdMode,
-  mergeApplicationConfig,
-} from '@angular/core';
+import { ApplicationConfig, enableProdMode, mergeApplicationConfig } from '@angular/core';
 import { provideServerRendering } from '@angular/platform-server';
 import { environment } from '../environments/environment';
 import { appConfig } from './app.config';

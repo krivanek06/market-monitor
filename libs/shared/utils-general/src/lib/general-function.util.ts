@@ -18,25 +18,28 @@ export const roundNDigits = (value?: number | null, n: number = 2, isPercent = f
 };
 
 export const groupValuesByDate = <T extends { date: string }>(data: T[]): { data: T[]; date: string }[] => {
-  return data.reduce((acc, curr) => {
-    const date = curr.date.split('T')[0];
-    const dateArrayIndex = acc.findIndex((d) => d.date === date);
+  return data.reduce(
+    (acc, curr) => {
+      const date = curr.date.split('T')[0];
+      const dateArrayIndex = acc.findIndex((d) => d.date === date);
 
-    // date not in array, create new entry
-    if (dateArrayIndex === -1) {
-      return [{ date, data: [curr] }, ...acc];
-    }
+      // date not in array, create new entry
+      if (dateArrayIndex === -1) {
+        return [{ date, data: [curr] }, ...acc];
+      }
 
-    // add data to the right position
-    acc[dateArrayIndex].data = [...acc[dateArrayIndex].data, curr];
-    return acc;
-  }, [] as { data: T[]; date: string }[]);
+      // add data to the right position
+      acc[dateArrayIndex].data = [...acc[dateArrayIndex].data, curr];
+      return acc;
+    },
+    [] as { data: T[]; date: string }[],
+  );
 };
 
 export const formatLargeNumber = (
   value?: string | number | null | unknown,
   isPercent = false,
-  showDollarSign = false
+  showDollarSign = false,
 ): string => {
   if (!value || (!isNumber(value) && typeof value !== 'number')) {
     return 'N/A';

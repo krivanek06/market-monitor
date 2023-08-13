@@ -11,14 +11,16 @@ import { MatCardModule } from '@angular/material/card';
     `
       mat-card-content {
         height: inherit;
+      }
 
-        .default {
-          @apply grid min-h-[200px] place-content-center;
+      .default {
+        display: grid;
+        min-height: 200px;
+        place-content: center;
+      }
 
-          &:not(:only-child) {
-            display: none !important;
-          }
-        }
+      .default:not(:only-child) {
+        display: none !important;
       }
     `,
   ],

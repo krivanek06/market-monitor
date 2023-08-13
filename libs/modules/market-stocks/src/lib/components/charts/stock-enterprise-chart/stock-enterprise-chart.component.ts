@@ -10,6 +10,7 @@ import { Recommendation } from '../../../models';
   selector: 'app-stock-enterprise-chart',
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
+  host: { ngSkipHydration: 'true' },
   styles: [
     `
       :host {
@@ -20,6 +21,7 @@ import { Recommendation } from '../../../models';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <highcharts-chart
+      *ngIf="isHighcharts"
       [(update)]="updateFromInput"
       [Highcharts]="Highcharts"
       [callbackFunction]="chartCallback"
@@ -37,6 +39,10 @@ export class StockEnterpriseChartComponent extends ChartConstructor {
   @Input() heightPx = 400;
 
   private initChart(data: EnterpriseValue[]): void {
+    if (!this.Highcharts) {
+      return;
+    }
+
     this.chartOptions = {
       chart: {
         type: 'column',

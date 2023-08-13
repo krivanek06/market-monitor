@@ -26,6 +26,14 @@ HC_stock(Highcharts);
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [CommonModule, HighchartsChartModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  host: { ngSkipHydration: 'true' },
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   template: `
     <div class="block relative">
       <button
@@ -88,6 +96,10 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (!this.Highcharts) {
+      return;
+    }
+
     if (this.applyFancyColor > 0) {
       this.fancyColoring();
     }

@@ -84,7 +84,11 @@ export class StockDetailsComponent {
    * may happen that url is different than default value in routesStockDetailsControl
    */
   private resolveUrl(): void {
-    const lastUrlSegment = this.router.url.split('?')[0].split('/').pop();
+    const slittedUrl = this.router.url.split('?');
+    if (!slittedUrl[0]) {
+      return;
+    }
+    const lastUrlSegment = slittedUrl[0].split('/').pop();
     if (lastUrlSegment) {
       this.routesStockDetailsControl.patchValue(lastUrlSegment);
     }
@@ -106,30 +110,36 @@ export const route: Routes = [
       },
       {
         path: ROUTES_STOCK_DETAILS.OVERVIEW,
+        title: 'Overview',
         loadComponent: () =>
           import('./subpages/stock-details-overview.component').then((m) => m.StockDetailsOverviewComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.HOLDERS,
+        title: 'Holders',
         loadComponent: () =>
           import('./subpages/stock-details-holders.component').then((m) => m.StockDetailsHoldersComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.NEWS,
+        title: 'News',
         loadComponent: () => import('./subpages/stock-details-news.component').then((m) => m.StockDetailsNewsComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.TRADES,
+        title: 'Trades',
         loadComponent: () =>
           import('./subpages/stock-details-trades.component').then((m) => m.StockDetailsTradesComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.FINANCIALS,
+        title: 'Financials',
         loadComponent: () =>
           import('./subpages/stock-details-financials.component').then((m) => m.StockDetailsFinancialsComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.RATIOS,
+        title: 'Ratios',
         loadComponent: () =>
           import('./subpages/stock-details-ratios.component').then((m) => m.StockDetailsRatiosComponent),
       },

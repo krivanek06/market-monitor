@@ -80,14 +80,19 @@ export class TabSelectControlComponent<T> implements ControlValueAccessor {
       switchMap((screenLayoutSplit) =>
         this.observer.observe(screenLayoutSplit).pipe(
           map((d) => d.matches),
-          tap((x) => console.log('x', x, screenLayoutSplit))
-        )
-      )
-    )
+          tap((x) => console.log('x', x, screenLayoutSplit)),
+        ),
+      ),
+    ),
   );
 
   onSelectTabChange(event: MatTabChangeEvent): void {
     const item = this.displayOptions[event.index];
+
+    if (!item) {
+      return;
+    }
+
     this.selectedValueSignal.set({
       index: event.index,
       value: item.value,

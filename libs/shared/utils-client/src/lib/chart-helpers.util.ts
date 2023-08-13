@@ -1,3 +1,5 @@
+import { inject } from '@angular/core';
+import { PlatformService } from '@market-monitor/shared-services';
 import * as Highcharts from 'highcharts';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 
@@ -6,15 +8,18 @@ export abstract class ChartConstructor {
   chart!: Highcharts.Chart;
   updateFromInput = true;
 
-  // determine whether we use SSR or not
-  // https://github.com/highcharts/highcharts-angular/issues/216
-  isHighcharts = typeof Highcharts === 'object';
-
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
     this.chart = chart;
   };
 
   chartOptions: Highcharts.Options = {};
+
+  platform = inject(PlatformService);
+
+  // determine whether we use SSR or not
+  // https://github.com/highcharts/highcharts-angular/issues/216
+  // isHighcharts = typeof Highcharts === 'object';
+  isHighcharts = this.platform.isBrowser;
 
   constructor() {
     // used in constructor to avoid SSR error

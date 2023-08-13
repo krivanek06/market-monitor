@@ -4,7 +4,7 @@ import {
   eachDayOfInterval,
   endOfMonth,
   format,
-  getDay,
+  getDaysInMonth,
   getMonth,
   getWeek,
   getWeeksInMonth,
@@ -39,9 +39,9 @@ export const dateGetDetailsInformationFromDate = (input: string | Date | number)
 
   return {
     year: getYear(date),
-    month: getMonth(date),
+    month: getMonth(date) + 1,
     week: getWeek(date),
-    day: getDay(date),
+    day: getDaysInMonth(date),
   };
 };
 
@@ -134,11 +134,6 @@ export const dateGetWeeksInMonth = (inputDate: DateInput): number => {
   return getWeeksInMonth(new Date(inputDate));
 };
 
-export const dateSplitter = (dateFormat: string): [number, number, number | undefined] => {
-  const [year, month, week] = dateFormat.split('-').map((d) => Number(d));
-  return [year, month, week] as [number, number, number | undefined];
-};
-
 export const dateIsSameDay = (date1: DateInput, date2: DateInput): boolean => {
   return isSameDay(new Date(Number(date1)), new Date(Number(date2)));
 };
@@ -172,14 +167,14 @@ export const generateDatesArray = (data: { year: number; month: number }): strin
  */
 export const fillOutMissingDatesForMonth = <T extends { date: string }>(
   input: T[],
-  ignoreWeekend = true
+  ignoreWeekend = true,
 ): (T | Spread<[{ [key in keyof T]: null }, { date: string }]>)[] => {
   if (input.length === 0) {
     return input;
   }
   const first = input[0];
   // get the year and month of the element we are working
-  const [year, month] = dateSplitter(first.date);
+  const { year, month } = dateGetDetailsInformationFromDate(first.date);
 
   const dateRange = generateDatesArray({ year, month });
   const filteredDates = dateRange.filter((date) => !ignoreWeekend || !isWeekend(new Date(date)));
@@ -205,8 +200,7 @@ export const fillOutMissingDatesForMonth = <T extends { date: string }>(
  * @returns
  */
 export const isDateValidQuarter = (date: DateInput): boolean => {
-  const dateFormatted = dateFormatDate(date);
-  const [year, month, day] = dateFormatted.split('-').map((d) => Number(d));
+  const { month, day } = dateGetDetailsInformationFromDate(date);
 
   if (day === 31 && [3, 12].includes(month)) {
     return true;
@@ -226,8 +220,7 @@ export const isDateValidQuarter = (date: DateInput): boolean => {
  * @param date
  */
 export const getMostRecentQuarter = (date: DateInput): string => {
-  const dateFormatted = dateFormatDate(date);
-  const [year, month, day] = dateFormatted.split('-').map((d) => Number(d));
+  const { year, month, day } = dateGetDetailsInformationFromDate(date);
 
   if (month > 1 && month <= 3) {
     return `${year}-03-31`;
@@ -245,8 +238,7 @@ export const getMostRecentQuarter = (date: DateInput): string => {
 };
 
 export const getPreviousQuarter = (date: DateInput): string => {
-  const dateFormatted = dateFormatDate(date);
-  const [year, month, day] = dateFormatted.split('-').map((d) => Number(d));
+  const { year, month } = dateGetDetailsInformationFromDate(date);
 
   if (month > 1 && month <= 3) {
     return `${year - 1}-12-31`;

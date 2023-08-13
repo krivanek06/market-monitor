@@ -13,6 +13,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { PlatformService } from '@market-monitor/shared-services';
 import { map, startWith } from 'rxjs';
 
 /**
@@ -63,10 +64,14 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
   constructor(
     @Host() @Self() @Optional() private readonly matPag: MatPaginator,
     private elementRef: ElementRef,
-    private ren: Renderer2
+    private ren: Renderer2,
+    private platform: PlatformService,
   ) {}
 
   ngAfterViewInit(): void {
+    if (this.platform.isServer) {
+      return;
+    }
     this.styleDefaultPagination();
     this.createBubbleDivRef();
     this.renderButtons();
@@ -76,6 +81,10 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
    * react on parent component changing the appCustomLength - rerender bubbles
    */
   ngOnChanges(changes: SimpleChanges): void {
+    if (this.platform.isServer) {
+      return;
+    }
+
     if (!changes?.['appCustomLength']?.firstChange) {
       // remove buttons before creating new ones
       this.removeButtons();
@@ -93,7 +102,7 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
     this.matPag.page
       .pipe(
         map((e) => [e.previousPageIndex ?? 0, e.pageIndex]),
-        startWith([0, 0])
+        startWith([0, 0]),
         // takeUntilDestroyed() // <-- does not work
       )
       .subscribe(([prev, curr]) => {
@@ -207,7 +216,7 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
     const neededButtons = Math.ceil(this.appCustomLength / this.matPag.pageSize);
 
     // if there is only one page, do not render buttons
-    if (neededButtons === 1) {
+    if (neededButtons === 0 || neededButtons === 1) {
       this.ren.setStyle(this.elementRef.nativeElement, 'display', 'none');
       return;
     }

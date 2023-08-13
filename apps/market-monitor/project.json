@@ -40,7 +40,7 @@
             {
               "type": "initial",
               "maximumWarning": "500kb",
-              "maximumError": "1mb"
+              "maximumError": "2mb"
             },
             {
               "type": "anyComponentStyle",
@@ -109,8 +109,8 @@
     "server": {
       "executor": "@angular-devkit/build-angular:server",
       "options": {
-        "outputPath": "dist/market-monitor/server",
-        "main": "apps/market-monitor/src/main.server.ts",
+        "outputPath": "dist/apps/market-monitor/server",
+        "main": "apps/market-monitor/src/ssr.server.ts",
         "tsConfig": "apps/market-monitor/tsconfig.server.json"
       },
       "configurations": {

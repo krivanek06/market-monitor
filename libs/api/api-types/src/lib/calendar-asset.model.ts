@@ -21,17 +21,21 @@ export const resolveCalendarType = <T extends CalendarAssetDataTypes>(
     data: CalendarAssetDataTypes[] | null;
     date: string;
   }[],
-  objectKey: keyof T
+  objectKey: keyof T,
 ): {
   data: T[] | null;
   date: string;
 }[] => {
-  const existingData = data.filter((item) => item.data && item.data.length > 0);
+  const existingData = data.filter((item) => item.data && item.data.length > 0)[0];
+
+  if (!existingData) {
+    return [];
+  }
+
   const isResolve =
-    existingData.length > 0 &&
-    existingData[0].data && // null or array
-    existingData[0].data.length > 0 && // length of array > 0
-    objectKey in existingData[0].data[0];
+    existingData.data && // null or array
+    !!existingData.data[0] && // length of array > 0
+    objectKey in existingData.data[0];
 
   return isResolve
     ? (data as {

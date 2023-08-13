@@ -25,7 +25,7 @@ import { ApiCacheService } from './api.service';
 export class MarketApiService extends ApiCacheService {
   constructor(
     private readonly http: HttpClient,
-    @Inject(ENDPOINT_FUNCTION_URL) private readonly endpointFunctions: string
+    @Inject(ENDPOINT_FUNCTION_URL) private readonly endpointFunctions: string,
   ) {
     super(http);
   }
@@ -33,21 +33,21 @@ export class MarketApiService extends ApiCacheService {
   getHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {
     return this.getData<HistoricalPrice[]>(
       `${this.endpointFunctions}/getassethistoricalprices?symbol=${symbol}&period=${period}`,
-      this.validity2Min
+      this.validity2Min,
     );
   }
 
   getMarketTopPerformance(): Observable<MarketTopPerformanceOverviewResponse> {
     return this.getData<MarketTopPerformanceOverviewResponse>(
       `${this.endpointFunctions}/getmarkettopperformance`,
-      this.validity10Min
+      this.validity10Min,
     );
   }
 
   getNews(newsType: FirebaseNewsTypes, symbol: string = ''): Observable<News[]> {
     return this.getData<News[]>(
       `${this.endpointFunctions}/getmarketnews?news_types=${newsType}&symbol=${symbol}`,
-      this.validity30Min
+      this.validity30Min,
     );
   }
 
@@ -58,7 +58,7 @@ export class MarketApiService extends ApiCacheService {
   getMarketOverviewData<T extends MarketOverviewDatabaseKeys>(key: T, subKey: string): Observable<MarketOverviewData> {
     return this.getData<MarketOverviewData>(
       `${this.endpointFunctions}/getmarketoverviewdata?key=${key}&subKey=${subKey}`,
-      this.validity30Min
+      this.validity30Min,
     );
   }
 
@@ -82,21 +82,21 @@ export class MarketApiService extends ApiCacheService {
   getMarketCalendarDividends(month: string | number, year: string | number): Observable<CalendarDividend[]> {
     return this.getData<CalendarDividend[]>(
       `${this.endpointFunctions}/getcalendarstockdividends?month=${month}&year=${year}`,
-      this.validity30Min
+      this.validity30Min,
     );
   }
 
   getMarketCalendarEarnings(month: string | number, year: string | number): Observable<CalendarStockEarning[]> {
     return this.getData<CalendarStockEarning[]>(
       `${this.endpointFunctions}/getcalendarstockearnigns?month=${month}&year=${year}`,
-      this.validity30Min
+      this.validity30Min,
     );
   }
 
   getMarketCalendarIPOs(month: string | number, year: string | number): Observable<CalendarStockIPO[]> {
     return this.getData<CalendarStockIPO[]>(
       `${this.endpointFunctions}/getcalendarstockipos?month=${month}&year=${year}`,
-      this.validity30Min
+      this.validity30Min,
     );
   }
 
