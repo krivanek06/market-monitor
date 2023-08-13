@@ -27,34 +27,35 @@
 @include mat.core();
 
 $custom-typography: mat.define-typography-config(
-	$font-family: 'Poppins, sans-serif',
+  $font-family: 'Poppins, sans-serif',
 );
 
 // dark theme
 $mat-theming-dark: mat.define-light-theme(
-	(
-		color: (
-			primary: mat.define-palette($custom-primary),
-			accent: mat.define-palette($custom-success),
-			warn: mat.define-palette($custom-warn),
-		),
-	)
+  (
+    color: (
+      primary: mat.define-palette($custom-primary),
+      accent: mat.define-palette($custom-success),
+      warn: mat.define-palette($custom-warn),
+    ),
+  )
 );
 
 // light theme
 $mat-theming-light: mat.define-dark-theme(
-	(
-		color: (
-			primary: mat.define-palette($custom-primary-light),
-			accent: mat.define-palette($custom-success-light),
-			warn: mat.define-palette($custom-warn),
-		),
-	)
+  (
+    color: (
+      primary: mat.define-palette($custom-primary-light),
+      accent: mat.define-palette($custom-success-light),
+      warn: mat.define-palette($custom-warn),
+    ),
+  )
 );
 
 @include mat.typography-hierarchy($custom-typography);
+@include mat.button-typography($custom-typography);
 @include mat.all-component-themes($mat-theming-light);
 
 .dark-theme {
-	@include mat.all-component-colors($mat-theming-dark);
+  @include mat.all-component-colors($mat-theming-dark);
 }

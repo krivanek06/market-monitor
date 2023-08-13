@@ -30,21 +30,12 @@ export class UserUnauthenticatedService extends StorageService<UserUnauthenticat
     return this.lastSearchedStocks$.asObservable();
   }
 
-  toggleSearchStock(symbol: string): boolean {
-    if (this.isSymbolInLastSearched(symbol)) {
-      this.removeLastSearchedStock(symbol);
-      return false;
-    }
-    this.addSearchStock(symbol);
-    return true;
-  }
-
   addSearchStock(symbol: string): void {
     const savedData = this.getData();
 
-    // if already in last searched, do nothing
+    // if already in last searched, remove it and add to the top
     if (savedData.lastSearchedStocks.includes(symbol)) {
-      return;
+      this.removeLastSearchedStock(symbol);
     }
 
     // load data from api
