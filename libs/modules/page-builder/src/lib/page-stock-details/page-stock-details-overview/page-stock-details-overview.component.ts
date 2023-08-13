@@ -1,4 +1,4 @@
-import { CommonModule, ViewportScroller } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StockSummary } from '@market-monitor/api-types';
@@ -65,7 +65,6 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
 export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   private stockTransformService = inject(StockTransformService);
   private showStockDialogDirective = inject(ShowStockDialogDirective);
-  private viewPortScroller = inject(ViewportScroller);
 
   stockPeersSignal = toSignal(
     this.stocksApiService
@@ -97,8 +96,6 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   }
 
   onShowSummary(summary: StockSummary) {
-    // scroll to top
-    this.viewPortScroller.scrollToPosition([0, 0]);
     // show summary
     this.showStockDialogDirective.onShowSummary(summary.id);
   }

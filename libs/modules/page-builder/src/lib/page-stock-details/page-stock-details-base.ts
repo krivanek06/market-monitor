@@ -19,5 +19,5 @@ export class PageStockDetailsBase {
   stockDetailsSignal = toSignal(this.stockDetails$, {
     initialValue: this.route.parent?.snapshot.data['stockDetails'] as StockDetails,
   });
-  stockSymbolSignal = computed(() => this.stockDetailsSignal()?.id);
+  stockSymbolSignal = computed(() => this.stockDetailsSignal().id);
 }

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, ViewportScroller } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -62,6 +62,7 @@ export class StockSummaryDialogComponent {
     private userUnauthenticatedService: UserUnauthenticatedService,
     private dialogServiceUtil: DialogServiceUtil,
     private route: Router,
+    private viewPortScroller: ViewportScroller,
   ) {}
 
   onAddToFavorite(): void {
@@ -75,6 +76,11 @@ export class StockSummaryDialogComponent {
   onDetailsRedirect(): void {
     // routing kept here, because component is used in multiple places
     this.route.navigate(['stock-details', this.data.symbol]);
+
+    // scroll to top
+    this.viewPortScroller.scrollToPosition([0, 0]);
+
+    // close dialog
     this.dialogRef.close();
   }
 }
