@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Routes } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Meta } from '@angular/platform-browser';
 import { PageSearchComponent } from '@market-monitor/modules/page-builder';
 
 @Component({
@@ -17,11 +17,19 @@ import { PageSearchComponent } from '@market-monitor/modules/page-builder';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SearchComponent {}
+export class SearchComponent implements OnInit {
+  constructor(private metaTagService: Meta) {}
 
-export const route: Routes = [
-  {
-    path: '',
-    component: SearchComponent,
-  },
-];
+  ngOnInit(): void {
+    this.metaTagService.addTags([
+      {
+        name: 'keywords',
+        content: 'Search Stocks',
+      },
+      {
+        name: 'description',
+        content: 'Search publicly traded companies.',
+      },
+    ]);
+  }
+}

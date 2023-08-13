@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Routes } from '@angular/router';
 import { PageCryptoComponent } from '@market-monitor/modules/page-builder';
 
 @Component({
@@ -18,10 +17,3 @@ import { PageCryptoComponent } from '@market-monitor/modules/page-builder';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CryptoComponent {}
-
-export const route: Routes = [
-  {
-    path: '',
-    component: CryptoComponent,
-  },
-];

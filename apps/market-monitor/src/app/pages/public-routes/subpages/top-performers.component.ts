@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Routes } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Meta } from '@angular/platform-browser';
 import { PageMarketTopPerformersComponent } from '@market-monitor/modules/page-builder';
 
 @Component({
@@ -17,11 +17,19 @@ import { PageMarketTopPerformersComponent } from '@market-monitor/modules/page-b
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TopPerformersComponent {}
+export class TopPerformersComponent implements OnInit {
+  constructor(private metaTagService: Meta) {}
 
-export const route: Routes = [
-  {
-    path: '',
-    component: TopPerformersComponent,
-  },
-];
+  ngOnInit(): void {
+    this.metaTagService.addTags([
+      {
+        name: 'keywords',
+        content: 'Stock Top Performers',
+      },
+      {
+        name: 'description',
+        content: 'Latest Stock Top Performers.',
+      },
+    ]);
+  }
+}
