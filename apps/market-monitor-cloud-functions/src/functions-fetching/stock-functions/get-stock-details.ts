@@ -14,14 +14,13 @@ import { getDatabaseStockDetailsRef } from '@market-monitor/api-firebase';
 import { CompanyOutlook, StockDetails, StockDetailsAPI, StockSummary } from '@market-monitor/api-types';
 import { ForcefullyOmit } from '@market-monitor/shared-utils-general';
 import { isBefore, subDays } from 'date-fns';
-import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
+import { Request, Response } from 'express';
 import { getSummary } from '../../shared';
 
 /**
  * returns symbols details based on provided symbol in query
  */
-export const getstockdetails = onRequest(async (request, response: Response<StockDetails | string>) => {
+export const getStockDetailsWrapper = async (request: Request, response: Response<StockDetails | string>) => {
   const symbolString = request.query.symbol as string;
   const reload = request.query.reload === 'true' ? true : false;
 
@@ -31,26 +30,22 @@ export const getstockdetails = onRequest(async (request, response: Response<Stoc
     return;
   }
 
-  try {
-    // load summary
-    const summary = await getSummary(symbolString);
+  //try {
+  // load summary
+  const summary = await getSummary(symbolString);
 
-    // prevent loading data for etf and funds
-    if (summary.profile.isEtf || summary.profile.isFund) {
-      response.status(400).send('Unable to get details for FUND or ETF');
-      return;
-    }
-
-    // data will be always present, if symbol does not exist, it already failed on summary
-    const details = await getStockDetailsAPI(symbolString, reload);
-    const formattedDetails = modifyDetailsAPItoStockDetails(summary, details);
-
-    response.send(formattedDetails);
-  } catch (e) {
-    console.log(e);
-    response.status(500).send(`Unable to load data for ${symbolString}`);
+  // prevent loading data for etf and funds
+  if (summary.profile.isEtf || summary.profile.isFund) {
+    response.status(400).send('Unable to get details for FUND or ETF');
+    return;
   }
-});
+
+  // data will be always present, if symbol does not exist, it already failed on summary
+  const details = await getStockDetailsAPI(symbolString, reload);
+  const formattedDetails = modifyDetailsAPItoStockDetails(summary, details);
+
+  response.send(formattedDetails);
+};
 
 /**
  *

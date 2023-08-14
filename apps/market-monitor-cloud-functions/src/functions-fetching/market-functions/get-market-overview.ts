@@ -1,21 +1,20 @@
 import { getDatabaseMarketOverviewRef } from '@market-monitor/api-firebase';
 import { MarketOverview, MarketOverviewData, MarketOverviewDatabaseKeys } from '@market-monitor/api-types';
-import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
+import { Request, Response } from 'express';
 import { loadMarketOverviewData } from '../../shared';
 
 /**
  * Get market overview data from database, data always exists in database
  */
-export const getmarketoverview = onRequest(async (_, response: Response<MarketOverview>) => {
+export const getMarketOverviewWrapper = async (_, response: Response<MarketOverview>) => {
   const marketOverviewRef = getDatabaseMarketOverviewRef();
   const marketOverviewData = (await marketOverviewRef.get()).data();
 
   // send data to user
   response.send(marketOverviewData);
-});
+};
 
-export const getmarketoverviewdata = onRequest(async (request, response: Response<MarketOverviewData | null>) => {
+export const getMarketOverviewDataWrapper = async (request: Request, response: Response<MarketOverviewData | null>) => {
   // i.e: sp500
   const key = request.query.key as MarketOverviewDatabaseKeys;
   // i.e: peRatio
@@ -32,4 +31,4 @@ export const getmarketoverviewdata = onRequest(async (request, response: Respons
   const result = await loadMarketOverviewData(key, subKey, hardReload === 'true');
 
   response.send(result);
-});
+};

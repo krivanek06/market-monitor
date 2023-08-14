@@ -1,12 +1,11 @@
 import { StockSummary } from '@market-monitor/api-types';
-import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
+import { Request, Response } from 'express';
 import { getSummaries, getSummary } from '../../shared';
 /**
  * query.symbols contains a comma-separated list of stock symbols 'symbols=MSFT,AAPL,GOOG'
  *
  */
-export const getstocksummaries = onRequest(async (request, response: Response<StockSummary[]>) => {
+export const getStockSummariesWrapper = async (request: Request, response: Response<StockSummary[]>) => {
   const symbolString = (request.query.symbol as string) ?? '';
 
   // throw error if no symbols
@@ -20,9 +19,9 @@ export const getstocksummaries = onRequest(async (request, response: Response<St
 
   const allData = await getSummaries(symbolsArray);
   response.send(allData);
-});
+};
 
-export const getstocksummary = onRequest(async (request, response: Response<StockSummary | string>) => {
+export const getStockSummaryWrapper = async (request, response: Response<StockSummary | string>) => {
   const symbolString = request.query.symbol as string;
 
   // throw error if no symbol
@@ -31,11 +30,6 @@ export const getstocksummary = onRequest(async (request, response: Response<Stoc
     return;
   }
 
-  try {
-    const data = await getSummary(symbolString);
-    response.send(data);
-  } catch (e) {
-    console.log(e);
-    response.status(400).send(`Unable to load summary for symbol ${symbolString}`);
-  }
-});
+  const data = await getSummary(symbolString);
+  response.send(data);
+};

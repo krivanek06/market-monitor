@@ -8,8 +8,7 @@ import {
 } from '@market-monitor/api-firebase';
 import { FirebaseNewsTypes, News, firebaseNewsAcceptableTypes } from '@market-monitor/api-types';
 import { subHours } from 'date-fns';
-import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
+import { Request, Response } from 'express';
 
 /**
  * Get market news, update data in firestore every 2h
@@ -19,7 +18,7 @@ import { onRequest } from 'firebase-functions/v2/https';
  * - query.symbol: string
  * @param response
  */
-export const getmarketnews = onRequest(async (request, response: Response<News[]>) => {
+export const getMarketNewsWrapper = async (request: Request, response: Response<News[]>) => {
   const newsTypes = request.query.news_types as FirebaseNewsTypes;
   const symbol = (request.query.symbol as string) ?? '';
 
@@ -50,11 +49,11 @@ export const getmarketnews = onRequest(async (request, response: Response<News[]
 
   // return data
   response.send(news);
-});
+};
 
 const resolveDatabaseNewsPath = (
   newsType: FirebaseNewsTypes,
-  symbol: string
+  symbol: string,
 ): FirebaseFirestore.DocumentReference<DataSnapshot<News[]>> => {
   // based on type and symbol, return correct path
   if (newsType === 'stocks' && symbol) {

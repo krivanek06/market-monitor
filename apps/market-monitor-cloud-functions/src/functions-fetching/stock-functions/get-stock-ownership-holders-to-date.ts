@@ -2,10 +2,12 @@ import { getSymbolOwnershipHolders } from '@market-monitor/api-external';
 import { getDatabaseStockOwnershipHoldersRef } from '@market-monitor/api-firebase';
 import { SymbolOwnershipHolders } from '@market-monitor/api-types';
 import { checkDataValidity, isDateValidQuarter } from '@market-monitor/shared-utils-general';
-import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
+import { Request, Response } from 'express';
 
-export const getownershipholderstodate = onRequest(async (request, response: Response<SymbolOwnershipHolders[]>) => {
+export const getOwnershipHoldersToDateWrapper = async (
+  request: Request,
+  response: Response<SymbolOwnershipHolders[]>,
+) => {
   const symbolString = request.query.symbol as string | undefined;
   const dateQuarter = request.query.date as string | undefined;
 
@@ -44,4 +46,4 @@ export const getownershipholderstodate = onRequest(async (request, response: Res
     lastUpdate: new Date().toISOString(),
   });
   response.send(data);
-});
+};

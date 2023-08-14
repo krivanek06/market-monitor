@@ -7,28 +7,28 @@ import {
   StockMetricsHistoricalBasic,
 } from '@market-monitor/api-types';
 import { isBefore, subDays } from 'date-fns';
-import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
+import { Request, Response } from 'express';
 
-export const getstockhistoricalmetrics = onRequest(
-  async (request, response: Response<StockMetricsHistoricalBasic | string>) => {
-    const symbolString = (request.query.symbol as string) ?? '';
-    const timePeriod = (request.query.period as DataTimePeriod) ?? DataTimePeriodEnum.QUARTER;
+export const getStockHistoricalMetricsWrapper = async (
+  request: Request,
+  response: Response<StockMetricsHistoricalBasic | string>,
+) => {
+  const symbolString = (request.query.symbol as string) ?? '';
+  const timePeriod = (request.query.period as DataTimePeriod) ?? DataTimePeriodEnum.QUARTER;
 
-    // throw error if no symbols
-    if (!symbolString) {
-      response.status(400).send(`Not provided symbol in query param`);
-      return;
-    }
-
-    // load data
-    const data = await getStockHistoricalMetrics(symbolString);
-    // format data
-    const formattedData = formatData(data, timePeriod);
-    // return data
-    response.send(formattedData);
+  // throw error if no symbols
+  if (!symbolString) {
+    response.status(400).send(`Not provided symbol in query param`);
+    return;
   }
-);
+
+  // load data
+  const data = await getStockHistoricalMetrics(symbolString);
+  // format data
+  const formattedData = formatData(data, timePeriod);
+  // return data
+  response.send(formattedData);
+};
 
 const formatData = (data: StockMetricsHistoricalAPI, timePeriod: DataTimePeriod): StockMetricsHistoricalBasic => {
   const keyMetrics = data[timePeriod].keyMetrics.reverse();

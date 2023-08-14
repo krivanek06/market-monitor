@@ -28,6 +28,7 @@
     "@angular/router": "~16.1.8",
     "@nguniversal/express-engine": "^16.1.2",
     "@nx/angular": "16.6.0",
+    "@sentry/serverless": "^7.63.0",
     "@simondotm/nx-firebase": "1.1.0",
     "axios": "^1.4.0",
     "date-fns": "^2.30.0",
