@@ -9,8 +9,13 @@ export const environment = {
     measurementId: 'G-82FD6D7MMR',
   },
 
+  sentry: {
+    dns: 'https://a2f4f951e0ad6b5221e3ee68c18f18d1@o4505699066052608.ingest.sentry.io/4505708168151040',
+  },
+
   endpointFunctionsURL: 'http://localhost:5001/market-monitor-prod/us-central1',
 
   production: false,
   version: '1.0.0',
+  environment: 'DEV',
 };

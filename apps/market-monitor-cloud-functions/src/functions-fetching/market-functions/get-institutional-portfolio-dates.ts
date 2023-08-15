@@ -2,12 +2,11 @@ import { getInstitutionalPortfolioDates } from '@market-monitor/api-external';
 import { getDatabaseInstitutionalPortfolioDatesRef } from '@market-monitor/api-firebase';
 import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
 
 /**
  * returns list of available quarters to load data from different APIs
  */
-export const getinstitutionalportfoliodates = onRequest(async (request, response: Response<string[]>) => {
+export const getInstitutionalPortfolioDatesWrapper = async (request, response: Response<string[]>) => {
   const databaseRef = getDatabaseInstitutionalPortfolioDatesRef();
   const databaseData = (await databaseRef.get()).data();
 
@@ -27,4 +26,4 @@ export const getinstitutionalportfoliodates = onRequest(async (request, response
 
   // return data
   response.send(data);
-});
+};

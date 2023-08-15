@@ -4,25 +4,22 @@ import { HistoricalLoadingPeriods, HistoricalPrice } from '@market-monitor/api-t
 import { dateGetDateOfOpenStockMarket } from '@market-monitor/shared-utils-general';
 import { format, isBefore, subDays, subMinutes } from 'date-fns';
 import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
 
-export const getassethistoricalpricesondate = onRequest(
-  async (request, response: Response<HistoricalPrice | string>) => {
-    const symbol = request.query.symbol as string | undefined;
-    const date = request.query.date as string | undefined;
+export const getAssetHistoricalPricesOnDateWrapper = async (request, response: Response<HistoricalPrice | string>) => {
+  const symbol = request.query.symbol as string | undefined;
+  const date = request.query.date as string | undefined;
 
-    // throw error if no symbol or date
-    if (!symbol || !date) {
-      response.status(400).send('missing symbol or date');
-      return;
-    }
-
-    const data = await getHistoricalPricesOnDate(symbol, date);
-    response.send(data);
+  // throw error if no symbol or date
+  if (!symbol || !date) {
+    response.status(400).send('missing symbol or date');
+    return;
   }
-);
 
-export const getassethistoricalprices = onRequest(async (request, response: Response<HistoricalPrice[]>) => {
+  const data = await getHistoricalPricesOnDate(symbol, date);
+  response.send(data);
+};
+
+export const getAssetHistoricalPricesWrapper = async (request, response: Response<HistoricalPrice[]>) => {
   const symbol = request.query.symbol as string;
   const period = request.query.period as keyof typeof HistoricalPricePeriods;
   const isCrypto = request.query.isCrypto as string;
@@ -55,7 +52,7 @@ export const getassethistoricalprices = onRequest(async (request, response: Resp
     symbol,
     loadingPeriod.loadingPeriod,
     loadingPeriod.from,
-    loadingPeriod.to
+    loadingPeriod.to,
   );
   // save data to firestore
   await firestoreCollectionRef.set({
@@ -65,12 +62,12 @@ export const getassethistoricalprices = onRequest(async (request, response: Resp
   // return data
   const reveredData = historicalPriceData.reverse();
   response.send(reveredData);
-});
+};
 
 const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
 const resolveLoadingPeriod = (
-  period: keyof typeof HistoricalPricePeriods
+  period: keyof typeof HistoricalPricePeriods,
 ): {
   loadingPeriod: HistoricalLoadingPeriods;
   from: string;

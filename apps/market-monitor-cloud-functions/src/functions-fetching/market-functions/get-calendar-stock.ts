@@ -19,38 +19,36 @@ import {
 import { isBefore, subDays } from 'date-fns';
 import { Response } from 'express';
 import { firestore } from 'firebase-admin';
-import { onRequest } from 'firebase-functions/v2/https';
 
-export const getcalendarstockdividends = onRequest(
-  async (request, response: Response<CompanyStockDividend[] | string>) => {
-    const year = request.query.year as string;
-    const month = request.query.month as string;
+export const getCalendarStockDividendsWrapper = async (
+  request,
+  response: Response<CompanyStockDividend[] | string>,
+) => {
+  const year = request.query.year as string;
+  const month = request.query.month as string;
 
-    // missing data
-    if (!year || !month) {
-      response.status(400).send('Missing year or month from the request');
-    }
-
-    const data = await getDataForCalendar<CompanyStockDividend>('dividends', year, month);
-    response.send(data);
+  // missing data
+  if (!year || !month) {
+    response.status(400).send('Missing year or month from the request');
   }
-);
 
-export const getcalendarstockearnigns = onRequest(
-  async (request, response: Response<CalendarStockEarning[] | string>) => {
-    const year = request.query.year as string;
-    const month = request.query.month as string;
+  const data = await getDataForCalendar<CompanyStockDividend>('dividends', year, month);
+  response.send(data);
+};
 
-    if (!year || !month) {
-      response.status(400).send('Missing year or month from the request');
-    }
+export const getCalendarStockEarnignsWrapper = async (request, response: Response<CalendarStockEarning[] | string>) => {
+  const year = request.query.year as string;
+  const month = request.query.month as string;
 
-    const data = await getDataForCalendar<CalendarStockEarning>('earnings', year, month);
-    response.send(data);
+  if (!year || !month) {
+    response.status(400).send('Missing year or month from the request');
   }
-);
 
-export const getcalendarstockipos = onRequest(async (request, response: Response<CalendarStockIPO[] | string>) => {
+  const data = await getDataForCalendar<CalendarStockEarning>('earnings', year, month);
+  response.send(data);
+};
+
+export const getCalendarStockIposWrapper = async (request, response: Response<CalendarStockIPO[] | string>) => {
   const year = request.query.year as string;
   const month = request.query.month as string;
 
@@ -60,12 +58,12 @@ export const getcalendarstockipos = onRequest(async (request, response: Response
 
   const data = await getDataForCalendar<CalendarStockIPO>('ipo', year, month);
   response.send(data);
-});
+};
 
 const getDataForCalendar = async <T extends CalendarAssetDataTypes>(
   type: CalendarAssetTypes,
   year: string,
-  month: string
+  month: string,
 ): Promise<T[]> => {
   const databaseRefFunction = resolveDatabaseByType(type);
 
@@ -98,7 +96,7 @@ const getDataForCalendar = async <T extends CalendarAssetDataTypes>(
 const resultAPIbyType = <T extends CalendarAssetDataTypes>(
   type: CalendarAssetTypes,
   year: string,
-  month: string
+  month: string,
 ): Promise<T[]> => {
   switch (type) {
     case 'dividends':

@@ -1,29 +1,23 @@
 import { searchTicker } from '@market-monitor/api-external';
 import { StockSummary } from '@market-monitor/api-types';
-import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
-import { getstocksummaries } from './get-stock-summary';
+import { Request, Response } from 'express';
+import { getStockSummariesWrapper } from './get-stock-summary';
 
-export const searchstocksbasic = onRequest(async (request, response: Response<StockSummary[]>) => {
-  try {
-    const symbolString = request.query.symbol as string;
+export const searchStocksBasicWrapper = async (request: Request, response: Response<StockSummary[]>) => {
+  const symbolString = request.query.symbol as string;
 
-    // no symbol provided
-    if (!symbolString) {
-      response.send([]);
-      return;
-    }
-
-    const searchedTickers = await searchTicker(symbolString);
-    const searchedSymbol = searchedTickers.map((d) => d.symbol);
-    console.log('searchedSymbol', searchedSymbol);
-
-    // add symbols to query
-    request.query.symbol = searchedSymbol.join(',');
-
-    return getstocksummaries(request, response);
-  } catch (error) {
-    console.error(error);
+  // no symbol provided
+  if (!symbolString) {
     response.send([]);
+    return;
   }
-});
+
+  const searchedTickers = await searchTicker(symbolString);
+  const searchedSymbol = searchedTickers.map((d) => d.symbol);
+  console.log('searchedSymbol', searchedSymbol);
+
+  // add symbols to query
+  request.query.symbol = searchedSymbol.join(',');
+
+  return getStockSummariesWrapper(request, response);
+};

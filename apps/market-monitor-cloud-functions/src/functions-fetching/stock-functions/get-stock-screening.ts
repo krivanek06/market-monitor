@@ -1,7 +1,6 @@
 import { getStockScreening } from '@market-monitor/api-external';
 import { StockScreenerValues, StockSummary } from '@market-monitor/api-types';
 import express, { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
 import { chunk, flatten } from 'lodash';
 import { getSummaries } from '../../shared';
 
@@ -28,7 +27,7 @@ app.post('/', async (req, res: Response<StockSummary[] | string>) => {
   // create multiple requests
   const symbolsChunks = chunk(
     stockScreeningResults.map((data) => data.symbol),
-    40
+    40,
   ) as string[][];
 
   // get summaries for all symbols
@@ -38,4 +37,4 @@ app.post('/', async (req, res: Response<StockSummary[] | string>) => {
   res.send(summariesOrder);
 });
 
-export const getstockscreening = onRequest(app);
+export const getStockScreeningWrapper = app;

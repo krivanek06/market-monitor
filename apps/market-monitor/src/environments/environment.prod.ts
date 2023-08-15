@@ -8,9 +8,14 @@ export const environment = {
     messagingSenderId: '185409661855',
     measurementId: 'G-82FD6D7MMR',
   },
-  endpointFunctionsURL:
-    'https://europe-central2-market-monitor-prod.cloudfunctions.net',
+
+  sentry: {
+    dns: 'https://a2f4f951e0ad6b5221e3ee68c18f18d1@o4505699066052608.ingest.sentry.io/4505708168151040',
+  },
+
+  endpointFunctionsURL: 'https://europe-central2-market-monitor-prod.cloudfunctions.net',
 
   production: true,
   version: '1.0.0',
+  environment: 'PROD',
 };

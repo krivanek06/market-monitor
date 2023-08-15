@@ -14,7 +14,7 @@ import {
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
 } from '@market-monitor/api-types';
-import { Observable } from 'rxjs';
+import { Observable, catchError } from 'rxjs';
 import { ENDPOINT_FUNCTION_URL } from './api-url.token';
 import { ApiCacheService } from './api.service';
 
@@ -33,14 +33,14 @@ export class StocksApiService extends ApiCacheService {
     return this.getData<StockSummary[]>(
       `${this.endpointFunctions}/searchstocksbasic?symbol=${ticker}`,
       this.validity10Min,
-    );
+    ).pipe(catchError(() => []));
   }
 
   getStockSummaries(symbols: string[]): Observable<StockSummary[]> {
     return this.getData<StockSummary[]>(
       `${this.endpointFunctions}/getstocksummaries?symbol=${symbols.join(',')}`,
       this.validity10Min,
-    );
+    ).pipe(catchError(() => []));
   }
 
   getStockSummary(symbol: string): Observable<StockSummary> {
