@@ -6,11 +6,12 @@
     "mm:serve": "nx run market-monitor:serve",
     "mm:dev:ssr": "nx run market-monitor:serve-ssr",
     "mm:serve:ssr": "node dist/apps/market-monitor/server/main.js",
-    "mm:build:ssr": "nx build market-monitor && market-monitor:server",
+    "mm:build:ssr": "nx build market-monitor && market-monitor:server && yarn run sentry:sourcemaps",
     "mm:cloud-function:serve": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --config firebase.market-monitor-cloud-functions.json",
     "mm:cloud-functions:kill": "kill -9 $(lsof -ti:4000,4001)",
     "mm:cloud-function:debug": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --inspect-functions --config firebase.market-monitor-cloud-functions.json",
-    "mm:cloud-function:deploy": "nx build market-monitor-cloud-functions && firebase deploy --only functions --config firebase.market-monitor-cloud-functions.json"
+    "mm:cloud-function:deploy": "nx build market-monitor-cloud-functions && firebase deploy --only functions --config firebase.market-monitor-cloud-functions.json",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org eduard-krivanek --project javascript-angular apps/market-monitor && sentry-cli sourcemaps upload --org eduard-krivanek --project javascript-angular apps/market-monitor"
   },
   "private": true,
   "dependencies": {
@@ -28,6 +29,7 @@
     "@angular/router": "~16.1.8",
     "@nguniversal/express-engine": "^16.1.2",
     "@nx/angular": "16.6.0",
+    "@sentry/angular-ivy": "^7.64.0",
     "@sentry/serverless": "^7.63.0",
     "@simondotm/nx-firebase": "1.1.0",
     "axios": "^1.4.0",
