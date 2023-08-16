@@ -7,10 +7,10 @@
     "mm:dev:ssr": "nx run market-monitor:serve-ssr",
     "mm:serve:ssr": "node dist/apps/market-monitor/server/main.js",
     "mm:build:ssr": "nx build market-monitor && market-monitor:server && yarn run sentry:sourcemaps",
-    "mm:cloud-function:serve": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --config firebase.market-monitor-cloud-functions.json",
+    "mm:cloud-function:serve": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions",
     "mm:cloud-functions:kill": "kill -9 $(lsof -ti:4000,4001)",
-    "mm:cloud-function:debug": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --inspect-functions --config firebase.market-monitor-cloud-functions.json",
-    "mm:cloud-function:deploy": "nx build market-monitor-cloud-functions && firebase deploy --only functions --config firebase.market-monitor-cloud-functions.json",
+    "mm:cloud-function:debug": "nx build market-monitor-cloud-functions && firebase emulators:start --only functions --inspect-functions",
+    "mm:cloud-function:deploy": "firebase deploy --only functions",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org eduard-krivanek --project javascript-angular apps/market-monitor && sentry-cli sourcemaps upload --org eduard-krivanek --project javascript-angular apps/market-monitor"
   },
   "private": true,

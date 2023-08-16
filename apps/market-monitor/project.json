@@ -65,6 +65,21 @@
       },
       "defaultConfiguration": "production"
     },
+    "prerender": {
+      "builder": "@nguniversal/builders:prerender",
+      "options": {
+        "routes": ["/", "search", "stock-screener", "market", "top-performers", "calendar"]
+      },
+      "configurations": {
+        "production": {
+          "browserTarget": "market-monitor:build:production"
+        },
+        "development": {
+          "browserTarget": "market-monitor:build:development"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
@@ -150,7 +165,8 @@
       "options": {
         "version": 2,
         "browserTarget": "market-monitor:build:production",
-        "serverTarget": "market-monitor:server:production"
+        "serverTarget": "market-monitor:server:production",
+        "prerenderTarget": "market-monitor:prerender:production"
       }
     }
   }

@@ -2,23 +2,33 @@
   "hosting": [
     {
       "target": "market-monitor",
-      "source": ".",
-      "frameworksBackend": {
-        "region": "europe-west1"
-      }
+      "public": "dist/apps/market-monitor",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
     }
   ],
   "functions": [
     {
       "source": "dist/apps/market-monitor-cloud-functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log"
-      ],
+      "codebase": "market-monitor-cloud-functions",
+      "runtime": "nodejs16",
+      "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"],
       "predeploy": ["yarn nx run market-monitor-cloud-functions:build"]
     }
-  ]
+  ],
+  "database": {
+    "rules": "apps/market-monitor-cloud-functions/database.rules.json"
+  },
+  "firestore": {
+    "rules": "apps/market-monitor-cloud-functions/firestore.rules",
+    "indexes": "apps/market-monitor-cloud-functions/firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "apps/market-monitor-cloud-functions/storage.rules"
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "singleProjectMode": true
+  }
 }
