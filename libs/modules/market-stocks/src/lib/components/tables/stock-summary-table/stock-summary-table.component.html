@@ -96,7 +96,7 @@
           <!-- PE -->
           <div class="hidden xs:block">
             <span class="text-wt-gray-dark">PE:</span>
-            <span> {{ row.quote.pe ? (row.quote.pe | number : '1.2-2') : 'N/A' }}</span>
+            <span> {{ row.quote.pe ? (row.quote.pe | number: '1.2-2') : 'N/A' }}</span>
           </div>
           <!-- shares -->
           <div>
@@ -106,7 +106,7 @@
           <!-- EPS -->
           <div class="hidden xs:block">
             <span class="text-wt-gray-dark">EPS:</span>
-            <span> {{ row.quote.eps ? (row.quote.eps | number : '1.2-2') : 'N/A' }}</span>
+            <span> {{ row.quote.eps ? (row.quote.eps | number: '1.2-2') : 'N/A' }}</span>
           </div>
         </div>
       </ng-container>
@@ -159,7 +159,7 @@
   <ng-container matColumnDef="pe">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">PE</th>
     <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-      {{ row.quote.pe ? (row.quote.pe | number : '1.2-2') : 'N/A' }}
+      {{ row.quote.pe ? (row.quote.pe | number: '1.2-2') : 'N/A' }}
     </td>
   </ng-container>
 
@@ -167,7 +167,7 @@
   <ng-container matColumnDef="eps">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">EPS</th>
     <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
-      {{ row.quote.eps ? (row.quote.eps | number : '1.2-2') : 'N/A' }}
+      {{ row.quote.eps ? (row.quote.eps | number: '1.2-2') : 'N/A' }}
     </td>
   </ng-container>
 
@@ -175,7 +175,7 @@
   <ng-container matColumnDef="beta">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">Beta</th>
     <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
-      {{ row.profile.beta ? (row.profile.beta | number : '1.2-2') : 'N/A' }}
+      {{ row.profile.beta ? (row.profile.beta | number: '1.2-2') : 'N/A' }}
     </td>
   </ng-container>
 
@@ -214,6 +214,6 @@
 
   <!-- Row shown when there is no matching data. -->
   <tr class="mat-row" *matNoDataRow>
-    <td class="mat-cell" colspan="10">No data has been found</td>
+    <td class="mat-cell" colspan="11">No data has been found</td>
   </tr>
 </table>

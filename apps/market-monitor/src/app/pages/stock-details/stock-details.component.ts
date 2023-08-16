@@ -24,9 +24,9 @@ import { ROUTES_STOCK_DETAILS } from '../../routes.model';
   ],
   template: `
     <section class="g-screen-size-default">
-      <div class="flex justify-between mb-6 items-center">
+      <div class="flex justify-between mb-6">
         <div>
-          <button type="button" mat-stroked-button class="min-w-[120px]" (click)="onHomeClick()">
+          <button type="button" mat-stroked-button class="min-w-[120px] mt-2" (click)="onHomeClick()">
             <mat-icon>home</mat-icon>
             Home
           </button>

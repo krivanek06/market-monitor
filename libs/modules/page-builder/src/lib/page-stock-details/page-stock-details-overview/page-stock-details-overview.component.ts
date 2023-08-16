@@ -24,6 +24,7 @@ import {
   NameValueListComponent,
   PriceChangeItemsComponent,
 } from '@market-monitor/shared-components';
+import { SortByKeyPipe } from '@market-monitor/shared-pipes';
 import { DialogServiceModule } from '@market-monitor/shared-utils-client';
 import { map } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
@@ -50,6 +51,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     StockSummaryListComponent,
     StockEnterpriseChartComponent,
     StockPeersListComponent,
+    SortByKeyPipe,
   ],
   templateUrl: './page-stock-details-overview.component.html',
   styles: [

@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { https } from 'firebase-functions';
 import { onRequest } from 'firebase-functions/v2/https';
 
-export const httpsOnCallWrapper = (
+export const sentryHttpsOnCallWrapper = (
   // We pass an identifying ‘name’ as a string
   // This will show up in our Sentry error titles
   // so it needs to a) be unique and b) make sense
@@ -51,7 +51,7 @@ export const httpsOnCallWrapper = (
   };
 };
 
-export const httpsOnRequestWrapper = (
+export const sentryHttpsOnRequestWrapper = (
   // We pass an identifying ‘name’ as a string
   // This will show up in our Sentry error titles
   // so it needs to a) be unique and b) make sense

@@ -34,7 +34,9 @@ import { Recommendation } from '../../../models';
 })
 export class StockEnterpriseChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(values: EnterpriseValue[]) {
-    this.initChart(values.reverse());
+    console.log('enterprise');
+    console.log(values);
+    this.initChart(values);
   }
   @Input() heightPx = 400;
 

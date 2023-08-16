@@ -3,7 +3,7 @@
   <div>
     <div class="g-item-wrapper">
       <div>Total Invested</div>
-      <div *ngIf="!isLoading && ownershipInstitutional && enterpriseValue" class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.totalInvested | largeNumberFormatter }}</span>
         <span
           appPercentageIncrease
@@ -13,8 +13,8 @@
             hideValue: true
           }"
         ></span>
-        <span>/</span>
-        <span>{{ enterpriseValue.marketCapitalization | largeNumberFormatter }}</span>
+        <span *ngIf="enterpriseValue">/</span>
+        <span *ngIf="enterpriseValue">{{ enterpriseValue.marketCapitalization | largeNumberFormatter }}</span>
       </div>
       <!-- loading -->
       <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
@@ -22,7 +22,7 @@
 
     <div class="g-item-wrapper">
       <div>Held Shares</div>
-      <div *ngIf="!isLoading && ownershipInstitutional && enterpriseValue" class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.numberOf13Fshares | largeNumberFormatter }}</span>
         <span
           appPercentageIncrease
@@ -32,8 +32,8 @@
             hideValue: true
           }"
         ></span>
-        <span>/</span>
-        <span>{{ enterpriseValue.numberOfShares | largeNumberFormatter }}</span>
+        <span *ngIf="enterpriseValue">/</span>
+        <span *ngIf="enterpriseValue">{{ enterpriseValue.numberOfShares | largeNumberFormatter }}</span>
       </div>
 
       <!-- loading -->

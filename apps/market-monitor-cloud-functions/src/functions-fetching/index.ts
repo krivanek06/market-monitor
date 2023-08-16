@@ -1,4 +1,4 @@
-import { httpsOnRequestWrapper } from '../utils';
+import { corsMiddleWare, sentryHttpsOnRequestWrapper } from '../utils';
 
 // stock-functions
 import { getStockDetailsWrapper } from './stock-functions/get-stock-details';
@@ -29,72 +29,105 @@ import { getQuoteBySymbolWrapper, getQuotesBySymbolsWrapper } from './market-fun
 import { getQuotesByTypeWrapper } from './market-functions/get-quotes-by-type';
 
 // wrap functions with sentry
-export const getstockdetails = httpsOnRequestWrapper('getStockDetailsWrapper', getStockDetailsWrapper);
-export const getstockearnings = httpsOnRequestWrapper('getStockEarningsWrapper', getStockEarningsWrapper);
-export const getstockhistoricalmetrics = httpsOnRequestWrapper(
+export const getstockdetails = sentryHttpsOnRequestWrapper(
+  'getStockDetailsWrapper',
+  corsMiddleWare(getStockDetailsWrapper),
+);
+export const getstockearnings = sentryHttpsOnRequestWrapper(
+  'getStockEarningsWrapper',
+  corsMiddleWare(getStockEarningsWrapper),
+);
+export const getstockhistoricalmetrics = sentryHttpsOnRequestWrapper(
   'getStockHistoricalMetricsWrapper',
-  getStockHistoricalMetricsWrapper,
+  corsMiddleWare(getStockHistoricalMetricsWrapper),
 );
 
-export const getstockinsidertrades = httpsOnRequestWrapper(
+export const getstockinsidertrades = sentryHttpsOnRequestWrapper(
   'getStockInsiderTradesWrapper',
-  getStockInsiderTradesWrapper,
+  corsMiddleWare(getStockInsiderTradesWrapper),
 );
 
-export const getownershipholderstodate = httpsOnRequestWrapper(
+export const getownershipholderstodate = sentryHttpsOnRequestWrapper(
   'getOwnershipHoldersToDateWrapper',
-  getOwnershipHoldersToDateWrapper,
+  corsMiddleWare(getOwnershipHoldersToDateWrapper),
 );
 
-export const getownershipinstitutional = httpsOnRequestWrapper(
+export const getownershipinstitutional = sentryHttpsOnRequestWrapper(
   'getOwnershipInstitutionalWrapper',
-  getOwnershipInstitutionalWrapper,
+  corsMiddleWare(getOwnershipInstitutionalWrapper),
 );
 
-export const getstockscreening = httpsOnRequestWrapper('getStockScreeningWrapper', getStockScreeningWrapper);
-export const getstocksummaries = httpsOnRequestWrapper('getStockSummariesWrapper', getStockSummariesWrapper);
-export const getstocksummary = httpsOnRequestWrapper('getStockScreeningWrapper', getStockSummaryWrapper);
-export const searchstocksbasic = httpsOnRequestWrapper('searchStocksBasicWrapper', searchStocksBasicWrapper);
+export const getstockscreening = sentryHttpsOnRequestWrapper(
+  'getStockScreeningWrapper',
+  corsMiddleWare(getStockScreeningWrapper),
+);
+export const getstocksummaries = sentryHttpsOnRequestWrapper(
+  'getStockSummariesWrapper',
+  corsMiddleWare(getStockSummariesWrapper),
+);
+export const getstocksummary = sentryHttpsOnRequestWrapper(
+  'getStockScreeningWrapper',
+  corsMiddleWare(getStockSummaryWrapper),
+);
+export const searchstocksbasic = sentryHttpsOnRequestWrapper(
+  'searchStocksBasicWrapper',
+  corsMiddleWare(searchStocksBasicWrapper),
+);
 
-export const getquotebysymbol = httpsOnRequestWrapper('getQuoteBySymbolWrapper', getQuoteBySymbolWrapper);
-export const getquotesbysymbols = httpsOnRequestWrapper('getQuotesBySymbolsWrapper', getQuotesBySymbolsWrapper);
+export const getquotebysymbol = sentryHttpsOnRequestWrapper(
+  'getQuoteBySymbolWrapper',
+  corsMiddleWare(getQuoteBySymbolWrapper),
+);
+export const getquotesbysymbols = sentryHttpsOnRequestWrapper(
+  'getQuotesBySymbolsWrapper',
+  corsMiddleWare(getQuotesBySymbolsWrapper),
+);
 
-export const getassethistoricalpricesondate = httpsOnRequestWrapper(
+export const getassethistoricalpricesondate = sentryHttpsOnRequestWrapper(
   'getAssetHistoricalPricesOnDateWrapper',
-  getAssetHistoricalPricesOnDateWrapper,
+  corsMiddleWare(getAssetHistoricalPricesOnDateWrapper),
 );
 
-export const getassethistoricalprices = httpsOnRequestWrapper(
+export const getassethistoricalprices = sentryHttpsOnRequestWrapper(
   'getAssetHistoricalPricesWrapper',
-  getAssetHistoricalPricesWrapper,
+  corsMiddleWare(getAssetHistoricalPricesWrapper),
 );
 
-export const getcalendarstockdividends = httpsOnRequestWrapper(
+export const getcalendarstockdividends = sentryHttpsOnRequestWrapper(
   'getCalendarStockDividendsWrapper',
-  getCalendarStockDividendsWrapper,
+  corsMiddleWare(getCalendarStockDividendsWrapper),
 );
 
-export const getcalendarstockearnigns = httpsOnRequestWrapper(
+export const getcalendarstockearnigns = sentryHttpsOnRequestWrapper(
   'getCalendarStockEarnignsWrapper',
-  getCalendarStockEarnignsWrapper,
+  corsMiddleWare(getCalendarStockEarnignsWrapper),
 );
 
-export const getcalendarstockipos = httpsOnRequestWrapper('getCalendarStockIposWrapper', getCalendarStockIposWrapper);
-export const getinstitutionalportfoliodates = httpsOnRequestWrapper(
+export const getcalendarstockipos = sentryHttpsOnRequestWrapper(
+  'getCalendarStockIposWrapper',
+  corsMiddleWare(getCalendarStockIposWrapper),
+);
+export const getinstitutionalportfoliodates = sentryHttpsOnRequestWrapper(
   'getInstitutionalPortfolioDatesWrapper',
-  getInstitutionalPortfolioDatesWrapper,
+  corsMiddleWare(getInstitutionalPortfolioDatesWrapper),
 );
 
-export const getmarketnews = httpsOnRequestWrapper('getMarketNewsWrapper', getMarketNewsWrapper);
-export const getmarketoverview = httpsOnRequestWrapper('getMarketOverviewWrapper', getMarketOverviewWrapper);
-export const getmarketoverviewdata = httpsOnRequestWrapper(
+export const getmarketnews = sentryHttpsOnRequestWrapper('getMarketNewsWrapper', corsMiddleWare(getMarketNewsWrapper));
+export const getmarketoverview = sentryHttpsOnRequestWrapper(
+  'getMarketOverviewWrapper',
+  corsMiddleWare(getMarketOverviewWrapper),
+);
+export const getmarketoverviewdata = sentryHttpsOnRequestWrapper(
   'getMarketOverviewDataWrapper',
-  getMarketOverviewDataWrapper,
+  corsMiddleWare(getMarketOverviewDataWrapper),
 );
 
-export const getmarkettopperformance = httpsOnRequestWrapper(
+export const getmarkettopperformance = sentryHttpsOnRequestWrapper(
   'getMarketTopPerformanceWrapper',
-  getMarketTopPerformanceWrapper,
+  corsMiddleWare(getMarketTopPerformanceWrapper),
 );
 
-export const getquotesbytype = httpsOnRequestWrapper('getQuotesByTypeWrapper', getQuotesByTypeWrapper);
+export const getquotesbytype = sentryHttpsOnRequestWrapper(
+  'getQuotesByTypeWrapper',
+  corsMiddleWare(getQuotesByTypeWrapper),
+);
