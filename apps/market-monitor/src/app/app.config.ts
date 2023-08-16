@@ -18,7 +18,7 @@ import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { PreloadAllModules, Router, provideRouter, withInMemoryScrolling, withPreloading } from '@angular/router';
-import { ENDPOINT_FUNCTION_URL } from '@market-monitor/api-client';
+import { API_IS_PRODUCTION, ENDPOINT_FUNCTION_URL } from '@market-monitor/api-client';
 import * as Sentry from '@sentry/angular-ivy';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
@@ -67,6 +67,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: ENDPOINT_FUNCTION_URL,
       useValue: environment.endpointFunctionsURL,
+    },
+    {
+      provide: API_IS_PRODUCTION,
+      useValue: environment.production,
     },
     {
       provide: ErrorHandler,
