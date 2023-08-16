@@ -14,6 +14,12 @@ import { LargeNumberFormatterPipe } from '@market-monitor/shared-pipes';
       :host {
         display: block;
       }
+
+      .c-loading-wrapper {
+        width: 45%;
+        margin-right: 24px;
+        height: 28px;
+      }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,7 +28,8 @@ export class StockOwnershipInstitutionalListComponent {
   /**
    * both inputs are associated with the same quarterly data
    */
-  @Input({ required: true }) ownershipInstitutional!: SymbolOwnershipInstitutional;
-  @Input({ required: true }) enterpriseValue!: EnterpriseValue;
+  @Input({ required: true }) ownershipInstitutional?: SymbolOwnershipInstitutional;
+  @Input({ required: true }) enterpriseValue?: EnterpriseValue;
+  @Input() isLoading = false;
   @Input() displayType: 'institution' | 'position' | 'option' = 'institution';
 }

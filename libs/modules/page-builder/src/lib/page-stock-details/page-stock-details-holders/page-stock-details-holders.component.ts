@@ -41,7 +41,7 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   marketDataTransformService = inject(MarketDataTransformService);
 
   quarterFormControl = new FormControl<string | null>(null);
-  loadingSignal = signal(false);
+  loadingSignal = signal(true);
 
   quarterFormControlSignal = toSignal(this.quarterFormControl.valueChanges);
   ownershipInstitutionalSignal = toSignal(

@@ -3,7 +3,7 @@
   <div>
     <div class="g-item-wrapper">
       <div>Total Invested</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional && enterpriseValue" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.totalInvested | largeNumberFormatter }}</span>
         <span
           appPercentageIncrease
@@ -16,10 +16,13 @@
         <span>/</span>
         <span>{{ enterpriseValue.marketCapitalization | largeNumberFormatter }}</span>
       </div>
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
+
     <div class="g-item-wrapper">
       <div>Held Shares</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional && enterpriseValue" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.numberOf13Fshares | largeNumberFormatter }}</span>
         <span
           appPercentageIncrease
@@ -32,10 +35,14 @@
         <span>/</span>
         <span>{{ enterpriseValue.numberOfShares | largeNumberFormatter }}</span>
       </div>
+
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
+
     <div class="g-item-wrapper">
       <div>Ownership</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.ownershipPercent | largeNumberFormatter }}%</span>
         <span
           appPercentageIncrease
@@ -46,10 +53,14 @@
           }"
         ></span>
       </div>
+
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
+
     <div class="g-item-wrapper">
       <div>Investors</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.investorsHolding }}</span>
         <span
           appPercentageIncrease
@@ -60,6 +71,9 @@
           }"
         ></span>
       </div>
+
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
   </div>
 </ng-container>
@@ -70,7 +84,7 @@
     <!-- line 1 -->
     <div class="g-item-wrapper">
       <div>Increased</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.increasedPositions }}</span>
         <span
           appPercentageIncrease
@@ -81,12 +95,15 @@
           }"
         ></span>
       </div>
+
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
 
     <!-- line 2-->
     <div class="g-item-wrapper">
       <div>Decreased</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.reducedPositions }}</span>
         <span
           appPercentageIncrease
@@ -97,11 +114,14 @@
           }"
         ></span>
       </div>
+
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
 
     <div class="g-item-wrapper">
       <div>New</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.newPositions }}</span>
         <span
           appPercentageIncrease
@@ -112,11 +132,14 @@
           }"
         ></span>
       </div>
+
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
 
     <div class="g-item-wrapper">
       <div>Sold</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.closedPositions }}</span>
         <span
           appPercentageIncrease
@@ -127,6 +150,9 @@
           }"
         ></span>
       </div>
+
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
   </div>
 </ng-container>
@@ -136,7 +162,7 @@
   <div>
     <div class="g-item-wrapper">
       <div>Calls</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.totalCalls | largeNumberFormatter }}</span>
         <span
           appPercentageIncrease
@@ -147,10 +173,13 @@
           }"
         ></span>
       </div>
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
+
     <div class="g-item-wrapper">
       <div>Puts</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.totalPuts | largeNumberFormatter }}</span>
         <span
           appPercentageIncrease
@@ -161,10 +190,13 @@
           }"
         ></span>
       </div>
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
+
     <div class="g-item-wrapper">
       <div>Put/Call Ratio</div>
-      <div class="flex items-center gap-2">
+      <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
         <span>{{ ownershipInstitutional.putCallRatio | largeNumberFormatter }}</span>
         <span
           appPercentageIncrease
@@ -175,6 +207,8 @@
           }"
         ></span>
       </div>
+      <!-- loading -->
+      <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
     </div>
   </div>
 </ng-container>
