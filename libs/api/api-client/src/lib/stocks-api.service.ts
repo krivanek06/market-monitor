@@ -15,8 +15,8 @@ import {
   SymbolOwnershipInstitutional,
 } from '@market-monitor/api-types';
 import { Observable, catchError } from 'rxjs';
+import { ApiCacheService } from './api-cache.service';
 import { ENDPOINT_FUNCTION_URL } from './api-url.token';
-import { ApiCacheService } from './api.service';
 
 @Injectable({
   providedIn: 'root',

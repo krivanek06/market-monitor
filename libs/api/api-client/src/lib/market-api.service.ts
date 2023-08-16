@@ -16,8 +16,8 @@ import {
   SymbolQuote,
 } from '@market-monitor/api-types';
 import { Observable, map } from 'rxjs';
+import { ApiCacheService } from './api-cache.service';
 import { ENDPOINT_FUNCTION_URL } from './api-url.token';
-import { ApiCacheService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
