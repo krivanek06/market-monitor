@@ -13,7 +13,7 @@ export const environment = {
     dns: 'https://a2f4f951e0ad6b5221e3ee68c18f18d1@o4505699066052608.ingest.sentry.io/4505708168151040',
   },
 
-  endpointFunctionsURL: 'https://europe-central2-market-monitor-prod.cloudfunctions.net',
+  endpointFunctionsURL: 'jhgz46ksfq-ey.a.run.app',
 
   production: true,
   version: '1.0.0',

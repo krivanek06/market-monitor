@@ -1,8 +1,7 @@
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
 import { GCPFunction } from '@sentry/serverless';
 import * as admin from 'firebase-admin';
-export * from './functions-fetching';
-export * from './functions-scheduled';
+import { setGlobalOptions } from 'firebase-functions/v2/options';
 
 const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
 
@@ -19,6 +18,8 @@ admin.initializeApp({
   databaseURL: DATABASE_URL,
 });
 
+setGlobalOptions({ region: 'europe-west3' });
+
 // sentry
 GCPFunction.init({
   dsn: 'https://640209974c94b49a86731408593f4a7b@o4505699066052608.ingest.sentry.io/4505699075751936',
@@ -33,3 +34,7 @@ GCPFunction.init({
 admin.firestore().settings({
   ignoreUndefinedProperties: true,
 });
+
+// must be below setGlobalOptions otherwise it will not set the region
+export * from './functions-fetching';
+export * from './functions-scheduled';

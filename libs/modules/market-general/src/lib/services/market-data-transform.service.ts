@@ -5,8 +5,6 @@ import {
   MarketOverviewData,
   getMarketOverKeyBySubKey,
 } from '@market-monitor/api-types';
-import { InputSource } from '@market-monitor/shared-components';
-import { dateFormatDate } from '@market-monitor/shared-utils-general';
 import { zip } from 'lodash';
 import { MarketOverviewChartData, MarketOverviewChartDataBody } from '../models';
 
@@ -16,20 +14,10 @@ import { MarketOverviewChartData, MarketOverviewChartDataBody } from '../models'
 export class MarketDataTransformService {
   constructor() {}
 
-  transformDatesIntoInputSource(dates: string[]): InputSource<string>[] {
-    return dates.map(
-      (date) =>
-        ({
-          caption: dateFormatDate(date, 'MMMM d, yyyy'),
-          value: date,
-        } as InputSource<string>)
-    );
-  }
-
   transformMarketOverviewData(
     name: string,
     overviewData: MarketOverviewData,
-    subKey: string
+    subKey: string,
   ): MarketOverviewChartDataBody {
     return {
       marketOverview: overviewData,
@@ -53,7 +41,7 @@ export class MarketDataTransformService {
     // helper method to construct parts of MarketOverviewChartData
     const helper = <T extends keyof MarketOverview>(
       mainKey: T,
-      subKey: keyof MarketOverview[T]
+      subKey: keyof MarketOverview[T],
     ): MarketOverviewChartDataBody => {
       const data = getMarketOverKeyBySubKey(String(subKey));
       const name = data ? data.name : 'Unresolved Name';

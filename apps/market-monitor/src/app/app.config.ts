@@ -2,9 +2,7 @@ import { isPlatformServer } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
 import {
   APP_ID,
-  APP_INITIALIZER,
   ApplicationConfig,
-  ErrorHandler,
   PLATFORM_ID,
   PLATFORM_INITIALIZER,
   importProvidersFrom,
@@ -17,9 +15,9 @@ import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { PreloadAllModules, Router, provideRouter, withInMemoryScrolling, withPreloading } from '@angular/router';
-import { ENDPOINT_FUNCTION_URL } from '@market-monitor/api-client';
-import * as Sentry from '@sentry/angular-ivy';
+import { PreloadAllModules, provideRouter, withInMemoryScrolling, withPreloading } from '@angular/router';
+import { API_IS_PRODUCTION, ENDPOINT_FUNCTION_URL } from '@market-monitor/api-client';
+// import * as Sentry from '@sentry/angular-ivy';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 
@@ -69,20 +67,24 @@ export const appConfig: ApplicationConfig = {
       useValue: environment.endpointFunctionsURL,
     },
     {
-      provide: ErrorHandler,
-      useValue: Sentry.createErrorHandler({
-        showDialog: true,
-      }),
+      provide: API_IS_PRODUCTION,
+      useValue: environment.production,
     },
-    {
-      provide: Sentry.TraceService,
-      deps: [Router],
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: () => () => {},
-      deps: [Sentry.TraceService],
-      multi: true,
-    },
+    // {
+    //   provide: ErrorHandler,
+    //   useValue: Sentry.createErrorHandler({
+    //     showDialog: true,
+    //   }),
+    // },
+    // {
+    //   provide: Sentry.TraceService,
+    //   deps: [Router],
+    // },
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: () => () => {},
+    //   deps: [Sentry.TraceService],
+    //   multi: true,
+    // },
   ],
 };

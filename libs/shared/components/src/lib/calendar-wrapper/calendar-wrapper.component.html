@@ -2,9 +2,9 @@
   <div class="flex items-center gap-10">
     <!-- current date range -->
     <div class="space-x-4 text-wt-gray-medium">
-      <span>{{ dateRangeSignal()[0] | date : 'MMMM d, y' }}</span>
+      <span>{{ dateRangeSignal()[0] | date: 'MMMM d, y' }}</span>
       <span>-</span>
-      <span>{{ dateRangeSignal()[dateRangeSignal().length - 1] | date : 'MMMM d, y' }}</span>
+      <span>{{ dateRangeSignal()[dateRangeSignal().length - 1] | date: 'MMMM d, y' }}</span>
     </div>
     <!-- current month button -->
     <button (click)="onCurrentMonthClick()" type="button" mat-stroked-button>Current Date</button>
@@ -26,14 +26,15 @@
 <div class="grid grid-cols-5">
   <!-- display day name -->
   <div *ngRange="5; let i = index" class="mb-4 text-base text-center text-wt-gray-medium">
-    {{ dateRangeSignal()[i] | date : 'EEEE' }}
+    {{ dateRangeSignal()[i] | date: 'EEEE' }}
   </div>
 
   <!-- showing border if not last line on the bottom -->
   <div
     *ngFor="let date of dateRangeSignal(); let i = index"
     class="p-2 g-border-bottom"
-    [style.min-height.px]="minHeight"
+    appClientStyles
+    [appMinHeight]="minHeight"
     [ngClass]="{
       'border-r': i % 5 !== 4,
       'border-b':
@@ -44,7 +45,7 @@
     <!-- display day -->
     <div class="flex justify-end mb-2">
       <span class="p-2 text-center rounded-full text-wt-gray-medium w-9 h-9 bg-wt-gray-light">
-        {{ dateRangeSignal()[i] | date : 'd' }}
+        {{ dateRangeSignal()[i] | date: 'd' }}
       </span>
     </div>
 

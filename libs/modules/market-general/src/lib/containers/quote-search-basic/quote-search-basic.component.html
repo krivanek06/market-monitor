@@ -25,7 +25,13 @@
 
     <!-- loaded data -->
     <ng-container *ngIf="!showLoadingIndicator()">
-      <cdk-virtual-scroll-viewport [itemSize]="50" [style.height.px]="8 * 50" minBufferPx="380" maxBufferPx="400">
+      <cdk-virtual-scroll-viewport
+        [itemSize]="50"
+        appClientStyles
+        [appMinHeight]="8 * 50"
+        minBufferPx="380"
+        maxBufferPx="400"
+      >
         <mat-option
           *cdkVirtualFor="let quote of displayedOptions(); let last = last"
           [value]="quote"

@@ -21,7 +21,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MarketApiService } from '@market-monitor/api-client';
 import { AvailableQuotes, SymbolQuote } from '@market-monitor/api-types';
 import { QuoteItemComponent } from '@market-monitor/shared-components';
-import { DefaultImgDirective, RangeDirective } from '@market-monitor/shared-directives';
+import { ClientStylesDirective, DefaultImgDirective, RangeDirective } from '@market-monitor/shared-directives';
 import { tap } from 'rxjs';
 
 @Component({
@@ -42,6 +42,7 @@ import { tap } from 'rxjs';
     MatProgressSpinnerModule,
     FormsModule,
     ScrollingModule,
+    ClientStylesDirective,
   ],
   templateUrl: './quote-search-basic.component.html',
   styleUrls: ['./quote-search-basic.component.scss'],
@@ -63,7 +64,7 @@ export class QuoteSearchBasicComponent implements ControlValueAccessor, OnChange
   searchControlSignal = signal<string>('');
   showLoadingIndicator = signal<boolean>(false);
   displayedOptions = computed(() =>
-    this.options().filter((quote) => quote.name.toLowerCase().includes(this.searchControlSignal().toLowerCase()))
+    this.options().filter((quote) => quote.name.toLowerCase().includes(this.searchControlSignal().toLowerCase())),
   );
   private options = signal<SymbolQuote[]>([]);
 
@@ -86,7 +87,7 @@ export class QuoteSearchBasicComponent implements ControlValueAccessor, OnChange
           console.log(quotes);
           this.options.set(quotes);
           this.showLoadingIndicator.set(false);
-        })
+        }),
       )
       .subscribe();
   }

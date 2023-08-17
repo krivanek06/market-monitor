@@ -20,7 +20,5 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
 export class PageStockDetailsNewsComponent extends PageStockDetailsBase {
   constructor() {
     super();
-    console.log(this.route.parent?.snapshot.params?.['symbol']);
-    console.log();
   }
 }

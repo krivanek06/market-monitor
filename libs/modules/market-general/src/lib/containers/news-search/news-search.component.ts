@@ -25,7 +25,13 @@ import { map, of, pairwise, startWith, switchMap, tap } from 'rxjs';
     TruncateWordsPipe,
   ],
   templateUrl: './news-search.component.html',
-  styleUrls: ['./news-search.component.scss'],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewsSearchComponent {

@@ -174,7 +174,7 @@
     >
       <app-stock-enterprise-chart
         [heightPx]="520"
-        [data]="stockDetailsSignal.enterpriseValue"
+        [data]="stockDetailsSignal.enterpriseValue | sortByKey: 'date' : 'asc'"
       ></app-stock-enterprise-chart>
     </app-general-card>
   </div>

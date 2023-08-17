@@ -8,9 +8,9 @@ import {
   StockOwnershipHoldersTableComponent,
   StockOwnershipInstitutionalListComponent,
 } from '@market-monitor/modules/market-stocks';
-import { FormMatInputWrapperComponent, GeneralCardComponent } from '@market-monitor/shared-components';
+import { FormMatInputWrapperComponent, GeneralCardComponent, InputSource } from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
-import { getPreviousDate, isStockMarketClosedDate } from '@market-monitor/shared-utils-general';
+import { dateFormatDate, getPreviousDate, isStockMarketClosedDate } from '@market-monitor/shared-utils-general';
 import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
@@ -41,11 +41,15 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   marketDataTransformService = inject(MarketDataTransformService);
 
   quarterFormControl = new FormControl<string | null>(null);
-  loadingSignal = signal(false);
+  loadingSignal = signal(true);
 
   quarterFormControlSignal = toSignal(this.quarterFormControl.valueChanges);
   ownershipInstitutionalSignal = toSignal(
-    this.stocksApiService.getStockOwnershipInstitutional(this.stockSymbolSignal()),
+    this.stocksApiService.getStockOwnershipInstitutional(this.stockSymbolSignal()).pipe(
+      tap((data) => {
+        this.quarterFormControl.setValue(data[0]?.date ?? null);
+      }),
+    ),
   );
   ownershipHoldersToDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
@@ -58,12 +62,18 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
       ),
     ),
   );
-  institutionalPortfolioInputSourceSignal = toSignal(
-    this.marketApiService.getInstitutionalPortfolioDates().pipe(
-      map((d) => this.marketDataTransformService.transformDatesIntoInputSource(d)),
-      tap((data) => this.quarterFormControl.setValue(data[0].value)),
-    ),
+
+  institutionalPortfolioInputSourceSignal = computed(
+    () =>
+      this.ownershipInstitutionalSignal()?.map(
+        (d) =>
+          ({
+            caption: dateFormatDate(d.date, 'MMMM d, yyyy'),
+            value: d.date,
+          }) as InputSource<string>,
+      ),
   );
+
   historicalPriceOnDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
       filter((data): data is string => !!data),
