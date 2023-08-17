@@ -11,7 +11,7 @@ import {
 import { FormMatInputWrapperComponent, GeneralCardComponent, InputSource } from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
 import { dateFormatDate, getPreviousDate, isStockMarketClosedDate } from '@market-monitor/shared-utils-general';
-import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
+import { catchError, filter, map, of, startWith, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
@@ -35,13 +35,14 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { ngSkipHydration: 'true' },
 })
 export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   marketApiService = inject(MarketApiService);
   marketDataTransformService = inject(MarketDataTransformService);
 
   quarterFormControl = new FormControl<string | null>(null);
-  loadingSignal = signal(true);
+  loadingSignal = signal(false);
 
   quarterFormControlSignal = toSignal(this.quarterFormControl.valueChanges);
   ownershipInstitutionalSignal = toSignal(
@@ -53,6 +54,7 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   );
   ownershipHoldersToDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
+      startWith(this.quarterFormControl.value),
       filter((data): data is string => !!data),
       tap(() => this.loadingSignal.set(true)),
       switchMap((quarter) =>
@@ -76,6 +78,7 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
 
   historicalPriceOnDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
+      startWith(this.quarterFormControl.value),
       filter((data): data is string => !!data),
       // if date is YYYY-12-31 then it is a closed date -> subtract 1 day
       map((quarter) => (isStockMarketClosedDate(quarter) ? getPreviousDate(quarter) : quarter)),
