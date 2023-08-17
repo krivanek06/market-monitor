@@ -77,6 +77,7 @@ export class StocksApiService extends ApiCacheService {
         'getassethistoricalpricesondate',
         `symbol=${symbol}&date=${date}`,
       ),
+      this.validity2Min,
     );
   }
 

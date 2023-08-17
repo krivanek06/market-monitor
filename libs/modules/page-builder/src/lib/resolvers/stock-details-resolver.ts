@@ -1,9 +1,9 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveFn, Router, RouterStateSnapshot } from '@angular/router';
-import { StocksApiService } from '@market-monitor/api-client';
+import { MarketApiService, StocksApiService } from '@market-monitor/api-client';
 import { StockDetails } from '@market-monitor/api-types';
 import { LoaderMainService } from '@market-monitor/shared-services';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, forkJoin, map, of, tap } from 'rxjs';
 
 export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
   route: ActivatedRouteSnapshot,
@@ -13,6 +13,7 @@ export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
 
   const router = inject(Router);
   const stocksApiService = inject(StocksApiService);
+  const marketApiService = inject(MarketApiService);
   const loaderMainService = inject(LoaderMainService);
   // const dialogServiceUtil = inject(DialogServiceUtil);
 
@@ -24,7 +25,16 @@ export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
   // set loading to true
   loaderMainService.setLoading(true);
 
-  return stocksApiService.getStockDetails(symbol).pipe(
+  // load multiple data at once
+  return forkJoin([
+    stocksApiService.getStockDetails(symbol),
+    stocksApiService.getStockOwnershipInstitutional(symbol),
+    stocksApiService.getStockHistoricalMetrics(symbol),
+    stocksApiService.getStockInsiderTrades(symbol),
+    marketApiService.getNews('stocks', symbol),
+  ]).pipe(
+    // return only details, everything else is cached
+    map(([details, ...rest]) => details),
     tap(() => loaderMainService.setLoading(false)),
     catchError((err) => {
       loaderMainService.setLoading(false);
