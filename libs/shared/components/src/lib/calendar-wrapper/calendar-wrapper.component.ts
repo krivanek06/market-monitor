@@ -3,7 +3,7 @@ import { Component, ContentChildren, Directive, Input, OnInit, TemplateRef, forw
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RangeDirective } from '@market-monitor/shared-directives';
+import { ClientStylesDirective, RangeDirective } from '@market-monitor/shared-directives';
 import { dateIsNotWeekend, generateDatesArray } from '@market-monitor/shared-utils-general';
 
 export type CalendarRange = { year: number; month: number };
@@ -21,7 +21,7 @@ export class MarkerDirective {}
 @Component({
   selector: 'app-calendar-wrapper',
   standalone: true,
-  imports: [CommonModule, RangeDirective, MatButtonModule, MatIconModule, MarkerDirective],
+  imports: [CommonModule, RangeDirective, MatButtonModule, MatIconModule, MarkerDirective, ClientStylesDirective],
   templateUrl: './calendar-wrapper.component.html',
   styleUrls: ['./calendar-wrapper.component.scss'],
   //changeDetection: ChangeDetectionStrategy.OnPush,
@@ -96,7 +96,7 @@ export class CalendarWrapperComponent implements OnInit, ControlValueAccessor {
       generateDatesArray({
         year: this.selectedDate.year,
         month: this.selectedDate.month,
-      }).filter((d) => dateIsNotWeekend(d))
+      }).filter((d) => dateIsNotWeekend(d)),
     );
   }
 }

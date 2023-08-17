@@ -1,14 +1,16 @@
 {
+  "projects": {
+    "default": "market-monitor-prod"
+  },
   "targets": {
     "market-monitor-prod": {
       "hosting": {
         "market-monitor": [
+          "market-monitor",
           "market-monitor-prod"
         ]
       }
     }
   },
-  "projects": {
-    "default": "market-monitor-prod"
-  }
+  "etags": {}
 }

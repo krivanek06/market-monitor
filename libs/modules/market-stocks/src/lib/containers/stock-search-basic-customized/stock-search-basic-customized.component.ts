@@ -27,7 +27,13 @@ import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-ba
     ElementFocusDirective,
   ],
   templateUrl: './stock-search-basic-customized.component.html',
-  styleUrls: ['./stock-search-basic-customized.component.scss'],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   hostDirectives: [ShowStockDialogDirective],
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {

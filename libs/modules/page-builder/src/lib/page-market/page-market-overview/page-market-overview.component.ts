@@ -10,7 +10,7 @@ import {
   MarketDataTransformService,
   QuoteSearchBasicComponent,
 } from '@market-monitor/modules/market-general';
-import { GenericChartComponent, GeneralCardComponent } from '@market-monitor/shared-components';
+import { GeneralCardComponent, GenericChartComponent } from '@market-monitor/shared-components';
 import { PercentageIncreaseDirective } from '@market-monitor/shared-directives';
 import { map } from 'rxjs';
 import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skeleton.component';
@@ -43,7 +43,7 @@ export class PageMarketOverviewComponent {
   marketOverviewSignal = toSignal(
     this.marketApiService
       .getMarketOverview()
-      .pipe(map((marketOverview) => this.marketDataTransformService.transformMarketOverview(marketOverview)))
+      .pipe(map((marketOverview) => this.marketDataTransformService.transformMarketOverview(marketOverview))),
   );
 
   marketTopIndexQuotesSignal = toSignal(
@@ -52,8 +52,8 @@ export class PageMarketOverviewComponent {
         quotes.map((quote, index) => ({
           name: INDEXES_DEFAULT[index].name,
           quote,
-        }))
-      )
-    )
+        })),
+      ),
+    ),
   );
 }

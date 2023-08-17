@@ -13,7 +13,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MarketApiService } from '@market-monitor/api-client';
 import { HistoricalPrice, SymbolHistoricalPeriods } from '@market-monitor/api-types';
 import { AssetPriceChartComponent, TimePeriodButtonsComponent } from '@market-monitor/shared-components';
-import { DefaultImgDirective } from '@market-monitor/shared-directives';
+import { ClientStylesDirective, DefaultImgDirective } from '@market-monitor/shared-directives';
 import { DialogServiceUtil, ErrorEnum } from '@market-monitor/shared-utils-client';
 import { catchError, startWith, switchMap, tap } from 'rxjs';
 
@@ -26,9 +26,16 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
     AssetPriceChartComponent,
     TimePeriodButtonsComponent,
     DefaultImgDirective,
+    ClientStylesDirective,
   ],
   templateUrl: './asset-price-chart-interactive.component.html',
-  styleUrls: ['./asset-price-chart-interactive.component.scss'],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
@@ -59,7 +66,7 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
           console.log(err);
           this.dialogServiceUtil.showNotificationBar(ErrorEnum.CLIENT_GENERAL_ERROR, 'error');
           return [];
-        })
+        }),
       )
       .subscribe((prices) => {
         this.stockHistoricalPrice.set(prices);

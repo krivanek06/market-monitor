@@ -18,7 +18,13 @@ import { DialogServiceModule } from '@market-monitor/shared-utils-client';
     StockSearchBasicCustomizedComponent,
   ],
   templateUrl: './page-search.component.html',
-  styleUrls: ['./page-search.component.scss'],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageSearchComponent implements OnInit {

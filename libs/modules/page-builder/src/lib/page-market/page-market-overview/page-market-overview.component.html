@@ -9,14 +9,14 @@
         titleScale="large"
       >
         <div class="flex items-center justify-center gap-3 text-base">
-          <span>{{ index.quote.price | number : '1.2-2' }}</span>
+          <span>{{ index.quote.price | number: '1.2-2' }}</span>
           <span
             appPercentageIncrease
             [useCurrencySign]="false"
             [changeValues]="{
               change: index.quote.change,
-              changePercentage: index.quote.changesPercentage,
-          }"
+              changePercentage: index.quote.changesPercentage
+            }"
           ></span>
         </div>
       </app-general-card>

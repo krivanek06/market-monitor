@@ -46,7 +46,7 @@
       </div>
       <div class="text-base g-item-wrapper">
         <span> Close Price: </span>
-        <span *ngIf="historicalPriceOnDateSignal() as data">{{ data ? (data.close | currency) : 'N/A' }}</span>
+        <span>{{ historicalPriceOnDateSignal() ? (historicalPriceOnDateSignal()?.close | currency) : 'N/A' }}</span>
       </div>
     </div>
   </div>
