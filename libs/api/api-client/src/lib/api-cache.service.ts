@@ -12,6 +12,9 @@ export abstract class ApiCacheService {
   validity5Min = 5;
   validity10Min = 10;
   validity30Min = 30;
+  validity1Hour = 60;
+  validity2Hour = 120;
+
   constructor(@Optional() private readonly httpClient: HttpClient) {
     if (!this.httpClient) {
       throw new Error('HttpClient is required');
@@ -44,7 +47,7 @@ export abstract class ApiCacheService {
           data,
           validity: Date.now() + validity,
         });
-      })
+      }),
     );
   }
 

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { generalNewsResolver } from '@market-monitor/modules/page-builder';
 import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
 
 @Component({
@@ -50,6 +51,9 @@ export const route: Routes = [
       {
         path: '',
         title: 'Search',
+        resolve: {
+          generalNews: generalNewsResolver,
+        },
         loadComponent: () => import('./subpages/search.component').then((m) => m.SearchComponent),
       },
       {

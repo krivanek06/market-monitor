@@ -5,11 +5,10 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-client';
 import { FirebaseNewsTypes, News, firebaseNewsAcceptableTypes } from '@market-monitor/api-types';
-import { UserCommonService } from '@market-monitor/modules/user';
 import { FormMatInputWrapperComponent, InputSource } from '@market-monitor/shared-components';
 import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared-directives';
 import { DateAgoPipe, TruncateWordsPipe } from '@market-monitor/shared-pipes';
-import { map, of, pairwise, startWith, switchMap, tap } from 'rxjs';
+import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-news-search',
@@ -45,7 +44,6 @@ export class NewsSearchComponent {
   }
 
   marketApiService = inject(MarketApiService);
-  userCommonService = inject(UserCommonService);
 
   newSearchFormGroup = new FormGroup({
     newsType: new FormControl<FirebaseNewsTypes>('stocks', { nonNullable: true }),
@@ -79,19 +77,7 @@ export class NewsSearchComponent {
       // save maybe modified symbol if newsType changed
       tap(([symbol, _]) => this.newSearchFormGroup.controls.symbol.setValue(symbol, { emitEvent: false })),
       // load news
-      switchMap(([symbol, newsType]) =>
-        newsType === 'general' && this.userCommonService.getData().news.length > 0
-          ? of(this.userCommonService.getData().news)
-          : this.marketApiService.getNews(newsType, symbol).pipe(
-              tap((news) => {
-                // save general news into local storage to avoid api call
-                this.userCommonService.saveData({
-                  ...this.userCommonService.getData(),
-                  news,
-                });
-              }),
-            ),
-      ),
+      switchMap(([symbol, newsType]) => this.marketApiService.getNews(newsType, symbol)),
       tap(() => this.loadingSignal.set(false)),
     ),
   );
