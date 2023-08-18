@@ -70,7 +70,7 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
 
   stockPeersSignal = toSignal(
     this.stocksApiService
-      .getStockSummaries(this.stockDetailsSignal().sectorPeers.peersList ?? [])
+      .getStockSummaries(this.stockDetailsSignal().sectorPeers?.peersList ?? [])
       .pipe(map((summaries) => summaries ?? [])),
   );
 

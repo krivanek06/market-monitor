@@ -36,7 +36,7 @@ export type StockDetailsAPI = {
   upgradesDowngrades: UpgradesDowngrades[];
   priceTarget: PriceTarget[];
   stockEarnings: StockEarning[];
-  sectorPeers: SectorPeers;
+  sectorPeers: SectorPeers | null;
   recommendationTrends: RecommendationTrends[];
   companyKeyMetricsTTM: CompanyKeyMetricsTTM;
   enterpriseValue: EnterpriseValue[];

@@ -6,7 +6,6 @@ import {
   MarketOverviewDatabaseKeys,
 } from '@market-monitor/api-types';
 import { delaySeconds } from '@market-monitor/shared-utils-general';
-import { zip } from 'lodash-es';
 
 /**
  * load data from quandl api
@@ -20,6 +19,7 @@ import { zip } from 'lodash-es';
  */
 
 import { firestore } from 'firebase-admin';
+import { warn } from 'firebase-functions/logger';
 
 // TODO: update data if older than 7 days
 export const loadMarketOverviewData = async (
@@ -61,6 +61,11 @@ export const loadMarketOverviewData = async (
   // get document keys to save multiple data into firestore
   const documentsToSave = getDocumentsToSaveData(key, url);
 
+  // check if we have the same amount of documents to save as api data
+  if (documentsToSave.length !== apiData.length) {
+    warn(`documentsToSave.length !== apiData.length for ${key} - ${subKey}`);
+  }
+
   // save api data per document
   await updateMultipleDocuments(documentsToSave, apiData);
 
@@ -99,8 +104,13 @@ const updateSingleDocuments = async (document: string, marketOverview: MarketOve
  */
 const updateMultipleDocuments = async (documents: string[], marketOverview: MarketOverviewData[]) => {
   const batch = firestore().batch();
-  for await (const [document, data] of zip(documents, marketOverview)) {
-    batch.set(getDatabaseMarketOverviewDataRef(document), data);
+  for (let index = 0; index < documents.length; index++) {
+    const document = documents[index];
+    const data = marketOverview[index];
+    const documentRef = getDatabaseMarketOverviewDataRef(document);
+
+    // add data to batch
+    batch.set(documentRef, data);
   }
   await batch.commit();
 };

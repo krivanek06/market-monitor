@@ -47,6 +47,8 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
   @Input() imageName = '';
   @Input() displayVolume = true;
 
+  loadingSignal = signal<boolean>(true);
+
   stockHistoricalPrice = signal<HistoricalPrice[]>([]);
 
   marketApiService = inject(MarketApiService);
@@ -61,7 +63,10 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
       .pipe(
         startWith(this.timePeriodFormControl.value),
         tap(() => this.stockHistoricalPrice.set([])),
-        switchMap((period) => this.marketApiService.getHistoricalPrices(this.symbol, period)),
+        tap(() => this.loadingSignal.set(true)),
+        switchMap((period) =>
+          this.marketApiService.getHistoricalPrices(this.symbol, period).pipe(tap(() => this.loadingSignal.set(false))),
+        ),
         catchError((err) => {
           console.log(err);
           this.dialogServiceUtil.showNotificationBar(ErrorEnum.CLIENT_GENERAL_ERROR, 'error');

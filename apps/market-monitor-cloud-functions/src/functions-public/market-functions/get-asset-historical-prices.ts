@@ -46,7 +46,7 @@ export const getAssetHistoricalPricesWrapper = async (request, response: Respons
 
   // resolve what data we have to load
   const loadingPeriod = resolveLoadingPeriod(period);
-  console.log(loadingPeriod);
+
   // load data
   const historicalPriceData = await getHistoricalPrices(
     symbol,

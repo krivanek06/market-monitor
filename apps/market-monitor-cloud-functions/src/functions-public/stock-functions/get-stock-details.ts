@@ -170,7 +170,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
     esgDataRatingYearly: esgRatingYearly[0],
     stockEarnings: analystEstimatesEarnings,
     priceTarget: priceTarget.slice(0, 15),
-    sectorPeers: sectorPeers[0],
+    sectorPeers: sectorPeers[0] ?? null,
     upgradesDowngrades: upgradesDowngrades.slice(0, 15),
     recommendationTrends,
     companyKeyMetricsTTM,
