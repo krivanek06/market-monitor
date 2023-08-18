@@ -1,5 +1,4 @@
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
-import { GCPFunction } from '@sentry/serverless';
 import * as admin from 'firebase-admin';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
 
@@ -18,14 +17,15 @@ admin.initializeApp({
   databaseURL: DATABASE_URL,
 });
 
+// firebase functions region
 setGlobalOptions({ region: 'europe-west3' });
 
-// sentry
-GCPFunction.init({
-  dsn: 'https://640209974c94b49a86731408593f4a7b@o4505699066052608.ingest.sentry.io/4505699075751936',
-  // Performance Monitoring
-  tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!
-});
+// sentry - not yet setup
+// GCPFunction.init({
+//   dsn: 'https://640209974c94b49a86731408593f4a7b@o4505699066052608.ingest.sentry.io/4505699075751936',
+//   // Performance Monitoring
+//   tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!
+// });
 
 // Set up extra settings. Since May 29, 2020, Firebase Firebase Added support for
 // calling FirebaseFirestore.settings with { ignoreUndefinedProperties: true }.
