@@ -50,15 +50,15 @@ export const route: Routes = [
     children: [
       {
         path: '',
-        title: 'Search',
-        resolve: {
-          generalNews: generalNewsResolver,
-        },
-        loadComponent: () => import('./subpages/search.component').then((m) => m.SearchComponent),
+        redirectTo: ROUTES_PUBLIC_ROUTES.SEARCH,
+        pathMatch: 'full',
       },
       {
         path: ROUTES_PUBLIC_ROUTES.SEARCH,
         title: 'Search',
+        resolve: {
+          generalNews: generalNewsResolver,
+        },
         loadComponent: () => import('./subpages/search.component').then((m) => m.SearchComponent),
       },
       {
