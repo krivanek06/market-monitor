@@ -38,3 +38,6 @@ admin.firestore().settings({
 // must be below setGlobalOptions otherwise it will not set the region
 export * from './functions-public';
 export * from './functions-scheduled';
+
+// ONLY ALLOW IN LOCAL
+// export * from './functions-admin';

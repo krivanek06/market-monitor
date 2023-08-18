@@ -22,7 +22,7 @@ import { getSummary } from '../../shared';
  */
 export const getStockDetailsWrapper = async (request: Request, response: Response<StockDetails | string>) => {
   const symbolString = request.query.symbol as string;
-  const reload = request.query.reload === 'true' ? true : false;
+  const reloadParam = request.query.reload === 'true' ? true : false;
 
   // throw error if no symbols
   if (!symbolString) {
@@ -30,9 +30,9 @@ export const getStockDetailsWrapper = async (request: Request, response: Respons
     return;
   }
 
-  //try {
   // load summary
   const summary = await getSummary(symbolString);
+  const reload = reloadParam ?? summary.reloadDetailsData;
 
   // prevent loading data for etf and funds
   if (summary.profile.isEtf || summary.profile.isFund) {
@@ -64,8 +64,6 @@ const getStockDetailsAPI = async (symbol: string, reload: boolean = false): Prom
     databaseStockDetailsData &&
     // no manual reload
     !reload &&
-    // no need to reload data
-    !databaseStockDetailsData.reloadData &&
     // data is not older than 7 days
     !isBefore(new Date(databaseStockDetailsData.lastUpdate.detailsLastUpdate), subDays(new Date(), 7))
   ) {
@@ -177,7 +175,6 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
     recommendationTrends,
     companyKeyMetricsTTM,
     enterpriseValue,
-    reloadData: false,
     lastUpdate: {
       detailsLastUpdate: new Date().toISOString(),
       earningLastUpdate: new Date().toISOString(),

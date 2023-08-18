@@ -44,7 +44,7 @@ export const getSummaries = async (symbolsArray: string[]): Promise<StockSummary
 
   // symbols to update in DB
   const symbolsToUpdate = symbolsArray.filter(
-    (symbol) => !filteredDatabaseDataNotUpdate.map((d) => d.id).includes(symbol)
+    (symbol) => !filteredDatabaseDataNotUpdate.map((d) => d.id).includes(symbol),
   );
 
   if (symbolsToUpdate.length === 0) {
@@ -80,6 +80,7 @@ export const getSummaries = async (symbolsArray: string[]): Promise<StockSummary
         profile,
         priceChange,
         reloadData: firebaseRecord?.reloadData ?? false,
+        reloadDetailsData: firebaseRecord?.reloadDetailsData ?? true,
         summaryLastUpdate: new Date().toISOString(),
       };
       return stockSummary;

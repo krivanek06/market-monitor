@@ -12,6 +12,8 @@ import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
 import { DataSnapshot, HistoricalPriceTypes } from './models';
 
+export const getDatabaseStocksRef = () => firestore().collection('market_data_stocks');
+
 export const getDatabaseStockSummaryRef = (symbol: string) =>
   firestore().collection('market_data_stocks').doc(symbol).withConverter(assignTypes<StockSummary>());
 

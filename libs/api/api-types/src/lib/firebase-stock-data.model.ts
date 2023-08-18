@@ -20,6 +20,7 @@ import {
 export type StockSummary = {
   id: string;
   reloadData: boolean;
+  reloadDetailsData: boolean;
   quote: SymbolQuote;
   profile: CompanyProfile;
   priceChange: PriceChange;
@@ -27,7 +28,6 @@ export type StockSummary = {
 };
 
 export type StockDetailsAPI = {
-  reloadData: boolean;
   companyOutlook: CompanyOutlook;
   esgDataRatingYearlyArray: ESGDataRatingYearly[];
   esgDataRatingYearly: ESGDataRatingYearly | null;
