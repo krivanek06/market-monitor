@@ -1,7 +1,7 @@
 import { getStockScreening } from '@market-monitor/api-external';
 import { StockScreenerValues, StockSummary } from '@market-monitor/api-types';
 import express, { Response } from 'express';
-import { chunk, flatten } from 'lodash';
+import { chunk, flatten } from 'lodash-es';
 import { getSummaries } from '../../shared';
 
 const app = express();

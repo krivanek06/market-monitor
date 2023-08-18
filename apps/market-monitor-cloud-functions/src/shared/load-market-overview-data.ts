@@ -6,7 +6,7 @@ import {
   MarketOverviewDatabaseKeys,
 } from '@market-monitor/api-types';
 import { delaySeconds } from '@market-monitor/shared-utils-general';
-import { zip } from 'lodash';
+import { zip } from 'lodash-es';
 
 /**
  * load data from quandl api
@@ -26,7 +26,7 @@ export const loadMarketOverviewData = async (
   key: MarketOverviewDatabaseKeys,
   subKey: string,
   hardReload = false,
-  waitSeconds = 0
+  waitSeconds = 0,
 ): Promise<MarketOverviewData> => {
   await delaySeconds(waitSeconds);
 
@@ -72,7 +72,7 @@ export const loadMarketOverviewData = async (
 
 const loadDataFromEndpoint = (
   subkey: string, // i.e: peRatio
-  url: string // i.e: MULTPL/SP500_PE_RATIO_MONTH
+  url: string, // i.e: MULTPL/SP500_PE_RATIO_MONTH
 ): Promise<MarketOverviewData | MarketOverviewData[]> => {
   // check if provided key is treasury
   if (subkey in MARKET_OVERVIEW_DATABASE_ENDPOINTS.treasury) {

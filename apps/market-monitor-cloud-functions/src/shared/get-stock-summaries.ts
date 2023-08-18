@@ -3,7 +3,7 @@ import { getDatabaseStockSummaryRef } from '@market-monitor/api-firebase';
 import { StockSummary } from '@market-monitor/api-types';
 import { isBefore, subMinutes } from 'date-fns';
 import { firestore } from 'firebase-admin';
-import { uniqBy } from 'lodash';
+import { uniqBy } from 'lodash-es';
 
 export const getSummary = async (symbol: string): Promise<StockSummary> => {
   const data = await getSummaries([symbol]);
