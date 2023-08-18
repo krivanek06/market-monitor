@@ -36,5 +36,5 @@ admin.firestore().settings({
 });
 
 // must be below setGlobalOptions otherwise it will not set the region
-export * from './functions-fetching';
+export * from './functions-public';
 export * from './functions-scheduled';
