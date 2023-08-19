@@ -1,12 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, Optional, forwardRef, signal } from '@angular/core';
 import {
-  ControlContainer,
+  AfterViewInit,
+  Component,
+  Host,
+  HostListener,
+  Inject,
+  Injector,
+  Input,
+  OnInit,
+  Optional,
+  forwardRef,
+  signal,
+} from '@angular/core';
+import {
+  AbstractControl,
   ControlValueAccessor,
   FormControl,
+  FormControlName,
   FormsModule,
+  NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
+  NgControl,
   ReactiveFormsModule,
+  ValidationErrors,
+  Validator,
 } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,7 +43,6 @@ import { InputSource, InputSourceWrapper, InputType, InputTypeEnum } from '../fo
 @Component({
   selector: 'app-form-mat-input-wrapper',
   templateUrl: './form-mat-input-wrapper.component.html',
-  styleUrls: ['./form-mat-input-wrapper.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -51,11 +67,30 @@ import { InputSource, InputSourceWrapper, InputType, InputTypeEnum } from '../fo
       useExisting: forwardRef(() => FormMatInputWrapperComponent),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: FormMatInputWrapperComponent,
+      multi: true,
+    },
+  ],
+  styles: [
+    `
+      mat-form-field.mat-mdc-form-field {
+        width: 100%;
+      }
+
+      fieldset {
+        clear: both;
+      }
+
+      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+        display: none !important;
+      }
+    `,
   ],
 })
-export class FormMatInputWrapperComponent<T> implements OnInit, ControlValueAccessor {
+export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, ControlValueAccessor, Validator {
   @Input({ required: true }) inputCaption!: string;
-  @Input() controlName?: string;
   @Input() prefixIcon?: string;
   @Input() inputType: InputTypeEnum | InputType = 'TEXT';
 
@@ -91,30 +126,53 @@ export class FormMatInputWrapperComponent<T> implements OnInit, ControlValueAcce
    */
   internalSelectFormControl = signal<InputSource<T> | null>(null);
 
-  private parentFormControl?: FormControl;
+  // TODO: remove this if possible to get parent validators
+  parentFormControl?: FormControl;
 
-  constructor(@Optional() private controlContainer: ControlContainer) {}
+  constructor(@Inject(Injector) @Optional() @Host() private injector: Injector) {}
 
-  get usedFormControl(): FormControl | undefined {
-    return this.parentFormControl;
+  get showErrors(): boolean {
+    return this.parentFormControl ? this.parentFormControl.touched && this.parentFormControl.invalid : false;
   }
 
-  get shouldBeErrorsShowed(): boolean | null {
-    if (!this.usedFormControl) {
-      return false;
-    }
-
-    return this.usedFormControl.errors && (this.usedFormControl.touched || this.usedFormControl.dirty);
+  // todo: refactor this to react when mouse enters and leaves the component
+  @HostListener('mouseup', ['$event'])
+  onTouch() {
+    console.log('touch');
+    // notify parent form control that this control has been touched
+    this.onTouched();
   }
 
   ngOnInit(): void {
-    if (this.controlContainer && this.controlName) {
-      this.parentFormControl = this.controlContainer.control?.get(this.controlName) as FormControl;
-    }
-
     this.internalFormControl.valueChanges.subscribe((value) => {
       this.onChange(value);
     });
+  }
+
+  ngAfterViewInit(): void {
+    const controlName = this.injector.get(NgControl) as FormControlName;
+
+    // access parent form control
+    if (controlName) {
+      this.parentFormControl = controlName.control;
+    }
+  }
+
+  validate(control: AbstractControl<any, any>): ValidationErrors | null {
+    if (!this.parentFormControl) {
+      return null;
+    }
+    return this.parentFormControl.errors;
+  }
+
+  /**
+   *
+   * emit event when validator changes on parent form control
+   *
+   * @param fn
+   */
+  registerOnValidatorChange?(fn: () => void): void {
+    // throw new Error('Method not implemented.');
   }
 
   onSelectChange(inputSource: InputSource<T>, e: MatOptionSelectionChange) {

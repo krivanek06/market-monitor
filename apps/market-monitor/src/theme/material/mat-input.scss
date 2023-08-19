@@ -1,6 +1,7 @@
 .mat-mdc-input-element:disabled,
 .mat-mdc-form-field-type-mat-native-select.mat-mdc-form-field-disabled .mat-mdc-form-field-infix::after {
   color: var(--disable-default) !important;
+  opacity: 0.55;
 }
 
 fieldset:disabled {
@@ -27,4 +28,12 @@ textarea {
 
 ::-webkit-input-placeholder {
   color: var(--gray-medium) !important;
+}
+
+mat-form-field {
+  &.g-form-error {
+    .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+      border: 1px solid var(--danger) !important;
+    }
+  }
 }

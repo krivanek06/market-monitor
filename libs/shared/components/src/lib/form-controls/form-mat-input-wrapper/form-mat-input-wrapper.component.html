@@ -6,7 +6,7 @@
         else fieldWhichCannotBeInFormField
       "
       appearance="fill"
-      [ngClass]="{ 'errors-showed': usedFormControl?.touched && usedFormControl?.invalid }"
+      [ngClass]="{ 'g-form-error': parentFormControl?.touched && parentFormControl?.invalid }"
     >
       <!-- label -->
       <mat-label> {{ inputCaption }}</mat-label>
@@ -114,11 +114,6 @@
         matInput
       />
 
-      <!-- errors -->
-      <mat-error *ngFor="let inputError of usedFormControl?.errors | keyvalue" [id]="''">
-        {{ inputError.value.errorText }}
-      </mat-error>
-
       <!-- hint -->
       <mat-hint *ngIf="hintText" class="hidden sm:block text-wt-gray-medium" matSuffix>
         {{ hintText }}
@@ -159,13 +154,19 @@
             </mat-radio-button>
           </mat-radio-group>
         </ng-container>
+
         <!-- errors -->
-        <ng-container *ngIf="shouldBeErrorsShowed">
-          <mat-error *ngFor="let inputError of usedFormControl?.errors | keyvalue" [id]="''">
-            {{ inputError.value.errorText }}
-          </mat-error>
-        </ng-container>
+        <mat-error *ngFor="let inputError of parentFormControl?.errors | keyvalue" [id]="''">
+          {{ inputError.value.errorText }}
+        </mat-error>
       </div>
     </ng-template>
   </ng-container>
 </fieldset>
+
+<!-- errors -->
+<ng-container *ngIf="showErrors">
+  <mat-error *ngFor="let inputError of parentFormControl?.errors | keyvalue" [id]="''">
+    {{ inputError.value.errorText }}
+  </mat-error>
+</ng-container>
