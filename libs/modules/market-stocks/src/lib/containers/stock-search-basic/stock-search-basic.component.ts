@@ -83,7 +83,6 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
 
   onStockSelect(event: MatAutocompleteSelectedEvent): void {
     const stock = event.option.value as StockSummary;
-    console.log(stock);
     this.onChange(stock);
     this.searchControl.setValue('', { emitEvent: true });
   }

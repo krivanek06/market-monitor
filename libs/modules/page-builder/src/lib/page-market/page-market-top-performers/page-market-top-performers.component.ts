@@ -21,9 +21,15 @@ import { DialogServiceModule } from '@market-monitor/shared-utils-client';
     DialogServiceModule,
   ],
   templateUrl: './page-market-top-performers.component.html',
-  styleUrls: ['./page-market-top-performers.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [ShowStockDialogDirective],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
 })
 export class PageMarketTopPerformersComponent {
   marketApiService = inject(MarketApiService);

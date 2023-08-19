@@ -6,7 +6,6 @@ import {
   Input,
   OnChanges,
   OnDestroy,
-  OnInit,
   Output,
   SimpleChanges,
 } from '@angular/core';
@@ -58,7 +57,7 @@ import { ChartType, ChartTypeKeys, GenericChartSeries, GenericChartSeriesPie } f
     </div>
   `,
 })
-export class GenericChartComponent extends ChartConstructor implements OnInit, OnChanges, OnDestroy {
+export class GenericChartComponent extends ChartConstructor implements OnChanges, OnDestroy {
   @Output() expandEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   @Input({ required: true }) series!: GenericChartSeries[] | GenericChartSeriesPie[];
@@ -94,7 +93,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!this.Highcharts) {
+    if (!this.Highcharts || this.platform.isServer) {
       return;
     }
 
@@ -130,12 +129,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
     if (this.categories.length > 0) {
       this.initCategories();
     }
-  }
-
-  ngOnInit() {
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-    }, 300);
   }
 
   expand() {

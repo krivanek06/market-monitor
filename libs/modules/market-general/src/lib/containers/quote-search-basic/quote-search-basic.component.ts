@@ -84,7 +84,6 @@ export class QuoteSearchBasicComponent implements ControlValueAccessor, OnChange
       .getQuotesByType(this.type)
       .pipe(
         tap((quotes) => {
-          console.log(quotes);
           this.options.set(quotes);
           this.showLoadingIndicator.set(false);
         }),
