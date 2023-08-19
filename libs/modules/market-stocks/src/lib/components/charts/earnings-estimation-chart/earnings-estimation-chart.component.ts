@@ -2,11 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ChartConstructor, ColorScheme, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import { roundNDigits } from '@market-monitor/shared-utils-general';
-import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
-import HC_more from 'highcharts/highcharts-more';
-
-HC_more(Highcharts);
 
 @Component({
   selector: 'app-earnings-estimation-chart',

@@ -17,10 +17,8 @@ import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-clie
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
-import HC_stock from 'highcharts/modules/stock';
 import { ChartType, ChartTypeKeys, GenericChartSeries, GenericChartSeriesPie } from './generic-chart.model';
 
-HC_stock(Highcharts);
 @Component({
   selector: 'app-generic-chart',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -400,7 +398,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
               value: 4,
             },
           },
-          colors: Highcharts.map(Highcharts.getOptions().colors as any[], function (color: any) {
+          colors: (Highcharts.getOptions().colors ?? ([] as any[])).map((color) => {
             return {
               radialGradient: {
                 cx: 0.5,

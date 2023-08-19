@@ -11,7 +11,7 @@ import {
   QuoteSearchBasicComponent,
 } from '@market-monitor/modules/market-general';
 import { GeneralCardComponent, GenericChartComponent } from '@market-monitor/shared-components';
-import { PercentageIncreaseDirective } from '@market-monitor/shared-directives';
+import { PercentageIncreaseDirective, RenderClientDirective } from '@market-monitor/shared-directives';
 import { map } from 'rxjs';
 import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skeleton.component';
 
@@ -28,14 +28,22 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     GeneralCardComponent,
     PercentageIncreaseDirective,
     PageMarketOverviewSkeletonComponent,
+    RenderClientDirective,
   ],
   templateUrl: './page-market-overview.component.html',
-  styleUrls: ['./page-market-overview.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
 })
 export class PageMarketOverviewComponent {
   marketApiService = inject(MarketApiService);
   marketDataTransformService = inject(MarketDataTransformService);
+
   selectedIndexSymbolQuoteControl = new FormControl<SymbolQuote | null>(null);
 
   SYMBOL_SP500 = SYMBOL_SP500;

@@ -43,7 +43,16 @@ export class PercentageIncreaseDirective implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // clear previous view -> switching SSR to CSR
+    const childElements = this.vr.element.nativeElement.childNodes;
+    for (let child of childElements) {
+      this.rederer2.removeChild(this.vr.element.nativeElement, child);
+    }
+
     if (this.platform.isServer) {
+      // placeholders while SSR
+      const na = this.rederer2.createText('N/A');
+      this.rederer2.appendChild(this.vr.element.nativeElement, na);
       return;
     }
 

@@ -15,7 +15,13 @@ import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { PreloadAllModules, provideRouter, withInMemoryScrolling, withPreloading } from '@angular/router';
+import {
+  PreloadAllModules,
+  provideRouter,
+  withEnabledBlockingInitialNavigation,
+  withInMemoryScrolling,
+  withPreloading,
+} from '@angular/router';
 import { API_IS_PRODUCTION, ENDPOINT_FUNCTION_URL } from '@market-monitor/api-client';
 // import * as Sentry from '@sentry/angular-ivy';
 import { environment } from '../environments/environment';
@@ -37,7 +43,7 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: 'enabled',
       }),
       // in place of initialNavigation: 'enabledBlocking'
-      // withEnabledBlockingInitialNavigation(),
+      withEnabledBlockingInitialNavigation(),
       // in place of preloadingStrategy: PreloadAllModules
       withPreloading(PreloadAllModules),
     ),
