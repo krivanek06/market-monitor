@@ -15,15 +15,12 @@
       "predeploy": ["yarn nx run market-monitor-cloud-functions:build"]
     }
   ],
-  "database": {
-    "rules": "apps/market-monitor-cloud-functions/database.rules.json"
-  },
   "firestore": {
-    "rules": "apps/market-monitor-cloud-functions/firestore.rules",
-    "indexes": "apps/market-monitor-cloud-functions/firestore.indexes.json"
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   },
   "storage": {
-    "rules": "apps/market-monitor-cloud-functions/storage.rules"
+    "rules": "storage.rules"
   },
   "emulators": {
     "functions": {
