@@ -16,7 +16,7 @@ import {
 } from '@market-monitor/api-types';
 import { Observable, catchError } from 'rxjs';
 import { ApiCacheService } from './api-cache.service';
-import { API_IS_PRODUCTION, ENDPOINT_FUNCTION_URL, constructCFEndpoint } from './api.model';
+import { API_FUNCTION_URL, API_IS_PRODUCTION, constructCFEndpoint } from './api.model';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +24,7 @@ import { API_IS_PRODUCTION, ENDPOINT_FUNCTION_URL, constructCFEndpoint } from '.
 export class StocksApiService extends ApiCacheService {
   constructor(
     private readonly http: HttpClient,
-    @Inject(ENDPOINT_FUNCTION_URL) private readonly endpointFunctions: string,
+    @Inject(API_FUNCTION_URL) private readonly endpointFunctions: string,
     @Inject(API_IS_PRODUCTION) private readonly isProd: boolean,
   ) {
     super(http);

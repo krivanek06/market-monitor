@@ -23,6 +23,10 @@ export class SearchComponent implements OnInit {
   ngOnInit(): void {
     this.metaTagService.addTags([
       {
+        name: 'og:url',
+        content: 'search',
+      },
+      {
         name: 'keywords',
         content: 'Search Stocks',
       },
