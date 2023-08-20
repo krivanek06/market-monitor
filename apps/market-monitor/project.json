@@ -65,7 +65,7 @@
     "prerender": {
       "builder": "@nguniversal/builders:prerender",
       "options": {
-        "routes": ["/", "search", "stock-screener", "market", "top-performers", "calendar"]
+        "routes": ["search", "stock-screener", "market", "top-performers", "calendar"]
       },
       "configurations": {
         "production": {
