@@ -75,6 +75,7 @@ mat-select-trigger {
 
 .cdk-overlay-pane {
   max-width: 99vw !important;
+  min-width: fit-content !important;
 }
 
 .mat-pseudo-checkbox-full {

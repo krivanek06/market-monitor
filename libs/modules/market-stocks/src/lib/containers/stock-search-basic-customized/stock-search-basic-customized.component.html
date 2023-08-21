@@ -17,6 +17,7 @@
 >
   <div
     [style.max-width.px]="overlayWidth() - 20"
+    [style.min-width.px]="overlayWidth() - 20"
     appElementFocus
     (outsideClick)="checkToDisplayOverlay(false, null)"
     class="min-h-[200px] max-h-[400px] bg-wt-gray-light -mt-4 w-full rounded-md mx-auto overflow-y-scroll p-3 shadow-md"

@@ -15,7 +15,7 @@ import {
   SymbolHistoricalPeriods,
   SymbolQuote,
 } from '@market-monitor/api-types';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { ApiCacheService } from './api-cache.service';
 import { API_FUNCTION_URL, API_IS_PRODUCTION, constructCFEndpoint } from './api.model';
 
@@ -59,7 +59,7 @@ export class MarketApiService extends ApiCacheService {
         `news_types=${newsType}&symbol=${symbol}`,
       ),
       this.validity30Min,
-    );
+    ).pipe(catchError(() => of([])));
   }
 
   getMarketOverview(): Observable<MarketOverview> {
