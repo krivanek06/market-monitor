@@ -14,8 +14,8 @@ export const environment = {
   },
 
   endpointFunctionsURL: 'localhost:5001/market-monitor-prod/europe-west3',
+  // endpointFunctionsURL: 'jhgz46ksfq-ey.a.run.app',
 
   production: false,
   version: '1.0.0',
-  environment: 'DEV',
 };

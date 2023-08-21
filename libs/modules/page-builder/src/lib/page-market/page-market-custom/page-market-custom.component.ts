@@ -23,8 +23,14 @@ import { forkJoin, map } from 'rxjs';
     ObjectArrayValueByKeyPipe,
   ],
   templateUrl: './page-market-custom.component.html',
-  styleUrls: ['./page-market-custom.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
 })
 export class PageMarketCustomComponent implements OnInit, RouterManagement {
   marketApiService = inject(MarketApiService);
@@ -51,8 +57,6 @@ export class PageMarketCustomComponent implements OnInit, RouterManagement {
   }
 
   onDataClick(key: MarketOverviewDatabaseKeys, subKey: string, sectionName: string): void {
-    console.log(key, subKey, sectionName);
-
     // if subKey is already selected, remove it
     if (this.selectedOverviewSubKeys().includes(subKey)) {
       this.selectedOverviewSignal.update((prev) => prev.filter((data) => data.subKey !== subKey));
@@ -91,7 +95,7 @@ export class PageMarketCustomComponent implements OnInit, RouterManagement {
           .map((subKey) => getMarketOverKeyBySubKey(subKey))
           .filter(
             // ignoring unknown subKeys
-            (overview): overview is { key: MarketOverviewDatabaseKeys; name: string; subKey: string } => !!overview
+            (overview): overview is { key: MarketOverviewDatabaseKeys; name: string; subKey: string } => !!overview,
           )
           .map((overview) =>
             this.marketApiService
@@ -101,16 +105,14 @@ export class PageMarketCustomComponent implements OnInit, RouterManagement {
                   this.marketDataTransformService.transformMarketOverviewData(
                     overview.name,
                     marketOverviewData,
-                    overview.subKey
-                  )
-                )
-              )
-          )
+                    overview.subKey,
+                  ),
+                ),
+              ),
+          ),
       ).subscribe((marketOverviewData) => {
-        console.log(marketOverviewData);
         this.showLoadingScreenSignal.set(false);
         this.selectedOverviewSignal.update((prev) => [...prev, ...marketOverviewData]);
-        console.log(this.selectedOverviewSignal());
       });
     }
   }

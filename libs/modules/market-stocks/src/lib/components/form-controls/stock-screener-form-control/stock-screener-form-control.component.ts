@@ -25,7 +25,6 @@ import {
   standalone: true,
   imports: [CommonModule, FormMatInputWrapperComponent, ReactiveFormsModule],
   templateUrl: './stock-screener-form-control.component.html',
-  styleUrls: ['./stock-screener-form-control.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
@@ -33,6 +32,13 @@ import {
       useExisting: forwardRef(() => StockScreenerFormControlComponent),
       multi: true,
     },
+  ],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
   ],
 })
 export class StockScreenerFormControlComponent implements OnInit, ControlValueAccessor {

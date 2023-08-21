@@ -6,7 +6,6 @@ import {
   Input,
   OnChanges,
   OnDestroy,
-  OnInit,
   Output,
   SimpleChanges,
 } from '@angular/core';
@@ -17,10 +16,8 @@ import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-clie
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
-import HC_stock from 'highcharts/modules/stock';
 import { ChartType, ChartTypeKeys, GenericChartSeries, GenericChartSeriesPie } from './generic-chart.model';
 
-HC_stock(Highcharts);
 @Component({
   selector: 'app-generic-chart',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,7 +57,7 @@ HC_stock(Highcharts);
     </div>
   `,
 })
-export class GenericChartComponent extends ChartConstructor implements OnInit, OnChanges, OnDestroy {
+export class GenericChartComponent extends ChartConstructor implements OnChanges, OnDestroy {
   @Output() expandEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   @Input({ required: true }) series!: GenericChartSeries[] | GenericChartSeriesPie[];
@@ -96,7 +93,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!this.Highcharts) {
+    if (!this.Highcharts || this.platform.isServer) {
       return;
     }
 
@@ -132,12 +129,6 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
     if (this.categories.length > 0) {
       this.initCategories();
     }
-  }
-
-  ngOnInit() {
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-    }, 300);
   }
 
   expand() {
@@ -400,7 +391,7 @@ export class GenericChartComponent extends ChartConstructor implements OnInit, O
               value: 4,
             },
           },
-          colors: Highcharts.map(Highcharts.getOptions().colors as any[], function (color: any) {
+          colors: (Highcharts.getOptions().colors ?? ([] as any[])).map((color) => {
             return {
               radialGradient: {
                 cx: 0.5,

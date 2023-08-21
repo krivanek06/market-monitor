@@ -60,9 +60,19 @@ import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs'
     DialogServiceModule,
   ],
   templateUrl: './page-market-calendar.component.html',
-  styleUrls: ['./page-market-calendar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [ShowStockDialogDirective],
+  styles: [
+    `
+      :host {
+        @apply mt-10 block;
+      }
+
+      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+      }
+    `,
+  ],
 })
 export class PageMarketCalendarComponent implements OnInit, RouterManagement {
   marketApiService = inject(MarketApiService);
@@ -115,10 +125,7 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
           map((res) => fillOutMissingDatesForMonth(res)),
         ),
       ),
-      tap((e) => {
-        console.log(e);
-        this.loadingSignal.set(false);
-      }),
+      tap(() => this.loadingSignal.set(false)),
     ),
     { initialValue: [] },
   );

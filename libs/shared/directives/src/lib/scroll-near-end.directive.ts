@@ -1,4 +1,5 @@
-import { Directive, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Directive, ElementRef, EventEmitter, HostListener, Inject, Input, OnInit, Output } from '@angular/core';
 
 @Directive({
   selector: '[appScrollNearEnd]',
@@ -12,17 +13,26 @@ export class ScrollNearEndDirective implements OnInit {
    */
   @Input() threshold = 50;
 
-  private window!: Window;
+  private window?: Window;
 
-  constructor(private el: ElementRef) {}
+  constructor(
+    @Inject(DOCUMENT) private document: Document,
+    private el: ElementRef,
+  ) {}
 
   ngOnInit(): void {
-    // save window object for type safety
-    this.window = window;
+    // save window object for type safety if not ssr
+    if (this.document.defaultView) {
+      this.window = this.document.defaultView;
+    }
   }
 
   @HostListener('window:scroll', ['$event.target'])
   windowScrollEvent(event: KeyboardEvent) {
+    if (!this.window) {
+      return;
+    }
+
     // height of whole window page
     const heightOfWholePage = this.window.document.documentElement.scrollHeight;
 

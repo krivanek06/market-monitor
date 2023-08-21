@@ -1,3 +1,8 @@
+// used because of firebase functions
+// url: https://fireship.io/lessons/angular-universal-firebase/
+(global as any).WebSocket = require('ws');
+(global as any).XMLHttpRequest = require('xhr2');
+
 import 'zone.js/node';
 
 import { APP_BASE_HREF } from '@angular/common';
@@ -5,12 +10,17 @@ import { ngExpressEngine } from '@nguniversal/express-engine';
 import * as express from 'express';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { environment } from './environments/environment';
 import bootstrap from './main.server';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
   const server = express();
-  const distFolder = join(process.cwd(), 'dist/apps/market-monitor/browser');
+
+  // production deployment is via cloud function so we need to change the location of the website files
+  const websiteFileLocation = environment.production ? 'browser' : 'dist/apps/market-monitor/browser';
+  const distFolder = join(process.cwd(), websiteFileLocation);
+
   const indexHtml = existsSync(join(distFolder, 'index.original.html')) ? 'index.original.html' : 'index';
 
   // Our Universal express-engine (found @ https://github.com/angular/universal/tree/main/modules/express-engine)
@@ -40,6 +50,7 @@ export function app(): express.Express {
   return server;
 }
 
+// commented out because of firebase functions
 function run(): void {
   const port = process.env['PORT'] || 4200;
 
@@ -57,7 +68,11 @@ declare const __non_webpack_require__: NodeRequire;
 const mainModule = __non_webpack_require__.main;
 const moduleFilename = (mainModule && mainModule.filename) || '';
 if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
-  run();
+  // run the server locally
+  // in production the server is run via firebase functions
+  if (!environment.production) {
+    run();
+  }
 }
 
 export * from './main.server';

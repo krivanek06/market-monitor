@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { generalNewsResolver } from '@market-monitor/modules/page-builder';
+import { MarketApiService } from '@market-monitor/api-client';
 import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
 
 @Component({
@@ -10,11 +10,11 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
   imports: [CommonModule, RouterModule],
   template: `
     <nav class="flex justify-center gap-4 pt-8 text-wt-gray-medium">
-      <a [routerLink]="ROUTES_PUBLIC_ROUTES.SEARCH" routerLinkActive="is-active">Search</a>
-      <a [routerLink]="ROUTES_PUBLIC_ROUTES.STOCK_SCREENER" routerLinkActive="is-active">Screener</a>
-      <a [routerLink]="ROUTES_PUBLIC_ROUTES.TOP_PERFORMERS" routerLinkActive="is-active">Top Performers</a>
-      <a [routerLink]="ROUTES_PUBLIC_ROUTES.MARKET" routerLinkActive="is-active">Market</a>
-      <a [routerLink]="ROUTES_PUBLIC_ROUTES.MARKET_CALENDAR" routerLinkActive="is-active">Calendar</a>
+      <a [routerLink]="[ROUTES_PUBLIC_ROUTES.SEARCH]" routerLinkActive="is-active">Search</a>
+      <a [routerLink]="[ROUTES_PUBLIC_ROUTES.STOCK_SCREENER]" routerLinkActive="is-active">Screener</a>
+      <a [routerLink]="[ROUTES_PUBLIC_ROUTES.TOP_PERFORMERS]" routerLinkActive="is-active">Top Performers</a>
+      <a [routerLink]="[ROUTES_PUBLIC_ROUTES.MARKET]" routerLinkActive="is-active">Market</a>
+      <a [routerLink]="[ROUTES_PUBLIC_ROUTES.MARKET_CALENDAR]" routerLinkActive="is-active">Calendar</a>
       <!-- <a [routerLink]="ROUTES_PUBLIC_ROUTES.CRYPTO" routerLinkActive="is-active">Crypto</a> -->
     </nav>
 
@@ -57,7 +57,10 @@ export const route: Routes = [
         path: ROUTES_PUBLIC_ROUTES.SEARCH,
         title: 'Search',
         resolve: {
-          generalNews: generalNewsResolver,
+          generalNews: () => {
+            const marketApiService = inject(MarketApiService);
+            return marketApiService.getNews('general');
+          },
         },
         loadComponent: () => import('./subpages/search.component').then((m) => m.SearchComponent),
       },

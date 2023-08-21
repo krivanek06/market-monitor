@@ -15,9 +15,9 @@ import {
   SymbolHistoricalPeriods,
   SymbolQuote,
 } from '@market-monitor/api-types';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { ApiCacheService } from './api-cache.service';
-import { API_IS_PRODUCTION, ENDPOINT_FUNCTION_URL, constructCFEndpoint } from './api.model';
+import { API_FUNCTION_URL, API_IS_PRODUCTION, constructCFEndpoint } from './api.model';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +25,7 @@ import { API_IS_PRODUCTION, ENDPOINT_FUNCTION_URL, constructCFEndpoint } from '.
 export class MarketApiService extends ApiCacheService {
   constructor(
     private readonly http: HttpClient,
-    @Inject(ENDPOINT_FUNCTION_URL) private readonly endpointFunctions: string,
+    @Inject(API_FUNCTION_URL) private readonly endpointFunctions: string,
     @Inject(API_IS_PRODUCTION) private readonly isProd: boolean,
   ) {
     super(http);
@@ -59,7 +59,7 @@ export class MarketApiService extends ApiCacheService {
         `news_types=${newsType}&symbol=${symbol}`,
       ),
       this.validity30Min,
-    );
+    ).pipe(catchError(() => of([])));
   }
 
   getMarketOverview(): Observable<MarketOverview> {
@@ -86,11 +86,10 @@ export class MarketApiService extends ApiCacheService {
 
   getQuotesBySymbols(symbols: string[]): Observable<SymbolQuote[]> {
     const symbolString = symbols.join(',');
-    return this.http
-      .get<SymbolQuote[]>(
-        constructCFEndpoint(this.isProd, this.endpointFunctions, 'getquotesbysymbols', `symbol=${symbolString}`),
-      )
-      .pipe(map((data) => data.filter((quote) => !!quote.price && !!quote.name)));
+    return this.getData<SymbolQuote[]>(
+      constructCFEndpoint(this.isProd, this.endpointFunctions, 'getquotesbysymbols', `symbol=${symbolString}`),
+      this.validity5Min,
+    ).pipe(map((data) => data.filter((quote) => !!quote.price && !!quote.name)));
   }
 
   getQuoteBySymbol(symbol: string): Observable<SymbolQuote | null> {

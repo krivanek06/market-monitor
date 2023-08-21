@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { PlatformService } from '@market-monitor/shared-services';
 import * as Highcharts from 'highcharts';
+import HC_more from 'highcharts/highcharts-more';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 
 export abstract class ChartConstructor {
@@ -22,8 +23,13 @@ export abstract class ChartConstructor {
   isHighcharts = this.platform.isBrowser;
 
   constructor() {
+    if (this.platform.isServer) {
+      return;
+    }
+
     // used in constructor to avoid SSR error
     NoDataToDisplay(Highcharts);
+    HC_more(Highcharts);
 
     Highcharts.setOptions({
       lang: {
