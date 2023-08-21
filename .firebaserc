@@ -5,8 +5,8 @@
   "targets": {
     "market-monitor-prod": {
       "hosting": {
-        "market-monitor": [
-          "market-monitor-prod.web.app"
+        "market-monitor-prod": [
+          "market-monitor-prod"
         ]
       }
     }

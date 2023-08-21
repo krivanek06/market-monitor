@@ -1,5 +1,6 @@
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
 import * as admin from 'firebase-admin';
+import { onRequest } from 'firebase-functions/v2/https';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
 
 const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
@@ -38,6 +39,10 @@ admin.firestore().settings({
 // must be below setGlobalOptions otherwise it will not set the region
 export * from './functions-public';
 export * from './functions-scheduled';
+
+//const universal = require(`${process.cwd()}/dist/server`).app;
+const universal = require(`${process.cwd()}/server/main`).app();
+export const ssr = onRequest(universal);
 
 // ONLY ALLOW IN LOCAL
 // export * from './functions-admin';
