@@ -38,6 +38,14 @@ export const getMarketNewsWrapper = async (request: Request, response: Response<
     return;
   }
 
+  // general news are always present in database, so we don't have to wait for update
+  // and we can return older data immediately
+  const earlyReturn = newsTypes === 'general' && marketNewsData;
+
+  if (earlyReturn) {
+    response.send(marketNewsData.data);
+  }
+
   // resolve what news have to be fetched based on newsTypes and symbol
   const news = await fetchNewsForType(newsTypes, symbol);
 
@@ -48,7 +56,9 @@ export const getMarketNewsWrapper = async (request: Request, response: Response<
   });
 
   // return data
-  response.send(news);
+  if (!earlyReturn) {
+    response.send(news);
+  }
 };
 
 const resolveDatabaseNewsPath = (

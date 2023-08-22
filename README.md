@@ -1,6 +1,10 @@
 ## Deployment
 
-To target firebase hosting fir a specific app, run: ` firebase target:apply hosting market-monitor <name>`
+### Deploying SSR
+
+- `yarn mm:build:ssr`
+- `yarn mm:cloud-function:build`
+- `firebase deploy --only hosting:market-monitor-prod,functions`
 
 ## Errors
 

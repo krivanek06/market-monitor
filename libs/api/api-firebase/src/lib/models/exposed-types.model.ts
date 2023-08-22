@@ -1,9 +1,9 @@
 import { FirebaseNewsTypes } from '@market-monitor/api-types';
 
-export interface DataSnapshot<T> {
+export type DataSnapshot<T> = {
   lastUpdate: string;
   data: T;
-}
+};
 
 export enum HistoricalPriceFields {
   historical_1d = 'historical_price_1d',

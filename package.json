@@ -11,7 +11,7 @@
     "mm:build-sentry:ssr": "yarn mm:build:ssr && yarn run sentry:sourcemaps",
     "mm:deploy:ssr": "nx build market-monitor && firebase target:apply hosting market-monitor market-monitor-prod && firebase deploy --only hosting:market-monitor-prod",
     "mm:deploy-sentry:ssr": "nx build market-monitor && yarn run sentry:sourcemaps && firebase target:apply hosting market-monitor market-monitor-prod && firebase deploy --only hosting:market-monitor-prod",
-    "mm:cloud-function:build": "nx build market-monitor-cloud-functions && node cp-angular",
+    "mm:cloud-function:build": "nx build market-monitor-cloud-functions --prod && node cp-angular",
     "mm:cloud-function:serve": "yarn mm:cloud-function:build && firebase emulators:start --only functions",
     "mm:cloud-function:kill": "kill -9 $(lsof -ti:4000,4001)",
     "mm:cloud-function:debug": "yarn mm:cloud-function:build && firebase emulators:start --only functions --inspect-functions",
