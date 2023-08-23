@@ -1,9 +1,9 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 /**
- * every 10minutes ping some critical firebase functions to minimize cold start
+ * every 5minutes ping some critical firebase functions to minimize cold start
  */
-export const run_warm_function_start = onSchedule('10 * * * *', async (event) => {
+export const run_warm_function_start = onSchedule('5 * * * *', async (event) => {
   console.log('Pinging functions');
 
   const ssrUniversal = 'https://ssr-jhgz46ksfq-ey.a.run.app';
