@@ -1,42 +1,48 @@
 import { getDatabaseMarketOverviewRef } from '@market-monitor/api-firebase';
 import { MarketOverview, MarketOverviewData, marketOverviewToLoad } from '@market-monitor/api-types';
 import { delaySeconds } from '@market-monitor/shared-utils-general';
-import { Response } from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { loadMarketOverviewData } from '../shared';
 
-export const rungetmarketoverview = onRequest(async (request, response: Response<string>) => {
-  const hardReload = request.query.hardReload as string;
+/**
+ * each week At 22:00 on Friday.”
+ */
+export const run_reload_market_overview = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '0 22 * * 5',
+  },
+  async (event) => {
+    const marketOverviewRef = getDatabaseMarketOverviewRef();
+    const marketOverviewData = (await marketOverviewRef.get()).data();
 
-  const marketOverviewRef = getDatabaseMarketOverviewRef();
-  const marketOverviewData = (await marketOverviewRef.get()).data();
+    // reload data from api
+    const loadedData = await reloadMarketOverview(marketOverviewData);
 
-  // reload data from api
-  const loadedData = await reloadMarketOverview(hardReload === 'true', marketOverviewData);
+    // save, but keep old data if fails
+    await marketOverviewRef.set(loadedData, { merge: true });
 
-  // save, but keep old data if fails
-  await marketOverviewRef.set(loadedData, { merge: true });
+    // send notification to user
+    console.log('function rungetmarketoverview finished successfully');
+  },
+);
 
-  // send notification to user
-  response.send('function rungetmarketoverview finished successfully');
-});
-
-const reloadMarketOverview = async (
-  hardReload: boolean,
-  oldMarketOverview?: MarketOverview
-): Promise<MarketOverview> => {
-  const waitingSeconds = 18;
+const reloadMarketOverview = async (oldMarketOverview?: MarketOverview): Promise<MarketOverview> => {
+  const waitingSeconds = 12;
   const datasetLimit = 75;
 
   // helper function to create correct data format
   const dataFormatter = <T extends keyof MarketOverview>(data: MarketOverviewData[], mainKey: T) => {
-    return data.reduce((acc, cur, index) => {
-      // create new data if exists or use old data - API can return null values if fails
-      const overview: MarketOverviewData = cur
-        ? { ...cur, data: cur.data.slice(0, datasetLimit), dates: cur.dates.slice(0, datasetLimit) }
-        : oldMarketOverview[mainKey][oldMarketOverview[mainKey][index]] ?? null;
-      return { ...acc, [marketOverviewToLoad[mainKey][index]]: overview };
-    }, {} as { [K in keyof MarketOverview[T]]: MarketOverviewData });
+    return data.reduce(
+      (acc, cur, index) => {
+        // create new data if exists or use old data - API can return null values if fails
+        const overview: MarketOverviewData = cur
+          ? { ...cur, data: cur.data.slice(0, datasetLimit), dates: cur.dates.slice(0, datasetLimit) }
+          : oldMarketOverview[mainKey][oldMarketOverview[mainKey][index]] ?? null;
+        return { ...acc, [marketOverviewToLoad[mainKey][index]]: overview };
+      },
+      {} as { [K in keyof MarketOverview[T]]: MarketOverviewData },
+    );
   };
 
   // create function to generate random number between 0 and 15
@@ -46,9 +52,9 @@ const reloadMarketOverview = async (
   console.log('loading data for SP500');
   const sp500Data = dataFormatter(
     await Promise.all(
-      marketOverviewToLoad.sp500.map((subKey) => loadMarketOverviewData('sp500', subKey, hardReload, randomWait()))
+      marketOverviewToLoad.sp500.map((subKey) => loadMarketOverviewData('sp500', subKey, true, randomWait())),
     ),
-    'sp500'
+    'sp500',
   );
   console.log('sp500 data loaded');
   console.log(`waiting ${waitingSeconds} seconds finished`);
@@ -57,9 +63,9 @@ const reloadMarketOverview = async (
   console.log('loading data for bonds');
   const bondsData = dataFormatter(
     await Promise.all(
-      marketOverviewToLoad.bonds.map((subKey) => loadMarketOverviewData('bonds', subKey, hardReload, randomWait()))
+      marketOverviewToLoad.bonds.map((subKey) => loadMarketOverviewData('bonds', subKey, true, randomWait())),
     ),
-    'bonds'
+    'bonds',
   );
   console.log('bonds data loaded');
   console.log(`waiting ${waitingSeconds} seconds finished`);
@@ -68,11 +74,9 @@ const reloadMarketOverview = async (
   console.log('loading data for treasury');
   const treasuryData = dataFormatter(
     await Promise.all(
-      marketOverviewToLoad.treasury.map((subKey) =>
-        loadMarketOverviewData('treasury', subKey, hardReload, randomWait())
-      )
+      marketOverviewToLoad.treasury.map((subKey) => loadMarketOverviewData('treasury', subKey, true, randomWait())),
     ),
-    'treasury'
+    'treasury',
   );
   console.log('treasury data loaded');
   console.log(`waiting ${waitingSeconds} seconds finished`);
@@ -82,10 +86,10 @@ const reloadMarketOverview = async (
   const inflationRateData = dataFormatter(
     await Promise.all(
       marketOverviewToLoad.inflationRate.map((subKey) =>
-        loadMarketOverviewData('inflationRate', subKey, hardReload, randomWait())
-      )
+        loadMarketOverviewData('inflationRate', subKey, true, randomWait()),
+      ),
     ),
-    'inflationRate'
+    'inflationRate',
   );
   console.log('inflationRate data loaded');
   console.log(`waiting ${waitingSeconds} seconds finished`);
@@ -95,10 +99,10 @@ const reloadMarketOverview = async (
   const consumerIndexData = dataFormatter(
     await Promise.all(
       marketOverviewToLoad.consumerIndex.map((subKey) =>
-        loadMarketOverviewData('consumerIndex', subKey, hardReload, randomWait())
-      )
+        loadMarketOverviewData('consumerIndex', subKey, true, randomWait()),
+      ),
     ),
-    'consumerIndex'
+    'consumerIndex',
   );
   console.log('consumerIndex data loaded');
 
