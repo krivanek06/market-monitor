@@ -141,6 +141,7 @@
     <!-- upgrades & downgrades -->
     <app-general-card title="Upgrades & Downgrades" class="lg:col-span-2">
       <app-stock-upgrades-downgrades-table
+        *ngIf="stockDetailsSignal.upgradesDowngrades.length > 0"
         [data]="stockDetailsSignal.upgradesDowngrades | slice: 0 : 12"
         [currentPrice]="stockDetailsSignal.quote.price"
       ></app-stock-upgrades-downgrades-table>
@@ -150,6 +151,7 @@
     <app-general-card additionalClasses="h-full" title="Peers" class="hidden lg:block">
       <ng-container *ngIf="stockPeersSignal() as stockPeersSignal">
         <app-stock-peers-list
+          *ngIf="stockPeersSignal.length > 0"
           (clickedEmitter)="onShowSummary($event)"
           [peers]="stockPeersSignal | slice: 0 : 12"
         ></app-stock-peers-list>

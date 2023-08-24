@@ -22,19 +22,22 @@
   (nearEnd)="onNearEndScroll()"
   class="grid grid-cols-1 lg:grid-cols-2"
 >
-  <article *ngFor="let news of marketStockNewsSignal()?.slice(0, maximumNewsDisplayed())" class="inline-block m-2">
+  <article
+    *ngFor="let news of marketStockNewsSignal()?.slice(0, maximumNewsDisplayed())"
+    class="inline-block m-2 transition-all duration-300 group hover:scale-95"
+  >
     <a
-      class="flex items-start gap-3 pt-2 pb-4 pl-2 pr-4 transition-all duration-500 rounded-md hover:bg-wt-gray-light group"
+      class="flex items-start gap-3 pt-2 pb-4 pl-2 pr-4 transition-all duration-500 rounded-md hover:bg-wt-gray-light"
       target="_blank"
       [href]="news.url"
     >
-      <img appDefaultImg [src]="news.image" [alt]="news.title" class="h-20 w-36" />
+      <img appDefaultImg [src]="news.image" [alt]="news.title" class="h-20 w-36 min-w-[9rem]" />
       <div class="flex flex-col">
-        <div class="text-base text-wt-gray-dark group-hover:text-wt-gray-dark-strong">
+        <div class="text-base text-wt-gray-dark group-hover:text-wt-primary">
           {{ news.title }}
         </div>
-        <div class="space-x-1 text-xs text-wt-gray-medium group-hover:text-wt-gray-dark-strong">
-          <span class="text-wt-gray-dark">{{ news.site }}</span>
+        <div class="space-x-1 text-xs text-wt-gray-medium">
+          <span>{{ news.site }}</span>
           <span>●</span>
           <span>{{ news.publishedDate | dateAgo }}</span>
         </div>
