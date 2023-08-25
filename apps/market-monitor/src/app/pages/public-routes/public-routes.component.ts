@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
+import { environment } from 'apps/market-monitor/src/environments/environment';
 import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
 
 @Component({
@@ -9,7 +10,8 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <nav class="flex justify-center gap-4 pt-8 text-wt-gray-medium">
+    <nav class="flex justify-center gap-4 pt-8 text-wt-gray-medium relative">
+      <span class="absolute left-4 text-wt-gray-medium text-xs">Version {{ version }}</span>
       <a [routerLink]="[ROUTES_PUBLIC_ROUTES.SEARCH]" routerLinkActive="is-active">Search</a>
       <a [routerLink]="[ROUTES_PUBLIC_ROUTES.STOCK_SCREENER]" routerLinkActive="is-active">Screener</a>
       <a [routerLink]="[ROUTES_PUBLIC_ROUTES.TOP_PERFORMERS]" routerLinkActive="is-active">Top Performers</a>
@@ -29,7 +31,7 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
       }
 
       a {
-        @apply transition-all duration-300 text-sm hover:text-wt-gray-dark-strong;
+        @apply transition-all duration-300 text-base hover:text-wt-gray-dark-strong;
       }
 
       a.is-active {
@@ -41,6 +43,7 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
 })
 export class PublicRoutesComponent {
   ROUTES_PUBLIC_ROUTES = ROUTES_PUBLIC_ROUTES;
+  version = environment.version;
 }
 
 export const route: Routes = [

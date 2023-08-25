@@ -74,13 +74,13 @@ export class StockSummaryDialogComponent {
   }
 
   onDetailsRedirect(): void {
-    // routing kept here, because component is used in multiple places
-    this.route.navigate(['stock-details', this.data.symbol]);
-
     // scroll to top
     this.viewPortScroller.scrollToPosition([0, 0]);
 
     // close dialog
-    this.dialogRef.close();
+    this.dialogRef.close({ redirect: true });
+
+    // routing kept here, because component is used in multiple places
+    this.route.navigate(['stock-details', this.data.symbol]);
   }
 }

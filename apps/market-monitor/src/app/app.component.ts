@@ -17,7 +17,9 @@ import { LoaderMainService } from '@market-monitor/shared-services';
         <mat-spinner></mat-spinner>
       </div>
 
-      <router-outlet></router-outlet>
+      <div [ngClass]="{ hidden: loadingSignal() }">
+        <router-outlet></router-outlet>
+      </div>
     </main>
   `,
   styles: [

@@ -11,7 +11,7 @@ import {
   QuoteSearchBasicComponent,
 } from '@market-monitor/modules/market-general';
 import { GeneralCardComponent, GenericChartComponent } from '@market-monitor/shared-components';
-import { PercentageIncreaseDirective, RenderClientDirective } from '@market-monitor/shared-directives';
+import { PercentageIncreaseDirective, RangeDirective, RenderClientDirective } from '@market-monitor/shared-directives';
 import { map } from 'rxjs';
 import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skeleton.component';
 
@@ -29,6 +29,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     PercentageIncreaseDirective,
     PageMarketOverviewSkeletonComponent,
     RenderClientDirective,
+    RangeDirective,
   ],
   templateUrl: './page-market-overview.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

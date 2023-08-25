@@ -2,6 +2,7 @@ import { Directive, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CalendarDividend, CalendarStockEarning } from '@market-monitor/api-types';
 import { SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
+import { Observable, map } from 'rxjs';
 import {
   DividendItemsDialogComponent,
   EarningsHistoricalDialogComponent,
@@ -17,13 +18,16 @@ export class ShowStockDialogDirective {
 
   constructor() {}
 
-  onShowSummary(symbol: string): void {
-    this.dialog.open(StockSummaryDialogComponent, {
-      data: {
-        symbol: symbol,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
+  onShowSummary(symbol: string): Observable<boolean> {
+    return this.dialog
+      .open(StockSummaryDialogComponent, {
+        data: {
+          symbol: symbol,
+        },
+        panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+      })
+      .afterClosed()
+      .pipe(map((res) => !!res?.['redirect']));
   }
 
   onMoreDividends(data: CalendarDividend[]): void {
