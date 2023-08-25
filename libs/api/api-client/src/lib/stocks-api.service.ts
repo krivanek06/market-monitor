@@ -82,9 +82,10 @@ export class StocksApiService extends ApiCacheService {
   }
 
   getStockScreening(screeningValue: StockScreenerValues): Observable<StockSummary[]> {
-    return this.http.post<StockSummary[]>(
+    return this.postData<StockSummary[], StockScreenerValues>(
       constructCFEndpoint(this.isProd, this.endpointFunctions, 'getstockscreening'),
       screeningValue,
+      this.validity5Min,
     );
   }
 

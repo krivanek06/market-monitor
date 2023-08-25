@@ -3,6 +3,7 @@
 <mat-dialog-content>
   <app-dividend-item
     *ngFor="let dividend of data.dividends; let last = last"
+    (itemClickedEmitter)="onDividendClicked(dividend)"
     [dividend]="dividend"
     [showBorder]="!last"
   ></app-dividend-item>

@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-client';
 import { FirebaseNewsTypes, News, firebaseNewsAcceptableTypes } from '@market-monitor/api-types';
 import { FormMatInputWrapperComponent, InputSource } from '@market-monitor/shared-components';
-import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared-directives';
+import { DefaultImgDirective, RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared-directives';
 import { DateAgoPipe, TruncateWordsPipe } from '@market-monitor/shared-pipes';
 import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
 
@@ -22,6 +22,7 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
     ScrollNearEndDirective,
     DateAgoPipe,
     TruncateWordsPipe,
+    DefaultImgDirective,
   ],
   templateUrl: './news-search.component.html',
   styles: [

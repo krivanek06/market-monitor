@@ -65,7 +65,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
   @Input() chartType: ChartType | ChartTypeKeys = ChartType.line;
   @Input() chartTitle = '';
   @Input() chartTitlePosition = 'left';
-  @Input() showTimelineSlider = false;
+  @Input() enableZoom = false;
   @Input() showTooltip = true;
   @Input() showDataLabel = false;
   @Input() categories: string[] = [];
@@ -151,25 +151,11 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
       chart: {
         type: this.chartType === ChartType.areaChange ? ChartType.areaspline : this.chartType,
         backgroundColor: 'transparent',
-        zooming: {
-          mouseWheel: false,
-        },
-      },
-      navigator: {
-        enabled: this.showTimelineSlider,
-        xAxis: {
-          labels: {
-            formatter: function () {
-              return '';
-            },
-          },
-        },
-      },
-      scrollbar: {
-        enabled: this.showTimelineSlider,
-      },
-      rangeSelector: {
-        enabled: false,
+        // zooming: {
+        //   type: 'x',
+        //   key: 'shift',
+        //   mouseWheel: this.enableZoom,
+        // },
       },
       yAxis: {
         title: {

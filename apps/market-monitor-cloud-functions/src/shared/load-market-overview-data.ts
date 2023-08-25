@@ -49,7 +49,7 @@ export const loadMarketOverviewData = async (
   }
 
   // resolve endpoint
-  console.log(`API call for ${key} - ${subKey}`);
+  // console.log(`API call for ${key} - ${subKey}`);
   const apiData = await loadDataFromEndpoint(subKey, url);
 
   // save data to DB

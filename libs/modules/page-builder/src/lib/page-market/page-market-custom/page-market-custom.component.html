@@ -1,9 +1,9 @@
 <!-- chart -->
 <div class="relative w-full mb-10" [ngClass]="{ 'g-shadow-background': showLoadingScreenSignal() }">
   <app-generic-chart
-    [series]="selectedOverviewSignal() | objectArrayValuesByKey : 'chartData'"
-    [heightPx]="400"
-    [showTimelineSlider]="true"
+    [series]="selectedOverviewSignal() | objectArrayValuesByKey: 'chartData'"
+    [heightPx]="450"
+    [enableZoom]="true"
     [enableLegendTogging]="true"
     [showLegend]="true"
     [shareTooltip]="false"
@@ -22,7 +22,7 @@
         (click)="onDataClick(section.key, data.subKey, data.name)"
         mat-button
         type="button"
-        [color]="(selectedOverviewSubKeys() | inArray : data.subKey) ? 'primary' : ''"
+        [color]="(selectedOverviewSubKeys() | inArray: data.subKey) ? 'primary' : ''"
         class="text-sm"
       >
         {{ data.name }}

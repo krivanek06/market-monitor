@@ -5,11 +5,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PriceTarget } from '@market-monitor/api-types';
 import { PercentageIncreaseDirective } from '@market-monitor/shared-directives';
+import { SplitStringPipe } from '@market-monitor/shared-pipes';
 
 @Component({
   selector: 'app-stock-price-target-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, PercentageIncreaseDirective],
+  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, PercentageIncreaseDirective, SplitStringPipe],
   templateUrl: './stock-price-target-table.component.html',
   styleUrls: ['./stock-price-target-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

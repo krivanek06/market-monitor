@@ -61,6 +61,30 @@ export abstract class ApiCacheService {
     return this.httpClient.post<T>(`${url}`, JSON.stringify(data), { headers: this.headers });
   }
 
+  postData<T, D>(url: string, data?: D, validityDefault = this.validity1Min): Observable<T> {
+    // create hash
+    const key = `${url}${JSON.stringify(data)}`;
+
+    // data cached
+    if (this.checkDataAndValidity(key)) {
+      const data = this.cache.get(key) as { data: any; validity: number };
+      return of(data.data);
+    }
+
+    // calculate validity
+    const validity = validityDefault * this.validityOneMinute;
+
+    return this.httpClient.post<T>(`${url}`, data, { headers: this.headers }).pipe(
+      retry(1),
+      tap((data) => {
+        this.cache.set(key, {
+          data,
+          validity: Date.now() + validity,
+        });
+      }),
+    );
+  }
+
   put<T, D>(url: string, data: D): Observable<T> {
     return this.httpClient.put<T>(`${url}`, JSON.stringify(data), {
       headers: this.headers,
@@ -83,5 +107,11 @@ export abstract class ApiCacheService {
       return false;
     }
     return isBefore(Date.now(), data.validity);
+  }
+
+  // TODO create function that each minute will check if data is still valid
+  // if not, remove from cache
+  checkDataValidity() {
+    // todo
   }
 }

@@ -19,7 +19,7 @@ admin.initializeApp({
 });
 
 // firebase functions region
-setGlobalOptions({ region: 'europe-west3' });
+setGlobalOptions({ region: 'europe-west3', maxInstances: 5 });
 
 // sentry - not yet setup
 // GCPFunction.init({
@@ -40,7 +40,7 @@ admin.firestore().settings({
 export * from './functions-public';
 export * from './functions-scheduled';
 
-//const universal = require(`${process.cwd()}/dist/server`).app;
+// function for SSR
 const universal = require(`${process.cwd()}/server/main`).app();
 export const ssr = onRequest(universal);
 

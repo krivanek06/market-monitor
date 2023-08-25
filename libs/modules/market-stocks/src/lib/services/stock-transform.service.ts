@@ -80,14 +80,14 @@ export class StockTransformService {
 
     const enterprise = `${formatLargeNumber(data.companyKeyMetricsTTM.enterpriseValueTTM)} (${roundNDigits(
       data.ratio.enterpriseValueMultipleTTM,
-      2
+      2,
     )})`;
     const stockBasedCompensation = `${formatLargeNumber(
-      data.additionalFinancialData.stockBasedCompensation
+      data.additionalFinancialData.stockBasedCompensation,
     )} (${roundNDigits(data.companyKeyMetricsTTM.stockBasedCompensationToRevenueTTM, 2)})`;
     const totalEquity = `${formatLargeNumber(data.companyKeyMetricsTTM.tangibleAssetValueTTM)} (${roundNDigits(
       data.ratio.companyEquityMultiplierTTM,
-      2
+      2,
     )})`;
 
     return [
@@ -206,17 +206,17 @@ export class StockTransformService {
 
     const payables = `${formatLargeNumber(data.companyKeyMetricsTTM.averagePayablesTTM)} (${roundNDigits(
       data.ratio.payablesTurnoverTTM,
-      2
+      2,
     )})`;
 
     const inventory = `${formatLargeNumber(data.companyKeyMetricsTTM.averageInventoryTTM)} (${roundNDigits(
       data.ratio.inventoryTurnoverTTM,
-      2
+      2,
     )})`;
 
     const receivables = `${formatLargeNumber(data.companyKeyMetricsTTM.averageReceivablesTTM)} (${roundNDigits(
       data.ratio.receivablesTurnoverTTM,
-      2
+      2,
     )})`;
 
     return [
@@ -242,12 +242,12 @@ export class StockTransformService {
     const dividendPaid = `${formatLargeNumber(Math.abs(dividendData.dividendsPaid))} (${roundNDigits(
       dividendData.payoutRatioTTM,
       2,
-      true
+      true,
     )}%)`;
 
     return [
       { name: 'Paid Dividends (Percent)', value: dividendPaid },
-      { name: 'Dividend / Share', value: dividendData.dividendPerShareTTM },
+      { name: 'Dividend / Share', value: roundNDigits(dividendData.dividendPerShareTTM, 2) },
       { name: 'Dividend Yield', value: `${roundNDigits(dividendData.dividendYielPercentageTTM, 2)}%` },
       ...stockDividends.map((d) => ({ name: d.label, value: d.dividend })),
     ];

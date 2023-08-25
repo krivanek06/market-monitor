@@ -1,1 +1,1 @@
-export * from './stock-details-resolver';
+export * from './stock-details.resolver';

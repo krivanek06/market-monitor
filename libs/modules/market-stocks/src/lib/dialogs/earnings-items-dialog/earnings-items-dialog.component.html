@@ -11,6 +11,7 @@
   </div>
   <app-earnings-item
     *ngFor="let earning of data.earnings; let last = last"
+    (itemClickedEmitter)="onEarningsClicked(earning)"
     [earning]="earning"
     [showBorder]="!last"
     [showRevenue]="true"
