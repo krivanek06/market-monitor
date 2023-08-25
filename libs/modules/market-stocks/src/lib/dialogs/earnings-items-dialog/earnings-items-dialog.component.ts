@@ -18,12 +18,16 @@ export class EarningsItemsDialogComponent {
   constructor(
     private dialogRef: MatDialogRef<EarningsItemsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { earnings: (StockEarning | CalendarStockEarning)[]; showDate: boolean },
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
   ) {}
 
   get dialogTitle(): string {
     return this.data.showDate && this.data.earnings.length > 0
       ? `Earnings: ${this.datePipe.transform(this.data.earnings[0].date, 'd. MMMM, y (EEEE)')}`
       : 'Earnings';
+  }
+
+  onEarningsClicked(earning: StockEarning | CalendarStockEarning): void {
+    this.dialogRef.close({ earning });
   }
 }

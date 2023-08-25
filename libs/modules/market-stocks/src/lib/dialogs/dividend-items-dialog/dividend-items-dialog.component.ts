@@ -18,12 +18,16 @@ export class DividendItemsDialogComponent {
   constructor(
     private dialogRef: MatDialogRef<DividendItemsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { dividends: (CalendarDividend | CompanyStockDividend)[]; showDate: boolean },
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
   ) {}
 
   get dialogTitle(): string {
     return this.data.showDate && this.data.dividends.length > 0
       ? `Dividends: ${this.datePipe.transform(this.data.dividends[0].date, 'd. MMMM, y (EEEE)')}`
       : 'Dividends';
+  }
+
+  onDividendClicked(dividend: CalendarDividend | CompanyStockDividend): void {
+    this.dialogRef.close({ dividend });
   }
 }
