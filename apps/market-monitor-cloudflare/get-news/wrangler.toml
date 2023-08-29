@@ -1,6 +1,9 @@
 name = "get-news"
 main = "src/worker.ts"
 compatibility_date = "2023-08-21"
+kv_namespaces = [
+	{ binding = "getnews", id = "ec4eb0818ddb4770bcf405efcece0b34", preview_id = "2ebf9abeb5b648a5856e77c245a99987" }
+]
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
@@ -10,9 +13,6 @@ compatibility_date = "2023-08-21"
 
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/runtime-apis/kv
-# [[kv_namespaces]]
-# binding = "MY_KV_NAMESPACE"
-# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # Bind an R2 Bucket. Use R2 to store arbitrarily large blobs of data, such as files.
 # Docs: https://developers.cloudflare.com/r2/api/workers/workers-api-usage/
