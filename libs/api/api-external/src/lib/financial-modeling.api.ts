@@ -75,7 +75,7 @@ export const getHistoricalPrices = async (
   symbol: string,
   period: HistoricalLoadingPeriods,
   from: string,
-  to: string
+  to: string,
 ): Promise<HistoricalPrice[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v3/historical-chart/${period}/${symbol}?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<HistoricalPrice[]>(url);
@@ -256,7 +256,7 @@ export const getCompanyEarnings = async (symbol: string): Promise<Earnings[]> =>
  */
 export const getAnalystEstimates = async (
   symbol: string,
-  period: DataTimePeriod = 'quarter'
+  period: DataTimePeriod = 'quarter',
 ): Promise<AnalystEstimates[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/analyst-estimates/${symbol}?period=${period}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<AnalystEstimates[]>(url);
@@ -271,7 +271,7 @@ export const getCompanyKeyMetricsTTM = async (symbol: string): Promise<CompanyKe
 
 export const getCompanyKeyMetrics = async (
   symbol: string,
-  period: DataTimePeriod = 'quarter'
+  period: DataTimePeriod = 'quarter',
 ): Promise<CompanyKeyMetrics[]> => {
   const limit = period === 'quarter' ? 60 : 30;
   const url = `${FINANCIAL_MODELING_URL}/v3/key-metrics/${symbol}?period=${period}&limit=${limit}&apikey=${FINANCIAL_MODELING_KEY}`;
@@ -480,33 +480,6 @@ export const getMostPerformingStocks = async (type: 'gainers' | 'losers' | 'acti
   return response.data.slice(0, 20);
 };
 
-export const getNewsForex = async (symbol: string = '') => {
-  const ticker = symbol ? `tickers=${symbol}&` : '';
-  const url = `${FINANCIAL_MODELING_URL}/v4/forex_news?${ticker}limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<News[]>(url);
-  return response.data;
-};
-
-export const getNewsStock = async (symbol: string = '') => {
-  const ticker = symbol ? `tickers=${symbol}&` : '';
-  const url = `${FINANCIAL_MODELING_URL}/v3/stock_news?${ticker}limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<News[]>(url);
-  return response.data;
-};
-
-export const getNewsCrypto = async (symbol: string = '') => {
-  const ticker = symbol ? `tickers=${symbol}&` : '';
-  const url = `${FINANCIAL_MODELING_URL}/v4/crypto_news?${ticker}limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<News[]>(url);
-  return response.data;
-};
-
-export const getNewsGeneral = async () => {
-  const url = `${FINANCIAL_MODELING_URL}/v4/general_news?limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<News[]>(url);
-  return response.data;
-};
-
 export const getQuotesByType = async (type: AvailableQuotes) => {
   const url = `${FINANCIAL_MODELING_URL}/v3/quotes/${type}?apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<SymbolQuote[]>(url);
@@ -522,7 +495,7 @@ export const getQuotesBySymbols = async (symbols: string[]) => {
 
 export const getCalendarStockDividends = async (
   month: number | string,
-  year: number | string
+  year: number | string,
 ): Promise<CalendarDividend[]> => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v3/stock_dividend_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
@@ -530,14 +503,14 @@ export const getCalendarStockDividends = async (
   const filteredOutResponse = filterOutSymbols(
     response.data,
     [],
-    ['recordDate', 'paymentDate', 'declarationDate', 'label', 'adjDividend']
+    ['recordDate', 'paymentDate', 'declarationDate', 'label', 'adjDividend'],
   );
   return filteredOutResponse;
 };
 
 export const getCalendarStockIPOs = async (
   month: number | string,
-  year: number | string
+  year: number | string,
 ): Promise<CalendarStockIPO[]> => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v4/ipo-calendar-prospectus?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
@@ -555,7 +528,7 @@ export const getCalendarStockIPOs = async (
 
 export const getCalendarStockEarnings = async (
   month: number | string,
-  year: number | string
+  year: number | string,
 ): Promise<CalendarStockEarning[]> => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v3/earning_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
@@ -579,7 +552,7 @@ export const getSymbolOwnershipInstitutional = async (symbol: string): Promise<S
 export const getSymbolOwnershipHolders = async (
   symbol: string,
   date: string,
-  page = 0
+  page = 0,
 ): Promise<SymbolOwnershipHolders[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/institutional-holders/symbol-ownership-percent?symbol=${symbol}&page=${page}&date=${date}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<SymbolOwnershipHolders[]>(url);

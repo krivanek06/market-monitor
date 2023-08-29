@@ -1,7 +1,6 @@
 import {
   CompanyInsideTrade,
   HistoricalPrice,
-  News,
   StockDetailsAPI,
   StockMetricsHistoricalAPI,
   StockSummary,
@@ -37,9 +36,6 @@ export const getDatabaseStockDetailsHistorical = (symbol: string, historical: Hi
   getDatabaseStockMoreInformationRef(symbol)
     .doc(historical)
     .withConverter(assignTypes<DataSnapshot<HistoricalPrice[]>>());
-
-export const getDatabaseStockDetailsNews = (symbol: string) =>
-  getDatabaseStockMoreInformationRef(symbol).doc('news').withConverter(assignTypes<DataSnapshot<News[]>>());
 
 export const getDatabaseStockOwnershipInstitutionalRef = (symbol: string) =>
   getDatabaseStockMoreInformationRef(symbol)

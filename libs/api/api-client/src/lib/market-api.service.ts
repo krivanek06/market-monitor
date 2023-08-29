@@ -52,12 +52,7 @@ export class MarketApiService extends ApiCacheService {
 
   getNews(newsType: FirebaseNewsTypes, symbol: string = ''): Observable<News[]> {
     return this.getData<News[]>(
-      constructCFEndpoint(
-        this.isProd,
-        this.endpointFunctions,
-        'getmarketnews',
-        `news_types=${newsType}&symbol=${symbol}`,
-      ),
+      `https://get-news.krivanek1234.workers.dev/?news_types=${newsType}&symbol=${symbol}`,
       this.validity30Min,
     ).pipe(catchError(() => of([])));
   }

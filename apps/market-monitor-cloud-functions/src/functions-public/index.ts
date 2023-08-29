@@ -22,7 +22,6 @@ import {
   getCalendarStockIposWrapper,
 } from './market-functions/get-calendar-stock';
 import { getInstitutionalPortfolioDatesWrapper } from './market-functions/get-institutional-portfolio-dates';
-import { getMarketNewsWrapper } from './market-functions/get-market-news';
 import { getMarketOverviewDataWrapper, getMarketOverviewWrapper } from './market-functions/get-market-overview';
 import { getMarketTopPerformanceWrapper } from './market-functions/get-market-top-performers';
 import { getQuoteBySymbolWrapper, getQuotesBySymbolsWrapper } from './market-functions/get-quote';
@@ -112,7 +111,6 @@ export const getinstitutionalportfoliodates = firebaseSimpleErrorLogger(
   corsMiddleWare(getInstitutionalPortfolioDatesWrapper),
 );
 
-export const getmarketnews = firebaseSimpleErrorLogger('getMarketNewsWrapper', corsMiddleWare(getMarketNewsWrapper));
 export const getmarketoverview = firebaseSimpleErrorLogger(
   'getMarketOverviewWrapper',
   corsMiddleWare(getMarketOverviewWrapper),
