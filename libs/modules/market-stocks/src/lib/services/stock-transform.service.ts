@@ -249,7 +249,7 @@ export class StockTransformService {
       { name: 'Paid Dividends (Percent)', value: dividendPaid },
       { name: 'Dividend / Share', value: roundNDigits(dividendData.dividendPerShareTTM, 2) },
       { name: 'Dividend Yield', value: `${roundNDigits(dividendData.dividendYielPercentageTTM, 2)}%` },
-      ...stockDividends.map((d) => ({ name: d.label, value: d.dividend })),
+      ...stockDividends.map((d) => ({ name: d.label, value: roundNDigits(d.dividend, 2) })),
     ];
   }
 

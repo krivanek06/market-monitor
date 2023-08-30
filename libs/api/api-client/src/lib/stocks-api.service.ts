@@ -54,7 +54,7 @@ export class StocksApiService extends ApiCacheService {
   getStockDetails(symbol: string): Observable<StockDetails> {
     return this.getData<StockDetails>(
       constructCFEndpoint(this.isProd, this.endpointFunctions, 'getstockdetails', `symbol=${symbol}`),
-      this.validity30Min,
+      this.validity1Hour,
     );
   }
 
@@ -107,7 +107,7 @@ export class StocksApiService extends ApiCacheService {
         'getstockhistoricalmetrics',
         `symbol=${symbol}&timePeriod=${period}`,
       ),
-      this.validity1Min,
+      this.validity2Min,
     );
   }
 
@@ -119,21 +119,21 @@ export class StocksApiService extends ApiCacheService {
         'getownershipholderstodate',
         `symbol=${symbol}&date=${date}`,
       ),
-      this.validity30Min,
+      this.validity1Hour,
     );
   }
 
   getStockOwnershipInstitutional(symbol: string): Observable<SymbolOwnershipInstitutional[]> {
     return this.getData<SymbolOwnershipInstitutional[]>(
       constructCFEndpoint(this.isProd, this.endpointFunctions, 'getownershipinstitutional', `symbol=${symbol}`),
-      this.validity30Min,
+      this.validity1Hour,
     );
   }
 
   getStockInsiderTrades(symbol: string): Observable<CompanyInsideTrade[]> {
     return this.getData<CompanyInsideTrade[]>(
       constructCFEndpoint(this.isProd, this.endpointFunctions, 'getstockinsidertrades', `symbol=${symbol}`),
-      this.validity30Min,
+      this.validity1Hour,
     );
   }
 
