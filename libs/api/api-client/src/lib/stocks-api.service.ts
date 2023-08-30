@@ -60,23 +60,13 @@ export class StocksApiService extends ApiCacheService {
 
   getStockHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {
     return this.getData<HistoricalPrice[]>(
-      constructCFEndpoint(
-        this.isProd,
-        this.endpointFunctions,
-        'getassethistoricalprices',
-        `symbol=${symbol}&period=${period}`,
-      ),
+      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&period=${period}`,
     );
   }
 
   getStockHistoricalPricesOnDate(symbol: string, date: string): Observable<HistoricalPrice> {
     return this.getData<HistoricalPrice>(
-      constructCFEndpoint(
-        this.isProd,
-        this.endpointFunctions,
-        'getassethistoricalpricesondate',
-        `symbol=${symbol}&date=${date}`,
-      ),
+      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&date=${date}`,
       this.validity2Min,
     );
   }

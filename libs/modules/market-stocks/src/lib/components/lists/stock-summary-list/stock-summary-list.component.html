@@ -74,7 +74,7 @@
 
 <div class="g-item-wrapper">
   <span>Earnings</span>
-  <span>{{ stockDetails.quote.earningsAnnouncement | date : 'MMMM d, y' }}</span>
+  <span>{{ stockDetails.quote.earningsAnnouncement | date: 'MMMM d, y' }}</span>
 </div>
 
 <!-- template render price change -->
@@ -85,7 +85,7 @@
       appPercentageIncrease
       [useCurrencySign]="false"
       [changeValues]="{
-        changePercentage: stockDetails.priceChange | priceChangeItemSelector : key
+        changePercentage: stockDetails.priceChange | priceChangeItemSelector: key
       }"
     ></span>
   </div>

@@ -33,12 +33,7 @@ export class MarketApiService extends ApiCacheService {
 
   getHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {
     return this.getData<HistoricalPrice[]>(
-      constructCFEndpoint(
-        this.isProd,
-        this.endpointFunctions,
-        'getassethistoricalprices',
-        `symbol=${symbol}&period=${period}`,
-      ),
+      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&period=${period}`,
       this.validity2Min,
     );
   }

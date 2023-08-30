@@ -19,6 +19,14 @@ export const getAssetHistoricalPricesOnDateWrapper = async (request, response: R
   response.send(data);
 };
 
+/**
+ * TODO migrate to cloudflare
+ *
+ *
+ * @param request
+ * @param response
+ * @returns
+ */
 export const getAssetHistoricalPricesWrapper = async (request, response: Response<HistoricalPrice[]>) => {
   const symbol = request.query.symbol as string;
   const period = request.query.period as keyof typeof HistoricalPricePeriods;
