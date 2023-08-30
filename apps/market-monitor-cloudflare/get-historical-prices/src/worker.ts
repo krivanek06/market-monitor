@@ -37,6 +37,8 @@ export interface HistoricalPrice {
 	volume: number;
 }
 
+type HistoricalPricePeriods = '1d' | '1w' | '1mo' | '3mo' | '6mo' | '1y' | '5y' | 'ytd' | 'all';
+
 const FINANCIAL_MODELING_KEY = '645c1db245d983df8a2d31bc39b92c32';
 const FINANCIAL_MODELING_URL = 'https://financialmodelingprep.com/api';
 
@@ -45,7 +47,7 @@ export default {
 		const { searchParams } = new URL(request.url);
 
 		const symbol = searchParams.get('symbol') as string | undefined;
-		const period = searchParams.get('period') as string | undefined;
+		const period = searchParams.get('period') as HistoricalPricePeriods | undefined;
 		const date = searchParams.get('date') as string | undefined;
 		const isCrypto = searchParams.get('isCrypto') as string | undefined;
 
@@ -129,7 +131,7 @@ const getHistoricalPrices = async (
 const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 
 const resolveLoadingPeriod = (
-	period: string,
+	period: HistoricalPricePeriods,
 ): {
 	loadingPeriod: HistoricalLoadingPeriods;
 	from: string;
