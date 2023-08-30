@@ -1,5 +1,5 @@
 import { CommonModule, ViewportScroller } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -35,25 +35,6 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
 })
 export class StockSummaryDialogComponent {
   stockSummarySignal = toSignal(this.stocksApiService.getStockSummary(this.data.symbol));
-  stockSummaryType = computed(() => {
-    const data = this.stockSummarySignal();
-    if (!data) {
-      return '';
-    }
-    if (data.profile.isAdr) {
-      return 'ADR';
-    }
-
-    if (data.profile.isEtf) {
-      return 'ETF';
-    }
-
-    if (data.profile.isFund) {
-      return 'Fund';
-    }
-
-    return 'Stock';
-  });
   isSymbolInFavoriteSignal = toSignal(this.userUnauthenticatedService.isSymbolInFavoriteObs(this.data.symbol));
 
   constructor(

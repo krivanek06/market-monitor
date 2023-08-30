@@ -23,10 +23,10 @@ export class StockTransformService {
       return null;
     }
 
-    const ratingDetailsDCFScoreValue = data.profile.dcf;
+    const ratingDetailsDCFScoreValue = data.companyOutlook.profile.dcf;
     const ratingDetailsROEScoreValue = companyRatio.returnOnEquityTTM;
     const ratingDetailsROAScoreValue = companyRatio.returnOnAssetsTTM;
-    const ratingDetailsDEScoreValue = data.profile.dcf;
+    const ratingDetailsDEScoreValue = data.companyOutlook.profile.dcf;
     const ratingDetailsPEScoreValue = data.quote.pe;
     const ratingDetailsPBScoreValue = companyRatio.priceToBookRatioTTM;
 
