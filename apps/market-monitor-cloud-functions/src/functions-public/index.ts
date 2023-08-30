@@ -13,10 +13,6 @@ import { searchStocksBasicWrapper } from './stock-functions/search-stock-basic';
 
 // market-functions
 import {
-  getAssetHistoricalPricesOnDateWrapper,
-  getAssetHistoricalPricesWrapper,
-} from './market-functions/get-asset-historical-prices';
-import {
   getCalendarStockDividendsWrapper,
   getCalendarStockEarnignsWrapper,
   getCalendarStockIposWrapper,
@@ -80,16 +76,6 @@ export const getquotebysymbol = firebaseSimpleErrorLogger(
 export const getquotesbysymbols = firebaseSimpleErrorLogger(
   'getQuotesBySymbolsWrapper',
   corsMiddleWare(getQuotesBySymbolsWrapper),
-);
-
-export const getassethistoricalpricesondate = firebaseSimpleErrorLogger(
-  'getAssetHistoricalPricesOnDateWrapper',
-  corsMiddleWare(getAssetHistoricalPricesOnDateWrapper),
-);
-
-export const getassethistoricalprices = firebaseSimpleErrorLogger(
-  'getAssetHistoricalPricesWrapper',
-  corsMiddleWare(getAssetHistoricalPricesWrapper),
 );
 
 export const getcalendarstockdividends = firebaseSimpleErrorLogger(

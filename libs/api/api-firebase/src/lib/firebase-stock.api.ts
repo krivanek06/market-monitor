@@ -1,6 +1,5 @@
 import {
   CompanyInsideTrade,
-  HistoricalPrice,
   StockDetailsAPI,
   StockMetricsHistoricalAPI,
   StockSummary,
@@ -9,7 +8,7 @@ import {
 } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
-import { DataSnapshot, HistoricalPriceTypes } from './models';
+import { DataSnapshot } from './models';
 
 export const getDatabaseStocksRef = () => firestore().collection('market_data_stocks');
 
@@ -31,11 +30,6 @@ export const getDatabaseStockInsiderTradingRef = (symbol: string) =>
   getDatabaseStockMoreInformationRef(symbol)
     .doc('insider_trading')
     .withConverter(assignTypes<DataSnapshot<CompanyInsideTrade[]>>());
-
-export const getDatabaseStockDetailsHistorical = (symbol: string, historical: HistoricalPriceTypes) =>
-  getDatabaseStockMoreInformationRef(symbol)
-    .doc(historical)
-    .withConverter(assignTypes<DataSnapshot<HistoricalPrice[]>>());
 
 export const getDatabaseStockOwnershipInstitutionalRef = (symbol: string) =>
   getDatabaseStockMoreInformationRef(symbol)
