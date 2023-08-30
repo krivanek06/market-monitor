@@ -18,11 +18,8 @@ import {
 
 export type StockSummary = {
   id: string;
-  reloadData: boolean;
-  reloadDetailsData: boolean;
   quote: SymbolQuote;
   priceChange: PriceChange;
-  summaryLastUpdate: string;
 };
 
 export type StockDetailsAPI = {

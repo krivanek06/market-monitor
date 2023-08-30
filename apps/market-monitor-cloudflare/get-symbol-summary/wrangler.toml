@@ -1,6 +1,9 @@
 name = "get-symbol-summary"
 main = "src/worker.ts"
 compatibility_date = "2023-08-21"
+kv_namespaces = [
+	{ binding = "get_symbol_summary", id = "87ab60c6d7c14ec1aff0fdf688fe6d97", preview_id = "d8846ab1ea344fd8812ac3dfb49741f2" }
+]
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.

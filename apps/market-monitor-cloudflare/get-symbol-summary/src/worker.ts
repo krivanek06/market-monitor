@@ -10,7 +10,7 @@
 
 export interface Env {
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-	// MY_KV_NAMESPACE: KVNamespace;
+	get_symbol_summary: KVNamespace;
 	//
 	// Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
 	// MY_DURABLE_OBJECT: DurableObjectNamespace;
@@ -25,8 +25,131 @@ export interface Env {
 	// MY_QUEUE: Queue;
 }
 
+const FINANCIAL_MODELING_KEY = '645c1db245d983df8a2d31bc39b92c32';
+const FINANCIAL_MODELING_URL = 'https://financialmodelingprep.com/api';
+
+type StockSummary = {
+	id: string;
+	quote: SymbolQuote;
+	priceChange: PriceChange;
+};
+
+type PriceChange = {
+	symbol: string;
+	'1D': number | null;
+	'5D': number | null;
+	'1M': number | null;
+	'3M': number | null;
+	'6M': number | null;
+	ytd: number | null;
+	'1Y': number | null;
+	'3Y': number | null;
+	'5Y': number | null;
+	'10Y': number | null;
+	max: number;
+};
+
+type SymbolQuote = {
+	symbol: string;
+	name: string;
+	price: number;
+	// other data
+};
+
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		return new Response('Hello World!');
+		const { searchParams } = new URL(request.url);
+		const symbolsString = searchParams.get('symbol') as string | undefined;
+
+		if (!symbolsString) {
+			return new Response('Symbol is required', { status: 400 });
+		}
+
+		// create response header
+		const responseHeader = {
+			status: 200,
+			headers: {
+				'Access-Control-Allow-Methods': 'GET, OPTIONS',
+				'content-type': 'application/json;charset=UTF-8',
+				'Access-Control-Allow-Origin': '*',
+				'Access-Control-Allow-Headers': '*',
+			},
+		} satisfies ResponseInit;
+
+		// unique symbols
+		const symbolArray = symbolsString.split(',').filter((value, index, self) => self.indexOf(value) === index);
+
+		// no symbol
+		if (symbolArray.length === 0) {
+			return new Response(JSON.stringify([]), responseHeader);
+		}
+
+		// check if data exists in cache
+		const cacheSummaries = (await Promise.all(symbolArray.map((d) => env.get_symbol_summary.get(d))))
+			.filter((d): d is string => !!d)
+			.map((d) => JSON.parse(d) as StockSummary);
+
+		const cachedIds = cacheSummaries.map((d) => d.id);
+		console.log('cachedIds', cachedIds);
+
+		// symbols to update in DB
+		const symbolsToUpdate = symbolArray.filter((symbol) => !cacheSummaries.map((d) => d.id).includes(symbol));
+		console.log('symbolsToUpdate', symbolsToUpdate);
+
+		// load data from api
+		const [updatedQuotes, stockPriceChange] = await Promise.all([getCompanyQuote(symbolsToUpdate), getSymbolsPriceChanges(symbolArray)]);
+
+		// map to correct data structure
+		const summaries = symbolsToUpdate
+			.map((symbol) => {
+				// find data from loaded API - ensureFind throws error if not found
+				const quote = updatedQuotes.find((q) => q.symbol === symbol);
+				const priceChange = stockPriceChange.find((p) => p.symbol === symbol);
+
+				// if any of the data is missing, return undefined
+				if (!quote || !priceChange) {
+					return undefined;
+				}
+
+				return {
+					id: symbol,
+					quote,
+					priceChange,
+				};
+			}) // filter out undefined values
+			.filter((d): d is StockSummary => !!d) satisfies StockSummary[];
+
+		// save new summaries into cache for 3min
+		await Promise.all(summaries.map((d) => env.get_symbol_summary.put(d.id, JSON.stringify(d), { expirationTtl: 60 * 3 })));
+
+		// order [summaries, cacheSummaries] the same way as symbolArray
+		const orderedSummaries = symbolArray
+			.map((symbol) => {
+				const summary = summaries.find((d) => d.id === symbol);
+				if (summary) {
+					return summary;
+				}
+				return cacheSummaries.find((d) => d.id === symbol);
+			})
+			.filter((d): d is StockSummary => !!d);
+
+		// return data
+		return new Response(JSON.stringify(orderedSummaries), responseHeader);
 	},
+};
+
+const getCompanyQuote = async (symbols: string[]): Promise<SymbolQuote[]> => {
+	const symbol = symbols.join(',');
+	const url = `${FINANCIAL_MODELING_URL}/v3/quote/${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
+	const response = await fetch(url);
+	const data = (await response.json()) as SymbolQuote[];
+	return data;
+};
+
+const getSymbolsPriceChanges = async (symbols: string[]): Promise<PriceChange[]> => {
+	const symbolString = symbols.join(',');
+	const url = `${FINANCIAL_MODELING_URL}/v3/stock-price-change/${symbolString}?apikey=${FINANCIAL_MODELING_KEY}`;
+	const response = await fetch(url);
+	const data = (await response.json()) as PriceChange[];
+	return data;
 };
