@@ -49,6 +49,14 @@ type PriceChange = {
 	max: number;
 };
 
+type TickerSearch = {
+	symbol: string;
+	name: string;
+	currency: string;
+	stockExchange: string;
+	exchangeShortName: string;
+};
+
 type SymbolQuote = {
 	symbol: string;
 	name: string;
@@ -56,47 +64,63 @@ type SymbolQuote = {
 	// other data
 };
 
+// create response header
+const responseHeader = {
+	status: 200,
+	headers: {
+		'Access-Control-Allow-Methods': 'GET, OPTIONS',
+		'content-type': 'application/json;charset=UTF-8',
+		'Access-Control-Allow-Origin': '*',
+		'Access-Control-Allow-Headers': '*',
+	},
+} satisfies ResponseInit;
+
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const { searchParams } = new URL(request.url);
 		const symbolsString = searchParams.get('symbol') as string | undefined;
 
+		// set isSearch to true if searching for symbols with same prefix
+		const isSearchString = searchParams.get('isSearch') as string | undefined;
+		const isSearch = isSearchString === 'true';
+
+		// stock, crypto, etf, fund
+		const symbolType = searchParams.get('symbolType') as string | undefined;
+		const isSymbolTypeCrypto = symbolType === 'crypto';
+
 		if (!symbolsString) {
 			return new Response('Symbol is required', { status: 400 });
 		}
 
-		// create response header
-		const responseHeader = {
-			status: 200,
-			headers: {
-				'Access-Control-Allow-Methods': 'GET, OPTIONS',
-				'content-type': 'application/json;charset=UTF-8',
-				'Access-Control-Allow-Origin': '*',
-				'Access-Control-Allow-Headers': '*',
-			},
-		} satisfies ResponseInit;
-
 		// unique symbols
-		const symbolArray = symbolsString.split(',').filter((value, index, self) => self.indexOf(value) === index);
+		let symbolArray = symbolsString.split(',').filter((value, index, self) => self.indexOf(value) === index);
 
 		// no symbol
 		if (symbolArray.length === 0) {
 			return new Response(JSON.stringify([]), responseHeader);
 		}
 
+		// if searching for symbols, get symbols from API
+		if (isSearch) {
+			// load searched symbols from API
+			const searchResults = await searchTicker(symbolArray[0], isSymbolTypeCrypto);
+			// rewrite symbolArray with searched symbols
+			symbolArray = searchResults.map((d) => d.symbol);
+		}
+
 		// check if data exists in cache
-		const cacheSummaries = (await Promise.all(symbolArray.map((d) => env.get_symbol_summary.get(d))))
+		const cachedSummaries = (await Promise.all(symbolArray.map((d) => env.get_symbol_summary.get(d))))
 			.filter((d): d is string => !!d)
 			.map((d) => JSON.parse(d) as StockSummary);
 
-		const cachedIds = cacheSummaries.map((d) => d.id);
+		const cachedIds = cachedSummaries.map((d) => d.id);
 		console.log('cachedIds', cachedIds);
 
-		// symbols to update in DB
-		const symbolsToUpdate = symbolArray.filter((symbol) => !cacheSummaries.map((d) => d.id).includes(symbol));
+		// symbols to update
+		const symbolsToUpdate = symbolArray.filter((symbol) => !cachedSummaries.map((d) => d.id).includes(symbol));
 		console.log('symbolsToUpdate', symbolsToUpdate);
 
-		// load data from api
+		// load data from api with
 		const [updatedQuotes, stockPriceChange] = await Promise.all([getCompanyQuote(symbolsToUpdate), getSymbolsPriceChanges(symbolArray)]);
 
 		// map to correct data structure
@@ -122,14 +146,14 @@ export default {
 		// save new summaries into cache for 3min
 		await Promise.all(summaries.map((d) => env.get_symbol_summary.put(d.id, JSON.stringify(d), { expirationTtl: 60 * 3 })));
 
-		// order [summaries, cacheSummaries] the same way as symbolArray
+		// order [summaries, cachedSummaries] the same way as symbolArray
 		const orderedSummaries = symbolArray
 			.map((symbol) => {
 				const summary = summaries.find((d) => d.id === symbol);
 				if (summary) {
 					return summary;
 				}
-				return cacheSummaries.find((d) => d.id === symbol);
+				return cachedSummaries.find((d) => d.id === symbol);
 			})
 			.filter((d): d is StockSummary => !!d);
 
@@ -152,4 +176,41 @@ const getSymbolsPriceChanges = async (symbols: string[]): Promise<PriceChange[]>
 	const response = await fetch(url);
 	const data = (await response.json()) as PriceChange[];
 	return data;
+};
+
+const searchTicker = async (symbolPrefix: string, isCrypto = false): Promise<TickerSearch[]> => {
+	const stockExchange = 'NASDAQ,NYSE';
+	const cryptoExchange = 'CRYPTO';
+	const usedExchange = isCrypto ? cryptoExchange : stockExchange;
+	const prefixUppercase = symbolPrefix.toUpperCase();
+	const url = `${FINANCIAL_MODELING_URL}/v3/search?query=${prefixUppercase}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+
+	const response = await fetch(url);
+	const data = (await response.json()) as TickerSearch[];
+
+	// check if symbol contains any of the ignored symbols
+	const filteredResponse = filterOutSymbols(data);
+	return filteredResponse;
+};
+
+const filterOutSymbols = <T extends { symbol: string }>(
+	data: T[],
+	nonNullableKeys: (keyof T)[] = [],
+	removeKeys: (keyof T)[] = [],
+): T[] => {
+	// if symbol con any of the ignored symbols, filter them out
+	const ignoredSymbols = ['.', '-', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+	return (
+		data
+			// filter out symbols that contain any of the ignored symbols
+			.filter((d) => !ignoredSymbols.some((ignoredSymbol) => d.symbol.includes(ignoredSymbol)))
+			// filter out symbols if multiple one in the array
+			// .filter((d, index) => data.indexOf(d) === index)
+			// filter out symbols if keys are null
+			.filter((d) => nonNullableKeys.every((key) => !!d[key]))
+			.map((d) => {
+				removeKeys.forEach((key) => delete d[key]);
+				return d;
+			})
+	);
 };

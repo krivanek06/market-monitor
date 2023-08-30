@@ -9,6 +9,7 @@ export abstract class ApiCacheService {
 
   validity1Min = 1;
   validity2Min = 2;
+  validity3Min = 3;
   validity5Min = 5;
   validity10Min = 10;
   validity30Min = 30;

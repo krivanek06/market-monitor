@@ -14,7 +14,7 @@ import {
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
 } from '@market-monitor/api-types';
-import { Observable, catchError } from 'rxjs';
+import { Observable, catchError, map } from 'rxjs';
 import { ApiCacheService } from './api-cache.service';
 import { API_FUNCTION_URL, API_IS_PRODUCTION, constructCFEndpoint } from './api.model';
 
@@ -32,23 +32,20 @@ export class StocksApiService extends ApiCacheService {
 
   searchStockSummariesByPrefix(ticker: string): Observable<StockSummary[]> {
     return this.getData<StockSummary[]>(
-      constructCFEndpoint(this.isProd, this.endpointFunctions, 'searchstocksbasic', `symbol=${ticker}`),
+      `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${ticker}&isSearch=true`,
       this.validity10Min,
     ).pipe(catchError(() => []));
   }
 
   getStockSummaries(symbols: string[]): Observable<StockSummary[]> {
     return this.getData<StockSummary[]>(
-      constructCFEndpoint(this.isProd, this.endpointFunctions, 'getstocksummaries', `symbol=${symbols.join(',')}`),
-      this.validity10Min,
+      `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`,
+      this.validity3Min,
     ).pipe(catchError(() => []));
   }
 
-  getStockSummary(symbol: string): Observable<StockSummary> {
-    return this.getData<StockSummary>(
-      constructCFEndpoint(this.isProd, this.endpointFunctions, 'getstocksummary', `symbol=${symbol}`),
-      this.validity10Min,
-    );
+  getStockSummary(symbol: string): Observable<StockSummary | null> {
+    return this.getStockSummaries([symbol]).pipe(map((d) => d[0] ?? null));
   }
 
   getStockDetails(symbol: string): Observable<StockDetails> {

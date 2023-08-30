@@ -662,14 +662,6 @@ export type PriceChange = {
   max: number;
 };
 
-export interface TickerSearch {
-  symbol: string;
-  name: string;
-  currency: string;
-  stockExchange: string;
-  exchangeShortName: string;
-}
-
 export interface HistoricalPrice {
   date: string;
   open: number;

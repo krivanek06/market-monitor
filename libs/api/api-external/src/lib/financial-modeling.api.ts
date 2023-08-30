@@ -30,7 +30,6 @@ import {
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
   SymbolQuote,
-  TickerSearch,
   UpgradesDowngrades,
 } from '@market-monitor/api-types';
 import axios from 'axios';
@@ -92,32 +91,6 @@ export const getHistoricalPricesOnDate = async (symbol: string, date: string): P
   const url = `${FINANCIAL_MODELING_URL}/v3/historical-price-full/${symbol}?from=${date}&to=${date}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await axios.get<{ historical: HistoricalPrice[] }>(url);
   return response.data.historical[0];
-};
-
-/**
- *
- * @param symbolPrefix
- * @param isCrypto
- * @returns array of ticker search results [{
-    "symbol": "MINAUSD",
-    "name": "Mina USD",
-    "currency": "USD",
-    "stockExchange": "CCC",
-    "exchangeShortName": "CRYPTO"
-  }]
- */
-export const searchTicker = async (symbolPrefix: string, isCrypto = false): Promise<TickerSearch[]> => {
-  const stockExchange = 'NASDAQ,NYSE';
-  const cryptoExchange = 'CRYPTO';
-  const usedExchange = isCrypto ? cryptoExchange : stockExchange;
-  const prefixUppercase = symbolPrefix.toUpperCase();
-  const url = `${FINANCIAL_MODELING_URL}/v3/search?query=${prefixUppercase}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
-
-  const response = await axios.get<TickerSearch[]>(url);
-
-  // check if symbol contains any of the ignored symbols
-  const filteredResponse = filterOutSymbols(response.data);
-  return filteredResponse;
 };
 
 /**
