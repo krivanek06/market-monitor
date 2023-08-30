@@ -6,12 +6,12 @@
 import 'zone.js/node';
 
 import { APP_BASE_HREF } from '@angular/common';
-import { ngExpressEngine } from '@nguniversal/express-engine';
 import * as express from 'express';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { environment } from './environments/environment';
 import bootstrap from './main.server';
+import { ngFlavrHubExpressEngine } from './ssr-cache.server';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -23,8 +23,18 @@ export function app(): express.Express {
 
   const indexHtml = existsSync(join(distFolder, 'index.original.html')) ? 'index.original.html' : 'index';
 
+  const oneMonth = 2_592_000;
+  const routeCaches = [
+    { path: '/', ttl: oneMonth },
+    { path: '/search', ttl: oneMonth },
+    { path: '/stock-screener', ttl: oneMonth, useQueryParams: true },
+    { path: '/top-performers', ttl: oneMonth },
+    { path: '/market/overview', ttl: oneMonth },
+    { path: '/calendar', ttl: oneMonth },
+  ];
+
   // Our Universal express-engine (found @ https://github.com/angular/universal/tree/main/modules/express-engine)
-  server.engine('html', ngExpressEngine({ bootstrap }));
+  server.engine('html', ngFlavrHubExpressEngine({ bootstrap, routeCaches }));
 
   server.set('view engine', 'html');
   server.set('views', distFolder);
