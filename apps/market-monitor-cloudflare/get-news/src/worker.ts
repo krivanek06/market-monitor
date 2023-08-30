@@ -44,10 +44,6 @@ export type News = {
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		if (request.method !== 'GET') {
-			return new Response('Method not allowed', { status: 405 });
-		}
-
 		const { searchParams } = new URL(request.url);
 
 		// get query strings
@@ -58,7 +54,10 @@ export default {
 		const responseHeader = {
 			status: 200,
 			headers: {
+				'Access-Control-Allow-Methods': 'GET, OPTIONS',
 				'content-type': 'application/json;charset=UTF-8',
+				'Access-Control-Allow-Origin': '*',
+				'Access-Control-Allow-Headers': '*',
 			},
 		} satisfies ResponseInit;
 
