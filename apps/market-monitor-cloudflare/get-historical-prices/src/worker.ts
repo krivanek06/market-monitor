@@ -79,9 +79,11 @@ export default {
 
 			// load data from api, save in cache
 			const data = await getHistoricalPricesOnDate(symbol, date);
-			await env.get_historical_prices.put(key, JSON.stringify(data), { expirationTtl: 60 * 60 * 24 * 7 });
 
-			// return data
+			// cache data for 1 minute
+			await env.get_historical_prices.put(key, JSON.stringify(data), { expirationTtl: 60 });
+
+			// return single object data
 			return new Response(JSON.stringify(data), responseHeader);
 		}
 
@@ -100,7 +102,7 @@ export default {
 			const reveredData = historicalPriceData.reverse();
 			await env.get_historical_prices.put(key, JSON.stringify(reveredData), { expirationTtl: 60 * 60 * 24 * 7 });
 
-			// return data
+			// return array of data
 			return new Response(JSON.stringify(reveredData), responseHeader);
 		}
 

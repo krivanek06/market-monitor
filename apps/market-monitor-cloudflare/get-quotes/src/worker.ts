@@ -25,8 +25,49 @@ export interface Env {
 	// MY_QUEUE: Queue;
 }
 
+const FINANCIAL_MODELING_KEY = '645c1db245d983df8a2d31bc39b92c32';
+const FINANCIAL_MODELING_URL = 'https://financialmodelingprep.com/api';
+
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		return new Response('Hello World!');
+		const { searchParams } = new URL(request.url);
+		const symbol = searchParams.get('symbol') as string | undefined;
+
+		if (!symbol) {
+			return new Response('missing symbol', { status: 400 });
+		}
+
+		// create response header
+		const responseHeader = {
+			status: 200,
+			headers: {
+				'Access-Control-Allow-Methods': 'GET, OPTIONS',
+				'content-type': 'application/json;charset=UTF-8',
+				'Access-Control-Allow-Origin': '*',
+				'Access-Control-Allow-Headers': '*',
+			},
+		} satisfies ResponseInit;
+
+		// ignore the same symbol
+		const symbolArray = symbol.split(',').filter((value, index, self) => self.indexOf(value) === index);
+
+		// return empty array if no symbol
+		if (!symbol) {
+			return new Response(JSON.stringify([]), responseHeader);
+		}
+
+		// load from API
+		const data = await getQuotesBySymbols(symbolArray);
+
+		// return data
+		return new Response(JSON.stringify(data), responseHeader);
 	},
+};
+
+const getQuotesBySymbols = async (symbols: string[]) => {
+	const symbolsString = symbols.join(',');
+	const url = `${FINANCIAL_MODELING_URL}/v3/quote/${symbolsString}?apikey=${FINANCIAL_MODELING_KEY}`;
+	const response = await fetch(url);
+	const data = await response.json();
+	return data as any[];
 };
