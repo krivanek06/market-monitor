@@ -12,6 +12,7 @@ import {
   MarketOverviewDatabaseKeys,
   MarketTopPerformanceOverviewResponse,
   News,
+  StockSummary,
   SymbolHistoricalPeriods,
   SymbolQuote,
 } from '@market-monitor/api-types';
@@ -29,6 +30,17 @@ export class MarketApiService extends ApiCacheService {
     @Inject(API_IS_PRODUCTION) private readonly isProd: boolean,
   ) {
     super(http);
+  }
+
+  getSymbolSummaries(symbols: string[]): Observable<StockSummary[]> {
+    return this.getData<StockSummary[]>(
+      `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`,
+      this.validity3Min,
+    ).pipe(catchError(() => []));
+  }
+
+  getSymbolSummary(symbol: string): Observable<StockSummary | null> {
+    return this.getSymbolSummaries([symbol]).pipe(map((d) => d[0] ?? null));
   }
 
   getHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {
@@ -72,20 +84,6 @@ export class MarketApiService extends ApiCacheService {
         constructCFEndpoint(this.isProd, this.endpointFunctions, 'getquotesbytype', `type=${quoteType}`),
       )
       .pipe(map((data) => data.filter((quote) => !!quote.price && !!quote.name)));
-  }
-
-  getQuotesBySymbols(symbols: string[]): Observable<SymbolQuote[]> {
-    const symbolString = symbols.join(',');
-    return this.getData<SymbolQuote[]>(
-      constructCFEndpoint(this.isProd, this.endpointFunctions, 'getquotesbysymbols', `symbol=${symbolString}`),
-      this.validity5Min,
-    ).pipe(map((data) => data.filter((quote) => !!quote.price && !!quote.name)));
-  }
-
-  getQuoteBySymbol(symbol: string): Observable<SymbolQuote | null> {
-    return this.http.get<SymbolQuote>(
-      constructCFEndpoint(this.isProd, this.endpointFunctions, 'getquotebysymbol', `symbol=${symbol}`),
-    );
   }
 
   getMarketCalendarDividends(month: string | number, year: string | number): Observable<CalendarDividend[]> {

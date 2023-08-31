@@ -17,7 +17,6 @@ import {
 import { getInstitutionalPortfolioDatesWrapper } from './market-functions/get-institutional-portfolio-dates';
 import { getMarketOverviewDataWrapper, getMarketOverviewWrapper } from './market-functions/get-market-overview';
 import { getMarketTopPerformanceWrapper } from './market-functions/get-market-top-performers';
-import { getQuoteBySymbolWrapper, getQuotesBySymbolsWrapper } from './market-functions/get-quote';
 import { getQuotesByTypeWrapper } from './market-functions/get-quotes-by-type';
 
 // wrap functions with sentry
@@ -47,15 +46,6 @@ export const getownershipholderstodate = firebaseSimpleErrorLogger(
 export const getownershipinstitutional = firebaseSimpleErrorLogger(
   'getOwnershipInstitutionalWrapper',
   corsMiddleWare(getOwnershipInstitutionalWrapper),
-);
-
-export const getquotebysymbol = firebaseSimpleErrorLogger(
-  'getQuoteBySymbolWrapper',
-  corsMiddleWare(getQuoteBySymbolWrapper),
-);
-export const getquotesbysymbols = firebaseSimpleErrorLogger(
-  'getQuotesBySymbolsWrapper',
-  corsMiddleWare(getQuotesBySymbolsWrapper),
 );
 
 export const getcalendarstockdividends = firebaseSimpleErrorLogger(
