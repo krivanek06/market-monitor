@@ -15,8 +15,8 @@ export type MarketTopPerformanceOverviewResponse = MarketTopPerformance<StockSum
 
 // ------------------ News ------------------
 
-export const firebaseNewsAcceptableTypes = ['general', 'stocks', 'forex', 'crypto'] as const;
-export type FirebaseNewsTypes = (typeof firebaseNewsAcceptableTypes)[number];
+export const NewsAcceptableTypes = ['general', 'stocks', 'forex', 'crypto'] as const;
+export type NewsTypes = (typeof NewsAcceptableTypes)[number];
 
 // ------------------ Market Overview ------------------
 
@@ -451,11 +451,14 @@ export const MARKET_OVERVIEW_DATA = Object.entries(MARKET_OVERVIEW_DATABASE_ENDP
     const key = cur[0] as MarketOverviewDatabaseKeys;
     const { name, data } = cur[1]; //as { [key: string]: MarketOverviewDatabaseEndpointBody };
 
-    const result = Object.entries(data).reduce((acc2, cur2) => {
-      const subKey = cur2[0]; // example: 'peRatio', 'shillerPeRatio', ...
-      const subKeyName = `${name} - ${cur2[1].name}`;
-      return [...acc2, { key, subKey, name: subKeyName }];
-    }, [] as { key: MarketOverviewDatabaseKeys; subKey: string; name: string }[]);
+    const result = Object.entries(data).reduce(
+      (acc2, cur2) => {
+        const subKey = cur2[0]; // example: 'peRatio', 'shillerPeRatio', ...
+        const subKeyName = `${name} - ${cur2[1].name}`;
+        return [...acc2, { key, subKey, name: subKeyName }];
+      },
+      [] as { key: MarketOverviewDatabaseKeys; subKey: string; name: string }[],
+    );
 
     return [
       ...acc,
@@ -474,11 +477,11 @@ export const MARKET_OVERVIEW_DATA = Object.entries(MARKET_OVERVIEW_DATABASE_ENDP
       subKey: string;
       name: string;
     }[];
-  }[]
+  }[],
 );
 
 export const getMarketOverKeyBySubKey = <T extends MarketOverviewDatabaseKeys>(
-  subKey: string
+  subKey: string,
 ): {
   key: T;
   name: string;

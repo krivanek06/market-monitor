@@ -42,6 +42,14 @@ export type CompanyOutlook = {
   financialsQuarter: CompanyFinancialsReport;
 };
 
+export type TickerSearch = {
+  symbol: string;
+  name: string;
+  currency: string;
+  stockExchange: string;
+  exchangeShortName: string;
+};
+
 export type CompanyProfile = {
   symbol: string;
   price: number;

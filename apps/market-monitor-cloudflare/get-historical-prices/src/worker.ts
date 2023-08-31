@@ -1,3 +1,5 @@
+import { getHistoricalPrices, getHistoricalPricesOnDate } from '@market-monitor/api-external';
+import { RESPONSE_HEADER } from '@market-monitor/api-types';
 import { format, subDays } from 'date-fns';
 /**
  * Welcome to Cloudflare Workers! This is your first worker.
@@ -39,9 +41,6 @@ export interface HistoricalPrice {
 
 type HistoricalPricePeriods = '1d' | '1w' | '1mo' | '3mo' | '6mo' | '1y' | '5y' | 'ytd' | 'all';
 
-const FINANCIAL_MODELING_KEY = '645c1db245d983df8a2d31bc39b92c32';
-const FINANCIAL_MODELING_URL = 'https://financialmodelingprep.com/api';
-
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const { searchParams } = new URL(request.url);
@@ -57,24 +56,13 @@ export default {
 			return new Response('missing symbol', { status: 400 });
 		}
 
-		// create response header
-		const responseHeader = {
-			status: 200,
-			headers: {
-				'Access-Control-Allow-Methods': 'GET, OPTIONS',
-				'content-type': 'application/json;charset=UTF-8',
-				'Access-Control-Allow-Origin': '*',
-				'Access-Control-Allow-Headers': '*',
-			},
-		} satisfies ResponseInit;
-
 		if (date) {
 			const key = `${symbol}-${date}`;
 			const cacheData = await env.get_historical_prices.get(key);
 
 			// data in cache
 			if (cacheData) {
-				return new Response(cacheData, responseHeader);
+				return new Response(cacheData, RESPONSE_HEADER);
 			}
 
 			// load data from api, save in cache
@@ -84,7 +72,7 @@ export default {
 			await env.get_historical_prices.put(key, JSON.stringify(data), { expirationTtl: 60 });
 
 			// return single object data
-			return new Response(JSON.stringify(data), responseHeader);
+			return new Response(JSON.stringify(data), RESPONSE_HEADER);
 		}
 
 		if (period) {
@@ -93,41 +81,24 @@ export default {
 
 			// data in cache
 			if (cacheData) {
-				return new Response(cacheData, responseHeader);
+				return new Response(cacheData, RESPONSE_HEADER);
 			}
 
-			// load data from api, save into cache
+			// load data from api
 			const loadingPeriod = resolveLoadingPeriod(period);
 			const historicalPriceData = await getHistoricalPrices(symbol, loadingPeriod.loadingPeriod, loadingPeriod.from, loadingPeriod.to);
 			const reveredData = historicalPriceData.reverse();
-			await env.get_historical_prices.put(key, JSON.stringify(reveredData), { expirationTtl: 60 * 60 * 24 * 7 });
+
+			// save into cache
+			await env.get_historical_prices.put(key, JSON.stringify(reveredData), { expirationTtl: 120 });
 
 			// return array of data
-			return new Response(JSON.stringify(reveredData), responseHeader);
+			return new Response(JSON.stringify(reveredData), RESPONSE_HEADER);
 		}
 
 		// throw error if no period or date
 		return new Response('missing period or date', { status: 400 });
 	},
-};
-
-const getHistoricalPricesOnDate = async (symbol: string, date: string): Promise<HistoricalPrice> => {
-	const url = `${FINANCIAL_MODELING_URL}/v3/historical-price-full/${symbol}?from=${date}&to=${date}&apikey=${FINANCIAL_MODELING_KEY}`;
-	const response = await fetch(url);
-	const data = (await response.json()) as { historical: HistoricalPrice[] };
-	return data.historical[0];
-};
-
-const getHistoricalPrices = async (
-	symbol: string,
-	period: HistoricalLoadingPeriods,
-	from: string,
-	to: string,
-): Promise<HistoricalPrice[]> => {
-	const url = `${FINANCIAL_MODELING_URL}/v3/historical-chart/${period}/${symbol}?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
-	const response = await fetch(url);
-	const data = (await response.json()) as HistoricalPrice[];
-	return data;
 };
 
 const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');

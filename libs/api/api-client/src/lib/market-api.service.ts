@@ -5,13 +5,13 @@ import {
   CalendarDividend,
   CalendarStockEarning,
   CalendarStockIPO,
-  FirebaseNewsTypes,
   HistoricalPrice,
   MarketOverview,
   MarketOverviewData,
   MarketOverviewDatabaseKeys,
   MarketTopPerformanceOverviewResponse,
   News,
+  NewsTypes,
   StockSummary,
   SymbolHistoricalPeriods,
   SymbolQuote,
@@ -57,7 +57,7 @@ export class MarketApiService extends ApiCacheService {
     );
   }
 
-  getNews(newsType: FirebaseNewsTypes, symbol: string = ''): Observable<News[]> {
+  getNews(newsType: NewsTypes, symbol: string = ''): Observable<News[]> {
     return this.getData<News[]>(
       `https://get-news.krivanek1234.workers.dev/?news_types=${newsType}&symbol=${symbol}`,
       this.validity30Min,

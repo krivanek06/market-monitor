@@ -8,6 +8,9 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { getNewsFromApi } from '@market-monitor/api-external';
+import { NewsAcceptableTypes, NewsTypes, RESPONSE_HEADER } from '@market-monitor/api-types';
+
 export interface Env {
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 	getnews: KVNamespace;
@@ -25,45 +28,17 @@ export interface Env {
 	// MY_QUEUE: Queue;
 }
 
-// helper types
-const newsAcceptableTypes = ['general', 'stocks', 'forex', 'crypto'] as const;
-type FirebaseNewsTypes = (typeof newsAcceptableTypes)[number];
-
-const FINANCIAL_MODELING_KEY = '645c1db245d983df8a2d31bc39b92c32';
-const FINANCIAL_MODELING_URL = 'https://financialmodelingprep.com/api';
-
-export type News = {
-	symbol: string;
-	publishedDate: string;
-	title: string;
-	image: string;
-	site: string;
-	text: string;
-	url: string;
-};
-
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const { searchParams } = new URL(request.url);
 
 		// get query strings
-		const newsType = searchParams.get('news_types') as FirebaseNewsTypes;
+		const newsType = searchParams.get('news_types') as NewsTypes | undefined;
 		const symbol = searchParams.get('symbol') ?? '';
 
-		// create response header
-		const responseHeader = {
-			status: 200,
-			headers: {
-				'Access-Control-Allow-Methods': 'GET, OPTIONS',
-				'content-type': 'application/json;charset=UTF-8',
-				'Access-Control-Allow-Origin': '*',
-				'Access-Control-Allow-Headers': '*',
-			},
-		} satisfies ResponseInit;
-
 		// if not news type, return empty array
-		if (!newsType || !newsAcceptableTypes.includes(newsType)) {
-			return new Response(JSON.stringify([]), responseHeader);
+		if (!newsType || !NewsAcceptableTypes.includes(newsType)) {
+			return new Response(JSON.stringify([]), RESPONSE_HEADER);
 		}
 
 		// create cache key
@@ -75,34 +50,13 @@ export default {
 			// get news from API
 			const news = await getNewsFromApi(newsType, symbol);
 			// save data into cache for 2h
-			await env.getnews.put(key, JSON.stringify(news), { expirationTtl: 60 * 60 * 2 });
+			const twoHours = 60 * 60 * 2;
+			await env.getnews.put(key, JSON.stringify(news), { expirationTtl: twoHours });
 			// return data
-			return new Response(JSON.stringify(news), responseHeader);
+			return new Response(JSON.stringify(news), RESPONSE_HEADER);
 		}
 
 		// return data
-		return new Response(cacheData, responseHeader);
+		return new Response(cacheData, RESPONSE_HEADER);
 	},
-};
-
-const getNewsFromApi = async (newsType: FirebaseNewsTypes, symbol: string = '') => {
-	const url = resolveNewsUrl(newsType, symbol);
-	const response = await fetch(url);
-	const data = await response.json();
-	return data as News[];
-};
-
-const resolveNewsUrl = (newsType: FirebaseNewsTypes, symbol: string) => {
-	const ticker = symbol ? `tickers=${symbol}&` : '';
-	if (newsType === 'forex') {
-		return `${FINANCIAL_MODELING_URL}/v4/forex_news?${ticker}limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
-	}
-	if (newsType === 'crypto') {
-		return `${FINANCIAL_MODELING_URL}/v4/crypto_news?${ticker}limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
-	}
-	if (newsType === 'stocks') {
-		return `${FINANCIAL_MODELING_URL}/v3/stock_news?${ticker}limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
-	}
-	// general
-	return `${FINANCIAL_MODELING_URL}/v4/general_news?limit=75&apikey=${FINANCIAL_MODELING_KEY}`;
 };
