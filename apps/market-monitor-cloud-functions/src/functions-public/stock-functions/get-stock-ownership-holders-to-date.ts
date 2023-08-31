@@ -1,7 +1,7 @@
 import { getSymbolOwnershipHolders } from '@market-monitor/api-external';
 import { getDatabaseStockOwnershipHoldersRef } from '@market-monitor/api-firebase';
 import { SymbolOwnershipHolders } from '@market-monitor/api-types';
-import { checkDataValidity, isDateValidQuarter } from '@market-monitor/shared-utils-general';
+import { checkDataValidityDays, isDateValidQuarter } from '@market-monitor/shared-utils-general';
 import { Request, Response } from 'express';
 
 export const getOwnershipHoldersToDateWrapper = async (
@@ -28,7 +28,7 @@ export const getOwnershipHoldersToDateWrapper = async (
   const databaseData = (await databaseRef.get()).data();
 
   // return data if exists
-  if (!checkDataValidity(databaseData)) {
+  if (checkDataValidityDays(databaseData)) {
     response.send(databaseData.data);
     return;
   }

@@ -19,6 +19,7 @@ import {
   startOfDay,
   startOfMonth,
   subDays,
+  subMinutes,
   subYears,
 } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
@@ -261,8 +262,13 @@ export const DATA_VALIDITY = 7;
  * @param data
  * @returns whether data is is not older than N days
  */
-export const checkDataValidity = <T extends { lastUpdate: string }>(data?: T, days = DATA_VALIDITY) =>
-  !data || isBefore(new Date(data.lastUpdate), subDays(new Date(), days));
+export const checkDataValidityDays = <T extends { lastUpdate: string | Date }>(data?: T, days = DATA_VALIDITY) =>
+  !!data && !isBefore(new Date(data.lastUpdate), subDays(new Date(), days));
+
+export const checkDataValidityMinutes = <T extends { lastUpdate: string | Date }>(
+  data: T | undefined,
+  minutes: number,
+) => !!data && !isBefore(new Date(data.lastUpdate), subMinutes(new Date(), minutes));
 
 export const getPreviousDate = (date: DateInput): string => {
   return subDays(new Date(date), 1).toDateString();

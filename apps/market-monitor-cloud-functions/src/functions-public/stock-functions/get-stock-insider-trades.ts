@@ -1,7 +1,7 @@
 import { getInsiderTrading } from '@market-monitor/api-external';
 import { getDatabaseStockInsiderTradingRef } from '@market-monitor/api-firebase';
 import { CompanyInsideTrade } from '@market-monitor/api-types';
-import { checkDataValidity } from '@market-monitor/shared-utils-general';
+import { checkDataValidityDays } from '@market-monitor/shared-utils-general';
 import { Request, Response } from 'express';
 
 export const getStockInsiderTradesWrapper = async (request: Request, response: Response<CompanyInsideTrade[]>) => {
@@ -17,7 +17,7 @@ export const getStockInsiderTradesWrapper = async (request: Request, response: R
   const databaseData = (await databaseRef.get()).data();
 
   // no need for reload
-  if (!checkDataValidity(databaseData)) {
+  if (checkDataValidityDays(databaseData)) {
     response.send(databaseData.data);
     return;
   }

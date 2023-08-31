@@ -1,9 +1,17 @@
 name = "get-historical-prices"
 main = "src/worker.ts"
 compatibility_date = "2023-08-21"
-kv_namespaces = [
-	{ binding = "get_historical_prices", id = "92e427ffc9d74ec3b4f7c7220804afb5", preview_id = "07822ac1eb85429db064c8964c690d59" }
-]
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "market-monitor"
+database_id = "05a5e71a-c328-4ca0-afd0-84171706d16d"
+preview_database_id = "local-test-db"
+
+
+# kv_namespaces = [
+#	{ binding = "get_historical_prices", id = "92e427ffc9d74ec3b4f7c7220804afb5", preview_id = "07822ac1eb85429db064c8964c690d59" }
+# ]
 
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)

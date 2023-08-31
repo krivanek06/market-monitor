@@ -1,5 +1,6 @@
 import { getCompanyQuote, getProfile, getSymbolsPriceChanges, searchTicker } from '@market-monitor/api-external';
 import { RESPONSE_HEADER } from '@market-monitor/api-types';
+import { checkDataValidityMinutes } from '@market-monitor/shared-utils-general';
 
 /**
  * Welcome to Cloudflare Workers! This is your first worker.
@@ -10,10 +11,9 @@ import { RESPONSE_HEADER } from '@market-monitor/api-types';
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
-import { isBefore, subMinutes } from 'date-fns';
 import { inArray, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/d1';
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export interface Env {
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -37,7 +37,7 @@ const SymbolSummaryTable = sqliteTable('symbol_summary', {
 	quote: text('quote').notNull().$type<string>(),
 	profile: text('profile').$type<string>(),
 	priceChange: text('priceChange').notNull().$type<string>(),
-	lastUpdated: integer('lastUpdated', { mode: 'timestamp' })
+	lastUpdate: text('lastUpdate')
 		.notNull()
 		.default(sql`CURRENT_TIMESTAMP`),
 });
@@ -85,19 +85,19 @@ export default {
 		);
 
 		// check symbol validity 3min
-		const validStoredIds = storedSymbolSummaries
-			.filter((d) => !isBefore(new Date(d.lastUpdated), subMinutes(new Date(), 3)))
-			.map((d) => d.id);
+		const validStoredIds = storedSymbolSummaries.filter((d) => checkDataValidityMinutes(d, 3)).map((d) => d.id);
 
 		// symbols to update
 		const symbolsToUpdate = symbolArray.filter((symbol) => !validStoredIds.includes(symbol));
 
 		// load data from api with
-		const [updatedQuotes, stockPriceChanges, profiles] = await Promise.all([
-			getCompanyQuote(symbolsToUpdate),
-			getSymbolsPriceChanges(symbolArray),
-			getProfile(symbolArray),
-		]);
+		const [updatedQuotes, stockPriceChanges, profiles] =
+			symbolsToUpdate.length > 0
+				? await Promise.all([getCompanyQuote(symbolsToUpdate), getSymbolsPriceChanges(symbolsToUpdate), getProfile(symbolsToUpdate)])
+				: [[], [], []];
+
+		console.log('validStoredIds', validStoredIds);
+		console.log('symbolsToUpdate', symbolsToUpdate);
 
 		// map to correct data structure
 		const summaries = symbolsToUpdate
@@ -124,7 +124,27 @@ export default {
 
 		// save new summaries into cache for 3min
 		const savedData =
-			summaries.length > 0 ? (await db.insert(SymbolSummaryTable).values(summaries).returning().all()).map(formatSummaryToObject) : [];
+			summaries.length > 0
+				? (
+						await db
+							.insert(SymbolSummaryTable)
+							.values(summaries)
+							.onConflictDoUpdate({
+								set: {
+									quote: sql`excluded.quote`,
+									priceChange: sql`excluded.priceChange`,
+									profile: sql`excluded.profile`,
+									lastUpdate: sql`CURRENT_TIMESTAMP`,
+								},
+								target: SymbolSummaryTable.id,
+							})
+							.returning()
+							.all()
+				  ).map(formatSummaryToObject)
+				: [];
+
+		const savedIds = savedData.map((d) => d.id);
+		console.log('saved ids', savedIds);
 
 		// order [summaries, cachedSummaries] the same way as symbolArray
 		const orderedSummaries = symbolArray
