@@ -7,10 +7,14 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
+import { isBefore, subMinutes } from 'date-fns';
+import { inArray, sql } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export interface Env {
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-	get_symbol_summary: KVNamespace;
+	DB: D1Database;
 	//
 	// Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
 	// MY_DURABLE_OBJECT: DurableObjectNamespace;
@@ -27,13 +31,6 @@ export interface Env {
 
 const FINANCIAL_MODELING_KEY = '645c1db245d983df8a2d31bc39b92c32';
 const FINANCIAL_MODELING_URL = 'https://financialmodelingprep.com/api';
-
-type StockSummary = {
-	id: string;
-	quote: SymbolQuote;
-	priceChange: PriceChange;
-	profile: CompanyProfile | undefined;
-};
 
 type PriceChange = {
 	symbol: string;
@@ -82,6 +79,18 @@ const responseHeader = {
 	},
 } satisfies ResponseInit;
 
+const SymbolSummaryTable = sqliteTable('symbol_summary', {
+	id: text('id').primaryKey(),
+	quote: text('quote').notNull().$type<string>(),
+	profile: text('profile').$type<string>(),
+	priceChange: text('priceChange').notNull().$type<string>(),
+	lastUpdated: integer('lastUpdated', { mode: 'timestamp' })
+		.notNull()
+		.default(sql`CURRENT_TIMESTAMP`),
+});
+
+type StockSummaryTable = typeof SymbolSummaryTable.$inferSelect;
+
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const { searchParams } = new URL(request.url);
@@ -95,6 +104,7 @@ export default {
 		const symbolType = searchParams.get('symbolType') as string | undefined;
 		const isSymbolTypeCrypto = symbolType === 'crypto';
 
+		// throw error if no symbols
 		if (!symbolsString) {
 			return new Response('Symbol is required', { status: 400 });
 		}
@@ -115,17 +125,19 @@ export default {
 			symbolArray = searchResults.map((d) => d.symbol);
 		}
 
-		// check if data exists in cache
-		const cachedSummaries = (await Promise.all(symbolArray.map((d) => env.get_symbol_summary.get(d))))
-			.filter((d): d is string => !!d)
-			.map((d) => JSON.parse(d) as StockSummary);
+		// check if data exists in db
+		const db = drizzle(env.DB);
+		const storedSymbolSummaries = (await db.select().from(SymbolSummaryTable).where(inArray(SymbolSummaryTable.id, symbolArray)).all()).map(
+			formatSummaryToObject,
+		);
 
-		const cachedIds = cachedSummaries.map((d) => d.id);
-		console.log('cachedIds', cachedIds);
+		// check symbol validity 3min
+		const validStoredIds = storedSymbolSummaries
+			.filter((d) => !isBefore(new Date(d.lastUpdated), subMinutes(new Date(), 3)))
+			.map((d) => d.id);
 
 		// symbols to update
-		const symbolsToUpdate = symbolArray.filter((symbol) => !cachedSummaries.map((d) => d.id).includes(symbol));
-		console.log('symbolsToUpdate', symbolsToUpdate);
+		const symbolsToUpdate = symbolArray.filter((symbol) => !validStoredIds.includes(symbol));
 
 		// load data from api with
 		const [updatedQuotes, stockPriceChanges, profiles] = await Promise.all([
@@ -147,32 +159,43 @@ export default {
 					return undefined;
 				}
 
+				// STRINGIFY DATA OTHERWISE NOT SAVED
 				return {
 					id: symbol,
-					quote,
-					priceChange,
-					profile,
+					quote: JSON.stringify(quote),
+					priceChange: JSON.stringify(priceChange),
+					profile: profile ? JSON.stringify(profile) : null,
 				};
 			}) // filter out undefined values
-			.filter((d): d is StockSummary => !!d) satisfies StockSummary[];
+			.filter((d): d is StockSummaryTable => !!d) satisfies StockSummaryTable[];
 
 		// save new summaries into cache for 3min
-		await Promise.all(summaries.map((d) => env.get_symbol_summary.put(d.id, JSON.stringify(d), { expirationTtl: 60 * 3 })));
+		const savedData =
+			summaries.length > 0 ? (await db.insert(SymbolSummaryTable).values(summaries).returning().all()).map(formatSummaryToObject) : [];
 
 		// order [summaries, cachedSummaries] the same way as symbolArray
 		const orderedSummaries = symbolArray
 			.map((symbol) => {
-				const summary = summaries.find((d) => d.id === symbol);
+				const summary = savedData.find((d) => d.id === symbol);
 				if (summary) {
 					return summary;
 				}
-				return cachedSummaries.find((d) => d.id === symbol);
+				return storedSymbolSummaries.find((d) => d.id === symbol);
 			})
-			.filter((d): d is StockSummary => !!d);
+			.filter((d): d is StockSummaryTable => !!d);
 
 		// return data
 		return new Response(JSON.stringify(orderedSummaries), responseHeader);
 	},
+};
+
+const formatSummaryToObject = (summary: StockSummaryTable) => {
+	return {
+		...summary,
+		quote: JSON.parse(summary.quote),
+		profile: summary.profile ? JSON.parse(summary.profile) : null,
+		priceChange: JSON.parse(summary.priceChange),
+	};
 };
 
 const getCompanyQuote = async (symbols: string[]): Promise<SymbolQuote[]> => {

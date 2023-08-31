@@ -1,9 +1,16 @@
 name = "get-symbol-summary"
 main = "src/worker.ts"
 compatibility_date = "2023-08-21"
-kv_namespaces = [
-	{ binding = "get_symbol_summary", id = "14590d0e16f34b7ea096019bb75baf6b", preview_id = "d8846ab1ea344fd8812ac3dfb49741f2" }
-]
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "market-monitor"
+database_id = "05a5e71a-c328-4ca0-afd0-84171706d16d"
+preview_database_id = "local-test-db"
+
+# kv_namespaces = [
+# 	{ binding = "get_symbol_summary", id = "14590d0e16f34b7ea096019bb75baf6b", preview_id = "d8846ab1ea344fd8812ac3dfb49741f2" }
+# ]
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
