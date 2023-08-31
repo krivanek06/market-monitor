@@ -1,6 +1,5 @@
-import { getHistoricalPrices, getHistoricalPricesOnDate } from '@market-monitor/api-external';
+import { HistoricalPricePeriods, getHistoricalPricesByPeriod, getHistoricalPricesOnDate } from '@market-monitor/api-external';
 import { RESPONSE_HEADER } from '@market-monitor/api-types';
-import { format, subDays } from 'date-fns';
 /**
  * Welcome to Cloudflare Workers! This is your first worker.
  *
@@ -38,8 +37,6 @@ export interface HistoricalPrice {
 	close: number;
 	volume: number;
 }
-
-type HistoricalPricePeriods = '1d' | '1w' | '1mo' | '3mo' | '6mo' | '1y' | '5y' | 'ytd' | 'all';
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -85,100 +82,16 @@ export default {
 			}
 
 			// load data from api
-			const loadingPeriod = resolveLoadingPeriod(period);
-			const historicalPriceData = await getHistoricalPrices(symbol, loadingPeriod.loadingPeriod, loadingPeriod.from, loadingPeriod.to);
-			const reveredData = historicalPriceData.reverse();
+			const historicalPriceData = await getHistoricalPricesByPeriod(symbol, period);
 
 			// save into cache
-			await env.get_historical_prices.put(key, JSON.stringify(reveredData), { expirationTtl: 120 });
+			await env.get_historical_prices.put(key, JSON.stringify(historicalPriceData), { expirationTtl: 120 });
 
 			// return array of data
-			return new Response(JSON.stringify(reveredData), RESPONSE_HEADER);
+			return new Response(JSON.stringify(historicalPriceData), RESPONSE_HEADER);
 		}
 
 		// throw error if no period or date
 		return new Response('missing period or date', { status: 400 });
 	},
-};
-
-const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
-
-const resolveLoadingPeriod = (
-	period: HistoricalPricePeriods,
-): {
-	loadingPeriod: HistoricalLoadingPeriods;
-	from: string;
-	to: string;
-} => {
-	const today = new Date();
-	if (period === '1d') {
-		return {
-			loadingPeriod: '1min',
-			from: formatDate(today),
-			to: formatDate(today),
-		};
-	}
-
-	if (period === '1w') {
-		return {
-			loadingPeriod: '5min',
-			from: formatDate(subDays(today, 7)),
-			to: formatDate(today),
-		};
-	}
-
-	if (period === '1mo') {
-		return {
-			loadingPeriod: '1hour',
-			from: formatDate(subDays(today, 30)),
-			to: formatDate(today),
-		};
-	}
-
-	if (period === '3mo') {
-		return {
-			loadingPeriod: '1hour',
-			from: formatDate(subDays(today, 90)),
-			to: formatDate(today),
-		};
-	}
-
-	if (period === '6mo') {
-		return {
-			loadingPeriod: '4hour',
-			from: formatDate(subDays(today, 180)),
-			to: formatDate(today),
-		};
-	}
-
-	if (period === '1y') {
-		return {
-			loadingPeriod: '1day',
-			from: formatDate(subDays(today, 365)),
-			to: formatDate(today),
-		};
-	}
-
-	if (period === '5y') {
-		return {
-			loadingPeriod: '1week',
-			from: formatDate(subDays(today, 365 * 5)),
-			to: formatDate(today),
-		};
-	}
-
-	if (period === 'all') {
-		return {
-			loadingPeriod: '1month',
-			from: formatDate(subDays(today, 365 * 20)),
-			to: formatDate(today),
-		};
-	}
-
-	// ytd as default
-	return {
-		loadingPeriod: '1day',
-		from: formatDate(new Date(today.getFullYear(), 0, 1)),
-		to: formatDate(today),
-	};
 };

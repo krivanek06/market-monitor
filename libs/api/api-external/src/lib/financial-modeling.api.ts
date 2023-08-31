@@ -36,7 +36,7 @@ import {
 } from '@market-monitor/api-types';
 import axios from 'axios';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
-import { filterOutSymbols, getDateRangeByMonthAndYear } from './helpers';
+import { HistoricalPricePeriods, filterOutSymbols, getDateRangeByMonthAndYear, resolveLoadingPeriod } from './helpers';
 
 export const getCompanyQuote = async (symbols: string[]): Promise<SymbolQuote[]> => {
   const symbol = symbols.join(',');
@@ -84,6 +84,21 @@ export const getHistoricalPrices = async (
   const response = await fetch(url);
   const data = (await response.json()) as HistoricalPrice[];
   return data;
+};
+
+export const getHistoricalPricesByPeriod = async (
+  symbol: string,
+  period: HistoricalPricePeriods,
+): Promise<HistoricalPrice[]> => {
+  const loadingPeriod = resolveLoadingPeriod(period);
+  const historicalPriceData = await getHistoricalPrices(
+    symbol,
+    loadingPeriod.loadingPeriod,
+    loadingPeriod.from,
+    loadingPeriod.to,
+  );
+  const reveredData = historicalPriceData.reverse();
+  return reveredData;
 };
 
 /**
