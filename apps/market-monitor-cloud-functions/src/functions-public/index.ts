@@ -7,8 +7,6 @@ import { getStockHistoricalMetricsWrapper } from './stock-functions/get-stock-hi
 import { getStockInsiderTradesWrapper } from './stock-functions/get-stock-insider-trades';
 import { getOwnershipHoldersToDateWrapper } from './stock-functions/get-stock-ownership-holders-to-date';
 import { getOwnershipInstitutionalWrapper } from './stock-functions/get-stock-ownership-institutional';
-import { getStockScreeningWrapper } from './stock-functions/get-stock-screening';
-import { searchStocksBasicWrapper } from './stock-functions/search-stock-basic';
 
 // market-functions
 import {
@@ -49,16 +47,6 @@ export const getownershipholderstodate = firebaseSimpleErrorLogger(
 export const getownershipinstitutional = firebaseSimpleErrorLogger(
   'getOwnershipInstitutionalWrapper',
   corsMiddleWare(getOwnershipInstitutionalWrapper),
-);
-
-export const getstockscreening = firebaseSimpleErrorLogger(
-  'getStockScreeningWrapper',
-  corsMiddleWare(getStockScreeningWrapper),
-);
-
-export const searchstocksbasic = firebaseSimpleErrorLogger(
-  'searchStocksBasicWrapper',
-  corsMiddleWare(searchStocksBasicWrapper),
 );
 
 export const getquotebysymbol = firebaseSimpleErrorLogger(

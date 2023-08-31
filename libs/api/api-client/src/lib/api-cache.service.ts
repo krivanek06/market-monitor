@@ -24,7 +24,7 @@ export abstract class ApiCacheService {
 
   get headers(): HttpHeaders {
     const headersConfig = {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json; charset=utf-8',
       Accept: 'application/json',
     };
 
@@ -75,7 +75,7 @@ export abstract class ApiCacheService {
     // calculate validity
     const validity = validityDefault * this.validityOneMinute;
 
-    return this.httpClient.post<T>(`${url}`, data, { headers: this.headers }).pipe(
+    return this.httpClient.post<T>(url, JSON.stringify(data), { headers: this.headers }).pipe(
       retry(1),
       tap((data) => {
         this.cache.set(key, {

@@ -32,6 +32,7 @@ type StockSummary = {
 	id: string;
 	quote: SymbolQuote;
 	priceChange: PriceChange;
+	profile: CompanyProfile | undefined;
 };
 
 type PriceChange = {
@@ -62,6 +63,12 @@ type SymbolQuote = {
 	name: string;
 	price: number;
 	// other data
+};
+
+type CompanyProfile = {
+	symbol: string;
+	price: number;
+	// .... other data
 };
 
 // create response header
@@ -121,14 +128,19 @@ export default {
 		console.log('symbolsToUpdate', symbolsToUpdate);
 
 		// load data from api with
-		const [updatedQuotes, stockPriceChange] = await Promise.all([getCompanyQuote(symbolsToUpdate), getSymbolsPriceChanges(symbolArray)]);
+		const [updatedQuotes, stockPriceChanges, profiles] = await Promise.all([
+			getCompanyQuote(symbolsToUpdate),
+			getSymbolsPriceChanges(symbolArray),
+			getProfile(symbolArray),
+		]);
 
 		// map to correct data structure
 		const summaries = symbolsToUpdate
 			.map((symbol) => {
 				// find data from loaded API - ensureFind throws error if not found
 				const quote = updatedQuotes.find((q) => q.symbol === symbol);
-				const priceChange = stockPriceChange.find((p) => p.symbol === symbol);
+				const priceChange = stockPriceChanges.find((p) => p.symbol === symbol);
+				const profile = profiles.find((p) => p.symbol === symbol);
 
 				// if any of the data is missing, return undefined
 				if (!quote || !priceChange) {
@@ -139,6 +151,7 @@ export default {
 					id: symbol,
 					quote,
 					priceChange,
+					profile,
 				};
 			}) // filter out undefined values
 			.filter((d): d is StockSummary => !!d) satisfies StockSummary[];
@@ -191,6 +204,14 @@ const searchTicker = async (symbolPrefix: string, isCrypto = false): Promise<Tic
 	// check if symbol contains any of the ignored symbols
 	const filteredResponse = filterOutSymbols(data);
 	return filteredResponse;
+};
+
+const getProfile = async (symbols: string[]): Promise<CompanyProfile[]> => {
+	const symbol = symbols.join(',');
+	const url = `${FINANCIAL_MODELING_URL}/v3/profile/${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
+	const response = await fetch(url);
+	const data = (await response.json()) as CompanyProfile[];
+	return data;
 };
 
 const filterOutSymbols = <T extends { symbol: string }>(

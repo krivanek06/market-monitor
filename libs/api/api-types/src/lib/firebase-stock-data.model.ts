@@ -3,6 +3,7 @@ import {
   CompanyKeyMetrics,
   CompanyKeyMetricsTTM,
   CompanyOutlook,
+  CompanyProfile,
   CompanyRatio,
   ESGDataQuarterly,
   ESGDataRatingYearly,
@@ -19,6 +20,7 @@ import {
 export type StockSummary = {
   id: string;
   quote: SymbolQuote;
+  profile?: CompanyProfile;
   priceChange: PriceChange;
 };
 
