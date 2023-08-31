@@ -284,7 +284,6 @@ export const getStockHistoricalEarnings = async (symbol: string): Promise<StockE
   const response = await axios.get<StockEarning[]>(url);
   // remove first 3 items if epsEstimated is undefined
   const filteredResponse = response.data.slice(0, 3).filter((item) => item.epsEstimated);
-  console.log(filteredResponse);
   return [...response.data.slice(3), ...filteredResponse];
 };
 

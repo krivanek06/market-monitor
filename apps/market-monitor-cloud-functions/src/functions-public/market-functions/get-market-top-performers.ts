@@ -1,9 +1,8 @@
-import { getMostPerformingStocks, getSymbolPrice } from '@market-monitor/api-external';
+import { getMostPerformingStocks, getSymbolPrice, getSymbolSummaries } from '@market-monitor/api-external';
 import { getDatabaseMarketTopPerformanceRef } from '@market-monitor/api-firebase';
 import { MarketTopPerformanceOverviewResponse, SYMBOL_SP500 } from '@market-monitor/api-types';
 import { isBefore, subMinutes } from 'date-fns';
 import { Response } from 'express';
-import { getSummaries } from '../../shared';
 
 export const getMarketTopPerformanceWrapper = async (_, response: Response<MarketTopPerformanceOverviewResponse>) => {
   // load data from firestore
@@ -50,9 +49,9 @@ export const getMarketTopPerformanceWrapper = async (_, response: Response<Marke
 
   // load stock summary data
   const [gainersData, losersData, activesData] = await Promise.all([
-    getSummaries(gainersSymbols),
-    getSummaries(losersSymbols),
-    getSummaries(activesSymbols),
+    getSymbolSummaries(gainersSymbols),
+    getSymbolSummaries(losersSymbols),
+    getSymbolSummaries(activesSymbols),
   ]);
 
   // limit data in fireabase

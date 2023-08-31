@@ -8,6 +8,7 @@ import {
   getRecommendationTrends,
   getSectorPeersForSymbols,
   getStockHistoricalEarnings,
+  getSymbolSummary,
   getUpgradesDowngrades,
 } from '@market-monitor/api-external';
 import { getDatabaseStockDetailsRef } from '@market-monitor/api-firebase';
@@ -15,7 +16,6 @@ import { CompanyOutlook, StockDetails, StockDetailsAPI, StockSummary } from '@ma
 import { ForcefullyOmit } from '@market-monitor/shared-utils-general';
 import { isBefore, subDays } from 'date-fns';
 import { Request, Response } from 'express';
-import { getSummary } from '../../shared';
 
 /**
  * returns symbols details based on provided symbol in query
@@ -31,8 +31,7 @@ export const getStockDetailsWrapper = async (request: Request, response: Respons
   }
 
   // load summary
-  const summary = await getSummary(symbolString);
-  const reload = reloadParam ?? summary.reloadDetailsData;
+  const summary = await getSymbolSummary(symbolString);
 
   // prevent loading data for etf and funds
   if (summary.profile.isEtf || summary.profile.isFund) {
@@ -41,7 +40,7 @@ export const getStockDetailsWrapper = async (request: Request, response: Respons
   }
 
   // data will be always present, if symbol does not exist, it already failed on summary
-  const details = await getStockDetailsAPI(symbolString, reload);
+  const details = await getStockDetailsAPI(symbolString, reloadParam);
   const formattedDetails = modifyDetailsAPItoStockDetails(summary, details);
 
   response.send(formattedDetails);
@@ -90,7 +89,6 @@ const modifyDetailsAPItoStockDetails = (summary: StockSummary, details: StockDet
 
   const result = {
     ...summary,
-    reloadData: false,
     companyOutlook,
     ratio,
     rating,
