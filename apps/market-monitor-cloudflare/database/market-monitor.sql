@@ -28,3 +28,15 @@ CREATE TABLE IF NOT EXISTS historical_prices (
   data TEXT NOT NULL,
   lastUpdate timestamp DEFAULT CURRENT_TIMESTAMP
 );
+
+
+/*
+  Create a table to store market json data
+*/
+CREATE TABLE IF NOT EXISTS market_data (
+  id VARCHAR(100) PRIMARY KEY,
+  data TEXT NOT NULL,
+  lastUpdate timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+

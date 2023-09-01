@@ -483,10 +483,11 @@ export const searchTicker = async (symbolPrefix: string, isCrypto = false): Prom
   const prefixUppercase = symbolPrefix.toUpperCase();
   const url = `${FINANCIAL_MODELING_URL}/v3/search?query=${prefixUppercase}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
 
-  const response = await axios.get<TickerSearch[]>(url);
+  const response = await fetch(url);
+  const data = (await response.json()) as TickerSearch[];
 
   // check if symbol contains any of the ignored symbols
-  const filteredResponse = filterOutSymbols(response.data);
+  const filteredResponse = filterOutSymbols(data);
   return filteredResponse;
 };
 
@@ -519,20 +520,23 @@ export const getSymbolOwnershipHolders = async (
   page = 0,
 ): Promise<SymbolOwnershipHolders[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/institutional-holders/symbol-ownership-percent?symbol=${symbol}&page=${page}&date=${date}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<SymbolOwnershipHolders[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as SymbolOwnershipHolders[];
+  return data;
 };
 
 export const getInstitutionalPortfolioDates = async (cik: string = '0000093751'): Promise<string[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/portfolio-date?cik=${cik}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<{ date: string }[]>(url);
-  return response.data.map((d) => d.date);
+  const response = await fetch(url);
+  const data = (await response.json()) as { date: string }[];
+  return data.map((d) => d.date);
 };
 
 export const getInsiderTrading = async (symbol: string, page = 0): Promise<CompanyInsideTrade[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/insider-trading?symbol=${symbol}&page=${page}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<CompanyInsideTrade[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as CompanyInsideTrade[];
+  return data;
 };
 
 /**

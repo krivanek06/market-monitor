@@ -1,4 +1,5 @@
-import { getMostPerformingStocks, getSymbolSummaries } from '@market-monitor/api-external';
+import { getInstitutionalPortfolioDates, getMostPerformingStocks, getQuotesByType, getSymbolSummaries } from '@market-monitor/api-external';
+import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 /**
  * Welcome to Cloudflare Workers! This is your first worker.
  *
@@ -10,12 +11,15 @@ import { getMostPerformingStocks, getSymbolSummaries } from '@market-monitor/api
  */
 
 import {
+	AvailableQuotes,
 	GetBasicDataType,
 	MarketTopPerformanceOverviewResponse,
 	MarketTopPerformanceSymbols,
 	RESPONSE_HEADER,
 	StockSummary,
+	SymbolQuote,
 } from '@market-monitor/api-types';
+import { sql } from 'drizzle-orm';
 
 export interface Env {
 	get_basic_data: KVNamespace;
@@ -35,6 +39,14 @@ export interface Env {
 	// MY_QUEUE: Queue;
 }
 
+const MarketDataTable = sqliteTable('MarketDataTable', {
+	id: text('id').primaryKey(),
+	data: text('data').notNull().$type<string>(),
+	lastUpdate: text('lastUpdate')
+		.notNull()
+		.default(sql`CURRENT_TIMESTAMP`),
+});
+
 /**
  * One endpoint for executing and caching basic HTTP requests
  */
@@ -53,8 +65,59 @@ export default {
 			return new Response(JSON.stringify(topSymbols), RESPONSE_HEADER);
 		}
 
+		/**
+		 * TODO: not working, upgrade to enterprise plan
+		 */
+		if (type === 'institutional-portfolio-dates') {
+			const institutionalPortfolioDates = await getInstitutionalPortfolioDatesWrapper(env);
+			return new Response(JSON.stringify(institutionalPortfolioDates), RESPONSE_HEADER);
+		}
+
+		if (type === 'quote-by-type') {
+			const quoteType = searchParams.get('quoteType') as AvailableQuotes | undefined;
+			if (!quoteType) {
+				return new Response('missing quote type', { status: 400 });
+			}
+			const quotes = await getQuotesByTypeWrapper(env, quoteType);
+			return new Response(JSON.stringify(quotes), RESPONSE_HEADER);
+		}
+
 		return new Response('Unsupported request', { status: 400 });
 	},
+};
+
+const getInstitutionalPortfolioDatesWrapper = async (env: Env): Promise<string[]> => {
+	// load data from KV
+	const key = 'institutional_portfolio_dates';
+	const cachedData = await env.get_basic_data.get(key);
+	if (cachedData) {
+		return JSON.parse(cachedData) as string[];
+	}
+
+	// load from api
+	const data = await getInstitutionalPortfolioDates();
+
+	// save into cache
+	const expirationOneWeek = 60 * 60 * 24 * 7;
+	env.get_basic_data.put(key, JSON.stringify(data), { expirationTtl: expirationOneWeek });
+	return data;
+};
+
+const getQuotesByTypeWrapper = async (env: Env, quoteType: AvailableQuotes): Promise<SymbolQuote[]> => {
+	// load data from KV
+	const key = `quote_${quoteType}`;
+	const cachedData = await env.get_basic_data.get(key);
+	if (cachedData) {
+		return JSON.parse(cachedData) as SymbolQuote[];
+	}
+
+	// load data
+	const data = await getQuotesByType(quoteType);
+
+	// save into cache for 1 week
+	const expirationOneWeek = 60 * 60 * 24 * 7;
+	env.get_basic_data.put(key, JSON.stringify(data), { expirationTtl: expirationOneWeek });
+	return data;
 };
 
 const getTopSymbols = async (env: Env): Promise<MarketTopPerformanceOverviewResponse> => {
