@@ -8,17 +8,6 @@ import { getStockInsiderTradesWrapper } from './stock-functions/get-stock-inside
 import { getOwnershipHoldersToDateWrapper } from './stock-functions/get-stock-ownership-holders-to-date';
 import { getOwnershipInstitutionalWrapper } from './stock-functions/get-stock-ownership-institutional';
 
-// market-functions
-import {
-  getCalendarStockDividendsWrapper,
-  getCalendarStockEarnignsWrapper,
-  getCalendarStockIposWrapper,
-} from './market-functions/get-calendar-stock';
-import { getInstitutionalPortfolioDatesWrapper } from './market-functions/get-institutional-portfolio-dates';
-import { getMarketOverviewDataWrapper, getMarketOverviewWrapper } from './market-functions/get-market-overview';
-import { getMarketTopPerformanceWrapper } from './market-functions/get-market-top-performers';
-import { getQuotesByTypeWrapper } from './market-functions/get-quotes-by-type';
-
 // wrap functions with sentry
 export const getstockdetails = firebaseSimpleErrorLogger(
   'getStockDetailsWrapper',
@@ -46,42 +35,4 @@ export const getownershipholderstodate = firebaseSimpleErrorLogger(
 export const getownershipinstitutional = firebaseSimpleErrorLogger(
   'getOwnershipInstitutionalWrapper',
   corsMiddleWare(getOwnershipInstitutionalWrapper),
-);
-
-export const getcalendarstockdividends = firebaseSimpleErrorLogger(
-  'getCalendarStockDividendsWrapper',
-  corsMiddleWare(getCalendarStockDividendsWrapper),
-);
-
-export const getcalendarstockearnigns = firebaseSimpleErrorLogger(
-  'getCalendarStockEarnignsWrapper',
-  corsMiddleWare(getCalendarStockEarnignsWrapper),
-);
-
-export const getcalendarstockipos = firebaseSimpleErrorLogger(
-  'getCalendarStockIposWrapper',
-  corsMiddleWare(getCalendarStockIposWrapper),
-);
-export const getinstitutionalportfoliodates = firebaseSimpleErrorLogger(
-  'getInstitutionalPortfolioDatesWrapper',
-  corsMiddleWare(getInstitutionalPortfolioDatesWrapper),
-);
-
-export const getmarketoverview = firebaseSimpleErrorLogger(
-  'getMarketOverviewWrapper',
-  corsMiddleWare(getMarketOverviewWrapper),
-);
-export const getmarketoverviewdata = firebaseSimpleErrorLogger(
-  'getMarketOverviewDataWrapper',
-  corsMiddleWare(getMarketOverviewDataWrapper),
-);
-
-export const getmarkettopperformance = firebaseSimpleErrorLogger(
-  'getMarketTopPerformanceWrapper',
-  corsMiddleWare(getMarketTopPerformanceWrapper),
-);
-
-export const getquotesbytype = firebaseSimpleErrorLogger(
-  'getQuotesByTypeWrapper',
-  corsMiddleWare(getQuotesByTypeWrapper),
 );

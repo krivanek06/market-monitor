@@ -1,1 +1,1 @@
-export * from './load-market-overview-data';
+export * from '../functions-public/market-functions/market-overview';

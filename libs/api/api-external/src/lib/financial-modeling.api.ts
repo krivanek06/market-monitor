@@ -437,9 +437,10 @@ export const getCalendarStockDividends = async (
 ): Promise<CalendarDividend[]> => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v3/stock_dividend_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<CompanyStockDividend[]>(url);
+  const response = await fetch(url);
+  const data = (await response.json()) as CompanyStockDividend[];
   const filteredOutResponse = filterOutSymbols(
-    response.data,
+    data,
     [],
     ['recordDate', 'paymentDate', 'declarationDate', 'label', 'adjDividend'],
   );
@@ -452,8 +453,9 @@ export const getCalendarStockIPOs = async (
 ): Promise<CalendarStockIPO[]> => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v4/ipo-calendar-prospectus?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<(CalendarStockIPO & { ipoDate: string })[]>(url);
-  const filteredOutResponse = filterOutSymbols(response.data);
+  const response = await fetch(url);
+  const data = (await response.json()) as (CalendarStockIPO & { ipoDate: string })[];
+  const filteredOutResponse = filterOutSymbols(data);
 
   // change key name 'ipoDate' to 'date';
   filteredOutResponse.forEach((item) => {
@@ -497,8 +499,9 @@ export const getCalendarStockEarnings = async (
 ): Promise<CalendarStockEarning[]> => {
   const [from, to] = getDateRangeByMonthAndYear(month, year);
   const url = `${FINANCIAL_MODELING_URL}/v3/earning_calendar?from=${from}&to=${to}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<StockEarning[]>(url);
-  const filteredOutResponse = filterOutSymbols(response.data, [], ['fiscalDateEnding', 'updatedFromDate', 'time']);
+  const response = await fetch(url);
+  const data = (await response.json()) as StockEarning[];
+  const filteredOutResponse = filterOutSymbols(data, [], ['fiscalDateEnding', 'updatedFromDate', 'time']);
   return filteredOutResponse;
 };
 
