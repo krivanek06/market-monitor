@@ -1,4 +1,4 @@
-import { getQuandlDataFormatter, getTreasuryYieldUS } from '@market-monitor/api-external';
+import { getQuandlDataFormatter, getTreasuryYieldUS, postMarketOverview } from '@market-monitor/api-external';
 import {
   MARKET_OVERVIEW_DATABASE_ENDPOINTS,
   MarketOverview,
@@ -9,14 +9,13 @@ import {
 import { delaySeconds } from '@market-monitor/shared-utils-general';
 import { Request, Response } from 'express';
 import { warn } from 'firebase-functions/logger';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 export const getMarketOverviewDataWrapper = async (request: Request, response: Response<MarketOverviewData | null>) => {
   // i.e: sp500
   const key = request.query.key as MarketOverviewDatabaseKeys;
   // i.e: peRatio
   const subKey = request.query.subKey as string;
-  // whether to reload data from api or not
-  const hardReload = request.query.hardReload as string;
 
   // if information not provided send error to client
   if (!key || !subKey) {
@@ -24,25 +23,32 @@ export const getMarketOverviewDataWrapper = async (request: Request, response: R
     throw new Error('key or subkey to access data not provided');
   }
 
-  const result = await loadMarketOverviewData(key, subKey, hardReload === 'true');
+  const result = await loadMarketOverviewData(key, subKey);
 
   response.send(result);
 };
 
-export const reload_market_overview = async (request: Request, response: Response<MarketOverview | null>) => {
-  // reload data from api
-  const loadedData = await reloadMarketOverview();
+export const run_reload_market_overview = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '0 22 * * 5',
+  },
+  async (event) => {
+    // reload data from api
+    const loadedData = await reloadMarketOverview();
 
-  // return data
-  response.send(loadedData);
+    // send data into cloudflare to save into KV
+    await postMarketOverview(loadedData);
 
-  // send notification to user
-  console.log('function rungetmarketoverview finished successfully');
-};
+    // send notification to user
+    console.log('function rungetmarketoverview finished successfully');
+  },
+);
 
 const reloadMarketOverview = async (): Promise<MarketOverview> => {
-  const waitingSeconds = 12;
+  const waitingSeconds = 11;
   const datasetLimit = 100;
+  const startTime = Date.now();
 
   // helper function to create correct data format
   const dataFormatter = <T extends keyof MarketOverview>(data: MarketOverviewData[], mainKey: T) => {
@@ -59,65 +65,49 @@ const reloadMarketOverview = async (): Promise<MarketOverview> => {
     );
   };
 
-  // create function to generate random number between 0 and 15
-  const randomWait = () => Math.floor(Math.random() * 16);
+  const createOverviewDataBundle = async (key: MarketOverviewDatabaseKeys): Promise<MarketOverviewData[]> => {
+    let marketOverviewDataTmp: MarketOverviewData[] = [];
+    for await (const subKey of marketOverviewToLoad[key]) {
+      const data = await loadMarketOverviewData(key, subKey, 1);
+      await delaySeconds(1);
+      marketOverviewDataTmp.push(data);
+    }
+
+    return marketOverviewDataTmp;
+  };
 
   // load data from API, but wait N seconds between each call to avoid rate limit
   console.log('loading data for SP500');
-  const sp500Data = dataFormatter(
-    await Promise.all(
-      marketOverviewToLoad.sp500.map((subKey) => loadMarketOverviewData('sp500', subKey, true, randomWait())),
-    ),
-    'sp500',
-  );
+  const sp500Data = dataFormatter(await createOverviewDataBundle('sp500'), 'sp500');
+
   console.log('sp500 data loaded');
   console.log(`waiting ${waitingSeconds} seconds finished`);
   await delaySeconds(waitingSeconds);
 
   console.log('loading data for bonds');
-  const bondsData = dataFormatter(
-    await Promise.all(
-      marketOverviewToLoad.bonds.map((subKey) => loadMarketOverviewData('bonds', subKey, true, randomWait())),
-    ),
-    'bonds',
-  );
+  const bondsData = dataFormatter(await createOverviewDataBundle('bonds'), 'bonds');
+
   console.log('bonds data loaded');
   console.log(`waiting ${waitingSeconds} seconds finished`);
   await delaySeconds(waitingSeconds);
 
   console.log('loading data for treasury');
-  const treasuryData = dataFormatter(
-    await Promise.all(
-      marketOverviewToLoad.treasury.map((subKey) => loadMarketOverviewData('treasury', subKey, true, randomWait())),
-    ),
-    'treasury',
-  );
+  const treasuryData = dataFormatter(await createOverviewDataBundle('treasury'), 'treasury');
+
   console.log('treasury data loaded');
   console.log(`waiting ${waitingSeconds} seconds finished`);
   await delaySeconds(waitingSeconds);
 
   console.log('loading data for inflationRate');
-  const inflationRateData = dataFormatter(
-    await Promise.all(
-      marketOverviewToLoad.inflationRate.map((subKey) =>
-        loadMarketOverviewData('inflationRate', subKey, true, randomWait()),
-      ),
-    ),
-    'inflationRate',
-  );
+  const inflationRateData = dataFormatter(await createOverviewDataBundle('inflationRate'), 'inflationRate');
+
   console.log('inflationRate data loaded');
   console.log(`waiting ${waitingSeconds} seconds finished`);
   await delaySeconds(waitingSeconds);
 
   console.log('loading data for consumerIndex');
-  const consumerIndexData = dataFormatter(
-    await Promise.all(
-      marketOverviewToLoad.consumerIndex.map((subKey) =>
-        loadMarketOverviewData('consumerIndex', subKey, true, randomWait()),
-      ),
-    ),
-    'consumerIndex',
-  );
+  const consumerIndexData = dataFormatter(await createOverviewDataBundle('consumerIndex'), 'consumerIndex');
+
   console.log('consumerIndex data loaded');
 
   const marketOverview: MarketOverview = {
@@ -138,20 +128,24 @@ const reloadMarketOverview = async (): Promise<MarketOverview> => {
     },
   };
 
+  // display how many seconds it took to load data
+  const endTime = Date.now();
+  const seconds = (endTime - startTime) / 1000;
+  console.log(`loading data took ${seconds} seconds`);
+
   return marketOverview;
 };
 
 const loadMarketOverviewData = async (
   key: MarketOverviewDatabaseKeys,
   subKey: string,
-  hardReload = false,
   waitSeconds = 0,
 ): Promise<MarketOverviewData> => {
+  console.log(`wait = ${waitSeconds}, key = ${key}, subkey = ${subKey}`);
   await delaySeconds(waitSeconds);
 
   // get document and url from database: {qundal_treasury_yield_curve_rates_1_mo, USTREASURY/YIELD}
   const { document, url } = MARKET_OVERVIEW_DATABASE_ENDPOINTS[key].data?.[subKey];
-  console.log(key, subKey, document, url);
 
   if (!document || !url) {
     console.log(`no firebaseDocument found for key: [${key}] - [${document}]`);

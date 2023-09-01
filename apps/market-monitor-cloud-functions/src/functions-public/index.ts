@@ -1,4 +1,8 @@
 import { corsMiddleWare, firebaseSimpleErrorLogger } from '../utils';
+import {
+  getMarketOverviewDataWrapper,
+  run_reload_market_overview as run_reload_market_overview_wrapper,
+} from './market-functions/market-overview';
 
 // stock-functions
 import { getStockDetailsWrapper } from './stock-functions/get-stock-details';
@@ -35,4 +39,11 @@ export const getownershipholderstodate = firebaseSimpleErrorLogger(
 export const getownershipinstitutional = firebaseSimpleErrorLogger(
   'getOwnershipInstitutionalWrapper',
   corsMiddleWare(getOwnershipInstitutionalWrapper),
+);
+
+export const run_reload_market_overview = run_reload_market_overview_wrapper;
+
+export const getmarketoverviewdata = firebaseSimpleErrorLogger(
+  'getMarketOverviewDataWrapper',
+  corsMiddleWare(getMarketOverviewDataWrapper),
 );

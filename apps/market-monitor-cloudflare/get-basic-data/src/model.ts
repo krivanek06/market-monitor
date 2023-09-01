@@ -3,6 +3,7 @@ import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export interface Env {
 	get_basic_data: KVNamespace;
+	DB: D1Database;
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 	// MY_KV_NAMESPACE: KVNamespace;
 	//

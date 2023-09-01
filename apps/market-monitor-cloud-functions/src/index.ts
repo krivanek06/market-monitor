@@ -38,7 +38,6 @@ admin.firestore().settings({
 
 // must be below setGlobalOptions otherwise it will not set the region
 export * from './functions-public';
-export * from './functions-scheduled';
 
 // function for SSR
 const universal = require(`${process.cwd()}/server/main`).app();

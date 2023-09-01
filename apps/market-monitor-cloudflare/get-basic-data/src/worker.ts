@@ -1,6 +1,6 @@
 import { getCalendarData } from './get-calendar-data';
 import { getInstitutionalPortfolioDatesWrapper } from './get-institutional-portfolio';
-import { getMarketOverData } from './get-market-overview';
+import { getMarketOverData, getMarketOverview, saveMarketOverview } from './get-market-overview';
 import { getQuotesByTypeWrapper } from './get-quotes-by-type';
 import { getTopSymbols } from './get-top-symbols';
 import { Env } from './model';
@@ -11,6 +11,7 @@ type GetBasicDataType =
 	| 'institutional-portfolio-dates'
 	| 'calendar'
 	| 'market-overview'
+	| 'market-overview-save'
 	| 'market-overview-data';
 
 /**
@@ -34,7 +35,12 @@ export default {
 			return getCalendarData(env, searchParams);
 		}
 
+		if (type === 'market-overview-save') {
+			return saveMarketOverview(env, request);
+		}
+
 		if (type === 'market-overview') {
+			return getMarketOverview(env);
 		}
 
 		if (type === 'market-overview-data') {
