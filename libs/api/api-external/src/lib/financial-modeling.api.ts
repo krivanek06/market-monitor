@@ -412,14 +412,16 @@ export const getNewsFromApi = async (newsType: NewsTypes, symbol: string = '') =
  */
 export const getMostPerformingStocks = async (type: 'gainers' | 'losers' | 'actives') => {
   const url = `${FINANCIAL_MODELING_URL}/v3/stock_market/${type}?apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<MostPerformingStocks[]>(url);
-  return response.data.slice(0, 20);
+  const response = await fetch(url);
+  const data = (await response.json()) as MostPerformingStocks[];
+  return data.slice(0, 20);
 };
 
 export const getQuotesByType = async (type: AvailableQuotes) => {
   const url = `${FINANCIAL_MODELING_URL}/v3/quotes/${type}?apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<SymbolQuote[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as SymbolQuote[];
+  return data;
 };
 
 export const getQuotesBySymbols = async (symbols: string[]) => {

@@ -4,7 +4,7 @@ import {
   CompanyStockDividend,
   MarketOverview,
   MarketOverviewData,
-  MarketTopPerformanceOverview,
+  MarketTopPerformanceSymbols,
 } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './firebase.util';
@@ -13,7 +13,7 @@ import { DataSnapshot } from './models';
 export const getDatabaseMarketDataRef = () => firestore().collection('market_data');
 
 export const getDatabaseMarketTopPerformanceRef = () =>
-  getDatabaseMarketDataRef().doc('market_top_performance').withConverter(assignTypes<MarketTopPerformanceOverview>());
+  getDatabaseMarketDataRef().doc('market_top_performance').withConverter(assignTypes<MarketTopPerformanceSymbols>());
 
 export const getDatabaseMarketOverviewRef = () =>
   getDatabaseMarketDataRef().doc('market_overview').withConverter(assignTypes<MarketOverview>());
