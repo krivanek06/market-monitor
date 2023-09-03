@@ -1,5 +1,11 @@
 import { getCalendarStockDividends, getCalendarStockEarnings, getCalendarStockIPOs } from '@market-monitor/api-external';
-import { AllowedCalendarAssetTypes, CalendarAssetDataTypes, CalendarAssetTypes, RESPONSE_HEADER } from '@market-monitor/api-types';
+import {
+	AllowedCalendarAssetTypes,
+	CalendarAssetDataTypes,
+	CalendarAssetTypes,
+	EXPIRATION_ONE_WEEK,
+	RESPONSE_HEADER,
+} from '@market-monitor/api-types';
 import { Env } from './model';
 
 export const getCalendarData = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {
@@ -30,8 +36,7 @@ export const getCalendarData = async (env: Env, searchParams: URLSearchParams): 
 	const data = await resultAPIbyType(calendarType, year, month);
 
 	// save data into KV
-	const expirationOneWeek = 60 * 60 * 24 * 7;
-	await env.get_basic_data.put(key, JSON.stringify(data), { expirationTtl: expirationOneWeek });
+	await env.get_basic_data.put(key, JSON.stringify(data), { expirationTtl: EXPIRATION_ONE_WEEK });
 
 	// return data
 	return new Response(JSON.stringify(data), RESPONSE_HEADER);

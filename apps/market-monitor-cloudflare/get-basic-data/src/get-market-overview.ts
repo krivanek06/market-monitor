@@ -1,5 +1,5 @@
 import { getMarketOverviewDataAPI } from '@market-monitor/api-external';
-import { MarketOverview, MarketOverviewDatabaseKeys, RESPONSE_HEADER } from '@market-monitor/api-types';
+import { EXPIRATION_ONE_WEEK, MarketOverview, MarketOverviewDatabaseKeys, RESPONSE_HEADER } from '@market-monitor/api-types';
 import { Env } from './model';
 
 export const getMarketOverData = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {
@@ -26,8 +26,7 @@ export const getMarketOverData = async (env: Env, searchParams: URLSearchParams)
 		const data = await getMarketOverviewDataAPI(key, subKey);
 
 		// save into cache
-		const expirationOneWeek = 60 * 60 * 24 * 7;
-		await env.get_basic_data.put(cacheKey, JSON.stringify(data), { expirationTtl: expirationOneWeek });
+		await env.get_basic_data.put(cacheKey, JSON.stringify(data), { expirationTtl: EXPIRATION_ONE_WEEK });
 
 		// return data
 		return new Response(JSON.stringify(data), RESPONSE_HEADER);
@@ -59,9 +58,8 @@ export const saveMarketOverview = async (env: Env, request: Request): Promise<Re
 		return new Response('Missing request body', { status: 400 });
 	}
 
-	const expirationOneWeek = 60 * 60 * 24 * 7;
 	const key = 'market-overview';
-	await env.get_basic_data.put(key, JSON.stringify(requestJson), { expirationTtl: expirationOneWeek });
+	await env.get_basic_data.put(key, JSON.stringify(requestJson), { expirationTtl: EXPIRATION_ONE_WEEK });
 
 	return new Response('saved', RESPONSE_HEADER);
 };

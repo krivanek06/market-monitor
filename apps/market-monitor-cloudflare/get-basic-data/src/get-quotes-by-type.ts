@@ -1,5 +1,5 @@
 import { getQuotesByType } from '@market-monitor/api-external';
-import { AvailableQuotes, RESPONSE_HEADER } from '@market-monitor/api-types';
+import { AvailableQuotes, EXPIRATION_ONE_WEEK, RESPONSE_HEADER } from '@market-monitor/api-types';
 import { Env } from './model';
 
 export const getQuotesByTypeWrapper = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {
@@ -20,8 +20,7 @@ export const getQuotesByTypeWrapper = async (env: Env, searchParams: URLSearchPa
 	const data = await getQuotesByType(quoteType);
 
 	// save into cache for 1 week
-	const expirationOneWeek = 60 * 60 * 24 * 7;
-	env.get_basic_data.put(key, JSON.stringify(data), { expirationTtl: expirationOneWeek });
+	env.get_basic_data.put(key, JSON.stringify(data), { expirationTtl: EXPIRATION_ONE_WEEK });
 
 	// stringify data and return
 	return new Response(JSON.stringify(data), RESPONSE_HEADER);

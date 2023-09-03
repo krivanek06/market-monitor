@@ -1,5 +1,5 @@
 import { getInstitutionalPortfolioDates } from '@market-monitor/api-external';
-import { RESPONSE_HEADER } from '@market-monitor/api-types';
+import { EXPIRATION_ONE_WEEK, RESPONSE_HEADER } from '@market-monitor/api-types';
 import { Env } from './model';
 
 export const getInstitutionalPortfolioDatesWrapper = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {
@@ -14,8 +14,7 @@ export const getInstitutionalPortfolioDatesWrapper = async (env: Env, searchPara
 	const data = await getInstitutionalPortfolioDates();
 
 	// save into cache
-	const expirationOneWeek = 60 * 60 * 24 * 7;
-	env.get_basic_data.put(key, JSON.stringify(data), { expirationTtl: expirationOneWeek });
+	env.get_basic_data.put(key, JSON.stringify(data), { expirationTtl: EXPIRATION_ONE_WEEK });
 
 	// return stringified data
 	return new Response(JSON.stringify(data), RESPONSE_HEADER);
