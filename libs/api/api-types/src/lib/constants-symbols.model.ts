@@ -31,14 +31,3 @@ export enum DataTimePeriodEnum {
   YEAR = 'year',
 }
 export type DataTimePeriod = `${DataTimePeriodEnum}`;
-
-// create response header
-export const RESPONSE_HEADER = {
-  status: 200,
-  headers: {
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'content-type': 'application/json;charset=UTF-8',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': '*',
-  },
-} satisfies ResponseInit;

@@ -2,6 +2,11 @@ name = "get-stock-data"
 main = "src/worker.ts"
 compatibility_date = "2023-08-21"
 
+kv_namespaces = [
+	{ binding = "get_stock_data", id = "5fc221dae03e4be39c6cdbfefe688b18", preview_id = "7608170cfd54450592bedd3178111976" }
+]
+
+
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
 # Docs: https://developers.cloudflare.com/workers/platform/environment-variables

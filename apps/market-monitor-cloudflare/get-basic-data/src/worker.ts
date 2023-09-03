@@ -47,9 +47,6 @@ export default {
 			return getMarketOverData(env, searchParams);
 		}
 
-		/**
-		 * TODO: not working, upgrade to enterprise plan
-		 */
 		if (type === 'institutional-portfolio-dates') {
 			return getInstitutionalPortfolioDatesWrapper(env, searchParams);
 		}
