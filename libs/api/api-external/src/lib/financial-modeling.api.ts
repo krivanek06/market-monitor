@@ -34,7 +34,6 @@ import {
   TickerSearch,
   UpgradesDowngrades,
 } from '@market-monitor/api-types';
-import axios from 'axios';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
 import { HistoricalPricePeriods, filterOutSymbols, getDateRangeByMonthAndYear, resolveLoadingPeriod } from './helpers';
 
@@ -56,8 +55,9 @@ export const getProfile = async (symbols: string[]): Promise<CompanyProfile[]> =
 
 export const getCompanyOutlook = async (symbol: string): Promise<CompanyOutlook> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/company-outlook?symbol=${symbol}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<CompanyOutlook>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as CompanyOutlook;
+  return data;
 };
 
 /**
@@ -130,8 +130,9 @@ export const getHistoricalPricesOnDate = async (symbol: string, date: string): P
  */
 export const getEsgRatingYearly = async (symbol: string): Promise<ESGDataRatingYearly[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/esg-environmental-social-governance-data-ratings?symbol=${symbol}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<ESGDataRatingYearly[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as ESGDataRatingYearly[];
+  return data;
 };
 
 /**
@@ -154,8 +155,9 @@ export const getEsgRatingYearly = async (symbol: string): Promise<ESGDataRatingY
  */
 export const getEsgDataQuarterly = async (symbol: string): Promise<ESGDataQuarterly[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/esg-environmental-social-governance-data?symbol=${symbol}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<ESGDataQuarterly[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as ESGDataQuarterly[];
+  return data;
 };
 
 /**
@@ -176,8 +178,9 @@ export const getEsgDataQuarterly = async (symbol: string): Promise<ESGDataQuarte
  */
 export const getUpgradesDowngrades = async (symbol: string): Promise<UpgradesDowngrades[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/upgrades-downgrades?symbol=${symbol}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<UpgradesDowngrades[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as UpgradesDowngrades[];
+  return data;
 };
 
 /**
@@ -198,8 +201,9 @@ export const getUpgradesDowngrades = async (symbol: string): Promise<UpgradesDow
  */
 export const getPriceTarget = async (symbol: string): Promise<PriceTarget[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/price-target?symbol=${symbol}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<PriceTarget[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as PriceTarget[];
+  return data;
 };
 
 /**
@@ -215,8 +219,9 @@ export const getPriceTarget = async (symbol: string): Promise<PriceTarget[]> => 
  */
 export const getCompanyEarnings = async (symbol: string): Promise<Earnings[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/earnings-surprise/${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<Earnings[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as Earnings[];
+  return data;
 };
 
 /**
@@ -253,14 +258,16 @@ export const getAnalystEstimates = async (
   period: DataTimePeriod = 'quarter',
 ): Promise<AnalystEstimates[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/analyst-estimates/${symbol}?period=${period}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<AnalystEstimates[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as AnalystEstimates[];
+  return data;
 };
 
 export const getCompanyKeyMetricsTTM = async (symbol: string): Promise<CompanyKeyMetricsTTM> => {
   const url = `${FINANCIAL_MODELING_URL}/v3/key-metrics-ttm/${symbol}?apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<CompanyKeyMetricsTTM[]>(url);
-  return response.data[0];
+  const response = await fetch(url);
+  const data = (await response.json()) as CompanyKeyMetricsTTM[];
+  return data[0];
 };
 
 export const getCompanyKeyMetrics = async (
@@ -269,21 +276,24 @@ export const getCompanyKeyMetrics = async (
 ): Promise<CompanyKeyMetrics[]> => {
   const limit = period === 'quarter' ? 60 : 30;
   const url = `${FINANCIAL_MODELING_URL}/v3/key-metrics/${symbol}?period=${period}&limit=${limit}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<CompanyKeyMetrics[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as CompanyKeyMetrics[];
+  return data;
 };
 
 export const getCompanyRatios = async (symbol: string, period: DataTimePeriod = 'quarter'): Promise<CompanyRatio[]> => {
   const limit = period === 'quarter' ? 60 : 30;
   const url = `${FINANCIAL_MODELING_URL}/v3/ratios/${symbol}?period=${period}&limit=${limit}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<CompanyRatio[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as CompanyRatio[];
+  return data;
 };
 
 export const getEnterpriseValue = async (symbol: string): Promise<EnterpriseValue[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v3/enterprise-values/${symbol}?period=quarter&limit=35&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<EnterpriseValue[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as EnterpriseValue[];
+  return data;
 };
 
 /**
@@ -304,10 +314,11 @@ export const getEnterpriseValue = async (symbol: string): Promise<EnterpriseValu
  */
 export const getStockHistoricalEarnings = async (symbol: string): Promise<StockEarning[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v3/historical/earning_calendar/${symbol}?limit=50&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<StockEarning[]>(url);
+  const response = await fetch(url);
+  const data = (await response.json()) as StockEarning[];
   // remove first 3 items if epsEstimated is undefined
-  const filteredResponse = response.data.slice(0, 3).filter((item) => item.epsEstimated);
-  return [...response.data.slice(3), ...filteredResponse];
+  const filteredResponse = data.slice(0, 3).filter((item) => item.epsEstimated);
+  return [...data.slice(3), ...filteredResponse];
 };
 
 /**
@@ -326,8 +337,9 @@ export const getStockHistoricalEarnings = async (symbol: string): Promise<StockE
 export const getSectorPeersForSymbols = async (symbols: string[]): Promise<SectorPeers[]> => {
   const symbolString = symbols.join(',');
   const url = `${FINANCIAL_MODELING_URL}/v4/stock_peers?symbol=${symbolString}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<SectorPeers[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as SectorPeers[];
+  return data;
 };
 
 /**
@@ -427,8 +439,9 @@ export const getQuotesByType = async (type: AvailableQuotes) => {
 export const getQuotesBySymbols = async (symbols: string[]) => {
   const symbolsString = symbols.join(',');
   const url = `${FINANCIAL_MODELING_URL}/v3/quote/${symbolsString}?apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<SymbolQuote[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as SymbolQuote[];
+  return data;
 };
 
 export const getCalendarStockDividends = async (
@@ -507,8 +520,9 @@ export const getCalendarStockEarnings = async (
 
 export const getSymbolOwnershipInstitutional = async (symbol: string): Promise<SymbolOwnershipInstitutional[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/symbol-ownership?symbol=${symbol}&includeCurrentQuarter=true&&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await axios.get<SymbolOwnershipInstitutional[]>(url);
-  return response.data;
+  const response = await fetch(url);
+  const data = (await response.json()) as SymbolOwnershipInstitutional[];
+  return data;
 };
 
 /**
