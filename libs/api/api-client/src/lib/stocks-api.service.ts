@@ -48,12 +48,12 @@ export class StocksApiService extends ApiCacheService {
     return this.getStockSummary(symbol).pipe(
       tap((summary) => {
         if (!summary || !summary.profile) {
-          return new Response('Invalid symbol', { status: 400 });
+          throw new Error('Invalid symbol');
         }
 
         // prevent loading data for etf and funds
         if (summary.profile.isEtf || summary.profile.isFund) {
-          return new Response('Unable to get details for FUND or ETF', { status: 400 });
+          throw new Error('Unable to get details for FUND or ETF');
         }
       }),
       switchMap((summary) =>

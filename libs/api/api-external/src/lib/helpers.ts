@@ -1,5 +1,6 @@
 import { HistoricalLoadingPeriods } from '@market-monitor/api-types';
 import { endOfMonth, format, startOfMonth, subDays } from 'date-fns';
+import { firestore } from 'firebase-admin';
 
 export const filterOutSymbols = <T extends { symbol: string }>(
   data: T[],
@@ -110,5 +111,21 @@ export const resolveLoadingPeriod = (
     loadingPeriod: '1day',
     from: formatDate(new Date(today.getFullYear(), 0, 1)),
     to: formatDate(today),
+  };
+};
+
+/**
+ * usage: .withConverter(assignTypes<DataSnapshot<SymbolOwnershipHolders[]>>());
+ *
+ * @returns
+ */
+export const assignTypes = <T extends object>() => {
+  return {
+    toFirestore(doc: T): firestore.DocumentData {
+      return doc;
+    },
+    fromFirestore(snapshot: firestore.QueryDocumentSnapshot): T {
+      return snapshot.data()! as T;
+    },
   };
 };

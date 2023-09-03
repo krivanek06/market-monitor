@@ -11,7 +11,6 @@ export const getTopSymbols = async (env: Env, searchParams: URLSearchParams): Pr
 	// return cached data if exists
 	if (cachedData) {
 		console.log('Top symbols loaded from cache');
-		//	const summaries = await loadSummaries(cachedData);
 		return new Response(JSON.stringify(cachedData), RESPONSE_HEADER);
 	}
 
@@ -41,30 +40,3 @@ export const getTopSymbols = async (env: Env, searchParams: URLSearchParams): Pr
 	// return data
 	return new Response(JSON.stringify(result), RESPONSE_HEADER);
 };
-
-// helper function to load summaries
-// const loadSummaries = async (data: MarketTopPerformanceSymbols): Promise<MarketTopPerformanceOverviewResponse> => {
-// 	// load stock summary data
-// 	const [gainersData, losersData, activesData] = await Promise.all([
-// 		getSymbolSummaries(data.stockTopGainers),
-// 		getSymbolSummaries(data.stockTopLosers),
-// 		getSymbolSummaries(data.stockTopActive),
-// 	]);
-
-// 	console.log('loaded summaries');
-
-// 	// limit data
-// 	const limit = 15;
-// 	const filterCorrect = (d: StockSummary) => d.profile && !d.profile.isEtf && !d.profile.isFund;
-
-// 	// filter out not ETFs, Funds and limit data
-// 	const stockTopGainers = gainersData.filter(filterCorrect).slice(0, limit);
-// 	const stockTopLosers = losersData.filter(filterCorrect).slice(0, limit);
-// 	const stockTopActive = activesData.filter(filterCorrect).slice(0, limit);
-
-// 	return {
-// 		stockTopActive,
-// 		stockTopGainers,
-// 		stockTopLosers,
-// 	};
-// };
