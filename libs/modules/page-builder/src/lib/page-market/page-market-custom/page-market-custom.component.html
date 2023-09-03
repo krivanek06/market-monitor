@@ -1,3 +1,8 @@
+<!-- slider to change dates -->
+<div>
+  <app-date-range-slider [formControl]="dateRangeControl" class="w-[600px]"></app-date-range-slider>
+</div>
+
 <!-- chart -->
 <div class="relative w-full mb-10" [ngClass]="{ 'g-shadow-background': showLoadingScreenSignal() }">
   <app-generic-chart
@@ -7,6 +12,7 @@
     [enableLegendTogging]="true"
     [showLegend]="true"
     [shareTooltip]="false"
+    [chartDateRestriction]="chartDateRestriction()"
   ></app-generic-chart>
 
   <mat-spinner *ngIf="showLoadingScreenSignal()" class="g-absolute-center" diameter="80"></mat-spinner>

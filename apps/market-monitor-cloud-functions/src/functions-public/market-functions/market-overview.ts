@@ -7,6 +7,7 @@ import {
   marketOverviewToLoad,
 } from '@market-monitor/api-types';
 import { delaySeconds } from '@market-monitor/shared-utils-general';
+import { isBefore, subYears } from 'date-fns';
 import { Request, Response } from 'express';
 import { warn } from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
@@ -68,9 +69,20 @@ const reloadMarketOverview = async (): Promise<MarketOverview> => {
   const createOverviewDataBundle = async (key: MarketOverviewDatabaseKeys): Promise<MarketOverviewData[]> => {
     let marketOverviewDataTmp: MarketOverviewData[] = [];
     for await (const subKey of marketOverviewToLoad[key]) {
-      const data = await loadMarketOverviewData(key, subKey, 1);
+      // load data from API
+      const data = await loadMarketOverviewData(key, subKey);
+      // limit data to show 3 years back
+      const index = data.dates.findIndex((date) => isBefore(new Date(date), subYears(new Date(), 3)));
+      // create new data
+      const formattedData = {
+        ...data,
+        dates: data.dates.slice(index),
+        data: data.data.slice(index),
+      } satisfies MarketOverviewData;
+      // wait to target API again
       await delaySeconds(1);
-      marketOverviewDataTmp.push(data);
+      // push data into array
+      marketOverviewDataTmp.push(formattedData);
     }
 
     return marketOverviewDataTmp;
@@ -136,14 +148,7 @@ const reloadMarketOverview = async (): Promise<MarketOverview> => {
   return marketOverview;
 };
 
-const loadMarketOverviewData = async (
-  key: MarketOverviewDatabaseKeys,
-  subKey: string,
-  waitSeconds = 0,
-): Promise<MarketOverviewData> => {
-  console.log(`wait = ${waitSeconds}, key = ${key}, subkey = ${subKey}`);
-  await delaySeconds(waitSeconds);
-
+const loadMarketOverviewData = async (key: MarketOverviewDatabaseKeys, subKey: string): Promise<MarketOverviewData> => {
   // get document and url from database: {qundal_treasury_yield_curve_rates_1_mo, USTREASURY/YIELD}
   const { document, url } = MARKET_OVERVIEW_DATABASE_ENDPOINTS[key].data?.[subKey];
 

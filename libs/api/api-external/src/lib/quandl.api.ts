@@ -30,15 +30,15 @@ const getQuandlDataGeneric = async (endpoint: string): Promise<QuandlData> => {
   }
 };
 
-const formatData = (data: QuandlData, values?: number[], dataLimit = 320): MarketOverviewData => {
+const formatData = (data: QuandlData, values?: number[]): MarketOverviewData => {
   return {
     name: data.name,
     start_date: data.start_date,
     frequency: data.frequency,
     end_date: data.end_date,
     lastUpdate: new Date().toISOString(),
-    dates: data.data.map((date) => date[0]).slice(0, dataLimit),
-    data: (values ?? data.data.map((date) => date[1])).slice(0, dataLimit),
+    dates: data.data.map((date) => date[0]),
+    data: values ?? data.data.map((date) => date[1]),
   };
 };
 
@@ -172,7 +172,7 @@ export const getTreasuryYieldUS = async (): Promise<MarketOverviewData[]> => {
   const result = quandlData.column_names
     .map((_, index) => {
       const dataToBeFormatted = quandlData.data.map((data) => data[index]);
-      return formatData(quandlData, dataToBeFormatted, 2000);
+      return formatData(quandlData, dataToBeFormatted);
     })
     .slice(1);
 

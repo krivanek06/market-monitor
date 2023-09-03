@@ -1,0 +1,39 @@
+<div *ngIf="dateRangeSignal() as values" class="flex flex-col w-full">
+  <!-- display current value from form -->
+  <div class="flex items-center justify-center gap-3">
+    <span class="text-sm text-wt-gray-medium">
+      {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
+    </span>
+    <span>-</span>
+    <span class="text-sm text-wt-gray-medium">
+      {{ values.dates | getDataByIndex: values.currentMaxDateIndex | date: 'MMM d, y' }}
+    </span>
+  </div>
+
+  <!-- display slider and min/max values -->
+  <div class="flex items-center w-full gap-4">
+    <!-- min value -->
+    <span class="text-sm text-wt-gray-medium">
+      {{ values.dates | getDataByIndex: 0 | date: 'MMM d, y' }}
+    </span>
+
+    <!-- slider -->
+    <mat-slider class="flex-1" [min]="0" [max]="values.dates.length - 1" showTickMarks>
+      <input
+        (valueChange)="onSliderValueChange($event, 'start')"
+        [value]="values.currentMinDateIndex"
+        matSliderStartThumb
+      />
+      <input
+        (valueChange)="onSliderValueChange($event, 'end')"
+        [value]="values.currentMaxDateIndex"
+        matSliderEndThumb
+      />
+    </mat-slider>
+
+    <!-- max value -->
+    <span class="text-sm text-wt-gray-medium">
+      {{ values.dates | getDataByIndex: values.dates.length - 1 | date: 'MMM d, y' }}
+    </span>
+  </div>
+</div>
