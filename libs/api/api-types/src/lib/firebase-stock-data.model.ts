@@ -4,7 +4,9 @@ import {
   CompanyKeyMetricsTTM,
   CompanyOutlook,
   CompanyProfile,
+  CompanyRating,
   CompanyRatio,
+  CompanyRatioTTM,
   ESGDataQuarterly,
   ESGDataRatingYearly,
   EnterpriseValue,
@@ -25,6 +27,8 @@ export type StockSummary = {
 };
 
 export type StockDetailsAPI = {
+  ratio: CompanyRatioTTM;
+  rating: CompanyRating;
   companyOutlook: CompanyOutlook;
   esgDataRatingYearlyArray: ESGDataRatingYearly[];
   esgDataRatingYearly: ESGDataRatingYearly | null;
@@ -37,9 +41,20 @@ export type StockDetailsAPI = {
   recommendationTrends: RecommendationTrends[];
   companyKeyMetricsTTM: CompanyKeyMetricsTTM;
   enterpriseValue: EnterpriseValue[];
-  lastUpdate: {
-    detailsLastUpdate: string;
-    earningLastUpdate: string;
+  additionalFinancialData: {
+    revenue: number;
+    costOfRevenue: number;
+    EBITDA: number;
+    netIncome: number;
+    totalAssets: number;
+    totalCurrentAssets: number;
+    totalDebt: number;
+    shortTermDebt: number;
+    cashOnHand: number;
+    freeCashFlow: number;
+    operatingCashFlow: number;
+    stockBasedCompensation: number;
+    dividends: StockDetailsDividends;
   };
 };
 

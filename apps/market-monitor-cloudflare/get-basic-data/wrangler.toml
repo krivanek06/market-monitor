@@ -3,7 +3,7 @@ main = "src/worker.ts"
 compatibility_date = "2023-08-21"
 
 kv_namespaces = [
-	{ binding = "get_basic_data", id = "ae3c117af8344aca9d4360833d9ebf62", preview_id = "ab2bdfbabf2d40f5991b8c137213f588" }
+	{ binding = "get_basic_data", id = "e012c8d69ef541119f349eb01b390a5c", preview_id = "ab2bdfbabf2d40f5991b8c137213f588" }
 ]
 
 [[d1_databases]]

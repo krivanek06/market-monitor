@@ -3,7 +3,17 @@ import axios from 'axios';
 
 export const getSymbolSummaries = async (symbols: string[]): Promise<StockSummary[]> => {
   const url = `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`;
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
+    return [];
+  }
   const data = (await response.json()) as StockSummary[];
   return data;
 };

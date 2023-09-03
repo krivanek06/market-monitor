@@ -60,3 +60,6 @@ ui-debug.log
 
 # Sentry Auth Token
 .sentryclirc
+
+# Cloudflare
+.wrangler

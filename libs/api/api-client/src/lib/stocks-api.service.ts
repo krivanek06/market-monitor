@@ -1,11 +1,11 @@
-import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   CompanyInsideTrade,
   DataTimePeriod,
   HistoricalPrice,
   News,
   StockDetails,
+  StockDetailsAPI,
   StockEarning,
   StockMetricsHistoricalBasic,
   StockScreenerResults,
@@ -15,20 +15,15 @@ import {
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
 } from '@market-monitor/api-types';
-import { Observable, catchError, forkJoin, map, mergeMap, reduce, switchMap } from 'rxjs';
+import { Observable, catchError, forkJoin, map, mergeMap, reduce, switchMap, tap } from 'rxjs';
 import { ApiCacheService } from './api-cache.service';
-import { API_FUNCTION_URL, API_IS_PRODUCTION, constructCFEndpoint } from './api.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StocksApiService extends ApiCacheService {
-  constructor(
-    private readonly http: HttpClient,
-    @Inject(API_FUNCTION_URL) private readonly endpointFunctions: string,
-    @Inject(API_IS_PRODUCTION) private readonly isProd: boolean,
-  ) {
-    super(http);
+  constructor() {
+    super();
   }
 
   searchStockSummariesByPrefix(ticker: string): Observable<StockSummary[]> {
@@ -45,14 +40,35 @@ export class StocksApiService extends ApiCacheService {
     ).pipe(catchError(() => []));
   }
 
-  getStockSummary(symbol: string): Observable<StockSummary | null> {
-    return this.getStockSummaries([symbol]).pipe(map((d) => d[0] ?? null));
+  getStockSummary(symbol: string): Observable<StockSummary> {
+    return this.getStockSummaries([symbol]).pipe(map((d) => d[0]));
   }
 
   getStockDetails(symbol: string): Observable<StockDetails> {
-    return this.getData<StockDetails>(
-      constructCFEndpoint(this.isProd, this.endpointFunctions, 'getstockdetails', `symbol=${symbol}`),
-      this.validity1Hour,
+    return this.getStockSummary(symbol).pipe(
+      tap((summary) => {
+        if (!summary || !summary.profile) {
+          return new Response('Invalid symbol', { status: 400 });
+        }
+
+        // prevent loading data for etf and funds
+        if (summary.profile.isEtf || summary.profile.isFund) {
+          return new Response('Unable to get details for FUND or ETF', { status: 400 });
+        }
+      }),
+      switchMap((summary) =>
+        this.getData<StockDetailsAPI>(
+          `https://get-stock-data.krivanek1234.workers.dev/?type=stock-details&symbol=${symbol}`,
+          this.validity1Hour,
+        ).pipe(
+          map((details) => {
+            return {
+              ...summary,
+              ...details,
+            };
+          }),
+        ),
+      ),
     );
   }
 
@@ -105,7 +121,7 @@ export class StocksApiService extends ApiCacheService {
 
   getStockEarnings(symbol: string): Observable<StockEarning[]> {
     return this.getData<StockEarning[]>(
-      constructCFEndpoint(this.isProd, this.endpointFunctions, 'getstockearnings', `symbol=${symbol}`),
+      `https://get-stock-data.krivanek1234.workers.dev/?type=stock-earnings&symbol=${symbol}`,
       this.validity30Min,
     );
   }
@@ -115,38 +131,28 @@ export class StocksApiService extends ApiCacheService {
     period: DataTimePeriod = 'quarter',
   ): Observable<StockMetricsHistoricalBasic> {
     return this.getData<StockMetricsHistoricalBasic>(
-      constructCFEndpoint(
-        this.isProd,
-        this.endpointFunctions,
-        'getstockhistoricalmetrics',
-        `symbol=${symbol}&timePeriod=${period}`,
-      ),
+      `https://get-stock-data.krivanek1234.workers.dev/?type=stock-historical-metrics&symbol=${symbol}&timePeriod=${period}`,
       this.validity2Min,
     );
   }
 
   getStockOwnershipHoldersToDate(symbol: string, date: string): Observable<SymbolOwnershipHolders[]> {
     return this.getData<SymbolOwnershipHolders[]>(
-      constructCFEndpoint(
-        this.isProd,
-        this.endpointFunctions,
-        'getownershipholderstodate',
-        `symbol=${symbol}&date=${date}`,
-      ),
+      `https://get-stock-data.krivanek1234.workers.dev/?type=stock-ownership-holders-to-date&symbol=${symbol}&date=${date}`,
       this.validity1Hour,
     );
   }
 
   getStockOwnershipInstitutional(symbol: string): Observable<SymbolOwnershipInstitutional[]> {
     return this.getData<SymbolOwnershipInstitutional[]>(
-      constructCFEndpoint(this.isProd, this.endpointFunctions, 'getownershipinstitutional', `symbol=${symbol}`),
+      `https://get-stock-data.krivanek1234.workers.dev/?type=stock-ownership-institutional&symbol=${symbol}`,
       this.validity1Hour,
     );
   }
 
   getStockInsiderTrades(symbol: string): Observable<CompanyInsideTrade[]> {
     return this.getData<CompanyInsideTrade[]>(
-      constructCFEndpoint(this.isProd, this.endpointFunctions, 'getstockinsidertrades', `symbol=${symbol}`),
+      `https://get-stock-data.krivanek1234.workers.dev/?type=stock-insider-trades&symbol=${symbol}`,
       this.validity1Hour,
     );
   }

@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Optional } from '@angular/core';
+import { inject } from '@angular/core';
 import { isBefore } from 'date-fns';
 import { Observable, of, retry, tap } from 'rxjs';
 
@@ -16,7 +16,9 @@ export abstract class ApiCacheService {
   validity1Hour = 60;
   validity2Hour = 120;
 
-  constructor(@Optional() private readonly httpClient: HttpClient) {
+  httpClient = inject(HttpClient);
+
+  constructor() {
     if (!this.httpClient) {
       throw new Error('HttpClient is required');
     }

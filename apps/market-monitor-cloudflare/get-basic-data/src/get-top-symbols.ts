@@ -1,22 +1,21 @@
-import { getMostPerformingStocks, getSymbolSummaries } from '@market-monitor/api-external';
-import {
-	MarketTopPerformanceOverviewResponse,
-	MarketTopPerformanceSymbols,
-	RESPONSE_HEADER,
-	StockSummary,
-} from '@market-monitor/api-types';
+import { getMostPerformingStocks } from '@market-monitor/api-external';
+import { MarketTopPerformanceSymbols, RESPONSE_HEADER } from '@market-monitor/api-types';
 import { Env } from './model';
 
 export const getTopSymbols = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {
 	const cacheKey = 'top_symbols';
-	const cachedData = await env.get_basic_data.get(cacheKey);
+	const cachedData = (await env.get_basic_data.get(cacheKey, {
+		type: 'json',
+	})) as MarketTopPerformanceSymbols;
 
 	// return cached data if exists
 	if (cachedData) {
-		const symbolPerformance = JSON.parse(cachedData) as MarketTopPerformanceSymbols;
-		const summaries = await loadSummaries(symbolPerformance);
-		return new Response(JSON.stringify(summaries), RESPONSE_HEADER);
+		console.log('Top symbols loaded from cache');
+		//	const summaries = await loadSummaries(cachedData);
+		return new Response(JSON.stringify(cachedData), RESPONSE_HEADER);
 	}
+
+	console.log('Top symbols loaded from API');
 
 	// get data from API
 	const [gainers, losers, actives] = await Promise.all([
@@ -37,31 +36,35 @@ export const getTopSymbols = async (env: Env, searchParams: URLSearchParams): Pr
 	await env.get_basic_data.put(cacheKey, JSON.stringify(result), { expirationTtl: minutes10 });
 
 	// load summaries
-	const summaries = await loadSummaries(result);
-	return new Response(JSON.stringify(summaries), RESPONSE_HEADER);
+	// const summaries = await loadSummaries(result);
+
+	// return data
+	return new Response(JSON.stringify(result), RESPONSE_HEADER);
 };
 
 // helper function to load summaries
-const loadSummaries = async (data: MarketTopPerformanceSymbols): Promise<MarketTopPerformanceOverviewResponse> => {
-	// load stock summary data
-	const [gainersData, losersData, activesData] = await Promise.all([
-		getSymbolSummaries(data.stockTopGainers),
-		getSymbolSummaries(data.stockTopLosers),
-		getSymbolSummaries(data.stockTopActive),
-	]);
+// const loadSummaries = async (data: MarketTopPerformanceSymbols): Promise<MarketTopPerformanceOverviewResponse> => {
+// 	// load stock summary data
+// 	const [gainersData, losersData, activesData] = await Promise.all([
+// 		getSymbolSummaries(data.stockTopGainers),
+// 		getSymbolSummaries(data.stockTopLosers),
+// 		getSymbolSummaries(data.stockTopActive),
+// 	]);
 
-	// limit data
-	const limit = 15;
-	const filterCorrect = (d: StockSummary) => d.profile && !d.profile.isEtf && !d.profile.isFund;
+// 	console.log('loaded summaries');
 
-	// filter out not ETFs, Funds and limit data
-	const stockTopGainers = gainersData.filter(filterCorrect).slice(0, limit);
-	const stockTopLosers = losersData.filter(filterCorrect).slice(0, limit);
-	const stockTopActive = activesData.filter(filterCorrect).slice(0, limit);
+// 	// limit data
+// 	const limit = 15;
+// 	const filterCorrect = (d: StockSummary) => d.profile && !d.profile.isEtf && !d.profile.isFund;
 
-	return {
-		stockTopActive,
-		stockTopGainers,
-		stockTopLosers,
-	};
-};
+// 	// filter out not ETFs, Funds and limit data
+// 	const stockTopGainers = gainersData.filter(filterCorrect).slice(0, limit);
+// 	const stockTopLosers = losersData.filter(filterCorrect).slice(0, limit);
+// 	const stockTopActive = activesData.filter(filterCorrect).slice(0, limit);
+
+// 	return {
+// 		stockTopActive,
+// 		stockTopGainers,
+// 		stockTopLosers,
+// 	};
+// };
