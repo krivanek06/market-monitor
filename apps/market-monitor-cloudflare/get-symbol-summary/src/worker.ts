@@ -62,8 +62,11 @@ export default {
 			return new Response('Symbol is required', { status: 400 });
 		}
 
-		// unique symbols
-		let symbolArray = symbolsString.split(',').filter((value, index, self) => self.indexOf(value) === index);
+		// unique symbols adn not undefined
+		let symbolArray = symbolsString
+			.split(',')
+			.filter((value, index, self) => self.indexOf(value) === index)
+			.filter((d) => !!d);
 
 		// no symbol
 		if (symbolArray.length === 0) {

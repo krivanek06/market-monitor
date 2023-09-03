@@ -89,7 +89,7 @@ export class MarketApiService extends ApiCacheService {
 
   getQuotesByType(quoteType: AvailableQuotes): Observable<SymbolQuote[]> {
     return this.getData<SymbolQuote[]>(
-      `https://get-basic-data.krivanek1234.workers.dev/?type=quote-by-type?quoteType=${quoteType}`,
+      `https://get-basic-data.krivanek1234.workers.dev/?type=quote-by-type&quoteType=${quoteType}`,
       this.validity10Min,
     ).pipe(map((data) => data.filter((quote) => !!quote.price && !!quote.name)));
   }

@@ -24,10 +24,17 @@ export const getSymbolSummary = async (symbol: string): Promise<StockSummary | n
 
 export const postMarketOverview = async (overview: MarketOverview): Promise<string> => {
   const url = `https://get-basic-data.krivanek1234.workers.dev?type=market-overview-save`;
-  const response = await axios.post(url, {
-    body: overview,
-    method: 'POST',
-  });
+  const response = await axios.post(
+    url,
+    {
+      ...overview,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  );
   const data = (await response.data) as string;
   return data;
 };
