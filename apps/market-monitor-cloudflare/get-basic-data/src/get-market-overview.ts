@@ -1,6 +1,10 @@
 import { getMarketOverviewDataAPI } from '@market-monitor/api-external';
 import { EXPIRATION_ONE_WEEK, MarketOverview, MarketOverviewDatabaseKeys, RESPONSE_HEADER } from '@market-monitor/api-types';
-import { Env } from './model';
+import { eq, sql } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
+import { Env, MarketDataTable } from './model';
+
+const MARKET_OVERVIEW_KEY = 'market_overview';
 
 export const getMarketOverData = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {
 	// i.e: sp500
@@ -36,10 +40,16 @@ export const getMarketOverData = async (env: Env, searchParams: URLSearchParams)
 };
 
 export const getMarketOverview = async (env: Env): Promise<Response> => {
-	// check data in cache
-	const cachedData = await env.get_basic_data.get('market-overview');
-	if (cachedData) {
-		return new Response(cachedData, RESPONSE_HEADER);
+	// init db
+	const db = drizzle(env.DB);
+
+	// load from DB saved historical prices
+	const storedOverview = await db.select().from(MarketDataTable).where(eq(MarketDataTable.id, MARKET_OVERVIEW_KEY)).get();
+
+	// data in cache
+	if (storedOverview) {
+		// data already in stringyfied format
+		return new Response(storedOverview.data, RESPONSE_HEADER);
 	}
 
 	// return error if no data
@@ -58,8 +68,24 @@ export const saveMarketOverview = async (env: Env, request: Request): Promise<Re
 		return new Response('Missing request body', { status: 400 });
 	}
 
-	const key = 'market-overview';
-	await env.get_basic_data.put(key, JSON.stringify(requestJson), { expirationTtl: EXPIRATION_ONE_WEEK });
+	// init db
+	const db = drizzle(env.DB);
+
+	// save into DB
+	await db
+		.insert(MarketDataTable)
+		.values({
+			id: MARKET_OVERVIEW_KEY,
+			data: JSON.stringify(requestJson),
+		})
+		.onConflictDoUpdate({
+			set: {
+				data: JSON.stringify(requestJson),
+				lastUpdate: sql`CURRENT_TIMESTAMP`,
+			},
+			target: MarketDataTable.id,
+		})
+		.run();
 
 	return new Response('saved', RESPONSE_HEADER);
 };

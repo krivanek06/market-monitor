@@ -20,7 +20,7 @@ export interface Env {
 	// MY_QUEUE: Queue;
 }
 
-export const MarketDataTable = sqliteTable('MarketDataTable', {
+export const MarketDataTable = sqliteTable('market_data', {
 	id: text('id').primaryKey(),
 	data: text('data').notNull().$type<string>(),
 	lastUpdate: text('lastUpdate')
