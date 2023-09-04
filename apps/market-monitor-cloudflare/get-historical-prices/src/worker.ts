@@ -1,34 +1,7 @@
-import { HistoricalPricePeriods, getHistoricalPricesByPeriod, getHistoricalPricesOnDate } from '@market-monitor/api-external';
-import { RESPONSE_HEADER } from '@market-monitor/api-types';
-import { checkDataValidityMinutes } from '@market-monitor/shared-utils-general';
-import { eq, sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/d1';
-import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
-
-export interface Env {
-	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-	DB: D1Database;
-	//
-	// Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
-	// MY_DURABLE_OBJECT: DurableObjectNamespace;
-	//
-	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
-	// MY_BUCKET: R2Bucket;
-	//
-	// Example binding to a Service. Learn more at https://developers.cloudflare.com/workers/runtime-apis/service-bindings/
-	// MY_SERVICE: Fetcher;
-	//
-	// Example binding to a Queue. Learn more at https://developers.cloudflare.com/queues/javascript-apis/
-	// MY_QUEUE: Queue;
-}
-
-const HistoricalPricesTable = sqliteTable('historical_prices', {
-	id: text('id').primaryKey(),
-	data: text('data').notNull().$type<string>(),
-	lastUpdate: text('lastUpdate')
-		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
-});
+import { HistoricalPricePeriods, HistoricalPricePeriodsArray } from '@market-monitor/api-external';
+import { getPriceOnDate } from './get-price-on-date';
+import { getPriceOnPeriod } from './get-price-on-period';
+import { Env } from './model';
 
 /**
  * return either historical data in array for a symbol if `period` is provided
@@ -49,46 +22,33 @@ export default {
 			return new Response('missing symbol', { status: 400 });
 		}
 
-		// init db
-		const db = drizzle(env.DB);
-
-		// create key
-		const savedKey = period ? `${symbol}-${period}` : `${symbol}-${date}`;
-
-		// load from DB saved historical prices
-		const storedHistoricalData = await db.select().from(HistoricalPricesTable).where(eq(HistoricalPricesTable.id, savedKey)).get();
-
-		// data in cache
-		if (storedHistoricalData && checkDataValidityMinutes(storedHistoricalData, 3)) {
-			// data already in stringyfied format
-			return new Response(storedHistoricalData.data, RESPONSE_HEADER);
-		}
-
-		// load data from api, save in cache
-		const data = period ? await getHistoricalPricesByPeriod(symbol, period) : date ? await getHistoricalPricesOnDate(symbol, date) : null;
-
-		// should not happen, just in case
-		if (!data) {
+		if (!period && !date) {
 			return new Response('missing period or date', { status: 400 });
 		}
 
-		// save into DB
-		await db
-			.insert(HistoricalPricesTable)
-			.values({
-				id: savedKey,
-				data: JSON.stringify(data),
-			})
-			.onConflictDoUpdate({
-				set: {
-					data: JSON.stringify(data),
-					lastUpdate: sql`CURRENT_TIMESTAMP`,
-				},
-				target: HistoricalPricesTable.id,
-			})
-			.run();
+		if (period && !HistoricalPricePeriodsArray.includes(period)) {
+			return new Response(`Valid periods are: ${HistoricalPricePeriodsArray}`, { status: 400 });
+		}
 
-		// return single object data
-		return new Response(JSON.stringify(data), RESPONSE_HEADER);
+		if (date) {
+			try {
+				return getPriceOnDate(env, symbol, date);
+			} catch (e) {
+				console.log(`Unable to Provide data for symbol=${symbol} and date=${date}`);
+				return new Response(`Unable to Provide data for symbol=${symbol} and date=${date}`, { status: 400 });
+			}
+		}
+
+		if (period) {
+			try {
+				return getPriceOnPeriod(env, symbol, period);
+			} catch (e) {
+				console.log(`Unable to Provide data for symbol=${symbol} and period=${period}`);
+				return new Response(`Unable to Provide data for symbol=${symbol} and period=${period}`, { status: 400 });
+			}
+		}
+
+		// invalid request
+		return new Response('invalid request', { status: 400 });
 	},
 };

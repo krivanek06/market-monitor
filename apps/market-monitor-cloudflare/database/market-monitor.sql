@@ -16,21 +16,6 @@ CREATE TABLE IF NOT EXISTS symbol_summary (
 );
 
 /*
-  Create a table to store the symbol details
- */
-
-
-/*
-  Create a table to store historical prices
-*/
-CREATE TABLE IF NOT EXISTS historical_prices (
-  id VARCHAR(50) PRIMARY KEY,
-  data TEXT NOT NULL,
-  lastUpdate timestamp DEFAULT CURRENT_TIMESTAMP
-);
-
-
-/*
   Create a table to store market json data
 */
 CREATE TABLE IF NOT EXISTS market_data (

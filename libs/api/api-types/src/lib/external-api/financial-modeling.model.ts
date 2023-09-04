@@ -670,14 +670,20 @@ export type PriceChange = {
   max: number;
 };
 
-export interface HistoricalPrice {
+export type HistoricalPriceAPI = {
   date: string;
   open: number;
   low: number;
   high: number;
   close: number;
   volume: number;
-}
+};
+
+export type HistoricalPrice = Omit<HistoricalPriceAPI, 'open' | 'low' | 'high'>;
+
+export type HistoricalPriceSymbol = HistoricalPrice & {
+  symbol: string;
+};
 
 export interface MostPerformingStocks {
   symbol: string;

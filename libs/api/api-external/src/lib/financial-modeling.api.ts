@@ -19,6 +19,8 @@ import {
   EnterpriseValue,
   HistoricalLoadingPeriods,
   HistoricalPrice,
+  HistoricalPriceAPI,
+  HistoricalPriceSymbol,
   MostPerformingStocks,
   News,
   NewsTypes,
@@ -89,7 +91,7 @@ export const getHistoricalPrices = async (
 export const getHistoricalPricesByPeriod = async (
   symbol: string,
   period: HistoricalPricePeriods,
-): Promise<HistoricalPrice[]> => {
+): Promise<{ period: HistoricalPricePeriods; data: HistoricalPrice[] }> => {
   const loadingPeriod = resolveLoadingPeriod(period);
   const historicalPriceData = await getHistoricalPrices(
     symbol,
@@ -97,21 +99,48 @@ export const getHistoricalPricesByPeriod = async (
     loadingPeriod.from,
     loadingPeriod.to,
   );
-  const reveredData = historicalPriceData.reverse();
-  return reveredData;
+
+  // format to correct type
+  const result = historicalPriceData.map(
+    (d) =>
+      ({
+        date: d.date,
+        close: d.close,
+        volume: d.volume,
+      }) satisfies HistoricalPrice,
+  );
+
+  return { period, data: result };
 };
 
 /**
+ * can return null value if date is before IPO
  *
  * @param symbol
  * @param date format YYYY-MM-DD
  * @returns
  */
-export const getHistoricalPricesOnDate = async (symbol: string, date: string): Promise<HistoricalPrice> => {
+export const getHistoricalPricesOnDate = async (
+  symbol: string,
+  date: string,
+): Promise<HistoricalPriceSymbol | null> => {
   const url = `${FINANCIAL_MODELING_URL}/v3/historical-price-full/${symbol}?from=${date}&to=${date}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await fetch(url);
-  const data = (await response.json()) as { historical: HistoricalPrice[] };
-  return data.historical[0];
+  const data = ((await response.json()) as { historical: HistoricalPriceAPI[] }) ?? {};
+
+  if (!('historical' in data) || (data.historical as HistoricalPriceAPI[]).length === 0) {
+    return null;
+  }
+
+  const historicalData = data.historical[0] as HistoricalPriceAPI;
+  const result = {
+    close: historicalData.close,
+    date: historicalData.date,
+    volume: historicalData.volume,
+    symbol: symbol,
+  } satisfies HistoricalPriceSymbol;
+
+  return result;
 };
 
 /**

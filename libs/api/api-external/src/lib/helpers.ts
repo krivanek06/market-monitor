@@ -31,7 +31,8 @@ export const getDateRangeByMonthAndYear = (month: number | string, year: number 
   return [from, to];
 };
 
-export type HistoricalPricePeriods = '1d' | '1w' | '1mo' | '3mo' | '6mo' | '1y' | '5y' | 'ytd' | 'all';
+export const HistoricalPricePeriodsArray = ['1d', '1w', '1mo', '3mo', '6mo', '1y', '5y', 'ytd', 'all'] as const;
+export type HistoricalPricePeriods = (typeof HistoricalPricePeriodsArray)[number];
 export const resolveLoadingPeriod = (
   period: HistoricalPricePeriods,
 ): {

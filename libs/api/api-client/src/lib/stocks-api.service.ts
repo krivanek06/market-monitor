@@ -82,10 +82,10 @@ export class StocksApiService extends ApiCacheService {
   }
 
   getStockHistoricalPricesOnDate(symbol: string, date: string): Observable<HistoricalPrice> {
-    return this.getData<HistoricalPrice>(
+    return this.getData<HistoricalPrice[]>(
       `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&date=${date}`,
       this.validity2Min,
-    );
+    ).pipe(map((d) => d[0]));
   }
 
   getStockScreening(screeningValue: StockScreenerValues): Observable<StockSummary[]> {

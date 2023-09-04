@@ -89,6 +89,15 @@ export enum SymbolHistoricalPeriods {
   ytd = 'ytd',
   all = 'all',
 }
+
+export const SymbolHistoricalPeriodsArrayPreload = [
+  SymbolHistoricalPeriods.day,
+  SymbolHistoricalPeriods.week,
+  SymbolHistoricalPeriods.month,
+  SymbolHistoricalPeriods.sixMonths,
+  SymbolHistoricalPeriods.year,
+  SymbolHistoricalPeriods.fiveYears,
+];
 /**
  * Stock data details from the pro api for pro members
  */
