@@ -1,4 +1,5 @@
 import { HistoricalLoadingPeriods } from '@market-monitor/api-types';
+import { dateGetDateOfOpenStockMarket } from '@market-monitor/shared-utils-general';
 import { endOfMonth, format, startOfMonth, subDays } from 'date-fns';
 import { firestore } from 'firebase-admin';
 
@@ -46,8 +47,8 @@ export const resolveLoadingPeriod = (
   if (period === '1d') {
     return {
       loadingPeriod: '1min',
-      from: formatDate(today),
-      to: formatDate(today),
+      from: formatDate(dateGetDateOfOpenStockMarket(today)),
+      to: formatDate(dateGetDateOfOpenStockMarket(today)),
     };
   }
 

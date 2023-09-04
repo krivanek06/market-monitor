@@ -92,6 +92,13 @@ export const isStockMarketClosedDate = (input: DateInput): boolean => {
   return false;
 };
 
+/**
+ * from provided date it starts to subtract 1 day until it finds a date
+ * when stock market is open, not a weekend and not a holiday
+ *
+ * @param input
+ * @returns
+ */
 export const dateGetDateOfOpenStockMarket = (input: DateInput): Date => {
   const date = new Date(input);
 

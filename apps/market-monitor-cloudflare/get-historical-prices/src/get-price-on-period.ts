@@ -4,6 +4,7 @@ import { Env } from './model';
 
 /**
  * save all periods into KV except for today
+ * if today is monday and period is '1d', load data from friday
  *
  *
  * @param env
@@ -37,5 +38,5 @@ export const getPriceOnPeriod = async (env: Env, symbol: string, period: Histori
 	}
 
 	// return data
-	return new Response(JSON.stringify(data), RESPONSE_HEADER);
+	return new Response(JSON.stringify(data.data), RESPONSE_HEADER);
 };
