@@ -11,7 +11,7 @@ export class ScrollNearEndDirective implements OnInit {
   /**
    * threshold in PX when to emit before page end scroll
    */
-  @Input() threshold = 50;
+  @Input() threshold = 40;
 
   private window?: Window;
 

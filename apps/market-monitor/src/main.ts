@@ -6,9 +6,9 @@ import { environment } from './environments/environment';
 // enable sentry only on production
 if (environment.production) {
   // disable console log on prod
-  // if (window) {
-  //   window.console.log = () => {};
-  // }
+  if (window) {
+    window.console.log = () => {};
+  }
   // Sentry.init({
   //   dsn: environment.sentry.dns,
   //   environment: environment.environment,

@@ -36,7 +36,7 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
 })
 export class NewsSearchComponent {
   @Input() showForm = false;
-  @Input() newDisplay = 16;
+  @Input() initialNewsToDisplay = 16;
   @Input({ required: true }) set searchData(value: { newsType: NewsTypes; symbol?: string }) {
     this.newSearchFormGroup.patchValue({
       newsType: value.newsType,
@@ -55,14 +55,16 @@ export class NewsSearchComponent {
     return this.newSearchFormGroup.controls.newsType.value === 'general';
   }
 
-  maximumNewsDisplayed = signal(this.newDisplay);
+  private newDisplay = 16;
+
+  maximumNewsDisplayed = signal(this.initialNewsToDisplay);
   loadingSignal = signal(false);
   marketStockNewsSignal = toSignal<News[]>(
     this.newSearchFormGroup.valueChanges.pipe(
       startWith(this.newSearchFormGroup.getRawValue()),
       tap(() => {
         this.loadingSignal.set(true);
-        this.maximumNewsDisplayed.set(this.newDisplay);
+        this.maximumNewsDisplayed.set(this.initialNewsToDisplay);
       }),
       pairwise(),
       map(([prev, curr]) => {

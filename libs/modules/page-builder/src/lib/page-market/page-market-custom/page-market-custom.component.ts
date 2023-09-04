@@ -133,10 +133,13 @@ export class PageMarketCustomComponent implements OnInit, RouterManagement {
       return;
     }
 
+    // bug that `dates` are in different order
+    const sortedDates = dates.sort((a, b) => (isBefore(new Date(a), new Date(b)) ? -1 : 1));
+
     // save & reset the date range
     const currentDate = this.dateRangeControl.value;
     this.dateRangeControl.patchValue({
-      dates: currentDate && currentDate.dates.length > dates.length ? currentDate.dates : dates.reverse(),
+      dates: currentDate && currentDate.dates.length > dates.length ? currentDate.dates : sortedDates,
       currentMaxDateIndex:
         currentDate?.dates && currentDate.dates.length > dates.length
           ? currentDate.currentMaxDateIndex
