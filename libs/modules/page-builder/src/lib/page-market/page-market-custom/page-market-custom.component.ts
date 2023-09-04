@@ -1,14 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
 import { MARKET_OVERVIEW_DATA, MarketOverviewDatabaseKeys, getMarketOverKeyBySubKey } from '@market-monitor/api-types';
 import { MarketDataTransformService, MarketOverviewChartDataBody } from '@market-monitor/modules/market-general';
-import { GenericChartComponent } from '@market-monitor/shared-components';
+import {
+  DateRangeSliderComponent,
+  DateRangeSliderValues,
+  GenericChartComponent,
+} from '@market-monitor/shared-components';
 import { InArrayPipe, ObjectArrayValueByKeyPipe } from '@market-monitor/shared-pipes';
 import { RouterManagement } from '@market-monitor/shared-utils-client';
+import { isBefore } from 'date-fns';
 import { forkJoin, map } from 'rxjs';
 
 @Component({
@@ -21,6 +28,8 @@ import { forkJoin, map } from 'rxjs';
     GenericChartComponent,
     MatProgressSpinnerModule,
     ObjectArrayValueByKeyPipe,
+    DateRangeSliderComponent,
+    ReactiveFormsModule,
   ],
   templateUrl: './page-market-custom.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,16 +50,37 @@ export class PageMarketCustomComponent implements OnInit, RouterManagement {
   MARKET_OVERVIEW_DATA = MARKET_OVERVIEW_DATA;
 
   /**
+   * date range control for user to manually select date range in custom chart
+   */
+  dateRangeControl = new FormControl<DateRangeSliderValues | null>(null);
+
+  /**
    * both signals keep the selected data and values
    */
   selectedOverviewSignal = signal<MarketOverviewChartDataBody[]>([]);
+
+  /**
+   * restricting the chart to show only the selected date range
+   */
+  chartDateRestriction = toSignal<[Date | string, Date | string] | undefined>(
+    this.dateRangeControl.valueChanges.pipe(
+      map((dateRange) => {
+        if (!dateRange) {
+          return undefined;
+        }
+        const startDate = dateRange.dates[dateRange.currentMinDateIndex];
+        const endDate = dateRange.dates[dateRange.currentMaxDateIndex];
+        return [startDate, endDate];
+      }),
+    ),
+  );
+
+  showLoadingScreenSignal = signal<boolean>(false);
   selectedOverviewSubKeys = computed(() => this.selectedOverviewSignal().map((data) => data.subKey));
 
   constructor() {
     effect(() => this.updateQueryParams(this.selectedOverviewSubKeys()));
   }
-
-  showLoadingScreenSignal = signal<boolean>(false);
 
   ngOnInit(): void {
     this.loadQueryParams();
@@ -60,15 +90,58 @@ export class PageMarketCustomComponent implements OnInit, RouterManagement {
     // if subKey is already selected, remove it
     if (this.selectedOverviewSubKeys().includes(subKey)) {
       this.selectedOverviewSignal.update((prev) => prev.filter((data) => data.subKey !== subKey));
+      const nextCurrentDates = this.selectedOverviewSignal().at(0)?.marketOverview?.dates ?? [];
+      this.updateDateRangeControl(nextCurrentDates, true);
       return;
     }
 
     // else add it and load data
     this.showLoadingScreenSignal.set(true);
     this.marketApiService.getMarketOverviewData(key, subKey).subscribe((marketOverviewData) => {
+      // sometimes dates are in reverse order
+      marketOverviewData.dates = isBefore(new Date(marketOverviewData.dates[0]), new Date(marketOverviewData.dates[1]))
+        ? marketOverviewData.dates.reverse()
+        : marketOverviewData.dates;
+
+      //  console.log('marketOverviewData', marketOverviewData.dates);
+
+      // transform data
       const data = this.marketDataTransformService.transformMarketOverviewData(sectionName, marketOverviewData, subKey);
+
+      // add data to signal
       this.selectedOverviewSignal.update((prev) => [...prev, data]);
+
+      // hide loading screen
       this.showLoadingScreenSignal.set(false);
+
+      // update date range control
+      this.updateDateRangeControl(marketOverviewData.dates);
+    });
+  }
+
+  private updateDateRangeControl(dates: string[], resetCurrentValue = false): void {
+    if (resetCurrentValue) {
+      if (dates.length > 0) {
+        // not emitting event to redrawing charts
+        this.dateRangeControl.patchValue(null, { emitEvent: false });
+      } else {
+        this.dateRangeControl.patchValue(null);
+      }
+    }
+
+    if (dates.length === 0) {
+      return;
+    }
+
+    // save & reset the date range
+    const currentDate = this.dateRangeControl.value;
+    this.dateRangeControl.patchValue({
+      dates: currentDate && currentDate.dates.length > dates.length ? currentDate.dates : dates.reverse(),
+      currentMaxDateIndex:
+        currentDate?.dates && currentDate.dates.length > dates.length
+          ? currentDate.currentMaxDateIndex
+          : dates.length - 1,
+      currentMinDateIndex: 0,
     });
   }
 
@@ -111,8 +184,18 @@ export class PageMarketCustomComponent implements OnInit, RouterManagement {
               ),
           ),
       ).subscribe((marketOverviewData) => {
+        // hide loading screen
         this.showLoadingScreenSignal.set(false);
+        // add data to signal
         this.selectedOverviewSignal.update((prev) => [...prev, ...marketOverviewData]);
+        // select the longest date range
+        const maxDates = marketOverviewData
+          .map((d) => d.marketOverview.dates.length)
+          .reduce((acc, curr) => Math.max(acc, curr), 0);
+        const longestDateRange = marketOverviewData.find((d) => d.marketOverview.dates.length === maxDates);
+        if (longestDateRange) {
+          this.updateDateRangeControl(longestDateRange.marketOverview.dates);
+        }
       });
     }
   }

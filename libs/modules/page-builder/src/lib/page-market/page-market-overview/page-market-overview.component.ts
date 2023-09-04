@@ -56,11 +56,11 @@ export class PageMarketOverviewComponent {
   );
 
   marketTopIndexQuotesSignal = toSignal(
-    this.marketApiService.getQuotesBySymbols(INDEXES_DEFAULT_SYMBOLS).pipe(
+    this.marketApiService.getSymbolSummaries(INDEXES_DEFAULT_SYMBOLS).pipe(
       map((quotes) =>
-        quotes.map((quote, index) => ({
+        quotes.map((summary, index) => ({
           name: INDEXES_DEFAULT[index].name,
-          quote,
+          summary,
         })),
       ),
     ),

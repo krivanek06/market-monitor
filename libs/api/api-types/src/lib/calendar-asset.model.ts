@@ -6,7 +6,8 @@ export type CalendarDividend = Omit<
 >;
 export type CalendarStockEarning = Omit<StockEarning, 'fiscalDateEnding' | 'updatedFromDate' | 'time'>;
 
-export type CalendarAssetTypes = 'dividends' | 'earnings' | 'ipo';
+export const AllowedCalendarAssetTypes = ['ipo', 'earnings', 'dividends'] as const;
+export type CalendarAssetTypes = (typeof AllowedCalendarAssetTypes)[number];
 export type CalendarAssetDataTypes = CalendarStockIPO | CalendarStockEarning | CalendarDividend;
 
 /**

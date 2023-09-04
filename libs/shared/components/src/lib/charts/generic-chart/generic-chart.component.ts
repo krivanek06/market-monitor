@@ -14,10 +14,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-client';
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
+import { isAfter, isBefore } from 'date-fns';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { ChartType, ChartTypeKeys, GenericChartSeries, GenericChartSeriesPie } from './generic-chart.model';
-
 @Component({
   selector: 'app-generic-chart',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -85,6 +85,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
 
   @Input() showExpandableButton = false;
   @Input() applyFancyColor = 0;
+  @Input() chartDateRestriction?: [Date | string, Date | string];
   constructor() {
     super();
   }
@@ -97,11 +98,33 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
       return;
     }
 
+    //    console.log('chart changes', changes);
+
     if (this.applyFancyColor > 0) {
       this.fancyColoring();
     }
 
-    this.initChart();
+    let series = this.series;
+
+    if (this.chartDateRestriction && this.chartType === 'line') {
+      const [startDate, endDate] = this.chartDateRestriction;
+      series = (series as GenericChartSeries[]).map((s) => {
+        const data = (s.data as [number, number][]).filter((d) => {
+          const date = d[0];
+          if (!date) {
+            return false;
+          }
+          const dateValue = new Date(date);
+          return isBefore(dateValue, new Date(endDate)) && isAfter(dateValue, new Date(startDate));
+        });
+        return {
+          ...s,
+          data,
+        };
+      });
+    }
+
+    this.initChart(series);
 
     if (this.floatingLegend && this.chartOptions.legend) {
       this.chartOptions.legend.floating = true;
@@ -146,7 +169,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
     }
   }
 
-  private initChart() {
+  private initChart(series: GenericChartSeries[] | GenericChartSeriesPie[]) {
     this.chartOptions = {
       chart: {
         type: this.chartType === ChartType.areaChange ? ChartType.areaspline : this.chartType,
@@ -395,7 +418,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
           threshold: null,
         },
       },
-      series: [...this.series] as Highcharts.SeriesOptionsType[],
+      series: [...series] as Highcharts.SeriesOptionsType[],
     };
   }
 

@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Optional } from '@angular/core';
+import { inject } from '@angular/core';
 import { isBefore } from 'date-fns';
 import { Observable, of, retry, tap } from 'rxjs';
 
@@ -9,13 +9,16 @@ export abstract class ApiCacheService {
 
   validity1Min = 1;
   validity2Min = 2;
+  validity3Min = 3;
   validity5Min = 5;
   validity10Min = 10;
   validity30Min = 30;
   validity1Hour = 60;
   validity2Hour = 120;
 
-  constructor(@Optional() private readonly httpClient: HttpClient) {
+  httpClient = inject(HttpClient);
+
+  constructor() {
     if (!this.httpClient) {
       throw new Error('HttpClient is required');
     }
@@ -23,7 +26,7 @@ export abstract class ApiCacheService {
 
   get headers(): HttpHeaders {
     const headersConfig = {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json; charset=utf-8',
       Accept: 'application/json',
     };
 
@@ -74,7 +77,7 @@ export abstract class ApiCacheService {
     // calculate validity
     const validity = validityDefault * this.validityOneMinute;
 
-    return this.httpClient.post<T>(`${url}`, data, { headers: this.headers }).pipe(
+    return this.httpClient.post<T>(url, JSON.stringify(data), { headers: this.headers }).pipe(
       retry(1),
       tap((data) => {
         this.cache.set(key, {

@@ -41,7 +41,9 @@ export class UserUnauthenticatedService extends StorageService<UserUnauthenticat
     // load data from api
     this.stocksApiService.getStockSummary(symbol).subscribe((stockSummary) => {
       // save data into array, limit to 12
-      this.lastSearchedStocks$.next([stockSummary, ...this.lastSearchedStocks$.getValue()].slice(0, 12));
+      if (stockSummary) {
+        this.lastSearchedStocks$.next([stockSummary, ...this.lastSearchedStocks$.getValue()].slice(0, 12));
+      }
     });
 
     // save into storage
@@ -93,7 +95,9 @@ export class UserUnauthenticatedService extends StorageService<UserUnauthenticat
     // load data from api
     this.stocksApiService.getStockSummary(symbol).subscribe((stockSummary) => {
       // save data into array, limit to 12
-      this.favoriteStocks$.next([stockSummary, ...this.favoriteStocks$.getValue()].slice(0, 12));
+      if (stockSummary) {
+        this.favoriteStocks$.next([stockSummary, ...this.favoriteStocks$.getValue()].slice(0, 12));
+      }
     });
 
     // save into storage

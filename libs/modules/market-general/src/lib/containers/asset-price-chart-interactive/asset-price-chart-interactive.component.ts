@@ -11,7 +11,11 @@ import {
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MarketApiService } from '@market-monitor/api-client';
-import { HistoricalPrice, SymbolHistoricalPeriods } from '@market-monitor/api-types';
+import {
+  HistoricalPrice,
+  SymbolHistoricalPeriods,
+  SymbolHistoricalPeriodsArrayPreload,
+} from '@market-monitor/api-types';
 import { AssetPriceChartComponent, TimePeriodButtonsComponent } from '@market-monitor/shared-components';
 import { ClientStylesDirective, DefaultImgDirective } from '@market-monitor/shared-directives';
 import { DialogServiceUtil, ErrorEnum } from '@market-monitor/shared-utils-client';
@@ -76,6 +80,13 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
       .subscribe((prices) => {
         this.stockHistoricalPrice.set(prices);
       });
+
+    // preload some data for faster interaction
+    SymbolHistoricalPeriodsArrayPreload.forEach((period) => {
+      this.marketApiService.getHistoricalPrices(this.symbol, period).subscribe(() => {
+        console.log(`Preloaded ${this.symbol} ${period}`);
+      });
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {

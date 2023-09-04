@@ -35,9 +35,15 @@ import { catchError, of, switchMap, tap } from 'rxjs';
     DialogServiceModule,
   ],
   templateUrl: './page-stock-screener.component.html',
-  styleUrls: ['./page-stock-screener.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [ShowStockDialogDirective],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
 })
 export class PageStockScreenerComponent implements OnInit, RouterManagement {
   private screenerDefault = 30;

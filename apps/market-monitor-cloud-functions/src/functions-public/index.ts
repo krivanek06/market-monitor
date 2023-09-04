@@ -1,131 +1,13 @@
 import { corsMiddleWare, firebaseSimpleErrorLogger } from '../utils';
-
-// stock-functions
-import { getStockDetailsWrapper } from './stock-functions/get-stock-details';
-import { getStockEarningsWrapper } from './stock-functions/get-stock-earnings';
-import { getStockHistoricalMetricsWrapper } from './stock-functions/get-stock-historical-metrics-basic';
-import { getStockInsiderTradesWrapper } from './stock-functions/get-stock-insider-trades';
-import { getOwnershipHoldersToDateWrapper } from './stock-functions/get-stock-ownership-holders-to-date';
-import { getOwnershipInstitutionalWrapper } from './stock-functions/get-stock-ownership-institutional';
-import { getStockScreeningWrapper } from './stock-functions/get-stock-screening';
-import { getStockSummariesWrapper, getStockSummaryWrapper } from './stock-functions/get-stock-summary';
-import { searchStocksBasicWrapper } from './stock-functions/search-stock-basic';
-
-// market-functions
 import {
-  getAssetHistoricalPricesOnDateWrapper,
-  getAssetHistoricalPricesWrapper,
-} from './market-functions/get-asset-historical-prices';
-import {
-  getCalendarStockDividendsWrapper,
-  getCalendarStockEarnignsWrapper,
-  getCalendarStockIposWrapper,
-} from './market-functions/get-calendar-stock';
-import { getInstitutionalPortfolioDatesWrapper } from './market-functions/get-institutional-portfolio-dates';
-import { getMarketOverviewDataWrapper, getMarketOverviewWrapper } from './market-functions/get-market-overview';
-import { getMarketTopPerformanceWrapper } from './market-functions/get-market-top-performers';
-import { getQuoteBySymbolWrapper, getQuotesBySymbolsWrapper } from './market-functions/get-quote';
-import { getQuotesByTypeWrapper } from './market-functions/get-quotes-by-type';
+  getMarketOverviewDataWrapper,
+  run_reload_market_overview as run_reload_market_overview_wrapper,
+} from './market-functions/market-overview';
 
 // wrap functions with sentry
-export const getstockdetails = firebaseSimpleErrorLogger(
-  'getStockDetailsWrapper',
-  corsMiddleWare(getStockDetailsWrapper),
-);
-export const getstockearnings = firebaseSimpleErrorLogger(
-  'getStockEarningsWrapper',
-  corsMiddleWare(getStockEarningsWrapper),
-);
-export const getstockhistoricalmetrics = firebaseSimpleErrorLogger(
-  'getStockHistoricalMetricsWrapper',
-  corsMiddleWare(getStockHistoricalMetricsWrapper),
-);
-
-export const getstockinsidertrades = firebaseSimpleErrorLogger(
-  'getStockInsiderTradesWrapper',
-  corsMiddleWare(getStockInsiderTradesWrapper),
-);
-
-export const getownershipholderstodate = firebaseSimpleErrorLogger(
-  'getOwnershipHoldersToDateWrapper',
-  corsMiddleWare(getOwnershipHoldersToDateWrapper),
-);
-
-export const getownershipinstitutional = firebaseSimpleErrorLogger(
-  'getOwnershipInstitutionalWrapper',
-  corsMiddleWare(getOwnershipInstitutionalWrapper),
-);
-
-export const getstockscreening = firebaseSimpleErrorLogger(
-  'getStockScreeningWrapper',
-  corsMiddleWare(getStockScreeningWrapper),
-);
-export const getstocksummaries = firebaseSimpleErrorLogger(
-  'getStockSummariesWrapper',
-  corsMiddleWare(getStockSummariesWrapper),
-);
-export const getstocksummary = firebaseSimpleErrorLogger(
-  'getStockScreeningWrapper',
-  corsMiddleWare(getStockSummaryWrapper),
-);
-export const searchstocksbasic = firebaseSimpleErrorLogger(
-  'searchStocksBasicWrapper',
-  corsMiddleWare(searchStocksBasicWrapper),
-);
-
-export const getquotebysymbol = firebaseSimpleErrorLogger(
-  'getQuoteBySymbolWrapper',
-  corsMiddleWare(getQuoteBySymbolWrapper),
-);
-export const getquotesbysymbols = firebaseSimpleErrorLogger(
-  'getQuotesBySymbolsWrapper',
-  corsMiddleWare(getQuotesBySymbolsWrapper),
-);
-
-export const getassethistoricalpricesondate = firebaseSimpleErrorLogger(
-  'getAssetHistoricalPricesOnDateWrapper',
-  corsMiddleWare(getAssetHistoricalPricesOnDateWrapper),
-);
-
-export const getassethistoricalprices = firebaseSimpleErrorLogger(
-  'getAssetHistoricalPricesWrapper',
-  corsMiddleWare(getAssetHistoricalPricesWrapper),
-);
-
-export const getcalendarstockdividends = firebaseSimpleErrorLogger(
-  'getCalendarStockDividendsWrapper',
-  corsMiddleWare(getCalendarStockDividendsWrapper),
-);
-
-export const getcalendarstockearnigns = firebaseSimpleErrorLogger(
-  'getCalendarStockEarnignsWrapper',
-  corsMiddleWare(getCalendarStockEarnignsWrapper),
-);
-
-export const getcalendarstockipos = firebaseSimpleErrorLogger(
-  'getCalendarStockIposWrapper',
-  corsMiddleWare(getCalendarStockIposWrapper),
-);
-export const getinstitutionalportfoliodates = firebaseSimpleErrorLogger(
-  'getInstitutionalPortfolioDatesWrapper',
-  corsMiddleWare(getInstitutionalPortfolioDatesWrapper),
-);
-
-export const getmarketoverview = firebaseSimpleErrorLogger(
-  'getMarketOverviewWrapper',
-  corsMiddleWare(getMarketOverviewWrapper),
-);
 export const getmarketoverviewdata = firebaseSimpleErrorLogger(
   'getMarketOverviewDataWrapper',
   corsMiddleWare(getMarketOverviewDataWrapper),
 );
 
-export const getmarkettopperformance = firebaseSimpleErrorLogger(
-  'getMarketTopPerformanceWrapper',
-  corsMiddleWare(getMarketTopPerformanceWrapper),
-);
-
-export const getquotesbytype = firebaseSimpleErrorLogger(
-  'getQuotesByTypeWrapper',
-  corsMiddleWare(getQuotesByTypeWrapper),
-);
+export const run_reload_market_overview = run_reload_market_overview_wrapper;

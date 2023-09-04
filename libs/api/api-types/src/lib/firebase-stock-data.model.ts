@@ -4,7 +4,9 @@ import {
   CompanyKeyMetricsTTM,
   CompanyOutlook,
   CompanyProfile,
+  CompanyRating,
   CompanyRatio,
+  CompanyRatioTTM,
   ESGDataQuarterly,
   ESGDataRatingYearly,
   EnterpriseValue,
@@ -19,15 +21,14 @@ import {
 
 export type StockSummary = {
   id: string;
-  reloadData: boolean;
-  reloadDetailsData: boolean;
   quote: SymbolQuote;
-  profile: CompanyProfile;
+  profile?: CompanyProfile;
   priceChange: PriceChange;
-  summaryLastUpdate: string;
 };
 
 export type StockDetailsAPI = {
+  ratio: CompanyRatioTTM | null;
+  rating: CompanyRating | null;
   companyOutlook: CompanyOutlook;
   esgDataRatingYearlyArray: ESGDataRatingYearly[];
   esgDataRatingYearly: ESGDataRatingYearly | null;
@@ -40,9 +41,20 @@ export type StockDetailsAPI = {
   recommendationTrends: RecommendationTrends[];
   companyKeyMetricsTTM: CompanyKeyMetricsTTM;
   enterpriseValue: EnterpriseValue[];
-  lastUpdate: {
-    detailsLastUpdate: string;
-    earningLastUpdate: string;
+  additionalFinancialData: {
+    revenue: number | null;
+    costOfRevenue: number | null;
+    EBITDA: number | null;
+    netIncome: number | null;
+    totalAssets: number | null;
+    totalCurrentAssets: number | null;
+    totalDebt: number | null;
+    shortTermDebt: number | null;
+    cashOnHand: number | null;
+    freeCashFlow: number | null;
+    operatingCashFlow: number | null;
+    stockBasedCompensation: number | null;
+    dividends: StockDetailsDividends | null;
   };
 };
 
@@ -77,6 +89,15 @@ export enum SymbolHistoricalPeriods {
   ytd = 'ytd',
   all = 'all',
 }
+
+export const SymbolHistoricalPeriodsArrayPreload = [
+  SymbolHistoricalPeriods.day,
+  SymbolHistoricalPeriods.week,
+  SymbolHistoricalPeriods.month,
+  SymbolHistoricalPeriods.sixMonths,
+  SymbolHistoricalPeriods.year,
+  SymbolHistoricalPeriods.fiveYears,
+];
 /**
  * Stock data details from the pro api for pro members
  */

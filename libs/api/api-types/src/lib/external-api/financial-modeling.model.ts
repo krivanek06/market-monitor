@@ -42,6 +42,14 @@ export type CompanyOutlook = {
   financialsQuarter: CompanyFinancialsReport;
 };
 
+export type TickerSearch = {
+  symbol: string;
+  name: string;
+  currency: string;
+  stockExchange: string;
+  exchangeShortName: string;
+};
+
 export type CompanyProfile = {
   symbol: string;
   price: number;
@@ -662,22 +670,20 @@ export type PriceChange = {
   max: number;
 };
 
-export interface TickerSearch {
-  symbol: string;
-  name: string;
-  currency: string;
-  stockExchange: string;
-  exchangeShortName: string;
-}
-
-export interface HistoricalPrice {
+export type HistoricalPriceAPI = {
   date: string;
   open: number;
   low: number;
   high: number;
   close: number;
   volume: number;
-}
+};
+
+export type HistoricalPrice = Omit<HistoricalPriceAPI, 'open' | 'low' | 'high'>;
+
+export type HistoricalPriceSymbol = HistoricalPrice & {
+  symbol: string;
+};
 
 export interface MostPerformingStocks {
   symbol: string;

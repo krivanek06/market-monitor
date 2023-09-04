@@ -26,7 +26,7 @@ import {
 } from '@market-monitor/shared-components';
 import { SortByKeyPipe } from '@market-monitor/shared-pipes';
 import { DialogServiceModule } from '@market-monitor/shared-utils-client';
-import { map } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
@@ -69,9 +69,9 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   private showStockDialogDirective = inject(ShowStockDialogDirective);
 
   stockPeersSignal = toSignal(
-    this.stocksApiService
-      .getStockSummaries(this.stockDetailsSignal().sectorPeers?.peersList ?? [])
-      .pipe(map((summaries) => summaries ?? [])),
+    this.stockDetails$.pipe(
+      switchMap((details) => this.stocksApiService.getStockSummaries(details.sectorPeers?.peersList ?? [])),
+    ),
   );
 
   companyRatingSignal = computed(() => this.stockTransformService.createCompanyRatingTable(this.stockDetailsSignal()));

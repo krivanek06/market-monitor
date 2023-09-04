@@ -4,16 +4,24 @@
       {
         "type": "chrome",
         "request": "launch",
-        "name": "Launch chrome market-monitor client",
+        "name": "Launch Chrome Debugger",
         "url": "http://localhost:4200",
-        "webRoot": "${workspaceFolder}/market-monitor"
+        "webRoot": "${workspaceFolder}",
+        "presentation": {
+          "hidden": true
+        }
       },
       {
-        "type": "node",
-        "request": "attach",
-        "name": "Debug Node",
-        "port": 9229,
-        "skipFiles": ["<node_internals>/**"]
+        "command": "yarn mm:serve",
+        "name": "Debug Market Monitor",
+        "cwd": "${workspaceFolder}",
+        "request": "launch",
+        "type": "node-terminal",
+        "serverReadyAction": {
+          "action": "startDebugging",
+          "name": "Launch Chrome Debugger",
+          "pattern": "listening on localhost:4200"
+        }
       }
     ]
   }

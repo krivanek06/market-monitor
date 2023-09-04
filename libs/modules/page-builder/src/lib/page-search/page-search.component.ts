@@ -46,7 +46,7 @@ export class PageSearchComponent implements OnInit {
       this.marketApiService.getNews('general'),
       this.marketApiService.getMarketTopPerformance(),
       this.stocksApiService.getStockScreening(STOCK_SCREENER_DEFAULT_VALUES),
-      this.marketApiService.getQuotesBySymbols(INDEXES_DEFAULT_SYMBOLS),
+      this.marketApiService.getSymbolSummaries(INDEXES_DEFAULT_SYMBOLS),
       this.marketApiService.getMarketCalendarDividends(month, year),
       this.marketApiService.getMarketOverview(),
     ])

@@ -30,7 +30,7 @@
     additionalClasses="h-full"
     class="hidden sm:block min-w-[150px]"
   >
-    <div class="text-center">{{ stockSummary.profile.mktCap | largeNumberFormatter }}</div>
+    <div class="text-center">{{ stockSummary.profile?.mktCap | largeNumberFormatter }}</div>
   </app-general-card>
 
   <!-- volume -->
@@ -80,6 +80,6 @@
     additionalClasses="h-full"
     class="hidden text-center xl:block"
   >
-    <div>{{ stockSummary.profile.sector || 'N/A' }}</div>
+    <div>{{ stockSummary.profile?.sector || 'N/A' }}</div>
   </app-general-card>
 </div>

@@ -24,9 +24,6 @@
       "@market-monitor/api-external": [
         "libs/api/api-external/src/index.ts"
       ],
-      "@market-monitor/api-firebase": [
-        "libs/api/api-firebase/src/index.ts"
-      ],
       "@market-monitor/api-types": [
         "libs/api/api-types/src/index.ts"
       ],
