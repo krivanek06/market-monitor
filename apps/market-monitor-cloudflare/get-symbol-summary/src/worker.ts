@@ -68,17 +68,17 @@ export default {
 			.filter((value, index, self) => self.indexOf(value) === index)
 			.filter((d) => !!d);
 
-		// no symbol
-		if (symbolArray.length === 0) {
-			return new Response(JSON.stringify([]), RESPONSE_HEADER);
-		}
-
 		// if searching for symbols, get symbols from API
 		if (isSearch) {
 			// load searched symbols from API
 			const searchResults = await searchTicker(symbolArray[0], isSymbolTypeCrypto);
 			// rewrite symbolArray with searched symbols
 			symbolArray = searchResults.map((d) => d.symbol);
+		}
+
+		// no symbol
+		if (symbolArray.length === 0) {
+			return new Response(JSON.stringify([]), RESPONSE_HEADER);
 		}
 
 		// check if data exists in db

@@ -6,6 +6,8 @@
       <div class="grid">
         <div class="flex gap-4 text-base text-wt-gray-medium">
           <span>{{ stockSummary.id }}</span>
+          <span>|</span>
+          <span>{{ symbolType() }}</span>
         </div>
         <span class="text-lg text-wt-gray-medium">{{ stockSummary.quote.name }}</span>
       </div>

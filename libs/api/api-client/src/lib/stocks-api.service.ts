@@ -33,10 +33,7 @@ export class StocksApiService extends ApiCacheService {
     return this.getData<StockSummary[]>(
       `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${ticker}&isSearch=true`,
       this.validity10Min,
-    ).pipe(
-      map((summaries) => summaries.filter((d) => d.quote.marketCap !== 0)),
-      catchError(() => []),
-    );
+    ).pipe(map((summaries) => summaries.filter((d) => d.quote.marketCap !== 0)));
   }
 
   getStockSummaries(symbols: string[]): Observable<StockSummary[]> {
@@ -58,8 +55,8 @@ export class StocksApiService extends ApiCacheService {
         }
 
         // prevent loading data for etf and funds
-        if (summary.profile.isEtf || summary.profile.isFund) {
-          throw new Error('Unable to get details for FUND or ETF');
+        if (summary.profile.isEtf) {
+          throw new Error('Unable to get details for ETF');
         }
       }),
       switchMap((summary) =>

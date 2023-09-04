@@ -72,7 +72,10 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
         switchMap((value) =>
           this.StocksApiService.searchStockSummariesByPrefix(value).pipe(
             tap(() => this.showLoadingIndicator.set(false)),
-            catchError(() => []),
+            catchError(() => {
+              this.showLoadingIndicator.set(false);
+              return [];
+            }),
           ),
         ),
         tap((data) => this.options.set(data)),
