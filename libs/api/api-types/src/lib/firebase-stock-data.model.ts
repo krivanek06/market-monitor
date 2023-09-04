@@ -27,8 +27,8 @@ export type StockSummary = {
 };
 
 export type StockDetailsAPI = {
-  ratio: CompanyRatioTTM;
-  rating: CompanyRating;
+  ratio: CompanyRatioTTM | null;
+  rating: CompanyRating | null;
   companyOutlook: CompanyOutlook;
   esgDataRatingYearlyArray: ESGDataRatingYearly[];
   esgDataRatingYearly: ESGDataRatingYearly | null;
@@ -42,19 +42,19 @@ export type StockDetailsAPI = {
   companyKeyMetricsTTM: CompanyKeyMetricsTTM;
   enterpriseValue: EnterpriseValue[];
   additionalFinancialData: {
-    revenue: number;
-    costOfRevenue: number;
-    EBITDA: number;
-    netIncome: number;
-    totalAssets: number;
-    totalCurrentAssets: number;
-    totalDebt: number;
-    shortTermDebt: number;
-    cashOnHand: number;
-    freeCashFlow: number;
-    operatingCashFlow: number;
-    stockBasedCompensation: number;
-    dividends: StockDetailsDividends;
+    revenue: number | null;
+    costOfRevenue: number | null;
+    EBITDA: number | null;
+    netIncome: number | null;
+    totalAssets: number | null;
+    totalCurrentAssets: number | null;
+    totalDebt: number | null;
+    shortTermDebt: number | null;
+    cashOnHand: number | null;
+    freeCashFlow: number | null;
+    operatingCashFlow: number | null;
+    stockBasedCompensation: number | null;
+    dividends: StockDetailsDividends | null;
   };
 };
 

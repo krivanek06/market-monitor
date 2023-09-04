@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { StockDetails } from '@market-monitor/api-types';
+import { CompanyRatioTTM, StockDetails } from '@market-monitor/api-types';
 import { NameValueItem } from '@market-monitor/shared-components';
 import { EstimatedChartDataType } from '@market-monitor/shared-utils-client';
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
@@ -78,16 +78,16 @@ export class StockTransformService {
       return [];
     }
 
-    const enterprise = `${formatLargeNumber(data.companyKeyMetricsTTM.enterpriseValueTTM)} (${roundNDigits(
-      data.ratio.enterpriseValueMultipleTTM,
-      2,
+    const resolveRation = (key: keyof CompanyRatioTTM) => (data.ratio ? roundNDigits(data.ratio[key], 2) : 'N/A');
+
+    const enterprise = `${formatLargeNumber(data.companyKeyMetricsTTM.enterpriseValueTTM)} (${resolveRation(
+      'enterpriseValueMultipleTTM',
     )})`;
     const stockBasedCompensation = `${formatLargeNumber(
       data.additionalFinancialData.stockBasedCompensation,
     )} (${roundNDigits(data.companyKeyMetricsTTM.stockBasedCompensationToRevenueTTM, 2)})`;
-    const totalEquity = `${formatLargeNumber(data.companyKeyMetricsTTM.tangibleAssetValueTTM)} (${roundNDigits(
-      data.ratio.companyEquityMultiplierTTM,
-      2,
+    const totalEquity = `${formatLargeNumber(data.companyKeyMetricsTTM.tangibleAssetValueTTM)} (${resolveRation(
+      'companyEquityMultiplierTTM',
     )})`;
 
     return [
@@ -115,30 +115,32 @@ export class StockTransformService {
       return [];
     }
 
+    const resolveRation = (key: keyof CompanyRatioTTM) => (data.ratio ? roundNDigits(data.ratio[key], 2) : 'N/A');
+
     return [
-      { name: 'Current Ratio', value: roundNDigits(data.ratio.currentRatioTTM, 2) },
-      { name: 'Quick Ratio', value: roundNDigits(data.ratio.quickRatioTTM, 2) },
-      { name: 'Cash Ratio', value: roundNDigits(data.ratio.cashRatioTTM, 2) },
-      { name: 'PEG Ratio', value: roundNDigits(data.ratio.pegRatioTTM, 2) },
-      { name: 'Price / Book Ratio', value: roundNDigits(data.ratio.priceToBookRatioTTM, 2) },
-      { name: 'Price / Sales Ratio', value: roundNDigits(data.ratio.priceToSalesRatioTTM, 2) },
-      { name: 'Price / Earnings Growth', value: roundNDigits(data.ratio.priceEarningsToGrowthRatioTTM, 2) },
-      { name: 'Price / Cash Flow Ratio', value: roundNDigits(data.ratio.priceCashFlowRatioTTM, 2) },
+      { name: 'Current Ratio', value: resolveRation('currentRatioTTM') },
+      { name: 'Quick Ratio', value: resolveRation('quickRatioTTM') },
+      { name: 'Cash Ratio', value: resolveRation('cashRatioTTM') },
+      { name: 'PEG Ratio', value: resolveRation('pegRatioTTM') },
+      { name: 'Price / Book Ratio', value: resolveRation('priceToBookRatioTTM') },
+      { name: 'Price / Sales Ratio', value: resolveRation('priceToSalesRatioTTM') },
+      { name: 'Price / Earnings Growth', value: resolveRation('priceEarningsToGrowthRatioTTM') },
+      { name: 'Price / Cash Flow Ratio', value: resolveRation('priceCashFlowRatioTTM') },
       {
         name: 'Price / Operating Cash Flow Ratio',
-        value: roundNDigits(data.ratio.priceToOperatingCashFlowsRatioTTM, 2),
+        value: resolveRation('priceToOperatingCashFlowsRatioTTM'),
       },
-      { name: 'Price / Free Cash Flow Ratio', value: roundNDigits(data.ratio.priceToFreeCashFlowsRatioTTM, 2) },
-      { name: 'Debt Ratio', value: roundNDigits(data.ratio.debtRatioTTM, 2) },
-      { name: 'Debt / Equity Ratio', value: roundNDigits(data.ratio.debtEquityRatioTTM, 2) },
+      { name: 'Price / Free Cash Flow Ratio', value: resolveRation('priceToFreeCashFlowsRatioTTM') },
+      { name: 'Debt Ratio', value: resolveRation('debtRatioTTM') },
+      { name: 'Debt / Equity Ratio', value: resolveRation('debtEquityRatioTTM') },
       { name: 'Debt / Market Cap. Ratio', value: roundNDigits(data.companyKeyMetricsTTM.debtToMarketCapTTM, 2) },
-      { name: 'Cash Flow to Debt Ratio', value: roundNDigits(data.ratio.cashFlowToDebtRatioTTM, 2) },
-      { name: 'Operating Cash Flow / Sales Ratio', value: roundNDigits(data.ratio.operatingCashFlowSalesRatioTTM, 2) },
+      { name: 'Cash Flow to Debt Ratio', value: resolveRation('cashFlowToDebtRatioTTM') },
+      { name: 'Operating Cash Flow / Sales Ratio', value: resolveRation('operatingCashFlowSalesRatioTTM') },
       {
         name: 'Free Cash Flow / Operating CF Ratio',
-        value: roundNDigits(data.ratio.freeCashFlowOperatingCashFlowRatioTTM, 2),
+        value: resolveRation('freeCashFlowOperatingCashFlowRatioTTM'),
       },
-      { name: 'Cash Flow Coverage Ratio', value: roundNDigits(data.ratio.cashFlowCoverageRatiosTTM, 2) },
+      { name: 'Cash Flow Coverage Ratio', value: resolveRation('cashFlowCoverageRatiosTTM') },
     ];
   }
 
@@ -147,16 +149,18 @@ export class StockTransformService {
       return [];
     }
 
+    const resolveRation = (key: keyof CompanyRatioTTM) => (data.ratio ? roundNDigits(data.ratio[key], 2) : 'N/A');
+
     return [
-      { name: 'Short Term Coverage Ratio', value: roundNDigits(data.ratio.shortTermCoverageRatiosTTM, 2) },
+      { name: 'Short Term Coverage Ratio', value: resolveRation('shortTermCoverageRatiosTTM') },
       {
         name: 'Capital Expenditure Coverage Ratio',
-        value: roundNDigits(data.ratio.capitalExpenditureCoverageRatioTTM, 2),
+        value: resolveRation('capitalExpenditureCoverageRatioTTM'),
       },
-      { name: 'Interest Coverage Ratio', value: roundNDigits(data.ratio.interestCoverageTTM, 2) },
-      { name: 'EBT / Ebit', value: roundNDigits(data.ratio.ebtPerEbitTTM, 2) },
-      { name: 'Ebit / Revenue', value: roundNDigits(data.ratio.ebitPerRevenueTTM, 2) },
-      { name: 'Net Income / Ebit', value: roundNDigits(data.ratio.netIncomePerEBTTTM, 2) },
+      { name: 'Interest Coverage Ratio', value: resolveRation('interestCoverageTTM') },
+      { name: 'EBT / Ebit', value: resolveRation('ebtPerEbitTTM') },
+      { name: 'Ebit / Revenue', value: resolveRation('ebitPerRevenueTTM') },
+      { name: 'Net Income / Ebit', value: resolveRation('netIncomePerEBTTTM') },
       { name: 'Enterprise Value / Sales', value: roundNDigits(data.companyKeyMetricsTTM.evToSalesTTM, 2) },
       {
         name: 'Enterprise Value / Operating Cash Flow',
@@ -166,12 +170,12 @@ export class StockTransformService {
         name: 'Enterprise Value / Free Cash Flow',
         value: roundNDigits(data.companyKeyMetricsTTM.evToFreeCashFlowTTM, 2),
       },
-      { name: 'Fixed Asset Turnover', value: roundNDigits(data.ratio.fixedAssetTurnoverTTM, 2) },
-      { name: 'Asset Turnover', value: roundNDigits(data.ratio.assetTurnoverTTM, 2) },
-      { name: 'Long Term Debt / Capitalization', value: roundNDigits(data.ratio.totalDebtToCapitalizationTTM, 2) },
+      { name: 'Fixed Asset Turnover', value: resolveRation('fixedAssetTurnoverTTM') },
+      { name: 'Asset Turnover', value: resolveRation('assetTurnoverTTM') },
+      { name: 'Long Term Debt / Capitalization', value: resolveRation('totalDebtToCapitalizationTTM') },
       {
         name: 'Dividend Pay & CAPEX Coverage',
-        value: roundNDigits(data.ratio.dividendPaidAndCapexCoverageRatioTTM, 2),
+        value: resolveRation('dividendPaidAndCapexCoverageRatioTTM'),
       },
       { name: 'CAPEX to OFC', value: roundNDigits(data.companyKeyMetricsTTM.capexToOperatingCashFlowTTM, 2) },
       { name: 'CAPEX to Revenue', value: roundNDigits(data.companyKeyMetricsTTM.capexToRevenueTTM, 2) },
@@ -204,30 +208,29 @@ export class StockTransformService {
       return [];
     }
 
-    const payables = `${formatLargeNumber(data.companyKeyMetricsTTM.averagePayablesTTM)} (${roundNDigits(
-      data.ratio.payablesTurnoverTTM,
-      2,
+    const resolveRation = (key: keyof CompanyRatioTTM) => (data.ratio ? roundNDigits(data.ratio[key], 2) : 'N/A');
+
+    const payables = `${formatLargeNumber(data.companyKeyMetricsTTM.averagePayablesTTM)} (${resolveRation(
+      'payablesTurnoverTTM',
     )})`;
 
-    const inventory = `${formatLargeNumber(data.companyKeyMetricsTTM.averageInventoryTTM)} (${roundNDigits(
-      data.ratio.inventoryTurnoverTTM,
-      2,
+    const inventory = `${formatLargeNumber(data.companyKeyMetricsTTM.averageInventoryTTM)} (${resolveRation(
+      'inventoryTurnoverTTM',
     )})`;
 
-    const receivables = `${formatLargeNumber(data.companyKeyMetricsTTM.averageReceivablesTTM)} (${roundNDigits(
-      data.ratio.receivablesTurnoverTTM,
-      2,
+    const receivables = `${formatLargeNumber(data.companyKeyMetricsTTM.averageReceivablesTTM)} (${resolveRation(
+      'receivablesTurnoverTTM',
     )})`;
 
     return [
       { name: 'Average Receivables (Turnover)', value: receivables },
       { name: 'Average Payables (Turnover)', value: payables },
       { name: 'Average Inventory (Turnover)', value: inventory },
-      { name: 'Days Of Sales Outstanding', value: roundNDigits(data.ratio.daysOfSalesOutstandingTTM, 2) },
-      { name: 'Days Of Payables Outstanding', value: roundNDigits(data.ratio.daysOfPayablesOutstandingTTM, 2) },
-      { name: 'Days Of Inventory Outstanding', value: roundNDigits(data.ratio.daysOfInventoryOutstandingTTM, 2) },
-      { name: 'Operating Cycle days', value: roundNDigits(data.ratio.operatingCycleTTM, 2) },
-      { name: 'Cash Conversion Cycle days', value: roundNDigits(data.ratio.cashConversionCycleTTM, 2) },
+      { name: 'Days Of Sales Outstanding', value: resolveRation('daysOfSalesOutstandingTTM') },
+      { name: 'Days Of Payables Outstanding', value: resolveRation('daysOfPayablesOutstandingTTM') },
+      { name: 'Days Of Inventory Outstanding', value: resolveRation('daysOfInventoryOutstandingTTM') },
+      { name: 'Operating Cycle days', value: resolveRation('operatingCycleTTM') },
+      { name: 'Cash Conversion Cycle days', value: resolveRation('cashConversionCycleTTM') },
     ];
   }
 
@@ -239,16 +242,21 @@ export class StockTransformService {
     const dividendData = data.additionalFinancialData.dividends;
     const stockDividends = data.companyOutlook.stockDividend;
 
-    const dividendPaid = `${formatLargeNumber(Math.abs(dividendData.dividendsPaid))} (${roundNDigits(
-      dividendData.payoutRatioTTM,
-      2,
-      true,
-    )}%)`;
+    const dividendPaid = dividendData
+      ? `${formatLargeNumber(Math.abs(dividendData.dividendsPaid))} (${roundNDigits(
+          dividendData.payoutRatioTTM,
+          2,
+          true,
+        )}%)`
+      : 'N/A';
 
     return [
       { name: 'Paid Dividends (Percent)', value: dividendPaid },
-      { name: 'Dividend / Share', value: roundNDigits(dividendData.dividendPerShareTTM, 2) },
-      { name: 'Dividend Yield', value: `${roundNDigits(dividendData.dividendYielPercentageTTM, 2)}%` },
+      { name: 'Dividend / Share', value: dividendData ? roundNDigits(dividendData.dividendPerShareTTM, 2) : 'N/A' },
+      {
+        name: 'Dividend Yield',
+        value: dividendData ? `${roundNDigits(dividendData.dividendYielPercentageTTM, 2)}%` : 'N/A',
+      },
       ...stockDividends.map((d) => ({ name: d.label, value: roundNDigits(d.dividend, 2) })),
     ];
   }

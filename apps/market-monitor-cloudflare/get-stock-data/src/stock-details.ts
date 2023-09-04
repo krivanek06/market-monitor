@@ -28,14 +28,19 @@ export const getStockDetailsWrapper = async (env: Env, symbol: string, searchPar
 
 	console.log(`Stock details for ${symbol} loaded from API`);
 
-	// reload data
-	const details = await reloadDetails(symbol);
+	try {
+		// reload data
+		const details = await reloadDetails(symbol);
 
-	// save into cache
-	env.get_stock_data.put(key, JSON.stringify(details), { expirationTtl: EXPIRATION_ONE_WEEK });
+		// save into cache
+		env.get_stock_data.put(key, JSON.stringify(details), { expirationTtl: EXPIRATION_ONE_WEEK });
 
-	// return data
-	return new Response(JSON.stringify(details), RESPONSE_HEADER);
+		// return data
+		return new Response(JSON.stringify(details), RESPONSE_HEADER);
+	} catch (e) {
+		console.log(`Unable to Provide data for symbol=${symbol}`);
+		return new Response(`Unable to Provide data for symbol=${symbol}`, { status: 400 });
+	}
 };
 
 /**
@@ -68,15 +73,15 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
 		getEnterpriseValue(symbol),
 	]);
 
-	const sheetIncomeYearly = companyOutlook.financialsAnnual.income[0];
-	const sheetBalanceQuarter = companyOutlook.financialsQuarter.balance[0];
-	const sheetCashYearly = companyOutlook.financialsAnnual.cash[0];
-	const sheetCashflowQuarter = companyOutlook.financialsQuarter.cash[0];
+	const sheetIncomeYearly = companyOutlook.financialsAnnual.income.at(0);
+	const sheetBalanceQuarter = companyOutlook.financialsQuarter.balance.at(0);
+	const sheetCashYearly = companyOutlook.financialsAnnual.cash.at(0);
+	const sheetCashflowQuarter = companyOutlook.financialsQuarter.cash.at(0);
 
 	const result = {
 		companyOutlook,
-		ratio: companyOutlook.ratios[0],
-		rating: companyOutlook.rating[0],
+		ratio: companyOutlook.ratios[0] ?? null,
+		rating: companyOutlook.rating[0] ?? null,
 		upgradesDowngrades: upgradesDowngrades.slice(0, 15),
 		priceTarget: priceTarget.slice(0, 15),
 		stockEarnings: analystEstimatesEarnings,
@@ -89,25 +94,27 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
 		esgDataRatingYearlyArray: esgRatingYearly.slice(0, 10),
 		enterpriseValue: enterpriseValue,
 		additionalFinancialData: {
-			cashOnHand: sheetBalanceQuarter.cashAndShortTermInvestments,
-			costOfRevenue: sheetIncomeYearly.costOfRevenue,
-			EBITDA: sheetIncomeYearly.ebitda,
-			freeCashFlow: sheetCashflowQuarter.freeCashFlow,
-			netIncome: sheetIncomeYearly.netIncome,
-			revenue: sheetIncomeYearly.revenue,
-			operatingCashFlow: sheetCashflowQuarter.operatingCashFlow,
-			totalAssets: sheetBalanceQuarter.totalAssets,
-			totalCurrentAssets: sheetBalanceQuarter.totalCurrentAssets,
-			totalDebt: sheetBalanceQuarter.totalDebt,
-			shortTermDebt: sheetBalanceQuarter.shortTermDebt,
-			stockBasedCompensation: sheetCashflowQuarter.stockBasedCompensation,
-			dividends: {
-				dividendsPaid: sheetCashYearly.dividendsPaid,
-				dividendPerShareTTM: companyOutlook.ratios[0]?.dividendPerShareTTM,
-				dividendYielPercentageTTM: companyOutlook.ratios[0]?.dividendYielPercentageTTM,
-				dividendYielTTM: companyOutlook.ratios[0]?.dividendYielTTM,
-				payoutRatioTTM: companyOutlook.ratios[0]?.payoutRatioTTM,
-			},
+			cashOnHand: sheetBalanceQuarter?.cashAndShortTermInvestments ?? null,
+			costOfRevenue: sheetIncomeYearly?.costOfRevenue ?? null,
+			EBITDA: sheetIncomeYearly?.ebitda ?? null,
+			freeCashFlow: sheetCashflowQuarter?.freeCashFlow ?? null,
+			netIncome: sheetIncomeYearly?.netIncome ?? null,
+			revenue: sheetIncomeYearly?.revenue ?? null,
+			operatingCashFlow: sheetCashflowQuarter?.operatingCashFlow ?? null,
+			totalAssets: sheetBalanceQuarter?.totalAssets ?? null,
+			totalCurrentAssets: sheetBalanceQuarter?.totalCurrentAssets ?? null,
+			totalDebt: sheetBalanceQuarter?.totalDebt ?? null,
+			shortTermDebt: sheetBalanceQuarter?.shortTermDebt ?? null,
+			stockBasedCompensation: sheetCashflowQuarter?.stockBasedCompensation ?? null,
+			dividends: sheetCashYearly
+				? {
+						dividendsPaid: sheetCashYearly.dividendsPaid,
+						dividendPerShareTTM: companyOutlook.ratios[0]?.dividendPerShareTTM,
+						dividendYielPercentageTTM: companyOutlook.ratios[0]?.dividendYielPercentageTTM,
+						dividendYielTTM: companyOutlook.ratios[0]?.dividendYielTTM,
+						payoutRatioTTM: companyOutlook.ratios[0]?.payoutRatioTTM,
+				  }
+				: null,
 		},
 	} satisfies StockDetailsAPI;
 

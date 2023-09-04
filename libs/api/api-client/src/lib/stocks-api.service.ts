@@ -15,7 +15,7 @@ import {
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
 } from '@market-monitor/api-types';
-import { Observable, catchError, forkJoin, map, mergeMap, reduce, switchMap, tap } from 'rxjs';
+import { Observable, catchError, forkJoin, map, mergeMap, of, reduce, switchMap, tap } from 'rxjs';
 import { ApiCacheService } from './api-cache.service';
 
 @Injectable({
@@ -27,6 +27,9 @@ export class StocksApiService extends ApiCacheService {
   }
 
   searchStockSummariesByPrefix(ticker: string): Observable<StockSummary[]> {
+    if (!ticker) {
+      return of([]);
+    }
     return this.getData<StockSummary[]>(
       `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${ticker}&isSearch=true`,
       this.validity10Min,

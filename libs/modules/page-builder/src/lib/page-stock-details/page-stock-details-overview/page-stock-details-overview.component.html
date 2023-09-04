@@ -95,13 +95,15 @@
               colorTooltipDefault: true,
               showPercentageSign: true
             },
-            data: [
-              { name: 'Operating Profit', y: stockDetailsSignal.ratio.operatingProfitMarginTTM },
-              { name: 'Gross Profit', y: stockDetailsSignal.ratio.grossProfitMarginTTM },
-              { name: 'Pretax Profit', y: stockDetailsSignal.ratio.pretaxProfitMarginTTM },
-              { name: 'Net Profit', y: stockDetailsSignal.ratio.netProfitMarginTTM },
-              { name: 'Effective Tax Rate', y: stockDetailsSignal.ratio.effectiveTaxRateTTM }
-            ]
+            data: stockDetailsSignal.ratio
+              ? [
+                  { name: 'Operating Profit', y: stockDetailsSignal.ratio.operatingProfitMarginTTM },
+                  { name: 'Gross Profit', y: stockDetailsSignal.ratio.grossProfitMarginTTM },
+                  { name: 'Pretax Profit', y: stockDetailsSignal.ratio.pretaxProfitMarginTTM },
+                  { name: 'Net Profit', y: stockDetailsSignal.ratio.netProfitMarginTTM },
+                  { name: 'Effective Tax Rate', y: stockDetailsSignal.ratio.effectiveTaxRateTTM }
+                ]
+              : []
           }
         ]"
         [showDataLabel]="true"
@@ -123,10 +125,10 @@
               showPercentageSign: true
             },
             data: [
-              { name: 'Equity', y: stockDetailsSignal.ratio.returnOnEquityTTM },
-              { name: 'Assets', y: stockDetailsSignal.ratio.returnOnAssetsTTM },
+              { name: 'Equity', y: stockDetailsSignal.ratio?.returnOnEquityTTM ?? 0 },
+              { name: 'Assets', y: stockDetailsSignal.ratio?.returnOnAssetsTTM ?? 0 },
               { name: 'Tangible Assets', y: stockDetailsSignal.companyKeyMetricsTTM.returnOnTangibleAssetsTTM },
-              { name: 'Capital Employed', y: stockDetailsSignal.ratio.returnOnCapitalEmployedTTM },
+              { name: 'Capital Employed', y: stockDetailsSignal.ratio?.returnOnCapitalEmployedTTM ?? 0 },
               { name: 'Invested Capital', y: stockDetailsSignal.companyKeyMetricsTTM.roicTTM }
             ]
           }

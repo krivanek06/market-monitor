@@ -67,8 +67,8 @@
 <div class="g-item-wrapper">
   <span>Rating</span>
   <div class="flex items-center gap-2">
-    <span>{{ stockDetails.rating.rating }}</span>
-    <div>(<span [appRecommendation]="stockDetails.rating.ratingScore"></span>)</div>
+    <span>{{ stockDetails.rating?.rating ?? 'N/A' }}</span>
+    <div>(<span [appRecommendation]="stockDetails.rating?.ratingScore"></span>)</div>
   </div>
 </div>
 
