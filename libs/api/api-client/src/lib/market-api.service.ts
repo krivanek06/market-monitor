@@ -42,7 +42,7 @@ export class MarketApiService extends ApiCacheService {
     return this.getData<HistoricalPrice[]>(
       `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&period=${period}`,
       this.validity2Min,
-    ).pipe(map((d) => d.reverse()));
+    );
   }
 
   getMarketTopPerformance(): Observable<MarketTopPerformanceOverviewResponse> {

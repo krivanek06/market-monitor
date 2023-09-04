@@ -109,7 +109,7 @@ export const dateGetDateOfOpenStockMarket = (input: DateInput): Date => {
   // from today subtract 1 day and return the correct date
   for (let i = 1; i < 30; i++) {
     const dateToCheck = subDays(date, i);
-    console.log('dateToCheck', dateToCheck, isStockMarketClosedDate(dateToCheck), isWeekend(dateToCheck));
+    // console.log('dateToCheck', dateToCheck, isStockMarketClosedDate(dateToCheck), isWeekend(dateToCheck));
     if (!isStockMarketClosedDate(dateToCheck) && !isWeekend(dateToCheck)) {
       return startOfDay(dateToCheck);
     }

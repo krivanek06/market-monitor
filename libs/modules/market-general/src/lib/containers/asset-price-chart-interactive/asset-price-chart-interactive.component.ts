@@ -19,7 +19,7 @@ import {
 import { AssetPriceChartComponent, TimePeriodButtonsComponent } from '@market-monitor/shared-components';
 import { ClientStylesDirective, DefaultImgDirective } from '@market-monitor/shared-directives';
 import { DialogServiceUtil, ErrorEnum } from '@market-monitor/shared-utils-client';
-import { catchError, startWith, switchMap, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-asset-price-chart-interactive',
@@ -66,6 +66,7 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
     this.timePeriodFormControl.valueChanges
       .pipe(
         startWith(this.timePeriodFormControl.value),
+        distinctUntilChanged(),
         tap(() => this.stockHistoricalPrice.set([])),
         tap(() => this.loadingSignal.set(true)),
         switchMap((period) =>
@@ -78,6 +79,7 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
         }),
       )
       .subscribe((prices) => {
+        console.log('prices', prices[0].date, prices[prices.length - 1].date);
         this.stockHistoricalPrice.set(prices);
       });
 
