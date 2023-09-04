@@ -79,7 +79,6 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
         }),
       )
       .subscribe((prices) => {
-        console.log('prices', prices[0].date, prices[prices.length - 1].date);
         this.stockHistoricalPrice.set(prices);
       });
 

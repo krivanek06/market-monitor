@@ -26,7 +26,7 @@ import {
 } from '@market-monitor/shared-components';
 import { SortByKeyPipe } from '@market-monitor/shared-pipes';
 import { DialogServiceModule } from '@market-monitor/shared-utils-client';
-import { switchMap } from 'rxjs';
+import { of, switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
@@ -70,7 +70,12 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
 
   stockPeersSignal = toSignal(
     this.stockDetails$.pipe(
-      switchMap((details) => this.stocksApiService.getStockSummaries(details.sectorPeers?.peersList ?? [])),
+      switchMap((details) => {
+        if (!details.sectorPeers || details.sectorPeers.peersList.length === 0) {
+          return of([]);
+        }
+        return this.stocksApiService.getStockSummaries(details.sectorPeers.peersList);
+      }),
     ),
   );
 

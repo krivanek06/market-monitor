@@ -19,7 +19,7 @@ export type SymbolQuote = {
   previousClose: number;
   eps: number | null;
   pe: number;
-  earningsAnnouncement: string;
+  earningsAnnouncement: string | null;
   timestamp: number;
 
   // value can be null if it is ETF or index
@@ -69,7 +69,7 @@ export type CompanyProfile = {
   industry: string;
   website: string;
   description: string;
-  ceo: string;
+  ceo?: string | null;
   country: string;
   fullTimeEmployees: string;
   phone: string;

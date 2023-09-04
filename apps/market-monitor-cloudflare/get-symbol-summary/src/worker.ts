@@ -111,7 +111,7 @@ export default {
 				const profile = profiles.find((p) => p.symbol === symbol);
 
 				// if any of the data is missing, return undefined
-				if (!quote || !priceChange) {
+				if (!quote || !priceChange || quote.marketCap === 0) {
 					return undefined;
 				}
 

@@ -19,7 +19,7 @@
 
 <div class="g-item-wrapper">
   <span>CEO</span>
-  <span>{{ stockDetails.companyOutlook.profile.ceo }}</span>
+  <span>{{ !!stockDetails.companyOutlook.profile.ceo ? stockDetails.companyOutlook.profile.ceo : 'N/A' }}</span>
 </div>
 
 <div class="g-item-wrapper">
@@ -74,7 +74,9 @@
 
 <div class="g-item-wrapper">
   <span>Earnings</span>
-  <span>{{ stockDetails.quote.earningsAnnouncement | date: 'MMMM d, y' }}</span>
+  <span>{{
+    stockDetails.quote.earningsAnnouncement ? (stockDetails.quote.earningsAnnouncement | date: 'MMMM d, y') : 'N/A'
+  }}</span>
 </div>
 
 <!-- template render price change -->
