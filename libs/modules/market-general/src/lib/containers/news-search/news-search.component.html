@@ -20,28 +20,33 @@
   *ngIf="!loadingSignal(); else showSkeleton"
   appScrollNearEnd
   (nearEnd)="onNearEndScroll()"
-  class="grid grid-cols-1 lg:grid-cols-2"
+  class="grid grid-cols-1 md:grid-cols-2"
 >
   <article
     *ngFor="let news of marketStockNewsSignal()?.slice(0, maximumNewsDisplayed())"
     class="inline-block m-2 transition-all duration-300 group hover:scale-95"
   >
     <a
-      class="flex items-start gap-3 pt-2 pb-4 pl-2 pr-4 transition-all duration-500 rounded-md hover:bg-wt-gray-light"
+      class="relative flex flex-col items-start gap-3 pt-2 pb-4 pl-2 pr-4 transition-all duration-500 rounded-md max-lg:p-0 lg:flex-row hover:bg-wt-gray-light"
       target="_blank"
       [href]="news.url"
     >
-      <img appDefaultImg [src]="news.image" [alt]="news.title" class="h-20 w-36 min-w-[9rem]" />
-      <div class="flex flex-col">
+      <img
+        appDefaultImg
+        [src]="news.image"
+        [alt]="news.title"
+        class="h-[255px] sm:h-[275px] object-cover lg:h-20 lg:w-36 min-w-[9rem] max-lg:m-auto w-full lg:pt-2"
+      />
+      <div class="flex flex-col max-lg:absolute p-2 xs:p-4 sm:p-6 lg:p-0 max-lg:bottom-0 max-lg:bg-[#ffffffbf]">
         <div class="text-base text-wt-gray-dark group-hover:text-wt-primary">
           {{ news.title }}
         </div>
-        <div class="space-x-1 text-xs text-wt-gray-medium">
+        <div class="hidden space-x-1 text-xs text-wt-gray-medium lg:block">
           <span>{{ news.site }}</span>
           <span>●</span>
           <span>{{ news.publishedDate | dateAgo }}</span>
         </div>
-        <div class="hidden text-sm sm:block text-wt-gray-medium">{{ news.text | truncateWords: 25 }}</div>
+        <div class="hidden text-lg lg:block text-wt-gray-medium">{{ news.text | truncateWords: 25 }}</div>
       </div>
     </a>
   </article>
@@ -58,7 +63,7 @@
         <div class="w-full h-6 g-skeleton"></div>
         <!-- creator -->
         <div class="w-full h-6 g-skeleton"></div>
-        <div class="hidden w-full h-20 sm:block g-skeleton"></div>
+        <div class="hidden w-full h-20 lg:block g-skeleton"></div>
       </div>
     </div>
   </div>
