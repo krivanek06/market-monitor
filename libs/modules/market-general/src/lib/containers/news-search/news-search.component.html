@@ -27,7 +27,7 @@
     class="inline-block m-2 transition-all duration-300 group hover:scale-95"
   >
     <a
-      class="relative flex flex-col items-start gap-3 pt-2 pb-4 pl-2 pr-4 transition-all duration-500 rounded-md max-lg:p-0 lg:flex-row hover:bg-wt-gray-light"
+      class="relative flex flex-col items-start gap-3 pt-2 pb-4 pl-2 pr-4 overflow-hidden transition-all duration-500 rounded-lg max-lg:p-0 lg:flex-row hover:bg-wt-gray-light"
       target="_blank"
       [href]="news.url"
     >
@@ -54,15 +54,20 @@
 
 <!-- loading screen -->
 <ng-template #showSkeleton>
-  <div class="columns-1 lg:columns-2">
-    <div *ngRange="initialNewsToDisplay" class="flex items-start gap-3 pt-2 pb-4 pl-2 pr-4">
+  <div class="columns-1 md:columns-2">
+    <div
+      *ngRange="initialNewsToDisplay"
+      class="flex flex-col items-start gap-3 pt-2 pb-4 pl-2 pr-4 rounded-md max-lg:p-0 lg:flex-row"
+    >
       <!-- image -->
-      <div class="h-20 w-36 g-skeleton"></div>
-      <div class="flex flex-col w-full gap-1">
+      <div
+        class="h-[255px] sm:h-[275px] object-cover lg:h-28 lg:w-36 min-w-[9rem] max-lg:m-auto w-full lg:pt-1 g-skeleton"
+      ></div>
+      <div class="flex flex-col w-full gap-1 lg:block">
         <!-- title -->
-        <div class="w-full h-6 g-skeleton"></div>
+        <div class="hidden w-full h-6 g-skeleton lg:block"></div>
         <!-- creator -->
-        <div class="w-full h-6 g-skeleton"></div>
+        <div class="hidden w-full h-6 g-skeleton lg:block"></div>
         <div class="hidden w-full h-20 lg:block g-skeleton"></div>
       </div>
     </div>

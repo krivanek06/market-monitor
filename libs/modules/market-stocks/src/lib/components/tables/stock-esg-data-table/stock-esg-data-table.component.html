@@ -3,7 +3,7 @@
   <ng-container matColumnDef="date">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Date</th>
     <td mat-cell *matCellDef="let row">
-      <span class="text-wt-gray-dark">{{ row.date | date : 'MMMM d, y' }}</span>
+      <span class="text-wt-gray-dark">{{ row.date | date: 'MMMM d, y' }}</span>
     </td>
   </ng-container>
 
@@ -17,8 +17,8 @@
 
   <!-- ESGScore -->
   <ng-container matColumnDef="ESGScore">
-    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">ESG</th>
-    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef>ESG</th>
+    <td mat-cell *matCellDef="let row">
       <span>
         {{ row.ESGScore }}
       </span>

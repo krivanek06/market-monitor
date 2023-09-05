@@ -1,22 +1,24 @@
-<div class="flex justify-between px-6 mb-10">
+<div class="flex flex-col justify-between px-6 mb-10 md:flex-row gap-y-3">
   <div class="flex items-center gap-10">
     <!-- current date range -->
-    <div class="space-x-4 text-wt-gray-medium">
+    <div class="justify-between space-x-4 text-wt-gray-medium max-md:flex max-md:flex-1">
       <span>{{ dateRangeSignal()[0] | date: 'MMMM d, y' }}</span>
       <span>-</span>
       <span>{{ dateRangeSignal()[dateRangeSignal().length - 1] | date: 'MMMM d, y' }}</span>
     </div>
     <!-- current month button -->
-    <button (click)="onCurrentMonthClick()" type="button" mat-stroked-button>Current Date</button>
+    <button class="hidden md:block" (click)="onCurrentMonthClick()" type="button" mat-stroked-button>
+      Current Date
+    </button>
   </div>
 
   <!-- left / right button -->
-  <div class="flex items-center gap-10">
-    <button (click)="onMonthChange('previous')" mat-button type="button">
+  <div class="flex items-center gap-10 max-md:flex-1">
+    <button (click)="onMonthChange('previous')" mat-button type="button" class="max-md:flex-1">
       <mat-icon>navigate_before</mat-icon>
       Previous Month
     </button>
-    <button (click)="onMonthChange('next')" mat-button type="button">
+    <button (click)="onMonthChange('next')" mat-button type="button" class="max-md:flex-1">
       Next Month
       <mat-icon iconPositionEnd>navigate_next</mat-icon>
     </button>
