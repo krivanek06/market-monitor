@@ -76,7 +76,7 @@ export const dateIsStockMarketOpen = (input: DateInput) => {
   return isAfter(utcCurrentDate, marketOpeningTime) && isBefore(utcCurrentDate, marketClosingTime);
 };
 
-export const isStockMarketClosedDate = (input: DateInput): boolean => {
+export const isStockMarketHolidayDate = (input: DateInput): boolean => {
   const formattedDate = new Date(input);
 
   // check if it's a holiday when the market is closed
@@ -102,7 +102,7 @@ export const isStockMarketClosedDate = (input: DateInput): boolean => {
 export const dateGetDateOfOpenStockMarket = (input: DateInput): Date => {
   const date = new Date(input);
 
-  if (dateIsStockMarketOpen(date) && !isStockMarketClosedDate(date) && !isWeekend(date)) {
+  if (!isStockMarketHolidayDate(date) && !isWeekend(date)) {
     return startOfDay(date);
   }
 
@@ -110,7 +110,7 @@ export const dateGetDateOfOpenStockMarket = (input: DateInput): Date => {
   for (let i = 1; i < 30; i++) {
     const dateToCheck = subDays(date, i);
     // console.log('dateToCheck', dateToCheck, isStockMarketClosedDate(dateToCheck), isWeekend(dateToCheck));
-    if (!isStockMarketClosedDate(dateToCheck) && !isWeekend(dateToCheck)) {
+    if (!isStockMarketHolidayDate(dateToCheck) && !isWeekend(dateToCheck)) {
       return startOfDay(dateToCheck);
     }
   }

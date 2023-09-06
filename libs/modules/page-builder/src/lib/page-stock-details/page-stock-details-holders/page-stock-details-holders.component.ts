@@ -10,7 +10,7 @@ import {
 } from '@market-monitor/modules/market-stocks';
 import { FormMatInputWrapperComponent, GeneralCardComponent, InputSource } from '@market-monitor/shared-components';
 import { RangeDirective } from '@market-monitor/shared-directives';
-import { dateFormatDate, getPreviousDate, isStockMarketClosedDate } from '@market-monitor/shared-utils-general';
+import { dateFormatDate, getPreviousDate, isStockMarketHolidayDate } from '@market-monitor/shared-utils-general';
 import { catchError, filter, map, of, startWith, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
@@ -81,7 +81,7 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
       startWith(this.quarterFormControl.value),
       filter((data): data is string => !!data),
       // if date is YYYY-12-31 then it is a closed date -> subtract 1 day
-      map((quarter) => (isStockMarketClosedDate(quarter) ? getPreviousDate(quarter) : quarter)),
+      map((quarter) => (isStockMarketHolidayDate(quarter) ? getPreviousDate(quarter) : quarter)),
       switchMap((quarter) =>
         this.stocksApiService
           .getStockHistoricalPricesOnDate(this.stockSymbolSignal(), quarter)
