@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ChartConstructor, ColorScheme, EstimatedChartDataType } from '@market-monitor/shared-utils-client';
-import { formatLargeNumber } from '@market-monitor/shared-utils-general';
+import { dateFormatDate, formatLargeNumber } from '@market-monitor/shared-utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({
@@ -143,7 +143,9 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
-        categories: dates,
+        categories: dates.map((date) => {
+          return dateFormatDate(date, 'MMMM d, y');
+        }),
       },
       yAxis: {
         title: {

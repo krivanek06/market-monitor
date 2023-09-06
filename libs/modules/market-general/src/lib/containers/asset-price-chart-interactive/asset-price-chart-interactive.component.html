@@ -19,6 +19,7 @@
 
     <!-- price & volume chart -->
     <app-asset-price-chart
+      [period]="timePeriodFormControl.value"
       [priceShowSign]="priceShowSign"
       [priceName]="priceName"
       [displayVolume]="displayVolume"
