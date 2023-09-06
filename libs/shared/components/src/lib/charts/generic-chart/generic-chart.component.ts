@@ -264,7 +264,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
         shared: this.shareTooltip,
         outside: true,
         useHTML: true,
-        xDateFormat: '%Y-%m-%d',
+        xDateFormat: '%b. %e, %Y',
         headerFormat: this.showTooltipHeader ? '<span>{point.key}</span>' : '',
 
         pointFormatter: function () {

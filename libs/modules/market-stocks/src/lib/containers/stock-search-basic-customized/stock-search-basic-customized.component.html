@@ -13,14 +13,22 @@
   cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
   [cdkConnectedOverlayMinWidth]="overlayWidth()"
   [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayPositions]="[
+    {
+      originX: 'center',
+      originY: 'bottom',
+      overlayX: 'center',
+      overlayY: 'top'
+    }
+  ]"
   [cdkConnectedOverlayOpen]="overlayIsOpen().isInputFocused && !overlayIsOpen().inputHasValue"
 >
   <div
-    [style.max-width.px]="overlayWidth() - 20"
-    [style.min-width.px]="overlayWidth() - 20"
+    [style.max-width.px]="overlayWidth()"
+    [style.min-width.px]="overlayWidth()"
     appElementFocus
     (outsideClick)="checkToDisplayOverlay(false, null)"
-    class="min-h-[200px] max-h-[400px] bg-wt-gray-light -mt-4 w-full rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
+    class="min-h-[200px] max-h-[400px] bg-wt-gray-light mt-[-18px] w-full rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
   >
     <!-- checkbox changing displayed stock summaries -->
     <div class="flex items-center justify-between mb-1">
@@ -36,7 +44,7 @@
       mat-button
       *ngFor="let summary of displayedStocksSignal()"
       (click)="onSummaryClick(summary)"
-      class="w-full h-12"
+      class="w-full h-12 max-sm:mb-2"
       type="button"
     >
       <app-quote-item

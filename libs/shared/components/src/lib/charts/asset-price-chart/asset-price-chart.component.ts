@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { HistoricalPrice } from '@market-monitor/api-types';
+import { HistoricalPrice, SymbolHistoricalPeriods } from '@market-monitor/api-types';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-client';
-import { formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
+import { dateFormatDate, formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({
@@ -31,8 +31,9 @@ import { HighchartsChartModule } from 'highcharts-angular';
   `,
 })
 export class AssetPriceChartComponent extends ChartConstructor implements OnInit, OnChanges {
+  @Input({ required: true }) period!: SymbolHistoricalPeriods;
+  @Input({ required: true }) historicalPrice!: HistoricalPrice[];
   @Input() heightPx = 550;
-  @Input() historicalPrice!: HistoricalPrice[];
   @Input() showTitle = false;
   @Input() priceName = 'price';
   @Input() displayVolume = true;
@@ -61,6 +62,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
 
     this.chartOptions = {
       chart: {
+        animation: true,
         plotBackgroundColor: undefined,
         plotBorderWidth: undefined,
         plotShadow: false,
@@ -100,7 +102,16 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         visible: true,
         crosshair: true,
         type: 'category',
-        categories: dates,
+        categories: dates.map((date) => {
+          if ([SymbolHistoricalPeriods.day, SymbolHistoricalPeriods.week].includes(this.period)) {
+            return dateFormatDate(date, 'HH:mm, MMMM d, y');
+          }
+          if (this.period === SymbolHistoricalPeriods.month) {
+            return dateFormatDate(date, 'HH:mm, MMMM d, y');
+          }
+
+          return dateFormatDate(date, 'MMMM d, y');
+        }),
         gridLineColor: '#66666644',
         labels: {
           rotation: -12,

@@ -10,8 +10,10 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <nav class="flex justify-center gap-4 pt-8 text-wt-gray-medium relative">
-      <span class="absolute left-4 top-4 text-wt-gray-medium text-xs">Version {{ version }}</span>
+    <nav
+      class="flex sm:justify-center gap-6 sm:gap-4 pt-8 text-wt-gray-medium relative max-sm:overflow-scroll pb-6 max-sm:px-6"
+    >
+      <span class="hidden md:block absolute left-4 top-4 text-wt-gray-medium text-xs">Version {{ version }}</span>
       <a [routerLink]="[ROUTES_PUBLIC_ROUTES.SEARCH]" routerLinkActive="is-active">Search</a>
       <a [routerLink]="[ROUTES_PUBLIC_ROUTES.STOCK_SCREENER]" routerLinkActive="is-active">Screener</a>
       <a [routerLink]="[ROUTES_PUBLIC_ROUTES.TOP_PERFORMERS]" routerLinkActive="is-active">Top Performers</a>
@@ -32,6 +34,7 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
 
       a {
         @apply transition-all duration-300 text-base hover:text-wt-gray-dark-strong;
+        min-width: fit-content;
       }
 
       a.is-active {

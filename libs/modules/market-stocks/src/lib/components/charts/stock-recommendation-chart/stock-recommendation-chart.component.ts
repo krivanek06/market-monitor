@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RecommendationTrends } from '@market-monitor/api-types';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-client';
+import { dateFormatDate } from '@market-monitor/shared-utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { Recommendation } from '../../../models';
 
@@ -96,7 +97,7 @@ export class StockRecommendationChartComponent extends ChartConstructor {
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
-        categories: data.map((rec) => rec.period),
+        categories: data.map((rec) => dateFormatDate(rec.period, 'MMMM d, y')),
       },
       plotOptions: {
         column: {

@@ -21,14 +21,14 @@
   </div>
 
   <!-- action buttons -->
-  <mat-dialog-actions class="flex justify-between px-4">
+  <mat-dialog-actions class="flex flex-col justify-between px-4 sm:flex-row gap-y-2">
     <button
       *ngIf="isSymbolInFavoriteSignal()"
       mat-stroked-button
       color="accent"
       (click)="onAddToFavorite()"
       type="button"
-      class="g-border-apply"
+      class="g-border-apply max-sm:w-full"
     >
       <mat-icon>do_not_disturb_on</mat-icon>
       favorites - remove
@@ -39,14 +39,15 @@
       color="accent"
       (click)="onAddToFavorite()"
       type="button"
-      class="g-border-apply"
+      class="g-border-apply max-sm:w-full"
     >
       <mat-icon>star</mat-icon>
       favorite - add
     </button>
 
-    <button type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
-      <div class="flex gap-2"><span class="hidden sm:block">Go to</span> <span>Details</span></div>
+    <button class="max-sm:w-full" type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
+      Go to Details
+      <mat-icon iconPositionEnd>navigate_next</mat-icon>
     </button>
   </mat-dialog-actions>
 
@@ -62,11 +63,13 @@
     </div>
 
     <!-- price & volume -->
-    <app-asset-price-chart-interactive
-      [imageName]="data.symbol"
-      [title]="data.symbol"
-      [symbol]="data.symbol"
-    ></app-asset-price-chart-interactive>
+    <div class="max-w-full">
+      <app-asset-price-chart-interactive
+        [imageName]="data.symbol"
+        [title]="data.symbol"
+        [symbol]="data.symbol"
+      ></app-asset-price-chart-interactive>
+    </div>
   </mat-dialog-content>
 </ng-container>
 
