@@ -1,4 +1,12 @@
+export const HistoricalPricePeriodsArray = ['1d', '1w', '1mo', '3mo', '6mo', '1y', '5y', 'ytd', 'all'] as const;
+export type HistoricalPricePeriods = (typeof HistoricalPricePeriodsArray)[number];
 export type HistoricalLoadingPeriods = '1min' | '5min' | '1hour' | '4hour' | '1day' | '1week' | '1month';
+export type HistoricalLoadingPeriodsDates = {
+  userPeriod: HistoricalPricePeriods;
+  loadingPeriod: HistoricalLoadingPeriods;
+  from: string;
+  to: string;
+};
 
 export const SYMBOL_SP500 = '^GSPC';
 export const SYMBOL_DOW_JONES = '^DJI';

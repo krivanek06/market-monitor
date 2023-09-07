@@ -1,4 +1,4 @@
-import { HistoricalPricePeriods, HistoricalPricePeriodsArray } from '@market-monitor/api-external';
+import { HistoricalPricePeriods, HistoricalPricePeriodsArray } from '@market-monitor/api-types';
 import { getPriceOnDate } from './get-price-on-date';
 import { getPriceOnPeriod } from './get-price-on-period';
 import { Env } from './model';

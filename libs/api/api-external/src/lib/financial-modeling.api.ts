@@ -18,6 +18,7 @@ import {
   Earnings,
   EnterpriseValue,
   HistoricalLoadingPeriods,
+  HistoricalLoadingPeriodsDates,
   HistoricalPrice,
   HistoricalPriceAPI,
   HistoricalPriceSymbol,
@@ -37,7 +38,7 @@ import {
   UpgradesDowngrades,
 } from '@market-monitor/api-types';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
-import { HistoricalPricePeriods, filterOutSymbols, getDateRangeByMonthAndYear, resolveLoadingPeriod } from './helpers';
+import { filterOutSymbols, getDateRangeByMonthAndYear } from './helpers';
 
 export const getCompanyQuote = async (symbols: string[]): Promise<SymbolQuote[]> => {
   const symbol = symbols.join(',');
@@ -90,9 +91,8 @@ export const getHistoricalPrices = async (
 
 export const getHistoricalPricesByPeriod = async (
   symbol: string,
-  period: HistoricalPricePeriods,
-): Promise<{ period: HistoricalPricePeriods; data: HistoricalPrice[] }> => {
-  const loadingPeriod = resolveLoadingPeriod(period);
+  loadingPeriod: HistoricalLoadingPeriodsDates,
+): Promise<HistoricalPrice[]> => {
   const historicalPriceData = await getHistoricalPrices(
     symbol,
     loadingPeriod.loadingPeriod,
@@ -110,7 +110,7 @@ export const getHistoricalPricesByPeriod = async (
       }) satisfies HistoricalPrice,
   );
 
-  return { period, data: result };
+  return result;
 };
 
 /**
