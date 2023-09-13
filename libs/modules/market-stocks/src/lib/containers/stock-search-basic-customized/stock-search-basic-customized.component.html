@@ -47,11 +47,7 @@
       class="w-full h-12 max-sm:mb-2"
       type="button"
     >
-      <app-quote-item
-        [symbolQuote]="summary.quote"
-        [assetUrl]="summary.profile?.image"
-        [displaySecondLine]="false"
-      ></app-quote-item>
+      <app-quote-item [symbolQuote]="summary.quote" [assetUrl]="summary.profile?.image"></app-quote-item>
     </button>
   </div>
 </ng-template>
