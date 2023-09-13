@@ -16,7 +16,6 @@ import {
   setHours,
   setMinutes,
   setSeconds,
-  startOfDay,
   startOfMonth,
   subDays,
   subMinutes,
@@ -90,32 +89,6 @@ export const isStockMarketHolidayDate = (input: DateInput): boolean => {
     }
   }
   return false;
-};
-
-/**
- * from provided date it starts to subtract 1 day until it finds a date
- * when stock market is open, not a weekend and not a holiday
- *
- * @param input
- * @returns
- */
-export const dateGetDateOfOpenStockMarket = (input: DateInput): Date => {
-  const date = new Date(input);
-
-  if (!isStockMarketHolidayDate(date) && !isWeekend(date)) {
-    return startOfDay(date);
-  }
-
-  // from today subtract 1 day and return the correct date
-  for (let i = 1; i < 30; i++) {
-    const dateToCheck = subDays(date, i);
-    // console.log('dateToCheck', dateToCheck, isStockMarketClosedDate(dateToCheck), isWeekend(dateToCheck));
-    if (!isStockMarketHolidayDate(dateToCheck) && !isWeekend(dateToCheck)) {
-      return startOfDay(dateToCheck);
-    }
-  }
-
-  return startOfDay(date);
 };
 
 /**

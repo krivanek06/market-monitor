@@ -1,7 +1,6 @@
 import { getHistoricalPricesByPeriod } from '@market-monitor/api-external';
 import { HistoricalLoadingPeriodsDates, HistoricalPrice, HistoricalPricePeriods, RESPONSE_HEADER } from '@market-monitor/api-types';
-import { dateGetDateOfOpenStockMarket } from '@market-monitor/shared-utils-general';
-import { format, subDays } from 'date-fns';
+import { format, isWeekend, subDays } from 'date-fns';
 import { Env } from './model';
 
 /**
@@ -50,35 +49,32 @@ export const getPriceOnPeriod = async (env: Env, symbol: string, period: Histori
 };
 
 /**
- * when loading data for 1d and stock market is not yet open - we load data from previous day
+ * load historical prices for current day. If period is '1d' and current day load fails then load data for previous day
  *
  * @param symbol
  * @param period
  */
 const loadHistoricalPrices = async (symbol: string, period: HistoricalPricePeriods): Promise<HistoricalPrice[]> => {
-	// resolve loading period to dates
-	const loadingPeriod = resolveLoadingPeriod(period);
+	// try 10 attempts
+	for (let i = 0; i < 10; i++) {
+		const workingDay = subDays(new Date(), i);
 
-	// load data
-	const historicalPrices = await getHistoricalPricesByPeriod(symbol, loadingPeriod);
+		// skip weekends
+		if (isWeekend(workingDay)) {
+			continue;
+		}
 
-	// return data if exists
-	if (historicalPrices.length !== 0) {
-		return historicalPrices;
+		// resolve loading period to dates
+		const loadingPeriodSecond = resolveLoadingPeriod(period, workingDay);
+
+		// load data
+		const historicalPricesSecond = await getHistoricalPricesByPeriod(symbol, loadingPeriodSecond);
+
+		// if data is loaded then return it
+		return historicalPricesSecond;
 	}
 
-	// the following happen when period === 1d and stock market is not yet open
-
-	// from previous day check when is the last time market is open - not holiday, etc.
-	const correctDate = dateGetDateOfOpenStockMarket(subDays(new Date(), 1));
-
-	// resolve loading period to dates
-	const loadingPeriodSecond = resolveLoadingPeriod(period, correctDate);
-
-	// load data
-	const historicalPricesSecond = await getHistoricalPricesByPeriod(symbol, loadingPeriodSecond);
-
-	return historicalPricesSecond;
+	throw new Error(`Unable to load data for symbol=${symbol} and period=${period}`);
 };
 
 const resolveLoadingPeriod = (period: HistoricalPricePeriods, currentDate = new Date()): HistoricalLoadingPeriodsDates => {
