@@ -71,7 +71,9 @@ const loadHistoricalPrices = async (symbol: string, period: HistoricalPricePerio
 		const historicalPricesSecond = await getHistoricalPricesByPeriod(symbol, loadingPeriodSecond);
 
 		// if data is loaded then return it
-		return historicalPricesSecond;
+		if (historicalPricesSecond.length > 0) {
+			return historicalPricesSecond;
+		}
 	}
 
 	throw new Error(`Unable to load data for symbol=${symbol} and period=${period}`);
