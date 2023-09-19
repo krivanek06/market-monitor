@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { Meta } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
 import { environment } from 'apps/market-monitor/src/environments/environment';
@@ -44,9 +45,28 @@ import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PublicRoutesComponent {
+export class PublicRoutesComponent implements OnInit {
   ROUTES_PUBLIC_ROUTES = ROUTES_PUBLIC_ROUTES;
   version = environment.version;
+
+  constructor(private metaTagService: Meta) {}
+
+  ngOnInit(): void {
+    this.metaTagService.addTags([
+      {
+        name: 'og:url',
+        content: 'search',
+      },
+      {
+        name: 'keywords',
+        content: 'Search Stocks',
+      },
+      {
+        name: 'description',
+        content: 'Search publicly traded companies.',
+      },
+    ]);
+  }
 }
 
 export const route: Routes = [

@@ -1,0 +1,31 @@
+:root {
+  --screen-max-width: 1620px;
+
+  /* primary */
+  --primary: #0e71c3;
+
+  /* success */
+  --success: #03aa06;
+
+  /* danger */
+  --danger: #d42626;
+
+  /* gray */
+  --gray-dark-strong: #1d1d1d;
+  --gray-dark: #313131;
+  --gray-medium: #7c7c7c;
+  --gray-light-strong: #ececec;
+  --gray-light: #f8f8f8;
+
+  /* table */
+  --table-hover: #99999955;
+  --table-border: #d0d0d0;
+
+  --background-dashboard: #ffffff;
+  --background-dialog: #f8f8f8;
+
+  --disable-default: #3e5156;
+}
+
+:root .dark-theme {
+}

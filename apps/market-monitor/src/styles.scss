@@ -5,9 +5,9 @@
 @tailwind utilities;
 
 // custom material scss
-@import './theme/custom-material';
-@import './theme/global.scss';
-@import './theme/variables.scss';
+@import '../../../styles/src/lib/custom-material';
+@import '../../../styles/src/lib/global.scss';
+@import '../../../styles/src/lib/variables.scss';
 
 // fonts
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,700,900');

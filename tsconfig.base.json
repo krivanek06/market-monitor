@@ -56,7 +56,7 @@
       ],
       "@market-monitor/shared-utils-general": [
         "libs/shared/utils-general/src/index.ts"
-      ]
+      ],
     }
   },
   "exclude": [
