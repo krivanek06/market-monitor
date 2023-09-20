@@ -8,12 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
-import {
-  CalendarAssetDataTypes,
-  CalendarDividend,
-  CalendarStockEarning,
-  resolveCalendarType,
-} from '@market-monitor/api-types';
+import { CalendarAssetDataTypes, CalendarDividend, CalendarStockEarning } from '@market-monitor/api-types';
 import {
   DividendItemComponent,
   DividendItemsDialogComponent,
@@ -103,10 +98,10 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
   );
 
   calendarDataDividendSignal = computed(() =>
-    resolveCalendarType<CalendarDividend>(this.calendarDataSignal(), 'dividend'),
+    this.resolveCalendarType<CalendarDividend>(this.calendarDataSignal(), 'dividend'),
   );
   calendarDataEarningsSignal = computed(() =>
-    resolveCalendarType<CalendarStockEarning>(this.calendarDataSignal(), 'eps'),
+    this.resolveCalendarType<CalendarStockEarning>(this.calendarDataSignal(), 'eps'),
   );
 
   ngOnInit(): void {
@@ -177,6 +172,42 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
       queryParamsHandling: 'merge',
     });
   }
+
+  /**
+   * based on the provided type T it will resolve to correct TS type
+   *
+   * @param data
+   * @param objectKey
+   * @returns
+   */
+  private resolveCalendarType = <T extends CalendarAssetDataTypes>(
+    data: {
+      data: CalendarAssetDataTypes[] | null;
+      date: string;
+    }[],
+    objectKey: keyof T,
+  ): {
+    data: T[] | null;
+    date: string;
+  }[] => {
+    const existingData = data.filter((item) => item.data && item.data.length > 0)[0];
+
+    if (!existingData) {
+      return [];
+    }
+
+    const isResolve =
+      existingData.data && // null or array
+      !!existingData.data[0] && // length of array > 0
+      objectKey in existingData.data[0];
+
+    return isResolve
+      ? (data as {
+          data: T[];
+          date: string;
+        }[])
+      : [];
+  };
 
   private resolveCalendarAPICall(
     type: (typeof this.calendarTypeInputSource)[number]['value'],

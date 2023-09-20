@@ -1,4 +1,4 @@
-import { StockDetailsAPI, StockSummary } from './firebase-stock-data.model';
+import { StockDetailsAPI, StockSummary } from './stock-data.model';
 
 export type StockDetails = StockSummary & StockDetailsAPI;
 

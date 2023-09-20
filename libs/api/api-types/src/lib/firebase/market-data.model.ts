@@ -1,4 +1,4 @@
-import { StockSummary } from './firebase-stock-data.model';
+import { StockSummary } from './stock-data.model';
 
 export type MarketTopPerformance<T> = {
   stockTopGainers: T[];

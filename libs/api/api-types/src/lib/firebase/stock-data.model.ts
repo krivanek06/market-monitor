@@ -1,4 +1,4 @@
-import { DataTimePeriodEnum } from './constants-symbols.model';
+import { DataTimePeriodEnum } from '../constants';
 import {
   CompanyKeyMetrics,
   CompanyKeyMetricsTTM,
@@ -17,7 +17,7 @@ import {
   StockEarning,
   SymbolQuote,
   UpgradesDowngrades,
-} from './external-api';
+} from '../external-api';
 
 export type StockSummary = {
   id: string;
