@@ -98,7 +98,3 @@ export const SymbolHistoricalPeriodsArrayPreload = [
   SymbolHistoricalPeriods.year,
   SymbolHistoricalPeriods.fiveYears,
 ];
-/**
- * Stock data details from the pro api for pro members
- */
-// export interface StockDataDetailsPro {}
