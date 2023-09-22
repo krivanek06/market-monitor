@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "mm:serve": "nx run market-monitor:serve",
+    "mmd:serve": "nx run market-monitor-dashboard:serve",
     "mm:dev:ssr": "nx run market-monitor:serve-ssr",
     "mm:serve:ssr": "node dist/apps/market-monitor/server/main.js",
     "mm:prerender:ssr": "nx prerender market-monitor:server --configuration=production",

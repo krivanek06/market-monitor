@@ -1,0 +1,28 @@
+<div class="flex items-center gap-2 p-6 mt-3 mb-4">
+  <!-- avatar -->
+  <div class="w-10 h-10 rounded-full bg-slate-200"></div>
+  <!-- name -->
+  <div>First Last</div>
+</div>
+
+<!-- main navigation -->
+<div class="flex flex-col">
+  <div class="mb-2 ml-5">Main</div>
+
+  <div class="grid gap-2">
+    <a
+      *ngFor="let main of sideNavigation.mainNavigation"
+      [routerLink]="main.path"
+      routerLinkActive="bg-wt-gray-dark text-wt-primary"
+      (click)="onNavigationClick(main.path)"
+      class="flex items-center h-12 gap-3 rounded-e-xl hover:bg-wt-gray-dark max-w-[90%]"
+      [ngClass]="{
+        'pl-5': selectedNavigationPath !== main.path
+      }"
+    >
+      <div *ngIf="selectedNavigationPath === main.path" class="w-3 h-full bg-wt-gray-dark-strong"></div>
+      <mat-icon>{{ main.icon }}</mat-icon>
+      <div class="text-base">{{ main.title }}</div>
+    </a>
+  </div>
+</div>
