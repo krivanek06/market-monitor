@@ -37,6 +37,7 @@ const mockUser: User = {
   settings: {
     isCreatingGroupAllowed: true,
     isPortfolioCashActive: true,
+    isProfilePublic: true,
   },
   personal: {
     accountCreated: '2021-07-01T00:00:00.000Z',

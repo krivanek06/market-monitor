@@ -56,4 +56,5 @@ export type UserPersonalInfo = {
 export type UserSettings = {
   isPortfolioCashActive: boolean;
   isCreatingGroupAllowed: boolean;
+  isProfilePublic: boolean;
 };
