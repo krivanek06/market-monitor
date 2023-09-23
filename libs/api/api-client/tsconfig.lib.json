@@ -8,5 +8,5 @@
     "types": []
   },
   "exclude": ["src/**/*.spec.ts", "src/test-setup.ts", "jest.config.ts", "src/**/*.test.ts"],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "../../shared/utils-client/src/lib/api-cache.util.ts", "../../modules/market-stocks/data-access/src/lib/services/stocks-api.service.spec.ts", "../../shared/utils-client/src/lib/api.model.ts"]
 }

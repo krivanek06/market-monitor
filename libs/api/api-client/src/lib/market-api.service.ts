@@ -16,8 +16,8 @@ import {
   SymbolHistoricalPeriods,
   SymbolQuote,
 } from '@market-monitor/api-types';
+import { ApiCacheService } from '@market-monitor/shared-utils-client';
 import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
-import { ApiCacheService } from './api-cache.service';
 
 @Injectable({
   providedIn: 'root',

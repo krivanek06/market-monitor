@@ -408,6 +408,15 @@ export type CompanyRating = {
   ratingDetailsPBRecommendation: string;
 };
 
+export type CompanyRatingTable = CompanyRating & {
+  ratingDetailsDCFScoreValue: number;
+  ratingDetailsROEScoreValue: number;
+  ratingDetailsROAScoreValue: number;
+  ratingDetailsDEScoreValue: number;
+  ratingDetailsPEScoreValue: number;
+  ratingDetailsPBScoreValue: number;
+};
+
 export type CompanyFinancialsReport = {
   income: FinancialIncome[];
   balance: FinancialBalance[];

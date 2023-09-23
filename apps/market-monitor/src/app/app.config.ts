@@ -22,7 +22,7 @@ import {
   withInMemoryScrolling,
   withPreloading,
 } from '@angular/router';
-import { API_FUNCTION_URL, API_IS_PRODUCTION } from '@market-monitor/api-client';
+import { API_IS_PRODUCTION } from '@market-monitor/shared-utils-client';
 // import * as Sentry from '@sentry/angular-ivy';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
@@ -67,10 +67,6 @@ export const appConfig: ApplicationConfig = {
         }
       },
       multi: true,
-    },
-    {
-      provide: API_FUNCTION_URL,
-      useValue: environment.endpointFunctionsURL,
     },
     {
       provide: API_IS_PRODUCTION,
