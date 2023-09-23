@@ -30,6 +30,15 @@
       "@market-monitor/modules/market-general": [
         "libs/modules/market-general/src/index.ts"
       ],
+      "@market-monitor/modules/market-general/data-access": [
+        "libs/modules/market-general/data-access/src/index.ts"
+      ],
+      "@market-monitor/modules/market-general/features": [
+        "libs/modules/market-general/features/src/index.ts"
+      ],
+      "@market-monitor/modules/market-general/ui": [
+        "libs/modules/market-general/ui/src/index.ts"
+      ],
       "@market-monitor/modules/market-stocks/data-access": [
         "libs/modules/market-stocks/data-access/src/index.ts"
       ],

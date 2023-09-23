@@ -1,8 +1,9 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveFn, Router, RouterStateSnapshot } from '@angular/router';
-import { MarketApiService, StocksApiService } from '@market-monitor/api-client';
+import { MarketApiService } from '@market-monitor/api-client';
 import { StockDetails } from '@market-monitor/api-types';
-import { LoaderMainService } from '@market-monitor/shared-services';
+import { StocksApiService } from '@market-monitor/modules/market-stocks/data-access';
+import { LoaderMainService } from '@market-monitor/shared/utils-client';
 import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
 
 export const stockDetailsResolver: ResolveFn<StockDetails | null> = (

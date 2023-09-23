@@ -2,15 +2,13 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MarketApiService, StocksApiService } from '@market-monitor/api-client';
+import { MarketApiService } from '@market-monitor/api-client';
 import { INDEXES_DEFAULT_SYMBOLS } from '@market-monitor/api-types';
 import { NewsSearchComponent } from '@market-monitor/modules/market-general';
-import {
-  STOCK_SCREENER_DEFAULT_VALUES,
-  StockSearchBasicCustomizedComponent,
-} from '@market-monitor/modules/market-stocks';
-import { CalendarRageToday } from '@market-monitor/shared-components';
-import { DialogServiceModule } from '@market-monitor/shared-utils-client';
+import { STOCK_SCREENER_DEFAULT_VALUES, StocksApiService } from '@market-monitor/modules/market-stocks/data-access';
+import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks/features';
+import { CalendarRageToday } from '@market-monitor/shared/ui';
+import { DialogServiceModule } from '@market-monitor/shared/utils-client';
 import { forkJoin, take } from 'rxjs';
 
 @Component({

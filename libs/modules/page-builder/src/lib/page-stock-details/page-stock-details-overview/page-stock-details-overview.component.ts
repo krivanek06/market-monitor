@@ -15,17 +15,17 @@ import {
   StockRatingTableComponent,
   StockRecommendationChartComponent,
   StockSummaryListComponent,
-  StockTransformService,
   StockUpgradesDowngradesTableComponent,
-} from '@market-monitor/modules/market-stocks';
+} from '@market-monitor/modules/market-stocks/ui';
 import {
   GeneralCardComponent,
   GenericChartComponent,
   NameValueListComponent,
   PriceChangeItemsComponent,
-} from '@market-monitor/shared-components';
-import { SortByKeyPipe } from '@market-monitor/shared-pipes';
-import { DialogServiceModule } from '@market-monitor/shared-utils-client';
+  SortByKeyPipe,
+} from '@market-monitor/shared/ui';
+import { DialogServiceModule } from '@market-monitor/shared/utils-client';
+import { StockTransformService } from '@market-monitor/shared/utils-transform';
 import { of, switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 

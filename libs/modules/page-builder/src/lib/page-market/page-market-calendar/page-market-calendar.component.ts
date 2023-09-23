@@ -17,20 +17,21 @@ import {
   EarningsItemsDialogComponent,
   ShowStockDialogDirective,
   StockSummaryDialogComponent,
-} from '@market-monitor/modules/market-stocks';
+} from '@market-monitor/modules/market-stocks/ui';
+import { RouterManagement } from '@market-monitor/shared/data-access';
 import {
   CalendarRageToday,
   CalendarRange,
   CalendarWrapperComponent,
   MarkerDirective,
-} from '@market-monitor/shared-components';
-import { RangeDirective } from '@market-monitor/shared-directives';
-import { DialogServiceModule, RouterManagement } from '@market-monitor/shared-utils-client';
+  RangeDirective,
+} from '@market-monitor/shared/ui';
+import { DialogServiceModule } from '@market-monitor/shared/utils-client';
 import {
   fillOutMissingDatesForMonth,
   generateDatesArray,
   groupValuesByDate,
-} from '@market-monitor/shared-utils-general';
+} from '@market-monitor/shared/utils-general';
 import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs';
 
 @Component({

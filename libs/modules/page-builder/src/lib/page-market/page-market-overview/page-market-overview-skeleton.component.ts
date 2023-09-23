@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RangeDirective } from '@market-monitor/shared-directives';
+import { RangeDirective } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-page-market-overview-skeleton',

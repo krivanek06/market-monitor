@@ -8,13 +8,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
 import { MARKET_OVERVIEW_DATA, MarketOverviewDatabaseKeys, getMarketOverKeyBySubKey } from '@market-monitor/api-types';
 import { MarketDataTransformService, MarketOverviewChartDataBody } from '@market-monitor/modules/market-general';
+import { RouterManagement } from '@market-monitor/shared/data-access';
 import {
   DateRangeSliderComponent,
   DateRangeSliderValues,
   GenericChartComponent,
-} from '@market-monitor/shared-components';
-import { InArrayPipe, ObjectArrayValueByKeyPipe } from '@market-monitor/shared-pipes';
-import { RouterManagement } from '@market-monitor/shared-utils-client';
+  InArrayPipe,
+  ObjectArrayValueByKeyPipe,
+} from '@market-monitor/shared/ui';
 import { isBefore } from 'date-fns';
 import { forkJoin, map } from 'rxjs';
 

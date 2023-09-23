@@ -7,10 +7,14 @@ import { MarketDataTransformService } from '@market-monitor/modules/market-gener
 import {
   StockOwnershipHoldersTableComponent,
   StockOwnershipInstitutionalListComponent,
-} from '@market-monitor/modules/market-stocks';
-import { FormMatInputWrapperComponent, GeneralCardComponent, InputSource } from '@market-monitor/shared-components';
-import { RangeDirective } from '@market-monitor/shared-directives';
-import { dateFormatDate, getPreviousDate, isStockMarketHolidayDate } from '@market-monitor/shared-utils-general';
+} from '@market-monitor/modules/market-stocks/ui';
+import {
+  FormMatInputWrapperComponent,
+  GeneralCardComponent,
+  InputSource,
+  RangeDirective,
+} from '@market-monitor/shared/ui';
+import { dateFormatDate, getPreviousDate, isStockMarketHolidayDate } from '@market-monitor/shared/utils-general';
 import { catchError, filter, map, of, startWith, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 

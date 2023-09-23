@@ -3,12 +3,12 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
-  SheetDataTimePeriodForm,
   StockSheetDataTableComponent,
   StockSheetDataTimePeriodComponent,
-  StockTransformService,
-} from '@market-monitor/modules/market-stocks';
-import { GeneralCardComponent } from '@market-monitor/shared-components';
+} from '@market-monitor/modules/market-stocks/ui';
+import { SheetDataTimePeriodForm } from '@market-monitor/shared/data-access';
+import { GeneralCardComponent } from '@market-monitor/shared/ui';
+import { StockTransformService } from '@market-monitor/shared/utils-transform';
 import { map, startWith } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
@@ -40,7 +40,7 @@ export class PageStockDetailsFinancialsComponent extends PageStockDetailsBase {
       timePeriod: 'financialsAnnual',
       sheetKey: 'balance',
     },
-    { nonNullable: true }
+    { nonNullable: true },
   );
 
   sheetDataSignal = toSignal(
@@ -56,8 +56,8 @@ export class PageStockDetailsFinancialsComponent extends PageStockDetailsBase {
           return this.stockTransformService.createSheetDataFromIncomeStatement(time, this.stockDetailsSignal());
         }
         return this.stockTransformService.createSheetDataFromBalanceSheet(time, this.stockDetailsSignal());
-      })
-    )
+      }),
+    ),
   );
 
   constructor() {
