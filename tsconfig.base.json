@@ -46,6 +46,9 @@
       "@market-monitor/modules/page-builder": [
         "libs/modules/page-builder/src/index.ts"
       ],
+      "@market-monitor/modules/portfolio/data-access": [
+        "libs/modules/portfolio/data-access/src/index.ts"
+      ],
       "@market-monitor/modules/portfolio/ui": [
         "libs/modules/portfolio/ui/src/index.ts"
       ],
