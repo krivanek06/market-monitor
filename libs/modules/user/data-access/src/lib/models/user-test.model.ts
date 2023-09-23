@@ -1,8 +1,6 @@
-import { Injectable } from '@angular/core';
 import { User, UserAccountType } from '@market-monitor/api-types';
-import { BehaviorSubject, Observable, filter } from 'rxjs';
 
-const mockUser: User = {
+export const mockUser: User = {
   id: '1',
   groups: {
     groupInvitations: [],
@@ -80,27 +78,3 @@ const mockUser: User = {
     },
   ],
 };
-
-@Injectable({
-  providedIn: 'root',
-})
-export class UserAuthenticatedService {
-  private authenticatedUser = new BehaviorSubject<User | null>(mockUser);
-  constructor() {}
-
-  get user(): User {
-    const user = this.authenticatedUser.getValue();
-    if (!user) {
-      throw new Error('User is not authenticated');
-    }
-    return user;
-  }
-
-  setUser(user: User): void {
-    this.authenticatedUser.next(user);
-  }
-
-  getUser(): Observable<User> {
-    return this.authenticatedUser.asObservable().pipe(filter((u): u is User => !!u));
-  }
-}

@@ -6,7 +6,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { StockSummary } from '@market-monitor/api-types';
-import { UserUnauthenticatedService } from '@market-monitor/modules/user';
+import { UserUnauthenticatedService } from '@market-monitor/modules/user/data-access';
 import { ElementFocusDirective, QuoteItemComponent } from '@market-monitor/shared/ui';
 import { Observable, iif, startWith, switchMap } from 'rxjs';
 import { ShowStockDialogDirective } from '../show-stock-dialog.directive/show-stock-dialog.directive';

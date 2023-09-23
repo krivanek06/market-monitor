@@ -1,7 +1,7 @@
 {
-  "name": "modules-user",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/modules/user/src",
+  "name": "modules-user-features",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/modules/user/features/src",
   "prefix": "market-monitor",
   "tags": [],
   "projectType": "library",
@@ -12,7 +12,7 @@
         "{workspaceRoot}/coverage/{projectRoot}"
       ],
       "options": {
-        "jestConfig": "libs/modules/user/jest.config.ts",
+        "jestConfig": "libs/modules/user/features/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {
@@ -29,8 +29,8 @@
       ],
       "options": {
         "lintFilePatterns": [
-          "libs/modules/user/**/*.ts",
-          "libs/modules/user/**/*.html"
+          "libs/modules/user/features/**/*.ts",
+          "libs/modules/user/features/**/*.html"
         ]
       }
     }

@@ -45,8 +45,14 @@
       "@market-monitor/modules/page-builder": [
         "libs/modules/page-builder/src/index.ts"
       ],
-      "@market-monitor/modules/user": [
-        "libs/modules/user/src/index.ts"
+      "@market-monitor/modules/user/data-access": [
+        "libs/modules/user/data-access/src/index.ts"
+      ],
+      "@market-monitor/modules/user/features": [
+        "libs/modules/user/features/src/index.ts"
+      ],
+      "@market-monitor/modules/user/ui": [
+        "libs/modules/user/ui/src/index.ts"
       ],
       "@market-monitor/shared/data-access": [
         "libs/shared/data-access/src/index.ts"

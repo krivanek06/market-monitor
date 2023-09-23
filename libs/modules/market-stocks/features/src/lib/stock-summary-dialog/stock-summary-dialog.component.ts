@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { StocksApiService } from '@market-monitor/modules/market-stocks/data-access';
-import { UserUnauthenticatedService } from '@market-monitor/modules/user';
+import { UserUnauthenticatedService } from '@market-monitor/modules/user/data-access';
 import { DefaultImgDirective, PriceChangeItemsComponent } from '@market-monitor/shared/ui';
 import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
