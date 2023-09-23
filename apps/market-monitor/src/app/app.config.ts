@@ -1,18 +1,6 @@
 import { isPlatformServer } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  APP_ID,
-  ApplicationConfig,
-  PLATFORM_ID,
-  PLATFORM_INITIALIZER,
-  importProvidersFrom,
-  inject,
-} from '@angular/core';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { getAuth, provideAuth } from '@angular/fire/auth';
-import { getFirestore, provideFirestore } from '@angular/fire/firestore';
-import { getFunctions, provideFunctions } from '@angular/fire/functions';
-import { getStorage, provideStorage } from '@angular/fire/storage';
+import { APP_ID, ApplicationConfig, PLATFORM_ID, PLATFORM_INITIALIZER, inject } from '@angular/core';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
@@ -29,12 +17,6 @@ import { appRoutes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    importProvidersFrom(provideFirebaseApp(() => initializeApp(environment.firebase))),
-    importProvidersFrom(provideAuth(() => getAuth())),
-    importProvidersFrom(provideFirestore(() => getFirestore())),
-    importProvidersFrom(provideFunctions(() => getFunctions())),
-    importProvidersFrom(provideStorage(() => getStorage())),
-
     provideHttpClient(),
     provideRouter(
       appRoutes,

@@ -6,10 +6,14 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class WordsUpPipe implements PipeTransform {
   transform(value: string): string {
+    if (!value) {
+      return value;
+    }
+
     return value
       .trim()
       .split(' ')
-      .map((word) => word.at(0)?.toUpperCase() + word.slice(1))
+      .map((word) => word[0]?.toUpperCase() + word.slice(1))
       .join(' ');
   }
 }

@@ -6,7 +6,6 @@ import {
   MarketOverviewDatabaseKeys,
   marketOverviewToLoad,
 } from '@market-monitor/api-types';
-import { delaySeconds } from '@market-monitor/shared-utils-general';
 import { isBefore, subYears } from 'date-fns';
 import { Request, Response } from 'express';
 import { warn } from 'firebase-functions/logger';
@@ -203,3 +202,5 @@ const getDocumentsToSaveData = (key: MarketOverviewDatabaseKeys, url: string): s
     .filter((subKey) => MARKET_OVERVIEW_DATABASE_ENDPOINTS[key][subKey].url === url)
     .map((subKey) => MARKET_OVERVIEW_DATABASE_ENDPOINTS[key][subKey].document);
 };
+
+const delaySeconds = (seconds: number) => new Promise((res) => setTimeout(res, seconds * 1000));

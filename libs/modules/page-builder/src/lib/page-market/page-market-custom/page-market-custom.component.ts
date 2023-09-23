@@ -91,7 +91,7 @@ export class PageMarketCustomComponent implements OnInit, RouterManagement {
     // if subKey is already selected, remove it
     if (this.selectedOverviewSubKeys().includes(subKey)) {
       this.selectedOverviewSignal.update((prev) => prev.filter((data) => data.subKey !== subKey));
-      const nextCurrentDates = this.selectedOverviewSignal().at(0)?.marketOverview?.dates ?? [];
+      const nextCurrentDates = this.selectedOverviewSignal()[0]?.marketOverview?.dates ?? [];
       this.updateDateRangeControl(nextCurrentDates, true);
       return;
     }

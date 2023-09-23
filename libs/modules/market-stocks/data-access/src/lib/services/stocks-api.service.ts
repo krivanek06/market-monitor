@@ -37,6 +37,10 @@ export class StocksApiService extends ApiCacheService {
   }
 
   getStockSummaries(symbols: string[]): Observable<StockSummary[]> {
+    if (symbols.length === 0) {
+      return of([]);
+    }
+
     return this.getData<StockSummary[]>(
       `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`,
       this.validity3Min,

@@ -1,5 +1,3 @@
-export const delaySeconds = (seconds: number) => new Promise((res) => setTimeout(res, seconds * 1000));
-
 export const getAssetUrl = (asset: string): string => {
   return `https://get-asset-url.krivanek1234.workers.dev/${asset}`;
 };

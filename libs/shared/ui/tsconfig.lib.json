@@ -15,5 +15,5 @@
   ],
   "include": [
     "src/**/*.ts"
-, "../data-access/src/lib/form-controls.model.ts", "../data-access/src/lib/value-present-item.model.ts"  ]
+  ]
 }
