@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angu
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MarketApiService } from '@market-monitor/api-client';
 import { News, NewsAcceptableTypes, NewsTypes } from '@market-monitor/api-types';
-import { MarketApiService } from '@market-monitor/modules/market-general/data-access';
 import {
   DateAgoPipe,
   DefaultImgDirective,

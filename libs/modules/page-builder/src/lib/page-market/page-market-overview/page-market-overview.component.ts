@@ -3,8 +3,9 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MarketApiService } from '@market-monitor/api-client';
 import { INDEXES_DEFAULT, INDEXES_DEFAULT_SYMBOLS, SYMBOL_SP500, SymbolQuote } from '@market-monitor/api-types';
-import { MarketApiService } from '@market-monitor/modules/market-general/data-access';
+import { MarketDataTransformService } from '@market-monitor/modules/market-general/data-access';
 import {
   AssetPriceChartInteractiveComponent,
   QuoteSearchBasicComponent,
@@ -16,7 +17,6 @@ import {
   RangeDirective,
   RenderClientDirective,
 } from '@market-monitor/shared/ui';
-import { MarketDataTransformService } from '@market-monitor/shared/utils-transform';
 import { map } from 'rxjs';
 import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skeleton.component';
 

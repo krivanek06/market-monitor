@@ -15,8 +15,8 @@ import {
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
 } from '@market-monitor/api-types';
-import { ApiCacheService } from '@market-monitor/shared/utils-client';
 import { Observable, catchError, forkJoin, map, mergeMap, of, reduce, switchMap, tap } from 'rxjs';
+import { ApiCacheService } from '../utils';
 
 @Injectable({
   providedIn: 'root',

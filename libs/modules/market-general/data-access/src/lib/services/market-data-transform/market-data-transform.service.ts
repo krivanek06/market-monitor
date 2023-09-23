@@ -5,8 +5,8 @@ import {
   MarketOverviewData,
   getMarketOverKeyBySubKey,
 } from '@market-monitor/api-types';
-import { MarketOverviewChartData, MarketOverviewChartDataBody } from '@market-monitor/shared/data-access';
 import { zip } from 'lodash-es';
+import { MarketOverviewChartData, MarketOverviewChartDataBody } from '../../models';
 
 @Injectable({
   providedIn: 'root',

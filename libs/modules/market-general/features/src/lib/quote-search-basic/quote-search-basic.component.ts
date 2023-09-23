@@ -18,8 +18,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MarketApiService } from '@market-monitor/api-client';
 import { AvailableQuotes, SymbolQuote } from '@market-monitor/api-types';
-import { MarketApiService } from '@market-monitor/modules/market-general/data-access';
 import {
   ClientStylesDirective,
   DefaultImgDirective,

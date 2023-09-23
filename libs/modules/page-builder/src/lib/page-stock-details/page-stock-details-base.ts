@@ -1,8 +1,8 @@
 import { Directive, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { StocksApiService } from '@market-monitor/api-client';
 import { StockDetails } from '@market-monitor/api-types';
-import { StocksApiService } from '@market-monitor/modules/market-stocks/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { Observable, map } from 'rxjs';
 

@@ -1,1 +1,2 @@
-export * from './services/market-api.service';
+export * from './models';
+export * from './services';

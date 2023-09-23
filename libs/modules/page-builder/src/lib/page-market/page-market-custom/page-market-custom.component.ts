@@ -5,9 +5,13 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MarketApiService } from '@market-monitor/api-client';
 import { MARKET_OVERVIEW_DATA, MarketOverviewDatabaseKeys, getMarketOverKeyBySubKey } from '@market-monitor/api-types';
-import { MarketApiService } from '@market-monitor/modules/market-general/data-access';
-import { MarketOverviewChartDataBody, RouterManagement } from '@market-monitor/shared/data-access';
+import {
+  MarketDataTransformService,
+  MarketOverviewChartDataBody,
+} from '@market-monitor/modules/market-general/data-access';
+import { RouterManagement } from '@market-monitor/shared/data-access';
 import {
   DateRangeSliderComponent,
   DateRangeSliderValues,
@@ -15,7 +19,6 @@ import {
   InArrayPipe,
   ObjectArrayValueByKeyPipe,
 } from '@market-monitor/shared/ui';
-import { MarketDataTransformService } from '@market-monitor/shared/utils-transform';
 import { isBefore } from 'date-fns';
 import { forkJoin, map } from 'rxjs';
 

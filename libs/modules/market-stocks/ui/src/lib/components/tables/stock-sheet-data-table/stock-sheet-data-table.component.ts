@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { SheetData } from '@market-monitor/shared/data-access';
+import { SheetData } from '@market-monitor/modules/market-stocks/data-access';
 import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
 @Component({

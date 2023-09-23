@@ -5,10 +5,10 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
+import { StocksApiService } from '@market-monitor/api-client';
 import { StockScreenerValues, StockSummary } from '@market-monitor/api-types';
 import {
   STOCK_SCREENER_DEFAULT_VALUES,
-  StocksApiService,
   getScreenerInputIndexByKey,
   getScreenerInputValueByKey,
 } from '@market-monitor/modules/market-stocks/data-access';

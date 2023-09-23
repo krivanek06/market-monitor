@@ -11,7 +11,7 @@ import {
   withPreloading,
 } from '@angular/router';
 // import * as Sentry from '@sentry/angular-ivy';
-import { API_IS_PRODUCTION } from '@market-monitor/shared/data-access';
+import { API_IS_PRODUCTION } from '@market-monitor/api-client';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 

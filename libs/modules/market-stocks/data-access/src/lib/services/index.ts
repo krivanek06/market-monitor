@@ -1,1 +1,1 @@
-export * from './stocks-api.service';
+export * from './stock-transform/stock-transform.service';

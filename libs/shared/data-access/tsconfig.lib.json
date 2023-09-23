@@ -15,5 +15,5 @@
   ],
   "include": [
     "src/**/*.ts"
-  ]
+, "../../api/api-client/src/lib/utils/api.model.ts", "../../modules/market-general/data-access/src/lib/models/market-overview-chart-data.model.ts", "../../modules/market-stocks/data-access/src/lib/models/sheet-data.model.ts"  ]
 }

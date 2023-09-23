@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
-import { MarketApiService } from '@market-monitor/modules/market-general/data-access';
+import { MarketApiService } from '@market-monitor/api-client';
 import { environment } from 'apps/market-monitor/src/environments/environment';
 import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
 

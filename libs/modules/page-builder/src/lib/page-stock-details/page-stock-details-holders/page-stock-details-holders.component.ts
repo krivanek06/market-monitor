@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MarketApiService } from '@market-monitor/modules/market-general/data-access';
+import { MarketApiService } from '@market-monitor/api-client';
+import { MarketDataTransformService } from '@market-monitor/modules/market-general/data-access';
 import {
   StockOwnershipHoldersTableComponent,
   StockOwnershipInstitutionalListComponent,
@@ -14,7 +15,6 @@ import {
   RangeDirective,
 } from '@market-monitor/shared/ui';
 import { dateFormatDate, getPreviousDate, isStockMarketHolidayDate } from '@market-monitor/shared/utils-general';
-import { MarketDataTransformService } from '@market-monitor/shared/utils-transform';
 import { catchError, filter, map, of, startWith, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 

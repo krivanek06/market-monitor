@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'shared-utils-utils-transform',
-  preset: '../../../../jest.preset.js',
+  displayName: 'api-api-client',
+  preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../../../coverage/libs/shared/utils/utils-transform',
+  coverageDirectory: '../../../coverage/libs/api/api-client',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

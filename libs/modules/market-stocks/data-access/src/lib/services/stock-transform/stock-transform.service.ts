@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { CompanyRatingTable, CompanyRatioTTM, StockDetails } from '@market-monitor/api-types';
-import { NameValueItem, SheetData, SheetDataPeriod } from '@market-monitor/shared/data-access';
+import { NameValueItem } from '@market-monitor/shared/data-access';
 import { EstimatedChartDataType } from '@market-monitor/shared/utils-client';
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/utils-general';
+import { SheetData, SheetDataPeriod } from '../../models';
 
 @Injectable({
   providedIn: 'root',

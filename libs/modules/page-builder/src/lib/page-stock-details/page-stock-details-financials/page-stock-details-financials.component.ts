@@ -2,13 +2,12 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { SheetDataTimePeriodForm, StockTransformService } from '@market-monitor/modules/market-stocks/data-access';
 import {
   StockSheetDataTableComponent,
   StockSheetDataTimePeriodComponent,
 } from '@market-monitor/modules/market-stocks/ui';
-import { SheetDataTimePeriodForm } from '@market-monitor/shared/data-access';
 import { GeneralCardComponent } from '@market-monitor/shared/ui';
-import { StockTransformService } from '@market-monitor/shared/utils-transform';
 import { map, startWith } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StockSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
+import { StockTransformService } from '@market-monitor/modules/market-stocks/data-access';
 import {
   EarningsEstimationChartComponent,
   RevenueEstimationChartComponent,
@@ -25,7 +26,6 @@ import {
   SortByKeyPipe,
 } from '@market-monitor/shared/ui';
 import { DialogServiceModule } from '@market-monitor/shared/utils-client';
-import { StockTransformService } from '@market-monitor/shared/utils-transform';
 import { of, switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 

@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
-import { StocksApiService } from '@market-monitor/modules/market-stocks/data-access';
+import { StocksApiService } from '@market-monitor/api-client';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
 import { EstimatedChartDataType } from '@market-monitor/shared/utils-client';
 import { map } from 'rxjs';
