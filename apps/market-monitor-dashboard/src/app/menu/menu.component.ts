@@ -7,7 +7,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
-import { SCREEN_LAYOUT } from '@market-monitor/shared-utils-client';
+import { SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
 import { map } from 'rxjs';
 import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-navigation.component';
 
