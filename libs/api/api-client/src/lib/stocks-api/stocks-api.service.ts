@@ -15,7 +15,7 @@ import {
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
 } from '@market-monitor/api-types';
-import { Observable, catchError, forkJoin, map, mergeMap, of, reduce, switchMap, tap } from 'rxjs';
+import { Observable, catchError, filter, forkJoin, map, mergeMap, of, reduce, switchMap, tap } from 'rxjs';
 import { ApiCacheService } from '../utils';
 
 @Injectable({
@@ -47,7 +47,7 @@ export class StocksApiService extends ApiCacheService {
     ).pipe(catchError(() => []));
   }
 
-  getStockSummary(symbol: string): Observable<StockSummary> {
+  getStockSummary(symbol: string): Observable<StockSummary | null> {
     return this.getStockSummaries([symbol]).pipe(map((d) => d[0]));
   }
 
@@ -63,6 +63,7 @@ export class StocksApiService extends ApiCacheService {
           throw new Error('Unable to get details for ETF');
         }
       }),
+      filter((d): d is StockSummary => !!d),
       switchMap((summary) =>
         this.getData<StockDetailsAPI>(
           `https://get-stock-data.krivanek1234.workers.dev/?type=stock-details&symbol=${symbol}`,

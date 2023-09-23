@@ -1,6 +1,6 @@
 import { getCompanyQuote, getProfile, getSymbolsPriceChanges, searchTicker } from '@market-monitor/api-external';
 import { RESPONSE_HEADER } from '@market-monitor/api-types';
-import { checkDataValidityMinutes } from '@market-monitor/shared-utils-general';
+import { checkDataValidityMinutes } from '@market-monitor/shared/utils-general';
 
 /**
  * Welcome to Cloudflare Workers! This is your first worker.
@@ -83,12 +83,19 @@ export default {
 
 		// check if data exists in db
 		const db = drizzle(env.DB);
-		const storedSymbolSummaries = (await db.select().from(SymbolSummaryTable).where(inArray(SymbolSummaryTable.id, symbolArray)).all()).map(
-			formatSummaryToObject,
-		);
+		let storedSymbolSummaries: StockSummaryTable[] = [];
+		let validStoredIds: string[] = [];
+		try {
+			// load data from db
+			storedSymbolSummaries = (await db.select().from(SymbolSummaryTable).where(inArray(SymbolSummaryTable.id, symbolArray)).all()).map(
+				formatSummaryToObject,
+			);
 
-		// check symbol validity 3min
-		const validStoredIds = storedSymbolSummaries.filter((d) => checkDataValidityMinutes(d, 3)).map((d) => d.id);
+			// check symbol validity 3min
+			validStoredIds = storedSymbolSummaries.filter((d) => checkDataValidityMinutes(d, 3)).map((d) => d.id);
+		} catch (e) {
+			console.log('error', e);
+		}
 
 		// symbols to update
 		const symbolsToUpdate = symbolArray.filter((symbol) => !validStoredIds.includes(symbol));

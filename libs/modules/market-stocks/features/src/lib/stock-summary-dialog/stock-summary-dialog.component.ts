@@ -1,11 +1,12 @@
 import { CommonModule, ViewportScroller } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, computed } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, Inject, computed, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
+import { StockSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { UserUnauthenticatedService } from '@market-monitor/modules/user/data-access';
 import { DefaultImgDirective, PriceChangeItemsComponent } from '@market-monitor/shared/ui';
@@ -32,7 +33,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSummaryDialogComponent {
-  stockSummarySignal = toSignal(this.stocksApiService.getStockSummary(this.data.symbol));
+  stockSummarySignal = signal<StockSummary | null>(null);
   isSymbolInFavoriteSignal = toSignal(this.userUnauthenticatedService.isSymbolInFavoriteObs(this.data.symbol));
   symbolType = computed(() => {
     const summary = this.stockSummarySignal();
@@ -59,7 +60,19 @@ export class StockSummaryDialogComponent {
     private dialogServiceUtil: DialogServiceUtil,
     private route: Router,
     private viewPortScroller: ViewportScroller,
-  ) {}
+  ) {
+    this.stocksApiService
+      .getStockSummary(this.data.symbol)
+      .pipe(takeUntilDestroyed())
+      .subscribe((res) => {
+        if (!res) {
+          this.dialogRef.close();
+          this.dialogServiceUtil.showNotificationBar(`Summary for symbol: ${this.data.symbol} not found`, 'error');
+          return;
+        }
+        this.stockSummarySignal.set(res);
+      });
+  }
 
   onAddToFavorite(): void {
     if (this.userUnauthenticatedService.toggleFavoriteSymbol(this.data.symbol)) {
