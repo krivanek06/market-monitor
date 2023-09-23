@@ -9,14 +9,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
 import { CalendarAssetDataTypes, CalendarDividend, CalendarStockEarning } from '@market-monitor/api-types';
+import { ShowStockDialogDirective, StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import {
   DividendItemComponent,
   DividendItemsDialogComponent,
   EarningsHistoricalDialogComponent,
   EarningsItemComponent,
   EarningsItemsDialogComponent,
-  ShowStockDialogDirective,
-  StockSummaryDialogComponent,
 } from '@market-monitor/modules/market-stocks/ui';
 import { RouterManagement } from '@market-monitor/shared/data-access';
 import {

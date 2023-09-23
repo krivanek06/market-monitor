@@ -4,10 +4,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { StockSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { StockTransformService } from '@market-monitor/modules/market-stocks/data-access';
+import { ShowStockDialogDirective } from '@market-monitor/modules/market-stocks/features';
 import {
   EarningsEstimationChartComponent,
   RevenueEstimationChartComponent,
-  ShowStockDialogDirective,
   StockEnterpriseChartComponent,
   StockEsgDataTableComponent,
   StockKeyExecutivesTableComponent,

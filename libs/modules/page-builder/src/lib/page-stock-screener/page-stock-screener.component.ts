@@ -12,8 +12,8 @@ import {
   getScreenerInputIndexByKey,
   getScreenerInputValueByKey,
 } from '@market-monitor/modules/market-stocks/data-access';
+import { ShowStockDialogDirective } from '@market-monitor/modules/market-stocks/features';
 import {
-  ShowStockDialogDirective,
   StockScreenerFormControlComponent,
   StockSummaryTableComponent,
 } from '@market-monitor/modules/market-stocks/ui';

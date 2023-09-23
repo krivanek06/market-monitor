@@ -5,10 +5,10 @@ import {
   DividendItemsDialogComponent,
   EarningsHistoricalDialogComponent,
   EarningsItemsDialogComponent,
-  StockSummaryDialogComponent,
 } from '@market-monitor/modules/market-stocks/ui';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { Observable, filter, map, take, tap } from 'rxjs';
+import { StockSummaryDialogComponent } from './../stock-summary-dialog/stock-summary-dialog.component';
 
 @Directive({
   standalone: true,
