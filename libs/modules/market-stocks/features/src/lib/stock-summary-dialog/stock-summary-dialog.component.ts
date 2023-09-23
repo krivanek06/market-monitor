@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
+import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { StocksApiService } from '@market-monitor/modules/market-stocks/data-access';
 import { UserUnauthenticatedService } from '@market-monitor/modules/user';
 import { DefaultImgDirective, PriceChangeItemsComponent } from '@market-monitor/shared/ui';

@@ -18,10 +18,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { MarketApiService } from '@market-monitor/api-client';
 import { AvailableQuotes, SymbolQuote } from '@market-monitor/api-types';
-import { QuoteItemComponent } from '@market-monitor/shared-components';
-import { ClientStylesDirective, DefaultImgDirective, RangeDirective } from '@market-monitor/shared-directives';
+import { MarketApiService } from '@market-monitor/modules/market-general/data-access';
+import {
+  ClientStylesDirective,
+  DefaultImgDirective,
+  QuoteItemComponent,
+  RangeDirective,
+} from '@market-monitor/shared/ui';
 import { tap } from 'rxjs';
 
 @Component({

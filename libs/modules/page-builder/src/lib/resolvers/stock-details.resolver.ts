@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveFn, Router, RouterStateSnapshot } from '@angular/router';
-import { MarketApiService } from '@market-monitor/api-client';
 import { StockDetails } from '@market-monitor/api-types';
+import { MarketApiService } from '@market-monitor/modules/market-general/data-access';
 import { StocksApiService } from '@market-monitor/modules/market-stocks/data-access';
 import { LoaderMainService } from '@market-monitor/shared/utils-client';
 import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';

@@ -7,8 +7,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MarketApiService } from '@market-monitor/api-client';
 import { CalendarAssetDataTypes, CalendarDividend, CalendarStockEarning } from '@market-monitor/api-types';
+import { MarketApiService } from '@market-monitor/modules/market-general/data-access';
 import {
   DividendItemComponent,
   DividendItemsDialogComponent,

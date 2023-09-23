@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { StocksApiService } from '@market-monitor/api-client';
 import { StockSummary } from '@market-monitor/api-types';
-import { StorageService } from '@market-monitor/shared-services';
+import { StocksApiService } from '@market-monitor/modules/market-stocks/data-access';
+import { LocalStorageService } from '@market-monitor/shared/utils-client';
 import { BehaviorSubject, Observable, forkJoin, map } from 'rxjs';
 import { UserUnauthenticated } from '../models';
 
 @Injectable({
   providedIn: 'root',
 })
-export class UserUnauthenticatedService extends StorageService<UserUnauthenticated> {
+export class UserUnauthenticatedService extends LocalStorageService<UserUnauthenticated> {
   private favoriteStocks$ = new BehaviorSubject<StockSummary[]>([]);
   private lastSearchedStocks$ = new BehaviorSubject<StockSummary[]>([]);
   private loadedData$ = new BehaviorSubject<boolean>(false);

@@ -18,7 +18,7 @@ import {
   STOCK_SCREENER_SECTORS,
   STOCK_SCREENER_VOLUME,
 } from '@market-monitor/modules/market-stocks/data-access';
-import { FormMatInputWrapperComponent } from '@market-monitor/shared-components';
+import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-stock-screener-form-control',

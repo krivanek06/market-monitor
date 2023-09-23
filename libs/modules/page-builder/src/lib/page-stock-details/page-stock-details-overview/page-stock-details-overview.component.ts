@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StockSummary } from '@market-monitor/api-types';
-import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
+import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import {
   EarningsEstimationChartComponent,
   RevenueEstimationChartComponent,

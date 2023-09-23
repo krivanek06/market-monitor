@@ -2,9 +2,11 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { StockDetails } from '@market-monitor/api-types';
-import { PriceChangeItemSelectorPipe } from '@market-monitor/shared-components';
-import { PercentageIncreaseDirective } from '@market-monitor/shared-directives';
-import { LargeNumberFormatterPipe } from '@market-monitor/shared-pipes';
+import {
+  LargeNumberFormatterPipe,
+  PercentageIncreaseDirective,
+  PriceChangeItemSelectorPipe,
+} from '@market-monitor/shared/ui';
 import { RecommendationDirective } from '../../../directives';
 
 @Component({

@@ -7,9 +7,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { StockSummary } from '@market-monitor/api-types';
-import { ProgressCurrencyComponent } from '@market-monitor/shared-components';
-import { DefaultImgDirective, PercentageIncreaseDirective, RangeDirective } from '@market-monitor/shared-directives';
-import { LargeNumberFormatterPipe, TruncatePipe } from '@market-monitor/shared-pipes';
+import {
+  DefaultImgDirective,
+  LargeNumberFormatterPipe,
+  PercentageIncreaseDirective,
+  ProgressCurrencyComponent,
+  RangeDirective,
+  TruncatePipe,
+} from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-stock-summary-list',

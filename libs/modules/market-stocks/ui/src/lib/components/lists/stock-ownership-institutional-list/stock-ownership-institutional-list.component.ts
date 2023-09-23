@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { EnterpriseValue, SymbolOwnershipInstitutional } from '@market-monitor/api-types';
-import { PercentageIncreaseDirective } from '@market-monitor/shared-directives';
-import { LargeNumberFormatterPipe } from '@market-monitor/shared-pipes';
+import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-stock-ownership-institutional-list',

@@ -3,6 +3,7 @@ export * from './color-scheme.model';
 export * from './form-controls.model';
 export * from './general-errors.model';
 export * from './generic-chart.model';
+export * from './market-overview-chart-data.model';
 export * from './name-value.model';
 export * from './recommendation.model';
 export * from './router.model';

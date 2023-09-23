@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { StockSummary } from '@market-monitor/api-types';
-import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared-directives';
+import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-stock-peers-list',

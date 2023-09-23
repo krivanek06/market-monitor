@@ -6,10 +6,11 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { SymbolOwnershipHolders } from '@market-monitor/api-types';
 import {
   BubblePaginationDirective,
+  LargeNumberFormatterPipe,
   PercentageIncreaseDirective,
   RenderClientDirective,
-} from '@market-monitor/shared-directives';
-import { LargeNumberFormatterPipe, TruncateWordsPipe } from '@market-monitor/shared-pipes';
+  TruncateWordsPipe,
+} from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-stock-ownership-holders-table',

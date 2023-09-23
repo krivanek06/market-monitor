@@ -1,1 +1,1 @@
-export * from './lib/stock-transform/stock-transform.service';
+export * from './lib';

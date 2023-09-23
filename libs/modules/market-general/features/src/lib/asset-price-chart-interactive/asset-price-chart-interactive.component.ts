@@ -10,15 +10,20 @@ import {
   signal,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MarketApiService } from '@market-monitor/api-client';
 import {
   HistoricalPrice,
   SymbolHistoricalPeriods,
   SymbolHistoricalPeriodsArrayPreload,
 } from '@market-monitor/api-types';
-import { AssetPriceChartComponent, TimePeriodButtonsComponent } from '@market-monitor/shared-components';
-import { ClientStylesDirective, DefaultImgDirective } from '@market-monitor/shared-directives';
-import { DialogServiceUtil, ErrorEnum } from '@market-monitor/shared-utils-client';
+import { MarketApiService } from '@market-monitor/modules/market-general/data-access';
+import { ErrorEnum } from '@market-monitor/shared/data-access';
+import {
+  AssetPriceChartComponent,
+  ClientStylesDirective,
+  DefaultImgDirective,
+  TimePeriodButtonsComponent,
+} from '@market-monitor/shared/ui';
+import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { catchError, distinctUntilChanged, startWith, switchMap, tap } from 'rxjs';
 
 @Component({

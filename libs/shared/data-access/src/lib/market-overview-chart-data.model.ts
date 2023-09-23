@@ -1,5 +1,5 @@
 import { MarketOverview, MarketOverviewData } from '@market-monitor/api-types';
-import { GenericChartSeries } from '@market-monitor/shared-components';
+import { GenericChartSeries } from './generic-chart.model';
 
 export type MarketOverviewChartDataBody = {
   marketOverview: MarketOverviewData;

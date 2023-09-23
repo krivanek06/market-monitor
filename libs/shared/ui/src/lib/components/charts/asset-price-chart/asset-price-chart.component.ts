@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { HistoricalPrice, SymbolHistoricalPeriods } from '@market-monitor/api-types';
-import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-client';
-import { dateFormatDate, formatLargeNumber, roundNDigits } from '@market-monitor/shared-utils-general';
+import { ColorScheme } from '@market-monitor/shared/data-access';
+import { ChartConstructor } from '@market-monitor/shared/utils-client';
+import { dateFormatDate, formatLargeNumber, roundNDigits } from '@market-monitor/shared/utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({

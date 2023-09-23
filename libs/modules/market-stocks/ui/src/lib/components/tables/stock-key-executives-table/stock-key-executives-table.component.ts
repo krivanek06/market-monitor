@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CompanyKeyExecutive } from '@market-monitor/api-types';
-import { LargeNumberFormatterPipe, SplitStringPipe } from '@market-monitor/shared-pipes';
+import { LargeNumberFormatterPipe, SplitStringPipe } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-stock-key-executives-table',

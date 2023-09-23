@@ -4,8 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PriceTarget } from '@market-monitor/api-types';
-import { PercentageIncreaseDirective } from '@market-monitor/shared-directives';
-import { SplitStringPipe } from '@market-monitor/shared-pipes';
+import { PercentageIncreaseDirective, SplitStringPipe } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-stock-price-target-table',
