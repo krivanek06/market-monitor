@@ -28,8 +28,6 @@ export class MenuSideNavigationComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedNavigationPath = this.route.url.split('/')[1]; // ['', 'dashboard']
-
-    console.log(this.route.url);
   }
 
   onNavigationClick(path: string) {
