@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RecommendationTrends } from '@market-monitor/api-types';
-import { ChartConstructor, ColorScheme } from '@market-monitor/shared-utils-client';
-import { dateFormatDate } from '@market-monitor/shared-utils-general';
+import { ColorScheme, Recommendation } from '@market-monitor/shared/data-access';
+import { ChartConstructor } from '@market-monitor/shared/utils-client';
+import { dateFormatDate } from '@market-monitor/shared/utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { Recommendation } from '../../../../../../data-access/src/lib/models';
 
 @Component({
   selector: 'app-stock-recommendation-chart',

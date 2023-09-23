@@ -8,9 +8,8 @@ import { Router } from '@angular/router';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
 import { StocksApiService } from '@market-monitor/modules/market-stocks/data-access';
 import { UserUnauthenticatedService } from '@market-monitor/modules/user';
-import { PriceChangeItemsComponent } from '@market-monitor/shared-components';
-import { DefaultImgDirective } from '@market-monitor/shared-directives';
-import { DialogServiceUtil } from '@market-monitor/shared-utils-client';
+import { DefaultImgDirective, PriceChangeItemsComponent } from '@market-monitor/shared/ui';
+import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
 import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-modal-skeleton.component';
 

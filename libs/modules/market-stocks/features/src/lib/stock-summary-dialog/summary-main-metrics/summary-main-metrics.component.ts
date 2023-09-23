@@ -1,9 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { StockSummary } from '@market-monitor/api-types';
-import { GeneralCardComponent } from '@market-monitor/shared-components';
-import { PercentageIncreaseDirective } from '@market-monitor/shared-directives';
-import { LargeNumberFormatterPipe } from '@market-monitor/shared-pipes';
+import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-summary-main-metrics',

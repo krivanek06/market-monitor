@@ -8,10 +8,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { StocksApiService } from '@market-monitor/api-client';
 import { StockSummary } from '@market-monitor/api-types';
-import { QuoteItemComponent } from '@market-monitor/shared-components';
-import { DefaultImgDirective, RangeDirective } from '@market-monitor/shared-directives';
+import { StocksApiService } from '@market-monitor/modules/market-stocks/data-access';
+import { DefaultImgDirective, QuoteItemComponent, RangeDirective } from '@market-monitor/shared/ui';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 
 @Component({

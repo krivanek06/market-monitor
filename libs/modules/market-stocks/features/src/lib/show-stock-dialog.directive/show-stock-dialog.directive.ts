@@ -1,14 +1,14 @@
 import { Directive, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CalendarDividend, CalendarStockEarning } from '@market-monitor/api-types';
-import { SCREEN_DIALOGS } from '@market-monitor/shared-utils-client';
-import { Observable, filter, map, take, tap } from 'rxjs';
 import {
   DividendItemsDialogComponent,
   EarningsHistoricalDialogComponent,
   EarningsItemsDialogComponent,
   StockSummaryDialogComponent,
-} from '../../../../ui/src/lib/dialogs';
+} from '@market-monitor/modules/market-stocks/ui';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
+import { Observable, filter, map, take, tap } from 'rxjs';
 
 @Directive({
   standalone: true,
