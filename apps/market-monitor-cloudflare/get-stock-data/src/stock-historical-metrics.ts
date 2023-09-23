@@ -7,6 +7,7 @@ import {
 	StockMetricsHistoricalAPI,
 	StockMetricsHistoricalBasic,
 } from '@market-monitor/api-types';
+import { dateFormatDate } from '@market-monitor/shared/utils-general';
 import { Env } from './model';
 
 export const getStockHistoricalMetricWrapper = async (env: Env, symbol: string, searchParams: URLSearchParams): Promise<Response> => {
@@ -73,7 +74,7 @@ const formatData = (data: StockMetricsHistoricalAPI, timePeriod: DataTimePeriod)
 	const ratios = data[timePeriod].ratios.reverse();
 
 	return {
-		dates: keyMetrics.map((d) => d.date),
+		dates: keyMetrics.map((d) => dateFormatDate(d.date, 'MMMM d, y')),
 		marketCap: keyMetrics.map((d) => d.marketCap),
 		enterpriseValue: keyMetrics.map((d) => d.enterpriseValue),
 		ratios: {

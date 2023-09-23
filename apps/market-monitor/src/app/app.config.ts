@@ -1,18 +1,6 @@
 import { isPlatformServer } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  APP_ID,
-  ApplicationConfig,
-  PLATFORM_ID,
-  PLATFORM_INITIALIZER,
-  importProvidersFrom,
-  inject,
-} from '@angular/core';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { getAuth, provideAuth } from '@angular/fire/auth';
-import { getFirestore, provideFirestore } from '@angular/fire/firestore';
-import { getFunctions, provideFunctions } from '@angular/fire/functions';
-import { getStorage, provideStorage } from '@angular/fire/storage';
+import { APP_ID, ApplicationConfig, PLATFORM_ID, PLATFORM_INITIALIZER, inject } from '@angular/core';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
@@ -22,19 +10,13 @@ import {
   withInMemoryScrolling,
   withPreloading,
 } from '@angular/router';
-import { API_FUNCTION_URL, API_IS_PRODUCTION } from '@market-monitor/api-client';
 // import * as Sentry from '@sentry/angular-ivy';
+import { API_IS_PRODUCTION } from '@market-monitor/shared/data-access';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    importProvidersFrom(provideFirebaseApp(() => initializeApp(environment.firebase))),
-    importProvidersFrom(provideAuth(() => getAuth())),
-    importProvidersFrom(provideFirestore(() => getFirestore())),
-    importProvidersFrom(provideFunctions(() => getFunctions())),
-    importProvidersFrom(provideStorage(() => getStorage())),
-
     provideHttpClient(),
     provideRouter(
       appRoutes,
@@ -67,10 +49,6 @@ export const appConfig: ApplicationConfig = {
         }
       },
       multi: true,
-    },
-    {
-      provide: API_FUNCTION_URL,
-      useValue: environment.endpointFunctionsURL,
     },
     {
       provide: API_IS_PRODUCTION,

@@ -8,9 +8,10 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "es2015",
+    "target": "es2022",
     "module": "esnext",
     "lib": [
+      "es2022",
       "es2020",
       "dom"
     ],
@@ -18,47 +19,56 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@market-monitor/api-client": [
-        "libs/api/api-client/src/index.ts"
-      ],
       "@market-monitor/api-external": [
         "libs/api/api-external/src/index.ts"
       ],
       "@market-monitor/api-types": [
         "libs/api/api-types/src/index.ts"
       ],
-      "@market-monitor/modules/market-general": [
-        "libs/modules/market-general/src/index.ts"
+      "@market-monitor/modules/market-general/data-access": [
+        "libs/modules/market-general/data-access/src/index.ts"
       ],
-      "@market-monitor/modules/market-stocks": [
-        "libs/modules/market-stocks/src/index.ts"
+      "@market-monitor/modules/market-general/features": [
+        "libs/modules/market-general/features/src/index.ts"
+      ],
+      "@market-monitor/modules/market-general/ui": [
+        "libs/modules/market-general/ui/src/index.ts"
+      ],
+      "@market-monitor/modules/market-stocks/data-access": [
+        "libs/modules/market-stocks/data-access/src/index.ts"
+      ],
+      "@market-monitor/modules/market-stocks/features": [
+        "libs/modules/market-stocks/features/src/index.ts"
+      ],
+      "@market-monitor/modules/market-stocks/ui": [
+        "libs/modules/market-stocks/ui/src/index.ts"
       ],
       "@market-monitor/modules/page-builder": [
         "libs/modules/page-builder/src/index.ts"
       ],
-      "@market-monitor/modules/portfolio": [
-        "libs/modules/portfolio/src/index.ts"
+      "@market-monitor/modules/user/data-access": [
+        "libs/modules/user/data-access/src/index.ts"
       ],
-      "@market-monitor/modules/user": [
-        "libs/modules/user/src/index.ts"
+      "@market-monitor/modules/user/features": [
+        "libs/modules/user/features/src/index.ts"
       ],
-      "@market-monitor/shared-components": [
-        "libs/shared/components/src/index.ts"
+      "@market-monitor/modules/user/ui": [
+        "libs/modules/user/ui/src/index.ts"
       ],
-      "@market-monitor/shared-directives": [
-        "libs/shared/directives/src/index.ts"
+      "@market-monitor/shared/data-access": [
+        "libs/shared/data-access/src/index.ts"
       ],
-      "@market-monitor/shared-pipes": [
-        "libs/shared/pipes/src/index.ts"
+      "@market-monitor/shared/ui": [
+        "libs/shared/ui/src/index.ts"
       ],
-      "@market-monitor/shared-services": [
-        "libs/shared/services/src/index.ts"
+      "@market-monitor/shared/utils-client": [
+        "libs/shared/utils/utils-client/src/index.ts"
       ],
-      "@market-monitor/shared-utils-client": [
-        "libs/shared/utils-client/src/index.ts"
+      "@market-monitor/shared/utils-general": [
+        "libs/shared/utils/utils-general/src/index.ts"
       ],
-      "@market-monitor/shared-utils-general": [
-        "libs/shared/utils-general/src/index.ts"
+      "@market-monitor/shared/utils-transform": [
+        "libs/shared/utils/utils-transform/src/index.ts"
       ]
     }
   },

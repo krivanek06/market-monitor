@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { GenericChartComponent } from '@market-monitor/shared-components';
-import { RangeDirective } from '@market-monitor/shared-directives';
+import { GenericChartComponent, RangeDirective } from '@market-monitor/shared/ui';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({

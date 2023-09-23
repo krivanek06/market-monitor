@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StockSummary } from '@market-monitor/api-types';
-import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general';
+import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import {
   EarningsEstimationChartComponent,
   RevenueEstimationChartComponent,
@@ -15,17 +15,17 @@ import {
   StockRatingTableComponent,
   StockRecommendationChartComponent,
   StockSummaryListComponent,
-  StockTransformService,
   StockUpgradesDowngradesTableComponent,
-} from '@market-monitor/modules/market-stocks';
+} from '@market-monitor/modules/market-stocks/ui';
 import {
   GeneralCardComponent,
   GenericChartComponent,
   NameValueListComponent,
   PriceChangeItemsComponent,
-} from '@market-monitor/shared-components';
-import { SortByKeyPipe } from '@market-monitor/shared-pipes';
-import { DialogServiceModule } from '@market-monitor/shared-utils-client';
+  SortByKeyPipe,
+} from '@market-monitor/shared/ui';
+import { DialogServiceModule } from '@market-monitor/shared/utils-client';
+import { StockTransformService } from '@market-monitor/shared/utils-transform';
 import { of, switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 

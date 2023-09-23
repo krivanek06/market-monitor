@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { StockInsiderTradesComponent } from '@market-monitor/modules/market-stocks';
-import { GeneralCardComponent } from '@market-monitor/shared-components';
-import { RangeDirective } from '@market-monitor/shared-directives';
+import { StockInsiderTradesComponent } from '@market-monitor/modules/market-stocks/ui';
+import { GeneralCardComponent, RangeDirective } from '@market-monitor/shared/ui';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({

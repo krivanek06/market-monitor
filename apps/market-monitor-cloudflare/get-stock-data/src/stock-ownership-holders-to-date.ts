@@ -1,6 +1,6 @@
 import { getSymbolOwnershipHolders } from '@market-monitor/api-external';
 import { EXPIRATION_ONE_WEEK, RESPONSE_HEADER } from '@market-monitor/api-types';
-import { isDateValidQuarter } from '@market-monitor/shared-utils-general';
+import { isDateValidQuarter } from '@market-monitor/shared/utils-general';
 import { Env } from './model';
 
 export const getStockOwnershipHoldersToDataWrapper = async (env: Env, symbol: string, searchParams: URLSearchParams): Promise<Response> => {
