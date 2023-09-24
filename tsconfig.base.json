@@ -28,7 +28,7 @@
       "@market-monitor/api-types": [
         "libs/api/api-types/src/index.ts"
       ],
-      "@market-monitor/api/api-firebase": [
+      "@market-monitor/api-firebase": [
         "libs/api/api-firebase/src/index.ts"
       ],
       "@market-monitor/modules/market-general/data-access": [

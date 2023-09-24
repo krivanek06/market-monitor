@@ -13,7 +13,14 @@ import { Env } from './model';
  * @param period
  * @returns
  */
-export const getPriceOnPeriod = async (env: Env, symbol: string, period: HistoricalPricePeriods): Promise<Response> => {
+export const getPriceOnPeriod = async (env: Env, symbol: string, searchParams: URLSearchParams): Promise<Response> => {
+	const period = searchParams.get('period') as HistoricalPricePeriods | undefined;
+
+	// check period
+	if (!period) {
+		return new Response('missing period', { status: 400 });
+	}
+
 	// create key
 	const savedKey = `${symbol}-${period}`;
 

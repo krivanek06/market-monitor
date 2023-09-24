@@ -21,7 +21,6 @@ import {
   HistoricalLoadingPeriodsDates,
   HistoricalPrice,
   HistoricalPriceAPI,
-  HistoricalPriceSymbol,
   MostPerformingStocks,
   News,
   NewsTypes,
@@ -120,27 +119,38 @@ export const getHistoricalPricesByPeriod = async (
  * @param date format YYYY-MM-DD
  * @returns
  */
-export const getHistoricalPricesOnDate = async (
+export const getHistoricalPricesOnDateRange = async (
   symbol: string,
-  date: string,
-): Promise<HistoricalPriceSymbol | null> => {
-  const url = `${FINANCIAL_MODELING_URL}/v3/historical-price-full/${symbol}?from=${date}&to=${date}&apikey=${FINANCIAL_MODELING_KEY}`;
+  dateStart: string,
+  dateEnd: string,
+): Promise<HistoricalPrice[]> => {
+  const url = `${FINANCIAL_MODELING_URL}/v3/historical-price-full/${symbol}?from=${dateStart}&to=${dateEnd}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await fetch(url);
-  const data = ((await response.json()) as { historical: HistoricalPriceAPI[] }) ?? {};
+  const data = (await response.json()) as { historical: HistoricalPriceAPI[] };
 
   if (!('historical' in data) || (data.historical as HistoricalPriceAPI[]).length === 0) {
-    return null;
+    return [];
   }
 
-  const historicalData = data.historical[0] as HistoricalPriceAPI;
-  const result = {
-    close: historicalData.close,
-    date: historicalData.date,
-    volume: historicalData.volume,
-    symbol: symbol,
-  } satisfies HistoricalPriceSymbol;
+  const historicalData = data.historical.map((d) => ({
+    close: d.close,
+    date: d.date,
+    volume: d.volume,
+  })) satisfies HistoricalPrice[];
 
-  return result;
+  return historicalData;
+};
+
+/**
+ * can return null value if date is before IPO
+ *
+ * @param symbol
+ * @param date format YYYY-MM-DD
+ * @returns
+ */
+export const getHistoricalPricesOnDate = async (symbol: string, date: string): Promise<HistoricalPrice | null> => {
+  const data = await getHistoricalPricesOnDateRange(symbol, date, date);
+  return data[0] ?? null;
 };
 
 /**

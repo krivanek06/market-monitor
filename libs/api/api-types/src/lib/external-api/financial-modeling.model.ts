@@ -690,10 +690,6 @@ export type HistoricalPriceAPI = {
 
 export type HistoricalPrice = Omit<HistoricalPriceAPI, 'open' | 'low' | 'high'>;
 
-export type HistoricalPriceSymbol = HistoricalPrice & {
-  symbol: string;
-};
-
 export interface MostPerformingStocks {
   symbol: string;
   name: string;
