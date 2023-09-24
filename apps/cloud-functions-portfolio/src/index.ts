@@ -4,7 +4,11 @@ import * as functions from 'firebase-functions';
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
 import * as admin from 'firebase-admin';
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
+import { NestFactory } from '@nestjs/core';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import express from 'express';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
+import { AppModule } from './app.module';
 
 const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
 
@@ -34,8 +38,16 @@ admin.firestore().settings({
 
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
+const server = express();
 
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info('Hello logs!', { structuredData: true });
-  response.send('Hello from Firebase!');
-});
+const createNestServer = async (expressInstance) => {
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(expressInstance));
+
+  return app.init();
+};
+
+createNestServer(server)
+  .then((v) => console.log('Nest Ready'))
+  .catch((err) => console.error('Nest broken', err));
+
+export const api = functions.https.onRequest(server);
