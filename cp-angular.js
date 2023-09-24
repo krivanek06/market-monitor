@@ -3,7 +3,7 @@ const fs = require('fs-extra');
 // Copy Angular build to functions folder
 (async () => {
   const src = './dist/apps/market-monitor';
-  const copy = './dist/apps/market-monitor-cloud-functions';
+  const copy = './dist/apps/cloud-functions';
 
   await fs.copy(src, copy);
 

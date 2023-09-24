@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'market-monitor-cloud-functions-e2e',
+  displayName: 'cloud-functions-e2e',
   preset: '../../jest.preset.js',
   globalSetup: '<rootDir>/src/support/global-setup.ts',
   globalTeardown: '<rootDir>/src/support/global-teardown.ts',
@@ -15,5 +15,5 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/market-monitor-cloud-functions-e2e',
+  coverageDirectory: '../../coverage/cloud-functions-e2e',
 };
