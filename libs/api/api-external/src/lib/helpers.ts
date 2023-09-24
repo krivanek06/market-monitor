@@ -1,5 +1,4 @@
 import { endOfMonth, startOfMonth } from 'date-fns';
-import { firestore } from 'firebase-admin';
 
 export const filterOutSymbols = <T extends { symbol: string }>(
   data: T[],
@@ -28,20 +27,4 @@ export const getDateRangeByMonthAndYear = (month: number | string, year: number 
   const from = startOfMonth(date).toISOString().split('T')[0];
   const to = endOfMonth(date).toISOString().split('T')[0];
   return [from, to];
-};
-
-/**
- * usage: .withConverter(assignTypes<DataSnapshot<SymbolOwnershipHolders[]>>());
- *
- * @returns
- */
-export const assignTypes = <T extends object>() => {
-  return {
-    toFirestore(doc: T): firestore.DocumentData {
-      return doc;
-    },
-    fromFirestore(snapshot: firestore.QueryDocumentSnapshot): T {
-      return snapshot.data()! as T;
-    },
-  };
 };
