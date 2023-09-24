@@ -1,21 +1,25 @@
 import { Injectable } from '@angular/core';
-import { PortfolioGrowth, PortfolioRisk } from '@market-monitor/api-types';
+import { PortfolioGrowth, PortfolioHoldingsData, PortfolioRisk } from '@market-monitor/api-types';
 import { Observable, of } from 'rxjs';
+import { MarketApiService } from '../market-api/market-api.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PortfolioApiService {
+  constructor(private marketApiService: MarketApiService) {}
 
-  constructor() { }
+  getPortfolioHoldingsDataByUser(userId: string): Observable<PortfolioHoldingsData[]> {
+    return of([]);
+  }
 
   // TODO: calculation on backend
-  getPortfolioRisk(): Observable<PortfolioRisk | null> {
+  getPortfolioRiskByUser(userId: string): Observable<PortfolioRisk | null> {
     return of(null);
   }
 
   // TODO: calculation on backend
-  getPortfolioGrowth(): Observable<PortfolioGrowth[]> {
+  getPortfolioGrowthByUser(userId: string): Observable<PortfolioGrowth[]> {
     return of([]);
   }
 }

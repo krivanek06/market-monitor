@@ -1,8 +1,17 @@
+import { SymbolSummary } from './stock-data.model';
+
 export type PortfolioHoldings = {
   symbol: string;
   symbolType: SymbolType;
   units: number;
   invested: number;
+};
+
+export type PortfolioHoldingsData = PortfolioHoldings & {
+  // tech, finance, etc.
+  sector: string;
+  breakEvenPrice: number;
+  symbolSummary: SymbolSummary;
 };
 
 export type Portfolio = {
@@ -23,11 +32,11 @@ export type PortfolioRisk = {
   annualVolatilityPrct: number;
 };
 
-export type PortfolioGrowth =  {
+export type PortfolioGrowth = {
   invested: number;
   date: string;
   ownedAssets: number;
-}
+};
 
 export type PortfolioTransaction = {
   userId: string;

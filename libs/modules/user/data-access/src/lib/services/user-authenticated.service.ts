@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { User } from '@market-monitor/api-types';
-import { BehaviorSubject, Observable, filter } from 'rxjs';
+import { PortfolioApiService } from '@market-monitor/api-client';
+import { PortfolioGrowth, PortfolioHoldingsData, PortfolioRisk, User } from '@market-monitor/api-types';
+import { BehaviorSubject, Observable, distinctUntilKeyChanged, filter, switchMap } from 'rxjs';
 import { mockUser } from '../models';
 
 @Injectable({
@@ -8,7 +9,7 @@ import { mockUser } from '../models';
 })
 export class UserAuthenticatedService {
   private authenticatedUser = new BehaviorSubject<User | null>(mockUser);
-  constructor() {}
+  constructor(private portfolioApiService: PortfolioApiService) {}
 
   get user(): User {
     const user = this.authenticatedUser.getValue();
@@ -24,5 +25,26 @@ export class UserAuthenticatedService {
 
   getUser(): Observable<User> {
     return this.authenticatedUser.asObservable().pipe(filter((u): u is User => !!u));
+  }
+
+  getPortfolioHoldingsData(): Observable<PortfolioHoldingsData[]> {
+    return this.getUser().pipe(
+      distinctUntilKeyChanged('holdings'),
+      switchMap((user) => this.portfolioApiService.getPortfolioHoldingsDataByUser(user.id)),
+    );
+  }
+
+  getPortfolioRisk(): Observable<PortfolioRisk | null> {
+    return this.getUser().pipe(
+      distinctUntilKeyChanged('holdings'),
+      switchMap((user) => this.portfolioApiService.getPortfolioRiskByUser(user.id)),
+    );
+  }
+
+  getPortfolioGrowth(): Observable<PortfolioGrowth[]> {
+    return this.getUser().pipe(
+      distinctUntilKeyChanged('holdings'),
+      switchMap((user) => this.portfolioApiService.getPortfolioGrowthByUser(user.id)),
+    );
   }
 }
