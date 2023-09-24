@@ -50,7 +50,6 @@ export const mockUser: User = {
     lastSignIn: '2021-07-01T00:00:00.000Z',
     photoURL: null,
   },
-  portfolioRisk: null,
   portfolio: {
     numberOfExecutedBuyTransactions: 4,
     numberOfExecutedSellTransactions: 2,

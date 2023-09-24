@@ -1,1 +1,1 @@
-export * from './lib/modules-portfolio-data-access.module';
+export * from './lib';

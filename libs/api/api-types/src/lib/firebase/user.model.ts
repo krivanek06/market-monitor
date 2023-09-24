@@ -1,4 +1,4 @@
-import { Portfolio, PortfolioHoldings, PortfolioRisk, SymbolType } from './portfolio.model';
+import { Portfolio, PortfolioHoldings, SymbolType } from './portfolio.model';
 
 export type UserAuthenticationType =
   | {
@@ -24,7 +24,6 @@ export type User = {
   groups: UserGroups;
   settings: UserSettings;
   portfolio: Portfolio;
-  portfolioRisk: PortfolioRisk | null;
   lastSearchedSymbols: {
     symbolType: SymbolType;
     symbol: string;
