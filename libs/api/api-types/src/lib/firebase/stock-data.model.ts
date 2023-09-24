@@ -19,11 +19,15 @@ import {
   UpgradesDowngrades,
 } from '../external-api';
 
-export type StockSummary = {
+export type SymbolSummary = {
   id: string;
   quote: SymbolQuote;
   profile?: CompanyProfile;
   priceChange: PriceChange;
+};
+
+export type StockSummary = SymbolSummary & {
+  profile: CompanyProfile;
 };
 
 export type StockDetailsAPI = {

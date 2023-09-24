@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { StockSummary } from '@market-monitor/api-types';
+import { SymbolSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { StockTransformService } from '@market-monitor/modules/market-stocks/data-access';
 import { ShowStockDialogDirective } from '@market-monitor/modules/market-stocks/features';
@@ -102,7 +102,7 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
     super();
   }
 
-  onShowSummary(summary: StockSummary) {
+  onShowSummary(summary: SymbolSummary) {
     // show summary
     this.showStockDialogDirective.onShowSummary(summary.id);
   }

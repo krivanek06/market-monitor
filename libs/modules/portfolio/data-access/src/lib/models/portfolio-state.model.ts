@@ -1,4 +1,4 @@
-import { PortfolioHoldings, StockSummary } from '@market-monitor/api-types';
+import { PortfolioHoldings, SymbolSummary } from '@market-monitor/api-types';
 
 export type PortfolioState = {
   balance: number;
@@ -12,5 +12,5 @@ export type PortfolioHoldingsData = PortfolioHoldings & {
   // tech, finance, etc.
   sector: string;
   breakEvenPrice: number;
-  assetSummary: StockSummary;
+  assetSummary: SymbolSummary;
 };

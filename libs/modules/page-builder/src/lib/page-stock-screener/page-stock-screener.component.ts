@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
-import { StockScreenerValues, StockSummary } from '@market-monitor/api-types';
+import { StockScreenerValues, SymbolSummary } from '@market-monitor/api-types';
 import {
   STOCK_SCREENER_DEFAULT_VALUES,
   getScreenerInputIndexByKey,
@@ -99,7 +99,7 @@ export class PageStockScreenerComponent implements OnInit, RouterManagement {
     this.screenerFormControl.reset(STOCK_SCREENER_DEFAULT_VALUES);
   }
 
-  onSummaryClick(summary: StockSummary): void {
+  onSummaryClick(summary: SymbolSummary): void {
     this.showStockDialogDirective.onShowSummary(summary.id);
   }
 

@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MarketApiService } from '@market-monitor/api-client';
-import { StockSummary } from '@market-monitor/api-types';
+import { SymbolSummary } from '@market-monitor/api-types';
 import { ShowStockDialogDirective } from '@market-monitor/modules/market-stocks/features';
 import { StockSummaryTableComponent } from '@market-monitor/modules/market-stocks/ui';
 import { RangeDirective } from '@market-monitor/shared/ui';
@@ -37,7 +37,7 @@ export class PageMarketTopPerformersComponent {
   showStockDialogDirective = inject(ShowStockDialogDirective);
   marketTopPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance());
 
-  onSummaryClick(summary: StockSummary) {
+  onSummaryClick(summary: SymbolSummary) {
     this.showStockDialogDirective.onShowSummary(summary.id);
   }
 }

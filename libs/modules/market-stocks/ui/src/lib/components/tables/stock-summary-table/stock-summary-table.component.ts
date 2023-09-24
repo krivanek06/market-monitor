@@ -6,7 +6,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { StockSummary } from '@market-monitor/api-types';
+import { SymbolSummary } from '@market-monitor/api-types';
 import {
   DefaultImgDirective,
   LargeNumberFormatterPipe,
@@ -38,9 +38,9 @@ import {
   styleUrls: ['./stock-summary-table.component.scss'],
 })
 export class StockSummaryTableComponent {
-  @Output() itemClickedEmitter = new EventEmitter<StockSummary>();
+  @Output() itemClickedEmitter = new EventEmitter<SymbolSummary>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @Input({ required: true }) set stockSummaries(data: StockSummary[] | null) {
+  @Input({ required: true }) set stockSummaries(data: SymbolSummary[] | null) {
     this.dataSource = new MatTableDataSource(data ?? []);
     this.dataSource.paginator = this.paginator;
   }
@@ -53,7 +53,7 @@ export class StockSummaryTableComponent {
     this.displayInfoMobile.set(!this.displayInfoMobile());
   }
 
-  dataSource!: MatTableDataSource<StockSummary>;
+  dataSource!: MatTableDataSource<SymbolSummary>;
 
   displayedColumns: string[] = [
     'symbol',
@@ -73,9 +73,9 @@ export class StockSummaryTableComponent {
     'infoMobile',
   ];
 
-  identity: TrackByFunction<StockSummary> = (index: number, item: StockSummary) => item.id;
+  identity: TrackByFunction<SymbolSummary> = (index: number, item: SymbolSummary) => item.id;
 
-  onItemClicked(item: StockSummary): void {
+  onItemClicked(item: SymbolSummary): void {
     this.itemClickedEmitter.emit(item);
   }
 }

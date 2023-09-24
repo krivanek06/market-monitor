@@ -1,6 +1,6 @@
-import { StockDetailsAPI, StockSummary } from './stock-data.model';
+import { StockDetailsAPI, SymbolSummary } from './stock-data.model';
 
-export type StockDetails = StockSummary & StockDetailsAPI;
+export type StockDetails = SymbolSummary & StockDetailsAPI;
 
 export type StockMetricsHistoricalBasic = {
   dates: string[];

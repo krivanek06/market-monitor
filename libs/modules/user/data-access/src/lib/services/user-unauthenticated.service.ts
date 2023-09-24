@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { StocksApiService } from '@market-monitor/api-client';
-import { StockSummary } from '@market-monitor/api-types';
+import { SymbolSummary } from '@market-monitor/api-types';
 import { LocalStorageService } from '@market-monitor/shared/utils-client';
 import { BehaviorSubject, Observable, forkJoin, map } from 'rxjs';
 import { UserUnauthenticated } from '../models';
@@ -9,8 +9,8 @@ import { UserUnauthenticated } from '../models';
   providedIn: 'root',
 })
 export class UserUnauthenticatedService extends LocalStorageService<UserUnauthenticated> {
-  private favoriteStocks$ = new BehaviorSubject<StockSummary[]>([]);
-  private lastSearchedStocks$ = new BehaviorSubject<StockSummary[]>([]);
+  private favoriteStocks$ = new BehaviorSubject<SymbolSummary[]>([]);
+  private lastSearchedStocks$ = new BehaviorSubject<SymbolSummary[]>([]);
   private loadedData$ = new BehaviorSubject<boolean>(false);
 
   constructor(private stocksApiService: StocksApiService) {
@@ -26,7 +26,7 @@ export class UserUnauthenticatedService extends LocalStorageService<UserUnauthen
 
   // -----------------------------
 
-  getLastSearchedStocks(): Observable<StockSummary[]> {
+  getLastSearchedStocks(): Observable<SymbolSummary[]> {
     return this.lastSearchedStocks$.asObservable();
   }
 
@@ -72,7 +72,7 @@ export class UserUnauthenticatedService extends LocalStorageService<UserUnauthen
 
   // -----------------------------
 
-  getFavoriteStocks(): Observable<StockSummary[]> {
+  getFavoriteStocks(): Observable<SymbolSummary[]> {
     return this.favoriteStocks$.asObservable();
   }
 

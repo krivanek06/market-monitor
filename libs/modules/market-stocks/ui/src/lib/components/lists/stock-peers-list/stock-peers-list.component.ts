@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
-import { StockSummary } from '@market-monitor/api-types';
+import { SymbolSummary } from '@market-monitor/api-types';
 import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
 @Component({
@@ -20,10 +20,10 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockPeersListComponent {
-  @Output() clickedEmitter = new EventEmitter<StockSummary>();
-  @Input() peers: StockSummary[] = [];
+  @Output() clickedEmitter = new EventEmitter<SymbolSummary>();
+  @Input() peers: SymbolSummary[] = [];
 
-  onItemClick(summary: StockSummary) {
+  onItemClick(summary: SymbolSummary) {
     this.clickedEmitter.emit(summary);
   }
 }

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { StockSummary } from '@market-monitor/api-types';
+import { SymbolSummary } from '@market-monitor/api-types';
 import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
 @Component({
@@ -11,5 +11,5 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
   styleUrls: ['./summary-main-metrics.component.scss'],
 })
 export class SummaryMainMetricsComponent {
-  @Input({ required: true }) stockSummary!: StockSummary;
+  @Input({ required: true }) stockSummary!: SymbolSummary;
 }

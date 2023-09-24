@@ -5,7 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { StockSummary } from '@market-monitor/api-types';
+import { SymbolSummary } from '@market-monitor/api-types';
 import { UserUnauthenticatedService } from '@market-monitor/modules/user/data-access';
 import { ElementFocusDirective, QuoteItemComponent } from '@market-monitor/shared/ui';
 import { Observable, iif, startWith, switchMap } from 'rxjs';
@@ -41,7 +41,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
   /**
    * selected stock summary from StockSearchBasicComponent
    */
-  searchControl = new FormControl<StockSummary | null>(null);
+  searchControl = new FormControl<SymbolSummary | null>(null);
   showFavoriteStocks = new FormControl<boolean>(false, { nonNullable: true });
 
   overlayWidth = signal(0);
@@ -93,7 +93,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     this.overlayWidth.set(overlayWidth);
   }
 
-  onSummaryClick(summary: StockSummary) {
+  onSummaryClick(summary: SymbolSummary) {
     // weird bug: if we don't set isInputFocused to false, the overlay will not close
     this.overlayIsOpen.update((d) => ({ ...d, isInputFocused: false }));
 

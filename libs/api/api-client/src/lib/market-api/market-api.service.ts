@@ -12,9 +12,9 @@ import {
   MarketTopPerformanceSymbols,
   News,
   NewsTypes,
-  StockSummary,
   SymbolHistoricalPeriods,
   SymbolQuote,
+  SymbolSummary,
 } from '@market-monitor/api-types';
 import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ApiCacheService } from '../utils';
@@ -27,17 +27,17 @@ export class MarketApiService extends ApiCacheService {
     super();
   }
 
-  getSymbolSummaries(symbols: string[]): Observable<StockSummary[]> {
+  getSymbolSummaries(symbols: string[]): Observable<SymbolSummary[]> {
     if (symbols.length === 0) {
       return of([]);
     }
-    return this.getData<StockSummary[]>(
+    return this.getData<SymbolSummary[]>(
       `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`,
       this.validity3Min,
     ).pipe(catchError(() => []));
   }
 
-  getSymbolSummary(symbol: string): Observable<StockSummary | null> {
+  getSymbolSummary(symbol: string): Observable<SymbolSummary | null> {
     return this.getSymbolSummaries([symbol]).pipe(map((d) => d[0] ?? null));
   }
 

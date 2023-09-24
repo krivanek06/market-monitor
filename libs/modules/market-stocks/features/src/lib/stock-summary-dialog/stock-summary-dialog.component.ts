@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
-import { StockSummary } from '@market-monitor/api-types';
+import { SymbolSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { UserUnauthenticatedService } from '@market-monitor/modules/user/data-access';
 import { DefaultImgDirective, PriceChangeItemsComponent } from '@market-monitor/shared/ui';
@@ -33,7 +33,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSummaryDialogComponent {
-  stockSummarySignal = signal<StockSummary | null>(null);
+  stockSummarySignal = signal<SymbolSummary | null>(null);
   isSymbolInFavoriteSignal = toSignal(this.userUnauthenticatedService.isSymbolInFavoriteObs(this.data.symbol));
   symbolType = computed(() => {
     const summary = this.stockSummarySignal();

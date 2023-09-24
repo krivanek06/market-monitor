@@ -1,7 +1,7 @@
-import { MarketOverview, StockSummary } from '@market-monitor/api-types';
+import { MarketOverview, SymbolSummary } from '@market-monitor/api-types';
 import axios from 'axios';
 
-export const getSymbolSummaries = async (symbols: string[]): Promise<StockSummary[]> => {
+export const getSymbolSummaries = async (symbols: string[]): Promise<SymbolSummary[]> => {
   const url = `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`;
   const response = await fetch(url, {
     method: 'GET',
@@ -14,11 +14,11 @@ export const getSymbolSummaries = async (symbols: string[]): Promise<StockSummar
     console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
     return [];
   }
-  const data = (await response.json()) as StockSummary[];
+  const data = (await response.json()) as SymbolSummary[];
   return data;
 };
 
-export const getSymbolSummary = async (symbol: string): Promise<StockSummary | null> => {
+export const getSymbolSummary = async (symbol: string): Promise<SymbolSummary | null> => {
   return getSymbolSummaries([symbol]).then((d) => d[0] ?? null);
 };
 

@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { StocksApiService } from '@market-monitor/api-client';
-import { StockSummary } from '@market-monitor/api-types';
+import { SymbolSummary } from '@market-monitor/api-types';
 import { DefaultImgDirective, QuoteItemComponent, RangeDirective } from '@market-monitor/shared/ui';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 
@@ -51,9 +51,9 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
 
   StocksApiService = inject(StocksApiService);
   showLoadingIndicator = signal<boolean>(false);
-  options = signal<StockSummary[]>([]);
+  options = signal<SymbolSummary[]>([]);
 
-  onChange: (value: StockSummary) => void = () => {};
+  onChange: (value: SymbolSummary) => void = () => {};
   onTouched = () => {};
 
   constructor() {
@@ -84,12 +84,12 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
   }
 
   onStockSelect(event: MatAutocompleteSelectedEvent): void {
-    const stock = event.option.value as StockSummary;
+    const stock = event.option.value as SymbolSummary;
     this.onChange(stock);
     this.searchControl.setValue('', { emitEvent: true });
   }
 
-  displayProperty = (stock: StockSummary) => stock.id;
+  displayProperty = (stock: SymbolSummary) => stock.id;
 
   /*
     parent component adds value to child

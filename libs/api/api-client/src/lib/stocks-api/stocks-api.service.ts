@@ -10,10 +10,10 @@ import {
   StockMetricsHistoricalBasic,
   StockScreenerResults,
   StockScreenerValues,
-  StockSummary,
   SymbolHistoricalPeriods,
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
+  SymbolSummary,
 } from '@market-monitor/api-types';
 import { Observable, catchError, filter, forkJoin, map, mergeMap, of, reduce, switchMap, tap } from 'rxjs';
 import { ApiCacheService } from '../utils';
@@ -26,28 +26,28 @@ export class StocksApiService extends ApiCacheService {
     super();
   }
 
-  searchStockSummariesByPrefix(ticker: string): Observable<StockSummary[]> {
+  searchStockSummariesByPrefix(ticker: string): Observable<SymbolSummary[]> {
     if (!ticker) {
       return of([]);
     }
-    return this.getData<StockSummary[]>(
+    return this.getData<SymbolSummary[]>(
       `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${ticker}&isSearch=true`,
       this.validity10Min,
     ).pipe(map((summaries) => summaries.filter((d) => d.quote.marketCap !== 0)));
   }
 
-  getStockSummaries(symbols: string[]): Observable<StockSummary[]> {
+  getStockSummaries(symbols: string[]): Observable<SymbolSummary[]> {
     if (symbols.length === 0) {
       return of([]);
     }
 
-    return this.getData<StockSummary[]>(
+    return this.getData<SymbolSummary[]>(
       `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`,
       this.validity3Min,
     ).pipe(catchError(() => []));
   }
 
-  getStockSummary(symbol: string): Observable<StockSummary | null> {
+  getStockSummary(symbol: string): Observable<SymbolSummary | null> {
     return this.getStockSummaries([symbol]).pipe(map((d) => d[0]));
   }
 
@@ -63,7 +63,7 @@ export class StocksApiService extends ApiCacheService {
           throw new Error('Unable to get details for ETF');
         }
       }),
-      filter((d): d is StockSummary => !!d),
+      filter((d): d is SymbolSummary => !!d),
       switchMap((summary) =>
         this.getData<StockDetailsAPI>(
           `https://get-stock-data.krivanek1234.workers.dev/?type=stock-details&symbol=${symbol}`,
@@ -93,7 +93,7 @@ export class StocksApiService extends ApiCacheService {
     ).pipe(map((d) => d[0]));
   }
 
-  getStockScreening(screeningValue: StockScreenerValues): Observable<StockSummary[]> {
+  getStockScreening(screeningValue: StockScreenerValues): Observable<SymbolSummary[]> {
     return this.postData<StockScreenerResults[], StockScreenerValues>(
       'https://get-stock-screening.krivanek1234.workers.dev',
       screeningValue,
@@ -123,7 +123,7 @@ export class StocksApiService extends ApiCacheService {
       // sort by ID
       map((d) => d.slice().sort((a, b) => a.id.localeCompare(b.id))),
       // Combine all summaries into a single array and emit only once
-      reduce((acc, curr) => [...acc, ...curr], [] as StockSummary[]),
+      reduce((acc, curr) => [...acc, ...curr], [] as SymbolSummary[]),
     );
   }
 
