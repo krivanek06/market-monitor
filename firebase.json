@@ -14,8 +14,14 @@
   ],
   "functions": [
     {
-      "source": "dist/apps/market-monitor-cloud-functions",
-      "codebase": "market-monitor-cloud-functions",
+      "source": "dist/apps/cloud-functions",
+      "codebase": "cloud-functions",
+      "runtime": "nodejs18",
+      "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"]
+    },
+    {
+      "source": "dist/apps/cloud-functions-portfolio",
+      "codebase": "cloud-functions-portfolio",
       "runtime": "nodejs18",
       "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"]
     }

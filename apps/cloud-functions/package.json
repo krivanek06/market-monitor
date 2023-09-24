@@ -1,5 +1,5 @@
 {
-  "name": "market-monitor-cloud-functions",
+  "name": "cloud-functions",
   "version": "0.0.1",
   "description": "Firebase Functions package",
   "engines": {

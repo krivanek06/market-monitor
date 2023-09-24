@@ -1,13 +1,13 @@
 {
-  "name": "market-monitor-cloud-functions-e2e",
+  "name": "cloud-functions-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "implicitDependencies": ["market-monitor-cloud-functions"],
+  "implicitDependencies": ["cloud-functions"],
   "targets": {
     "e2e": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
       "options": {
-        "jestConfig": "apps/market-monitor-cloud-functions-e2e/jest.config.ts",
+        "jestConfig": "apps/cloud-functions-e2e/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -15,9 +15,7 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/market-monitor-cloud-functions-e2e/**/*.{js,ts}"
-        ]
+        "lintFilePatterns": ["apps/cloud-functions-e2e/**/*.{js,ts}"]
       }
     }
   }
