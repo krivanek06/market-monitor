@@ -1,26 +1,3 @@
-import { SymbolSummary } from './stock-data.model';
-
-export type PortfolioHoldings = {
-  symbol: string;
-  symbolType: SymbolType;
-  units: number;
-  invested: number;
-};
-
-export type PortfolioHoldingsData = PortfolioHoldings & {
-  // tech, finance, etc.
-  sector: string;
-  breakEvenPrice: number;
-  symbolSummary: SymbolSummary;
-};
-
-export type Portfolio = {
-  portfolioCash: number | null;
-  numberOfExecutedBuyTransactions: number;
-  numberOfExecutedSellTransactions: number;
-  transactionFees: number | null;
-};
-
 export type PortfolioRisk = {
   alpha: number;
   beta: number;
@@ -38,19 +15,40 @@ export type PortfolioGrowth = {
   ownedAssets: number;
 };
 
+export type PortfolioGrowthAssets = {
+  name: string;
+  data: [number, number][]; // [timestamp, value]
+};
+
+export type PortfolioTransactionType = 'BUY' | 'SELL';
+
 export type PortfolioTransaction = {
+  transactionId: string;
   userId: string;
-  data: {
-    itemId: string;
-    symbolType: SymbolType;
-    symbol: string;
-    units: number;
-    unitPrice: number;
-    date: string;
-    return: number | null;
-    returnChange: number | null;
-    transactionType: 'BUY' | 'SELL';
-  }[];
+  userPhotoURL: string;
+  userDisplayName: string;
+  symbolType: SymbolType;
+  symbol: string;
+  units: number;
+  unitPrice: number;
+  date: string;
+  returnValue: number;
+  returnChange: number;
+  transactionType: PortfolioTransactionType;
+  transactionFees: number;
+  // calculations
+  // invested = unitPrice * units
+};
+
+export type PortfolioTransactionCreate = {
+  userId: string;
+  symbol: string;
+  symbolType: SymbolType;
+  units: number;
+  date: string;
+  transactionType: PortfolioTransactionType;
+  /** User can add custom total value of this holding and not load from API */
+  customTotalValue?: number;
 };
 
 export type SymbolType = 'STOCK' | 'CRYPTO' | 'ETF' | 'FUND' | 'CURRENCY';

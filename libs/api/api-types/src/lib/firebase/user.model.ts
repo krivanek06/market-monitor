@@ -1,4 +1,4 @@
-import { Portfolio, PortfolioHoldings, SymbolType } from './portfolio.model';
+import { PortfolioTransaction, SymbolType } from './portfolio.model';
 
 export type UserAuthenticationType =
   | {
@@ -20,10 +20,13 @@ export enum UserAccountType {
 export type User = {
   id: string;
   personal: UserPersonalInfo;
-  holdings: PortfolioHoldings[];
-  groups: UserGroups;
+  groups: {
+    groupMember: string[];
+    groupOwner: string[];
+    groupInvitations: string[];
+    groupWatched: string[];
+  };
   settings: UserSettings;
-  portfolio: Portfolio;
   lastSearchedSymbols: {
     symbolType: SymbolType;
     symbol: string;
@@ -34,11 +37,12 @@ export type User = {
   }[];
 };
 
-export type UserGroups = {
-  groupMember: string[];
-  groupOwner: string[];
-  groupInvitations: string[];
-  groupWatched: string[];
+export type UserPortfolioTransaction = {
+  transactions: PortfolioTransaction[];
+  cashDeposit: {
+    date: string;
+    amount: number;
+  }[];
 };
 
 export type UserPersonalInfo = {
@@ -53,7 +57,21 @@ export type UserPersonalInfo = {
 };
 
 export type UserSettings = {
+  /**
+   * if true, for each buy/sell transaction, the system will check and adjust the cash on hand
+   * throw error if user doesn't have enough cash on hand on sell operation
+   */
   isPortfolioCashActive: boolean;
+  /**
+   * if true, for each transaction the system will calculate the transaction fees
+   */
+  isTransactionFeesActive: boolean;
+  /**
+   * if true, user will be able to create groups
+   */
   isCreatingGroupAllowed: boolean;
+  /**
+   * if true, other users will be able to find this user portfolio by searching
+   */
   isProfilePublic: boolean;
 };
