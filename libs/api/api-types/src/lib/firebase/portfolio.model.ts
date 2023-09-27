@@ -51,4 +51,9 @@ export type PortfolioTransactionCreate = {
   customTotalValue?: number;
 };
 
+export type PortfolioTransactionDelete = {
+  userId: string;
+  transactionId: string;
+};
+
 export type SymbolType = 'STOCK' | 'CRYPTO' | 'ETF' | 'FUND' | 'CURRENCY';

@@ -1,5 +1,6 @@
 import { getSymbolSummary } from '@market-monitor/api-external';
 import {
+  transactionDocumentRef,
   transactionsCollectionRef,
   userDocumentRef,
   userDocumentTransactionHistoryRef,
@@ -7,6 +8,7 @@ import {
 import {
   PortfolioTransaction,
   PortfolioTransactionCreate,
+  PortfolioTransactionDelete,
   SymbolSummary,
   User,
   UserPortfolioTransaction,
@@ -19,21 +21,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { TRANSACTION_FEE_PRCT } from '../model';
 
 /**
- * TODO user can have multiple documents in the collection of 'transactions', but limit only N (1000) items in one document
- *
- * TODO: create, read multiple, remove item from array, update item in array
  *
  */
 
 @Injectable()
 export class PortfolioTransactionsService {
-  // TODO: buy / sell transaction
-  //  todo: update user.holdings
-  // todo: maximum 1000 items in one document
-  // todo save transaction in user document & public transactions document - 2 places
-  // todo: check if user has activated transactionFees and
-  // todo: check if user has activated cash account
-  // todo: if selling - reduce 'invested' by the % of units sold
   async executeTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
     // get references
     const userDocRef = userDocumentRef(input.userId);
@@ -69,6 +61,42 @@ export class PortfolioTransactionsService {
 
     // return data
     return transaction;
+  }
+
+  async deleteTransactionOperation(input: PortfolioTransactionDelete): Promise<PortfolioTransaction> {
+    // get references
+    const userDocRef = userDocumentRef(input.userId);
+    const userTransactionHistoryRef = userDocumentTransactionHistoryRef(input.userId);
+    const publicTransactionRef = transactionDocumentRef(input.transactionId);
+
+    // get data
+    const [userDoc, userTransactionsDoc, removedTransactionDoc] = await Promise.all([
+      userDocRef.get(),
+      userTransactionHistoryRef.get(),
+      publicTransactionRef.get(),
+    ]);
+    const user = userDoc.data();
+    const userTransactions = userTransactionsDoc.data();
+    const removedTransaction = removedTransactionDoc.data();
+
+    if (!userTransactions || !removedTransaction) {
+      throw new Error('No transaction history found');
+    }
+
+    if (!user) {
+      throw new Error('No user found');
+    }
+
+    // remove transaction from public transactions collection
+    await publicTransactionRef.delete();
+
+    // remove transaction from user document
+    const transactions = userTransactions.transactions.filter((d) => d.transactionId !== input.transactionId);
+    await userTransactionHistoryRef.update({
+      transactions: transactions,
+    });
+
+    return removedTransaction;
   }
 
   private getCurrentInvestedFromTransactions(
@@ -216,11 +244,4 @@ export class PortfolioTransactionsService {
       }
     }
   }
-
-  // TODO remove transaction from public and from user
-  // TODO: if removing buy operation - increase cash on hand + remove from holdings
-  // TODO: if removing sell operation - decrease cash on hand + add from holdings
-  // todo: update number of executed transactions
-  // todo: update transaction fees
-  deleteTransactionOperation(userId: string, transactionId: string) {}
 }
