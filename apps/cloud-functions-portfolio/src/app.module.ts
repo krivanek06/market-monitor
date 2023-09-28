@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { PortfolioGrowthService } from './portfolio/portfolio-growth/portfolio-growth.service';
-import { PortfolioHoldingsService } from './portfolio/portfolio-holdings/portfolio-holdings.service';
-import { PortfolioRiskService } from './portfolio/portfolio-risk/portfolio-risk.service';
-import { PortfolioTransactionsService } from './portfolio/portfolio-transactions/portfolio-transactions.service';
-import { PortfolioController } from './portfolio/portfolio.controller';
+import { ApiService } from './api/api.service';
+import { PortfolioGrowthService } from './portfolio-growth/portfolio-growth.service';
+import { PortfolioRiskService } from './portfolio-risk/portfolio-risk.service';
+import { PortfolioTransactionsService } from './portfolio-transactions/portfolio-transactions.service';
+import { PortfolioController } from './portfolio.controller';
 
 @Module({
   controllers: [PortfolioController],
-  providers: [PortfolioRiskService, PortfolioHoldingsService, PortfolioGrowthService, PortfolioTransactionsService],
+  providers: [PortfolioRiskService, PortfolioGrowthService, PortfolioTransactionsService, ApiService],
 })
 export class AppModule {}

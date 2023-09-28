@@ -16,8 +16,15 @@ export type PortfolioGrowth = {
 };
 
 export type PortfolioGrowthAssets = {
-  name: string;
-  data: [number, number][]; // [timestamp, value]
+  symbol: string;
+  data: PortfolioGrowthAssetsDataItem[];
+};
+
+export type PortfolioGrowthAssetsDataItem = {
+  date: string;
+  price: number;
+  units: number;
+  totalValue: number;
 };
 
 export type PortfolioTransactionType = 'BUY' | 'SELL';

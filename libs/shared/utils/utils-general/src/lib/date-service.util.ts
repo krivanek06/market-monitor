@@ -133,7 +133,7 @@ export const dateFormatDateWithHours = (date: Date) => {
   return `${hours}:${minutes}, ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
 };
 
-export const generateDatesArray = (data: { year: number; month: number }): string[] => {
+export const generateDatesArrayForMonth = (data: { year: number; month: number }): string[] => {
   const startDate = startOfMonth(new Date(data.year, data.month - 1)); // month is zero-based
   const endDate = endOfMonth(startDate);
   const datesArray = eachDayOfInterval({ start: startDate, end: endDate });
@@ -157,7 +157,7 @@ export const fillOutMissingDatesForMonth = <T extends { date: string }>(
   // get the year and month of the element we are working
   const { year, month } = dateGetDetailsInformationFromDate(first.date);
 
-  const dateRange = generateDatesArray({ year, month });
+  const dateRange = generateDatesArrayForMonth({ year, month });
   const filteredDates = dateRange.filter((date) => !ignoreWeekend || !isWeekend(new Date(date)));
 
   // create empty object that will fill out the missing space

@@ -1,10 +1,3 @@
-import { getSymbolSummary } from '@market-monitor/api-external';
-import {
-  transactionDocumentRef,
-  transactionsCollectionRef,
-  userDocumentRef,
-  userDocumentTransactionHistoryRef,
-} from '@market-monitor/api-firebase';
 import {
   PortfolioTransaction,
   PortfolioTransactionCreate,
@@ -16,30 +9,19 @@ import {
 import { dateGetDetailsInformationFromDate, roundNDigits } from '@market-monitor/shared/utils-general';
 import { Injectable } from '@nestjs/common';
 import { isBefore, isValid, isWeekend } from 'date-fns';
-import { firestore } from 'firebase-admin';
 import { v4 as uuidv4 } from 'uuid';
-import { TRANSACTION_FEE_PRCT } from '../model';
-
-/**
- *
- */
+import { ApiService } from '../api/api.service';
 
 @Injectable()
 export class PortfolioTransactionsService {
+  constructor(private apiService: ApiService) {}
   async executeTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
-    // get references
-    const userDocRef = userDocumentRef(input.userId);
-    const userTransactionHistoryRef = userDocumentTransactionHistoryRef(input.userId);
-    const publicTransactionRef = transactionsCollectionRef();
-
     // get data
-    const [userDoc, userTransactionsDoc, symbolSummary] = await Promise.all([
-      userDocRef.get(),
-      userTransactionHistoryRef.get(),
-      getSymbolSummary(input.symbol),
+    const [user, userTransactions, symbolSummary] = await Promise.all([
+      this.apiService.getUser(input.userId),
+      this.apiService.getUserPortfolioTransaction(input.userId),
+      this.apiService.getSymbolSummary(input.symbol),
     ]);
-    const user = userDoc.data();
-    const userTransactions = userTransactionsDoc.data();
 
     // from previous transaction calculate invested and units - currently if I own that symbol
     const symbolHolding = this.getCurrentInvestedFromTransactions(input.symbol, userTransactions.transactions);
@@ -52,32 +34,22 @@ export class PortfolioTransactionsService {
     const transaction = this.createTransaction(input, user, symbolSummary, symbolHoldingBreakEvenPrice);
 
     // save transaction into public transactions collection
-    await publicTransactionRef.doc(transaction.transactionId).set(transaction);
+    await this.apiService.addPortfolioTransactionForPublic(transaction);
 
     // save transaction into user document
-    await userTransactionHistoryRef.update({
-      transactions: firestore.FieldValue.arrayUnion(transaction),
-    });
+    this.apiService.addPortfolioTransactionForUser(input.userId, transaction);
 
     // return data
     return transaction;
   }
 
   async deleteTransactionOperation(input: PortfolioTransactionDelete): Promise<PortfolioTransaction> {
-    // get references
-    const userDocRef = userDocumentRef(input.userId);
-    const userTransactionHistoryRef = userDocumentTransactionHistoryRef(input.userId);
-    const publicTransactionRef = transactionDocumentRef(input.transactionId);
-
     // get data
-    const [userDoc, userTransactionsDoc, removedTransactionDoc] = await Promise.all([
-      userDocRef.get(),
-      userTransactionHistoryRef.get(),
-      publicTransactionRef.get(),
+    const [user, userTransactions, removedTransaction] = await Promise.all([
+      this.apiService.getUserPortfolioTransaction(input.userId),
+      this.apiService.getUserPortfolioTransaction(input.userId),
+      this.apiService.getPortfolioTransactionForPublic(input.transactionId),
     ]);
-    const user = userDoc.data();
-    const userTransactions = userTransactionsDoc.data();
-    const removedTransaction = removedTransactionDoc.data();
 
     if (!userTransactions || !removedTransaction) {
       throw new Error('No transaction history found');
@@ -88,14 +60,12 @@ export class PortfolioTransactionsService {
     }
 
     // remove transaction from public transactions collection
-    await publicTransactionRef.delete();
+    await this.apiService.deletePortfolioTransactionForPublic(input.transactionId);
 
     // remove transaction from user document
-    const transactions = userTransactions.transactions.filter((d) => d.transactionId !== input.transactionId);
-    await userTransactionHistoryRef.update({
-      transactions: transactions,
-    });
+    await this.apiService.deletePortfolioTransactionForUser(input.userId, input.transactionId);
 
+    // return removed transaction
     return removedTransaction;
   }
 
@@ -131,6 +101,7 @@ export class PortfolioTransactionsService {
     const returnChange = isSell ? (unitPrice - breakEvenPrice) / breakEvenPrice : null;
 
     // transaction fees are 0.01% of the transaction value
+    const TRANSACTION_FEE_PRCT = 0.1;
     const transactionFeesCalc = isTransactionFeesActive ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
     const transactionFees = roundNDigits(transactionFeesCalc, 2);
 
