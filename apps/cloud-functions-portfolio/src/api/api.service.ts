@@ -7,6 +7,7 @@ import {
 import { PortfolioTransaction, SymbolSummary, User, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { Injectable } from '@nestjs/common';
 import { firestore } from 'firebase-admin';
+import { USER_NOT_NOT_FOUND_ERROR } from '../models';
 
 @Injectable()
 export class ApiService {
@@ -18,7 +19,7 @@ export class ApiService {
     const userDoc = await userDocumentRef(userId).get();
     const user = userDoc.data();
     if (!user) {
-      throw new Error('No user found');
+      throw new Error(USER_NOT_NOT_FOUND_ERROR);
     }
     return user;
   }

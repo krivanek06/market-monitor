@@ -47,6 +47,12 @@ export type PortfolioTransaction = {
   // invested = unitPrice * units
 };
 
+export type PortfolioTransactionCash = {
+  transactionId: string;
+  date: string;
+  amount: number;
+};
+
 export type PortfolioTransactionCreate = {
   userId: string;
   symbol: string;

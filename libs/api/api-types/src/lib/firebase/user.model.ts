@@ -1,4 +1,4 @@
-import { PortfolioTransaction, SymbolType } from './portfolio.model';
+import { PortfolioTransaction, PortfolioTransactionCash, SymbolType } from './portfolio.model';
 
 export type UserAuthenticationType =
   | {
@@ -39,10 +39,7 @@ export type User = {
 
 export type UserPortfolioTransaction = {
   transactions: PortfolioTransaction[];
-  cashDeposit: {
-    date: string;
-    amount: number;
-  }[];
+  cashDeposit: PortfolioTransactionCash[];
 };
 
 export type UserPersonalInfo = {

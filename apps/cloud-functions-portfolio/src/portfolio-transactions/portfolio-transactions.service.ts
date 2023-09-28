@@ -11,6 +11,13 @@ import { Injectable } from '@nestjs/common';
 import { isBefore, isValid, isWeekend } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiService } from '../api/api.service';
+import {
+  SYMBOL_NOT_FOUND_ERROR,
+  TRANSACTION_HISTORY_NOT_FOUND_ERROR,
+  TRANSACTION_INPUT_UNITS_INTEGER,
+  TRANSACTION_INPUT_UNITS_POSITIVE,
+  USER_NOT_NOT_FOUND_ERROR,
+} from '../models';
 
 @Injectable()
 export class PortfolioTransactionsService {
@@ -23,12 +30,12 @@ export class PortfolioTransactionsService {
       this.apiService.getSymbolSummary(input.symbol),
     ]);
 
+    // check data validity
+    this.executeTransactionOperationDataValidity(input, user, symbolSummary, userTransactions);
+
     // from previous transaction calculate invested and units - currently if I own that symbol
     const symbolHolding = this.getCurrentInvestedFromTransactions(input.symbol, userTransactions.transactions);
     const symbolHoldingBreakEvenPrice = roundNDigits(symbolHolding.invested / symbolHolding.units, 2);
-
-    // check data validity
-    this.executeTransactionOperationDataValidity(input, user, symbolSummary, userTransactions);
 
     // create transaction
     const transaction = this.createTransaction(input, user, symbolSummary, symbolHoldingBreakEvenPrice);
@@ -46,7 +53,7 @@ export class PortfolioTransactionsService {
   async deleteTransactionOperation(input: PortfolioTransactionDelete): Promise<PortfolioTransaction> {
     // get data
     const [user, userTransactions, removedTransaction] = await Promise.all([
-      this.apiService.getUserPortfolioTransaction(input.userId),
+      this.apiService.getUser(input.userId),
       this.apiService.getUserPortfolioTransaction(input.userId),
       this.apiService.getPortfolioTransactionForPublic(input.transactionId),
     ]);
@@ -56,7 +63,7 @@ export class PortfolioTransactionsService {
     }
 
     if (!user) {
-      throw new Error('No user found');
+      throw new Error(USER_NOT_NOT_FOUND_ERROR);
     }
 
     // remove transaction from public transactions collection
@@ -144,22 +151,27 @@ export class PortfolioTransactionsService {
   ): void {
     // throw error if no user
     if (!user) {
-      throw new Error('No user found');
+      throw new Error(USER_NOT_NOT_FOUND_ERROR);
     }
 
     // throw error if no transaction history
     if (!userTransactionHistory) {
-      throw new Error('No transaction history found');
+      throw new Error(TRANSACTION_HISTORY_NOT_FOUND_ERROR);
     }
 
     // negative units
     if (input.units <= 0) {
-      throw new Error('Units must be positive');
+      throw new Error(TRANSACTION_INPUT_UNITS_POSITIVE);
+    }
+
+    // check if units is integer
+    if (input.units % 1 !== 0) {
+      throw new Error(TRANSACTION_INPUT_UNITS_INTEGER);
     }
 
     // check if symbol exists
     if (!symbolSummary) {
-      throw new Error('Symbol not found');
+      throw new Error(SYMBOL_NOT_FOUND_ERROR);
     }
 
     // check if date is valid
