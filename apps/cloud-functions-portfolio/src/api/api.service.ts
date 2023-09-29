@@ -34,8 +34,8 @@ export class ApiService {
     return userTransactions;
   }
 
-  async addPortfolioTransactionForUser(userId: string, transaction: PortfolioTransaction): Promise<void> {
-    const userTransactionHistoryRef = userDocumentTransactionHistoryRef(userId);
+  async addPortfolioTransactionForUser(transaction: PortfolioTransaction): Promise<void> {
+    const userTransactionHistoryRef = userDocumentTransactionHistoryRef(transaction.userId);
 
     // save transaction into user document
     await userTransactionHistoryRef.update({

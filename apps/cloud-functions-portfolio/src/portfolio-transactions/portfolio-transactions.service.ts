@@ -12,11 +12,19 @@ import { isBefore, isValid, isWeekend } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiService } from '../api/api.service';
 import {
+  DATE_FUTURE,
+  DATE_INVALID_DATE,
+  DATE_TOO_OLD,
+  DATE_WEEKEND,
+  HISTORICAL_PRICE_RESTRICTION_YEARS,
   SYMBOL_NOT_FOUND_ERROR,
+  TRANSACTION_FEE_PRCT,
   TRANSACTION_HISTORY_NOT_FOUND_ERROR,
   TRANSACTION_INPUT_UNITS_INTEGER,
   TRANSACTION_INPUT_UNITS_POSITIVE,
+  USER_NOT_ENOUGH_CASH_ERROR,
   USER_NOT_NOT_FOUND_ERROR,
+  USER_NOT_UNITS_ON_HAND_ERROR,
 } from '../models';
 
 @Injectable()
@@ -44,7 +52,7 @@ export class PortfolioTransactionsService {
     await this.apiService.addPortfolioTransactionForPublic(transaction);
 
     // save transaction into user document
-    this.apiService.addPortfolioTransactionForUser(input.userId, transaction);
+    await this.apiService.addPortfolioTransactionForUser(transaction);
 
     // return data
     return transaction;
@@ -58,12 +66,12 @@ export class PortfolioTransactionsService {
       this.apiService.getPortfolioTransactionForPublic(input.transactionId),
     ]);
 
-    if (!userTransactions || !removedTransaction) {
-      throw new Error('No transaction history found');
-    }
-
     if (!user) {
       throw new Error(USER_NOT_NOT_FOUND_ERROR);
+    }
+
+    if (!userTransactions || !removedTransaction) {
+      throw new Error(TRANSACTION_HISTORY_NOT_FOUND_ERROR);
     }
 
     // remove transaction from public transactions collection
@@ -104,11 +112,10 @@ export class PortfolioTransactionsService {
     const unitPrice = symbolSummary.quote.price;
 
     const isSell = input.transactionType === 'SELL';
-    const returnValue = isSell ? (unitPrice - breakEvenPrice) * input.units : null;
-    const returnChange = isSell ? (unitPrice - breakEvenPrice) / breakEvenPrice : null;
+    const returnValue = isSell ? (unitPrice - breakEvenPrice) * input.units : 0;
+    const returnChange = isSell ? (unitPrice - breakEvenPrice) / breakEvenPrice : 0;
 
     // transaction fees are 0.01% of the transaction value
-    const TRANSACTION_FEE_PRCT = 0.1;
     const transactionFeesCalc = isTransactionFeesActive ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
     const transactionFees = roundNDigits(transactionFeesCalc, 2);
 
@@ -165,7 +172,7 @@ export class PortfolioTransactionsService {
     }
 
     // check if units is integer
-    if (input.units % 1 !== 0) {
+    if (input.symbolType !== 'CRYPTO' && !Number.isInteger(input.units)) {
       throw new Error(TRANSACTION_INPUT_UNITS_INTEGER);
     }
 
@@ -176,26 +183,26 @@ export class PortfolioTransactionsService {
 
     // check if date is valid
     if (!isValid(new Date(input.date))) {
-      throw new Error('Invalid date');
-    }
-
-    // do not allow selecting weekend for date
-    if (isWeekend(new Date(input.date))) {
-      throw new Error('Weekend as date is not allowed');
+      throw new Error(DATE_INVALID_DATE);
     }
 
     // prevent adding future holdings
     if (isBefore(new Date(), new Date(input.date))) {
-      throw new Error('Future date is not allowed');
+      throw new Error(DATE_FUTURE);
+    }
+
+    // do not allow selecting weekend for date
+    if (isWeekend(new Date(input.date))) {
+      throw new Error(DATE_WEEKEND);
     }
 
     // get year data form input and today
     const { year: inputYear } = dateGetDetailsInformationFromDate(input.date);
     const { year: todayYear } = dateGetDetailsInformationFromDate(new Date());
 
-    // prevent loading more than N year of asset data or future data - just in case
-    if (todayYear - inputYear > 10) {
-      throw new Error('Too old data');
+    // prevent loading more than N year of asset data - just in case
+    if (todayYear - inputYear > HISTORICAL_PRICE_RESTRICTION_YEARS) {
+      throw new Error(DATE_TOO_OLD);
     }
 
     // calculate total value
@@ -205,7 +212,7 @@ export class PortfolioTransactionsService {
     if (input.transactionType === 'BUY' && user.settings.isPortfolioCashActive) {
       const cashOnHand = userTransactionHistory.cashDeposit.reduce((acc, curr) => acc + curr.amount, 0);
       if (cashOnHand < totalValue) {
-        throw new Error('Error User - Not enough cash on hand');
+        throw new Error(USER_NOT_ENOUGH_CASH_ERROR);
       }
     }
 
@@ -213,9 +220,6 @@ export class PortfolioTransactionsService {
     if (input.transactionType === 'SELL') {
       // check if user has any holdings of that symbol
       const symbolTransactions = userTransactionHistory.transactions.filter((d) => d.symbol === input.symbol);
-      if (symbolTransactions.length === 0) {
-        throw new Error('Error User - No holding found');
-      }
 
       // calculate holding units
       const holdingUnits = symbolTransactions.reduce(
@@ -223,7 +227,7 @@ export class PortfolioTransactionsService {
         0,
       );
       if (holdingUnits < input.units) {
-        throw new Error('Error User - Not enough units on hand');
+        throw new Error(USER_NOT_UNITS_ON_HAND_ERROR);
       }
     }
   }

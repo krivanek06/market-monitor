@@ -7,3 +7,11 @@ export const testSymbolSummary_AAPL: SymbolSummary = {
     price: 100,
   },
 } as SymbolSummary;
+
+export const testSymbolSummary_MSFT: SymbolSummary = {
+  id: 'MSFT',
+  quote: {
+    symbol: 'MSFT',
+    price: 50,
+  },
+} as SymbolSummary;
