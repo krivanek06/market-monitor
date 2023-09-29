@@ -1,5 +1,11 @@
 import { createMock } from '@golevelup/ts-jest';
-import { PortfolioTransactionCreate, User } from '@market-monitor/api-types';
+import {
+  PortfolioTransaction,
+  PortfolioTransactionCreate,
+  User,
+  UserPortfolioTransaction,
+} from '@market-monitor/api-types';
+import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { Test, TestingModule } from '@nestjs/testing';
 import { addDays, format } from 'date-fns';
 import { when } from 'jest-when';
@@ -22,8 +28,8 @@ import {
   testSymbolSummary_MSFT,
   testTransactionCreate_BUY_AAPL_1,
   testTransaction_BUY_AAPL_1,
+  testTransaction_BUY_AAPL_2,
   testTransaction_BUY_MSFT_1,
-  userTestPortfolioTransaction1,
 } from './../models';
 import { PortfolioTransactionsService } from './portfolio-transactions.service';
 
@@ -43,6 +49,21 @@ describe('PortfolioCrudService', () => {
 
   // create test data
   const testUser = mockCreateUser();
+  const userTestPortfolioTransaction1 = {
+    cashDeposit: [
+      {
+        transactionId: '1',
+        amount: 2000,
+        date: '2020-01-01',
+      },
+      {
+        transactionId: '2',
+        amount: 4000,
+        date: '2020-01-14',
+      },
+    ],
+    transactions: [testTransaction_BUY_AAPL_1, testTransaction_BUY_AAPL_2],
+  } satisfies UserPortfolioTransaction;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -268,24 +289,19 @@ describe('PortfolioCrudService', () => {
         // act
         const result = await service.executeTransactionOperation(input);
 
+        const expectedResult = {
+          ...testTransaction_BUY_AAPL_1,
+          transactionFees: transactionFee,
+          transactionId: expect.any(String),
+          unitPrice: testSymbolSummary_AAPL.quote.price,
+        } satisfies PortfolioTransaction;
+
         // assert
-        expect(apiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
-          ...testTransaction_BUY_AAPL_1,
-          transactionFees: transactionFee,
-          transactionId: expect.any(String),
-        });
+        expect(apiServiceMock.addPortfolioTransactionForUser).toBeCalledWith(expectedResult);
 
-        expect(apiServiceMock.addPortfolioTransactionForPublic).toBeCalledWith({
-          ...testTransaction_BUY_AAPL_1,
-          transactionFees: transactionFee,
-          transactionId: expect.any(String),
-        });
+        expect(apiServiceMock.addPortfolioTransactionForPublic).toBeCalledWith(expectedResult);
 
-        expect(result).toEqual({
-          ...testTransaction_BUY_AAPL_1,
-          transactionFees: transactionFee,
-          transactionId: expect.any(String),
-        });
+        expect(result).toEqual(expectedResult);
       });
 
       it('should execute buy operation and not calculate transaction fee if user does not have isTransactionFeesActive ', async () => {
@@ -311,6 +327,7 @@ describe('PortfolioCrudService', () => {
           ...testTransaction_BUY_AAPL_1,
           transactionFees: 0,
           transactionId: expect.any(String),
+          unitPrice: testSymbolSummary_AAPL.quote.price,
         });
       });
 
@@ -325,6 +342,9 @@ describe('PortfolioCrudService', () => {
               isTransactionFeesActive: true,
             },
           } satisfies User);
+        when(apiServiceMock.getUserPortfolioTransaction)
+          .calledWith(testUser.id)
+          .mockResolvedValue(userTestPortfolioTransaction1);
 
         // arrange
         const input = {
@@ -333,16 +353,38 @@ describe('PortfolioCrudService', () => {
         } satisfies PortfolioTransactionCreate;
         const transactionFee = ((input.units * testSymbolSummary_AAPL.quote.price) / 100) * TRANSACTION_FEE_PRCT;
 
-        // act
-        await service.executeTransactionOperation(input);
+        const t0 = userTestPortfolioTransaction1.transactions[0];
+        const t1 = userTestPortfolioTransaction1.transactions[1];
+        const breakEvenPrice = roundNDigits(
+          (t0.unitPrice * t0.units + t1.unitPrice * t1.units) / (t0.units + t1.units),
+          2,
+        );
 
-        // assert
-        expect(apiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
-          ...testTransaction_BUY_AAPL_1,
+        const returnValue = roundNDigits((testSymbolSummary_AAPL.quote.price - breakEvenPrice) * input.units);
+        const returnChange = roundNDigits((testSymbolSummary_AAPL.quote.price - breakEvenPrice) / breakEvenPrice);
+
+        // act
+        const result = await service.executeTransactionOperation(input);
+
+        const expectedResult: PortfolioTransaction = {
+          date: input.date,
+          symbol: input.symbol,
+          units: input.units,
+          transactionType: input.transactionType,
+          userId: input.userId,
+          userPhotoURL: testUser.personal.photoURL,
+          userDisplayName: testUser.personal.displayName,
+          symbolType: input.symbolType,
+          unitPrice: testSymbolSummary_AAPL.quote.price,
           transactionFees: transactionFee,
           transactionId: expect.any(String),
-          transactionType: 'SELL',
-        });
+          returnChange: returnChange,
+          returnValue: returnValue,
+        };
+        // assert
+        expect(apiServiceMock.addPortfolioTransactionForUser).toBeCalledWith(expectedResult);
+        expect(apiServiceMock.addPortfolioTransactionForPublic).toBeCalledWith(expectedResult);
+        expect(result).toEqual(expectedResult);
       });
 
       it('should execute sell operation and calculate transaction fee if user does not have isTransactionFeesActive', async () => {
@@ -372,6 +414,9 @@ describe('PortfolioCrudService', () => {
           transactionFees: 0,
           transactionId: expect.any(String),
           transactionType: 'SELL',
+          unitPrice: testSymbolSummary_AAPL.quote.price,
+          returnChange: expect.any(Number),
+          returnValue: expect.any(Number),
         });
       });
     });

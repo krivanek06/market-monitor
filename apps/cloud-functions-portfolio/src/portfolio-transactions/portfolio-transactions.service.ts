@@ -112,8 +112,8 @@ export class PortfolioTransactionsService {
     const unitPrice = symbolSummary.quote.price;
 
     const isSell = input.transactionType === 'SELL';
-    const returnValue = isSell ? (unitPrice - breakEvenPrice) * input.units : 0;
-    const returnChange = isSell ? (unitPrice - breakEvenPrice) / breakEvenPrice : 0;
+    const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
+    const returnChange = isSell ? roundNDigits((unitPrice - breakEvenPrice) / breakEvenPrice) : 0;
 
     // transaction fees are 0.01% of the transaction value
     const transactionFeesCalc = isTransactionFeesActive ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;

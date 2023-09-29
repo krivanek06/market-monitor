@@ -1,4 +1,4 @@
-import { PortfolioTransaction, PortfolioTransactionCreate, UserPortfolioTransaction } from '@market-monitor/api-types';
+import { PortfolioTransaction, PortfolioTransactionCreate } from '@market-monitor/api-types';
 import { USER_TEST_1_ID } from './user-test.model';
 
 export const mockCreatePortfolioTransactionCreate = (
@@ -50,6 +50,7 @@ export const testTransaction_BUY_AAPL_1 = mockPortfolioTransaction({
   units: testTransactionCreate_BUY_AAPL_1.units,
   date: testTransactionCreate_BUY_AAPL_1.date,
   transactionType: testTransactionCreate_BUY_AAPL_1.transactionType,
+  unitPrice: 45.5,
 });
 
 export const testTransactionCreate_BUY_AAPL_2 = mockCreatePortfolioTransactionCreate({
@@ -63,6 +64,7 @@ export const testTransaction_BUY_AAPL_2 = mockPortfolioTransaction({
   units: testTransactionCreate_BUY_AAPL_2.units,
   date: testTransactionCreate_BUY_AAPL_2.date,
   transactionType: testTransactionCreate_BUY_AAPL_2.transactionType,
+  unitPrice: 123.21,
 });
 
 export const testTransactionCreate_BUY_MSFT_1 = mockCreatePortfolioTransactionCreate({
@@ -77,20 +79,5 @@ export const testTransaction_BUY_MSFT_1 = mockPortfolioTransaction({
   units: testTransactionCreate_BUY_MSFT_1.units,
   date: testTransactionCreate_BUY_MSFT_1.date,
   transactionType: testTransactionCreate_BUY_MSFT_1.transactionType,
+  unitPrice: 85.5,
 });
-
-export const userTestPortfolioTransaction1: UserPortfolioTransaction = {
-  cashDeposit: [
-    {
-      transactionId: '1',
-      amount: 2000,
-      date: '2020-01-01',
-    },
-    {
-      transactionId: '2',
-      amount: 4000,
-      date: '2020-01-14',
-    },
-  ],
-  transactions: [testTransaction_BUY_AAPL_1, testTransaction_BUY_AAPL_2],
-};
