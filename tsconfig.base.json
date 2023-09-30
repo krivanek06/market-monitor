@@ -25,11 +25,20 @@
       "@market-monitor/api-external": [
         "libs/api/api-external/src/index.ts"
       ],
+      "@market-monitor/api-firebase": [
+        "libs/api/api-firebase/src/index.ts"
+      ],
       "@market-monitor/api-types": [
         "libs/api/api-types/src/index.ts"
       ],
-      "@market-monitor/api-firebase": [
-        "libs/api/api-firebase/src/index.ts"
+      "@market-monitor/modules/authentication/data-access": [
+        "libs/modules/authentication/data-access/src/index.ts"
+      ],
+      "@market-monitor/modules/authentication/features": [
+        "libs/modules/authentication/features/src/index.ts"
+      ],
+      "@market-monitor/modules/authentication/ui": [
+        "libs/modules/authentication/ui/src/index.ts"
       ],
       "@market-monitor/modules/market-general/data-access": [
         "libs/modules/market-general/data-access/src/index.ts"
