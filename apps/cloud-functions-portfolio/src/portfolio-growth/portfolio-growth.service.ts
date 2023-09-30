@@ -12,6 +12,7 @@ import { ApiService } from '../api/api.service';
 @Injectable()
 export class PortfolioGrowthService {
   constructor(private apiService: ApiService) {}
+
   async getPortfolioGrowthAssetsByUserId(userId: string): Promise<PortfolioGrowthAssets[]> {
     // load data
     const userTransactions = await this.apiService.getUserPortfolioTransaction(userId);

@@ -1,4 +1,4 @@
-import { SymbolSummary, SymbolType } from '@market-monitor/api-types';
+import { PortfolioGrowthAssetsDataItem, SymbolSummary, SymbolType } from '@market-monitor/api-types';
 
 export type PortfolioState = {
   balance: number;
@@ -20,4 +20,9 @@ export type PortfolioStateHolding = {
   sector: string; // tech, finance, etc.
   // breakEvenPrice: number; // calculated
   symbolSummary: SymbolSummary;
+};
+
+export type PortfolioGrowth = Pick<PortfolioGrowthAssetsDataItem, 'investedValue' | 'marketTotalValue'> & {
+  date: string;
+  ownedAssets: number;
 };

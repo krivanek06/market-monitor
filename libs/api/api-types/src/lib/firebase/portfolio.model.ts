@@ -9,12 +9,6 @@ export type PortfolioRisk = {
   annualVolatilityPrct: number;
 };
 
-export type PortfolioGrowth = {
-  invested: number;
-  date: string;
-  ownedAssets: number;
-};
-
 export type PortfolioGrowthAssets = {
   symbol: string;
   data: PortfolioGrowthAssetsDataItem[];
