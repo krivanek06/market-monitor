@@ -22,9 +22,17 @@ export type PortfolioGrowthAssets = {
 
 export type PortfolioGrowthAssetsDataItem = {
   date: string;
-  price: number;
+  /**
+   * units * invested values - how much user invested in this asset
+   */
+  investedValue: number;
+  // breakEvenPrice - investedValue / units
   units: number;
-  totalValue: number;
+  /**
+   * units * price of the asset on day
+   */
+  marketTotalValue: number;
+  // price - marketTotalValue / units
 };
 
 export type PortfolioTransactionType = 'BUY' | 'SELL';

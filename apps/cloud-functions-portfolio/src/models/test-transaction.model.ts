@@ -1,5 +1,5 @@
 import { PortfolioTransaction, PortfolioTransactionCreate } from '@market-monitor/api-types';
-import { USER_TEST_1_ID } from './user-test.model';
+import { USER_TEST_1_ID } from './test-user.model';
 
 export const mockCreatePortfolioTransactionCreate = (
   input?: Partial<PortfolioTransactionCreate>,
@@ -41,7 +41,7 @@ export const mockPortfolioTransaction = (input?: Partial<PortfolioTransaction>):
 export const testTransactionCreate_BUY_AAPL_1 = mockCreatePortfolioTransactionCreate({
   symbol: 'AAPL',
   units: 10,
-  date: '2020-01-01',
+  date: '2023-09-04',
   transactionType: 'BUY',
 });
 
@@ -56,7 +56,7 @@ export const testTransaction_BUY_AAPL_1 = mockPortfolioTransaction({
 export const testTransactionCreate_BUY_AAPL_2 = mockCreatePortfolioTransactionCreate({
   symbol: 'AAPL',
   units: 5,
-  date: '2020-01-10',
+  date: '2023-09-11',
 });
 
 export const testTransaction_BUY_AAPL_2 = mockPortfolioTransaction({
@@ -70,7 +70,7 @@ export const testTransaction_BUY_AAPL_2 = mockPortfolioTransaction({
 export const testTransactionCreate_BUY_MSFT_1 = mockCreatePortfolioTransactionCreate({
   symbol: 'MSFT',
   units: 10,
-  date: '2020-01-01',
+  date: '2023-09-07',
   transactionType: 'BUY',
 });
 

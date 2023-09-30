@@ -1,16 +1,26 @@
-import { getSymbolSummary } from '@market-monitor/api-external';
+import { getPriceOnDateRange, getSymbolSummary } from '@market-monitor/api-external';
 import {
   transactionsCollectionRef,
   userDocumentRef,
   userDocumentTransactionHistoryRef,
 } from '@market-monitor/api-firebase';
-import { PortfolioTransaction, SymbolSummary, User, UserPortfolioTransaction } from '@market-monitor/api-types';
+import {
+  HistoricalPriceSymbol,
+  PortfolioTransaction,
+  SymbolSummary,
+  User,
+  UserPortfolioTransaction,
+} from '@market-monitor/api-types';
 import { Injectable } from '@nestjs/common';
 import { firestore } from 'firebase-admin';
 import { USER_NOT_NOT_FOUND_ERROR } from '../models';
 
 @Injectable()
 export class ApiService {
+  getPriceOnDateRange(symbol: string, dateStart: string, endDate: string): Promise<HistoricalPriceSymbol | null> {
+    return getPriceOnDateRange(symbol, dateStart, endDate);
+  }
+
   async getSymbolSummary(symbol: string): Promise<SymbolSummary> {
     return getSymbolSummary(symbol);
   }

@@ -1,4 +1,4 @@
-export const HISTORICAL_PRICE_RESTRICTION_YEARS = 10;
+export const HISTORICAL_PRICE_RESTRICTION_YEARS = 6;
 export const TRANSACTION_FEE_PRCT = 0.1;
 
 // user

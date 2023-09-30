@@ -109,7 +109,11 @@ export class PortfolioTransactionsService {
     breakEvenPrice: number,
   ): PortfolioTransaction {
     const isTransactionFeesActive = user.settings.isTransactionFeesActive;
-    const unitPrice = symbolSummary.quote.price;
+
+    // if custom total value is provided calculate unit price, else use API price
+    const unitPrice = input.customTotalValue
+      ? roundNDigits(input.customTotalValue / input.units)
+      : symbolSummary.quote.price;
 
     const isSell = input.transactionType === 'SELL';
     const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;

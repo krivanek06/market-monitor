@@ -331,6 +331,26 @@ describe('PortfolioCrudService', () => {
         });
       });
 
+      it('should execute operation with customTotalValue', async () => {
+        // arrange
+        const input = {
+          ...testTransactionCreate_BUY_AAPL_1,
+          customTotalValue: 1420,
+        } satisfies PortfolioTransactionCreate;
+
+        // act
+        await service.executeTransactionOperation(input);
+        const unitPrice = roundNDigits(input.customTotalValue / input.units, 2);
+
+        // assert
+        expect(apiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
+          ...testTransaction_BUY_AAPL_1,
+          transactionFees: expect.any(Number),
+          transactionId: expect.any(String),
+          unitPrice: unitPrice,
+        });
+      });
+
       it('should execute sell operation and calculate transaction fee if user has isTransactionFeesActive', async () => {
         // activate portfolio cash
         when(apiServiceMock.getUser)

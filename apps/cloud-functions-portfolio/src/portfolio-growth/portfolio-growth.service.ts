@@ -1,12 +1,12 @@
-import { getPriceOnDateRange } from '@market-monitor/api-external';
 import {
   HistoricalPrice,
   HistoricalPriceSymbol,
   PortfolioGrowthAssets,
   PortfolioGrowthAssetsDataItem,
 } from '@market-monitor/api-types';
+import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { Injectable } from '@nestjs/common';
-import { eachDayOfInterval, format, isBefore, isSameDay, subDays } from 'date-fns';
+import { format, isBefore, isSameDay, subDays } from 'date-fns';
 import { ApiService } from '../api/api.service';
 
 @Injectable()
@@ -14,13 +14,7 @@ export class PortfolioGrowthService {
   constructor(private apiService: ApiService) {}
   async getPortfolioGrowthAssetsByUserId(userId: string): Promise<PortfolioGrowthAssets[]> {
     // load data
-    const user = await this.apiService.getUser(userId);
     const userTransactions = await this.apiService.getUserPortfolioTransaction(userId);
-
-    // throw error if no user
-    if (!user) {
-      throw new Error('No user found');
-    }
 
     // from transactions get all distinct symbols with soonest date of transaction
     const transactionStart = userTransactions.transactions.reduce(
@@ -44,7 +38,9 @@ export class PortfolioGrowthService {
     // load historical prices for all holdings
     const yesterDay = format(subDays(new Date(), 1), 'yyyy-MM-dd');
     const historicalPricesPromise = await Promise.allSettled(
-      transactionStart.map((transaction) => getPriceOnDateRange(transaction.symbol, transaction.startDate, yesterDay)),
+      transactionStart.map((transaction) =>
+        this.apiService.getPriceOnDateRange(transaction.symbol, transaction.startDate, yesterDay),
+      ),
     );
 
     // get fulfilled promises or fulfilled promises with null
@@ -52,7 +48,8 @@ export class PortfolioGrowthService {
       .filter((d): d is PromiseRejectedResult => d.status === 'rejected' || d.value === null)
       .map((d) => d.reason);
 
-    console.warn('incorrectData', incorrectData);
+    // TODO: maybe use some logging service
+    console.log('incorrectData', incorrectData);
 
     // get fulfilled promises and create object with symbol as key
     const historicalPrices = historicalPricesPromise
@@ -64,7 +61,6 @@ export class PortfolioGrowthService {
     const distinctSymbols = transactionStart.map((d) => d.symbol);
 
     // create portfolio growth assets
-    // todo: this may be slow because of constant converting string to date ?
     const result: PortfolioGrowthAssets[] = distinctSymbols.map((symbol) => {
       // get all transactions for this symbol
       const symbolTransactions = userTransactions.transactions
@@ -77,37 +73,45 @@ export class PortfolioGrowthService {
       );
 
       // internal helper
-      const aggregator = { units: symbolTransactions[0].units, index: 0 };
+      const aggregator = {
+        units: symbolTransactions[0].units,
+        index: 0,
+        breakEvenPrice: symbolTransactions[0].unitPrice,
+      };
       const growthAssetItems = historicalPrices[symbol].slice(historicalPriceIndex).map((historicalPrice) => {
         // check if the next transaction data is before the date then increase index
         if (
-          !symbolTransactions[aggregator.index + 1] &&
-          isBefore(new Date(symbolTransactions[aggregator.index].date), new Date(historicalPrice.date))
+          !!symbolTransactions[aggregator.index + 1] &&
+          isSameDay(new Date(symbolTransactions[aggregator.index + 1].date), new Date(historicalPrice.date))
         ) {
           aggregator.index += 1;
-          aggregator.units += symbolTransactions[aggregator.index].units;
+          const nextTransaction = symbolTransactions[aggregator.index];
+          const isBuy = nextTransaction.transactionType === 'BUY';
+          // change break even price
+          aggregator.breakEvenPrice = isBuy
+            ? (aggregator.breakEvenPrice * aggregator.units + historicalPrice.close * nextTransaction.unitPrice) /
+              (aggregator.units + nextTransaction.units)
+            : aggregator.breakEvenPrice;
+
+          // add or subtract units depending on transaction type
+          aggregator.units += isBuy ? nextTransaction.units : -nextTransaction.units;
         }
 
         return {
-          price: historicalPrice.close,
+          investedValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice, 2),
           date: historicalPrice.date,
           units: aggregator.units,
-          totalValue: aggregator.units * historicalPrice.close,
+          marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close, 2),
         } satisfies PortfolioGrowthAssetsDataItem;
       });
 
+      const growthAssetsNonNullUnits = growthAssetItems.filter((d) => d.units > 0);
       return {
         symbol,
-        data: growthAssetItems,
+        data: growthAssetsNonNullUnits,
       } satisfies PortfolioGrowthAssets;
     });
 
     return result;
   }
-
-  private generateDatesArray = (start: string, end: string): string[] => {
-    const datesArray = eachDayOfInterval({ start: new Date(start), end: new Date(end) });
-    const datesArrayFormatted = datesArray.map((date) => format(date, 'yyyy-MM-dd'));
-    return datesArrayFormatted;
-  };
 }
