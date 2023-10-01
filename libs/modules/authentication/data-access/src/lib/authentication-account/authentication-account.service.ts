@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Auth, GoogleAuthProvider, User, signInWithPopup } from '@angular/fire/auth';
+import {
+  Auth,
+  GoogleAuthProvider,
+  User,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from '@angular/fire/auth';
 import { DocumentReference, Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
 import { UserAccountType, UserData, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
@@ -41,12 +48,13 @@ export class AuthenticationAccountService {
     );
   }
 
-  signIn() {
-    // todo
+  async signIn(email: string, password: string) {
+    const data = signInWithEmailAndPassword(this.auth, email, password);
+    console.log('sign in ', data);
   }
 
-  register() {
-    // todo
+  register(email: string, password: string) {
+    createUserWithEmailAndPassword(this.auth, email, password);
   }
 
   signInGoogle() {

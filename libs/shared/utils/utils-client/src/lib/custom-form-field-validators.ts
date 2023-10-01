@@ -2,7 +2,7 @@ import { AbstractControl, Validators } from '@angular/forms';
 
 export type CustomInputValidatorFn = (
   control: AbstractControl,
-  additionalData?: any
+  additionalData?: any,
 ) => {
   [errorName: string]: {
     errorText: string;
@@ -40,9 +40,7 @@ export const wholeNumberValidator: CustomInputValidatorFn = (control) => {
   return null;
 };
 
-export const maxLengthValidator = (
-  maxLength: number
-): CustomInputValidatorFn => {
+export const maxLengthValidator = (maxLength: number): CustomInputValidatorFn => {
   const maxLengthValidatorFn = Validators.maxLength(maxLength);
 
   return (control: AbstractControl) => {
@@ -60,9 +58,7 @@ export const maxLengthValidator = (
   };
 };
 
-export const minLengthValidator = (
-  maxLength: number
-): CustomInputValidatorFn => {
+export const minLengthValidator = (maxLength: number): CustomInputValidatorFn => {
   const minLengthValidatorFn = Validators.minLength(maxLength);
 
   return (control: AbstractControl) => {
@@ -138,8 +134,7 @@ export const phoneNumberFieldValidator: CustomInputValidatorFn = (control) => {
   return !isMatching
     ? {
         phoneNumber: {
-          errorText:
-            'The phone number can contain only numbers and characters *, + and #',
+          errorText: 'The phone number can contain only numbers and characters *, + and #',
         },
       }
     : null;

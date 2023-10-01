@@ -18,12 +18,10 @@ import {
   FormControl,
   FormControlName,
   FormsModule,
-  NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
   NgControl,
   ReactiveFormsModule,
   ValidationErrors,
-  Validator,
 } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -67,11 +65,6 @@ import { DefaultImgDirective } from '../../../directives';
       useExisting: forwardRef(() => FormMatInputWrapperComponent),
       multi: true,
     },
-    {
-      provide: NG_VALIDATORS,
-      useExisting: FormMatInputWrapperComponent,
-      multi: true,
-    },
   ],
   styles: [
     `
@@ -89,7 +82,7 @@ import { DefaultImgDirective } from '../../../directives';
     `,
   ],
 })
-export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, ControlValueAccessor, Validator {
+export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, ControlValueAccessor {
   @Input({ required: true }) inputCaption!: string;
   @Input() prefixIcon?: string;
   @Input() inputType: InputTypeEnum | InputType = 'TEXT';
@@ -163,16 +156,6 @@ export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, C
       return null;
     }
     return this.parentFormControl.errors;
-  }
-
-  /**
-   *
-   * emit event when validator changes on parent form control
-   *
-   * @param fn
-   */
-  registerOnValidatorChange?(fn: () => void): void {
-    // throw new Error('Method not implemented.');
   }
 
   onSelectChange(inputSource: InputSource<T>, e: MatOptionSelectionChange) {
