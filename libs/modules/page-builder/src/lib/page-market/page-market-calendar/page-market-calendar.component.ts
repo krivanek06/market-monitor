@@ -28,7 +28,7 @@ import {
 import { DialogServiceModule } from '@market-monitor/shared/utils-client';
 import {
   fillOutMissingDatesForMonth,
-  generateDatesArray,
+  generateDatesArrayForMonth,
   groupValuesByDate,
 } from '@market-monitor/shared/utils-general';
 import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs';
@@ -93,7 +93,7 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
   datesInMonthSignal = toSignal(
     this.currentDateRangeControl.valueChanges.pipe(
       startWith(this.currentDateRangeControl.value),
-      map((d) => generateDatesArray(d).length),
+      map((d) => generateDatesArrayForMonth(d).length),
     ),
   );
 

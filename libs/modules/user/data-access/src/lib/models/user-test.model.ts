@@ -1,6 +1,6 @@
-import { User, UserAccountType } from '@market-monitor/api-types';
+import { UserAccountType, UserData } from '@market-monitor/api-types';
 
-export const mockUser: User = {
+export const mockUser: UserData = {
   id: '1',
   groups: {
     groupInvitations: [],

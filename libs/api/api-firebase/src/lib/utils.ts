@@ -5,7 +5,7 @@ import { firestore } from 'firebase-admin';
  *
  * @returns
  */
-export const assignTypes = <T extends object>() => {
+export const assignTypesServer = <T extends object>() => {
   return {
     toFirestore(doc: T): firestore.DocumentData {
       return doc;

@@ -1,4 +1,4 @@
-import { HistoricalPrice, MarketOverview, SymbolSummary } from '@market-monitor/api-types';
+import { HistoricalPrice, HistoricalPriceSymbol, MarketOverview, SymbolSummary } from '@market-monitor/api-types';
 import axios from 'axios';
 
 export const getSymbolSummaries = async (symbols: string[]): Promise<SymbolSummary[]> => {
@@ -26,7 +26,7 @@ export const getPriceOnDateRange = async (
   symbol: string,
   dateStart: string,
   endDate: string,
-): Promise<HistoricalPrice[]> => {
+): Promise<HistoricalPriceSymbol | null> => {
   const url = `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&dateStart=${dateStart}&endDate=${endDate}&type=dateRange`;
   const response = await fetch(url, {
     method: 'GET',
@@ -37,10 +37,10 @@ export const getPriceOnDateRange = async (
 
   if (!response.ok) {
     console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
-    return [];
+    return null;
   }
   const data = (await response.json()) as HistoricalPrice[];
-  return data;
+  return { symbol, data };
 };
 
 export const postMarketOverview = async (overview: MarketOverview): Promise<string> => {

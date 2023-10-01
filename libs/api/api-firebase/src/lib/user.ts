@@ -1,6 +1,16 @@
-import { User } from '@market-monitor/api-types';
+import { UserData, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
-import { assignTypes } from './utils';
+import { assignTypesServer } from './utils';
 
-export const usersCollectionRef = firestore().collection('users');
-export const userDocumentRef = (userId: string) => usersCollectionRef.doc(userId).withConverter(assignTypes<User>());
+export const usersCollectionRef = () => firestore().collection('users').withConverter(assignTypesServer<UserData>());
+
+export const userDocumentRef = (userId: string) =>
+  usersCollectionRef().doc(userId).withConverter(assignTypesServer<UserData>());
+
+export const userCollectionMoreInformationRef = (userId: string) =>
+  userDocumentRef(userId).collection('more_information');
+
+export const userDocumentTransactionHistoryRef = (userId: string) =>
+  userCollectionMoreInformationRef(userId)
+    .doc('transactions')
+    .withConverter(assignTypesServer<UserPortfolioTransaction>());

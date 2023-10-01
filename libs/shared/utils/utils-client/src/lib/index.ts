@@ -1,3 +1,4 @@
+export * from './assign-type-client';
 export * from './chart-helpers.util';
 export * from './custom-form-field-validators';
 export * from './dialogs';
