@@ -1,1 +1,1 @@
-export * from './lib/modules-authentication-ui.module';
+export * from './lib/components';

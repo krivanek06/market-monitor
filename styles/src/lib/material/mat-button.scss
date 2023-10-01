@@ -28,6 +28,14 @@ button[mat-stroked-button] {
   &.mat-primary {
     border: 1px solid var(--primary) !important;
   }
+
+  &.mat-warn {
+    border: 1px solid var(--danger) !important;
+  }
+
+  &.mat-accent {
+    border: 1px solid var(--success) !important;
+  }
 }
 
 button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {

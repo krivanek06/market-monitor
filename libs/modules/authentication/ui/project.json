@@ -2,15 +2,13 @@
   "name": "modules-authentication-ui",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/modules/authentication/ui/src",
-  "prefix": "market-monitor",
+  "prefix": "app",
   "tags": [],
   "projectType": "library",
   "targets": {
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "libs/modules/authentication/ui/jest.config.ts",
         "passWithNoTests": true
@@ -24,14 +22,9 @@
     },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/modules/authentication/ui/**/*.ts",
-          "libs/modules/authentication/ui/**/*.html"
-        ]
+        "lintFilePatterns": ["libs/modules/authentication/ui/**/*.ts", "libs/modules/authentication/ui/**/*.html"]
       }
     }
   }

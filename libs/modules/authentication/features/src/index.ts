@@ -1,1 +1,1 @@
-export * from './lib/modules-authentication-features.module';
+export * from './lib/authentication-form/authentication-form.component';

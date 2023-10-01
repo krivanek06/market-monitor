@@ -1,1 +1,2 @@
-export * from './lib/modules-authentication-data-access.module';
+export * from './lib/authentication-account/authentication-account.service';
+export * from './lib/model';
