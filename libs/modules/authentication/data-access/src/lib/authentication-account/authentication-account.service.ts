@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { GoogleAuthProvider, User, getAuth, signInWithPopup } from '@angular/fire/auth';
-import { DocumentReference, collection, doc, getFirestore, setDoc } from '@angular/fire/firestore';
+import { Auth, GoogleAuthProvider, User, signInWithPopup } from '@angular/fire/auth';
+import { DocumentReference, Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
 import { UserAccountType, UserData, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { docData as rxDocData } from 'rxfire/firestore';
-import { BehaviorSubject, Observable, map, take } from 'rxjs';
+import { BehaviorSubject, Observable, filter, map, take } from 'rxjs';
 import { createNewUser } from '../model';
 
 @Injectable({
@@ -12,19 +12,33 @@ import { createNewUser } from '../model';
 })
 export class AuthenticationAccountService {
   private authenticatedUser$ = new BehaviorSubject<UserData | null>(null);
-  private auth = getAuth();
-  private db = getFirestore();
+  private loadingAuthentication$ = new BehaviorSubject<boolean>(false);
 
-  constructor() {}
-
-  getAuthenticatedUser(): void {
-    //const auth = getAuth();
-    const user = this.auth.currentUser;
-    console.log(user);
+  constructor(
+    private auth: Auth,
+    private firestore: Firestore,
+  ) {
+    this.initAuthenticationUser();
   }
 
-  getToken() {
-    // todo
+  getLoadingAuthentication(): Observable<boolean> {
+    return this.loadingAuthentication$.asObservable();
+  }
+
+  getCurrentUser(): Observable<User | null> {
+    return this.loadingAuthentication$.pipe(
+      filter((loading) => !!loading),
+      map(() => this.auth.currentUser),
+      take(1),
+    );
+  }
+
+  getCurrentUserData(): Observable<UserData | null> {
+    return this.loadingAuthentication$.pipe(
+      filter((loading) => !!loading),
+      map(() => this.authenticatedUser$.value),
+      take(1),
+    );
   }
 
   signIn() {
@@ -35,22 +49,13 @@ export class AuthenticationAccountService {
     // todo
   }
 
-  async signInGoogle() {
+  signInGoogle() {
     const provider = new GoogleAuthProvider();
-    const credentials = await signInWithPopup(this.auth, provider);
-    this.getUserFromFirestoreUser(credentials.user)
-      .pipe(take(1))
-      .subscribe((userData) => {
-        console.log('login', userData);
-        this.authenticatedUser$.next(userData);
-      });
-    // this.authenticatedUser$.next(user);
-    console.log('credentials', credentials);
-    // console.log('user', user);
+    signInWithPopup(this.auth, provider);
   }
 
   signOut() {
-    // todo
+    this.auth.signOut();
   }
 
   changePassword() {
@@ -59,6 +64,25 @@ export class AuthenticationAccountService {
 
   resetPassword() {
     // todo
+  }
+
+  private initAuthenticationUser(): void {
+    this.auth.onAuthStateChanged((user) => {
+      console.log('authentication state change', user);
+      if (user) {
+        this.getUserFromFirestoreUser(user)
+          .pipe(take(1))
+          .subscribe((userData) => {
+            console.log('login', userData);
+            this.authenticatedUser$.next(userData);
+            this.loadingAuthentication$.next(true);
+          });
+      } else {
+        // logout
+        this.authenticatedUser$.next(null);
+        this.loadingAuthentication$.next(true);
+      }
+    });
   }
 
   private getUserFromFirestoreUser(user: User): Observable<UserData> {
@@ -100,12 +124,12 @@ export class AuthenticationAccountService {
   }
 
   private getUserPortfolioTransactionDocRef(userId: string): DocumentReference<UserPortfolioTransaction> {
-    return doc(this.db, 'users', userId, 'more_information', 'transactions').withConverter(
+    return doc(this.firestore, 'users', userId, 'more_information', 'transactions').withConverter(
       assignTypesClient<UserPortfolioTransaction>(),
     );
   }
 
   private getUserDocRef(userId: string): DocumentReference<UserData> {
-    return doc(collection(this.db, 'users').withConverter(assignTypesClient<UserData>()), userId);
+    return doc(collection(this.firestore, 'users').withConverter(assignTypesClient<UserData>()), userId);
   }
 }

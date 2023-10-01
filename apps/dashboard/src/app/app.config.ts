@@ -13,7 +13,6 @@ import {
 } from '@angular/router';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
-
 export const appConfig: ApplicationConfig = {
   providers: [
     importProvidersFrom([
@@ -34,5 +33,11 @@ export const appConfig: ApplicationConfig = {
       withPreloading(PreloadAllModules),
     ),
     provideAnimations(),
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: () => () => {},
+    //   deps: [AngularFireModule],
+    //   multi: true,
+    // },
   ],
 };

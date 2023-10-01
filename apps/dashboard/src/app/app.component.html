@@ -1,1 +1,11 @@
-<router-outlet></router-outlet>
+<div
+  *ngIf="!loadingAuthenticationSignal(); else showRoutes"
+  class="grid w-full h-full gap-4 place-content-center place-items-center"
+>
+  <mat-spinner diameter="140"></mat-spinner>
+  <div class="text-lg text-wt-gray-medium">Checking Authentication</div>
+</div>
+
+<ng-template #showRoutes>
+  <router-outlet></router-outlet>
+</ng-template>

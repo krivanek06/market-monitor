@@ -1,5 +1,7 @@
+import { inject } from '@angular/core';
 import { Route } from '@angular/router';
-import { MenuComponent } from './menu/menu.component';
+import { AuthenticationAccountService } from '@market-monitor/modules/authentication/data-access';
+import { map, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
   {
@@ -7,7 +9,13 @@ export const appRoutes: Route[] = [
     children: [
       {
         path: '',
-        component: MenuComponent,
+        loadComponent: () => import('./menu/menu.component').then((m) => m.MenuComponent),
+        canMatch: [
+          () =>
+            inject(AuthenticationAccountService)
+              .getCurrentUserData()
+              .pipe(map((userData) => (!!userData ? true : false))),
+        ],
         children: [
           {
             path: '',
@@ -33,8 +41,17 @@ export const appRoutes: Route[] = [
         ],
       },
       {
-        path: 'login',
+        path: '',
         loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
+        canMatch: [
+          () =>
+            inject(AuthenticationAccountService)
+              .getCurrentUserData()
+              .pipe(
+                tap((x) => console.log('login guard', x)),
+                map((userData) => (!userData ? true : false)),
+              ),
+        ],
       },
     ],
   },
