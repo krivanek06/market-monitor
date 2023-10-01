@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Firestore } from '@angular/fire/firestore';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -9,5 +10,6 @@ import { RouterModule } from '@angular/router';
   styles: [''],
 })
 export class AppComponent {
+  constructor(firestore: Firestore) {}
   title = 'market-monitor-dashboard';
 }

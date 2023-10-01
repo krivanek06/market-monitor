@@ -1,15 +1,5 @@
 import { PortfolioTransaction, PortfolioTransactionCash, SymbolType } from './portfolio.model';
 
-export type UserAuthenticationType =
-  | {
-      authenticationType: 'GOOGLE';
-      token: string;
-    }
-  | {
-      authenticationType: 'BASIC_AUTH';
-      password: string;
-    };
-
 export enum UserAccountType {
   TEST = 'TEST',
   ADMIN = 'ADMIN',
@@ -17,7 +7,7 @@ export enum UserAccountType {
   ACCOUNT_TYPE_1 = 'ACCOUNT_TYPE_1',
 }
 
-export type User = {
+export type UserData = {
   id: string;
   personal: UserPersonalInfo;
   groups: {
@@ -43,14 +33,9 @@ export type UserPortfolioTransaction = {
 };
 
 export type UserPersonalInfo = {
-  authentication: UserAuthenticationType;
   accountType: UserAccountType;
-  accountCreated: string;
-  lastSignIn: string;
-  email: string | null;
   photoURL: string | null;
   displayName: string | null;
-  isVerified: boolean;
 };
 
 export type UserSettings = {

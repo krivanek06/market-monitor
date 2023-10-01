@@ -1,9 +1,9 @@
 import { PortfolioTransaction } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
-import { assignTypes } from './utils';
+import { assignTypesServer } from './utils';
 
 export const transactionsCollectionRef = () =>
-  firestore().collection('transactions').withConverter(assignTypes<PortfolioTransaction>());
+  firestore().collection('transactions').withConverter(assignTypesServer<PortfolioTransaction>());
 
 export const transactionDocumentRef = (transactionId: string) =>
-  transactionsCollectionRef().doc(transactionId).withConverter(assignTypes<PortfolioTransaction>());
+  transactionsCollectionRef().doc(transactionId).withConverter(assignTypesServer<PortfolioTransaction>());
