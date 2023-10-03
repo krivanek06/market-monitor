@@ -14,7 +14,7 @@ import { sideNavigation } from './menu-routing.model';
   styles: [
     `
       :host {
-        @apply block;
+        @apply block h-full;
       }
     `,
   ],

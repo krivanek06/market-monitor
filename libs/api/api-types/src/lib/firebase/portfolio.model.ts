@@ -1,3 +1,5 @@
+import { SymbolType } from './symbol.model';
+
 export type PortfolioRisk = {
   alpha: number;
   beta: number;
@@ -70,5 +72,3 @@ export type PortfolioTransactionDelete = {
   userId: string;
   transactionId: string;
 };
-
-export type SymbolType = 'STOCK' | 'CRYPTO' | 'ETF' | 'FUND' | 'CURRENCY';

@@ -1,4 +1,5 @@
-import { StockDetailsAPI, SymbolSummary } from './stock-data.model';
+import { StockDetailsAPI } from './stock-data.model';
+import { SymbolSummary } from './symbol.model';
 
 export type StockDetails = SymbolSummary & StockDetailsAPI;
 

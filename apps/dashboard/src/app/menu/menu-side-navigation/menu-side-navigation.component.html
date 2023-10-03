@@ -1,4 +1,4 @@
-<div class="flex items-center gap-2 p-6 mt-3 mb-4">
+<div class="flex items-center gap-2 p-6 pt-10 mb-4">
   <!-- avatar -->
   <div class="w-10 h-10 rounded-full bg-slate-200"></div>
   <!-- name -->
@@ -7,11 +7,25 @@
 
 <!-- main navigation -->
 <div class="flex flex-col">
-  <div class="mb-2 ml-5">Main</div>
+  <div class="mb-2 ml-4">Main</div>
+  <ng-container
+    *ngTemplateOutlet="navigationBlock; context: { navigation: sideNavigation.mainNavigation }"
+  ></ng-container>
+</div>
 
+<!-- main navigation -->
+<div class="flex flex-col mt-10">
+  <div class="mb-2 ml-4">Market</div>
+  <ng-container
+    *ngTemplateOutlet="navigationBlock; context: { navigation: sideNavigation.marketNavigation }"
+  ></ng-container>
+</div>
+
+<!-- navigation helper -->
+<ng-template #navigationBlock let-navigation="navigation">
   <div class="grid gap-2">
     <a
-      *ngFor="let main of sideNavigation.mainNavigation"
+      *ngFor="let main of navigation"
       [routerLink]="main.path"
       routerLinkActive="bg-wt-gray-light-strong text-wt-primary"
       (click)="onNavigationClick(main.path)"
@@ -22,7 +36,7 @@
     >
       <div *ngIf="selectedNavigationPath === main.path" class="w-3 h-full bg-wt-primary"></div>
       <mat-icon>{{ main.icon }}</mat-icon>
-      <div class="text-base">{{ main.title }}</div>
+      <div class="text-base">{{ main.title | titlecase }}</div>
     </a>
   </div>
-</div>
+</ng-template>

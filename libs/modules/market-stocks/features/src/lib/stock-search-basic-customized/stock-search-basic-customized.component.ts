@@ -1,14 +1,18 @@
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, Optional, ViewChild, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SymbolSummary } from '@market-monitor/api-types';
-import { UserUnauthenticatedService } from '@market-monitor/modules/user/data-access';
+import {
+  AUTHENTICATION_ACCOUNT_TOKEN,
+  AuthenticationAccountService,
+} from '@market-monitor/modules/authentication/data-access';
+import { SymbolFavoriteService, SymbolSearchService } from '@market-monitor/modules/market-stocks/data-access';
 import { ElementFocusDirective, QuoteItemComponent } from '@market-monitor/shared/ui';
-import { Observable, iif, startWith, switchMap } from 'rxjs';
+import { iif, startWith, switchMap } from 'rxjs';
 import { ShowStockDialogDirective } from '../show-stock-dialog.directive/show-stock-dialog.directive';
 import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-basic.component';
 
@@ -49,9 +53,23 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     isInputFocused: false,
     inputHasValue: false,
   });
-  userUnauthenticatedService = inject(UserUnauthenticatedService);
+  isUserAuthenticatedSignal = signal(false);
+  symbolFavoriteService = inject(SymbolFavoriteService);
+  symbolSearchService = inject(SymbolSearchService);
   showStockSummaryDirective = inject(ShowStockDialogDirective);
-  isStockSummaryLoaded$: Observable<boolean> = this.userUnauthenticatedService.isDataLoaded();
+
+  constructor(
+    @Inject(AUTHENTICATION_ACCOUNT_TOKEN)
+    @Optional()
+    private authenticationAccountService: AuthenticationAccountService,
+  ) {
+    // Authentication may not exists when app is available in public
+    if (this.authenticationAccountService) {
+      this.authenticationAccountService?.isAuthenticationLoaded().subscribe((isAuthenticationLoaded) => {
+        this.isUserAuthenticatedSignal.set(isAuthenticationLoaded);
+      });
+    }
+  }
 
   /**
    * display stock summaries based on whether showFavoriteStocks is true or false
@@ -62,8 +80,8 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
       switchMap((showFavoriteStocks) =>
         iif(
           () => showFavoriteStocks,
-          this.userUnauthenticatedService.getFavoriteStocks(),
-          this.userUnauthenticatedService.getLastSearchedStocks(),
+          this.symbolFavoriteService.getFavoriteSymbols(),
+          this.symbolSearchService.getSearchedSymbols(),
         ),
       ),
     ),
@@ -72,7 +90,10 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
   ngOnInit(): void {
     this.searchControl.valueChanges.subscribe((value) => {
       if (value) {
-        this.userUnauthenticatedService.addSearchStock(value.id);
+        this.symbolSearchService.addSearchedSymbol({
+          symbolType: 'STOCK',
+          symbol: value.id,
+        });
         this.onSummaryClick(value);
       }
     });

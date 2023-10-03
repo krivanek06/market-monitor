@@ -11,6 +11,10 @@ import {
   withInMemoryScrolling,
   withPreloading,
 } from '@angular/router';
+import {
+  AUTHENTICATION_ACCOUNT_TOKEN,
+  AuthenticationAccountService,
+} from '@market-monitor/modules/authentication/data-access';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 export const appConfig: ApplicationConfig = {
@@ -39,5 +43,9 @@ export const appConfig: ApplicationConfig = {
     //   deps: [AngularFireModule],
     //   multi: true,
     // },
+    {
+      provide: AUTHENTICATION_ACCOUNT_TOKEN,
+      useExisting: AuthenticationAccountService,
+    },
   ],
 };

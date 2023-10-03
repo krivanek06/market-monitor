@@ -16,6 +16,7 @@ export const appRoutes: Route[] = [
               .getCurrentUserData()
               .pipe(map((userData) => (!!userData ? true : false))),
         ],
+        //canMatch: [() => false],
         children: [
           {
             path: '',
@@ -52,6 +53,7 @@ export const appRoutes: Route[] = [
                 map((userData) => (!userData ? true : false)),
               ),
         ],
+        //canMatch: [() => true],
       },
     ],
   },

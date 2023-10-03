@@ -1,4 +1,4 @@
-import { SymbolSummary } from './stock-data.model';
+import { SymbolSummary } from './symbol.model';
 
 export type MarketTopPerformance<T> = {
   stockTopGainers: T[];

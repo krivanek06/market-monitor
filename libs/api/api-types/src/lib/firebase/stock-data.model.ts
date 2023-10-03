@@ -10,21 +10,13 @@ import {
   ESGDataQuarterly,
   ESGDataRatingYearly,
   EnterpriseValue,
-  PriceChange,
   PriceTarget,
   RecommendationTrends,
   SectorPeers,
   StockEarning,
-  SymbolQuote,
   UpgradesDowngrades,
 } from '../external-api';
-
-export type SymbolSummary = {
-  id: string;
-  quote: SymbolQuote;
-  profile?: CompanyProfile;
-  priceChange: PriceChange;
-};
+import { SymbolSummary } from './symbol.model';
 
 export type StockSummary = SymbolSummary & {
   profile: CompanyProfile;

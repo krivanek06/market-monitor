@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, InjectionToken } from '@angular/core';
 import {
   Auth,
   GoogleAuthProvider,
   User,
+  UserCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -12,14 +13,18 @@ import { UserAccountType, UserData, UserPortfolioTransaction } from '@market-mon
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { BehaviorSubject, Observable, filter, map, take } from 'rxjs';
-import { createNewUser } from '../model';
+import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
+
+export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
+  'AUTHENTICATION_ACCOUNT_TOKEN',
+);
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationAccountService {
-  private authenticatedUser$ = new BehaviorSubject<UserData | null>(null);
-  private loadingAuthentication$ = new BehaviorSubject<boolean>(false);
+  private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
+  private authenticationLoaded$ = new BehaviorSubject<boolean>(false);
 
   constructor(
     private auth: Auth,
@@ -28,12 +33,26 @@ export class AuthenticationAccountService {
     this.initAuthenticationUser();
   }
 
-  getLoadingAuthentication(): Observable<boolean> {
-    return this.loadingAuthentication$.asObservable();
+  get user(): User {
+    if (!this.auth.currentUser) {
+      throw new Error('User not logged in');
+    }
+    return this.auth.currentUser;
+  }
+
+  get userData(): UserData {
+    if (!this.authenticatedUserData$.value) {
+      throw new Error('User not logged in');
+    }
+    return this.authenticatedUserData$.value;
+  }
+
+  isAuthenticationLoaded(): Observable<boolean> {
+    return this.authenticationLoaded$.asObservable();
   }
 
   getCurrentUser(): Observable<User | null> {
-    return this.loadingAuthentication$.pipe(
+    return this.authenticationLoaded$.pipe(
       filter((loading) => !!loading),
       map(() => this.auth.currentUser),
       take(1),
@@ -41,25 +60,28 @@ export class AuthenticationAccountService {
   }
 
   getCurrentUserData(): Observable<UserData | null> {
-    return this.loadingAuthentication$.pipe(
+    return this.authenticationLoaded$.pipe(
       filter((loading) => !!loading),
-      map(() => this.authenticatedUser$.value),
+      map(() => this.authenticatedUserData$.value),
       take(1),
     );
   }
 
-  async signIn(email: string, password: string) {
-    const data = signInWithEmailAndPassword(this.auth, email, password);
-    console.log('sign in ', data);
+  updateUserData(userData: Partial<UserData>): void {
+    this.updateUser(this.userData.id, userData);
   }
 
-  register(email: string, password: string) {
-    createUserWithEmailAndPassword(this.auth, email, password);
+  signIn(input: LoginUserInput): Promise<UserCredential> {
+    return signInWithEmailAndPassword(this.auth, input.email, input.password);
   }
 
-  signInGoogle() {
+  register(input: RegisterUserInput): Promise<UserCredential> {
+    return createUserWithEmailAndPassword(this.auth, input.email, input.password);
+  }
+
+  signInGoogle(): Promise<UserCredential> {
     const provider = new GoogleAuthProvider();
-    signInWithPopup(this.auth, provider);
+    return signInWithPopup(this.auth, provider);
   }
 
   signOut() {
@@ -82,13 +104,13 @@ export class AuthenticationAccountService {
           .pipe(take(1))
           .subscribe((userData) => {
             console.log('login', userData);
-            this.authenticatedUser$.next(userData);
-            this.loadingAuthentication$.next(true);
+            this.authenticatedUserData$.next(userData);
+            this.authenticationLoaded$.next(true);
           });
       } else {
         // logout
-        this.authenticatedUser$.next(null);
-        this.loadingAuthentication$.next(true);
+        this.authenticatedUserData$.next(null);
+        this.authenticationLoaded$.next(true);
       }
     });
   }

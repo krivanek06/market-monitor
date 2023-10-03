@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { StockStorageService } from './user-unauthenticated.service';
+import { StockStorageService } from './symbol-search.service';
 
 describe('StockStorageService', () => {
   let service: StockStorageService;

@@ -1,4 +1,4 @@
-<mat-tab-group *ngIf="!loadingSignal(); else loader">
+<mat-tab-group *ngIf="isAuthenticationLoaded(); else loader">
   <mat-tab label="Login">
     <app-form-login [formControl]="loginUserInputControl"></app-form-login>
 
@@ -35,5 +35,12 @@
 <ng-template #loader>
   <div class="flex justify-center mt-[40%] sm:my-10">
     <mat-spinner color="primary" diameter="120"></mat-spinner>
+  </div>
+</ng-template>
+
+<ng-template #loader>
+  <div class="grid w-full h-full gap-4 place-content-center place-items-center">
+    <mat-spinner diameter="120"></mat-spinner>
+    <div class="text-lg text-wt-gray-medium">Checking Authentication</div>
   </div>
 </ng-template>

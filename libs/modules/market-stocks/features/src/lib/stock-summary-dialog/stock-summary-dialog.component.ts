@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { SymbolSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
-import { UserUnauthenticatedService } from '@market-monitor/modules/user/data-access';
+import { SymbolFavoriteService } from '@market-monitor/modules/market-stocks/data-access';
 import { DefaultImgDirective, PriceChangeItemsComponent } from '@market-monitor/shared/ui';
 import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
@@ -34,7 +34,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
 })
 export class StockSummaryDialogComponent {
   stockSummarySignal = signal<SymbolSummary | null>(null);
-  isSymbolInFavoriteSignal = toSignal(this.userUnauthenticatedService.isSymbolInFavoriteObs(this.data.symbol));
+  isSymbolInFavoriteSignal = toSignal(this.symbolFavoriteService.isSymbolInFavoriteObs(this.data.symbol));
   symbolType = computed(() => {
     const summary = this.stockSummarySignal();
     if (!summary) {
@@ -56,7 +56,7 @@ export class StockSummaryDialogComponent {
     private dialogRef: MatDialogRef<StockSummaryDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { symbol: string },
     private stocksApiService: StocksApiService,
-    private userUnauthenticatedService: UserUnauthenticatedService,
+    private symbolFavoriteService: SymbolFavoriteService,
     private dialogServiceUtil: DialogServiceUtil,
     private route: Router,
     private viewPortScroller: ViewportScroller,
@@ -75,11 +75,19 @@ export class StockSummaryDialogComponent {
   }
 
   onAddToFavorite(): void {
-    if (this.userUnauthenticatedService.toggleFavoriteSymbol(this.data.symbol)) {
-      this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.data.symbol} has been added into favorites`);
-    } else {
-      this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.data.symbol} has been removed from favorites`);
-    }
+    this.symbolFavoriteService.addFavoriteSymbol({
+      symbolType: 'STOCK',
+      symbol: this.data.symbol,
+    });
+    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.data.symbol} has been added into favorites`);
+  }
+
+  onRemoveToFavorite(): void {
+    this.symbolFavoriteService.removeFavoriteSymbol({
+      symbolType: 'STOCK',
+      symbol: this.data.symbol,
+    });
+    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.data.symbol} has been removed from favorites`);
   }
 
   onDetailsRedirect(): void {

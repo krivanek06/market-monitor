@@ -21,17 +21,26 @@ export const sideNavigation = {
       icon: 'settings',
     },
   ],
-
   marketNavigation: [
     {
-      path: 'dashboard',
-      title: 'Dashboard',
+      path: 'screener',
+      title: 'Screener',
       icon: 'dashboard',
     },
     {
-      path: 'watchlist',
-      title: 'Watchlist',
-      icon: 'monitoring',
+      path: 'performer',
+      title: 'Performers',
+      icon: 'dashboard',
+    },
+    {
+      path: 'market',
+      title: 'Market',
+      icon: 'dashboard',
+    },
+    {
+      path: 'calendar',
+      title: 'Calendar',
+      icon: 'dashboard',
     },
   ],
 } as const;
