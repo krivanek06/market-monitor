@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,15 +21,22 @@ import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SummaryActionButtonsComponent {
+export class SummaryActionButtonsComponent implements OnInit {
   @Output() redirectClickedEmitter = new EventEmitter<void>();
   @Input({ required: true }) symbolSummary!: SymbolSummary;
 
-  isSymbolInFavoriteSignal = toSignal(this.symbolFavoriteService.isSymbolInFavoriteObs(this.symbolSummary?.id ?? ''));
+  isSymbolInFavoriteSignal = signal<boolean>(false);
+
   constructor(
     private symbolFavoriteService: SymbolFavoriteService,
     private dialogServiceUtil: DialogServiceUtil,
   ) {}
+
+  ngOnInit(): void {
+    this.symbolFavoriteService.isSymbolInFavoriteObs(this.symbolSummary.id).subscribe((isInFavorite) => {
+      this.isSymbolInFavoriteSignal.set(isInFavorite);
+    });
+  }
 
   onAddToFavorite(): void {
     this.symbolFavoriteService.addFavoriteSymbol({
