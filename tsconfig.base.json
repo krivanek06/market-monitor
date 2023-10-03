@@ -58,6 +58,12 @@
       "@market-monitor/modules/market-stocks/ui": [
         "libs/modules/market-stocks/ui/src/index.ts"
       ],
+      "@market-monitor/modules/market-symbol/data-access": [
+        "libs/modules/market-symbol/data-access/src/index.ts"
+      ],
+      "@market-monitor/modules/market-symbol/ui": [
+        "libs/modules/market-symbol/ui/src/index.ts"
+      ],
       "@market-monitor/modules/page-builder": [
         "libs/modules/page-builder/src/index.ts"
       ],
