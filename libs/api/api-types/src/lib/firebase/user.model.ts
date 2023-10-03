@@ -1,5 +1,5 @@
 import { PortfolioTransaction, PortfolioTransactionCash } from './portfolio.model';
-import { SymbolSearch } from './symbol.model';
+import { SymbolType } from './symbol.model';
 
 export enum UserAccountType {
   TEST = 'TEST',
@@ -18,13 +18,19 @@ export type UserData = {
     groupWatched: string[];
   };
   settings: UserSettings;
-  lastSearchedSymbols: SymbolSearch[];
-  watchlists: string[];
 };
 
 export type UserPortfolioTransaction = {
   transactions: PortfolioTransaction[];
   cashDeposit: PortfolioTransactionCash[];
+};
+
+export type UserWatchlist = {
+  data: {
+    symbol: string;
+    symbolType: SymbolType;
+  }[];
+  createdDate: string;
 };
 
 export type UserPersonalInfo = {

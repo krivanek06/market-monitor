@@ -9,7 +9,7 @@ import {
   signInWithPopup,
 } from '@angular/fire/auth';
 import { DocumentReference, Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
-import { UserAccountType, UserData, UserPortfolioTransaction } from '@market-monitor/api-types';
+import { UserAccountType, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { BehaviorSubject, Observable, filter, map, take } from 'rxjs';
@@ -51,7 +51,7 @@ export class AuthenticationAccountService {
     return this.authenticationLoaded$.asObservable();
   }
 
-  getCurrentUser(): Observable<User | null> {
+  getUser(): Observable<User | null> {
     return this.authenticationLoaded$.pipe(
       filter((loading) => !!loading),
       map(() => this.auth.currentUser),
@@ -59,7 +59,7 @@ export class AuthenticationAccountService {
     );
   }
 
-  getCurrentUserData(): Observable<UserData | null> {
+  getUserData(): Observable<UserData | null> {
     return this.authenticationLoaded$.pipe(
       filter((loading) => !!loading),
       map(() => this.authenticatedUserData$.value),
@@ -67,10 +67,27 @@ export class AuthenticationAccountService {
     );
   }
 
+  getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {
+    return rxDocData(this.getUserPortfolioTransactionDocRef(this.userData.id)).pipe(
+      filter((d): d is UserPortfolioTransaction => !!d),
+    );
+  }
+
+  getUserWatchlist(): Observable<UserWatchlist> {
+    return rxDocData(this.getUserWatchlistDocRef(this.userData.id)).pipe(filter((d): d is UserWatchlist => !!d));
+  }
+
   updateUserData(userData: Partial<UserData>): void {
     this.updateUser(this.userData.id, userData);
   }
 
+  updateUserPortfolioTransactionData(transaction: Partial<UserPortfolioTransaction>): void {
+    this.updateUserPortfolioTransaction(this.userData.id, transaction);
+  }
+
+  updateUserWatchlistData(watchlist: Partial<UserWatchlist>): void {
+    this.updateUserWatchlist(watchlist);
+  }
   signIn(input: LoginUserInput): Promise<UserCredential> {
     return signInWithEmailAndPassword(this.auth, input.email, input.password);
   }
@@ -145,7 +162,7 @@ export class AuthenticationAccountService {
     return newUserData;
   }
 
-  private updateUserPortfolioTransaction(id: string, transaction: UserPortfolioTransaction): void {
+  private updateUserPortfolioTransaction(id: string, transaction: Partial<UserPortfolioTransaction>): void {
     setDoc(this.getUserPortfolioTransactionDocRef(id), transaction, { merge: true });
   }
 
@@ -161,5 +178,15 @@ export class AuthenticationAccountService {
 
   private getUserDocRef(userId: string): DocumentReference<UserData> {
     return doc(collection(this.firestore, 'users').withConverter(assignTypesClient<UserData>()), userId);
+  }
+
+  private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchlist> {
+    return doc(this.firestore, 'users', userId, 'more_information', 'watchlist').withConverter(
+      assignTypesClient<UserWatchlist>(),
+    );
+  }
+
+  private updateUserWatchlist(watchlist: Partial<UserWatchlist>): void {
+    setDoc(this.getUserWatchlistDocRef(this.userData.id), watchlist, { merge: true });
   }
 }

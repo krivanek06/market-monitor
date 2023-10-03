@@ -1,26 +1,55 @@
 <mat-dialog-actions class="flex flex-col justify-between px-4 sm:flex-row gap-y-2">
-  <button
-    *ngIf="isSymbolInFavoriteSignal()"
-    mat-stroked-button
-    color="warn"
-    (click)="onRemoveToFavorite()"
-    type="button"
-    class="g-border-apply max-sm:w-full"
-  >
-    <mat-icon>do_not_disturb_on</mat-icon>
-    favorites - remove
-  </button>
-  <button
-    *ngIf="!isSymbolInFavoriteSignal()"
-    mat-stroked-button
-    color="accent"
-    (click)="onAddToFavorite()"
-    type="button"
-    class="g-border-apply max-sm:w-full"
-  >
-    <mat-icon>star</mat-icon>
-    favorite - add
-  </button>
+  <!-- favorites button -->
+  <ng-container *ngIf="!isUserAuthenticatedSignal()">
+    <button
+      *ngIf="isSymbolInFavoriteSignal()"
+      mat-stroked-button
+      color="warn"
+      (click)="onRemoveToFavorite()"
+      type="button"
+      class="g-border-apply max-sm:w-full"
+    >
+      <mat-icon>do_not_disturb_on</mat-icon>
+      favorites - remove
+    </button>
+    <button
+      *ngIf="!isSymbolInFavoriteSignal()"
+      mat-stroked-button
+      color="accent"
+      (click)="onAddToFavorite()"
+      type="button"
+      class="g-border-apply max-sm:w-full"
+    >
+      <mat-icon>star</mat-icon>
+      favorite - add
+    </button>
+  </ng-container>
+
+  <!-- watchlist button -->
+  <ng-container *ngIf="isUserAuthenticatedSignal()">
+    <button
+      *ngIf="isSymbolInWatchlist()"
+      mat-stroked-button
+      color="warn"
+      (click)="onRemoveWatchlist()"
+      type="button"
+      class="g-border-apply max-sm:w-full"
+    >
+      <mat-icon>do_not_disturb_on</mat-icon>
+      watchlist - remove
+    </button>
+    <button
+      *ngIf="!isSymbolInWatchlist()"
+      mat-stroked-button
+      color="accent"
+      (click)="onAddWatchlist()"
+      type="button"
+      class="g-border-apply max-sm:w-full"
+    >
+      <mat-icon>star</mat-icon>
+      watchlist - add
+    </button>
+  </ng-container>
 
   <button class="max-sm:w-full" type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
     Go to Details

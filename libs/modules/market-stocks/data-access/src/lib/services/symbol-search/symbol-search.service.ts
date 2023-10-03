@@ -1,10 +1,6 @@
-import { Inject, Injectable, Optional } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { StocksApiService } from '@market-monitor/api-client';
 import { SymbolSearch, SymbolSummary } from '@market-monitor/api-types';
-import {
-  AUTHENTICATION_ACCOUNT_TOKEN,
-  AuthenticationAccountService,
-} from '@market-monitor/modules/authentication/data-access';
 import { LocalStorageService } from '@market-monitor/shared/utils-client';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 
@@ -14,16 +10,9 @@ import { BehaviorSubject, Observable, map } from 'rxjs';
 export class SymbolSearchService extends LocalStorageService<SymbolSearch[]> {
   private searchedSymbols$ = new BehaviorSubject<SymbolSummary[]>([]);
 
-  constructor(
-    @Inject(AUTHENTICATION_ACCOUNT_TOKEN)
-    @Optional()
-    private authenticationAccountService: AuthenticationAccountService,
-    private stocksApiService: StocksApiService,
-  ) {
+  constructor(private stocksApiService: StocksApiService) {
     super('SYMBOL_SEARCH', []);
     this.initService();
-
-    console.log('authenticationAccountService is alive', !!this.authenticationAccountService);
   }
 
   getSearchedSymbols(): Observable<SymbolSummary[]> {
@@ -54,7 +43,7 @@ export class SymbolSearchService extends LocalStorageService<SymbolSearch[]> {
     });
   }
 
-  removeSearchedeSymbol(searchSymbol: SymbolSearch): void {
+  removeSearchedSymbol(searchSymbol: SymbolSearch): void {
     const savedData = this.getData();
 
     // remove from searchedSymbols$
@@ -66,17 +55,11 @@ export class SymbolSearchService extends LocalStorageService<SymbolSearch[]> {
   }
 
   private persistData(searchSymbols: SymbolSearch[], symbolSummaries: SymbolSummary[]): void {
-    const searchSymbolsSlice = searchSymbols.slice(0, 12);
-    const symbolSummariesSlice = symbolSummaries.slice(0, 12);
+    const searchSymbolsSlice = searchSymbols.slice(0, 20);
+    const symbolSummariesSlice = symbolSummaries.slice(0, 20);
 
     // save into storage
-    if (this.isUserInitialized()) {
-      this.authenticationAccountService.updateUserData({
-        lastSearchedSymbols: searchSymbolsSlice,
-      });
-    } else {
-      this.saveData(searchSymbolsSlice);
-    }
+    this.saveData(searchSymbolsSlice);
 
     // save into subject
     this.searchedSymbols$.next(symbolSummariesSlice);
@@ -86,18 +69,12 @@ export class SymbolSearchService extends LocalStorageService<SymbolSearch[]> {
    * load necessary data from api
    */
   private initService(): void {
-    const data = this.isUserInitialized()
-      ? this.authenticationAccountService.userData.lastSearchedSymbols
-      : this.getData();
+    const data = this.getData();
     const symbols = data.map((d) => d.symbol);
 
     // load favorite stocks from api and last searched stocks from api
     this.stocksApiService.getStockSummaries(symbols).subscribe((searchedStocks) => {
       this.searchedSymbols$.next(searchedStocks);
     });
-  }
-
-  private isUserInitialized(): boolean {
-    return !!this.authenticationAccountService?.user;
   }
 }

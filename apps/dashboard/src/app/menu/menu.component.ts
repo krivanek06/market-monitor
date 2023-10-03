@@ -34,7 +34,7 @@ import { MenuTopNavigationComponent } from './menu-top-navigation/menu-top-navig
 
       mat-drawer-container {
         overflow: visible;
-        height: 100vh;
+        height: 100vh !important;
       }
 
       mat-drawer-content {

@@ -13,7 +13,7 @@ export const appRoutes: Route[] = [
         canMatch: [
           () =>
             inject(AuthenticationAccountService)
-              .getCurrentUserData()
+              .getUser()
               .pipe(map((userData) => (!!userData ? true : false))),
         ],
         //canMatch: [() => false],
@@ -47,7 +47,7 @@ export const appRoutes: Route[] = [
         canMatch: [
           () =>
             inject(AuthenticationAccountService)
-              .getCurrentUserData()
+              .getUser()
               .pipe(
                 tap((x) => console.log('login guard', x)),
                 map((userData) => (!userData ? true : false)),
