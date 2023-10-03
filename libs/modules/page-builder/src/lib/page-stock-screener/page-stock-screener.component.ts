@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { StockScreenerValues, SymbolSummary } from '@market-monitor/api-types';
@@ -12,14 +12,14 @@ import {
   getScreenerInputIndexByKey,
   getScreenerInputValueByKey,
 } from '@market-monitor/modules/market-stocks/data-access';
-import { ShowStockDialogDirective } from '@market-monitor/modules/market-stocks/features';
+import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import {
   StockScreenerFormControlComponent,
   StockSummaryTableComponent,
 } from '@market-monitor/modules/market-stocks/ui';
 import { RouterManagement } from '@market-monitor/shared/data-access';
 import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared/ui';
-import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/utils-client';
+import { DialogServiceModule, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { catchError, of, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -36,10 +36,10 @@ import { catchError, of, switchMap, tap } from 'rxjs';
     DialogServiceModule,
     MatButtonModule,
     DialogServiceModule,
+    MatDialogModule,
   ],
   templateUrl: './page-stock-screener.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [ShowStockDialogDirective],
   styles: [
     `
       :host {
@@ -52,7 +52,7 @@ export class PageStockScreenerComponent implements OnInit, RouterManagement {
   private screenerDefault = 30;
   stocksApiService = inject(StocksApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
-  showStockDialogDirective = inject(ShowStockDialogDirective);
+  dialog = inject(MatDialog);
   router = inject(Router);
   route = inject(ActivatedRoute);
 
@@ -100,7 +100,12 @@ export class PageStockScreenerComponent implements OnInit, RouterManagement {
   }
 
   onSummaryClick(summary: SymbolSummary): void {
-    this.showStockDialogDirective.onShowSummary(summary.id);
+    this.dialog.open(StockSummaryDialogComponent, {
+      data: {
+        symbol: summary.id,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
   }
 
   /**

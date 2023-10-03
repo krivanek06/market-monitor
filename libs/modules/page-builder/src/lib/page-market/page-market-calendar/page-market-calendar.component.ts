@@ -3,13 +3,13 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
 import { CalendarAssetDataTypes, CalendarDividend, CalendarStockEarning } from '@market-monitor/api-types';
-import { ShowStockDialogDirective, StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
+import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import {
   DividendItemComponent,
   DividendItemsDialogComponent,
@@ -25,13 +25,13 @@ import {
   MarkerDirective,
   RangeDirective,
 } from '@market-monitor/shared/ui';
-import { DialogServiceModule } from '@market-monitor/shared/utils-client';
+import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import {
   fillOutMissingDatesForMonth,
   generateDatesArrayForMonth,
   groupValuesByDate,
 } from '@market-monitor/shared/utils-general';
-import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs';
+import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap } from 'rxjs';
 
 @Component({
   selector: 'app-page-market-calendar',
@@ -53,10 +53,10 @@ import { Observable, combineLatest, map, startWith, switchMap, tap } from 'rxjs'
     EarningsHistoricalDialogComponent,
     StockSummaryDialogComponent,
     DialogServiceModule,
+    MatDialogModule,
   ],
   templateUrl: './page-market-calendar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [ShowStockDialogDirective],
   styles: [
     `
       :host {
@@ -73,7 +73,7 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
   marketApiService = inject(MarketApiService);
   router = inject(Router);
   route = inject(ActivatedRoute);
-  showStockSummaryDirective = inject(ShowStockDialogDirective);
+  dialog = inject(MatDialog);
 
   currentDateRangeControl = new FormControl<CalendarRange>(CalendarRageToday, { nonNullable: true });
 
@@ -126,19 +126,54 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
   );
 
   onMoreDividends(data: CalendarDividend[]): void {
-    this.showStockSummaryDirective.onMoreDividends(data);
+    this.dialog
+      .open(DividendItemsDialogComponent, {
+        data: {
+          dividends: data,
+          showDate: true,
+        },
+        panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+      })
+      .afterClosed()
+      .pipe(
+        map((res) => res?.['dividend']),
+        filter((res): res is CalendarDividend => !!res),
+        tap((res) => this.showStockSummary(res.symbol)),
+        take(1),
+      )
+      .subscribe();
   }
 
   onMoreEarnings(data: CalendarStockEarning[]): void {
-    this.showStockSummaryDirective.onMoreEarnings(data);
+    this.dialog
+      .open(EarningsItemsDialogComponent, {
+        data: {
+          earnings: data,
+          showDate: true,
+        },
+        panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+      })
+      .afterClosed()
+      .pipe(
+        map((res) => res?.['earning']),
+        filter((res): res is CalendarStockEarning => !!res),
+        tap((res) => this.onEarningsClicked(res)),
+        take(1),
+      )
+      .subscribe();
   }
 
   onEarningsClicked(data: CalendarStockEarning): void {
-    this.showStockSummaryDirective.onEarningsClicked(data.symbol);
+    this.dialog.open(EarningsHistoricalDialogComponent, {
+      data: {
+        symbol: data.symbol,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
   }
 
   onDividendClick(data: CalendarDividend): void {
-    this.showStockSummaryDirective.onShowSummary(data.symbol);
+    this.showStockSummary(data.symbol);
   }
 
   loadQueryParams(): void {
@@ -170,6 +205,15 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
         year: range.year,
       },
       queryParamsHandling: 'merge',
+    });
+  }
+
+  private showStockSummary(symbol: string): void {
+    this.dialog.open(StockSummaryDialogComponent, {
+      data: {
+        symbol: symbol,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });
   }
 

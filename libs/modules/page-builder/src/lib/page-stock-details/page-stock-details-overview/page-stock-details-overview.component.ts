@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatDialog } from '@angular/material/dialog';
 import { SymbolSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { StockTransformService } from '@market-monitor/modules/market-stocks/data-access';
-import { ShowStockDialogDirective } from '@market-monitor/modules/market-stocks/features';
+import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import {
   EarningsEstimationChartComponent,
   RevenueEstimationChartComponent,
@@ -25,7 +26,7 @@ import {
   PriceChangeItemsComponent,
   SortByKeyPipe,
 } from '@market-monitor/shared/ui';
-import { DialogServiceModule } from '@market-monitor/shared/utils-client';
+import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { of, switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
@@ -62,11 +63,10 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [ShowStockDialogDirective],
 })
 export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   private stockTransformService = inject(StockTransformService);
-  private showStockDialogDirective = inject(ShowStockDialogDirective);
+  private dialog = inject(MatDialog);
 
   stockPeersSignal = toSignal(
     this.stockDetails$.pipe(
@@ -103,7 +103,11 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   }
 
   onShowSummary(summary: SymbolSummary) {
-    // show summary
-    this.showStockDialogDirective.onShowSummary(summary.id);
+    return this.dialog.open(StockSummaryDialogComponent, {
+      data: {
+        symbol: summary.id,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
   }
 }

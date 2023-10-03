@@ -1,5 +1,6 @@
 export const AvailableQuotesConst = ['index', 'crypto', 'etf', 'commodity', 'euronext'] as const;
 export type AvailableQuotes = (typeof AvailableQuotesConst)[number];
+
 export type SymbolQuote = {
   symbol: string;
   name: string;
@@ -12,7 +13,7 @@ export type SymbolQuote = {
   yearLow: number;
   priceAvg50: number;
   priceAvg200: number;
-  exchange: string;
+  exchange: 'CRYPTO' | 'INDEX' | string;
   volume: number;
   avgVolume: number;
   open: number;

@@ -1,0 +1,29 @@
+<mat-dialog-actions class="flex flex-col justify-between px-4 sm:flex-row gap-y-2">
+  <button
+    *ngIf="isSymbolInFavoriteSignal()"
+    mat-stroked-button
+    color="accent"
+    (click)="onRemoveToFavorite()"
+    type="button"
+    class="g-border-apply max-sm:w-full"
+  >
+    <mat-icon>do_not_disturb_on</mat-icon>
+    favorites - remove
+  </button>
+  <button
+    *ngIf="!isSymbolInFavoriteSignal()"
+    mat-stroked-button
+    color="accent"
+    (click)="onAddToFavorite()"
+    type="button"
+    class="g-border-apply max-sm:w-full"
+  >
+    <mat-icon>star</mat-icon>
+    favorite - add
+  </button>
+
+  <button class="max-sm:w-full" type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
+    Go to Details
+    <mat-icon iconPositionEnd>navigate_next</mat-icon>
+  </button>
+</mat-dialog-actions>

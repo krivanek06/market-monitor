@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialog } from '@angular/material/dialog';
 import { SymbolSummary } from '@market-monitor/api-types';
 import {
   AUTHENTICATION_ACCOUNT_TOKEN,
@@ -12,9 +13,10 @@ import {
 } from '@market-monitor/modules/authentication/data-access';
 import { SymbolFavoriteService, SymbolSearchService } from '@market-monitor/modules/market-stocks/data-access';
 import { ElementFocusDirective, QuoteItemComponent } from '@market-monitor/shared/ui';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { iif, startWith, switchMap } from 'rxjs';
-import { ShowStockDialogDirective } from '../show-stock-dialog.directive/show-stock-dialog.directive';
 import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-basic.component';
+import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summary-dialog.component';
 
 @Component({
   selector: 'app-stock-search-basic-customized',
@@ -37,7 +39,6 @@ import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-ba
       }
     `,
   ],
-  hostDirectives: [ShowStockDialogDirective],
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {
   @ViewChild('trigger', { read: ElementRef }) trigger?: ElementRef<HTMLElement>;
@@ -56,7 +57,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
   isUserAuthenticatedSignal = signal(false);
   symbolFavoriteService = inject(SymbolFavoriteService);
   symbolSearchService = inject(SymbolSearchService);
-  showStockSummaryDirective = inject(ShowStockDialogDirective);
+  dialog = inject(MatDialog);
 
   constructor(
     @Inject(AUTHENTICATION_ACCOUNT_TOKEN)
@@ -118,6 +119,11 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     // weird bug: if we don't set isInputFocused to false, the overlay will not close
     this.overlayIsOpen.update((d) => ({ ...d, isInputFocused: false }));
 
-    this.showStockSummaryDirective.onShowSummary(summary.id);
+    this.dialog.open(StockSummaryDialogComponent, {
+      data: {
+        symbol: summary.id,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
   }
 }
