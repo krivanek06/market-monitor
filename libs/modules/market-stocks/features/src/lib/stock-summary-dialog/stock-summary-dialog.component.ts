@@ -54,7 +54,7 @@ export class StockSummaryDialogComponent {
     }
     return 'Stock';
   });
-  isSymbolTypeStock = computed(() => this.symbolType() === 'Stock');
+  isSymbolTypeStock = computed(() => this.symbolType() === 'Stock' || this.symbolType() === 'ADR');
 
   constructor(
     private dialogRef: MatDialogRef<StockSummaryDialogComponent>,
