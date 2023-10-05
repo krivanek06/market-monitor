@@ -8,7 +8,4 @@ import { RouterModule } from '@angular/router';
   templateUrl: './app.component.html',
   styles: [''],
 })
-export class AppComponent {
-  constructor() {}
-  title = 'market-monitor-dashboard';
-}
+export class AppComponent {}

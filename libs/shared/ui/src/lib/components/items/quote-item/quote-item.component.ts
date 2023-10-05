@@ -15,4 +15,5 @@ import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
 export class QuoteItemComponent {
   @Input({ required: true }) symbolQuote!: SymbolQuote;
   @Input() assetUrl?: string;
+  @Input() showValueChange = true;
 }

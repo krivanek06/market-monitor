@@ -10,7 +10,7 @@ import {
 } from '@angular/fire/auth';
 import { DocumentReference, Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
 import { UserAccountType, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/utils-client';
+import { assignTypesClient, isNonNullable } from '@market-monitor/shared/utils-client';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { BehaviorSubject, Observable, filter, map, take } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
@@ -47,24 +47,16 @@ export class AuthenticationAccountService {
     return this.authenticatedUserData$.value;
   }
 
+  get isUserDataPresent(): boolean {
+    return !!this.authenticatedUserData$.value;
+  }
+
   isAuthenticationLoaded(): Observable<boolean> {
     return this.authenticationLoaded$.asObservable();
   }
 
-  getUser(): Observable<User | null> {
-    return this.authenticationLoaded$.pipe(
-      filter((loading) => !!loading),
-      map(() => this.auth.currentUser),
-      take(1),
-    );
-  }
-
-  getUserData(): Observable<UserData | null> {
-    return this.authenticationLoaded$.pipe(
-      filter((loading) => !!loading),
-      map(() => this.authenticatedUserData$.value),
-      take(1),
-    );
+  getUserData(): Observable<UserData> {
+    return this.authenticatedUserData$.pipe(isNonNullable());
   }
 
   getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {
@@ -101,8 +93,8 @@ export class AuthenticationAccountService {
     return signInWithPopup(this.auth, provider);
   }
 
-  signOut() {
-    this.auth.signOut();
+  async signOut() {
+    await this.auth.signOut();
   }
 
   changePassword() {
@@ -126,6 +118,7 @@ export class AuthenticationAccountService {
           });
       } else {
         // logout
+        console.log('logout');
         this.authenticatedUserData$.next(null);
         this.authenticationLoaded$.next(true);
       }

@@ -1,6 +1,6 @@
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Inject, OnInit, Optional, ViewChild, inject, signal } from '@angular/core';
+import { Component, ElementRef, Inject, Input, OnInit, Optional, ViewChild, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -41,6 +41,10 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
   ],
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {
+  @Input() showHint = true;
+  @Input() showIcon = true;
+  @Input() showValueChange = true;
+
   @ViewChild('trigger', { read: ElementRef }) trigger?: ElementRef<HTMLElement>;
 
   /**

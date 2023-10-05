@@ -82,3 +82,13 @@ button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
 .mat-mdc-outlined-button {
   --mat-mdc-button-persistent-ripple-color: var(--gray-medium) !important;
 }
+
+.mat-mdc-unelevated-button:not(:disabled) {
+  background-color: var(--gray-light) !important;
+  color: var(--gray-medium) !important;
+
+  &:hover {
+    color: var(--gray-dark) !important;
+    background-color: var(--gray-light-strong) !important;
+  }
+}

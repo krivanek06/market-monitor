@@ -1,4 +1,5 @@
 export * from './color-scheme.model';
+export * from './dashboard-routes.model';
 export * from './form-controls.model';
 export * from './general-errors.model';
 export * from './generic-chart.model';

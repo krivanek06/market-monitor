@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -46,6 +46,9 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
    * emit whether searchControl has any value
    */
   @Output() inputHasValue = new EventEmitter<boolean>();
+  @Input() showHint = true;
+  @Input() showIcon = true;
+  @Input() showValueChange = true;
 
   searchControl = new FormControl<string>('', { nonNullable: true });
 
