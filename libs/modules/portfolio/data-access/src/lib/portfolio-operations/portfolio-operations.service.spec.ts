@@ -7,12 +7,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { addDays, format } from 'date-fns';
 import { when } from 'jest-when';
 import { of } from 'rxjs';
-import { PortfolioTransactionCreate } from '../models';
 import {
   DATE_FUTURE,
   DATE_INVALID_DATE,
   DATE_TOO_OLD,
   DATE_WEEKEND,
+  PortfolioTransactionCreate,
   SYMBOL_NOT_FOUND_ERROR,
   TRANSACTION_FEE_PRCT,
   TRANSACTION_INPUT_UNITS_INTEGER,
@@ -26,7 +26,7 @@ import {
   testTransaction_BUY_AAPL_1,
   testTransaction_BUY_AAPL_2,
   testTransaction_BUY_MSFT_1,
-} from '../models-test';
+} from '../models';
 import { PortfolioOperationsService } from './portfolio-operations.service';
 
 describe('PortfolioCrudService', () => {

@@ -7,11 +7,10 @@ import { of } from 'rxjs';
 import {
   TestTransactionDates,
   expectedResult,
-  mockCreateUser,
   testHistoricalPriceSymbol_AAPL,
   testHistoricalPriceSymbol_MSFT,
   userTestPortfolioTransaction1,
-} from '../models-test';
+} from '../models';
 import { PortfolioGrowthService } from './portfolio-growth.service';
 
 describe('PortfolioGrowthService', () => {
@@ -20,8 +19,6 @@ describe('PortfolioGrowthService', () => {
   const marketApiServiceMock = createMock<MarketApiService>({
     getHistoricalPricesDateRange: jest.fn(),
   });
-
-  const testUser = mockCreateUser();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
