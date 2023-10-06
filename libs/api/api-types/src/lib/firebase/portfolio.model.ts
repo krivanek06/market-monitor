@@ -59,19 +59,3 @@ export type PortfolioTransactionCash = {
   date: string;
   amount: number;
 };
-
-export type PortfolioTransactionCreate = {
-  userId: string;
-  symbol: string;
-  symbolType: SymbolType;
-  units: number;
-  date: string;
-  transactionType: PortfolioTransactionType;
-  /** User can add custom total value of this holding and not load from API */
-  customTotalValue?: number;
-};
-
-export type PortfolioTransactionDelete = {
-  userId: string;
-  transactionId: string;
-};

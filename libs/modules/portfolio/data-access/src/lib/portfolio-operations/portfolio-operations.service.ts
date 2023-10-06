@@ -1,12 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
-import {
-  PortfolioTransaction,
-  PortfolioTransactionCreate,
-  PortfolioTransactionDelete,
-  SymbolSummary,
-  UserPortfolioTransaction,
-} from '@market-monitor/api-types';
+import { PortfolioTransaction, SymbolSummary, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { dateGetDetailsInformationFromDate, roundNDigits } from '@market-monitor/shared/utils-general';
 import { isBefore, isValid, isWeekend } from 'date-fns';
@@ -18,6 +12,8 @@ import {
   DATE_TOO_OLD,
   DATE_WEEKEND,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
+  PortfolioTransactionCreate,
+  PortfolioTransactionDelete,
   SYMBOL_NOT_FOUND_ERROR,
   TRANSACTION_FEE_PRCT,
   TRANSACTION_HISTORY_NOT_FOUND_ERROR,

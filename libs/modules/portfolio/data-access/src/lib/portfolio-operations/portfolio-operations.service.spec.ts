@@ -1,12 +1,13 @@
 import { createMock } from '@golevelup/ts-jest';
 import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
-import { PortfolioTransaction, PortfolioTransactionCreate, UserPortfolioTransaction } from '@market-monitor/api-types';
+import { PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { Test, TestingModule } from '@nestjs/testing';
 import { addDays, format } from 'date-fns';
 import { when } from 'jest-when';
 import { of } from 'rxjs';
+import { PortfolioTransactionCreate } from '../models';
 import {
   DATE_FUTURE,
   DATE_INVALID_DATE,
