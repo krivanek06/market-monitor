@@ -16,7 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { SymbolSummary } from '@market-monitor/api-types';
 import {
   AUTHENTICATION_ACCOUNT_TOKEN,
-  AuthenticationAccountService,
+  AuthenticationUserService,
 } from '@market-monitor/modules/authentication/data-access';
 import { SymbolFavoriteService } from '@market-monitor/modules/market-stocks/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
@@ -50,10 +50,10 @@ export class SummaryActionButtonsComponent implements OnInit {
     private dialogServiceUtil: DialogServiceUtil,
     @Inject(AUTHENTICATION_ACCOUNT_TOKEN)
     @Optional()
-    private authenticationAccountService: AuthenticationAccountService,
+    private authenticationUserService: AuthenticationUserService,
   ) {
-    if (this.authenticationAccountService) {
-      this.isUserAuthenticatedSignal.set(!!this.authenticationAccountService.user);
+    if (this.authenticationUserService) {
+      this.isUserAuthenticatedSignal.set(!!this.authenticationUserService.user);
     }
   }
 
@@ -64,8 +64,8 @@ export class SummaryActionButtonsComponent implements OnInit {
     });
 
     // check if symbol in watchlist
-    if (this.authenticationAccountService) {
-      this.authenticationAccountService
+    if (this.authenticationUserService) {
+      this.authenticationUserService
         .getUserWatchlist()
         .pipe(map((watchlist) => watchlist.data.map((d) => d.symbol).includes(this.symbolSummary.id)))
         .subscribe((isInWatchlist) => {

@@ -9,7 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SymbolSummary } from '@market-monitor/api-types';
 import {
   AUTHENTICATION_ACCOUNT_TOKEN,
-  AuthenticationAccountService,
+  AuthenticationUserService,
 } from '@market-monitor/modules/authentication/data-access';
 import { SymbolFavoriteService, SymbolSearchService } from '@market-monitor/modules/market-stocks/data-access';
 import { ElementFocusDirective, QuoteItemComponent } from '@market-monitor/shared/ui';
@@ -66,13 +66,11 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
   constructor(
     @Inject(AUTHENTICATION_ACCOUNT_TOKEN)
     @Optional()
-    private authenticationAccountService: AuthenticationAccountService,
+    private authenticationUserService: AuthenticationUserService,
   ) {
     // Authentication may not exists when app is available in public
-    if (this.authenticationAccountService) {
-      this.authenticationAccountService?.isAuthenticationLoaded().subscribe((isAuthenticationLoaded) => {
-        this.isUserAuthenticatedSignal.set(isAuthenticationLoaded);
-      });
+    if (this.authenticationUserService) {
+      this.isUserAuthenticatedSignal.set(true);
     }
   }
 

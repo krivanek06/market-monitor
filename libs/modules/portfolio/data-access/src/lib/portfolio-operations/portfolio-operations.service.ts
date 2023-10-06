@@ -1,16 +1,17 @@
+import { Injectable } from '@angular/core';
+import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
 import {
   PortfolioTransaction,
   PortfolioTransactionCreate,
   PortfolioTransactionDelete,
   SymbolSummary,
-  User,
   UserPortfolioTransaction,
 } from '@market-monitor/api-types';
+import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { dateGetDetailsInformationFromDate, roundNDigits } from '@market-monitor/shared/utils-general';
-import { Injectable } from '@nestjs/common';
 import { isBefore, isValid, isWeekend } from 'date-fns';
+import { firstValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { ApiService } from '../api/api.service';
 import {
   DATE_FUTURE,
   DATE_INVALID_DATE,
@@ -23,36 +24,45 @@ import {
   TRANSACTION_INPUT_UNITS_INTEGER,
   TRANSACTION_INPUT_UNITS_POSITIVE,
   USER_NOT_ENOUGH_CASH_ERROR,
-  USER_NOT_NOT_FOUND_ERROR,
   USER_NOT_UNITS_ON_HAND_ERROR,
 } from '../models';
 
-@Injectable()
-export class PortfolioTransactionsService {
-  constructor(private apiService: ApiService) {}
+@Injectable({
+  providedIn: 'root',
+})
+export class PortfolioOperationsService {
+  constructor(
+    private marketApiService: MarketApiService,
+    private authenticationUserService: AuthenticationUserService,
+    private portfolioApiService: PortfolioApiService,
+    private userApiService: UserApiService,
+  ) {}
+
   async executeTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
     // get data
-    const [user, userTransactions, symbolSummary] = await Promise.all([
-      this.apiService.getUser(input.userId),
-      this.apiService.getUserPortfolioTransaction(input.userId),
-      this.apiService.getSymbolSummary(input.symbol),
-    ]);
+    const userTransactions = await this.authenticationUserService.getUserPortfolioTransactionPromise();
+    const symbolSummary = await firstValueFrom(this.marketApiService.getSymbolSummary(input.symbol));
+
+    // check if symbol exists
+    if (!symbolSummary) {
+      throw new Error(SYMBOL_NOT_FOUND_ERROR);
+    }
 
     // check data validity
-    this.executeTransactionOperationDataValidity(input, user, symbolSummary, userTransactions);
+    this.executeTransactionOperationDataValidity(input, symbolSummary, userTransactions);
 
     // from previous transaction calculate invested and units - currently if I own that symbol
     const symbolHolding = this.getCurrentInvestedFromTransactions(input.symbol, userTransactions.transactions);
     const symbolHoldingBreakEvenPrice = roundNDigits(symbolHolding.invested / symbolHolding.units, 2);
 
     // create transaction
-    const transaction = this.createTransaction(input, user, symbolSummary, symbolHoldingBreakEvenPrice);
+    const transaction = this.createTransaction(input, symbolSummary, symbolHoldingBreakEvenPrice);
 
     // save transaction into public transactions collection
-    await this.apiService.addPortfolioTransactionForPublic(transaction);
+    this.portfolioApiService.addPortfolioTransactionForPublic(transaction);
 
     // save transaction into user document
-    await this.apiService.addPortfolioTransactionForUser(transaction);
+    this.userApiService.addPortfolioTransactionForUser(transaction);
 
     // return data
     return transaction;
@@ -60,25 +70,18 @@ export class PortfolioTransactionsService {
 
   async deleteTransactionOperation(input: PortfolioTransactionDelete): Promise<PortfolioTransaction> {
     // get data
-    const [user, userTransactions, removedTransaction] = await Promise.all([
-      this.apiService.getUser(input.userId),
-      this.apiService.getUserPortfolioTransaction(input.userId),
-      this.apiService.getPortfolioTransactionForPublic(input.transactionId),
-    ]);
-
-    if (!user) {
-      throw new Error(USER_NOT_NOT_FOUND_ERROR);
-    }
+    const userTransactions = await this.authenticationUserService.getUserPortfolioTransactionPromise();
+    const removedTransaction = await this.portfolioApiService.getPortfolioTransactionPublicPromise(input.transactionId);
 
     if (!userTransactions || !removedTransaction) {
       throw new Error(TRANSACTION_HISTORY_NOT_FOUND_ERROR);
     }
 
     // remove transaction from public transactions collection
-    await this.apiService.deletePortfolioTransactionForPublic(input.transactionId);
+    this.portfolioApiService.deletePortfolioTransactionForPublic(input.transactionId);
 
     // remove transaction from user document
-    await this.apiService.deletePortfolioTransactionForUser(input.userId, input.transactionId);
+    this.userApiService.deletePortfolioTransactionForUser(input.userId, input.transactionId);
 
     // return removed transaction
     return removedTransaction;
@@ -104,11 +107,11 @@ export class PortfolioTransactionsService {
 
   private createTransaction(
     input: PortfolioTransactionCreate,
-    user: User,
     symbolSummary: SymbolSummary,
     breakEvenPrice: number,
   ): PortfolioTransaction {
-    const isTransactionFeesActive = user.settings.isTransactionFeesActive;
+    const userData = this.authenticationUserService.userData;
+    const isTransactionFeesActive = userData.settings.isTransactionFeesActive;
 
     // if custom total value is provided calculate unit price, else use API price
     const unitPrice = input.customTotalValue
@@ -130,8 +133,6 @@ export class PortfolioTransactionsService {
       units: input.units,
       transactionType: input.transactionType,
       userId: input.userId,
-      userPhotoURL: user.personal.photoURL,
-      userDisplayName: user.personal.displayName,
       symbolType: input.symbolType,
       unitPrice,
       transactionFees,
@@ -156,19 +157,10 @@ export class PortfolioTransactionsService {
    */
   private executeTransactionOperationDataValidity(
     input: PortfolioTransactionCreate,
-    user?: User,
-    symbolSummary?: SymbolSummary,
-    userTransactionHistory?: UserPortfolioTransaction,
+    symbolSummary: SymbolSummary,
+    userTransactionHistory: UserPortfolioTransaction,
   ): void {
-    // throw error if no user
-    if (!user) {
-      throw new Error(USER_NOT_NOT_FOUND_ERROR);
-    }
-
-    // throw error if no transaction history
-    if (!userTransactionHistory) {
-      throw new Error(TRANSACTION_HISTORY_NOT_FOUND_ERROR);
-    }
+    const userData = this.authenticationUserService.userData;
 
     // negative units
     if (input.units <= 0) {
@@ -178,11 +170,6 @@ export class PortfolioTransactionsService {
     // check if units is integer
     if (input.symbolType !== 'CRYPTO' && !Number.isInteger(input.units)) {
       throw new Error(TRANSACTION_INPUT_UNITS_INTEGER);
-    }
-
-    // check if symbol exists
-    if (!symbolSummary) {
-      throw new Error(SYMBOL_NOT_FOUND_ERROR);
     }
 
     // check if date is valid
@@ -213,7 +200,7 @@ export class PortfolioTransactionsService {
     const totalValue = input.units * symbolSummary.quote.price;
 
     // check if user has enough cash on hand if BUY and cashAccountActive
-    if (input.transactionType === 'BUY' && user.settings.isPortfolioCashActive) {
+    if (input.transactionType === 'BUY' && userData.settings.isPortfolioCashActive) {
       const cashOnHand = userTransactionHistory.cashDeposit.reduce((acc, curr) => acc + curr.amount, 0);
       if (cashOnHand < totalValue) {
         throw new Error(USER_NOT_ENOUGH_CASH_ERROR);

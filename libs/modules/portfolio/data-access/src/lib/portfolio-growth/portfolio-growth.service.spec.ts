@@ -1,8 +1,9 @@
 import { createMock } from '@golevelup/ts-jest';
+import { MarketApiService } from '@market-monitor/api-client';
 import { Test, TestingModule } from '@nestjs/testing';
 import { format, subDays } from 'date-fns';
 import { when } from 'jest-when';
-import { ApiService } from '../api/api.service';
+import { of } from 'rxjs';
 import {
   TestTransactionDates,
   expectedResult,
@@ -10,44 +11,32 @@ import {
   testHistoricalPriceSymbol_AAPL,
   testHistoricalPriceSymbol_MSFT,
   userTestPortfolioTransaction1,
-} from '../models';
+} from '../models-test';
 import { PortfolioGrowthService } from './portfolio-growth.service';
 
 describe('PortfolioGrowthService', () => {
   let service: PortfolioGrowthService;
-  const apiServiceMock = createMock<ApiService>({
-    getSymbolSummary: jest.fn(),
-    getUser: jest.fn(),
-    getUserPortfolioTransaction: jest.fn(),
-    addPortfolioTransactionForPublic: jest.fn(),
-    addPortfolioTransactionForUser: jest.fn(),
-    deletePortfolioTransactionForPublic: jest.fn(),
-    deletePortfolioTransactionForUser: jest.fn(),
-    getPortfolioTransactionForPublic: jest.fn(),
-    getPriceOnDateRange: jest.fn(),
+
+  const marketApiServiceMock = createMock<MarketApiService>({
+    getHistoricalPricesDateRange: jest.fn(),
   });
 
   const testUser = mockCreateUser();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PortfolioGrowthService, { provide: ApiService, useValue: apiServiceMock }],
+      providers: [PortfolioGrowthService, { provide: MarketApiService, useValue: marketApiServiceMock }],
     }).compile();
 
     service = module.get<PortfolioGrowthService>(PortfolioGrowthService);
-    when(apiServiceMock.getUser).calledWith(testUser.id).mockResolvedValue(testUser);
 
     const yesterDay = format(subDays(new Date(), 1), 'yyyy-MM-dd');
-    when(apiServiceMock.getPriceOnDateRange)
+    when(marketApiServiceMock.getHistoricalPricesDateRange)
       .calledWith('AAPL', TestTransactionDates['2023-09-04'], yesterDay)
-      .mockResolvedValue(testHistoricalPriceSymbol_AAPL);
-    when(apiServiceMock.getPriceOnDateRange)
+      .mockReturnValue(of(testHistoricalPriceSymbol_AAPL));
+    when(marketApiServiceMock.getHistoricalPricesDateRange)
       .calledWith('MSFT', TestTransactionDates['2023-09-07'], yesterDay)
-      .mockResolvedValue(testHistoricalPriceSymbol_MSFT);
-
-    when(apiServiceMock.getUserPortfolioTransaction)
-      .calledWith(testUser.id)
-      .mockResolvedValue(userTestPortfolioTransaction1);
+      .mockReturnValue(of(testHistoricalPriceSymbol_MSFT));
   });
 
   it('should be defined', () => {
@@ -56,7 +45,7 @@ describe('PortfolioGrowthService', () => {
 
   describe('Test: getPortfolioGrowthAssetsByUserId', () => {
     it('should return portfolio growth assets', async () => {
-      const result = await service.getPortfolioGrowthAssetsByUserId(testUser.id);
+      const result = await service.getPortfolioGrowthAssetsByUserId(userTestPortfolioTransaction1);
 
       expect(result).toEqual(expectedResult);
     });

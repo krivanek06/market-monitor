@@ -1,4 +1,4 @@
-import { Injectable, InjectionToken } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   Auth,
   GoogleAuthProvider,
@@ -8,16 +8,11 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from '@angular/fire/auth';
-import { DocumentReference, Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
-import { UserAccountType, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
-import { assignTypesClient, isNonNullable } from '@market-monitor/shared/utils-client';
-import { docData as rxDocData } from 'rxfire/firestore';
-import { BehaviorSubject, Observable, filter, map, take } from 'rxjs';
+import { UserApiService } from '@market-monitor/api-client';
+import { UserAccountType, UserData, UserPortfolioTransaction } from '@market-monitor/api-types';
+import { isNonNullable } from '@market-monitor/shared/utils-client';
+import { BehaviorSubject, Observable, map, take } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
-
-export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
-  'AUTHENTICATION_ACCOUNT_TOKEN',
-);
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +23,7 @@ export class AuthenticationAccountService {
 
   constructor(
     private auth: Auth,
-    private firestore: Firestore,
+    private userApiService: UserApiService,
   ) {
     this.initAuthenticationUser();
   }
@@ -59,27 +54,6 @@ export class AuthenticationAccountService {
     return this.authenticatedUserData$.pipe(isNonNullable());
   }
 
-  getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {
-    return rxDocData(this.getUserPortfolioTransactionDocRef(this.userData.id)).pipe(
-      filter((d): d is UserPortfolioTransaction => !!d),
-    );
-  }
-
-  getUserWatchlist(): Observable<UserWatchlist> {
-    return rxDocData(this.getUserWatchlistDocRef(this.userData.id)).pipe(filter((d): d is UserWatchlist => !!d));
-  }
-
-  updateUserData(userData: Partial<UserData>): void {
-    this.updateUser(this.userData.id, userData);
-  }
-
-  updateUserPortfolioTransactionData(transaction: Partial<UserPortfolioTransaction>): void {
-    this.updateUserPortfolioTransaction(this.userData.id, transaction);
-  }
-
-  updateUserWatchlistData(watchlist: Partial<UserWatchlist>): void {
-    this.updateUserWatchlist(watchlist);
-  }
   signIn(input: LoginUserInput): Promise<UserCredential> {
     return signInWithEmailAndPassword(this.auth, input.email, input.password);
   }
@@ -126,10 +100,9 @@ export class AuthenticationAccountService {
   }
 
   private getUserFromFirestoreUser(user: User): Observable<UserData> {
-    return this.getUserById(user.uid).pipe(map((userData) => (userData ? userData : this.createUser(user))));
-  }
-  private getUserById(userId: string): Observable<UserData | undefined> {
-    return rxDocData(this.getUserDocRef(userId), { idField: 'id' });
+    return this.userApiService
+      .getUserData(user.uid)
+      .pipe(map((userData) => (userData ? userData : this.createUser(user))));
   }
 
   private createUser(user: User): UserData {
@@ -146,40 +119,12 @@ export class AuthenticationAccountService {
     };
 
     // update user
-    this.updateUser(newUserData.id, newUserData);
+    this.userApiService.updateUser(newUserData.id, newUserData);
 
     // create portfolio for user
-    this.updateUserPortfolioTransaction(newUserData.id, newTransactions);
+    this.userApiService.updateUserPortfolioTransaction(newUserData.id, newTransactions);
 
     // return new user data
     return newUserData;
-  }
-
-  private updateUserPortfolioTransaction(id: string, transaction: Partial<UserPortfolioTransaction>): void {
-    setDoc(this.getUserPortfolioTransactionDocRef(id), transaction, { merge: true });
-  }
-
-  private updateUser(id: string, user: Partial<UserData>): void {
-    setDoc(this.getUserDocRef(id), user, { merge: true });
-  }
-
-  private getUserPortfolioTransactionDocRef(userId: string): DocumentReference<UserPortfolioTransaction> {
-    return doc(this.firestore, 'users', userId, 'more_information', 'transactions').withConverter(
-      assignTypesClient<UserPortfolioTransaction>(),
-    );
-  }
-
-  private getUserDocRef(userId: string): DocumentReference<UserData> {
-    return doc(collection(this.firestore, 'users').withConverter(assignTypesClient<UserData>()), userId);
-  }
-
-  private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchlist> {
-    return doc(this.firestore, 'users', userId, 'more_information', 'watchlist').withConverter(
-      assignTypesClient<UserWatchlist>(),
-    );
-  }
-
-  private updateUserWatchlist(watchlist: Partial<UserWatchlist>): void {
-    setDoc(this.getUserWatchlistDocRef(this.userData.id), watchlist, { merge: true });
   }
 }

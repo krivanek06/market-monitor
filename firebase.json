@@ -18,12 +18,6 @@
       "codebase": "cloud-functions",
       "runtime": "nodejs18",
       "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"]
-    },
-    {
-      "source": "dist/apps/cloud-functions-portfolio",
-      "codebase": "cloud-functions-portfolio",
-      "runtime": "nodejs18",
-      "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"]
     }
   ],
   "firestore": {

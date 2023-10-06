@@ -1,22 +1,23 @@
+import { Injectable } from '@angular/core';
+import { MarketApiService } from '@market-monitor/api-client';
 import {
   HistoricalPrice,
   HistoricalPriceSymbol,
   PortfolioGrowthAssets,
   PortfolioGrowthAssetsDataItem,
+  UserPortfolioTransaction,
 } from '@market-monitor/api-types';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
-import { Injectable } from '@nestjs/common';
 import { format, isBefore, isSameDay, subDays } from 'date-fns';
-import { ApiService } from '../api/api.service';
+import { firstValueFrom } from 'rxjs';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class PortfolioGrowthService {
-  constructor(private apiService: ApiService) {}
+  constructor(private marketApiService: MarketApiService) {}
 
-  async getPortfolioGrowthAssetsByUserId(userId: string): Promise<PortfolioGrowthAssets[]> {
-    // load data
-    const userTransactions = await this.apiService.getUserPortfolioTransaction(userId);
-
+  async getPortfolioGrowthAssetsByUserId(userTransactions: UserPortfolioTransaction): Promise<PortfolioGrowthAssets[]> {
     // from transactions get all distinct symbols with soonest date of transaction
     const transactionStart = userTransactions.transactions.reduce(
       (acc, curr) => {
@@ -40,7 +41,9 @@ export class PortfolioGrowthService {
     const yesterDay = format(subDays(new Date(), 1), 'yyyy-MM-dd');
     const historicalPricesPromise = await Promise.allSettled(
       transactionStart.map((transaction) =>
-        this.apiService.getPriceOnDateRange(transaction.symbol, transaction.startDate, yesterDay),
+        firstValueFrom(
+          this.marketApiService.getHistoricalPricesDateRange(transaction.symbol, transaction.startDate, yesterDay),
+        ),
       ),
     );
 
