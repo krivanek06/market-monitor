@@ -1,15 +1,12 @@
 import { createMock } from '@golevelup/ts-jest';
-import {
-  PortfolioTransaction,
-  PortfolioTransactionCreate,
-  User,
-  UserPortfolioTransaction,
-} from '@market-monitor/api-types';
+import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
+import { PortfolioTransaction, PortfolioTransactionCreate, UserPortfolioTransaction } from '@market-monitor/api-types';
+import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { Test, TestingModule } from '@nestjs/testing';
 import { addDays, format } from 'date-fns';
 import { when } from 'jest-when';
-import { ApiService } from './../api/api.service';
+import { of } from 'rxjs';
 import {
   DATE_FUTURE,
   DATE_INVALID_DATE,
@@ -17,11 +14,9 @@ import {
   DATE_WEEKEND,
   SYMBOL_NOT_FOUND_ERROR,
   TRANSACTION_FEE_PRCT,
-  TRANSACTION_HISTORY_NOT_FOUND_ERROR,
   TRANSACTION_INPUT_UNITS_INTEGER,
   TRANSACTION_INPUT_UNITS_POSITIVE,
   USER_NOT_ENOUGH_CASH_ERROR,
-  USER_NOT_NOT_FOUND_ERROR,
   USER_NOT_UNITS_ON_HAND_ERROR,
   mockCreateUser,
   testSymbolSummary_AAPL,
@@ -30,25 +25,32 @@ import {
   testTransaction_BUY_AAPL_1,
   testTransaction_BUY_AAPL_2,
   testTransaction_BUY_MSFT_1,
-} from './../models';
-import { PortfolioTransactionsService } from './portfolio-transactions.service';
+} from '../models-test';
+import { PortfolioOperationsService } from './portfolio-operations.service';
 
 describe('PortfolioCrudService', () => {
   //  let apiService: ApiService;
-  let service: PortfolioTransactionsService;
-  const apiServiceMock = createMock<ApiService>({
+  let service: PortfolioOperationsService;
+  const marketApiServiceMock = createMock<MarketApiService>({
     getSymbolSummary: jest.fn(),
-    getUser: jest.fn(),
-    getUserPortfolioTransaction: jest.fn(),
+  });
+  const authenticationUserServiceMock = createMock<AuthenticationUserService>({
+    getUserPortfolioTransactionPromise: jest.fn(),
+    userData: mockCreateUser(),
+  });
+
+  const portfolioApiServiceMock = createMock<PortfolioApiService>({
     addPortfolioTransactionForPublic: jest.fn(),
-    addPortfolioTransactionForUser: jest.fn(),
+    getPortfolioTransactionPublicPromise: jest.fn(),
     deletePortfolioTransactionForPublic: jest.fn(),
+  });
+
+  const userApiServiceMock = createMock<UserApiService>({
+    addPortfolioTransactionForUser: jest.fn(),
     deletePortfolioTransactionForUser: jest.fn(),
-    getPortfolioTransactionForPublic: jest.fn(),
   });
 
   // create test data
-  const testUser = mockCreateUser();
   const userTestPortfolioTransaction1 = {
     cashDeposit: [
       {
@@ -67,23 +69,29 @@ describe('PortfolioCrudService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PortfolioTransactionsService, { provide: ApiService, useValue: apiServiceMock }],
+      providers: [
+        PortfolioOperationsService,
+        { provide: MarketApiService, useValue: marketApiServiceMock },
+        { provide: AuthenticationUserService, useValue: authenticationUserServiceMock },
+        { provide: PortfolioApiService, useValue: portfolioApiServiceMock },
+        { provide: UserApiService, useValue: userApiServiceMock },
+      ],
     }).compile();
 
-    service = module.get<PortfolioTransactionsService>(PortfolioTransactionsService);
+    service = module.get<PortfolioOperationsService>(PortfolioOperationsService);
 
     // mock api calls
-    when(apiServiceMock.getSymbolSummary)
+    when(marketApiServiceMock.getSymbolSummary)
       .calledWith(testTransactionCreate_BUY_AAPL_1.symbol)
-      .mockResolvedValue(testSymbolSummary_AAPL);
-    when(apiServiceMock.getSymbolSummary)
+      .mockReturnValue(of(testSymbolSummary_AAPL));
+    when(marketApiServiceMock.getSymbolSummary)
       .calledWith(testSymbolSummary_MSFT.id)
-      .mockResolvedValue(testSymbolSummary_MSFT);
-    when(apiServiceMock.getUser).calledWith(testUser.id).mockResolvedValue(testUser);
-    when(apiServiceMock.getUserPortfolioTransaction)
-      .calledWith(testUser.id)
-      .mockResolvedValue(userTestPortfolioTransaction1);
-    when(apiServiceMock.getPortfolioTransactionForPublic)
+      .mockReturnValue(of(testSymbolSummary_MSFT));
+
+    when(authenticationUserServiceMock.getUserPortfolioTransactionPromise).mockResolvedValue(
+      userTestPortfolioTransaction1,
+    );
+    when(portfolioApiServiceMock.getPortfolioTransactionPublicPromise)
       .calledWith(testTransaction_BUY_AAPL_1.transactionId)
       .mockResolvedValue(testTransaction_BUY_AAPL_1);
   });
@@ -98,28 +106,6 @@ describe('PortfolioCrudService', () => {
 
   describe('Test: executeTransactionOperation', () => {
     describe('it should throw error', () => {
-      it('should throw error if user now found', () => {
-        // arrange
-        when(apiServiceMock.getUser).calledWith(testUser.id).mockResolvedValue(null);
-
-        // act
-        const act = () => service.executeTransactionOperation(testTransactionCreate_BUY_AAPL_1);
-
-        // assert
-        expect(act()).rejects.toThrow(USER_NOT_NOT_FOUND_ERROR);
-      });
-
-      it('should throw error if user transaction history not found', () => {
-        // arrange
-        when(apiServiceMock.getUserPortfolioTransaction).calledWith(testUser.id).mockResolvedValue(null);
-
-        // act
-        const act = () => service.executeTransactionOperation(testTransactionCreate_BUY_AAPL_1);
-
-        // assert
-        expect(act()).rejects.toThrow(TRANSACTION_HISTORY_NOT_FOUND_ERROR);
-      });
-
       it('should throw error if units input is not positive', () => {
         // arrange
         const input = { ...testTransactionCreate_BUY_AAPL_1, units: -1 };
@@ -169,9 +155,9 @@ describe('PortfolioCrudService', () => {
 
       it('should throw error if symbol not found', () => {
         // arrange
-        when(apiServiceMock.getSymbolSummary)
+        when(marketApiServiceMock.getSymbolSummary)
           .calledWith(testTransactionCreate_BUY_AAPL_1.symbol)
-          .mockResolvedValue(null);
+          .mockReturnValue(of(null));
 
         // act
         const act = () => service.executeTransactionOperation(testTransactionCreate_BUY_AAPL_1);
@@ -272,15 +258,7 @@ describe('PortfolioCrudService', () => {
     describe('should execute operation', () => {
       it('should execute buy operation and calculate transaction fee if user has isTransactionFeesActive', async () => {
         // activate portfolio cash
-        when(apiServiceMock.getUser)
-          .calledWith(testUser.id)
-          .mockResolvedValue({
-            ...testUser,
-            settings: {
-              ...testUser.settings,
-              isTransactionFeesActive: true,
-            },
-          } satisfies User);
+        authenticationUserServiceMock.userData.settings.isTransactionFeesActive = true;
 
         // arrange
         const input = testTransactionCreate_BUY_AAPL_1;
@@ -297,24 +275,16 @@ describe('PortfolioCrudService', () => {
         } satisfies PortfolioTransaction;
 
         // assert
-        expect(apiServiceMock.addPortfolioTransactionForUser).toBeCalledWith(expectedResult);
+        expect(userApiServiceMock.addPortfolioTransactionForUser).toBeCalledWith(expectedResult);
 
-        expect(apiServiceMock.addPortfolioTransactionForPublic).toBeCalledWith(expectedResult);
+        expect(portfolioApiServiceMock.addPortfolioTransactionForPublic).toBeCalledWith(expectedResult);
 
         expect(result).toEqual(expectedResult);
       });
 
       it('should execute buy operation and not calculate transaction fee if user does not have isTransactionFeesActive ', async () => {
         // activate portfolio cash
-        when(apiServiceMock.getUser)
-          .calledWith(testUser.id)
-          .mockResolvedValue({
-            ...testUser,
-            settings: {
-              ...testUser.settings,
-              isTransactionFeesActive: false,
-            },
-          } satisfies User);
+        authenticationUserServiceMock.userData.settings.isTransactionFeesActive = false;
 
         // arrange
         const input = testTransactionCreate_BUY_AAPL_1;
@@ -323,7 +293,7 @@ describe('PortfolioCrudService', () => {
         await service.executeTransactionOperation(input);
 
         // assert
-        expect(apiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
+        expect(userApiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
           ...testTransaction_BUY_AAPL_1,
           transactionFees: 0,
           transactionId: expect.any(String),
@@ -343,7 +313,7 @@ describe('PortfolioCrudService', () => {
         const unitPrice = roundNDigits(input.customTotalValue / input.units, 2);
 
         // assert
-        expect(apiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
+        expect(userApiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
           ...testTransaction_BUY_AAPL_1,
           transactionFees: expect.any(Number),
           transactionId: expect.any(String),
@@ -352,19 +322,9 @@ describe('PortfolioCrudService', () => {
       });
 
       it('should execute sell operation and calculate transaction fee if user has isTransactionFeesActive', async () => {
-        // activate portfolio cash
-        when(apiServiceMock.getUser)
-          .calledWith(testUser.id)
-          .mockResolvedValue({
-            ...testUser,
-            settings: {
-              ...testUser.settings,
-              isTransactionFeesActive: true,
-            },
-          } satisfies User);
-        when(apiServiceMock.getUserPortfolioTransaction)
-          .calledWith(testUser.id)
-          .mockResolvedValue(userTestPortfolioTransaction1);
+        authenticationUserServiceMock.userData.settings.isTransactionFeesActive = true;
+
+        when(userApiServiceMock.getUserPortfolioTransactionPromise).mockResolvedValue(userTestPortfolioTransaction1);
 
         // arrange
         const input = {
@@ -392,8 +352,6 @@ describe('PortfolioCrudService', () => {
           units: input.units,
           transactionType: input.transactionType,
           userId: input.userId,
-          userPhotoURL: testUser.personal.photoURL,
-          userDisplayName: testUser.personal.displayName,
           symbolType: input.symbolType,
           unitPrice: testSymbolSummary_AAPL.quote.price,
           transactionFees: transactionFee,
@@ -402,22 +360,14 @@ describe('PortfolioCrudService', () => {
           returnValue: returnValue,
         };
         // assert
-        expect(apiServiceMock.addPortfolioTransactionForUser).toBeCalledWith(expectedResult);
-        expect(apiServiceMock.addPortfolioTransactionForPublic).toBeCalledWith(expectedResult);
+        expect(userApiServiceMock.addPortfolioTransactionForUser).toBeCalledWith(expectedResult);
+        expect(portfolioApiServiceMock.addPortfolioTransactionForPublic).toBeCalledWith(expectedResult);
         expect(result).toEqual(expectedResult);
       });
 
       it('should execute sell operation and calculate transaction fee if user does not have isTransactionFeesActive', async () => {
         // activate portfolio cash
-        when(apiServiceMock.getUser)
-          .calledWith(testUser.id)
-          .mockResolvedValue({
-            ...testUser,
-            settings: {
-              ...testUser.settings,
-              isTransactionFeesActive: false,
-            },
-          } satisfies User);
+        authenticationUserServiceMock.userData.settings.isTransactionFeesActive = false;
 
         // arrange
         const input = {
@@ -429,7 +379,7 @@ describe('PortfolioCrudService', () => {
         await service.executeTransactionOperation(input);
 
         // assert
-        expect(apiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
+        expect(userApiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
           ...testTransaction_BUY_AAPL_1,
           transactionFees: 0,
           transactionId: expect.any(String),
@@ -443,51 +393,19 @@ describe('PortfolioCrudService', () => {
   });
 
   describe('Test: deleteTransactionOperation', () => {
-    describe('it should throw error', () => {
-      it('should throw error if user now found', () => {
-        // arrange
-        when(apiServiceMock.getUser).calledWith(testUser.id).mockResolvedValue(null);
-
-        // act
-        const act = () =>
-          service.deleteTransactionOperation({
-            userId: testUser.id,
-            transactionId: testTransaction_BUY_AAPL_1.transactionId,
-          });
-
-        // assert
-        expect(act()).rejects.toThrow(USER_NOT_NOT_FOUND_ERROR);
-      });
-
-      it('should throw error if user transaction history not found', () => {
-        // arrange
-        when(apiServiceMock.getUserPortfolioTransaction).calledWith(testUser.id).mockResolvedValue(null);
-
-        // act
-        const act = () =>
-          service.deleteTransactionOperation({
-            userId: testUser.id,
-            transactionId: testTransaction_BUY_AAPL_1.transactionId,
-          });
-
-        // assert
-        expect(act()).rejects.toThrow(TRANSACTION_HISTORY_NOT_FOUND_ERROR);
-      });
-    });
-
     describe('should execute operation', () => {
       it('should execute delete operation', async () => {
         // arrange
-        when(apiServiceMock.getUserPortfolioTransaction)
-          .calledWith(testUser.id)
-          .mockResolvedValue(userTestPortfolioTransaction1);
-        when(apiServiceMock.getPortfolioTransactionForPublic)
+        when(authenticationUserServiceMock.getUserPortfolioTransactionPromise).mockResolvedValue(
+          userTestPortfolioTransaction1,
+        );
+        when(portfolioApiServiceMock.getPortfolioTransactionPublicPromise)
           .calledWith(testTransaction_BUY_AAPL_1.transactionId)
           .mockResolvedValue(testTransaction_BUY_AAPL_1);
 
         // arrange
         const input = {
-          userId: testUser.id,
+          userId: authenticationUserServiceMock.userData.id,
           transactionId: testTransaction_BUY_AAPL_1.transactionId,
         };
 
@@ -495,8 +413,8 @@ describe('PortfolioCrudService', () => {
         const result = await service.deleteTransactionOperation(input);
 
         // assert
-        expect(apiServiceMock.deletePortfolioTransactionForUser).toBeCalledWith(input.userId, input.transactionId);
-        expect(apiServiceMock.deletePortfolioTransactionForPublic).toBeCalledWith(input.transactionId);
+        expect(userApiServiceMock.deletePortfolioTransactionForUser).toBeCalledWith(input.userId, input.transactionId);
+        expect(portfolioApiServiceMock.deletePortfolioTransactionForPublic).toBeCalledWith(input.transactionId);
         expect(result).toEqual(testTransaction_BUY_AAPL_1);
       });
     });

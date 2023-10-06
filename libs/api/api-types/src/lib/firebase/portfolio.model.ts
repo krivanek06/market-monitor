@@ -36,8 +36,6 @@ export type PortfolioTransactionType = 'BUY' | 'SELL';
 export type PortfolioTransaction = {
   transactionId: string;
   userId: string;
-  userPhotoURL: string;
-  userDisplayName: string;
   symbolType: SymbolType;
   symbol: string;
   units: number;
@@ -49,6 +47,11 @@ export type PortfolioTransaction = {
   transactionFees: number;
   // calculations
   // invested = unitPrice * units
+};
+
+export type PortfolioTransactionAggregation = PortfolioTransaction & {
+  userPhotoURL: string;
+  userDisplayName: string;
 };
 
 export type PortfolioTransactionCash = {

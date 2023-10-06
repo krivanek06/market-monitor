@@ -13,7 +13,7 @@ import {
 } from '@angular/router';
 import {
   AUTHENTICATION_ACCOUNT_TOKEN,
-  AuthenticationAccountService,
+  AuthenticationUserService,
 } from '@market-monitor/modules/authentication/data-access';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
@@ -45,7 +45,7 @@ export const appConfig: ApplicationConfig = {
     // },
     {
       provide: AUTHENTICATION_ACCOUNT_TOKEN,
-      useExisting: AuthenticationAccountService,
+      useExisting: AuthenticationUserService,
     },
   ],
 };
