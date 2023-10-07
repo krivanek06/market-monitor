@@ -13,7 +13,6 @@ import {
   DATE_WEEKEND,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
   PortfolioTransactionCreate,
-  PortfolioTransactionDelete,
   SYMBOL_NOT_FOUND_ERROR,
   TRANSACTION_FEE_PRCT,
   TRANSACTION_HISTORY_NOT_FOUND_ERROR,
@@ -34,8 +33,9 @@ export class PortfolioOperationsService {
     private userApiService: UserApiService,
   ) {}
 
-  async executeTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
+  async createTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
     // get data
+    const userId = this.authenticationUserService.userData.id;
     const userTransactions = await this.authenticationUserService.getUserPortfolioTransactionPromise();
     const symbolSummary = await firstValueFrom(this.marketApiService.getSymbolSummary(input.symbol));
 
@@ -52,7 +52,7 @@ export class PortfolioOperationsService {
     const symbolHoldingBreakEvenPrice = roundNDigits(symbolHolding.invested / symbolHolding.units, 2);
 
     // create transaction
-    const transaction = this.createTransaction(input, symbolSummary, symbolHoldingBreakEvenPrice);
+    const transaction = this.createTransaction(userId, input, symbolSummary, symbolHoldingBreakEvenPrice);
 
     // save transaction into public transactions collection
     this.portfolioApiService.addPortfolioTransactionForPublic(transaction);
@@ -64,20 +64,21 @@ export class PortfolioOperationsService {
     return transaction;
   }
 
-  async deleteTransactionOperation(input: PortfolioTransactionDelete): Promise<PortfolioTransaction> {
+  async deleteTransactionOperation(transactionId: string): Promise<PortfolioTransaction> {
     // get data
+    const userId = this.authenticationUserService.userData.id;
     const userTransactions = await this.authenticationUserService.getUserPortfolioTransactionPromise();
-    const removedTransaction = await this.portfolioApiService.getPortfolioTransactionPublicPromise(input.transactionId);
+    const removedTransaction = await this.portfolioApiService.getPortfolioTransactionPublicPromise(transactionId);
 
     if (!userTransactions || !removedTransaction) {
       throw new Error(TRANSACTION_HISTORY_NOT_FOUND_ERROR);
     }
 
     // remove transaction from public transactions collection
-    this.portfolioApiService.deletePortfolioTransactionForPublic(input.transactionId);
+    this.portfolioApiService.deletePortfolioTransactionForPublic(transactionId);
 
     // remove transaction from user document
-    this.userApiService.deletePortfolioTransactionForUser(input.userId, input.transactionId);
+    this.userApiService.deletePortfolioTransactionForUser(userId, transactionId);
 
     // return removed transaction
     return removedTransaction;
@@ -102,6 +103,7 @@ export class PortfolioOperationsService {
   }
 
   private createTransaction(
+    userId: string,
     input: PortfolioTransactionCreate,
     symbolSummary: SymbolSummary,
     breakEvenPrice: number,
@@ -128,7 +130,7 @@ export class PortfolioOperationsService {
       symbol: input.symbol,
       units: input.units,
       transactionType: input.transactionType,
-      userId: input.userId,
+      userId: userId,
       symbolType: input.symbolType,
       unitPrice,
       transactionFees,

@@ -10,7 +10,6 @@ export const mockCreatePortfolioTransactionCreate = (
     symbol: 'AAPL',
     transactionType: 'BUY',
     units: 1,
-    userId: USER_TEST_1_ID,
     symbolType: 'STOCK',
     ...input,
   };

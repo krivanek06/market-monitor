@@ -2,7 +2,7 @@ import { Injectable, InjectionToken } from '@angular/core';
 import { UserApiService } from '@market-monitor/api-client';
 import { UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
 import { User } from 'firebase/auth';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom, shareReplay, tap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
@@ -13,6 +13,11 @@ export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAcc
   providedIn: 'root',
 })
 export class AuthenticationUserService {
+  private userPortfolioTransaction$ = this.userApiService.getUserPortfolioTransactions(this.userData.id).pipe(
+    tap(() => console.log(`AuthenticationUserService: getUserPortfolioTransactions`)),
+    shareReplay(1),
+  );
+
   constructor(
     private authenticationAccountService: AuthenticationAccountService,
     private userApiService: UserApiService,
@@ -31,11 +36,11 @@ export class AuthenticationUserService {
   }
 
   getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {
-    return this.userApiService.getUserPortfolioTransactions(this.userData.id);
+    return this.userPortfolioTransaction$;
   }
 
   getUserPortfolioTransactionPromise(): Promise<UserPortfolioTransaction> {
-    return this.userApiService.getUserPortfolioTransactionPromise(this.userData.id);
+    return firstValueFrom(this.userPortfolioTransaction$);
   }
 
   getUserWatchlist(): Observable<UserWatchlist> {

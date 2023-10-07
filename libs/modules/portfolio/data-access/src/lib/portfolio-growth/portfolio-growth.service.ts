@@ -23,6 +23,7 @@ export class PortfolioGrowthService {
   ) {}
 
   getPortfolioState(portfolioTransactions: UserPortfolioTransaction): Observable<PortfolioState> {
+    console.log(`PortfolioGrowthService: getPortfolioState`);
     const transactions = portfolioTransactions.transactions;
     const cashOnHand = portfolioTransactions.cashDeposit.reduce(
       (acc, curr) => acc + (curr.type === 'DEPOSIT' ? curr.amount : -curr.amount),
@@ -83,6 +84,7 @@ export class PortfolioGrowthService {
   }
 
   async getPortfolioGrowthAssets(userTransactions: UserPortfolioTransaction): Promise<PortfolioGrowthAssets[]> {
+    console.log(`PortfolioGrowthService: getPortfolioGrowthAssets`);
     // from transactions get all distinct symbols with soonest date of transaction
     const transactionStart = userTransactions.transactions.reduce(
       (acc, curr) => {

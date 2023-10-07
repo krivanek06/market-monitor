@@ -11,6 +11,7 @@ import {
   testHistoricalPriceSymbol_MSFT,
   userTestPortfolioTransaction1,
 } from '../models';
+import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioGrowthService } from './portfolio-growth.service';
 
 describe('PortfolioGrowthService', () => {
@@ -20,9 +21,17 @@ describe('PortfolioGrowthService', () => {
     getHistoricalPricesDateRange: jest.fn(),
   });
 
+  const portfolioCalculationServiceMock = createMock<PortfolioCalculationService>({
+    getPortfolioStateHoldingPartial: jest.fn(),
+  });
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PortfolioGrowthService, { provide: MarketApiService, useValue: marketApiServiceMock }],
+      providers: [
+        PortfolioGrowthService,
+        { provide: MarketApiService, useValue: marketApiServiceMock },
+        { provide: PortfolioCalculationService, useValue: portfolioCalculationServiceMock },
+      ],
     }).compile();
 
     service = module.get<PortfolioGrowthService>(PortfolioGrowthService);
@@ -40,7 +49,7 @@ describe('PortfolioGrowthService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('Test: getPortfolioGrowthAssetsByUserId', () => {
+  describe('Test: getPortfolioGrowthAssets', () => {
     it('should return portfolio growth assets', async () => {
       const result = await service.getPortfolioGrowthAssets(userTestPortfolioTransaction1);
 

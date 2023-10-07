@@ -7,8 +7,6 @@ import { PortfolioChange, PortfolioGrowth, PortfolioStateHolding, PortfolioState
   providedIn: 'root',
 })
 export class PortfolioCalculationService {
-  constructor() {}
-
   getPortfolioGrowth(data: PortfolioGrowthAssets[]): PortfolioGrowth[] {
     return data.reduce((acc, curr) => {
       curr.data.forEach((dataItem) => {
@@ -88,31 +86,11 @@ export class PortfolioCalculationService {
   }
 
   /**
-   * generate array of sector allocations, where name is the sector's name
-   * and value is the value allocated to that sector
+   * generate pie chart based on holdings representing sector allocation
    *
    * @param holdings
    * @returns
    */
-  getPortfolioSectorAllocation(
-    transactions: PortfolioStateHolding[],
-    key: 'asset' | 'sector',
-  ): { [name: string]: number } {
-    return transactions.reduce(
-      (acc, curr) => {
-        const dataKey = key === 'asset' ? curr.symbol : curr.symbolSummary.profile?.sector ?? curr.symbolType;
-        const existingData = acc[dataKey];
-        if (existingData) {
-          acc[dataKey] += curr.symbolSummary.quote.price * curr.units;
-        } else {
-          acc[dataKey] = curr.symbolSummary.quote.price * curr.units;
-        }
-        return acc;
-      },
-      {} as { [name: string]: number },
-    );
-  }
-
   getPortfolioSectorAllocationPieChart(holdings: PortfolioStateHolding[]): GenericChartSeriesPie {
     const allocations = this.getPortfolioSectorAllocation(holdings, 'sector');
     const chartData = Object.entries(allocations)
@@ -139,7 +117,7 @@ export class PortfolioCalculationService {
    * @param holdings
    * @returns
    */
-  getPortfolioAssetAllocation(holdings: PortfolioStateHolding[]): GenericChartSeriesPie {
+  getPortfolioAssetAllocationPieChart(holdings: PortfolioStateHolding[]): GenericChartSeriesPie {
     const visibleData = 8;
     const allocations = this.getPortfolioSectorAllocation(holdings, 'asset');
     const chartData = Object.entries(allocations)
@@ -169,5 +147,31 @@ export class PortfolioCalculationService {
       type: 'pie',
       data: resultData,
     };
+  }
+
+  /**
+   * generate array of sector\asset allocations, where name is the sector's/asset's name
+   * and value is the value allocated to that  sector\asset
+   *
+   * @param holdings
+   * @returns
+   */
+  private getPortfolioSectorAllocation(
+    transactions: PortfolioStateHolding[],
+    key: 'asset' | 'sector',
+  ): { [name: string]: number } {
+    return transactions.reduce(
+      (acc, curr) => {
+        const dataKey = key === 'asset' ? curr.symbol : curr.symbolSummary.profile?.sector ?? curr.symbolType;
+        const existingData = acc[dataKey];
+        if (existingData) {
+          acc[dataKey] += curr.symbolSummary.quote.price * curr.units;
+        } else {
+          acc[dataKey] = curr.symbolSummary.quote.price * curr.units;
+        }
+        return acc;
+      },
+      {} as { [name: string]: number },
+    );
   }
 }

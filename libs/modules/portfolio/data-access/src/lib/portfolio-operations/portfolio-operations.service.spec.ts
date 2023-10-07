@@ -32,12 +32,14 @@ import { PortfolioOperationsService } from './portfolio-operations.service';
 describe('PortfolioCrudService', () => {
   //  let apiService: ApiService;
   let service: PortfolioOperationsService;
+
+  const user = mockCreateUser();
   const marketApiServiceMock = createMock<MarketApiService>({
     getSymbolSummary: jest.fn(),
   });
   const authenticationUserServiceMock = createMock<AuthenticationUserService>({
     getUserPortfolioTransactionPromise: jest.fn(),
-    userData: mockCreateUser(),
+    userData: user,
   });
 
   const portfolioApiServiceMock = createMock<PortfolioApiService>({
@@ -114,7 +116,7 @@ describe('PortfolioCrudService', () => {
         const input = { ...testTransactionCreate_BUY_AAPL_1, units: -1 };
 
         // act
-        const act = () => service.executeTransactionOperation(input);
+        const act = () => service.createTransactionOperation(input);
 
         // assert
         expect(act()).rejects.toThrow(TRANSACTION_INPUT_UNITS_POSITIVE);
@@ -144,10 +146,10 @@ describe('PortfolioCrudService', () => {
         } satisfies PortfolioTransactionCreate;
 
         // act
-        const act1 = () => service.executeTransactionOperation(inputStock);
-        const act2 = () => service.executeTransactionOperation(inputEtf);
-        const act3 = () => service.executeTransactionOperation(inputFund);
-        const act4 = () => service.executeTransactionOperation(inputCurrency);
+        const act1 = () => service.createTransactionOperation(inputStock);
+        const act2 = () => service.createTransactionOperation(inputEtf);
+        const act3 = () => service.createTransactionOperation(inputFund);
+        const act4 = () => service.createTransactionOperation(inputCurrency);
 
         // assert
         expect(act1()).rejects.toThrow(TRANSACTION_INPUT_UNITS_INTEGER);
@@ -163,7 +165,7 @@ describe('PortfolioCrudService', () => {
           .mockReturnValue(of(null));
 
         // act
-        const act = () => service.executeTransactionOperation(testTransactionCreate_BUY_AAPL_1);
+        const act = () => service.createTransactionOperation(testTransactionCreate_BUY_AAPL_1);
 
         // assert
         expect(act()).rejects.toThrow(SYMBOL_NOT_FOUND_ERROR);
@@ -174,7 +176,7 @@ describe('PortfolioCrudService', () => {
         const input = { ...testTransactionCreate_BUY_AAPL_1, date: 'invalid date' };
 
         // act
-        const act = () => service.executeTransactionOperation(input);
+        const act = () => service.createTransactionOperation(input);
 
         // assert
         expect(act()).rejects.toThrow(DATE_INVALID_DATE);
@@ -186,7 +188,7 @@ describe('PortfolioCrudService', () => {
         const input = { ...testTransactionCreate_BUY_AAPL_1, date: randomWeekend };
 
         // act
-        const act = () => service.executeTransactionOperation(input);
+        const act = () => service.createTransactionOperation(input);
 
         // assert
         expect(act()).rejects.toThrow(DATE_WEEKEND);
@@ -198,7 +200,7 @@ describe('PortfolioCrudService', () => {
         const input = { ...testTransactionCreate_BUY_AAPL_1, date: tomorrow };
 
         // act
-        const act = () => service.executeTransactionOperation(input);
+        const act = () => service.createTransactionOperation(input);
 
         // assert
         expect(act()).rejects.toThrow(DATE_FUTURE);
@@ -210,7 +212,7 @@ describe('PortfolioCrudService', () => {
         const input = { ...testTransactionCreate_BUY_AAPL_1, date: tooOldDate };
 
         // act
-        const act = () => service.executeTransactionOperation(input);
+        const act = () => service.createTransactionOperation(input);
 
         // assert
         expect(act()).rejects.toThrow(DATE_TOO_OLD);
@@ -221,7 +223,7 @@ describe('PortfolioCrudService', () => {
         const input = { ...testTransactionCreate_BUY_AAPL_1, units: 10000 } satisfies PortfolioTransactionCreate;
 
         // act
-        const act = () => service.executeTransactionOperation(input);
+        const act = () => service.createTransactionOperation(input);
 
         // assert
         expect(act()).rejects.toThrow(USER_NOT_ENOUGH_CASH_ERROR);
@@ -236,7 +238,7 @@ describe('PortfolioCrudService', () => {
         } satisfies PortfolioTransactionCreate;
 
         // act
-        const act = () => service.executeTransactionOperation(input);
+        const act = () => service.createTransactionOperation(input);
 
         // assert
         expect(act()).rejects.toThrow(USER_NOT_UNITS_ON_HAND_ERROR);
@@ -251,7 +253,7 @@ describe('PortfolioCrudService', () => {
         } satisfies PortfolioTransactionCreate;
 
         // act
-        const act = () => service.executeTransactionOperation(input);
+        const act = () => service.createTransactionOperation(input);
 
         // assert
         expect(act()).rejects.toThrow(USER_NOT_UNITS_ON_HAND_ERROR);
@@ -268,7 +270,7 @@ describe('PortfolioCrudService', () => {
         const transactionFee = ((input.units * testSymbolSummary_AAPL.quote.price) / 100) * TRANSACTION_FEE_PRCT;
 
         // act
-        const result = await service.executeTransactionOperation(input);
+        const result = await service.createTransactionOperation(input);
 
         const expectedResult = {
           ...testTransaction_BUY_AAPL_1,
@@ -293,7 +295,7 @@ describe('PortfolioCrudService', () => {
         const input = testTransactionCreate_BUY_AAPL_1;
 
         // act
-        await service.executeTransactionOperation(input);
+        await service.createTransactionOperation(input);
 
         // assert
         expect(userApiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
@@ -312,7 +314,7 @@ describe('PortfolioCrudService', () => {
         } satisfies PortfolioTransactionCreate;
 
         // act
-        await service.executeTransactionOperation(input);
+        await service.createTransactionOperation(input);
         const unitPrice = roundNDigits(input.customTotalValue / input.units, 2);
 
         // assert
@@ -327,7 +329,9 @@ describe('PortfolioCrudService', () => {
       it('should execute sell operation and calculate transaction fee if user has isTransactionFeesActive', async () => {
         authenticationUserServiceMock.userData.settings.isTransactionFeesActive = true;
 
-        when(userApiServiceMock.getUserPortfolioTransactionPromise).mockResolvedValue(userTestPortfolioTransaction1);
+        when(authenticationUserServiceMock.getUserPortfolioTransactionPromise).mockResolvedValue(
+          userTestPortfolioTransaction1,
+        );
 
         // arrange
         const input = {
@@ -347,14 +351,14 @@ describe('PortfolioCrudService', () => {
         const returnChange = roundNDigits((testSymbolSummary_AAPL.quote.price - breakEvenPrice) / breakEvenPrice);
 
         // act
-        const result = await service.executeTransactionOperation(input);
+        const result = await service.createTransactionOperation(input);
 
         const expectedResult: PortfolioTransaction = {
           date: input.date,
           symbol: input.symbol,
           units: input.units,
           transactionType: input.transactionType,
-          userId: input.userId,
+          userId: user.id,
           symbolType: input.symbolType,
           unitPrice: testSymbolSummary_AAPL.quote.price,
           transactionFees: transactionFee,
@@ -379,7 +383,7 @@ describe('PortfolioCrudService', () => {
         } satisfies PortfolioTransactionCreate;
 
         // act
-        await service.executeTransactionOperation(input);
+        await service.createTransactionOperation(input);
 
         // assert
         expect(userApiServiceMock.addPortfolioTransactionForUser).toBeCalledWith({
@@ -413,7 +417,7 @@ describe('PortfolioCrudService', () => {
         };
 
         // act
-        const result = await service.deleteTransactionOperation(input);
+        const result = await service.deleteTransactionOperation(input.transactionId);
 
         // assert
         expect(userApiServiceMock.deletePortfolioTransactionForUser).toBeCalledWith(input.userId, input.transactionId);

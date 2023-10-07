@@ -12,7 +12,7 @@ import {
 import { PortfolioTransaction, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { docData as rxDocData } from 'rxfire/firestore';
-import { Observable, filter, firstValueFrom } from 'rxjs';
+import { Observable, filter } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -25,10 +25,6 @@ export class UserApiService {
     return rxDocData(this.getUserPortfolioTransactionDocRef(userId)).pipe(
       filter((d): d is UserPortfolioTransaction => !!d),
     );
-  }
-
-  getUserPortfolioTransactionPromise(userId: string): Promise<UserPortfolioTransaction> {
-    return firstValueFrom(this.getUserPortfolioTransactions(userId));
   }
 
   addPortfolioTransactionForUser(transaction: PortfolioTransaction): void {
