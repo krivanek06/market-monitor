@@ -9,15 +9,80 @@ import {
 } from '@market-monitor/api-types';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { format, isBefore, isSameDay, subDays } from 'date-fns';
-import { firstValueFrom } from 'rxjs';
+import { Observable, firstValueFrom, map, tap } from 'rxjs';
+import { PortfolioState, PortfolioStateHolding } from '../models';
+import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PortfolioGrowthService {
-  constructor(private marketApiService: MarketApiService) {}
+  constructor(
+    private marketApiService: MarketApiService,
+    private portfolioCalculationService: PortfolioCalculationService,
+  ) {}
 
-  async getPortfolioGrowthAssetsByUserId(userTransactions: UserPortfolioTransaction): Promise<PortfolioGrowthAssets[]> {
+  getPortfolioState(portfolioTransactions: UserPortfolioTransaction): Observable<PortfolioState> {
+    const transactions = portfolioTransactions.transactions;
+    const cashOnHand = portfolioTransactions.cashDeposit.reduce(
+      (acc, curr) => acc + (curr.type === 'DEPOSIT' ? curr.amount : -curr.amount),
+      0,
+    );
+    const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
+    const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
+    const transactionFees = transactions.reduce((acc, curr) => acc + curr.transactionFees, 0);
+
+    // get partial holdings calculations
+    const partialHoldings = this.portfolioCalculationService.getPortfolioStateHoldingPartial(transactions);
+    const partialHoldingSymbols = partialHoldings.map((d) => d.symbol);
+
+    // get symbol summaries from API
+    return this.marketApiService.getSymbolSummaries(partialHoldingSymbols).pipe(
+      // TODO: maybe use some logging service
+      tap((summaries) => console.log(`Sending ${partialHoldings.length}, receiving: ${summaries.length}`)),
+      // map summaries into holdings data
+      map((summaries) =>
+        summaries
+          .map((symbolSummary) => {
+            const holding = partialHoldings.find((d) => d.symbol === symbolSummary.id);
+            if (!holding) {
+              console.log(`Holding not found for symbol ${symbolSummary.id}`);
+              return null;
+            }
+            return {
+              ...holding,
+              symbolSummary,
+            } satisfies PortfolioStateHolding;
+          })
+          // filter out nulls
+          .filter((d): d is PortfolioStateHolding => !!d),
+      ),
+      map((holdings) => {
+        const invested = holdings.reduce((acc, curr) => acc + curr.invested, 0);
+        const userBalance = invested + cashOnHand;
+        const holdingsBalance = holdings.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0);
+        const totalGainsValue = roundNDigits(holdingsBalance - invested, 2);
+        const totalGainsPercentage = roundNDigits((holdingsBalance - holdingsBalance) / holdingsBalance, 4);
+
+        const result: PortfolioState = {
+          numberOfExecutedBuyTransactions,
+          numberOfExecutedSellTransactions,
+          transactionFees,
+          cashOnHand,
+          userBalance,
+          invested,
+          holdings,
+          holdingsBalance,
+          totalGainsValue,
+          totalGainsPercentage,
+        };
+
+        return result;
+      }),
+    );
+  }
+
+  async getPortfolioGrowthAssets(userTransactions: UserPortfolioTransaction): Promise<PortfolioGrowthAssets[]> {
     // from transactions get all distinct symbols with soonest date of transaction
     const transactionStart = userTransactions.transactions.reduce(
       (acc, curr) => {

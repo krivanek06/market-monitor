@@ -1,23 +1,44 @@
 import { PortfolioGrowthAssetsDataItem, SymbolSummary, SymbolType } from '@market-monitor/api-types';
 
 export type PortfolioState = {
-  balance: number;
+  /**
+   * userBalance = invested + cashOnHand
+   */
+  userBalance: number;
+  /**
+   * holdingsBalance = closed price * units for each holdings
+   */
+  holdingsBalance: number;
+
+  /**
+   * total invested value into holdings
+   */
   invested: number;
+  cashOnHand: number;
   numberOfExecutedBuyTransactions: number;
   numberOfExecutedSellTransactions: number;
   transactionFees: number;
-  cashOnHand: number;
+
+  /**
+   * calculated from previous transactions
+   */
   holdings: PortfolioStateHolding[];
+
+  /**
+   * calculated from holdings and userBalance
+   */
   totalGainsValue: number;
   totalGainsPercentage: number;
 };
 
-export type PortfolioStateHolding = {
+export type PortfolioStateHoldingPartial = {
   symbolType: SymbolType;
   symbol: string;
   units: number;
   invested: number;
-  sector: string; // tech, finance, etc.
+};
+
+export type PortfolioStateHolding = PortfolioStateHoldingPartial & {
   // breakEvenPrice: number; // calculated
   symbolSummary: SymbolSummary;
 };

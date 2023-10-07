@@ -58,11 +58,13 @@ describe('PortfolioCrudService', () => {
         transactionId: '1',
         amount: 2000,
         date: '2020-01-01',
+        type: 'DEPOSIT',
       },
       {
         transactionId: '2',
         amount: 4000,
         date: '2020-01-14',
+        type: 'DEPOSIT',
       },
     ],
     transactions: [testTransaction_BUY_AAPL_1, testTransaction_BUY_AAPL_2],

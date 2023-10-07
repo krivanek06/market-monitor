@@ -45,8 +45,6 @@ export type PortfolioTransaction = {
   returnChange: number;
   transactionType: PortfolioTransactionType;
   transactionFees: number;
-  // calculations
-  // invested = unitPrice * units
 };
 
 export type PortfolioTransactionAggregation = PortfolioTransaction & {
@@ -58,4 +56,5 @@ export type PortfolioTransactionCash = {
   transactionId: string;
   date: string;
   amount: number;
+  type: 'DEPOSIT' | 'WITHDRAW';
 };

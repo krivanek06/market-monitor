@@ -1,1 +1,42 @@
-<p>portfolio-state works!</p>
+<div class="flex justify-between">
+  <!-- balance -->
+  <div class="flex flex-col gap-2 text-center">
+    <div>Balance</div>
+    <div>{{ portfolioState.balance | currency }}</div>
+  </div>
+
+  <!-- Invested -->
+  <div class="flex flex-col gap-2 text-center">
+    <div>Invested</div>
+    <div>{{ portfolioState.invested | currency }}</div>
+  </div>
+
+  <!-- Cash - if isPortfolioCashActive active -->
+  <div *ngIf="isPortfolioCashActive" class="flex flex-col gap-2 text-center">
+    <div>Cash</div>
+    <div>{{ portfolioState.cashOnHand | currency }}</div>
+  </div>
+
+  <!-- Total Gains - if isPortfolioCashActive not active -->
+  <div *ngIf="!isPortfolioCashActive" class="flex flex-col gap-2 text-center">
+    <div>Total Gains</div>
+    <div
+      appPercentageIncrease
+      [changeValues]="{
+        changePercentage: portfolioState.totalGainsPercentage
+      }"
+    ></div>
+  </div>
+
+  <!-- Total Return -->
+  <div class="flex flex-col gap-2 text-center">
+    <div>Total Return</div>
+    <div
+      appPercentageIncrease
+      [changeValues]="{
+        change: portfolioState.totalGainsValue,
+        changePercentage: isPortfolioCashActive ? portfolioState.totalGainsPercentage : undefined
+      }"
+    ></div>
+  </div>
+</div>
