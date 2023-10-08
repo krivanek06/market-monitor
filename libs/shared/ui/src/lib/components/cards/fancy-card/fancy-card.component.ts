@@ -6,11 +6,11 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="h-full relative overflow-hidden px-6 py-4 rounded-md shadow-md" [style]="backgroundLinear">
+    <div class="h-full relative overflow-hidden px-6 pb-2 pt-4 rounded-md shadow-md" [style]="backgroundLinear">
       <!-- title -->
-      <div *ngIf="title" class="pt-2 pb-6 flex items-center gap-2">
+      <div *ngIf="title" class="pb-4 flex items-center gap-2">
         <div class="c-title-dot" [ngStyle]="{ 'background-color': colorPrimary }"></div>
-        <div class="text-lg" [ngStyle]="{ color: colorPrimary }">
+        <div class="text-xl" [ngStyle]="{ color: colorPrimary }">
           {{ title }}
         </div>
       </div>

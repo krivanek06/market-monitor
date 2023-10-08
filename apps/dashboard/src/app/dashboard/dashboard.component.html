@@ -1,1 +1,25 @@
-<p>dashboard works!</p>
+<div *ngIf="portfolioState() as portfolioState" class="grid gap-4 sm:grid-cols-3">
+  <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
+    <app-portfolio-state
+      [titleColor]="ColorValues.ACCOUNT_STATE"
+      [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
+      [portfolioState]="portfolioState"
+    ></app-portfolio-state>
+  </app-fancy-card>
+
+  <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
+    <app-portfolio-state
+      [titleColor]="ColorValues.ACCOUNT_STATE"
+      [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
+      [portfolioState]="portfolioState"
+    ></app-portfolio-state>
+  </app-fancy-card>
+
+  <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
+    <app-portfolio-state
+      [titleColor]="ColorValues.ACCOUNT_STATE"
+      [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
+      [portfolioState]="portfolioState"
+    ></app-portfolio-state>
+  </app-fancy-card>
+</div>
