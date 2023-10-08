@@ -4,6 +4,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Router, RouterModule } from '@angular/router';
+import { AuthenticationAccountService } from '@market-monitor/modules/authentication/data-access';
+import { DASHBOARD_MAIN_ROUTES } from '@market-monitor/shared/data-access';
 import { sideNavigation } from './menu-routing.model';
 
 @Component({
@@ -21,17 +23,23 @@ import { sideNavigation } from './menu-routing.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuSideNavigationComponent implements OnInit {
-  private route = inject(Router);
+  private router = inject(Router);
+  private authenticationService = inject(AuthenticationAccountService);
 
   sideNavigation = sideNavigation;
   selectedNavigationPath = '';
 
   ngOnInit(): void {
-    this.selectedNavigationPath = this.route.url.split('/')[1]; // ['', 'dashboard']
+    this.selectedNavigationPath = this.router.url.split('/')[1]; // ['', 'dashboard']
   }
 
   onNavigationClick(path: string) {
     console.log('path', path);
     this.selectedNavigationPath = path;
+  }
+
+  async onLogout(): Promise<void> {
+    await this.authenticationService.signOut();
+    this.router.navigate([DASHBOARD_MAIN_ROUTES.LOGIN]);
   }
 }

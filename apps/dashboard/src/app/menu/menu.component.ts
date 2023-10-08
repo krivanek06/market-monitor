@@ -10,7 +10,6 @@ import { RouterModule } from '@angular/router';
 import { SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
 import { map } from 'rxjs';
 import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-navigation.component';
-import { MenuTopNavigationComponent } from './menu-top-navigation/menu-top-navigation.component';
 
 @Component({
   selector: 'app-menu',
@@ -23,7 +22,6 @@ import { MenuTopNavigationComponent } from './menu-top-navigation/menu-top-navig
     RouterModule,
     MatDividerModule,
     MenuSideNavigationComponent,
-    MenuTopNavigationComponent,
   ],
   templateUrl: './menu.component.html',
   styles: [

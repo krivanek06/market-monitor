@@ -15,10 +15,21 @@
 
 <!-- main navigation -->
 <div class="flex flex-col mt-10">
-  <div class="mb-2 ml-4">Market</div>
+  <div class="mb-2 ml-4">Other</div>
   <ng-container
     *ngTemplateOutlet="navigationBlock; context: { navigation: sideNavigation.marketNavigation }"
   ></ng-container>
+
+  <!-- logout -->
+  <div class="grid gap-2">
+    <a
+      (click)="onLogout()"
+      class="flex items-center h-12 gap-3 rounded-e-xl hover:bg-wt-gray-light-strong max-w-[90%] pl-5 cursor-pointer"
+    >
+      <mat-icon>logout</mat-icon>
+      <div class="text-base">Logout</div>
+    </a>
+  </div>
 </div>
 
 <!-- navigation helper -->
