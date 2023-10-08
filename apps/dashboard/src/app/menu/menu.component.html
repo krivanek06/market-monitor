@@ -1,4 +1,5 @@
 <mat-drawer-container autosize class="h-full">
+  <!-- side nav -->
   <mat-drawer
     [mode]="isSmallScreenSignal() ? 'over' : 'side'"
     [opened]="true"
@@ -6,30 +7,20 @@
     role="navigation"
     (closed)="toggleMatDrawerExpandedView()"
   >
-    <!-- side nav -->
-    <!-- <app-side-navigation
-			[user]="user$ | async"
-			[authenticating]="authenticating$ | async"
-			(clickedNavigationEmitter)="changeHeaderInfo($event)"
-			(closeEmitter)="toggleMatDrawerExpandedView()"
-		></app-side-navigation> -->
-
     <app-menu-side-navigation></app-menu-side-navigation>
     <!-- creator credits -->
     <!-- <app-menu-creator-credits></app-menu-creator-credits> -->
   </mat-drawer>
 
   <mat-drawer-content>
-    <!-- page headers -->
-    <app-menu-top-navigation></app-menu-top-navigation>
-    <!-- <app-menu-header (showMenuEmitter)="toggleMatDrawerExpandedView()" [showMenuButton]="(isOpen$ | async) === false"></app-menu-header>
- -->
-    <!-- <div *ngIf="activePage" class="flex items-center gap-4 py-4 mb-2">
-  <mat-icon color="primary" class="c-page-icon">{{activePage.icon}}</mat-icon>
-  <span class="text-3xl g-color-white">{{activePage.title | replaceChar: '-': ' ' }}</span>
-</div> -->
+    <div class="c-content-wrapper">
+      <!-- page headers -->
+      <app-menu-top-navigation></app-menu-top-navigation>
 
-    <!-- content -->
-    <router-outlet></router-outlet>
+      <!-- content -->
+      <div class="px-10 pt-6">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
   </mat-drawer-content>
 </mat-drawer-container>

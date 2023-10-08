@@ -37,13 +37,15 @@ import { MenuTopNavigationComponent } from './menu-top-navigation/menu-top-navig
         height: 100vh !important;
       }
 
-      mat-drawer-content {
+      .c-content-wrapper {
         height: auto;
         padding: 24px 20px 40px 20px;
         max-width: 100%;
+        margin: auto;
 
         @screen xl {
-          padding: 24px 12px 40px 12px;
+          padding: 24px 32px 40px 32px;
+          max-width: 1440px;
         }
       }
     `,

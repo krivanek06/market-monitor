@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { PortfolioState } from '@market-monitor/modules/portfolio/data-access';
-import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-portfolio-state',
   standalone: true,
-  imports: [CommonModule, PercentageIncreaseDirective],
+  imports: [CommonModule, PercentageIncreaseDirective, AddColorDirective],
   templateUrl: './portfolio-state.component.html',
   styles: [
     `
@@ -20,4 +20,5 @@ import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 export class PortfolioStateComponent {
   @Input({ required: true }) portfolioState!: PortfolioState;
   @Input() isPortfolioCashActive: boolean = false;
+  @Input() titleColor?: string;
 }
