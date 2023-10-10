@@ -1,12 +1,15 @@
-export interface ValuePresentItem<T> {
+export type ValueItem = {
+  value: number;
+  valuePrct: number;
+};
+
+export type ValuePresentItem<T> = ValueItem & {
   imageSrc?: string | null;
 
   name: string;
-  value: number;
-  valuePrct: number;
 
   color: string;
 
   // item that will be propagated to the parent
   item: T;
-}
+};

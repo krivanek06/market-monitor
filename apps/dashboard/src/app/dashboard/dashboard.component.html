@@ -1,4 +1,4 @@
-<div *ngIf="portfolioState() as portfolioState" class="grid gap-4 sm:grid-cols-3">
+<div *ngIf="portfolioStateSignal() as portfolioState" class="grid gap-4 mb-8 sm:grid-cols-3">
   <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
     <app-portfolio-state
       [titleColor]="ColorValues.ACCOUNT_STATE"
@@ -22,4 +22,17 @@
       [portfolioState]="portfolioState"
     ></app-portfolio-state>
   </app-fancy-card>
+</div>
+
+<!-- portfolio change -->
+<div class="mb-8 lg:px-10">
+  <app-portfolio-period-change
+    *ngIf="portfolioChangeSignal() as portfolioChange"
+    [portfolioChange]="portfolioChange"
+  ></app-portfolio-period-change>
+</div>
+
+<!-- charts -->
+<div>
+  <app-portfolio-growth-chart [data]="[]"></app-portfolio-growth-chart>
 </div>

@@ -1,16 +1,12 @@
-export type PortfolioChangeValue = {
-  value: number;
-  valuePrct: number;
-};
+import { ValueItem } from '@market-monitor/shared/data-access';
 
 export type PortfolioChange = {
-  '1_day': PortfolioChangeValue;
-  '1_week': PortfolioChangeValue;
-  '2_week': PortfolioChangeValue;
-  '3_week': PortfolioChangeValue;
-  '1_month': PortfolioChangeValue;
-  '3_month': PortfolioChangeValue;
-  '6_month': PortfolioChangeValue;
-  '1_year': PortfolioChangeValue;
-  beginning: PortfolioChangeValue;
+  '1_day': ValueItem | null;
+  '1_week': ValueItem | null;
+  '2_week': ValueItem | null;
+  '3_week': ValueItem | null;
+  '1_month': ValueItem | null;
+  '3_month': ValueItem | null;
+  '6_month': ValueItem | null;
+  '1_year': ValueItem | null;
 };

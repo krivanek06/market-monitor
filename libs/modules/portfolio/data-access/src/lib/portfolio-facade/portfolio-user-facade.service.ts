@@ -3,7 +3,7 @@ import { PortfolioGrowthAssets, PortfolioTransaction } from '@market-monitor/api
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { GenericChartSeriesPie } from '@market-monitor/shared/data-access';
 import { Observable, map, switchMap } from 'rxjs';
-import { PortfolioGrowth, PortfolioState, PortfolioTransactionCreate } from '../models';
+import { PortfolioChange, PortfolioGrowth, PortfolioState, PortfolioTransactionCreate } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.service';
 import { PortfolioOperationsService } from '../portfolio-operations/portfolio-operations.service';
@@ -38,6 +38,10 @@ export class PortfolioUserFacadeService {
     return this.getPortfolioGrowthAssets().pipe(
       map((transactions) => this.portfolioCalculationService.getPortfolioGrowth(transactions)),
     );
+  }
+
+  getPortfolioChange(): Observable<PortfolioChange> {
+    return this.getPortfolioGrowth().pipe(map((growth) => this.portfolioCalculationService.getPortfolioChange(growth)));
   }
 
   getPortfolioSectorAllocationPieChart(): Observable<GenericChartSeriesPie> {

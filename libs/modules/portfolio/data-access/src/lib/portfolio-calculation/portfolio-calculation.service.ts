@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { PortfolioGrowthAssets, PortfolioTransaction, SymbolSummary } from '@market-monitor/api-types';
-import { GenericChartSeriesData, GenericChartSeriesPie } from '@market-monitor/shared/data-access';
+import { PortfolioGrowthAssets, PortfolioTransaction } from '@market-monitor/api-types';
+import { GenericChartSeriesData, GenericChartSeriesPie, ValueItem } from '@market-monitor/shared/data-access';
+import { dateFormatDate, roundNDigits } from '@market-monitor/shared/utils-general';
+import { subDays, subMonths, subWeeks, subYears } from 'date-fns';
 import { PortfolioChange, PortfolioGrowth, PortfolioStateHolding, PortfolioStateHoldingPartial } from '../models';
 
 @Injectable({
@@ -81,8 +83,75 @@ export class PortfolioCalculationService {
       .filter((d) => d.units > 0);
   }
 
-  getPortfolioChange(holdings: SymbolSummary[]): PortfolioChange | null {
-    return null;
+  /**
+   * from growth data create a time period change
+   *
+   * TODO: fix for better logic than subtracting exact dates from today
+   * TODO: maybe getting the average previous monthly data and comparing to today's data
+   *
+   * @param growthData
+   * @returns
+   */
+  getPortfolioChange(growthData: PortfolioGrowth[]): PortfolioChange {
+    // reverse data to start from DESC
+    const reversedData = [...growthData].reverse();
+    const today = new Date();
+    const todayBalance = reversedData.at(0)?.marketTotalValue;
+
+    // return default values if no data
+    if (!todayBalance) {
+      return {
+        '1_day': null,
+        '1_week': null,
+        '2_week': null,
+        '3_week': null,
+        '1_month': null,
+        '3_month': null,
+        '6_month': null,
+        '1_year': null,
+      };
+    }
+
+    // construct dates
+    const day1ChangeDate = dateFormatDate(subDays(today, 1));
+    const week1ChangeDate = dateFormatDate(subWeeks(today, 1));
+    const week2ChangeDate = dateFormatDate(subWeeks(today, 2));
+    const week3ChangeDate = dateFormatDate(subWeeks(today, 3));
+    const month1ChangeDate = dateFormatDate(subMonths(today, 1));
+    const month3ChangeDate = dateFormatDate(subMonths(today, 3));
+    const month6ChangeDate = dateFormatDate(subMonths(today, 6));
+    const year1ChangeDate = dateFormatDate(subYears(today, 1));
+
+    // find index for data which date's are one smaller than the date we are looking for
+    const day1ChangeIndex = reversedData.findIndex((d) => d.date <= day1ChangeDate);
+    const week1ChangeIndex = reversedData.findIndex((d) => d.date <= week1ChangeDate);
+    const week2ChangeIndex = reversedData.findIndex((d) => d.date <= week2ChangeDate);
+    const week3ChangeIndex = reversedData.findIndex((d) => d.date <= week3ChangeDate);
+    const month1ChangeIndex = reversedData.findIndex((d) => d.date <= month1ChangeDate);
+    const month3ChangeIndex = reversedData.findIndex((d) => d.date <= month3ChangeDate);
+    const month6ChangeIndex = reversedData.findIndex((d) => d.date <= month6ChangeDate);
+    const year1ChangeIndex = reversedData.findIndex((d) => d.date <= year1ChangeDate);
+
+    // create helper function to create change value
+    const createPortfolioChangeValue = (growth: PortfolioGrowth): ValueItem =>
+      ({
+        value: roundNDigits(todayBalance - growth.marketTotalValue, 2),
+        valuePrct: roundNDigits((todayBalance - growth.marketTotalValue) / growth.marketTotalValue, 4),
+      }) satisfies ValueItem;
+
+    // calculate change for each time period
+    const result: PortfolioChange = {
+      '1_day': day1ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[day1ChangeIndex]) : null,
+      '1_week': week1ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[week1ChangeIndex]) : null,
+      '2_week': week2ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[week2ChangeIndex]) : null,
+      '3_week': week3ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[week3ChangeIndex]) : null,
+      '1_month': month1ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[month1ChangeIndex]) : null,
+      '3_month': month3ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[month3ChangeIndex]) : null,
+      '6_month': month6ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[month6ChangeIndex]) : null,
+      '1_year': year1ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[year1ChangeIndex]) : null,
+    };
+
+    return result;
   }
 
   /**
