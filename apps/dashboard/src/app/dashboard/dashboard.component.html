@@ -1,26 +1,26 @@
 <div *ngIf="portfolioStateSignal() as portfolioState" class="grid gap-4 mb-8 sm:grid-cols-3">
   <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
-    <app-portfolio-state
+    <app-portfolio-state-color
       [titleColor]="ColorValues.ACCOUNT_STATE"
       [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
-    ></app-portfolio-state>
+    ></app-portfolio-state-color>
   </app-fancy-card>
 
   <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
-    <app-portfolio-state
+    <app-portfolio-state-color
       [titleColor]="ColorValues.ACCOUNT_STATE"
       [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
-    ></app-portfolio-state>
+    ></app-portfolio-state-color>
   </app-fancy-card>
 
   <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
-    <app-portfolio-state
+    <app-portfolio-state-color
       [titleColor]="ColorValues.ACCOUNT_STATE"
       [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
-    ></app-portfolio-state>
+    ></app-portfolio-state-color>
   </app-fancy-card>
 </div>
 
@@ -35,4 +35,22 @@
 <!-- charts -->
 <div>
   <app-portfolio-growth-chart [data]="[]"></app-portfolio-growth-chart>
+</div>
+
+<!-- holdings pie charts -->
+<div class="flex justify-around">
+  <app-generic-chart
+    *ngIf="portfolioAssetAllocation() as portfolioAssetAllocation"
+    chartTitle="Asset Allocation"
+    class="h-[200px]"
+    chartTitlePosition="center"
+    [series]="[portfolioAssetAllocation]"
+  ></app-generic-chart>
+  <app-generic-chart
+    *ngIf="portfolioSectorAllocation() as portfolioSectorAllocation"
+    class="h-[200px]"
+    chartTitle="Sector Allocation"
+    chartTitlePosition="center"
+    [series]="[portfolioSectorAllocation]"
+  ></app-generic-chart>
 </div>

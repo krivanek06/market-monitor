@@ -71,7 +71,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
   @Input() heightPx = 400;
   @Input() chartType: ChartType | ChartTypeKeys = ChartType.line;
   @Input() chartTitle = '';
-  @Input() chartTitlePosition = 'left';
+  @Input() chartTitlePosition: Highcharts.AlignValue = 'left';
   @Input() enableZoom = false;
   @Input() showTooltip = true;
   @Input() showDataLabel = false;
@@ -225,7 +225,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
       },
       title: {
         text: this.chartTitle,
-        align: 'left',
+        align: this.chartTitlePosition,
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,
           fontSize: '13px',

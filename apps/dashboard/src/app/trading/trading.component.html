@@ -1,10 +1,10 @@
 <div *ngIf="portfolioState() as portfolioState" class="flex justify-between">
   <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
-    <app-portfolio-state
+    <app-portfolio-state-color
       [titleColor]="ColorValues.ACCOUNT_STATE"
       [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
-    ></app-portfolio-state>
+    ></app-portfolio-state-color>
   </app-fancy-card>
 
   <div>rest</div>

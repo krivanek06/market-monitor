@@ -214,7 +214,7 @@ export class PortfolioCalculationService {
     return {
       name: 'Portfolio Allocation',
       type: 'pie',
-      data: resultData,
+      data: holdings.length > 0 ? resultData : [],
     };
   }
 
@@ -229,6 +229,10 @@ export class PortfolioCalculationService {
     transactions: PortfolioStateHolding[],
     key: 'asset' | 'sector',
   ): { [name: string]: number } {
+    if (transactions.length === 0) {
+      return {};
+    }
+
     return transactions.reduce(
       (acc, curr) => {
         const dataKey = key === 'asset' ? curr.symbol : curr.symbolSummary.profile?.sector ?? curr.symbolType;

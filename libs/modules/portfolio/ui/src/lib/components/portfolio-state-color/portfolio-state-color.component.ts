@@ -4,10 +4,10 @@ import { PortfolioState } from '@market-monitor/modules/portfolio/data-access';
 import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
 @Component({
-  selector: 'app-portfolio-state',
+  selector: 'app-portfolio-state-color',
   standalone: true,
   imports: [CommonModule, PercentageIncreaseDirective, AddColorDirective],
-  templateUrl: './portfolio-state.component.html',
+  templateUrl: './portfolio-state-color.component.html',
   styles: [
     `
       :host {
@@ -17,7 +17,7 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PortfolioStateComponent {
+export class PortfolioStateColorComponent {
   @Input({ required: true }) portfolioState!: PortfolioState;
   @Input() isPortfolioCashActive: boolean = false;
   @Input() titleColor?: string;

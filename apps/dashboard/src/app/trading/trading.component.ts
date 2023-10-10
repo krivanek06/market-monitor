@@ -3,14 +3,14 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
-import { PortfolioStateComponent } from '@market-monitor/modules/portfolio/ui';
+import { PortfolioStateColorComponent } from '@market-monitor/modules/portfolio/ui';
 import { ColorValues } from '@market-monitor/shared/data-access';
 import { FancyCardComponent } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-trading',
   standalone: true,
-  imports: [CommonModule, PortfolioStateComponent, FancyCardComponent],
+  imports: [CommonModule, PortfolioStateColorComponent, FancyCardComponent],
   templateUrl: './trading.component.html',
   styles: [
     `
