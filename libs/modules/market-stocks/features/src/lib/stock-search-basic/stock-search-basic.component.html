@@ -8,7 +8,7 @@
     [formControl]="searchControl"
     [matAutocomplete]="auto"
   />
-  <mat-icon *ngIf="showIcon" matPrefix>search</mat-icon>
+  <mat-icon matPrefix>search</mat-icon>
   <mat-autocomplete
     #auto="matAutocomplete"
     (optionSelected)="onStockSelect($event)"

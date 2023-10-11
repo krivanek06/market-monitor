@@ -64,6 +64,9 @@
       "@market-monitor/modules/portfolio/data-access": [
         "libs/modules/portfolio/data-access/src/index.ts"
       ],
+      "@market-monitor/modules/portfolio/features": [
+        "libs/modules/portfolio/features/src/index.ts"
+      ],
       "@market-monitor/modules/portfolio/ui": [
         "libs/modules/portfolio/ui/src/index.ts"
       ],

@@ -55,8 +55,13 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
 export class StockSearchBasicCustomizedComponent implements OnInit {
   @Output() clickedSummary = new EventEmitter<SymbolSummary>();
   @Input() showHint = true;
-  @Input() showIcon = true;
+  /**
+   * showing % change in overlay
+   */
   @Input() showValueChange = true;
+  /**
+   * open modal on summary click
+   */
   @Input() openModalOnClick = true;
 
   @ViewChild('trigger', { read: ElementRef }) trigger?: ElementRef<HTMLElement>;
