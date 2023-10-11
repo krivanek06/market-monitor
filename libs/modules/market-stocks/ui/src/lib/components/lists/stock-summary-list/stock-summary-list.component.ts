@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
-import { StockDetails } from '@market-monitor/api-types';
+import { SymbolSummary } from '@market-monitor/api-types';
 import {
   LargeNumberFormatterPipe,
   PercentageIncreaseDirective,
@@ -31,5 +31,5 @@ import { RecommendationDirective } from '../../../directives';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSummaryListComponent {
-  @Input({ required: true }) stockDetails!: StockDetails;
+  @Input({ required: true }) symbolSummary!: SymbolSummary;
 }

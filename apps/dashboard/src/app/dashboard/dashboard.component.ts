@@ -6,9 +6,9 @@ import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/da
 import {
   PortfolioGrowthChartComponent,
   PortfolioPeriodChangeComponent,
-  PortfolioStateColorComponent,
+  PortfolioStateComponent,
 } from '@market-monitor/modules/portfolio/ui';
-import { ColorValues } from '@market-monitor/shared/data-access';
+import { ColorScheme } from '@market-monitor/shared/data-access';
 import { FancyCardComponent, GenericChartComponent } from '@market-monitor/shared/ui';
 
 @Component({
@@ -16,7 +16,7 @@ import { FancyCardComponent, GenericChartComponent } from '@market-monitor/share
   standalone: true,
   imports: [
     CommonModule,
-    PortfolioStateColorComponent,
+    PortfolioStateComponent,
     FancyCardComponent,
     PortfolioGrowthChartComponent,
     PortfolioPeriodChangeComponent,
@@ -41,5 +41,5 @@ export class DashboardComponent {
   portfolioAssetAllocation = toSignal(this.portfolioUserFacadeService.getPortfolioAssetAllocationPieChart());
   portfolioSectorAllocation = toSignal(this.portfolioUserFacadeService.getPortfolioSectorAllocationPieChart());
 
-  ColorValues = ColorValues;
+  ColorScheme = ColorScheme;
 }

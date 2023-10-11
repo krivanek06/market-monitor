@@ -7,37 +7,37 @@
 
 <div class="g-item-wrapper">
   <div>Company Name</div>
-  <div>{{ stockDetails.companyOutlook.profile.companyName }}</div>
+  <div>{{ symbolSummary.profile?.companyName }}</div>
 </div>
 
 <div class="g-item-wrapper">
   <span>Sector</span>
   <mat-chip-listbox>
-    <mat-chip class="m-0" color="primary">{{ stockDetails.companyOutlook.profile.sector }}</mat-chip>
+    <mat-chip class="m-0" color="primary">{{ symbolSummary.profile?.sector }}</mat-chip>
   </mat-chip-listbox>
 </div>
 
 <div class="g-item-wrapper">
   <span>CEO</span>
-  <span>{{ !!stockDetails.companyOutlook.profile.ceo ? stockDetails.companyOutlook.profile.ceo : 'N/A' }}</span>
+  <span>{{ !!symbolSummary.profile?.ceo ? symbolSummary.profile?.ceo : 'N/A' }}</span>
 </div>
 
 <div class="g-item-wrapper">
   <span>Market Cap.</span>
-  <span>{{ stockDetails.quote.price * stockDetails.quote.sharesOutstanding | largeNumberFormatter }}</span>
+  <span>{{ symbolSummary.quote.price * symbolSummary.quote.sharesOutstanding | largeNumberFormatter }}</span>
 </div>
 
 <div class="g-item-wrapper">
   <span>Price</span>
   <div class="flex items-center gap-2">
-    <span>{{ stockDetails.quote.price | currency }}</span>
+    <span>{{ symbolSummary.quote.price | currency }}</span>
     <span
       appPercentageIncrease
       [useCurrencySign]="true"
       [currentValues]="{
         hideValue: false,
-        value: stockDetails.quote.price,
-        valueToCompare: stockDetails.quote.previousClose
+        value: symbolSummary.quote.price,
+        valueToCompare: symbolSummary.quote.previousClose
       }"
     ></span>
   </div>
@@ -46,14 +46,14 @@
 <div class="g-item-wrapper">
   <span>Volume</span>
   <div class="flex items-center gap-2">
-    <span>{{ stockDetails.quote.volume | largeNumberFormatter }}</span>
+    <span>{{ symbolSummary.quote.volume | largeNumberFormatter }}</span>
     <span
       appPercentageIncrease
       [useCurrencySign]="false"
       [currentValues]="{
         hideValue: false,
-        value: stockDetails.quote.volume,
-        valueToCompare: stockDetails.quote.avgVolume
+        value: symbolSummary.quote.volume,
+        valueToCompare: symbolSummary.quote.avgVolume
       }"
     ></span>
   </div>
@@ -61,21 +61,21 @@
 
 <div class="g-item-wrapper">
   <span>PE / EPS</span>
-  <span>{{ stockDetails.quote.pe }} / {{ stockDetails.quote.eps }}</span>
+  <span>{{ symbolSummary.quote.pe }} / {{ symbolSummary.quote.eps }}</span>
 </div>
 
-<div class="g-item-wrapper">
+<!-- <div class="g-item-wrapper">
   <span>Rating</span>
   <div class="flex items-center gap-2">
-    <span>{{ stockDetails.rating?.rating ?? 'N/A' }}</span>
-    <div>(<span [appRecommendation]="stockDetails.rating?.ratingScore"></span>)</div>
+    <span>{{ symbolSummary.rating?.rating ?? 'N/A' }}</span>
+    <div>(<span [appRecommendation]="symbolSummary.rating?.ratingScore"></span>)</div>
   </div>
-</div>
+</div> -->
 
 <div class="g-item-wrapper">
   <span>Earnings</span>
   <span>{{
-    stockDetails.quote.earningsAnnouncement ? (stockDetails.quote.earningsAnnouncement | date: 'MMMM d, y') : 'N/A'
+    symbolSummary.quote.earningsAnnouncement ? (symbolSummary.quote.earningsAnnouncement | date: 'MMMM d, y') : 'N/A'
   }}</span>
 </div>
 
@@ -87,7 +87,7 @@
       appPercentageIncrease
       [useCurrencySign]="false"
       [changeValues]="{
-        changePercentage: stockDetails.priceChange | priceChangeItemSelector: key
+        changePercentage: symbolSummary.priceChange | priceChangeItemSelector: key
       }"
     ></span>
   </div>

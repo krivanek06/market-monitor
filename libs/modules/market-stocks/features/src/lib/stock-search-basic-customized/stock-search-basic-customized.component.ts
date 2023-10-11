@@ -1,6 +1,18 @@
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Inject, Input, OnInit, Optional, ViewChild, inject, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Inject,
+  Input,
+  OnInit,
+  Optional,
+  Output,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -41,9 +53,11 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
   ],
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {
+  @Output() clickedSummary = new EventEmitter<SymbolSummary>();
   @Input() showHint = true;
   @Input() showIcon = true;
   @Input() showValueChange = true;
+  @Input() openModalOnClick = true;
 
   @ViewChild('trigger', { read: ElementRef }) trigger?: ElementRef<HTMLElement>;
 
@@ -121,11 +135,15 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     // weird bug: if we don't set isInputFocused to false, the overlay will not close
     this.overlayIsOpen.update((d) => ({ ...d, isInputFocused: false }));
 
-    this.dialog.open(StockSummaryDialogComponent, {
-      data: {
-        symbol: summary.id,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
+    if (this.openModalOnClick) {
+      this.dialog.open(StockSummaryDialogComponent, {
+        data: {
+          symbol: summary.id,
+        },
+        panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+      });
+    }
+
+    this.clickedSummary.emit(summary);
   }
 }

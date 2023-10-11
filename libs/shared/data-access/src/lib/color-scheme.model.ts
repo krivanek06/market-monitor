@@ -8,8 +8,7 @@ export enum ColorScheme {
   GRAY_MEDIUM_VAR = 'var(--gray-medium)',
   GRAY_LIGHT_STRONG_VAR = 'var(--gray-light-strong)',
   GRAY_LIGHT_VAR = 'var(--gray-light)',
-}
 
-export enum ColorValues {
+  // additional colors
   ACCOUNT_STATE = '#c90ff7',
 }

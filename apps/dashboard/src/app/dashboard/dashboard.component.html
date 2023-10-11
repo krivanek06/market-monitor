@@ -1,26 +1,28 @@
 <div *ngIf="portfolioStateSignal() as portfolioState" class="grid gap-4 mb-8 sm:grid-cols-3">
-  <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
-    <app-portfolio-state-color
-      [titleColor]="ColorValues.ACCOUNT_STATE"
-      [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
+  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.ACCOUNT_STATE">
+    <app-portfolio-state
+      classes="grid gap-4 sm:grid-cols-2"
+      [titleColor]="ColorScheme.ACCOUNT_STATE"
+      [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+      [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
-    ></app-portfolio-state-color>
+    ></app-portfolio-state>
   </app-fancy-card>
 
-  <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
-    <app-portfolio-state-color
-      [titleColor]="ColorValues.ACCOUNT_STATE"
-      [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
+  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.ACCOUNT_STATE">
+    <app-portfolio-state
+      [titleColor]="ColorScheme.ACCOUNT_STATE"
+      [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
-    ></app-portfolio-state-color>
+    ></app-portfolio-state>
   </app-fancy-card>
 
-  <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
-    <app-portfolio-state-color
-      [titleColor]="ColorValues.ACCOUNT_STATE"
-      [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
+  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.ACCOUNT_STATE">
+    <app-portfolio-state
+      [titleColor]="ColorScheme.ACCOUNT_STATE"
+      [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
-    ></app-portfolio-state-color>
+    ></app-portfolio-state>
   </app-fancy-card>
 </div>
 

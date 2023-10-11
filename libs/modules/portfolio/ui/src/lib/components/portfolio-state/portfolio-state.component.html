@@ -1,0 +1,46 @@
+<div [class]="classes">
+  <!-- balance -->
+  <div class="flex flex-col gap-2">
+    <div [appAddColor]="titleColor" class="text-xl">Balance</div>
+    <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.holdingsBalance | currency }}</div>
+  </div>
+
+  <!-- Invested -->
+  <div class="flex flex-col gap-2">
+    <div [appAddColor]="titleColor" class="text-xl">Invested</div>
+    <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.invested | currency }}</div>
+  </div>
+
+  <!-- Cash -->
+  <div *ngIf="showCashSegment" class="flex flex-col gap-2">
+    <div [appAddColor]="titleColor" class="text-xl">Cash</div>
+    <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.cashOnHand | currency }}</div>
+  </div>
+
+  <!-- Total Gains -->
+  <div *ngIf="!showCashSegment" class="flex flex-col gap-2">
+    <div [appAddColor]="titleColor" class="text-xl">Total Gains</div>
+    <div
+      class="text-lg"
+      [appAddColor]="valueColor"
+      appPercentageIncrease
+      [changeValues]="{
+        changePercentage: portfolioState.totalGainsPercentage
+      }"
+    ></div>
+  </div>
+
+  <!-- Total Return -->
+  <div class="flex flex-col gap-2">
+    <div [appAddColor]="titleColor" class="text-xl">Total Return</div>
+    <div
+      class="text-lg"
+      [appAddColor]="valueColor"
+      appPercentageIncrease
+      [changeValues]="{
+        change: portfolioState.totalGainsValue,
+        changePercentage: showCashSegment ? portfolioState.totalGainsPercentage : undefined
+      }"
+    ></div>
+  </div>
+</div>

@@ -17,7 +17,7 @@ import {
 } from '@market-monitor/shared/ui';
 
 @Component({
-  selector: 'app-stock-summary-list',
+  selector: 'app-stock-summary-table',
   standalone: true,
   imports: [
     CommonModule,

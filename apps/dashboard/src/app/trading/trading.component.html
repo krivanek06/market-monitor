@@ -1,11 +1,41 @@
-<div *ngIf="portfolioState() as portfolioState" class="flex justify-between">
-  <app-fancy-card title="Account State" [colorPrimary]="ColorValues.ACCOUNT_STATE">
-    <app-portfolio-state-color
-      [titleColor]="ColorValues.ACCOUNT_STATE"
-      [isPortfolioCashActive]="authenticationUserService.userData.settings.isPortfolioCashActive"
-      [portfolioState]="portfolioState"
-    ></app-portfolio-state-color>
-  </app-fancy-card>
+<!-- account state -->
+<div *ngIf="portfolioState() as portfolioState" class="mb-10 xl:w-9/12 md:pt-6 md:pl-10">
+  <app-portfolio-state
+    [titleColor]="ColorScheme.PRIMARY_VAR"
+    [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+    classes="flex items-center gap-4 justify-between"
+    [showCashSegment]="userSettings.isPortfolioCashActive"
+    [portfolioState]="portfolioState"
+  ></app-portfolio-state>
+</div>
 
-  <div>rest</div>
+<div class="flex items-center justify-between mb-8">
+  <!-- search -->
+  <div class="-ml-6">
+    <app-stock-search-basic-customized
+      (clickedSummary)="onSummaryClick($event)"
+      [openModalOnClick]="false"
+      class="scale-90 min-w-[600px]"
+    ></app-stock-search-basic-customized>
+  </div>
+
+  <!-- action buttons -->
+  <div class="flex items-center gap-4 md:-mt-3">
+    <button class="w-[120px]" mat-stroked-button color="accent" type="button">BUY</button>
+    <button class="w-[120px]" mat-stroked-button color="warn" type="button">SELL</button>
+  </div>
+</div>
+
+<div class="flex flex-col gap-4 mb-6 lg:flex-row">
+  <app-asset-price-chart-interactive class="lg:basis-3/5" symbol="AAPL"></app-asset-price-chart-interactive>
+  <div class="lg:basis-2/5" *ngIf="symbolSummary() as symbolSummary">
+    <app-stock-summary-list [symbolSummary]="symbolSummary"></app-stock-summary-list>
+  </div>
+</div>
+
+<div>
+  <app-portfolio-transactions-table
+    [showTransactionFees]="userSettings.isTransactionFeesActive"
+    [data]="[]"
+  ></app-portfolio-transactions-table>
 </div>
