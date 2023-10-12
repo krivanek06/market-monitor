@@ -5,11 +5,11 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-client';
 import { News, NewsAcceptableTypes, NewsTypes } from '@market-monitor/api-types';
+import { InputSource } from '@market-monitor/shared/data-access';
 import {
   DateAgoPipe,
   DefaultImgDirective,
   FormMatInputWrapperComponent,
-  InputSource,
   RangeDirective,
   ScrollNearEndDirective,
   TruncateWordsPipe,

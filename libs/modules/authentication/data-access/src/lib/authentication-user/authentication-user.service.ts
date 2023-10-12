@@ -1,6 +1,6 @@
 import { Injectable, InjectionToken } from '@angular/core';
 import { UserApiService } from '@market-monitor/api-client';
-import { UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
+import { UserData, UserPortfolioTransaction, UserSettings, UserWatchlist } from '@market-monitor/api-types';
 import { User } from 'firebase/auth';
 import { Observable, firstValueFrom, shareReplay, tap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
@@ -29,6 +29,10 @@ export class AuthenticationUserService {
 
   get userData(): UserData {
     return this.authenticationAccountService.userData;
+  }
+
+  get userSettings(): UserSettings {
+    return this.userData.settings;
   }
 
   getUserData(): Observable<UserData> {

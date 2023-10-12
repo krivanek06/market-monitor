@@ -2,12 +2,18 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatNativeDateModule } from '@angular/material/core';
 import { DateFilterFn, MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { filter } from 'rxjs';
-import { InputTypeDateTimePickerConfig } from './date-picker.model';
+
+export interface InputTypeDateTimePickerConfig {
+  minDate?: Date | string;
+  maxDate?: Date | string;
+  dateFilter?: DateFilterFn<any>;
+}
 
 @Component({
   selector: 'app-date-picker',
@@ -20,6 +26,7 @@ import { InputTypeDateTimePickerConfig } from './date-picker.model';
     MatDatepickerModule,
     MatFormFieldModule,
     MatInputModule,
+    MatNativeDateModule,
   ],
   templateUrl: './date-picker.component.html',
   styleUrls: ['./date-picker.component.scss'],
@@ -37,6 +44,7 @@ export class DatePickerComponent implements OnInit {
 		used when inputType === DATEPICKER
 	*/
   @Input() inputTypeDateTimePickerConfig?: InputTypeDateTimePickerConfig;
+  @Input() isDisabled = false;
 
   defaultDateFilter: DateFilterFn<any> = (d: Date) => true;
 

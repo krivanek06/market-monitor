@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { KeyboardComponentType, KeyboardComponentValues } from './number-keyboard-control.model';
@@ -20,11 +20,12 @@ import { KeyboardComponentType, KeyboardComponentValues } from './number-keyboar
   ],
 })
 export class NumberKeyboardComponent {
+  @Input() enableDecimal = true;
+  @Input({required: true}) value: string = ''
+
   // outputting number with maximum 2 decimal -> i.e: 122.33
   onChange: (data: string) => void = () => {};
   onTouched = () => {};
-
-  value: string = '';
 
   KeyboardComponent = KeyboardComponentValues;
 

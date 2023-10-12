@@ -1,1 +1,1 @@
-export * from './lib/modules-portfolio-features.module';
+export * from './lib';

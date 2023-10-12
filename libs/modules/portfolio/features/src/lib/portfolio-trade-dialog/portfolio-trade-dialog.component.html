@@ -1,0 +1,131 @@
+<!-- form -->
+<form [formGroup]="form" (ngSubmit)="onFormSubmit()">
+  <mat-dialog-content>
+    <div class="flex items-center justify-between pt-5">
+      <!-- symbol & image -->
+      <div class="flex items-center gap-3">
+        <img appDefaultImg imageType="symbol" [src]="data.summary.id" class="w-12 h-12" />
+        <div class="flex flex-col">
+          <div class="text-lg text-wt-gray-dark">{{ data.summary.quote.symbol }}</div>
+          <div class="hidden md:block">{{ data.summary.quote.name }}</div>
+        </div>
+      </div>
+
+      <!-- operation -->
+      <div class="flex flex-row items-center gap-3 text-xl">
+        <div
+          [ngClass]="{
+            'text-wt-danger': data.transactionType === 'SELL',
+            'text-wt-success': data.transactionType === 'BUY'
+          }"
+        >
+          {{ data.transactionType | uppercase }} Operation
+        </div>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!isLoadingSignal(); else showLoader">
+      <!-- date picker -->
+      <app-date-picker
+        *ngIf="userSettings.isHistoricalAssetsTradingAllowed"
+        [inputTypeDateTimePickerConfig]="datePickerConfig"
+        [formControl]="form.controls.date"
+      ></app-date-picker>
+
+      <!-- custom -->
+      <div class="flex justify-between mb-2">
+        <div class="flex items-center gap-3">
+          <ng-container *ngIf="isCustomTotal">
+            <button
+              mat-flat-button
+              [color]="activeTotalValueButtonSignal() === 'UNITS' ? 'primary' : ''"
+              (click)="onActiveTotalValueButtonChange('UNITS')"
+            >
+              Change Units
+            </button>
+            <button
+              mat-flat-button
+              [color]="activeTotalValueButtonSignal() === 'TOTAL_VALUE' ? 'primary' : ''"
+              (click)="onActiveTotalValueButtonChange('TOTAL_VALUE')"
+            >
+              Change Total Value
+            </button>
+          </ng-container>
+        </div>
+
+        <mat-checkbox
+          matTooltip="Add Custom Value"
+          color="primary"
+          [formControl]="form.controls.useCustomTotalValueControl"
+        >
+          Custom
+        </mat-checkbox>
+      </div>
+
+      <!-- info -->
+      <div class="flex flex-col p-3">
+        <div class="g-item-wrapper">
+          <span>Date</span>
+          <span>{{ form.controls.date.value | date: 'MMMM d, y' }}</span>
+        </div>
+        <div class="g-item-wrapper">
+          <span>Owned Units</span>
+          <span>{{ holdingSignal()?.units ?? 0 }}</span>
+        </div>
+        <div *ngIf="!isCustomTotal" class="g-item-wrapper">
+          <span>Price</span>
+          <span>{{ symbolPriceOnDate() | currency }}</span>
+        </div>
+        <div class="g-item-wrapper">
+          <span>Units</span>
+          <span>{{ form.controls.units.value || 0 }}</span>
+        </div>
+        <div class="g-item-wrapper">
+          <span>Total Value</span>
+          <span>
+            <ng-container *ngIf="!isCustomTotal">
+              {{ symbolPriceOnDate() * (form.controls.units.value | castToNumber) | currency }}
+            </ng-container>
+            <ng-container *ngIf="isCustomTotal">
+              {{ form.controls.customTotalValue.value || 0 | currency }}
+            </ng-container>
+          </span>
+        </div>
+      </div>
+
+      <!-- units / keyboard -->
+      <div class="md:px-3">
+        <app-number-keyboard-control
+          [value]="keyboardValue"
+          [enableDecimal]="false"
+          [formControl]="keyboardValuesControl"
+        ></app-number-keyboard-control>
+      </div>
+    </ng-container>
+
+    <!-- loader -->
+    <ng-template #showLoader>
+      <div class="grid py-16 place-content-center">
+        <mat-spinner [diameter]="100"></mat-spinner>
+      </div>
+    </ng-template>
+  </mat-dialog-content>
+
+  <div class="my-4">
+    <mat-divider></mat-divider>
+  </div>
+
+  <mat-dialog-actions>
+    <div class="g-mat-dialog-actions-full">
+      <button mat-flat-button mat-dialog-close type="button">Cancel</button>
+      <button
+        [disabled]="isLoadingSignal()"
+        type="submit"
+        mat-flat-button
+        [color]="data.transactionType === 'BUY' ? 'accent' : 'warn'"
+      >
+        Save
+      </button>
+    </div>
+  </mat-dialog-actions>
+</form>

@@ -14,7 +14,13 @@
 </mat-form-field>
 
 <div class="mb-5">
-  <button (click)="datePicker.open()" type="button" mat-stroked-button class="w-full min-h-[50px]">
-    {{ selectedDate.value ? 'Date: ' + (selectedDate.value | date : 'dd.MM.YYYY') : 'Please select a date' }}
+  <button
+    [disabled]="isDisabled"
+    (click)="datePicker.open()"
+    type="button"
+    mat-stroked-button
+    class="w-full min-h-[50px]"
+  >
+    {{ selectedDate.value ? 'Date: ' + (selectedDate.value | date: 'dd.MM.YYYY') : 'Please select a date' }}
   </button>
 </div>

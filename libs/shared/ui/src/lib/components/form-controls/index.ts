@@ -1,4 +1,3 @@
-export * from '../../../../../data-access/src/lib/form-controls.model';
 export * from './color-picker/color-picker.component';
 export * from './date-picker/date-picker.component';
 export * from './date-range-slider/date-range-slider.component';

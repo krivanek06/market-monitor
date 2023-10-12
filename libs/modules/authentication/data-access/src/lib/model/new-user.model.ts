@@ -13,6 +13,7 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
       isPortfolioCashActive: true,
       isProfilePublic: true,
       isTransactionFeesActive: true,
+      isHistoricalAssetsTradingAllowed: true,
     },
     personal: personal,
   };

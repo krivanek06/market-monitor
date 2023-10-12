@@ -40,6 +40,8 @@ button[mat-stroked-button] {
 
 button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
   border: 1px solid var(--gray-medium) !important;
+  background-color: var(--gray-light-strong) !important;
+  opacity: 0.85 !important;
 }
 
 .mdc-button__label {
@@ -83,12 +85,13 @@ button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
   --mat-mdc-button-persistent-ripple-color: var(--gray-medium) !important;
 }
 
-.mat-mdc-unelevated-button:not(:disabled) {
-  background-color: var(--gray-light) !important;
+.mat-mdc-unelevated-button.mat-unthemed {
+  background-color: var(--gray-light-strong) !important;
   color: var(--gray-medium) !important;
+  border: 1px solid var(--gray-medium) !important;
 
-  &:hover {
-    color: var(--gray-dark) !important;
-    background-color: var(--gray-light-strong) !important;
-  }
+  // &:hover {
+  //   color: var(--gray-dark) !important;
+  //   background-color: var(--gray-medium) !important;
+  // }
 }

@@ -57,4 +57,10 @@ export type UserSettings = {
    * if true, other users will be able to find this user portfolio by searching
    */
   isProfilePublic: boolean;
+  /**
+   * if true, user will be able to trade with historical assets,
+   * selecting the date of the transaction in history.
+   * If false user can buy/sell assets only for current date
+   */
+  isHistoricalAssetsTradingAllowed: boolean;
 };

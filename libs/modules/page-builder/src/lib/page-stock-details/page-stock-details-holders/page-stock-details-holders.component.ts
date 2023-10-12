@@ -8,12 +8,8 @@ import {
   StockOwnershipHoldersTableComponent,
   StockOwnershipInstitutionalListComponent,
 } from '@market-monitor/modules/market-stocks/ui';
-import {
-  FormMatInputWrapperComponent,
-  GeneralCardComponent,
-  InputSource,
-  RangeDirective,
-} from '@market-monitor/shared/ui';
+import { InputSource } from '@market-monitor/shared/data-access';
+import { FormMatInputWrapperComponent, GeneralCardComponent, RangeDirective } from '@market-monitor/shared/ui';
 import { dateFormatDate, getPreviousDate, isStockMarketHolidayDate } from '@market-monitor/shared/utils-general';
 import { catchError, filter, map, of, startWith, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';

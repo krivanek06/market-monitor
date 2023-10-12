@@ -49,6 +49,13 @@ export class MarketApiService extends ApiCacheService {
     );
   }
 
+  getHistoricalPricesOnDate(symbol: string, date: string): Observable<HistoricalPrice | null> {
+    return this.getData<HistoricalPrice | null>(
+      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&date=${date}&type=specificDate`,
+      this.validity2Min,
+    ).pipe(map((d) => d));
+  }
+
   getHistoricalPricesDateRange(
     symbol: string,
     dateStart: string,

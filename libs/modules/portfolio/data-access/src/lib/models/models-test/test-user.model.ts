@@ -21,6 +21,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       isTransactionFeesActive: true,
       isPortfolioCashActive: true,
       isProfilePublic: true,
+      isHistoricalAssetsTradingAllowed: true,
     },
   };
 

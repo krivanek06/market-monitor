@@ -22,14 +22,24 @@
 
   <!-- action buttons -->
   <div class="flex items-center gap-4 md:-mt-3">
-    <button class="w-[120px]" mat-stroked-button color="accent" type="button">BUY</button>
-    <button class="w-[120px]" mat-stroked-button color="warn" type="button">SELL</button>
+    <ng-container *ngIf="symbolSummary()">
+      <button (click)="onOperationClick('BUY')" class="w-[120px]" mat-stroked-button color="accent" type="button">
+        BUY
+      </button>
+      <button (click)="onOperationClick('SELL')" class="w-[120px]" mat-stroked-button color="warn" type="button">
+        SELL
+      </button>
+    </ng-container>
   </div>
 </div>
 
-<div class="flex flex-col gap-4 mb-6 lg:flex-row">
-  <app-asset-price-chart-interactive class="lg:basis-3/5" symbol="AAPL"></app-asset-price-chart-interactive>
-  <div class="lg:basis-2/5" *ngIf="symbolSummary() as symbolSummary">
+<!-- historical chart & summary -->
+<div *ngIf="symbolSummary() as symbolSummary; else noSelectedSummary" class="flex flex-col gap-4 mb-6 lg:flex-row">
+  <app-asset-price-chart-interactive
+    class="lg:basis-3/5"
+    [symbol]="symbolSummary.id"
+  ></app-asset-price-chart-interactive>
+  <div class="lg:basis-2/5">
     <app-stock-summary-list [symbolSummary]="symbolSummary"></app-stock-summary-list>
   </div>
 </div>
@@ -40,3 +50,8 @@
     [data]="[]"
   ></app-portfolio-transactions-table>
 </div>
+
+<!-- templates -->
+<ng-template #noSelectedSummary>
+  <div class="h-[200px] grid place-content-center text-2xl">Please select a symbol</div>
+</ng-template>

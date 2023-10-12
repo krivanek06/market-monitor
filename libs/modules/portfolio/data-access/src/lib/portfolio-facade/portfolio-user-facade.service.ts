@@ -3,7 +3,13 @@ import { PortfolioGrowthAssets, PortfolioTransaction } from '@market-monitor/api
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { GenericChartSeriesPie } from '@market-monitor/shared/data-access';
 import { Observable, map, switchMap } from 'rxjs';
-import { PortfolioChange, PortfolioGrowth, PortfolioState, PortfolioTransactionCreate } from '../models';
+import {
+  PortfolioChange,
+  PortfolioGrowth,
+  PortfolioState,
+  PortfolioStateHolding,
+  PortfolioTransactionCreate,
+} from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.service';
 import { PortfolioOperationsService } from '../portfolio-operations/portfolio-operations.service';
@@ -26,6 +32,10 @@ export class PortfolioUserFacadeService {
     return this.authenticationUserService
       .getUserPortfolioTransactions()
       .pipe(switchMap((transactions) => this.portfolioGrowthService.getPortfolioState(transactions)));
+  }
+
+  getPortfolioStateHolding(symbol: string): Observable<PortfolioStateHolding | undefined> {
+    return this.getPortfolioState().pipe(map((state) => state.holdings.find((holding) => holding.symbol === symbol)));
   }
 
   getPortfolioGrowthAssets(): Observable<PortfolioGrowthAssets[]> {
