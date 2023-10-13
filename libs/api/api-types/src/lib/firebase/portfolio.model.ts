@@ -56,5 +56,4 @@ export type PortfolioTransactionCash = {
   transactionId: string;
   date: string;
   amount: number;
-  type: 'DEPOSIT' | 'WITHDRAW';
 };

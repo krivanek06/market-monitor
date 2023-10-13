@@ -25,8 +25,15 @@ export class PortfolioGrowthService {
   getPortfolioState(portfolioTransactions: UserPortfolioTransaction): Observable<PortfolioState> {
     console.log(`PortfolioGrowthService: getPortfolioState`);
     const transactions = portfolioTransactions.transactions;
-    const cashOnHand = portfolioTransactions.cashDeposit.reduce(
-      (acc, curr) => acc + (curr.type === 'DEPOSIT' ? curr.amount : -curr.amount),
+
+    // todo: remove/add transaction total values into this
+    // accumulate cash on hand from deposits
+    const cashOnHandFromDeposit = portfolioTransactions.cashDeposit.reduce((acc, curr) => acc + curr.amount, 0);
+    const isCashActive = cashOnHandFromDeposit !== 0;
+    // accumulate cash on hand from transactions
+    const cashOnHandTransactions = transactions.reduce(
+      (acc, curr) =>
+        curr.transactionType === 'BUY' ? acc - curr.unitPrice * curr.units : acc + curr.unitPrice * curr.units,
       0,
     );
     const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
@@ -60,7 +67,7 @@ export class PortfolioGrowthService {
       ),
       map((holdings) => {
         const invested = holdings.reduce((acc, curr) => acc + curr.invested, 0);
-        const userBalance = invested + cashOnHand;
+        const userBalance = invested + cashOnHandFromDeposit + (isCashActive ? cashOnHandTransactions : 0);
         const holdingsBalance = holdings.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0);
         const totalGainsValue = roundNDigits(holdingsBalance - invested, 2);
         const totalGainsPercentage = roundNDigits((holdingsBalance - holdingsBalance) / holdingsBalance, 4);
@@ -69,7 +76,7 @@ export class PortfolioGrowthService {
           numberOfExecutedBuyTransactions,
           numberOfExecutedSellTransactions,
           transactionFees,
-          cashOnHand,
+          cashOnHand: isCashActive ? cashOnHandFromDeposit + cashOnHandTransactions : 0,
           userBalance,
           invested,
           holdings,

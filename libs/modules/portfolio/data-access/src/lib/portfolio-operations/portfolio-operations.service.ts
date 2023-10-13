@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
-import { PortfolioTransaction, SymbolSummary, UserPortfolioTransaction } from '@market-monitor/api-types';
+import { HistoricalPrice, PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
-import { dateGetDetailsInformationFromDate, roundNDigits } from '@market-monitor/shared/utils-general';
+import { dateFormatDate, dateGetDetailsInformationFromDate, roundNDigits } from '@market-monitor/shared/utils-general';
 import { isBefore, isValid, isWeekend } from 'date-fns';
 import { firstValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
@@ -37,22 +37,24 @@ export class PortfolioOperationsService {
     // get data
     const userId = this.authenticationUserService.userData.id;
     const userTransactions = await this.authenticationUserService.getUserPortfolioTransactionPromise();
-    const symbolSummary = await firstValueFrom(this.marketApiService.getSymbolSummary(input.symbol));
+    const symbolPrice = await firstValueFrom(
+      this.marketApiService.getHistoricalPricesOnDate(input.symbol, dateFormatDate(input.date)),
+    );
 
     // check if symbol exists
-    if (!symbolSummary) {
+    if (!symbolPrice) {
       throw new Error(SYMBOL_NOT_FOUND_ERROR);
     }
 
     // check data validity
-    this.executeTransactionOperationDataValidity(input, symbolSummary, userTransactions);
+    this.executeTransactionOperationDataValidity(input, symbolPrice, userTransactions);
 
     // from previous transaction calculate invested and units - currently if I own that symbol
     const symbolHolding = this.getCurrentInvestedFromTransactions(input.symbol, userTransactions.transactions);
     const symbolHoldingBreakEvenPrice = roundNDigits(symbolHolding.invested / symbolHolding.units, 2);
 
     // create transaction
-    const transaction = this.createTransaction(userId, input, symbolSummary, symbolHoldingBreakEvenPrice);
+    const transaction = this.createTransaction(userId, input, symbolPrice, symbolHoldingBreakEvenPrice);
 
     // save transaction into public transactions collection
     this.portfolioApiService.addPortfolioTransactionForPublic(transaction);
@@ -105,7 +107,7 @@ export class PortfolioOperationsService {
   private createTransaction(
     userId: string,
     input: PortfolioTransactionCreate,
-    symbolSummary: SymbolSummary,
+    historicalPrice: HistoricalPrice,
     breakEvenPrice: number,
   ): PortfolioTransaction {
     const userData = this.authenticationUserService.userData;
@@ -114,7 +116,7 @@ export class PortfolioOperationsService {
     // if custom total value is provided calculate unit price, else use API price
     const unitPrice = input.customTotalValue
       ? roundNDigits(input.customTotalValue / input.units)
-      : symbolSummary.quote.price;
+      : historicalPrice.close;
 
     const isSell = input.transactionType === 'SELL';
     const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
@@ -155,7 +157,7 @@ export class PortfolioOperationsService {
    */
   private executeTransactionOperationDataValidity(
     input: PortfolioTransactionCreate,
-    symbolSummary: SymbolSummary,
+    historicalPrice: HistoricalPrice,
     userTransactionHistory: UserPortfolioTransaction,
   ): void {
     const userData = this.authenticationUserService.userData;
@@ -195,12 +197,26 @@ export class PortfolioOperationsService {
     }
 
     // calculate total value
-    const totalValue = input.units * symbolSummary.quote.price;
+    const totalValue = roundNDigits(input.units * historicalPrice.close, 2);
 
     // check if user has enough cash on hand if BUY and cashAccountActive
     if (input.transactionType === 'BUY' && userData.settings.isPortfolioCashActive) {
-      const cashOnHand = userTransactionHistory.cashDeposit.reduce((acc, curr) => acc + curr.amount, 0);
-      if (cashOnHand < totalValue) {
+      // calculate cash on hand from deposits
+      const cashOnHandFromDeposit = userTransactionHistory.cashDeposit.reduce((acc, curr) => acc + curr.amount, 0);
+      // calculate cash on hand from transactions
+      const cashOnHandTransactions = userTransactionHistory.transactions.reduce(
+        (acc, curr) =>
+          curr.transactionType === 'BUY' ? acc - curr.unitPrice * curr.units : acc + curr.unitPrice * curr.units,
+        0,
+      );
+      console.log(
+        'Evaluating cash on hand',
+        cashOnHandFromDeposit,
+        cashOnHandTransactions,
+        cashOnHandFromDeposit + cashOnHandTransactions,
+        totalValue,
+      );
+      if (cashOnHandFromDeposit + cashOnHandTransactions < totalValue) {
         throw new Error(USER_NOT_ENOUGH_CASH_ERROR);
       }
     }

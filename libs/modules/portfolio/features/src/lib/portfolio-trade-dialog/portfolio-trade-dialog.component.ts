@@ -89,6 +89,7 @@ export class PortfolioTradeDialogComponent {
 
   // get holding information for symbol if there is any
   holdingSignal = toSignal(this.portfolioUserFacadeService.getPortfolioStateHolding(this.data.summary.id));
+  portfolioState = toSignal(this.portfolioUserFacadeService.getPortfolioState());
   symbolPriceOnDate = toSignal(
     this.form.controls.date.valueChanges.pipe(
       switchMap((date) =>
@@ -107,6 +108,14 @@ export class PortfolioTradeDialogComponent {
   activeTotalValueButtonSignal = signal<'UNITS' | 'TOTAL_VALUE'>('UNITS');
 
   isLoadingSignal = signal<boolean>(false);
+  /**
+   * true if user tries to sell more than he owns
+   */
+  insufficientUnitsErrorSignal = signal<boolean>(false);
+  /**
+   * true if user tries to buy more than he has cash
+   */
+  insufficientCashErrorSignal = signal<boolean>(false);
 
   constructor(
     private dialogRef: MatDialogRef<PortfolioTradeDialogComponent>,
@@ -119,6 +128,12 @@ export class PortfolioTradeDialogComponent {
     this.form.valueChanges.subscribe(console.log);
     this.listenKeyboardChange();
     this.listenCustomTotalValueChange();
+    this.listenOnInSufficientUnits();
+    this.listenOnInSufficientCash();
+  }
+
+  get isError(): boolean {
+    return this.insufficientUnitsErrorSignal() || this.insufficientCashErrorSignal();
   }
 
   get isCustomTotal(): boolean {
@@ -130,7 +145,7 @@ export class PortfolioTradeDialogComponent {
     return useUnits ? this.form.controls.units.value : this.form.controls.customTotalValue.value;
   }
 
-  onFormSubmit(): void {
+  async onFormSubmit(): Promise<void> {
     console.log('submitting');
     if (this.form.invalid) {
       this.dialogServiceUtil.showNotificationBar('Please fill in all required fields', 'error');
@@ -143,10 +158,8 @@ export class PortfolioTradeDialogComponent {
       return;
     }
 
-    // todo: check if user has enough cash to buy this stock
-
     // create object
-    const transaction: PortfolioTransactionCreate = {
+    const transactionCreate: PortfolioTransactionCreate = {
       date: this.form.controls.date.value.toISOString(),
       symbol: this.data.summary.id,
       units: Number(this.form.controls.units.value),
@@ -155,9 +168,19 @@ export class PortfolioTradeDialogComponent {
       symbolType: 'STOCK',
     };
 
-    console.log('transaction', transaction);
+    console.log('transaction', transactionCreate);
+    this.isLoadingSignal.set(true);
 
-    // TODO subtract from cash if enabled
+    try {
+      const transaction = await this.portfolioUserFacadeService.createTransactionOperation(transactionCreate);
+      console.log('result', transaction);
+      this.dialogServiceUtil.showNotificationBar('Transaction created', 'success');
+    } catch (error) {
+      this.dialogServiceUtil.showNotificationBar(String(error), 'error');
+      console.log(error);
+    } finally {
+      this.isLoadingSignal.set(false);
+    }
   }
 
   onActiveTotalValueButtonChange(value: 'UNITS' | 'TOTAL_VALUE'): void {
@@ -184,6 +207,38 @@ export class PortfolioTradeDialogComponent {
         return;
       }
       this.form.controls.customTotalValue.setValue(value);
+    });
+  }
+
+  /**
+   * listen to form changes and set insufficient cash error signal
+   * if user tries to buy more than he has cash and has portfolio cash active
+   */
+  private listenOnInSufficientCash(): void {
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((form) => {
+      if (this.data.transactionType === 'SELL' || !this.userSettings.isPortfolioCashActive) {
+        return;
+      }
+
+      if (this.isCustomTotal) {
+        const value = Number(this.form.controls.customTotalValue.value) > (this.portfolioState()?.cashOnHand ?? 0);
+        this.insufficientCashErrorSignal.set(value);
+      } else {
+        const value =
+          Number(this.form.controls.units.value) * this.symbolPriceOnDate() > (this.portfolioState()?.cashOnHand ?? 0);
+        this.insufficientCashErrorSignal.set(value);
+      }
+    });
+  }
+
+  /**
+   * listen to form changes and set insufficient units error signal
+   * if user tries to sell more than he owns
+   */
+  private listenOnInSufficientUnits(): void {
+    this.form.controls.units.valueChanges.pipe(takeUntilDestroyed()).subscribe((units) => {
+      const value = Number(units) > (this.holdingSignal()?.units ?? 0) && this.data.transactionType === 'SELL';
+      this.insufficientUnitsErrorSignal.set(value);
     });
   }
 }
