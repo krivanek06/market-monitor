@@ -8,15 +8,24 @@ export class SortByKeyPipe<T> implements PipeTransform {
   transform(
     values: (T extends any[] ? T[] : 'Do not other than array') | null,
     key: keyof T,
-    order: 'asc' | 'desc' = 'asc'
+    order: 'asc' | 'desc' = 'asc',
   ): T[] {
     if (!values || typeof values === 'string') {
       return [];
     }
-    return values
-      .slice()
-      .sort((a, b) =>
-        order === 'desc' ? (a[key] < b[key] ? 1 : -1) : a[key] < b[key] ? -1 : 1
-      );
+    return values.slice().sort((a, b) => (order === 'desc' ? (a[key] < b[key] ? 1 : -1) : a[key] < b[key] ? -1 : 1));
+  }
+}
+
+@Pipe({
+  name: 'sortReverse',
+  standalone: true,
+})
+export class SortReversePipe<T> implements PipeTransform {
+  transform(values: (T extends any[] ? T[] : 'Do not other than array') | null): T[] {
+    if (!values || typeof values === 'string') {
+      return [];
+    }
+    return values.slice().reverse();
   }
 }

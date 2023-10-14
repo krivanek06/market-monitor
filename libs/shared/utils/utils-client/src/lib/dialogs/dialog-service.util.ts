@@ -10,12 +10,15 @@ import { NotificationProgressComponent } from './notification-bar/notification-b
  */
 @Injectable()
 export class DialogServiceUtil {
-  constructor(@Optional() private matDialog: MatDialog, @Optional() private snackBar: MatSnackBar) {}
+  constructor(
+    @Optional() private matDialog: MatDialog,
+    @Optional() private snackBar: MatSnackBar,
+  ) {}
 
   showNotificationBar(
     message: string,
     type: 'success' | 'error' | 'notification' = 'notification',
-    duration: number = 4000
+    duration: number = 4000,
   ): void {
     if (!this.snackBar) {
       console.warn('DialogService.snackBar not initialized');
@@ -37,7 +40,7 @@ export class DialogServiceUtil {
   async showConfirmDialog(
     dialogTitle: string,
     confirmButton: string = 'Confirm',
-    showCancelButton: boolean = true
+    showCancelButton: boolean = true,
   ): Promise<boolean> {
     if (!this.matDialog) {
       console.warn('DialogService.matDialog not initialized');
@@ -59,7 +62,7 @@ export class DialogServiceUtil {
   showConfirmDialogObs(
     dialogTitle: string,
     confirmButton: string = 'Confirm',
-    showCancelButton: boolean = true
+    showCancelButton: boolean = true,
   ): Observable<boolean> {
     if (!this.matDialog) {
       console.warn('DialogService.matDialog not initialized');

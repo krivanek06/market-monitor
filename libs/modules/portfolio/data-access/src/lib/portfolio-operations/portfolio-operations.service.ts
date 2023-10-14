@@ -15,7 +15,6 @@ import {
   PortfolioTransactionCreate,
   SYMBOL_NOT_FOUND_ERROR,
   TRANSACTION_FEE_PRCT,
-  TRANSACTION_HISTORY_NOT_FOUND_ERROR,
   TRANSACTION_INPUT_UNITS_INTEGER,
   TRANSACTION_INPUT_UNITS_POSITIVE,
   USER_NOT_ENOUGH_CASH_ERROR,
@@ -66,24 +65,12 @@ export class PortfolioOperationsService {
     return transaction;
   }
 
-  async deleteTransactionOperation(transactionId: string): Promise<PortfolioTransaction> {
-    // get data
-    const userId = this.authenticationUserService.userData.id;
-    const userTransactions = await this.authenticationUserService.getUserPortfolioTransactionPromise();
-    const removedTransaction = await this.portfolioApiService.getPortfolioTransactionPublicPromise(transactionId);
-
-    if (!userTransactions || !removedTransaction) {
-      throw new Error(TRANSACTION_HISTORY_NOT_FOUND_ERROR);
-    }
-
+  deleteTransactionOperation(transaction: PortfolioTransaction): void {
     // remove transaction from public transactions collection
-    this.portfolioApiService.deletePortfolioTransactionForPublic(transactionId);
+    this.portfolioApiService.deletePortfolioTransactionForPublic(transaction.transactionId);
 
     // remove transaction from user document
-    this.userApiService.deletePortfolioTransactionForUser(userId, transactionId);
-
-    // return removed transaction
-    return removedTransaction;
+    this.userApiService.deletePortfolioTransactionForUser(transaction);
   }
 
   private getCurrentInvestedFromTransactions(
@@ -111,7 +98,7 @@ export class PortfolioOperationsService {
     breakEvenPrice: number,
   ): PortfolioTransaction {
     const userData = this.authenticationUserService.userData;
-    const isTransactionFeesActive = userData.settings.isTransactionFeesActive;
+    const isTransactionFeesActive = userData.settings.isPortfolioCashActive;
 
     // if custom total value is provided calculate unit price, else use API price
     const unitPrice = input.customTotalValue

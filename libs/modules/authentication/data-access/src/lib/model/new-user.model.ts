@@ -14,7 +14,6 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
 
       isCreatingGroupAllowed: false,
       isPortfolioCashActive: false,
-      isTransactionFeesActive: false,
     },
     personal: personal,
     accountResets: [],

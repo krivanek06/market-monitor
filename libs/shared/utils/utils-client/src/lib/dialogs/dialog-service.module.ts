@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { Injector, NgModule } from '@angular/core';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBarRef } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
@@ -21,4 +21,10 @@ import { NotificationBarModule } from './notification-bar/notification-bar.modul
     DialogServiceUtil,
   ],
 })
-export class DialogServiceModule {}
+export class DialogServiceModule {
+  static injector: Injector;
+
+  constructor(injector: Injector) {
+    DialogServiceModule.injector = injector;
+  }
+}

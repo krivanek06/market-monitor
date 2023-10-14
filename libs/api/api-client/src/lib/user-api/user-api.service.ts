@@ -33,9 +33,9 @@ export class UserApiService {
     });
   }
 
-  deletePortfolioTransactionForUser(transactionId: string, userId: string): void {
-    updateDoc(this.getUserPortfolioTransactionDocRef(userId), {
-      transactions: arrayRemove({ transactionId }),
+  deletePortfolioTransactionForUser(transaction: PortfolioTransaction): void {
+    updateDoc(this.getUserPortfolioTransactionDocRef(transaction.userId), {
+      transactions: arrayRemove(transaction),
     });
   }
 

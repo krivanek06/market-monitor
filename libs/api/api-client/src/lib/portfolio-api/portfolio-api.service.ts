@@ -3,7 +3,7 @@ import { DocumentReference, Firestore, deleteDoc, doc, setDoc } from '@angular/f
 import { PortfolioRisk, PortfolioTransaction } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { docData as rxDocData } from 'rxfire/firestore';
-import { Observable, filter, firstValueFrom, of } from 'rxjs';
+import { Observable, firstValueFrom, of } from 'rxjs';
 import { MarketApiService } from '../market-api/market-api.service';
 
 @Injectable({
@@ -25,13 +25,11 @@ export class PortfolioApiService {
     return of(null);
   }
 
-  getPortfolioTransactionPublic(transactionId: string): Observable<PortfolioTransaction> {
-    return rxDocData(this.getPortfolioTransactionPublicRef(transactionId)).pipe(
-      filter((d): d is PortfolioTransaction => !!d),
-    );
+  getPortfolioTransactionPublic(transactionId: string): Observable<PortfolioTransaction | undefined> {
+    return rxDocData(this.getPortfolioTransactionPublicRef(transactionId));
   }
 
-  getPortfolioTransactionPublicPromise(transactionId: string): Promise<PortfolioTransaction> {
+  getPortfolioTransactionPublicPromise(transactionId: string): Promise<PortfolioTransaction | undefined> {
     return firstValueFrom(this.getPortfolioTransactionPublic(transactionId));
   }
 

@@ -6,7 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@market-monitor/api-client';
-import { PortfolioTransactionType, SymbolSummary } from '@market-monitor/api-types';
+import { PortfolioTransaction, PortfolioTransactionType, SymbolSummary } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks/features';
@@ -18,8 +18,9 @@ import {
 } from '@market-monitor/modules/portfolio/features';
 import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
-import { FancyCardComponent } from '@market-monitor/shared/ui';
+import { FancyCardComponent, SortReversePipe } from '@market-monitor/shared/ui';
 import {
+  Confirmable,
   DialogServiceModule,
   DialogServiceUtil,
   SCREEN_DIALOGS,
@@ -44,6 +45,7 @@ import { switchMap } from 'rxjs';
     PortfolioTransactionsTableComponent,
     PortfolioTradeDialogComponent,
     MatTooltipModule,
+    SortReversePipe,
   ],
   templateUrl: './trading.component.html',
   styles: [
@@ -71,14 +73,24 @@ export class TradingComponent {
   );
 
   portfolioState = toSignal(this.portfolioUserFacadeService.getPortfolioState());
-
-  userSettings = this.authenticationUserService.userData.settings;
+  portfolioTransaction = toSignal(this.portfolioUserFacadeService.getUserPortfolioTransactions());
+  userSettingsSignal = signal(this.authenticationUserService.userData.settings);
 
   ColorScheme = ColorScheme;
 
   onSummaryClick(summary: SymbolSummary) {
-    console.log('summary', summary);
     this.selectedSummary.set(summary);
+  }
+
+  @Confirmable('Please confirm removing transaction')
+  onTransactionDelete(transaction: PortfolioTransaction) {
+    try {
+      this.portfolioUserFacadeService.deleteTransactionOperation(transaction);
+      this.dialogServiceUtil.showNotificationBar('Transaction removed', 'notification');
+    } catch (e) {
+      console.log(e);
+      this.dialogServiceUtil.showNotificationBar('Transaction failed to remove', 'error');
+    }
   }
 
   onOperationClick(transactionType: PortfolioTransactionType): void {

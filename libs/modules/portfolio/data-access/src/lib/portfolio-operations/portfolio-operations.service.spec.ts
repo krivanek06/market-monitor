@@ -261,9 +261,9 @@ describe('PortfolioCrudService', () => {
     });
 
     describe('should execute operation', () => {
-      it('should execute buy operation and calculate transaction fee if user has isTransactionFeesActive', async () => {
+      it('should execute buy operation and calculate transaction fee if user has isPortfolioCashActive', async () => {
         // activate portfolio cash
-        authenticationUserServiceMock.userData.settings.isTransactionFeesActive = true;
+        authenticationUserServiceMock.userData.settings.isPortfolioCashActive = true;
 
         // arrange
         const input = testTransactionCreate_BUY_AAPL_1;
@@ -287,9 +287,9 @@ describe('PortfolioCrudService', () => {
         expect(result).toEqual(expectedResult);
       });
 
-      it('should execute buy operation and not calculate transaction fee if user does not have isTransactionFeesActive ', async () => {
+      it('should execute buy operation and not calculate transaction fee if user does not have isPortfolioCashActive ', async () => {
         // activate portfolio cash
-        authenticationUserServiceMock.userData.settings.isTransactionFeesActive = false;
+        authenticationUserServiceMock.userData.settings.isPortfolioCashActive = false;
 
         // arrange
         const input = testTransactionCreate_BUY_AAPL_1;
@@ -326,8 +326,8 @@ describe('PortfolioCrudService', () => {
         });
       });
 
-      it('should execute sell operation and calculate transaction fee if user has isTransactionFeesActive', async () => {
-        authenticationUserServiceMock.userData.settings.isTransactionFeesActive = true;
+      it('should execute sell operation and calculate transaction fee if user has isPortfolioCashActive', async () => {
+        authenticationUserServiceMock.userData.settings.isPortfolioCashActive = true;
 
         when(authenticationUserServiceMock.getUserPortfolioTransactionPromise).mockResolvedValue(
           userTestPortfolioTransaction1,
@@ -372,9 +372,9 @@ describe('PortfolioCrudService', () => {
         expect(result).toEqual(expectedResult);
       });
 
-      it('should execute sell operation and calculate transaction fee if user does not have isTransactionFeesActive', async () => {
+      it('should execute sell operation and calculate transaction fee if user does not have isPortfolioCashActive', async () => {
         // activate portfolio cash
-        authenticationUserServiceMock.userData.settings.isTransactionFeesActive = false;
+        authenticationUserServiceMock.userData.settings.isPortfolioCashActive = false;
 
         // arrange
         const input = {
@@ -414,15 +414,14 @@ describe('PortfolioCrudService', () => {
         const input = {
           userId: authenticationUserServiceMock.userData.id,
           transactionId: testTransaction_BUY_AAPL_1.transactionId,
-        };
+        } as PortfolioTransaction;
 
         // act
-        const result = await service.deleteTransactionOperation(input.transactionId);
+        service.deleteTransactionOperation(input);
 
         // assert
-        expect(userApiServiceMock.deletePortfolioTransactionForUser).toBeCalledWith(input.userId, input.transactionId);
+        expect(userApiServiceMock.deletePortfolioTransactionForUser).toBeCalledWith(input);
         expect(portfolioApiServiceMock.deletePortfolioTransactionForPublic).toBeCalledWith(input.transactionId);
-        expect(result).toEqual(testTransaction_BUY_AAPL_1);
       });
     });
   });

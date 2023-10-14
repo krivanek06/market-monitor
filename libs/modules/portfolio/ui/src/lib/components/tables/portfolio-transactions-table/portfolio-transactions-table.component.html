@@ -13,12 +13,12 @@
 
   <!-- transactionType -->
   <ng-container matColumnDef="transactionType">
-    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Transaction Type</th>
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Type</th>
     <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
       <div
         [ngClass]="{
           'text-wt-danger': row.transactionType === 'SELL',
-          'text-wt-green': row.transactionType === 'BUY'
+          'text-wt-success': row.transactionType === 'BUY'
         }"
       >
         {{ row.transactionType }}
@@ -40,7 +40,7 @@
   <ng-container matColumnDef="unitPrice">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Unit Price</th>
     <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-      {{ row.unitPrices | currency }}
+      {{ row.unitPrice | currency }}
     </td>
   </ng-container>
 
@@ -54,10 +54,8 @@
 
   <!-- transactionFees -->
   <ng-container matColumnDef="transactionFees">
-    <th [ngClass]="{ hidden: !showTransactionFees }" mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">
-      Transaction Fees
-    </th>
-    <td [ngClass]="{ hidden: !showTransactionFees }" mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+    <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Fees</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
       {{ row.transactionFees | currency }}
     </td>
   </ng-container>
@@ -84,7 +82,7 @@
     <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
       <div class="flex items-center gap-2">
         <button type="button" mat-icon-button color="warn" (click)="onDeleteClick(row)">
-          <mat-icon>bin</mat-icon>
+          <mat-icon>delete</mat-icon>
         </button>
       </div>
     </td>

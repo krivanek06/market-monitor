@@ -19,7 +19,6 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
     },
     settings: {
       isCreatingGroupAllowed: true,
-      isTransactionFeesActive: true,
       isPortfolioCashActive: true,
       isProfilePublic: true,
       isHistoricalAssetsTradingAllowed: true,

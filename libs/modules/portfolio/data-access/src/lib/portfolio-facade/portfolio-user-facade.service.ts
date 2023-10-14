@@ -42,10 +42,6 @@ export class PortfolioUserFacadeService {
     return this.authenticationUserService.getUserPortfolioTransactions();
   }
 
-  getUserPortfolioTransactionPromise(): Promise<UserPortfolioTransaction> {
-    return this.authenticationUserService.getUserPortfolioTransactionPromise();
-  }
-
   getPortfolioGrowthAssets(): Observable<PortfolioGrowthAssets[]> {
     return this.authenticationUserService
       .getUserPortfolioTransactions()
@@ -78,7 +74,7 @@ export class PortfolioUserFacadeService {
     return this.portfolioOperationsService.createTransactionOperation(input);
   }
 
-  deleteTransactionOperation(transactionId: string): Promise<PortfolioTransaction> {
-    return this.portfolioOperationsService.deleteTransactionOperation(transactionId);
+  deleteTransactionOperation(transaction: PortfolioTransaction): void {
+    this.portfolioOperationsService.deleteTransactionOperation(transaction);
   }
 }

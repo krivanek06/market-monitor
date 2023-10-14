@@ -56,10 +56,6 @@ export type UserSettings = {
    */
   isPortfolioCashActive: boolean;
   /**
-   * if true, for each transaction the system will calculate the transaction fees
-   */
-  isTransactionFeesActive: boolean;
-  /**
    * if true, user will be able to create groups
    */
   isCreatingGroupAllowed: boolean;
