@@ -74,7 +74,7 @@ export class FancyCardComponent {
   get backgroundLinear(): string {
     return `background: linear-gradient(135deg,
         color-mix(in srgb, ${this.colorPrimary} 55%, white),
-        color-mix(in srgb, ${this.colorPrimary} 35%, white)
+        color-mix(in srgb, ${this.colorPrimary} 40%, white)
       );`;
   }
 }

@@ -2,7 +2,7 @@
   *ngIf="portfolioStateSignal() as portfolioState"
   class="grid gap-4 mx-auto mb-8 xl:gap-10 sm:grid-cols-3 xl:w-10/12"
 >
-  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+  <app-fancy-card title="Account stats" [colorPrimary]="ColorScheme.PRIMARY_VAR">
     <app-portfolio-state
       classes="grid gap-4 sm:grid-cols-2"
       [titleColor]="ColorScheme.PRIMARY_VAR"
@@ -12,20 +12,20 @@
     ></app-portfolio-state>
   </app-fancy-card>
 
-  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.SUCCESS_VAR">
-    <app-portfolio-state
+  <app-fancy-card title="Risk stats" [colorPrimary]="ColorScheme.SUCCESS_VAR">
+    <app-portfolio-state-risk
       [titleColor]="ColorScheme.SUCCESS_VAR"
-      [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
-      [portfolioState]="portfolioState"
-    ></app-portfolio-state>
+      [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+    ></app-portfolio-state-risk>
   </app-fancy-card>
 
-  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.DANGER_VAR">
-    <app-portfolio-state
+  <app-fancy-card title="Transactions stats" [colorPrimary]="ColorScheme.DANGER_VAR">
+    <app-portfolio-state-transactions
       [titleColor]="ColorScheme.DANGER_VAR"
-      [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
+      [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+      [showFees]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
-    ></app-portfolio-state>
+    ></app-portfolio-state-transactions>
   </app-fancy-card>
 </div>
 

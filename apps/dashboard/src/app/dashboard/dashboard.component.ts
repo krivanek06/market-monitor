@@ -7,6 +7,8 @@ import {
   PortfolioGrowthChartComponent,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
+  PortfolioStateRiskComponent,
+  PortfolioStateTransactionsComponent,
 } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { FancyCardComponent, GenericChartComponent } from '@market-monitor/shared/ui';
@@ -21,6 +23,8 @@ import { FancyCardComponent, GenericChartComponent } from '@market-monitor/share
     PortfolioGrowthChartComponent,
     PortfolioPeriodChangeComponent,
     GenericChartComponent,
+    PortfolioStateTransactionsComponent,
+    PortfolioStateRiskComponent,
   ],
   templateUrl: './dashboard.component.html',
   styles: [
