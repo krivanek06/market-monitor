@@ -62,7 +62,7 @@ export class MarketApiService extends ApiCacheService {
     endDate: string,
   ): Observable<HistoricalPriceSymbol | null> {
     return this.getData<HistoricalPriceSymbol | null>(
-      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&dateStart=${dateStart}&endDate=${endDate}&type=dateRange`,
+      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&dateStart=${dateStart}&dateEnd=${endDate}&type=dateRange`,
       this.validity2Min,
     );
   }

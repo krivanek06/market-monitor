@@ -27,7 +27,7 @@ export const getPriceOnDateRange = async (
   dateStart: string,
   endDate: string,
 ): Promise<HistoricalPriceSymbol | null> => {
-  const url = `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&dateStart=${dateStart}&endDate=${endDate}&type=dateRange`;
+  const url = `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&dateStart=${dateStart}&dateEnd=${endDate}&type=dateRange`;
   const response = await fetch(url, {
     method: 'GET',
     headers: {

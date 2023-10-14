@@ -172,7 +172,7 @@ export class PortfolioTradeDialogComponent {
 
     // create object
     const transactionCreate: PortfolioTransactionCreate = {
-      date: this.form.controls.date.value.toISOString(),
+      date: dateFormatDate(this.form.controls.date.value),
       symbol: this.data.summary.id,
       units: Number(this.form.controls.units.value),
       customTotalValue: this.isCustomTotal ? Number(this.form.controls.customTotalValue.value) : undefined,

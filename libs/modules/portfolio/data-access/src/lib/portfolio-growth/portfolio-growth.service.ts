@@ -116,7 +116,11 @@ export class PortfolioGrowthService {
     const historicalPricesPromise = await Promise.allSettled(
       transactionStart.map((transaction) =>
         firstValueFrom(
-          this.marketApiService.getHistoricalPricesDateRange(transaction.symbol, transaction.startDate, yesterDay),
+          this.marketApiService.getHistoricalPricesDateRange(
+            transaction.symbol,
+            format(new Date(transaction.startDate), 'yyyy-MM-dd'),
+            yesterDay,
+          ),
         ),
       ),
     );
@@ -133,62 +137,71 @@ export class PortfolioGrowthService {
     const historicalPrices = historicalPricesPromise
       .filter((d) => d.status === 'fulfilled')
       .map((d) => d.status === 'fulfilled' && d.value)
-      .filter((d): d is HistoricalPriceSymbol => d !== null)
+      .filter((d): d is HistoricalPriceSymbol => !!d)
       .reduce((acc, curr) => ({ ...acc, [curr.symbol]: curr.data }), {} as { [key: string]: HistoricalPrice[] });
 
     const distinctSymbols = transactionStart.map((d) => d.symbol);
 
     // create portfolio growth assets
-    const result: PortfolioGrowthAssets[] = distinctSymbols.map((symbol) => {
-      // get all transactions for this symbol
-      const symbolTransactions = userTransactions.transactions
-        .filter((d) => d.symbol === symbol)
-        .sort((a, b) => (isBefore(new Date(a.date), new Date(b.date)) ? -1 : 1));
+    const result: PortfolioGrowthAssets[] = distinctSymbols
+      .map((symbol) => {
+        const symbolHistoricalPrice = historicalPrices[symbol];
 
-      // get the index of historical prices to match the first transaction date
-      const historicalPriceIndex = historicalPrices[symbol].findIndex((d) =>
-        isSameDay(new Date(d.date), new Date(symbolTransactions[0].date)),
-      );
-
-      // internal helper
-      const aggregator = {
-        units: symbolTransactions[0].units,
-        index: 0,
-        breakEvenPrice: symbolTransactions[0].unitPrice,
-      };
-      const growthAssetItems = historicalPrices[symbol].slice(historicalPriceIndex).map((historicalPrice) => {
-        // check if the next transaction data is before the date then increase index
-        if (
-          !!symbolTransactions[aggregator.index + 1] &&
-          isSameDay(new Date(symbolTransactions[aggregator.index + 1].date), new Date(historicalPrice.date))
-        ) {
-          aggregator.index += 1;
-          const nextTransaction = symbolTransactions[aggregator.index];
-          const isBuy = nextTransaction.transactionType === 'BUY';
-          // change break even price
-          aggregator.breakEvenPrice = isBuy
-            ? (aggregator.breakEvenPrice * aggregator.units + historicalPrice.close * nextTransaction.unitPrice) /
-              (aggregator.units + nextTransaction.units)
-            : aggregator.breakEvenPrice;
-
-          // add or subtract units depending on transaction type
-          aggregator.units += isBuy ? nextTransaction.units : -nextTransaction.units;
+        if (!symbolHistoricalPrice) {
+          console.log(`Missing historical prices for ${symbol}`);
+          return null;
         }
 
-        return {
-          investedValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice, 2),
-          date: historicalPrice.date,
-          units: aggregator.units,
-          marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close, 2),
-        } satisfies PortfolioGrowthAssetsDataItem;
-      });
+        // get all transactions for this symbol
+        const symbolTransactions = userTransactions.transactions
+          .filter((d) => d.symbol === symbol)
+          .sort((a, b) => (isBefore(new Date(a.date), new Date(b.date)) ? -1 : 1));
 
-      const growthAssetsNonNullUnits = growthAssetItems.filter((d) => d.units > 0);
-      return {
-        symbol,
-        data: growthAssetsNonNullUnits,
-      } satisfies PortfolioGrowthAssets;
-    });
+        // get the index of historical prices to match the first transaction date
+        const historicalPriceIndex = symbolHistoricalPrice.findIndex((d) =>
+          isSameDay(new Date(d.date), new Date(symbolTransactions[0].date)),
+        );
+
+        // internal helper
+        const aggregator = {
+          units: symbolTransactions[0].units,
+          index: 0,
+          breakEvenPrice: symbolTransactions[0].unitPrice,
+        };
+        const growthAssetItems = symbolHistoricalPrice.slice(historicalPriceIndex).map((historicalPrice) => {
+          // check if the next transaction data is before the date then increase index
+          if (
+            !!symbolTransactions[aggregator.index + 1] &&
+            isSameDay(new Date(symbolTransactions[aggregator.index + 1].date), new Date(historicalPrice.date))
+          ) {
+            aggregator.index += 1;
+            const nextTransaction = symbolTransactions[aggregator.index];
+            const isBuy = nextTransaction.transactionType === 'BUY';
+            // change break even price
+            aggregator.breakEvenPrice = isBuy
+              ? (aggregator.breakEvenPrice * aggregator.units + historicalPrice.close * nextTransaction.unitPrice) /
+                (aggregator.units + nextTransaction.units)
+              : aggregator.breakEvenPrice;
+
+            // add or subtract units depending on transaction type
+            aggregator.units += isBuy ? nextTransaction.units : -nextTransaction.units;
+          }
+
+          return {
+            investedValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice, 2),
+            date: historicalPrice.date,
+            units: aggregator.units,
+            marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close, 2),
+          } satisfies PortfolioGrowthAssetsDataItem;
+        });
+
+        const growthAssetsNonNullUnits = growthAssetItems.filter((d) => d.units > 0);
+        return {
+          symbol,
+          data: growthAssetsNonNullUnits,
+        } satisfies PortfolioGrowthAssets;
+      })
+      .filter((d): d is PortfolioGrowthAssets => !!d);
 
     return result;
   }

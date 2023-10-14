@@ -43,7 +43,7 @@ export abstract class ApiCacheService {
     // no data cached
     const validity = validityDefault * this.validityOneMinute;
     return this.get<T>(url).pipe(
-      retry(3),
+      retry(1),
       tap((data) => {
         console.log('save to cache');
         this.cache.set(url, {
