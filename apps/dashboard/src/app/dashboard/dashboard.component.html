@@ -1,25 +1,28 @@
-<div *ngIf="portfolioStateSignal() as portfolioState" class="grid gap-4 mb-8 sm:grid-cols-3">
-  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.ACCOUNT_STATE">
+<div
+  *ngIf="portfolioStateSignal() as portfolioState"
+  class="grid gap-4 mx-auto mb-8 xl:gap-10 sm:grid-cols-3 xl:w-10/12"
+>
+  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.PRIMARY_VAR">
     <app-portfolio-state
       classes="grid gap-4 sm:grid-cols-2"
-      [titleColor]="ColorScheme.ACCOUNT_STATE"
+      [titleColor]="ColorScheme.PRIMARY_VAR"
       [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
       [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
     ></app-portfolio-state>
   </app-fancy-card>
 
-  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.ACCOUNT_STATE">
+  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.SUCCESS_VAR">
     <app-portfolio-state
-      [titleColor]="ColorScheme.ACCOUNT_STATE"
+      [titleColor]="ColorScheme.SUCCESS_VAR"
       [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
     ></app-portfolio-state>
   </app-fancy-card>
 
-  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.ACCOUNT_STATE">
+  <app-fancy-card title="Account State" [colorPrimary]="ColorScheme.DANGER_VAR">
     <app-portfolio-state
-      [titleColor]="ColorScheme.ACCOUNT_STATE"
+      [titleColor]="ColorScheme.DANGER_VAR"
       [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
       [portfolioState]="portfolioState"
     ></app-portfolio-state>
@@ -35,8 +38,11 @@
 </div>
 
 <!-- charts -->
-<div>
-  <app-portfolio-growth-chart [data]="[]"></app-portfolio-growth-chart>
+<div class="mb-8">
+  <app-portfolio-growth-chart
+    *ngIf="portfolioGrowthSignal() as portfolioGrowthSignal"
+    [data]="portfolioGrowthSignal"
+  ></app-portfolio-growth-chart>
 </div>
 
 <!-- holdings pie charts -->
@@ -44,14 +50,16 @@
   <app-generic-chart
     *ngIf="portfolioAssetAllocation() as portfolioAssetAllocation"
     chartTitle="Asset Allocation"
-    class="h-[200px]"
+    [heightPx]="380"
+    [showDataLabel]="true"
     chartTitlePosition="center"
     [series]="[portfolioAssetAllocation]"
   ></app-generic-chart>
   <app-generic-chart
     *ngIf="portfolioSectorAllocation() as portfolioSectorAllocation"
-    class="h-[200px]"
+    [heightPx]="380"
     chartTitle="Sector Allocation"
+    [showDataLabel]="true"
     chartTitlePosition="center"
     [series]="[portfolioSectorAllocation]"
   ></app-generic-chart>

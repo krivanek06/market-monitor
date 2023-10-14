@@ -36,6 +36,7 @@ export class DashboardComponent {
   portfolioUserFacadeService = inject(PortfolioUserFacadeService);
   authenticationUserService = inject(AuthenticationUserService);
 
+  portfolioGrowthSignal = toSignal(this.portfolioUserFacadeService.getPortfolioGrowth());
   portfolioStateSignal = toSignal(this.portfolioUserFacadeService.getPortfolioState());
   portfolioChangeSignal = toSignal(this.portfolioUserFacadeService.getPortfolioChange());
   portfolioAssetAllocation = toSignal(this.portfolioUserFacadeService.getPortfolioAssetAllocationPieChart());

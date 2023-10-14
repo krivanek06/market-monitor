@@ -175,6 +175,7 @@ export class PortfolioCalculationService {
     return {
       name: 'Sector Allocation',
       type: 'pie',
+      innerSize: '35%',
       data: chartData,
     };
   }
@@ -214,6 +215,7 @@ export class PortfolioCalculationService {
     return {
       name: 'Portfolio Allocation',
       type: 'pie',
+      innerSize: '35%',
       data: holdings.length > 0 ? resultData : [],
     };
   }

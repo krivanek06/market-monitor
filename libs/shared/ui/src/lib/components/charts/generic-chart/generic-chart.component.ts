@@ -384,10 +384,13 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
               const that = this as any;
               // rounded value
               const rounded = Math.round(that.percentage * 100) / 100;
+              console.log(this);
+              const color =
+                typeof that.color === 'object' && 'radialGradient' in that.color ? ColorScheme.PRIMARY_VAR : this.color;
 
               const result = `
-              <div class="text-sm">
-                  <span style="color: ${this.color}">● ${this.name}: </span>
+              <div class="text-base">
+                  <span style="color: ${color}">● ${this.name}: </span>
                   <span>${rounded}%</span>
               </div>
                 `;
@@ -395,11 +398,13 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
             },
           },
           dataLabels: {
+            overflow: 'allow',
+            shadow: false,
             style: {
               fontSize: '12px',
               width: 90,
             },
-            format: '<span style="color: {point.color}">{point.name}</span><br>{point.percentage:.1f} %',
+            format: '<span style="color: {point.color}" >{point.name}</span><br>{point.percentage:.1f}%',
             //distance: -25,
             filter: {
               property: 'percentage',
@@ -411,8 +416,8 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
             return {
               radialGradient: {
                 cx: 0.5,
-                cy: 0.3,
-                r: 0.1,
+                cy: 0.25,
+                r: 0.25,
               },
               stops: [
                 [0, color],

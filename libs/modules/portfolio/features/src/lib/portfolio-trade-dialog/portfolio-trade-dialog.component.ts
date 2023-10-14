@@ -158,7 +158,6 @@ export class PortfolioTradeDialogComponent {
   }
 
   async onFormSubmit(): Promise<void> {
-    console.log('submitting');
     if (this.form.invalid) {
       this.dialogServiceUtil.showNotificationBar('Please fill in all required fields', 'error');
       return;
@@ -180,13 +179,13 @@ export class PortfolioTradeDialogComponent {
       symbolType: 'STOCK',
     };
 
-    console.log('transaction', transactionCreate);
+    // set loading
     this.isLoadingSignal.set(true);
 
     try {
-      const transaction = await this.portfolioUserFacadeService.createTransactionOperation(transactionCreate);
-      console.log('result', transaction);
+      await this.portfolioUserFacadeService.createTransactionOperation(transactionCreate);
       this.dialogServiceUtil.showNotificationBar('Transaction created', 'success');
+      this.dialogRef.close();
     } catch (error) {
       this.dialogServiceUtil.showNotificationBar(String(error), 'error');
       console.log(error);
