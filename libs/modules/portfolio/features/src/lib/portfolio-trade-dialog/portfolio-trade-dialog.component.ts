@@ -29,6 +29,7 @@ import {
   requiredValidator,
 } from '@market-monitor/shared/utils-client';
 import { dateFormatDate, dateIsNotWeekend } from '@market-monitor/shared/utils-general';
+import { isSameDay } from 'date-fns';
 import { map, switchMap, tap } from 'rxjs';
 
 export type PortfolioTradeDialogComponentData = {
@@ -68,7 +69,7 @@ export type PortfolioTradeDialogComponentData = {
 })
 export class PortfolioTradeDialogComponent {
   form = new FormGroup({
-    date: new FormControl(new Date(), { validators: [requiredValidator], nonNullable: true }),
+    date: new FormControl(this.lastDateMarketOpen, { validators: [requiredValidator], nonNullable: true }),
     units: new FormControl('', {
       validators: [requiredValidator, minValueValidator(0), positiveNumberValidator],
       nonNullable: true,
@@ -80,16 +81,21 @@ export class PortfolioTradeDialogComponent {
 
   // config for date picker
   datePickerConfig: InputTypeDateTimePickerConfig = {
-    maxDate: new Date(),
+    maxDate: this.lastDateMarketOpen,
     minDate: new Date(2015, 0, 1),
     dateFilter: dateIsNotWeekend,
   };
 
-  userSettings = this.authenticationUserService.userSettings;
+  userSettingsSignal = signal(this.authenticationUserService.userSettings);
 
   // get holding information for symbol if there is any
   holdingSignal = toSignal(this.portfolioUserFacadeService.getPortfolioStateHolding(this.data.summary.id));
   portfolioState = toSignal(this.portfolioUserFacadeService.getPortfolioState());
+
+  /**
+   * load current price or use from summary
+   * can be mismatch during the weekend whe loading fails, however quote has the price from friday
+   */
   symbolPriceOnDate = toSignal(
     this.form.controls.date.valueChanges.pipe(
       switchMap((date) =>
@@ -130,6 +136,12 @@ export class PortfolioTradeDialogComponent {
     this.listenCustomTotalValueChange();
     this.listenOnInSufficientUnits();
     this.listenOnInSufficientCash();
+  }
+
+  get lastDateMarketOpen(): Date {
+    return !isSameDay(new Date(this.data.summary.quote.timestamp * 1000), new Date())
+      ? new Date(this.data.summary.quote.timestamp * 1000)
+      : new Date();
   }
 
   get isError(): boolean {
@@ -216,7 +228,7 @@ export class PortfolioTradeDialogComponent {
    */
   private listenOnInSufficientCash(): void {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((form) => {
-      if (this.data.transactionType === 'SELL' || !this.userSettings.isPortfolioCashActive) {
+      if (this.data.transactionType === 'SELL' || !this.userSettingsSignal().isPortfolioCashActive) {
         return;
       }
 

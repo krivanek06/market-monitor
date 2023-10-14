@@ -1,6 +1,6 @@
 import { createMock } from '@golevelup/ts-jest';
 import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
-import { PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
+import { HistoricalPrice, PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -36,6 +36,7 @@ describe('PortfolioCrudService', () => {
   const user = mockCreateUser();
   const marketApiServiceMock = createMock<MarketApiService>({
     getSymbolSummary: jest.fn(),
+    getHistoricalPricesOnDate: jest.fn(),
   });
   const authenticationUserServiceMock = createMock<AuthenticationUserService>({
     getUserPortfolioTransactionPromise: jest.fn(),
@@ -55,20 +56,7 @@ describe('PortfolioCrudService', () => {
 
   // create test data
   const userTestPortfolioTransaction1 = {
-    cashDeposit: [
-      {
-        transactionId: '1',
-        amount: 2000,
-        date: '2020-01-01',
-        type: 'DEPOSIT',
-      },
-      {
-        transactionId: '2',
-        amount: 4000,
-        date: '2020-01-14',
-        type: 'DEPOSIT',
-      },
-    ],
+    startingCash: 6000,
     transactions: [testTransaction_BUY_AAPL_1, testTransaction_BUY_AAPL_2],
   } satisfies UserPortfolioTransaction;
 
@@ -86,12 +74,24 @@ describe('PortfolioCrudService', () => {
     service = module.get<PortfolioOperationsService>(PortfolioOperationsService);
 
     // mock api calls
-    when(marketApiServiceMock.getSymbolSummary)
-      .calledWith(testTransactionCreate_BUY_AAPL_1.symbol)
-      .mockReturnValue(of(testSymbolSummary_AAPL));
-    when(marketApiServiceMock.getSymbolSummary)
-      .calledWith(testSymbolSummary_MSFT.id)
-      .mockReturnValue(of(testSymbolSummary_MSFT));
+    when(marketApiServiceMock.getHistoricalPricesOnDate)
+      .calledWith(testTransactionCreate_BUY_AAPL_1.symbol, expect.any(String))
+      .mockReturnValue(
+        of({
+          close: testSymbolSummary_AAPL.quote.price,
+          date: '',
+          volume: 0,
+        } as HistoricalPrice),
+      );
+    when(marketApiServiceMock.getHistoricalPricesOnDate)
+      .calledWith(testSymbolSummary_MSFT.id, expect.any(String))
+      .mockReturnValue(
+        of({
+          close: testSymbolSummary_MSFT.quote.price,
+          date: '',
+          volume: 0,
+        } as HistoricalPrice),
+      );
 
     when(authenticationUserServiceMock.getUserPortfolioTransactionPromise).mockResolvedValue(
       userTestPortfolioTransaction1,

@@ -202,7 +202,7 @@ export class PortfolioOperationsService {
     // check if user has enough cash on hand if BUY and cashAccountActive
     if (input.transactionType === 'BUY' && userData.settings.isPortfolioCashActive) {
       // calculate cash on hand from deposits
-      const cashOnHandFromDeposit = userTransactionHistory.cashDeposit.reduce((acc, curr) => acc + curr.amount, 0);
+      const cashOnHandStarting = userTransactionHistory.startingCash;
       // calculate cash on hand from transactions
       const cashOnHandTransactions = userTransactionHistory.transactions.reduce(
         (acc, curr) =>
@@ -211,12 +211,12 @@ export class PortfolioOperationsService {
       );
       console.log(
         'Evaluating cash on hand',
-        cashOnHandFromDeposit,
+        cashOnHandStarting,
         cashOnHandTransactions,
-        cashOnHandFromDeposit + cashOnHandTransactions,
+        cashOnHandStarting + cashOnHandTransactions,
         totalValue,
       );
-      if (cashOnHandFromDeposit + cashOnHandTransactions < totalValue) {
+      if (cashOnHandStarting + cashOnHandTransactions < totalValue) {
         throw new Error(USER_NOT_ENOUGH_CASH_ERROR);
       }
     }

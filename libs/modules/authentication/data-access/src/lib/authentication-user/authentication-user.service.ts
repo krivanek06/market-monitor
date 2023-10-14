@@ -2,7 +2,7 @@ import { Injectable, InjectionToken } from '@angular/core';
 import { UserApiService } from '@market-monitor/api-client';
 import { UserData, UserPortfolioTransaction, UserSettings, UserWatchlist } from '@market-monitor/api-types';
 import { User } from 'firebase/auth';
-import { Observable, firstValueFrom, shareReplay, tap } from 'rxjs';
+import { Observable, firstValueFrom, map, shareReplay, tap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
@@ -37,6 +37,10 @@ export class AuthenticationUserService {
 
   getUserData(): Observable<UserData> {
     return this.authenticationAccountService.getUserData();
+  }
+
+  getIsUserNew(): Observable<boolean> {
+    return this.getUserData().pipe(map((d) => d.accountResets.length === 0));
   }
 
   getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {

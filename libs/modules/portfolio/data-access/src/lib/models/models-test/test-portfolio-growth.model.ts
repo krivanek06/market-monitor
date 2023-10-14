@@ -53,7 +53,7 @@ const testTransaction_SELL_MSFT_1 = mockPortfolioTransaction({
 });
 
 export const userTestPortfolioTransaction1 = {
-  cashDeposit: [],
+  startingCash: 1000,
   transactions: [
     testTransaction_BUY_AAPL_1,
     testTransaction_BUY_MSFT_1,

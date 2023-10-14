@@ -1,4 +1,4 @@
-import { PortfolioTransaction, PortfolioTransactionCash } from './portfolio.model';
+import { PortfolioTransaction } from './portfolio.model';
 import { SymbolType } from './symbol.model';
 
 export enum UserAccountType {
@@ -18,11 +18,21 @@ export type UserData = {
     groupWatched: string[];
   };
   settings: UserSettings;
+  accountResets: UserAccountResets[];
+};
+
+/**
+ * user can reset its account and all previous data
+ * such as groups, transactions, watchlist, etc. will be removed
+ */
+export type UserAccountResets = {
+  date: string;
 };
 
 export type UserPortfolioTransaction = {
+  startingCash: number;
   transactions: PortfolioTransaction[];
-  cashDeposit: PortfolioTransactionCash[];
+  // cashDeposit: PortfolioTransactionCash[];
 };
 
 export type UserWatchlist = {

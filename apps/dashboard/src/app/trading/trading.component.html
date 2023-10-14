@@ -1,9 +1,9 @@
 <!-- account state -->
-<div *ngIf="portfolioState() as portfolioState" class="mb-10 xl:w-9/12 md:pt-6 md:pl-10">
+<div *ngIf="portfolioState() as portfolioState" class="lg:w-9/12 md:pt-6 md:px-10">
   <app-portfolio-state
     [titleColor]="ColorScheme.PRIMARY_VAR"
     [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-    classes="flex items-center gap-4 justify-between"
+    classes="flex items-start gap-4 justify-between"
     [showCashSegment]="userSettings.isPortfolioCashActive"
     [portfolioState]="portfolioState"
   ></app-portfolio-state>

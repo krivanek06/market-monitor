@@ -5,6 +5,7 @@ export const USER_TEST_1_ID = 'USER_TEST_1';
 export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
   const defaultUser: UserData = {
     id: USER_TEST_1_ID,
+    accountResets: [],
     groups: {
       groupInvitations: [],
       groupMember: [],

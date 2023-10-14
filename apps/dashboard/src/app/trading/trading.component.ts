@@ -4,6 +4,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@market-monitor/api-client';
 import { PortfolioTransactionType, SymbolSummary } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
@@ -42,6 +43,7 @@ import { switchMap } from 'rxjs';
     StockSummaryListComponent,
     PortfolioTransactionsTableComponent,
     PortfolioTradeDialogComponent,
+    MatTooltipModule,
   ],
   templateUrl: './trading.component.html',
   styles: [

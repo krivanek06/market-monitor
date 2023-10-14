@@ -9,13 +9,15 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
       groupWatched: [],
     },
     settings: {
-      isCreatingGroupAllowed: true,
-      isPortfolioCashActive: true,
       isProfilePublic: true,
-      isTransactionFeesActive: true,
       isHistoricalAssetsTradingAllowed: true,
+
+      isCreatingGroupAllowed: false,
+      isPortfolioCashActive: false,
+      isTransactionFeesActive: false,
     },
     personal: personal,
+    accountResets: [],
   };
   return newUser;
 };

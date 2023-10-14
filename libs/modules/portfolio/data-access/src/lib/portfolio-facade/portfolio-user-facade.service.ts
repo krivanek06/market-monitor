@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PortfolioGrowthAssets, PortfolioTransaction } from '@market-monitor/api-types';
+import { PortfolioGrowthAssets, PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { GenericChartSeriesPie } from '@market-monitor/shared/data-access';
 import { Observable, map, switchMap } from 'rxjs';
@@ -24,7 +24,7 @@ export class PortfolioUserFacadeService {
   constructor(
     private authenticationUserService: AuthenticationUserService,
     private portfolioGrowthService: PortfolioGrowthService,
-    private PortfolioOperationsService: PortfolioOperationsService,
+    private portfolioOperationsService: PortfolioOperationsService,
     private portfolioCalculationService: PortfolioCalculationService,
   ) {}
 
@@ -36,6 +36,14 @@ export class PortfolioUserFacadeService {
 
   getPortfolioStateHolding(symbol: string): Observable<PortfolioStateHolding | undefined> {
     return this.getPortfolioState().pipe(map((state) => state.holdings.find((holding) => holding.symbol === symbol)));
+  }
+
+  getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {
+    return this.authenticationUserService.getUserPortfolioTransactions();
+  }
+
+  getUserPortfolioTransactionPromise(): Promise<UserPortfolioTransaction> {
+    return this.authenticationUserService.getUserPortfolioTransactionPromise();
   }
 
   getPortfolioGrowthAssets(): Observable<PortfolioGrowthAssets[]> {
@@ -67,10 +75,10 @@ export class PortfolioUserFacadeService {
   }
 
   createTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
-    return this.PortfolioOperationsService.createTransactionOperation(input);
+    return this.portfolioOperationsService.createTransactionOperation(input);
   }
 
   deleteTransactionOperation(transactionId: string): Promise<PortfolioTransaction> {
-    return this.PortfolioOperationsService.deleteTransactionOperation(transactionId);
+    return this.portfolioOperationsService.deleteTransactionOperation(transactionId);
   }
 }

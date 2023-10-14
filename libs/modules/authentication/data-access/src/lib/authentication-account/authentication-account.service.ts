@@ -114,7 +114,7 @@ export class AuthenticationAccountService {
     });
 
     const newTransactions: UserPortfolioTransaction = {
-      cashDeposit: [],
+      startingCash: 0,
       transactions: [],
     };
 

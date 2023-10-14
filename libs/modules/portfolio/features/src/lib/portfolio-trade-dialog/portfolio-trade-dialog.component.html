@@ -27,7 +27,7 @@
     <ng-container *ngIf="!isLoadingSignal(); else showLoader">
       <!-- date picker -->
       <app-date-picker
-        *ngIf="userSettings.isHistoricalAssetsTradingAllowed && !userSettings.isPortfolioCashActive"
+        *ngIf="userSettingsSignal().isHistoricalAssetsTradingAllowed && !userSettingsSignal().isPortfolioCashActive"
         [inputTypeDateTimePickerConfig]="datePickerConfig"
         [formControl]="form.controls.date"
       ></app-date-picker>
@@ -68,17 +68,17 @@
       <div class="flex flex-col p-3 mb-1">
         <div class="g-item-wrapper">
           <span>Date</span>
-          <span>{{ form.controls.date.value | date: 'MMMM d, y' }}</span>
+          <span>{{ form.controls.date.value | date: 'MMMM d, y (EEEE)' }}</span>
         </div>
         <div class="g-item-wrapper">
           <span>Owned Units</span>
           <span>{{ holdingSignal()?.units ?? 0 }}</span>
         </div>
-        <div *ngIf="userSettings.isPortfolioCashActive" class="g-item-wrapper">
+        <div *ngIf="userSettingsSignal().isPortfolioCashActive" class="g-item-wrapper">
           <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">Cash on Hand</span>
-          <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">{{
-            portfolioState()?.cashOnHand | currency
-          }}</span>
+          <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">
+            {{ portfolioState()?.cashOnHand | currency }}
+          </span>
         </div>
         <div *ngIf="!isCustomTotal" class="g-item-wrapper">
           <span>Price</span>

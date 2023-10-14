@@ -28,7 +28,7 @@ export class PortfolioGrowthService {
 
     // todo: remove/add transaction total values into this
     // accumulate cash on hand from deposits
-    const cashOnHandFromDeposit = portfolioTransactions.cashDeposit.reduce((acc, curr) => acc + curr.amount, 0);
+    const cashOnHandFromDeposit = portfolioTransactions.startingCash ?? 0;
     const isCashActive = cashOnHandFromDeposit !== 0;
     // accumulate cash on hand from transactions
     const cashOnHandTransactions = transactions.reduce(
