@@ -43,7 +43,6 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
   ngOnInit(): void {}
   ngOnChanges(changes: SimpleChanges): void {
     const price = changes?.['historicalPrice'];
-
     if (price && price?.currentValue) {
       this.initChart(price.currentValue);
     }

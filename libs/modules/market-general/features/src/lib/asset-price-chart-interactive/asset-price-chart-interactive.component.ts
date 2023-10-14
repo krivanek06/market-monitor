@@ -24,7 +24,7 @@ import {
   TimePeriodButtonsComponent,
 } from '@market-monitor/shared/ui';
 import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
-import { catchError, distinctUntilChanged, startWith, switchMap, tap } from 'rxjs';
+import { catchError, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-asset-price-chart-interactive',
@@ -58,7 +58,7 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
 
   loadingSignal = signal<boolean>(true);
 
-  stockHistoricalPrice = signal<HistoricalPrice[]>([]);
+  stockHistoricalPriceSignal = signal<HistoricalPrice[]>([]);
 
   marketApiService = inject(MarketApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
@@ -71,8 +71,7 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
     this.timePeriodFormControl.valueChanges
       .pipe(
         startWith(this.timePeriodFormControl.value),
-        distinctUntilChanged(),
-        tap(() => this.stockHistoricalPrice.set([])),
+        tap(() => this.stockHistoricalPriceSignal.set([])),
         tap(() => this.loadingSignal.set(true)),
         switchMap((period) =>
           this.marketApiService.getHistoricalPrices(this.symbol, period).pipe(tap(() => this.loadingSignal.set(false))),
@@ -84,7 +83,7 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
         }),
       )
       .subscribe((prices) => {
-        this.stockHistoricalPrice.set(prices);
+        this.stockHistoricalPriceSignal.set(prices);
       });
 
     // preload some data for faster interaction

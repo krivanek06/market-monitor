@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { SymbolSummary } from '@market-monitor/api-types';
 import {
+  DefaultImgDirective,
   LargeNumberFormatterPipe,
   PercentageIncreaseDirective,
   PriceChangeItemSelectorPipe,
@@ -19,6 +20,7 @@ import { RecommendationDirective } from '../../../directives';
     RecommendationDirective,
     MatChipsModule,
     PriceChangeItemSelectorPipe,
+    DefaultImgDirective,
   ],
   templateUrl: './stock-summary-list.component.html',
   styles: [

@@ -4,7 +4,7 @@
 </div>
 
 <ng-container *ngIf="!loadingSignal(); else chartSkeleton">
-  <ng-container *ngIf="stockHistoricalPrice() as historicalPrice">
+  <ng-container *ngIf="stockHistoricalPriceSignal() as historicalPrice">
     <!-- time data about chart -->
     <div class="flex justify-end md:justify-between text-wt-gray-medium">
       <div class="items-center hidden gap-2 md:flex">
