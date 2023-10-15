@@ -1,66 +1,76 @@
-<div
-  *ngIf="portfolioStateSignal() as portfolioState"
-  class="grid gap-4 mx-auto mb-8 xl:gap-10 sm:grid-cols-3 xl:w-10/12"
->
-  <app-fancy-card title="Account stats" [colorPrimary]="ColorScheme.PRIMARY_VAR">
-    <app-portfolio-state
-      classes="grid gap-4 sm:grid-cols-2"
-      [titleColor]="ColorScheme.PRIMARY_VAR"
-      [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-      [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
-      [portfolioState]="portfolioState"
-    ></app-portfolio-state>
-  </app-fancy-card>
+<ng-container *ngIf="portfolioStateSignal() as portfolioState">
+  <div class="grid gap-4 mx-auto mb-8 xl:gap-10 sm:grid-cols-3 2xl:w-10/12">
+    <app-fancy-card title="Account stats" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+      <app-portfolio-state
+        classes="grid gap-4 sm:grid-cols-2"
+        [titleColor]="ColorScheme.PRIMARY_VAR"
+        [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+        [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
+        [portfolioState]="portfolioState"
+      ></app-portfolio-state>
+    </app-fancy-card>
 
-  <app-fancy-card title="Risk stats" [colorPrimary]="ColorScheme.SUCCESS_VAR">
-    <app-portfolio-state-risk
-      [titleColor]="ColorScheme.SUCCESS_VAR"
-      [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-    ></app-portfolio-state-risk>
-  </app-fancy-card>
+    <app-fancy-card title="Risk stats" [colorPrimary]="ColorScheme.SUCCESS_VAR">
+      <app-portfolio-state-risk
+        [titleColor]="ColorScheme.SUCCESS_VAR"
+        [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+      ></app-portfolio-state-risk>
+    </app-fancy-card>
 
-  <app-fancy-card title="Transactions stats" [colorPrimary]="ColorScheme.DANGER_VAR">
-    <app-portfolio-state-transactions
-      [titleColor]="ColorScheme.DANGER_VAR"
-      [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-      [showFees]="authenticationUserService.userData.settings.isPortfolioCashActive"
-      [portfolioState]="portfolioState"
-    ></app-portfolio-state-transactions>
-  </app-fancy-card>
-</div>
+    <app-fancy-card title="Transactions stats" [colorPrimary]="ColorScheme.DANGER_VAR">
+      <app-portfolio-state-transactions
+        [titleColor]="ColorScheme.DANGER_VAR"
+        [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+        [showFees]="authenticationUserService.userData.settings.isPortfolioCashActive"
+        [portfolioState]="portfolioState"
+      ></app-portfolio-state-transactions>
+    </app-fancy-card>
+  </div>
 
-<!-- portfolio change -->
-<div class="mb-8 lg:px-10">
-  <app-portfolio-period-change
-    *ngIf="portfolioChangeSignal() as portfolioChange"
-    [portfolioChange]="portfolioChange"
-  ></app-portfolio-period-change>
-</div>
+  <!-- portfolio change -->
+  <div class="mb-8 lg:px-10">
+    <app-portfolio-period-change
+      *ngIf="portfolioChangeSignal() as portfolioChange"
+      [portfolioChange]="portfolioChange"
+    ></app-portfolio-period-change>
+  </div>
 
-<!-- charts -->
-<div class="mb-8">
-  <app-portfolio-growth-chart
-    *ngIf="portfolioGrowthSignal() as portfolioGrowthSignal"
-    [data]="portfolioGrowthSignal"
-  ></app-portfolio-growth-chart>
-</div>
+  <!-- charts -->
+  <div class="mb-8">
+    <app-portfolio-growth-chart
+      *ngIf="portfolioGrowthSignal() as portfolioGrowthSignal"
+      [data]="portfolioGrowthSignal"
+    ></app-portfolio-growth-chart>
+  </div>
 
-<!-- holdings pie charts -->
-<div class="flex justify-around overflow-x-clip">
-  <app-generic-chart
-    *ngIf="portfolioAssetAllocation() as portfolioAssetAllocation"
-    chartTitle="Asset Allocation"
-    [heightPx]="380"
-    [showDataLabel]="true"
-    chartTitlePosition="center"
-    [series]="[portfolioAssetAllocation]"
-  ></app-generic-chart>
-  <app-generic-chart
-    *ngIf="portfolioSectorAllocation() as portfolioSectorAllocation"
-    [heightPx]="380"
-    chartTitle="Sector Allocation"
-    [showDataLabel]="true"
-    chartTitlePosition="center"
-    [series]="[portfolioSectorAllocation]"
-  ></app-generic-chart>
-</div>
+  <!-- holdings pie charts -->
+  <div class="flex justify-around mb-10 overflow-x-clip">
+    <app-generic-chart
+      *ngIf="portfolioAssetAllocation() as portfolioAssetAllocation"
+      chartTitle="Asset Allocation"
+      [heightPx]="380"
+      [showDataLabel]="true"
+      chartTitlePosition="center"
+      [series]="[portfolioAssetAllocation]"
+    ></app-generic-chart>
+    <app-generic-chart
+      *ngIf="portfolioSectorAllocation() as portfolioSectorAllocation"
+      [heightPx]="380"
+      chartTitle="Sector Allocation"
+      [showDataLabel]="true"
+      chartTitlePosition="center"
+      [series]="[portfolioSectorAllocation]"
+    ></app-generic-chart>
+  </div>
+
+  <!-- holding -->
+  <div>
+    <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">
+      <app-portfolio-holdings-table
+        (symbolClicked)="onSummaryClick($event)"
+        [holdings]="portfolioState.holdings"
+        [holdingsBalance]="portfolioState.holdingsBalance"
+      ></app-portfolio-holdings-table>
+    </app-general-card>
+  </div>
+</ng-container>

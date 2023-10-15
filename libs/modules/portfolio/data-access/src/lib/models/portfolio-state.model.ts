@@ -35,11 +35,14 @@ export type PortfolioStateHoldingPartial = {
   symbolType: SymbolType;
   symbol: string;
   units: number;
+  /**
+   * how much user invested. Used to calculate BEP.
+   */
   invested: number;
 };
 
 export type PortfolioStateHolding = PortfolioStateHoldingPartial & {
-  // breakEvenPrice: number; // calculated
+  breakEvenPrice: number; // calculated
   symbolSummary: SymbolSummary;
 };
 

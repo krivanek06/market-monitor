@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-general-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule],
+  imports: [CommonModule, MatCardModule, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
     `
@@ -36,8 +37,9 @@ import { MatCardModule } from '@angular/material/card';
     >
       <!-- title -->
       <mat-card-header *ngIf="title" [ngClass]="{ 'justify-center': titleCenter }">
-        <mat-card-title class="mb-2">
+        <mat-card-title class="mb-2 flex items-center gap-2">
           <img *ngIf="titleImgUrl" appDefaultImg [src]="titleImgUrl" />
+          <mat-icon *ngIf="matIcon" color="primary">{{ matIcon }}</mat-icon>
           <h3
             class="mb-0 text-wt-primary"
             [ngClass]="{
@@ -64,6 +66,7 @@ import { MatCardModule } from '@angular/material/card';
 export class GeneralCardComponent {
   @Input() title: string | null = null;
   @Input() titleImgUrl?: string;
+  @Input() matIcon?: string;
   @Input() titleScale: 'small' | 'medium' | 'large' = 'medium';
   @Input() showDataInCard = true;
   @Input() additionalClasses = '';

@@ -59,6 +59,7 @@ export class PortfolioGrowthService {
             }
             return {
               ...holding,
+              breakEvenPrice: roundNDigits(holding.invested / holding.units, 2),
               symbolSummary,
             } satisfies PortfolioStateHolding;
           })
