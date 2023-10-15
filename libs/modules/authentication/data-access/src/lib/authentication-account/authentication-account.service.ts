@@ -9,8 +9,9 @@ import {
   signInWithPopup,
 } from '@angular/fire/auth';
 import { UserApiService } from '@market-monitor/api-client';
-import { UserAccountType, UserData, UserPortfolioTransaction } from '@market-monitor/api-types';
+import { UserAccountType, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
 import { isNonNullable } from '@market-monitor/shared/utils-client';
+import { dateFormatDate } from '@market-monitor/shared/utils-general';
 import { BehaviorSubject, Observable, map, take } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 
@@ -118,11 +119,19 @@ export class AuthenticationAccountService {
       transactions: [],
     };
 
+    const newWatchlist: UserWatchlist = {
+      createdDate: dateFormatDate(new Date()),
+      data: [],
+    };
+
     // update user
     this.userApiService.updateUser(newUserData.id, newUserData);
 
     // create portfolio for user
     this.userApiService.updateUserPortfolioTransaction(newUserData.id, newTransactions);
+
+    // create empty watchlist
+    this.userApiService.updateUserWatchlist(newUserData.id, newWatchlist);
 
     // return new user data
     return newUserData;

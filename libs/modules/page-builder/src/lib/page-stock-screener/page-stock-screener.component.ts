@@ -20,7 +20,7 @@ import {
 import { RouterManagement } from '@market-monitor/shared/data-access';
 import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared/ui';
 import { DialogServiceModule, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
-import { catchError, of, switchMap, tap } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-page-stock-screener',
@@ -78,7 +78,7 @@ export class PageStockScreenerComponent implements OnInit, RouterManagement {
       catchError(() => {
         this.dialogServiceUtil.showNotificationBar('Error loading screener results', 'error');
         this.loadingSignal.set(false);
-        return of([]);
+        return [];
       }),
     ),
   );

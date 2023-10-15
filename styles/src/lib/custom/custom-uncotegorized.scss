@@ -73,3 +73,7 @@ h2 {
     border-bottom: 1px solid var(--table-border);
   }
 }
+
+.g-table-empty {
+  @apply h-[200px] grid place-content-center text-wt-gray-medium text-base;
+}

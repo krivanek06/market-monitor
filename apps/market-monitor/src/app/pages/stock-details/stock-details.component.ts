@@ -6,8 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
 import { stockDetailsResolver } from '@market-monitor/modules/page-builder';
-import { SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
-import { LabelValue, TabSelectControlComponent } from '@market-monitor/shared/ui';
+import { LabelValue, SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
+import { TabSelectControlComponent } from '@market-monitor/shared/ui';
 import { DialogServiceModule } from '@market-monitor/shared/utils-client';
 import { ROUTES_STOCK_DETAILS } from '../../routes.model';
 

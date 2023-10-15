@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
-import { SymbolSummary } from '@market-monitor/api-types';
+import { StockSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { DefaultImgDirective, PriceChangeItemsComponent } from '@market-monitor/shared/ui';
 import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/utils-client';
@@ -36,7 +36,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSummaryDialogComponent {
-  stockSummarySignal = signal<SymbolSummary | null>(null);
+  stockSummarySignal = signal<StockSummary | null>(null);
 
   symbolType = computed(() => {
     const summary = this.stockSummarySignal();
