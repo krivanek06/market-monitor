@@ -117,11 +117,13 @@ export class PortfolioGrowthService {
     const historicalPricesPromise = await Promise.allSettled(
       transactionStart.map((transaction) =>
         firstValueFrom(
-          this.marketApiService.getHistoricalPricesDateRange(
-            transaction.symbol,
-            format(new Date(transaction.startDate), 'yyyy-MM-dd'),
-            yesterDay,
-          ),
+          this.marketApiService
+            .getHistoricalPricesDateRange(
+              transaction.symbol,
+              format(new Date(transaction.startDate), 'yyyy-MM-dd'),
+              yesterDay,
+            )
+            .pipe(map((res) => ({ symbol: transaction.symbol, data: res }) satisfies HistoricalPriceSymbol)),
         ),
       ),
     );
@@ -136,15 +138,13 @@ export class PortfolioGrowthService {
 
     // get fulfilled promises and create object with symbol as key
     const historicalPrices = historicalPricesPromise
-      .filter((d) => d.status === 'fulfilled')
-      .map((d) => d.status === 'fulfilled' && d.value)
-      .filter((d): d is HistoricalPriceSymbol => !!d)
+      .filter((d): d is PromiseFulfilledResult<HistoricalPriceSymbol> => d.status === 'fulfilled')
+      .map((d) => d.value)
       .reduce((acc, curr) => ({ ...acc, [curr.symbol]: curr.data }), {} as { [key: string]: HistoricalPrice[] });
 
-    const distinctSymbols = transactionStart.map((d) => d.symbol);
-
     // create portfolio growth assets
-    const result: PortfolioGrowthAssets[] = distinctSymbols
+    const result: PortfolioGrowthAssets[] = transactionStart
+      .map((d) => d.symbol)
       .map((symbol) => {
         const symbolHistoricalPrice = historicalPrices[symbol];
 
@@ -153,15 +153,10 @@ export class PortfolioGrowthService {
           return null;
         }
 
-        // get all transactions for this symbol
+        // get all transactions for this symbol in ASC order by date
         const symbolTransactions = userTransactions.transactions
           .filter((d) => d.symbol === symbol)
           .sort((a, b) => (isBefore(new Date(a.date), new Date(b.date)) ? -1 : 1));
-
-        // get the index of historical prices to match the first transaction date
-        const historicalPriceIndex = symbolHistoricalPrice.findIndex((d) =>
-          isSameDay(new Date(d.date), new Date(symbolTransactions[0].date)),
-        );
 
         // internal helper
         const aggregator = {
@@ -169,7 +164,7 @@ export class PortfolioGrowthService {
           index: 0,
           breakEvenPrice: symbolTransactions[0].unitPrice,
         };
-        const growthAssetItems = symbolHistoricalPrice.slice(historicalPriceIndex).map((historicalPrice) => {
+        const growthAssetItems = symbolHistoricalPrice.map((historicalPrice) => {
           // check if the next transaction data is before the date then increase index
           if (
             !!symbolTransactions[aggregator.index + 1] &&
@@ -178,9 +173,10 @@ export class PortfolioGrowthService {
             aggregator.index += 1;
             const nextTransaction = symbolTransactions[aggregator.index];
             const isBuy = nextTransaction.transactionType === 'BUY';
+
             // change break even price
             aggregator.breakEvenPrice = isBuy
-              ? (aggregator.breakEvenPrice * aggregator.units + historicalPrice.close * nextTransaction.unitPrice) /
+              ? (aggregator.units * aggregator.breakEvenPrice + nextTransaction.units * nextTransaction.unitPrice) /
                 (aggregator.units + nextTransaction.units)
               : aggregator.breakEvenPrice;
 
@@ -203,7 +199,7 @@ export class PortfolioGrowthService {
         } satisfies PortfolioGrowthAssets;
       })
       .filter((d): d is PortfolioGrowthAssets => !!d);
-
+    console.log('result', result);
     return result;
   }
 }

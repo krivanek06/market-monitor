@@ -5,7 +5,6 @@ import {
   CalendarStockEarning,
   CalendarStockIPO,
   HistoricalPrice,
-  HistoricalPriceSymbol,
   MarketOverview,
   MarketOverviewData,
   MarketOverviewDatabaseKeys,
@@ -56,12 +55,8 @@ export class MarketApiService extends ApiCacheService {
     ).pipe(map((d) => d));
   }
 
-  getHistoricalPricesDateRange(
-    symbol: string,
-    dateStart: string,
-    endDate: string,
-  ): Observable<HistoricalPriceSymbol | null> {
-    return this.getData<HistoricalPriceSymbol | null>(
+  getHistoricalPricesDateRange(symbol: string, dateStart: string, endDate: string): Observable<HistoricalPrice[]> {
+    return this.getData<HistoricalPrice[]>(
       `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&dateStart=${dateStart}&dateEnd=${endDate}&type=dateRange`,
       this.validity2Min,
     );

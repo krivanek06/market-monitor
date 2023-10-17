@@ -18,7 +18,7 @@ import {
 } from '@market-monitor/modules/portfolio/features';
 import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
-import { FancyCardComponent, SortReversePipe } from '@market-monitor/shared/ui';
+import { FancyCardComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
 import {
   Confirmable,
   DialogServiceModule,
@@ -45,7 +45,7 @@ import { switchMap } from 'rxjs';
     PortfolioTransactionsTableComponent,
     PortfolioTradeDialogComponent,
     MatTooltipModule,
-    SortReversePipe,
+    SortByKeyPipe,
   ],
   templateUrl: './trading.component.html',
   styles: [

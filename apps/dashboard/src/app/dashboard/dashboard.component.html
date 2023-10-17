@@ -36,10 +36,11 @@
   </div>
 
   <!-- charts -->
-  <div class="mb-8">
+  <div class="pt-4 mb-8">
     <app-portfolio-growth-chart
       *ngIf="portfolioGrowthSignal() as portfolioGrowthSignal"
       [data]="portfolioGrowthSignal"
+      [heightPx]="500"
     ></app-portfolio-growth-chart>
   </div>
 

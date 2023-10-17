@@ -18,6 +18,7 @@ export class PortfolioCalculationService {
         // if elementIndex exists, add value to it
         if (elementIndex > -1) {
           acc[elementIndex].investedValue += dataItem.investedValue;
+          acc[elementIndex].marketTotalValue += dataItem.marketTotalValue;
           acc[elementIndex].ownedAssets += dataItem.units > 0 ? 1 : 0;
           return;
         }

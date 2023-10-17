@@ -22,6 +22,18 @@
           "name": "Launch Chrome Debugger",
           "pattern": "listening on localhost:4200"
         }
+      },
+      {
+        "command": "yarn mmd:serve",
+        "name": "Debug Dashboard",
+        "cwd": "${workspaceFolder}",
+        "request": "launch",
+        "type": "node-terminal",
+        "serverReadyAction": {
+          "action": "startDebugging",
+          "name": "Launch Chrome Debugger",
+          "pattern": "listening on localhost:4200"
+        }
       }
     ]
   }

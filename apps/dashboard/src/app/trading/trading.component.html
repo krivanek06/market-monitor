@@ -56,7 +56,7 @@
       (deleteEmitter)="onTransactionDelete($event)"
       [showTransactionFees]="userSettingsSignal().isPortfolioCashActive"
       [showActionButton]="!userSettingsSignal().isPortfolioCashActive"
-      [data]="portfolioTransaction()?.transactions ?? [] | sortReverse"
+      [data]="portfolioTransaction()?.transactions ?? [] | sortByKey: 'date' : 'desc'"
     ></app-portfolio-transactions-table>
   </div>
 

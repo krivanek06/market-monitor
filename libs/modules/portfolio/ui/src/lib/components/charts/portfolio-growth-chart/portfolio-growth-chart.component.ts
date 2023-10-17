@@ -39,6 +39,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
 
   private initChart(data: PortfolioGrowth[]) {
     const marketTotalValue = data.map((point) => point.marketTotalValue);
+    const investedValue = data.map((point) => point.investedValue);
     const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
 
     this.chartOptions = {
@@ -71,20 +72,20 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           minorGridLineWidth: 0,
           visible: true,
         },
-        // {
-        //   title: {
-        //     text: '',
-        //   },
-        //   startOnTick: false,
-        //   endOnTick: false,
-        //   gridLineColor: '#66666655',
-        //   opposite: true,
-        //   gridLineWidth: 1,
-        //   minorTickInterval: 'auto',
-        //   tickPixelInterval: 40,
-        //   minorGridLineWidth: 0,
-        //   visible: !isMobileView,
-        // },
+        {
+          title: {
+            text: '',
+          },
+          startOnTick: false,
+          endOnTick: false,
+          gridLineColor: '#66666655',
+          opposite: true,
+          gridLineWidth: 1,
+          minorTickInterval: 'auto',
+          tickPixelInterval: 40,
+          minorGridLineWidth: 0,
+          visible: true,
+        },
       ],
       xAxis: {
         labels: {
@@ -185,9 +186,30 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
       },
       series: [
         {
+          color: ColorScheme.SUCCESS_VAR,
+          type: 'line',
+          zIndex: 10,
+          yAxis: 1,
+          // fillColor: {
+          //   linearGradient: {
+          //     x1: 1,
+          //     y1: 0,
+          //     x2: 0,
+          //     y2: 1,
+          //   },
+          //   stops: [
+          //     [0, ColorScheme.SUCCESS_VAR],
+          //     [1, 'transparent'],
+          //   ],
+          // },
+          name: 'Investment Value',
+          data: investedValue,
+        },
+        {
           color: ColorScheme.PRIMARY_VAR,
           type: 'area',
           zIndex: 10,
+          yAxis: 0,
           fillColor: {
             linearGradient: {
               x1: 1,
@@ -200,7 +222,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
               [1, 'transparent'],
             ],
           },
-          name: 'Investment Value',
+          name: 'Market Value',
           data: marketTotalValue,
         },
       ],

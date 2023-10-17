@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { PortfolioGrowthAssets, PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { GenericChartSeriesPie } from '@market-monitor/shared/data-access';
-import { Observable, map, switchMap } from 'rxjs';
+import { Observable, from, map, switchMap } from 'rxjs';
 import {
   PortfolioChange,
   PortfolioGrowth,
@@ -45,7 +45,7 @@ export class PortfolioUserFacadeService {
   getPortfolioGrowthAssets(): Observable<PortfolioGrowthAssets[]> {
     return this.authenticationUserService
       .getUserPortfolioTransactions()
-      .pipe(switchMap((transactions) => this.portfolioGrowthService.getPortfolioGrowthAssets(transactions)));
+      .pipe(switchMap((transactions) => from(this.portfolioGrowthService.getPortfolioGrowthAssets(transactions))));
   }
 
   getPortfolioGrowth(): Observable<PortfolioGrowth[]> {

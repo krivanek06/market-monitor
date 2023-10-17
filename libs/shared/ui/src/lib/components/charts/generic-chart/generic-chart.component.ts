@@ -384,7 +384,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
               const that = this as any;
               // rounded value
               const rounded = Math.round(that.percentage * 100) / 100;
-              console.log(this);
+
               const color =
                 typeof that.color === 'object' && 'radialGradient' in that.color ? ColorScheme.PRIMARY_VAR : this.color;
 
