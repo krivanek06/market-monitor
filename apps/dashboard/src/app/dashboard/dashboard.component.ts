@@ -1,10 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
-import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
+import {
+  PortfolioUserFacadeService,
+  dashboardChartOptionsInputSource,
+} from '@market-monitor/modules/portfolio/data-access';
 import {
   PortfolioGrowthChartComponent,
   PortfolioHoldingsTableComponent,
@@ -14,7 +18,12 @@ import {
   PortfolioStateTransactionsComponent,
 } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
-import { FancyCardComponent, GeneralCardComponent, GenericChartComponent } from '@market-monitor/shared/ui';
+import {
+  FancyCardComponent,
+  FormMatInputWrapperComponent,
+  GeneralCardComponent,
+  GenericChartComponent,
+} from '@market-monitor/shared/ui';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 
 @Component({
@@ -33,6 +42,8 @@ import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
     GeneralCardComponent,
     StockSummaryDialogComponent,
     MatDialogModule,
+    FormMatInputWrapperComponent,
+    ReactiveFormsModule,
   ],
   templateUrl: './dashboard.component.html',
   styles: [
@@ -56,6 +67,9 @@ export class DashboardComponent {
   portfolioSectorAllocation = toSignal(this.portfolioUserFacadeService.getPortfolioSectorAllocationPieChart());
 
   ColorScheme = ColorScheme;
+
+  chartOptionControl = new FormControl(dashboardChartOptionsInputSource[0].value, { nonNullable: true });
+  dashboardChartOptionsInputSource = dashboardChartOptionsInputSource;
 
   onSummaryClick(symbol: string) {
     this.dialog.open(StockSummaryDialogComponent, {

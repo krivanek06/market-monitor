@@ -37,6 +37,7 @@
       class="text-xl"
       [appAddColor]="valueColor"
       appPercentageIncrease
+      [useCurrencySign]="true"
       [changeValues]="{
         change: portfolioState.totalGainsValue,
         changePercentage: showCashSegment ? portfolioState.totalGainsPercentage : undefined

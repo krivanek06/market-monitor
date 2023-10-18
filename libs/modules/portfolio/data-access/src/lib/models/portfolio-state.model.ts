@@ -15,6 +15,7 @@ export type PortfolioState = {
    */
   invested: number;
   cashOnHand: number;
+  startingCash: number;
   numberOfExecutedBuyTransactions: number;
   numberOfExecutedSellTransactions: number;
   transactionFees: number;

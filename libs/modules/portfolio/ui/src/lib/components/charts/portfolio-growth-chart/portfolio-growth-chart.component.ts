@@ -32,15 +32,19 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioGrowthChartComponent extends ChartConstructor {
-  @Input({ required: true }) set data(values: PortfolioGrowth[]) {
-    this.initChart(values);
+  @Input({ required: true }) set data(input: { values: PortfolioGrowth[]; startingCashValue: number }) {
+    this.initChart(input.values, input.startingCashValue);
   }
   @Input() heightPx = 400;
 
-  private initChart(data: PortfolioGrowth[]) {
+  private initChart(data: PortfolioGrowth[], startingCashValue: number = 0) {
     const marketTotalValue = data.map((point) => point.marketTotalValue);
     const investedValue = data.map((point) => point.investedValue);
     const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
+    const totalBalanceValues = data.map((point) => point.marketTotalValue - point.investedValue + startingCashValue);
+
+    // if user has blocked settings if cash account it will be 0
+    const isCashActive = startingCashValue > 0;
 
     this.chartOptions = {
       chart: {
@@ -68,26 +72,33 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           opposite: false,
           gridLineWidth: 1,
           minorTickInterval: 'auto',
-          tickPixelInterval: 40,
+          tickPixelInterval: 30,
           minorGridLineWidth: 0,
           visible: true,
-        },
-        {
-          title: {
-            text: '',
+          labels: {
+            style: {
+              color: ColorScheme.GRAY_MEDIUM_VAR,
+              font: '10px Trebuchet MS, Verdana, sans-serif',
+            },
           },
-          startOnTick: false,
-          endOnTick: false,
-          gridLineColor: '#66666655',
-          opposite: true,
-          gridLineWidth: 1,
-          minorTickInterval: 'auto',
-          tickPixelInterval: 40,
-          minorGridLineWidth: 0,
-          visible: true,
         },
+        // {
+        //   title: {
+        //     text: '',
+        //   },
+        //   startOnTick: false,
+        //   endOnTick: false,
+        //   gridLineColor: '#66666655',
+        //   opposite: true,
+        //   gridLineWidth: 1,
+        //   minorTickInterval: 'auto',
+        //   tickPixelInterval: 40,
+        //   minorGridLineWidth: 0,
+        //   visible: true,
+        // },
       ],
       xAxis: {
+        gridLineColor: '#66666644',
         labels: {
           rotation: -20,
           enabled: true,
@@ -99,12 +110,12 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         categories: dates,
       },
       title: {
-        text: 'Portfolio Growth',
+        text: '',
         align: 'left',
-        y: 15,
+        y: 0,
         floating: true,
         style: {
-          color: '#8e8e8e',
+          color: ColorScheme.GRAY_MEDIUM_VAR,
           fontSize: '13px',
         },
       },
@@ -116,23 +127,23 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         enabled: false,
       },
       legend: {
-        enabled: false,
+        enabled: true,
         //floating: true,
         verticalAlign: 'top',
-        align: 'right',
+        align: 'left',
         //layout: 'vertical',
-        //y: -8,
+        y: -8,
         //x: 50,
         itemStyle: {
-          color: '#acacac',
+          color: ColorScheme.GRAY_MEDIUM_VAR,
           cursor: 'default',
           fontSize: '12px',
         },
         itemHoverStyle: {
-          color: '#484d55',
+          color: ColorScheme.GRAY_LIGHT_VAR,
         },
         itemHiddenStyle: {
-          color: '#282828',
+          color: ColorScheme.GRAY_DARK_VAR,
         },
         labelFormatter: function () {
           const that = this as any;
@@ -142,11 +153,11 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
       tooltip: {
         padding: 11,
         enabled: true,
-        backgroundColor: '#232323',
+        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
         xDateFormat: '%A, %b %e, %Y',
         style: {
           fontSize: '16px',
-          color: '#D9D8D8',
+          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
         shared: true,
         headerFormat: '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
@@ -186,30 +197,33 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
       },
       series: [
         {
-          color: ColorScheme.SUCCESS_VAR,
-          type: 'line',
+          color: ColorScheme.ACCENT_1_VAR,
+          type: 'area',
           zIndex: 10,
-          yAxis: 1,
-          // fillColor: {
-          //   linearGradient: {
-          //     x1: 1,
-          //     y1: 0,
-          //     x2: 0,
-          //     y2: 1,
-          //   },
-          //   stops: [
-          //     [0, ColorScheme.SUCCESS_VAR],
-          //     [1, 'transparent'],
-          //   ],
-          // },
-          name: 'Investment Value',
-          data: investedValue,
+          yAxis: 0,
+          visible: isCashActive,
+          showInLegend: isCashActive,
+          fillColor: {
+            linearGradient: {
+              x1: 1,
+              y1: 0,
+              x2: 0,
+              y2: 1,
+            },
+            stops: [
+              [0, ColorScheme.ACCENT_1_VAR],
+              [1, 'transparent'],
+            ],
+          },
+          name: 'Total Balance',
+          data: totalBalanceValues,
         },
         {
           color: ColorScheme.PRIMARY_VAR,
           type: 'area',
           zIndex: 10,
           yAxis: 0,
+          visible: !isCashActive,
           fillColor: {
             linearGradient: {
               x1: 1,
@@ -222,7 +236,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
               [1, 'transparent'],
             ],
           },
-          name: 'Market Value',
+          name: 'Investment Value',
           data: marketTotalValue,
         },
       ],

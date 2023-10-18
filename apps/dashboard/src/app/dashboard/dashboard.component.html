@@ -1,5 +1,5 @@
 <ng-container *ngIf="portfolioStateSignal() as portfolioState">
-  <div class="grid gap-4 mx-auto mb-8 xl:gap-10 sm:grid-cols-3 2xl:w-10/12">
+  <div class="grid gap-4 mx-auto mb-6 md:mb-12 xl:gap-10 sm:grid-cols-3 2xl:w-10/12">
     <app-fancy-card title="Account stats" [colorPrimary]="ColorScheme.PRIMARY_VAR">
       <app-portfolio-state
         classes="grid gap-4 sm:grid-cols-2"
@@ -28,18 +28,34 @@
   </div>
 
   <!-- portfolio change -->
-  <div class="mb-8 lg:px-10">
+  <div class="mb-12 lg:px-10">
     <app-portfolio-period-change
       *ngIf="portfolioChangeSignal() as portfolioChange"
       [portfolioChange]="portfolioChange"
     ></app-portfolio-period-change>
   </div>
 
+  <!-- chart title and options -->
+  <div class="flex items-center justify-between">
+    <div class="text-lg text-wt-primary">{{ chartOptionControl.value.caption }}</div>
+
+    <app-form-mat-input-wrapper
+      class="min-w-[300px]"
+      inputCaption="Chart Options"
+      inputType="SELECT"
+      [inputSource]="dashboardChartOptionsInputSource"
+      [formControl]="chartOptionControl"
+    ></app-form-mat-input-wrapper>
+  </div>
+
   <!-- charts -->
-  <div class="pt-4 mb-8">
+  <div class="mb-8">
     <app-portfolio-growth-chart
       *ngIf="portfolioGrowthSignal() as portfolioGrowthSignal"
-      [data]="portfolioGrowthSignal"
+      [data]="{
+        values: portfolioGrowthSignal,
+        startingCashValue: portfolioState.startingCash
+      }"
       [heightPx]="500"
     ></app-portfolio-growth-chart>
   </div>

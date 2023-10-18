@@ -373,7 +373,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
           showInLegend: this.showLegend,
           allowPointSelect: false,
           depth: 35,
-          minSize: 90,
+          minSize: 70,
           tooltip: {
             headerFormat: undefined,
             // style: {

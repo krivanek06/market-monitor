@@ -2,6 +2,8 @@ export enum ColorScheme {
   PRIMARY_VAR = 'var(--primary)',
   SUCCESS_VAR = 'var(--success)',
   DANGER_VAR = 'var(--danger)',
+  ACCENT_1_VAR = 'var(--accent-1)',
+  ACCENT_2_VAR = 'var(--accent-2)',
 
   GRAY_DARK_STRONG_VAR = 'var(--gray-dark-strong)',
   GRAY_DARK_VAR = 'var(--gray-dark)',
