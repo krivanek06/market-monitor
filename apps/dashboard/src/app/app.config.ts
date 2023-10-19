@@ -37,12 +37,6 @@ export const appConfig: ApplicationConfig = {
       withPreloading(PreloadAllModules),
     ),
     provideAnimations(),
-    // {
-    //   provide: APP_INITIALIZER,
-    //   useFactory: () => () => {},
-    //   deps: [AngularFireModule],
-    //   multi: true,
-    // },
     {
       provide: AUTHENTICATION_ACCOUNT_TOKEN,
       useExisting: AuthenticationUserService,

@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { DocumentReference, Firestore, deleteDoc, doc, setDoc } from '@angular/fire/firestore';
 import { PortfolioRisk, PortfolioTransaction } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
-import { docData as rxDocData } from 'rxfire/firestore';
-import { Observable, firstValueFrom, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { MarketApiService } from '../market-api/market-api.service';
 
 @Injectable({
@@ -23,14 +22,6 @@ export class PortfolioApiService {
   // TODO: calculation on backend
   getPortfolioRiskByUser(userId: string): Observable<PortfolioRisk | null> {
     return of(null);
-  }
-
-  getPortfolioTransactionPublic(transactionId: string): Observable<PortfolioTransaction | undefined> {
-    return rxDocData(this.getPortfolioTransactionPublicRef(transactionId));
-  }
-
-  getPortfolioTransactionPublicPromise(transactionId: string): Promise<PortfolioTransaction | undefined> {
-    return firstValueFrom(this.getPortfolioTransactionPublic(transactionId));
   }
 
   addPortfolioTransactionForPublic(transaction: PortfolioTransaction): void {
