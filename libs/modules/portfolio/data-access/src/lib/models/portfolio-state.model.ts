@@ -30,6 +30,9 @@ export type PortfolioState = {
    */
   totalGainsValue: number;
   totalGainsPercentage: number;
+
+  firstTransactionDate: string;
+  lastTransactionDate: string;
 };
 
 export type PortfolioStateHoldingPartial = {

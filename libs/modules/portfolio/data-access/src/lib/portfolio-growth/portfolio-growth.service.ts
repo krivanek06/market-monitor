@@ -72,6 +72,8 @@ export class PortfolioGrowthService {
         const holdingsBalance = holdings.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0);
         const totalGainsValue = roundNDigits(holdingsBalance - invested, 2);
         const totalGainsPercentage = roundNDigits((holdingsBalance - invested) / holdingsBalance, 6);
+        const firstTransactionDate = transactions[0].date;
+        const lastTransactionDate = transactions[transactions.length - 1].date;
 
         const result: PortfolioState = {
           numberOfExecutedBuyTransactions,
@@ -85,6 +87,8 @@ export class PortfolioGrowthService {
           totalGainsValue,
           totalGainsPercentage,
           startingCash: cashOnHandFromDeposit,
+          firstTransactionDate,
+          lastTransactionDate,
         };
 
         return result;

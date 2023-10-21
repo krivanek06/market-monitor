@@ -1,6 +1,6 @@
 <div *ngIf="dateRangeSignal() as values" class="flex flex-col w-full">
   <!-- display current value from form -->
-  <div class="flex items-center justify-center gap-3">
+  <div *ngIf="displayUpperDate" class="flex items-center justify-center gap-3">
     <span class="text-sm text-wt-gray-medium">
       {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
     </span>
@@ -14,7 +14,14 @@
   <div class="flex items-center w-full gap-4">
     <!-- min value -->
     <span class="text-sm text-wt-gray-medium">
-      {{ values.dates | getDataByIndex: 0 | date: 'MMM d, y' }}
+      <!-- min date -->
+      <ng-container *ngIf="displayUpperDate">
+        {{ values.dates | getDataByIndex: 0 | date: 'MMM d, y' }}
+      </ng-container>
+      <!-- current date -->
+      <ng-container *ngIf="!displayUpperDate">
+        {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
+      </ng-container>
     </span>
 
     <!-- slider -->
@@ -33,7 +40,14 @@
 
     <!-- max value -->
     <span class="text-sm text-wt-gray-medium">
-      {{ values.dates | getDataByIndex: values.dates.length - 1 | date: 'MMM d, y' }}
+      <!-- max date -->
+      <ng-container *ngIf="displayUpperDate">
+        {{ values.dates | getDataByIndex: values.dates.length - 1 | date: 'MMM d, y' }}
+      </ng-container>
+      <!-- current date -->
+      <ng-container *ngIf="!displayUpperDate">
+        {{ values.dates | getDataByIndex: values.currentMaxDateIndex | date: 'MMM d, y' }}
+      </ng-container>
     </span>
   </div>
 </div>

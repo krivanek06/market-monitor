@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, forwardRef, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, forwardRef, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { GetDataByIndexPipe } from '../../../pipes';
@@ -32,6 +32,7 @@ export type DateRangeSliderValues = {
   ],
 })
 export class DateRangeSliderComponent implements ControlValueAccessor {
+  @Input() displayUpperDate = true;
   dateRangeSignal = signal<DateRangeSliderValues | null>(null);
 
   onChange: (data: DateRangeSliderValues) => void = () => {};
@@ -60,6 +61,7 @@ export class DateRangeSliderComponent implements ControlValueAccessor {
       currentMaxDateIndex: slider === 'end' ? index : previousValue.currentMaxDateIndex,
     } satisfies DateRangeSliderValues;
 
+    // set values into signal
     this.dateRangeSignal.set(newValues);
 
     // notify parent
@@ -70,7 +72,7 @@ export class DateRangeSliderComponent implements ControlValueAccessor {
     if (!value) {
       return;
     }
-
+    console.log('seeting', value);
     this.dateRangeSignal.set(value);
   }
 

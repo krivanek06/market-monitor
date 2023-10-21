@@ -37,7 +37,6 @@ export class PortfolioChangeChartComponent extends ChartConstructor {
     for (let i = 1; i < input.length; i++) {
       const current = input[i].totalBalanceValue;
       const before = input[i - 1].totalBalanceValue;
-      console.log(input[i].date, current, before);
 
       data.push([Date.parse(input[i].date), current - before, (current / 100) * before]);
     }

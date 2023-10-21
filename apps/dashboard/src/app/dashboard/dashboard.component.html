@@ -47,23 +47,45 @@
     ></app-form-mat-input-wrapper>
   </div> -->
 
-  <!-- charts -->
-  <ng-container *ngIf="portfolioGrowthSignal() as portfolioGrowthSignal">
-    <div class="mb-8">
-      <div class="text-lg text-wt-primary">{{ chartOptionControl.value.caption }}</div>
-      <app-portfolio-growth-chart
-        [data]="{
-          values: portfolioGrowthSignal,
-          startingCashValue: portfolioState.startingCash
-        }"
-        [heightPx]="500"
-      ></app-portfolio-growth-chart>
+  <!-- portfolio growth chart -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div class="text-lg text-wt-primary">Portfolio Growth</div>
+      <app-date-range-slider
+        *ngIf="portfolioGrowthDateRangeControl.value && portfolioGrowthDateRangeControl.value.currentMaxDateIndex > 50"
+        class="w-[550px]"
+        [displayUpperDate]="false"
+        [formControl]="portfolioGrowthDateRangeControl"
+      ></app-date-range-slider>
     </div>
-    <div class="mb-8">
-      <div class="text-lg text-wt-primary">{{ chartOptionControl.value.caption }}</div>
-      <app-portfolio-change-chart [data]="portfolioGrowthSignal" [heightPx]="500"></app-portfolio-change-chart>
+
+    <app-portfolio-growth-chart
+      *ngIf="portfolioGrowthChartSignal() as portfolioGrowthChartSignal"
+      [data]="{
+        values: portfolioGrowthChartSignal,
+        startingCashValue: portfolioState.startingCash
+      }"
+      [heightPx]="500"
+    ></app-portfolio-growth-chart>
+  </div>
+
+  <!-- portfolio change chart -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div class="text-lg text-wt-primary">Portfolio Change</div>
+      <app-date-range-slider
+        *ngIf="portfolioChangeDateRangeControl.value && portfolioChangeDateRangeControl.value.currentMaxDateIndex > 50"
+        class="w-[550px]"
+        [displayUpperDate]="false"
+        [formControl]="portfolioChangeDateRangeControl"
+      ></app-date-range-slider>
     </div>
-  </ng-container>
+    <app-portfolio-change-chart
+      *ngIf="portfolioChangeChartSignal() as portfolioChangeChartSignal"
+      [data]="portfolioChangeChartSignal"
+      [heightPx]="500"
+    ></app-portfolio-change-chart>
+  </div>
 
   <!-- holdings pie charts -->
   <div class="flex justify-around mb-10 overflow-x-clip">
