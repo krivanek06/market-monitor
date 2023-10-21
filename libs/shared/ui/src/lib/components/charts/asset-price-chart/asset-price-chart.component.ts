@@ -34,7 +34,6 @@ import { HighchartsChartModule } from 'highcharts-angular';
 export class AssetPriceChartComponent extends ChartConstructor implements OnInit, OnChanges {
   @Input({ required: true }) period!: SymbolHistoricalPeriods;
   @Input({ required: true }) historicalPrice!: HistoricalPrice[];
-  @Input() heightPx = 550;
   @Input() showTitle = false;
   @Input() priceName = 'price';
   @Input() displayVolume = true;

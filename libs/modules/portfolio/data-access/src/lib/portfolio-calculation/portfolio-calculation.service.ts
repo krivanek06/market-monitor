@@ -9,13 +9,13 @@ import { PortfolioChange, PortfolioGrowth, PortfolioStateHolding, PortfolioState
   providedIn: 'root',
 })
 export class PortfolioCalculationService {
-  getPortfolioGrowth(data: PortfolioGrowthAssets[]): PortfolioGrowth[] {
+  getPortfolioGrowth(data: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
     return data.reduce((acc, curr) => {
       curr.data.forEach((dataItem) => {
         // find index of element with same date
         const elementIndex = acc.findIndex((el) => el.date === dataItem.date);
 
-        // if elementIndex exists, add value to it
+        // if elementIndex exists, add value to it => different symbol, same date
         if (elementIndex > -1) {
           acc[elementIndex].investedValue += dataItem.investedValue;
           acc[elementIndex].marketTotalValue += dataItem.marketTotalValue;
@@ -23,11 +23,13 @@ export class PortfolioCalculationService {
           return;
         }
 
+        // initial object
         const portfolioItem: PortfolioGrowth = {
           date: dataItem.date,
           investedValue: dataItem.investedValue,
           ownedAssets: 1,
           marketTotalValue: dataItem.marketTotalValue,
+          totalBalanceValue: dataItem.marketTotalValue - dataItem.investedValue + startingCashValue,
         };
 
         if (acc.length === 0 || dataItem.date < acc[0].date) {

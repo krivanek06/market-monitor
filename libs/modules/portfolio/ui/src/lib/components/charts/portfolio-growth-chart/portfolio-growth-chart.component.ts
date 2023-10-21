@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { ChartConstructor } from '@market-monitor/shared/utils-client';
-import { dateFormatDate, formatLargeNumber } from '@market-monitor/shared/utils-general';
+import { dateFormatDate, formatValueIntoCurrency } from '@market-monitor/shared/utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({
@@ -35,13 +35,12 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(input: { values: PortfolioGrowth[]; startingCashValue: number }) {
     this.initChart(input.values, input.startingCashValue);
   }
-  @Input() heightPx = 400;
 
   private initChart(data: PortfolioGrowth[], startingCashValue: number = 0) {
     const marketTotalValue = data.map((point) => point.marketTotalValue);
     const investedValue = data.map((point) => point.investedValue);
     const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
-    const totalBalanceValues = data.map((point) => point.marketTotalValue - point.investedValue + startingCashValue);
+    const totalBalanceValues = data.map((point) => point.totalBalanceValue);
 
     // if user has blocked settings if cash account it will be 0
     const isCashActive = startingCashValue > 0;
@@ -163,12 +162,11 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         headerFormat: '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
         pointFormatter: function () {
           const that = this as any;
-          const value = formatLargeNumber(that.y);
+          const value = formatValueIntoCurrency(that.y);
 
           const name = that.series.name.toLowerCase();
-          const displayTextValue = that.y === 0 ? '$0' : `$${value}`;
 
-          return `<p><span style="color: ${that.series.color}; font-weight: bold" class="capitalize">● ${name}: </span><span>${displayTextValue}</span></p><br/>`;
+          return `<p><span style="color: ${that.series.color}; font-weight: bold" class="capitalize">● ${name}: </span><span>${value}</span></p><br/>`;
         },
       },
       plotOptions: {

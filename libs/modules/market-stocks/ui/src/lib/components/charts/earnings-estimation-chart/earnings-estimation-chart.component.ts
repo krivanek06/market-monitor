@@ -28,7 +28,6 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(values: EstimatedChartDataType[]) {
     this.initChart(values);
   }
-  @Input() heightPx = 400;
   @Input() limitValues = 30;
 
   @Input() showTitle = false;

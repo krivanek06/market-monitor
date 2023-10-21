@@ -34,6 +34,19 @@ export const groupValuesByDate = <T extends { date: string }>(data: T[]): { data
   );
 };
 
+export const formatValueIntoCurrency = (value?: string | number | null | unknown): string => {
+  if (!value || (!isNumber(value) && typeof value !== 'number')) {
+    return 'N/A';
+  }
+  // Create our number formatter.
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 2,
+  });
+
+  return formatter.format(Number(value));
+};
 export const formatLargeNumber = (
   value?: string | number | null | unknown,
   isPercent = false,

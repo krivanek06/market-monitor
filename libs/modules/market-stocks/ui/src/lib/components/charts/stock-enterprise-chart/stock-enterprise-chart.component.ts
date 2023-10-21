@@ -37,7 +37,6 @@ export class StockEnterpriseChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(values: EnterpriseValue[]) {
     this.initChart(values);
   }
-  @Input() heightPx = 400;
 
   private initChart(data: EnterpriseValue[]): void {
     if (!this.Highcharts) {

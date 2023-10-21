@@ -68,7 +68,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
   @Output() expandEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   @Input({ required: true }) series!: GenericChartSeries[] | GenericChartSeriesPie[];
-  @Input() heightPx = 400;
+
   @Input() chartType: ChartType | ChartTypeKeys = ChartType.line;
   @Input() chartTitle = '';
   @Input() chartTitlePosition: Highcharts.AlignValue = 'left';

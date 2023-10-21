@@ -1,10 +1,13 @@
-import { inject } from '@angular/core';
+import { Directive, Input, inject } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import HC_more from 'highcharts/highcharts-more';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 import { PlatformService } from './platform';
 
+@Directive()
 export abstract class ChartConstructor {
+  @Input() heightPx = 400;
+
   Highcharts: typeof Highcharts = Highcharts;
   chart!: Highcharts.Chart;
   updateFromInput = true;

@@ -37,7 +37,6 @@ export class StockRecommendationChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(values: RecommendationTrends[]) {
     this.initChart(values);
   }
-  @Input() heightPx = 400;
 
   private initChart(data: RecommendationTrends[]): void {
     if (!this.Highcharts) {

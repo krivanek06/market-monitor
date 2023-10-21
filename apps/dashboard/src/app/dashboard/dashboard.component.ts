@@ -10,6 +10,7 @@ import {
   dashboardChartOptionsInputSource,
 } from '@market-monitor/modules/portfolio/data-access';
 import {
+  PortfolioChangeChartComponent,
   PortfolioGrowthChartComponent,
   PortfolioHoldingsTableComponent,
   PortfolioPeriodChangeComponent,
@@ -44,6 +45,7 @@ import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
     MatDialogModule,
     FormMatInputWrapperComponent,
     ReactiveFormsModule,
+    PortfolioChangeChartComponent,
   ],
   templateUrl: './dashboard.component.html',
   styles: [
