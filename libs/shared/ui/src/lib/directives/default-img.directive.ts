@@ -1,12 +1,14 @@
 import { Directive, ElementRef, Input, OnChanges, Renderer2, SimpleChanges } from '@angular/core';
 import { PlatformService } from '../utils';
 
+type ImageSrc = string | null | undefined;
+
 @Directive({
   selector: '[appDefaultImg]',
   standalone: true,
 })
 export class DefaultImgDirective implements OnChanges {
-  @Input({ required: true }) src: string | null = null;
+  @Input({ required: true }) src: ImageSrc = null;
   @Input() imageType: 'default' | 'symbol' = 'default';
 
   private symbolURL = 'https://get-asset-url.krivanek1234.workers.dev';
@@ -54,11 +56,11 @@ export class DefaultImgDirective implements OnChanges {
     img.src = this.resolveImage(this.src);
   }
 
-  private setImage(src: string | null) {
+  private setImage(src: ImageSrc) {
     this.imageRef.nativeElement.setAttribute('src', src);
   }
 
-  private resolveImage(src: string | null): string {
+  private resolveImage(src: ImageSrc): string {
     if (!src) {
       return this.defaultLocalImage;
     }

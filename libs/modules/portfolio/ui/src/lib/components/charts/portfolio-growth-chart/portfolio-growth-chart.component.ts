@@ -81,20 +81,6 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
             },
           },
         },
-        // {
-        //   title: {
-        //     text: '',
-        //   },
-        //   startOnTick: false,
-        //   endOnTick: false,
-        //   gridLineColor: '#66666655',
-        //   opposite: true,
-        //   gridLineWidth: 1,
-        //   minorTickInterval: 'auto',
-        //   tickPixelInterval: 40,
-        //   minorGridLineWidth: 0,
-        //   visible: true,
-        // },
       ],
       xAxis: {
         gridLineColor: '#66666644',

@@ -34,57 +34,9 @@
     ></app-portfolio-period-change>
   </div>
 
-  <!-- chart title and options -->
-  <!-- <div class="flex items-center justify-between">
-    <div class="text-lg text-wt-primary">{{ chartOptionControl.value.caption }}</div>
-
-    <app-form-mat-input-wrapper
-      class="min-w-[300px]"
-      inputCaption="Chart Options"
-      inputType="SELECT"
-      [inputSource]="dashboardChartOptionsInputSource"
-      [formControl]="chartOptionControl"
-    ></app-form-mat-input-wrapper>
-  </div> -->
-
-  <!-- portfolio growth chart -->
+  <!-- dashboard charts -->
   <div class="mb-8">
-    <div class="flex items-center justify-between">
-      <div class="text-lg text-wt-primary">Portfolio Growth</div>
-      <app-date-range-slider
-        *ngIf="portfolioGrowthDateRangeControl.value && portfolioGrowthDateRangeControl.value.currentMaxDateIndex > 50"
-        class="w-[550px]"
-        [displayUpperDate]="false"
-        [formControl]="portfolioGrowthDateRangeControl"
-      ></app-date-range-slider>
-    </div>
-
-    <app-portfolio-growth-chart
-      *ngIf="portfolioGrowthChartSignal() as portfolioGrowthChartSignal"
-      [data]="{
-        values: portfolioGrowthChartSignal,
-        startingCashValue: portfolioState.startingCash
-      }"
-      [heightPx]="500"
-    ></app-portfolio-growth-chart>
-  </div>
-
-  <!-- portfolio change chart -->
-  <div class="mb-8">
-    <div class="flex items-center justify-between">
-      <div class="text-lg text-wt-primary">Portfolio Change</div>
-      <app-date-range-slider
-        *ngIf="portfolioChangeDateRangeControl.value && portfolioChangeDateRangeControl.value.currentMaxDateIndex > 50"
-        class="w-[550px]"
-        [displayUpperDate]="false"
-        [formControl]="portfolioChangeDateRangeControl"
-      ></app-date-range-slider>
-    </div>
-    <app-portfolio-change-chart
-      *ngIf="portfolioChangeChartSignal() as portfolioChangeChartSignal"
-      [data]="portfolioChangeChartSignal"
-      [heightPx]="500"
-    ></app-portfolio-change-chart>
+    <app-dashboard-portfolio-charts [portfolioState]="portfolioState"></app-dashboard-portfolio-charts>
   </div>
 
   <!-- holdings pie charts -->

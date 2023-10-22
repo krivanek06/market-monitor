@@ -28,3 +28,7 @@ mat-chip {
 .mat-mdc-chip-selected {
   background-color: var(--gray-light) !important;
 }
+
+.mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) .mdc-evolution-chip__checkmark {
+  color: var(--primary) !important;
+}

@@ -82,22 +82,15 @@ export class PortfolioChangeChartComponent extends ChartConstructor {
         },
       },
       xAxis: {
-        title: {
-          text: '',
-        },
+        gridLineColor: '#66666644',
         type: 'datetime',
+        crosshair: true,
         dateTimeLabelFormats: {
           day: '%e of %b',
         },
-        startOnTick: false,
-        endOnTick: false,
-        gridLineColor: '#66666655',
-        opposite: false,
-        minorTickInterval: 'auto',
-        tickPixelInterval: 30,
-        minorGridLineWidth: 0,
-        visible: true,
         labels: {
+          rotation: -20,
+          enabled: true,
           style: {
             color: ColorScheme.GRAY_MEDIUM_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
