@@ -154,6 +154,7 @@ export class PortfolioCalculationService {
       '1_year': year1ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[year1ChangeIndex]) : null,
     };
 
+    console.log('daily result', result);
     return result;
   }
 

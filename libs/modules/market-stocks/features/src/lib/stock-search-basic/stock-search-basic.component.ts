@@ -48,6 +48,7 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
   @Output() inputHasValue = new EventEmitter<boolean>();
   @Input() showHint = true;
   @Input() showValueChange = true;
+  @Input() displayValue: 'name' | 'symbol' = 'name';
 
   searchControl = new FormControl<string>('', { nonNullable: true });
 

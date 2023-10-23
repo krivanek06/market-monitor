@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, TrackByFunction, ViewChild, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  TrackByFunction,
+  ViewChild,
+  signal,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
@@ -37,17 +46,32 @@ import {
   templateUrl: './stock-summary-table.component.html',
   styleUrls: ['./stock-summary-table.component.scss'],
 })
-export class StockSummaryTableComponent {
+export class StockSummaryTableComponent implements AfterViewInit {
   @Output() itemClickedEmitter = new EventEmitter<SymbolSummary>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @Input({ required: true }) set stockSummaries(data: SymbolSummary[] | null) {
-    this.dataSource = new MatTableDataSource(data ?? []);
-    this.dataSource.paginator = this.paginator;
+    if (!data) {
+      return;
+    }
+    // filtering out what do add and remove and update table to not rerender everything
+    const dataToAdd = data.filter((d) => this.dataSource.data.findIndex((d2) => d2.id === d.id) === -1);
+    const keepData = this.dataSource.data.filter((d) => data.findIndex((d2) => d2.id === d.id) !== -1);
+
+    this.dataSource.data = [...keepData, ...dataToAdd];
+    this.dataSource._updateChangeSubscription();
   }
   @Input() tableTitle = '';
   @Input() showMobileInfoButton = true;
 
   displayInfoMobile = signal(false);
+
+  constructor() {
+    this.dataSource = new MatTableDataSource([] as SymbolSummary[]);
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+  }
 
   toggleDisplayedValues(): void {
     this.displayInfoMobile.set(!this.displayInfoMobile());

@@ -20,7 +20,6 @@ import {
 } from '@market-monitor/modules/authentication/data-access';
 import { SymbolFavoriteService } from '@market-monitor/modules/market-stocks/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
-import { map } from 'rxjs';
 
 @Component({
   selector: 'app-summary-action-buttons',
@@ -65,12 +64,9 @@ export class SummaryActionButtonsComponent implements OnInit {
 
     // check if symbol in watchlist
     if (this.authenticationUserService) {
-      this.authenticationUserService
-        .getUserWatchlist()
-        .pipe(map((watchlist) => watchlist.data.map((d) => d.symbol).includes(this.symbolSummary.id)))
-        .subscribe((isInWatchlist) => {
-          this.isSymbolInWatchlist.set(isInWatchlist);
-        });
+      this.authenticationUserService.isSymbolInWatchlist(this.symbolSummary.id).subscribe((isInWatchlist) => {
+        this.isSymbolInWatchlist.set(isInWatchlist);
+      });
     }
   }
 
@@ -90,9 +86,19 @@ export class SummaryActionButtonsComponent implements OnInit {
     this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been removed from favorites`);
   }
 
-  onAddWatchlist(): void {}
+  onAddWatchlist(): void {
+    if (this.authenticationUserService) {
+      this.authenticationUserService.addSymbolToUserWatchlist(this.symbolSummary.id, 'STOCK');
+      this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been added into watchlist`);
+    }
+  }
 
-  onRemoveWatchlist(): void {}
+  onRemoveWatchlist(): void {
+    if (this.authenticationUserService) {
+      this.authenticationUserService.removeSymbolFromUserWatchlist(this.symbolSummary.id, 'STOCK');
+      this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been removed from watchlist`);
+    }
+  }
 
   onDetailsRedirect(): void {
     this.redirectClickedEmitter.emit();

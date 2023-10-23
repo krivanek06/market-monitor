@@ -1,0 +1,12 @@
+.mat-column-symbol {
+  min-width: 130px;
+  //width: 50%;
+
+  @screen xs {
+    width: 60%;
+  }
+  @screen sm {
+    width: auto;
+    max-width: 130px;
+  }
+}

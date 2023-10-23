@@ -26,7 +26,7 @@
 <ng-template #dataTemplate let-change="change" let-name="name">
   <div class="flex flex-row justify-between gap-1 sm:flex-col">
     <div class="text-base text-center text-wt-gray-medium sm:text-lg whitespace-nowrap">{{ name }}</div>
-    <ng-container *ngIf="portfolioChange['1_day'] as change; else noData">
+    <ng-container *ngIf="change; else noData">
       <div
         class="justify-center text-base text-center xs:text-lg sm:text-xl"
         appPercentageIncrease

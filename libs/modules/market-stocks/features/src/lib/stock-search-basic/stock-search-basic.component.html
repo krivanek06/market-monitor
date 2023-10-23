@@ -28,6 +28,7 @@
         <app-quote-item
           [showValueChange]="showValueChange"
           [symbolQuote]="summary.quote"
+          [displayValue]="displayValue"
           [assetUrl]="summary.profile?.image"
         ></app-quote-item>
         <div *ngIf="!last" class="mt-2">

@@ -24,7 +24,10 @@ import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
         <div class="flex items-center gap-3 max-w-[60%]">
           <img *ngIf="assetUrl" appDefaultImg [src]="assetUrl" alt="stock image" class="w-7 h-7" />
           <span class="block sm:hidden">{{ symbolQuote.symbol }}</span>
-          <span class="hidden sm:block text-start">{{ symbolQuote.name | truncate: 25 }}</span>
+          <span class="hidden sm:block text-start">
+            <ng-container *ngIf="displayValue === 'name'">{{ symbolQuote.name | truncate: 25 }}</ng-container>
+            <ng-container *ngIf="displayValue === 'symbol'">{{ symbolQuote.symbol }}</ng-container>
+          </span>
         </div>
         <!-- price & price change -->
         <div class="flex flex-col items-end xs:items-center gap-x-3 xs:flex-row min-w-max">
@@ -46,4 +49,5 @@ export class QuoteItemComponent {
   @Input({ required: true }) symbolQuote!: SymbolQuote;
   @Input() assetUrl?: string;
   @Input() showValueChange = true;
+  @Input() displayValue: 'name' | 'symbol' = 'name';
 }

@@ -9,7 +9,13 @@ import {
   setDoc,
   updateDoc,
 } from '@angular/fire/firestore';
-import { PortfolioTransaction, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
+import {
+  PortfolioTransaction,
+  SymbolType,
+  UserData,
+  UserPortfolioTransaction,
+  UserWatchlist,
+} from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { Observable, filter } from 'rxjs';
@@ -46,11 +52,30 @@ export class UserApiService {
   /* watchlist */
 
   getUserWatchlist(userId: string): Observable<UserWatchlist> {
+    console.log('calling watchlist api');
     return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchlist => !!d));
   }
 
   updateUserWatchlist(userId: string, watchlist: Partial<UserWatchlist>): void {
     setDoc(this.getUserWatchlistDocRef(userId), watchlist, { merge: true });
+  }
+
+  addSymbolToUserWatchlist(userId: string, symbol: string, symbolType: SymbolType): void {
+    updateDoc(this.getUserWatchlistDocRef(userId), {
+      data: arrayUnion({
+        symbol,
+        symbolType,
+      }),
+    });
+  }
+
+  removeSymbolFromUserWatchlist(userId: string, symbol: string, symbolType: SymbolType): void {
+    updateDoc(this.getUserWatchlistDocRef(userId), {
+      data: arrayRemove({
+        symbol,
+        symbolType,
+      }),
+    });
   }
 
   /* user */
