@@ -4,7 +4,9 @@
     <div class="text-lg text-wt-primary">{{ selectedChartFormControl.value.caption }}</div>
     <!-- date range -->
     <app-date-range-slider
-      *ngIf="selectedChartFormControl.value.value !== 'PortfolioAssets'"
+      *ngIf="
+        selectedChartFormControl.value.value !== 'PortfolioAssets' && (portfolioAssetsGrowthSignal()?.length ?? 0) > 40
+      "
       class="w-[550px]"
       [displayUpperDate]="false"
       [formControl]="portfolioRangeControl"

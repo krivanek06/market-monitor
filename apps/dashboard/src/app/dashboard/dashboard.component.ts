@@ -15,6 +15,7 @@ import {
   PortfolioStateComponent,
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
+  PortfolioTransactionChartComponent,
 } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import {
@@ -44,6 +45,7 @@ import { DashboardPortfolioChartsComponent } from './dashboard-portfolio-charts/
     StockSummaryDialogComponent,
     MatDialogModule,
     FormMatInputWrapperComponent,
+    PortfolioTransactionChartComponent,
   ],
   templateUrl: './dashboard.component.html',
   styles: [
@@ -68,6 +70,7 @@ export class DashboardComponent {
   portfolioChangeSignal = toSignal(this.portfolioUserFacadeService.getPortfolioChange());
   portfolioAssetAllocation = toSignal(this.portfolioUserFacadeService.getPortfolioAssetAllocationPieChart());
   portfolioSectorAllocation = toSignal(this.portfolioUserFacadeService.getPortfolioSectorAllocationPieChart());
+  portfolioTransactionToDateSignal = toSignal(this.portfolioUserFacadeService.getPortfolioTransactionToDate());
 
   ColorScheme = ColorScheme;
   dashboardChartOptionsInputSource = dashboardChartOptionsInputSource;

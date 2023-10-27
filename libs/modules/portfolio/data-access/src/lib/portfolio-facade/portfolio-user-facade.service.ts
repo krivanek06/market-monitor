@@ -9,6 +9,7 @@ import {
   PortfolioState,
   PortfolioStateHolding,
   PortfolioTransactionCreate,
+  PortfolioTransactionToDate,
 } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.service';
@@ -71,6 +72,12 @@ export class PortfolioUserFacadeService {
   getPortfolioAssetAllocationPieChart(): Observable<GenericChartSeriesPie> {
     return this.getPortfolioState().pipe(
       map((state) => this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(state.holdings)),
+    );
+  }
+
+  getPortfolioTransactionToDate(): Observable<PortfolioTransactionToDate[]> {
+    return this.getUserPortfolioTransactions().pipe(
+      map((data) => this.portfolioCalculationService.getPortfolioTransactionToDate(data.transactions)),
     );
   }
 

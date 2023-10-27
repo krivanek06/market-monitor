@@ -18,7 +18,7 @@ import {
 } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { docData as rxDocData } from 'rxfire/firestore';
-import { Observable, filter } from 'rxjs';
+import { Observable, filter, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +30,11 @@ export class UserApiService {
   getUserPortfolioTransactions(userId: string): Observable<UserPortfolioTransaction> {
     return rxDocData(this.getUserPortfolioTransactionDocRef(userId)).pipe(
       filter((d): d is UserPortfolioTransaction => !!d),
+      map((d) => ({
+        // sort ASC
+        transactions: d.transactions.slice().sort((a, b) => (a.date > b.date ? 1 : -1)),
+        startingCash: d.startingCash,
+      })),
     );
   }
 

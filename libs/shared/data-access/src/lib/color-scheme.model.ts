@@ -4,6 +4,7 @@ export enum ColorScheme {
   DANGER_VAR = 'var(--danger)',
   ACCENT_1_VAR = 'var(--accent-1)',
   ACCENT_2_VAR = 'var(--accent-2)',
+  ACCENT_3_VAR = 'var(--accent-3)',
 
   GRAY_DARK_STRONG_VAR = 'var(--gray-dark-strong)',
   GRAY_DARK_VAR = 'var(--gray-dark)',

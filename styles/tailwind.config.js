@@ -25,6 +25,7 @@ module.exports = {
         /* accent */
         'wt-accent-1': 'var(--accent-1)',
         'wt-accent-2': 'var(--accent-2)',
+        'wt-accent-3': 'var(--accent-3)',
 
         /* gray */
         'wt-gray-dark-strong': 'var(--gray-dark-strong)',

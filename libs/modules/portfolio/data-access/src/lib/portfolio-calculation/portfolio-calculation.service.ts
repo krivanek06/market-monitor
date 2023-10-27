@@ -3,7 +3,13 @@ import { PortfolioGrowthAssets, PortfolioTransaction } from '@market-monitor/api
 import { GenericChartSeriesData, GenericChartSeriesPie, ValueItem } from '@market-monitor/shared/data-access';
 import { dateFormatDate, roundNDigits } from '@market-monitor/shared/utils-general';
 import { subDays, subMonths, subWeeks, subYears } from 'date-fns';
-import { PortfolioChange, PortfolioGrowth, PortfolioStateHolding, PortfolioStateHoldingPartial } from '../models';
+import {
+  PortfolioChange,
+  PortfolioGrowth,
+  PortfolioStateHolding,
+  PortfolioStateHoldingPartial,
+  PortfolioTransactionToDate,
+} from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -156,6 +162,34 @@ export class PortfolioCalculationService {
 
     console.log('daily result', result);
     return result;
+  }
+
+  /**
+   *
+   * @param transactions
+   * @returns array of aggregated transaction by date
+   */
+  getPortfolioTransactionToDate(transactions: PortfolioTransaction[]): PortfolioTransactionToDate[] {
+    return transactions.reduce((acc, curr) => {
+      const existingTransaction = acc.find((d) => d.date === curr.date);
+      if (!existingTransaction) {
+        return [
+          ...acc,
+          {
+            date: curr.date,
+            numberOfExecutedBuyTransactions: curr.transactionType === 'BUY' ? 1 : 0,
+            numberOfExecutedSellTransactions: curr.transactionType === 'SELL' ? 1 : 0,
+            transactionFees: curr.transactionFees,
+          },
+        ];
+      }
+
+      existingTransaction.numberOfExecutedBuyTransactions += curr.transactionType === 'BUY' ? 1 : 0;
+      existingTransaction.numberOfExecutedSellTransactions += curr.transactionType === 'SELL' ? 1 : 0;
+      existingTransaction.transactionFees += curr.transactionFees;
+
+      return acc;
+    }, [] as PortfolioTransactionToDate[]);
   }
 
   /**

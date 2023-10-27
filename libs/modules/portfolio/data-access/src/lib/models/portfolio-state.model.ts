@@ -35,6 +35,13 @@ export type PortfolioState = {
   lastTransactionDate: string;
 };
 
+export type PortfolioTransactionToDate = Pick<
+  PortfolioState,
+  'numberOfExecutedBuyTransactions' | 'numberOfExecutedSellTransactions' | 'transactionFees'
+> & {
+  date: string;
+};
+
 export type PortfolioStateHoldingPartial = {
   symbolType: SymbolType;
   symbol: string;

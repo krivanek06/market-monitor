@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
+  PortfolioGrowth,
   PortfolioState,
   PortfolioUserFacadeService,
   dashboardChartOptionsInputSource,
@@ -59,17 +60,7 @@ export class DashboardPortfolioChartsComponent {
       switchMap((dateRange) =>
         this.portfolioUserFacadeService
           .getPortfolioGrowth()
-          .pipe(
-            map((data) =>
-              !dateRange
-                ? data
-                : data.filter(
-                    (d) =>
-                      isBefore(new Date(d.date), new Date(dateRange.dates[dateRange.currentMaxDateIndex])) &&
-                      isAfter(new Date(d.date), new Date(dateRange.dates[dateRange.currentMinDateIndex])),
-                  ),
-            ),
-          ),
+          .pipe(map((data) => (!dateRange ? data : this.filterDataByDateRange(data, dateRange)))),
       ),
     ),
   );
@@ -80,17 +71,7 @@ export class DashboardPortfolioChartsComponent {
       switchMap((dateRange) =>
         this.portfolioUserFacadeService
           .getPortfolioGrowth()
-          .pipe(
-            map((data) =>
-              !dateRange
-                ? data
-                : data.filter(
-                    (d) =>
-                      isBefore(new Date(d.date), new Date(dateRange.dates[dateRange.currentMaxDateIndex])) &&
-                      isAfter(new Date(d.date), new Date(dateRange.dates[dateRange.currentMinDateIndex])),
-                  ),
-            ),
-          ),
+          .pipe(map((data) => (!dateRange ? data : this.filterDataByDateRange(data, dateRange)))),
       ),
     ),
   );
@@ -113,5 +94,13 @@ export class DashboardPortfolioChartsComponent {
         takeUntilDestroyed(),
       )
       .subscribe();
+  }
+
+  private filterDataByDateRange(data: PortfolioGrowth[], dateRange: DateRangeSliderValues) {
+    return data.filter(
+      (d) =>
+        isBefore(new Date(d.date), new Date(dateRange.dates[dateRange.currentMaxDateIndex])) &&
+        isAfter(new Date(d.date), new Date(dateRange.dates[dateRange.currentMinDateIndex])),
+    );
   }
 }

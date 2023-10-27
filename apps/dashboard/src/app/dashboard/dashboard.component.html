@@ -60,7 +60,7 @@
   </div>
 
   <!-- holding -->
-  <div>
+  <div class="mb-8">
     <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">
       <app-portfolio-holdings-table
         (symbolClicked)="onSummaryClick($event)"
@@ -69,4 +69,10 @@
       ></app-portfolio-holdings-table>
     </app-general-card>
   </div>
+
+  <!-- transactions chart -->
+  <app-portfolio-transaction-chart
+    *ngIf="portfolioTransactionToDateSignal() as portfolioTransactionToDateSignal"
+    [data]="portfolioTransactionToDateSignal"
+  ></app-portfolio-transaction-chart>
 </ng-container>
