@@ -71,8 +71,10 @@
   </div>
 
   <!-- transactions chart -->
-  <app-portfolio-transaction-chart
-    *ngIf="portfolioTransactionToDateSignal() as portfolioTransactionToDateSignal"
-    [data]="portfolioTransactionToDateSignal"
-  ></app-portfolio-transaction-chart>
+  <ng-container *ngIf="authenticationUserService.userData.settings.isPortfolioCashActive">
+    <app-portfolio-transaction-chart
+      *ngIf="portfolioTransactionToDateSignal() as portfolioTransactionToDateSignal"
+      [data]="portfolioTransactionToDateSignal"
+    ></app-portfolio-transaction-chart>
+  </ng-container>
 </ng-container>
