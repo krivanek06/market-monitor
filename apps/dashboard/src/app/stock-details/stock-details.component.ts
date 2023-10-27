@@ -112,36 +112,37 @@ export const route: Routes = [
         path: ROUTES_STOCK_DETAILS.OVERVIEW,
         title: 'Overview',
         loadComponent: () =>
-          import('./subpages/stock-details-overview.component').then((m) => m.StockDetailsOverviewComponent),
+          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsOverviewComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.HOLDERS,
         title: 'Holders',
         loadComponent: () =>
-          import('./subpages/stock-details-holders.component').then((m) => m.StockDetailsHoldersComponent),
+          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsHoldersComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.NEWS,
         title: 'News',
-        loadComponent: () => import('./subpages/stock-details-news.component').then((m) => m.StockDetailsNewsComponent),
+        loadComponent: () =>
+          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsNewsComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.TRADES,
         title: 'Trades',
         loadComponent: () =>
-          import('./subpages/stock-details-trades.component').then((m) => m.StockDetailsTradesComponent),
+          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsTradesComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.FINANCIALS,
         title: 'Financials',
         loadComponent: () =>
-          import('./subpages/stock-details-financials.component').then((m) => m.StockDetailsFinancialsComponent),
+          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsFinancialsComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.RATIOS,
         title: 'Ratios',
         loadComponent: () =>
-          import('./subpages/stock-details-ratios.component').then((m) => m.StockDetailsRatiosComponent),
+          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsRatiosComponent),
       },
     ],
   },

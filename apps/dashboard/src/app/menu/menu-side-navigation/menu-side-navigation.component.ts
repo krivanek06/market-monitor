@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Router, RouterModule } from '@angular/router';
 import { AuthenticationAccountService } from '@market-monitor/modules/authentication/data-access';
-import { DASHBOARD_MAIN_ROUTES } from '@market-monitor/shared/data-access';
+import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { sideNavigation } from './menu-routing.model';
 
 @Component({
@@ -40,6 +40,6 @@ export class MenuSideNavigationComponent implements OnInit {
 
   async onLogout(): Promise<void> {
     await this.authenticationService.signOut();
-    this.router.navigate([DASHBOARD_MAIN_ROUTES.LOGIN]);
+    this.router.navigate([ROUTES_MAIN.LOGIN]);
   }
 }

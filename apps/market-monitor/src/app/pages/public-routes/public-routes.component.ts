@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { Meta } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
+import { ROUTES_PUBLIC_ROUTES } from '@market-monitor/shared/data-access';
 import { environment } from 'apps/market-monitor/src/environments/environment';
-import { ROUTES_PUBLIC_ROUTES } from '../../routes.model';
 
 @Component({
   selector: 'app-public-routes',

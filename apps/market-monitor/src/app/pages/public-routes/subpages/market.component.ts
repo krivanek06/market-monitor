@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
+import { ROUTES_MARKET, ROUTES_PUBLIC_ROUTES } from '@market-monitor/shared/data-access';
 import { DialogServiceModule } from '@market-monitor/shared/utils-client';
-import { ROUTES_MARKET, ROUTES_PUBLIC_ROUTES } from '../../../routes.model';
 import { MarketCustomComponent } from './market-subpages/market-custom.component';
 import { MarketOverviewComponent } from './market-subpages/market-overview.component';
 

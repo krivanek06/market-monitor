@@ -15,7 +15,7 @@ import {
   RegisterUserInput,
 } from '@market-monitor/modules/authentication/data-access';
 import { FormLoginComponent, FormRegisterComponent } from '@market-monitor/modules/authentication/ui';
-import { DASHBOARD_MAIN_ROUTES } from '@market-monitor/shared/data-access';
+import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, filter, from, switchMap, take, tap } from 'rxjs';
 
@@ -65,7 +65,7 @@ export class AuthenticationFormComponent {
         switchMap(() =>
           this.authenticationAccountService.getUserData().pipe(
             tap(() => {
-              this.router.navigate([DASHBOARD_MAIN_ROUTES.DASHBOARD]);
+              this.router.navigate([ROUTES_MAIN.DASHBOARD]);
               this.loadingSnipperShowSignal.set(false);
             }),
           ),
@@ -92,7 +92,7 @@ export class AuthenticationFormComponent {
             switchMap(() =>
               this.authenticationAccountService.getUserData().pipe(
                 tap(() => {
-                  this.router.navigate([DASHBOARD_MAIN_ROUTES.DASHBOARD]);
+                  this.router.navigate([ROUTES_MAIN.DASHBOARD]);
                   this.loadingSnipperShowSignal.set(false);
                 }),
               ),
@@ -127,7 +127,7 @@ export class AuthenticationFormComponent {
             switchMap(() =>
               this.authenticationAccountService.getUserData().pipe(
                 tap(() => {
-                  this.router.navigate([DASHBOARD_MAIN_ROUTES.DASHBOARD]);
+                  this.router.navigate([ROUTES_MAIN.DASHBOARD]);
                   this.loadingSnipperShowSignal.set(false);
                 }),
               ),
