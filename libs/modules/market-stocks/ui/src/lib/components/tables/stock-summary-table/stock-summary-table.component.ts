@@ -93,7 +93,7 @@ export class StockSummaryTableComponent implements AfterViewInit {
     'eps',
     'beta',
     '52WeekRange',
-    'sector',
+    //'sector',
     'infoMobile',
   ];
 
