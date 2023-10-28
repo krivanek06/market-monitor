@@ -24,14 +24,7 @@ import { DialogServiceModule } from '@market-monitor/shared/utils-client';
   ],
   template: `
     <section class="g-screen-size-default">
-      <div class="flex justify-between mb-6">
-        <div>
-          <button type="button" mat-stroked-button class="min-w-[120px] mt-2" (click)="onHomeClick()">
-            <mat-icon>home</mat-icon>
-            Home
-          </button>
-        </div>
-
+      <div class="flex justify-end mb-6">
         <!-- main navigation -->
         <app-tab-select-control
           [formControl]="routesStockDetailsControl"

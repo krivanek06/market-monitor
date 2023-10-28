@@ -1,46 +1,48 @@
+import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
+
 export const sideNavigation = {
   mainNavigation: [
     {
-      path: 'dashboard',
+      path: ROUTES_MAIN.DASHBOARD,
       title: 'Dashboard',
       icon: 'dashboard',
     },
     {
-      path: 'watchlist',
+      path: ROUTES_MAIN.WATCHLIST,
       title: 'Watchlist',
       icon: 'monitoring',
     },
     {
-      path: 'trading',
+      path: ROUTES_MAIN.TRADING,
       title: 'Trading',
       icon: 'attach_money',
     },
     {
-      path: 'settings',
+      path: ROUTES_MAIN.SETTING,
       title: 'Settings',
       icon: 'settings',
     },
   ],
   marketNavigation: [
     {
-      path: 'screener',
+      path: ROUTES_MAIN.STOCK_SCREENER,
       title: 'Screener',
-      icon: 'dashboard',
+      icon: 'query_stats',
     },
     {
-      path: 'performer',
+      path: ROUTES_MAIN.TOP_PERFORMERS,
       title: 'Performers',
-      icon: 'dashboard',
+      icon: 'travel_explore',
     },
     {
-      path: 'market',
+      path: ROUTES_MAIN.MARKET,
       title: 'Market',
-      icon: 'dashboard',
+      icon: 'storefront',
     },
     {
-      path: 'calendar',
+      path: ROUTES_MAIN.MARKET_CALENDAR,
       title: 'Calendar',
-      icon: 'dashboard',
+      icon: 'calendar_month',
     },
   ],
 } as const;

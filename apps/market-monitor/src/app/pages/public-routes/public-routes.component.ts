@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { Meta } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
-import { ROUTES_PUBLIC_ROUTES } from '@market-monitor/shared/data-access';
+import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { environment } from 'apps/market-monitor/src/environments/environment';
 
 @Component({
@@ -15,12 +15,12 @@ import { environment } from 'apps/market-monitor/src/environments/environment';
       class="flex sm:justify-center gap-6 sm:gap-4 pt-8 text-wt-gray-medium relative max-sm:overflow-scroll pb-6 max-sm:px-6"
     >
       <span class="hidden md:block absolute left-4 top-4 text-wt-gray-medium text-xs">Version {{ version }}</span>
-      <a [routerLink]="[ROUTES_PUBLIC_ROUTES.SEARCH]" routerLinkActive="is-active">Search</a>
-      <a [routerLink]="[ROUTES_PUBLIC_ROUTES.STOCK_SCREENER]" routerLinkActive="is-active">Screener</a>
-      <a [routerLink]="[ROUTES_PUBLIC_ROUTES.TOP_PERFORMERS]" routerLinkActive="is-active">Top Performers</a>
-      <a [routerLink]="[ROUTES_PUBLIC_ROUTES.MARKET]" routerLinkActive="is-active">Market</a>
-      <a [routerLink]="[ROUTES_PUBLIC_ROUTES.MARKET_CALENDAR]" routerLinkActive="is-active">Calendar</a>
-      <!-- <a [routerLink]="ROUTES_PUBLIC_ROUTES.CRYPTO" routerLinkActive="is-active">Crypto</a> -->
+      <a [routerLink]="[ROUTES_MAIN.SEARCH]" routerLinkActive="is-active">Search</a>
+      <a [routerLink]="[ROUTES_MAIN.STOCK_SCREENER]" routerLinkActive="is-active">Screener</a>
+      <a [routerLink]="[ROUTES_MAIN.TOP_PERFORMERS]" routerLinkActive="is-active">Top Performers</a>
+      <a [routerLink]="[ROUTES_MAIN.MARKET]" routerLinkActive="is-active">Market</a>
+      <a [routerLink]="[ROUTES_MAIN.MARKET_CALENDAR]" routerLinkActive="is-active">Calendar</a>
+      <!-- <a [routerLink]="ROUTES_MAIN.CRYPTO" routerLinkActive="is-active">Crypto</a> -->
     </nav>
 
     <section class="g-screen-size-default">
@@ -46,7 +46,7 @@ import { environment } from 'apps/market-monitor/src/environments/environment';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicRoutesComponent implements OnInit {
-  ROUTES_PUBLIC_ROUTES = ROUTES_PUBLIC_ROUTES;
+  ROUTES_MAIN = ROUTES_MAIN;
   version = environment.version;
 
   constructor(private metaTagService: Meta) {}
@@ -76,11 +76,11 @@ export const route: Routes = [
     children: [
       {
         path: '',
-        redirectTo: ROUTES_PUBLIC_ROUTES.SEARCH,
+        redirectTo: ROUTES_MAIN.SEARCH,
         pathMatch: 'full',
       },
       {
-        path: ROUTES_PUBLIC_ROUTES.SEARCH,
+        path: ROUTES_MAIN.SEARCH,
         title: 'Search',
         resolve: {
           generalNews: () => {
@@ -91,27 +91,27 @@ export const route: Routes = [
         loadComponent: () => import('./subpages/search.component').then((m) => m.SearchComponent),
       },
       {
-        path: ROUTES_PUBLIC_ROUTES.STOCK_SCREENER,
+        path: ROUTES_MAIN.STOCK_SCREENER,
         title: 'Stock Screener',
         loadComponent: () => import('./subpages/stock-screener.component').then((m) => m.StockScreenerComponent),
       },
       {
-        path: ROUTES_PUBLIC_ROUTES.MARKET,
+        path: ROUTES_MAIN.MARKET,
         title: 'Market',
         loadChildren: () => import('./subpages/market.component').then((m) => m.route),
       },
       {
-        path: ROUTES_PUBLIC_ROUTES.MARKET_CALENDAR,
+        path: ROUTES_MAIN.MARKET_CALENDAR,
         title: 'Market Calendar',
         loadComponent: () => import('./subpages/calendar.component').then((m) => m.CalendarComponent),
       },
       {
-        path: ROUTES_PUBLIC_ROUTES.TOP_PERFORMERS,
+        path: ROUTES_MAIN.TOP_PERFORMERS,
         title: 'Top Performers',
         loadComponent: () => import('./subpages/top-performers.component').then((m) => m.TopPerformersComponent),
       },
       {
-        path: ROUTES_PUBLIC_ROUTES.CRYPTO,
+        path: ROUTES_MAIN.CRYPTO,
         title: 'Crypto',
         loadComponent: () => import('./subpages/crypto.component').then((m) => m.CryptoComponent),
       },

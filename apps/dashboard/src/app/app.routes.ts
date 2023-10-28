@@ -51,6 +51,34 @@ export const appRoutes: Route[] = [
             title: 'Stock Details',
             loadChildren: () => import('./stock-details/stock-details.component').then((m) => m.route),
           },
+          {
+            path: ROUTES_MAIN.STOCK_SCREENER,
+            title: 'Stock Screener',
+            loadComponent: () =>
+              import('./stock-screener/stock-screener.component').then((m) => m.StockScreenerComponent),
+          },
+          {
+            path: ROUTES_MAIN.MARKET,
+            title: 'Market',
+            loadChildren: () => import('./market/market.component').then((m) => m.route),
+          },
+          {
+            path: ROUTES_MAIN.MARKET_CALENDAR,
+            title: 'Market Calendar',
+            loadComponent: () =>
+              import('@market-monitor/modules/page-builder').then((m) => m.PageMarketCalendarComponent),
+          },
+          {
+            path: ROUTES_MAIN.TOP_PERFORMERS,
+            title: 'Top Performers',
+            loadComponent: () =>
+              import('@market-monitor/modules/page-builder').then((m) => m.PageMarketTopPerformersComponent),
+          },
+          {
+            path: ROUTES_MAIN.CRYPTO,
+            title: 'Crypto',
+            loadComponent: () => import('@market-monitor/modules/page-builder').then((m) => m.PageCryptoComponent),
+          },
         ],
       },
       {

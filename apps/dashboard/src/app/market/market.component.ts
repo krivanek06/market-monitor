@@ -3,10 +3,9 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
+import { PageMarketCustomComponent, PageMarketOverviewComponent } from '@market-monitor/modules/page-builder';
 import { ROUTES_MAIN, ROUTES_MARKET } from '@market-monitor/shared/data-access';
 import { DialogServiceModule } from '@market-monitor/shared/utils-client';
-import { MarketCustomComponent } from './market-subpages/market-custom.component';
-import { MarketOverviewComponent } from './market-subpages/market-overview.component';
 
 @Component({
   selector: 'app-market',
@@ -61,11 +60,11 @@ export const route: Routes = [
       },
       {
         path: ROUTES_MARKET.OVERVIEW,
-        component: MarketOverviewComponent,
+        component: PageMarketOverviewComponent,
       },
       {
         path: ROUTES_MARKET.CUSTOM,
-        component: MarketCustomComponent,
+        component: PageMarketCustomComponent,
       },
     ],
   },
