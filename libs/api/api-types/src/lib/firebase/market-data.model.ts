@@ -1,3 +1,4 @@
+import { ChartDataType } from '../constants';
 import { SymbolSummary } from './symbol.model';
 
 export type MarketTopPerformance<T> = {
@@ -16,560 +17,482 @@ export const NewsAcceptableTypes = ['general', 'stocks', 'forex', 'crypto'] as c
 export type NewsTypes = (typeof NewsAcceptableTypes)[number];
 
 // ------------------ Market Overview ------------------
-
-export type MarketOverviewDatabaseEndpointBody = {
-  document: string;
-  url: string;
-  provider: string;
-  name: string;
-};
-
-export const MARKET_OVERVIEW_DATABASE_ENDPOINTS = {
+export const MARKET_OVERVIEW_ENDPOINTS = {
+  general: {
+    name: 'General',
+    provider: 'financialmodelingprep',
+    data: [
+      {
+        key: 'GDP',
+        name: 'GDP',
+        keyReadable: 'GDP',
+      },
+      {
+        key: 'realGDP',
+        name: 'Real GDP',
+        keyReadable: 'realGDP',
+      },
+      {
+        key: 'nominalPotentialGDP',
+        name: 'Potential GDP',
+        keyReadable: 'nominalPotentialGDP',
+      },
+      {
+        key: 'realGDPPerCapita',
+        name: 'GDP per capita',
+        keyReadable: 'realGDPPerCapita',
+      },
+      {
+        key: 'federalFunds',
+        name: 'Federal funds',
+        keyReadable: 'federalFunds',
+      },
+      {
+        key: 'CPI',
+        name: 'CPI',
+        keyReadable: 'CPI',
+      },
+      {
+        key: 'inflationRate',
+        name: 'Inflation Rate',
+        keyReadable: 'inflationRate',
+      },
+      {
+        key: 'inflation',
+        name: 'Inflation',
+        keyReadable: 'inflation',
+      },
+      {
+        key: 'retailSales',
+        name: 'Retail Sales',
+        keyReadable: 'retailSales',
+      },
+      {
+        key: 'consumerSentiment',
+        name: 'Consumer Sentiment',
+        keyReadable: 'consumerSentiment',
+      },
+      {
+        key: 'durableGoods',
+        name: 'Durable Goods',
+        keyReadable: 'durableGoods',
+      },
+      {
+        key: 'unemploymentRate',
+        name: 'Unemployment Rate',
+        keyReadable: 'unemploymentRate',
+      },
+      {
+        key: 'totalNonfarmPayroll',
+        name: 'Non-Farm Payroll',
+        keyReadable: 'totalNonfarmPayroll',
+      },
+      {
+        key: 'initialClaims',
+        name: 'Initial Claims',
+        keyReadable: 'initialClaims',
+      },
+      {
+        key: 'industrialProductionTotalIndex',
+        name: 'Industrial Production',
+        keyReadable: 'industrialProductionTotalIndex',
+      },
+      {
+        key: 'newPrivatelyOwnedHousingUnitsStartedTotalUnits',
+        name: 'Housing Units Started',
+        keyReadable: 'newPrivatelyOwnedHousingUnitsStartedTotalUnits',
+      },
+      {
+        key: 'totalVehicleSales',
+        name: 'Vehicle Sales',
+        keyReadable: 'totalVehicleSales',
+      },
+      {
+        key: 'retailMoneyFunds',
+        name: 'Money Funds',
+        keyReadable: 'retailMoneyFunds',
+      },
+      {
+        key: 'smoothedUSRecessionProbabilities',
+        name: 'Recession Probabilities',
+        keyReadable: 'smoothedUSRecessionProbabilities',
+      },
+      {
+        key: '3MonthOr90DayRatesAndYieldsCertificatesOfDeposit',
+        name: '3 Month Rates',
+        keyReadable: '3MonthOr90DayRatesAndYieldsCertificatesOfDeposit',
+      },
+      {
+        key: 'commercialBankInterestRateOnCreditCardPlansAllAccounts',
+        name: 'Credit Card Interest Rate',
+        keyReadable: 'commercialBankInterestRateOnCreditCardPlansAllAccounts',
+      },
+      {
+        key: '30YearFixedRateMortgageAverage',
+        name: '30 Year Mortgage',
+        keyReadable: '30YearFixedRateMortgageAverage',
+      },
+      {
+        key: '15YearFixedRateMortgageAverage',
+        name: '15 Year Mortgage',
+        keyReadable: '15YearFixedRateMortgageAverage',
+      },
+    ],
+  },
   sp500: {
     name: 'S&P 500',
-    data: {
-      peRatio: {
-        document: 'qundal_sp_500_pe_ratio_by_month_value',
-        url: 'MULTPL/SP500_PE_RATIO_MONTH',
-        provider: 'quandl',
+    provider: 'quandl',
+    data: [
+      {
+        key: 'MULTPL/SP500_PE_RATIO_MONTH',
         name: 'PE ratio',
+        keyReadable: 'peRatio',
       },
-      shillerPeRatio: {
-        document: 'qundal_shiller_pe_ratio_by_month_value',
-        url: 'MULTPL/SHILLER_PE_RATIO_MONTH',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SHILLER_PE_RATIO_MONTH',
         name: 'Shiller PE',
+        keyReadable: 'shillerPeRatio',
       },
-      bookValue: {
-        document: 'qundal_sp_500_book_value_per_share_by_quarter_value',
-        url: 'MULTPL/SP500_BVPS_QUARTER',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_BVPS_QUARTER',
         name: 'Book value',
+        keyReadable: 'bookValue',
       },
-      priceToBook: {
-        document: 'qundal_sp_500_price_to_book_value_by_quarter_value',
-        url: 'MULTPL/SP500_PBV_RATIO_QUARTER',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_PBV_RATIO_QUARTER',
         name: 'Price to book',
+        keyReadable: 'priceToBook',
       },
-      sales: {
-        document: 'qundal_sp_500_real_sales_by_quarter_value',
-        url: 'MULTPL/SP500_SALES_QUARTER',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_SALES_QUARTER',
         name: 'Sales',
+        keyReadable: 'sales',
       },
-      salesGrowth: {
-        document: 'qundal_sp_500_real_sales_growth_by_quarter_value',
-        url: 'MULTPL/SP500_SALES_GROWTH_QUARTER',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_SALES_GROWTH_QUARTER',
         name: 'Sales growth',
+        keyReadable: 'salesGrowth',
       },
-      priceToSales: {
-        document: 'qundal_sp_500_price_to_sales_ratio_by_quarter_value',
-        url: 'MULTPL/SP500_PSR_QUARTER',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_PSR_QUARTER',
         name: 'Price to sale',
+        keyReadable: 'priceToSales',
       },
-      earnings: {
-        document: 'qundal_sp_500_earnings_by_month_value',
-        url: 'MULTPL/SP500_EARNINGS_MONTH',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_EARNINGS_MONTH',
         name: 'Earnings',
+        keyReadable: 'earnings',
       },
-      earningsGrowth: {
-        document: 'qundal_sp_500_earnings_growth_rate_by_quarter_value',
-        url: 'MULTPL/SP500_EARNINGS_GROWTH_QUARTER',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_EARNINGS_GROWTH_QUARTER',
         name: 'Earnings growth',
+        keyReadable: 'earningsGrowth',
       },
-      earningsYield: {
-        document: 'qundal_sp_500_earnings_yield_by_month_value',
-        url: 'MULTPL/SP500_EARNINGS_YIELD_MONTH',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_EARNINGS_YIELD_MONTH',
         name: 'Earnings yield',
+        keyReadable: 'earningsYield',
       },
-      dividendYield: {
-        document: 'qundal_sp_500_dividend_yield_by_month_value',
-        url: 'MULTPL/SP500_DIV_YIELD_MONTH',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_DIV_YIELD_MONTH',
         name: 'Dividend yield',
+        keyReadable: 'dividendYield',
       },
-      dividend: {
-        document: 'qundal_sp_500_dividend_by_month_value',
-        url: 'MULTPL/SP500_DIV_MONTH',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_DIV_MONTH',
         name: 'Dividend',
+        keyReadable: 'dividend',
       },
-      dividendGrowth: {
-        document: 'qundal_sp_500_dividend_growth_by_quarter_value',
-        url: 'MULTPL/SP500_DIV_GROWTH_QUARTER',
-        provider: 'quandl',
+      {
+        key: 'MULTPL/SP500_DIV_GROWTH_QUARTER',
         name: 'Dividend growth',
+        keyReadable: 'dividendGrowth',
       },
-    },
+    ],
   },
   bonds: {
     name: 'Bonds',
-    data: {
-      usAAAYield: {
-        document: 'qundal_us_aaa_rated_bond_index_yield_bamlc0a1caaaey',
-        url: 'ML/AAAEY',
-        provider: 'quandl',
+    provider: 'quandl',
+    data: [
+      {
+        key: 'ML/AAAEY',
         name: 'US AAA yield',
+        keyReadable: 'usAAAYield',
       },
-      usAAYield: {
-        document: 'qundal_us_aa_bond_index_yield_bamlc0a2caaey',
-        url: 'ML/AAY',
-        provider: 'quandl',
+      {
+        key: 'ML/AAY',
         name: 'US AA yield',
+        keyReadable: 'usAAYield',
       },
-      usAYield: {
-        document: 'qundal_us_corporate_bond_a_rated_index_yield_bamlc0a3caey',
-        url: 'ML/AEY',
-        provider: 'quandl',
+      {
+        key: 'ML/AEY',
         name: 'US A yield',
+        keyReadable: 'usAYield',
       },
-      usBBYield: {
-        document: 'qundal_us_high_yield_bb_corporate_bond_index_yield_bamlh0a1hybbey',
-        url: 'ML/BBY',
-        provider: 'quandl',
+      {
+        key: 'ML/BBY',
         name: 'US BB yield',
+        keyReadable: 'usBBYield',
       },
-      usBYield: {
-        document: 'qundal_us_b_rated_corporate_bond_index_yield_bamlh0a2hybey',
-        url: 'ML/BEY',
-        provider: 'quandl',
+      {
+        key: 'ML/BEY',
         name: 'US B yield',
+        keyReadable: 'usBYield',
       },
-      usCCCYield: {
-        document: 'qundal_us_cccrated_bond_index_yield_bamlh0a3hycey',
-        url: 'ML/CCCY',
-        provider: 'quandl',
+      {
+        key: 'ML/CCCY',
         name: 'US CCC yield',
+        keyReadable: 'usCCCYield',
       },
-      usCorporateYield: {
-        document: 'qundal_us_corporate_bond_index_yield_bamlc0a0cmey',
-        url: 'ML/USEY',
-        provider: 'quandl',
+      {
+        key: 'ML/USEY',
         name: 'US Corporate yield',
+        keyReadable: 'usCorporateYield',
       },
-      usHighYield: {
-        document: 'qundal_us_high_yield_corporate_bond_index_yield_bamlh0a0hym2ey',
-        url: 'ML/USTRI',
-        provider: 'quandl',
+      {
+        key: 'ML/USTRI',
         name: 'US high yield',
+        keyReadable: 'usHighYield',
       },
-      usEmergingMarket: {
-        document: 'qundal_euro_emerging_markets_corporate_bond_index_yield_bamlemebcrpieey',
-        url: 'ML/EMHYY',
-        provider: 'quandl',
+      {
+        key: 'ML/EMHYY',
         name: 'Emerging markets high yield',
+        keyReadable: 'usEmergingMarket',
       },
-    },
+    ],
   },
   treasury: {
     name: 'Treasury',
-    data: {
-      us1Month: {
-        document: 'qundal_treasury_yield_curve_rates_1_mo',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+    provider: 'quandl',
+    data: [
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 1 MO',
+        keyReadable: 'us1Month',
       },
-      us2Month: {
-        document: 'qundal_treasury_yield_curve_rates_2_mo',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 2 MO',
+        keyReadable: 'us2Month',
       },
-      us3Month: {
-        document: 'qundal_treasury_yield_curve_rates_3_mo',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 3 MO',
+        keyReadable: 'us3Month',
       },
-      us6Month: {
-        document: 'qundal_treasury_yield_curve_rates_6_mo',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 6 MO',
+        keyReadable: 'us6Month',
       },
-      us1Year: {
-        document: 'qundal_treasury_yield_curve_rates_1_yr',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 1 YR',
+        keyReadable: 'us1Year',
       },
-      us2Year: {
-        document: 'qundal_treasury_yield_curve_rates_2_yr',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 2 YR',
+        keyReadable: 'us2Year',
       },
-      us3Year: {
-        document: 'qundal_treasury_yield_curve_rates_3_yr',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 3 YR',
+        keyReadable: 'us3Year',
       },
-      us5Year: {
-        document: 'qundal_treasury_yield_curve_rates_5_yr',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 5 YR',
+        keyReadable: 'us5Year',
       },
-      us7Year: {
-        document: 'qundal_treasury_yield_curve_rates_7_yr',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 7 YR',
+        keyReadable: 'us7Year',
       },
-      us10Year: {
-        document: 'qundal_treasury_yield_curve_rates_10_yr',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 10 YR',
+        keyReadable: 'us10Year',
       },
-      us20Year: {
-        document: 'qundal_treasury_yield_curve_rates_20_yr',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 20 YR',
+        keyReadable: 'us20Year',
       },
-      us30Year: {
-        document: 'qundal_treasury_yield_curve_rates_30_yr',
-        url: 'USTREASURY/YIELD',
-        provider: 'quandl',
+      {
+        key: 'USTREASURY/YIELD',
         name: 'yield 30 YR',
+        keyReadable: 'us30Year',
       },
-    },
-  },
-  consumerIndex: {
-    name: 'Consumer price index',
-    data: {
-      usCpi: {
-        document: 'qundal_consumer_price_index__usa_value',
-        url: 'RATEINF/CPI_USA',
-        provider: 'quandl',
-        name: 'USA',
-      },
-      euCpi: {
-        document: 'qundal_consumer_price_index__euro_area_value',
-        url: 'RATEINF/CPI_EUR',
-        provider: 'quandl',
-        name: 'Europe',
-      },
-      ukCpi: {
-        document: 'qundal_consumer_price_index__uk_value',
-        url: 'RATEINF/CPI_GBR',
-        provider: 'quandl',
-        name: 'UK',
-      },
-      jpCpi: {
-        document: 'qundal_consumer_price_index__japan_value',
-        url: 'RATEINF/CPI_JPN',
-        provider: 'quandl',
-        name: 'Japan',
-      },
-      caCpi: {
-        document: 'qundal_consumer_price_index__canada_value',
-        url: 'RATEINF/CPI_CAN',
-        provider: 'quandl',
-        name: 'Canada',
-      },
-      cheCpi: {
-        document: 'qundal_consumer_price_index__switzerland_value',
-        url: 'RATEINF/CPI_CHE',
-        provider: 'quandl',
-        name: 'Switzerland',
-      },
-      rusCpi: {
-        document: 'qundal_consumer_price_index__russia_value',
-        url: 'RATEINF/CPI_RUS',
-        provider: 'quandl',
-        name: 'Russia',
-      },
-      ausCpi: {
-        document: 'qundal_consumer_price_index__australia_value',
-        url: 'RATEINF/CPI_AUS',
-        provider: 'quandl',
-        name: 'Australia',
-      },
-      gerCpi: {
-        document: 'qundal_consumer_price_index__germany_value',
-        url: 'RATEINF/CPI_DEU',
-        provider: 'quandl',
-        name: 'Germany',
-      },
-      fraCpi: {
-        document: 'qundal_consumer_price_index__france_value',
-        url: 'RATEINF/CPI_FRA',
-        provider: 'quandl',
-        name: 'France',
-      },
-      itaCpi: {
-        document: 'qundal_consumer_price_index__italy_value',
-        url: 'RATEINF/CPI_ITA',
-        provider: 'quandl',
-        name: 'Italy',
-      },
-      nzlCpi: {
-        document: 'qundal_consumer_price_index__new_zealand_value',
-        url: 'RATEINF/CPI_NZL',
-        provider: 'quandl',
-        name: 'New Zealand',
-      },
-    },
-  },
-  inflationRate: {
-    name: 'Inflation YOY',
-    data: {
-      usInflationRate: {
-        document: 'qundal_inflation_rate__usa_value',
-        url: 'RATEINF/INFLATION_USA',
-        provider: 'quandl',
-        name: 'USA',
-      },
-      euInflationRate: {
-        document: 'qundal_inflation_rate__euro_area_value',
-        url: 'RATEINF/INFLATION_EUR',
-        provider: 'quandl',
-        name: 'Europe',
-      },
-      ukInflationRate: {
-        document: 'qundal_inflation_rate__uk_value',
-        url: 'RATEINF/INFLATION_GBR',
-        provider: 'quandl',
-        name: 'UK',
-      },
-      jpInflationRate: {
-        document: 'qundal_inflation_rate__japan_value',
-        url: 'RATEINF/INFLATION_CAN',
-        provider: 'quandl',
-        name: 'Canada',
-      },
-      caInflationRate: {
-        document: 'qundal_inflation_rate__canada_value',
-        url: 'RATEINF/INFLATION_JPN',
-        provider: 'quandl',
-        name: 'Japan',
-      },
-      cheInflationRate: {
-        document: 'qundal_inflation_rate__switzerland_value',
-        url: 'RATEINF/INFLATION_CHE',
-        provider: 'quandl',
-        name: 'Switzerland',
-      },
-      rusInflationRate: {
-        document: 'qundal_inflation_rate__russia_value',
-        url: 'RATEINF/INFLATION_RUS',
-        provider: 'quandl',
-        name: 'Russia',
-      },
-      ausInflationRate: {
-        document: 'qundal_inflation_rate__australia_value',
-        url: 'RATEINF/INFLATION_AUS',
-        provider: 'quandl',
-        name: 'Australia',
-      },
-      gerInflationRate: {
-        document: 'qundal_inflation_rate__germany_value',
-        url: 'RATEINF/INFLATION_DEU',
-        provider: 'quandl',
-        name: 'Germany',
-      },
-      fraInflationRate: {
-        document: 'qundal_inflation_rate__france_value',
-        url: 'RATEINF/INFLATION_FRA',
-        provider: 'quandl',
-        name: 'France',
-      },
-      itaInflationRate: {
-        document: 'qundal_inflation_rate__italy_value',
-        url: 'RATEINF/INFLATION_ITA',
-        provider: 'quandl',
-        name: 'Italy',
-      },
-      nzlInflationRate: {
-        document: 'qundal_inflation_rate__new_zealand_value',
-        url: 'RATEINF/INFLATION_NZL',
-        provider: 'quandl',
-        name: 'New Zealand',
-      },
-    },
+    ],
   },
   bitcoin: {
     name: 'Bitcoin',
-    data: {
-      marketCap: {
-        document: 'qundal_bitcoin_market_cap_value',
-        url: 'BCHAIN/MKTCP',
-        provider: 'quandl',
+    provider: 'quandl',
+    data: [
+      {
+        key: 'BCHAIN/MKTCP',
         name: 'Market cap',
+        keyReadable: 'marketCap',
       },
-      tradingVolume: {
-        document: 'qundal_bitcoin_trading_volume_value',
-        url: 'BCHAIN/TRVOU',
-        provider: 'quandl',
+      {
+        key: 'BCHAIN/TRVOU',
         name: 'Traiding volume',
+        keyReadable: 'tradingVolume',
       },
-      transactionFees: {
-        document: 'qundal_bitcoin_transaction_fees_value',
-        url: 'BCHAIN/TRFUS',
-        provider: 'quandl',
+      {
+        key: 'BCHAIN/TRFUS',
         name: 'Transaction fees',
+        keyReadable: 'transactionFees',
       },
-      transactionTime: {
-        document: 'qundal_bitcoin_transaction_time_value',
-        url: 'BCHAIN/ATRCT',
-        provider: 'quandl',
+      {
+        key: 'BCHAIN/ATRCT',
         name: 'Transaction time',
+        keyReadable: 'transactionTime',
       },
-      transactionCost: {
-        document: 'qundal_bitcoin_transaction_cost_value',
-        url: 'BCHAIN/CPTRA',
-        provider: 'quandl',
+      {
+        key: 'BCHAIN/CPTRA',
         name: 'Transaction cost',
+        keyReadable: 'transactionCost',
       },
-      dailyTransactions: {
-        document: 'qundal_bitcoin_daily_transactions_value',
-        url: 'BCHAIN/NTRAN',
-        provider: 'quandl',
+      {
+        key: 'BCHAIN/NTRAN',
         name: 'Daily transactions',
+        keyReadable: 'dailyTransactions',
       },
-    },
+    ],
   },
 } as const;
+export type MarketOverviewKey = keyof typeof MARKET_OVERVIEW_ENDPOINTS;
 
-export type MarketOverviewDatabaseKeys = keyof typeof MARKET_OVERVIEW_DATABASE_ENDPOINTS;
+export type MarketOverviewSubKey<T extends MarketOverviewKey> =
+  (typeof MARKET_OVERVIEW_ENDPOINTS)[T]['data'][number]['key'];
 
-export const MARKET_OVERVIEW_DATA = Object.entries(MARKET_OVERVIEW_DATABASE_ENDPOINTS).reduce(
-  (acc, cur) => {
-    const key = cur[0] as MarketOverviewDatabaseKeys;
-    const { name, data } = cur[1]; //as { [key: string]: MarketOverviewDatabaseEndpointBody };
+export type MarketOverviewSubkeyReadable<T extends MarketOverviewKey> =
+  (typeof MARKET_OVERVIEW_ENDPOINTS)[T]['data'][number]['keyReadable'];
 
-    const result = Object.entries(data).reduce(
-      (acc2, cur2) => {
-        const subKey = cur2[0]; // example: 'peRatio', 'shillerPeRatio', ...
-        const subKeyName = `${name} - ${cur2[1].name}`;
-        return [...acc2, { key, subKey, name: subKeyName }];
-      },
-      [] as { key: MarketOverviewDatabaseKeys; subKey: string; name: string }[],
-    );
+export type MarketOverviewName<T extends MarketOverviewKey> =
+  (typeof MARKET_OVERVIEW_ENDPOINTS)[T]['data'][number]['name'];
+export type MarketOverviewProvider = (typeof MARKET_OVERVIEW_ENDPOINTS)[MarketOverviewKey]['provider'];
 
-    return [
-      ...acc,
-      {
-        key,
-        name,
-        data: result,
-      },
-    ];
-  },
-  [] as {
-    key: MarketOverviewDatabaseKeys;
-    name: string;
-    data: {
-      key: MarketOverviewDatabaseKeys;
-      subKey: string;
-      name: string;
-    }[];
-  }[],
-);
-
-export const getMarketOverKeyBySubKey = <T extends MarketOverviewDatabaseKeys>(
-  subKey: string,
-): {
-  key: T;
-  name: string;
-  subKey: string;
-} | null => {
-  const section = MARKET_OVERVIEW_DATA.find((overview) => overview.data.find((d) => d.subKey === subKey));
-  const data = section?.data.find((d) => d.subKey === subKey);
-
-  if (!section || !data) {
-    return null;
+export type MarketOverviewBase<
+  Keys extends MarketOverviewKey,
+  T extends Partial<{ [K in MarketOverviewSubkeyReadable<Keys>]: ChartDataType }>,
+> = { [K in Keys]: T };
+export type MarketOverview = MarketOverviewBase<
+  'sp500',
+  {
+    peRatio: ChartDataType;
+    shillerPeRatio: ChartDataType;
+    priceToBook: ChartDataType;
+    priceToSales: ChartDataType;
+    earningsYield: ChartDataType;
+    dividendYield: ChartDataType;
   }
+> &
+  MarketOverviewBase<
+    'bonds',
+    {
+      usAAAYield: ChartDataType;
+      usAAYield: ChartDataType;
+      usBBYield: ChartDataType;
+      usCCCYield: ChartDataType;
+      usCorporateYield: ChartDataType;
+      usHighYield: ChartDataType;
+      usEmergingMarket: ChartDataType;
+    }
+  > &
+  MarketOverviewBase<
+    'treasury',
+    {
+      us1Month: ChartDataType;
+      us3Month: ChartDataType;
+      us1Year: ChartDataType;
+      us5Year: ChartDataType;
+      us10Year: ChartDataType;
+      us30Year: ChartDataType;
+    }
+  > &
+  MarketOverviewBase<
+    'general',
+    {
+      GDP: ChartDataType;
+      realGDP: ChartDataType;
+      nominalPotentialGDP: ChartDataType;
+      realGDPPerCapita: ChartDataType;
+      federalFunds: ChartDataType;
+      CPI: ChartDataType;
+      inflationRate: ChartDataType;
+      inflation: ChartDataType;
+      retailSales: ChartDataType;
+      consumerSentiment: ChartDataType;
+      durableGoods: ChartDataType;
+      unemploymentRate: ChartDataType;
+      totalNonfarmPayroll: ChartDataType;
+      initialClaims: ChartDataType;
+      industrialProductionTotalIndex: ChartDataType;
+      newPrivatelyOwnedHousingUnitsStartedTotalUnits: ChartDataType;
+      totalVehicleSales: ChartDataType;
+      retailMoneyFunds: ChartDataType;
+      smoothedUSRecessionProbabilities: ChartDataType;
+      '3MonthOr90DayRatesAndYieldsCertificatesOfDeposit': ChartDataType;
+      commercialBankInterestRateOnCreditCardPlansAllAccounts: ChartDataType;
+      '30YearFixedRateMortgageAverage': ChartDataType;
+      '15YearFixedRateMortgageAverage': ChartDataType;
+    }
+  >;
 
-  return {
-    key: section.key as T,
-    name: data.name,
-    subKey,
-  };
-};
+export const marketOverviewLoadSP500: Array<keyof MarketOverview['sp500']> = [
+  'peRatio',
+  'shillerPeRatio',
+  'priceToSales',
+  'priceToBook',
+  'earningsYield',
+  'dividendYield',
+];
 
-export const MARKET_OVERVIEW_DATABASE_KEYS = Object.entries(MARKET_OVERVIEW_DATABASE_ENDPOINTS)
-  .map(([key, value]) => {
-    const subkeys = Object.keys(value.data)
-      .map((d) => ({ [d]: d }))
-      .reduce((acc2, cur2) => ({ ...acc2, ...cur2 }), {});
-    const result = {
-      [key]: {
-        ...subkeys,
-      },
-    } as {
-      [K in MarketOverviewDatabaseKeys]: {
-        [S in keyof (typeof MARKET_OVERVIEW_DATABASE_ENDPOINTS)[K]['data']]: S;
-      };
-    };
-    return result;
-  })
-  .reduce((acc, curr) => ({ ...acc, ...curr }));
+export const marketOverviewLoadBonds: Array<keyof MarketOverview['bonds']> = [
+  'usAAAYield',
+  'usAAYield',
+  'usBBYield',
+  'usCCCYield',
+  'usCorporateYield',
+  'usEmergingMarket',
+  'usHighYield',
+];
 
-export type MarketOverviewData = {
-  data: number[];
-  dates: string[];
-  frequency: string;
-  start_date: string;
-  end_date: string;
-  lastUpdate: string;
-  name: string;
-};
+export const marketOverviewLoadTreasury: Array<keyof MarketOverview['treasury']> = [
+  'us10Year',
+  'us1Month',
+  'us1Year',
+  'us30Year',
+  'us3Month',
+  'us5Year',
+];
 
-export type MarketOverview = {
-  sp500: {
-    peRatio: MarketOverviewData;
-    shillerPeRatio: MarketOverviewData;
-    priceToBook: MarketOverviewData;
-    priceToSales: MarketOverviewData;
-    earningsYield: MarketOverviewData;
-    dividendYield: MarketOverviewData;
-  };
-  treasury: {
-    us1Month: MarketOverviewData;
-    us3Month: MarketOverviewData;
-    us1Year: MarketOverviewData;
-    us5Year: MarketOverviewData;
-    us10Year: MarketOverviewData;
-    us30Year: MarketOverviewData;
-  };
-  bonds: {
-    usAAAYield: MarketOverviewData;
-    usAAYield: MarketOverviewData;
-    usBBYield: MarketOverviewData;
-    usCCCYield: MarketOverviewData;
-    usCorporateYield: MarketOverviewData;
-    usHighYield: MarketOverviewData;
-    usEmergingMarket: MarketOverviewData;
-  };
-  consumerIndex: {
-    usCpi: MarketOverviewData;
-    euCpi: MarketOverviewData;
-    ukCpi: MarketOverviewData;
-    gerCpi: MarketOverviewData;
-  };
-  inflationRate: {
-    usInflationRate: MarketOverviewData;
-    euInflationRate: MarketOverviewData;
-    ukInflationRate: MarketOverviewData;
-    gerInflationRate: MarketOverviewData;
-  };
-};
-
-export const marketOverviewToLoad: { [K in keyof MarketOverview]: Array<keyof MarketOverview[K]> } = {
-  sp500: ['peRatio', 'shillerPeRatio', 'priceToSales', 'priceToBook', 'earningsYield', 'dividendYield'],
-  bonds: ['usAAAYield', 'usAAYield', 'usBBYield', 'usCCCYield', 'usCorporateYield', 'usEmergingMarket', 'usHighYield'],
-  consumerIndex: ['euCpi', 'gerCpi', 'ukCpi', 'usCpi'],
-  inflationRate: ['euInflationRate', 'gerInflationRate', 'ukInflationRate', 'usInflationRate'],
-  treasury: ['us10Year', 'us1Month', 'us1Year', 'us30Year', 'us3Month', 'us5Year'],
-};
+export const marketOverviewLoadGeneral: Array<keyof MarketOverview['general']> = [
+  'GDP',
+  'realGDP',
+  'nominalPotentialGDP',
+  'realGDPPerCapita',
+  'federalFunds',
+  'CPI',
+  'inflationRate',
+  'inflation',
+  'retailSales',
+  'consumerSentiment',
+  'durableGoods',
+  'unemploymentRate',
+  'totalNonfarmPayroll',
+  'initialClaims',
+  'industrialProductionTotalIndex',
+  'newPrivatelyOwnedHousingUnitsStartedTotalUnits',
+  'totalVehicleSales',
+  'retailMoneyFunds',
+  'smoothedUSRecessionProbabilities',
+  '3MonthOr90DayRatesAndYieldsCertificatesOfDeposit',
+  'commercialBankInterestRateOnCreditCardPlansAllAccounts',
+  '30YearFixedRateMortgageAverage',
+  '15YearFixedRateMortgageAverage',
+];

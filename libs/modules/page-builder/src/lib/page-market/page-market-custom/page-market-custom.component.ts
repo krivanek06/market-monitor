@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
-import { MARKET_OVERVIEW_DATA, MarketOverviewDatabaseKeys, getMarketOverKeyBySubKey } from '@market-monitor/api-types';
+import { MARKET_OVERVIEW_DATA, MarketOverviewQuandlKeys, getMarketOverKeyBySubKey } from '@market-monitor/api-types';
 import {
   MarketDataTransformService,
   MarketOverviewChartDataBody,
@@ -90,7 +90,7 @@ export class PageMarketCustomComponent implements OnInit, RouterManagement {
     this.loadQueryParams();
   }
 
-  onDataClick(key: MarketOverviewDatabaseKeys, subKey: string, sectionName: string): void {
+  onDataClick(key: MarketOverviewQuandlKeys, subKey: string, sectionName: string): void {
     // if subKey is already selected, remove it
     if (this.selectedOverviewSubKeys().includes(subKey)) {
       this.selectedOverviewSignal.update((prev) => prev.filter((data) => data.subKey !== subKey));
@@ -175,7 +175,7 @@ export class PageMarketCustomComponent implements OnInit, RouterManagement {
           .map((subKey) => getMarketOverKeyBySubKey(subKey))
           .filter(
             // ignoring unknown subKeys
-            (overview): overview is { key: MarketOverviewDatabaseKeys; name: string; subKey: string } => !!overview,
+            (overview): overview is { key: MarketOverviewQuandlKeys; name: string; subKey: string } => !!overview,
           )
           .map((overview) =>
             this.marketApiService

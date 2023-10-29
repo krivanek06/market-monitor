@@ -41,7 +41,7 @@
     "@nx/angular": "16.10.0",
     "@sentry/angular-ivy": "^7.74.1",
     "@sentry/serverless": "^7.74.1",
-    "@simondotm/nx-firebase": "2.1.2",
+    "@simondotm/nx-firebase": "1.1.0",
     "axios": "^1.5.1",
     "better-sqlite3": "^9.0.0",
     "cache-manager": "^5.2.4",

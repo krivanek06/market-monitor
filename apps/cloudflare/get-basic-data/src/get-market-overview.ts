@@ -1,5 +1,11 @@
 import { getMarketOverviewDataAPI } from '@market-monitor/api-external';
-import { EXPIRATION_ONE_WEEK, MarketOverview, MarketOverviewDatabaseKeys, RESPONSE_HEADER } from '@market-monitor/api-types';
+import {
+	EXPIRATION_ONE_WEEK,
+	MarketOverview,
+	MarketOverviewKey,
+	MarketOverviewSubkeyReadable,
+	RESPONSE_HEADER,
+} from '@market-monitor/api-types';
 import { eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/d1';
 import { Env, MarketDataTable } from './model';
@@ -8,9 +14,9 @@ const MARKET_OVERVIEW_KEY = 'market_overview';
 
 export const getMarketOverData = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {
 	// i.e: sp500
-	const key = searchParams.get('key') as MarketOverviewDatabaseKeys;
+	const key = searchParams.get('key') as MarketOverviewKey;
 	// i.e: peRatio
-	const subKey = searchParams.get('subKey') as string;
+	const subKey = searchParams.get('subKey') as MarketOverviewSubkeyReadable<MarketOverviewKey>;
 	// create cache key
 	const cacheKey = `${key}-${subKey}`;
 
