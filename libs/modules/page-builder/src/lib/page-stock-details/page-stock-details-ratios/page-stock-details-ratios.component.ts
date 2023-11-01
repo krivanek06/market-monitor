@@ -9,7 +9,13 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   standalone: true,
   imports: [CommonModule, GenericChartComponent, RangeDirective],
   templateUrl: './page-stock-details-ratios.component.html',
-  styles: [],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageStockDetailsRatiosComponent extends PageStockDetailsBase {

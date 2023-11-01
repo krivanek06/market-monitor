@@ -6,7 +6,7 @@
 <!-- chart -->
 <div class="relative w-full mb-10" [ngClass]="{ 'g-shadow-background': showLoadingScreenSignal() }">
   <app-generic-chart
-    [series]="selectedOverviewSignal() | objectArrayValuesByKey: 'chartData'"
+    [series]="selectedChartDataSignal()"
     [heightPx]="450"
     [enableZoom]="true"
     [enableLegendTogging]="true"
@@ -20,18 +20,18 @@
 
 <!-- options -->
 <div class="columns-2">
-  <div *ngFor="let section of MARKET_OVERVIEW_DATA" class="inline-block mb-6">
-    <h2 class="mb-0 text-lg text-wt-gray-dark">{{ section.name }}</h2>
+  <div class="inline-block mb-6">
+    <h2 class="mb-0 text-lg text-wt-gray-dark">S&P 500</h2>
     <div class="flex flex-wrap items-center gap-x-2">
       <button
-        *ngFor="let data of section.data"
-        (click)="onDataClick(section.key, data.subKey, data.name)"
+        *ngFor="let dataSection of MARKET_OVERVIEW_ENDPOINTS.sp500.data"
+        (click)="onDataClick('sp500', dataSection.keyReadable, dataSection.name)"
         mat-button
         type="button"
-        [color]="(selectedOverviewSubKeys() | inArray: data.subKey) ? 'primary' : ''"
+        [color]="(selectedOverviewSubKeys() | inArray: dataSection.keyReadable) ? 'primary' : ''"
         class="text-sm"
       >
-        {{ data.name }}
+        {{ dataSection.name }}
       </button>
     </div>
   </div>

@@ -21,7 +21,7 @@ import {
 } from '@market-monitor/shared/data-access';
 import { ChartConstructor } from '@market-monitor/shared/utils-client';
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/utils-general';
-import { isAfter, isBefore } from 'date-fns';
+import { format, isAfter, isBefore } from 'date-fns';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 
@@ -93,6 +93,8 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
   @Input() showExpandableButton = false;
   @Input() applyFancyColor = 0;
   @Input() chartDateRestriction?: [Date | string, Date | string];
+  @Input() isCategoryDates = false;
+
   constructor() {
     super();
   }
@@ -104,8 +106,6 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
     if (!this.Highcharts || this.platform.isServer) {
       return;
     }
-
-    //    console.log('chart changes', changes);
 
     if (this.applyFancyColor > 0) {
       this.fancyColoring();
@@ -170,7 +170,9 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
     if (this.chartOptions.xAxis) {
       this.chartOptions.xAxis = {
         ...this.chartOptions.xAxis,
-        categories: [...this.categories],
+        categories: this.isCategoryDates
+          ? this.categories.map((d) => format(new Date(d), 'MMM dd, yyyy'))
+          : this.categories,
         type: 'category',
       };
     }
@@ -458,7 +460,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
       console.warn('Cannot init initAreaChange in Generic chart, empty series');
       return;
     }
-    const data = this.series[0].data as number[];
+    const data = this.series[0].data as any as number[];
     const oldestData = data[0] as number;
     const newestData = data[data.length - 1] as number;
     const color = oldestData > newestData ? '#ff1010' : '#0d920d';

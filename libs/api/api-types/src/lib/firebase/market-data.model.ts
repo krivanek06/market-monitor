@@ -496,3 +496,37 @@ export const marketOverviewLoadGeneral: Array<keyof MarketOverview['general']> =
   '30YearFixedRateMortgageAverage',
   '15YearFixedRateMortgageAverage',
 ];
+
+type MarketOverviewTypes<T extends MarketOverviewKey> = {
+  name: string;
+  key: T;
+  subkeys: MarketOverviewSubkeyReadable<T>[];
+};
+
+// export const MARKET_OVERVIEW_DATA: [
+//   MarketOverviewTypes<'sp500'>,
+//   MarketOverviewTypes<'bonds'>,
+//   MarketOverviewTypes<'treasury'>,
+//   MarketOverviewTypes<'general'>,
+// ] = [
+//   {
+//     name: 'S&P 500',
+//     key: 'sp500',
+//     subkeys: marketOverviewLoadSP500,
+//   },
+//   {
+//     name: 'Bonds',
+//     key: 'bonds',
+//     subkeys: marketOverviewLoadBonds
+//   },
+//   {
+//     name: 'Treasury',
+//     key: 'treasury',
+//     subkeys: marketOverviewLoadTreasury
+//   },
+//   {
+//     name: 'General',
+//     key: 'general',
+//     subkeys: marketOverviewLoadGeneral
+//   },
+// ];

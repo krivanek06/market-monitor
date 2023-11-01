@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MarketApiService } from '@market-monitor/api-client';
-import { MarketDataTransformService } from '@market-monitor/modules/market-general/data-access';
 import {
   StockOwnershipHoldersTableComponent,
   StockOwnershipInstitutionalListComponent,
@@ -39,7 +38,6 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
 })
 export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   marketApiService = inject(MarketApiService);
-  marketDataTransformService = inject(MarketDataTransformService);
 
   quarterFormControl = new FormControl<string | null>(null);
   loadingSignal = signal(false);

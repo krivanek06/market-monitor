@@ -1,8 +1,8 @@
 import { ChartDataType, MarketOverviewKey, MarketOverviewSubkeyReadable } from '@market-monitor/api-types';
 
-export const getMarketOverviewDataAPI = async (
-  key: MarketOverviewKey,
-  subKey: MarketOverviewSubkeyReadable<MarketOverviewKey>,
+export const getMarketOverviewDataAPI = async <T extends MarketOverviewKey>(
+  key: T,
+  subKey: MarketOverviewSubkeyReadable<T>,
 ): Promise<ChartDataType> => {
   const url = `https://getmarketoverviewdata-jhgz46ksfq-ey.a.run.app/?key=${key}&subKey=${subKey}`;
   const response = await fetch(url);
