@@ -39,3 +39,5 @@ export enum DataTimePeriodEnum {
   YEAR = 'year',
 }
 export type DataTimePeriod = `${DataTimePeriodEnum}`;
+
+export type ChartDataType = [string, number][];

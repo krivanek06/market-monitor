@@ -5,6 +5,7 @@ import {
   CalendarDividend,
   CalendarStockEarning,
   CalendarStockIPO,
+  ChartDataType,
   CompanyInsideTrade,
   CompanyKeyMetrics,
   CompanyKeyMetricsTTM,
@@ -21,6 +22,7 @@ import {
   HistoricalLoadingPeriodsDates,
   HistoricalPrice,
   HistoricalPriceAPI,
+  MarketOverviewSubKey,
   MostPerformingStocks,
   News,
   NewsTypes,
@@ -668,4 +670,12 @@ export const getStockScreening = async (values: StockScreenerValues): Promise<St
   // check if symbol contains any of the ignored symbols
   const filteredResponse = filterOutSymbols(data, ['sector']);
   return filteredResponse;
+};
+
+export const getEconomicData = async (endpointKey: MarketOverviewSubKey<'general'>): Promise<ChartDataType> => {
+  const url = `${FINANCIAL_MODELING_URL}/v4/economic?name=${endpointKey}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const response = await fetch(url);
+  const data = (await response.json()) as { date: string; value: number }[];
+  const formattedData = data.map((d) => [d.date, d.value] as [string, number]) satisfies ChartDataType;
+  return formattedData;
 };

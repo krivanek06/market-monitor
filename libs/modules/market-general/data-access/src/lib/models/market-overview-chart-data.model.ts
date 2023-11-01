@@ -1,8 +1,8 @@
-import { MarketOverview, MarketOverviewData } from '@market-monitor/api-types';
+import { ChartDataType, MarketOverview } from '@market-monitor/api-types';
 import { GenericChartSeries } from '@market-monitor/shared/data-access';
 
 export type MarketOverviewChartDataBody = {
-  marketOverview: MarketOverviewData;
+  marketOverview: ChartDataType;
   chartData: GenericChartSeries;
   name: string;
   subKey: string;

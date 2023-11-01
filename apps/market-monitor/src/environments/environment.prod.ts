@@ -16,5 +16,5 @@ export const environment = {
   endpointFunctionsURL: 'jhgz46ksfq-ey.a.run.app',
 
   production: true,
-  version: '1.2.6',
+  version: '1.2.8',
 };

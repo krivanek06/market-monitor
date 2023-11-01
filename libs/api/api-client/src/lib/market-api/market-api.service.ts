@@ -4,10 +4,11 @@ import {
   CalendarDividend,
   CalendarStockEarning,
   CalendarStockIPO,
+  ChartDataType,
   HistoricalPrice,
   MarketOverview,
-  MarketOverviewData,
-  MarketOverviewDatabaseKeys,
+  MarketOverviewKey,
+  MarketOverviewSubkeyReadable,
   MarketTopPerformanceOverviewResponse,
   MarketTopPerformanceSymbols,
   News,
@@ -97,8 +98,11 @@ export class MarketApiService extends ApiCacheService {
     );
   }
 
-  getMarketOverviewData<T extends MarketOverviewDatabaseKeys>(key: T, subKey: string): Observable<MarketOverviewData> {
-    return this.getData<MarketOverviewData>(
+  getMarketOverviewData<T extends MarketOverviewKey>(
+    key: T,
+    subKey: MarketOverviewSubkeyReadable<T>,
+  ): Observable<ChartDataType> {
+    return this.getData<ChartDataType>(
       `https://get-basic-data.krivanek1234.workers.dev/?type=market-overview-data&key=${key}&subKey=${subKey}`,
       this.validity30Min,
     );

@@ -14,7 +14,12 @@ export enum ChartType {
 
 export type ChartTypeKeys = keyof typeof ChartType;
 
-export interface GenericChartSeries {
+export type GenericChartSeriesAcceptedData =
+  | (number | null)
+  | [number | null, number | null]
+  | { name: string; y: number; color?: string };
+
+export interface GenericChartSeries<TData extends GenericChartSeriesAcceptedData = GenericChartSeriesAcceptedData> {
   type?: ChartType;
   name?: string;
   showInNavigator?: boolean;
@@ -22,7 +27,7 @@ export interface GenericChartSeries {
   /**
    * example: [value, value, ...] or [[timestamp, value], [timestamp, value], ...]
    */
-  data: (number | null)[] | [number | null, number | null][] | { name: string; y: number; color?: string }[];
+  data: TData[];
   color?:
     | string
     | {

@@ -5,17 +5,19 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@market-monitor/api-client';
 import { INDEXES_DEFAULT, INDEXES_DEFAULT_SYMBOLS, SYMBOL_SP500, SymbolQuote } from '@market-monitor/api-types';
-import { MarketDataTransformService } from '@market-monitor/modules/market-general/data-access';
 import {
   AssetPriceChartInteractiveComponent,
   QuoteSearchBasicComponent,
 } from '@market-monitor/modules/market-general/features';
 import {
+  FlattenArrayPipe,
   GeneralCardComponent,
   GenericChartComponent,
+  MultiplyDtaPipe,
   PercentageIncreaseDirective,
   RangeDirective,
   RenderClientDirective,
+  SortReversePipe,
 } from '@market-monitor/shared/ui';
 import { map } from 'rxjs';
 import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skeleton.component';
@@ -35,6 +37,9 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     PageMarketOverviewSkeletonComponent,
     RenderClientDirective,
     RangeDirective,
+    FlattenArrayPipe,
+    SortReversePipe,
+    MultiplyDtaPipe,
   ],
   templateUrl: './page-market-overview.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,17 +53,12 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
 })
 export class PageMarketOverviewComponent {
   marketApiService = inject(MarketApiService);
-  marketDataTransformService = inject(MarketDataTransformService);
 
   selectedIndexSymbolQuoteControl = new FormControl<SymbolQuote | null>(null);
 
   SYMBOL_SP500 = SYMBOL_SP500;
 
-  marketOverviewSignal = toSignal(
-    this.marketApiService
-      .getMarketOverview()
-      .pipe(map((marketOverview) => this.marketDataTransformService.transformMarketOverview(marketOverview))),
-  );
+  marketOverviewSignal = toSignal(this.marketApiService.getMarketOverview());
 
   marketTopIndexQuotesSignal = toSignal(
     this.marketApiService.getSymbolSummaries(INDEXES_DEFAULT_SYMBOLS).pipe(

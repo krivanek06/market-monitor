@@ -54,150 +54,234 @@
     <h2>SP500 stats</h2>
     <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.sp500.peRatio.name"
+        *ngIf="marketOverviewSignalValues.sp500.peRatio | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="PE Ratio"
         [heightPx]="300"
         [applyFancyColor]="2"
-        [series]="[marketOverviewSignalValues.sp500.peRatio.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'PE Ratio' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.sp500.shillerPeRatio.name"
+        *ngIf="marketOverviewSignalValues.sp500.shillerPeRatio | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Shiller PE Ratio"
         [heightPx]="300"
         [applyFancyColor]="2"
-        [series]="[marketOverviewSignalValues.sp500.shillerPeRatio.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Shiller PE Ratio' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.sp500.priceToBook.name"
+        *ngIf="marketOverviewSignalValues.sp500.priceToBook | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Price To Book"
         [heightPx]="300"
         [applyFancyColor]="2"
-        [series]="[marketOverviewSignalValues.sp500.priceToBook.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Price To Book' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.sp500.priceToSales.name"
+        *ngIf="marketOverviewSignalValues.sp500.priceToSales | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Price To Sales"
         [heightPx]="300"
         [applyFancyColor]="2"
-        [series]="[marketOverviewSignalValues.sp500.priceToSales.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Price To Sales' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.sp500.earningsYield.name"
+        *ngIf="marketOverviewSignalValues.sp500.earningsYield | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Earning Yield"
         [heightPx]="300"
         [applyFancyColor]="2"
-        [series]="[marketOverviewSignalValues.sp500.earningsYield.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Earning Yield' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.sp500.dividendYield.name"
+        *ngIf="marketOverviewSignalValues.sp500.dividendYield | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Dividend Yield"
         [heightPx]="300"
         [applyFancyColor]="2"
-        [series]="[marketOverviewSignalValues.sp500.dividendYield.chartData]"
-      ></app-generic-chart>
-    </div>
-
-    <h2>Inflation Rate</h2>
-    <div class="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2 lg:grid-cols-4">
-      <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.inflationRate.usInflationRate.name"
-        [heightPx]="250"
-        [series]="[marketOverviewSignalValues.inflationRate.usInflationRate.chartData]"
-      ></app-generic-chart>
-
-      <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.inflationRate.euInflationRate.name"
-        [heightPx]="250"
-        [series]="[marketOverviewSignalValues.inflationRate.euInflationRate.chartData]"
-      ></app-generic-chart>
-
-      <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.inflationRate.ukInflationRate.name"
-        [heightPx]="250"
-        [series]="[marketOverviewSignalValues.inflationRate.ukInflationRate.chartData]"
-      ></app-generic-chart>
-
-      <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.inflationRate.gerInflationRate.name"
-        [heightPx]="250"
-        [series]="[marketOverviewSignalValues.inflationRate.gerInflationRate.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Dividend Yield' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
     </div>
 
     <h2>Treasury</h2>
     <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.treasury.us3Month.name"
+        *ngIf="marketOverviewSignalValues.treasury.us3Month | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Treasury 3 Months"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.treasury.us3Month.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Treasury 3 Months' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.treasury.us1Year.name"
+        *ngIf="marketOverviewSignalValues.treasury.us1Year | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Treasury 1 Year"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.treasury.us1Year.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Treasury 1 Year' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.treasury.us10Year.name"
+        *ngIf="marketOverviewSignalValues.treasury.us10Year | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Treasury 10 Years"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.treasury.us10Year.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Treasury 10 Years' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.treasury.us30Year.name"
+        *ngIf="marketOverviewSignalValues.treasury.us30Year | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Treasury 30 Years"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.treasury.us30Year.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Treasury 30 Years' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
     </div>
 
     <h2>Bonds</h2>
     <div class="grid grid-cols-1 gap-4 mb-3 sm:grid-cols-2 lg:grid-cols-4">
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.bonds.usAAAYield.name"
+        *ngIf="marketOverviewSignalValues.bonds.usAAAYield | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Bonds US AAA Yield"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.bonds.usAAAYield.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Bonds US AAA Yield' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
+
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.bonds.usAAYield.name"
+        *ngIf="marketOverviewSignalValues.bonds.usAAYield | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Bonds US AA Yield"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.bonds.usAAYield.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Bonds US AA Yield' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
+
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.bonds.usBBYield.name"
+        *ngIf="marketOverviewSignalValues.bonds.usBBYield | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Bonds US BB Yield"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.bonds.usBBYield.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Bonds US BB Yield' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
+
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.bonds.usCCCYield.name"
+        *ngIf="marketOverviewSignalValues.bonds.usCCCYield | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Bonds US CCC Yield"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.bonds.usCCCYield.chartData]"
+        [series]="[{ data: data | flattenArray: 1, name: 'Bonds US CCC Yield' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
     </div>
 
-    <h2>Consumer Price Index</h2>
+    <h2>US Data</h2>
     <div class="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2 lg:grid-cols-4">
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.consumerIndex.usCpi.name"
+        *ngIf="marketOverviewSignalValues.general.GDP | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="US GDP"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.consumerIndex.usCpi.chartData]"
+        [applyFancyColor]="3"
+        [series]="[{ data: data | flattenArray: 1, name: 'US GDP' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.consumerIndex.euCpi.name"
+        *ngIf="marketOverviewSignalValues.general.realGDPPerCapita | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="GDP per Capita"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.consumerIndex.euCpi.chartData]"
+        [applyFancyColor]="3"
+        [series]="[{ data: data | flattenArray: 1, name: 'GDP per Capita' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.consumerIndex.ukCpi.name"
+        *ngIf="marketOverviewSignalValues.general.CPI | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="CPI"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.consumerIndex.ukCpi.chartData]"
+        [applyFancyColor]="3"
+        [series]="[{ data: data | flattenArray: 1, name: 'CPI' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
 
       <app-generic-chart
-        [chartTitle]="marketOverviewSignalValues.consumerIndex.gerCpi.name"
+        *ngIf="marketOverviewSignalValues.general.federalFunds | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Federal Funds"
         [heightPx]="250"
-        [series]="[marketOverviewSignalValues.consumerIndex.gerCpi.chartData]"
+        [applyFancyColor]="3"
+        [series]="[{ data: data | flattenArray: 1, name: 'Federal Funds' }]"
+        [categories]="data | flattenArray: 0"
+      ></app-generic-chart>
+
+      <app-generic-chart
+        *ngIf="marketOverviewSignalValues.general.inflation | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Inflation"
+        [heightPx]="250"
+        [applyFancyColor]="4"
+        [series]="[{ data: data | flattenArray: 1, name: 'Inflation' }]"
+        [categories]="data | flattenArray: 0"
+      ></app-generic-chart>
+
+      <app-generic-chart
+        *ngIf="marketOverviewSignalValues.general.unemploymentRate | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Unemployment"
+        [heightPx]="250"
+        [applyFancyColor]="4"
+        [series]="[
+          {
+            data: (data | flattenArray: 1 | multiplyData: 1_000_000),
+            name: 'Unemployment'
+          }
+        ]"
+        [categories]="data | flattenArray: 0"
+      ></app-generic-chart>
+
+      <app-generic-chart
+        *ngIf="marketOverviewSignalValues.general.smoothedUSRecessionProbabilities | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Smooth Recession Probabilities"
+        [heightPx]="250"
+        [applyFancyColor]="4"
+        [series]="[
+          {
+            data: data | flattenArray: 1,
+            name: 'Smooth Recession Probabilities'
+          }
+        ]"
+        [categories]="data | flattenArray: 0"
+      ></app-generic-chart>
+
+      <app-generic-chart
+        *ngIf="marketOverviewSignalValues.general.totalVehicleSales | sortReverse as data"
+        [isCategoryDates]="true"
+        chartTitle="Vehicle Sales"
+        [heightPx]="250"
+        [applyFancyColor]="4"
+        [series]="[{ data: data | flattenArray: 1 | multiplyData: 1_000_000, name: 'Vehicle Sales' }]"
+        [categories]="data | flattenArray: 0"
       ></app-generic-chart>
     </div>
   </div>

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Firebase Functions package",
   "engines": {
-    "node": " 18"
+    "node": "18"
   },
   "devDependencies": {},
   "private": true
