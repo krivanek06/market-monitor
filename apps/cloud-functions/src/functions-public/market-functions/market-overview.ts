@@ -27,7 +27,7 @@ export const getMarketOverviewDataWrapper = async (request: Request, response: R
   // if information not provided send error to client
   if (!key || !subKey) {
     response.status(400);
-    throw new Error('key or subkey to access data not provided');
+    throw new Error('key or sub key to access data not provided');
   }
 
   try {

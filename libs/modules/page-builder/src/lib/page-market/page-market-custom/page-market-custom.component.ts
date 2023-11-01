@@ -108,8 +108,6 @@ export class PageMarketCustomComponent implements OnInit {
     // else add it and load data
     this.showLoadingScreenSignal.set(true);
     this.marketApiService.getMarketOverviewData(key, subKey).subscribe((marketOverviewData) => {
-      console.log('marketOverviewData', marketOverviewData);
-
       // transform data
       const displayName = `${MARKET_OVERVIEW_ENDPOINTS[key].name} - ${subKeyName}`;
       const chartData: GenericChartSeries<[number, number]> = {
@@ -119,9 +117,10 @@ export class PageMarketCustomComponent implements OnInit {
           id: subKey,
         },
         //color: color,
-        data: marketOverviewData
-          .reverse()
-          .reduce((acc, [date, value]) => [[new Date(date).getTime(), value], ...acc], [] as [number, number][]),
+        data: marketOverviewData.reduce(
+          (acc, [date, value]) => [[new Date(date).getTime(), value], ...acc],
+          [] as [number, number][],
+        ),
       };
 
       // add data to signal
