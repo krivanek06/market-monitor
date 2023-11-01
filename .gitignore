@@ -63,3 +63,5 @@ ui-debug.log
 
 # Cloudflare
 .wrangler
+
+package-lock.json
