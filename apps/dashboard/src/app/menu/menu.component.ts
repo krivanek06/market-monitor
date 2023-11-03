@@ -8,9 +8,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
+import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
 import { SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
 import { LoaderMainService } from '@market-monitor/shared/utils-client';
-import { map } from 'rxjs';
+import { map, take, tap } from 'rxjs';
 import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-navigation.component';
 
 @Component({
@@ -83,12 +84,25 @@ import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-na
 })
 export class MenuComponent implements OnInit {
   breakpointObserver = inject(BreakpointObserver);
+  portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  loaderMainService = inject(LoaderMainService);
 
-  loadingSignal = toSignal(inject(LoaderMainService).getLoading());
+  loadingSignal = toSignal(this.loaderMainService.getLoading());
   isOpenSignal = signal<boolean>(false);
   isSmallScreenSignal = toSignal(
     this.breakpointObserver.observe([SCREEN_LAYOUT.LAYOUT_SM]).pipe(map((x) => !x.matches)),
   );
+
+  constructor() {
+    this.loaderMainService.setLoading(true);
+    this.portfolioUserFacadeService
+      .getPortfolioState()
+      .pipe(
+        tap(() => this.loaderMainService.setLoading(false)),
+        take(1),
+      )
+      .subscribe();
+  }
 
   ngOnInit(): void {}
 

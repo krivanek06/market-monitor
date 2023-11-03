@@ -59,9 +59,12 @@ export class StockSummaryTableComponent implements AfterViewInit {
 
     this.dataSource.data = [...keepData, ...dataToAdd];
     this.dataSource._updateChangeSubscription();
+    this.showLoadingSkeletonSignal.set(false);
   }
   @Input() tableTitle = '';
   @Input() showMobileInfoButton = true;
+
+  showLoadingSkeletonSignal = signal(true);
 
   displayInfoMobile = signal(false);
 

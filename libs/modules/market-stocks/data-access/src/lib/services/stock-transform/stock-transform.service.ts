@@ -305,7 +305,7 @@ export class StockTransformService {
         { name: 'Common Stock', values: balanceSheet.map((d) => d.commonStock) },
         { name: 'Retained Earnings', values: balanceSheet.map((d) => d.retainedEarnings) },
         {
-          name: 'Accumulated Comprehensive IncomeLoss',
+          name: 'Comprehensive IncomeLoss',
           values: balanceSheet.map((d) => d.accumulatedOtherComprehensiveIncomeLoss),
         },
       ],
