@@ -1,4 +1,4 @@
-import { UserAccountType, UserData } from '@market-monitor/api-types';
+import { USER_ROLE, UserAccountType, UserData } from '@market-monitor/api-types';
 
 export const USER_TEST_1_ID = 'USER_TEST_1';
 
@@ -17,11 +17,9 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       displayName: 'Test User',
       photoURL: null,
     },
+    role: USER_ROLE.BASIC,
     settings: {
-      isCreatingGroupAllowed: true,
-      isPortfolioCashActive: true,
       isProfilePublic: true,
-      isHistoricalAssetsTradingAllowed: true,
     },
   };
 

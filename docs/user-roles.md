@@ -8,6 +8,7 @@ Document contains different user types and functions that falls under each of th
 - portfolio cash (checking cash amount for each transaction)
 - public portfolio by default
 - searching people (with trade account) & groups
+- display transaction chart on dashboard
 
 ## ROLE: Basic
 
