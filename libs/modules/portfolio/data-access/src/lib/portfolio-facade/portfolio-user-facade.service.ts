@@ -6,8 +6,8 @@ import { Observable, from, map, startWith, switchMap, withLatestFrom } from 'rxj
 import {
   PortfolioChange,
   PortfolioGrowth,
-  PortfolioState,
   PortfolioStateHolding,
+  PortfolioStateHoldings,
   PortfolioTransactionCreate,
   PortfolioTransactionToDate,
 } from '../models';
@@ -29,10 +29,17 @@ export class PortfolioUserFacadeService {
     private portfolioCalculationService: PortfolioCalculationService,
   ) {}
 
-  getPortfolioState(): Observable<PortfolioState> {
+  getPortfolioState(): Observable<PortfolioStateHoldings> {
     return this.authenticationUserService
       .getUserPortfolioTransactions()
-      .pipe(switchMap((transactions) => this.portfolioGrowthService.getPortfolioState(transactions)));
+      .pipe(
+        switchMap((transactions) =>
+          this.portfolioGrowthService.getPortfolioState(
+            this.authenticationUserService.userData.lastPortfolioState,
+            transactions,
+          ),
+        ),
+      );
   }
 
   getPortfolioStateHolding(symbol: string): Observable<PortfolioStateHolding | undefined> {

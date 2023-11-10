@@ -5,12 +5,13 @@ import {
   HistoricalPriceSymbol,
   PortfolioGrowthAssets,
   PortfolioGrowthAssetsDataItem,
+  PortfolioState,
   UserPortfolioTransaction,
 } from '@market-monitor/api-types';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { format, isBefore, isSameDay, subDays } from 'date-fns';
 import { Observable, firstValueFrom, map, tap } from 'rxjs';
-import { PortfolioState, PortfolioStateHolding } from '../models';
+import { PortfolioStateHolding, PortfolioStateHoldings } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 
 @Injectable({
@@ -22,13 +23,16 @@ export class PortfolioGrowthService {
     private portfolioCalculationService: PortfolioCalculationService,
   ) {}
 
-  getPortfolioState(portfolioTransactions: UserPortfolioTransaction): Observable<PortfolioState> {
+  getPortfolioState(
+    previousPortfolioState: PortfolioState,
+    portfolioTransactions: UserPortfolioTransaction,
+  ): Observable<PortfolioStateHoldings> {
     console.log(`PortfolioGrowthService: getPortfolioState`);
     const transactions = portfolioTransactions.transactions;
 
     // todo: remove/add transaction total values into this
     // accumulate cash on hand from deposits
-    const cashOnHandFromDeposit = portfolioTransactions.startingCash ?? 0;
+    const cashOnHandFromDeposit = previousPortfolioState.startingCash ?? 0;
     const isCashActive = cashOnHandFromDeposit !== 0;
     // accumulate cash on hand from transactions
     const cashOnHandTransactions = transactions.reduce(
@@ -75,7 +79,7 @@ export class PortfolioGrowthService {
         const firstTransactionDate = transactions[0].date;
         const lastTransactionDate = transactions[transactions.length - 1].date;
 
-        const result: PortfolioState = {
+        const result: PortfolioStateHoldings = {
           numberOfExecutedBuyTransactions,
           numberOfExecutedSellTransactions,
           transactionFees,

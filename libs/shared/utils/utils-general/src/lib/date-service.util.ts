@@ -103,6 +103,10 @@ export const dateFormatDate = (inputDate: DateInput, formateStr: string = 'yyyy-
   return format(date, formateStr);
 };
 
+export const getDefaultDateFormat = (): string => {
+  return dateFormatDate(new Date(), 'yyyy-MM-dd');
+};
+
 export const dateIsNotWeekend = (date: DateInput): boolean => {
   return !isWeekend(new Date(date));
 };

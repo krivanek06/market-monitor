@@ -11,7 +11,7 @@ import {
 import { UserApiService } from '@market-monitor/api-client';
 import { UserAccountType, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
 import { isNonNullable } from '@market-monitor/shared/utils-client';
-import { dateFormatDate } from '@market-monitor/shared/utils-general';
+import { dateFormatDate, getDefaultDateFormat } from '@market-monitor/shared/utils-general';
 import { BehaviorSubject, Observable, map, take } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 
@@ -90,6 +90,11 @@ export class AuthenticationAccountService {
             console.log('login', userData);
             this.authenticatedUserData$.next(userData);
             this.authenticationLoaded$.next(true);
+
+            // update last login
+            this.userApiService.updateUser(userData.id, {
+              lastLoginDate: getDefaultDateFormat(),
+            });
           });
       } else {
         // logout
@@ -115,7 +120,6 @@ export class AuthenticationAccountService {
     });
 
     const newTransactions: UserPortfolioTransaction = {
-      startingCash: 0,
       transactions: [],
     };
 

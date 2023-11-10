@@ -4,7 +4,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
   PortfolioGrowth,
-  PortfolioState,
+  PortfolioStateHoldings,
   PortfolioUserFacadeService,
   dashboardChartOptionsInputSource,
 } from '@market-monitor/modules/portfolio/data-access';
@@ -44,7 +44,7 @@ import { map, startWith, switchMap, tap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardPortfolioChartsComponent {
-  @Input({ required: true }) portfolioState!: PortfolioState;
+  @Input({ required: true }) portfolioState!: PortfolioStateHoldings;
 
   portfolioUserFacadeService = inject(PortfolioUserFacadeService);
 

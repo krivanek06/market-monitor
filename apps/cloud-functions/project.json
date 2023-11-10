@@ -5,7 +5,7 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@simondotm/nx-firebase:build",
+      "executor": "@simondotm/nx-firebase:function",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/cloud-functions",

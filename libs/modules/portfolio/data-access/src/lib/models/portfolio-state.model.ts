@@ -1,42 +1,14 @@
-import { PortfolioGrowthAssetsDataItem, SymbolSummary, SymbolType } from '@market-monitor/api-types';
+import { PortfolioGrowthAssetsDataItem, PortfolioState, SymbolSummary, SymbolType } from '@market-monitor/api-types';
 
-export type PortfolioState = {
-  /**
-   * userBalance = invested + cashOnHand
-   */
-  userBalance: number;
-  /**
-   * holdingsBalance = closed price * units for each holdings
-   */
-  holdingsBalance: number;
-
-  /**
-   * total invested value into holdings
-   */
-  invested: number;
-  cashOnHand: number;
-  startingCash: number;
-  numberOfExecutedBuyTransactions: number;
-  numberOfExecutedSellTransactions: number;
-  transactionFees: number;
-
+export type PortfolioStateHoldings = PortfolioState & {
   /**
    * calculated from previous transactions
    */
   holdings: PortfolioStateHolding[];
-
-  /**
-   * calculated from holdings and userBalance
-   */
-  totalGainsValue: number;
-  totalGainsPercentage: number;
-
-  firstTransactionDate: string;
-  lastTransactionDate: string;
 };
 
 export type PortfolioTransactionToDate = Pick<
-  PortfolioState,
+  PortfolioStateHoldings,
   'numberOfExecutedBuyTransactions' | 'numberOfExecutedSellTransactions' | 'transactionFees'
 > & {
   date: string;

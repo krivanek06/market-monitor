@@ -33,7 +33,6 @@ export class UserApiService {
       map((d) => ({
         // sort ASC
         transactions: d.transactions.slice().sort((a, b) => (a.date > b.date ? 1 : -1)),
-        startingCash: d.startingCash,
       })),
     );
   }

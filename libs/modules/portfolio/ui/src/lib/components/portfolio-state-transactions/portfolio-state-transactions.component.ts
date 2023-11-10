@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { PortfolioState } from '@market-monitor/modules/portfolio/data-access';
+import { PortfolioStateHoldings } from '@market-monitor/modules/portfolio/data-access';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { AddColorDirective } from '@market-monitor/shared/ui';
 
@@ -19,7 +19,7 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStateTransactionsComponent {
-  @Input({ required: true }) portfolioState!: PortfolioState;
+  @Input({ required: true }) portfolioState!: PortfolioStateHoldings;
   @Input() showFees = false;
   @Input() titleColor?: ColorScheme;
   @Input() valueColor?: ColorScheme;

@@ -11,6 +11,36 @@ export type PortfolioRisk = {
   annualVolatilityPrct: number;
 };
 
+export type PortfolioState = {
+  /**
+   * userBalance = invested + cashOnHand
+   */
+  userBalance: number;
+  /**
+   * holdingsBalance = closed price * units for each holdings
+   */
+  holdingsBalance: number;
+
+  /**
+   * total invested value into holdings
+   */
+  invested: number;
+  cashOnHand: number;
+  startingCash: number;
+  numberOfExecutedBuyTransactions: number;
+  numberOfExecutedSellTransactions: number;
+  transactionFees: number;
+
+  /**
+   * calculated from holdings and userBalance
+   */
+  totalGainsValue: number;
+  totalGainsPercentage: number;
+
+  firstTransactionDate: string | null;
+  lastTransactionDate: string | null;
+};
+
 export type PortfolioGrowthAssets = {
   symbol: string;
   data: PortfolioGrowthAssetsDataItem[];

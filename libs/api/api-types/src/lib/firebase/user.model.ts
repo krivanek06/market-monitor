@@ -1,4 +1,4 @@
-import { PortfolioTransaction } from './portfolio.model';
+import { PortfolioState, PortfolioTransaction } from './portfolio.model';
 import { SymbolType } from './symbol.model';
 
 export enum UserAccountType {
@@ -20,6 +20,17 @@ export type UserData = {
   };
   settings: UserSettings;
   accountResets: UserAccountResets[];
+
+  /**
+   * user portfolio state calculated from transactions in cloud functions at the end of the day
+   */
+  lastPortfolioState: PortfolioState;
+
+  /**
+   * dates
+   */
+  lastPortfolioStateModifiedDate: string;
+  lastLoginDate: string;
 };
 
 /**
@@ -31,7 +42,6 @@ export type UserAccountResets = {
 };
 
 export type UserPortfolioTransaction = {
-  startingCash: number;
   transactions: PortfolioTransaction[];
 };
 
