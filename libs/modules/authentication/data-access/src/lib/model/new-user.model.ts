@@ -1,4 +1,4 @@
-import { UserData, UserPersonalInfo } from '@market-monitor/api-types';
+import { USER_ROLE, UserData, UserPersonalInfo } from '@market-monitor/api-types';
 export const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
   const newUser: UserData = {
     id,
@@ -8,12 +8,9 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
       groupOwner: [],
       groupWatched: [],
     },
+    role: USER_ROLE.BASIC,
     settings: {
       isProfilePublic: true,
-      isHistoricalAssetsTradingAllowed: true,
-
-      isCreatingGroupAllowed: false,
-      isPortfolioCashActive: false,
     },
     personal: personal,
     accountResets: [],

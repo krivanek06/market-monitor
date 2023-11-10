@@ -1,6 +1,13 @@
 import { Injectable, InjectionToken } from '@angular/core';
 import { UserApiService } from '@market-monitor/api-client';
-import { SymbolType, UserData, UserPortfolioTransaction, UserSettings, UserWatchlist } from '@market-monitor/api-types';
+import {
+  SymbolType,
+  USER_ROLE,
+  UserData,
+  UserPortfolioTransaction,
+  UserSettings,
+  UserWatchlist,
+} from '@market-monitor/api-types';
 import { User } from 'firebase/auth';
 import { Observable, firstValueFrom, map, shareReplay, tap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
@@ -41,6 +48,18 @@ export class AuthenticationUserService {
 
   get userSettings(): UserSettings {
     return this.userData.settings;
+  }
+
+  get isUserRoleAdmin(): boolean {
+    return this.userData.role === USER_ROLE.ADMIN;
+  }
+
+  get isUserRoleBasic(): boolean {
+    return this.userData.role === USER_ROLE.BASIC;
+  }
+
+  get isUserRoleSimulation(): boolean {
+    return this.userData.role === USER_ROLE.SIMULATION;
   }
 
   getUserData(): Observable<UserData> {

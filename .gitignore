@@ -64,4 +64,5 @@ ui-debug.log
 # Cloudflare
 .wrangler
 
+.nx
 package-lock.json
