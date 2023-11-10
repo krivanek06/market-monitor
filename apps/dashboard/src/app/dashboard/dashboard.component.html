@@ -4,7 +4,7 @@
       <app-portfolio-state
         [titleColor]="ColorScheme.PRIMARY_VAR"
         [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-        [showCashSegment]="authenticationUserService.userData.settings.isPortfolioCashActive"
+        [showCashSegment]="authenticationUserService.isUserRoleSimulation"
         [portfolioState]="portfolioState"
       ></app-portfolio-state>
     </app-fancy-card>
@@ -20,7 +20,7 @@
       <app-portfolio-state-transactions
         [titleColor]="ColorScheme.DANGER_VAR"
         [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-        [showFees]="authenticationUserService.userData.settings.isPortfolioCashActive"
+        [showFees]="authenticationUserService.isUserRoleSimulation"
         [portfolioState]="portfolioState"
       ></app-portfolio-state-transactions>
     </app-fancy-card>
@@ -71,7 +71,7 @@
   </div>
 
   <!-- transactions chart -->
-  <ng-container *ngIf="authenticationUserService.userData.settings.isPortfolioCashActive">
+  <ng-container *ngIf="authenticationUserService.isUserRoleSimulation">
     <app-portfolio-transaction-chart
       *ngIf="portfolioTransactionToDateSignal() as portfolioTransactionToDateSignal"
       [data]="portfolioTransactionToDateSignal"

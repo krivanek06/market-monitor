@@ -11,6 +11,7 @@ export enum UserAccountType {
 export type UserData = {
   id: string;
   personal: UserPersonalInfo;
+  role: USER_ROLE;
   groups: {
     groupMember: string[];
     groupOwner: string[];
@@ -32,7 +33,6 @@ export type UserAccountResets = {
 export type UserPortfolioTransaction = {
   startingCash: number;
   transactions: PortfolioTransaction[];
-  // cashDeposit: PortfolioTransactionCash[];
 };
 
 export type UserWatchlist = {
@@ -49,24 +49,15 @@ export type UserPersonalInfo = {
   displayName: string | null;
 };
 
+export enum USER_ROLE {
+  SIMULATION = 'SIMULATION',
+  BASIC = 'BASIC',
+  ADMIN = 'ADMIN',
+}
+
 export type UserSettings = {
-  /**
-   * if true, for each buy/sell transaction, the system will check and adjust the cash on hand
-   * throw error if user doesn't have enough cash on hand on sell operation
-   */
-  isPortfolioCashActive: boolean;
-  /**
-   * if true, user will be able to create groups
-   */
-  isCreatingGroupAllowed: boolean;
   /**
    * if true, other users will be able to find this user portfolio by searching
    */
   isProfilePublic: boolean;
-  /**
-   * if true, user will be able to trade with historical assets,
-   * selecting the date of the transaction in history.
-   * If false user can buy/sell assets only for current date
-   */
-  isHistoricalAssetsTradingAllowed: boolean;
 };

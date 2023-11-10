@@ -86,8 +86,6 @@ export class PortfolioTradeDialogComponent {
     dateFilter: dateIsNotWeekend,
   };
 
-  userSettingsSignal = signal(this.authenticationUserService.userSettings);
-
   // get holding information for symbol if there is any
   holdingSignal = toSignal(this.portfolioUserFacadeService.getPortfolioStateHolding(this.data.summary.id));
   portfolioState = toSignal(this.portfolioUserFacadeService.getPortfolioState());
@@ -125,13 +123,12 @@ export class PortfolioTradeDialogComponent {
 
   constructor(
     private dialogRef: MatDialogRef<PortfolioTradeDialogComponent>,
-    private authenticationUserService: AuthenticationUserService,
+    public authenticationUserService: AuthenticationUserService,
     private portfolioUserFacadeService: PortfolioUserFacadeService,
     private marketApiService: MarketApiService,
     private dialogServiceUtil: DialogServiceUtil,
     @Inject(MAT_DIALOG_DATA) public data: PortfolioTradeDialogComponentData,
   ) {
-    this.form.valueChanges.subscribe(console.log);
     this.listenKeyboardChange();
     this.listenCustomTotalValueChange();
     this.listenOnInSufficientUnits();
@@ -227,7 +224,7 @@ export class PortfolioTradeDialogComponent {
    */
   private listenOnInSufficientCash(): void {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((form) => {
-      if (this.data.transactionType === 'SELL' || !this.userSettingsSignal().isPortfolioCashActive) {
+      if (this.data.transactionType === 'SELL' || !this.authenticationUserService.isUserRoleSimulation) {
         return;
       }
 

@@ -97,8 +97,7 @@ export class PortfolioOperationsService {
     historicalPrice: HistoricalPrice,
     breakEvenPrice: number,
   ): PortfolioTransaction {
-    const userData = this.authenticationUserService.userData;
-    const isTransactionFeesActive = userData.settings.isPortfolioCashActive;
+    const isTransactionFeesActive = this.authenticationUserService.isUserRoleSimulation;
 
     // if custom total value is provided calculate unit price, else use API price
     const unitPrice = input.customTotalValue
@@ -187,7 +186,7 @@ export class PortfolioOperationsService {
     const totalValue = roundNDigits(input.units * historicalPrice.close, 2);
 
     // check if user has enough cash on hand if BUY and cashAccountActive
-    if (input.transactionType === 'BUY' && userData.settings.isPortfolioCashActive) {
+    if (input.transactionType === 'BUY' && this.authenticationUserService.isUserRoleSimulation) {
       // calculate cash on hand from deposits
       const cashOnHandStarting = userTransactionHistory.startingCash;
       // calculate cash on hand from transactions
