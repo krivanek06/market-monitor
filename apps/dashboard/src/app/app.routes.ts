@@ -47,6 +47,10 @@ export const appRoutes: Route[] = [
             loadComponent: () => import('./trading/trading.component').then((m) => m.TradingComponent),
           },
           {
+            path: ROUTES_MAIN.GROUPS,
+            loadComponent: () => import('./groups/groups.component').then((m) => m.GroupsComponent),
+          },
+          {
             path: `${ROUTES_MAIN.STOCK_DETAILS}/:symbol`,
             title: 'Stock Details',
             loadChildren: () => import('./stock-details/stock-details.component').then((m) => m.route),

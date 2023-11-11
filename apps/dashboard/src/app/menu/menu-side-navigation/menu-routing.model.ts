@@ -18,6 +18,11 @@ export const sideNavigation = {
       icon: 'attach_money',
     },
     {
+      path: ROUTES_MAIN.GROUPS,
+      title: 'Groups',
+      icon: 'group',
+    },
+    {
       path: ROUTES_MAIN.SETTING,
       title: 'Settings',
       icon: 'settings',

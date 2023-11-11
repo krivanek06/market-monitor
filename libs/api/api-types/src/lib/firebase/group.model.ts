@@ -2,6 +2,10 @@ export type GroupData = {
   id: string;
   name: string;
   imageUrl: string;
+
+  /**
+   * set to true when endDate is added
+   */
   isClosed: boolean;
 
   /**
@@ -13,7 +17,7 @@ export type GroupData = {
   /**
    * Fields with user ids
    */
-  members: string[];
-  membersInvited: string[];
-  owner: string;
+  memberUserIds: string[];
+  memberInvitedUserIds: string[];
+  ownerUserId: string;
 };

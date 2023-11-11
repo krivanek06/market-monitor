@@ -3,6 +3,7 @@ export enum ROUTES_MAIN {
   LOGIN = 'login',
   SETTING = 'settings',
   TRADING = 'trading',
+  GROUPS = 'groups',
   WATCHLIST = 'watchlist',
   STOCK_DETAILS = 'stock-details',
   SEARCH = 'search',
