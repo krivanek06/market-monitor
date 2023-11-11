@@ -3,7 +3,6 @@ import { userDocumentTransactionHistoryRef, usersCollectionRef } from '@market-m
 import { PortfolioState, PortfolioTransaction, SymbolType, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { getDefaultDateFormat, roundNDigits } from '@market-monitor/shared/utils-general';
 import { format, subDays } from 'date-fns';
-import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 type PortfolioStateHoldingPartial = {
   symbolType: SymbolType;
@@ -24,55 +23,54 @@ type PortfolioStateHoldingPartial = {
  *
  * At every 5th minute past every hour from 1 through 2am
  */
-export const run_user_portfolio_state_scheduler = onSchedule(
-  {
-    timeoutSeconds: 200,
-    schedule: '*/5 1-2 * * *',
-  },
-  async (event) => {
-    const today = getDefaultDateFormat();
-    const twoWeeksBefore = format(subDays(new Date(), 14), 'yyyy-MM-dd');
+export const executeUserPortfolioUpdate = async (): Promise<void> => {
+  const today = getDefaultDateFormat();
+  const twoWeeksBefore = format(subDays(new Date(), 14), 'yyyy-MM-dd');
 
-    // load users to calculate balance
-    const userToUpdate = usersCollectionRef()
-      .where('role', '==', 'SIMULATION')
-      .where('lastLoginDate', '>=', twoWeeksBefore)
-      .where('lastPortfolioStateModifiedDate', '!=', today)
-      .limit(200);
+  // load users to calculate balance
+  const userToUpdate = usersCollectionRef()
+    .where('role', '==', 'SIMULATION')
+    // .where('lastLoginDate', '>=', twoWeeksBefore) // not able to use this filter
+    .where('lastPortfolioStateModifiedDate', '!=', today)
+    .orderBy('lastPortfolioStateModifiedDate', 'desc')
+    .orderBy('lastLoginDate', 'desc')
+    .limit(200);
 
-    const users = await userToUpdate.get();
+  const users = await userToUpdate.get();
 
-    // loop though users, load transactions and calculate balance
-    for await (const userDoc of users.docs) {
-      // load transaction per user
-      const transactionRef = userDocumentTransactionHistoryRef(userDoc.id);
-      const transactions = (await transactionRef.get()).data();
-      const user = userDoc.data();
+  console.log('Loaded: ', users.docs.length);
 
-      try {
-        // get portfolio state
-        const portfolioState = await getPortfolioState(user.lastPortfolioState.cashOnHand, transactions);
+  // loop though users, load transactions and calculate balance
+  for await (const userDoc of users.docs) {
+    // load transaction per user
+    const transactionRef = userDocumentTransactionHistoryRef(userDoc.id);
+    const transactions = (await transactionRef.get()).data();
+    const user = userDoc.data();
 
-        // update user
-        userDoc.ref.update({
-          lastPortfolioState: portfolioState,
-          lastPortfolioStateModifiedDate: today,
-        });
+    try {
+      // get portfolio state
+      const portfolioState = await getPortfolioState(user.lastPortfolioState.cashOnHand, transactions);
 
-        // log
-        console.log(`Updated user: ${user.personal.displayName}, ${userDoc.id}`);
-      } catch (e) {
-        console.warn(`Error for user: ${user.personal.displayName}, ${userDoc.id}: ${e}`);
-      }
+      // update user
+      userDoc.ref.update({
+        lastPortfolioState: portfolioState,
+        lastPortfolioStateModifiedDate: today,
+      });
+
+      // log
+      console.log(`Updated user: ${user.personal.displayName}, ${userDoc.id}`);
+    } catch (e) {
+      console.warn(`Error for user: ${user.personal.displayName}, ${userDoc.id}: ${e}`);
     }
-  },
-);
+
+    console.log('Finished');
+  }
+};
 
 const getPortfolioState = async (
   cashOnHandFromDeposit: number,
   portfolioTransactions: UserPortfolioTransaction,
 ): Promise<PortfolioState> => {
-  console.log(`PortfolioGrowthService: getPortfolioState`);
   const transactions = portfolioTransactions.transactions;
 
   // accumulate cash on hand from transactions
@@ -92,7 +90,7 @@ const getPortfolioState = async (
   // get symbol summaries from API
   const summaries = await getSymbolSummaries(partialHoldingSymbols);
 
-  console.log(`Sending ${partialHoldings.length}, receiving: ${summaries.length}`);
+  console.log(`Getting Summaries: sending ${partialHoldings.length}, receiving: ${summaries.length}`);
 
   const holdings = summaries.map((symbolSummary) => {
     const holding = partialHoldings.find((d) => d.symbol === symbolSummary.id);
@@ -109,22 +107,22 @@ const getPortfolioState = async (
   const invested = holdings.reduce((acc, curr) => acc + curr.invested, 0);
   const userBalance = invested + cashOnHandFromDeposit + cashOnHandTransactions;
   const holdingsBalance = holdings.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0);
-  const totalGainsValue = roundNDigits(holdingsBalance - invested, 2);
-  const totalGainsPercentage = roundNDigits((holdingsBalance - invested) / holdingsBalance, 6);
+  const totalGainsValue = holdingsBalance - invested;
+  const totalGainsPercentage = (holdingsBalance - invested) / holdingsBalance;
   const firstTransactionDate = transactions[0].date;
   const lastTransactionDate = transactions[transactions.length - 1].date;
 
   const result: PortfolioState = {
     numberOfExecutedBuyTransactions,
     numberOfExecutedSellTransactions,
-    transactionFees,
-    cashOnHand: cashOnHandFromDeposit + cashOnHandTransactions,
-    userBalance,
-    invested,
-    holdingsBalance,
-    totalGainsValue,
-    totalGainsPercentage,
-    startingCash: cashOnHandFromDeposit,
+    transactionFees: roundNDigits(transactionFees, 2),
+    cashOnHand: roundNDigits(cashOnHandFromDeposit + cashOnHandTransactions, 2),
+    userBalance: roundNDigits(userBalance, 2),
+    invested: roundNDigits(invested, 2),
+    holdingsBalance: roundNDigits(holdingsBalance, 2),
+    totalGainsValue: roundNDigits(totalGainsValue, 2),
+    totalGainsPercentage: roundNDigits(totalGainsPercentage, 6),
+    startingCash: roundNDigits(cashOnHandFromDeposit, 2),
     firstTransactionDate,
     lastTransactionDate,
   };

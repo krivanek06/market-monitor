@@ -1,7 +1,9 @@
-import { getMarketOverviewDataWrapper } from './market-functions/market-overview';
+import { getMarketOverviewDataWrapper, reloadMarketOverview } from './market-functions/market-overview';
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
 import * as admin from 'firebase-admin';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { executeUserPortfolioUpdate } from './user/user-portfolio-state';
 import { corsMiddleWare, firebaseSimpleErrorLogger } from './utils';
 
 const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
@@ -37,14 +39,45 @@ admin.firestore().settings({
   ignoreUndefinedProperties: true,
 });
 
-// must be below setGlobalOptions otherwise it will not set the region
-export * from './market-functions/market-overview';
-export * from './user/user-portfolio-state-scheduler';
+// -------- Testing ---------
+
+// export const test_me = firebaseSimpleErrorLogger(
+//   'test_function',
+//   corsMiddleWare(async (request, response) => {
+//     console.log('Run Test Function');
+
+//     executeUserPortfolioUpdate();
+//   }),
+// );
+
+// -------- Production ---------
 
 // wrap functions with sentry
 export const getmarketoverviewdata = firebaseSimpleErrorLogger(
   'getMarketOverviewDataWrapper',
   corsMiddleWare(getMarketOverviewDataWrapper),
+);
+
+// -------- Scheduler ---------
+
+export const run_user_portfolio_state_scheduler = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '*/5 1-2 * * *',
+  },
+  async (event) => {
+    executeUserPortfolioUpdate();
+  },
+);
+
+export const run_reload_market_overview = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '0 22 * * 5',
+  },
+  async () => {
+    reloadMarketOverview();
+  },
 );
 
 // function for SSR

@@ -16,7 +16,6 @@ import {
   marketOverviewLoadTreasury,
 } from '@market-monitor/api-types';
 import { Request, Response } from 'express';
-import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 export const getMarketOverviewDataWrapper = async (request: Request, response: Response<ChartDataType | string>) => {
   // i.e: sp500
@@ -39,24 +38,10 @@ export const getMarketOverviewDataWrapper = async (request: Request, response: R
   }
 };
 
-export const run_reload_market_overview = onSchedule(
-  {
-    timeoutSeconds: 200,
-    schedule: '0 22 * * 5',
-  },
-  async (event) => {
-    // reload data from api
-    const loadedData = await reloadMarketOverview();
-
-    // send data into cloudflare to save into KV
-    await postMarketOverview(loadedData);
-
-    // send notification to user
-    console.log('function rungetmarketoverview finished successfully');
-  },
-);
-
-const reloadMarketOverview = async (): Promise<MarketOverview> => {
+/**
+ * reload market overview data and save into cloudflare
+ */
+export const reloadMarketOverview = async (): Promise<void> => {
   const waitingSeconds = 11;
   const datasetLimit = 150;
   const startTime = Date.now();
@@ -123,12 +108,15 @@ const reloadMarketOverview = async (): Promise<MarketOverview> => {
     },
   };
 
+  console.log('Saving data into cloudflare');
+
+  // send data into cloudflare to save into KV
+  await postMarketOverview(marketOverview);
+
   // display how many seconds it took to load data
   const endTime = Date.now();
   const seconds = (endTime - startTime) / 1000;
   console.log(`loading data took ${seconds} seconds`);
-
-  return marketOverview;
 };
 
 const loadMarketOverviewData = async <T extends MarketOverviewKey>(
