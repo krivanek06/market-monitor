@@ -1,7 +1,8 @@
+import { getMarketOverviewDataWrapper } from './market-functions/market-overview';
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
 import * as admin from 'firebase-admin';
-import { onRequest } from 'firebase-functions/v2/https';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
+import { corsMiddleWare, firebaseSimpleErrorLogger } from './utils';
 
 const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
 
@@ -19,7 +20,7 @@ admin.initializeApp({
 });
 
 // firebase functions region
-setGlobalOptions({ region: 'europe-west3', maxInstances: 5 });
+setGlobalOptions({ region: 'europe-west3', maxInstances: 3 });
 
 // sentry - not yet setup
 // GCPFunction.init({
@@ -37,11 +38,15 @@ admin.firestore().settings({
 });
 
 // must be below setGlobalOptions otherwise it will not set the region
-export * from './functions-public';
+export * from './market-functions/market-overview';
+export * from './user/user-portfolio-state-scheduler';
+
+// wrap functions with sentry
+export const getmarketoverviewdata = firebaseSimpleErrorLogger(
+  'getMarketOverviewDataWrapper',
+  corsMiddleWare(getMarketOverviewDataWrapper),
+);
 
 // function for SSR
-const universal = require(`${process.cwd()}/server/main`).app();
-export const ssr = onRequest(universal);
-
-// ONLY ALLOW IN LOCAL
-// export * from './functions-admin';
+// const universal = require(`${process.cwd()}/server/main`).app();
+// export const ssr = onRequest(universal);
