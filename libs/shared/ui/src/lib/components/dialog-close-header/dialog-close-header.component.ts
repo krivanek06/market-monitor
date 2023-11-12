@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
     <div class="flex items-center justify-between p-4">
       <h2 class="text-xl text-wt-primary mb-0">{{ title }}</h2>
 
-      <div>
+      <div *ngIf="showCloseButton">
         <button mat-icon-button color="warn" type="button" (click)="onDialogClose()">
           <mat-icon>close</mat-icon>
         </button>
@@ -24,6 +24,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class DialogCloseHeaderComponent {
   @Output() dialogCloseEmitter = new EventEmitter<void>();
   @Input() title!: string;
+  @Input() showCloseButton = true;
 
   constructor(@Optional() @SkipSelf() private dialogRef: MatDialogRef<unknown>) {}
 

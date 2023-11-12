@@ -1,0 +1,57 @@
+<app-dialog-close-header [showCloseButton]="false" title="Create Group"></app-dialog-close-header>
+<!-- form -->
+<form [formGroup]="form" (ngSubmit)="onFormSubmit()">
+  <mat-dialog-content>
+    <div class="flex gap-4">
+      <!-- upload image -->
+      <div class="h-[200px] w-[200px] bg-slate-400">Upload Image</div>
+
+      <!-- additional forms -->
+      <div class="flex-1">
+        <!-- group name -->
+        <app-form-mat-input-wrapper
+          formControlName="groupName"
+          inputCaption="Group Name"
+          inputType="TEXT"
+        ></app-form-mat-input-wrapper>
+
+        <!-- is public -->
+        <app-form-mat-input-wrapper
+          formControlName="isPublic"
+          inputCaption="Is Group Public"
+          inputType="CHECKBOX"
+          hintText="If selected people can request be member of a group"
+        ></app-form-mat-input-wrapper>
+
+        <!-- add owner as member -->
+        <app-form-mat-input-wrapper
+          formControlName="isMember"
+          inputCaption="Add owner as member"
+          inputType="CHECKBOX"
+          hintText="If selected the owner will be added as a member of the group"
+        ></app-form-mat-input-wrapper>
+      </div>
+    </div>
+
+    <!-- invite member -->
+    <div class="my-8 text-lg">Invite People</div>
+  </mat-dialog-content>
+
+  <div class="my-4">
+    <mat-divider></mat-divider>
+  </div>
+
+  <mat-dialog-actions>
+    <div class="g-mat-dialog-actions-end">
+      <button mat-flat-button mat-dialog-close type="button">Cancel</button>
+      <button type="submit" mat-flat-button color="primary">Save</button>
+    </div>
+  </mat-dialog-actions>
+</form>
+
+<!-- loader -->
+<ng-template #showLoader>
+  <div class="grid py-16 place-content-center">
+    <mat-spinner [diameter]="100"></mat-spinner>
+  </div>
+</ng-template>

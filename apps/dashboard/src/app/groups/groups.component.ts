@@ -1,12 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { GroupCreateDialogComponent } from '@market-monitor/modules/group/features';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 
 @Component({
   selector: 'app-groups',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, GroupCreateDialogComponent, MatDialogModule],
   templateUrl: './groups.component.html',
   styles: [
     `
@@ -18,7 +21,12 @@ import { MatIconModule } from '@angular/material/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupsComponent {
+  dialog = inject(MatDialog);
+
   onCreateGroupClick(): void {
-    console.log('onCreateGroupClick');
+    this.dialog.open(GroupCreateDialogComponent, {
+      data: {},
+      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+    });
   }
 }
