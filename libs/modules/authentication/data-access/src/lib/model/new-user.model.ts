@@ -1,4 +1,4 @@
-import { USER_ROLE, UserData, UserPersonalInfo } from '@market-monitor/api-types';
+import { UserData, UserPersonalInfo } from '@market-monitor/api-types';
 import { getDefaultDateFormat } from '@market-monitor/shared/utils-general';
 export const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
   const newUser: UserData = {
@@ -9,7 +9,6 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
       groupOwner: [],
       groupWatched: [],
     },
-    role: USER_ROLE.BASIC,
     settings: {
       isProfilePublic: true,
     },
@@ -31,6 +30,7 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
     },
     lastPortfolioStateModifiedDate: getDefaultDateFormat(),
     lastLoginDate: getDefaultDateFormat(),
+    accountCreatedDate: getDefaultDateFormat(),
   };
   return newUser;
 };

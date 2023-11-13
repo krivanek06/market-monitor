@@ -2,7 +2,7 @@ import { Injectable, InjectionToken } from '@angular/core';
 import { UserApiService } from '@market-monitor/api-client';
 import {
   SymbolType,
-  USER_ROLE,
+  USER_ACCOUNT_TYPE,
   UserData,
   UserPortfolioTransaction,
   UserSettings,
@@ -51,15 +51,15 @@ export class AuthenticationUserService {
   }
 
   get isUserRoleAdmin(): boolean {
-    return this.userData.role === USER_ROLE.ADMIN;
+    return this.userData.personal.accountType === USER_ACCOUNT_TYPE.ADMIN;
   }
 
   get isUserRoleBasic(): boolean {
-    return this.userData.role === USER_ROLE.BASIC;
+    return this.userData.personal.accountType === USER_ACCOUNT_TYPE.BASIC;
   }
 
   get isUserRoleSimulation(): boolean {
-    return this.userData.role === USER_ROLE.SIMULATION;
+    return this.userData.personal.accountType === USER_ACCOUNT_TYPE.SIMULATION;
   }
 
   getUserData(): Observable<UserData> {

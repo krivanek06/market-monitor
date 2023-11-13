@@ -1,17 +1,9 @@
 import { PortfolioState, PortfolioTransaction } from './portfolio.model';
 import { SymbolType } from './symbol.model';
 
-export enum UserAccountType {
-  TEST = 'TEST',
-  ADMIN = 'ADMIN',
-  DISABLES = 'DISABLED',
-  ACCOUNT_TYPE_1 = 'ACCOUNT_TYPE_1',
-}
-
 export type UserData = {
   id: string;
   personal: UserPersonalInfo;
-  role: USER_ROLE;
   groups: {
     groupMember: string[];
     groupOwner: string[];
@@ -31,6 +23,7 @@ export type UserData = {
    */
   lastPortfolioStateModifiedDate: string;
   lastLoginDate: string;
+  accountCreatedDate: string;
 };
 
 /**
@@ -54,12 +47,12 @@ export type UserWatchlist = {
 };
 
 export type UserPersonalInfo = {
-  accountType: UserAccountType;
+  accountType: USER_ACCOUNT_TYPE;
   photoURL: string | null;
-  displayName: string | null;
+  displayName: string;
 };
 
-export enum USER_ROLE {
+export enum USER_ACCOUNT_TYPE {
   SIMULATION = 'SIMULATION',
   BASIC = 'BASIC',
   ADMIN = 'ADMIN',

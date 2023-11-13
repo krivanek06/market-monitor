@@ -1,23 +1,29 @@
 import { Injectable } from '@angular/core';
 import {
+  CollectionReference,
   DocumentReference,
   Firestore,
   arrayRemove,
   arrayUnion,
   collection,
   doc,
+  limit,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from '@angular/fire/firestore';
 import {
   PortfolioTransaction,
   SymbolType,
+  USER_ACCOUNT_TYPE,
   UserData,
   UserPortfolioTransaction,
   UserWatchlist,
 } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
-import { docData as rxDocData } from 'rxfire/firestore';
+import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
+import { DocumentData } from 'rxfire/firestore/interfaces';
 import { Observable, filter, map } from 'rxjs';
 
 @Injectable({
@@ -34,6 +40,18 @@ export class UserApiService {
         // sort ASC
         transactions: d.transactions.slice().sort((a, b) => (a.date > b.date ? 1 : -1)),
       })),
+    );
+  }
+
+  /**
+   *
+   * @param name prefix name
+   * @returns list of users by the name prefix
+   */
+  getUsersByName(name: string): Observable<UserData[]> {
+    // where('personal.displayName', '==', name)
+    return rxCollectionData(
+      query(this.userCollection(), where('personal.accountType', '==', USER_ACCOUNT_TYPE.SIMULATION), limit(10)),
     );
   }
 
@@ -94,18 +112,26 @@ export class UserApiService {
   /* private */
 
   private getUserDocRef(userId: string): DocumentReference<UserData> {
-    return doc(collection(this.firestore, 'users').withConverter(assignTypesClient<UserData>()), userId);
+    return doc(this.userCollection(), userId);
   }
 
   private getUserPortfolioTransactionDocRef(userId: string): DocumentReference<UserPortfolioTransaction> {
-    return doc(this.firestore, 'users', userId, 'more_information', 'transactions').withConverter(
+    return doc(this.userCollectionMoreInformationRef(userId), 'transactions').withConverter(
       assignTypesClient<UserPortfolioTransaction>(),
     );
   }
 
   private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchlist> {
-    return doc(this.firestore, 'users', userId, 'more_information', 'watchlist').withConverter(
+    return doc(this.userCollectionMoreInformationRef(userId), 'watchlist').withConverter(
       assignTypesClient<UserWatchlist>(),
     );
+  }
+
+  private userCollectionMoreInformationRef(userId: string): CollectionReference<DocumentData, DocumentData> {
+    return collection(doc(this.userCollection(), userId), 'more_information');
+  }
+
+  private userCollection(): CollectionReference<UserData, DocumentData> {
+    return collection(this.firestore, 'users').withConverter(assignTypesClient<UserData>());
   }
 }
