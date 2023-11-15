@@ -3,6 +3,7 @@ import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   PreloadAllModules,
@@ -17,12 +18,14 @@ import {
 } from '@market-monitor/modules/authentication/data-access';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     importProvidersFrom([
       provideFirebaseApp(() => initializeApp(environment.firebase)),
       provideFirestore(() => getFirestore()),
       provideAuth(() => getAuth()),
+      provideStorage(() => getStorage()),
     ]),
     provideHttpClient(),
     provideRouter(

@@ -4,12 +4,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { GroupCreateDialogComponent } from '@market-monitor/modules/group/features';
+import { UploadImageSingleComponent } from '@market-monitor/shared/features';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 
 @Component({
   selector: 'app-groups',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, GroupCreateDialogComponent, MatDialogModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatButtonModule,
+    GroupCreateDialogComponent,
+    MatDialogModule,
+    UploadImageSingleComponent,
+  ],
   templateUrl: './groups.component.html',
   styles: [
     `

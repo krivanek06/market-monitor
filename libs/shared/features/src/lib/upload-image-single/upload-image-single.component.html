@@ -1,0 +1,25 @@
+<div
+  class="grid w-full h-full text-center transition-all duration-300 ease-in-out border rounded-md cursor-pointer border-wt-gray-medium hover:border-wt-gray-dark hover:shadow-lg ripple-container bg-wt-gray-light place-content-center hover:bg-wt-gray-medium opacity-80 hover:text-wt-gray-light"
+  matRipple
+  [matRippleCentered]="true"
+  [matRippleDisabled]="false"
+  [matRippleUnbounded]="false"
+  [matRippleColor]="ColorScheme.GRAY_LIGHT_STRONG_VAR"
+  (click)="fileUpload.click()"
+>
+  <input style="display: none" type="file" (change)="onFileSelected($event)" #fileUpload />
+  <div *ngIf="!lastFileUploadSignal()">Click To Upload</div>
+
+  <!-- uploaded image -->
+  <ng-container *ngIf="lastFileUploadSignal() as data" class="p-3">
+    <img appDefaultImg [src]="data.downloadURL" class="w-full h-full" alt="image upload" />
+  </ng-container>
+</div>
+
+<!-- progress -->
+<ng-container *ngIf="percentage$ | async as pct">
+  <div *ngIf="isUploadingSignal()" class="flex flex-col items-center mt-4">
+    <div class="text-center">{{ pct | number }}%</div>
+    <mat-progress-bar mode="determinate" [value]="pct" max="100"></mat-progress-bar>
+  </div>
+</ng-container>

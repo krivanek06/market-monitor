@@ -1,4 +1,5 @@
 export * from './calendar-asset.model';
+export * from './general-constants.model';
 export * from './market-data.model';
 export * from './portfolio.model';
 export * from './stock-data-modified.model';

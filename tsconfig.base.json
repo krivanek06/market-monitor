@@ -39,6 +39,7 @@
       "@market-monitor/modules/user/features": ["libs/modules/user/features/src/index.ts"],
       "@market-monitor/modules/user/ui": ["libs/modules/user/ui/src/index.ts"],
       "@market-monitor/shared/data-access": ["libs/shared/data-access/src/index.ts"],
+      "@market-monitor/shared/features": ["libs/shared/features/src/index.ts"],
       "@market-monitor/shared/ui": ["libs/shared/ui/src/index.ts"],
       "@market-monitor/shared/utils-client": ["libs/shared/utils/utils-client/src/index.ts"],
       "@market-monitor/shared/utils-general": ["libs/shared/utils/utils-general/src/index.ts"]

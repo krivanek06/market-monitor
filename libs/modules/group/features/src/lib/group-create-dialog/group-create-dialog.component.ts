@@ -104,14 +104,14 @@ export class GroupCreateDialogComponent implements OnInit {
         return;
       }
 
-      // prevent adding myself
-      if (userData.id === this.authenticationUserService.userData.id) {
-        this.dialogServiceUtil.showNotificationBar(
-          'You cannot add invite yourself. Check the above checkbox for it',
-          'error',
-        );
-        return;
-      }
+      // prevent adding myself // TODO: comment out for now
+      // if (userData.id === this.authenticationUserService.userData.id) {
+      //   this.dialogServiceUtil.showNotificationBar(
+      //     'You cannot add invite yourself. Check the above checkbox for it',
+      //     'error',
+      //   );
+      //   return;
+      // }
 
       // check if user is already added
       const userIds = this.selectedUsersSignal().map((d) => d.id);
