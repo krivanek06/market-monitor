@@ -37,6 +37,8 @@ export type GroupData = {
    * Fields with user ids
    */
   ownerUserId: string;
+  ownerUser: UserBase;
+
   /**
    * user ids that are members
    */
@@ -44,19 +46,29 @@ export type GroupData = {
   /**
    * user ids that are invited
    */
-  memberInvitedUserIds: string[];
+  memberInvitedUserIds: {
+    userId: string;
+    date: string;
+  }[];
   /**
    * user ids that requested to join the group
    */
-  memberRequestUserIds: string[];
+  memberRequestUserIds: {
+    userId: string;
+    date: string;
+  }[];
 };
 
-export type GroupDetailsData = {
+export type GroupTransactionsData = {
+  lastModifiedDate: string;
+
+  // memberInvitedUsers: UserBase[];
+  // memberRequestUsers: UserBase[];
+  lastTransactions: PortfolioTransaction[];
+  // topTransaction: PortfolioTransaction[];
+};
+
+export type GroupMembersData = {
   lastModifiedDate: string;
   memberUsers: UserBase[];
-  ownerUser: UserBase;
-  memberInvitedUsers: UserBase[];
-  memberRequestUsers: UserBase[];
-  lastTransactions: PortfolioTransaction[];
-  // topTransaction: PortfolioTransaction[]; // TODO implement
 };

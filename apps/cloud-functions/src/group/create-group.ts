@@ -1,24 +1,26 @@
-import { GROUP_OWNER_LIMIT, GroupCreateInput, GroupData } from '@market-monitor/api-types';
+import { GROUP_OWNER_LIMIT, GroupCreateInput, GroupData, UserBase } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { onCall } from 'firebase-functions/v2/https';
 import { arrayUnion } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
-import { groupDocumentRef, userDocumentRef } from '../models';
+import { groupDocumentMembersRef, groupDocumentRef, groupDocumentTransactionsRef, userDocumentRef } from '../models';
+import { transformUserToBase } from '../utils';
 
 export const createGroupWrapper = onCall(async (request) => {
   const data = request.data as GroupCreateInput;
-  const user = request.auth?.uid;
+  const userAuthId = request.auth?.uid;
 
-  if (!user) {
+  if (!userAuthId) {
     throw new Error('User not authenticated');
   }
 
   console.log('data', data);
-  console.log('user', user);
+  console.log('user', userAuthId);
 
   // load user data from firebase
-  const userDataDoc = await userDocumentRef(user).get();
+  const userDataDoc = await userDocumentRef(userAuthId).get();
   const userData = userDataDoc.data();
+  const userBase = transformUserToBase(userData);
 
   // check limit
   if (userData.groups.groupOwner.length >= GROUP_OWNER_LIMIT) {
@@ -26,10 +28,22 @@ export const createGroupWrapper = onCall(async (request) => {
   }
 
   // create group
-  const newGroup = createGroup(data, user);
+  const newGroup = createGroup(data, userBase);
+  const groupRef = groupDocumentRef(newGroup.id);
 
   // save new group
-  await groupDocumentRef(newGroup.id).set(newGroup);
+  await groupRef.set(newGroup);
+
+  // create additional documents for group
+  await groupDocumentTransactionsRef(newGroup.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    lastTransactions: [],
+  });
+
+  await groupDocumentMembersRef(newGroup.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    memberUsers: [],
+  });
 
   // update member list
   for await (const memberId of data.memberInvitedUserIds) {
@@ -51,14 +65,18 @@ export const createGroupWrapper = onCall(async (request) => {
   return newGroup;
 });
 
-const createGroup = (data: GroupCreateInput, ownerId: string): GroupData => {
+const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
   return {
     id: uuidv4(),
     name: data.groupName,
     imageUrl: data.imageUrl,
     isPublic: data.isPublic,
-    memberInvitedUserIds: data.memberInvitedUserIds,
-    ownerUserId: ownerId,
+    memberInvitedUserIds: data.memberInvitedUserIds.map((d) => ({
+      userId: d,
+      date: getCurrentDateDefaultFormat(),
+    })),
+    ownerUserId: owner.id,
+    ownerUser: owner,
     createdDate: getCurrentDateDefaultFormat(),
     isClosed: false,
     memberRequestUserIds: [],

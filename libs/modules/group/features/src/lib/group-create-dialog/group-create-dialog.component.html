@@ -71,7 +71,8 @@
 
 <!-- loader -->
 <ng-template #showLoader>
-  <div class="grid py-16 place-content-center">
-    <mat-spinner [diameter]="100"></mat-spinner>
+  <div class="grid gap-5 py-16 place-content-center">
+    <mat-spinner [diameter]="100" class="m-auto"></mat-spinner>
+    <div class="text-center text-wt-gray-medium">This may time a while. Please wait...</div>
   </div>
 </ng-template>
