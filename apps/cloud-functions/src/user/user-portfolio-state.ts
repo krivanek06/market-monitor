@@ -1,8 +1,8 @@
 import { getSymbolSummaries } from '@market-monitor/api-external';
-import { userDocumentTransactionHistoryRef, usersCollectionRef } from '@market-monitor/api-firebase';
 import { PortfolioState, PortfolioTransaction, SymbolType, UserPortfolioTransaction } from '@market-monitor/api-types';
-import { getDefaultDateFormat, roundNDigits } from '@market-monitor/shared/utils-general';
+import { getCurrentDateDefaultFormat, roundNDigits } from '@market-monitor/shared/utils-general';
 import { format, subDays } from 'date-fns';
+import { userDocumentTransactionHistoryRef, usersCollectionRef } from '../models';
 
 type PortfolioStateHoldingPartial = {
   symbolType: SymbolType;
@@ -24,7 +24,7 @@ type PortfolioStateHoldingPartial = {
  * At every 5th minute past every hour from 1 through 2am
  */
 export const executeUserPortfolioUpdate = async (): Promise<void> => {
-  const today = getDefaultDateFormat();
+  const today = getCurrentDateDefaultFormat();
   const twoWeeksBefore = format(subDays(new Date(), 14), 'yyyy-MM-dd');
 
   // load users to calculate balance

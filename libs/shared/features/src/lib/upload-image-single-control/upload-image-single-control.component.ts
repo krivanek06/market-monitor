@@ -1,6 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  forwardRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { Storage, UploadTask, getDownloadURL, percentage, ref, uploadBytesResumable } from '@angular/fire/storage';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatRippleModule } from '@angular/material/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ColorScheme } from '@market-monitor/shared/data-access';
@@ -14,10 +24,24 @@ export interface UploadedFile {
 }
 
 @Component({
-  selector: 'app-upload-image-single',
+  selector: 'app-upload-image-single-control',
   standalone: true,
-  imports: [CommonModule, MatRippleModule, DialogServiceModule, DefaultImgDirective, MatProgressBarModule],
-  templateUrl: './upload-image-single.component.html',
+  imports: [
+    CommonModule,
+    MatRippleModule,
+    DialogServiceModule,
+    DefaultImgDirective,
+    MatProgressBarModule,
+    ReactiveFormsModule,
+  ],
+  templateUrl: './upload-image-single-control.component.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => UploadImageSingleControlComponent),
+      multi: true,
+    },
+  ],
   styles: [
     `
       :host {
@@ -49,7 +73,7 @@ export interface UploadedFile {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UploadImageSingleComponent {
+export class UploadImageSingleControlComponent implements ControlValueAccessor {
   @Output() uploadedFilesEmitter: EventEmitter<UploadedFile> = new EventEmitter<UploadedFile>();
 
   /**
@@ -64,6 +88,9 @@ export class UploadImageSingleComponent {
 
   dialogServiceUtil = inject(DialogServiceUtil);
   storage = inject(Storage);
+
+  onChange: (value: UploadedFile) => void = () => {};
+  onTouched = () => {};
 
   ColorScheme = ColorScheme;
 
@@ -94,6 +121,21 @@ export class UploadImageSingleComponent {
         );
       }
     }
+  }
+
+  writeValue(obj: null): void {}
+  /**
+   * Register Component's ControlValueAccessor onChange callback
+   */
+  registerOnChange(fn: UploadImageSingleControlComponent['onChange']): void {
+    this.onChange = fn;
+  }
+
+  /**
+   * Register Component's ControlValueAccessor onTouched callback
+   */
+  registerOnTouched(fn: UploadImageSingleControlComponent['onTouched']): void {
+    this.onTouched = fn;
   }
 
   private startUpload(file: File) {
@@ -131,6 +173,8 @@ export class UploadImageSingleComponent {
         this.isUploadingSignal.set(false);
         this.lastFileUploadSignal.set({ downloadURL, path });
 
+        // notify parent
+        this.onChange({ downloadURL, path });
         this.uploadedFilesEmitter.emit({ downloadURL, path });
       });
   }

@@ -4,7 +4,7 @@ import * as admin from 'firebase-admin';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { executeUserPortfolioUpdate } from './user/user-portfolio-state';
-import { corsMiddleWare, firebaseSimpleErrorLogger } from './utils';
+import { corsMiddleWareHttp, firebaseSimpleErrorLogger } from './utils';
 
 const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
 
@@ -51,11 +51,12 @@ admin.firestore().settings({
 // );
 
 // -------- Production ---------
+export { createGroupWrapper } from './group/create-group';
 
 // wrap functions with sentry
 export const getmarketoverviewdata = firebaseSimpleErrorLogger(
   'getMarketOverviewDataWrapper',
-  corsMiddleWare(getMarketOverviewDataWrapper),
+  corsMiddleWareHttp(getMarketOverviewDataWrapper),
 );
 
 // -------- Scheduler ---------

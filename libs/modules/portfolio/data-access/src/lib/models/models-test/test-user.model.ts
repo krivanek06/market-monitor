@@ -1,5 +1,5 @@
 import { USER_ACCOUNT_TYPE, UserData } from '@market-monitor/api-types';
-import { getDefaultDateFormat } from '@market-monitor/shared/utils-general';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 
 export const USER_TEST_1_ID = 'USER_TEST_1';
 
@@ -35,9 +35,9 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       firstTransactionDate: null,
       lastTransactionDate: null,
     },
-    lastPortfolioStateModifiedDate: getDefaultDateFormat(),
-    lastLoginDate: getDefaultDateFormat(),
-    accountCreatedDate: getDefaultDateFormat(),
+    lastPortfolioStateModifiedDate: getCurrentDateDefaultFormat(),
+    lastLoginDate: getCurrentDateDefaultFormat(),
+    accountCreatedDate: getCurrentDateDefaultFormat(),
   };
 
   return { ...defaultUser, ...data };

@@ -1,9 +1,19 @@
 import { PortfolioState, PortfolioTransaction } from './portfolio.model';
 import { SymbolType } from './symbol.model';
 
-export type UserData = {
+export type UserBase = {
   id: string;
   personal: UserPersonalInfo;
+
+  /**
+   * user portfolio state calculated from transactions in cloud functions at the end of the day
+   */
+  lastPortfolioState: PortfolioState;
+
+  accountCreatedDate: string;
+};
+
+export type UserData = UserBase & {
   groups: {
     groupMember: string[];
     groupOwner: string[];
@@ -14,16 +24,10 @@ export type UserData = {
   accountResets: UserAccountResets[];
 
   /**
-   * user portfolio state calculated from transactions in cloud functions at the end of the day
-   */
-  lastPortfolioState: PortfolioState;
-
-  /**
    * dates
    */
   lastPortfolioStateModifiedDate: string;
   lastLoginDate: string;
-  accountCreatedDate: string;
 };
 
 /**

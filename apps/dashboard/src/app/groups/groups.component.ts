@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { GroupCreateDialogComponent } from '@market-monitor/modules/group/features';
-import { UploadImageSingleComponent } from '@market-monitor/shared/features';
+import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 
 @Component({
@@ -16,7 +16,7 @@ import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
     MatButtonModule,
     GroupCreateDialogComponent,
     MatDialogModule,
-    UploadImageSingleComponent,
+    UploadImageSingleControlComponent,
   ],
   templateUrl: './groups.component.html',
   styles: [

@@ -103,7 +103,7 @@ export const dateFormatDate = (inputDate: DateInput, formateStr: string = 'yyyy-
   return format(date, formateStr);
 };
 
-export const getDefaultDateFormat = (): string => {
+export const getCurrentDateDefaultFormat = (): string => {
   return dateFormatDate(new Date(), 'yyyy-MM-dd');
 };
 

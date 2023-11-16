@@ -1,10 +1,15 @@
 <app-dialog-close-header [showCloseButton]="false" title="Create Group"></app-dialog-close-header>
 <!-- form -->
 <form [formGroup]="form" (ngSubmit)="onFormSubmit()">
-  <mat-dialog-content>
+  <mat-dialog-content *ngIf="!loaderSignal(); else showLoader">
     <div class="flex gap-4">
       <!-- upload image -->
-      <div class="h-[200px] w-[200px] bg-slate-400">Upload Image</div>
+      <div class="w-[250px] h-[250px]">
+        <app-upload-image-single-control
+          filePath="groups"
+          formControlName="uploadedImage"
+        ></app-upload-image-single-control>
+      </div>
 
       <!-- additional forms -->
       <div class="flex-1">
@@ -25,7 +30,7 @@
 
         <!-- add owner as member -->
         <app-form-mat-input-wrapper
-          formControlName="isMember"
+          formControlName="isOwnerMember"
           inputCaption="Add owner as member"
           inputType="CHECKBOX"
           hintText="If selected the owner will be added as a member of the group"
@@ -56,7 +61,7 @@
     <mat-divider></mat-divider>
   </div>
 
-  <mat-dialog-actions>
+  <mat-dialog-actions *ngIf="!loaderSignal()">
     <div class="g-mat-dialog-actions-end">
       <button mat-flat-button mat-dialog-close type="button">Cancel</button>
       <button type="submit" mat-flat-button color="primary">Save</button>

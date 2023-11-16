@@ -11,7 +11,7 @@ import {
 import { UserApiService } from '@market-monitor/api-client';
 import { USER_ACCOUNT_TYPE, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
 import { isNonNullable } from '@market-monitor/shared/utils-client';
-import { dateFormatDate, getDefaultDateFormat } from '@market-monitor/shared/utils-general';
+import { dateFormatDate, getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { BehaviorSubject, Observable, map, take } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 
@@ -93,7 +93,7 @@ export class AuthenticationAccountService {
 
             // update last login
             this.userApiService.updateUser(userData.id, {
-              lastLoginDate: getDefaultDateFormat(),
+              lastLoginDate: getCurrentDateDefaultFormat(),
             });
           });
       } else {

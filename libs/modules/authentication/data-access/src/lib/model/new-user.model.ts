@@ -1,5 +1,5 @@
 import { UserData, UserPersonalInfo } from '@market-monitor/api-types';
-import { getDefaultDateFormat } from '@market-monitor/shared/utils-general';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 export const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
   const newUser: UserData = {
     id,
@@ -28,9 +28,9 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
       firstTransactionDate: null,
       lastTransactionDate: null,
     },
-    lastPortfolioStateModifiedDate: getDefaultDateFormat(),
-    lastLoginDate: getDefaultDateFormat(),
-    accountCreatedDate: getDefaultDateFormat(),
+    lastPortfolioStateModifiedDate: getCurrentDateDefaultFormat(),
+    lastLoginDate: getCurrentDateDefaultFormat(),
+    accountCreatedDate: getCurrentDateDefaultFormat(),
   };
   return newUser;
 };

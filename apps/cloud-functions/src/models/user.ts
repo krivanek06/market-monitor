@@ -1,6 +1,6 @@
 import { UserData, UserPortfolioTransaction } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
-import { assignTypesServer } from './utils';
+import { assignTypesServer } from './assign-type';
 
 export const usersCollectionRef = () => firestore().collection('users').withConverter(assignTypesServer<UserData>());
 
