@@ -13,7 +13,7 @@ export class GroupApiService {
   constructor() {}
 
   async createGroup(input: GroupCreateInput): Promise<GroupData> {
-    const createGroupWrapper = httpsCallable<GroupCreateInput, GroupData>(this.functions, 'createGroupWrapper');
+    const createGroupWrapper = httpsCallable<GroupCreateInput, GroupData>(this.functions, 'groupCreateCall');
     const result = await createGroupWrapper(input);
     console.log('THIS IS RESULT');
     console.log(result);

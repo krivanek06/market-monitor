@@ -12,6 +12,15 @@ export type GroupCreateInput = {
   imageUrl: string | null;
 };
 
+export type GroupBaseInput = {
+  groupId: string;
+  userId: string;
+};
+
+export type GroupMember = UserBase & {
+  since: string;
+};
+
 export type GroupData = {
   id: string;
   name: string;
@@ -46,17 +55,11 @@ export type GroupData = {
   /**
    * user ids that are invited
    */
-  memberInvitedUserIds: {
-    userId: string;
-    date: string;
-  }[];
+  memberInvitedUserIds: string[];
   /**
    * user ids that requested to join the group
    */
-  memberRequestUserIds: {
-    userId: string;
-    date: string;
-  }[];
+  memberRequestUserIds: string[];
 };
 
 export type GroupTransactionsData = {
@@ -70,5 +73,5 @@ export type GroupTransactionsData = {
 
 export type GroupMembersData = {
   lastModifiedDate: string;
-  memberUsers: UserBase[];
+  memberUsers: GroupMember[];
 };

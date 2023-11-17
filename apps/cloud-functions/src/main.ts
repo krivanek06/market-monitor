@@ -51,7 +51,7 @@ admin.firestore().settings({
 // );
 
 // -------- Production ---------
-export { createGroupWrapper } from './group/create-group';
+export { groupCreateCall } from './group/group-create';
 
 // wrap functions with sentry
 export const getmarketoverviewdata = firebaseSimpleErrorLogger(

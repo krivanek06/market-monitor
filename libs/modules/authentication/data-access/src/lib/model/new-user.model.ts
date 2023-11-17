@@ -8,6 +8,7 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
       groupMember: [],
       groupOwner: [],
       groupWatched: [],
+      groupRequested: [],
     },
     settings: {
       isProfilePublic: true,

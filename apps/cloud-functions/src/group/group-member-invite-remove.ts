@@ -1,0 +1,39 @@
+import { GroupBaseInput } from '@market-monitor/api-types';
+import { onCall } from 'firebase-functions/v2/https';
+import { arrayRemove } from 'firebase/firestore';
+import { groupDocumentRef, userDocumentRef } from '../models';
+
+/**
+ * Remove a group invitation sent to the user by the owner
+ */
+export const groupMemberInviteRemoveCall = onCall(async (request) => {
+  const userAuthId = request.auth.uid as string;
+  const data = request.data as GroupBaseInput;
+
+  const groupData = (await groupDocumentRef(data.groupId).get()).data();
+
+  // check if group exists
+  if (!groupData) {
+    throw new Error('Group does not exist');
+  }
+
+  // check if requestor is owner
+  if (groupData.ownerUserId !== userAuthId) {
+    throw new Error('User is not owner');
+  }
+
+  // check is user is invited
+  if (!groupData.memberInvitedUserIds.includes(data.userId)) {
+    throw new Error('User is not invited');
+  }
+
+  // group - remove user from invited list
+  await groupDocumentRef(data.groupId).update({
+    memberInvitedUserIds: arrayRemove(data.userId),
+  });
+
+  // user - remove group from groupInvitations
+  await userDocumentRef(data.userId).update({
+    'groups.groupInvitations': arrayRemove(data.groupId),
+  });
+});

@@ -6,7 +6,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { groupDocumentMembersRef, groupDocumentRef, groupDocumentTransactionsRef, userDocumentRef } from '../models';
 import { transformUserToBase } from '../utils';
 
-export const createGroupWrapper = onCall(async (request) => {
+/**
+ * Create a new group
+ * - create group
+ * - create additional documents for group: transactions, members
+ * - add group into users.groupOwner
+ * - add group into users.groupInvitations
+ */
+export const groupCreateCall = onCall(async (request) => {
   const data = request.data as GroupCreateInput;
   const userAuthId = request.auth?.uid;
 
@@ -49,7 +56,7 @@ export const createGroupWrapper = onCall(async (request) => {
   for await (const memberId of data.memberInvitedUserIds) {
     await userDocumentRef(memberId).update({
       groups: {
-        groupMember: arrayUnion(newGroup.id),
+        groupInvitations: arrayUnion(newGroup.id),
       },
     });
   }
@@ -71,10 +78,7 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
     name: data.groupName,
     imageUrl: data.imageUrl,
     isPublic: data.isPublic,
-    memberInvitedUserIds: data.memberInvitedUserIds.map((d) => ({
-      userId: d,
-      date: getCurrentDateDefaultFormat(),
-    })),
+    memberInvitedUserIds: data.memberInvitedUserIds,
     ownerUserId: owner.id,
     ownerUser: owner,
     createdDate: getCurrentDateDefaultFormat(),

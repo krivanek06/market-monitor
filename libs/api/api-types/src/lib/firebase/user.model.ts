@@ -17,7 +17,14 @@ export type UserData = UserBase & {
   groups: {
     groupMember: string[];
     groupOwner: string[];
+    /**
+     * invitation from a group to join
+     */
     groupInvitations: string[];
+    /**
+     * user request to join a group
+     */
+    groupRequested: string[];
     groupWatched: string[];
   };
   settings: UserSettings;
