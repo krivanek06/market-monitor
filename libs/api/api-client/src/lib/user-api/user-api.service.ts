@@ -49,7 +49,7 @@ export class UserApiService {
    * @returns list of users by the name prefix
    */
   getUsersByName(name: string): Observable<UserData[]> {
-    // where('personal.displayName', '==', name)
+    // TODO: where('personal.displayName', '==', name)
     return rxCollectionData(
       query(this.userCollection(), where('personal.accountType', '==', USER_ACCOUNT_TYPE.SIMULATION), limit(10)),
     );

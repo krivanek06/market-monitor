@@ -1,5 +1,5 @@
 import { PortfolioTransaction } from './portfolio.model';
-import { UserBase } from './user.model';
+import { UserBase, UserData } from './user.model';
 
 export const GROUP_MEMBER_LIMIT = 50;
 export const GROUP_OWNER_LIMIT = 3;
@@ -20,6 +20,8 @@ export type GroupBaseInput = {
 export type GroupMember = UserBase & {
   since: string;
 };
+
+export type UserGroupData = { [K in keyof UserData['groups']]: GroupData[] };
 
 export type GroupData = {
   id: string;

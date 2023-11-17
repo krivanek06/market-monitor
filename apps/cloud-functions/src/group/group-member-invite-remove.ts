@@ -4,7 +4,11 @@ import { onCall } from 'firebase-functions/v2/https';
 import { groupDocumentRef, userDocumentRef } from '../models';
 
 /**
- * Remove a group invitation sent to the user by the owner
+ * Remove a group invitation sent to the user by the owner or the user itself
+ * - check if authenticated user is owner or the user who leaves
+ * - update group
+ * - update user
+ * - return removed user
  */
 export const groupMemberInviteRemoveCall = onCall(async (request) => {
   const userAuthId = request.auth.uid as string;
@@ -18,8 +22,8 @@ export const groupMemberInviteRemoveCall = onCall(async (request) => {
   }
 
   // check if requestor is owner
-  if (groupData.ownerUserId !== userAuthId) {
-    throw new Error('User is not owner');
+  if (groupData.ownerUserId !== userAuthId || data.userId !== userAuthId) {
+    throw new Error('User is not owner or the user itself');
   }
 
   // check is user is invited
