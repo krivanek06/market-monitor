@@ -60,6 +60,11 @@ export type GroupData = {
    * user ids that requested to join the group
    */
   memberRequestUserIds: string[];
+
+  /**
+   * data when was members and transactions last updated
+   */
+  lastModifiedSubCollectionDate: string;
 };
 
 export type GroupTransactionsData = {

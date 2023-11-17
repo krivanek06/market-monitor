@@ -1,6 +1,6 @@
 import { GroupBaseInput } from '@market-monitor/api-types';
+import { FieldValue } from 'firebase-admin/firestore';
 import { onCall } from 'firebase-functions/v2/https';
-import { arrayRemove } from 'firebase/firestore';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 
 /**
@@ -37,7 +37,7 @@ export const groupMemberRemoveCall = onCall(async (request) => {
 
   // remove user from group
   await groupDocumentRef(data.groupId).update({
-    memberUserIds: arrayRemove(data.userId),
+    memberUserIds: FieldValue.arrayRemove(data.userId),
   });
 
   // remove user from group member
@@ -47,6 +47,6 @@ export const groupMemberRemoveCall = onCall(async (request) => {
 
   // update user info
   await userDocumentRef(data.userId).update({
-    'groups.groupMember': arrayRemove(data.groupId),
+    'groups.groupMember': FieldValue.arrayRemove(data.groupId),
   });
 });

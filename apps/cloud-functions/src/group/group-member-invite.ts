@@ -1,6 +1,6 @@
 import { GroupBaseInput } from '@market-monitor/api-types';
+import { FieldValue } from 'firebase-admin/firestore';
 import { onCall } from 'firebase-functions/v2/https';
-import { arrayUnion } from 'firebase/firestore';
 import { groupDocumentRef, userDocumentRef } from '../models';
 
 /**
@@ -45,13 +45,13 @@ export const groupMemberInviteCall = onCall(async (request) => {
 
   // add user to invited list
   await groupDocumentRef(data.groupId).update({
-    memberInvitedUserIds: [...groupData.memberInvitedUserIds, data.userId],
+    memberInvitedUserIds: FieldValue.arrayUnion(data.userId),
   });
 
   // add group to user groupInvitations
   await userDocumentRef(data.userId).update({
     groups: {
-      groupInvitations: arrayUnion(data.groupId),
+      groupInvitations: FieldValue.arrayUnion(data.groupId),
     },
   });
 });

@@ -109,8 +109,8 @@ const getPortfolioState = async (
   const holdingsBalance = holdings.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0);
   const totalGainsValue = holdingsBalance - invested;
   const totalGainsPercentage = (holdingsBalance - invested) / holdingsBalance;
-  const firstTransactionDate = transactions[0].date;
-  const lastTransactionDate = transactions[transactions.length - 1].date;
+  const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
+  const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
 
   const result: PortfolioState = {
     numberOfExecutedBuyTransactions,

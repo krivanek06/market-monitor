@@ -1,6 +1,6 @@
 import { GroupMember } from '@market-monitor/api-types';
+import { FieldValue } from 'firebase-admin/firestore';
 import { onCall } from 'firebase-functions/v2/https';
-import { arrayRemove, arrayUnion } from 'firebase/firestore';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 import { transformUserToGroupMember } from './../utils/transform.util';
 
@@ -30,21 +30,19 @@ export const groupMemberAcceptCall = onCall(async (request) => {
 
   // update user to join group
   await userDocumentRef(userAuthId).update({
-    groups: {
-      groupInvitations: arrayRemove(requestGroupId),
-      groupMember: arrayUnion(requestGroupId),
-    },
+    'groups.groupInvitations': FieldValue.arrayRemove(requestGroupId),
+    'groups.groupMember': FieldValue.arrayUnion(requestGroupId),
   });
 
   // update group
   await groupDocumentRef(userAuthId).update({
-    memberUserIds: arrayUnion(userAuthId), // add user to members
-    memberInvitedUserIds: arrayRemove(userAuthId), // remove invitation
+    memberUserIds: FieldValue.arrayUnion(userAuthId), // add user to members
+    memberInvitedUserIds: FieldValue.arrayRemove(userAuthId), // remove invitation
   });
 
   // update group members
   await groupDocumentMembersRef(userAuthId).update({
-    memberUsers: arrayUnion(<GroupMember>{
+    memberUsers: FieldValue.arrayUnion(<GroupMember>{
       ...transformUserToGroupMember(userData),
     }),
   });

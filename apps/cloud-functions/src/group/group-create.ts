@@ -1,7 +1,7 @@
 import { GROUP_OWNER_LIMIT, GroupCreateInput, GroupData, UserBase } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
+import { FieldValue } from 'firebase-admin/firestore';
 import { onCall } from 'firebase-functions/v2/https';
-import { arrayUnion } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { groupDocumentMembersRef, groupDocumentRef, groupDocumentTransactionsRef, userDocumentRef } from '../models';
 import { transformUserToBase } from '../utils';
@@ -21,13 +21,15 @@ export const groupCreateCall = onCall(async (request) => {
     throw new Error('User not authenticated');
   }
 
-  console.log('data', data);
-  console.log('user', userAuthId);
-
   // load user data from firebase
   const userDataDoc = await userDocumentRef(userAuthId).get();
   const userData = userDataDoc.data();
   const userBase = transformUserToBase(userData);
+
+  // check to load user
+  if (!userData) {
+    throw new Error('User not found');
+  }
 
   // check limit
   if (userData.groups.groupOwner.length >= GROUP_OWNER_LIMIT) {
@@ -55,18 +57,14 @@ export const groupCreateCall = onCall(async (request) => {
   // update member list
   for await (const memberId of data.memberInvitedUserIds) {
     await userDocumentRef(memberId).update({
-      groups: {
-        groupInvitations: arrayUnion(newGroup.id),
-      },
+      'groups.groupInvitations': FieldValue.arrayUnion(newGroup.id),
     });
   }
 
   // add group to owner list
   userDataDoc.ref.update({
-    groups: {
-      groupMember: data.isOwnerMember ? [...userData.groups.groupMember, newGroup.id] : userData.groups.groupMember,
-      groupOwner: [...userData.groups.groupOwner, newGroup.id],
-    },
+    'groups.groupMember': data.isOwnerMember ? FieldValue.arrayUnion(newGroup.id) : userData.groups.groupMember,
+    'groups.groupOwner': FieldValue.arrayUnion(newGroup.id),
   });
 
   return newGroup;
@@ -85,5 +83,6 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
     isClosed: false,
     memberRequestUserIds: [],
     memberUserIds: [],
+    lastModifiedSubCollectionDate: getCurrentDateDefaultFormat(),
   };
 };

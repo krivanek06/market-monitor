@@ -1,6 +1,6 @@
 import { GroupBaseInput, GroupMember } from '@market-monitor/api-types';
+import { FieldValue } from 'firebase-admin/firestore';
 import { onCall } from 'firebase-functions/v2/https';
-import { arrayRemove, arrayUnion } from 'firebase/firestore';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 import { transformUserToGroupMember } from './../utils/transform.util';
 
@@ -32,13 +32,13 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
 
   // update group
   await groupDocumentRef(data.groupId).update({
-    memberUserIds: arrayUnion(userAuthId),
-    memberRequestUserIds: arrayRemove(userAuthId),
+    memberUserIds: FieldValue.arrayUnion(userAuthId),
+    memberRequestUserIds: FieldValue.arrayRemove(userAuthId),
   });
 
   // update group member data
   await groupDocumentMembersRef(data.groupId).update({
-    memberUsers: arrayUnion(<GroupMember>{
+    memberUsers: FieldValue.arrayUnion(<GroupMember>{
       ...transformUserToGroupMember(userData),
     }),
   });
@@ -46,8 +46,8 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
   // update user
   await userDocumentRef(userAuthId).update({
     groups: {
-      groupRequested: arrayRemove(data.groupId),
-      groupMember: arrayUnion(data.groupId),
+      groupRequested: FieldValue.arrayRemove(data.groupId),
+      groupMember: FieldValue.arrayUnion(data.groupId),
     },
   });
 });

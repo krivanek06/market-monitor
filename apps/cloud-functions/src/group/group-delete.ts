@@ -1,5 +1,5 @@
+import { FieldValue } from 'firebase-admin/firestore';
 import { onCall } from 'firebase-functions/v2/https';
-import { arrayRemove } from 'firebase/firestore';
 import { groupDocumentMembersRef, groupDocumentRef, groupDocumentTransactionsRef, userDocumentRef } from '../models';
 
 /**
@@ -32,20 +32,16 @@ export const groupDeleteCall = onCall(async (request) => {
 
   // remove group from owner
   await userDocumentRef(userAuthId).update({
-    groups: {
-      groupOwner: arrayRemove(groupId),
-    },
+    'groups.groupOwner': FieldValue.arrayRemove(groupId),
   });
 
   // remove group all users even if there is a bug, remove all data
   const userIds = [...groupData.memberUserIds, ...groupData.memberInvitedUserIds, ...groupData.memberRequestUserIds];
   for await (const userId of userIds) {
     await userDocumentRef(userId).update({
-      groups: {
-        groupInvitations: arrayRemove(userId),
-        groupMember: arrayRemove(userId),
-        groupRequested: arrayRemove(userId),
-      },
+      'groups.groupInvitations': FieldValue.arrayRemove(groupId),
+      'groups.groupMember': FieldValue.arrayRemove(groupId),
+      'groups.groupRequested': FieldValue.arrayRemove(groupId),
     });
   }
 

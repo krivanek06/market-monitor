@@ -3,6 +3,7 @@ import { getMarketOverviewDataWrapper, reloadMarketOverview } from './market-fun
 import * as admin from 'firebase-admin';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { updateGroupData } from './group/group-update-data-scheduller';
 import { executeUserPortfolioUpdate } from './user/user-portfolio-state';
 import { corsMiddleWareHttp, firebaseSimpleErrorLogger } from './utils';
 
@@ -51,7 +52,7 @@ admin.firestore().settings({
 // );
 
 // -------- Production ---------
-export { groupCreateCall } from './group/group-create';
+export * from './group';
 
 // wrap functions with sentry
 export const getmarketoverviewdata = firebaseSimpleErrorLogger(
@@ -68,6 +69,16 @@ export const run_user_portfolio_state_scheduler = onSchedule(
   },
   async (event) => {
     executeUserPortfolioUpdate();
+  },
+);
+
+export const run_group_update_data_scheduler = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '*/5 2-3 * * *',
+  },
+  async (event) => {
+    updateGroupData();
   },
 );
 

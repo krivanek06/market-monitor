@@ -138,6 +138,7 @@ export class AuthenticationFormComponent {
               } else {
                 this.dialogServiceUtil.showNotificationBar(`Unable to create new user`, 'error');
               }
+              this.loadingSnipperShowSignal.set(false);
               return EMPTY;
             }),
           ),

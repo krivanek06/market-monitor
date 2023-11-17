@@ -1,5 +1,5 @@
+import { FieldValue } from 'firebase-admin/firestore';
 import { onCall } from 'firebase-functions/v2/https';
-import { arrayUnion } from 'firebase/firestore';
 import { groupDocumentRef, userDocumentRef } from '../models';
 
 /**
@@ -38,13 +38,11 @@ export const groupRequestMembershipCall = onCall(async (request) => {
 
   // group update - add user to requested list
   await groupDocumentRef(groupId).update({
-    memberRequestUserIds: arrayUnion(userAuthId),
+    memberRequestUserIds: FieldValue.arrayUnion(userAuthId),
   });
 
   // user update - add group to user groupRequested
   await userDocumentRef(userAuthId).update({
-    groups: {
-      groupRequested: arrayUnion(groupId),
-    },
+    'groups.groupRequested': FieldValue.arrayUnion(groupId),
   });
 });

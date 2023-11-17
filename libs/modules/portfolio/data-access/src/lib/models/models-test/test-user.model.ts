@@ -12,6 +12,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       groupMember: [],
       groupOwner: [],
       groupWatched: [],
+      groupRequested: [],
     },
     personal: {
       accountType: USER_ACCOUNT_TYPE.BASIC,
