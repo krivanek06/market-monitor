@@ -77,7 +77,7 @@ export class AuthenticationFormComponent {
 
   onDemoLogin(): void {
     this.loginUserInputControl.patchValue({
-      email: 'krivanek1234+1@gmail.com',
+      email: 'krivanek1234+2@gmail.com',
       password: 'qwer1234',
     });
   }

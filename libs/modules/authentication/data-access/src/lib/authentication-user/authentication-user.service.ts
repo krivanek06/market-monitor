@@ -1,15 +1,16 @@
 import { Injectable, InjectionToken } from '@angular/core';
-import { UserApiService } from '@market-monitor/api-client';
+import { GroupApiService, UserApiService } from '@market-monitor/api-client';
 import {
   SymbolType,
   USER_ACCOUNT_TYPE,
   UserData,
+  UserGroupData,
   UserPortfolioTransaction,
   UserSettings,
   UserWatchlist,
 } from '@market-monitor/api-types';
 import { User } from 'firebase/auth';
-import { Observable, firstValueFrom, map, shareReplay, tap } from 'rxjs';
+import { Observable, combineLatest, firstValueFrom, map, shareReplay, switchMap, tap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
@@ -23,12 +24,14 @@ export class AuthenticationUserService {
   /**
    * prevent multiple calls to the api
    */
-  private userPortfolioTransaction$ = this.userApiService.getUserPortfolioTransactions(this.userData.id).pipe(
+  private userPortfolioTransaction$ = this.authenticationAccountService.getUserData().pipe(
+    switchMap((userData) => this.userApiService.getUserPortfolioTransactions(userData.id)),
     tap(() => console.log(`AuthenticationUserService: getUserPortfolioTransactions`)),
     shareReplay(1),
   );
 
-  private userWatchlist$ = this.userApiService.getUserWatchlist(this.userData.id).pipe(
+  private userWatchlist$ = this.authenticationAccountService.getUserData().pipe(
+    switchMap((userData) => this.userApiService.getUserWatchlist(userData.id)),
     tap(() => console.log(`AuthenticationUserService: getUserWatchlist`)),
     shareReplay(1),
   );
@@ -36,6 +39,7 @@ export class AuthenticationUserService {
   constructor(
     private authenticationAccountService: AuthenticationAccountService,
     private userApiService: UserApiService,
+    private groupApiService: GroupApiService,
   ) {}
 
   get user(): User {
@@ -68,6 +72,31 @@ export class AuthenticationUserService {
 
   getIsUserNew(): Observable<boolean> {
     return this.getUserData().pipe(map((d) => d.accountResets.length === 0));
+  }
+
+  getUserGroupsData(): Observable<UserGroupData> {
+    return this.getUserData().pipe(
+      map((user) => user.groups),
+      // distinctUntilChanged(), // TODO: add back
+      switchMap((groups) =>
+        combineLatest([
+          this.groupApiService.getGroupsDataByIds(groups.groupMember),
+          this.groupApiService.getGroupsDataByIds(groups.groupOwner),
+          this.groupApiService.getGroupsDataByIds(groups.groupInvitations),
+          this.groupApiService.getGroupsDataByIds(groups.groupRequested),
+          this.groupApiService.getGroupsDataByIds(groups.groupWatched),
+        ]).pipe(
+          tap((x) => console.log('map', x)),
+          map(([groupMember, groupOwner, groupInvitations, groupRequested, groupWatched]) => ({
+            groupMember,
+            groupOwner,
+            groupInvitations,
+            groupRequested,
+            groupWatched,
+          })),
+        ),
+      ),
+    );
   }
 
   getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {

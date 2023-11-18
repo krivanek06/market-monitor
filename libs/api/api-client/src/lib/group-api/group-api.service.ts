@@ -1,13 +1,21 @@
 import { Injectable } from '@angular/core';
-import { CollectionReference, DocumentReference, Firestore, collection, doc } from '@angular/fire/firestore';
+import {
+  CollectionReference,
+  DocumentReference,
+  Firestore,
+  collection,
+  doc,
+  query,
+  where,
+} from '@angular/fire/firestore';
 import { httpsCallable } from '@angular/fire/functions';
 import { GroupBaseInput, GroupCreateInput, GroupData } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { getApp } from 'firebase/app';
 import { getFunctions } from 'firebase/functions';
-import { docData as rxDocData } from 'rxfire/firestore';
+import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +27,13 @@ export class GroupApiService {
 
   getGroupDataById(groupId: string): Observable<GroupData | undefined> {
     return rxDocData(this.getGroupDocRef(groupId), { idField: 'id' });
+  }
+
+  getGroupsDataByIds(groupIds: string[]): Observable<GroupData[]> {
+    if (groupIds.length === 0) {
+      return of([]);
+    }
+    return rxCollectionData(query(this.getGroupCollectionRef(), where('id', 'in', groupIds)));
   }
 
   async createGroup(input: GroupCreateInput): Promise<GroupData> {
