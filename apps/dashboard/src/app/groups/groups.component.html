@@ -4,15 +4,27 @@
     <span class="text-xl text-wt-primary">Groups</span>
   </div>
 
-  <button mat-stroked-button type="button" color="primary" (click)="onCreateGroupClick()">
-    <mat-icon>add</mat-icon>
-    create group
-  </button>
+  <div [matTooltip]="isCreateGroupDisabledSignal() ? errorMessageGroupCreate : ''">
+    <button
+      [disabled]="isCreateGroupDisabledSignal()"
+      mat-stroked-button
+      type="button"
+      color="primary"
+      (click)="onCreateGroupClick()"
+    >
+      <mat-icon>add</mat-icon>
+      create group
+    </button>
+  </div>
 </div>
 
 <!-- my groups -->
 <h2>My Groups</h2>
-<div></div>
+<div class="flex flex-wrap gap-5">
+  <ng-container *ngFor="let group of groupsSignal()?.groupOwner">
+    <app-group-display-card (groupClickEmitter)="onGroupClick(group)" [groupData]="group"></app-group-display-card>
+  </ng-container>
+</div>
 
 <div class="text-2xl">DISPLAY GROUPS!</div>
 

@@ -26,7 +26,7 @@ import {
   GenericChartComponent,
 } from '@market-monitor/shared/ui';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
-import { DashboardPortfolioChartsComponent } from './dashboard-portfolio-charts/dashboard-portfolio-charts.component';
+import { DashboardPortfolioChartsComponent } from './components/dashboard-portfolio-charts/dashboard-portfolio-charts.component';
 
 @Component({
   selector: 'app-dashboard',

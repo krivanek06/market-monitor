@@ -27,3 +27,7 @@ export enum ROUTES_STOCK_DETAILS {
   TRADES = 'trades',
   NEWS = 'news',
 }
+
+export enum ROUTES_GROUP {
+  DETAILS = 'details',
+}

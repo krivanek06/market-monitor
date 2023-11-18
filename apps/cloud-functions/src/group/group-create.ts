@@ -1,4 +1,10 @@
-import { GROUP_OWNER_LIMIT, GroupCreateInput, GroupData, UserBase } from '@market-monitor/api-types';
+import {
+  GROUP_MEMBER_LIMIT,
+  GROUP_OWNER_LIMIT,
+  GroupCreateInput,
+  GroupData,
+  UserBase,
+} from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { FieldValue } from 'firebase-admin/firestore';
 import { onCall } from 'firebase-functions/v2/https';
@@ -34,6 +40,11 @@ export const groupCreateCall = onCall(async (request) => {
   // check limit
   if (userData.groups.groupOwner.length >= GROUP_OWNER_LIMIT) {
     throw new Error(`User can only create ${GROUP_OWNER_LIMIT} groups`);
+  }
+
+  // check members
+  if (data.memberInvitedUserIds.length >= GROUP_MEMBER_LIMIT) {
+    throw new Error(`Group can only have ${GROUP_MEMBER_LIMIT} members`);
   }
 
   // create group

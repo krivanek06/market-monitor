@@ -1,4 +1,4 @@
-import { GroupBaseInput, GroupMember } from '@market-monitor/api-types';
+import { GROUP_MEMBER_LIMIT, GroupBaseInput, GroupMember } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { onCall } from 'firebase-functions/v2/https';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
@@ -8,6 +8,7 @@ import { transformUserToGroupMember } from './../utils/transform.util';
  * Group accepts the user request to join
  * - check if authenticated user is owner
  * - check if user sent request
+ * - check if group will not have more than N members
  * - update group
  * - update group member data
  * - update user
@@ -28,6 +29,11 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
   // check if user sent request
   if (!groupData.memberRequestUserIds.includes(userAuthId)) {
     throw new Error('User has not requested to join');
+  }
+
+  // check if group will not have more than N members
+  if (groupData.memberUserIds.length >= GROUP_MEMBER_LIMIT) {
+    throw new Error('Group is full');
   }
 
   // update group

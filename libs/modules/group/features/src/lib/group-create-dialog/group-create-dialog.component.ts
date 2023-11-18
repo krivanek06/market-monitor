@@ -76,6 +76,8 @@ export class GroupCreateDialogComponent implements OnInit {
   selectedUsersSignal = signal<UserData[]>([]);
   loaderSignal = signal<boolean>(false);
 
+  memberLimit = GROUP_MEMBER_LIMIT;
+
   constructor(
     private dialogRef: MatDialogRef<GroupCreateDialogComponent>,
     private authenticationUserService: AuthenticationUserService,
@@ -100,10 +102,10 @@ export class GroupCreateDialogComponent implements OnInit {
     }
 
     // check if at least one user is added
-    // if (this.selectedUsersSignal().length === 0) {
-    //   this.dialogServiceUtil.showNotificationBar('Please add at least one user', 'error');
-    //   return;
-    // }
+    if (this.selectedUsersSignal().length === 0) {
+      this.dialogServiceUtil.showNotificationBar('Please add at least one user', 'error');
+      return;
+    }
 
     const value: GroupCreateInput = {
       groupName: this.form.controls.groupName.value,
@@ -120,13 +122,12 @@ export class GroupCreateDialogComponent implements OnInit {
     this.groupApiService
       .createGroup(value)
       .then((d) => {
-        console.log('THIS HAPPENED AFTER FUNCTION EXECUTION');
         console.log(d);
-
         this.dialogRef.close();
         this.dialogServiceUtil.showNotificationBar('Group has been created', 'success');
       })
       .catch((e) => {
+        console.log(e);
         this.loaderSignal.set(false);
         this.dialogServiceUtil.showNotificationBar('Something went wrong', 'error');
       });

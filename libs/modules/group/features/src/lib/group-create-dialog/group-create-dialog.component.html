@@ -39,7 +39,10 @@
     </div>
 
     <!-- invite member -->
-    <div class="my-8 text-lg">Invite People</div>
+    <div class="my-8 space-x-2 text-lg">
+      <span>Invite People</span>
+      <span>{{ selectedUsersSignal().length }} / {{ memberLimit }}</span>
+    </div>
 
     <!-- search user control -->
     <div class="max-w-[450px] mb-8">

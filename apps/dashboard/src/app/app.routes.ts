@@ -48,7 +48,18 @@ export const appRoutes: Route[] = [
           },
           {
             path: ROUTES_MAIN.GROUPS,
-            loadComponent: () => import('./groups/groups.component').then((m) => m.GroupsComponent),
+            children: [
+              {
+                path: '',
+                loadComponent: () => import('./groups/groups.component').then((m) => m.GroupsComponent),
+              },
+              {
+                path: ':id',
+                title: 'Group Details',
+                loadComponent: () =>
+                  import('./groups/group-details/group-details.component').then((m) => m.GroupDetailsComponent),
+              },
+            ],
           },
           {
             path: `${ROUTES_MAIN.STOCK_DETAILS}/:symbol`,

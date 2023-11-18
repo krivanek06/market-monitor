@@ -27,8 +27,6 @@ export class AuthenticationAccountService {
    */
   private authenticationLoaded$ = new BehaviorSubject<boolean>(false);
 
-  private destroy$ = new BehaviorSubject<boolean>(false);
-
   constructor(
     private auth: Auth,
     private userApiService: UserApiService,
