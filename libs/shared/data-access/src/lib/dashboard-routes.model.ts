@@ -3,6 +3,7 @@ export enum ROUTES_MAIN {
   LOGIN = 'login',
   SETTING = 'settings',
   TRADING = 'trading',
+  GROUPS = 'groups',
   WATCHLIST = 'watchlist',
   STOCK_DETAILS = 'stock-details',
   SEARCH = 'search',
@@ -25,4 +26,8 @@ export enum ROUTES_STOCK_DETAILS {
   RATIOS = 'ratios',
   TRADES = 'trades',
   NEWS = 'news',
+}
+
+export enum ROUTES_GROUP {
+  DETAILS = 'details',
 }

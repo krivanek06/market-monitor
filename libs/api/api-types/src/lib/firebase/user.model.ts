@@ -1,25 +1,39 @@
-import { PortfolioTransaction } from './portfolio.model';
+import { PortfolioState, PortfolioTransaction } from './portfolio.model';
 import { SymbolType } from './symbol.model';
 
-export enum UserAccountType {
-  TEST = 'TEST',
-  ADMIN = 'ADMIN',
-  DISABLES = 'DISABLED',
-  ACCOUNT_TYPE_1 = 'ACCOUNT_TYPE_1',
-}
-
-export type UserData = {
+export type UserBase = {
   id: string;
   personal: UserPersonalInfo;
-  role: USER_ROLE;
+
+  /**
+   * user portfolio state calculated from transactions in cloud functions at the end of the day
+   */
+  lastPortfolioState: PortfolioState;
+
+  accountCreatedDate: string;
+};
+
+export type UserData = UserBase & {
   groups: {
     groupMember: string[];
     groupOwner: string[];
+    /**
+     * invitation from a group to join
+     */
     groupInvitations: string[];
+    /**
+     * user request to join a group
+     */
+    groupRequested: string[];
     groupWatched: string[];
   };
   settings: UserSettings;
   accountResets: UserAccountResets[];
+
+  /**
+   * dates
+   */
+  lastLoginDate: string;
 };
 
 /**
@@ -31,7 +45,6 @@ export type UserAccountResets = {
 };
 
 export type UserPortfolioTransaction = {
-  startingCash: number;
   transactions: PortfolioTransaction[];
 };
 
@@ -44,12 +57,12 @@ export type UserWatchlist = {
 };
 
 export type UserPersonalInfo = {
-  accountType: UserAccountType;
+  accountType: USER_ACCOUNT_TYPE;
   photoURL: string | null;
-  displayName: string | null;
+  displayName: string;
 };
 
-export enum USER_ROLE {
+export enum USER_ACCOUNT_TYPE {
   SIMULATION = 'SIMULATION',
   BASIC = 'BASIC',
   ADMIN = 'ADMIN',

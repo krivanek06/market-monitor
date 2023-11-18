@@ -9,10 +9,10 @@ import {
   signInWithPopup,
 } from '@angular/fire/auth';
 import { UserApiService } from '@market-monitor/api-client';
-import { UserAccountType, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
-import { isNonNullable } from '@market-monitor/shared/utils-client';
+import { USER_ACCOUNT_TYPE, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
+import { filterNullish, isNonNullable } from '@market-monitor/shared/utils-client';
 import { dateFormatDate } from '@market-monitor/shared/utils-general';
-import { BehaviorSubject, Observable, map, take } from 'rxjs';
+import { BehaviorSubject, Observable, map, switchMap, tap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 
 @Injectable({
@@ -20,6 +20,11 @@ import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 })
 export class AuthenticationAccountService {
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
+  private authenticatedUser$ = new BehaviorSubject<User | null>(null);
+
+  /**
+   * emits true when authentication is finished whether user if loaded or not. Used for guards
+   */
   private authenticationLoaded$ = new BehaviorSubject<boolean>(false);
 
   constructor(
@@ -27,13 +32,14 @@ export class AuthenticationAccountService {
     private userApiService: UserApiService,
   ) {
     this.initAuthenticationUser();
+    this.listenOnUserChanges();
   }
 
   get user(): User {
-    if (!this.auth.currentUser) {
+    if (!this.authenticatedUser$.value) {
       throw new Error('User not logged in');
     }
-    return this.auth.currentUser;
+    return this.authenticatedUser$.value;
   }
 
   get userData(): UserData {
@@ -69,6 +75,8 @@ export class AuthenticationAccountService {
   }
 
   async signOut() {
+    this.authenticatedUserData$.next(null);
+    this.authenticatedUser$.next(null);
     await this.auth.signOut();
   }
 
@@ -80,21 +88,26 @@ export class AuthenticationAccountService {
     // todo
   }
 
+  private listenOnUserChanges(): void {
+    this.authenticatedUser$
+      .pipe(
+        tap((c) => console.log('watch', c)),
+        filterNullish(),
+        switchMap((user) => this.getUserFromFirestoreUser(user)),
+      )
+      .subscribe((userData) => {
+        console.log('UPDATING USER', userData);
+        this.authenticationLoaded$.next(true);
+        this.authenticatedUserData$.next(userData);
+      });
+  }
+
   private initAuthenticationUser(): void {
     this.auth.onAuthStateChanged((user) => {
       console.log('authentication state change', user);
-      if (user) {
-        this.getUserFromFirestoreUser(user)
-          .pipe(take(1))
-          .subscribe((userData) => {
-            console.log('login', userData);
-            this.authenticatedUserData$.next(userData);
-            this.authenticationLoaded$.next(true);
-          });
-      } else {
-        // logout
-        console.log('logout');
-        this.authenticatedUserData$.next(null);
+      this.authenticatedUser$.next(user);
+      if (!user) {
+        console.log('USER UNAUTHENTICATED');
         this.authenticationLoaded$.next(true);
       }
     });
@@ -109,13 +122,12 @@ export class AuthenticationAccountService {
   private createUser(user: User): UserData {
     // create new user data
     const newUserData = createNewUser(user.uid, {
-      accountType: UserAccountType.ACCOUNT_TYPE_1,
-      displayName: user.displayName,
+      accountType: USER_ACCOUNT_TYPE.BASIC,
+      displayName: user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`,
       photoURL: user.photoURL,
     });
 
     const newTransactions: UserPortfolioTransaction = {
-      startingCash: 0,
       transactions: [],
     };
 

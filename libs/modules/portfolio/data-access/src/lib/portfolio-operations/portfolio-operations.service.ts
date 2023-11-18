@@ -188,7 +188,7 @@ export class PortfolioOperationsService {
     // check if user has enough cash on hand if BUY and cashAccountActive
     if (input.transactionType === 'BUY' && this.authenticationUserService.isUserRoleSimulation) {
       // calculate cash on hand from deposits
-      const cashOnHandStarting = userTransactionHistory.startingCash;
+      const cashOnHandStarting = userData.lastPortfolioState.startingCash;
       // calculate cash on hand from transactions
       const cashOnHandTransactions = userTransactionHistory.transactions.reduce(
         (acc, curr) =>

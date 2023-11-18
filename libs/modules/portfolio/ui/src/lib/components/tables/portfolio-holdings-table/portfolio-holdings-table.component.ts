@@ -15,7 +15,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { PortfolioStateHolding } from '@market-monitor/modules/portfolio/data-access';
+import { PortfolioStateHolding } from '@market-monitor/api-types';
 import {
   DefaultImgDirective,
   LargeNumberFormatterPipe,

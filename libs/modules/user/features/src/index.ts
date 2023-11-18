@@ -1,1 +1,1 @@
-export * from './lib/modules-user-features.module';
+export * from './lib/user-search-control/user-search-control.component';

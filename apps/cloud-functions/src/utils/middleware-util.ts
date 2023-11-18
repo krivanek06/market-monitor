@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-export const corsMiddleWare =
+export const corsMiddleWareHttp =
   (handler: (req: Request, res: Response<any>) => any, { authenticatedRoute = false } = {}) =>
   (req: Request, res: Response<any>) => {
     if (authenticatedRoute) {

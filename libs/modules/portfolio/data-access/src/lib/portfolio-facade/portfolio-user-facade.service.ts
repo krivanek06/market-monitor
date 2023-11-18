@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
-import { PortfolioGrowthAssets, PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
+import {
+  PortfolioGrowthAssets,
+  PortfolioStateHolding,
+  PortfolioStateHoldings,
+  PortfolioTransaction,
+  UserPortfolioTransaction,
+} from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { GenericChartSeriesPie } from '@market-monitor/shared/data-access';
 import { Observable, from, map, startWith, switchMap, withLatestFrom } from 'rxjs';
-import {
-  PortfolioChange,
-  PortfolioGrowth,
-  PortfolioState,
-  PortfolioStateHolding,
-  PortfolioTransactionCreate,
-  PortfolioTransactionToDate,
-} from '../models';
+import { PortfolioChange, PortfolioGrowth, PortfolioTransactionCreate, PortfolioTransactionToDate } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.service';
 import { PortfolioOperationsService } from '../portfolio-operations/portfolio-operations.service';
@@ -29,10 +28,17 @@ export class PortfolioUserFacadeService {
     private portfolioCalculationService: PortfolioCalculationService,
   ) {}
 
-  getPortfolioState(): Observable<PortfolioState> {
+  getPortfolioState(): Observable<PortfolioStateHoldings> {
     return this.authenticationUserService
       .getUserPortfolioTransactions()
-      .pipe(switchMap((transactions) => this.portfolioGrowthService.getPortfolioState(transactions)));
+      .pipe(
+        switchMap((transactions) =>
+          this.portfolioGrowthService.getPortfolioState(
+            this.authenticationUserService.userData.lastPortfolioState,
+            transactions,
+          ),
+        ),
+      );
   }
 
   getPortfolioStateHolding(symbol: string): Observable<PortfolioStateHolding | undefined> {

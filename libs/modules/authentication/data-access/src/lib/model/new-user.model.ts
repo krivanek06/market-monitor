@@ -1,4 +1,5 @@
-import { USER_ROLE, UserData, UserPersonalInfo } from '@market-monitor/api-types';
+import { UserData, UserPersonalInfo } from '@market-monitor/api-types';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 export const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
   const newUser: UserData = {
     id,
@@ -7,13 +8,30 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
       groupMember: [],
       groupOwner: [],
       groupWatched: [],
+      groupRequested: [],
     },
-    role: USER_ROLE.BASIC,
     settings: {
       isProfilePublic: true,
     },
     personal: personal,
     accountResets: [],
+    lastPortfolioState: {
+      cashOnHand: 0,
+      startingCash: 0,
+      holdingsBalance: 0,
+      invested: 0,
+      numberOfExecutedBuyTransactions: 0,
+      numberOfExecutedSellTransactions: 0,
+      transactionFees: 0,
+      totalGainsPercentage: 0,
+      totalGainsValue: 0,
+      balance: 0,
+      firstTransactionDate: null,
+      lastTransactionDate: null,
+      modifiedDate: getCurrentDateDefaultFormat(),
+    },
+    lastLoginDate: getCurrentDateDefaultFormat(),
+    accountCreatedDate: getCurrentDateDefaultFormat(),
   };
   return newUser;
 };

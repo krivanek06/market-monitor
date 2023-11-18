@@ -1,4 +1,4 @@
-import { SymbolType } from './symbol.model';
+import { SymbolSummary, SymbolType } from './symbol.model';
 
 export type PortfolioRisk = {
   alpha: number;
@@ -9,6 +9,63 @@ export type PortfolioRisk = {
   estimatedReturnValue: number;
   annualVariancePrct: number;
   annualVolatilityPrct: number;
+};
+
+export type PortfolioState = {
+  /**
+   * balance = invested + cashOnHand
+   */
+  balance: number;
+  /**
+   * holdingsBalance = closed price * units for each holdings
+   */
+  holdingsBalance: number;
+
+  /**
+   * total invested value into holdings
+   */
+  invested: number;
+  cashOnHand: number;
+  startingCash: number;
+  numberOfExecutedBuyTransactions: number;
+  numberOfExecutedSellTransactions: number;
+  transactionFees: number;
+
+  /**
+   * calculated from holdings and balance
+   */
+  totalGainsValue: number;
+  totalGainsPercentage: number;
+
+  firstTransactionDate: string | null;
+  lastTransactionDate: string | null;
+
+  /**
+   * date when it was last calculated
+   */
+  modifiedDate: string;
+};
+
+export type PortfolioStateHoldingPartial = {
+  symbolType: SymbolType;
+  symbol: string;
+  units: number;
+  /**
+   * how much user invested. Used to calculate BEP.
+   */
+  invested: number;
+};
+
+export type PortfolioStateHolding = PortfolioStateHoldingPartial & {
+  breakEvenPrice: number; // calculated
+  symbolSummary: SymbolSummary;
+};
+
+export type PortfolioStateHoldings = PortfolioState & {
+  /**
+   * calculated from previous transactions
+   */
+  holdings: PortfolioStateHolding[];
 };
 
 export type PortfolioGrowthAssets = {
