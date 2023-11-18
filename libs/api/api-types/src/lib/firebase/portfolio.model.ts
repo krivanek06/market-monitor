@@ -13,9 +13,9 @@ export type PortfolioRisk = {
 
 export type PortfolioState = {
   /**
-   * userBalance = invested + cashOnHand
+   * balance = invested + cashOnHand
    */
-  userBalance: number;
+  balance: number;
   /**
    * holdingsBalance = closed price * units for each holdings
    */
@@ -32,13 +32,18 @@ export type PortfolioState = {
   transactionFees: number;
 
   /**
-   * calculated from holdings and userBalance
+   * calculated from holdings and balance
    */
   totalGainsValue: number;
   totalGainsPercentage: number;
 
   firstTransactionDate: string | null;
   lastTransactionDate: string | null;
+
+  /**
+   * date when it was last calculated
+   */
+  modifiedDate: string;
 };
 
 export type PortfolioGrowthAssets = {

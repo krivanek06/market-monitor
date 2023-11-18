@@ -1,4 +1,4 @@
-<div class="flex justify-between w-full md:pt-10">
+<div class="flex justify-between w-full mb-6 md:pt-10">
   <div class="flex items-center gap-3">
     <mat-icon color="primary">group</mat-icon>
     <span class="text-xl text-wt-primary">Groups</span>
@@ -18,20 +18,36 @@
   </div>
 </div>
 
-<!-- my groups -->
-<h2>My Groups</h2>
-<div class="flex flex-wrap gap-5">
-  <ng-container *ngFor="let group of groupsSignal()?.groupOwner">
-    <app-group-display-card (groupClickEmitter)="onGroupClick(group)" [groupData]="group"></app-group-display-card>
-  </ng-container>
-</div>
+<ng-container *ngIf="groupsSignal() as groups">
+  <div class="flex flex-col gap-6 lg:flex-row">
+    <div class="lg:basis-3/5">
+      <!-- my groups -->
+      <div *ngIf="groups.groupOwner.length > 0" class="mb-4">
+        <h2>My Groups</h2>
+        <div class="flex flex-col gap-3">
+          <app-group-display-card
+            class="lg:w-10/12"
+            *ngFor="let group of groups.groupOwner"
+            (groupClickEmitter)="onGroupClick(group)"
+            [groupData]="group"
+          ></app-group-display-card>
+        </div>
+      </div>
 
-<div class="text-2xl">DISPLAY GROUPS!</div>
+      <!-- member of -->
+      <div *ngIf="groups.groupMember.length > 0" class="mb-4">
+        <h2>Member of</h2>
+        <div class="flex flex-col gap-3">
+          <app-group-display-card
+            class="lg:w-10/12"
+            *ngFor="let group of groups.groupOwner"
+            (groupClickEmitter)="onGroupClick(group)"
+            [groupData]="group"
+          ></app-group-display-card>
+        </div>
+      </div>
+    </div>
 
-<!-- member of -->
-<h2>Member of Groups</h2>
-<div></div>
-
-<!-- watched groups -->
-<h2>Watched Groups</h2>
-<div></div>
+    <div class="lg:basis-2/5">something else</div>
+  </div>
+</ng-container>

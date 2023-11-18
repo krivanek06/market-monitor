@@ -25,11 +25,11 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
       transactionFees: 0,
       totalGainsPercentage: 0,
       totalGainsValue: 0,
-      userBalance: 0,
+      balance: 0,
       firstTransactionDate: null,
       lastTransactionDate: null,
+      modifiedDate: getCurrentDateDefaultFormat(),
     },
-    lastPortfolioStateModifiedDate: getCurrentDateDefaultFormat(),
     lastLoginDate: getCurrentDateDefaultFormat(),
     accountCreatedDate: getCurrentDateDefaultFormat(),
   };

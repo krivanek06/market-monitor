@@ -1,4 +1,4 @@
-import { PortfolioTransaction } from './portfolio.model';
+import { PortfolioState, PortfolioTransaction } from './portfolio.model';
 import { UserBase, UserData } from './user.model';
 
 export const GROUP_MEMBER_LIMIT = 50;
@@ -67,6 +67,11 @@ export type GroupData = {
    * data when was members and transactions last updated
    */
   lastModifiedSubCollectionDate: string;
+
+  /**
+   * portfolio state calculated from transactions at the end of the day
+   */
+  lastPortfolioState: PortfolioState;
 };
 
 export type GroupTransactionsData = {

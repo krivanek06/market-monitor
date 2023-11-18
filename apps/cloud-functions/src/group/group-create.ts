@@ -95,5 +95,20 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
     memberRequestUserIds: [],
     memberUserIds: [],
     lastModifiedSubCollectionDate: getCurrentDateDefaultFormat(),
+    lastPortfolioState: {
+      cashOnHand: 0,
+      firstTransactionDate: null,
+      lastTransactionDate: null,
+      holdingsBalance: 0,
+      invested: 0,
+      modifiedDate: getCurrentDateDefaultFormat(),
+      numberOfExecutedBuyTransactions: 0,
+      numberOfExecutedSellTransactions: 0,
+      startingCash: 0,
+      totalGainsPercentage: 0,
+      totalGainsValue: 0,
+      transactionFees: 0,
+      balance: 0,
+    },
   };
 };

@@ -8,7 +8,7 @@ import {
   PortfolioState,
   UserPortfolioTransaction,
 } from '@market-monitor/api-types';
-import { roundNDigits } from '@market-monitor/shared/utils-general';
+import { getCurrentDateDefaultFormat, roundNDigits } from '@market-monitor/shared/utils-general';
 import { format, isBefore, isSameDay, subDays } from 'date-fns';
 import { Observable, firstValueFrom, map, tap } from 'rxjs';
 import { PortfolioStateHolding, PortfolioStateHoldings } from '../models';
@@ -72,7 +72,7 @@ export class PortfolioGrowthService {
       ),
       map((holdings) => {
         const invested = holdings.reduce((acc, curr) => acc + curr.invested, 0);
-        const userBalance = invested + cashOnHandFromDeposit + (isCashActive ? cashOnHandTransactions : 0);
+        const balance = invested + cashOnHandFromDeposit + (isCashActive ? cashOnHandTransactions : 0);
         const holdingsBalance = holdings.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0);
         const totalGainsValue = roundNDigits(holdingsBalance - invested, 2);
         const totalGainsPercentage = roundNDigits((holdingsBalance - invested) / holdingsBalance, 6);
@@ -84,7 +84,7 @@ export class PortfolioGrowthService {
           numberOfExecutedSellTransactions,
           transactionFees,
           cashOnHand: isCashActive ? cashOnHandFromDeposit + cashOnHandTransactions : 0,
-          userBalance,
+          balance,
           invested,
           holdings,
           holdingsBalance,
@@ -93,6 +93,7 @@ export class PortfolioGrowthService {
           startingCash: cashOnHandFromDeposit,
           firstTransactionDate,
           lastTransactionDate,
+          modifiedDate: getCurrentDateDefaultFormat(),
         };
 
         return result;

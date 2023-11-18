@@ -31,8 +31,8 @@ export const executeUserPortfolioUpdate = async (): Promise<void> => {
   const userToUpdate = usersCollectionRef()
     .where('role', '==', 'SIMULATION')
     // .where('lastLoginDate', '>=', twoWeeksBefore) // not able to use this filter
-    .where('lastPortfolioStateModifiedDate', '!=', today)
-    .orderBy('lastPortfolioStateModifiedDate', 'desc')
+    .where('lastPortfolioState.modifiedDate', '!=', today)
+    .orderBy('lastPortfolioState.modifiedDate', 'desc')
     .orderBy('lastLoginDate', 'desc')
     .limit(200);
 
@@ -54,7 +54,6 @@ export const executeUserPortfolioUpdate = async (): Promise<void> => {
       // update user
       userDoc.ref.update({
         lastPortfolioState: portfolioState,
-        lastPortfolioStateModifiedDate: today,
       });
 
       // log
@@ -68,7 +67,7 @@ export const executeUserPortfolioUpdate = async (): Promise<void> => {
 };
 
 const getPortfolioState = async (
-  cashOnHandFromDeposit: number,
+  cashOnHandFromDeposit: number = 0,
   portfolioTransactions: UserPortfolioTransaction,
 ): Promise<PortfolioState> => {
   const transactions = portfolioTransactions.transactions;
@@ -105,7 +104,7 @@ const getPortfolioState = async (
   });
 
   const invested = holdings.reduce((acc, curr) => acc + curr.invested, 0);
-  const userBalance = invested + cashOnHandFromDeposit + cashOnHandTransactions;
+  const balance = invested + cashOnHandFromDeposit + cashOnHandTransactions;
   const holdingsBalance = holdings.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0);
   const totalGainsValue = holdingsBalance - invested;
   const totalGainsPercentage = (holdingsBalance - invested) / holdingsBalance;
@@ -117,7 +116,7 @@ const getPortfolioState = async (
     numberOfExecutedSellTransactions,
     transactionFees: roundNDigits(transactionFees, 2),
     cashOnHand: roundNDigits(cashOnHandFromDeposit + cashOnHandTransactions, 2),
-    userBalance: roundNDigits(userBalance, 2),
+    balance: roundNDigits(balance, 2),
     invested: roundNDigits(invested, 2),
     holdingsBalance: roundNDigits(holdingsBalance, 2),
     totalGainsValue: roundNDigits(totalGainsValue, 2),
@@ -125,6 +124,7 @@ const getPortfolioState = async (
     startingCash: roundNDigits(cashOnHandFromDeposit, 2),
     firstTransactionDate,
     lastTransactionDate,
+    modifiedDate: getCurrentDateDefaultFormat(),
   };
 
   return result;

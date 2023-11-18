@@ -33,7 +33,6 @@ export type UserData = UserBase & {
   /**
    * dates
    */
-  lastPortfolioStateModifiedDate: string;
   lastLoginDate: string;
 };
 
