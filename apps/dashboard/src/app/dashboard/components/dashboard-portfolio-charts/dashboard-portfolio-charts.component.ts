@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { PortfolioStateHoldings } from '@market-monitor/api-types';
 import {
   PortfolioGrowth,
-  PortfolioStateHoldings,
   PortfolioUserFacadeService,
   dashboardChartOptionsInputSource,
 } from '@market-monitor/modules/portfolio/data-access';

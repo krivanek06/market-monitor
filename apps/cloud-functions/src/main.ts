@@ -42,14 +42,14 @@ admin.firestore().settings({
 
 // -------- Testing ---------
 
-// export const test_me = firebaseSimpleErrorLogger(
-//   'test_function',
-//   corsMiddleWare(async (request, response) => {
-//     console.log('Run Test Function');
+export const test_me = firebaseSimpleErrorLogger(
+  'test_function',
+  corsMiddleWareHttp(async (request, response) => {
+    console.log('Run Test Function');
 
-//     executeUserPortfolioUpdate();
-//   }),
-// );
+    executeUserPortfolioUpdate();
+  }),
+);
 
 // -------- Production ---------
 export * from './group';

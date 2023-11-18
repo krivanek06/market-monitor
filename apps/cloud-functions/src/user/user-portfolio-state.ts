@@ -1,8 +1,13 @@
 import { getSymbolSummaries } from '@market-monitor/api-external';
-import { PortfolioState, PortfolioTransaction, SymbolType, UserPortfolioTransaction } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat, roundNDigits } from '@market-monitor/shared/utils-general';
+import { SymbolType } from '@market-monitor/api-types';
+import {
+  getCurrentDateDefaultFormat,
+  getPortfolioStateHoldingPartialUtil,
+  getPortfolioStateHoldingsUtil,
+} from '@market-monitor/shared/utils-general';
 import { format, subDays } from 'date-fns';
 import { userDocumentTransactionHistoryRef, usersCollectionRef } from '../models';
+import { transformPortfolioStateHoldingToPortfolioState } from '../utils';
 
 type PortfolioStateHoldingPartial = {
   symbolType: SymbolType;
@@ -26,10 +31,10 @@ type PortfolioStateHoldingPartial = {
 export const executeUserPortfolioUpdate = async (): Promise<void> => {
   const today = getCurrentDateDefaultFormat();
   const twoWeeksBefore = format(subDays(new Date(), 14), 'yyyy-MM-dd');
-
+  console.log('today', today);
   // load users to calculate balance
   const userToUpdate = usersCollectionRef()
-    .where('role', '==', 'SIMULATION')
+    .where('personal.accountType', '==', 'SIMULATION')
     // .where('lastLoginDate', '>=', twoWeeksBefore) // not able to use this filter
     .where('lastPortfolioState.modifiedDate', '!=', today)
     .orderBy('lastPortfolioState.modifiedDate', 'desc')
@@ -48,8 +53,22 @@ export const executeUserPortfolioUpdate = async (): Promise<void> => {
     const user = userDoc.data();
 
     try {
+      // get partial holdings calculations
+      const partialHoldings = getPortfolioStateHoldingPartialUtil(transactions.transactions);
+
+      // get symbol summaries from API
+      const partialHoldingSymbols = partialHoldings.map((d) => d.symbol);
+      const summaries = partialHoldingSymbols.length > 0 ? await getSymbolSummaries(partialHoldingSymbols) : [];
+
       // get portfolio state
-      const portfolioState = await getPortfolioState(user.lastPortfolioState.cashOnHand, transactions);
+      const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
+        user.lastPortfolioState.startingCash,
+        transactions.transactions,
+        partialHoldings,
+        summaries,
+      );
+      // remove holdings
+      const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
 
       // update user
       userDoc.ref.update({
@@ -64,105 +83,4 @@ export const executeUserPortfolioUpdate = async (): Promise<void> => {
 
     console.log('Finished');
   }
-};
-
-const getPortfolioState = async (
-  cashOnHandFromDeposit: number = 0,
-  portfolioTransactions: UserPortfolioTransaction,
-): Promise<PortfolioState> => {
-  const transactions = portfolioTransactions.transactions;
-
-  // accumulate cash on hand from transactions
-  const cashOnHandTransactions = transactions.reduce(
-    (acc, curr) =>
-      curr.transactionType === 'BUY' ? acc - curr.unitPrice * curr.units : acc + curr.unitPrice * curr.units,
-    0,
-  );
-  const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
-  const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
-  const transactionFees = transactions.reduce((acc, curr) => acc + curr.transactionFees, 0);
-
-  // get partial holdings calculations
-  const partialHoldings = getPortfolioStateHoldingPartial(transactions);
-  const partialHoldingSymbols = partialHoldings.map((d) => d.symbol);
-
-  // get symbol summaries from API
-  const summaries = await getSymbolSummaries(partialHoldingSymbols);
-
-  console.log(`Getting Summaries: sending ${partialHoldings.length}, receiving: ${summaries.length}`);
-
-  const holdings = summaries.map((symbolSummary) => {
-    const holding = partialHoldings.find((d) => d.symbol === symbolSummary.id);
-    if (!holding) {
-      console.log(`Holding not found for symbol ${symbolSummary.id}`);
-      return null;
-    }
-    return {
-      ...holding,
-      symbolSummary,
-    };
-  });
-
-  const invested = holdings.reduce((acc, curr) => acc + curr.invested, 0);
-  const balance = invested + cashOnHandFromDeposit + cashOnHandTransactions;
-  const holdingsBalance = holdings.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0);
-  const totalGainsValue = holdingsBalance - invested;
-  const totalGainsPercentage = (holdingsBalance - invested) / holdingsBalance;
-  const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
-  const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
-
-  const result: PortfolioState = {
-    numberOfExecutedBuyTransactions,
-    numberOfExecutedSellTransactions,
-    transactionFees: roundNDigits(transactionFees, 2),
-    cashOnHand: roundNDigits(cashOnHandFromDeposit + cashOnHandTransactions, 2),
-    balance: roundNDigits(balance, 2),
-    invested: roundNDigits(invested, 2),
-    holdingsBalance: roundNDigits(holdingsBalance, 2),
-    totalGainsValue: roundNDigits(totalGainsValue, 2),
-    totalGainsPercentage: roundNDigits(totalGainsPercentage, 6),
-    startingCash: roundNDigits(cashOnHandFromDeposit, 2),
-    firstTransactionDate,
-    lastTransactionDate,
-    modifiedDate: getCurrentDateDefaultFormat(),
-  };
-
-  return result;
-};
-
-/**
- * get partial data for user's current holdings from all previous transactions, where units are more than 0
- *
- * @param transactions - user's transactions
- * @returns
- */
-const getPortfolioStateHoldingPartial = (transactions: PortfolioTransaction[]): PortfolioStateHoldingPartial[] => {
-  return transactions
-    .reduce((acc, curr) => {
-      const existingHolding = acc.find((d) => d.symbol === curr.symbol);
-      const isSell = curr.transactionType === 'SELL';
-      // update existing holding
-      if (existingHolding) {
-        existingHolding.units += isSell ? -curr.units : curr.units;
-        existingHolding.invested += curr.unitPrice * curr.units * (isSell ? -1 : 1);
-        return acc;
-      }
-
-      // first value can not be sell
-      if (isSell) {
-        console.error('First transaction can not be sell');
-      }
-
-      // add new holding
-      return [
-        ...acc,
-        {
-          symbolType: curr.symbolType,
-          symbol: curr.symbol,
-          units: curr.units,
-          invested: curr.unitPrice * curr.units,
-        } satisfies PortfolioStateHoldingPartial,
-      ];
-    }, [] as PortfolioStateHoldingPartial[])
-    .filter((d) => d.units > 0);
 };

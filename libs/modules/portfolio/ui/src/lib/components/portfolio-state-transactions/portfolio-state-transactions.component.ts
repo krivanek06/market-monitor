@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { PortfolioStateHoldings } from '@market-monitor/modules/portfolio/data-access';
+import { PortfolioStateHoldings } from '@market-monitor/api-types';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { AddColorDirective } from '@market-monitor/shared/ui';
 

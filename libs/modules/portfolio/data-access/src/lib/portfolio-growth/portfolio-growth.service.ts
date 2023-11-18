@@ -6,99 +6,46 @@ import {
   PortfolioGrowthAssets,
   PortfolioGrowthAssetsDataItem,
   PortfolioState,
+  PortfolioStateHoldings,
   UserPortfolioTransaction,
 } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat, roundNDigits } from '@market-monitor/shared/utils-general';
+import {
+  getPortfolioStateHoldingPartialUtil,
+  getPortfolioStateHoldingsUtil,
+  roundNDigits,
+} from '@market-monitor/shared/utils-general';
 import { format, isBefore, isSameDay, subDays } from 'date-fns';
-import { Observable, firstValueFrom, map, tap } from 'rxjs';
-import { PortfolioStateHolding, PortfolioStateHoldings } from '../models';
-import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
+import { Observable, firstValueFrom, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PortfolioGrowthService {
-  constructor(
-    private marketApiService: MarketApiService,
-    private portfolioCalculationService: PortfolioCalculationService,
-  ) {}
+  constructor(private marketApiService: MarketApiService) {}
 
   getPortfolioState(
     previousPortfolioState: PortfolioState,
     portfolioTransactions: UserPortfolioTransaction,
   ): Observable<PortfolioStateHoldings> {
     console.log(`PortfolioGrowthService: getPortfolioState`);
-    const transactions = portfolioTransactions.transactions;
-
-    // todo: remove/add transaction total values into this
-    // accumulate cash on hand from deposits
-    const cashOnHandFromDeposit = previousPortfolioState.startingCash ?? 0;
-    const isCashActive = cashOnHandFromDeposit !== 0;
-    // accumulate cash on hand from transactions
-    const cashOnHandTransactions = transactions.reduce(
-      (acc, curr) =>
-        curr.transactionType === 'BUY' ? acc - curr.unitPrice * curr.units : acc + curr.unitPrice * curr.units,
-      0,
-    );
-    const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
-    const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
-    const transactionFees = transactions.reduce((acc, curr) => acc + curr.transactionFees, 0);
 
     // get partial holdings calculations
-    const partialHoldings = this.portfolioCalculationService.getPortfolioStateHoldingPartial(transactions);
+    const partialHoldings = getPortfolioStateHoldingPartialUtil(portfolioTransactions.transactions);
     const partialHoldingSymbols = partialHoldings.map((d) => d.symbol);
 
     // get symbol summaries from API
-    return this.marketApiService.getSymbolSummaries(partialHoldingSymbols).pipe(
-      // TODO: maybe use some logging service
-      tap((summaries) => console.log(`Sending ${partialHoldings.length}, receiving: ${summaries.length}`)),
-      // map summaries into holdings data
-      map((summaries) =>
-        summaries
-          .map((symbolSummary) => {
-            const holding = partialHoldings.find((d) => d.symbol === symbolSummary.id);
-            if (!holding) {
-              console.log(`Holding not found for symbol ${symbolSummary.id}`);
-              return null;
-            }
-            return {
-              ...holding,
-              breakEvenPrice: roundNDigits(holding.invested / holding.units, 2),
-              symbolSummary,
-            } satisfies PortfolioStateHolding;
-          })
-          // filter out nulls
-          .filter((d): d is PortfolioStateHolding => !!d),
-      ),
-      map((holdings) => {
-        const invested = holdings.reduce((acc, curr) => acc + curr.invested, 0);
-        const balance = invested + cashOnHandFromDeposit + (isCashActive ? cashOnHandTransactions : 0);
-        const holdingsBalance = holdings.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0);
-        const totalGainsValue = roundNDigits(holdingsBalance - invested, 2);
-        const totalGainsPercentage = roundNDigits((holdingsBalance - invested) / holdingsBalance, 6);
-        const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
-        const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
-
-        const result: PortfolioStateHoldings = {
-          numberOfExecutedBuyTransactions,
-          numberOfExecutedSellTransactions,
-          transactionFees,
-          cashOnHand: isCashActive ? cashOnHandFromDeposit + cashOnHandTransactions : 0,
-          balance,
-          invested,
-          holdings,
-          holdingsBalance,
-          totalGainsValue,
-          totalGainsPercentage,
-          startingCash: cashOnHandFromDeposit,
-          firstTransactionDate,
-          lastTransactionDate,
-          modifiedDate: getCurrentDateDefaultFormat(),
-        };
-
-        return result;
-      }),
-    );
+    return this.marketApiService
+      .getSymbolSummaries(partialHoldingSymbols)
+      .pipe(
+        map((summaries) =>
+          getPortfolioStateHoldingsUtil(
+            previousPortfolioState.startingCash,
+            portfolioTransactions.transactions,
+            partialHoldings,
+            summaries,
+          ),
+        ),
+      );
   }
 
   async getPortfolioGrowthAssets(userTransactions: UserPortfolioTransaction): Promise<PortfolioGrowthAssets[]> {

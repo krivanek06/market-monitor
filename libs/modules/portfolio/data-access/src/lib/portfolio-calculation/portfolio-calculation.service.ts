@@ -1,15 +1,9 @@
 import { Injectable } from '@angular/core';
-import { PortfolioGrowthAssets, PortfolioTransaction } from '@market-monitor/api-types';
+import { PortfolioGrowthAssets, PortfolioStateHolding, PortfolioTransaction } from '@market-monitor/api-types';
 import { GenericChartSeriesData, GenericChartSeriesPie, ValueItem } from '@market-monitor/shared/data-access';
 import { dateFormatDate, roundNDigits } from '@market-monitor/shared/utils-general';
 import { subDays, subMonths, subWeeks, subYears } from 'date-fns';
-import {
-  PortfolioChange,
-  PortfolioGrowth,
-  PortfolioStateHolding,
-  PortfolioStateHoldingPartial,
-  PortfolioTransactionToDate,
-} from '../models';
+import { PortfolioChange, PortfolioGrowth, PortfolioTransactionToDate } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -53,43 +47,6 @@ export class PortfolioCalculationService {
 
       return acc;
     }, [] as PortfolioGrowth[]);
-  }
-
-  /**
-   * get partial data for user's current holdings from all previous transactions, where units are more than 0
-   *
-   * @param transactions - user's transactions
-   * @returns
-   */
-  getPortfolioStateHoldingPartial(transactions: PortfolioTransaction[]): PortfolioStateHoldingPartial[] {
-    return transactions
-      .reduce((acc, curr) => {
-        const existingHolding = acc.find((d) => d.symbol === curr.symbol);
-        const isSell = curr.transactionType === 'SELL';
-        // update existing holding
-        if (existingHolding) {
-          existingHolding.units += isSell ? -curr.units : curr.units;
-          existingHolding.invested += curr.unitPrice * curr.units * (isSell ? -1 : 1);
-          return acc;
-        }
-
-        // first value can not be sell
-        if (isSell) {
-          console.error('First transaction can not be sell');
-        }
-
-        // add new holding
-        return [
-          ...acc,
-          {
-            symbolType: curr.symbolType,
-            symbol: curr.symbol,
-            units: curr.units,
-            invested: curr.unitPrice * curr.units,
-          } satisfies PortfolioStateHoldingPartial,
-        ];
-      }, [] as PortfolioStateHoldingPartial[])
-      .filter((d) => d.units > 0);
   }
 
   /**

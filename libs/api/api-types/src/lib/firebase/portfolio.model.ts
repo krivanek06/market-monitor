@@ -1,4 +1,4 @@
-import { SymbolType } from './symbol.model';
+import { SymbolSummary, SymbolType } from './symbol.model';
 
 export type PortfolioRisk = {
   alpha: number;
@@ -44,6 +44,28 @@ export type PortfolioState = {
    * date when it was last calculated
    */
   modifiedDate: string;
+};
+
+export type PortfolioStateHoldingPartial = {
+  symbolType: SymbolType;
+  symbol: string;
+  units: number;
+  /**
+   * how much user invested. Used to calculate BEP.
+   */
+  invested: number;
+};
+
+export type PortfolioStateHolding = PortfolioStateHoldingPartial & {
+  breakEvenPrice: number; // calculated
+  symbolSummary: SymbolSummary;
+};
+
+export type PortfolioStateHoldings = PortfolioState & {
+  /**
+   * calculated from previous transactions
+   */
+  holdings: PortfolioStateHolding[];
 };
 
 export type PortfolioGrowthAssets = {
