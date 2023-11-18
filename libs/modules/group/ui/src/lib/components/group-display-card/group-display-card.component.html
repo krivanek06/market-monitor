@@ -4,12 +4,12 @@
   [matRippleDisabled]="false"
   [matRippleUnbounded]="false"
   appearance="outlined"
-  class="shadow-md cursor-pointer"
+  class="shadow-md cursor-pointer bg-wt-gray-light"
   (click)="onGroupClick()"
 >
   <mat-card-header>
     <mat-card-title class="text-lg text-wt-primary">
-      {{ groupData.name }}
+      {{ groupData.name | titlecase }}
     </mat-card-title>
   </mat-card-header>
   <mat-card-content>
@@ -25,7 +25,7 @@
             alt="Owner Image"
             class="w-8 h-8 rounded-full"
           />
-          <span>{{ groupData.ownerUser.personal.displayName }}</span>
+          <span>{{ groupData.ownerUser.personal.displayName | titlecase }}</span>
         </div>
         <div class="flex gap-2">
           <div class="w-20">Status</div>

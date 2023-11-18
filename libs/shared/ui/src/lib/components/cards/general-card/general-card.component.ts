@@ -28,11 +28,9 @@ import { MatIconModule } from '@angular/material/icon';
   template: `
     <mat-card
       appearance="outlined"
-      [class]="additionalClasses + ' ' + 'h-full'"
+      [class]="additionalClasses + ' ' + cardColor + ' ' + 'h-full'"
       [ngClass]="{
-        'shadow-md': showDataInCard,
-        'bg-wt-gray-light': showDataInCard,
-        'bg-wt-gray-light-strong': !showDataInCard
+        'shadow-md': useShadow
       }"
     >
       <!-- title -->
@@ -68,7 +66,8 @@ export class GeneralCardComponent {
   @Input() titleImgUrl?: string;
   @Input() matIcon?: string;
   @Input() titleScale: 'small' | 'medium' | 'large' = 'medium';
-  @Input() showDataInCard = true;
+  @Input() useShadow = true;
   @Input() additionalClasses = '';
   @Input() titleCenter = false;
+  @Input() cardColor: 'bg-wt-gray-medium' | 'bg-wt-gray-light-strong' | 'bg-wt-gray-light' = 'bg-wt-gray-light';
 }
