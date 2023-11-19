@@ -14,7 +14,7 @@
   </mat-card-header>
   <mat-card-content>
     <div class="flex justify-between">
-      <div class="flex gap-3 p-3">
+      <div class="flex flex-1 gap-3 p-3">
         <!-- image -->
         <img appDefaultImg [src]="groupData.imageUrl" alt="Group Image" class="w-[100px] h-[100px]" />
         <!-- data -->
@@ -54,7 +54,12 @@
       </div>
 
       <!-- portfolio chart -->
-      <div class="hidden lg:block">CHART !!!! TODO</div>
+      <div class="hidden xl:block -mt-8 w-[400px]">
+        <app-portfolio-balance-pie-chart
+          [heightPx]="200"
+          [data]="groupData.portfolioState"
+        ></app-portfolio-balance-pie-chart>
+      </div>
     </div>
   </mat-card-content>
 </mat-card>
