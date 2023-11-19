@@ -22,7 +22,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
     settings: {
       isProfilePublic: true,
     },
-    lastPortfolioState: {
+    portfolioState: {
       cashOnHand: 0,
       startingCash: 1000,
       holdingsBalance: 0,

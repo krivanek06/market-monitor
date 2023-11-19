@@ -34,7 +34,7 @@ export class PortfolioUserFacadeService {
       .pipe(
         switchMap((transactions) =>
           this.portfolioGrowthService.getPortfolioState(
-            this.authenticationUserService.userData.lastPortfolioState,
+            this.authenticationUserService.userData.portfolioState,
             transactions,
           ),
         ),

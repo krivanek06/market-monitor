@@ -15,7 +15,7 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
     },
     personal: personal,
     accountResets: [],
-    lastPortfolioState: {
+    portfolioState: {
       cashOnHand: 0,
       startingCash: 0,
       holdingsBalance: 0,

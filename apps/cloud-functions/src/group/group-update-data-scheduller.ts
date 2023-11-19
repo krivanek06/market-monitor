@@ -21,7 +21,7 @@ export const updateGroupData = async (): Promise<void> => {
   const today = getCurrentDateDefaultFormat();
   // get all non closed groups
   const group = await groupsCollectionRef()
-    .where('lastModifiedSubCollectionDate', '!=', today)
+    .where('modifiedSubCollectionDate', '!=', today)
     .where('isClosed', '==', false)
     .limit(25)
     .get();
@@ -60,9 +60,9 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     .sort((a, b) => (b.date < a.date ? -1 : 1))
     .slice(0, 250);
 
-  // calculate lastPortfolioState from all members
-  const lastPortfolioState = membersData
-    .map((d) => d.lastPortfolioState)
+  // calculate portfolioState from all members
+  const portfolioState = membersData
+    .map((d) => d.portfolioState)
     .reduce((acc, curr) => {
       if (!acc) {
         return curr;
@@ -88,8 +88,8 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     }, null);
 
   // calculate additional fields
-  lastPortfolioState.totalGainsValue = lastPortfolioState.holdingsBalance - lastPortfolioState.invested;
-  lastPortfolioState.totalGainsPercentage = lastPortfolioState.totalGainsValue / lastPortfolioState.holdingsBalance;
+  portfolioState.totalGainsValue = portfolioState.holdingsBalance - portfolioState.invested;
+  portfolioState.totalGainsPercentage = portfolioState.totalGainsValue / portfolioState.holdingsBalance;
 
   // update last transactions for the group
   groupDocumentTransactionsRef(group.id).set({
@@ -106,7 +106,7 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // update owner
   groupDocumentRef(group.id).update({
     ownerUser: transformUserToBase(ownerData),
-    lastModifiedSubCollectionDate: getCurrentDateDefaultFormat(),
-    lastPortfolioState: lastPortfolioState,
+    modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
+    portfolioState: portfolioState,
   });
 };

@@ -36,8 +36,8 @@ export const executeUserPortfolioUpdate = async (): Promise<void> => {
   const userToUpdate = usersCollectionRef()
     .where('personal.accountType', '==', 'SIMULATION')
     // .where('lastLoginDate', '>=', twoWeeksBefore) // not able to use this filter
-    .where('lastPortfolioState.modifiedDate', '!=', today)
-    .orderBy('lastPortfolioState.modifiedDate', 'desc')
+    .where('portfolioState.modifiedDate', '!=', today)
+    .orderBy('portfolioState.modifiedDate', 'desc')
     .orderBy('lastLoginDate', 'desc')
     .limit(200);
 
@@ -62,7 +62,7 @@ export const executeUserPortfolioUpdate = async (): Promise<void> => {
 
       // get portfolio state
       const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
-        user.lastPortfolioState.startingCash,
+        user.portfolioState.startingCash,
         transactions.transactions,
         partialHoldings,
         summaries,
@@ -72,7 +72,7 @@ export const executeUserPortfolioUpdate = async (): Promise<void> => {
 
       // update user
       userDoc.ref.update({
-        lastPortfolioState: portfolioState,
+        portfolioState: portfolioState,
       });
 
       // log

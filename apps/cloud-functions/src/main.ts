@@ -48,6 +48,7 @@ export const test_me = firebaseSimpleErrorLogger(
     console.log('Run Test Function');
 
     updateGroupData();
+    //executeUserPortfolioUpdate();
   }),
 );
 

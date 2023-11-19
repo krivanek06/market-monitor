@@ -66,12 +66,12 @@ export type GroupData = {
   /**
    * data when was members and transactions last updated
    */
-  lastModifiedSubCollectionDate: string;
+  modifiedSubCollectionDate: string;
 
   /**
    * portfolio state calculated from transactions at the end of the day
    */
-  lastPortfolioState: PortfolioState;
+  portfolioState: PortfolioState;
 };
 
 export type GroupTransactionsData = {

@@ -106,8 +106,8 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
     isClosed: false,
     memberRequestUserIds: [],
     memberUserIds: [],
-    lastModifiedSubCollectionDate: getCurrentDateDefaultFormat(),
-    lastPortfolioState: {
+    modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
+    portfolioState: {
       cashOnHand: 0,
       firstTransactionDate: null,
       lastTransactionDate: null,

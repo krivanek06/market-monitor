@@ -8,7 +8,7 @@ export type UserBase = {
   /**
    * user portfolio state calculated from transactions in cloud functions at the end of the day
    */
-  lastPortfolioState: PortfolioState;
+  portfolioState: PortfolioState;
 
   accountCreatedDate: string;
 };

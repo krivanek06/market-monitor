@@ -19,14 +19,14 @@
 </div>
 
 <ng-container *ngIf="groupsSignal() as groups">
-  <div class="flex flex-col gap-6 lg:flex-row">
-    <div class="lg:basis-3/5">
+  <div class="flex flex-col-reverse gap-6 xl:flex-row">
+    <div class="xl:basis-3/5">
       <!-- my groups -->
       <div *ngIf="groups.groupOwner.length > 0" class="mb-4">
         <h2>My Groups</h2>
         <div class="flex flex-col gap-3">
           <app-group-display-card
-            class="lg:w-10/12"
+            class="xl:w-11/12"
             *ngFor="let group of groups.groupOwner"
             (groupClickEmitter)="onGroupClick(group)"
             [groupData]="group"
@@ -39,7 +39,7 @@
         <h2>Member of</h2>
         <div class="flex flex-col gap-3">
           <app-group-display-card
-            class="lg:w-10/12"
+            class="xl:w-11/12"
             *ngFor="let group of groups.groupMember"
             (groupClickEmitter)="onGroupClick(group)"
             [groupData]="group"
@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <div class="lg:basis-2/5">
+    <div class="xl:basis-2/5">
       <div>
         <h2>Received Invitation</h2>
         <div *ngFor="let group of groups.groupInvitations">
