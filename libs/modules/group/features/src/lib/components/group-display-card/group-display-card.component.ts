@@ -4,12 +4,20 @@ import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { GROUP_MEMBER_LIMIT, GroupData } from '@market-monitor/api-types';
+import { PortfolioBalancePieChartComponent } from '@market-monitor/modules/portfolio/ui';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-group-display-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, DefaultImgDirective, MatRippleModule, MatIconModule],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    DefaultImgDirective,
+    MatRippleModule,
+    MatIconModule,
+    PortfolioBalancePieChartComponent,
+  ],
   templateUrl: './group-display-card.component.html',
   styles: [
     `

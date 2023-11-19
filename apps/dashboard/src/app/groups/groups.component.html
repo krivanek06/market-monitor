@@ -19,49 +19,42 @@
 </div>
 
 <ng-container *ngIf="groupsSignal() as groups">
-  <div class="flex flex-col-reverse gap-6 xl:flex-row">
-    <div class="xl:basis-3/5">
-      <!-- my groups -->
-      <div *ngIf="groups.groupOwner.length > 0" class="mb-4">
-        <h2>My Groups</h2>
-        <div class="flex flex-col gap-3">
-          <app-group-display-card
-            class="xl:w-11/12"
-            *ngFor="let group of groups.groupOwner"
-            (groupClickEmitter)="onGroupClick(group)"
-            [groupData]="group"
-          ></app-group-display-card>
-        </div>
-      </div>
-
-      <!-- member of -->
-      <div *ngIf="groups.groupMember.length > 0" class="mb-4">
-        <h2>Member of</h2>
-        <div class="flex flex-col gap-3">
-          <app-group-display-card
-            class="xl:w-11/12"
-            *ngFor="let group of groups.groupMember"
-            (groupClickEmitter)="onGroupClick(group)"
-            [groupData]="group"
-          ></app-group-display-card>
-        </div>
-      </div>
+  <!-- invitations -->
+  <div *ngIf="groups.groupInvitations.length > 0" class="mb-4">
+    <h2>Received Invitation</h2>
+    <div *ngFor="let group of groups.groupInvitations">
+      <app-general-card>
+        <app-group-display-item
+          (acceptClickEmitter)="onAcceptInvitationClick(group)"
+          (declineClickEmitter)="onDeclineInvitationClick(group)"
+          [groupData]="group"
+          [showActionButtons]="true"
+        ></app-group-display-item>
+      </app-general-card>
     </div>
+  </div>
 
-    <div class="xl:basis-2/5">
-      <div>
-        <h2>Received Invitation</h2>
-        <div *ngFor="let group of groups.groupInvitations">
-          <app-general-card>
-            <app-group-display-item
-              (acceptClickEmitter)="onAcceptInvitationClick(group)"
-              (declineClickEmitter)="onDeclineInvitationClick(group)"
-              [groupData]="group"
-              [showActionButtons]="true"
-            ></app-group-display-item>
-          </app-general-card>
-        </div>
-      </div>
+  <!-- my groups -->
+  <div *ngIf="groups.groupOwner.length > 0" class="m-auto mb-4 xl:w-11/12">
+    <h2>My Groups</h2>
+    <div class="flex flex-col gap-3">
+      <app-group-display-card
+        *ngFor="let group of groups.groupOwner"
+        (groupClickEmitter)="onGroupClick(group)"
+        [groupData]="group"
+      ></app-group-display-card>
+    </div>
+  </div>
+
+  <!-- member of -->
+  <div *ngIf="groups.groupMember.length > 0" class="m-auto mb-4 xl:w-11/12">
+    <h2>Member of</h2>
+    <div class="flex flex-col gap-3">
+      <app-group-display-card
+        *ngFor="let group of groups.groupMember"
+        (groupClickEmitter)="onGroupClick(group)"
+        [groupData]="group"
+      ></app-group-display-card>
     </div>
   </div>
 </ng-container>

@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { PortfolioState } from '@market-monitor/api-types';
+import { ColorScheme } from '@market-monitor/shared/data-access';
 import { ChartConstructor } from '@market-monitor/shared/utils-client';
+import { formatValueIntoCurrency } from '@market-monitor/shared/utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({
@@ -30,9 +32,11 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioBalancePieChartComponent extends ChartConstructor {
-  @Input({ required: true }) set data(input: PortfolioState) {}
+  @Input({ required: true }) set data(input: PortfolioState) {
+    this.initChart(input);
+  }
 
-  private initChart(data: number[][]) {
+  private initChart(data: PortfolioState) {
     this.chartOptions = {
       chart: {
         type: 'area',
@@ -162,7 +166,7 @@ export class PortfolioBalancePieChartComponent extends ChartConstructor {
               },
             },
           ],
-          data: data,
+          data: [],
         },
       ],
     };
