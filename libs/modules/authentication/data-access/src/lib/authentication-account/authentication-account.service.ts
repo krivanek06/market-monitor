@@ -97,8 +97,8 @@ export class AuthenticationAccountService {
       )
       .subscribe((userData) => {
         console.log('UPDATING USER', userData);
-        this.authenticationLoaded$.next(true);
         this.authenticatedUserData$.next(userData);
+        this.authenticationLoaded$.next(true);
       });
   }
 

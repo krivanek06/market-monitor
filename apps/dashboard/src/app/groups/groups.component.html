@@ -40,7 +40,7 @@
         <div class="flex flex-col gap-3">
           <app-group-display-card
             class="lg:w-10/12"
-            *ngFor="let group of groups.groupOwner"
+            *ngFor="let group of groups.groupMember"
             (groupClickEmitter)="onGroupClick(group)"
             [groupData]="group"
           ></app-group-display-card>
@@ -48,6 +48,20 @@
       </div>
     </div>
 
-    <div class="lg:basis-2/5">something else</div>
+    <div class="lg:basis-2/5">
+      <div>
+        <h2>Received Invitation</h2>
+        <div *ngFor="let group of groups.groupInvitations">
+          <app-general-card>
+            <app-group-display-item
+              (acceptClickEmitter)="onAcceptInvitationClick(group)"
+              (declineClickEmitter)="onDeclineInvitationClick(group)"
+              [groupData]="group"
+              [showActionButtons]="true"
+            ></app-group-display-item>
+          </app-general-card>
+        </div>
+      </div>
+    </div>
   </div>
 </ng-container>

@@ -10,7 +10,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
 import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
 import { SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
-import { LoaderMainService } from '@market-monitor/shared/utils-client';
+import { DialogServiceModule, LoaderMainService } from '@market-monitor/shared/utils-client';
 import { map, take, tap } from 'rxjs';
 import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-navigation.component';
 
@@ -26,6 +26,9 @@ import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-na
     MatDividerModule,
     MenuSideNavigationComponent,
     MatProgressSpinnerModule,
+
+    // do not remove - allows showing dialogs sub child routes
+    DialogServiceModule,
   ],
   template: `
     <mat-drawer-container autosize class="h-full">

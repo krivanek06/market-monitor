@@ -86,7 +86,6 @@ export class AuthenticationUserService {
           this.groupApiService.getGroupsDataByIds(groups.groupRequested),
           this.groupApiService.getGroupsDataByIds(groups.groupWatched),
         ]).pipe(
-          tap((x) => console.log('map', x)),
           map(([groupMember, groupOwner, groupInvitations, groupRequested, groupWatched]) => ({
             groupMember,
             groupOwner,

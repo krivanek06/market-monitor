@@ -41,13 +41,13 @@ export const groupMemberAcceptCall = onCall(async (request) => {
   });
 
   // update group
-  await groupDocumentRef(userAuthId).update({
+  await groupDocumentRef(groupData.id).update({
     memberUserIds: FieldValue.arrayUnion(userAuthId), // add user to members
     memberInvitedUserIds: FieldValue.arrayRemove(userAuthId), // remove invitation
   });
 
   // update group members
-  await groupDocumentMembersRef(userAuthId).update({
+  await groupDocumentMembersRef(groupData.id).update({
     memberUsers: FieldValue.arrayUnion(<GroupMember>{
       ...transformUserToGroupMember(userData),
     }),

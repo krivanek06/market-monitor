@@ -22,7 +22,7 @@ export const groupMemberInviteRemoveCall = onCall(async (request) => {
   }
 
   // check if requestor is owner
-  if (groupData.ownerUserId !== userAuthId || data.userId !== userAuthId) {
+  if (groupData.ownerUserId !== userAuthId && data.userId !== userAuthId) {
     throw new HttpsError('failed-precondition', 'User is not owner or the user itself');
   }
 

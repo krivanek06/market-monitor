@@ -6,12 +6,14 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
+import { GroupApiService } from '@market-monitor/api-client';
 import { GROUP_OWNER_LIMIT, GroupData } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { GroupCreateDialogComponent } from '@market-monitor/modules/group/features';
-import { GroupDisplayCardComponent } from '@market-monitor/modules/group/ui';
+import { GroupDisplayCardComponent, GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
+import { GeneralCardComponent } from '@market-monitor/shared/ui';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { map } from 'rxjs';
 
 @Component({
@@ -26,6 +28,8 @@ import { map } from 'rxjs';
     UploadImageSingleControlComponent,
     MatTooltipModule,
     GroupDisplayCardComponent,
+    GroupDisplayItemComponent,
+    GeneralCardComponent,
   ],
   templateUrl: './groups.component.html',
   styles: [
@@ -39,6 +43,8 @@ import { map } from 'rxjs';
 })
 export class GroupsComponent {
   authenticationUserService = inject(AuthenticationUserService);
+  groupApiService = inject(GroupApiService);
+  dialogServiceUtil = inject(DialogServiceUtil);
   dialog = inject(MatDialog);
   router = inject(Router);
 
@@ -50,6 +56,13 @@ export class GroupsComponent {
 
   get errorMessageGroupCreate(): string {
     return `You can only create ${GROUP_OWNER_LIMIT} groups`;
+  }
+
+  constructor() {
+    this.authenticationUserService.getUserGroupsData().subscribe((data) => {
+      console.log('HERE IS GROUP DATA');
+      console.log(data);
+    });
   }
 
   onCreateGroupClick(): void {
@@ -65,10 +78,28 @@ export class GroupsComponent {
     this.router.navigate(['groups', group.id]);
   }
 
-  constructor() {
-    this.authenticationUserService.getUserGroupsData().subscribe((data) => {
-      console.log('HERE IS GROUP DATA');
-      console.log(data);
-    });
+  async onAcceptInvitationClick(group: GroupData) {
+    try {
+      this.dialogServiceUtil.showNotificationBar('Accepting invitation', 'notification');
+      await this.groupApiService.userAcceptsGroupInvitation(group.id);
+      this.dialogServiceUtil.showNotificationBar('Invitation accepted', 'success');
+    } catch (e) {
+      this.dialogServiceUtil.handleError(e);
+    }
+  }
+
+  @Confirmable('Are you sure you want to decline this invitation?')
+  async onDeclineInvitationClick(group: GroupData) {
+    console.log('decline', group);
+    try {
+      this.dialogServiceUtil.showNotificationBar('Declining invitation', 'notification');
+      await this.groupApiService.userDeclinesGroupInvitation({
+        groupId: group.id,
+        userId: this.authenticationUserService.userData.id,
+      });
+      this.dialogServiceUtil.showNotificationBar('Invitation declined', 'success');
+    } catch (e) {
+      this.dialogServiceUtil.handleError(e);
+    }
   }
 }
