@@ -1,6 +1,6 @@
 import { GroupBaseInput } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
-import { onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentRef, userDocumentRef } from '../models';
 
 /**
@@ -18,17 +18,17 @@ export const groupMemberInviteRemoveCall = onCall(async (request) => {
 
   // check if group exists
   if (!groupData) {
-    throw new Error('Group does not exist');
+    throw new HttpsError('not-found', 'Group does not exist');
   }
 
   // check if requestor is owner
   if (groupData.ownerUserId !== userAuthId || data.userId !== userAuthId) {
-    throw new Error('User is not owner or the user itself');
+    throw new HttpsError('failed-precondition', 'User is not owner or the user itself');
   }
 
   // check is user is invited
   if (!groupData.memberInvitedUserIds.includes(data.userId)) {
-    throw new Error('User is not invited');
+    throw new HttpsError('failed-precondition', 'User is not invited');
   }
 
   // group - remove user from invited list

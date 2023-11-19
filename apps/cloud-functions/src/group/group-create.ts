@@ -7,9 +7,15 @@ import {
 } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { FieldValue } from 'firebase-admin/firestore';
-import { onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
-import { groupDocumentMembersRef, groupDocumentRef, groupDocumentTransactionsRef, userDocumentRef } from '../models';
+import {
+  groupDocumentMembersRef,
+  groupDocumentRef,
+  groupDocumentTransactionsRef,
+  groupsCollectionRef,
+  userDocumentRef,
+} from '../models';
 import { transformUserToBase } from '../utils';
 
 /**
@@ -31,20 +37,26 @@ export const groupCreateCall = onCall(async (request) => {
   const userDataDoc = await userDocumentRef(userAuthId).get();
   const userData = userDataDoc.data();
   const userBase = transformUserToBase(userData);
+  const group = (await groupsCollectionRef().where('name', '==', data.groupName).get()).docs[0];
+
+  // check if group already exists
+  if (group) {
+    throw new HttpsError('already-exists', 'Group with same name already exists');
+  }
 
   // check to load user
   if (!userData) {
-    throw new Error('User not found');
+    throw new HttpsError('cancelled', 'User not found');
   }
 
   // check limit
   if (userData.groups.groupOwner.length >= GROUP_OWNER_LIMIT) {
-    throw new Error(`User can only create ${GROUP_OWNER_LIMIT} groups`);
+    throw new HttpsError('resource-exhausted', `User can only create ${GROUP_OWNER_LIMIT} groups`);
   }
 
   // check members
   if (data.memberInvitedUserIds.length >= GROUP_MEMBER_LIMIT) {
-    throw new Error(`Group can only have ${GROUP_MEMBER_LIMIT} members`);
+    throw new HttpsError('resource-exhausted', `Group can only have ${GROUP_MEMBER_LIMIT} members`);
   }
 
   // create group

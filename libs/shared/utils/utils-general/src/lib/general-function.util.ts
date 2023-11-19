@@ -7,7 +7,7 @@ export const isNumber = (value: string | number | unknown): boolean => {
 };
 
 export const roundNDigits = (value?: number | null, n: number = 2, isPercent = false): number => {
-  if (value === undefined || value === null) {
+  if (value === undefined || value === null || isNaN(value)) {
     return 0;
   }
 

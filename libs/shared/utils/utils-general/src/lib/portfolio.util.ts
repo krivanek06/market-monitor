@@ -49,7 +49,7 @@ export const getPortfolioStateHoldingsUtil = (
     0,
   );
   const totalGainsValue = holdingsBalance - invested;
-  const totalGainsPercentage = (holdingsBalance - invested) / holdingsBalance;
+  const totalGainsPercentage = holdingsBalance === 0 ? 0 : (holdingsBalance - invested) / holdingsBalance;
   const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
   const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
 

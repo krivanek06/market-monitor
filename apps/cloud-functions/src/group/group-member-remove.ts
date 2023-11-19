@@ -1,6 +1,6 @@
 import { GroupBaseInput } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
-import { onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 
 /**
@@ -21,18 +21,18 @@ export const groupMemberRemoveCall = onCall(async (request) => {
 
   // check if group exists
   if (!groupData) {
-    throw new Error('Group does not exist');
+    throw new HttpsError('not-found', 'Group does not exist');
   }
 
   // check if authenticated user is owner or the user who leaves
   const canBeUserRemove = groupData.ownerUserId === userAuthId && data.userId === userAuthId;
   if (!canBeUserRemove) {
-    throw new Error('User can not be removed');
+    throw new HttpsError('aborted', 'User can not be removed');
   }
 
   // check if user is in group
   if (!groupData.memberUserIds.includes(data.userId)) {
-    throw new Error('User is not in group');
+    throw new HttpsError('failed-precondition', 'User is not in group');
   }
 
   // remove user from group

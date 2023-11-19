@@ -1,5 +1,5 @@
 import { FieldValue } from 'firebase-admin/firestore';
-import { onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentRef, userDocumentRef } from '../models';
 
 /**
@@ -18,22 +18,22 @@ export const groupRequestMembershipCall = onCall(async (request) => {
 
   // check if group exists
   if (!groupData) {
-    throw new Error('Group does not exist');
+    throw new HttpsError('not-found', 'Group does not exist');
   }
 
   // check if user is already in group
   if (groupData.memberUserIds.includes(userAuthId)) {
-    throw new Error('User is already in group');
+    throw new HttpsError('already-exists', 'User is already in group');
   }
 
   // check if user already requested to join
   if (groupData.memberRequestUserIds.includes(userAuthId)) {
-    throw new Error('User already requested to join');
+    throw new HttpsError('already-exists', 'User already requested to join');
   }
 
   // check if user already invited
   if (groupData.memberInvitedUserIds.includes(userAuthId)) {
-    throw new Error('User already invited');
+    throw new HttpsError('already-exists', 'User already invited');
   }
 
   // group update - add user to requested list

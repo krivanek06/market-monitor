@@ -1,6 +1,6 @@
 import { GroupBaseInput } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
-import { onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentRef, userDocumentRef } from '../models';
 import { transformUserToBase } from '../utils';
 
@@ -21,7 +21,7 @@ export const groupRequestMembershipRemoveCall = onCall(async (request) => {
   // check if authenticated user is owner or the user who leaves
   const canBeUserRemove = groupData.ownerUserId === userAuthId && data.userId === userAuthId;
   if (!canBeUserRemove) {
-    throw new Error('Request can not be removed');
+    throw new HttpsError('aborted', 'Request can not be removed');
   }
 
   // update group

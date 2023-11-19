@@ -1,6 +1,6 @@
 import { GROUP_MEMBER_LIMIT, GroupMember } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
-import { onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 import { transformUserToGroupMember } from './../utils/transform.util';
 
@@ -21,17 +21,17 @@ export const groupMemberAcceptCall = onCall(async (request) => {
 
   // check if user is already in group
   if (userData.groups.groupMember.includes(requestGroupId)) {
-    throw new Error('User is already in group');
+    throw new HttpsError('already-exists', 'User is already in group');
   }
 
   // check if user has an invitation
   if (!userData.groups.groupInvitations.includes(requestGroupId)) {
-    throw new Error('User has no invitation');
+    throw new HttpsError('failed-precondition', 'User has no invitation');
   }
 
   // check if group will not have more than N members
   if (groupData.memberUserIds.length >= GROUP_MEMBER_LIMIT) {
-    throw new Error('Group is full');
+    throw new HttpsError('resource-exhausted', 'Group is full');
   }
 
   // update user to join group

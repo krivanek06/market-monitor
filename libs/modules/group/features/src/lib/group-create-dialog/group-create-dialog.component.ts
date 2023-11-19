@@ -127,9 +127,8 @@ export class GroupCreateDialogComponent implements OnInit {
         this.dialogServiceUtil.showNotificationBar('Group has been created', 'success');
       })
       .catch((e) => {
-        console.log(e);
         this.loaderSignal.set(false);
-        this.dialogServiceUtil.showNotificationBar('Something went wrong', 'error');
+        this.dialogServiceUtil.handleError(e);
       });
   }
 

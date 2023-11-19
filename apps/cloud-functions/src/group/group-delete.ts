@@ -1,5 +1,5 @@
 import { FieldValue } from 'firebase-admin/firestore';
-import { onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentMembersRef, groupDocumentRef, groupDocumentTransactionsRef, userDocumentRef } from '../models';
 
 /**
@@ -14,7 +14,7 @@ export const groupDeleteCall = onCall(async (request) => {
   const userAuthId = request.auth?.uid;
 
   if (!userAuthId) {
-    throw new Error('User not authenticated');
+    throw new HttpsError('unauthenticated', 'User not authenticated');
   }
 
   const groupRef = await groupDocumentRef(groupId).get();
@@ -22,12 +22,12 @@ export const groupDeleteCall = onCall(async (request) => {
 
   // check if group exists
   if (!groupData) {
-    throw new Error('Group does not exist');
+    throw new HttpsError('not-found', 'Group does not exist');
   }
 
   // check if owner match request user id
   if (groupData.ownerUserId !== userAuthId) {
-    throw new Error('User is not owner');
+    throw new HttpsError('failed-precondition', 'User is not owner');
   }
 
   // remove group from owner

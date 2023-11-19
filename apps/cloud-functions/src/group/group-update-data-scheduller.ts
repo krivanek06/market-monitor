@@ -57,7 +57,8 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   const lastTransactions = memberTransactionHistory
     .map((d) => d.data())
     .reduce((acc, val) => [...acc, ...val.transactions.slice(0, 10)], [] as PortfolioTransaction[])
-    .sort((a, b) => (b.date < a.date ? 1 : -1));
+    .sort((a, b) => (b.date < a.date ? -1 : 1))
+    .slice(0, 250);
 
   // calculate lastPortfolioState from all members
   const lastPortfolioState = membersData

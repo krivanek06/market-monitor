@@ -1,6 +1,6 @@
 import { GROUP_MEMBER_LIMIT, GroupBaseInput, GroupMember } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
-import { onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 import { transformUserToGroupMember } from './../utils/transform.util';
 
@@ -23,17 +23,17 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
 
   // check if authenticated user is owner
   if (groupData.ownerUserId !== userAuthId) {
-    throw new Error('User is not owner');
+    throw new HttpsError('aborted', 'User is not owner');
   }
 
   // check if user sent request
   if (!groupData.memberRequestUserIds.includes(userAuthId)) {
-    throw new Error('User has not requested to join');
+    throw new HttpsError('failed-precondition', 'User has not requested to join');
   }
 
   // check if group will not have more than N members
   if (groupData.memberUserIds.length >= GROUP_MEMBER_LIMIT) {
-    throw new Error('Group is full');
+    throw new HttpsError('resource-exhausted', 'Group is full');
   }
 
   // update group
@@ -51,9 +51,7 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
 
   // update user
   await userDocumentRef(userAuthId).update({
-    groups: {
-      groupRequested: FieldValue.arrayRemove(data.groupId),
-      groupMember: FieldValue.arrayUnion(data.groupId),
-    },
+    'groups.groupRequested': FieldValue.arrayRemove(data.groupId),
+    'groups.groupMember': FieldValue.arrayUnion(data.groupId),
   });
 });

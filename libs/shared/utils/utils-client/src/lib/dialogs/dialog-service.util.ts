@@ -15,6 +15,20 @@ export class DialogServiceUtil {
     @Optional() private snackBar: MatSnackBar,
   ) {}
 
+  handleError(error: any): void {
+    console.log('error', error);
+    const message = error?.message ?? '';
+
+    // check if error contains the work INTERNAL
+    if (message === 'INTERNAL') {
+      this.showNotificationBar('Something went wrong', 'error');
+      return;
+    }
+
+    // remove the word FirebaseError:
+    this.showNotificationBar(message, 'error');
+  }
+
   showNotificationBar(
     message: string,
     type: 'success' | 'error' | 'notification' = 'notification',
