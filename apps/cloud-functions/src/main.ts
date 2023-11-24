@@ -3,8 +3,7 @@ import { getMarketOverviewDataWrapper, reloadMarketOverview } from './market-fun
 import * as admin from 'firebase-admin';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { updateGroupData } from './group/group-update-data-scheduller';
-import { executeUserPortfolioUpdate } from './user/user-portfolio-state';
+import { groupUpdateDataScheduler, userUpdatePortfolioScheduler } from './schedulers';
 import { corsMiddleWareHttp, firebaseSimpleErrorLogger } from './utils';
 
 const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
@@ -47,7 +46,7 @@ export const test_me = firebaseSimpleErrorLogger(
   corsMiddleWareHttp(async (request, response) => {
     console.log('Run Test Function');
 
-    updateGroupData();
+    groupUpdateDataScheduler();
     //executeUserPortfolioUpdate();
   }),
 );
@@ -69,7 +68,7 @@ export const run_user_portfolio_state_scheduler = onSchedule(
     schedule: '*/5 1-2 * * *',
   },
   async (event) => {
-    executeUserPortfolioUpdate();
+    userUpdatePortfolioScheduler();
   },
 );
 
@@ -79,7 +78,7 @@ export const run_group_update_data_scheduler = onSchedule(
     schedule: '*/5 2-3 * * *',
   },
   async (event) => {
-    updateGroupData();
+    groupUpdateDataScheduler();
   },
 );
 

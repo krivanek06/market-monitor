@@ -1,5 +1,4 @@
 import { getSymbolSummaries } from '@market-monitor/api-external';
-import { SymbolType } from '@market-monitor/api-types';
 import {
   getCurrentDateDefaultFormat,
   getPortfolioStateHoldingPartialUtil,
@@ -8,16 +7,6 @@ import {
 import { format, subDays } from 'date-fns';
 import { userDocumentTransactionHistoryRef, usersCollectionRef } from '../models';
 import { transformPortfolioStateHoldingToPortfolioState } from '../utils';
-
-type PortfolioStateHoldingPartial = {
-  symbolType: SymbolType;
-  symbol: string;
-  units: number;
-  /**
-   * how much user invested. Used to calculate BEP.
-   */
-  invested: number;
-};
 
 /**
  * for each user who is active and have SIMULATION role,
@@ -28,7 +17,7 @@ type PortfolioStateHoldingPartial = {
  *
  * At every 5th minute past every hour from 1 through 2am
  */
-export const executeUserPortfolioUpdate = async (): Promise<void> => {
+export const userUpdatePortfolioScheduler = async (): Promise<void> => {
   const today = getCurrentDateDefaultFormat();
   const twoWeeksBefore = format(subDays(new Date(), 14), 'yyyy-MM-dd');
   console.log('today', today);

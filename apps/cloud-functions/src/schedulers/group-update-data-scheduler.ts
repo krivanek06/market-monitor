@@ -17,7 +17,7 @@ import { transformUserToBase, transformUserToGroupMember } from '../utils';
  * - transactions
  * - owner
  */
-export const updateGroupData = async (): Promise<void> => {
+export const groupUpdateDataScheduler = async (): Promise<void> => {
   const today = getCurrentDateDefaultFormat();
   // get all non closed groups
   const group = await groupsCollectionRef()
