@@ -87,3 +87,9 @@ export type GroupMembersData = {
   lastModifiedDate: string;
   memberUsers: GroupMember[];
 };
+
+export type GroupDetails = {
+  groupData: GroupData;
+  groupTransactionsData: GroupTransactionsData;
+  groupMembersData: GroupMembersData;
+};

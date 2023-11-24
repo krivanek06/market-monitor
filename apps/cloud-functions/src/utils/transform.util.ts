@@ -1,5 +1,6 @@
 import { GroupMember, PortfolioState, PortfolioStateHoldings, UserBase, UserData } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
+import { roundNDigits } from './../../../../libs/shared/utils/utils-general/src/lib/general-function.util';
 
 export const transformUserToBase = (user: UserData): UserBase => {
   return {
@@ -26,8 +27,8 @@ export const transformPortfolioStateHoldingToPortfolioState = (holding: Portfoli
     numberOfExecutedSellTransactions: holding.numberOfExecutedSellTransactions,
     transactionFees: holding.transactionFees,
     holdingsBalance: holding.holdingsBalance,
-    totalGainsValue: holding.totalGainsValue,
-    totalGainsPercentage: holding.totalGainsPercentage,
+    totalGainsValue: roundNDigits(holding.totalGainsValue, 2),
+    totalGainsPercentage: roundNDigits(holding.totalGainsPercentage, 2),
     firstTransactionDate: holding.firstTransactionDate,
     lastTransactionDate: holding.lastTransactionDate,
     modifiedDate: holding.modifiedDate,

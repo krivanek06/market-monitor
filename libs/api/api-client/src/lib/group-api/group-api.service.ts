@@ -9,13 +9,20 @@ import {
   where,
 } from '@angular/fire/firestore';
 import { httpsCallable } from '@angular/fire/functions';
-import { GroupBaseInput, GroupCreateInput, GroupData } from '@market-monitor/api-types';
+import {
+  GroupBaseInput,
+  GroupCreateInput,
+  GroupData,
+  GroupDetails,
+  GroupMembersData,
+  GroupTransactionsData,
+} from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { getApp } from 'firebase/app';
 import { getFunctions } from 'firebase/functions';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
-import { Observable, of } from 'rxjs';
+import { Observable, combineLatest, map, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -25,8 +32,35 @@ export class GroupApiService {
 
   constructor(private firestore: Firestore) {}
 
+  getGroupDetailsById(groupId: string): Observable<GroupDetails | undefined> {
+    return combineLatest([
+      this.getGroupDataById(groupId),
+      this.getGroupMembersDataById(groupId),
+      this.getGroupPortfolioTransactionsDataById(groupId),
+    ]).pipe(
+      map(([groupData, groupMembersData, groupTransactionData]) => {
+        if (!groupData || !groupMembersData || !groupTransactionData) {
+          return undefined;
+        }
+        return {
+          groupData: groupData,
+          groupMembersData: groupMembersData,
+          groupTransactionsData: groupTransactionData,
+        } as GroupDetails;
+      }),
+    );
+  }
+
   getGroupDataById(groupId: string): Observable<GroupData | undefined> {
     return rxDocData(this.getGroupDocRef(groupId), { idField: 'id' });
+  }
+
+  getGroupMembersDataById(groupId: string): Observable<GroupMembersData | undefined> {
+    return rxDocData(this.getGroupMembersDocRef(groupId));
+  }
+
+  getGroupPortfolioTransactionsDataById(groupId: string): Observable<GroupTransactionsData | undefined> {
+    return rxDocData(this.getGroupPortfolioTransactionDocRef(groupId));
   }
 
   getGroupsDataByIds(groupIds: string[]): Observable<GroupData[]> {
@@ -108,5 +142,21 @@ export class GroupApiService {
 
   private getGroupCollectionRef(): CollectionReference<GroupData, DocumentData> {
     return collection(this.firestore, 'groups').withConverter(assignTypesClient<GroupData>());
+  }
+
+  private getGroupCollectionMoreInformationRef(userId: string): CollectionReference<DocumentData, DocumentData> {
+    return collection(doc(this.getGroupCollectionRef(), userId), 'more_information');
+  }
+
+  private getGroupPortfolioTransactionDocRef(userId: string): DocumentReference<GroupTransactionsData> {
+    return doc(this.getGroupCollectionMoreInformationRef(userId), 'transactions').withConverter(
+      assignTypesClient<GroupTransactionsData>(),
+    );
+  }
+
+  private getGroupMembersDocRef(userId: string): DocumentReference<GroupMembersData> {
+    return doc(this.getGroupCollectionMoreInformationRef(userId), 'members').withConverter(
+      assignTypesClient<GroupMembersData>(),
+    );
   }
 }

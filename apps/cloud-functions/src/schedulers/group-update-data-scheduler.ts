@@ -88,8 +88,11 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     }, null);
 
   // calculate additional fields
-  portfolioState.totalGainsValue = portfolioState.holdingsBalance - portfolioState.invested;
-  portfolioState.totalGainsPercentage = portfolioState.totalGainsValue / portfolioState.holdingsBalance;
+  portfolioState.totalGainsValue = roundNDigits(portfolioState.holdingsBalance - portfolioState.invested, 2);
+  portfolioState.totalGainsPercentage = roundNDigits(
+    portfolioState.totalGainsValue / portfolioState.holdingsBalance,
+    2,
+  );
 
   // update last transactions for the group
   groupDocumentTransactionsRef(group.id).set({
