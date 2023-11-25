@@ -17,6 +17,11 @@ export type GroupBaseInput = {
   userId: string;
 };
 
+export type GroupBaseInputInviteMembers = {
+  groupId: string;
+  userIds: string[];
+};
+
 export type GroupMember = UserBase & {
   since: string;
 };

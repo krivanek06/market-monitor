@@ -11,6 +11,7 @@ import {
 import { httpsCallable } from '@angular/fire/functions';
 import {
   GroupBaseInput,
+  GroupBaseInputInviteMembers,
   GroupCreateInput,
   GroupData,
   GroupDetails,
@@ -76,11 +77,17 @@ export class GroupApiService {
     return result.data;
   }
 
-  async deleteGroup(input: string): Promise<GroupData> {
-    const callable = httpsCallable<string, GroupData>(this.functions, 'groupDeleteCall');
+  async closeGroup(input: string): Promise<GroupData> {
+    const callable = httpsCallable<string, GroupData>(this.functions, 'groupCloseCall');
     const result = await callable(input);
     return result.data;
   }
+
+  // async deleteGroup(input: string): Promise<GroupData> {
+  //   const callable = httpsCallable<string, GroupData>(this.functions, 'groupDeleteCall');
+  //   const result = await callable(input);
+  //   return result.data;
+  // }
 
   async userAcceptsGroupInvitation(input: string): Promise<GroupData> {
     const callable = httpsCallable<string, GroupData>(this.functions, 'groupMemberAcceptCall');
@@ -92,6 +99,25 @@ export class GroupApiService {
     const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupMemberInviteRemoveCall');
     const result = await callable(input);
     return result.data;
+  }
+
+  /**
+   *
+   * @param input
+   * @returns - how many users were invited to the group who are not yet members or invited or requested
+   */
+  async inviteUsersToGroup(input: GroupBaseInputInviteMembers): Promise<number> {
+    const callable = httpsCallable<GroupBaseInputInviteMembers, number>(
+      this.functions,
+      'groupMemberInviteMultipleCall',
+    );
+    const result = await callable(input);
+    return result.data;
+  }
+
+  async addOwnerOfGroupIntoGroup(groupId: string): Promise<void> {
+    const callable = httpsCallable<string, void>(this.functions, 'groupAddOwnerIntoGroupCall');
+    await callable(groupId);
   }
 
   async inviteUserToGroup(input: GroupBaseInput): Promise<GroupData> {
@@ -124,9 +150,9 @@ export class GroupApiService {
     return result.data;
   }
 
-  async sendRequestToJoinGroup(input: GroupBaseInput): Promise<GroupData> {
-    const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupRequestMembershipCall');
-    const result = await callable(input);
+  async sendRequestToJoinGroup(groupId: string): Promise<GroupData> {
+    const callable = httpsCallable<string, GroupData>(this.functions, 'groupRequestMembershipCall');
+    const result = await callable(groupId);
     return result.data;
   }
 

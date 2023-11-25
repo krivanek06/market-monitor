@@ -28,6 +28,11 @@ export const groupMemberInviteCall = onCall(async (request) => {
     throw new HttpsError('failed-precondition', 'User is not owner');
   }
 
+  // check if user is owner
+  if (groupData.ownerUserId === data.userId) {
+    throw new HttpsError('failed-precondition', 'User is owner');
+  }
+
   // check if user is already in group
   if (groupData.memberUserIds.includes(data.userId)) {
     throw new HttpsError('already-exists', 'User is already in group');

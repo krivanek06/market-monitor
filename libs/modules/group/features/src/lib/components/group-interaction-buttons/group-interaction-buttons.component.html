@@ -1,0 +1,108 @@
+<ng-container *ngIf="!groupDetails.groupData.isClosed">
+  <!-- owner -->
+  <button
+    *ngIf="isOwnerSignal()"
+    (click)="onGroupCloseClick()"
+    type="button"
+    mat-stroked-button
+    color="warn"
+    [matTooltip]="tooltipClose"
+  >
+    <mat-icon>close</mat-icon>
+    Close Group
+  </button>
+
+  <button
+    *ngIf="isOwnerSignal() && !isMemberSignal()"
+    (click)="onAddOwnerToGroupClick()"
+    type="button"
+    mat-stroked-button
+    color="accent"
+    [matTooltip]="tooltipAddMyselfOwner"
+  >
+    <mat-icon>person</mat-icon>
+    Add Myself To Group
+  </button>
+
+  <!-- member -->
+  <button
+    *ngIf="isMemberSignal()"
+    (click)="onLeaveGroupClick()"
+    type="button"
+    mat-stroked-button
+    color="warn"
+    [matTooltip]="tooltipLeave"
+  >
+    <mat-icon>logout</mat-icon>
+    Leave Group
+  </button>
+
+  <!-- invited person -->
+  <button
+    *ngIf="isUserInvitedToJoinSignal()"
+    (click)="onDeclineInvitationClick()"
+    type="button"
+    mat-stroked-button
+    color="warn"
+    [matTooltip]="tooltipInvitedCancel"
+  >
+    <mat-icon>logout</mat-icon>
+    Decline Invitation
+  </button>
+
+  <button
+    *ngIf="isUserInvitedToJoinSignal()"
+    (click)="onAcceptInvitationClick()"
+    type="button"
+    mat-stroked-button
+    color="accent"
+    [matTooltip]="tooltipInvitedAccept"
+  >
+    <mat-icon>done</mat-icon>
+    Accept Invitation
+  </button>
+
+  <!-- request invitation person -->
+  <button
+    *ngIf="isUserRequestingToJoinSignal()"
+    (click)="onCancelRequestClick()"
+    type="button"
+    mat-stroked-button
+    color="warn"
+    [matTooltip]="tooltipDeclineRequest"
+  >
+    <mat-icon>logout</mat-icon>
+    Decline Request
+  </button>
+
+  <button
+    *ngIf="
+      !isUserRequestingToJoinSignal() &&
+      !isMemberSignal() &&
+      !isUserInvitedToJoinSignal() &&
+      !isOwnerSignal() &&
+      groupDetails.groupData.isPublic
+    "
+    (click)="onRequestToJoinClick()"
+    type="button"
+    mat-stroked-button
+    color="accent"
+    [matTooltip]="tooltipRequestToJoin"
+  >
+    <mat-icon>person</mat-icon>
+    Send Request To Join
+  </button>
+
+  <!-- owner -->
+  <button
+    *ngIf="isOwnerSignal()"
+    (click)="onInviteMembersClick()"
+    type="button"
+    mat-stroked-button
+    color="primary"
+    [matTooltip]="tooltipInviteMembers"
+  >
+    <mat-icon>add</mat-icon>
+    Invite Members
+  </button>
+</ng-container>

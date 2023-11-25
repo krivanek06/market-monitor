@@ -1,3 +1,16 @@
-<p>group-details works!</p>
+<div *ngIf="groupDetailsSignal() as groupDetailsSignal" class="flex justify-between pt-8">
+  <div>
+    <app-group-interaction-buttons [groupDetails]="groupDetailsSignal"></app-group-interaction-buttons>
+  </div>
+
+  <mat-tab-group (selectedTabChange)="onSelectionChange($event)" mat-stretch-tabs="false" mat-align-tabs="end">
+    <mat-tab label="Group Overview">
+      <app-group-details-overview [groupDetails]="groupDetailsSignal"></app-group-details-overview>
+    </mat-tab>
+    <mat-tab label="Member Data">
+      <app-group-details-holdings [groupDetails]="groupDetailsSignal"></app-group-details-holdings>
+    </mat-tab>
+  </mat-tab-group>
+</div>
 
 {{ groupDetailsSignal()?.groupData?.name }}

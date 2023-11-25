@@ -8,6 +8,8 @@ import { groupDocumentMembersRef, groupDocumentRef, groupDocumentTransactionsRef
  * - remove group from all users
  * - delete group and all subgroups
  * - return removed group
+ *
+ * PS: This function is not used in the app, it is only for testing purposes
  */
 export const groupDeleteCall = onCall(async (request) => {
   const groupId = request.data as string;

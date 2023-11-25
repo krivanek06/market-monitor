@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'market-monitor-group-search-control',
+  selector: 'app-group-search-control',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './group-search-control.component.html',
