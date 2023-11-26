@@ -35,13 +35,18 @@
           inputType="CHECKBOX"
           hintText="If selected the owner will be added as a member of the group"
         ></app-form-mat-input-wrapper>
+
+        <!-- owner -->
+        <div *ngIf="form.controls.isOwnerMember.value" class="flex gap-4 p-4 mt-2 shadow-md">
+          <app-user-display-item [userData]="authenticatedUserData"></app-user-display-item>
+        </div>
       </div>
     </div>
 
     <!-- invite member -->
     <div class="my-8 space-x-2 text-lg">
       <span>Invite People</span>
-      <span>{{ selectedUsersSignal().length }} / {{ memberLimit }}</span>
+      <span>{{ selectedUsersSignal().length }} / {{ memberLimitSignal() }}</span>
     </div>
 
     <!-- search user control -->

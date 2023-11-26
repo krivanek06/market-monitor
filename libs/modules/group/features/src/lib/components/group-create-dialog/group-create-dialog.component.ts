@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, OnInit, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -27,6 +28,7 @@ import {
   minLengthValidator,
   requiredValidator,
 } from '@market-monitor/shared/utils-client';
+import { map, startWith } from 'rxjs';
 
 @Component({
   selector: 'market-monitor-group-create-dialog',
@@ -76,7 +78,18 @@ export class GroupCreateDialogComponent implements OnInit {
   selectedUsersSignal = signal<UserData[]>([]);
   loaderSignal = signal<boolean>(false);
 
-  memberLimit = GROUP_MEMBER_LIMIT;
+  /**
+   * Limit of members that can be added to a group
+   */
+  memberLimitSignal = toSignal(
+    this.form.controls.isOwnerMember.valueChanges.pipe(
+      startWith(this.form.controls.isOwnerMember.value),
+      map((isSelected) => (isSelected ? GROUP_MEMBER_LIMIT - 1 : GROUP_MEMBER_LIMIT)),
+    ),
+    { initialValue: GROUP_MEMBER_LIMIT },
+  );
+
+  authenticatedUserData = this.authenticationUserService.userData;
 
   constructor(
     private dialogRef: MatDialogRef<GroupCreateDialogComponent>,
@@ -148,8 +161,8 @@ export class GroupCreateDialogComponent implements OnInit {
       }
 
       // check limit
-      if (this.selectedUsersSignal().length >= GROUP_MEMBER_LIMIT) {
-        this.dialogServiceUtil.showNotificationBar(`You can only add up to ${GROUP_MEMBER_LIMIT} users`, 'error');
+      if (this.selectedUsersSignal().length >= this.memberLimitSignal()) {
+        this.dialogServiceUtil.showNotificationBar(`You can only add up to ${this.memberLimitSignal()} users`, 'error');
         return;
       }
 
