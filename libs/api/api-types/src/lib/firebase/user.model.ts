@@ -73,4 +73,9 @@ export type UserSettings = {
    * if true, other users will be able to find this user portfolio by searching
    */
   isProfilePublic: boolean;
+
+  /**
+   * if true, user can create unlimited number of groups
+   */
+  allowUnlimitedGroupsToCreate?: boolean;
 };

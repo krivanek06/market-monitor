@@ -2,9 +2,9 @@
 <!-- form -->
 <form [formGroup]="form" (ngSubmit)="onFormSubmit()">
   <mat-dialog-content *ngIf="!loaderSignal(); else showLoader">
-    <div class="flex gap-4">
+    <div *ngIf="allowCreateGroup()" class="flex gap-4">
       <!-- upload image -->
-      <div class="w-[250px] h-[250px]">
+      <div class="w-[270px] h-[270px]">
         <app-upload-image-single-control
           filePath="groups"
           formControlName="uploadedImage"
@@ -43,26 +43,42 @@
       </div>
     </div>
 
-    <!-- invite member -->
-    <div class="my-8 space-x-2 text-lg">
-      <span>Invite People</span>
-      <span>{{ selectedUsersSignal().length }} / {{ memberLimitSignal() }}</span>
+    <!-- display how many groups can be created -->
+    <div *ngIf="allowCreateGroup()" class="p-4 mx-auto my-4 text-center rounded-md bg-wt-gray-light-strong lg:w-11/12">
+      You are limited to create only {{ createGroupLimitSignal() }} groups. If you want to create more groups please
+      contact support.
     </div>
 
-    <!-- search user control -->
-    <div class="max-w-[450px] mb-8">
-      <app-user-search-control [formControl]="searchUserControl"></app-user-search-control>
+    <!-- error message if can not create more groups -->
+    <div
+      *ngIf="!allowCreateGroup()"
+      class="p-4 mx-auto my-4 text-center rounded-md bg-wt-danger text-wt-gray-light lg:w-11/12"
+    >
+      You can not longer create any additional groups. If you want to create more groups please contact support.
     </div>
 
-    <!-- display selected users -->
-    <div class="flex flex-wrap gap-4">
-      <div *ngFor="let user of selectedUsersSignal()" class="flex gap-4 p-4 shadow-md">
-        <app-user-display-item [userData]="user"></app-user-display-item>
-        <button mat-icon-button type="button" matTooltip="Remove User" (click)="onUserRemove(user)">
-          <mat-icon color="warn">delete</mat-icon>
-        </button>
+    <ng-container *ngIf="allowCreateGroup()">
+      <!-- invite member -->
+      <div class="my-8 space-x-2 text-lg">
+        <span>Invite People</span>
+        <span>{{ selectedUsersSignal().length }} / {{ memberLimitSignal() }}</span>
       </div>
-    </div>
+
+      <!-- search user control -->
+      <div class="max-w-[450px] mb-8">
+        <app-user-search-control [formControl]="searchUserControl"></app-user-search-control>
+      </div>
+
+      <!-- display selected users -->
+      <div class="flex flex-wrap gap-4">
+        <div *ngFor="let user of selectedUsersSignal()" class="flex gap-4 p-4 shadow-md">
+          <app-user-display-item [userData]="user"></app-user-display-item>
+          <button mat-icon-button type="button" matTooltip="Remove User" (click)="onUserRemove(user)">
+            <mat-icon color="warn">delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </ng-container>
   </mat-dialog-content>
 
   <div class="my-4">
@@ -72,7 +88,7 @@
   <mat-dialog-actions *ngIf="!loaderSignal()">
     <div class="g-mat-dialog-actions-end">
       <button mat-flat-button mat-dialog-close type="button">Cancel</button>
-      <button type="submit" mat-flat-button color="primary">Save</button>
+      <button type="submit" mat-flat-button color="primary" [disabled]="!allowCreateGroup()">Save</button>
     </div>
   </mat-dialog-actions>
 </form>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit, computed, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { GroupApiService } from '@market-monitor/api-client';
-import { GROUP_MEMBER_LIMIT, GroupCreateInput, UserData } from '@market-monitor/api-types';
+import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT, GroupCreateInput, UserData } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { UserSearchControlComponent } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
@@ -89,6 +89,18 @@ export class GroupCreateDialogComponent implements OnInit {
     { initialValue: GROUP_MEMBER_LIMIT },
   );
 
+  /**
+   * Limit of groups that can be created
+   */
+  createGroupLimitSignal = toSignal(
+    this.authenticationUserService.getUserGroupsData().pipe(
+      map((groups) => groups.groupOwner.map((d) => !d.isClosed)),
+      map((openGroups) => GROUP_OWNER_LIMIT - openGroups.length),
+    ),
+    { initialValue: GROUP_OWNER_LIMIT },
+  );
+  allowCreateGroup = computed(() => this.createGroupLimitSignal() > 0);
+
   authenticatedUserData = this.authenticationUserService.userData;
 
   constructor(
@@ -108,6 +120,11 @@ export class GroupCreateDialogComponent implements OnInit {
   }
 
   onFormSubmit(): void {
+    if (!this.allowCreateGroup()) {
+      this.dialogServiceUtil.showNotificationBar(`You can only create ${GROUP_OWNER_LIMIT} groups`, 'error');
+      return;
+    }
+
     this.form.markAllAsTouched();
     if (this.form.invalid) {
       this.dialogServiceUtil.showNotificationBar('Please fill out all required fields', 'error');
