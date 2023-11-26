@@ -1,7 +1,14 @@
-import { GroupData, PortfolioState, PortfolioTransaction } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat, roundNDigits } from '@market-monitor/shared/utils-general';
+import {
+  GroupData,
+  PortfolioState,
+  PortfolioStateHoldingPartial,
+  PortfolioTransaction,
+} from '@market-monitor/api-types';
+import { getCurrentDateDefaultFormat, getObjectEntries, roundNDigits } from '@market-monitor/shared/utils-general';
+import { FieldValue } from 'firebase-admin/firestore';
 import {
   groupDocumentMembersRef,
+  groupDocumentPortfolioStateSnapshotsRef,
   groupDocumentRef,
   groupDocumentTransactionsRef,
   groupsCollectionRef,
@@ -68,6 +75,26 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
         return curr;
       }
 
+      // merge holdings by symbol
+      const mergedPartialHoldings = [...acc.holdingsPartial, ...curr.holdingsPartial].reduce(
+        (acc, curr) => ({
+          ...acc,
+          ...{
+            [curr.symbol]: {
+              ...curr,
+              invested: (acc[curr.symbol]?.invested || 0) + curr.invested,
+              units: (acc[curr.symbol]?.units || 0) + curr.units,
+              symbol: curr.symbol,
+              symbolType: curr.symbolType,
+            },
+          },
+        }),
+        {} as { [key: string]: PortfolioStateHoldingPartial },
+      );
+
+      console.log('mergedPartialHoldings');
+      console.log(mergedPartialHoldings);
+
       const result: PortfolioState = {
         balance: acc.balance + curr.balance,
         cashOnHand: acc.cashOnHand + curr.cashOnHand,
@@ -82,6 +109,7 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
         totalGainsValue: 0,
         firstTransactionDate: null,
         lastTransactionDate: null,
+        holdingsPartial: getObjectEntries(mergedPartialHoldings).map((d) => d[1]),
       };
 
       return result;
@@ -106,10 +134,15 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     memberUsers: membersData.map((d) => transformUserToGroupMember(d)),
   });
 
-  // update owner
+  // update owner for group
   await groupDocumentRef(group.id).update({
     ownerUser: transformUserToBase(ownerData),
     modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
     portfolioState: portfolioState,
+  });
+
+  // save portfolio state
+  await groupDocumentPortfolioStateSnapshotsRef(group.id).update({
+    data: FieldValue.arrayUnion(portfolioState),
   });
 };

@@ -23,7 +23,7 @@ export const userUpdatePortfolioScheduler = async (): Promise<void> => {
   console.log('today', today);
   // load users to calculate balance
   const userToUpdate = usersCollectionRef()
-    .where('personal.accountType', '==', 'SIMULATION')
+    // .where('personal.accountType', '==', 'SIMULATION')
     // .where('lastLoginDate', '>=', twoWeeksBefore) // not able to use this filter
     .where('portfolioState.modifiedDate', '!=', today)
     .orderBy('portfolioState.modifiedDate', 'desc')

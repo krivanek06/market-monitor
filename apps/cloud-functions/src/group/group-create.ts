@@ -11,6 +11,7 @@ import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
 import {
   groupDocumentMembersRef,
+  groupDocumentPortfolioStateSnapshotsRef,
   groupDocumentRef,
   groupDocumentTransactionsRef,
   groupsCollectionRef,
@@ -77,6 +78,10 @@ export const groupCreateCall = onCall(async (request) => {
     memberUsers: [],
   });
 
+  await groupDocumentPortfolioStateSnapshotsRef(newGroup.id).set({
+    data: [],
+  });
+
   // update member list
   for await (const memberId of data.memberInvitedUserIds) {
     await userDocumentRef(memberId).update({
@@ -121,6 +126,7 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
       totalGainsValue: 0,
       transactionFees: 0,
       balance: 0,
+      holdingsPartial: [],
     },
   };
 };

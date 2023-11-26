@@ -100,6 +100,10 @@ export type GroupMembersData = {
   memberUsers: GroupMember[];
 };
 
+export type GroupPortfolioStateSnapshotsData = {
+  data: PortfolioState[];
+};
+
 export type GroupDetails = {
   groupData: GroupData;
   groupTransactionsData: GroupTransactionsData;

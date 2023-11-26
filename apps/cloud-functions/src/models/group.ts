@@ -1,4 +1,9 @@
-import { GroupData, GroupMembersData, GroupTransactionsData } from '@market-monitor/api-types';
+import {
+  GroupData,
+  GroupMembersData,
+  GroupPortfolioStateSnapshotsData,
+  GroupTransactionsData,
+} from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypesServer } from './assign-type';
 
@@ -17,3 +22,13 @@ export const groupDocumentTransactionsRef = (groupId: string) =>
 
 export const groupDocumentMembersRef = (groupId: string) =>
   groupCollectionMoreInformationRef(groupId).doc('members').withConverter(assignTypesServer<GroupMembersData>());
+
+/**
+ *
+ * @param groupId
+ * @returns - historical snapshots of the group portfolio state for each day
+ */
+export const groupDocumentPortfolioStateSnapshotsRef = (groupId: string) =>
+  groupCollectionMoreInformationRef(groupId)
+    .doc('portfolio_snapshots')
+    .withConverter(assignTypesServer<GroupPortfolioStateSnapshotsData>());

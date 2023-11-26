@@ -46,8 +46,9 @@ export const test_me = firebaseSimpleErrorLogger(
   corsMiddleWareHttp(async (request, response) => {
     console.log('Run Test Function');
 
-    groupUpdateDataScheduler();
-    //executeUserPortfolioUpdate();
+    await userUpdatePortfolioScheduler();
+    console.log('update groups');
+    await groupUpdateDataScheduler();
   }),
 );
 

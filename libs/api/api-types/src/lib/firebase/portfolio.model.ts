@@ -44,6 +44,11 @@ export type PortfolioState = {
    * date when it was last calculated
    */
   modifiedDate: string;
+
+  /**
+   * data about current holdings, calculated from previous transactions
+   */
+  holdingsPartial: PortfolioStateHoldingPartial[];
 };
 
 export type PortfolioStateHoldingPartial = {

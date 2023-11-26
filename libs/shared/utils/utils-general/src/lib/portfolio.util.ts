@@ -67,6 +67,7 @@ export const getPortfolioStateHoldingsUtil = (
     firstTransactionDate,
     lastTransactionDate,
     modifiedDate: getCurrentDateDefaultFormat(),
+    holdingsPartial: partialHoldings,
   };
 
   return {

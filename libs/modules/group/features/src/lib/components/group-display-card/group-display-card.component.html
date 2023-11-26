@@ -20,6 +20,7 @@
       <!-- portfolio chart -->
       <div class="hidden xl:block -mt-8 w-[400px]">
         <app-portfolio-balance-pie-chart
+          *ngIf="groupData.portfolioState.balance > 0"
           [heightPx]="200"
           [data]="groupData.portfolioState"
         ></app-portfolio-balance-pie-chart>
