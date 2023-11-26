@@ -1,1 +1,32 @@
-<p>group-details-overview works!</p>
+<div class="flex flex-col justify-between mb-6 lg:flex-row">
+  <!-- group info -->
+  <app-group-display-info
+    [clickableOwner]="true"
+    [imageHeightPx]="150"
+    [groupData]="groupDetails.groupData"
+  ></app-group-display-info>
+
+  <!-- portfolio info -->
+  <app-portfolio-state
+    [titleColor]="ColorScheme.PRIMARY_VAR"
+    [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+    [showCashSegment]="true"
+    [portfolioState]="groupDetails.groupData.portfolioState"
+  ></app-portfolio-state>
+
+  <!-- portfolio chart -->
+  <div class="-mt-10 w-[420px] hidden xl:block">
+    <app-portfolio-balance-pie-chart
+      [heightPx]="260"
+      [data]="groupDetails.groupData.portfolioState"
+    ></app-portfolio-balance-pie-chart>
+  </div>
+</div>
+
+<!-- portfolio change -->
+<div class="mb-12 lg:px-10">
+  <!-- <app-portfolio-period-change
+    *ngIf="portfolioChangeSignal() as portfolioChange"
+    [portfolioChange]="portfolioChange"
+  ></app-portfolio-period-change> -->
+</div>

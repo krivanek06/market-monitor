@@ -1,7 +1,7 @@
 <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
-  <div class="flex justify-between pt-8">
+  <div class="flex justify-between pt-8 mb-12">
     <!-- group action buttons -->
-    <div>
+    <div class="-mb-2">
       <app-group-interaction-buttons [groupDetails]="groupDetailsSignal"></app-group-interaction-buttons>
     </div>
 
@@ -13,10 +13,12 @@
     ></app-tab-select-control>
   </div>
 
+  <!-- group overview -->
   <ng-container *ngIf="groupDetailsTabControl.value === 'overview'">
     <app-group-details-overview [groupDetails]="groupDetailsSignal"></app-group-details-overview>
   </ng-container>
 
+  <!-- group holdings -->
   <ng-container *ngIf="groupDetailsTabControl.value === 'holdings'">
     <app-group-details-holdings [groupDetails]="groupDetailsSignal"></app-group-details-holdings>
   </ng-container>

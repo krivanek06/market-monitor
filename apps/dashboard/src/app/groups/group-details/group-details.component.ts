@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -58,6 +58,10 @@ export class GroupDetailsComponent {
 
   constructor() {
     console.log('GroupDetailsComponent');
+
+    effect(() => {
+      console.log(this.groupDetailsSignal());
+    });
   }
 
   onSelectionChange(event: MatTabChangeEvent) {

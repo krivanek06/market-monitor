@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { GROUP_MEMBER_LIMIT, GroupData } from '@market-monitor/api-types';
+import { GroupData } from '@market-monitor/api-types';
+import { GroupDisplayInfoComponent } from '@market-monitor/modules/group/ui';
 import { PortfolioBalancePieChartComponent } from '@market-monitor/modules/portfolio/ui';
-import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-group-display-card',
@@ -13,7 +13,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
   imports: [
     CommonModule,
     MatCardModule,
-    DefaultImgDirective,
+    GroupDisplayInfoComponent,
     MatRippleModule,
     MatIconModule,
     PortfolioBalancePieChartComponent,
@@ -31,8 +31,6 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 export class GroupDisplayCardComponent {
   @Output() groupClickEmitter = new EventEmitter<void>();
   @Input({ required: true }) groupData!: GroupData;
-
-  GROUP_MEMBER_LIMIT = GROUP_MEMBER_LIMIT;
 
   onGroupClick(): void {
     this.groupClickEmitter.emit();
