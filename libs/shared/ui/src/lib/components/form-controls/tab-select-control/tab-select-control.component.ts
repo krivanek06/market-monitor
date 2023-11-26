@@ -5,9 +5,8 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
-import { SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
+import { LabelValue, SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
 import { map, switchMap, tap } from 'rxjs';
-import { LabelValue } from '../../../../../../data-access/src/lib/form-controls.model';
 
 @Component({
   selector: 'app-tab-select-control',
