@@ -1,4 +1,4 @@
-export type DataDocWrapper<T> = {
+export type DataDocsWrapper<T> = {
   lastModifiedDate: string;
   data: T[];
 };

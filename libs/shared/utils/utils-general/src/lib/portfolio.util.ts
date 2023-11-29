@@ -1,7 +1,7 @@
 import {
   PortfolioState,
   PortfolioStateHolding,
-  PortfolioStateHoldingPartial,
+  PortfolioStateHoldingBase,
   PortfolioStateHoldings,
   PortfolioTransaction,
   SymbolSummary,
@@ -12,7 +12,7 @@ import { roundNDigits } from './general-function.util';
 export const getPortfolioStateHoldingsUtil = (
   startingCash: number,
   transactions: PortfolioTransaction[],
-  partialHoldings: PortfolioStateHoldingPartial[],
+  partialHoldings: PortfolioStateHoldingBase[],
   symbolSummaries: SymbolSummary[],
 ): PortfolioStateHoldings => {
   // accumulate cash on hand from transactions
@@ -67,7 +67,6 @@ export const getPortfolioStateHoldingsUtil = (
     firstTransactionDate,
     lastTransactionDate,
     modifiedDate: getCurrentDateDefaultFormat(),
-    holdingsPartial: partialHoldings,
   };
 
   return {
@@ -82,9 +81,7 @@ export const getPortfolioStateHoldingsUtil = (
  * @param transactions - user's transactions
  * @returns
  */
-export const getPortfolioStateHoldingPartialUtil = (
-  transactions: PortfolioTransaction[],
-): PortfolioStateHoldingPartial[] => {
+export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransaction[]): PortfolioStateHoldingBase[] => {
   return transactions
     .reduce((acc, curr) => {
       const existingHolding = acc.find((d) => d.symbol === curr.symbol);
@@ -109,8 +106,8 @@ export const getPortfolioStateHoldingPartialUtil = (
           symbol: curr.symbol,
           units: curr.units,
           invested: curr.unitPrice * curr.units,
-        } satisfies PortfolioStateHoldingPartial,
+        } satisfies PortfolioStateHoldingBase,
       ];
-    }, [] as PortfolioStateHoldingPartial[])
+    }, [] as PortfolioStateHoldingBase[])
     .filter((d) => d.units > 0);
 };

@@ -1,9 +1,4 @@
-import {
-  GroupData,
-  PortfolioState,
-  PortfolioStateHoldingPartial,
-  PortfolioTransaction,
-} from '@market-monitor/api-types';
+import { GroupData, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat, getObjectEntries, roundNDigits } from '@market-monitor/shared/utils-general';
 import { FieldValue } from 'firebase-admin/firestore';
 import {
@@ -67,34 +62,33 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     .sort((a, b) => (b.date < a.date ? -1 : 1))
     .slice(0, 250);
 
+  // calculate holdings from all members
+  const memberHoldingSnapshots = membersData
+    .map((d) => d.holdingSnapshot.data)
+    .reduce(
+      (acc, curr) =>
+        curr.reduce(
+          (acc2, curr2) => ({
+            ...acc2,
+            [curr2.symbol]: {
+              invested: (acc[curr2.symbol]?.invested || 0) + curr2.invested,
+              units: (acc[curr2.symbol]?.units || 0) + curr2.units,
+              symbol: curr2.symbol,
+              symbolType: curr2.symbolType,
+            },
+          }),
+          {} as { [key: string]: PortfolioStateHoldingBase },
+        ),
+      {} as { [key: string]: PortfolioStateHoldingBase },
+    );
+
   // calculate portfolioState from all members
-  const portfolioState = membersData
+  const memberPortfolioState = membersData
     .map((d) => d.portfolioState)
     .reduce((acc, curr) => {
       if (!acc) {
         return curr;
       }
-
-      // merge holdings by symbol
-      const mergedPartialHoldings = [...acc.holdingsPartial, ...curr.holdingsPartial].reduce(
-        (acc, curr) => ({
-          ...acc,
-          ...{
-            [curr.symbol]: {
-              ...curr,
-              invested: (acc[curr.symbol]?.invested || 0) + curr.invested,
-              units: (acc[curr.symbol]?.units || 0) + curr.units,
-              symbol: curr.symbol,
-              symbolType: curr.symbolType,
-            },
-          },
-        }),
-        {} as { [key: string]: PortfolioStateHoldingPartial },
-      );
-
-      console.log('mergedPartialHoldings');
-      console.log(mergedPartialHoldings);
-
       const result: PortfolioState = {
         balance: acc.balance + curr.balance,
         cashOnHand: acc.cashOnHand + curr.cashOnHand,
@@ -109,17 +103,17 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
         totalGainsValue: 0,
         firstTransactionDate: null,
         lastTransactionDate: null,
-        holdingsPartial: getObjectEntries(mergedPartialHoldings).map((d) => d[1]),
       };
 
       return result;
-    }, null);
+    }, null as PortfolioState);
 
   // calculate additional fields
-  portfolioState.totalGainsValue = roundNDigits(portfolioState.holdingsBalance - portfolioState.invested, 2);
-  portfolioState.totalGainsPercentage = roundNDigits(
-    portfolioState.totalGainsValue / portfolioState.holdingsBalance,
-    2,
+  memberPortfolioState.totalGainsValue = roundNDigits(
+    memberPortfolioState.holdingsBalance - memberPortfolioState.invested,
+  );
+  memberPortfolioState.totalGainsPercentage = roundNDigits(
+    memberPortfolioState.totalGainsValue / memberPortfolioState.holdingsBalance,
   );
 
   // update last transactions for the group
@@ -138,11 +132,15 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   await groupDocumentRef(group.id).update({
     ownerUser: transformUserToBase(ownerData),
     modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
-    portfolioState: portfolioState,
+    portfolioState: memberPortfolioState,
+    holdingSnapshot: {
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      data: getObjectEntries(memberHoldingSnapshots).map((d) => d[1]),
+    },
   });
 
   // save portfolio state
   await groupDocumentPortfolioStateSnapshotsRef(group.id).update({
-    data: FieldValue.arrayUnion(portfolioState),
+    data: FieldValue.arrayUnion(memberPortfolioState),
   });
 };

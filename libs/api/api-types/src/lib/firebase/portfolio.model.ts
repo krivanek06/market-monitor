@@ -44,14 +44,9 @@ export type PortfolioState = {
    * date when it was last calculated
    */
   modifiedDate: string;
-
-  /**
-   * data about current holdings, calculated from previous transactions
-   */
-  holdingsPartial: PortfolioStateHoldingPartial[];
 };
 
-export type PortfolioStateHoldingPartial = {
+export type PortfolioStateHoldingBase = {
   symbolType: SymbolType;
   symbol: string;
   units: number;
@@ -61,7 +56,7 @@ export type PortfolioStateHoldingPartial = {
   invested: number;
 };
 
-export type PortfolioStateHolding = PortfolioStateHoldingPartial & {
+export type PortfolioStateHolding = PortfolioStateHoldingBase & {
   breakEvenPrice: number; // calculated
   symbolSummary: SymbolSummary;
 };

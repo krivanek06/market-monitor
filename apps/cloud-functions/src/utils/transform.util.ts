@@ -33,6 +33,5 @@ export const transformPortfolioStateHoldingToPortfolioState = (holding: Portfoli
     lastTransactionDate: holding.lastTransactionDate,
     modifiedDate: holding.modifiedDate,
     startingCash: holding.startingCash,
-    holdingsPartial: holding.holdingsPartial,
   };
 };

@@ -10,7 +10,7 @@ import {
   UserPortfolioTransaction,
 } from '@market-monitor/api-types';
 import {
-  getPortfolioStateHoldingPartialUtil,
+  getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
   roundNDigits,
 } from '@market-monitor/shared/utils-general';
@@ -30,7 +30,7 @@ export class PortfolioGrowthService {
     console.log(`PortfolioGrowthService: getPortfolioState`);
 
     // get partial holdings calculations
-    const partialHoldings = getPortfolioStateHoldingPartialUtil(portfolioTransactions.transactions);
+    const partialHoldings = getPortfolioStateHoldingBaseUtil(portfolioTransactions.transactions);
     const partialHoldingSymbols = partialHoldings.map((d) => d.symbol);
 
     // get symbol summaries from API

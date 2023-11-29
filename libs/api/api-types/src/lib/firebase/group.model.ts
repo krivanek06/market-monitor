@@ -1,5 +1,5 @@
-import { DataDocWrapper } from '../constants';
-import { PortfolioState, PortfolioTransaction } from './portfolio.model';
+import { DataDocsWrapper } from '../constants';
+import { PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
 import { UserBase, UserData } from './user.model';
 
 /**
@@ -85,11 +85,16 @@ export type GroupData = {
    * portfolio state calculated from transactions at the end of the day
    */
   portfolioState: PortfolioState;
+
+  /**
+   * data about current holdings, calculated from users data
+   */
+  holdingSnapshot: DataDocsWrapper<PortfolioStateHoldingBase>;
 };
 
-export type GroupTransactionsData = DataDocWrapper<PortfolioTransaction>;
-export type GroupMembersData = DataDocWrapper<GroupMember>;
-export type GroupPortfolioStateSnapshotsData = DataDocWrapper<PortfolioState>;
+export type GroupTransactionsData = DataDocsWrapper<PortfolioTransaction>;
+export type GroupMembersData = DataDocsWrapper<GroupMember>;
+export type GroupPortfolioStateSnapshotsData = DataDocsWrapper<PortfolioState>;
 
 export type GroupDetails = {
   groupData: GroupData;

@@ -1,7 +1,7 @@
 import { getSymbolSummaries } from '@market-monitor/api-external';
 import {
   getCurrentDateDefaultFormat,
-  getPortfolioStateHoldingPartialUtil,
+  getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
 } from '@market-monitor/shared/utils-general';
 import { format, subDays } from 'date-fns';
@@ -43,17 +43,17 @@ export const userUpdatePortfolioScheduler = async (): Promise<void> => {
 
     try {
       // get partial holdings calculations
-      const partialHoldings = getPortfolioStateHoldingPartialUtil(transactions.transactions);
+      const holdingsBase = getPortfolioStateHoldingBaseUtil(transactions.transactions);
 
       // get symbol summaries from API
-      const partialHoldingSymbols = partialHoldings.map((d) => d.symbol);
+      const partialHoldingSymbols = holdingsBase.map((d) => d.symbol);
       const summaries = partialHoldingSymbols.length > 0 ? await getSymbolSummaries(partialHoldingSymbols) : [];
 
       // get portfolio state
       const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
         user.portfolioState.startingCash,
         transactions.transactions,
-        partialHoldings,
+        holdingsBase,
         summaries,
       );
       // remove holdings
@@ -62,6 +62,10 @@ export const userUpdatePortfolioScheduler = async (): Promise<void> => {
       // update user
       userDoc.ref.update({
         portfolioState: portfolioState,
+        holdingSnapshot: {
+          data: holdingsBase,
+          lastModifiedDate: today,
+        },
       });
 
       // log

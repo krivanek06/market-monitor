@@ -1,4 +1,5 @@
-import { PortfolioState, PortfolioTransaction } from './portfolio.model';
+import { DataDocsWrapper } from './../constants/generic.model';
+import { PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
 import { SymbolType } from './symbol.model';
 
 export type UserBase = {
@@ -15,7 +16,13 @@ export type UserBase = {
 
 export type UserData = UserBase & {
   groups: {
+    /**
+     * group member
+     */
     groupMember: string[];
+    /**
+     * group owner
+     */
     groupOwner: string[];
     /**
      * invitation from a group to join
@@ -30,10 +37,12 @@ export type UserData = UserBase & {
   settings: UserSettings;
   accountResets: UserAccountResets[];
 
-  /**
-   * dates
-   */
   lastLoginDate: string;
+
+  /**
+   * data about current holdings, calculated from previous transactions
+   */
+  holdingSnapshot: DataDocsWrapper<PortfolioStateHoldingBase>;
 };
 
 /**

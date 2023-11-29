@@ -22,7 +22,7 @@ describe('PortfolioGrowthService', () => {
   });
 
   const portfolioCalculationServiceMock = createMock<PortfolioCalculationService>({
-    getPortfolioStateHoldingPartial: jest.fn(),
+    getPortfolioStateHoldingBase: jest.fn(),
   });
 
   beforeEach(async () => {
