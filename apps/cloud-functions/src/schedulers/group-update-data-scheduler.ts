@@ -125,13 +125,13 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // update last transactions for the group
   await groupDocumentTransactionsRef(group.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    lastTransactions: lastTransactions,
+    data: lastTransactions,
   });
 
   // update members for the group
   await groupDocumentMembersRef(group.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    memberUsers: membersData.map((d) => transformUserToGroupMember(d)),
+    data: membersData.map((d) => transformUserToGroupMember(d)),
   });
 
   // update owner for group

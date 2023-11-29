@@ -1,3 +1,4 @@
+import { DataDocWrapper } from '../constants';
 import { PortfolioState, PortfolioTransaction } from './portfolio.model';
 import { UserBase, UserData } from './user.model';
 
@@ -86,23 +87,9 @@ export type GroupData = {
   portfolioState: PortfolioState;
 };
 
-export type GroupTransactionsData = {
-  lastModifiedDate: string;
-
-  // memberInvitedUsers: UserBase[];
-  // memberRequestUsers: UserBase[];
-  lastTransactions: PortfolioTransaction[];
-  // topTransaction: PortfolioTransaction[];
-};
-
-export type GroupMembersData = {
-  lastModifiedDate: string;
-  memberUsers: GroupMember[];
-};
-
-export type GroupPortfolioStateSnapshotsData = {
-  data: PortfolioState[];
-};
+export type GroupTransactionsData = DataDocWrapper<PortfolioTransaction>;
+export type GroupMembersData = DataDocWrapper<GroupMember>;
+export type GroupPortfolioStateSnapshotsData = DataDocWrapper<PortfolioState>;
 
 export type GroupDetails = {
   groupData: GroupData;

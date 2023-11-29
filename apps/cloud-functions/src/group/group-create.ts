@@ -70,15 +70,16 @@ export const groupCreateCall = onCall(async (request) => {
   // create additional documents for group
   await groupDocumentTransactionsRef(newGroup.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    lastTransactions: [],
+    data: [],
   });
 
   await groupDocumentMembersRef(newGroup.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    memberUsers: [],
+    data: [],
   });
 
   await groupDocumentPortfolioStateSnapshotsRef(newGroup.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
     data: [],
   });
 
