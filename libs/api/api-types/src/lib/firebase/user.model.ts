@@ -82,9 +82,22 @@ export type UserSettings = {
    * if true, other users will be able to find this user portfolio by searching
    */
   isProfilePublic: boolean;
+};
+
+export type UserFeatures = {
+  /**
+   * if true, user can create groups limited by - GROUP_OWNER_LIMIT
+   */
+  groupAllowCreate?: boolean;
 
   /**
    * if true, user can create unlimited number of groups
    */
-  allowUnlimitedGroupsToCreate?: boolean;
+  groupAllowCreateUnlimited?: boolean;
+
+  /**
+   * if true, user will have a starting cash balance and system
+   * will always check whether user has enough cash to buy
+   */
+  userPortfolioAllowCashAccount?: boolean;
 };

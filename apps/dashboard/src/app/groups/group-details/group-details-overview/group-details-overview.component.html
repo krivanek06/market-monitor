@@ -1,36 +1,61 @@
-<div class="flex flex-col justify-between mb-6 lg:flex-row">
-  <!-- group info -->
-  <app-group-display-info
-    [clickableOwner]="true"
-    [imageHeightPx]="150"
-    [groupData]="groupDetails.groupData"
-  ></app-group-display-info>
+<ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
+  <div class="flex flex-col justify-between mb-6 lg:flex-row">
+    <!-- group info -->
+    <app-group-display-info
+      [clickableOwner]="true"
+      [imageHeightPx]="150"
+      [groupData]="groupDetailsSignal.groupData"
+    ></app-group-display-info>
 
-  <!-- portfolio info -->
-  <app-portfolio-state
-    [titleColor]="ColorScheme.PRIMARY_VAR"
-    [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-    [showCashSegment]="true"
-    [portfolioState]="groupDetails.groupData.portfolioState"
-  ></app-portfolio-state>
+    <!-- portfolio info -->
+    <app-portfolio-state
+      [titleColor]="ColorScheme.PRIMARY_VAR"
+      [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+      [showCashSegment]="true"
+      [portfolioState]="groupDetailsSignal.groupData.portfolioState"
+    ></app-portfolio-state>
 
-  <!-- portfolio chart -->
-  <div class="-mt-10 w-[420px] hidden xl:block">
-    <app-portfolio-balance-pie-chart
-      [heightPx]="260"
-      [data]="groupDetails.groupData.portfolioState"
-    ></app-portfolio-balance-pie-chart>
+    <!-- portfolio chart -->
+    <div class="-mt-10 w-[420px] hidden xl:block">
+      <app-portfolio-balance-pie-chart
+        [heightPx]="260"
+        [data]="groupDetailsSignal.groupData.portfolioState"
+      ></app-portfolio-balance-pie-chart>
+    </div>
   </div>
-</div>
 
-<div class="pt-4 mb-8">
-  <mat-divider></mat-divider>
-</div>
+  <!-- divider -->
+  <div class="pt-4 mb-8">
+    <mat-divider></mat-divider>
+  </div>
 
-<!-- portfolio change -->
-<div class="mb-12 lg:px-10">
-  <app-portfolio-period-change
-    *ngIf="portfolioChangeSignal() as portfolioChange"
-    [portfolioChange]="portfolioChange"
-  ></app-portfolio-period-change>
-</div>
+  <!-- portfolio change -->
+  <div class="mb-12 lg:px-10">
+    <app-portfolio-period-change
+      *ngIf="portfolioChangeSignal() as portfolioChange"
+      [portfolioChange]="portfolioChange"
+    ></app-portfolio-period-change>
+  </div>
+
+  <!-- divider -->
+  <div class="pb-4">
+    <mat-divider></mat-divider>
+  </div>
+
+  <app-portfolio-growth-chart
+    *ngIf="portfolioGrowthSignal() as portfolioGrowthChartSignal"
+    [showOnlyTotalBalance]="true"
+    [data]="{
+      values: portfolioGrowthChartSignal,
+      startingCashValue: groupDetailsSignal.groupData.portfolioState.startingCash
+    }"
+    [heightPx]="425"
+  ></app-portfolio-growth-chart>
+
+  <!-- invitations -->
+  <app-group-invitations-manager
+    [groupData]="groupDetailsSignal"
+    [memberRequestUsers]="memberRequestedUsersSignal()"
+    [memberInvitedUsers]="memberInvitedUsersSignal()"
+  ></app-group-invitations-manager>
+</ng-container>

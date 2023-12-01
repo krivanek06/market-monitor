@@ -1,15 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatDividerModule } from '@angular/material/divider';
-import { GroupDetails } from '@market-monitor/api-types';
+import { ActivatedRoute } from '@angular/router';
+import { GroupApiService, UserApiService } from '@market-monitor/api-client';
+import { GroupInvitationsManagerComponent } from '@market-monitor/modules/group/features';
 import { GroupDisplayInfoComponent } from '@market-monitor/modules/group/ui';
-import { PortfolioCalculationService, PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
+import { PortfolioCalculationService } from '@market-monitor/modules/portfolio/data-access';
 import {
   PortfolioBalancePieChartComponent,
+  PortfolioGrowthChartComponent,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
 } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
+import { map, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-group-details-overview',
@@ -21,6 +26,8 @@ import { ColorScheme } from '@market-monitor/shared/data-access';
     PortfolioStateComponent,
     PortfolioPeriodChangeComponent,
     MatDividerModule,
+    PortfolioGrowthChartComponent,
+    GroupInvitationsManagerComponent,
   ],
   templateUrl: './group-details-overview.component.html',
   styles: [
@@ -33,22 +40,38 @@ import { ColorScheme } from '@market-monitor/shared/data-access';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDetailsOverviewComponent implements OnInit {
-  @Input({ required: true }) groupDetails!: GroupDetails;
-
+  groupApiService = inject(GroupApiService);
   portfolioCalculationService = inject(PortfolioCalculationService);
+  userApiService = inject(UserApiService);
 
-  portfolioGrowthSignal = signal<PortfolioGrowth[]>([]);
+  groupDetails$ = inject(ActivatedRoute).params.pipe(
+    map((d) => d['id']),
+    switchMap((id) => this.groupApiService.getGroupDetailsById(id)),
+  );
+  groupDetailsSignal = toSignal(this.groupDetails$);
+
+  memberRequestedUsersSignal = toSignal(
+    this.groupDetails$.pipe(
+      switchMap((group) => this.userApiService.getUsersByIds(group.groupData.memberRequestUserIds)),
+    ),
+    { initialValue: [] },
+  );
+  memberInvitedUsersSignal = toSignal(
+    this.groupDetails$.pipe(
+      switchMap((group) => this.userApiService.getUsersByIds(group.groupData.memberInvitedUserIds)),
+    ),
+    { initialValue: [] },
+  );
+  portfolioGrowthSignal = computed(() =>
+    this.portfolioCalculationService.getPortfolioGrowthFromPortfolioState(
+      this.groupDetailsSignal()?.groupPortfolioSnapshotsData?.data ?? [],
+    ),
+  );
   portfolioChangeSignal = computed(() =>
     this.portfolioCalculationService.getPortfolioChange(this.portfolioGrowthSignal()),
   );
 
   ColorScheme = ColorScheme;
 
-  ngOnInit(): void {
-    // TODO: input should be signal, it fails because groupDetails is null
-    const calculation = this.portfolioCalculationService.getPortfolioGrowthFromPortfolioState(
-      this.groupDetails.groupPortfolioSnapshotsData.data,
-    );
-    this.portfolioGrowthSignal.set(calculation);
-  }
+  ngOnInit(): void {}
 }

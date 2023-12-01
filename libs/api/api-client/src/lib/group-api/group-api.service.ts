@@ -34,7 +34,7 @@ export class GroupApiService {
 
   constructor(private firestore: Firestore) {}
 
-  getGroupDetailsById(groupId: string): Observable<GroupDetails | undefined> {
+  getGroupDetailsById(groupId: string): Observable<GroupDetails> {
     return combineLatest([
       this.getGroupDataById(groupId),
       this.getGroupMembersDataById(groupId),
@@ -43,7 +43,7 @@ export class GroupApiService {
     ]).pipe(
       map(([groupData, groupMembersData, groupTransactionData, groupPortfolioSnapshotsData]) => {
         if (!groupData || !groupMembersData || !groupTransactionData || !groupPortfolioSnapshotsData) {
-          return undefined;
+          throw new Error('Group data not found');
         }
         return {
           groupData: groupData,
@@ -133,10 +133,15 @@ export class GroupApiService {
     return result.data;
   }
 
-  async removeUserInvitationToGroup(input: GroupBaseInput): Promise<GroupData> {
-    const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupMemberInviteRemoveCall');
-    const result = await callable(input);
-    return result.data;
+  /**
+   * Removes user invitation to join group
+   *
+   * @param input
+   * @returns
+   */
+  async removeUserInvitationToGroup(input: GroupBaseInput): Promise<void> {
+    const callable = httpsCallable<GroupBaseInput, void>(this.functions, 'groupMemberInviteRemoveCall');
+    await callable(input);
   }
 
   async removeGroupMember(input: GroupBaseInput): Promise<GroupData> {

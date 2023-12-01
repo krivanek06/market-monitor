@@ -12,7 +12,6 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
     },
     settings: {
       isProfilePublic: true,
-      allowUnlimitedGroupsToCreate: false,
     },
     personal: personal,
     accountResets: [],

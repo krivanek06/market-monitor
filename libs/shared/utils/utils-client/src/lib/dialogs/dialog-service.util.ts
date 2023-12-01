@@ -2,6 +2,7 @@ import { Injectable, Optional } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, firstValueFrom, of } from 'rxjs';
+import { ActionButtonDialog, ActionButtonDialogComponent } from './action-button-dialog/action-button-dialog.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { NotificationProgressComponent } from './notification-bar/notification-bar.component';
 
@@ -70,6 +71,22 @@ export class DialogServiceUtil {
     });
 
     const result = (await firstValueFrom(dialogRef.afterClosed())) as boolean;
+    return result;
+  }
+
+  async showActionButtonDialog(config: ActionButtonDialog): Promise<'primary' | 'secondary' | undefined> {
+    if (!this.matDialog) {
+      console.warn('DialogService.matDialog not initialized');
+      return undefined;
+    }
+
+    const dialogRef = this.matDialog.open(ActionButtonDialogComponent, {
+      data: <ActionButtonDialog>{
+        ...config,
+      },
+    });
+
+    const result = (await firstValueFrom(dialogRef.afterClosed())) as 'primary' | 'secondary';
     return result;
   }
 
