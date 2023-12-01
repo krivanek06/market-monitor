@@ -100,4 +100,5 @@ export type GroupDetails = {
   groupData: GroupData;
   groupTransactionsData: GroupTransactionsData;
   groupMembersData: GroupMembersData;
+  groupPortfolioSnapshotsData: GroupPortfolioStateSnapshotsData;
 };

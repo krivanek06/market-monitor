@@ -16,6 +16,7 @@ import {
   GroupData,
   GroupDetails,
   GroupMembersData,
+  GroupPortfolioStateSnapshotsData,
   GroupTransactionsData,
 } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
@@ -38,16 +39,18 @@ export class GroupApiService {
       this.getGroupDataById(groupId),
       this.getGroupMembersDataById(groupId),
       this.getGroupPortfolioTransactionsDataById(groupId),
+      this.getGroupPortfolioSnapshotsDataById(groupId),
     ]).pipe(
-      map(([groupData, groupMembersData, groupTransactionData]) => {
-        if (!groupData || !groupMembersData || !groupTransactionData) {
+      map(([groupData, groupMembersData, groupTransactionData, groupPortfolioSnapshotsData]) => {
+        if (!groupData || !groupMembersData || !groupTransactionData || !groupPortfolioSnapshotsData) {
           return undefined;
         }
         return {
           groupData: groupData,
           groupMembersData: groupMembersData,
           groupTransactionsData: groupTransactionData,
-        } as GroupDetails;
+          groupPortfolioSnapshotsData: groupPortfolioSnapshotsData,
+        } satisfies GroupDetails;
       }),
     );
   }
@@ -62,6 +65,10 @@ export class GroupApiService {
 
   getGroupPortfolioTransactionsDataById(groupId: string): Observable<GroupTransactionsData | undefined> {
     return rxDocData(this.getGroupPortfolioTransactionDocRef(groupId));
+  }
+
+  getGroupPortfolioSnapshotsDataById(groupId: string): Observable<GroupPortfolioStateSnapshotsData | undefined> {
+    return rxDocData(this.getGroupPortfolioSnapshotsDocRef(groupId));
   }
 
   getGroupsDataByIds(groupIds: string[]): Observable<GroupData[]> {
@@ -177,6 +184,12 @@ export class GroupApiService {
   private getGroupPortfolioTransactionDocRef(userId: string): DocumentReference<GroupTransactionsData> {
     return doc(this.getGroupCollectionMoreInformationRef(userId), 'transactions').withConverter(
       assignTypesClient<GroupTransactionsData>(),
+    );
+  }
+
+  private getGroupPortfolioSnapshotsDocRef(userId: string): DocumentReference<GroupPortfolioStateSnapshotsData> {
+    return doc(this.getGroupCollectionMoreInformationRef(userId), 'portfolio_snapshots').withConverter(
+      assignTypesClient<GroupPortfolioStateSnapshotsData>(),
     );
   }
 

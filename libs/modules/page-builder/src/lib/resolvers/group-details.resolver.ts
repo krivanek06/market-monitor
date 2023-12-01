@@ -36,6 +36,8 @@ export const groupDetailsResolver: ResolveFn<GroupDetails | null> = (
         return null;
       }
 
+      console.log('GROUP loaded', groupDetails);
+
       return groupDetails;
     }),
     tap(() => loaderMainService.setLoading(false)),

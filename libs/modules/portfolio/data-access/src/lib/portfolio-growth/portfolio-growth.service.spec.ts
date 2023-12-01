@@ -51,7 +51,7 @@ describe('PortfolioGrowthService', () => {
 
   describe('Test: getPortfolioGrowthAssets', () => {
     it('should return portfolio growth assets', async () => {
-      const result = await service.getPortfolioGrowthAssets(userTestPortfolioTransaction1);
+      const result = await service.getPortfolioGrowthAssets(userTestPortfolioTransaction1.transactions);
 
       expect(result).toEqual(expectedResult);
     });

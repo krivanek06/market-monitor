@@ -7,6 +7,7 @@ import {
   PortfolioGrowthAssetsDataItem,
   PortfolioState,
   PortfolioStateHoldings,
+  PortfolioTransaction,
   UserPortfolioTransaction,
 } from '@market-monitor/api-types';
 import {
@@ -23,7 +24,7 @@ import { Observable, firstValueFrom, map } from 'rxjs';
 export class PortfolioGrowthService {
   constructor(private marketApiService: MarketApiService) {}
 
-  getPortfolioState(
+  getPortfolioStateHoldings(
     previousPortfolioState: PortfolioState,
     portfolioTransactions: UserPortfolioTransaction,
   ): Observable<PortfolioStateHoldings> {
@@ -48,10 +49,10 @@ export class PortfolioGrowthService {
       );
   }
 
-  async getPortfolioGrowthAssets(userTransactions: UserPortfolioTransaction): Promise<PortfolioGrowthAssets[]> {
+  async getPortfolioGrowthAssets(transactions: PortfolioTransaction[]): Promise<PortfolioGrowthAssets[]> {
     console.log(`PortfolioGrowthService: getPortfolioGrowthAssets`);
     // from transactions get all distinct symbols with soonest date of transaction
-    const transactionStart = userTransactions.transactions.reduce(
+    const transactionStart = transactions.reduce(
       (acc, curr) => {
         // check if symbol already exists
         const entry = acc.find((d) => d.symbol === curr.symbol);
@@ -111,7 +112,7 @@ export class PortfolioGrowthService {
         }
 
         // get all transactions for this symbol in ASC order by date
-        const symbolTransactions = userTransactions.transactions
+        const symbolTransactions = transactions
           .filter((d) => d.symbol === symbol)
           .sort((a, b) => (isBefore(new Date(a.date), new Date(b.date)) ? -1 : 1));
 

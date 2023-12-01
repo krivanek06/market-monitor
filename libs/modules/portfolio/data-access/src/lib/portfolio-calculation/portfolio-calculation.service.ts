@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { PortfolioGrowthAssets, PortfolioStateHolding, PortfolioTransaction } from '@market-monitor/api-types';
+import {
+  PortfolioGrowthAssets,
+  PortfolioState,
+  PortfolioStateHolding,
+  PortfolioTransaction,
+} from '@market-monitor/api-types';
 import { GenericChartSeriesData, GenericChartSeriesPie, ValueItem } from '@market-monitor/shared/data-access';
 import { dateFormatDate, roundNDigits } from '@market-monitor/shared/utils-general';
 import { subDays, subMonths, subWeeks, subYears } from 'date-fns';
@@ -9,6 +14,15 @@ import { PortfolioChange, PortfolioGrowth, PortfolioTransactionToDate } from '..
   providedIn: 'root',
 })
 export class PortfolioCalculationService {
+  getPortfolioGrowthFromPortfolioState(data: PortfolioState[]): PortfolioGrowth[] {
+    return data.map((portfolioStatePerDay) => ({
+      date: portfolioStatePerDay.modifiedDate,
+      investedValue: portfolioStatePerDay.invested,
+      marketTotalValue: portfolioStatePerDay.holdingsBalance,
+      totalBalanceValue: portfolioStatePerDay.balance,
+    }));
+  }
+
   getPortfolioGrowth(data: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
     return data.reduce((acc, curr) => {
       curr.data.forEach((dataItem) => {
@@ -19,7 +33,6 @@ export class PortfolioCalculationService {
         if (elementIndex > -1) {
           acc[elementIndex].investedValue += dataItem.investedValue;
           acc[elementIndex].marketTotalValue += dataItem.marketTotalValue;
-          acc[elementIndex].ownedAssets += dataItem.units > 0 ? 1 : 0;
           return;
         }
 
@@ -27,7 +40,6 @@ export class PortfolioCalculationService {
         const portfolioItem: PortfolioGrowth = {
           date: dataItem.date,
           investedValue: dataItem.investedValue,
-          ownedAssets: 1,
           marketTotalValue: dataItem.marketTotalValue,
           totalBalanceValue: dataItem.marketTotalValue - dataItem.investedValue + startingCashValue,
         };
