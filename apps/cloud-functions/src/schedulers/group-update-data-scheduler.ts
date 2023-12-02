@@ -46,13 +46,18 @@ export const groupUpdateDataScheduler = async (): Promise<void> => {
 const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // load all members of the group
   const ownerData = (await userDocumentRef(group.ownerUserId).get()).data();
-  const membersData = (
+
+  /**
+   * difference is membersPreviousData can contain less people, those who accepted membership only today
+   */
+  const membersPreviousData = (await groupDocumentMembersRef(group.id).get()).data();
+  const membersCurrentData = (
     await usersCollectionRef().where('groups.groupMember', 'array-contains', group.id).get()
   ).docs.map((d) => d.data());
 
   // load all transactions of the group members
   const memberTransactionHistory = await Promise.all(
-    membersData.map((m) => userDocumentTransactionHistoryRef(m.id).get()),
+    membersCurrentData.map((m) => userDocumentTransactionHistoryRef(m.id).get()),
   );
 
   // save only last N transactions for everybody - order by date desc
@@ -63,7 +68,7 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     .slice(0, 250);
 
   // calculate holdings from all members
-  const memberHoldingSnapshots = membersData
+  const memberHoldingSnapshots = membersCurrentData
     .map((d) => d.holdingSnapshot.data)
     .reduce(
       (acc, curr) =>
@@ -83,7 +88,7 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     );
 
   // calculate portfolioState from all members
-  const memberPortfolioState = membersData
+  const memberPortfolioState = membersCurrentData
     .map((d) => d.portfolioState)
     .reduce((acc, curr) => {
       if (!acc) {
@@ -116,6 +121,12 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     memberPortfolioState.totalGainsValue / memberPortfolioState.holdingsBalance,
   );
 
+  // create group members, calculate current group position
+  const updatedGroupMembers = membersCurrentData
+    .slice()
+    .sort((a, b) => b.portfolioState.totalGainsValue - a.portfolioState.totalGainsValue)
+    .map((d, index) => transformUserToGroupMember(d, index + 1, membersPreviousData?.data?.find((m) => m.id === d.id)));
+
   // update last transactions for the group
   await groupDocumentTransactionsRef(group.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
@@ -125,7 +136,7 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // update members for the group
   await groupDocumentMembersRef(group.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    data: membersData.map((d) => transformUserToGroupMember(d)),
+    data: updatedGroupMembers,
   });
 
   // update owner for group

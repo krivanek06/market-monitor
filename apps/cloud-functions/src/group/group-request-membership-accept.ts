@@ -45,7 +45,7 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
   // update group member data
   await groupDocumentMembersRef(data.groupId).update({
     data: FieldValue.arrayUnion(<GroupMember>{
-      ...transformUserToGroupMember(userData),
+      ...transformUserToGroupMember(userData, groupData.memberUserIds.length + 1),
     }),
   });
 

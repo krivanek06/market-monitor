@@ -30,7 +30,7 @@ export const groupAddOwnerIntoGroupCall = onCall(async (request) => {
   // update group member data
   await groupDocumentMembersRef(groupId).update({
     data: FieldValue.arrayUnion(<GroupMember>{
-      ...transformUserToGroupMember(userData),
+      ...transformUserToGroupMember(userData, 1),
     }),
   });
 
