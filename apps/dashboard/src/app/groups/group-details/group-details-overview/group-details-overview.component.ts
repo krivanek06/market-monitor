@@ -4,6 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatDividerModule } from '@angular/material/divider';
 import { ActivatedRoute } from '@angular/router';
 import { GroupApiService, UserApiService } from '@market-monitor/api-client';
+import { GROUP_MEMBER_LIMIT, GroupMember } from '@market-monitor/api-types';
 import { GroupInvitationsManagerComponent } from '@market-monitor/modules/group/features';
 import { GroupDisplayInfoComponent } from '@market-monitor/modules/group/ui';
 import { PortfolioCalculationService } from '@market-monitor/modules/portfolio/data-access';
@@ -13,7 +14,9 @@ import {
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
 } from '@market-monitor/modules/portfolio/ui';
+import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
+import { PositionCardComponent } from '@market-monitor/shared/ui';
 import { map, switchMap } from 'rxjs';
 
 @Component({
@@ -28,6 +31,8 @@ import { map, switchMap } from 'rxjs';
     MatDividerModule,
     PortfolioGrowthChartComponent,
     GroupInvitationsManagerComponent,
+    PositionCardComponent,
+    UserDisplayItemComponent,
   ],
   templateUrl: './group-details-overview.component.html',
   styles: [
@@ -40,6 +45,7 @@ import { map, switchMap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDetailsOverviewComponent implements OnInit {
+  GROUP_MEMBER_LIMIT = GROUP_MEMBER_LIMIT;
   groupApiService = inject(GroupApiService);
   portfolioCalculationService = inject(PortfolioCalculationService);
   userApiService = inject(UserApiService);
@@ -74,4 +80,8 @@ export class GroupDetailsOverviewComponent implements OnInit {
   ColorScheme = ColorScheme;
 
   ngOnInit(): void {}
+
+  onMemberClick(member: GroupMember): void {
+    console.log('onMemberClick', member);
+  }
 }

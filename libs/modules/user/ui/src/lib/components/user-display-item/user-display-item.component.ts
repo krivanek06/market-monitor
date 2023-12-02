@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { UserData } from '@market-monitor/api-types';
+import { UserBase } from '@market-monitor/api-types';
 import { USER_ACTIVE_ACCOUNT_TIME_DAYS } from '@market-monitor/modules/user/data-access';
 import { DefaultImgDirective, LargeNumberFormatterPipe } from '@market-monitor/shared/ui';
 import { isBefore, subDays } from 'date-fns';
@@ -20,7 +20,7 @@ import { isBefore, subDays } from 'date-fns';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserDisplayItemComponent {
-  @Input({ required: true }) userData!: UserData;
+  @Input({ required: true }) userData!: UserBase;
 
   USER_ACTIVE_ACCOUNT_TIME_DAYS = USER_ACTIVE_ACCOUNT_TIME_DAYS;
 

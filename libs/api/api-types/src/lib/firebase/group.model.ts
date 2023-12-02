@@ -36,16 +36,18 @@ export type GroupMember = UserBase & {
    */
   since: string;
 
-  /**
-   * position in the group based on portfolioState
-   */
-  currentGroupMemberPosition: number;
+  position: {
+    /**
+     * position in the group based on portfolioState
+     */
+    currentGroupMemberPosition: number;
 
-  /**
-   * position in the group based on portfolioState previous date,
-   * valued that was saved in currentGroupMemberPosition
-   */
-  previousGroupMemberPosition: number | null;
+    /**
+     * position in the group based on portfolioState previous date,
+     * valued that was saved in currentGroupMemberPosition
+     */
+    previousGroupMemberPosition: number | null;
+  };
 };
 
 export type UserGroupData = { [K in keyof UserData['groups']]: GroupData[] };

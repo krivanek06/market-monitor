@@ -7,6 +7,7 @@ export const transformUserToBase = (user: UserData): UserBase => {
     accountCreatedDate: user.accountCreatedDate,
     portfolioState: user.portfolioState,
     personal: user.personal,
+    lastLoginDate: user.lastLoginDate,
   };
 };
 
@@ -18,8 +19,10 @@ export const transformUserToGroupMember = (
   return {
     ...transformUserToBase(user),
     since: getCurrentDateDefaultFormat(),
-    currentGroupMemberPosition: newPosition,
-    previousGroupMemberPosition: userPreviousGroupData?.currentGroupMemberPosition ?? null,
+    position: {
+      currentGroupMemberPosition: newPosition,
+      previousGroupMemberPosition: userPreviousGroupData.position?.currentGroupMemberPosition ?? null,
+    },
   };
 };
 

@@ -12,6 +12,8 @@ export type UserBase = {
   portfolioState: PortfolioState;
 
   accountCreatedDate: string;
+
+  lastLoginDate: string;
 };
 
 export type UserData = UserBase & {
@@ -36,9 +38,6 @@ export type UserData = UserBase & {
   };
   settings: UserSettings;
   accountResets: UserAccountResets[];
-
-  lastLoginDate: string;
-
   /**
    * data about current holdings, calculated from previous transactions
    */

@@ -13,10 +13,9 @@
     <!-- owner -->
     <div
       (click)="onOwnerClick()"
-      class="flex items-center gap-2 px-1 py-2 transition-all duration-300 rounded-lg"
+      class="flex items-center gap-2 px-1 py-2 rounded-lg"
       [ngClass]="{
-        'hover:scale-95': clickableOwner,
-        'hover:cursor-pointer': clickableOwner,
+        'g-clickable-hover': clickableOwner,
         'hover:shadow-lg': clickableOwner
       }"
     >

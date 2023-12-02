@@ -58,4 +58,23 @@
     [memberRequestUsers]="memberRequestedUsersSignal()"
     [memberInvitedUsers]="memberInvitedUsersSignal()"
   ></app-group-invitations-manager>
+
+  <!-- member -->
+  <div class="grid gap-4">
+    <div class="text-lg text-wt-primary">
+      Members [{{ groupDetailsSignal.groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}]
+    </div>
+    <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+      @for (user of groupDetailsSignal.groupMembersData.data; track user.id) {
+      <app-position-card
+        (clickedEmitter)="onMemberClick(user)"
+        [clickable]="true"
+        [currentPositions]="user.position.currentGroupMemberPosition"
+        [previousPosition]="user.position.previousGroupMemberPosition"
+      >
+        <app-user-display-item [userData]="user"></app-user-display-item>
+      </app-position-card>
+      }
+    </div>
+  </div>
 </ng-container>
