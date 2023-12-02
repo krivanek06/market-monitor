@@ -43,13 +43,14 @@ export const getPortfolioStateHoldingsUtil = (
     .filter((d) => !!d) as PortfolioStateHolding[];
 
   const invested = portfolioStateHolding.reduce((acc, curr) => acc + curr.invested, 0);
-  const balance = invested + startingCash + cashOnHandTransactions;
   const holdingsBalance = portfolioStateHolding.reduce(
     (acc, curr) => acc + curr.symbolSummary.quote.price * curr.units,
     0,
   );
-  const totalGainsValue = holdingsBalance - invested;
-  const totalGainsPercentage = holdingsBalance === 0 ? 0 : (holdingsBalance - invested) / holdingsBalance;
+
+  const balance = holdingsBalance + cashOnHandTransactions + startingCash;
+  const totalGainsValue = balance - startingCash;
+  const totalGainsPercentage = holdingsBalance === 0 ? 0 : (balance - startingCash) / balance;
   const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
   const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
 
