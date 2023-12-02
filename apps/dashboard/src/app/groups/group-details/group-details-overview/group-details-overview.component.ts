@@ -2,8 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatDividerModule } from '@angular/material/divider';
-import { ActivatedRoute } from '@angular/router';
-import { GroupApiService, UserApiService } from '@market-monitor/api-client';
+import { UserApiService } from '@market-monitor/api-client';
 import { GROUP_MEMBER_LIMIT, GroupMember } from '@market-monitor/api-types';
 import { GroupInvitationsManagerComponent } from '@market-monitor/modules/group/features';
 import { GroupDisplayInfoComponent } from '@market-monitor/modules/group/ui';
@@ -17,7 +16,8 @@ import {
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { PositionCardComponent } from '@market-monitor/shared/ui';
-import { map, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
+import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
 @Component({
   selector: 'app-group-details-overview',
@@ -44,18 +44,10 @@ import { map, switchMap } from 'rxjs';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GroupDetailsOverviewComponent implements OnInit {
+export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent implements OnInit {
   GROUP_MEMBER_LIMIT = GROUP_MEMBER_LIMIT;
-  groupApiService = inject(GroupApiService);
   portfolioCalculationService = inject(PortfolioCalculationService);
   userApiService = inject(UserApiService);
-
-  groupDetails$ = inject(ActivatedRoute).params.pipe(
-    map((d) => d['id']),
-    switchMap((id) => this.groupApiService.getGroupDetailsById(id)),
-  );
-  groupDetailsSignal = toSignal(this.groupDetails$);
-
   memberRequestedUsersSignal = toSignal(
     this.groupDetails$.pipe(
       switchMap((group) => this.userApiService.getUsersByIds(group.groupData.memberRequestUserIds)),

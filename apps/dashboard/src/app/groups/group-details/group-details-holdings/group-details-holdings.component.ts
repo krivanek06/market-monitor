@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { GroupDetails } from '@market-monitor/api-types';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
 @Component({
   selector: 'app-group-details-holdings',
@@ -16,6 +16,4 @@ import { GroupDetails } from '@market-monitor/api-types';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GroupDetailsHoldingsComponent {
-  @Input({ required: true }) groupDetails!: GroupDetails;
-}
+export class GroupDetailsHoldingsComponent extends PageGroupsBaseComponent {}

@@ -64,7 +64,7 @@
     <div class="text-lg text-wt-primary">
       Members [{{ groupDetailsSignal.groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}]
     </div>
-    <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+    <div class="grid grid-cols-2 2xl:grid-cols-3 gap-x-6 gap-y-4">
       @for (user of groupDetailsSignal.groupMembersData.data; track user.id) {
       <app-position-card
         (clickedEmitter)="onMemberClick(user)"

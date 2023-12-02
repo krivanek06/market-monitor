@@ -40,8 +40,12 @@ button[mat-stroked-button] {
 
 button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
   border: 1px solid var(--gray-medium) !important;
-  background-color: var(--gray-light-strong) !important;
-  opacity: 0.85 !important;
+  //background-color: #ffffff !important;
+  opacity: 0.95 !important;
+
+  // &:hover > span {
+  //   background-color: var(--gray-light) !important;
+  // }
 }
 
 .mdc-button__label {

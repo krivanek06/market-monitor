@@ -93,7 +93,7 @@
     Send Request To Join
   </button>
 
-  <!-- owner -->
+  <!-- owner - invite people -->
   <button
     *ngIf="isOwnerSignal()"
     (click)="onInviteMembersClick()"
@@ -104,5 +104,11 @@
   >
     <mat-icon>add</mat-icon>
     Invite Members
+  </button>
+
+  <!-- owner - settings -->
+  <button *ngIf="isOwnerSignal()" (click)="onGroupSettingsClick()" type="button" mat-stroked-button>
+    <mat-icon>settings</mat-icon>
+    Group Settings
   </button>
 </ng-container>

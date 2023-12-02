@@ -77,6 +77,10 @@ export class GroupInteractionButtonsComponent {
     return `By requesting to join a group, you will be part of the group if the owner accepts your request`;
   }
 
+  onGroupSettingsClick() {
+    console.log('onGroupSettingsClick');
+  }
+
   @Confirmable('Are you sure you want to close this group?')
   async onGroupCloseClick() {
     try {
