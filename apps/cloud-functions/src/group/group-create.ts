@@ -10,6 +10,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  groupDocumentHoldingSnapshotsRef,
   groupDocumentMembersRef,
   groupDocumentPortfolioStateSnapshotsRef,
   groupDocumentRef,
@@ -83,6 +84,11 @@ export const groupCreateCall = onCall(async (request) => {
     data: [],
   });
 
+  await groupDocumentHoldingSnapshotsRef(newGroup.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: [],
+  });
+
   // update member list
   for await (const memberId of data.memberInvitedUserIds) {
     await userDocumentRef(memberId).update({
@@ -113,10 +119,6 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
     memberRequestUserIds: [],
     memberUserIds: [],
     modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
-    holdingSnapshot: {
-      data: [],
-      lastModifiedDate: getCurrentDateDefaultFormat(),
-    },
     portfolioState: {
       cashOnHand: 0,
       firstTransactionDate: null,

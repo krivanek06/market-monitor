@@ -15,11 +15,13 @@ import {
   GroupCreateInput,
   GroupData,
   GroupDetails,
+  GroupHoldingSnapshotsData,
   GroupMembersData,
   GroupPortfolioStateSnapshotsData,
   GroupTransactionsData,
 } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { getApp } from 'firebase/app';
 import { getFunctions } from 'firebase/functions';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
@@ -40,18 +42,38 @@ export class GroupApiService {
       this.getGroupMembersDataById(groupId),
       this.getGroupPortfolioTransactionsDataById(groupId),
       this.getGroupPortfolioSnapshotsDataById(groupId),
+      this.getGroupHoldingSnapshotsDataById(groupId),
     ]).pipe(
-      map(([groupData, groupMembersData, groupTransactionData, groupPortfolioSnapshotsData]) => {
-        if (!groupData || !groupMembersData || !groupTransactionData || !groupPortfolioSnapshotsData) {
-          throw new Error('Group data not found');
-        }
-        return {
-          groupData: groupData,
-          groupMembersData: groupMembersData,
-          groupTransactionsData: groupTransactionData,
-          groupPortfolioSnapshotsData: groupPortfolioSnapshotsData,
-        } satisfies GroupDetails;
-      }),
+      map(
+        ([
+          groupData,
+          groupMembersData,
+          groupTransactionsData,
+          groupPortfolioSnapshotsData,
+          groupHoldingSnapshotsData,
+        ]) => {
+          if (!groupData || !groupMembersData) {
+            throw new Error('Group data not found');
+          }
+
+          return {
+            groupData,
+            groupMembersData,
+            groupTransactionsData: {
+              data: groupTransactionsData?.data ?? [],
+              lastModifiedDate: groupTransactionsData?.lastModifiedDate ?? getCurrentDateDefaultFormat(),
+            },
+            groupPortfolioSnapshotsData: {
+              data: groupPortfolioSnapshotsData?.data ?? [],
+              lastModifiedDate: groupPortfolioSnapshotsData?.lastModifiedDate ?? getCurrentDateDefaultFormat(),
+            },
+            groupHoldingSnapshotsData: {
+              data: groupHoldingSnapshotsData?.data ?? [],
+              lastModifiedDate: groupHoldingSnapshotsData?.lastModifiedDate ?? getCurrentDateDefaultFormat(),
+            },
+          } satisfies GroupDetails;
+        },
+      ),
     );
   }
 
@@ -69,6 +91,10 @@ export class GroupApiService {
 
   getGroupPortfolioSnapshotsDataById(groupId: string): Observable<GroupPortfolioStateSnapshotsData | undefined> {
     return rxDocData(this.getGroupPortfolioSnapshotsDocRef(groupId));
+  }
+
+  getGroupHoldingSnapshotsDataById(groupId: string): Observable<GroupHoldingSnapshotsData | undefined> {
+    return rxDocData(this.getGroupHoldingSnapshotsDocRef(groupId));
   }
 
   getGroupsDataByIds(groupIds: string[]): Observable<GroupData[]> {
@@ -195,6 +221,12 @@ export class GroupApiService {
   private getGroupPortfolioSnapshotsDocRef(userId: string): DocumentReference<GroupPortfolioStateSnapshotsData> {
     return doc(this.getGroupCollectionMoreInformationRef(userId), 'portfolio_snapshots').withConverter(
       assignTypesClient<GroupPortfolioStateSnapshotsData>(),
+    );
+  }
+
+  private getGroupHoldingSnapshotsDocRef(userId: string): DocumentReference<GroupHoldingSnapshotsData> {
+    return doc(this.getGroupCollectionMoreInformationRef(userId), 'holding_snapshots').withConverter(
+      assignTypesClient<GroupHoldingSnapshotsData>(),
     );
   }
 

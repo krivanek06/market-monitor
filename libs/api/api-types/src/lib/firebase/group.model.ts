@@ -101,20 +101,20 @@ export type GroupData = {
    * portfolio state calculated from transactions at the end of the day
    */
   portfolioState: PortfolioState;
-
-  /**
-   * data about current holdings, calculated from users data
-   */
-  holdingSnapshot: DataDocsWrapper<PortfolioStateHoldingBase>;
 };
 
 export type GroupTransactionsData = DataDocsWrapper<PortfolioTransaction>;
 export type GroupMembersData = DataDocsWrapper<GroupMember>;
 export type GroupPortfolioStateSnapshotsData = DataDocsWrapper<PortfolioState>;
+export type GroupHoldingSnapshotsData = DataDocsWrapper<PortfolioStateHoldingBase>;
 
 export type GroupDetails = {
   groupData: GroupData;
   groupTransactionsData: GroupTransactionsData;
   groupMembersData: GroupMembersData;
   groupPortfolioSnapshotsData: GroupPortfolioStateSnapshotsData;
+  /**
+   * data about current holdings, calculated from users data
+   */
+  groupHoldingSnapshotsData: GroupHoldingSnapshotsData;
 };

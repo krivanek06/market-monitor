@@ -1,5 +1,6 @@
 import {
   GroupData,
+  GroupHoldingSnapshotsData,
   GroupMembersData,
   GroupPortfolioStateSnapshotsData,
   GroupTransactionsData,
@@ -32,3 +33,8 @@ export const groupDocumentPortfolioStateSnapshotsRef = (groupId: string) =>
   groupCollectionMoreInformationRef(groupId)
     .doc('portfolio_snapshots')
     .withConverter(assignTypesServer<GroupPortfolioStateSnapshotsData>());
+
+export const groupDocumentHoldingSnapshotsRef = (groupId: string) =>
+  groupCollectionMoreInformationRef(groupId)
+    .doc('holding_snapshots')
+    .withConverter(assignTypesServer<GroupHoldingSnapshotsData>());

@@ -2,6 +2,7 @@ import { GroupData, PortfolioState, PortfolioStateHoldingBase, PortfolioTransact
 import { getCurrentDateDefaultFormat, getObjectEntries, roundNDigits } from '@market-monitor/shared/utils-general';
 import { FieldValue } from 'firebase-admin/firestore';
 import {
+  groupDocumentHoldingSnapshotsRef,
   groupDocumentMembersRef,
   groupDocumentPortfolioStateSnapshotsRef,
   groupDocumentRef,
@@ -144,10 +145,12 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     ownerUser: transformUserToBase(ownerData),
     modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
     portfolioState: memberPortfolioState,
-    holdingSnapshot: {
-      lastModifiedDate: getCurrentDateDefaultFormat(),
-      data: getObjectEntries(memberHoldingSnapshots).map((d) => d[1]),
-    },
+  });
+
+  // save holding snapshots
+  await groupDocumentHoldingSnapshotsRef(group.id).update({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: getObjectEntries(memberHoldingSnapshots).map((d) => d[1]),
   });
 
   // save portfolio state
