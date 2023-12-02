@@ -3,21 +3,12 @@ import { DocumentReference, Firestore, deleteDoc, doc, setDoc } from '@angular/f
 import { PortfolioRisk, PortfolioTransaction } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { Observable, of } from 'rxjs';
-import { MarketApiService } from '../market-api/market-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PortfolioApiService {
-  constructor(
-    private marketApiService: MarketApiService,
-    private firestore: Firestore,
-  ) {}
-
-  // todo load all transaction from user and calculate portfolio
-  getPortfolioTransactionsByUser(userId: string): Observable<PortfolioTransaction[]> {
-    return of([]);
-  }
+  constructor(private firestore: Firestore) {}
 
   // TODO: calculation on backend
   getPortfolioRiskByUser(userId: string): Observable<PortfolioRisk | null> {

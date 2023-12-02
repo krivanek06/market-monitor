@@ -77,7 +77,7 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
           (acc2, curr2) => ({
             ...acc2,
             [curr2.symbol]: {
-              invested: (acc[curr2.symbol]?.invested || 0) + curr2.invested,
+              invested: roundNDigits((acc[curr2.symbol]?.invested || 0) + curr2.invested),
               units: (acc[curr2.symbol]?.units || 0) + curr2.units,
               symbol: curr2.symbol,
               symbolType: curr2.symbolType,

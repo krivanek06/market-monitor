@@ -17,6 +17,7 @@ import {
   SymbolQuote,
   SymbolSummary,
 } from '@market-monitor/api-types';
+import { chunk } from 'lodash-es';
 import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ApiCacheService } from '../utils';
 
@@ -28,10 +29,16 @@ export class MarketApiService extends ApiCacheService {
     super();
   }
 
-  getSymbolSummaries(symbols: string[]): Observable<SymbolSummary[]> {
-    if (symbols.length === 0) {
+  getSymbolSummaries(symbols: string[] | undefined): Observable<SymbolSummary[]> {
+    if (!symbols || symbols.length === 0) {
       return of([]);
     }
+
+    // if more than 100 symbols, split into chunks
+    if (symbols.length > 120) {
+      return this.getSymbolSummariesLong(symbols);
+    }
+
     return this.getData<SymbolSummary[]>(
       `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`,
       this.validity3Min,
@@ -140,6 +147,14 @@ export class MarketApiService extends ApiCacheService {
     return this.getData<string[]>(
       `https://get-basic-data.krivanek1234.workers.dev/?type=institutional-portfolio-dates`,
       this.validity30Min,
+    );
+  }
+
+  private getSymbolSummariesLong(symbols: string[]): Observable<SymbolSummary[]> {
+    const chunkLimit = 100;
+    const checkedSymbols = chunk(symbols, chunkLimit);
+    return forkJoin(checkedSymbols.map((chunk) => this.getSymbolSummaries(chunk))).pipe(
+      map((data) => data.reduce((acc, curr) => [...acc, ...curr], [])),
     );
   }
 }

@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveFn, Router, RouterStateSnapshot } from '@angular/router';
-import { GroupApiService } from '@market-monitor/api-client';
 import { GroupDetails } from '@market-monitor/api-types';
+import { GroupFacadeService } from '@market-monitor/modules/group/data-access';
 import { LoaderMainService } from '@market-monitor/shared/utils-client';
 import { catchError, map, of, tap } from 'rxjs';
 
@@ -19,7 +19,7 @@ export const groupDetailsResolver: ResolveFn<GroupDetails | null> = (
   const groupId = route.params['id'];
 
   const router = inject(Router);
-  const groupApiService = inject(GroupApiService);
+  const groupFacadeService = inject(GroupFacadeService);
   const loaderMainService = inject(LoaderMainService);
 
   if (!groupId) {
@@ -28,7 +28,7 @@ export const groupDetailsResolver: ResolveFn<GroupDetails | null> = (
   }
 
   // load multiple data at once
-  return groupApiService.getGroupDetailsById(groupId).pipe(
+  return groupFacadeService.getGroupDetailsById(groupId).pipe(
     // return only details, everything else is cached
     map((groupDetails) => {
       if (!groupDetails) {

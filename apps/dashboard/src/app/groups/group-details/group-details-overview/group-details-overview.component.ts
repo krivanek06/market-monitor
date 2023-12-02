@@ -62,7 +62,7 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
   );
   portfolioGrowthSignal = computed(() =>
     this.portfolioCalculationService.getPortfolioGrowthFromPortfolioState(
-      this.groupDetailsSignal()?.groupPortfolioSnapshotsData?.data ?? [],
+      this.groupDetailsSignal()?.groupPortfolioSnapshotsData ?? [],
     ),
   );
   portfolioChangeSignal = computed(() =>
