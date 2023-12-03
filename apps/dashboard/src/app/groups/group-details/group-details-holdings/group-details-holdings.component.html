@@ -1,7 +1,12 @@
 <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
-  <div class="grid mb-4 2xl:grid-cols-3">
-    <div class="2xl:col-span-2">TODO</div>
-    <div>
+  <div class="grid mb-8 2xl:grid-cols-3">
+    <div class="2xl:col-span-2">
+      <app-generic-chart-bubble
+        *ngIf="portfolioHoldingBubbleChartSignal() as portfolioHoldingBubbleChart"
+        [data]="portfolioHoldingBubbleChart"
+      ></app-generic-chart-bubble>
+    </div>
+    <div class="hidden 2xl:block">
       <app-generic-chart
         *ngIf="portfolioSectorAllocationSignal() as portfolioSectorAllocation"
         [heightPx]="380"
@@ -14,7 +19,7 @@
   </div>
 
   <!-- holding table -->
-  <div class="mb-8">
+  <div class="">
     <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">
       <app-portfolio-holdings-table
         (symbolClicked)="onSummaryClick($event)"

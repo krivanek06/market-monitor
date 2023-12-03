@@ -5,8 +5,14 @@ import {
   PortfolioStateHolding,
   PortfolioTransaction,
 } from '@market-monitor/api-types';
-import { GenericChartSeriesData, GenericChartSeriesPie, ValueItem } from '@market-monitor/shared/data-access';
-import { dateFormatDate, roundNDigits } from '@market-monitor/shared/utils-general';
+import {
+  ChartType,
+  GenericChartSeries,
+  GenericChartSeriesData,
+  GenericChartSeriesPie,
+  ValueItem,
+} from '@market-monitor/shared/data-access';
+import { dateFormatDate, getObjectEntries, roundNDigits } from '@market-monitor/shared/utils-general';
 import { subDays, subMonths, subWeeks, subYears } from 'date-fns';
 import { PortfolioChange, PortfolioGrowth, PortfolioTransactionToDate } from '../models';
 
@@ -185,6 +191,64 @@ export class PortfolioCalculationService {
       innerSize: '35%',
       data: chartData,
     };
+  }
+
+  getPortfolioHoldingBubbleChart(
+    holdings: PortfolioStateHolding[],
+  ): GenericChartSeries<{ name: string; value: number }>[] {
+    // limit bubbles, show rest as 'others'
+    const dataLimit = 50;
+    // sort symbols by value and divide them by first and rest
+    const sortedHoldings = [...holdings].sort(
+      (a, b) => b.symbolSummary.quote.price * b.units - a.symbolSummary.quote.price * a.units,
+    );
+    const firstNData = sortedHoldings.slice(0, dataLimit);
+    const restData = sortedHoldings.slice(dataLimit);
+
+    // divide symbols into sectors
+    const sectorsDivider = firstNData.reduce(
+      (acc, curr) => {
+        const sector = curr.symbolSummary.profile?.sector ?? curr.symbolType;
+        return {
+          ...acc,
+          [sector]: [
+            ...(acc[sector] ?? []),
+            {
+              name: curr.symbol,
+              value: curr.symbolSummary.quote.price * curr.units,
+            },
+          ],
+        };
+      },
+      {} as {
+        [K in string]: {
+          name: string; // symbol
+          value: number; // symbol current market value
+        }[];
+      },
+    );
+
+    // from sectors create series
+    const sectorDividerSeries = getObjectEntries(sectorsDivider).map(
+      ([name, data]) =>
+        ({
+          type: ChartType.packedbubble,
+          name,
+          data,
+        }) satisfies GenericChartSeries<{ name: string; value: number }>,
+    );
+
+    // add rest data as 'others'
+    const restDataSeries = {
+      type: ChartType.packedbubble,
+      name: 'Others',
+      data: restData.map((d) => ({
+        name: d.symbol,
+        value: d.symbolSummary.quote.price * d.units,
+      })),
+    } satisfies GenericChartSeries<{ name: string; value: number }>;
+
+    return [...sectorDividerSeries, restDataSeries];
   }
 
   /**

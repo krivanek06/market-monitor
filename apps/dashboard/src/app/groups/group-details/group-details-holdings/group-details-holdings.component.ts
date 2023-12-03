@@ -5,7 +5,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { PortfolioCalculationService } from '@market-monitor/modules/portfolio/data-access';
 import { PortfolioHoldingsTableComponent } from '@market-monitor/modules/portfolio/ui';
-import { GeneralCardComponent, GenericChartComponent } from '@market-monitor/shared/ui';
+import { GeneralCardComponent, GenericChartBubbleComponent, GenericChartComponent } from '@market-monitor/shared/ui';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { map } from 'rxjs';
 import { PageGroupsBaseComponent } from '../page-groups-base.component';
@@ -20,6 +20,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     PortfolioHoldingsTableComponent,
     MatDialogModule,
     StockSummaryDialogComponent,
+    GenericChartBubbleComponent,
   ],
   templateUrl: './group-details-holdings.component.html',
   styles: [
@@ -37,6 +38,13 @@ export class GroupDetailsHoldingsComponent extends PageGroupsBaseComponent {
     this.groupDetails$.pipe(
       map((groupDetails) =>
         this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(groupDetails.groupHoldingSnapshotsData),
+      ),
+    ),
+  );
+  portfolioHoldingBubbleChartSignal = toSignal(
+    this.groupDetails$.pipe(
+      map((groupDetails) =>
+        this.portfolioCalculationService.getPortfolioHoldingBubbleChart(groupDetails.groupHoldingSnapshotsData),
       ),
     ),
   );
