@@ -24,7 +24,7 @@ import {
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
-import { Observable, filter, map } from 'rxjs';
+import { Observable, filter, map, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -41,6 +41,13 @@ export class UserApiService {
         transactions: d.transactions.slice().sort((a, b) => (a.date > b.date ? 1 : -1)),
       })),
     );
+  }
+
+  getUsersByIds(ids: string[]): Observable<UserData[]> {
+    if (!ids || ids.length === 0) {
+      return of([]);
+    }
+    return rxCollectionData(query(this.userCollection(), where('id', 'in', ids)));
   }
 
   /**

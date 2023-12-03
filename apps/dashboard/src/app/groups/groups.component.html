@@ -20,7 +20,7 @@
 
 <ng-container *ngIf="groupsSignal() as groups">
   <!-- invitations -->
-  <div *ngIf="groups.groupInvitations.length > 0" class="mb-4">
+  <!-- <div *ngIf="groups.groupInvitations.length > 0" class="mb-4">
     <h2>Received Invitation</h2>
     <div *ngFor="let group of groups.groupInvitations">
       <app-general-card>
@@ -28,11 +28,11 @@
           (acceptClickEmitter)="onAcceptInvitationClick(group)"
           (declineClickEmitter)="onDeclineInvitationClick(group)"
           [groupData]="group"
-          [showActionButtons]="true"
         ></app-group-display-item>
       </app-general-card>
     </div>
-  </div>
+  </div> -->
+  TODO display received and sent invitations
 
   <!-- my groups -->
   <div *ngIf="groups.groupOwner.length > 0" class="m-auto mb-4 xl:w-11/12">

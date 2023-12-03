@@ -1,8 +1,21 @@
-import { PortfolioState, PortfolioTransaction } from './portfolio.model';
+import { DataDocsWrapper } from '../constants';
+import {
+  PortfolioState,
+  PortfolioStateHolding,
+  PortfolioStateHoldingBase,
+  PortfolioTransaction,
+} from './portfolio.model';
 import { UserBase, UserData } from './user.model';
 
+/**
+ * how many members a group can have
+ */
 export const GROUP_MEMBER_LIMIT = 50;
-export const GROUP_OWNER_LIMIT = 3;
+
+/**
+ * how many groups a user can create
+ */
+export const GROUP_OWNER_LIMIT = 5;
 
 export type GroupCreateInput = {
   groupName: string;
@@ -23,7 +36,23 @@ export type GroupBaseInputInviteMembers = {
 };
 
 export type GroupMember = UserBase & {
+  /**
+   * date when user joined the group
+   */
   since: string;
+
+  position: {
+    /**
+     * position in the group based on portfolioState
+     */
+    currentGroupMemberPosition: number;
+
+    /**
+     * position in the group based on portfolioState previous date,
+     * valued that was saved in currentGroupMemberPosition
+     */
+    previousGroupMemberPosition: number | null;
+  };
 };
 
 export type UserGroupData = { [K in keyof UserData['groups']]: GroupData[] };
@@ -79,22 +108,18 @@ export type GroupData = {
   portfolioState: PortfolioState;
 };
 
-export type GroupTransactionsData = {
-  lastModifiedDate: string;
-
-  // memberInvitedUsers: UserBase[];
-  // memberRequestUsers: UserBase[];
-  lastTransactions: PortfolioTransaction[];
-  // topTransaction: PortfolioTransaction[];
-};
-
-export type GroupMembersData = {
-  lastModifiedDate: string;
-  memberUsers: GroupMember[];
-};
+export type GroupTransactionsData = DataDocsWrapper<PortfolioTransaction>;
+export type GroupMembersData = DataDocsWrapper<GroupMember>;
+export type GroupPortfolioStateSnapshotsData = DataDocsWrapper<PortfolioState>;
+export type GroupHoldingSnapshotsData = DataDocsWrapper<PortfolioStateHoldingBase>;
 
 export type GroupDetails = {
   groupData: GroupData;
-  groupTransactionsData: GroupTransactionsData;
-  groupMembersData: GroupMembersData;
+  groupTransactionsData: PortfolioTransaction[];
+  groupMembersData: GroupMember[];
+  groupPortfolioSnapshotsData: PortfolioState[];
+  /**
+   * data about current holdings, calculated from users data
+   */
+  groupHoldingSnapshotsData: PortfolioStateHolding[];
 };

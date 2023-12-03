@@ -35,6 +35,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(input: { values: PortfolioGrowth[]; startingCashValue: number }) {
     this.initChart(input.values, input.startingCashValue);
   }
+  @Input() showOnlyTotalBalance = false;
 
   private initChart(data: PortfolioGrowth[], startingCashValue: number = 0) {
     const marketTotalValue = data.map((point) => point.marketTotalValue);
@@ -112,7 +113,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         enabled: false,
       },
       legend: {
-        enabled: true,
+        enabled: !this.showOnlyTotalBalance,
         //floating: true,
         verticalAlign: 'top',
         align: 'left',
@@ -207,7 +208,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           type: 'area',
           zIndex: 10,
           yAxis: 0,
-          visible: !isCashActive,
+          visible: !isCashActive && !this.showOnlyTotalBalance,
           fillColor: {
             linearGradient: {
               x1: 1,

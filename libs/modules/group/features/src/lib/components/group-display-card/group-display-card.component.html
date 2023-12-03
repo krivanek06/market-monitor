@@ -14,48 +14,13 @@
   </mat-card-header>
   <mat-card-content>
     <div class="flex justify-between">
-      <div class="flex flex-1 gap-3 p-3">
-        <!-- image -->
-        <img appDefaultImg [src]="groupData.imageUrl" alt="Group Image" class="w-[100px] h-[100px]" />
-        <!-- data -->
-        <div class="flex flex-col">
-          <div class="flex items-center gap-2 mb-2">
-            <img
-              appDefaultImg
-              [src]="groupData.ownerUser.personal.photoURL"
-              alt="Owner Image"
-              class="w-8 h-8 rounded-full"
-            />
-            <span>{{ groupData.ownerUser.personal.displayName | titlecase }}</span>
-          </div>
-          <div class="flex gap-2">
-            <div class="w-20">Status</div>
-            <div
-              class="flex items-center gap-2"
-              [ngClass]="{
-                'text-wt-success': groupData.isPublic,
-                'text-wt-danger': !groupData.isPublic
-              }"
-            >
-              <mat-icon *ngIf="groupData.isPublic" color="accent">lock_open</mat-icon>
-              <mat-icon *ngIf="!groupData.isPublic" color="warn">lock</mat-icon>
-              <span>{{ groupData.isPublic ? 'Open' : 'Closed' }}</span>
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <div class="w-20">Members</div>
-            <div>{{ groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}</div>
-          </div>
-          <div class="flex gap-2">
-            <div class="w-20">Created</div>
-            <div>{{ groupData.createdDate | date: 'MMMM d, y' }}</div>
-          </div>
-        </div>
-      </div>
+      <!-- group info -->
+      <app-group-display-info [imageHeightPx]="125" [groupData]="groupData"></app-group-display-info>
 
       <!-- portfolio chart -->
       <div class="hidden xl:block -mt-8 w-[400px]">
         <app-portfolio-balance-pie-chart
+          *ngIf="groupData.portfolioState.balance > 0"
           [heightPx]="200"
           [data]="groupData.portfolioState"
         ></app-portfolio-balance-pie-chart>

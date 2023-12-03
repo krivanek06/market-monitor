@@ -15,16 +15,4 @@
     <img appDefaultImg [src]="groupData.ownerUser.personal.photoURL" alt="Owner image" class="w-10 h-10 rounded-full" />
     <span>{{ groupData.ownerUser.personal.displayName | titlecase }}</span>
   </div>
-
-  <!-- buttons -->
-  <div *ngIf="showActionButtons" class="flex gap-4 mt-4">
-    <button (click)="onAcceptClick()" mat-stroked-button type="button" color="accent" class="flex-1">
-      <mat-icon class="w-8">check_circle</mat-icon>
-      Accept
-    </button>
-    <button (click)="onDeclineClick()" mat-stroked-button type="button" color="warn" class="flex-1">
-      <mat-icon class="w-8">cancel</mat-icon>
-      Decline
-    </button>
-  </div>
 </div>

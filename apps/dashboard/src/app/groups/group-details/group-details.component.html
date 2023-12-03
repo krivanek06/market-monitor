@@ -1,16 +1,25 @@
-<div *ngIf="groupDetailsSignal() as groupDetailsSignal" class="flex justify-between pt-8">
-  <div>
-    <app-group-interaction-buttons [groupDetails]="groupDetailsSignal"></app-group-interaction-buttons>
+<ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
+  <div class="flex justify-between pt-8 mb-12">
+    <!-- group action buttons -->
+    <div class="-mb-2">
+      <app-group-interaction-buttons [groupDetails]="groupDetailsSignal"></app-group-interaction-buttons>
+    </div>
+
+    <!-- navigation -->
+    <app-tab-select-control
+      [formControl]="groupDetailsTabControl"
+      [screenLayoutSplit]="screenSplit"
+      [displayOptions]="displayOptions"
+    ></app-tab-select-control>
   </div>
 
-  <mat-tab-group (selectedTabChange)="onSelectionChange($event)" mat-stretch-tabs="false" mat-align-tabs="end">
-    <mat-tab label="Group Overview">
-      <app-group-details-overview [groupDetails]="groupDetailsSignal"></app-group-details-overview>
-    </mat-tab>
-    <mat-tab label="Member Data">
-      <app-group-details-holdings [groupDetails]="groupDetailsSignal"></app-group-details-holdings>
-    </mat-tab>
-  </mat-tab-group>
-</div>
+  <!-- group overview -->
+  <ng-container *ngIf="groupDetailsTabControl.value === 'overview'">
+    <app-group-details-overview></app-group-details-overview>
+  </ng-container>
 
-{{ groupDetailsSignal()?.groupData?.name }}
+  <!-- group holdings -->
+  <ng-container *ngIf="groupDetailsTabControl.value === 'holdings'">
+    <app-group-details-holdings></app-group-details-holdings>
+  </ng-container>
+</ng-container>

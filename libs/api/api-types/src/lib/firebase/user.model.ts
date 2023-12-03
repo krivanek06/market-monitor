@@ -1,4 +1,5 @@
-import { PortfolioState, PortfolioTransaction } from './portfolio.model';
+import { DataDocsWrapper } from './../constants/generic.model';
+import { PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
 import { SymbolType } from './symbol.model';
 
 export type UserBase = {
@@ -11,11 +12,19 @@ export type UserBase = {
   portfolioState: PortfolioState;
 
   accountCreatedDate: string;
+
+  lastLoginDate: string;
 };
 
 export type UserData = UserBase & {
   groups: {
+    /**
+     * group member
+     */
     groupMember: string[];
+    /**
+     * group owner
+     */
     groupOwner: string[];
     /**
      * invitation from a group to join
@@ -29,11 +38,10 @@ export type UserData = UserBase & {
   };
   settings: UserSettings;
   accountResets: UserAccountResets[];
-
   /**
-   * dates
+   * data about current holdings, calculated from previous transactions
    */
-  lastLoginDate: string;
+  holdingSnapshot: DataDocsWrapper<PortfolioStateHoldingBase>;
 };
 
 /**
@@ -73,4 +81,27 @@ export type UserSettings = {
    * if true, other users will be able to find this user portfolio by searching
    */
   isProfilePublic: boolean;
+};
+
+export type UserFeatures = {
+  /**
+   * if true, user can create groups limited by - GROUP_OWNER_LIMIT
+   */
+  groupAllowCreate?: boolean;
+
+  /**
+   * if true, user can create unlimited number of groups
+   */
+  groupAllowCreateUnlimited?: boolean;
+
+  /**
+   * if true, user will have a starting cash balance and system
+   * will always check whether user has enough cash to buy
+   */
+  userPortfolioAllowCashAccount?: boolean;
+
+  /**
+   * if true, user can have unlimited number of symbols in portfolio, else it is limited
+   */
+  userAllowUnlimitedSymbols?: boolean;
 };

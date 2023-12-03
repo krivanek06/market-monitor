@@ -82,10 +82,10 @@
               "with": "apps/market-monitor/src/environments/environment.prod.ts"
             }
           ],
-          "browserTarget": "market-monitor:build:production"
+          "buildTarget": "market-monitor:build:production"
         },
         "development": {
-          "browserTarget": "market-monitor:build:development"
+          "buildTarget": "market-monitor:build:development"
         }
       },
       "defaultConfiguration": "production"
@@ -100,10 +100,10 @@
               "with": "apps/market-monitor/src/environments/environment.prod.ts"
             }
           ],
-          "browserTarget": "market-monitor:build:production"
+          "buildTarget": "market-monitor:build:production"
         },
         "development": {
-          "browserTarget": "market-monitor:build:development"
+          "buildTarget": "market-monitor:build:development"
         }
       },
       "defaultConfiguration": "development"
@@ -111,7 +111,7 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "market-monitor:build"
+        "buildTarget": "market-monitor:build"
       }
     },
     "lint": {
@@ -172,11 +172,11 @@
       "executor": "@nguniversal/builders:ssr-dev-server",
       "configurations": {
         "development": {
-          "browserTarget": "market-monitor:build:development",
+          "buildTarget": "market-monitor:build:development",
           "serverTarget": "market-monitor:server:development"
         },
         "production": {
-          "browserTarget": "market-monitor:build:production",
+          "buildTarget": "market-monitor:build:production",
           "serverTarget": "market-monitor:server:production"
         }
       },
@@ -186,7 +186,7 @@
       "executor": "@angular/fire:deploy",
       "options": {
         "version": 2,
-        "browserTarget": "nx build market-monitor --configuration=prod",
+        "buildTarget": "nx build market-monitor --configuration=prod",
         "serverTarget": "nx build market-monitor:server --configuration=prod",
         "prerenderTarget": "nx prerender market-monitor:server --configuration=prod"
       }

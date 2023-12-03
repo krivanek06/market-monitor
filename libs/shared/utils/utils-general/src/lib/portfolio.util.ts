@@ -1,7 +1,7 @@
 import {
   PortfolioState,
   PortfolioStateHolding,
-  PortfolioStateHoldingPartial,
+  PortfolioStateHoldingBase,
   PortfolioStateHoldings,
   PortfolioTransaction,
   SymbolSummary,
@@ -12,7 +12,7 @@ import { roundNDigits } from './general-function.util';
 export const getPortfolioStateHoldingsUtil = (
   startingCash: number,
   transactions: PortfolioTransaction[],
-  partialHoldings: PortfolioStateHoldingPartial[],
+  partialHoldings: PortfolioStateHoldingBase[],
   symbolSummaries: SymbolSummary[],
 ): PortfolioStateHoldings => {
   // accumulate cash on hand from transactions
@@ -43,13 +43,14 @@ export const getPortfolioStateHoldingsUtil = (
     .filter((d) => !!d) as PortfolioStateHolding[];
 
   const invested = portfolioStateHolding.reduce((acc, curr) => acc + curr.invested, 0);
-  const balance = invested + startingCash + cashOnHandTransactions;
   const holdingsBalance = portfolioStateHolding.reduce(
     (acc, curr) => acc + curr.symbolSummary.quote.price * curr.units,
     0,
   );
-  const totalGainsValue = holdingsBalance - invested;
-  const totalGainsPercentage = holdingsBalance === 0 ? 0 : (holdingsBalance - invested) / holdingsBalance;
+
+  const balance = holdingsBalance + cashOnHandTransactions + startingCash;
+  const totalGainsValue = balance - startingCash;
+  const totalGainsPercentage = holdingsBalance === 0 ? 0 : (balance - startingCash) / balance;
   const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
   const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
 
@@ -81,9 +82,7 @@ export const getPortfolioStateHoldingsUtil = (
  * @param transactions - user's transactions
  * @returns
  */
-export const getPortfolioStateHoldingPartialUtil = (
-  transactions: PortfolioTransaction[],
-): PortfolioStateHoldingPartial[] => {
+export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransaction[]): PortfolioStateHoldingBase[] => {
   return transactions
     .reduce((acc, curr) => {
       const existingHolding = acc.find((d) => d.symbol === curr.symbol);
@@ -108,8 +107,8 @@ export const getPortfolioStateHoldingPartialUtil = (
           symbol: curr.symbol,
           units: curr.units,
           invested: curr.unitPrice * curr.units,
-        } satisfies PortfolioStateHoldingPartial,
+        } satisfies PortfolioStateHoldingBase,
       ];
-    }, [] as PortfolioStateHoldingPartial[])
+    }, [] as PortfolioStateHoldingBase[])
     .filter((d) => d.units > 0);
 };

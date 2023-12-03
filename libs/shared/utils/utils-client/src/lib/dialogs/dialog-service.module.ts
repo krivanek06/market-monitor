@@ -1,14 +1,27 @@
 import { Injector, NgModule } from '@angular/core';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBarRef } from '@angular/material/snack-bar';
+import { ActionButtonDialogComponent } from './action-button-dialog/action-button-dialog.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { DialogServiceUtil } from './dialog-service.util';
 import { NotificationBarModule } from './notification-bar/notification-bar.module';
 
 @NgModule({
   declarations: [],
-  imports: [MatSnackBarModule, MatDialogModule, NotificationBarModule, ConfirmDialogComponent],
-  exports: [MatSnackBarModule, MatDialogModule, NotificationBarModule, ConfirmDialogComponent],
+  imports: [
+    MatSnackBarModule,
+    MatDialogModule,
+    NotificationBarModule,
+    ConfirmDialogComponent,
+    ActionButtonDialogComponent,
+  ],
+  exports: [
+    MatSnackBarModule,
+    MatDialogModule,
+    NotificationBarModule,
+    ConfirmDialogComponent,
+    ActionButtonDialogComponent,
+  ],
   providers: [
     {
       provide: MatDialogRef,

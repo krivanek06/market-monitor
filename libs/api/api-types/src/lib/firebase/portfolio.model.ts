@@ -46,7 +46,7 @@ export type PortfolioState = {
   modifiedDate: string;
 };
 
-export type PortfolioStateHoldingPartial = {
+export type PortfolioStateHoldingBase = {
   symbolType: SymbolType;
   symbol: string;
   units: number;
@@ -56,7 +56,7 @@ export type PortfolioStateHoldingPartial = {
   invested: number;
 };
 
-export type PortfolioStateHolding = PortfolioStateHoldingPartial & {
+export type PortfolioStateHolding = PortfolioStateHoldingBase & {
   breakEvenPrice: number; // calculated
   symbolSummary: SymbolSummary;
 };

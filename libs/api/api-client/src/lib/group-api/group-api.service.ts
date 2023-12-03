@@ -14,8 +14,9 @@ import {
   GroupBaseInputInviteMembers,
   GroupCreateInput,
   GroupData,
-  GroupDetails,
+  GroupHoldingSnapshotsData,
   GroupMembersData,
+  GroupPortfolioStateSnapshotsData,
   GroupTransactionsData,
 } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
@@ -23,7 +24,7 @@ import { getApp } from 'firebase/app';
 import { getFunctions } from 'firebase/functions';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
-import { Observable, combineLatest, map, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -32,25 +33,6 @@ export class GroupApiService {
   private functions = getFunctions(getApp());
 
   constructor(private firestore: Firestore) {}
-
-  getGroupDetailsById(groupId: string): Observable<GroupDetails | undefined> {
-    return combineLatest([
-      this.getGroupDataById(groupId),
-      this.getGroupMembersDataById(groupId),
-      this.getGroupPortfolioTransactionsDataById(groupId),
-    ]).pipe(
-      map(([groupData, groupMembersData, groupTransactionData]) => {
-        if (!groupData || !groupMembersData || !groupTransactionData) {
-          return undefined;
-        }
-        return {
-          groupData: groupData,
-          groupMembersData: groupMembersData,
-          groupTransactionsData: groupTransactionData,
-        } as GroupDetails;
-      }),
-    );
-  }
 
   getGroupDataById(groupId: string): Observable<GroupData | undefined> {
     return rxDocData(this.getGroupDocRef(groupId), { idField: 'id' });
@@ -62,6 +44,14 @@ export class GroupApiService {
 
   getGroupPortfolioTransactionsDataById(groupId: string): Observable<GroupTransactionsData | undefined> {
     return rxDocData(this.getGroupPortfolioTransactionDocRef(groupId));
+  }
+
+  getGroupPortfolioSnapshotsDataById(groupId: string): Observable<GroupPortfolioStateSnapshotsData | undefined> {
+    return rxDocData(this.getGroupPortfolioSnapshotsDocRef(groupId));
+  }
+
+  getGroupHoldingSnapshotsDataById(groupId: string): Observable<GroupHoldingSnapshotsData | undefined> {
+    return rxDocData(this.getGroupHoldingSnapshotsDocRef(groupId));
   }
 
   getGroupsDataByIds(groupIds: string[]): Observable<GroupData[]> {
@@ -83,11 +73,11 @@ export class GroupApiService {
     return result.data;
   }
 
-  // async deleteGroup(input: string): Promise<GroupData> {
-  //   const callable = httpsCallable<string, GroupData>(this.functions, 'groupDeleteCall');
-  //   const result = await callable(input);
-  //   return result.data;
-  // }
+  async deleteGroup(input: string): Promise<GroupData> {
+    const callable = httpsCallable<string, GroupData>(this.functions, 'groupDeleteCall');
+    const result = await callable(input);
+    return result.data;
+  }
 
   async userAcceptsGroupInvitation(input: string): Promise<GroupData> {
     const callable = httpsCallable<string, GroupData>(this.functions, 'groupMemberAcceptCall');
@@ -126,10 +116,15 @@ export class GroupApiService {
     return result.data;
   }
 
-  async removeUserInvitationToGroup(input: GroupBaseInput): Promise<GroupData> {
-    const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupMemberInviteRemoveCall');
-    const result = await callable(input);
-    return result.data;
+  /**
+   * Removes user invitation to join group
+   *
+   * @param input
+   * @returns
+   */
+  async removeUserInvitationToGroup(input: GroupBaseInput): Promise<void> {
+    const callable = httpsCallable<GroupBaseInput, void>(this.functions, 'groupMemberInviteRemoveCall');
+    await callable(input);
   }
 
   async removeGroupMember(input: GroupBaseInput): Promise<GroupData> {
@@ -177,6 +172,18 @@ export class GroupApiService {
   private getGroupPortfolioTransactionDocRef(userId: string): DocumentReference<GroupTransactionsData> {
     return doc(this.getGroupCollectionMoreInformationRef(userId), 'transactions').withConverter(
       assignTypesClient<GroupTransactionsData>(),
+    );
+  }
+
+  private getGroupPortfolioSnapshotsDocRef(userId: string): DocumentReference<GroupPortfolioStateSnapshotsData> {
+    return doc(this.getGroupCollectionMoreInformationRef(userId), 'portfolio_snapshots').withConverter(
+      assignTypesClient<GroupPortfolioStateSnapshotsData>(),
+    );
+  }
+
+  private getGroupHoldingSnapshotsDocRef(userId: string): DocumentReference<GroupHoldingSnapshotsData> {
+    return doc(this.getGroupCollectionMoreInformationRef(userId), 'holding_snapshots').withConverter(
+      assignTypesClient<GroupHoldingSnapshotsData>(),
     );
   }
 

@@ -48,8 +48,8 @@ export const groupMemberAcceptCall = onCall(async (request) => {
 
   // update group members
   await groupDocumentMembersRef(groupData.id).update({
-    memberUsers: FieldValue.arrayUnion(<GroupMember>{
-      ...transformUserToGroupMember(userData),
+    data: FieldValue.arrayUnion(<GroupMember>{
+      ...transformUserToGroupMember(userData, groupData.memberUserIds.length + 1),
     }),
   });
 });

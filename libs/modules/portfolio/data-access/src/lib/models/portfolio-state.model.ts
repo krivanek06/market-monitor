@@ -9,7 +9,6 @@ export type PortfolioTransactionToDate = Pick<
 
 export type PortfolioGrowth = Pick<PortfolioGrowthAssetsDataItem, 'investedValue' | 'marketTotalValue'> & {
   date: string;
-  ownedAssets: number;
 
   /**
    * if user has activated cash account it will be investedValue + cashOnHand else investedValue

@@ -10,7 +10,9 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  groupDocumentHoldingSnapshotsRef,
   groupDocumentMembersRef,
+  groupDocumentPortfolioStateSnapshotsRef,
   groupDocumentRef,
   groupDocumentTransactionsRef,
   groupsCollectionRef,
@@ -55,7 +57,7 @@ export const groupCreateCall = onCall(async (request) => {
   }
 
   // check members
-  if (data.memberInvitedUserIds.length >= GROUP_MEMBER_LIMIT) {
+  if (data.memberInvitedUserIds.length >= GROUP_MEMBER_LIMIT - (data.isOwnerMember ? 1 : 0)) {
     throw new HttpsError('resource-exhausted', `Group can only have ${GROUP_MEMBER_LIMIT} members`);
   }
 
@@ -69,12 +71,22 @@ export const groupCreateCall = onCall(async (request) => {
   // create additional documents for group
   await groupDocumentTransactionsRef(newGroup.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    lastTransactions: [],
+    data: [],
   });
 
   await groupDocumentMembersRef(newGroup.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    memberUsers: [],
+    data: [],
+  });
+
+  await groupDocumentPortfolioStateSnapshotsRef(newGroup.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: [],
+  });
+
+  await groupDocumentHoldingSnapshotsRef(newGroup.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: [],
   });
 
   // update member list

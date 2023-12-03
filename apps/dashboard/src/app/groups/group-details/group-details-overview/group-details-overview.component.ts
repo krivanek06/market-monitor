@@ -1,11 +1,39 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { GroupDetails } from '@market-monitor/api-types';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { MatDividerModule } from '@angular/material/divider';
+import { UserApiService } from '@market-monitor/api-client';
+import { GROUP_MEMBER_LIMIT, GroupMember } from '@market-monitor/api-types';
+import { GroupInvitationsManagerComponent } from '@market-monitor/modules/group/features';
+import { GroupDisplayInfoComponent } from '@market-monitor/modules/group/ui';
+import { PortfolioCalculationService } from '@market-monitor/modules/portfolio/data-access';
+import {
+  PortfolioBalancePieChartComponent,
+  PortfolioGrowthChartComponent,
+  PortfolioPeriodChangeComponent,
+  PortfolioStateComponent,
+} from '@market-monitor/modules/portfolio/ui';
+import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
+import { ColorScheme } from '@market-monitor/shared/data-access';
+import { PositionCardComponent } from '@market-monitor/shared/ui';
+import { switchMap } from 'rxjs';
+import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
 @Component({
   selector: 'app-group-details-overview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    GroupDisplayInfoComponent,
+    PortfolioBalancePieChartComponent,
+    PortfolioStateComponent,
+    PortfolioPeriodChangeComponent,
+    MatDividerModule,
+    PortfolioGrowthChartComponent,
+    GroupInvitationsManagerComponent,
+    PositionCardComponent,
+    UserDisplayItemComponent,
+  ],
   templateUrl: './group-details-overview.component.html',
   styles: [
     `
@@ -16,6 +44,36 @@ import { GroupDetails } from '@market-monitor/api-types';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GroupDetailsOverviewComponent {
-  @Input({ required: true }) groupDetails!: GroupDetails;
+export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent implements OnInit {
+  GROUP_MEMBER_LIMIT = GROUP_MEMBER_LIMIT;
+  portfolioCalculationService = inject(PortfolioCalculationService);
+  userApiService = inject(UserApiService);
+  memberRequestedUsersSignal = toSignal(
+    this.groupDetails$.pipe(
+      switchMap((group) => this.userApiService.getUsersByIds(group.groupData.memberRequestUserIds)),
+    ),
+    { initialValue: [] },
+  );
+  memberInvitedUsersSignal = toSignal(
+    this.groupDetails$.pipe(
+      switchMap((group) => this.userApiService.getUsersByIds(group.groupData.memberInvitedUserIds)),
+    ),
+    { initialValue: [] },
+  );
+  portfolioGrowthSignal = computed(() =>
+    this.portfolioCalculationService.getPortfolioGrowthFromPortfolioState(
+      this.groupDetailsSignal()?.groupPortfolioSnapshotsData ?? [],
+    ),
+  );
+  portfolioChangeSignal = computed(() =>
+    this.portfolioCalculationService.getPortfolioChange(this.portfolioGrowthSignal()),
+  );
+
+  ColorScheme = ColorScheme;
+
+  ngOnInit(): void {}
+
+  onMemberClick(member: GroupMember): void {
+    console.log('onMemberClick', member);
+  }
 }

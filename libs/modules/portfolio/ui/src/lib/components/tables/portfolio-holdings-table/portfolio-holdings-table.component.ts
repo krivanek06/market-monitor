@@ -51,7 +51,9 @@ import { compare } from '@market-monitor/shared/utils-general';
 export class PortfolioHoldingsTableComponent implements OnChanges {
   @Output() symbolClicked = new EventEmitter<string>();
 
-  /** closed price * units for each holdings */
+  /**
+   * Invested amount - closed price * units for each holdings
+   */
   @Input({ required: true }) holdingsBalance!: number;
   @Input({ required: true }) holdings!: PortfolioStateHolding[];
 

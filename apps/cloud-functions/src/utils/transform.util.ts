@@ -1,6 +1,5 @@
 import { GroupMember, PortfolioState, PortfolioStateHoldings, UserBase, UserData } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
-import { roundNDigits } from './../../../../libs/shared/utils/utils-general/src/lib/general-function.util';
+import { getCurrentDateDefaultFormat, roundNDigits } from '@market-monitor/shared/utils-general';
 
 export const transformUserToBase = (user: UserData): UserBase => {
   return {
@@ -8,13 +7,22 @@ export const transformUserToBase = (user: UserData): UserBase => {
     accountCreatedDate: user.accountCreatedDate,
     portfolioState: user.portfolioState,
     personal: user.personal,
+    lastLoginDate: user.lastLoginDate,
   };
 };
 
-export const transformUserToGroupMember = (user: UserData): GroupMember => {
+export const transformUserToGroupMember = (
+  user: UserData,
+  newPosition: number,
+  userPreviousGroupData?: GroupMember,
+): GroupMember => {
   return {
     ...transformUserToBase(user),
     since: getCurrentDateDefaultFormat(),
+    position: {
+      currentGroupMemberPosition: newPosition,
+      previousGroupMemberPosition: userPreviousGroupData.position?.currentGroupMemberPosition ?? null,
+    },
   };
 };
 

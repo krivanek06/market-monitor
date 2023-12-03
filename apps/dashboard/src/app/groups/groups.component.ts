@@ -73,8 +73,6 @@ export class GroupsComponent {
   }
 
   onGroupClick(group: GroupData): void {
-    console.log('GROUP CLICKED');
-    console.log(group);
     this.router.navigate(['groups', group.id]);
   }
 

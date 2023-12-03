@@ -42,7 +42,7 @@ export const groupMemberRemoveCall = onCall(async (request) => {
 
   // remove user from group member
   await groupDocumentMembersRef(data.groupId).update({
-    memberUsers: groupMemberData.memberUsers.filter((user) => user.id !== data.userId),
+    data: groupMemberData.data.filter((user) => user.id !== data.userId),
   });
 
   // update user info

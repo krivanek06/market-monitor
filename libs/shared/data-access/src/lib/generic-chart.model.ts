@@ -17,7 +17,8 @@ export type ChartTypeKeys = keyof typeof ChartType;
 export type GenericChartSeriesAcceptedData =
   | (number | null)
   | [number | null, number | null]
-  | { name: string; y: number; color?: string };
+  | { name: string; y: number; color?: string }
+  | { name: string; value: number };
 
 export interface GenericChartSeries<TData extends GenericChartSeriesAcceptedData = GenericChartSeriesAcceptedData> {
   type?: ChartType;

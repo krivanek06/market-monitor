@@ -33,7 +33,7 @@ export class PortfolioUserFacadeService {
       .getUserPortfolioTransactions()
       .pipe(
         switchMap((transactions) =>
-          this.portfolioGrowthService.getPortfolioState(
+          this.portfolioGrowthService.getPortfolioStateHoldings(
             this.authenticationUserService.userData.portfolioState,
             transactions,
           ),
@@ -52,7 +52,11 @@ export class PortfolioUserFacadeService {
   getPortfolioGrowthAssets(): Observable<PortfolioGrowthAssets[]> {
     return this.authenticationUserService
       .getUserPortfolioTransactions()
-      .pipe(switchMap((transactions) => from(this.portfolioGrowthService.getPortfolioGrowthAssets(transactions))));
+      .pipe(
+        switchMap((transactions) =>
+          from(this.portfolioGrowthService.getPortfolioGrowthAssets(transactions.transactions)),
+        ),
+      );
   }
 
   getPortfolioGrowth(): Observable<PortfolioGrowth[]> {
