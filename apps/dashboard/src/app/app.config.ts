@@ -12,6 +12,7 @@ import {
   withEnabledBlockingInitialNavigation,
   withInMemoryScrolling,
   withPreloading,
+  withViewTransitions,
 } from '@angular/router';
 import {
   AUTHENTICATION_ACCOUNT_TOKEN,
@@ -19,6 +20,7 @@ import {
 } from '@market-monitor/modules/authentication/data-access';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
+// import { provideAnimationsAsync } from '@angular/platform-browser/animations-async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -40,6 +42,10 @@ export const appConfig: ApplicationConfig = {
       withEnabledBlockingInitialNavigation(),
       // in place of preloadingStrategy: PreloadAllModules
       withPreloading(PreloadAllModules),
+      // add transition animations
+      withViewTransitions(),
+      // lazy load animation modules
+      // provideAnimationsAsync()
     ),
     provideAnimations(),
     {

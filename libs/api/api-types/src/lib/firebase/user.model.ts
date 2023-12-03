@@ -99,4 +99,9 @@ export type UserFeatures = {
    * will always check whether user has enough cash to buy
    */
   userPortfolioAllowCashAccount?: boolean;
+
+  /**
+   * if true, user can have unlimited number of symbols in portfolio, else it is limited
+   */
+  userAllowUnlimitedSymbols?: boolean;
 };

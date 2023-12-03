@@ -1,16 +1,26 @@
-<ng-container>
-  <div class="grid 2xl:grid-cols-3">
+<ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
+  <div class="grid mb-4 2xl:grid-cols-3">
+    <div class="2xl:col-span-2">TODO</div>
     <div>
-      <!-- <app-generic-chart
-        *ngIf="portfolioSectorAllocation() as portfolioSectorAllocation"
+      <app-generic-chart
+        *ngIf="portfolioSectorAllocationSignal() as portfolioSectorAllocation"
         [heightPx]="380"
         chartTitle="Sector Allocation"
         [showDataLabel]="true"
         chartTitlePosition="center"
         [series]="[portfolioSectorAllocation]"
-      ></app-generic-chart> -->
+      ></app-generic-chart>
     </div>
+  </div>
 
-    <div class="2xl:col-span-2"></div>
+  <!-- holding table -->
+  <div class="mb-8">
+    <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">
+      <app-portfolio-holdings-table
+        (symbolClicked)="onSummaryClick($event)"
+        [holdings]="groupDetailsSignal.groupHoldingSnapshotsData"
+        [holdingsBalance]="groupDetailsSignal.groupData.portfolioState.holdingsBalance"
+      ></app-portfolio-holdings-table>
+    </app-general-card>
   </div>
 </ng-container>
