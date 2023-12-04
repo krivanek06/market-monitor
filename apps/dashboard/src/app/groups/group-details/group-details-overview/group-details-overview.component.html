@@ -60,8 +60,9 @@
   ></app-group-invitations-manager>
 
   <!-- member -->
-  <div class="grid gap-4">
-    <div class="text-lg text-wt-primary">
+  <div class="grid gap-4 mb-10">
+    <div class="flex items-center gap-4 text-lg text-wt-primary">
+      <mat-icon>history</mat-icon>
       Members [{{ groupDetailsSignal.groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}]
     </div>
     <div class="grid grid-cols-2 2xl:grid-cols-3 gap-x-6 gap-y-4">
@@ -76,5 +77,18 @@
       </app-position-card>
       }
     </div>
+  </div>
+
+  <!-- transactions -->
+  <div>
+    <h2 class="flex items-center gap-4 pl-1 mb-3 text-xl text-wt-primary">
+      <mat-icon>history</mat-icon>
+      Transaction History
+    </h2>
+    <app-portfolio-transactions-table
+      [showTransactionFees]="true"
+      [showUser]="true"
+      [data]="groupDetailsSignal.groupTransactionsData | sortByKey: 'date' : 'desc'"
+    ></app-portfolio-transactions-table>
   </div>
 </ng-container>

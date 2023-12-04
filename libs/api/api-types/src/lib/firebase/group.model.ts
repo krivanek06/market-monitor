@@ -4,6 +4,7 @@ import {
   PortfolioStateHolding,
   PortfolioStateHoldingBase,
   PortfolioTransaction,
+  PortfolioTransactionMore,
 } from './portfolio.model';
 import { UserBase, UserData } from './user.model';
 
@@ -115,7 +116,7 @@ export type GroupHoldingSnapshotsData = DataDocsWrapper<PortfolioStateHoldingBas
 
 export type GroupDetails = {
   groupData: GroupData;
-  groupTransactionsData: PortfolioTransaction[];
+  groupTransactionsData: PortfolioTransactionMore[];
   groupMembersData: GroupMember[];
   groupPortfolioSnapshotsData: PortfolioState[];
   /**

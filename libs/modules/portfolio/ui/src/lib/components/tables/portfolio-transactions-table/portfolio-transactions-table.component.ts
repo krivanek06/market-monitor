@@ -12,7 +12,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { PortfolioTransaction } from '@market-monitor/api-types';
+import { PortfolioTransaction, PortfolioTransactionMore } from '@market-monitor/api-types';
 import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 import { insertIntoArray } from '@market-monitor/shared/utils-general';
 
@@ -38,18 +38,28 @@ import { insertIntoArray } from '@market-monitor/shared/utils-general';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioTransactionsTableComponent implements OnChanges {
-  @Output() deleteEmitter = new EventEmitter<PortfolioTransaction>();
+  @Output() deleteEmitter = new EventEmitter<PortfolioTransactionMore>();
 
-  @Input({ required: true }) set data(values: PortfolioTransaction[]) {
+  @Input({ required: true }) set data(values: PortfolioTransactionMore[]) {
     this.dataSource = new MatTableDataSource(values ?? []);
   }
   @Input() showTransactionFees = false;
+
+  /**
+   * Whether to show the action button column - delete button
+   */
   @Input() showActionButton = false;
 
-  dataSource!: MatTableDataSource<PortfolioTransaction>;
+  /**
+   * Whether to show the user column
+   */
+  @Input() showUser = false;
+
+  dataSource!: MatTableDataSource<PortfolioTransactionMore>;
   displayedColumns: string[] = ['symbol', 'transactionType', 'totalValue', 'unitPrice', 'units', 'return', 'date'];
 
-  identity: TrackByFunction<PortfolioTransaction> = (index: number, item: PortfolioTransaction) => item.transactionId;
+  identity: TrackByFunction<PortfolioTransactionMore> = (index: number, item: PortfolioTransactionMore) =>
+    item.transactionId;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.showTransactionFees && !this.displayedColumns.includes('transactionFees')) {
@@ -57,6 +67,9 @@ export class PortfolioTransactionsTableComponent implements OnChanges {
     }
     if (this.showActionButton && !this.displayedColumns.includes('action')) {
       this.displayedColumns = [...this.displayedColumns, 'action'];
+    }
+    if (this.showUser && !this.displayedColumns.includes('user')) {
+      this.displayedColumns = insertIntoArray(this.displayedColumns, 2, 'user');
     }
   }
 

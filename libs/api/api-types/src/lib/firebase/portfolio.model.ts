@@ -104,9 +104,9 @@ export type PortfolioTransaction = {
   transactionFees: number;
 };
 
-export type PortfolioTransactionAggregation = PortfolioTransaction & {
-  userPhotoURL: string;
-  userDisplayName: string;
+export type PortfolioTransactionMore = PortfolioTransaction & {
+  userPhotoURL?: string | null;
+  userDisplayName?: string;
 };
 
 export type PortfolioTransactionCash = {

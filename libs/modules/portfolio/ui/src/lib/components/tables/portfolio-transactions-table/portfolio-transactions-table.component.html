@@ -26,6 +26,17 @@
     </td>
   </ng-container>
 
+  <!-- user -->
+  <ng-container matColumnDef="user">
+    <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">User</th>
+    <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+      <div class="flex items-center gap-2">
+        <img class="rounded-full h-7 w-7" appDefaultImg [src]="row.userPhotoURL" />
+        <span>{{ row.userDisplayName ?? 'Unknown' }}</span>
+      </div>
+    </td>
+  </ng-container>
+
   <!-- totalValue -->
   <ng-container matColumnDef="totalValue">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Total Value</th>

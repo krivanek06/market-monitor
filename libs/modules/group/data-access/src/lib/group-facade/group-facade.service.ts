@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GroupApiService, MarketApiService } from '@market-monitor/api-client';
-import { GroupDetails, PortfolioStateHolding } from '@market-monitor/api-types';
+import { GroupDetails, PortfolioStateHolding, PortfolioTransactionMore } from '@market-monitor/api-types';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { Observable, combineLatest, map, switchMap } from 'rxjs';
 
@@ -49,10 +49,20 @@ export class GroupFacadeService {
             throw new Error('Group data not found');
           }
 
+          // merge transactions with user data
+          const portfolioTransactionsMore = (groupTransactionsData?.data ?? []).map(
+            (transaction) =>
+              ({
+                ...transaction,
+                userDisplayName: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.displayName,
+                userPhotoURL: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.photoURL,
+              }) satisfies PortfolioTransactionMore,
+          );
+
           return {
             groupData,
             groupMembersData: groupMembersData.data ?? [],
-            groupTransactionsData: groupTransactionsData?.data ?? [],
+            groupTransactionsData: portfolioTransactionsMore,
             groupPortfolioSnapshotsData: groupPortfolioSnapshotsData?.data ?? [],
             groupHoldingSnapshotsData: groupHoldingSnapshotsData ?? [],
           } satisfies GroupDetails;

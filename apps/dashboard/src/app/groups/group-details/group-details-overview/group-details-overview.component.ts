@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
 import { UserApiService } from '@market-monitor/api-client';
 import { GROUP_MEMBER_LIMIT, GroupMember } from '@market-monitor/api-types';
 import { GroupInvitationsManagerComponent } from '@market-monitor/modules/group/features';
@@ -12,10 +13,11 @@ import {
   PortfolioGrowthChartComponent,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
+  PortfolioTransactionsTableComponent,
 } from '@market-monitor/modules/portfolio/ui';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
-import { PositionCardComponent } from '@market-monitor/shared/ui';
+import { PositionCardComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
 import { switchMap } from 'rxjs';
 import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
@@ -33,6 +35,9 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     GroupInvitationsManagerComponent,
     PositionCardComponent,
     UserDisplayItemComponent,
+    PortfolioTransactionsTableComponent,
+    MatIconModule,
+    SortByKeyPipe,
   ],
   templateUrl: './group-details-overview.component.html',
   styles: [
