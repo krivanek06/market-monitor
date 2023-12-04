@@ -61,7 +61,11 @@
 
   <!-- holding -->
   <div class="mb-8">
-    <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">
+    <app-general-card
+      title="Holdings [{{ portfolioState.holdings.length }} / {{ USER_HOLDINGS_SYMBOL_LIMIT }}]"
+      titleScale="large"
+      matIcon="show_chart"
+    >
       <app-portfolio-holdings-table
         (symbolClicked)="onSummaryClick($event)"
         [holdings]="portfolioState.holdings"

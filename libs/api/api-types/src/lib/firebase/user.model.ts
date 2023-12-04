@@ -101,7 +101,7 @@ export type UserFeatures = {
   userPortfolioAllowCashAccount?: boolean;
 
   /**
-   * if true, user can have unlimited number of symbols in portfolio, else it is limited
+   * if true, user can have unlimited number of symbols in portfolio, else it is limited - USER_HOLDINGS_SYMBOL_LIMIT
    */
   userAllowUnlimitedSymbols?: boolean;
 };

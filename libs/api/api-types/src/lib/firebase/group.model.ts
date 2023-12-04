@@ -8,16 +8,6 @@ import {
 } from './portfolio.model';
 import { UserBase, UserData } from './user.model';
 
-/**
- * how many members a group can have
- */
-export const GROUP_MEMBER_LIMIT = 50;
-
-/**
- * how many groups a user can create
- */
-export const GROUP_OWNER_LIMIT = 5;
-
 export type GroupCreateInput = {
   groupName: string;
   isPublic: boolean;

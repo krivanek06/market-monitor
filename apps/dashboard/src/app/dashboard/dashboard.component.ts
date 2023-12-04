@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import {
@@ -74,6 +75,8 @@ export class DashboardComponent {
 
   ColorScheme = ColorScheme;
   dashboardChartOptionsInputSource = dashboardChartOptionsInputSource;
+
+  USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
 
   onSummaryClick(symbol: string) {
     this.dialog.open(StockSummaryDialogComponent, {

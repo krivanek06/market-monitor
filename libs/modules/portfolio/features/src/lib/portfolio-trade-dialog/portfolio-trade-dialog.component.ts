@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, computed, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@market-monitor/api-client';
-import { PortfolioTransactionType, SymbolSummary } from '@market-monitor/api-types';
+import { PortfolioTransactionType, SymbolSummary, USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { PortfolioTransactionCreate, PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
 import {
@@ -121,6 +121,8 @@ export class PortfolioTradeDialogComponent {
    */
   insufficientCashErrorSignal = signal<boolean>(false);
 
+  USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
+
   constructor(
     private dialogRef: MatDialogRef<PortfolioTradeDialogComponent>,
     public authenticationUserService: AuthenticationUserService,
@@ -144,6 +146,23 @@ export class PortfolioTradeDialogComponent {
   get isError(): boolean {
     return this.insufficientUnitsErrorSignal() || this.insufficientCashErrorSignal();
   }
+
+  /**
+   * true if user has this symbol in his portfolio or he has not reached the limit of symbols
+   */
+  allowBuyOperationSignal = computed(() => {
+    // check if user will not have more symbols than limit
+    const portfolioState = this.portfolioState();
+    if (!portfolioState) {
+      return true;
+    }
+    if (this.data.transactionType === 'SELL') {
+      return true;
+    }
+    const userContainSymbol = portfolioState.holdings.map((d) => d.symbol).includes(this.data.summary.id);
+    const userHoldingsLimit = portfolioState.holdings.length < USER_HOLDINGS_SYMBOL_LIMIT;
+    return userContainSymbol || userHoldingsLimit;
+  });
 
   get isCustomTotal(): boolean {
     return this.form.controls.useCustomTotalValueControl.value;
