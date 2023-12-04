@@ -17,7 +17,7 @@ import {
 } from '@market-monitor/modules/portfolio/ui';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
-import { PositionCardComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
+import { PositionCardComponent, SectionTitleComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
 import { switchMap } from 'rxjs';
 import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
@@ -38,6 +38,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     PortfolioTransactionsTableComponent,
     MatIconModule,
     SortByKeyPipe,
+    SectionTitleComponent,
   ],
   templateUrl: './group-details-overview.component.html',
   styles: [

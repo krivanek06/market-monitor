@@ -19,9 +19,12 @@
   </div>
 
   <!-- transaction chart -->
-  <app-portfolio-transaction-chart
-    [data]="groupDetailsSignal.groupPortfolioSnapshotsData"
-  ></app-portfolio-transaction-chart>
+  <div class="mb-6">
+    <app-section-title title="Last Transactions" matIcon="history" />
+    <app-portfolio-transaction-chart
+      [data]="groupDetailsSignal.groupPortfolioSnapshotsData"
+    ></app-portfolio-transaction-chart>
+  </div>
 
   <!-- holding table -->
   <div class="">

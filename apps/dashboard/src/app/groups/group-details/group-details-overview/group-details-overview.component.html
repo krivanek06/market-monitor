@@ -61,10 +61,10 @@
 
   <!-- member -->
   <div class="grid gap-4 mb-10">
-    <div class="flex items-center gap-4 text-lg text-wt-primary">
-      <mat-icon>history</mat-icon>
-      Members [{{ groupDetailsSignal.groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}]
-    </div>
+    <app-section-title
+      title="Members [{{ groupDetailsSignal.groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}]"
+      matIcon="group"
+    />
     <div class="grid grid-cols-2 2xl:grid-cols-3 gap-x-6 gap-y-4">
       @for (user of groupDetailsSignal.groupMembersData; track user.id) {
       <app-position-card
@@ -81,10 +81,7 @@
 
   <!-- transactions -->
   <div>
-    <h2 class="flex items-center gap-4 pl-1 mb-3 text-xl text-wt-primary">
-      <mat-icon>history</mat-icon>
-      Transaction History
-    </h2>
+    <app-section-title title="Transaction History" matIcon="history" additionalClasses="pl-1 mb-3" />
     <app-portfolio-transactions-table
       [showTransactionFees]="true"
       [showUser]="true"
