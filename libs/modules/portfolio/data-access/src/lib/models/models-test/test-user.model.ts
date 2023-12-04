@@ -35,7 +35,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       balance: 0,
       firstTransactionDate: null,
       lastTransactionDate: null,
-      modifiedDate: getCurrentDateDefaultFormat(),
+      date: getCurrentDateDefaultFormat(),
     },
     holdingSnapshot: {
       lastModifiedDate: getCurrentDateDefaultFormat(),

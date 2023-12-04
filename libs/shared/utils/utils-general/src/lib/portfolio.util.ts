@@ -67,7 +67,7 @@ export const getPortfolioStateHoldingsUtil = (
     startingCash: roundNDigits(startingCash, 2),
     firstTransactionDate,
     lastTransactionDate,
-    modifiedDate: getCurrentDateDefaultFormat(),
+    date: getCurrentDateDefaultFormat(),
   };
 
   return {

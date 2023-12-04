@@ -4,7 +4,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatDialogModule } from '@angular/material/dialog';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { PortfolioCalculationService } from '@market-monitor/modules/portfolio/data-access';
-import { PortfolioHoldingsTableComponent } from '@market-monitor/modules/portfolio/ui';
+import {
+  PortfolioHoldingsTableComponent,
+  PortfolioTransactionChartComponent,
+} from '@market-monitor/modules/portfolio/ui';
 import { GeneralCardComponent, GenericChartBubbleComponent, GenericChartComponent } from '@market-monitor/shared/ui';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { map } from 'rxjs';
@@ -21,6 +24,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     MatDialogModule,
     StockSummaryDialogComponent,
     GenericChartBubbleComponent,
+    PortfolioTransactionChartComponent,
   ],
   templateUrl: './group-details-holdings.component.html',
   styles: [

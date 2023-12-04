@@ -104,7 +104,7 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
         numberOfExecutedSellTransactions: acc.numberOfExecutedSellTransactions + curr.numberOfExecutedSellTransactions,
         startingCash: acc.startingCash + curr.startingCash,
         transactionFees: acc.transactionFees + curr.transactionFees,
-        modifiedDate: getCurrentDateDefaultFormat(),
+        date: getCurrentDateDefaultFormat(),
         totalGainsPercentage: 0,
         totalGainsValue: 0,
         firstTransactionDate: null,

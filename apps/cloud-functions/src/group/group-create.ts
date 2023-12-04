@@ -125,7 +125,7 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
       lastTransactionDate: null,
       holdingsBalance: 0,
       invested: 0,
-      modifiedDate: getCurrentDateDefaultFormat(),
+      date: getCurrentDateDefaultFormat(),
       numberOfExecutedBuyTransactions: 0,
       numberOfExecutedSellTransactions: 0,
       startingCash: 0,

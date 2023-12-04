@@ -18,6 +18,11 @@
     </div>
   </div>
 
+  <!-- transaction chart -->
+  <app-portfolio-transaction-chart
+    [data]="groupDetailsSignal.groupPortfolioSnapshotsData"
+  ></app-portfolio-transaction-chart>
+
   <!-- holding table -->
   <div class="">
     <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">

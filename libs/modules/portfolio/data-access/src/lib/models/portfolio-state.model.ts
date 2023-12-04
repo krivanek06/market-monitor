@@ -1,11 +1,9 @@
-import { PortfolioGrowthAssetsDataItem, PortfolioStateHoldings } from '@market-monitor/api-types';
+import { PortfolioGrowthAssetsDataItem, PortfolioState } from '@market-monitor/api-types';
 
 export type PortfolioTransactionToDate = Pick<
-  PortfolioStateHoldings,
-  'numberOfExecutedBuyTransactions' | 'numberOfExecutedSellTransactions' | 'transactionFees'
-> & {
-  date: string;
-};
+  PortfolioState,
+  'numberOfExecutedBuyTransactions' | 'numberOfExecutedSellTransactions' | 'transactionFees' | 'date'
+>;
 
 export type PortfolioGrowth = Pick<PortfolioGrowthAssetsDataItem, 'investedValue' | 'marketTotalValue'> & {
   date: string;

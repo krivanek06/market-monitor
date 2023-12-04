@@ -39,7 +39,7 @@ export const transformPortfolioStateHoldingToPortfolioState = (holding: Portfoli
     totalGainsPercentage: roundNDigits(holding.totalGainsPercentage, 2),
     firstTransactionDate: holding.firstTransactionDate,
     lastTransactionDate: holding.lastTransactionDate,
-    modifiedDate: holding.modifiedDate,
+    date: holding.date,
     startingCash: holding.startingCash,
   };
 };

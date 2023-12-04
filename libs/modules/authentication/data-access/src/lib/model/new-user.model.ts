@@ -28,7 +28,7 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
       balance: 0,
       firstTransactionDate: null,
       lastTransactionDate: null,
-      modifiedDate: getCurrentDateDefaultFormat(),
+      date: getCurrentDateDefaultFormat(),
     },
     holdingSnapshot: {
       lastModifiedDate: getCurrentDateDefaultFormat(),

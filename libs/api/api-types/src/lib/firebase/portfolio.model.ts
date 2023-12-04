@@ -43,7 +43,7 @@ export type PortfolioState = {
   /**
    * date when it was last calculated
    */
-  modifiedDate: string;
+  date: string;
 };
 
 export type PortfolioStateHoldingBase = {

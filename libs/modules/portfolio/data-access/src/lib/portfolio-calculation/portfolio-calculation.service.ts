@@ -22,7 +22,7 @@ import { PortfolioChange, PortfolioGrowth, PortfolioTransactionToDate } from '..
 export class PortfolioCalculationService {
   getPortfolioGrowthFromPortfolioState(data: PortfolioState[]): PortfolioGrowth[] {
     return data.map((portfolioStatePerDay) => ({
-      date: portfolioStatePerDay.modifiedDate,
+      date: portfolioStatePerDay.date,
       investedValue: portfolioStatePerDay.invested,
       marketTotalValue: portfolioStatePerDay.holdingsBalance,
       totalBalanceValue: portfolioStatePerDay.balance,

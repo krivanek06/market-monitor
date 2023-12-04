@@ -25,8 +25,8 @@ export const userUpdatePortfolioScheduler = async (): Promise<void> => {
   const userToUpdate = usersCollectionRef()
     // .where('personal.accountType', '==', 'SIMULATION')
     // .where('lastLoginDate', '>=', twoWeeksBefore) // not able to use this filter
-    .where('portfolioState.modifiedDate', '!=', today)
-    .orderBy('portfolioState.modifiedDate', 'desc')
+    .where('portfolioState.date', '!=', today)
+    .orderBy('portfolioState.date', 'desc')
     .orderBy('lastLoginDate', 'desc')
     .limit(200);
 
