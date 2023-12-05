@@ -21,6 +21,7 @@ import {
 } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { getApp } from 'firebase/app';
+import { limit } from 'firebase/firestore';
 import { getFunctions } from 'firebase/functions';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
@@ -59,6 +60,17 @@ export class GroupApiService {
       return of([]);
     }
     return rxCollectionData(query(this.getGroupCollectionRef(), where('id', 'in', groupIds)));
+  }
+
+  getGroupByName(name: string, limitResult = 5): Observable<GroupData[]> {
+    return rxCollectionData(
+      query(
+        this.getGroupCollectionRef(),
+        where('name', '>=', name),
+        where('name', '<=', name + '\uf8ff'),
+        limit(limitResult),
+      ),
+    );
   }
 
   async createGroup(input: GroupCreateInput): Promise<GroupData> {

@@ -1,18 +1,37 @@
 <div class="flex flex-col gap-1 p-2">
-  <div class="flex items-center justify-between">
-    <!-- image & name -->
-    <div class="flex items-center gap-4">
-      <img appDefaultImg [src]="groupData.imageUrl" alt="Group image" class="w-10 h-10" />
-      <span class="text-lg">{{ groupData.name | titlecase }}</span>
+  <div class="flex items-center gap-4">
+    <!-- image -->
+    <img appDefaultImg [src]="groupData.imageUrl" alt="Group image" class="w-16 h-16" />
+
+    <!-- info -->
+    <div class="grid gap-1">
+      <div class="flex gap-4">
+        <!-- name -->
+        <div class="text-lg text-wt-primary">{{ groupData.name | titlecase }} AAAABBBBEEEE</div>
+        <!-- portfolio -->
+        <div
+          appPercentageIncrease
+          [useCurrencySign]="true"
+          [changeValues]="{
+            change: groupData.portfolioState.totalGainsValue,
+            changePercentage: groupData.portfolioState.totalGainsPercentage
+          }"
+        ></div>
+      </div>
+      <div class="flex items-center gap-4">
+        <!-- owner -->
+        <div class="flex items-center gap-4">
+          <img
+            appDefaultImg
+            [src]="groupData.ownerUser.personal.photoURL"
+            alt="Owner image"
+            class="w-8 h-8 rounded-full"
+          />
+          <span>{{ groupData.ownerUser.personal.displayName | titlecase }}</span>
+        </div>
+        <!-- members -->
+        <div>[{{ groupData.memberUserIds.length }} / {{ memberLimit }}]</div>
+      </div>
     </div>
-
-    <!-- members -->
-    <div>[{{ groupData.memberUserIds.length }} / {{ memberLimit }}]</div>
-  </div>
-
-  <!-- owner -->
-  <div *ngIf="showOwner" class="flex items-center gap-4">
-    <img appDefaultImg [src]="groupData.ownerUser.personal.photoURL" alt="Owner image" class="w-10 h-10 rounded-full" />
-    <span>{{ groupData.ownerUser.personal.displayName | titlecase }}</span>
   </div>
 </div>

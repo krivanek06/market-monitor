@@ -8,8 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { UserApiService } from '@market-monitor/api-client';
 import { UserData } from '@market-monitor/api-types';
-import { UserFacadeService } from '@market-monitor/modules/user/data-access';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { DefaultImgDirective, RangeDirective } from '@market-monitor/shared/ui';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
@@ -52,7 +52,7 @@ export class UserSearchControlComponent implements ControlValueAccessor {
   optionsSignal = signal<UserData[]>([]);
   searchControl = new FormControl<string>('', { nonNullable: true });
 
-  userFacadeService = inject(UserFacadeService);
+  userApiService = inject(UserApiService);
 
   onChange: (value: UserData) => void = () => {};
   onTouched = () => {};
@@ -69,7 +69,7 @@ export class UserSearchControlComponent implements ControlValueAccessor {
         debounceTime(400),
         distinctUntilChanged(),
         switchMap((value) =>
-          this.userFacadeService.getUsersByName(value).pipe(
+          this.userApiService.getUsersByName(value).pipe(
             tap(() => this.showLoadingIndicator.set(false)),
             tap(console.log),
             catchError(() => {
