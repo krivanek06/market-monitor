@@ -21,6 +21,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
     },
     settings: {
       isProfilePublic: true,
+      allowReceivingGroupInvitations: true,
     },
     portfolioState: {
       cashOnHand: 0,

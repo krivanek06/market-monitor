@@ -81,6 +81,11 @@ export type UserSettings = {
    * if true, other users will be able to find this user portfolio by searching
    */
   isProfilePublic: boolean;
+
+  /**
+   * if true, user will be able to receive group invitations
+   */
+  allowReceivingGroupInvitations: boolean;
 };
 
 export type UserFeatures = {

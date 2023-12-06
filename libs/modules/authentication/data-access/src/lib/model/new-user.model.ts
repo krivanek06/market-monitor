@@ -12,6 +12,7 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
     },
     settings: {
       isProfilePublic: true,
+      allowReceivingGroupInvitations: true,
     },
     personal: personal,
     accountResets: [],
