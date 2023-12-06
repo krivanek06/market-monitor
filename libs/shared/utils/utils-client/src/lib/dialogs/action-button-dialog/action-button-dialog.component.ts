@@ -10,7 +10,7 @@ export type ActionButtonDialog = {
   primaryButtonText: string;
   primaryButtonColor?: 'primary' | 'accent' | 'warn';
 
-  secondaryButtonText: string;
+  secondaryButtonText?: string;
   secondaryButtonColor?: 'primary' | 'accent' | 'warn';
 };
 

@@ -17,7 +17,7 @@ import {
 } from '@market-monitor/modules/group/features';
 import { GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
-import { GeneralCardComponent } from '@market-monitor/shared/ui';
+import { GeneralCardComponent, SectionTitleComponent } from '@market-monitor/shared/ui';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { map } from 'rxjs';
 
@@ -37,6 +37,7 @@ import { map } from 'rxjs';
     GeneralCardComponent,
     GroupSearchControlComponent,
     ReactiveFormsModule,
+    SectionTitleComponent,
   ],
   templateUrl: './groups.component.html',
   styles: [
@@ -82,6 +83,24 @@ export class GroupsComponent {
       data: {},
       panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
     });
+  }
+
+  async onReceivedInvitationClick(group: GroupData) {
+    const result = await this.dialogServiceUtil.showActionButtonDialog({
+      dialogTitle: `Do you want to accept or decline the invitation from ${group.name}?`,
+      primaryButtonText: 'Accept',
+      secondaryButtonText: 'Decline',
+      secondaryButtonColor: 'warn',
+    });
+    console.log('result', result);
+  }
+
+  async onSentRequestClick(group: GroupData) {
+    const result = await this.dialogServiceUtil.showActionButtonDialog({
+      dialogTitle: `Do you want to remove your request from from ${group.name}?`,
+      primaryButtonText: 'Remove',
+    });
+    console.log('result', result);
   }
 
   onGroupClick(group: GroupData): void {
