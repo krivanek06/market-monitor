@@ -211,7 +211,7 @@ export class GroupInteractionButtonsComponent {
       // show notification
       this.dialogServiceUtil.showNotificationBar('Removing request', 'notification');
 
-      await this.groupApiService.removeRequestToJoinGroup({
+      await this.groupApiService.declineUserRequestToGroup({
         groupId: this.groupDetails.groupData.id,
         userId: this.authenticationUserService.userData.id,
       });

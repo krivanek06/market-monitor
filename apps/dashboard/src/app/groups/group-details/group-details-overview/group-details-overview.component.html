@@ -55,9 +55,8 @@
 
   <!-- invitations -->
   <app-group-invitations-manager
+    *appGroupUserHasRole="groupDetailsSignal.groupData.id; include: ['groupOwner']"
     class="mb-6"
-    [appGroupUserHasRole]="groupDetailsSignal.groupData.id"
-    [groupRolesInclude]="['groupOwner']"
     [groupData]="groupDetailsSignal"
     [memberRequestUsers]="memberRequestedUsersSignal()"
     [memberInvitedUsers]="memberInvitedUsersSignal()"

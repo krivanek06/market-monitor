@@ -1,8 +1,7 @@
 <ng-container *ngIf="!groupDetails.groupData.isClosed">
   <!-- owner -->
   <button
-    [appGroupUserHasRole]="groupDetails.groupData.id"
-    [groupRolesInclude]="['groupOwner']"
+    *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
     (click)="onGroupCloseClick()"
     type="button"
     mat-stroked-button
@@ -14,9 +13,7 @@
   </button>
 
   <button
-    [appGroupUserHasRole]="groupDetails.groupData.id"
-    [groupRolesInclude]="['groupOwner']"
-    [groupRolesExclude]="['groupMember']"
+    *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']; exclude: ['groupMember']"
     (click)="onAddOwnerToGroupClick()"
     type="button"
     mat-stroked-button
@@ -29,8 +26,7 @@
 
   <!-- member -->
   <button
-    [appGroupUserHasRole]="groupDetails.groupData.id"
-    [groupRolesInclude]="['groupMember']"
+    *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupMember']"
     (click)="onLeaveGroupClick()"
     type="button"
     mat-stroked-button
@@ -43,8 +39,7 @@
 
   <!-- invited person -->
   <button
-    [appGroupUserHasRole]="groupDetails.groupData.id"
-    [groupRolesInclude]="['groupInvitations']"
+    *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupInvitations']"
     (click)="onDeclineInvitationClick()"
     type="button"
     mat-stroked-button
@@ -56,8 +51,7 @@
   </button>
 
   <button
-    [appGroupUserHasRole]="groupDetails.groupData.id"
-    [groupRolesInclude]="['groupInvitations']"
+    *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupInvitations']"
     (click)="onAcceptInvitationClick()"
     type="button"
     mat-stroked-button
@@ -70,8 +64,7 @@
 
   <!-- request invitation person -->
   <button
-    [appGroupUserHasRole]="groupDetails.groupData.id"
-    [groupRolesInclude]="['groupRequested']"
+    *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupRequested']"
     (click)="onCancelRequestClick()"
     type="button"
     mat-stroked-button
@@ -83,8 +76,10 @@
   </button>
 
   <button
-    [appGroupUserHasRole]="groupDetails.groupData.id"
-    [groupRolesExclude]="['groupRequested', 'groupMember', 'groupInvitations', 'groupOwner']"
+    *appGroupUserHasRole="
+      groupDetails.groupData.id;
+      exclude: ['groupRequested', 'groupMember', 'groupInvitations', 'groupOwner']
+    "
     (click)="onRequestToJoinClick()"
     type="button"
     mat-stroked-button
@@ -97,8 +92,7 @@
 
   <!-- owner - invite people -->
   <button
-    [appGroupUserHasRole]="groupDetails.groupData.id"
-    [groupRolesInclude]="['groupOwner']"
+    *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
     (click)="onInviteMembersClick()"
     type="button"
     mat-stroked-button
@@ -111,8 +105,7 @@
 
   <!-- owner - settings -->
   <button
-    [appGroupUserHasRole]="groupDetails.groupData.id"
-    [groupRolesInclude]="['groupOwner']"
+    *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
     (click)="onGroupSettingsClick()"
     type="button"
     mat-stroked-button

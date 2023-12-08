@@ -19,9 +19,9 @@ export const groupRequestMembershipRemoveCall = onCall(async (request) => {
   const userData = (await userDocumentRef(data.userId).get()).data();
 
   // check if authenticated user is owner or the user who leaves
-  const canBeUserRemove = groupData.ownerUserId === userAuthId && data.userId === userAuthId;
+  const canBeUserRemove = groupData.ownerUserId === userAuthId || data.userId === userAuthId;
   if (!canBeUserRemove) {
-    throw new HttpsError('aborted', 'Request can not be removed');
+    throw new HttpsError('aborted', 'Request can not be removed, only the owner or the user can do it.');
   }
 
   // update group
