@@ -50,10 +50,14 @@
       startingCashValue: groupDetailsSignal.groupData.portfolioState.startingCash
     }"
     [heightPx]="425"
+    class="mb-6"
   ></app-portfolio-growth-chart>
 
   <!-- invitations -->
   <app-group-invitations-manager
+    class="mb-6"
+    [appGroupUserHasRole]="groupDetailsSignal.groupData.id"
+    [groupRolesInclude]="['groupOwner']"
     [groupData]="groupDetailsSignal"
     [memberRequestUsers]="memberRequestedUsersSignal()"
     [memberInvitedUsers]="memberInvitedUsersSignal()"

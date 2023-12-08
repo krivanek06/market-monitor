@@ -1,7 +1,8 @@
 <ng-container *ngIf="!groupDetails.groupData.isClosed">
   <!-- owner -->
   <button
-    *ngIf="isOwnerSignal()"
+    [appGroupUserHasRole]="groupDetails.groupData.id"
+    [groupRolesInclude]="['groupOwner']"
     (click)="onGroupCloseClick()"
     type="button"
     mat-stroked-button
@@ -13,7 +14,9 @@
   </button>
 
   <button
-    *ngIf="isOwnerSignal() && !isMemberSignal()"
+    [appGroupUserHasRole]="groupDetails.groupData.id"
+    [groupRolesInclude]="['groupOwner']"
+    [groupRolesExclude]="['groupMember']"
     (click)="onAddOwnerToGroupClick()"
     type="button"
     mat-stroked-button
@@ -26,7 +29,8 @@
 
   <!-- member -->
   <button
-    *ngIf="isMemberSignal()"
+    [appGroupUserHasRole]="groupDetails.groupData.id"
+    [groupRolesInclude]="['groupMember']"
     (click)="onLeaveGroupClick()"
     type="button"
     mat-stroked-button
@@ -39,7 +43,8 @@
 
   <!-- invited person -->
   <button
-    *ngIf="isUserInvitedToJoinSignal()"
+    [appGroupUserHasRole]="groupDetails.groupData.id"
+    [groupRolesInclude]="['groupInvitations']"
     (click)="onDeclineInvitationClick()"
     type="button"
     mat-stroked-button
@@ -51,7 +56,8 @@
   </button>
 
   <button
-    *ngIf="isUserInvitedToJoinSignal()"
+    [appGroupUserHasRole]="groupDetails.groupData.id"
+    [groupRolesInclude]="['groupInvitations']"
     (click)="onAcceptInvitationClick()"
     type="button"
     mat-stroked-button
@@ -64,7 +70,8 @@
 
   <!-- request invitation person -->
   <button
-    *ngIf="isUserRequestingToJoinSignal()"
+    [appGroupUserHasRole]="groupDetails.groupData.id"
+    [groupRolesInclude]="['groupRequested']"
     (click)="onCancelRequestClick()"
     type="button"
     mat-stroked-button
@@ -76,13 +83,8 @@
   </button>
 
   <button
-    *ngIf="
-      !isUserRequestingToJoinSignal() &&
-      !isMemberSignal() &&
-      !isUserInvitedToJoinSignal() &&
-      !isOwnerSignal() &&
-      groupDetails.groupData.isPublic
-    "
+    [appGroupUserHasRole]="groupDetails.groupData.id"
+    [groupRolesExclude]="['groupRequested', 'groupMember', 'groupInvitations', 'groupOwner']"
     (click)="onRequestToJoinClick()"
     type="button"
     mat-stroked-button
@@ -95,7 +97,8 @@
 
   <!-- owner - invite people -->
   <button
-    *ngIf="isOwnerSignal()"
+    [appGroupUserHasRole]="groupDetails.groupData.id"
+    [groupRolesInclude]="['groupOwner']"
     (click)="onInviteMembersClick()"
     type="button"
     mat-stroked-button
@@ -107,7 +110,13 @@
   </button>
 
   <!-- owner - settings -->
-  <button *ngIf="isOwnerSignal()" (click)="onGroupSettingsClick()" type="button" mat-stroked-button>
+  <button
+    [appGroupUserHasRole]="groupDetails.groupData.id"
+    [groupRolesInclude]="['groupOwner']"
+    (click)="onGroupSettingsClick()"
+    type="button"
+    mat-stroked-button
+  >
     <mat-icon>settings</mat-icon>
     Group Settings
   </button>

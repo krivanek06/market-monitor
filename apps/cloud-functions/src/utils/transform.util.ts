@@ -21,7 +21,7 @@ export const transformUserToGroupMember = (
     since: getCurrentDateDefaultFormat(),
     position: {
       currentGroupMemberPosition: newPosition,
-      previousGroupMemberPosition: userPreviousGroupData.position?.currentGroupMemberPosition ?? null,
+      previousGroupMemberPosition: userPreviousGroupData?.position?.currentGroupMemberPosition ?? null,
     },
   };
 };

@@ -5,7 +5,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { UserApiService } from '@market-monitor/api-client';
 import { GROUP_MEMBER_LIMIT, GroupMember } from '@market-monitor/api-types';
-import { GroupInvitationsManagerComponent } from '@market-monitor/modules/group/features';
+import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@market-monitor/modules/group/features';
 import { GroupDisplayInfoComponent } from '@market-monitor/modules/group/ui';
 import { PortfolioCalculationService } from '@market-monitor/modules/portfolio/data-access';
 import {
@@ -39,6 +39,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     MatIconModule,
     SortByKeyPipe,
     SectionTitleComponent,
+    GroupUserHasRoleDirective,
   ],
   templateUrl: './group-details-overview.component.html',
   styles: [
@@ -54,6 +55,7 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
   GROUP_MEMBER_LIMIT = GROUP_MEMBER_LIMIT;
   portfolioCalculationService = inject(PortfolioCalculationService);
   userApiService = inject(UserApiService);
+
   memberRequestedUsersSignal = toSignal(
     this.groupDetails$.pipe(
       switchMap((group) => this.userApiService.getUsersByIds(group.groupData.memberRequestUserIds)),

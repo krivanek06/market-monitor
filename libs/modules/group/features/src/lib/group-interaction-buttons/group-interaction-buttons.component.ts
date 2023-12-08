@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,11 +10,20 @@ import { AuthenticationUserService } from '@market-monitor/modules/authenticatio
 import { UserSearchDialogComponent, UserSearchDialogData } from '@market-monitor/modules/user/features';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS, filterNullish } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, filter, from, of, switchMap, take, tap } from 'rxjs';
+import { GroupUserHasRoleDirective } from '../group-person-position-directive/group-user-role.directive';
 
 @Component({
   selector: 'app-group-interaction-buttons',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule, UserSearchDialogComponent, MatDialogModule],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    UserSearchDialogComponent,
+    MatDialogModule,
+    GroupUserHasRoleDirective,
+  ],
   templateUrl: './group-interaction-buttons.component.html',
   styles: [
     `
@@ -34,16 +42,6 @@ export class GroupInteractionButtonsComponent {
   groupApiService = inject(GroupApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
   dialog = inject(MatDialog);
-
-  userDataSignal = toSignal(this.authenticationUserService.getUserData());
-  isOwnerSignal = computed(() => this.userDataSignal()?.groups.groupOwner.includes(this.groupDetails.groupData.id));
-  isMemberSignal = computed(() => this.userDataSignal()?.groups.groupMember.includes(this.groupDetails.groupData.id));
-  isUserInvitedToJoinSignal = computed(
-    () => this.userDataSignal()?.groups.groupInvitations.includes(this.groupDetails.groupData.id),
-  );
-  isUserRequestingToJoinSignal = computed(
-    () => this.userDataSignal()?.groups.groupRequested.includes(this.groupDetails.groupData.id),
-  );
 
   get tooltipClose(): string {
     return `By closing a group, you will save its current state as a historical data and will not be able to make any changes to it.`;
