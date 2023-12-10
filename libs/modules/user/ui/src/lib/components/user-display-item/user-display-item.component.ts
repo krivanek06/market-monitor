@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { UserBase } from '@market-monitor/api-types';
 import { USER_ACTIVE_ACCOUNT_TIME_DAYS } from '@market-monitor/modules/user/data-access';
 import { DefaultImgDirective, LargeNumberFormatterPipe } from '@market-monitor/shared/ui';
@@ -8,7 +9,7 @@ import { isBefore, subDays } from 'date-fns';
 @Component({
   selector: 'app-user-display-item',
   standalone: true,
-  imports: [CommonModule, DefaultImgDirective, LargeNumberFormatterPipe],
+  imports: [CommonModule, DefaultImgDirective, LargeNumberFormatterPipe, MatIconModule],
   templateUrl: './user-display-item.component.html',
   styles: [
     `
