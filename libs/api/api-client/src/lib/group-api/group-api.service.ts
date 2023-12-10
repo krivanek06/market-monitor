@@ -145,12 +145,23 @@ export class GroupApiService {
     return result.data;
   }
 
-  async acceptUserRequestToGroup(input: GroupBaseInput): Promise<GroupData> {
+  /**
+   * Accepts user request to join group
+   *
+   * @param input
+   * @returns
+   */
+  async acceptUserRequestToGroup(input: GroupBaseInput): Promise<void> {
     const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupRequestMembershipAcceptCall');
-    const result = await callable(input);
-    return result.data;
+    await callable(input);
   }
 
+  /**
+   * Declines user request to join group
+   *
+   * @param input
+   * @returns
+   */
   async declineUserRequestToGroup(input: GroupBaseInput): Promise<GroupData> {
     const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupRequestMembershipRemoveCall');
     const result = await callable(input);

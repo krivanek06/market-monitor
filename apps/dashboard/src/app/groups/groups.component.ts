@@ -74,7 +74,7 @@ export class GroupsComponent {
     });
 
     this.searchGroupControl.valueChanges.subscribe((d) => {
-      console.log('searchGroupControl', d);
+      this.router.navigate(['groups', d?.id]);
     });
   }
 
