@@ -10,6 +10,10 @@ import { AuthenticationUserService } from '@market-monitor/modules/authenticatio
 import { UserSearchDialogComponent, UserSearchDialogData } from '@market-monitor/modules/user/features';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS, filterNullish } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, filter, from, of, switchMap, take, tap } from 'rxjs';
+import {
+  GroupSettingsDialogComponent,
+  GroupSettingsDialogComponentData,
+} from '../group-settings-dialog/group-settings-dialog.component';
 import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-user-role.directive';
 
 @Component({
@@ -23,6 +27,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
     UserSearchDialogComponent,
     MatDialogModule,
     GroupUserHasRoleDirective,
+    GroupSettingsDialogComponent,
   ],
   templateUrl: './group-interaction-buttons.component.html',
   styles: [
@@ -76,7 +81,11 @@ export class GroupInteractionButtonsComponent {
   }
 
   onGroupSettingsClick() {
-    console.log('onGroupSettingsClick');
+    this.dialog.open(GroupSettingsDialogComponent, {
+      data: <GroupSettingsDialogComponentData>{
+        groupId: this.groupDetails.groupData.id,
+      },
+    });
   }
 
   @Confirmable('Are you sure you want to close this group?')

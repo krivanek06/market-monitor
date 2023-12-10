@@ -75,6 +75,8 @@ export class GroupUserHasRoleDirective implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe((generateDom) => {
+        // clear the view - used to be the same element multiple times
+        this.viewContainerRef.clear();
         if (generateDom) {
           // create the view
           this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);

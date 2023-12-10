@@ -1,4 +1,5 @@
 export * from './add-color.directive';
+export * from './array-manipulation.directive';
 export * from './bubble-pagination.directive';
 export * from './client-styles.directive';
 export * from './default-img.directive';

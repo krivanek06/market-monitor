@@ -14,7 +14,7 @@ import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT, GroupCreateInput, UserData } fro
 import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
 import { UserSearchControlComponent } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { UploadImageSingleControlComponent, UploadedFile } from '@market-monitor/shared/features';
+import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
 import {
   DatePickerComponent,
   DefaultImgDirective,
@@ -70,7 +70,7 @@ export class GroupCreateDialogComponent implements OnInit {
     }),
     isPublic: new FormControl(true),
     isOwnerMember: new FormControl(true),
-    uploadedImage: new FormControl<UploadedFile | null>(null),
+    uploadedImage: new FormControl<string | null>(null),
   });
 
   searchUserControl = new FormControl<UserData | null>(null, { nonNullable: true });
@@ -142,7 +142,7 @@ export class GroupCreateDialogComponent implements OnInit {
       isPublic: this.form.controls.isPublic.value ?? false,
       isOwnerMember: this.form.controls.isOwnerMember.value ?? false,
       memberInvitedUserIds: this.selectedUsersSignal().map((d) => d.id),
-      imageUrl: this.form.controls.uploadedImage.value?.downloadURL ?? null,
+      imageUrl: this.form.controls.uploadedImage.value ?? null,
     };
 
     // show loader

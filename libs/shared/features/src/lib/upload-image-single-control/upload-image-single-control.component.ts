@@ -18,11 +18,6 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { EMPTY, Observable, catchError, first, map } from 'rxjs';
 
-export interface UploadedFile {
-  downloadURL: string;
-  path: string;
-}
-
 @Component({
   selector: 'app-upload-image-single-control',
   standalone: true,
@@ -74,7 +69,7 @@ export interface UploadedFile {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploadImageSingleControlComponent implements ControlValueAccessor {
-  @Output() uploadedFilesEmitter: EventEmitter<UploadedFile> = new EventEmitter<UploadedFile>();
+  @Output() uploadedFilesEmitter: EventEmitter<string> = new EventEmitter<string>();
 
   /**
    * overwrites existing file name the user uploads
@@ -89,7 +84,7 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
   dialogServiceUtil = inject(DialogServiceUtil);
   storage = inject(Storage);
 
-  onChange: (value: UploadedFile) => void = () => {};
+  onChange: (value: string) => void = () => {};
   onTouched = () => {};
 
   ColorScheme = ColorScheme;
@@ -100,7 +95,7 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
   percentage$!: Observable<number>;
 
   isUploadingSignal = signal(false);
-  lastFileUploadSignal = signal<UploadedFile | undefined>(undefined);
+  lastFileUploadSignal = signal<string | undefined>(undefined);
 
   private task: UploadTask | undefined;
 
@@ -123,7 +118,9 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
     }
   }
 
-  writeValue(obj: null): void {}
+  writeValue(downloadUrl: string): void {
+    this.lastFileUploadSignal.set(downloadUrl);
+  }
   /**
    * Register Component's ControlValueAccessor onChange callback
    */
@@ -171,11 +168,11 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
         console.log('emitting', downloadURL, path);
 
         this.isUploadingSignal.set(false);
-        this.lastFileUploadSignal.set({ downloadURL, path });
+        this.lastFileUploadSignal.set(downloadURL);
 
         // notify parent
-        this.onChange({ downloadURL, path });
-        this.uploadedFilesEmitter.emit({ downloadURL, path });
+        this.onChange(downloadURL);
+        this.uploadedFilesEmitter.emit(downloadURL);
       });
   }
 }

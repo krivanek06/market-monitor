@@ -17,6 +17,7 @@ import {
   GroupHoldingSnapshotsData,
   GroupMembersData,
   GroupPortfolioStateSnapshotsData,
+  GroupSettingsChangeInput,
   GroupTransactionsData,
 } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
@@ -91,16 +92,19 @@ export class GroupApiService {
     return result.data;
   }
 
-  async userAcceptsGroupInvitation(input: string): Promise<GroupData> {
+  async userAcceptsGroupInvitation(input: string): Promise<void> {
     const callable = httpsCallable<string, GroupData>(this.functions, 'groupMemberAcceptCall');
-    const result = await callable(input);
-    return result.data;
+    await callable(input);
   }
 
-  async userDeclinesGroupInvitation(input: GroupBaseInput): Promise<GroupData> {
+  async userDeclinesGroupInvitation(input: GroupBaseInput): Promise<void> {
     const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupMemberInviteRemoveCall');
-    const result = await callable(input);
-    return result.data;
+    await callable(input);
+  }
+
+  async changeGroupSettings(input: GroupSettingsChangeInput): Promise<void> {
+    const callable = httpsCallable<GroupSettingsChangeInput, GroupData>(this.functions, 'groupSettingsChangeCall');
+    await callable(input);
   }
 
   /**
@@ -122,10 +126,9 @@ export class GroupApiService {
     await callable(groupId);
   }
 
-  async inviteUserToGroup(input: GroupBaseInput): Promise<GroupData> {
+  async inviteUserToGroup(input: GroupBaseInput): Promise<void> {
     const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupMemberInviteCall');
-    const result = await callable(input);
-    return result.data;
+    await callable(input);
   }
 
   /**
@@ -139,10 +142,14 @@ export class GroupApiService {
     await callable(input);
   }
 
-  async removeGroupMember(input: GroupBaseInput): Promise<GroupData> {
+  /**
+   * Removes existing group member
+   *
+   * @param input
+   */
+  async removeGroupMember(input: GroupBaseInput): Promise<void> {
     const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupMemberRemoveCall');
-    const result = await callable(input);
-    return result.data;
+    await callable(input);
   }
 
   /**
@@ -152,7 +159,7 @@ export class GroupApiService {
    * @returns
    */
   async acceptUserRequestToGroup(input: GroupBaseInput): Promise<void> {
-    const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupRequestMembershipAcceptCall');
+    const callable = httpsCallable<GroupBaseInput, void>(this.functions, 'groupRequestMembershipAcceptCall');
     await callable(input);
   }
 
@@ -162,22 +169,19 @@ export class GroupApiService {
    * @param input
    * @returns
    */
-  async declineUserRequestToGroup(input: GroupBaseInput): Promise<GroupData> {
-    const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupRequestMembershipRemoveCall');
-    const result = await callable(input);
-    return result.data;
+  async declineUserRequestToGroup(input: GroupBaseInput): Promise<void> {
+    const callable = httpsCallable<GroupBaseInput, void>(this.functions, 'groupRequestMembershipRemoveCall');
+    await callable(input);
   }
 
-  async sendRequestToJoinGroup(groupId: string): Promise<GroupData> {
-    const callable = httpsCallable<string, GroupData>(this.functions, 'groupRequestMembershipCall');
-    const result = await callable(groupId);
-    return result.data;
+  async sendRequestToJoinGroup(groupId: string): Promise<void> {
+    const callable = httpsCallable<string, void>(this.functions, 'groupRequestMembershipCall');
+    await callable(groupId);
   }
 
-  async removeRequestToJoinGroup(input: GroupBaseInput): Promise<GroupData> {
-    const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupRequestMembershipRemoveCall');
-    const result = await callable(input);
-    return result.data;
+  async removeRequestToJoinGroup(input: GroupBaseInput): Promise<void> {
+    const callable = httpsCallable<GroupBaseInput, void>(this.functions, 'groupRequestMembershipRemoveCall');
+    await callable(input);
   }
 
   private getGroupDocRef(groupId: string): DocumentReference<GroupData> {
