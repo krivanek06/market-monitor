@@ -4,6 +4,7 @@ export * from './bubble-pagination.directive';
 export * from './client-styles.directive';
 export * from './default-img.directive';
 export * from './element-focus.directive';
+export * from './hide-after.directive';
 export * from './ng-show.directive';
 export * from './percentage-increase.directive';
 export * from './range.directive';

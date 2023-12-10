@@ -20,6 +20,7 @@ import {
   DefaultImgDirective,
   DialogCloseHeaderComponent,
   FormMatInputWrapperComponent,
+  HideAfterDirective,
 } from '@market-monitor/shared/ui';
 import {
   DialogServiceModule,
@@ -51,6 +52,7 @@ import { map, startWith } from 'rxjs';
     UserSearchControlComponent,
     UserDisplayItemComponent,
     UploadImageSingleControlComponent,
+    HideAfterDirective,
   ],
   templateUrl: './group-create-dialog.component.html',
   styles: [
