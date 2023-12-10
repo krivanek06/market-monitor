@@ -1,4 +1,4 @@
-<ng-container *ngIf="!groupDetails.groupData.isClosed">
+<ng-container *ngIf="!groupDetails.groupData.isClosed; else closedGroupActionButtons">
   <!-- owner -->
   <button
     *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
@@ -114,3 +114,19 @@
     Group Settings
   </button>
 </ng-container>
+
+<!-- closed group -->
+<ng-template #closedGroupActionButtons>
+  <!-- owner -->
+  <button
+    *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
+    (click)="onGroupReopenClick()"
+    type="button"
+    mat-stroked-button
+    color="accent"
+    [matTooltip]="tooltipClose"
+  >
+    <mat-icon>cached</mat-icon>
+    Reopen Group
+  </button>
+</ng-template>

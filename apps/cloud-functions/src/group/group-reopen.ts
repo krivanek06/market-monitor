@@ -1,8 +1,10 @@
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentRef } from '../models';
 
-export const groupCloseCall = onCall(async (request) => {
+/**
+ * if the group is closed, reopen it
+ */
+export const groupReopenCall = onCall(async (request) => {
   const groupId = request.data as string;
   const userAuthId = request.auth?.uid;
 
@@ -20,14 +22,14 @@ export const groupCloseCall = onCall(async (request) => {
   }
 
   // check if group is closed
-  if (groupData.isClosed) {
-    throw new HttpsError('failed-precondition', 'Group is already closed');
+  if (!groupData.isClosed) {
+    throw new HttpsError('failed-precondition', 'Group is not closed');
   }
 
   // close group
   await groupDocumentRef(groupId).update({
-    isClosed: true,
-    endDate: getCurrentDateDefaultFormat(),
+    isClosed: false,
+    endDate: null,
   });
 
   return groupData;

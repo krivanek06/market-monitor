@@ -103,6 +103,21 @@ export class GroupInteractionButtonsComponent {
     }
   }
 
+  @Confirmable('Are you sure you want to reopen this group?')
+  async onGroupReopenClick() {
+    try {
+      // show notification
+      this.dialogServiceUtil.showNotificationBar('Reopening group', 'notification');
+
+      await this.groupApiService.reopenGroup(this.groupDetails.groupData.id);
+
+      // show notification
+      this.dialogServiceUtil.showNotificationBar('The group has been reopened', 'success');
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
+  }
+
   async onAddOwnerToGroupClick() {
     try {
       // show notification

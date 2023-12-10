@@ -86,6 +86,12 @@ export class GroupApiService {
     return result.data;
   }
 
+  async reopenGroup(input: string): Promise<GroupData> {
+    const callable = httpsCallable<string, GroupData>(this.functions, 'groupReopenCall');
+    const result = await callable(input);
+    return result.data;
+  }
+
   async deleteGroup(input: string): Promise<GroupData> {
     const callable = httpsCallable<string, GroupData>(this.functions, 'groupDeleteCall');
     const result = await callable(input);

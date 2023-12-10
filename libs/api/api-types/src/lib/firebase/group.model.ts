@@ -78,7 +78,7 @@ export type GroupData = {
    * how long to keep group open
    */
   createdDate: string;
-  endDate?: string;
+  endDate: string | null;
 
   /**
    * Fields with user ids
