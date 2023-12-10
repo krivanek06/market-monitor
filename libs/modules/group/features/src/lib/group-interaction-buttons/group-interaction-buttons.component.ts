@@ -10,7 +10,7 @@ import { AuthenticationUserService } from '@market-monitor/modules/authenticatio
 import { UserSearchDialogComponent, UserSearchDialogData } from '@market-monitor/modules/user/features';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS, filterNullish } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, filter, from, of, switchMap, take, tap } from 'rxjs';
-import { GroupUserHasRoleDirective } from '../group-person-position-directive/group-user-role.directive';
+import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-user-role.directive';
 
 @Component({
   selector: 'app-group-interaction-buttons',
