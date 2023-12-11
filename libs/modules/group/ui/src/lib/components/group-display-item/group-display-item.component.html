@@ -14,11 +14,20 @@
 
     <!-- info -->
     <div class="grid gap-1">
-      <div class="flex gap-4">
+      <div class="flex items-center gap-4">
         <!-- name -->
-        <div class="text-lg text-wt-primary">{{ groupData.name | titlecase }} AAAABBBBEEEE</div>
+        <div
+          class="text-lg"
+          [ngClass]="{
+            'text-wt-primary': !groupData.isClosed,
+            'text-wt-danger': groupData.isClosed
+          }"
+        >
+          {{ groupData.name | titlecase }}
+        </div>
         <!-- portfolio -->
         <div
+          *ngIf="!groupData.isClosed"
           appPercentageIncrease
           [useCurrencySign]="true"
           [changeValues]="{
@@ -26,6 +35,8 @@
             changePercentage: groupData.portfolioState.totalGainsPercentage
           }"
         ></div>
+        <!-- closed group display message -->
+        <div *ngIf="groupData.isClosed" class="text-wt-danger">(Closed)</div>
       </div>
       <div class="flex items-center gap-4">
         <!-- owner -->

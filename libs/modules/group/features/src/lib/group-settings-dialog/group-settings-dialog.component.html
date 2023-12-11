@@ -1,0 +1,82 @@
+<app-dialog-close-header
+  [showCloseButton]="false"
+  [title]="'Group Settings: ' + groupDataSignal()?.name"
+></app-dialog-close-header>
+<!-- form -->
+<form [formGroup]="form" (ngSubmit)="onFormSubmit()">
+  <mat-dialog-content>
+    <div class="flex gap-4">
+      <!-- upload image -->
+      <div class="w-[270px] h-[270px]">
+        <app-upload-image-single-control
+          filePath="groups"
+          formControlName="uploadedImage"
+        ></app-upload-image-single-control>
+      </div>
+
+      <!-- additional forms -->
+      <div class="flex-1">
+        <!-- group name -->
+        <app-form-mat-input-wrapper
+          formControlName="groupName"
+          inputCaption="Group Name"
+          inputType="TEXT"
+        ></app-form-mat-input-wrapper>
+
+        <!-- is public -->
+        <app-form-mat-input-wrapper
+          formControlName="isPublic"
+          inputCaption="Is Group Public"
+          inputType="CHECKBOX"
+          hintText="If selected people can request be member of a group"
+        ></app-form-mat-input-wrapper>
+      </div>
+    </div>
+
+    @if (removingGroupMembers().length > 0) {
+    <!-- removing member -->
+    <div class="mt-8 mb-4 space-x-2 text-lg">
+      <span>Remove Members</span>
+    </div>
+
+    <!-- display selected users -->
+    <div class="grid md:grid-cols-2 gap-x-6 gap-y-2">
+      <div *ngFor="let user of removingGroupMembers()" class="flex gap-4 p-4 shadow-md">
+        <app-user-display-item [userData]="user"></app-user-display-item>
+        <button mat-icon-button type="button" matTooltip="Remove User" (click)="onAddUserBack(user)">
+          <mat-icon color="primary">add</mat-icon>
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- current members -->
+    <div class="mt-8 mb-4 space-x-2 text-lg">
+      <span>Current Members</span>
+    </div>
+
+    <!-- display selected users -->
+    <div class="grid md:grid-cols-2 gap-x-6 gap-y-2">
+      <div
+        *ngFor="let user of groupMembersSignal() | arrayExclude: removingGroupMembers() : 'id'"
+        class="flex gap-4 p-4 shadow-md"
+      >
+        <app-user-display-item [userData]="user"></app-user-display-item>
+        <button mat-icon-button type="button" matTooltip="Remove User" (click)="onUserRemove(user)">
+          <mat-icon color="warn">delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <div class="my-4">
+    <mat-divider></mat-divider>
+  </div>
+
+  <mat-dialog-actions>
+    <div class="g-mat-dialog-actions-end">
+      <button type="button" mat-flat-button mat-dialog-close>Cancel</button>
+      <button type="submit" mat-flat-button color="primary">Save</button>
+    </div>
+  </mat-dialog-actions>
+</form>

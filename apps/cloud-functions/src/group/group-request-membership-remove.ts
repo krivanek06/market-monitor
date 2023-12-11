@@ -2,7 +2,6 @@ import { GroupBaseInput } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentRef, userDocumentRef } from '../models';
-import { transformUserToBase } from '../utils';
 
 /**
  * Remove user who request to join the group - only owner or the requester can do it
@@ -33,7 +32,4 @@ export const groupRequestMembershipRemoveCall = onCall(async (request) => {
   await userDocumentRef(data.userId).update({
     'groups.groupRequested': FieldValue.arrayRemove(data.groupId),
   });
-
-  // return user
-  return transformUserToBase(userData);
 });

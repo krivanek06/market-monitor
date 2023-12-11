@@ -108,7 +108,10 @@ export class UserApiService {
   }
 
   /* user */
-  getUserData(userId: string): Observable<UserData | undefined> {
+  getUserData(userId?: string): Observable<UserData | undefined> {
+    if (!userId) {
+      return of(undefined);
+    }
     return rxDocData(this.getUserDocRef(userId), { idField: 'id' });
   }
 

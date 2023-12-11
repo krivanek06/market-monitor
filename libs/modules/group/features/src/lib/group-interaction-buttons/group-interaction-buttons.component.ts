@@ -10,7 +10,11 @@ import { AuthenticationUserService } from '@market-monitor/modules/authenticatio
 import { UserSearchDialogComponent, UserSearchDialogData } from '@market-monitor/modules/user/features';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS, filterNullish } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, filter, from, of, switchMap, take, tap } from 'rxjs';
-import { GroupUserHasRoleDirective } from '../group-person-position-directive/group-user-role.directive';
+import {
+  GroupSettingsDialogComponent,
+  GroupSettingsDialogComponentData,
+} from '../group-settings-dialog/group-settings-dialog.component';
+import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-user-role.directive';
 
 @Component({
   selector: 'app-group-interaction-buttons',
@@ -23,6 +27,7 @@ import { GroupUserHasRoleDirective } from '../group-person-position-directive/gr
     UserSearchDialogComponent,
     MatDialogModule,
     GroupUserHasRoleDirective,
+    GroupSettingsDialogComponent,
   ],
   templateUrl: './group-interaction-buttons.component.html',
   styles: [
@@ -76,7 +81,11 @@ export class GroupInteractionButtonsComponent {
   }
 
   onGroupSettingsClick() {
-    console.log('onGroupSettingsClick');
+    this.dialog.open(GroupSettingsDialogComponent, {
+      data: <GroupSettingsDialogComponentData>{
+        groupId: this.groupDetails.groupData.id,
+      },
+    });
   }
 
   @Confirmable('Are you sure you want to close this group?')
@@ -89,6 +98,21 @@ export class GroupInteractionButtonsComponent {
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You closed the group', 'success');
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
+  }
+
+  @Confirmable('Are you sure you want to reopen this group?')
+  async onGroupReopenClick() {
+    try {
+      // show notification
+      this.dialogServiceUtil.showNotificationBar('Reopening group', 'notification');
+
+      await this.groupApiService.reopenGroup(this.groupDetails.groupData.id);
+
+      // show notification
+      this.dialogServiceUtil.showNotificationBar('The group has been reopened', 'success');
     } catch (error) {
       this.dialogServiceUtil.handleError(error);
     }

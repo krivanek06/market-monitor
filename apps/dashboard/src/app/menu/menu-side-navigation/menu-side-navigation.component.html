@@ -1,8 +1,8 @@
-<div class="flex items-center gap-2 p-6 pt-10 mb-4">
+<div *ngIf="userDataSignal() as userDataSignal" class="flex items-center gap-2 p-6 pt-10 mb-4">
   <!-- avatar -->
-  <div class="w-10 h-10 rounded-full bg-slate-200"></div>
+  <img appDefaultImg [src]="userDataSignal.personal.photoURL" alt="user image" class="w-10 h-10 rounded-full" />
   <!-- name -->
-  <div>First Last</div>
+  <div>{{ userDataSignal.personal.displayName }}</div>
 </div>
 
 <!-- main navigation -->

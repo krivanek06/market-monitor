@@ -10,9 +10,9 @@ import {
 } from '@angular/fire/auth';
 import { UserApiService } from '@market-monitor/api-client';
 import { USER_ACCOUNT_TYPE, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
-import { filterNullish, isNonNullable } from '@market-monitor/shared/utils-client';
+import { isNonNullable } from '@market-monitor/shared/utils-client';
 import { dateFormatDate } from '@market-monitor/shared/utils-general';
-import { BehaviorSubject, Observable, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, map, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 
 @Injectable({
@@ -21,11 +21,6 @@ import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 export class AuthenticationAccountService {
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
   private authenticatedUser$ = new BehaviorSubject<User | null>(null);
-
-  /**
-   * emits true when authentication is finished whether user if loaded or not. Used for guards
-   */
-  private authenticationLoaded$ = new BehaviorSubject<boolean>(false);
 
   constructor(
     private auth: Auth,
@@ -51,10 +46,6 @@ export class AuthenticationAccountService {
 
   get isUserDataPresent(): boolean {
     return !!this.authenticatedUserData$.value;
-  }
-
-  isAuthenticationLoaded(): Observable<boolean> {
-    return this.authenticationLoaded$.asObservable();
   }
 
   getUserData(): Observable<UserData> {
@@ -91,14 +82,15 @@ export class AuthenticationAccountService {
   private listenOnUserChanges(): void {
     this.authenticatedUser$
       .pipe(
-        tap((c) => console.log('watch', c)),
-        filterNullish(),
-        switchMap((user) => this.getUserFromFirestoreUser(user)),
+        switchMap((user) =>
+          this.userApiService
+            .getUserData(user?.uid)
+            .pipe(map((userData) => (userData ? userData : user ? this.createUser(user) : null))),
+        ),
       )
       .subscribe((userData) => {
         console.log('UPDATING USER', userData);
         this.authenticatedUserData$.next(userData);
-        this.authenticationLoaded$.next(true);
       });
   }
 
@@ -106,17 +98,17 @@ export class AuthenticationAccountService {
     this.auth.onAuthStateChanged((user) => {
       console.log('authentication state change', user);
       this.authenticatedUser$.next(user);
-      if (!user) {
-        console.log('USER UNAUTHENTICATED');
-        this.authenticationLoaded$.next(true);
+
+      if (user) {
+        // wait some time before updating last login date so that user is already saved in authenticatedUserData
+        setTimeout(() => {
+          // update last login date
+          this.userApiService.updateUser(user.uid, {
+            lastLoginDate: dateFormatDate(new Date()),
+          });
+        }, 1000);
       }
     });
-  }
-
-  private getUserFromFirestoreUser(user: User): Observable<UserData> {
-    return this.userApiService
-      .getUserData(user.uid)
-      .pipe(map((userData) => (userData ? userData : this.createUser(user))));
   }
 
   private createUser(user: User): UserData {

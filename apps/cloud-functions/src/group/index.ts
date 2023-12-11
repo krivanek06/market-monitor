@@ -7,6 +7,8 @@ export * from './group-member-invite';
 export * from './group-member-invite-multiple';
 export * from './group-member-invite-remove';
 export * from './group-member-remove';
+export * from './group-reopen';
 export * from './group-request-membership';
 export * from './group-request-membership-accept';
 export * from './group-request-membership-remove';
+export * from './group-settings-change';

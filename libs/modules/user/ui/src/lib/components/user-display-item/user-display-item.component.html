@@ -6,13 +6,7 @@
     <div class="flex">
       <div class="text-wt-gray-dark w-[80px]">Name:</div>
       <div class="mr-4">{{ userData.personal.displayName }}</div>
-      <span
-        [ngClass]="{
-          'text-wt-success': isUserActive,
-          'text-wt-danger': !isUserActive
-        }"
-        >{{ isUserActive ? 'Active' : 'Not Active' }}</span
-      >
+      <mat-icon [color]="isUserActive ? 'accent' : 'warn'"> radio_button_checked </mat-icon>
     </div>
 
     <div class="flex">

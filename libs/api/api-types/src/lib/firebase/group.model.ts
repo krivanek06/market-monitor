@@ -26,6 +26,17 @@ export type GroupBaseInputInviteMembers = {
   userIds: string[];
 };
 
+export type GroupSettingsChangeInput = {
+  groupId: string;
+  isPublic: boolean;
+  groupName: string;
+  imageUrl: string | null;
+  /**
+   * user ids that are removed from the group
+   */
+  removingUserIds: string[];
+};
+
 export type GroupMember = UserBase & {
   /**
    * date when user joined the group
@@ -67,7 +78,7 @@ export type GroupData = {
    * how long to keep group open
    */
   createdDate: string;
-  endDate?: string;
+  endDate: string | null;
 
   /**
    * Fields with user ids

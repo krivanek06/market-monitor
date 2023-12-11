@@ -1,4 +1,4 @@
-<div class="flex flex-1 gap-3 p-3">
+<div class="flex items-center flex-1 gap-3 p-3">
   <!-- image -->
   <img
     appDefaultImg
@@ -10,6 +10,30 @@
   />
   <!-- data -->
   <div class="flex flex-col">
+    <div class="flex gap-4 items-center">
+      <!-- name -->
+      <div
+        class="text-lg"
+        [ngClass]="{
+          'text-wt-primary': !groupData.isClosed,
+          'text-wt-danger': groupData.isClosed
+        }"
+      >
+        {{ groupData.name | titlecase }}
+      </div>
+      <!-- portfolio -->
+      <div
+        *ngIf="!groupData.isClosed"
+        appPercentageIncrease
+        [useCurrencySign]="true"
+        [changeValues]="{
+          change: groupData.portfolioState.totalGainsValue,
+          changePercentage: groupData.portfolioState.totalGainsPercentage
+        }"
+      ></div>
+      <!-- closed group display message -->
+      <div *ngIf="groupData.isClosed" class="text-wt-danger">(Closed)</div>
+    </div>
     <!-- owner -->
     <div
       (click)="onOwnerClick()"
@@ -22,7 +46,7 @@
       <img appDefaultImg [src]="groupData.ownerUser.personal.photoURL" alt="Owner Image" class="w-8 h-8 rounded-full" />
       <span>{{ groupData.ownerUser.personal.displayName | titlecase }}</span>
     </div>
-    <!-- info -->
+    <!-- status -->
     <div class="flex gap-2">
       <div class="w-20">Status</div>
       <div
@@ -37,10 +61,12 @@
         <span>{{ groupData.isPublic ? 'Open' : 'Closed' }}</span>
       </div>
     </div>
+    <!-- members -->
     <div class="flex gap-2">
       <div class="w-20">Members</div>
       <div>{{ groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}</div>
     </div>
+    <!-- created date -->
     <div class="flex gap-2">
       <div class="w-20">Created</div>
       <div>{{ groupData.createdDate | date: 'MMMM d, y' }}</div>

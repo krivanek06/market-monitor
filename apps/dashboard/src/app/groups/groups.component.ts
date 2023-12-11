@@ -17,7 +17,7 @@ import {
 } from '@market-monitor/modules/group/features';
 import { GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
-import { GeneralCardComponent, SectionTitleComponent } from '@market-monitor/shared/ui';
+import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { map } from 'rxjs';
 
@@ -38,6 +38,7 @@ import { map } from 'rxjs';
     GroupSearchControlComponent,
     ReactiveFormsModule,
     SectionTitleComponent,
+    RangeDirective,
   ],
   templateUrl: './groups.component.html',
   styles: [
@@ -74,7 +75,7 @@ export class GroupsComponent {
     });
 
     this.searchGroupControl.valueChanges.subscribe((d) => {
-      console.log('searchGroupControl', d);
+      this.router.navigate(['groups', d?.id]);
     });
   }
 

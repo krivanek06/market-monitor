@@ -27,7 +27,7 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
   }
 
   // check if user sent request
-  if (!groupData.memberRequestUserIds.includes(userAuthId)) {
+  if (!groupData.memberRequestUserIds.includes(userData.id)) {
     throw new HttpsError('failed-precondition', 'User has not requested to join');
   }
 
@@ -38,8 +38,8 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
 
   // update group
   await groupDocumentRef(data.groupId).update({
-    memberUserIds: FieldValue.arrayUnion(userAuthId),
-    memberRequestUserIds: FieldValue.arrayRemove(userAuthId),
+    memberUserIds: FieldValue.arrayUnion(userData.id),
+    memberRequestUserIds: FieldValue.arrayRemove(userData.id),
   });
 
   // update group member data
@@ -50,7 +50,7 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
   });
 
   // update user
-  await userDocumentRef(userAuthId).update({
+  await userDocumentRef(data.userId).update({
     'groups.groupRequested': FieldValue.arrayRemove(data.groupId),
     'groups.groupMember': FieldValue.arrayUnion(data.groupId),
   });

@@ -3,7 +3,7 @@ import { Route, Router } from '@angular/router';
 import { AuthenticationAccountService } from '@market-monitor/modules/authentication/data-access';
 import { groupDetailsResolver } from '@market-monitor/modules/page-builder';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { filter, map, take, tap } from 'rxjs';
+import { map, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
   {
@@ -17,10 +17,9 @@ export const appRoutes: Route[] = [
             const authentication = inject(AuthenticationAccountService);
             const router = inject(Router);
 
-            return authentication.isAuthenticationLoaded().pipe(
-              filter((isLoaded) => isLoaded),
+            return authentication.getUserData().pipe(
+              tap(() => console.log('CHECK REDIRECT DASHBOARD')),
               take(1),
-              tap(() => console.log('Redirecting dashboard:', authentication.isUserDataPresent)),
               map(() => (authentication.isUserDataPresent ? true : router.navigate([ROUTES_MAIN.LOGIN]))),
             );
           },
@@ -108,12 +107,12 @@ export const appRoutes: Route[] = [
             const authentication = inject(AuthenticationAccountService);
             const router = inject(Router);
 
-            return authentication.isAuthenticationLoaded().pipe(
-              filter((isLoaded) => isLoaded),
-              take(1),
-              tap(() => console.log('Redirecting login:', !authentication.isUserDataPresent)),
-              map(() => (!authentication.isUserDataPresent ? true : router.navigate([ROUTES_MAIN.DASHBOARD]))),
-            );
+            // return authentication.getUserData().pipe(
+            //   tap(() => console.log('CHECK REDIRECT LOGIN')),
+            //   take(1),
+            //   map(() => (!authentication.isUserDataPresent ? true : router.navigate([ROUTES_MAIN.DASHBOARD]))),
+            // );
+            return true;
           },
         ],
       },
