@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageLoginComponent } from '@market-monitor/modules/page-builder';
+import { AuthenticationFormComponent } from '@market-monitor/modules/authentication/features';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-page-login',
   standalone: true,
-  imports: [CommonModule, PageLoginComponent],
-  template: `<app-page-login></app-page-login>`,
+  imports: [CommonModule, AuthenticationFormComponent],
+  templateUrl: './page-login.component.html',
   styles: [
     `
       :host {
@@ -16,6 +16,4 @@ import { PageLoginComponent } from '@market-monitor/modules/page-builder';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent {
-  constructor() {}
-}
+export class PageLoginComponent {}
