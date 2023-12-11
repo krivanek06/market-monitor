@@ -77,3 +77,8 @@ h2 {
 .g-clickable-hover {
   @apply hover:scale-95 duration-300 transition-all cursor-pointer ease-in-out;
 }
+
+.g-overlay {
+  background-color: #6f6f6f7a !important;
+  opacity: 0.8;
+}

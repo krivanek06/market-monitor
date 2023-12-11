@@ -23,7 +23,7 @@
   </div>
 </div>
 
-<div *ngIf="groupsSignal() as groups" class="grid m-auto xl:w-11/12 gap-y-4">
+<div *ngIf="groupsSignal() as groups; else skeleton" class="grid m-auto xl:w-11/12 gap-y-4">
   <!-- invitations - sent / received -->
   <div
     *ngIf="groups.groupInvitations.length > 0 || groups.groupRequested.length > 0"
@@ -61,6 +61,13 @@
     </app-general-card>
   </div>
 
+  <div
+    *ngIf="groups.groupOwner.length === 0 && groups.groupMember.length === 0"
+    class="text-xl text-center text-wt-gray-medium absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+  >
+    You are not a member of any group. You can create a new group or search for existing groups.
+  </div>
+
   <!-- my groups -->
   <div *ngIf="groups.groupOwner.length > 0">
     <h2>My Groups</h2>
@@ -85,3 +92,10 @@
     </div>
   </div>
 </div>
+
+<!-- skeleton -->
+<ng-template #skeleton>
+  <div class="grid m-auto xl:w-11/12 gap-y-4">
+    <div *ngRange="5" class="g-skeleton h-[200px] w-full mb-2"></div>
+  </div>
+</ng-template>

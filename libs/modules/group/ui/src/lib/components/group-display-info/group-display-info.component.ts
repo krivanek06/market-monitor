@@ -3,12 +3,12 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { GROUP_MEMBER_LIMIT, GroupData } from '@market-monitor/api-types';
-import { DefaultImgDirective } from '@market-monitor/shared/ui';
+import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-group-display-info',
   standalone: true,
-  imports: [CommonModule, DefaultImgDirective, MatButtonModule, MatIconModule],
+  imports: [CommonModule, DefaultImgDirective, MatButtonModule, MatIconModule, PercentageIncreaseDirective],
   templateUrl: './group-display-info.component.html',
   styles: [
     `
