@@ -5,7 +5,7 @@ import { PageMenuComponent } from '@market-monitor/modules/page-builder';
   selector: 'app-menu',
   standalone: true,
   imports: [PageMenuComponent],
-  template: ` <app-page-menu></app-page-menu> `,
+  template: `<app-page-menu></app-page-menu>`,
   styles: [
     `
       :host {
