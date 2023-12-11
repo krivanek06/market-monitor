@@ -4,6 +4,7 @@ export * from './page-group-details/page-group-details.component';
 export * from './page-groups/page-groups.component';
 export * from './page-login/page-login.component';
 export * from './page-market';
+export * from './page-menu/page-menu.component';
 export * from './page-search/page-search.component';
 export * from './page-stock-details';
 export * from './page-stock-screener/page-stock-screener.component';
