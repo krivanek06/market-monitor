@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Directive, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { UserData } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { BehaviorSubject, Subject, combineLatest, map, takeUntil } from 'rxjs';
 
 type SubGroups = (keyof UserData['groups'])[];
@@ -43,7 +43,7 @@ export class GroupUserHasRoleDirective implements OnInit, OnDestroy {
   constructor(
     private viewContainerRef: ViewContainerRef,
     private templateRef: TemplateRef<GroupUserHasRoleDirectiveContext>,
-    private authenticationUserService: AuthenticationUserService,
+    private authenticationUserService: AuthenticationUserStoreService,
     private cd: ChangeDetectorRef,
   ) {}
 

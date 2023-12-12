@@ -11,7 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@market-monitor/api-client';
 import { PortfolioTransactionType, SymbolSummary, USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { PortfolioTransactionCreate, PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
 import {
   CastToNumberPipe,
@@ -125,7 +125,7 @@ export class PortfolioTradeDialogComponent {
 
   constructor(
     private dialogRef: MatDialogRef<PortfolioTradeDialogComponent>,
-    public authenticationUserService: AuthenticationUserService,
+    public authenticationUserService: AuthenticationUserStoreService,
     private portfolioUserFacadeService: PortfolioUserFacadeService,
     private marketApiService: MarketApiService,
     private dialogServiceUtil: DialogServiceUtil,
@@ -243,7 +243,10 @@ export class PortfolioTradeDialogComponent {
    */
   private listenOnInSufficientCash(): void {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((form) => {
-      if (this.data.transactionType === 'SELL' || !this.authenticationUserService.isUserRoleSimulation) {
+      if (
+        this.data.transactionType === 'SELL' ||
+        !this.authenticationUserService.userData.features.userPortfolioAllowCashAccount
+      ) {
         return;
       }
 

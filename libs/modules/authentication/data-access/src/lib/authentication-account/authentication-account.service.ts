@@ -9,7 +9,7 @@ import {
   signInWithPopup,
 } from '@angular/fire/auth';
 import { UserApiService } from '@market-monitor/api-client';
-import { USER_ACCOUNT_TYPE, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
+import { UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
 import { isNonNullable } from '@market-monitor/shared/utils-client';
 import { dateFormatDate } from '@market-monitor/shared/utils-general';
 import { BehaviorSubject, Observable, map, switchMap } from 'rxjs';
@@ -114,7 +114,6 @@ export class AuthenticationAccountService {
   private createUser(user: User): UserData {
     // create new user data
     const newUserData = createNewUser(user.uid, {
-      accountType: USER_ACCOUNT_TYPE.BASIC,
       displayName: user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`,
       photoURL: user.photoURL,
     });

@@ -6,7 +6,7 @@ import {
   PortfolioTransaction,
   UserPortfolioTransaction,
 } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { GenericChartSeriesPie } from '@market-monitor/shared/data-access';
 import { Observable, from, map, startWith, switchMap, withLatestFrom } from 'rxjs';
 import { PortfolioChange, PortfolioGrowth, PortfolioTransactionCreate, PortfolioTransactionToDate } from '../models';
@@ -22,7 +22,7 @@ import { PortfolioOperationsService } from '../portfolio-operations/portfolio-op
 })
 export class PortfolioUserFacadeService {
   constructor(
-    private authenticationUserService: AuthenticationUserService,
+    private authenticationUserService: AuthenticationUserStoreService,
     private portfolioGrowthService: PortfolioGrowthService,
     private portfolioOperationsService: PortfolioOperationsService,
     private portfolioCalculationService: PortfolioCalculationService,

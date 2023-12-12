@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import {
   PortfolioUserFacadeService,
@@ -60,7 +60,7 @@ import { DashboardPortfolioChartsComponent } from './dashboard-portfolio-charts/
 })
 export class PageDashboardComponent {
   portfolioUserFacadeService = inject(PortfolioUserFacadeService);
-  authenticationUserService = inject(AuthenticationUserService);
+  authenticationUserService = inject(AuthenticationUserStoreService);
   dialog = inject(MatDialog);
 
   portfolioGrowthDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });

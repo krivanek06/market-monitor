@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { PlatformService } from '../platform/platform.service';
 
-export abstract class LocalStorageService<T> {
+export abstract class StorageLocalStoreService<T> {
   private readonly STORAGE_MAIN_KEY = 'MARKET_MONITOR';
   private storageKey: string;
   private defaultValues: T;

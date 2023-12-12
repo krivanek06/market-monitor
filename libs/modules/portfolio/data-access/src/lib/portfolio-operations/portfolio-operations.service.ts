@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
 import { HistoricalPrice, PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { dateFormatDate, dateGetDetailsInformationFromDate, roundNDigits } from '@market-monitor/shared/utils-general';
 import { isBefore, isValid, isWeekend } from 'date-fns';
 import { firstValueFrom } from 'rxjs';
@@ -27,7 +27,7 @@ import {
 export class PortfolioOperationsService {
   constructor(
     private marketApiService: MarketApiService,
-    private authenticationUserService: AuthenticationUserService,
+    private authenticationUserService: AuthenticationUserStoreService,
     private portfolioApiService: PortfolioApiService,
     private userApiService: UserApiService,
   ) {}
@@ -97,7 +97,7 @@ export class PortfolioOperationsService {
     historicalPrice: HistoricalPrice,
     breakEvenPrice: number,
   ): PortfolioTransaction {
-    const isTransactionFeesActive = this.authenticationUserService.isUserRoleSimulation;
+    const isTransactionFeesActive = this.authenticationUserService.userData.features.userPortfolioAllowCashAccount;
 
     // if custom total value is provided calculate unit price, else use API price
     const unitPrice = input.customTotalValue
@@ -186,7 +186,10 @@ export class PortfolioOperationsService {
     const totalValue = roundNDigits(input.units * historicalPrice.close, 2);
 
     // check if user has enough cash on hand if BUY and cashAccountActive
-    if (input.transactionType === 'BUY' && this.authenticationUserService.isUserRoleSimulation) {
+    if (
+      input.transactionType === 'BUY' &&
+      this.authenticationUserService.userData.features.userPortfolioAllowCashAccount
+    ) {
       // calculate cash on hand from deposits
       const cashOnHandStarting = userData.portfolioState.startingCash;
       // calculate cash on hand from transactions

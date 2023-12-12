@@ -1,7 +1,7 @@
 import { createMock } from '@golevelup/ts-jest';
 import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
 import { HistoricalPrice, PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { Test, TestingModule } from '@nestjs/testing';
 import { addDays, format } from 'date-fns';
@@ -38,7 +38,7 @@ describe('PortfolioCrudService', () => {
     getSymbolSummary: jest.fn(),
     getHistoricalPricesOnDate: jest.fn(),
   });
-  const authenticationUserServiceMock = createMock<AuthenticationUserService>({
+  const authenticationUserServiceMock = createMock<AuthenticationUserStoreService>({
     getUserPortfolioTransactionPromise: jest.fn(),
     userData: user,
   });
@@ -65,7 +65,7 @@ describe('PortfolioCrudService', () => {
       providers: [
         PortfolioOperationsService,
         { provide: MarketApiService, useValue: marketApiServiceMock },
-        { provide: AuthenticationUserService, useValue: authenticationUserServiceMock },
+        { provide: AuthenticationUserStoreService, useValue: authenticationUserServiceMock },
         { provide: PortfolioApiService, useValue: portfolioApiServiceMock },
         { provide: UserApiService, useValue: userApiServiceMock },
       ],

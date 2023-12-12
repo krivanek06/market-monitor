@@ -9,7 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { GroupApiService } from '@market-monitor/api-client';
 import { GROUP_OWNER_LIMIT, GroupData } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import {
   GroupCreateDialogComponent,
   GroupDisplayCardComponent,
@@ -51,7 +51,7 @@ import { map } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageGroupsComponent {
-  authenticationUserService = inject(AuthenticationUserService);
+  authenticationUserService = inject(AuthenticationUserStoreService);
   groupApiService = inject(GroupApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
   dialog = inject(MatDialog);

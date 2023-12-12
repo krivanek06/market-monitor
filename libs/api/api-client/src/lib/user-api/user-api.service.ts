@@ -16,7 +16,6 @@ import {
 import {
   PortfolioTransaction,
   SymbolType,
-  USER_ACCOUNT_TYPE,
   UserData,
   UserPortfolioTransaction,
   UserWatchlist,
@@ -57,9 +56,7 @@ export class UserApiService {
    */
   getUsersByName(name: string): Observable<UserData[]> {
     // TODO: where('personal.displayName', '==', name)
-    return rxCollectionData(
-      query(this.userCollection(), where('personal.accountType', '==', USER_ACCOUNT_TYPE.SIMULATION), limit(10)),
-    );
+    return rxCollectionData(query(this.userCollection(), where('settings.isProfilePublic', '==', true), limit(10)));
   }
 
   addPortfolioTransactionForUser(transaction: PortfolioTransaction): void {
@@ -89,8 +86,8 @@ export class UserApiService {
     setDoc(this.getUserWatchlistDocRef(userId), watchlist, { merge: true });
   }
 
-  addSymbolToUserWatchlist(userId: string, symbol: string, symbolType: SymbolType): void {
-    updateDoc(this.getUserWatchlistDocRef(userId), {
+  addSymbolToUserWatchlist(userId: string, symbol: string, symbolType: SymbolType): Promise<void> {
+    return updateDoc(this.getUserWatchlistDocRef(userId), {
       data: arrayUnion({
         symbol,
         symbolType,
@@ -98,8 +95,8 @@ export class UserApiService {
     });
   }
 
-  removeSymbolFromUserWatchlist(userId: string, symbol: string, symbolType: SymbolType): void {
-    updateDoc(this.getUserWatchlistDocRef(userId), {
+  removeSymbolFromUserWatchlist(userId: string, symbol: string, symbolType: SymbolType): Promise<void> {
+    return updateDoc(this.getUserWatchlistDocRef(userId), {
       data: arrayRemove({
         symbol,
         symbolType,

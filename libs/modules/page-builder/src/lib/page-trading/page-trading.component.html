@@ -5,7 +5,7 @@
       [titleColor]="ColorScheme.PRIMARY_VAR"
       [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
       classes="flex items-start gap-4 justify-between"
-      [showCashSegment]="authenticationUserService.isUserRoleSimulation"
+      [showCashSegment]="!!authenticationUserService.userData.features.userPortfolioAllowCashAccount"
       [portfolioState]="portfolioState"
     ></app-portfolio-state>
   </div>
@@ -54,8 +54,8 @@
     </h2>
     <app-portfolio-transactions-table
       (deleteEmitter)="onTransactionDelete($event)"
-      [showTransactionFees]="authenticationUserService.isUserRoleSimulation"
-      [showActionButton]="!authenticationUserService.isUserRoleSimulation"
+      [showTransactionFees]="!!authenticationUserService.userData.features.userPortfolioAllowCashAccount"
+      [showActionButton]="!authenticationUserService.userData.features.userPortfolioAllowCashAccount"
       [data]="portfolioTransaction()?.transactions ?? [] | sortByKey: 'date' : 'desc'"
     ></app-portfolio-transactions-table>
   </div>

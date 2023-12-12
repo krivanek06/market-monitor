@@ -37,6 +37,7 @@ export const createNewUser = (id: string, personal: UserPersonalInfo): UserData 
     },
     lastLoginDate: getCurrentDateDefaultFormat(),
     accountCreatedDate: getCurrentDateDefaultFormat(),
+    features: {},
   };
   return newUser;
 };

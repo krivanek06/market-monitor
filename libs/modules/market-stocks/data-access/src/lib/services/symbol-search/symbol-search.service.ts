@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { StocksApiService } from '@market-monitor/api-client';
 import { SymbolSearch, SymbolSummary } from '@market-monitor/api-types';
-import { LocalStorageService } from '@market-monitor/shared/utils-client';
+import { StorageLocalStoreService } from '@market-monitor/shared/utils-client';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SymbolSearchService extends LocalStorageService<SymbolSearch[]> {
+export class SymbolSearchService extends StorageLocalStoreService<SymbolSearch[]> {
   private searchedSymbols$ = new BehaviorSubject<SymbolSummary[]>([]);
 
   constructor(private stocksApiService: StocksApiService) {

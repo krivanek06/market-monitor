@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { GroupApiService } from '@market-monitor/api-client';
 import { GROUP_MEMBER_LIMIT, GroupDetails, UserData } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserSearchDialogComponent, UserSearchDialogData } from '@market-monitor/modules/user/features';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS, filterNullish } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, filter, from, of, switchMap, take, tap } from 'rxjs';
@@ -43,7 +43,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
 export class GroupInteractionButtonsComponent {
   @Input({ required: true }) groupDetails!: GroupDetails;
 
-  authenticationUserService = inject(AuthenticationUserService);
+  authenticationUserService = inject(AuthenticationUserStoreService);
   groupApiService = inject(GroupApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
   dialog = inject(MatDialog);

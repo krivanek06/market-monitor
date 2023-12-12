@@ -42,6 +42,8 @@ export type UserData = UserBase & {
    * data about current holdings, calculated from previous transactions
    */
   holdingSnapshot: DataDocsWrapper<PortfolioStateHoldingBase>;
+
+  features: UserFeatures;
 };
 
 /**
@@ -65,16 +67,9 @@ export type UserWatchlist = {
 };
 
 export type UserPersonalInfo = {
-  accountType: USER_ACCOUNT_TYPE;
   photoURL: string | null;
   displayName: string;
 };
-
-export enum USER_ACCOUNT_TYPE {
-  SIMULATION = 'SIMULATION',
-  BASIC = 'BASIC',
-  ADMIN = 'ADMIN',
-}
 
 export type UserSettings = {
   /**

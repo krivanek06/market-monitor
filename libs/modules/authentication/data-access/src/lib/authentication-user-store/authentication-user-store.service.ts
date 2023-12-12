@@ -1,14 +1,16 @@
-import { Injectable, InjectionToken } from '@angular/core';
+import { Injectable, InjectionToken, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GroupApiService, UserApiService } from '@market-monitor/api-client';
 import {
+  PortfolioTransaction,
   SymbolType,
-  USER_ACCOUNT_TYPE,
   UserData,
   UserGroupData,
   UserPortfolioTransaction,
-  UserSettings,
   UserWatchlist,
 } from '@market-monitor/api-types';
+import { StorageSignalsService } from '@market-monitor/shared/utils-client';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { User } from 'firebase/auth';
 import { Observable, combineLatest, firstValueFrom, map, shareReplay, switchMap, tap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
@@ -17,10 +19,17 @@ export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAcc
   'AUTHENTICATION_ACCOUNT_TOKEN',
 );
 
+export type AuthenticationUserStoreServiceSignals = {
+  user: User | null;
+  userData: UserData | null;
+  portfolioTransactions: PortfolioTransaction[];
+  watchlist: UserWatchlist;
+};
+
 @Injectable({
   providedIn: 'root',
 })
-export class AuthenticationUserService {
+export class AuthenticationUserStoreService extends StorageSignalsService<AuthenticationUserStoreServiceSignals> {
   /**
    * prevent multiple calls to the api
    */
@@ -30,17 +39,31 @@ export class AuthenticationUserService {
     shareReplay(1),
   );
 
-  private userWatchlist$ = this.authenticationAccountService.getUserData().pipe(
-    switchMap((userData) => this.userApiService.getUserWatchlist(userData.id)),
-    tap(() => console.log(`AuthenticationUserService: getUserWatchlist`)),
-    shareReplay(1),
-  );
-
   constructor(
     private authenticationAccountService: AuthenticationAccountService,
     private userApiService: UserApiService,
     private groupApiService: GroupApiService,
-  ) {}
+  ) {
+    super('AuthenticationUserStoreService', {
+      user: null,
+      userData: null,
+      portfolioTransactions: [],
+      watchlist: {
+        createdDate: getCurrentDateDefaultFormat(),
+        data: [],
+      },
+    });
+
+    this.authenticationAccountService
+      .getUserData()
+      .pipe(
+        switchMap((userData) => this.userApiService.getUserWatchlist(userData.id)),
+        takeUntilDestroyed(),
+      )
+      .subscribe((watchlist) => {
+        this.setKey('watchlist', watchlist);
+      });
+  }
 
   get user(): User {
     return this.authenticationAccountService.user;
@@ -50,21 +73,21 @@ export class AuthenticationUserService {
     return this.authenticationAccountService.userData;
   }
 
-  get userSettings(): UserSettings {
-    return this.userData.settings;
-  }
+  // get userSettings(): UserSettings {
+  //   return this.userData.settings;
+  // }
 
-  get isUserRoleAdmin(): boolean {
-    return this.userData.personal.accountType === USER_ACCOUNT_TYPE.ADMIN;
-  }
+  // get isUserRoleAdmin(): boolean {
+  //   return this.userData.personal.accountType === USER_ACCOUNT_TYPE.ADMIN;
+  // }
 
-  get isUserRoleBasic(): boolean {
-    return this.userData.personal.accountType === USER_ACCOUNT_TYPE.BASIC;
-  }
+  // get isUserRoleBasic(): boolean {
+  //   return this.userData.personal.accountType === USER_ACCOUNT_TYPE.BASIC;
+  // }
 
-  get isUserRoleSimulation(): boolean {
-    return this.userData.personal.accountType === USER_ACCOUNT_TYPE.SIMULATION;
-  }
+  // get isUserRoleSimulation(): boolean {
+  //   return this.userData.personal.accountType === USER_ACCOUNT_TYPE.SIMULATION;
+  // }
 
   getUserData(): Observable<UserData> {
     return this.authenticationAccountService.getUserData();
@@ -106,9 +129,9 @@ export class AuthenticationUserService {
     return firstValueFrom(this.userPortfolioTransaction$);
   }
 
-  getUserWatchlist(): Observable<UserWatchlist> {
-    return this.userWatchlist$;
-  }
+  getUserWatchlist = this.select((store) => store.watchlist);
+  isSymbolInWatchlist = (symbol: string) =>
+    computed(() => !!this.getUserWatchlist().data.find((d) => d.symbol === symbol));
 
   updateUserData(userData: Partial<UserData>): void {
     this.userApiService.updateUser(this.userData.id, userData);
@@ -118,15 +141,15 @@ export class AuthenticationUserService {
     this.userApiService.updateUserPortfolioTransaction(this.userData.id, transaction);
   }
 
-  addSymbolToUserWatchlist(symbol: string, symbolType: SymbolType): void {
-    this.userApiService.addSymbolToUserWatchlist(this.userData.id, symbol, symbolType);
+  addSymbolToUserWatchlist(symbol: string, symbolType: SymbolType) {
+    return this.userApiService.addSymbolToUserWatchlist(this.userData.id, symbol, symbolType);
   }
 
-  removeSymbolFromUserWatchlist(symbol: string, symbolType: SymbolType): void {
-    this.userApiService.removeSymbolFromUserWatchlist(this.userData.id, symbol, symbolType);
+  removeSymbolFromUserWatchlist(symbol: string, symbolType: SymbolType) {
+    return this.userApiService.removeSymbolFromUserWatchlist(this.userData.id, symbol, symbolType);
   }
 
-  isSymbolInWatchlist(symbol: string): Observable<boolean> {
-    return this.userWatchlist$.pipe(map((watchlist) => !!watchlist.data.find((d) => d.symbol === symbol)));
-  }
+  // isSymbolInWatchlist(symbol: string): Observable<boolean> {
+  //   return this.userWatchlist$.pipe(map((watchlist) => !!watchlist.data.find((d) => d.symbol === symbol)));
+  // }
 }
