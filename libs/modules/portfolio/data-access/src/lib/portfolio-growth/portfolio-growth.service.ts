@@ -8,7 +8,6 @@ import {
   PortfolioState,
   PortfolioStateHoldings,
   PortfolioTransaction,
-  UserPortfolioTransaction,
 } from '@market-monitor/api-types';
 import {
   getPortfolioStateHoldingBaseUtil,
@@ -26,12 +25,12 @@ export class PortfolioGrowthService {
 
   getPortfolioStateHoldings(
     previousPortfolioState: PortfolioState,
-    portfolioTransactions: UserPortfolioTransaction,
+    transactions: PortfolioTransaction[],
   ): Observable<PortfolioStateHoldings> {
     console.log(`PortfolioGrowthService: getPortfolioState`);
 
     // get partial holdings calculations
-    const partialHoldings = getPortfolioStateHoldingBaseUtil(portfolioTransactions.transactions);
+    const partialHoldings = getPortfolioStateHoldingBaseUtil(transactions);
     const partialHoldingSymbols = partialHoldings.map((d) => d.symbol);
 
     // get symbol summaries from API
@@ -39,12 +38,7 @@ export class PortfolioGrowthService {
       .getSymbolSummaries(partialHoldingSymbols)
       .pipe(
         map((summaries) =>
-          getPortfolioStateHoldingsUtil(
-            previousPortfolioState.startingCash,
-            portfolioTransactions.transactions,
-            partialHoldings,
-            summaries,
-          ),
+          getPortfolioStateHoldingsUtil(previousPortfolioState.startingCash, transactions, partialHoldings, summaries),
         ),
       );
   }

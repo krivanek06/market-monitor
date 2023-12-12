@@ -87,9 +87,8 @@ export class PortfolioTradeDialogComponent {
   };
 
   // get holding information for symbol if there is any
-  holdingSignal = toSignal(this.portfolioUserFacadeService.getPortfolioStateHolding(this.data.summary.id));
-  portfolioState = toSignal(this.portfolioUserFacadeService.getPortfolioState());
-
+  holdingSignal = this.portfolioUserFacadeService.getPortfolioStateHolding(this.data.summary.id);
+  portfolioState = this.portfolioUserFacadeService.getPortfolioState;
   /**
    * load current price or use from summary
    * can be mismatch during the weekend whe loading fails, however quote has the price from friday

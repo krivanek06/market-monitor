@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
@@ -66,12 +65,12 @@ export class PageDashboardComponent {
   portfolioGrowthDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
   portfolioChangeDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 
-  portfolioStateSignal = toSignal(this.portfolioUserFacadeService.getPortfolioState());
+  portfolioStateSignal = this.portfolioUserFacadeService.getPortfolioState;
 
-  portfolioChangeSignal = toSignal(this.portfolioUserFacadeService.getPortfolioChange());
-  portfolioAssetAllocation = toSignal(this.portfolioUserFacadeService.getPortfolioAssetAllocationPieChart());
-  portfolioSectorAllocation = toSignal(this.portfolioUserFacadeService.getPortfolioSectorAllocationPieChart());
-  portfolioTransactionToDateSignal = toSignal(this.portfolioUserFacadeService.getPortfolioTransactionToDate());
+  portfolioChangeSignal = this.portfolioUserFacadeService.getPortfolioChange;
+  portfolioAssetAllocation = this.portfolioUserFacadeService.getPortfolioAssetAllocationPieChart;
+  portfolioSectorAllocation = this.portfolioUserFacadeService.getPortfolioSectorAllocationPieChart;
+  portfolioTransactionToDateSignal = this.portfolioUserFacadeService.getPortfolioTransactionToDate;
 
   ColorScheme = ColorScheme;
   dashboardChartOptionsInputSource = dashboardChartOptionsInputSource;

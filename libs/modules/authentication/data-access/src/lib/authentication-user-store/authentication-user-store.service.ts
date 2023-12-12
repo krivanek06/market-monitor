@@ -54,6 +54,11 @@ export class AuthenticationUserStoreService extends StorageSignalsService<Authen
       },
     });
 
+    this.initWatchlist();
+    this.initPortfolioTransactions();
+  }
+
+  private initWatchlist() {
     this.authenticationAccountService
       .getUserData()
       .pipe(
@@ -62,6 +67,18 @@ export class AuthenticationUserStoreService extends StorageSignalsService<Authen
       )
       .subscribe((watchlist) => {
         this.setKey('watchlist', watchlist);
+      });
+  }
+
+  private initPortfolioTransactions() {
+    this.authenticationAccountService
+      .getUserData()
+      .pipe(
+        switchMap((userData) => this.userApiService.getUserPortfolioTransactions(userData.id)),
+        takeUntilDestroyed(),
+      )
+      .subscribe((portfolioTransactions) => {
+        this.setKey('portfolioTransactions', portfolioTransactions.transactions);
       });
   }
 
@@ -121,9 +138,7 @@ export class AuthenticationUserStoreService extends StorageSignalsService<Authen
     );
   }
 
-  getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {
-    return this.userPortfolioTransaction$;
-  }
+  getUserPortfolioTransactions = this.select((store) => store.portfolioTransactions);
 
   getUserPortfolioTransactionPromise(): Promise<UserPortfolioTransaction> {
     return firstValueFrom(this.userPortfolioTransaction$);

@@ -56,7 +56,7 @@
       (deleteEmitter)="onTransactionDelete($event)"
       [showTransactionFees]="!!authenticationUserService.userData.features.userPortfolioAllowCashAccount"
       [showActionButton]="!authenticationUserService.userData.features.userPortfolioAllowCashAccount"
-      [data]="portfolioTransaction()?.transactions ?? [] | sortByKey: 'date' : 'desc'"
+      [data]="portfolioTransaction() | sortByKey: 'date' : 'desc'"
     ></app-portfolio-transactions-table>
   </div>
 

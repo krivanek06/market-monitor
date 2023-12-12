@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -98,8 +98,7 @@ export class PageMenuComponent implements OnInit {
 
   constructor() {
     this.loaderMainService.setLoading(true);
-    this.portfolioUserFacadeService
-      .getPortfolioState()
+    toObservable(this.portfolioUserFacadeService.getPortfolioState)
       .pipe(
         tap(() => this.loaderMainService.setLoading(false)),
         take(1),
