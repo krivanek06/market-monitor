@@ -14,6 +14,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "strict": true,
     "paths": {
       "@market-monitor/api-client": ["libs/api/api-client/src/index.ts"],
       "@market-monitor/api-external": ["libs/api/api-external/src/index.ts"],

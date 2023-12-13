@@ -48,6 +48,11 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // load all members of the group
   const ownerData = (await userDocumentRef(group.ownerUserId).get()).data();
 
+  if (!ownerData) {
+    console.error(`Owner not found for group ${group.id}`);
+    return;
+  }
+
   /**
    * difference is membersPreviousData can contain less people, those who accepted membership only today
    */
@@ -64,7 +69,7 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // save only last N transactions for everybody - order by date desc
   const lastTransactions = memberTransactionHistory
     .map((d) => d.data())
-    .reduce((acc, val) => [...acc, ...val.transactions.slice(0, 10)], [] as PortfolioTransaction[])
+    .reduce((acc, val) => [...acc, ...(val?.transactions ?? []).slice(0, 10)], [] as PortfolioTransaction[])
     .sort((a, b) => (b.date < a.date ? -1 : 1))
     .slice(0, 250);
 
@@ -91,28 +96,41 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // calculate portfolioState from all members
   const memberPortfolioState = membersCurrentData
     .map((d) => d.portfolioState)
-    .reduce((acc, curr) => {
-      if (!acc) {
-        return curr;
-      }
-      const result: PortfolioState = {
-        balance: acc.balance + curr.balance,
-        cashOnHand: acc.cashOnHand + curr.cashOnHand,
-        holdingsBalance: acc.holdingsBalance + curr.holdingsBalance,
-        invested: acc.invested + curr.invested,
-        numberOfExecutedBuyTransactions: acc.numberOfExecutedBuyTransactions + curr.numberOfExecutedBuyTransactions,
-        numberOfExecutedSellTransactions: acc.numberOfExecutedSellTransactions + curr.numberOfExecutedSellTransactions,
-        startingCash: acc.startingCash + curr.startingCash,
-        transactionFees: acc.transactionFees + curr.transactionFees,
+    .reduce(
+      (acc, curr) => ({
+        ...{
+          balance: acc.balance + curr.balance,
+          cashOnHand: acc.cashOnHand + curr.cashOnHand,
+          holdingsBalance: acc.holdingsBalance + curr.holdingsBalance,
+          invested: acc.invested + curr.invested,
+          numberOfExecutedBuyTransactions: acc.numberOfExecutedBuyTransactions + curr.numberOfExecutedBuyTransactions,
+          numberOfExecutedSellTransactions:
+            acc.numberOfExecutedSellTransactions + curr.numberOfExecutedSellTransactions,
+          startingCash: acc.startingCash + curr.startingCash,
+          transactionFees: acc.transactionFees + curr.transactionFees,
+          date: getCurrentDateDefaultFormat(),
+          totalGainsPercentage: 0,
+          totalGainsValue: 0,
+          firstTransactionDate: null,
+          lastTransactionDate: null,
+        },
+      }),
+      {
+        balance: 0,
+        cashOnHand: 0,
+        holdingsBalance: 0,
+        invested: 0,
+        numberOfExecutedBuyTransactions: 0,
+        numberOfExecutedSellTransactions: 0,
+        startingCash: 0,
+        transactionFees: 0,
         date: getCurrentDateDefaultFormat(),
         totalGainsPercentage: 0,
         totalGainsValue: 0,
         firstTransactionDate: null,
         lastTransactionDate: null,
-      };
-
-      return result;
-    }, null as PortfolioState);
+      } satisfies PortfolioState,
+    );
 
   // calculate additional fields
   memberPortfolioState.totalGainsValue = roundNDigits(

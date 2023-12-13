@@ -13,7 +13,7 @@ import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../m
  * - return removed user
  */
 export const groupMemberRemoveCall = onCall(async (request) => {
-  const userAuthId = request.auth.uid as string;
+  const userAuthId = request.auth?.uid as string;
   const data = request.data as GroupBaseInput;
 
   const groupData = (await groupDocumentRef(data.groupId).get()).data();
@@ -22,6 +22,11 @@ export const groupMemberRemoveCall = onCall(async (request) => {
   // check if group exists
   if (!groupData) {
     throw new HttpsError('not-found', 'Group does not exist');
+  }
+
+  // check if member data exists
+  if (!groupMemberData) {
+    throw new HttpsError('not-found', 'Group member does not exist');
   }
 
   // check if authenticated user is owner or the user who leaves

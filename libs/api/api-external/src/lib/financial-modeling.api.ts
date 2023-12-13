@@ -514,7 +514,6 @@ export const getCalendarStockIPOs = async (
   // change key name 'ipoDate' to 'date';
   filteredOutResponse.forEach((item) => {
     item.date = item.ipoDate;
-    delete item.ipoDate;
   });
 
   return filteredOutResponse;
@@ -672,10 +671,19 @@ export const getStockScreening = async (values: StockScreenerValues): Promise<St
   return filteredResponse;
 };
 
-export const getEconomicData = async (endpointKey: MarketOverviewSubKey<'general'>): Promise<ChartDataType> => {
-  const url = `${FINANCIAL_MODELING_URL}/v4/economic?name=${endpointKey}&apikey=${FINANCIAL_MODELING_KEY}`;
-  const response = await fetch(url);
-  const data = (await response.json()) as { date: string; value: number }[];
-  const formattedData = data.map((d) => [d.date, d.value] as [string, number]) satisfies ChartDataType;
-  return formattedData;
+export const getEconomicData = async (endpointKey?: MarketOverviewSubKey<'general'>): Promise<ChartDataType> => {
+  if (!endpointKey) {
+    return [];
+  }
+
+  try {
+    const url = `${FINANCIAL_MODELING_URL}/v4/economic?name=${endpointKey}&apikey=${FINANCIAL_MODELING_KEY}`;
+    const response = await fetch(url);
+    const data = (await response.json()) as { date: string; value: number }[];
+    const formattedData = data.map((d) => [d.date, d.value] as [string, number]) satisfies ChartDataType;
+    return formattedData;
+  } catch (e) {
+    console.log('error in getEconomicData', e);
+    return [];
+  }
 };

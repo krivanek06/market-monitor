@@ -5,11 +5,16 @@ import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../m
 import { transformUserToGroupMember } from './../utils/transform.util';
 
 export const groupAddOwnerIntoGroupCall = onCall(async (request) => {
-  const userAuthId = request.auth.uid as string;
+  const userAuthId = request.auth?.uid as string;
   const groupId = request.data as string;
 
   const groupData = (await groupDocumentRef(groupId).get()).data();
   const userData = (await userDocumentRef(userAuthId).get()).data();
+
+  // check if user exists
+  if (!userData) {
+    throw new HttpsError('not-found', 'User does not exist');
+  }
 
   // check if group exists
   if (!groupData) {

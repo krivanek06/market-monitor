@@ -21,6 +21,16 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
   const groupData = (await groupDocumentRef(data.groupId).get()).data();
   const userData = (await userDocumentRef(data.userId).get()).data();
 
+  // check if group exists
+  if (!groupData) {
+    throw new HttpsError('not-found', 'Group does not exist');
+  }
+
+  // check if user exists
+  if (!userData) {
+    throw new HttpsError('not-found', 'User does not exist');
+  }
+
   // check if authenticated user is owner
   if (groupData.ownerUserId !== userAuthId) {
     throw new HttpsError('aborted', 'User is not owner');

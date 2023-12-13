@@ -132,7 +132,7 @@ const loadMarketOverviewData = async <T extends MarketOverviewKey>(
   // resolve endpoint
   if (collection.provider === 'financialmodelingprep') {
     const collectionData = collection.data.find((d) => d.keyReadable === subKey);
-    return getEconomicData(collectionData.key);
+    return getEconomicData(collectionData?.key);
   }
 
   if (collection.provider === 'quandl') {
@@ -148,18 +148,20 @@ const loadMarketOverviewData = async <T extends MarketOverviewKey>(
     // TODO: error:  has signatures, but none of those signatures are compatible with each other.
     if (collection.name === 'Bonds') {
       const collectionData = collection.data.find((d) => d.keyReadable === subKey);
-      return getQuandlDataFormatter(collectionData.key);
+      return getQuandlDataFormatter(collectionData?.key);
     }
     if (collection.name === 'Bitcoin') {
       const collectionData = collection.data.find((d) => d.keyReadable === subKey);
-      return getQuandlDataFormatter(collectionData.key);
+      return getQuandlDataFormatter(collectionData?.key);
     }
 
     if (collection.name === 'S&P 500') {
       const collectionData = collection.data.find((d) => d.keyReadable === subKey);
-      return getQuandlDataFormatter(collectionData.key);
+      return getQuandlDataFormatter(collectionData?.key);
     }
   }
+
+  throw new Error(`Unable to find data for: [${key}] - [${subKey}]`);
 };
 
 const delaySeconds = (seconds: number) => new Promise((res) => setTimeout(res, seconds * 1000));

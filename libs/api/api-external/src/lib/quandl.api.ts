@@ -43,7 +43,10 @@ const getQuandlDataGeneric = async <T extends QuandlResponseDataTypes>(key: stri
   }
 };
 
-export const getQuandlDataFormatter = async (key: string): Promise<[string, number][]> => {
+export const getQuandlDataFormatter = async (key?: string): Promise<[string, number][]> => {
+  if (!key) {
+    return [];
+  }
   return (await getQuandlDataGeneric<[string, number][]>(key)).data;
 };
 

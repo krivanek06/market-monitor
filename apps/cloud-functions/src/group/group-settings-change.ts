@@ -12,7 +12,7 @@ import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../m
  * - remove group members
  */
 export const groupSettingsChangeCall = onCall(async (request) => {
-  const userAuthId = request.auth.uid as string;
+  const userAuthId = request.auth!.uid as string;
   const data = request.data as GroupSettingsChangeInput;
 
   const groupData = (await groupDocumentRef(data.groupId).get()).data();
@@ -26,6 +26,11 @@ export const groupSettingsChangeCall = onCall(async (request) => {
   // check if owner
   if (groupData.ownerUserId !== userAuthId) {
     throw new HttpsError('failed-precondition', 'User is not owner');
+  }
+
+  // check if member data exists
+  if (!groupMemberData) {
+    throw new HttpsError('not-found', 'Group member does not exist');
   }
 
   // update group data

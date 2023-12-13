@@ -13,7 +13,7 @@ import { groupDocumentRef, userDocumentRef } from '../models';
  * - add group to user groupInvitations
  */
 export const groupMemberInviteMultipleCall = onCall(async (request) => {
-  const userAuthId = request.auth.uid as string;
+  const userAuthId = request.auth?.uid as string;
   const data = request.data as GroupBaseInputInviteMembers;
 
   const groupData = (await groupDocumentRef(data.groupId).get()).data();
