@@ -39,7 +39,7 @@ export class PortfolioGrowthService {
   }
 
   async getPortfolioGrowthAssets(transactions: PortfolioTransaction[]): Promise<PortfolioGrowthAssets[]> {
-    console.log(`PortfolioGrowthService: getPortfolioGrowthAssets`);
+    console.log(`PortfolioGrowthService: getPortfolioGrowthAssets`, transactions);
     // from transactions get all distinct symbols with soonest date of transaction
     const transactionStart = transactions.reduce(
       (acc, curr) => {

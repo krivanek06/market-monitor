@@ -19,7 +19,7 @@ import {
   FormMatInputWrapperComponent,
 } from '@market-monitor/shared/ui';
 import { isAfter, isBefore } from 'date-fns';
-import { map, startWith, tap } from 'rxjs';
+import { combineLatest, map, startWith, tap } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-portfolio-charts',
@@ -54,18 +54,19 @@ export class DashboardPortfolioChartsComponent {
   portfolioRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 
   portfolioAssetsGrowthSignal = this.portfolioUserFacadeService.getPortfolioGrowthAssets;
+
   portfolioGrowthChartSignal = toSignal(
-    this.portfolioRangeControl.valueChanges.pipe(
-      startWith(null),
-      map((dateRange) => this.filterDataByDateRange(this.portfolioUserFacadeService.getPortfolioGrowth(), dateRange)),
-    ),
+    combineLatest([
+      this.portfolioRangeControl.valueChanges.pipe(startWith(null)),
+      toObservable(this.portfolioUserFacadeService.getPortfolioGrowth),
+    ]).pipe(map(([dateRange, data]) => this.filterDataByDateRange(data, dateRange))),
   );
 
   portfolioChangeChartSignal = toSignal(
-    this.portfolioRangeControl.valueChanges.pipe(
-      startWith(null),
-      map((dateRange) => this.filterDataByDateRange(this.portfolioUserFacadeService.getPortfolioGrowth(), dateRange)),
-    ),
+    combineLatest([
+      this.portfolioRangeControl.valueChanges.pipe(startWith(null)),
+      toObservable(this.portfolioUserFacadeService.getPortfolioGrowth),
+    ]).pipe(map(([dateRange, data]) => this.filterDataByDateRange(data, dateRange))),
   );
 
   constructor() {

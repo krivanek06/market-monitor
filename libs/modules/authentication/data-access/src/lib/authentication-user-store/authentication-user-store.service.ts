@@ -1,4 +1,4 @@
-import { Injectable, InjectionToken, inject } from '@angular/core';
+import { Injectable, InjectionToken, effect, inject } from '@angular/core';
 import { GroupApiService, UserApiService } from '@market-monitor/api-client';
 import {
   PortfolioTransaction,
@@ -18,6 +18,14 @@ export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAcc
 );
 
 type AuthenticationState = {
+  /**
+   * flag to indicate if authentication is loaded
+   */
+  authenticationLoaded: boolean;
+
+  /**
+   * data of authenticated user
+   */
   user: User | null;
   userData: UserData | null;
   userGroupData: UserGroupData | null;
@@ -34,6 +42,7 @@ export class AuthenticationUserStoreService {
   private groupApiService = inject(GroupApiService);
 
   private initialState: AuthenticationState = {
+    authenticationLoaded: false,
     user: null,
     userData: null,
     userGroupData: null,
@@ -43,6 +52,12 @@ export class AuthenticationUserStoreService {
       data: [],
     },
   };
+
+  private loadedAuthenticationSource$ = this.authenticationAccountService.getLoadedAuthentication().pipe(
+    map((loaded) => ({
+      authenticationLoaded: loaded,
+    })),
+  );
 
   /**
    * Source used to get user data
@@ -113,6 +128,7 @@ export class AuthenticationUserStoreService {
       this.watchListSource$,
       this.portfolioTransactionsSource$,
       this.userGroupDataSource$,
+      this.loadedAuthenticationSource$,
     ],
     actionSources: {
       // updates user data
@@ -160,4 +176,10 @@ export class AuthenticationUserStoreService {
     //   },
     // }),
   });
+
+  constructor() {
+    effect(() => {
+      console.log('AUTHENTICATION STATE', this.state());
+    });
+  }
 }

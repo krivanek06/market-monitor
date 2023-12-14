@@ -1,8 +1,8 @@
 import { Injectable, computed } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { PortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { from } from 'rxjs';
+import { from, switchMap } from 'rxjs';
 import { PortfolioTransactionCreate } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.service';
@@ -23,24 +23,26 @@ export class PortfolioUserFacadeService {
   ) {}
 
   getPortfolioState = toSignal(
-    this.portfolioGrowthService.getPortfolioStateHoldings(
-      this.authenticationUserService.state.getUserPortfolioTransactions(),
-      this.authenticationUserService.state.userData()?.portfolioState.startingCash,
+    toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
+      switchMap((transactions) =>
+        this.portfolioGrowthService.getPortfolioStateHoldings(
+          transactions,
+          this.authenticationUserService.state.userData()?.portfolioState.startingCash,
+        ),
+      ),
     ),
-    { initialValue: null },
   );
 
   getPortfolioStateHolding = (symbol: string) =>
     computed(() => this.getPortfolioState()?.holdings.find((holding) => holding.symbol === symbol));
 
   getPortfolioGrowthAssets = toSignal(
-    from(
-      this.portfolioGrowthService.getPortfolioGrowthAssets(
-        this.authenticationUserService.state().portfolioTransactions,
-      ),
+    toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
+      switchMap((transactions) => from(this.portfolioGrowthService.getPortfolioGrowthAssets(transactions))),
     ),
     { initialValue: [] },
   );
+
   getPortfolioGrowth = computed(() =>
     this.portfolioCalculationService.getPortfolioGrowth(
       this.getPortfolioGrowthAssets(),

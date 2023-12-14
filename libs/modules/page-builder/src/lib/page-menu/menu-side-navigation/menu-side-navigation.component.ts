@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Router, RouterModule } from '@angular/router';
-import { AuthenticationAccountService } from '@market-monitor/modules/authentication/data-access';
+import {
+  AuthenticationAccountService,
+  AuthenticationUserStoreService,
+} from '@market-monitor/modules/authentication/data-access';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
 import { sideNavigation } from './menu-routing.model';
@@ -27,8 +29,9 @@ import { sideNavigation } from './menu-routing.model';
 export class MenuSideNavigationComponent implements OnInit {
   private router = inject(Router);
   private authenticationService = inject(AuthenticationAccountService);
+  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
 
-  userDataSignal = toSignal(this.authenticationService.getUserData());
+  userDataSignal = this.authenticationUserStoreService.state.getUserData;
 
   sideNavigation = sideNavigation;
   selectedNavigationPath = '';

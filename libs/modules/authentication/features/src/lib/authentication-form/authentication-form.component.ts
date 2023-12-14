@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import {
   AUTHENTICATION_ERRORS,
   AuthenticationAccountService,
+  AuthenticationUserStoreService,
   LoginUserInput,
   RegisterUserInput,
 } from '@market-monitor/modules/authentication/data-access';
@@ -49,6 +50,7 @@ export class AuthenticationFormComponent {
   registerUserInputControl = new FormControl<RegisterUserInput | null>(null);
 
   authenticationAccountService = inject(AuthenticationAccountService);
+  authenticationUserStoreService = inject(AuthenticationUserStoreService);
   dialogServiceUtil = inject(DialogServiceUtil);
   router = inject(Router);
   loadingSnipperShowSignal = signal(false);

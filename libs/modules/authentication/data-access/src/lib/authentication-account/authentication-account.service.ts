@@ -12,7 +12,7 @@ import { UserApiService } from '@market-monitor/api-client';
 import { UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
 import { isNonNullable } from '@market-monitor/shared/utils-client';
 import { dateFormatDate } from '@market-monitor/shared/utils-general';
-import { BehaviorSubject, Observable, map, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, map, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 
 @Injectable({
@@ -21,6 +21,7 @@ import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 export class AuthenticationAccountService {
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
   private authenticatedUser$ = new BehaviorSubject<User | null>(null);
+  private loadedAuthentication$ = new Subject<boolean>();
 
   constructor(
     private auth: Auth,
@@ -36,6 +37,10 @@ export class AuthenticationAccountService {
 
   getUser(): Observable<User | null> {
     return this.authenticatedUser$.asObservable();
+  }
+
+  getLoadedAuthentication(): Observable<boolean> {
+    return this.loadedAuthentication$.asObservable();
   }
 
   signIn(input: LoginUserInput): Promise<UserCredential> {
@@ -77,6 +82,7 @@ export class AuthenticationAccountService {
       .subscribe((userData) => {
         console.log('UPDATING USER', userData);
         this.authenticatedUserData$.next(userData);
+        this.loadedAuthentication$.next(true);
       });
   }
 
@@ -108,7 +114,7 @@ export class AuthenticationAccountService {
       transactions: [],
     };
 
-    const newWatchlist: UserWatchlist = {
+    const newWatchList: UserWatchlist = {
       createdDate: dateFormatDate(new Date()),
       data: [],
     };
@@ -119,8 +125,8 @@ export class AuthenticationAccountService {
     // create portfolio for user
     this.userApiService.updateUserPortfolioTransaction(newUserData.id, newTransactions);
 
-    // create empty watchlist
-    this.userApiService.updateUserWatchList(newUserData.id, newWatchlist);
+    // create empty watchList
+    this.userApiService.updateUserWatchList(newUserData.id, newWatchList);
 
     // return new user data
     return newUserData;

@@ -120,6 +120,8 @@ export class PortfolioTradeDialogComponent {
    */
   insufficientCashErrorSignal = signal<boolean>(false);
 
+  userDataSignal = this.authenticationUserService.state.getUserData;
+
   USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
 
   constructor(
@@ -242,10 +244,7 @@ export class PortfolioTradeDialogComponent {
    */
   private listenOnInSufficientCash(): void {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((form) => {
-      if (
-        this.data.transactionType === 'SELL' ||
-        !this.authenticationUserService.state.getUserData().features.userPortfolioAllowCashAccount
-      ) {
+      if (this.data.transactionType === 'SELL' || !this.userDataSignal().features.userPortfolioAllowCashAccount) {
         return;
       }
 
