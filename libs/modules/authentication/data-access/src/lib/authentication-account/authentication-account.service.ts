@@ -10,7 +10,7 @@ import {
 } from '@angular/fire/auth';
 import { UserApiService } from '@market-monitor/api-client';
 import { UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
-import { isNonNullable } from '@market-monitor/shared/utils-client';
+import { filterNullish } from '@market-monitor/shared/utils-client';
 import { dateFormatDate } from '@market-monitor/shared/utils-general';
 import { BehaviorSubject, Observable, Subject, map, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
@@ -32,7 +32,7 @@ export class AuthenticationAccountService {
   }
 
   getUserData(): Observable<UserData> {
-    return this.authenticatedUserData$.pipe(isNonNullable());
+    return this.authenticatedUserData$.pipe(filterNullish());
   }
 
   getUser(): Observable<User | null> {
