@@ -77,12 +77,12 @@ export class UserApiService {
 
   /* watchlist */
 
-  getUserWatchlist(userId: string): Observable<UserWatchlist> {
+  getUserWatchList(userId: string): Observable<UserWatchlist> {
     console.log('calling watchlist api');
     return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchlist => !!d));
   }
 
-  updateUserWatchlist(userId: string, watchlist: Partial<UserWatchlist>): void {
+  updateUserWatchList(userId: string, watchlist: Partial<UserWatchlist>): void {
     setDoc(this.getUserWatchlistDocRef(userId), watchlist, { merge: true });
   }
 

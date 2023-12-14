@@ -91,19 +91,15 @@ export class GroupCreateDialogComponent implements OnInit {
     { initialValue: GROUP_MEMBER_LIMIT },
   );
 
-  /**
-   * Limit of groups that can be created
-   */
-  createGroupLimitSignal = toSignal(
-    this.authenticationUserService.getUserGroupsData().pipe(
-      map((groups) => groups.groupOwner.map((d) => !d.isClosed)),
-      map((openGroups) => GROUP_OWNER_LIMIT - openGroups.length),
-    ),
-    { initialValue: GROUP_OWNER_LIMIT },
+  createGroupLimitSignal = computed(
+    () =>
+      GROUP_OWNER_LIMIT -
+      (this.authenticationUserService.state.userGroupData()?.groupOwner.filter((d) => !d.isClosed).length ?? 0),
   );
+
   allowCreateGroup = computed(() => this.createGroupLimitSignal() > 0);
 
-  authenticatedUserData = this.authenticationUserService.userData;
+  authenticatedUserDataSignal = this.authenticationUserService.state.userData;
 
   constructor(
     private dialogRef: MatDialogRef<GroupCreateDialogComponent>,
@@ -171,7 +167,7 @@ export class GroupCreateDialogComponent implements OnInit {
       }
 
       // prevent adding myself as a member
-      if (userData.id === this.authenticationUserService.userData.id) {
+      if (userData.id === this.authenticationUserService.state().userData!.id) {
         this.dialogServiceUtil.showNotificationBar(
           'You cannot add invite yourself. Check the above checkbox for it',
           'error',

@@ -4,7 +4,7 @@
       <app-portfolio-state
         [titleColor]="ColorScheme.PRIMARY_VAR"
         [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-        [showCashSegment]="!!authenticationUserService.userData.features.userPortfolioAllowCashAccount"
+        [showCashSegment]="!!userDataSignal().features.userPortfolioAllowCashAccount"
         [portfolioState]="portfolioState"
       ></app-portfolio-state>
     </app-fancy-card>
@@ -20,7 +20,7 @@
       <app-portfolio-state-transactions
         [titleColor]="ColorScheme.DANGER_VAR"
         [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-        [showFees]="!!authenticationUserService.userData.features.userPortfolioAllowCashAccount"
+        [showFees]="!!userDataSignal().features.userPortfolioAllowCashAccount"
         [portfolioState]="portfolioState"
       ></app-portfolio-state-transactions>
     </app-fancy-card>
@@ -50,7 +50,7 @@
       [series]="[portfolioAssetAllocation]"
     ></app-generic-chart>
     <app-generic-chart
-      *ngIf="portfolioSectorAllocation() as portfolioSectorAllocation"
+      *ngIf="portfolioSectorAllocationSignal() as portfolioSectorAllocation"
       [heightPx]="380"
       chartTitle="Sector Allocation"
       [showDataLabel]="true"
@@ -75,7 +75,7 @@
   </div>
 
   <!-- transactions chart -->
-  <ng-container *ngIf="!!authenticationUserService.userData.features.userPortfolioAllowCashAccount">
+  <ng-container *ngIf="!!userDataSignal().features.userPortfolioAllowCashAccount">
     <app-portfolio-transaction-chart
       *ngIf="portfolioTransactionToDateSignal() as portfolioTransactionToDateSignal"
       [data]="portfolioTransactionToDateSignal"

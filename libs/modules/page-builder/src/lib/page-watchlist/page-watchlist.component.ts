@@ -44,8 +44,8 @@ export class PageWatchlistComponent implements OnInit {
   /**
    * all symbols in the user's watchlist
    */
-  userWatchlistSymbolsSignal = computed(() =>
-    this.authenticationUserService.getUserWatchlist().data.map((d) => d.symbol),
+  userWatchListSymbolsSignal = computed(() =>
+    this.authenticationUserService.state.watchList().data.map((d) => d.symbol),
   );
 
   searchSymbolControl = new FormControl<SymbolSummary | null>(null, { nonNullable: true });
@@ -56,31 +56,27 @@ export class PageWatchlistComponent implements OnInit {
 
   ngOnInit(): void {
     this.searchSymbolControl.valueChanges
-      .pipe(
-        filter((value): value is SymbolSummary => !!value),
-        // switchMap((summary) =>
-        //   this.authenticationUserService.isSymbolInWatchlist(summary.id).pipe(
-        //     map((isInWatchlist) => ({ summary, isInWatchlist })),
-        //     take(1),
-        //   ),
-        // ),
-      )
+      .pipe(filter((value): value is SymbolSummary => !!value))
       .subscribe((summary) => {
-        const isInWatchlistSignal = this.authenticationUserService.isSymbolInWatchlist(summary.id);
-        console.log(summary, isInWatchlistSignal());
+        const isInWatchList = this.authenticationUserService.state.isSymbolInWatchList()(summary.id);
+        console.log(summary, isInWatchList);
 
-        if (isInWatchlistSignal()) {
-          this.dialogServiceUtil.showNotificationBar('Symbol already in watchlist', 'error', 3000);
+        if (isInWatchList) {
+          this.dialogServiceUtil.showNotificationBar('Symbol already in watch List', 'error', 3000);
         } else {
-          this.authenticationUserService.addSymbolToUserWatchlist(summary.id, 'STOCK');
-          this.dialogServiceUtil.showNotificationBar('Symbol added into watchlist', 'success', 3000);
+          this.authenticationUserService.state.addSymbolToUserWatchList({
+            symbol: summary.id,
+            symbolType: 'STOCK',
+          });
+          // this.authenticationUserService.state.updateWatchList();
+          this.dialogServiceUtil.showNotificationBar('Symbol added into watch List', 'success', 3000);
         }
       });
   }
 
   onNearEndScroll(): void {
     // increase only if maxScreenerResults is less than screenerResults length
-    if (this.displayResultsSignal() > (this.userWatchlistSymbolsSignal()?.length ?? 0)) {
+    if (this.displayResultsSignal() > (this.userWatchListSymbolsSignal()?.length ?? 0)) {
       return;
     }
     this.displayResultsSignal.update((prev) => prev + this.displayCheckValue);

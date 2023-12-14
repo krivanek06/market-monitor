@@ -42,7 +42,7 @@ export class SummaryActionButtonsComponent implements OnInit {
   isSymbolInFavoriteSignal = signal<boolean>(false);
 
   isUserAuthenticatedSignal = signal(false);
-  isSymbolInWatchlist = signal(false);
+  isSymbolInWatchList = signal(false);
 
   constructor(
     private symbolFavoriteService: SymbolFavoriteService,
@@ -52,7 +52,7 @@ export class SummaryActionButtonsComponent implements OnInit {
     private authenticationUserService: AuthenticationUserStoreService,
   ) {
     if (this.authenticationUserService) {
-      this.isUserAuthenticatedSignal.set(!!this.authenticationUserService.user);
+      this.isUserAuthenticatedSignal.set(!!this.authenticationUserService.state().user);
     }
   }
 
@@ -68,8 +68,8 @@ export class SummaryActionButtonsComponent implements OnInit {
 
   private checkIfSymbolInWatchlist(): void {
     if (this.authenticationUserService) {
-      const inWatchlist = this.authenticationUserService.isSymbolInWatchlist(this.symbolSummary.id);
-      this.isSymbolInWatchlist.set(inWatchlist());
+      const inWatchList = this.authenticationUserService.state.isSymbolInWatchList()(this.symbolSummary.id);
+      this.isSymbolInWatchList.set(inWatchList);
     }
   }
 
@@ -91,7 +91,10 @@ export class SummaryActionButtonsComponent implements OnInit {
 
   async onAddWatchlist() {
     if (this.authenticationUserService) {
-      await this.authenticationUserService.addSymbolToUserWatchlist(this.symbolSummary.id, 'STOCK');
+      this.authenticationUserService.state.addSymbolToUserWatchList({
+        symbol: this.symbolSummary.id,
+        symbolType: 'STOCK',
+      });
       this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been added into watchlist`);
       this.checkIfSymbolInWatchlist();
     }
@@ -99,7 +102,10 @@ export class SummaryActionButtonsComponent implements OnInit {
 
   async onRemoveWatchlist() {
     if (this.authenticationUserService) {
-      await this.authenticationUserService.removeSymbolFromUserWatchlist(this.symbolSummary.id, 'STOCK');
+      this.authenticationUserService.state.removeSymbolFromUserWatchList({
+        symbol: this.symbolSummary.id,
+        symbolType: 'STOCK',
+      });
       this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been removed from watchlist`);
       this.checkIfSymbolInWatchlist();
     }

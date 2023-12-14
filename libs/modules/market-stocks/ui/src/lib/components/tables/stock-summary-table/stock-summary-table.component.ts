@@ -50,12 +50,9 @@ export class StockSummaryTableComponent implements AfterViewInit {
   @Output() itemClickedEmitter = new EventEmitter<SymbolSummary>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @Input({ required: true }) set stockSummaries(data: SymbolSummary[] | null) {
-    if (!data) {
-      return;
-    }
     // filtering out what do add and remove and update table to not rerender everything
-    const dataToAdd = data.filter((d) => this.dataSource.data.findIndex((d2) => d2.id === d.id) === -1);
-    const keepData = this.dataSource.data.filter((d) => data.findIndex((d2) => d2.id === d.id) !== -1);
+    const dataToAdd = (data ?? []).filter((d) => this.dataSource.data.findIndex((d2) => d2.id === d.id) === -1);
+    const keepData = this.dataSource.data.filter((d) => (data ?? []).findIndex((d2) => d2.id === d.id) !== -1);
 
     this.dataSource.data = [...keepData, ...dataToAdd];
     this.dataSource._updateChangeSubscription();

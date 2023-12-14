@@ -28,7 +28,7 @@
   <!-- watchlist button -->
   <ng-container *ngIf="isUserAuthenticatedSignal()">
     <button
-      *ngIf="isSymbolInWatchlist()"
+      *ngIf="isSymbolInWatchList()"
       mat-stroked-button
       color="warn"
       (click)="onRemoveWatchlist()"
@@ -39,7 +39,7 @@
       watchlist - remove
     </button>
     <button
-      *ngIf="!isSymbolInWatchlist()"
+      *ngIf="!isSymbolInWatchList()"
       mat-stroked-button
       color="accent"
       (click)="onAddWatchlist()"

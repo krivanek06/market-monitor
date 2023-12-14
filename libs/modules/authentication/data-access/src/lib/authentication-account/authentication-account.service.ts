@@ -30,26 +30,12 @@ export class AuthenticationAccountService {
     this.listenOnUserChanges();
   }
 
-  get user(): User {
-    if (!this.authenticatedUser$.value) {
-      throw new Error('User not logged in');
-    }
-    return this.authenticatedUser$.value;
-  }
-
-  get userData(): UserData {
-    if (!this.authenticatedUserData$.value) {
-      throw new Error('User not logged in');
-    }
-    return this.authenticatedUserData$.value;
-  }
-
-  get isUserDataPresent(): boolean {
-    return !!this.authenticatedUserData$.value;
-  }
-
   getUserData(): Observable<UserData> {
     return this.authenticatedUserData$.pipe(isNonNullable());
+  }
+
+  getUser(): Observable<User | null> {
+    return this.authenticatedUser$.asObservable();
   }
 
   signIn(input: LoginUserInput): Promise<UserCredential> {
@@ -134,7 +120,7 @@ export class AuthenticationAccountService {
     this.userApiService.updateUserPortfolioTransaction(newUserData.id, newTransactions);
 
     // create empty watchlist
-    this.userApiService.updateUserWatchlist(newUserData.id, newWatchlist);
+    this.userApiService.updateUserWatchList(newUserData.id, newWatchlist);
 
     // return new user data
     return newUserData;

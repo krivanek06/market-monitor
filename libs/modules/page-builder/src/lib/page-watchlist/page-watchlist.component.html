@@ -18,6 +18,6 @@
   (nearEnd)="onNearEndScroll()"
   (itemClickedEmitter)="onSummaryClick($event)"
   [stockSummaries]="
-    userWatchlistSymbolsSignal() | slice: 0 : displayResultsSignal() | getStocksSummary: displayCheckValue | async
+    userWatchListSymbolsSignal() | slice: 0 : displayResultsSignal() | getStocksSummary: displayCheckValue | async
   "
 ></app-stock-summary-table>

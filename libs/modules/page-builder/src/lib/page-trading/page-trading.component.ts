@@ -73,8 +73,8 @@ export class PageTradingComponent {
   );
 
   portfolioState = this.portfolioUserFacadeService.getPortfolioState;
-  portfolioTransaction = this.authenticationUserService.getUserPortfolioTransactions;
-  userSettingsSignal = signal(this.authenticationUserService.userData.settings);
+  portfolioTransactionSignal = this.authenticationUserService.state.portfolioTransactions;
+  userDataSignal = this.authenticationUserService.state.getUserData;
 
   ColorScheme = ColorScheme;
 

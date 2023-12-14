@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Directive, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { UserData } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { BehaviorSubject, Subject, combineLatest, map, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, map, takeUntil } from 'rxjs';
 
 type SubGroups = (keyof UserData['groups'])[];
 
@@ -56,9 +56,10 @@ export class GroupUserHasRoleDirective implements OnInit, OnDestroy {
     this.context.appGroupUserHasRoleInclude = this.groupRolesInclude;
     this.context.appGroupUserHasRoleExclude = this.groupRolesExclude;
 
-    combineLatest([this.groupId$, this.authenticationUserService.getUserData()])
+    this.groupId$
       .pipe(
-        map(([groupId, userData]) => {
+        map((groupId) => {
+          const userData = this.authenticationUserService.state.getUserData();
           const includeRoles = this.groupRolesInclude.every((role) => userData.groups[role].includes(groupId));
           const excludeRoles = this.groupRolesExclude.every((role) => !userData.groups[role].includes(groupId));
           console.log({

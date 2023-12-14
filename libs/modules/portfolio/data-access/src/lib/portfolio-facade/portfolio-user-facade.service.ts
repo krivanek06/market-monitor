@@ -24,9 +24,10 @@ export class PortfolioUserFacadeService {
 
   getPortfolioState = toSignal(
     this.portfolioGrowthService.getPortfolioStateHoldings(
-      this.authenticationUserService.userData.portfolioState,
-      this.authenticationUserService.getUserPortfolioTransactions(),
+      this.authenticationUserService.state.getUserPortfolioTransactions(),
+      this.authenticationUserService.state.userData()?.portfolioState.startingCash,
     ),
+    { initialValue: null },
   );
 
   getPortfolioStateHolding = (symbol: string) =>
@@ -35,7 +36,7 @@ export class PortfolioUserFacadeService {
   getPortfolioGrowthAssets = toSignal(
     from(
       this.portfolioGrowthService.getPortfolioGrowthAssets(
-        this.authenticationUserService.getUserPortfolioTransactions(),
+        this.authenticationUserService.state().portfolioTransactions,
       ),
     ),
     { initialValue: [] },
@@ -58,7 +59,7 @@ export class PortfolioUserFacadeService {
   );
 
   getPortfolioTransactionToDate = computed(() => {
-    const transactions = this.authenticationUserService.getUserPortfolioTransactions();
+    const transactions = this.authenticationUserService.state().portfolioTransactions;
     return this.portfolioCalculationService.getPortfolioTransactionToDate(transactions);
   });
 

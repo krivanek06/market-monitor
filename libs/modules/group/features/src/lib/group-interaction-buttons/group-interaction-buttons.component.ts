@@ -187,7 +187,7 @@ export class GroupInteractionButtonsComponent {
 
       await this.groupApiService.removeGroupMember({
         groupId: this.groupDetails.groupData.id,
-        userId: this.authenticationUserService.userData.id,
+        userId: this.authenticationUserService.state.getUserData().id,
       });
 
       // show notification
@@ -205,7 +205,7 @@ export class GroupInteractionButtonsComponent {
 
       await this.groupApiService.userDeclinesGroupInvitation({
         groupId: this.groupDetails.groupData.id,
-        userId: this.authenticationUserService.userData.id,
+        userId: this.authenticationUserService.state.getUserData().id,
       });
 
       // show notification
@@ -237,7 +237,7 @@ export class GroupInteractionButtonsComponent {
 
       await this.groupApiService.declineUserRequestToGroup({
         groupId: this.groupDetails.groupData.id,
-        userId: this.authenticationUserService.userData.id,
+        userId: this.authenticationUserService.state.getUserData().id,
       });
 
       // show notification

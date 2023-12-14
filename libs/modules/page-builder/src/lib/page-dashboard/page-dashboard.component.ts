@@ -58,18 +58,18 @@ import { DashboardPortfolioChartsComponent } from './dashboard-portfolio-charts/
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageDashboardComponent {
-  portfolioUserFacadeService = inject(PortfolioUserFacadeService);
-  authenticationUserService = inject(AuthenticationUserStoreService);
-  dialog = inject(MatDialog);
+  private portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  private authenticationUserService = inject(AuthenticationUserStoreService);
+  private dialog = inject(MatDialog);
 
   portfolioGrowthDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
   portfolioChangeDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 
+  userDataSignal = this.authenticationUserService.state.getUserData;
   portfolioStateSignal = this.portfolioUserFacadeService.getPortfolioState;
-
   portfolioChangeSignal = this.portfolioUserFacadeService.getPortfolioChange;
   portfolioAssetAllocation = this.portfolioUserFacadeService.getPortfolioAssetAllocationPieChart;
-  portfolioSectorAllocation = this.portfolioUserFacadeService.getPortfolioSectorAllocationPieChart;
+  portfolioSectorAllocationSignal = this.portfolioUserFacadeService.getPortfolioSectorAllocationPieChart;
   portfolioTransactionToDateSignal = this.portfolioUserFacadeService.getPortfolioTransactionToDate;
 
   ColorScheme = ColorScheme;

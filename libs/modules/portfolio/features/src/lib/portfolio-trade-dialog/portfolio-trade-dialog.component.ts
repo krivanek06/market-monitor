@@ -244,7 +244,7 @@ export class PortfolioTradeDialogComponent {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((form) => {
       if (
         this.data.transactionType === 'SELL' ||
-        !this.authenticationUserService.userData.features.userPortfolioAllowCashAccount
+        !this.authenticationUserService.state.getUserData().features.userPortfolioAllowCashAccount
       ) {
         return;
       }

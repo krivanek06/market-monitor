@@ -38,7 +38,10 @@
 
         <!-- owner -->
         <div *ngIf="form.controls.isOwnerMember.value" class="flex gap-4 p-4 mt-2 shadow-md">
-          <app-user-display-item [userData]="authenticatedUserData"></app-user-display-item>
+          <app-user-display-item
+            *ngIf="authenticatedUserDataSignal() as user"
+            [userData]="user"
+          ></app-user-display-item>
         </div>
       </div>
     </div>
