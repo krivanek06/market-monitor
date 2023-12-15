@@ -92,16 +92,23 @@ export const appRoutes: Route[] = [
             loadChildren: () => import('./market/market.component').then((m) => m.route),
           },
           {
+            path: ROUTES_MAIN.SEARCH,
+            title: 'Search',
+            loadComponent: () => import('./search/search.component').then((m) => m.SearchComponent),
+          },
+          {
             path: ROUTES_MAIN.MARKET_CALENDAR,
             title: 'Market Calendar',
             loadComponent: () =>
-              import('@market-monitor/modules/page-builder').then((m) => m.PageMarketCalendarComponent),
+              import('./market-calendar/market-calendar.component').then((m) => m.MarketCalendarComponent),
           },
           {
             path: ROUTES_MAIN.TOP_PERFORMERS,
             title: 'Top Performers',
             loadComponent: () =>
-              import('@market-monitor/modules/page-builder').then((m) => m.PageMarketTopPerformersComponent),
+              import('./market-top-performers/market-top-performers.component').then(
+                (m) => m.MarketTopPerformersComponent,
+              ),
           },
           {
             path: ROUTES_MAIN.CRYPTO,
