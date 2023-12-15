@@ -82,7 +82,7 @@ export class AuthenticationAccountService {
       .subscribe((userData) => {
         console.log('UPDATING USER', userData);
         this.authenticatedUserData$.next(userData);
-        this.loadedAuthentication$.next(true);
+        this.loadedAuthentication$.next(!!userData);
       });
   }
 

@@ -1,10 +1,12 @@
-<div class="flex justify-between w-full mb-6 md:pt-10">
-  <div class="flex items-center gap-3">
-    <mat-icon color="primary">group</mat-icon>
-    <span class="text-xl text-wt-primary">Groups</span>
+<div class="grid m-auto xl:w-11/12 gap-y-4">
+  <div class="flex justify-between w-full mb-6 md:pt-10">
+    <div class="flex items-center gap-3">
+      <mat-icon color="primary">group</mat-icon>
+      <span class="text-xl text-wt-primary">Groups</span>
+    </div>
   </div>
 
-  <div class="flex items-center gap-6">
+  <div class="flex flex-col items-center justify-between gap-2 md:flex-row">
     <!-- search groups -->
     <app-group-search-control [formControl]="searchGroupControl" class="w-[450px] hidden lg:block" />
     <!-- create new group -->
@@ -21,9 +23,8 @@
       </button>
     </div>
   </div>
-</div>
 
-<div *ngIf="groupsSignal() as groups; else skeleton" class="grid m-auto xl:w-11/12 gap-y-4">
+  @if (groupsSignal(); as groups) {
   <!-- invitations - sent / received -->
   <div
     *ngIf="groups.groupInvitations.length > 0 || groups.groupRequested.length > 0"
@@ -91,11 +92,10 @@
       ></app-group-display-card>
     </div>
   </div>
-</div>
-
-<!-- skeleton -->
-<ng-template #skeleton>
+  } @else {
+  <!-- skeleton -->
   <div class="grid m-auto xl:w-11/12 gap-y-4">
     <div *ngRange="5" class="g-skeleton h-[200px] w-full mb-2"></div>
   </div>
-</ng-template>
+  }
+</div>

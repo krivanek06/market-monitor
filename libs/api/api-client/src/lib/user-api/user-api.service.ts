@@ -86,7 +86,7 @@ export class UserApiService {
     setDoc(this.getUserWatchlistDocRef(userId), watchlist, { merge: true });
   }
 
-  addSymbolToUserWatchlist(userId: string, symbol: string, symbolType: SymbolType): Promise<void> {
+  addSymbolToUserWatchList(userId: string, symbol: string, symbolType: SymbolType): Promise<void> {
     return updateDoc(this.getUserWatchlistDocRef(userId), {
       data: arrayUnion({
         symbol,
@@ -95,7 +95,7 @@ export class UserApiService {
     });
   }
 
-  removeSymbolFromUserWatchlist(userId: string, symbol: string, symbolType: SymbolType): Promise<void> {
+  removeSymbolFromUserWatchList(userId: string, symbol: string, symbolType: SymbolType): Promise<void> {
     return updateDoc(this.getUserWatchlistDocRef(userId), {
       data: arrayRemove({
         symbol,

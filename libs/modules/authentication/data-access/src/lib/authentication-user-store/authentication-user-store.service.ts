@@ -2,7 +2,6 @@ import { Injectable, InjectionToken, effect, inject } from '@angular/core';
 import { GroupApiService, UserApiService } from '@market-monitor/api-client';
 import {
   PortfolioTransaction,
-  SymbolType,
   UserData,
   UserGroupData,
   UserWatchlist as UserWatchList,
@@ -10,7 +9,7 @@ import {
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { User } from 'firebase/auth';
 import { signalSlice } from 'ngxtension/signal-slice';
-import { Observable, combineLatest, map, switchMap } from 'rxjs';
+import { combineLatest, map, switchMap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
@@ -130,39 +129,6 @@ export class AuthenticationUserStoreService {
       this.userGroupDataSource$,
       this.loadedAuthenticationSource$,
     ],
-    actionSources: {
-      // updates user data
-      updateUserData: (state, action$: Observable<Partial<UserData>>) =>
-        action$.pipe(
-          map((userData) => ({
-            userData: {
-              ...state().userData!,
-              ...userData,
-            },
-          })),
-        ),
-      // add symbol into watch list
-      addSymbolToUserWatchList: (state, action$: Observable<{ symbol: string; symbolType: SymbolType }>) =>
-        action$.pipe(
-          map(({ symbol, symbolType }) => ({
-            watchList: {
-              ...state().watchList,
-              data: [...state().watchList.data, { symbol, symbolType }],
-            },
-          })),
-        ),
-
-      // remove symbol from watch list
-      removeSymbolFromUserWatchList: (state, action$: Observable<{ symbol: string; symbolType: SymbolType }>) =>
-        action$.pipe(
-          map(({ symbol, symbolType }) => ({
-            watchList: {
-              ...state().watchList,
-              data: state().watchList.data.filter((d) => d.symbol !== symbol && d.symbolType !== symbolType),
-            },
-          })),
-        ),
-    },
     selectors: (state) => ({
       getUser: () => state().user!,
       getUserData: () => state().userData!,
@@ -170,16 +136,11 @@ export class AuthenticationUserStoreService {
       getUserPortfolioTransactions: () => state().portfolioTransactions,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
     }),
-    // effects: (state) => ({
-    //   updateWatchList: () => {
-    //     this.userApiService.updateUserWatchList(state().userData!.id, state.watchList());
-    //   },
-    // }),
   });
 
   constructor() {
     effect(() => {
-      console.log('AUTHENTICATION STATE', this.state());
+      console.log('AuthenticationUserStoreService update', this.state());
     });
   }
 }
