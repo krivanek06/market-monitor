@@ -1,26 +1,27 @@
 <div class="grid m-auto xl:w-11/12 gap-y-4">
   <div class="flex justify-between w-full mb-6 md:pt-10">
+    <!-- title -->
     <div class="flex items-center gap-3">
       <mat-icon color="primary">group</mat-icon>
       <span class="text-xl text-wt-primary">Groups</span>
     </div>
-  </div>
 
-  <div class="flex flex-col items-center justify-between gap-2 md:flex-row">
-    <!-- search groups -->
-    <app-group-search-control [formControl]="searchGroupControl" class="w-[450px] hidden lg:block" />
-    <!-- create new group -->
-    <div [matTooltip]="isCreateGroupDisabledSignal() ? errorMessageGroupCreate : ''">
-      <button
-        [disabled]="isCreateGroupDisabledSignal()"
-        mat-stroked-button
-        type="button"
-        color="primary"
-        (click)="onCreateGroupClick()"
-      >
-        <mat-icon>add</mat-icon>
-        create group
-      </button>
+    <div class="flex flex-col items-center justify-between gap-2 md:flex-row">
+      <!-- search groups -->
+      <app-group-search-control [formControl]="searchGroupControl" class="w-[450px] hidden lg:block" />
+      <!-- create new group -->
+      <div [matTooltip]="isCreateGroupDisabledSignal() ? errorMessageGroupCreate : ''">
+        <button
+          [disabled]="isCreateGroupDisabledSignal()"
+          mat-stroked-button
+          type="button"
+          color="primary"
+          (click)="onCreateGroupClick()"
+        >
+          <mat-icon>add</mat-icon>
+          create group
+        </button>
+      </div>
     </div>
   </div>
 

@@ -23,7 +23,7 @@ import { DialogServiceModule } from '@market-monitor/shared/utils-client';
     MatIconModule,
   ],
   template: `
-    <section class="g-screen-size-default">
+    <section>
       <div class="flex justify-end mb-6">
         <!-- main navigation -->
         <app-tab-select-control

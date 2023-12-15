@@ -12,7 +12,8 @@ import { AuthenticationUserStoreService } from '@market-monitor/modules/authenti
 import { SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
 import { DialogServiceModule, LoaderMainService } from '@market-monitor/shared/utils-client';
 import { map } from 'rxjs';
-import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-navigation.component';
+import { MenuSideNavigationComponent } from './menu-navigation/menu-side-navigation.component';
+import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
 
 @Component({
   selector: 'app-page-menu',
@@ -26,6 +27,7 @@ import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-na
     MatDividerModule,
     MenuSideNavigationComponent,
     MatProgressSpinnerModule,
+    MenuTopNavigationComponent,
 
     // do not remove - allows showing dialogs sub child routes
     DialogServiceModule,
@@ -35,7 +37,7 @@ import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-na
       <!-- side nav -->
       <mat-drawer
         [mode]="isSmallScreenSignal() ? 'over' : 'side'"
-        [opened]="true"
+        [opened]="false"
         class="w-2/12 min-w-[275px]"
         role="navigation"
         (closed)="toggleMatDrawerExpandedView()"
@@ -44,7 +46,10 @@ import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-na
       </mat-drawer>
 
       <mat-drawer-content>
-        <div class="px-10 pt-6 c-content-wrapper">
+        <!-- top navigation on big screen -->
+        <app-menu-top-navigation></app-menu-top-navigation>
+
+        <div class="c-content-wrapper">
           <!-- content -->
           <div *ngIf="loadingSignal()" class="grid place-content-center pb-[15%] min-h-screen min-w-full">
             <mat-spinner></mat-spinner>
@@ -78,7 +83,7 @@ import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-na
 
         @screen xl {
           padding: 24px 32px 40px 32px;
-          max-width: 1440px;
+          max-width: 1560px;
         }
       }
     `,
