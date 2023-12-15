@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -160,7 +160,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MenuTopNavigationComponent {
+export class MenuTopNavigationComponent implements OnInit {
   private router = inject(Router);
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private authenticationService = inject(AuthenticationAccountService);
@@ -169,6 +169,12 @@ export class MenuTopNavigationComponent {
 
   ROUTES_MAIN = ROUTES_MAIN;
   activeLinkSignal = signal<ROUTES_MAIN>(ROUTES_MAIN.DASHBOARD);
+
+  ngOnInit(): void {
+    // check if url is different than activeLinkSignal
+    const url = this.router.url.replace('/', '') as ROUTES_MAIN;
+    this.activeLinkSignal.set(url);
+  }
 
   onNavClick(navigation: ROUTES_MAIN) {
     this.activeLinkSignal.set(navigation);
