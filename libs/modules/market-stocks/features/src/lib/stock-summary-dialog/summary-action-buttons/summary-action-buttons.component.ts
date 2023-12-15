@@ -13,10 +13,11 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { UserApiService } from '@market-monitor/api-client';
 import { SymbolSummary } from '@market-monitor/api-types';
 import {
   AUTHENTICATION_ACCOUNT_TOKEN,
-  AuthenticationUserService,
+  AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
 import { SymbolFavoriteService } from '@market-monitor/modules/market-stocks/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
@@ -42,17 +43,18 @@ export class SummaryActionButtonsComponent implements OnInit {
   isSymbolInFavoriteSignal = signal<boolean>(false);
 
   isUserAuthenticatedSignal = signal(false);
-  isSymbolInWatchlist = signal(false);
+  isSymbolInWatchList = signal(false);
 
   constructor(
     private symbolFavoriteService: SymbolFavoriteService,
     private dialogServiceUtil: DialogServiceUtil,
+    private userApiService: UserApiService,
     @Inject(AUTHENTICATION_ACCOUNT_TOKEN)
     @Optional()
-    private authenticationUserService: AuthenticationUserService,
+    private authenticationUserService: AuthenticationUserStoreService,
   ) {
     if (this.authenticationUserService) {
-      this.isUserAuthenticatedSignal.set(!!this.authenticationUserService.user);
+      this.isUserAuthenticatedSignal.set(!!this.authenticationUserService.state().user);
     }
   }
 
@@ -62,11 +64,14 @@ export class SummaryActionButtonsComponent implements OnInit {
       this.isSymbolInFavoriteSignal.set(isInFavorite);
     });
 
-    // check if symbol in watchlist
+    // check if symbol in watchList
+    this.checkIfSymbolInWatchList();
+  }
+
+  private checkIfSymbolInWatchList(): void {
     if (this.authenticationUserService) {
-      this.authenticationUserService.isSymbolInWatchlist(this.symbolSummary.id).subscribe((isInWatchlist) => {
-        this.isSymbolInWatchlist.set(isInWatchlist);
-      });
+      const inWatchList = this.authenticationUserService.state.isSymbolInWatchList()(this.symbolSummary.id);
+      this.isSymbolInWatchList.set(inWatchList);
     }
   }
 
@@ -86,17 +91,33 @@ export class SummaryActionButtonsComponent implements OnInit {
     this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been removed from favorites`);
   }
 
-  onAddWatchlist(): void {
+  async onAddWatchList() {
     if (this.authenticationUserService) {
-      this.authenticationUserService.addSymbolToUserWatchlist(this.symbolSummary.id, 'STOCK');
+      // save data into fireStore
+      await this.userApiService.addSymbolToUserWatchList(
+        this.authenticationUserService.state().userData?.id!,
+        this.symbolSummary.id,
+        'STOCK',
+      );
+
+      // show notification
       this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been added into watchlist`);
+      this.checkIfSymbolInWatchList();
     }
   }
 
-  onRemoveWatchlist(): void {
+  async onRemoveWatchList() {
     if (this.authenticationUserService) {
-      this.authenticationUserService.removeSymbolFromUserWatchlist(this.symbolSummary.id, 'STOCK');
+      // save data into fireStore
+      await this.userApiService.removeSymbolFromUserWatchList(
+        this.authenticationUserService.state().userData!.id,
+        this.symbolSummary.id,
+        'STOCK',
+      );
+
+      // show notification
       this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been removed from watchlist`);
+      this.checkIfSymbolInWatchList();
     }
   }
 

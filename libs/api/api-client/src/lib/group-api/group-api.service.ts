@@ -14,19 +14,24 @@ import {
   GroupBaseInputInviteMembers,
   GroupCreateInput,
   GroupData,
+  GroupDetails,
   GroupHoldingSnapshotsData,
   GroupMembersData,
   GroupPortfolioStateSnapshotsData,
   GroupSettingsChangeInput,
   GroupTransactionsData,
+  PortfolioStateHolding,
+  PortfolioTransactionMore,
 } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/utils-client';
+import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { getApp } from 'firebase/app';
 import { limit } from 'firebase/firestore';
 import { getFunctions } from 'firebase/functions';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
-import { Observable, of } from 'rxjs';
+import { Observable, combineLatest, map, of, switchMap } from 'rxjs';
+import { MarketApiService } from '../market-api/market-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -34,7 +39,10 @@ import { Observable, of } from 'rxjs';
 export class GroupApiService {
   private functions = getFunctions(getApp());
 
-  constructor(private firestore: Firestore) {}
+  constructor(
+    private firestore: Firestore,
+    private marketApiService: MarketApiService,
+  ) {}
 
   getGroupDataById(groupId: string): Observable<GroupData | undefined> {
     return rxDocData(this.getGroupDocRef(groupId), { idField: 'id' });
@@ -70,6 +78,64 @@ export class GroupApiService {
         where('name', '>=', name),
         where('name', '<=', name + '\uf8ff'),
         limit(limitResult),
+      ),
+    );
+  }
+
+  getGroupDetailsById(groupId: string): Observable<GroupDetails> {
+    return combineLatest([
+      this.getGroupDataById(groupId),
+      this.getGroupMembersDataById(groupId),
+      this.getGroupPortfolioTransactionsDataById(groupId),
+      this.getGroupPortfolioSnapshotsDataById(groupId),
+      this.getGroupHoldingSnapshotsDataById(groupId).pipe(
+        switchMap((groupHoldings) =>
+          this.marketApiService.getSymbolSummaries(groupHoldings?.data?.map((h) => h.symbol)).pipe(
+            map(
+              (symbolSummaries) =>
+                groupHoldings?.data.map(
+                  (holding) =>
+                    ({
+                      ...holding,
+                      symbolSummary: symbolSummaries.find((s) => s.id === holding.symbol)!,
+                      breakEvenPrice: roundNDigits(holding.invested / holding.units),
+                    }) satisfies PortfolioStateHolding,
+                ),
+            ),
+          ),
+        ),
+      ),
+    ]).pipe(
+      map(
+        ([
+          groupData,
+          groupMembersData,
+          groupTransactionsData,
+          groupPortfolioSnapshotsData,
+          groupHoldingSnapshotsData,
+        ]) => {
+          if (!groupData || !groupMembersData) {
+            throw new Error('Group data not found');
+          }
+
+          // merge transactions with user data
+          const portfolioTransactionsMore = (groupTransactionsData?.data ?? []).map(
+            (transaction) =>
+              ({
+                ...transaction,
+                userDisplayName: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.displayName,
+                userPhotoURL: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.photoURL,
+              }) satisfies PortfolioTransactionMore,
+          );
+
+          return {
+            groupData,
+            groupMembersData: groupMembersData.data ?? [],
+            groupTransactionsData: portfolioTransactionsMore,
+            groupPortfolioSnapshotsData: groupPortfolioSnapshotsData?.data ?? [],
+            groupHoldingSnapshotsData: groupHoldingSnapshotsData ?? [],
+          } satisfies GroupDetails;
+        },
       ),
     );
   }

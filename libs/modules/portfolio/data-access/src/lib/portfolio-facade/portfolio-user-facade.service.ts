@@ -1,15 +1,9 @@
-import { Injectable } from '@angular/core';
-import {
-  PortfolioGrowthAssets,
-  PortfolioStateHolding,
-  PortfolioStateHoldings,
-  PortfolioTransaction,
-  UserPortfolioTransaction,
-} from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
-import { GenericChartSeriesPie } from '@market-monitor/shared/data-access';
-import { Observable, from, map, startWith, switchMap, withLatestFrom } from 'rxjs';
-import { PortfolioChange, PortfolioGrowth, PortfolioTransactionCreate, PortfolioTransactionToDate } from '../models';
+import { Injectable, computed } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { PortfolioTransaction } from '@market-monitor/api-types';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
+import { from, switchMap } from 'rxjs';
+import { PortfolioTransactionCreate } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.service';
 import { PortfolioOperationsService } from '../portfolio-operations/portfolio-operations.service';
@@ -22,74 +16,54 @@ import { PortfolioOperationsService } from '../portfolio-operations/portfolio-op
 })
 export class PortfolioUserFacadeService {
   constructor(
-    private authenticationUserService: AuthenticationUserService,
+    private authenticationUserService: AuthenticationUserStoreService,
     private portfolioGrowthService: PortfolioGrowthService,
     private portfolioOperationsService: PortfolioOperationsService,
     private portfolioCalculationService: PortfolioCalculationService,
   ) {}
 
-  getPortfolioState(): Observable<PortfolioStateHoldings> {
-    return this.authenticationUserService
-      .getUserPortfolioTransactions()
-      .pipe(
-        switchMap((transactions) =>
-          this.portfolioGrowthService.getPortfolioStateHoldings(
-            this.authenticationUserService.userData.portfolioState,
-            transactions,
-          ),
+  getPortfolioState = toSignal(
+    toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
+      switchMap((transactions) =>
+        this.portfolioGrowthService.getPortfolioStateHoldings(
+          transactions,
+          this.authenticationUserService.state.userData()?.portfolioState.startingCash,
         ),
-      );
-  }
-
-  getPortfolioStateHolding(symbol: string): Observable<PortfolioStateHolding | undefined> {
-    return this.getPortfolioState().pipe(map((state) => state.holdings.find((holding) => holding.symbol === symbol)));
-  }
-
-  getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {
-    return this.authenticationUserService.getUserPortfolioTransactions();
-  }
-
-  getPortfolioGrowthAssets(): Observable<PortfolioGrowthAssets[]> {
-    return this.authenticationUserService
-      .getUserPortfolioTransactions()
-      .pipe(
-        switchMap((transactions) =>
-          from(this.portfolioGrowthService.getPortfolioGrowthAssets(transactions.transactions)),
-        ),
-      );
-  }
-
-  getPortfolioGrowth(): Observable<PortfolioGrowth[]> {
-    return this.getPortfolioGrowthAssets().pipe(
-      // startWith allows first emotion to go through
-      withLatestFrom(this.getPortfolioState().pipe(startWith(null))),
-      map(([transactions, portfolioState]) =>
-        this.portfolioCalculationService.getPortfolioGrowth(transactions, portfolioState?.startingCash),
       ),
-    );
-  }
+    ),
+  );
 
-  getPortfolioChange(): Observable<PortfolioChange> {
-    return this.getPortfolioGrowth().pipe(map((growth) => this.portfolioCalculationService.getPortfolioChange(growth)));
-  }
+  getPortfolioStateHolding = (symbol: string) =>
+    computed(() => this.getPortfolioState()?.holdings.find((holding) => holding.symbol === symbol));
 
-  getPortfolioSectorAllocationPieChart(): Observable<GenericChartSeriesPie> {
-    return this.getPortfolioState().pipe(
-      map((state) => this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(state.holdings)),
-    );
-  }
+  getPortfolioGrowthAssets = toSignal(
+    toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
+      switchMap((transactions) => from(this.portfolioGrowthService.getPortfolioGrowthAssets(transactions))),
+    ),
+    { initialValue: [] },
+  );
 
-  getPortfolioAssetAllocationPieChart(): Observable<GenericChartSeriesPie> {
-    return this.getPortfolioState().pipe(
-      map((state) => this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(state.holdings)),
-    );
-  }
+  getPortfolioGrowth = computed(() =>
+    this.portfolioCalculationService.getPortfolioGrowth(
+      this.getPortfolioGrowthAssets(),
+      this.getPortfolioState()?.startingCash,
+    ),
+  );
 
-  getPortfolioTransactionToDate(): Observable<PortfolioTransactionToDate[]> {
-    return this.getUserPortfolioTransactions().pipe(
-      map((data) => this.portfolioCalculationService.getPortfolioTransactionToDate(data.transactions)),
-    );
-  }
+  getPortfolioChange = computed(() => this.portfolioCalculationService.getPortfolioChange(this.getPortfolioGrowth()));
+
+  getPortfolioSectorAllocationPieChart = computed(() =>
+    this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(this.getPortfolioState()?.holdings ?? []),
+  );
+
+  getPortfolioAssetAllocationPieChart = computed(() =>
+    this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.getPortfolioState()?.holdings ?? []),
+  );
+
+  getPortfolioTransactionToDate = computed(() => {
+    const transactions = this.authenticationUserService.state().portfolioTransactions;
+    return this.portfolioCalculationService.getPortfolioTransactionToDate(transactions);
+  });
 
   createTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
     return this.portfolioOperationsService.createTransactionOperation(input);

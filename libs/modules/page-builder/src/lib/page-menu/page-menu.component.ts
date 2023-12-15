@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -8,10 +8,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
-import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
 import { DialogServiceModule, LoaderMainService } from '@market-monitor/shared/utils-client';
-import { map, take, tap } from 'rxjs';
+import { map } from 'rxjs';
 import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-navigation.component';
 
 @Component({
@@ -87,7 +87,7 @@ import { MenuSideNavigationComponent } from './menu-side-navigation/menu-side-na
 })
 export class PageMenuComponent implements OnInit {
   breakpointObserver = inject(BreakpointObserver);
-  portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  authenticationUserStoreService = inject(AuthenticationUserStoreService);
   loaderMainService = inject(LoaderMainService);
 
   loadingSignal = toSignal(this.loaderMainService.getLoading());
@@ -97,14 +97,20 @@ export class PageMenuComponent implements OnInit {
   );
 
   constructor() {
-    this.loaderMainService.setLoading(true);
-    this.portfolioUserFacadeService
-      .getPortfolioState()
-      .pipe(
-        tap(() => this.loaderMainService.setLoading(false)),
-        take(1),
-      )
-      .subscribe();
+    //this.loaderMainService.setLoading(true);
+
+    effect(() => {
+      // const user = this.authenticationUserStoreService.state.user();
+      // console.log('this is effect', user);
+      // this.loaderMainService.setLoading(!!user);
+    });
+
+    // toObservable(this.portfolioUserFacadeService.getPortfolioState)
+    //   .pipe(
+    //     tap(() => this.loaderMainService.setLoading(false)),
+    //     take(1),
+    //   )
+    //   .subscribe();
   }
 
   ngOnInit(): void {}

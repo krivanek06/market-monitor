@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -9,7 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { GroupApiService } from '@market-monitor/api-client';
 import { GROUP_OWNER_LIMIT, GroupData } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import {
   GroupCreateDialogComponent,
   GroupDisplayCardComponent,
@@ -19,7 +18,6 @@ import { GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
 import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
-import { map } from 'rxjs';
 
 @Component({
   selector: 'app-page-groups',
@@ -51,17 +49,18 @@ import { map } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageGroupsComponent {
-  authenticationUserService = inject(AuthenticationUserService);
+  authenticationUserService = inject(AuthenticationUserStoreService);
   groupApiService = inject(GroupApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
   dialog = inject(MatDialog);
   router = inject(Router);
 
-  groupsSignal = toSignal(this.authenticationUserService.getUserGroupsData());
+  // groupsSignal = toSignal(this.authenticationUserService..getUserGroupsData());
+  groupsSignal = this.authenticationUserService.state.userGroupData;
   searchGroupControl = new FormControl<GroupData | null>(null);
 
-  isCreateGroupDisabledSignal = toSignal(
-    this.authenticationUserService.getUserData().pipe(map((d) => d.groups.groupOwner.length >= GROUP_OWNER_LIMIT)),
+  isCreateGroupDisabledSignal = computed(
+    () => this.authenticationUserService.state.getUserData().groups.groupOwner.length >= GROUP_OWNER_LIMIT,
   );
 
   get errorMessageGroupCreate(): string {
@@ -69,11 +68,6 @@ export class PageGroupsComponent {
   }
 
   constructor() {
-    this.authenticationUserService.getUserGroupsData().subscribe((data) => {
-      console.log('HERE IS GROUP DATA');
-      console.log(data);
-    });
-
     this.searchGroupControl.valueChanges.subscribe((d) => {
       this.router.navigate(['groups', d?.id]);
     });
@@ -125,7 +119,7 @@ export class PageGroupsComponent {
       this.dialogServiceUtil.showNotificationBar('Declining invitation', 'notification');
       await this.groupApiService.userDeclinesGroupInvitation({
         groupId: group.id,
-        userId: this.authenticationUserService.userData.id,
+        userId: this.authenticationUserService.state.getUserData().id,
       });
       this.dialogServiceUtil.showNotificationBar('Invitation declined', 'success');
     } catch (e) {

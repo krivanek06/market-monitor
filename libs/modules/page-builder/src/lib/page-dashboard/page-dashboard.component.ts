@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import {
   PortfolioUserFacadeService,
@@ -59,19 +58,19 @@ import { DashboardPortfolioChartsComponent } from './dashboard-portfolio-charts/
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageDashboardComponent {
-  portfolioUserFacadeService = inject(PortfolioUserFacadeService);
-  authenticationUserService = inject(AuthenticationUserService);
-  dialog = inject(MatDialog);
+  private portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  private authenticationUserService = inject(AuthenticationUserStoreService);
+  private dialog = inject(MatDialog);
 
   portfolioGrowthDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
   portfolioChangeDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 
-  portfolioStateSignal = toSignal(this.portfolioUserFacadeService.getPortfolioState());
-
-  portfolioChangeSignal = toSignal(this.portfolioUserFacadeService.getPortfolioChange());
-  portfolioAssetAllocation = toSignal(this.portfolioUserFacadeService.getPortfolioAssetAllocationPieChart());
-  portfolioSectorAllocation = toSignal(this.portfolioUserFacadeService.getPortfolioSectorAllocationPieChart());
-  portfolioTransactionToDateSignal = toSignal(this.portfolioUserFacadeService.getPortfolioTransactionToDate());
+  userDataSignal = this.authenticationUserService.state.getUserData;
+  portfolioStateSignal = this.portfolioUserFacadeService.getPortfolioState;
+  portfolioChangeSignal = this.portfolioUserFacadeService.getPortfolioChange;
+  portfolioAssetAllocation = this.portfolioUserFacadeService.getPortfolioAssetAllocationPieChart;
+  portfolioSectorAllocationSignal = this.portfolioUserFacadeService.getPortfolioSectorAllocationPieChart;
+  portfolioTransactionToDateSignal = this.portfolioUserFacadeService.getPortfolioTransactionToDate;
 
   ColorScheme = ColorScheme;
   dashboardChartOptionsInputSource = dashboardChartOptionsInputSource;

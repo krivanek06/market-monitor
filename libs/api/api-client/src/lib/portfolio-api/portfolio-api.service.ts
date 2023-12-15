@@ -19,12 +19,12 @@ export class PortfolioApiService {
     setDoc(this.getPortfolioTransactionPublicRef(transaction.transactionId), transaction);
   }
 
-  deletePortfolioTransactionForPublic(transactionId: string): void {
-    deleteDoc(this.getPortfolioTransactionPublicRef(transactionId));
+  deletePortfolioTransactionForPublic(transactionId: string): Promise<void> {
+    return deleteDoc(this.getPortfolioTransactionPublicRef(transactionId));
   }
 
-  updatePortfolioTransactionPublic(id: string, transaction: Partial<PortfolioTransaction>): void {
-    setDoc(this.getPortfolioTransactionPublicRef(id), transaction, { merge: true });
+  updatePortfolioTransactionPublic(id: string, transaction: Partial<PortfolioTransaction>): Promise<void> {
+    return setDoc(this.getPortfolioTransactionPublicRef(id), transaction, { merge: true });
   }
 
   private getPortfolioTransactionPublicRef(transactionId: string): DocumentReference<PortfolioTransaction> {

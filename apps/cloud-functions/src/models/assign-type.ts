@@ -5,13 +5,24 @@ import { firestore } from 'firebase-admin';
  *
  * @returns
  */
-export const assignTypesServer = <T extends object>() => {
+export const assignTypesOptional = <T extends object>() => {
   return {
     toFirestore(doc: T): firestore.DocumentData {
       return doc;
     },
     fromFirestore(snapshot: firestore.QueryDocumentSnapshot): T | undefined {
       return snapshot.data() as T | undefined;
+    },
+  };
+};
+
+export const assignTypes = <T extends object>() => {
+  return {
+    toFirestore(doc: T): firestore.DocumentData {
+      return doc;
+    },
+    fromFirestore(snapshot: firestore.QueryDocumentSnapshot): T {
+      return snapshot.data() as T;
     },
   };
 };

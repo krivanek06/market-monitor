@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Directive, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { UserData } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { BehaviorSubject, Subject, combineLatest, map, takeUntil } from 'rxjs';
 
 type SubGroups = (keyof UserData['groups'])[];
@@ -37,13 +38,14 @@ export class GroupUserHasRoleDirective implements OnInit, OnDestroy {
   @Input({ alias: 'appGroupUserHasRoleExclude' }) groupRolesExclude: SubGroups = [];
 
   private groupId$ = new BehaviorSubject<string>('');
+  private getUserData$ = toObservable(this.authenticationUserService.state.getUserData);
   private destroy$ = new Subject<void>();
   private context = new GroupUserHasRoleDirectiveContext();
 
   constructor(
     private viewContainerRef: ViewContainerRef,
     private templateRef: TemplateRef<GroupUserHasRoleDirectiveContext>,
-    private authenticationUserService: AuthenticationUserService,
+    private authenticationUserService: AuthenticationUserStoreService,
     private cd: ChangeDetectorRef,
   ) {}
 
@@ -56,7 +58,7 @@ export class GroupUserHasRoleDirective implements OnInit, OnDestroy {
     this.context.appGroupUserHasRoleInclude = this.groupRolesInclude;
     this.context.appGroupUserHasRoleExclude = this.groupRolesExclude;
 
-    combineLatest([this.groupId$, this.authenticationUserService.getUserData()])
+    combineLatest([this.groupId$, this.getUserData$])
       .pipe(
         map(([groupId, userData]) => {
           const includeRoles = this.groupRolesInclude.every((role) => userData.groups[role].includes(groupId));

@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@market-monitor/api-client';
 import { PortfolioTransaction, PortfolioTransactionType, SymbolSummary } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks/features';
 import { StockSummaryListComponent } from '@market-monitor/modules/market-stocks/ui';
@@ -59,7 +59,7 @@ import { switchMap } from 'rxjs';
 })
 export class PageTradingComponent {
   portfolioUserFacadeService = inject(PortfolioUserFacadeService);
-  authenticationUserService = inject(AuthenticationUserService);
+  authenticationUserService = inject(AuthenticationUserStoreService);
   marketApiService = inject(MarketApiService);
   dialog = inject(MatDialog);
   dialogServiceUtil = inject(DialogServiceUtil);
@@ -72,9 +72,9 @@ export class PageTradingComponent {
     ),
   );
 
-  portfolioState = toSignal(this.portfolioUserFacadeService.getPortfolioState());
-  portfolioTransaction = toSignal(this.portfolioUserFacadeService.getUserPortfolioTransactions());
-  userSettingsSignal = signal(this.authenticationUserService.userData.settings);
+  portfolioState = this.portfolioUserFacadeService.getPortfolioState;
+  portfolioTransactionSignal = this.authenticationUserService.state.portfolioTransactions;
+  userDataSignal = this.authenticationUserService.state.getUserData;
 
   ColorScheme = ColorScheme;
 

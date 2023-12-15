@@ -11,7 +11,7 @@ import { groupDocumentRef, userDocumentRef } from '../models';
  * - add group to user groupRequested
  */
 export const groupRequestMembershipCall = onCall(async (request) => {
-  const userAuthId = request.auth.uid as string;
+  const userAuthId = request.auth?.uid as string;
   const groupId = request.data as string;
 
   const groupData = (await groupDocumentRef(groupId).get()).data();

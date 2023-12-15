@@ -5,10 +5,8 @@ import {
   HistoricalPriceSymbol,
   PortfolioGrowthAssets,
   PortfolioGrowthAssetsDataItem,
-  PortfolioState,
   PortfolioStateHoldings,
   PortfolioTransaction,
-  UserPortfolioTransaction,
 } from '@market-monitor/api-types';
 import {
   getPortfolioStateHoldingBaseUtil,
@@ -25,32 +23,23 @@ export class PortfolioGrowthService {
   constructor(private marketApiService: MarketApiService) {}
 
   getPortfolioStateHoldings(
-    previousPortfolioState: PortfolioState,
-    portfolioTransactions: UserPortfolioTransaction,
+    transactions: PortfolioTransaction[],
+    startingCash: number = 0,
   ): Observable<PortfolioStateHoldings> {
     console.log(`PortfolioGrowthService: getPortfolioState`);
 
     // get partial holdings calculations
-    const partialHoldings = getPortfolioStateHoldingBaseUtil(portfolioTransactions.transactions);
+    const partialHoldings = getPortfolioStateHoldingBaseUtil(transactions);
     const partialHoldingSymbols = partialHoldings.map((d) => d.symbol);
 
     // get symbol summaries from API
     return this.marketApiService
       .getSymbolSummaries(partialHoldingSymbols)
-      .pipe(
-        map((summaries) =>
-          getPortfolioStateHoldingsUtil(
-            previousPortfolioState.startingCash,
-            portfolioTransactions.transactions,
-            partialHoldings,
-            summaries,
-          ),
-        ),
-      );
+      .pipe(map((summaries) => getPortfolioStateHoldingsUtil(startingCash, transactions, partialHoldings, summaries)));
   }
 
   async getPortfolioGrowthAssets(transactions: PortfolioTransaction[]): Promise<PortfolioGrowthAssets[]> {
-    console.log(`PortfolioGrowthService: getPortfolioGrowthAssets`);
+    console.log(`PortfolioGrowthService: getPortfolioGrowthAssets`, transactions);
     // from transactions get all distinct symbols with soonest date of transaction
     const transactionStart = transactions.reduce(
       (acc, curr) => {

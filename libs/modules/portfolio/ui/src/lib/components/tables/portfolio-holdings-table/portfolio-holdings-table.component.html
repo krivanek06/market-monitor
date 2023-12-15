@@ -102,7 +102,7 @@
   <ng-container matColumnDef="pe">
     <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">PE</th>
     <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
-      {{ row.symbolSummary.quote.pe ?? 'N/A' }}
+      {{ (row.symbolSummary.quote.pe | number: '1.2-2') ?? 'N/A' }}
     </td>
   </ng-container>
 

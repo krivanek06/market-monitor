@@ -1,6 +1,9 @@
 import { inject } from '@angular/core';
 import { Route, Router } from '@angular/router';
-import { AuthenticationAccountService } from '@market-monitor/modules/authentication/data-access';
+import {
+  AuthenticationAccountService,
+  AuthenticationUserStoreService,
+} from '@market-monitor/modules/authentication/data-access';
 import { groupDetailsResolver } from '@market-monitor/modules/page-builder';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { map, take, tap } from 'rxjs';
@@ -15,12 +18,20 @@ export const appRoutes: Route[] = [
         canActivate: [
           () => {
             const authentication = inject(AuthenticationAccountService);
+            const authenticationState = inject(AuthenticationUserStoreService);
             const router = inject(Router);
 
-            return authentication.getUserData().pipe(
+            // check if user already loaded
+            if (authenticationState.state().authenticationLoaded && authenticationState.state().userData) {
+              console.log('USER LOGGED IN', authenticationState.state().userData);
+              return true;
+            }
+
+            // listen on user loaded
+            return authentication.getLoadedAuthentication().pipe(
               tap(() => console.log('CHECK REDIRECT DASHBOARD')),
               take(1),
-              map(() => (authentication.isUserDataPresent ? true : router.navigate([ROUTES_MAIN.LOGIN]))),
+              map((isLoaded) => (isLoaded ? true : router.navigate([ROUTES_MAIN.LOGIN]))),
             );
           },
         ],
@@ -102,19 +113,6 @@ export const appRoutes: Route[] = [
       {
         path: ROUTES_MAIN.LOGIN,
         loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
-        canActivate: [
-          () => {
-            const authentication = inject(AuthenticationAccountService);
-            const router = inject(Router);
-
-            // return authentication.getUserData().pipe(
-            //   tap(() => console.log('CHECK REDIRECT LOGIN')),
-            //   take(1),
-            //   map(() => (!authentication.isUserDataPresent ? true : router.navigate([ROUTES_MAIN.DASHBOARD]))),
-            // );
-            return true;
-          },
-        ],
       },
     ],
   },

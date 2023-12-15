@@ -41,6 +41,12 @@ export const userUpdatePortfolioScheduler = async (): Promise<void> => {
     const transactions = (await transactionRef.get()).data();
     const user = userDoc.data();
 
+    // skip if no transactions
+    if (!transactions) {
+      console.log(`No transactions for user: ${user.personal.displayName}, ${userDoc.id}`);
+      continue;
+    }
+
     try {
       // get partial holdings calculations
       const holdingsBase = getPortfolioStateHoldingBaseUtil(transactions.transactions);

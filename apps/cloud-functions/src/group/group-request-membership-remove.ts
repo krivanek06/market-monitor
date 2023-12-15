@@ -17,6 +17,11 @@ export const groupRequestMembershipRemoveCall = onCall(async (request) => {
   const groupData = (await groupDocumentRef(data.groupId).get()).data();
   const userData = (await userDocumentRef(data.userId).get()).data();
 
+  // check if group exists
+  if (!groupData) {
+    throw new HttpsError('not-found', 'Group does not exist');
+  }
+
   // check if authenticated user is owner or the user who leaves
   const canBeUserRemove = groupData.ownerUserId === userAuthId || data.userId === userAuthId;
   if (!canBeUserRemove) {

@@ -38,6 +38,12 @@ export const groupCreateCall = onCall(async (request) => {
   // load user data from firebase
   const userDataDoc = await userDocumentRef(userAuthId).get();
   const userData = userDataDoc.data();
+
+  // check if user exists
+  if (!userData) {
+    throw new HttpsError('not-found', 'User does not exist');
+  }
+
   const userBase = transformUserToBase(userData);
   const group = (await groupsCollectionRef().where('name', '==', data.groupName).get()).docs[0];
 

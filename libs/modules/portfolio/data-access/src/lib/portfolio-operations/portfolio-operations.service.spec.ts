@@ -1,7 +1,7 @@
 import { createMock } from '@golevelup/ts-jest';
 import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
 import { HistoricalPrice, PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { Test, TestingModule } from '@nestjs/testing';
 import { addDays, format } from 'date-fns';
@@ -38,7 +38,7 @@ describe('PortfolioCrudService', () => {
     getSymbolSummary: jest.fn(),
     getHistoricalPricesOnDate: jest.fn(),
   });
-  const authenticationUserServiceMock = createMock<AuthenticationUserService>({
+  const authenticationUserServiceMock = createMock<AuthenticationUserStoreService>({
     getUserPortfolioTransactionPromise: jest.fn(),
     userData: user,
   });
@@ -65,7 +65,7 @@ describe('PortfolioCrudService', () => {
       providers: [
         PortfolioOperationsService,
         { provide: MarketApiService, useValue: marketApiServiceMock },
-        { provide: AuthenticationUserService, useValue: authenticationUserServiceMock },
+        { provide: AuthenticationUserStoreService, useValue: authenticationUserServiceMock },
         { provide: PortfolioApiService, useValue: portfolioApiServiceMock },
         { provide: UserApiService, useValue: userApiServiceMock },
       ],
@@ -263,7 +263,7 @@ describe('PortfolioCrudService', () => {
     describe('should execute operation', () => {
       it('should execute buy operation and calculate transaction fee if user has isPortfolioCashActive', async () => {
         // activate portfolio cash
-        authenticationUserServiceMock.userData.settings.isPortfolioCashActive = true;
+        authenticationUserServiceMock.state.userData()?.settings.isPortfolioCashActive = true;
 
         // arrange
         const input = testTransactionCreate_BUY_AAPL_1;
@@ -289,7 +289,7 @@ describe('PortfolioCrudService', () => {
 
       it('should execute buy operation and not calculate transaction fee if user does not have isPortfolioCashActive ', async () => {
         // activate portfolio cash
-        authenticationUserServiceMock.userData.settings.isPortfolioCashActive = false;
+        authenticationUserServiceMock.state.userData()?.settings.isPortfolioCashActive = false;
 
         // arrange
         const input = testTransactionCreate_BUY_AAPL_1;
@@ -327,7 +327,7 @@ describe('PortfolioCrudService', () => {
       });
 
       it('should execute sell operation and calculate transaction fee if user has isPortfolioCashActive', async () => {
-        authenticationUserServiceMock.userData.settings.isPortfolioCashActive = true;
+        authenticationUserServiceMock.state.userData()?.settings.isPortfolioCashActive = true;
 
         when(authenticationUserServiceMock.getUserPortfolioTransactionPromise).mockResolvedValue(
           userTestPortfolioTransaction1,
@@ -374,7 +374,7 @@ describe('PortfolioCrudService', () => {
 
       it('should execute sell operation and calculate transaction fee if user does not have isPortfolioCashActive', async () => {
         // activate portfolio cash
-        authenticationUserServiceMock.userData.settings.isPortfolioCashActive = false;
+        authenticationUserServiceMock.state.userData()?.settings.isPortfolioCashActive = false;
 
         // arrange
         const input = {
@@ -412,7 +412,7 @@ describe('PortfolioCrudService', () => {
 
         // arrange
         const input = {
-          userId: authenticationUserServiceMock.userData.id,
+          userId: authenticationUserServiceMock.state.userData()?.id,
           transactionId: testTransaction_BUY_AAPL_1.transactionId,
         } as PortfolioTransaction;
 

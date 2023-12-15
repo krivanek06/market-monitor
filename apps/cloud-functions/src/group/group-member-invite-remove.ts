@@ -11,7 +11,7 @@ import { groupDocumentRef, userDocumentRef } from '../models';
  * - return removed user
  */
 export const groupMemberInviteRemoveCall = onCall(async (request) => {
-  const userAuthId = request.auth.uid as string;
+  const userAuthId = request.auth?.uid as string;
   const data = request.data as GroupBaseInput;
 
   const groupData = (await groupDocumentRef(data.groupId).get()).data();

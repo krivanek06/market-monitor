@@ -6,23 +6,21 @@ import {
   GroupTransactionsData,
 } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
-import { assignTypesServer } from './assign-type';
+import { assignTypes, assignTypesOptional } from './assign-type';
 
-export const groupsCollectionRef = () => firestore().collection('groups').withConverter(assignTypesServer<GroupData>());
+export const groupsCollectionRef = () => firestore().collection('groups').withConverter(assignTypes<GroupData>());
 
 export const groupDocumentRef = (groupId: string) =>
-  groupsCollectionRef().doc(groupId).withConverter(assignTypesServer<GroupData>());
+  groupsCollectionRef().doc(groupId).withConverter(assignTypesOptional<GroupData>());
 
 export const groupCollectionMoreInformationRef = (groupId: string) =>
   groupDocumentRef(groupId).collection('more_information');
 
 export const groupDocumentTransactionsRef = (groupId: string) =>
-  groupCollectionMoreInformationRef(groupId)
-    .doc('transactions')
-    .withConverter(assignTypesServer<GroupTransactionsData>());
+  groupCollectionMoreInformationRef(groupId).doc('transactions').withConverter(assignTypes<GroupTransactionsData>());
 
 export const groupDocumentMembersRef = (groupId: string) =>
-  groupCollectionMoreInformationRef(groupId).doc('members').withConverter(assignTypesServer<GroupMembersData>());
+  groupCollectionMoreInformationRef(groupId).doc('members').withConverter(assignTypes<GroupMembersData>());
 
 /**
  *
@@ -32,9 +30,9 @@ export const groupDocumentMembersRef = (groupId: string) =>
 export const groupDocumentPortfolioStateSnapshotsRef = (groupId: string) =>
   groupCollectionMoreInformationRef(groupId)
     .doc('portfolio_snapshots')
-    .withConverter(assignTypesServer<GroupPortfolioStateSnapshotsData>());
+    .withConverter(assignTypes<GroupPortfolioStateSnapshotsData>());
 
 export const groupDocumentHoldingSnapshotsRef = (groupId: string) =>
   groupCollectionMoreInformationRef(groupId)
     .doc('holding_snapshots')
-    .withConverter(assignTypesServer<GroupHoldingSnapshotsData>());
+    .withConverter(assignTypes<GroupHoldingSnapshotsData>());

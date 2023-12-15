@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
-import { HistoricalPrice, PortfolioTransaction, UserPortfolioTransaction } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { HistoricalPrice, PortfolioTransaction } from '@market-monitor/api-types';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { dateFormatDate, dateGetDetailsInformationFromDate, roundNDigits } from '@market-monitor/shared/utils-general';
 import { isBefore, isValid, isWeekend } from 'date-fns';
 import { firstValueFrom } from 'rxjs';
@@ -27,15 +27,15 @@ import {
 export class PortfolioOperationsService {
   constructor(
     private marketApiService: MarketApiService,
-    private authenticationUserService: AuthenticationUserService,
+    private authenticationUserService: AuthenticationUserStoreService,
     private portfolioApiService: PortfolioApiService,
     private userApiService: UserApiService,
   ) {}
 
   async createTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
     // get data
-    const userId = this.authenticationUserService.userData.id;
-    const userTransactions = await this.authenticationUserService.getUserPortfolioTransactionPromise();
+    const userId = this.authenticationUserService.state.getUserData().id;
+    const userTransactions = this.authenticationUserService.state().portfolioTransactions;
     const symbolPrice = await firstValueFrom(
       this.marketApiService.getHistoricalPricesOnDate(input.symbol, dateFormatDate(input.date)),
     );
@@ -49,7 +49,7 @@ export class PortfolioOperationsService {
     this.executeTransactionOperationDataValidity(input, symbolPrice, userTransactions);
 
     // from previous transaction calculate invested and units - currently if I own that symbol
-    const symbolHolding = this.getCurrentInvestedFromTransactions(input.symbol, userTransactions.transactions);
+    const symbolHolding = this.getCurrentInvestedFromTransactions(input.symbol, userTransactions);
     const symbolHoldingBreakEvenPrice = roundNDigits(symbolHolding.invested / symbolHolding.units, 2);
 
     // create transaction
@@ -97,7 +97,8 @@ export class PortfolioOperationsService {
     historicalPrice: HistoricalPrice,
     breakEvenPrice: number,
   ): PortfolioTransaction {
-    const isTransactionFeesActive = this.authenticationUserService.isUserRoleSimulation;
+    const isTransactionFeesActive =
+      this.authenticationUserService.state.getUserData().features.userPortfolioAllowCashAccount;
 
     // if custom total value is provided calculate unit price, else use API price
     const unitPrice = input.customTotalValue
@@ -144,9 +145,9 @@ export class PortfolioOperationsService {
   private executeTransactionOperationDataValidity(
     input: PortfolioTransactionCreate,
     historicalPrice: HistoricalPrice,
-    userTransactionHistory: UserPortfolioTransaction,
+    portfolioTransaction: PortfolioTransaction[],
   ): void {
-    const userData = this.authenticationUserService.userData;
+    const userData = this.authenticationUserService.state.getUserData();
 
     // negative units
     if (input.units <= 0) {
@@ -186,11 +187,11 @@ export class PortfolioOperationsService {
     const totalValue = roundNDigits(input.units * historicalPrice.close, 2);
 
     // check if user has enough cash on hand if BUY and cashAccountActive
-    if (input.transactionType === 'BUY' && this.authenticationUserService.isUserRoleSimulation) {
+    if (input.transactionType === 'BUY' && userData.features.userPortfolioAllowCashAccount) {
       // calculate cash on hand from deposits
       const cashOnHandStarting = userData.portfolioState.startingCash;
       // calculate cash on hand from transactions
-      const cashOnHandTransactions = userTransactionHistory.transactions.reduce(
+      const cashOnHandTransactions = portfolioTransaction.reduce(
         (acc, curr) =>
           curr.transactionType === 'BUY' ? acc - curr.unitPrice * curr.units : acc + curr.unitPrice * curr.units,
         0,
@@ -210,7 +211,7 @@ export class PortfolioOperationsService {
     // check if user has enough units on hand if SELL
     if (input.transactionType === 'SELL') {
       // check if user has any holdings of that symbol
-      const symbolTransactions = userTransactionHistory.transactions.filter((d) => d.symbol === input.symbol);
+      const symbolTransactions = portfolioTransaction.filter((d) => d.symbol === input.symbol);
 
       // calculate holding units
       const holdingUnits = symbolTransactions.reduce(

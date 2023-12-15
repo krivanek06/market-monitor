@@ -55,6 +55,7 @@
     "highcharts": "^11.1.0",
     "highcharts-angular": "^3.1.2",
     "lodash-es": "^4.17.21",
+    "ngxtension": "^1.6.1",
     "reflect-metadata": "^0.1.13",
     "rxfire": "~6.0.5",
     "rxjs": "^7.8.1",

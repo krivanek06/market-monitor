@@ -16,7 +16,7 @@ import {
 } from '@angular/router';
 import {
   AUTHENTICATION_ACCOUNT_TOKEN,
-  AuthenticationUserService,
+  AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
@@ -50,7 +50,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     {
       provide: AUTHENTICATION_ACCOUNT_TOKEN,
-      useExisting: AuthenticationUserService,
+      useExisting: AuthenticationUserStoreService,
     },
   ],
 };

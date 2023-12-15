@@ -9,10 +9,10 @@ import {
   signInWithPopup,
 } from '@angular/fire/auth';
 import { UserApiService } from '@market-monitor/api-client';
-import { USER_ACCOUNT_TYPE, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
-import { isNonNullable } from '@market-monitor/shared/utils-client';
+import { UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
+import { filterNullish } from '@market-monitor/shared/utils-client';
 import { dateFormatDate } from '@market-monitor/shared/utils-general';
-import { BehaviorSubject, Observable, map, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, map, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 
 @Injectable({
@@ -21,6 +21,7 @@ import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 export class AuthenticationAccountService {
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
   private authenticatedUser$ = new BehaviorSubject<User | null>(null);
+  private loadedAuthentication$ = new Subject<boolean>();
 
   constructor(
     private auth: Auth,
@@ -30,26 +31,16 @@ export class AuthenticationAccountService {
     this.listenOnUserChanges();
   }
 
-  get user(): User {
-    if (!this.authenticatedUser$.value) {
-      throw new Error('User not logged in');
-    }
-    return this.authenticatedUser$.value;
-  }
-
-  get userData(): UserData {
-    if (!this.authenticatedUserData$.value) {
-      throw new Error('User not logged in');
-    }
-    return this.authenticatedUserData$.value;
-  }
-
-  get isUserDataPresent(): boolean {
-    return !!this.authenticatedUserData$.value;
-  }
-
   getUserData(): Observable<UserData> {
-    return this.authenticatedUserData$.pipe(isNonNullable());
+    return this.authenticatedUserData$.pipe(filterNullish());
+  }
+
+  getUser(): Observable<User | null> {
+    return this.authenticatedUser$.asObservable();
+  }
+
+  getLoadedAuthentication(): Observable<boolean> {
+    return this.loadedAuthentication$.asObservable();
   }
 
   signIn(input: LoginUserInput): Promise<UserCredential> {
@@ -91,6 +82,7 @@ export class AuthenticationAccountService {
       .subscribe((userData) => {
         console.log('UPDATING USER', userData);
         this.authenticatedUserData$.next(userData);
+        this.loadedAuthentication$.next(!!userData);
       });
   }
 
@@ -114,7 +106,6 @@ export class AuthenticationAccountService {
   private createUser(user: User): UserData {
     // create new user data
     const newUserData = createNewUser(user.uid, {
-      accountType: USER_ACCOUNT_TYPE.BASIC,
       displayName: user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`,
       photoURL: user.photoURL,
     });
@@ -123,7 +114,7 @@ export class AuthenticationAccountService {
       transactions: [],
     };
 
-    const newWatchlist: UserWatchlist = {
+    const newWatchList: UserWatchlist = {
       createdDate: dateFormatDate(new Date()),
       data: [],
     };
@@ -134,8 +125,8 @@ export class AuthenticationAccountService {
     // create portfolio for user
     this.userApiService.updateUserPortfolioTransaction(newUserData.id, newTransactions);
 
-    // create empty watchlist
-    this.userApiService.updateUserWatchlist(newUserData.id, newWatchlist);
+    // create empty watchList
+    this.userApiService.updateUserWatchList(newUserData.id, newWatchList);
 
     // return new user data
     return newUserData;

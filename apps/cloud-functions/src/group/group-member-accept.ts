@@ -13,11 +13,21 @@ import { transformUserToGroupMember } from './../utils/transform.util';
  * - update group
  */
 export const groupMemberAcceptCall = onCall(async (request) => {
-  const userAuthId = request.auth.uid as string;
+  const userAuthId = request.auth?.uid as string;
   const requestGroupId = request.data as string;
 
   const userData = (await userDocumentRef(userAuthId).get()).data();
   const groupData = (await groupDocumentRef(requestGroupId).get()).data();
+
+  // check if group exists
+  if (!groupData) {
+    throw new HttpsError('not-found', 'Group does not exist');
+  }
+
+  // check if user exists
+  if (!userData) {
+    throw new HttpsError('not-found', 'User does not exist');
+  }
 
   // check if user is already in group
   if (userData.groups.groupMember.includes(requestGroupId)) {

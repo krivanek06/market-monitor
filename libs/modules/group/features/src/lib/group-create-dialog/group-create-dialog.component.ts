@@ -11,7 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { GroupApiService } from '@market-monitor/api-client';
 import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT, GroupCreateInput, UserData } from '@market-monitor/api-types';
-import { AuthenticationUserService } from '@market-monitor/modules/authentication/data-access';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserSearchControlComponent } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
@@ -91,23 +91,19 @@ export class GroupCreateDialogComponent implements OnInit {
     { initialValue: GROUP_MEMBER_LIMIT },
   );
 
-  /**
-   * Limit of groups that can be created
-   */
-  createGroupLimitSignal = toSignal(
-    this.authenticationUserService.getUserGroupsData().pipe(
-      map((groups) => groups.groupOwner.map((d) => !d.isClosed)),
-      map((openGroups) => GROUP_OWNER_LIMIT - openGroups.length),
-    ),
-    { initialValue: GROUP_OWNER_LIMIT },
+  createGroupLimitSignal = computed(
+    () =>
+      GROUP_OWNER_LIMIT -
+      (this.authenticationUserService.state.userGroupData()?.groupOwner.filter((d) => !d.isClosed).length ?? 0),
   );
+
   allowCreateGroup = computed(() => this.createGroupLimitSignal() > 0);
 
-  authenticatedUserData = this.authenticationUserService.userData;
+  authenticatedUserDataSignal = this.authenticationUserService.state.userData;
 
   constructor(
     private dialogRef: MatDialogRef<GroupCreateDialogComponent>,
-    private authenticationUserService: AuthenticationUserService,
+    private authenticationUserService: AuthenticationUserStoreService,
     private dialogServiceUtil: DialogServiceUtil,
     private groupApiService: GroupApiService,
     @Inject(MAT_DIALOG_DATA) public data: unknown,
@@ -171,7 +167,7 @@ export class GroupCreateDialogComponent implements OnInit {
       }
 
       // prevent adding myself as a member
-      if (userData.id === this.authenticationUserService.userData.id) {
+      if (userData.id === this.authenticationUserService.state().userData!.id) {
         this.dialogServiceUtil.showNotificationBar(
           'You cannot add invite yourself. Check the above checkbox for it',
           'error',

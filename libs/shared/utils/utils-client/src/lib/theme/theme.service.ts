@@ -1,12 +1,12 @@
 import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable } from '@angular/core';
-import { LocalStorageService } from '../storage/local-storage.service';
+import { StorageLocalStoreService } from '../storage/storage-local-store.service';
 
 export type ThemeType = 'light' | 'dark';
 @Injectable({
   providedIn: 'root',
 })
-export class ThemeService extends LocalStorageService<ThemeType> {
+export class ThemeService extends StorageLocalStoreService<ThemeType> {
   private readonly LIGHT_THEME = 'light-theme';
 
   constructor(@Inject(DOCUMENT) private document: Document) {
