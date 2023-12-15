@@ -1,18 +1,23 @@
-<div class="flex items-center gap-2 mb-8 text-xl text-wt-primary md:pt-10">
-  <mat-icon>monitoring</mat-icon>
-  Watchlist
+<div class="flex items-center justify-between">
+  <!-- title -->
+  <div class="flex items-center gap-2 mb-8 text-xl text-wt-primary">
+    <mat-icon>monitoring</mat-icon>
+    Watchlist
+  </div>
+
+  <!-- search -->
+  <div>
+    <app-stock-search-basic
+      [formControl]="searchSymbolControl"
+      displayValue="symbol"
+      [showValueChange]="false"
+      [showHint]="false"
+      class="w-[480px] scale-[0.85] -ml-8 mb-6"
+    ></app-stock-search-basic>
+  </div>
 </div>
 
-<!-- search -->
-<div>
-  <app-stock-search-basic
-    [formControl]="searchSymbolControl"
-    displayValue="symbol"
-    [showValueChange]="false"
-    class="w-[480px] scale-[0.85] -ml-8 mb-6"
-  ></app-stock-search-basic>
-</div>
-
+<!-- table -->
 <app-stock-summary-table
   appScrollNearEnd
   (nearEnd)="onNearEndScroll()"

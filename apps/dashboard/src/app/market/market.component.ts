@@ -12,7 +12,7 @@ import { DialogServiceModule } from '@market-monitor/shared/utils-client';
   standalone: true,
   imports: [CommonModule, MatCheckboxModule, RouterModule, DialogServiceModule, ReactiveFormsModule],
   template: `
-    <div class="flex justify-end mt-10 mb-6">
+    <div class="flex justify-end mb-6">
       <mat-checkbox [formControl]="isCustomCheckedControl" color="primary">Custom Chart</mat-checkbox>
     </div>
 
