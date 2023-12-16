@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "mm:serve": "nx run market-monitor:serve",
+    "mm:deploy": "firebase deploy --only hosting",
     "mmd:serve": "nx run dashboard:serve",
     "mm:build-sentry:ssr": "npm run mm:build:ssr && npm run sentry:sourcemaps",
     "mm:deploy:ssr": "nx build market-monitor && firebase target:apply hosting market-monitor market-monitor-prod && firebase deploy --only hosting:market-monitor-prod",
