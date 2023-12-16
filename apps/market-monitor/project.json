@@ -123,9 +123,7 @@
       "executor": "@angular/fire:deploy",
       "options": {
         "version": 2,
-        "buildTarget": "nx build market-monitor --configuration=prod",
-        "serverTarget": "nx build market-monitor:server --configuration=prod",
-        "prerenderTarget": "nx prerender market-monitor:server --configuration=prod"
+        "buildTarget": "nx build market-monitor --configuration=prod"
       }
     }
   }

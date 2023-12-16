@@ -1,8 +1,6 @@
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
 import * as admin from 'firebase-admin';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
-import { groupUpdateDataScheduler, userUpdatePortfolioScheduler } from './schedulers';
-import { corsMiddleWareHttp, firebaseSimpleErrorLogger } from './utils';
 
 const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
 
@@ -36,19 +34,6 @@ setGlobalOptions({ region: 'europe-west3', maxInstances: 3 });
 admin.firestore().settings({
   ignoreUndefinedProperties: true,
 });
-
-// -------- Testing ---------
-
-export const test_me = firebaseSimpleErrorLogger(
-  'test_function',
-  corsMiddleWareHttp(async (request, response) => {
-    console.log('Run Test Function');
-
-    await userUpdatePortfolioScheduler();
-    console.log('update groups');
-    await groupUpdateDataScheduler();
-  }),
-);
 
 // -------- Production ---------
 export * from './group';

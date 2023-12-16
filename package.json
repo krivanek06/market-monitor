@@ -8,7 +8,7 @@
     "mm:build-sentry:ssr": "npm run mm:build:ssr && npm run sentry:sourcemaps",
     "mm:deploy:ssr": "nx build market-monitor && firebase target:apply hosting market-monitor market-monitor-prod && firebase deploy --only hosting:market-monitor-prod",
     "mm:deploy-sentry:ssr": "nx build market-monitor && npm run sentry:sourcemaps && firebase target:apply hosting market-monitor market-monitor-prod && firebase deploy --only hosting:market-monitor-prod",
-    "mm:cloud-function:build": "nx run cloud-functions:build && node cp-angular",
+    "mm:cloud-function:build": "nx run cloud-functions:build",
     "mm:cloud-function:serve": "npm run mm:cloud-function:build && firebase emulators:start --only functions",
     "mm:cloud-function:kill": "kill -9 $(lsof -ti:4000,4001,9299)",
     "mm:cloud-function:debug": "npm run mm:cloud-function:build && firebase emulators:start --only functions --inspect-functions",
