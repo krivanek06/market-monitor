@@ -29,7 +29,38 @@ import { EMPTY, Observable, catchError, first, map } from 'rxjs';
     MatProgressBarModule,
     ReactiveFormsModule,
   ],
-  templateUrl: './upload-image-single-control.component.html',
+  template: `
+    <div
+      class="relative grid w-full h-full text-center border rounded-md group border-wt-gray-medium hover:border-wt-gray-dark hover:shadow-lg ripple-container bg-wt-gray-light place-content-center hover:bg-wt-gray-medium opacity-80 hover:text-wt-gray-light g-clickable-hover"
+      matRipple
+      [matRippleCentered]="true"
+      [matRippleDisabled]="false"
+      [matRippleUnbounded]="false"
+      [matRippleColor]="ColorScheme.GRAY_LIGHT_STRONG_VAR"
+      (click)="fileUpload.click()"
+    >
+      <input style="display: none" type="file" (change)="onFileSelected($event)" #fileUpload />
+      <div *ngIf="!lastFileUploadSignal()">Click To Upload</div>
+
+      <!-- uploaded image -->
+      <ng-container *ngIf="lastFileUploadSignal() as downloadURL" class="p-3">
+        <img appDefaultImg [src]="downloadURL" class="w-full h-full" alt="image upload" />
+        <div
+          class="absolute hidden w-full py-4 text-xl transition-all duration-300 ease-in-out transform -translate-y-1/2 bg-gray-700 top-2/4 opacity-80 group-hover:block"
+        >
+          Click To Upload
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- progress -->
+    <ng-container *ngIf="percentage$ | async as pct">
+      <div *ngIf="isUploadingSignal()" class="flex flex-col items-center mt-4">
+        <div class="text-center">{{ pct | number }}%</div>
+        <mat-progress-bar mode="determinate" [value]="pct" max="100"></mat-progress-bar>
+      </div>
+    </ng-container>
+  `,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

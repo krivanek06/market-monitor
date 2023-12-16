@@ -85,9 +85,9 @@ export type UserSettings = {
 
 export type UserFeatures = {
   /**
-   * if true, user can create groups limited by - GROUP_OWNER_LIMIT
+   * if true, user can access group page and create groups limited by - GROUP_OWNER_LIMIT
    */
-  groupAllowCreate?: boolean;
+  groupAllowAccess?: boolean;
 
   /**
    * if true, user can create unlimited number of groups
@@ -105,3 +105,4 @@ export type UserFeatures = {
    */
   userAllowUnlimitedSymbols?: boolean;
 };
+export type UserFeaturesType = keyof UserFeatures;

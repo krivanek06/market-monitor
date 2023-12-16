@@ -10,6 +10,7 @@ import {
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
+import { FeatureAccessDirective } from '@market-monitor/shared/features';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
 @Component({
@@ -23,6 +24,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
     MatMenuModule,
     DefaultImgDirective,
     MatButtonModule,
+    FeatureAccessDirective,
   ],
   template: `
     <div class="shadow-md pt-5 px-8 mb-4">
@@ -65,7 +67,12 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
           </a>
 
           <!-- groups -->
-          <a mat-tab-link (click)="onNavClick(ROUTES_MAIN.GROUPS)" [active]="activeLinkSignal() == ROUTES_MAIN.GROUPS">
+          <a
+            *appFeatureAccess="'groupAllowAccess'"
+            mat-tab-link
+            (click)="onNavClick(ROUTES_MAIN.GROUPS)"
+            [active]="activeLinkSignal() == ROUTES_MAIN.GROUPS"
+          >
             <div class="gap-2 flex items-center">
               <mat-icon>group</mat-icon>
               <span>Groups</span>

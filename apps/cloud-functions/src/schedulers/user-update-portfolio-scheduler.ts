@@ -9,7 +9,7 @@ import { userDocumentTransactionHistoryRef, usersCollectionRef } from '../models
 import { transformPortfolioStateHoldingToPortfolioState } from '../utils';
 
 /**
- * for each user who is active and have SIMULATION role,
+ * for each user who is active
  * calculate portfolio state at the end of the day.
  *
  * functions runs multiple time to make sure all users are processed.
@@ -23,7 +23,6 @@ export const userUpdatePortfolioScheduler = async (): Promise<void> => {
   console.log('today', today);
   // load users to calculate balance
   const userToUpdate = usersCollectionRef()
-    // .where('personal.accountType', '==', 'SIMULATION')
     // .where('lastLoginDate', '>=', twoWeeksBefore) // not able to use this filter
     .where('portfolioState.date', '!=', today)
     .orderBy('portfolioState.date', 'desc')

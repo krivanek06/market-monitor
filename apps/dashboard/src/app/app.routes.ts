@@ -59,6 +59,13 @@ export const appRoutes: Route[] = [
           },
           {
             path: ROUTES_MAIN.GROUPS,
+            canActivate: [
+              () => {
+                inject(AuthenticationUserStoreService).state.userData()?.features.groupAllowAccess
+                  ? true
+                  : inject(Router).navigate([ROUTES_MAIN.DASHBOARD]);
+              },
+            ],
             children: [
               {
                 path: '',
