@@ -2,8 +2,6 @@ import {
 	getCompanyKeyMetricsTTM,
 	getCompanyOutlook,
 	getEnterpriseValue,
-	getEsgDataQuarterly,
-	getEsgRatingYearly,
 	getPriceTarget,
 	getRecommendationTrends,
 	getSectorPeersForSymbols,
@@ -38,7 +36,7 @@ export const getStockDetailsWrapper = async (env: Env, symbol: string, searchPar
 		// return data
 		return new Response(JSON.stringify(details), RESPONSE_HEADER);
 	} catch (e) {
-		console.log(`Unable to Provide data for symbol=${symbol}`);
+		console.log(e);
 		return new Response(`Unable to Provide data for symbol=${symbol}`, { status: 400 });
 	}
 };
@@ -51,8 +49,8 @@ export const getStockDetailsWrapper = async (env: Env, symbol: string, searchPar
 const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
 	const [
 		companyOutlook,
-		esgRatingYearly,
-		eSGDataQuarterly,
+		// esgRatingYearly,
+		// eSGDataQuarterly,
 		upgradesDowngrades,
 		priceTarget,
 		analystEstimatesEarnings,
@@ -62,8 +60,8 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
 		enterpriseValue,
 	] = await Promise.all([
 		getCompanyOutlook(symbol),
-		getEsgRatingYearly(symbol),
-		getEsgDataQuarterly(symbol),
+		// getEsgRatingYearly(symbol),
+		// getEsgDataQuarterly(symbol),
 		getUpgradesDowngrades(symbol),
 		getPriceTarget(symbol),
 		getStockHistoricalEarnings(symbol),
@@ -73,10 +71,10 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
 		getEnterpriseValue(symbol),
 	]);
 
-	const sheetIncomeYearly = companyOutlook.financialsAnnual.income.at(0);
-	const sheetBalanceQuarter = companyOutlook.financialsQuarter.balance.at(0);
-	const sheetCashYearly = companyOutlook.financialsAnnual.cash.at(0);
-	const sheetCashflowQuarter = companyOutlook.financialsQuarter.cash.at(0);
+	const sheetIncomeYearly = companyOutlook.financialsAnnual.income[0];
+	const sheetBalanceQuarter = companyOutlook.financialsQuarter.balance[0];
+	const sheetCashYearly = companyOutlook.financialsAnnual.cash[0];
+	const sheetCashflowQuarter = companyOutlook.financialsQuarter.cash[0];
 
 	const result = {
 		companyOutlook,
@@ -88,10 +86,10 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
 		sectorPeers: sectorPeers[0] ?? null,
 		recommendationTrends: recommendationTrends.slice().reverse(),
 		companyKeyMetricsTTM: companyKeyMetricsTTM,
-		esgDataQuarterly: eSGDataQuarterly[0],
-		esgDataQuarterlyArray: eSGDataQuarterly.slice(0, 10),
-		esgDataRatingYearly: esgRatingYearly[0],
-		esgDataRatingYearlyArray: esgRatingYearly.slice(0, 10),
+		// esgDataQuarterly: eSGDataQuarterly[0],
+		// esgDataQuarterlyArray: eSGDataQuarterly.slice(0, 10),
+		// esgDataRatingYearly: esgRatingYearly[0],
+		// esgDataRatingYearlyArray: esgRatingYearly.slice(0, 10),
 		enterpriseValue: enterpriseValue,
 		additionalFinancialData: {
 			cashOnHand: sheetBalanceQuarter?.cashAndShortTermInvestments ?? null,

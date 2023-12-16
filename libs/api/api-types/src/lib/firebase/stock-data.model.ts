@@ -7,8 +7,6 @@ import {
   CompanyRating,
   CompanyRatio,
   CompanyRatioTTM,
-  ESGDataQuarterly,
-  ESGDataRatingYearly,
   EnterpriseValue,
   PriceTarget,
   RecommendationTrends,
@@ -26,10 +24,10 @@ export type StockDetailsAPI = {
   ratio: CompanyRatioTTM | null;
   rating: CompanyRating | null;
   companyOutlook: CompanyOutlook;
-  esgDataRatingYearlyArray: ESGDataRatingYearly[];
-  esgDataRatingYearly: ESGDataRatingYearly | null;
-  esgDataQuarterlyArray: ESGDataQuarterly[];
-  esgDataQuarterly: ESGDataQuarterly | null;
+  // esgDataRatingYearlyArray: ESGDataRatingYearly[];
+  // esgDataRatingYearly: ESGDataRatingYearly | null;
+  // esgDataQuarterlyArray: ESGDataQuarterly[];
+  // esgDataQuarterly: ESGDataQuarterly | null;
   upgradesDowngrades: UpgradesDowngrades[];
   priceTarget: PriceTarget[];
   stockEarnings: StockEarning[];

@@ -183,15 +183,15 @@
     </app-general-card>
   </div>
 
-  <div class="grid gap-6 xl:grid-cols-3">
-    <!-- esg quarterly -->
+  <!-- <div class="grid gap-6 xl:grid-cols-3">
+
     <app-general-card title="ESG data" class="xl:col-span-2" additionalClasses="h-full">
       <app-stock-esg-data-table
         [data]="stockDetailsSignal.esgDataQuarterlyArray | slice: 0 : 8"
       ></app-stock-esg-data-table>
     </app-general-card>
 
-    <!-- esg yearly -->
+
     <app-general-card title="ESG data" class="hidden xl:block">
       <div *ngFor="let data of stockDetailsSignal.esgDataRatingYearlyArray" class="g-item-wrapper">
         <div>{{ data.year }}</div>
@@ -201,5 +201,5 @@
         </div>
       </div>
     </app-general-card>
-  </div>
+  </div> -->
 </div>

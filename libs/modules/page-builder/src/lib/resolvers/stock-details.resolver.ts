@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, ResolveFn, Router, RouterStateSnapshot } from '
 import { MarketApiService, StocksApiService } from '@market-monitor/api-client';
 import { StockDetails } from '@market-monitor/api-types';
 import { LoaderMainService } from '@market-monitor/shared/utils-client';
-import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { catchError, forkJoin, map, of, tap } from 'rxjs';
 
 export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
   route: ActivatedRouteSnapshot,
@@ -33,9 +33,10 @@ export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
     stocksApiService.getStockInsiderTrades(symbol),
     marketApiService.getNews('stocks', symbol),
     // holders page
-    stocksApiService
-      .getStockOwnershipInstitutional(symbol)
-      .pipe(switchMap((data) => stocksApiService.getStockOwnershipHoldersToDate(symbol, data[0]?.date ?? null))),
+
+    // stocksApiService
+    //   .getStockOwnershipInstitutional(symbol)
+    //   .pipe(switchMap((data) => stocksApiService.getStockOwnershipHoldersToDate(symbol, data[0]?.date ?? null))),
   ]).pipe(
     // return only details, everything else is cached
     map(([details, ...rest]) => details),
