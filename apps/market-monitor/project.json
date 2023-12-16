@@ -7,13 +7,13 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:browser",
+      "executor": "@angular-devkit/build-angular:browser-esbuild",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/market-monitor/browser",
         "index": "apps/market-monitor/src/index.html",
         "main": "apps/market-monitor/src/main.ts",
-        "polyfills": ["apps/market-monitor/src/polyfills.ts"],
+        "polyfills": ["zone.js"],
         "tsConfig": "apps/market-monitor/tsconfig.app.json",
         "assets": ["apps/market-monitor/src/favicon.ico", "apps/market-monitor/src/assets"],
         "styles": ["@angular/material/prebuilt-themes/indigo-pink.css", "apps/market-monitor/src/styles.scss"],
@@ -61,31 +61,9 @@
         "development": {
           "buildOptimizer": false,
           "optimization": false,
-          "vendorChunk": true,
           "extractLicenses": false,
           "sourceMap": true,
           "namedChunks": true
-        }
-      },
-      "defaultConfiguration": "production"
-    },
-    "prerender": {
-      "builder": "@nguniversal/builders:prerender",
-      "options": {
-        "routes": ["search", "stock-screener", "market", "top-performers", "calendar"]
-      },
-      "configurations": {
-        "production": {
-          "fileReplacements": [
-            {
-              "replace": "apps/market-monitor/src/environments/environment.ts",
-              "with": "apps/market-monitor/src/environments/environment.prod.ts"
-            }
-          ],
-          "buildTarget": "market-monitor:build:production"
-        },
-        "development": {
-          "buildTarget": "market-monitor:build:development"
         }
       },
       "defaultConfiguration": "production"
@@ -140,47 +118,6 @@
       "options": {
         "buildTarget": "market-monitor:build"
       }
-    },
-    "server": {
-      "executor": "@angular-devkit/build-angular:server",
-      "options": {
-        "outputPath": "dist/apps/market-monitor/server",
-        "main": "apps/market-monitor/src/ssr.server.ts",
-        "tsConfig": "apps/market-monitor/tsconfig.server.json"
-      },
-      "configurations": {
-        "production": {
-          "fileReplacements": [
-            {
-              "replace": "apps/market-monitor/src/environments/environment.ts",
-              "with": "apps/market-monitor/src/environments/environment.prod.ts"
-            }
-          ],
-          "outputHashing": "media"
-        },
-        "development": {
-          "buildOptimizer": false,
-          "optimization": false,
-          "sourceMap": true,
-          "extractLicenses": false,
-          "vendorChunk": true
-        }
-      },
-      "defaultConfiguration": "production"
-    },
-    "serve-ssr": {
-      "executor": "@nguniversal/builders:ssr-dev-server",
-      "configurations": {
-        "development": {
-          "buildTarget": "market-monitor:build:development",
-          "serverTarget": "market-monitor:server:development"
-        },
-        "production": {
-          "buildTarget": "market-monitor:build:production",
-          "serverTarget": "market-monitor:server:production"
-        }
-      },
-      "defaultConfiguration": "development"
     },
     "deploy": {
       "executor": "@angular/fire:deploy",
