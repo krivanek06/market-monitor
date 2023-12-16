@@ -36,8 +36,8 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
     <mat-drawer-container autosize class="h-full">
       <!-- side nav -->
       <mat-drawer
-        [mode]="isSmallScreenSignal() ? 'over' : 'side'"
-        [opened]="false"
+        mode="over"
+        [opened]="isScreenXLSignal()"
         class="w-2/12 min-w-[275px]"
         role="navigation"
         (closed)="toggleMatDrawerExpandedView()"
@@ -47,7 +47,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
 
       <mat-drawer-content>
         <!-- top navigation on big screen -->
-        <app-menu-top-navigation></app-menu-top-navigation>
+        <app-menu-top-navigation *ngIf="!isScreenXLSignal()"></app-menu-top-navigation>
 
         <div class="c-content-wrapper">
           <!-- content -->
@@ -97,9 +97,8 @@ export class PageMenuComponent implements OnInit {
 
   loadingSignal = toSignal(this.loaderMainService.getLoading());
   isOpenSignal = signal<boolean>(false);
-  isSmallScreenSignal = toSignal(
-    this.breakpointObserver.observe([SCREEN_LAYOUT.LAYOUT_SM]).pipe(map((x) => !x.matches)),
-  );
+  isScreenSmSignal = toSignal(this.breakpointObserver.observe([SCREEN_LAYOUT.LAYOUT_SM]).pipe(map((x) => !x.matches)));
+  isScreenXLSignal = toSignal(this.breakpointObserver.observe([SCREEN_LAYOUT.LAYOUT_XL]).pipe(map((x) => !x.matches)));
 
   constructor() {
     //this.loaderMainService.setLoading(true);
