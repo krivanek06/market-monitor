@@ -1,8 +1,6 @@
-import { getMarketOverviewDataWrapper, reloadMarketOverview } from './market-functions/market-overview';
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
 import * as admin from 'firebase-admin';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
-import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { groupUpdateDataScheduler, userUpdatePortfolioScheduler } from './schedulers';
 import { corsMiddleWareHttp, firebaseSimpleErrorLogger } from './utils';
 
@@ -54,45 +52,7 @@ export const test_me = firebaseSimpleErrorLogger(
 
 // -------- Production ---------
 export * from './group';
-
-// wrap functions with sentry
-export const getmarketoverviewdata = firebaseSimpleErrorLogger(
-  'getMarketOverviewDataWrapper',
-  corsMiddleWareHttp(getMarketOverviewDataWrapper),
-);
+export * from './market-functions';
 
 // -------- Scheduler ---------
-
-export const run_user_portfolio_state_scheduler = onSchedule(
-  {
-    timeoutSeconds: 200,
-    schedule: '*/5 1-2 * * *',
-  },
-  async (event) => {
-    userUpdatePortfolioScheduler();
-  },
-);
-
-export const run_group_update_data_scheduler = onSchedule(
-  {
-    timeoutSeconds: 200,
-    schedule: '*/5 2-3 * * *',
-  },
-  async (event) => {
-    groupUpdateDataScheduler();
-  },
-);
-
-export const run_reload_market_overview = onSchedule(
-  {
-    timeoutSeconds: 200,
-    schedule: '0 22 * * 5',
-  },
-  async () => {
-    reloadMarketOverview();
-  },
-);
-
-// function for SSR
-// const universal = require(`${process.cwd()}/server/main`).app();
-// export const ssr = onRequest(universal);
+export * from './schedulers';
