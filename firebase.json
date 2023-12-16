@@ -7,7 +7,7 @@
       "rewrites": [
         {
           "source": "**",
-          "function": "ssr"
+          "destination": "/index.html"
         }
       ]
     }
