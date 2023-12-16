@@ -24,16 +24,21 @@ export const getStockOwnershipHoldersToDataWrapper = async (env: Env, symbol: st
 	console.log(`Stock ownership holders to date for ${symbol} loaded from API`);
 
 	// reload data
-	const [page0, page1, page2] = await Promise.all([
-		getSymbolOwnershipHolders(symbol, dateQuarter, 0),
-		getSymbolOwnershipHolders(symbol, dateQuarter, 1),
-		getSymbolOwnershipHolders(symbol, dateQuarter, 2),
-	]);
-	const data = [...page0, ...page1, ...page2];
+	try {
+		const [page0, page1, page2] = await Promise.all([
+			getSymbolOwnershipHolders(symbol, dateQuarter, 0),
+			getSymbolOwnershipHolders(symbol, dateQuarter, 1),
+			getSymbolOwnershipHolders(symbol, dateQuarter, 2),
+		]);
+		const data = [...page0, ...page1, ...page2];
 
-	// save data to cache
-	env.get_stock_data.put(key, JSON.stringify(data), { expirationTtl: EXPIRATION_ONE_WEEK });
+		// save data to cache
+		env.get_stock_data.put(key, JSON.stringify(data), { expirationTtl: EXPIRATION_ONE_WEEK });
 
-	// return data
-	return new Response(JSON.stringify(data), RESPONSE_HEADER);
+		// return data
+		return new Response(JSON.stringify(data), RESPONSE_HEADER);
+	} catch (e) {
+		console.log(e);
+		return new Response(`Unable to Provide data for symbol=${symbol}`, { status: 400 });
+	}
 };

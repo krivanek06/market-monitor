@@ -15,12 +15,17 @@ export const getStockOwnershipInstitutionalWrapper = async (env: Env, symbol: st
 
 	console.log(`Stock ownership institutional for ${symbol} loaded from API`);
 
-	// reload data
-	const data = await getSymbolOwnershipInstitutional(symbol);
+	try {
+		// reload data
+		const data = await getSymbolOwnershipInstitutional(symbol);
 
-	// save into cache
-	env.get_stock_data.put(key, JSON.stringify(data), { expirationTtl: EXPIRATION_ONE_WEEK });
+		// save into cache
+		env.get_stock_data.put(key, JSON.stringify(data), { expirationTtl: EXPIRATION_ONE_WEEK });
 
-	// return data
-	return new Response(JSON.stringify(data), RESPONSE_HEADER);
+		// return data
+		return new Response(JSON.stringify(data), RESPONSE_HEADER);
+	} catch (e) {
+		console.log(e);
+		return new Response(`Unable to Provide data for symbol=${symbol}`, { status: 400 });
+	}
 };

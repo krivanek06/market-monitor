@@ -13,7 +13,6 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { UserApiService } from '@market-monitor/api-client';
 import { SymbolSummary } from '@market-monitor/api-types';
 import {
   AUTHENTICATION_ACCOUNT_TOKEN,
@@ -26,7 +25,66 @@ import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
   selector: 'app-summary-action-buttons',
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule],
-  templateUrl: './summary-action-buttons.component.html',
+  template: `
+    <mat-dialog-actions class="flex flex-col justify-between px-4 sm:flex-row gap-y-2">
+      <!-- favorites button -->
+      <ng-container *ngIf="!isUserAuthenticatedSignal()">
+        <button
+          *ngIf="isSymbolInFavoriteSignal()"
+          mat-stroked-button
+          color="warn"
+          (click)="onRemoveToFavorite()"
+          type="button"
+          class="g-border-apply max-sm:w-full"
+        >
+          <mat-icon>do_not_disturb_on</mat-icon>
+          favorites - remove
+        </button>
+        <button
+          *ngIf="!isSymbolInFavoriteSignal()"
+          mat-stroked-button
+          color="accent"
+          (click)="onAddToFavorite()"
+          type="button"
+          class="g-border-apply max-sm:w-full"
+        >
+          <mat-icon>star</mat-icon>
+          favorite - add
+        </button>
+      </ng-container>
+
+      <!-- watchlist button -->
+      <ng-container *ngIf="isUserAuthenticatedSignal()">
+        <button
+          *ngIf="isSymbolInWatchList()"
+          mat-stroked-button
+          color="warn"
+          (click)="onRemoveWatchList()"
+          type="button"
+          class="g-border-apply max-sm:w-full"
+        >
+          <mat-icon>do_not_disturb_on</mat-icon>
+          watchlist - remove
+        </button>
+        <button
+          *ngIf="!isSymbolInWatchList()"
+          mat-stroked-button
+          color="accent"
+          (click)="onAddWatchList()"
+          type="button"
+          class="g-border-apply max-sm:w-full"
+        >
+          <mat-icon>star</mat-icon>
+          watchlist - add
+        </button>
+      </ng-container>
+
+      <button class="max-sm:w-full" type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
+        Go to Details
+        <mat-icon iconPositionEnd>navigate_next</mat-icon>
+      </button>
+    </mat-dialog-actions>
+  `,
   styles: [
     `
       :host {
@@ -48,7 +106,6 @@ export class SummaryActionButtonsComponent implements OnInit {
   constructor(
     private symbolFavoriteService: SymbolFavoriteService,
     private dialogServiceUtil: DialogServiceUtil,
-    private userApiService: UserApiService,
     @Inject(AUTHENTICATION_ACCOUNT_TOKEN)
     @Optional()
     private authenticationUserService: AuthenticationUserStoreService,
@@ -94,7 +151,7 @@ export class SummaryActionButtonsComponent implements OnInit {
   async onAddWatchList() {
     if (this.authenticationUserService) {
       // save data into fireStore
-      await this.userApiService.addSymbolToUserWatchList(
+      await this.authenticationUserService.addSymbolToUserWatchList(
         this.authenticationUserService.state().userData?.id!,
         this.symbolSummary.id,
         'STOCK',
@@ -109,7 +166,7 @@ export class SummaryActionButtonsComponent implements OnInit {
   async onRemoveWatchList() {
     if (this.authenticationUserService) {
       // save data into fireStore
-      await this.userApiService.removeSymbolFromUserWatchList(
+      await this.authenticationUserService.removeSymbolFromUserWatchList(
         this.authenticationUserService.state().userData!.id,
         this.symbolSummary.id,
         'STOCK',

@@ -28,5 +28,10 @@ export const getStockInsiderTradesWrapper = async (env: Env, symbol: string, sea
 	env.get_stock_data.put(key, JSON.stringify(data), { expirationTtl: EXPIRATION_ONE_WEEK });
 
 	// return data
-	return new Response(JSON.stringify(data), RESPONSE_HEADER);
+	try {
+		return new Response(JSON.stringify(data), RESPONSE_HEADER);
+	} catch (e) {
+		console.log(e);
+		return new Response(`Unable to Provide data for symbol=${symbol}`, { status: 400 });
+	}
 };

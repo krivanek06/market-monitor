@@ -2,6 +2,7 @@ import { Injectable, InjectionToken, effect, inject } from '@angular/core';
 import { GroupApiService, UserApiService } from '@market-monitor/api-client';
 import {
   PortfolioTransaction,
+  SymbolType,
   UserData,
   UserGroupData,
   UserWatchlist as UserWatchList,
@@ -142,5 +143,13 @@ export class AuthenticationUserStoreService {
     effect(() => {
       console.log('AuthenticationUserStoreService update', this.state());
     });
+  }
+
+  addSymbolToUserWatchList(userId: string, symbol: string, symbolType: SymbolType): Promise<void> {
+    return this.userApiService.addSymbolToUserWatchList(userId, symbol, symbolType);
+  }
+
+  removeSymbolFromUserWatchList(userId: string, symbol: string, symbolType: SymbolType): Promise<void> {
+    return this.userApiService.removeSymbolFromUserWatchList(userId, symbol, symbolType);
   }
 }

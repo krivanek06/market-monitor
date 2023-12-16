@@ -16,11 +16,16 @@ export const getStockEarningsWrapper = async (env: Env, symbol: string, searchPa
 	console.log(`Stock earnings for ${symbol} loaded from API`);
 
 	// reload data
-	const stockEarnings = await getStockHistoricalEarnings(symbol);
+	try {
+		const stockEarnings = await getStockHistoricalEarnings(symbol);
 
-	// save into cache
-	env.get_stock_data.put(key, JSON.stringify(stockEarnings), { expirationTtl: EXPIRATION_ONE_WEEK });
+		// save into cache
+		env.get_stock_data.put(key, JSON.stringify(stockEarnings), { expirationTtl: EXPIRATION_ONE_WEEK });
 
-	// return data
-	return new Response(JSON.stringify(stockEarnings), RESPONSE_HEADER);
+		// return data
+		return new Response(JSON.stringify(stockEarnings), RESPONSE_HEADER);
+	} catch (e) {
+		console.log(e);
+		return new Response(`Unable to Provide data for symbol=${symbol}`, { status: 400 });
+	}
 };

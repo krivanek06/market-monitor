@@ -31,16 +31,21 @@ export const getStockHistoricalMetricWrapper = async (env: Env, symbol: string, 
 	console.log(`Stock historical metrics for ${symbol} loaded from API`);
 
 	// load data
-	const data = await getStockHistoricalMetrics(symbol);
+	try {
+		const data = await getStockHistoricalMetrics(symbol);
 
-	// format data
-	const formattedData = formatData(data, timePeriod);
+		// format data
+		const formattedData = formatData(data, timePeriod);
 
-	// save to cache
-	env.get_stock_data.put(key, JSON.stringify(formattedData), { expirationTtl: EXPIRATION_ONE_WEEK });
+		// save to cache
+		env.get_stock_data.put(key, JSON.stringify(formattedData), { expirationTtl: EXPIRATION_ONE_WEEK });
 
-	// stringify data and return
-	return new Response(JSON.stringify(formattedData), RESPONSE_HEADER);
+		// stringify data and return
+		return new Response(JSON.stringify(formattedData), RESPONSE_HEADER);
+	} catch (e) {
+		console.log(e);
+		return new Response(`Unable to Provide data for symbol=${symbol}`, { status: 400 });
+	}
 };
 
 const getStockHistoricalMetrics = async (symbol: string): Promise<StockMetricsHistoricalAPI> => {
