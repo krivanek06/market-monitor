@@ -1,11 +1,21 @@
 import { DOCUMENT } from '@angular/common';
-import { Directive, ElementRef, EventEmitter, HostListener, Inject, Input, OnInit, Output } from '@angular/core';
+import {
+  AfterViewInit,
+  Directive,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Inject,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 
 @Directive({
   selector: '[appScrollNearEnd]',
   standalone: true,
 })
-export class ScrollNearEndDirective implements OnInit {
+export class ScrollNearEndDirective implements OnInit, AfterViewInit {
   @Output() nearEnd: EventEmitter<void> = new EventEmitter<void>();
 
   /**
@@ -27,8 +37,12 @@ export class ScrollNearEndDirective implements OnInit {
     }
   }
 
+  ngAfterViewInit(): void {
+    this.windowScrollEvent();
+  }
+
   @HostListener('window:scroll', ['$event.target'])
-  windowScrollEvent(event: KeyboardEvent) {
+  windowScrollEvent(event?: KeyboardEvent) {
     if (!this.window) {
       return;
     }

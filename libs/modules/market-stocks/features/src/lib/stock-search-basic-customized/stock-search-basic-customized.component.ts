@@ -78,9 +78,9 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     inputHasValue: false,
   });
   isUserAuthenticatedSignal = signal(false);
-  symbolFavoriteService = inject(SymbolFavoriteService);
-  symbolSearchService = inject(SymbolSearchService);
-  dialog = inject(MatDialog);
+  private symbolFavoriteService = inject(SymbolFavoriteService);
+  private symbolSearchService = inject(SymbolSearchService);
+  private dialog = inject(MatDialog);
 
   constructor(
     @Inject(AUTHENTICATION_ACCOUNT_TOKEN)

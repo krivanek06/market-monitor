@@ -21,7 +21,19 @@ import { forkJoin, take } from 'rxjs';
     NewsSearchComponent,
     StockSearchBasicCustomizedComponent,
   ],
-  templateUrl: './page-search.component.html',
+  template: `
+    <div class="pt-[180px] pb-[260px] sm:pt-[200px] sm:pb-[300px]">
+      <div class="max-w-[620px] mx-auto">
+        <h1 class="text-xl text-center">Search Stock</h1>
+        <app-stock-search-basic-customized></app-stock-search-basic-customized>
+      </div>
+    </div>
+
+    <!-- news -->
+    <div class="g-width-lg">
+      <app-news-search [initialNewsToDisplay]="4" [searchData]="{ newsType: 'general' }"></app-news-search>
+    </div>
+  `,
   styles: [
     `
       :host {
