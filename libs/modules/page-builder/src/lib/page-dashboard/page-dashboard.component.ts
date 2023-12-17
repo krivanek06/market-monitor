@@ -47,7 +47,93 @@ import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
     FormMatInputWrapperComponent,
     PortfolioTransactionChartComponent,
   ],
-  templateUrl: './page-dashboard.component.html',
+  template: `
+    <ng-container *ngIf="portfolioUserFacadeService.getPortfolioState() as portfolioState">
+      <div class="flex flex-col gap-4 mx-auto mb-6 md:mb-12 xl:gap-10 md:flex-row 2xl:w-11/12">
+        <app-fancy-card class="sm:basis-3/6" title="Account" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+          <app-portfolio-state
+            [titleColor]="ColorScheme.PRIMARY_VAR"
+            [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+            [showCashSegment]="!!authenticationUserService.state.getUserData().features.userPortfolioAllowCashAccount"
+            [portfolioState]="portfolioState"
+          ></app-portfolio-state>
+        </app-fancy-card>
+
+        <app-fancy-card title="Risk" [colorPrimary]="ColorScheme.SUCCESS_VAR" class="flex-1">
+          <app-portfolio-state-risk
+            [titleColor]="ColorScheme.SUCCESS_VAR"
+            [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+          ></app-portfolio-state-risk>
+        </app-fancy-card>
+
+        <app-fancy-card title="Transactions" [colorPrimary]="ColorScheme.DANGER_VAR" class="flex-1">
+          <app-portfolio-state-transactions
+            [titleColor]="ColorScheme.DANGER_VAR"
+            [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+            [showFees]="!!authenticationUserService.state.getUserData().features.userPortfolioAllowCashAccount"
+            [portfolioState]="portfolioState"
+          ></app-portfolio-state-transactions>
+        </app-fancy-card>
+      </div>
+
+      <!-- portfolio change -->
+      <div class="mb-12 lg:px-10">
+        <app-portfolio-period-change
+          *ngIf="portfolioUserFacadeService.getPortfolioChange() as portfolioChange"
+          [portfolioChange]="portfolioChange"
+        ></app-portfolio-period-change>
+      </div>
+
+      <!-- dashboard charts -->
+      <div class="mb-8">
+        <app-portfolio-growth-charts
+          [portfolioState]="portfolioState"
+          [portfolioAssetsGrowth]="portfolioUserFacadeService.getPortfolioGrowthAssets()"
+          [portfolioGrowth]="portfolioUserFacadeService.getPortfolioGrowth()"
+        ></app-portfolio-growth-charts>
+      </div>
+
+      <!-- holdings pie charts -->
+      <div class="flex justify-around mb-10 overflow-x-clip">
+        <app-generic-chart
+          chartTitle="Asset Allocation"
+          [heightPx]="380"
+          [showDataLabel]="true"
+          chartTitlePosition="center"
+          [series]="[portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()]"
+        ></app-generic-chart>
+        <app-generic-chart
+          [heightPx]="380"
+          chartTitle="Sector Allocation"
+          [showDataLabel]="true"
+          chartTitlePosition="center"
+          [series]="[portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()]"
+        ></app-generic-chart>
+      </div>
+
+      <!-- holding -->
+      <div class="mb-8">
+        <app-general-card
+          title="Holdings [{{ portfolioState.holdings.length }} / {{ USER_HOLDINGS_SYMBOL_LIMIT }}]"
+          titleScale="large"
+          matIcon="show_chart"
+        >
+          <app-portfolio-holdings-table
+            (symbolClicked)="onSummaryClick($event)"
+            [holdings]="portfolioState.holdings"
+            [holdingsBalance]="portfolioState.holdingsBalance"
+          ></app-portfolio-holdings-table>
+        </app-general-card>
+      </div>
+
+      <!-- transactions chart -->
+      <ng-container *ngIf="!!authenticationUserService.state.getUserData().features.userPortfolioAllowCashAccount">
+        <app-portfolio-transaction-chart
+          [data]="portfolioUserFacadeService.getPortfolioTransactionToDate()"
+        ></app-portfolio-transaction-chart>
+      </ng-container>
+    </ng-container>
+  `,
   styles: [
     `
       :host {
@@ -58,19 +144,12 @@ import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageDashboardComponent {
-  private portfolioUserFacadeService = inject(PortfolioUserFacadeService);
-  private authenticationUserService = inject(AuthenticationUserStoreService);
+  portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  authenticationUserService = inject(AuthenticationUserStoreService);
   private dialog = inject(MatDialog);
 
   portfolioGrowthDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
   portfolioChangeDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
-
-  userDataSignal = this.authenticationUserService.state.getUserData;
-  portfolioStateSignal = this.portfolioUserFacadeService.getPortfolioState;
-  portfolioChangeSignal = this.portfolioUserFacadeService.getPortfolioChange;
-  portfolioAssetAllocation = this.portfolioUserFacadeService.getPortfolioAssetAllocationPieChart;
-  portfolioSectorAllocationSignal = this.portfolioUserFacadeService.getPortfolioSectorAllocationPieChart;
-  portfolioTransactionToDateSignal = this.portfolioUserFacadeService.getPortfolioTransactionToDate;
 
   ColorScheme = ColorScheme;
   dashboardChartOptionsInputSource = dashboardChartOptionsInputSource;

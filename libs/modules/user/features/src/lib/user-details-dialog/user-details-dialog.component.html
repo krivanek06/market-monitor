@@ -51,7 +51,11 @@
 
     <!-- portfolio growth charts -->
     <div>
-      <app-portfolio-growth-charts [portfolioState]="portfolioStateHoldingSignal()"></app-portfolio-growth-charts>
+      <app-portfolio-growth-charts
+        [portfolioState]="userData.portfolioState"
+        [portfolioAssetsGrowth]="portfolioGrowthAssetsSignal()"
+        [portfolioGrowth]="portfolioGrowthSignal()"
+      ></app-portfolio-growth-charts>
     </div>
   } @else {
     <mat-spinner></mat-spinner>

@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GroupApiService, UserApiService } from '@market-monitor/api-client';
-import { GroupData, PortfolioStateHoldings, UserData } from '@market-monitor/api-types';
-import { PortfolioGrowthService } from '@market-monitor/modules/portfolio/data-access';
+import { GroupData, PortfolioGrowthAssets, PortfolioStateHoldings, UserData } from '@market-monitor/api-types';
+import { PortfolioCalculationService, PortfolioGrowthService } from '@market-monitor/modules/portfolio/data-access';
 import { PortfolioGrowthChartsComponent } from '@market-monitor/modules/portfolio/features';
 import {
   PortfolioStateComponent,
@@ -17,7 +17,7 @@ import {
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
 import { DialogServiceUtil, filterNullish } from '@market-monitor/shared/utils-client';
-import { forkJoin, map, share, switchMap, tap } from 'rxjs';
+import { forkJoin, from, map, share, switchMap, tap } from 'rxjs';
 
 export type UserDetailsDialogComponentData = {
   userId: string;
@@ -52,6 +52,7 @@ export class UserDetailsDialogComponent {
   private groupApiService = inject(GroupApiService);
   private dialogServiceUtil = inject(DialogServiceUtil);
   private portfolioGrowthService = inject(PortfolioGrowthService);
+  private portfolioCalculationService = inject(PortfolioCalculationService);
 
   userDataSignal = signal<UserData | undefined>(undefined);
   userGroupDataSignal = signal<{
@@ -62,6 +63,13 @@ export class UserDetailsDialogComponent {
     groupOwner: [],
   });
   portfolioStateHoldingSignal = signal<PortfolioStateHoldings | undefined>(undefined);
+  portfolioGrowthAssetsSignal = signal<PortfolioGrowthAssets[]>([]);
+  portfolioGrowthSignal = computed(() =>
+    this.portfolioCalculationService.getPortfolioGrowth(
+      this.portfolioGrowthAssetsSignal(),
+      this.userDataSignal()?.portfolioState?.startingCash,
+    ),
+  );
 
   ColorScheme = ColorScheme;
 
@@ -77,6 +85,15 @@ export class UserDetailsDialogComponent {
         }
       }),
       filterNullish(),
+      share(),
+    );
+
+    const userPortfolioTransactions$ = userRef$.pipe(
+      switchMap((userData) =>
+        this.userApiService
+          .getUserPortfolioTransactions(userData.id)
+          .pipe(map((transactions) => ({ userData, transactions: transactions.transactions }))),
+      ),
       share(),
     );
 
@@ -103,18 +120,20 @@ export class UserDetailsDialogComponent {
       );
 
     // load user portfolio state
-    userRef$
+    userPortfolioTransactions$
       .pipe(
-        switchMap((userData) =>
-          this.userApiService.getUserPortfolioTransactions(userData.id).pipe(
-            map((d) => d.transactions),
-            switchMap((transactions) =>
-              this.portfolioGrowthService.getPortfolioStateHoldings(transactions, userData.portfolioState.startingCash),
-            ),
+        switchMap((data) =>
+          this.portfolioGrowthService.getPortfolioStateHoldings(
+            data.transactions,
+            data.userData.portfolioState.startingCash,
           ),
         ),
       )
       .subscribe((portfolioState) => this.portfolioStateHoldingSignal.set(portfolioState));
+
+    userPortfolioTransactions$
+      .pipe(switchMap((data) => from(this.portfolioGrowthService.getPortfolioGrowthAssets(data.transactions))))
+      .subscribe((portfolioGrowthAssets) => this.portfolioGrowthAssetsSignal.set(portfolioGrowthAssets));
   }
 
   onDialogClose() {
