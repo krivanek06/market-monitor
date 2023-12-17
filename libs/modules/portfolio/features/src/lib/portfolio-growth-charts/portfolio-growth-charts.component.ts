@@ -22,7 +22,7 @@ import { isAfter, isBefore } from 'date-fns';
 import { combineLatest, map, startWith, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-dashboard-portfolio-charts',
+  selector: 'app-portfolio-growth-charts',
   standalone: true,
   imports: [
     CommonModule,
@@ -33,7 +33,7 @@ import { combineLatest, map, startWith, tap } from 'rxjs';
     ReactiveFormsModule,
     PortfolioGrowthChartComponent,
   ],
-  templateUrl: './dashboard-portfolio-charts.component.html',
+  templateUrl: './portfolio-growth-charts.component.html',
   styles: [
     `
       :host {
@@ -43,17 +43,15 @@ import { combineLatest, map, startWith, tap } from 'rxjs';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardPortfolioChartsComponent {
-  @Input({ required: true }) portfolioState!: PortfolioStateHoldings;
-
+export class PortfolioGrowthChartsComponent {
   portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  @Input({ required: true }) portfolioState!: PortfolioStateHoldings;
+  @Input() portfolioAssetsGrowthSignal = this.portfolioUserFacadeService.getPortfolioGrowthAssets;
 
   dashboardChartOptionsInputSource = dashboardChartOptionsInputSource;
 
   selectedChartFormControl = new FormControl(dashboardChartOptionsInputSource[0].value, { nonNullable: true });
   portfolioRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
-
-  portfolioAssetsGrowthSignal = this.portfolioUserFacadeService.getPortfolioGrowthAssets;
 
   portfolioGrowthChartSignal = toSignal(
     combineLatest([

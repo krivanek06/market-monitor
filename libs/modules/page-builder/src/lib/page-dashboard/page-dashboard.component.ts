@@ -9,6 +9,7 @@ import {
   PortfolioUserFacadeService,
   dashboardChartOptionsInputSource,
 } from '@market-monitor/modules/portfolio/data-access';
+import { PortfolioGrowthChartsComponent } from '@market-monitor/modules/portfolio/features';
 import {
   PortfolioHoldingsTableComponent,
   PortfolioPeriodChangeComponent,
@@ -26,7 +27,6 @@ import {
   GenericChartComponent,
 } from '@market-monitor/shared/ui';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
-import { DashboardPortfolioChartsComponent } from './dashboard-portfolio-charts/dashboard-portfolio-charts.component';
 
 @Component({
   selector: 'app-page-dashboard',
@@ -35,7 +35,7 @@ import { DashboardPortfolioChartsComponent } from './dashboard-portfolio-charts/
     CommonModule,
     PortfolioStateComponent,
     FancyCardComponent,
-    DashboardPortfolioChartsComponent,
+    PortfolioGrowthChartsComponent,
     PortfolioPeriodChangeComponent,
     GenericChartComponent,
     PortfolioStateTransactionsComponent,

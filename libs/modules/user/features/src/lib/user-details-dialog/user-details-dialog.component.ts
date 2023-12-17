@@ -6,7 +6,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GroupApiService, UserApiService } from '@market-monitor/api-client';
-import { GroupData, UserData } from '@market-monitor/api-types';
+import { GroupData, PortfolioStateHoldings, UserData } from '@market-monitor/api-types';
+import { PortfolioGrowthService } from '@market-monitor/modules/portfolio/data-access';
+import { PortfolioGrowthChartsComponent } from '@market-monitor/modules/portfolio/features';
 import {
   PortfolioStateComponent,
   PortfolioStateRiskComponent,
@@ -15,7 +17,7 @@ import {
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
 import { DialogServiceUtil, filterNullish } from '@market-monitor/shared/utils-client';
-import { forkJoin, share, switchMap, tap } from 'rxjs';
+import { forkJoin, map, share, switchMap, tap } from 'rxjs';
 
 export type UserDetailsDialogComponentData = {
   userId: string;
@@ -35,6 +37,7 @@ export type UserDetailsDialogComponentData = {
     PortfolioStateComponent,
     PortfolioStateRiskComponent,
     PortfolioStateTransactionsComponent,
+    PortfolioGrowthChartsComponent,
   ],
   templateUrl: './user-details-dialog.component.html',
   styles: `
@@ -48,6 +51,7 @@ export class UserDetailsDialogComponent {
   private userApiService = inject(UserApiService);
   private groupApiService = inject(GroupApiService);
   private dialogServiceUtil = inject(DialogServiceUtil);
+  private portfolioGrowthService = inject(PortfolioGrowthService);
 
   userDataSignal = signal<UserData | undefined>(undefined);
   userGroupDataSignal = signal<{
@@ -57,6 +61,7 @@ export class UserDetailsDialogComponent {
     groupMember: [],
     groupOwner: [],
   });
+  portfolioStateHoldingSignal = signal<PortfolioStateHoldings | undefined>(undefined);
 
   ColorScheme = ColorScheme;
 
@@ -96,6 +101,20 @@ export class UserDetailsDialogComponent {
           groupOwner,
         }),
       );
+
+    // load user portfolio state
+    userRef$
+      .pipe(
+        switchMap((userData) =>
+          this.userApiService.getUserPortfolioTransactions(userData.id).pipe(
+            map((d) => d.transactions),
+            switchMap((transactions) =>
+              this.portfolioGrowthService.getPortfolioStateHoldings(transactions, userData.portfolioState.startingCash),
+            ),
+          ),
+        ),
+      )
+      .subscribe((portfolioState) => this.portfolioStateHoldingSignal.set(portfolioState));
   }
 
   onDialogClose() {

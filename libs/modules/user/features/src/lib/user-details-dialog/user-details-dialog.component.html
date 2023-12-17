@@ -16,7 +16,7 @@
 <mat-dialog-content>
   @if (userDataSignal(); as userData) {
     <!-- display portfolio -->
-    <div class="grid grid-cols-3 p-2 divide-x-2">
+    <div class="grid grid-cols-3 p-2 mb-6 divide-x-2">
       <!-- portfolio state -->
       <div class="px-6">
         <app-portfolio-state
@@ -47,6 +47,11 @@
         >
         </app-portfolio-state-transactions>
       </div>
+    </div>
+
+    <!-- portfolio growth charts -->
+    <div>
+      <app-portfolio-growth-charts [portfolioState]="portfolioStateHoldingSignal()"></app-portfolio-growth-charts>
     </div>
   } @else {
     <mat-spinner></mat-spinner>
