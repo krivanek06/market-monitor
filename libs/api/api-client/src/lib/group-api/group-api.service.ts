@@ -48,6 +48,13 @@ export class GroupApiService {
     return rxDocData(this.getGroupDocRef(groupId), { idField: 'id' });
   }
 
+  getGroupDataByIds(ids: string[]): Observable<GroupData[]> {
+    if (!ids || ids.length === 0) {
+      return of([]);
+    }
+    return rxCollectionData(query(this.getGroupCollectionRef(), where('id', 'in', ids)));
+  }
+
   getGroupMembersDataById(groupId: string): Observable<GroupMembersData | undefined> {
     return rxDocData(this.getGroupMembersDocRef(groupId));
   }

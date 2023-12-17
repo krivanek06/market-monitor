@@ -20,4 +20,11 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
 export class PortfolioStateRiskComponent {
   @Input() titleColor?: ColorScheme;
   @Input() valueColor?: ColorScheme;
+  @Input() isLayoutHorizontal = false;
+  @Input() classes = 'grid gap-4 sm:grid-cols-2';
+
+  get valueClasses(): string {
+    const position = this.isLayoutHorizontal ? 'flex-row justify-between' : 'flex-col';
+    return `flex gap-y-2 ${position}`;
+  }
 }

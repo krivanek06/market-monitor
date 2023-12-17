@@ -1,0 +1,54 @@
+<div class="flex items-center justify-between p-4 mb-4">
+  <!-- display user -->
+  <div class="flex items-center gap-2">
+    <img appDefaultImg [src]="userDataSignal()?.personal?.photoURL" alt="User Image" class="rounded-full w-14 h-14" />
+    <span class="text-xl">{{ userDataSignal()?.personal?.displayName }}</span>
+  </div>
+
+  <!-- close -->
+  <div>
+    <button mat-icon-button color="warn" type="button" (click)="onDialogClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
+
+<mat-dialog-content>
+  @if (userDataSignal(); as userData) {
+    <!-- display portfolio -->
+    <div class="grid grid-cols-3 p-2 divide-x-2">
+      <!-- portfolio state -->
+      <div class="px-6">
+        <app-portfolio-state
+          [titleColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [portfolioState]="userData.portfolioState"
+          [isLayoutHorizontal]="true"
+          classes="grid"
+        ></app-portfolio-state>
+      </div>
+      <!-- risk -->
+      <div class="px-6">
+        <app-portfolio-state-risk
+          [titleColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [isLayoutHorizontal]="true"
+          classes="grid"
+        ></app-portfolio-state-risk>
+      </div>
+      <!-- transactions -->
+      <div class="px-6">
+        <app-portfolio-state-transactions
+          [portfolioState]="userData.portfolioState"
+          [titleColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [isLayoutHorizontal]="true"
+          classes="grid"
+        >
+        </app-portfolio-state-transactions>
+      </div>
+    </div>
+  } @else {
+    <mat-spinner></mat-spinner>
+  }
+</mat-dialog-content>

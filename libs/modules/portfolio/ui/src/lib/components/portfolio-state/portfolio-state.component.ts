@@ -23,6 +23,11 @@ export class PortfolioStateComponent {
   @Input() classes = 'grid gap-4 sm:grid-cols-2';
   @Input() titleColor?: ColorScheme;
   @Input() valueColor?: ColorScheme;
-
+  @Input() isLayoutHorizontal = false;
   @Input() showCashSegment = false;
+
+  get valueClasses(): string {
+    const position = this.isLayoutHorizontal ? 'flex-row justify-between' : 'flex-col';
+    return `flex gap-y-2 ${position}`;
+  }
 }

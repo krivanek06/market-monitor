@@ -1,26 +1,26 @@
-<div class="grid gap-4 sm:grid-cols-2">
-  <!-- balance -->
-  <div class="flex flex-col gap-2">
-    <div [appAddColor]="titleColor" class="text-xl">Buy</div>
-    <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedBuyTransactions }}</div>
-  </div>
-
-  <!-- Invested -->
-  <div class="flex flex-col gap-2">
-    <div [appAddColor]="titleColor" class="text-xl">Sell</div>
-    <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedSellTransactions }}</div>
-  </div>
-
-  <!-- Invested -->
-  <div class="flex flex-col gap-2">
+<div [class]="classes">
+  <!-- Total -->
+  <div [class]="valueClasses">
     <div [appAddColor]="titleColor" class="text-xl">Total</div>
     <div [appAddColor]="valueColor" class="text-xl">
       {{ portfolioState.numberOfExecutedBuyTransactions + portfolioState.numberOfExecutedSellTransactions }}
     </div>
   </div>
 
-  <!-- Invested -->
-  <div class="flex flex-col gap-2">
+  <!-- Buy -->
+  <div [class]="valueClasses">
+    <div [appAddColor]="titleColor" class="text-xl">Buy</div>
+    <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedBuyTransactions }}</div>
+  </div>
+
+  <!-- Sell -->
+  <div [class]="valueClasses">
+    <div [appAddColor]="titleColor" class="text-xl">Sell</div>
+    <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedSellTransactions }}</div>
+  </div>
+
+  <!-- Fees -->
+  <div [class]="valueClasses">
     <div [appAddColor]="titleColor" class="text-xl">Fees</div>
     <div *ngIf="showFees" [appAddColor]="valueColor" class="text-xl">
       {{ portfolioState.transactionFees | currency }}
