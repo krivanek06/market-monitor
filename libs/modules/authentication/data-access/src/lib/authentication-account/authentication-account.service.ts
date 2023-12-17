@@ -10,7 +10,6 @@ import {
 } from '@angular/fire/auth';
 import { UserApiService } from '@market-monitor/api-client';
 import { UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
-import { filterNullish } from '@market-monitor/shared/utils-client';
 import { dateFormatDate } from '@market-monitor/shared/utils-general';
 import { BehaviorSubject, Observable, Subject, map, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
@@ -31,8 +30,8 @@ export class AuthenticationAccountService {
     this.listenOnUserChanges();
   }
 
-  getUserData(): Observable<UserData> {
-    return this.authenticatedUserData$.pipe(filterNullish());
+  getUserData(): Observable<UserData | null> {
+    return this.authenticatedUserData$;
   }
 
   getUser(): Observable<User | null> {
@@ -56,10 +55,8 @@ export class AuthenticationAccountService {
     return signInWithPopup(this.auth, provider);
   }
 
-  async signOut() {
-    this.authenticatedUserData$.next(null);
-    this.authenticatedUser$.next(null);
-    await this.auth.signOut();
+  signOut() {
+    this.auth.signOut();
   }
 
   changePassword() {

@@ -37,8 +37,8 @@ export class FeatureAccessDirective implements OnInit, OnDestroy {
     this.viewContainerRef.clear();
 
     this.getUserData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
+      this.viewContainerRef.clear();
       if (!userData) {
-        this.viewContainerRef.clear();
         return;
       }
       const hasAccess = userData.features[this.featureName];

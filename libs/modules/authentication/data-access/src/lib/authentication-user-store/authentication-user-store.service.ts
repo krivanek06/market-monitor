@@ -10,7 +10,7 @@ import {
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { User } from 'firebase/auth';
 import { signalSlice } from 'ngxtension/signal-slice';
-import { combineLatest, map, switchMap } from 'rxjs';
+import { combineLatest, map, of, switchMap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
@@ -81,7 +81,9 @@ export class AuthenticationUserStoreService {
    * Source used to get user watchList
    */
   private watchListSource$ = this.authenticationAccountService.getUserData().pipe(
-    switchMap((userData) => this.userApiService.getUserWatchList(userData.id)),
+    switchMap((userData) =>
+      userData ? this.userApiService.getUserWatchList(userData.id) : of(this.initialState.watchList),
+    ),
     map((watchList) => ({ watchList: watchList })),
   );
 
@@ -89,9 +91,13 @@ export class AuthenticationUserStoreService {
    * Source used to get user portfolio transactions
    */
   private portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
-    switchMap((userData) => this.userApiService.getUserPortfolioTransactions(userData.id)),
-    map((userTransactions) => ({
-      portfolioTransactions: userTransactions.transactions,
+    switchMap((userData) =>
+      userData
+        ? this.userApiService.getUserPortfolioTransactions(userData.id).pipe(map((d) => d.transactions))
+        : of([]),
+    ),
+    map((transactions) => ({
+      portfolioTransactions: transactions,
     })),
   );
 
@@ -99,24 +105,34 @@ export class AuthenticationUserStoreService {
    * Source used to get user group data, owner, member, invitations, requested, watched
    */
   private userGroupDataSource$ = this.authenticationAccountService.getUserData().pipe(
-    map((user) => user.groups),
+    map((user) => user?.groups),
     switchMap((groups) =>
-      combineLatest([
-        this.groupApiService.getGroupsDataByIds(groups.groupMember),
-        this.groupApiService.getGroupsDataByIds(groups.groupOwner),
-        this.groupApiService.getGroupsDataByIds(groups.groupInvitations),
-        this.groupApiService.getGroupsDataByIds(groups.groupRequested),
-        this.groupApiService.getGroupsDataByIds(groups.groupWatched),
-      ]).pipe(
-        map(([groupMember, groupOwner, groupInvitations, groupRequested, groupWatched]) => ({
-          groupMember,
-          groupOwner,
-          groupInvitations,
-          groupRequested,
-          groupWatched,
-        })),
-        map((userGroupData) => ({ userGroupData })),
-      ),
+      groups
+        ? combineLatest([
+            this.groupApiService.getGroupsDataByIds(groups.groupMember),
+            this.groupApiService.getGroupsDataByIds(groups.groupOwner),
+            this.groupApiService.getGroupsDataByIds(groups.groupInvitations),
+            this.groupApiService.getGroupsDataByIds(groups.groupRequested),
+            this.groupApiService.getGroupsDataByIds(groups.groupWatched),
+          ]).pipe(
+            map(([groupMember, groupOwner, groupInvitations, groupRequested, groupWatched]) => ({
+              groupMember,
+              groupOwner,
+              groupInvitations,
+              groupRequested,
+              groupWatched,
+            })),
+            map((userGroupData) => ({ userGroupData })),
+          )
+        : of({
+            userGroupData: {
+              groupMember: [],
+              groupOwner: [],
+              groupInvitations: [],
+              groupRequested: [],
+              groupWatched: [],
+            },
+          }),
     ),
   );
 

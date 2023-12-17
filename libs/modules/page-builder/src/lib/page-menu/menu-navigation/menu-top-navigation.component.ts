@@ -122,15 +122,15 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
         <div>
           <!-- display logged in person -->
-          <button mat-button [matMenuTriggerFor]="personMenu">
+          <button *ngIf="userDataSignal() as userDataSignal" mat-button [matMenuTriggerFor]="personMenu">
             <div class="flex items-center gap-3">
               <img
                 appDefaultImg
                 class="w-8 h-8 rounded-full"
-                [src]="userDataSignal().personal.photoURL"
-                [alt]="userDataSignal().personal.displayName"
+                [src]="userDataSignal.personal.photoURL"
+                [alt]="userDataSignal.personal.displayName"
               />
-              <span>{{ userDataSignal().personal.displayName }}</span>
+              <span>{{ userDataSignal.personal.displayName }}</span>
             </div>
           </button>
 
@@ -172,7 +172,7 @@ export class MenuTopNavigationComponent implements OnInit {
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private authenticationService = inject(AuthenticationAccountService);
 
-  userDataSignal = this.authenticationUserStoreService.state.getUserData;
+  userDataSignal = this.authenticationUserStoreService.state.userData;
 
   ROUTES_MAIN = ROUTES_MAIN;
   activeLinkSignal = signal<ROUTES_MAIN>(ROUTES_MAIN.DASHBOARD);
@@ -193,7 +193,7 @@ export class MenuTopNavigationComponent implements OnInit {
   onHelpClick() {}
 
   async onLogOutClick() {
-    await this.authenticationService.signOut();
     this.router.navigate([ROUTES_MAIN.LOGIN]);
+    this.authenticationService.signOut();
   }
 }
