@@ -87,6 +87,7 @@ import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
       <!-- dashboard charts -->
       <div class="mb-8">
         <app-portfolio-growth-charts
+          [showChartChangeSelect]="true"
           [portfolioState]="portfolioState"
           [portfolioAssetsGrowth]="portfolioUserFacadeService.getPortfolioGrowthAssets()"
           [portfolioGrowth]="portfolioUserFacadeService.getPortfolioGrowth()"

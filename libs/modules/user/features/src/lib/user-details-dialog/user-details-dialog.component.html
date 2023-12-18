@@ -1,8 +1,20 @@
 <div class="flex items-center justify-between p-4 mb-4">
   <!-- display user -->
-  <div class="flex items-center gap-2">
-    <img appDefaultImg [src]="userDataSignal()?.personal?.photoURL" alt="User Image" class="rounded-full w-14 h-14" />
-    <span class="text-xl">{{ userDataSignal()?.personal?.displayName }}</span>
+  <div *ngIf="userDataSignal() as user" class="flex items-center gap-2">
+    <img appDefaultImg [src]="user.personal.photoURL" alt="User Image" class="rounded-full w-14 h-14" />
+    <div class="flex flex-col">
+      <span class="text-xl">{{ user.personal.displayName }}</span>
+      <span class="text-sm">{{ user.accountCreatedDate | date: 'MMMM d, y' }}</span>
+    </div>
+
+    <!-- action buttons -->
+    <div class="ml-8 -mb-4">
+      <!-- navigation -->
+      <app-tab-select-control
+        [formControl]="selectedTabControl"
+        [displayOptions]="displayOptions"
+      ></app-tab-select-control>
+    </div>
   </div>
 
   <!-- close -->
@@ -13,50 +25,21 @@
   </div>
 </div>
 
-<mat-dialog-content>
+<mat-dialog-content class="h-[650px]">
   @if (userDataSignal(); as userData) {
-    <!-- display portfolio -->
-    <div class="grid grid-cols-3 p-2 mb-6 divide-x-2">
-      <!-- portfolio state -->
-      <div class="px-6">
-        <app-portfolio-state
-          [titleColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          [portfolioState]="userData.portfolioState"
-          [isLayoutHorizontal]="true"
-          classes="grid"
-        ></app-portfolio-state>
-      </div>
-      <!-- risk -->
-      <div class="px-6">
-        <app-portfolio-state-risk
-          [titleColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          [isLayoutHorizontal]="true"
-          classes="grid"
-        ></app-portfolio-state-risk>
-      </div>
-      <!-- transactions -->
-      <div class="px-6">
-        <app-portfolio-state-transactions
-          [portfolioState]="userData.portfolioState"
-          [titleColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          [isLayoutHorizontal]="true"
-          classes="grid"
-        >
-        </app-portfolio-state-transactions>
-      </div>
-    </div>
+    <!-- overview -->
+    <app-user-details-overview
+      *ngIf="selectedTabControl.value === 'overview'"
+      [userData]="userData"
+      [portfolioGrowth]="portfolioGrowthSignal()"
+    ></app-user-details-overview>
 
-    <!-- portfolio growth charts -->
-    <div>
-      <app-portfolio-growth-charts
-        [portfolioState]="userData.portfolioState"
-        [portfolioAssetsGrowth]="portfolioGrowthAssetsSignal()"
-        [portfolioGrowth]="portfolioGrowthSignal()"
-      ></app-portfolio-growth-charts>
-    </div>
+    <!-- holdings -->
+    <app-user-details-holdings
+      *ngIf="selectedTabControl.value === 'holdings'"
+      [holdings]="portfolioStateHoldingSignal()?.holdings ?? []"
+      [holdingsBalance]="portfolioStateHoldingSignal()?.balance ?? 0"
+    ></app-user-details-holdings>
   } @else {
     <mat-spinner></mat-spinner>
   }

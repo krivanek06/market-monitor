@@ -33,7 +33,9 @@ import { Subject, combineLatest, map, startWith } from 'rxjs';
     <div class="flex items-center justify-between">
       <div class="flex flex-col">
         <!-- select chart title -->
-        <div class="text-lg text-wt-primary">{{ selectedChartFormControl.value.caption }}</div>
+        <div *ngIf="showChartChangeSelect" class="text-lg text-wt-primary">
+          {{ selectedChartFormControl.value.caption }}
+        </div>
         <!-- date range -->
         <app-date-range-slider
           *ngIf="selectedChartFormControl.value.value !== 'PortfolioAssets' && portfolioAssetsGrowth.length > 40"
@@ -45,6 +47,7 @@ import { Subject, combineLatest, map, startWith } from 'rxjs';
 
       <!-- select chart type -->
       <app-form-mat-input-wrapper
+        *ngIf="showChartChangeSelect"
         class="w-[350px]"
         [formControl]="selectedChartFormControl"
         inputCaption="Select Portfolio Type"
@@ -61,7 +64,7 @@ import { Subject, combineLatest, map, startWith } from 'rxjs';
           values: portfolioGrowthChartSignal,
           startingCashValue: portfolioState.startingCash
         }"
-        [heightPx]="500"
+        [heightPx]="heightPx"
       ></app-portfolio-growth-chart>
     </ng-container>
 
@@ -70,13 +73,13 @@ import { Subject, combineLatest, map, startWith } from 'rxjs';
       <app-portfolio-change-chart
         *ngIf="portfolioChangeChartSignal() as portfolioChangeChartSignal"
         [data]="portfolioChangeChartSignal"
-        [heightPx]="500"
+        [heightPx]="heightPx"
       ></app-portfolio-change-chart>
     </ng-container>
 
     <!-- portfolio assets -->
     <ng-container *ngIf="selectedChartFormControl.value.value === 'PortfolioAssets'">
-      <app-portfolio-asset-chart [data]="portfolioAssetsGrowth"></app-portfolio-asset-chart>
+      <app-portfolio-asset-chart [data]="portfolioAssetsGrowth" [heightPx]="heightPx"></app-portfolio-asset-chart>
     </ng-container>
   `,
   styles: [
@@ -89,6 +92,8 @@ import { Subject, combineLatest, map, startWith } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioGrowthChartsComponent implements OnInit {
+  @Input() showChartChangeSelect = false;
+  @Input() heightPx = 500;
   @Input({ required: true }) portfolioState!: PortfolioState;
   @Input({ required: true }) portfolioAssetsGrowth!: PortfolioGrowthAssets[];
   @Input({ required: true }) set portfolioGrowth(data: PortfolioGrowth[]) {

@@ -1,12 +1,14 @@
-import { Directive, inject } from '@angular/core';
+import { inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { GroupApiService } from '@market-monitor/api-client';
 import { map, switchMap } from 'rxjs';
 
-@Directive()
-export class PageGroupsBaseComponent {
+/**
+ * Helper class for all page group details components
+ */
+export abstract class PageGroupsBaseComponent {
   groupApiService = inject(GroupApiService);
   dialog = inject(MatDialog);
 

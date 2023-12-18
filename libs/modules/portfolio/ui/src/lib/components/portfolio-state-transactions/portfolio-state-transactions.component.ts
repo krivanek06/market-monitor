@@ -8,7 +8,37 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
   selector: 'app-portfolio-state-transactions',
   standalone: true,
   imports: [CommonModule, AddColorDirective],
-  templateUrl: './portfolio-state-transactions.component.html',
+  template: `
+    <div [class]="classes">
+      <!-- Total -->
+      <div [class]="valueClasses">
+        <div [appAddColor]="titleColor" class="text-xl">Total</div>
+        <div [appAddColor]="valueColor" class="text-xl">
+          {{ portfolioState.numberOfExecutedBuyTransactions + portfolioState.numberOfExecutedSellTransactions }}
+        </div>
+      </div>
+
+      <!-- Buy -->
+      <div [class]="valueClasses">
+        <div [appAddColor]="titleColor" class="text-xl">Buy</div>
+        <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedBuyTransactions }}</div>
+      </div>
+
+      <!-- Sell -->
+      <div [class]="valueClasses">
+        <div [appAddColor]="titleColor" class="text-xl">Sell</div>
+        <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedSellTransactions }}</div>
+      </div>
+
+      <!-- Fees -->
+      <div *ngIf="showFees" [class]="valueClasses">
+        <div [appAddColor]="titleColor" class="text-xl">Fees</div>
+        <div [appAddColor]="valueColor" class="text-xl">
+          {{ portfolioState.transactionFees | currency }}
+        </div>
+      </div>
+    </div>
+  `,
   styles: [
     `
       :host {

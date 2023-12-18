@@ -18,6 +18,7 @@ export type PortfolioState = {
   balance: number;
   /**
    * holdingsBalance = closed price * units for each holdings
+   * calculated from holdings the value of user's appreciated investments
    */
   holdingsBalance: number;
 

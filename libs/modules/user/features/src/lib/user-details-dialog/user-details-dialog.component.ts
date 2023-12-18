@@ -1,23 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, computed, inject, signal } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GroupApiService, UserApiService } from '@market-monitor/api-client';
 import { GroupData, PortfolioGrowthAssets, PortfolioStateHoldings, UserData } from '@market-monitor/api-types';
+import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { PortfolioCalculationService, PortfolioGrowthService } from '@market-monitor/modules/portfolio/data-access';
-import { PortfolioGrowthChartsComponent } from '@market-monitor/modules/portfolio/features';
-import {
-  PortfolioStateComponent,
-  PortfolioStateRiskComponent,
-  PortfolioStateTransactionsComponent,
-} from '@market-monitor/modules/portfolio/ui';
-import { ColorScheme } from '@market-monitor/shared/data-access';
-import { DefaultImgDirective } from '@market-monitor/shared/ui';
-import { DialogServiceUtil, filterNullish } from '@market-monitor/shared/utils-client';
+import { LabelValue } from '@market-monitor/shared/data-access';
+import { DefaultImgDirective, TabSelectControlComponent } from '@market-monitor/shared/ui';
+import { DialogServiceUtil, SCREEN_DIALOGS, filterNullish } from '@market-monitor/shared/utils-client';
 import { forkJoin, from, map, share, switchMap, tap } from 'rxjs';
+import { UserDetailsHoldingsComponent } from './user-details-holdings/user-details-holdings.component';
+import { UserDetailsOverviewComponent } from './user-details-overview/user-details-overview.component';
 
 export type UserDetailsDialogComponentData = {
   userId: string;
@@ -34,10 +32,11 @@ export type UserDetailsDialogComponentData = {
     MatDividerModule,
     DefaultImgDirective,
     MatProgressSpinnerModule,
-    PortfolioStateComponent,
-    PortfolioStateRiskComponent,
-    PortfolioStateTransactionsComponent,
-    PortfolioGrowthChartsComponent,
+    UserDetailsOverviewComponent,
+    TabSelectControlComponent,
+    ReactiveFormsModule,
+    UserDetailsHoldingsComponent,
+    StockSummaryDialogComponent,
   ],
   templateUrl: './user-details-dialog.component.html',
   styles: `
@@ -53,6 +52,7 @@ export class UserDetailsDialogComponent {
   private dialogServiceUtil = inject(DialogServiceUtil);
   private portfolioGrowthService = inject(PortfolioGrowthService);
   private portfolioCalculationService = inject(PortfolioCalculationService);
+  private dialog = inject(MatDialog);
 
   userDataSignal = signal<UserData | undefined>(undefined);
   userGroupDataSignal = signal<{
@@ -71,7 +71,11 @@ export class UserDetailsDialogComponent {
     ),
   );
 
-  ColorScheme = ColorScheme;
+  selectedTabControl = new FormControl<'overview' | 'holdings'>('overview');
+  displayOptions: LabelValue<'overview' | 'holdings'>[] = [
+    { label: 'Overview', value: 'overview' },
+    { label: 'Holdings', value: 'holdings' },
+  ];
 
   constructor(
     private dialogRef: MatDialogRef<UserDetailsDialogComponent>,
@@ -134,6 +138,19 @@ export class UserDetailsDialogComponent {
     userPortfolioTransactions$
       .pipe(switchMap((data) => from(this.portfolioGrowthService.getPortfolioGrowthAssets(data.transactions))))
       .subscribe((portfolioGrowthAssets) => this.portfolioGrowthAssetsSignal.set(portfolioGrowthAssets));
+  }
+
+  onSummaryClick(symbol: string) {
+    // close current dialog
+    this.onDialogClose();
+
+    // open new dialog
+    this.dialog.open(StockSummaryDialogComponent, {
+      data: {
+        symbol: symbol,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
   }
 
   onDialogClose() {
