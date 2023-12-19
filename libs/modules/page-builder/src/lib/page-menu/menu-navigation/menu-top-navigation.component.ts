@@ -2,8 +2,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatTabsModule } from '@angular/material/tabs';
 import { Router, RouterModule } from '@angular/router';
 import {
   AuthenticationAccountService,
@@ -16,113 +14,137 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 @Component({
   selector: 'app-menu-top-navigation',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatTabsModule,
-    RouterModule,
-    MatIconModule,
-    MatMenuModule,
-    DefaultImgDirective,
-    MatButtonModule,
-    FeatureAccessDirective,
-  ],
+  imports: [CommonModule, RouterModule, MatIconModule, DefaultImgDirective, MatButtonModule, FeatureAccessDirective],
   template: `
-    <div class="shadow-md pt-5 px-8 mb-4">
-      <div class="flex justify-between max-w-[1620px] mx-auto">
-        <nav mat-tab-nav-bar [tabPanel]="tabPanel" class="flex-1">
-          <!-- dashboard -->
-          <a
-            mat-tab-link
-            (click)="onNavClick(ROUTES_MAIN.DASHBOARD)"
-            [active]="activeLinkSignal() == ROUTES_MAIN.DASHBOARD"
-          >
-            <div class="gap-2 flex items-center">
-              <mat-icon>dashboard</mat-icon>
-              <span>Dashboard</span>
-            </div>
-          </a>
+    <div class="w-full shadow-md mb-4">
+      <nav class="w-full py-4 pl-8 pr-12 flex items-center gap-4 max-w-[1620px] mx-auto">
+        <!-- dashboard -->
+        <a
+          (click)="onNavClick(ROUTES_MAIN.DASHBOARD)"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.DASHBOARD }"
+        >
+          <div class="gap-2 flex items-center">
+            <mat-icon>dashboard</mat-icon>
+            <span>Dashboard</span>
+          </div>
+        </a>
 
-          <!-- watchlist -->
-          <a
-            mat-tab-link
-            (click)="onNavClick(ROUTES_MAIN.WATCHLIST)"
-            [active]="activeLinkSignal() == ROUTES_MAIN.WATCHLIST"
-          >
-            <div class="gap-2 flex items-center">
-              <mat-icon>monitoring</mat-icon>
-              <span>Watchlist</span>
-            </div>
-          </a>
+        <!-- watchlist -->
+        <a
+          (click)="onNavClick(ROUTES_MAIN.WATCHLIST)"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.WATCHLIST }"
+        >
+          <div class="gap-2 flex items-center">
+            <mat-icon>monitoring</mat-icon>
+            <span>Watchlist</span>
+          </div>
+        </a>
 
-          <!-- trading -->
-          <a
-            mat-tab-link
-            (click)="onNavClick(ROUTES_MAIN.TRADING)"
-            [active]="activeLinkSignal() == ROUTES_MAIN.TRADING"
-          >
-            <div class="gap-2 flex items-center">
-              <mat-icon>attach_money</mat-icon>
-              <span>Trading</span>
-            </div>
-          </a>
+        <!-- trading -->
+        <a
+          (click)="onNavClick(ROUTES_MAIN.TRADING)"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.TRADING }"
+        >
+          <div class="gap-2 flex items-center">
+            <mat-icon>attach_money</mat-icon>
+            <span>Trading</span>
+          </div>
+        </a>
 
-          <!-- groups -->
-          <a
-            *appFeatureAccess="'groupAllowAccess'"
-            mat-tab-link
-            (click)="onNavClick(ROUTES_MAIN.GROUPS)"
-            [active]="activeLinkSignal() == ROUTES_MAIN.GROUPS"
-          >
-            <div class="gap-2 flex items-center">
-              <mat-icon>group</mat-icon>
-              <span>Groups</span>
-            </div>
-          </a>
+        <!-- groups -->
+        <a
+          *appFeatureAccess="'groupAllowAccess'"
+          (click)="onNavClick(ROUTES_MAIN.GROUPS)"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.GROUPS }"
+        >
+          <div class="gap-2 flex items-center">
+            <mat-icon>group</mat-icon>
+            <span>Groups</span>
+          </div>
+        </a>
 
-          <!-- search -->
-          <a mat-tab-link (click)="onNavClick(ROUTES_MAIN.SEARCH)" [active]="activeLinkSignal() == ROUTES_MAIN.SEARCH">
-            <div class="gap-2 flex items-center">
+        <!-- market dropdown on smaller screen -->
+        <div class="p-4 hover:bg-gray-100 rounded-md block 2xl:hidden group relative">
+          <div class="gap-2 flex items-center">
+            <mat-icon>expand_more</mat-icon>
+            <span>Other</span>
+          </div>
+
+          <div class="w-[200px] c-scale top-[60px] -left-5">
+            <button mat-button class="mb-2 c-scale__item" (click)="onNavClick(ROUTES_MAIN.SEARCH)">
               <mat-icon>search</mat-icon>
-              <span>Search</span>
-            </div>
-          </a>
-
-          <!-- performers -->
-          <a
-            mat-tab-link
-            (click)="onNavClick(ROUTES_MAIN.TOP_PERFORMERS)"
-            [active]="activeLinkSignal() == ROUTES_MAIN.TOP_PERFORMERS"
-          >
-            <div class="gap-2 flex items-center">
+              Search
+            </button>
+            <button mat-button class="mb-2 c-scale__item" (click)="onNavClick(ROUTES_MAIN.TOP_PERFORMERS)">
               <mat-icon>travel_explore</mat-icon>
-              <span>Performers</span>
-            </div>
-          </a>
-
-          <!-- market -->
-          <a mat-tab-link (click)="onNavClick(ROUTES_MAIN.MARKET)" [active]="activeLinkSignal() == ROUTES_MAIN.MARKET">
-            <div class="gap-2 flex items-center">
+              Performers
+            </button>
+            <button mat-button class="mb-2 c-scale__item" (click)="onNavClick(ROUTES_MAIN.MARKET)">
               <mat-icon>storefront</mat-icon>
-              <span>Market</span>
-            </div>
-          </a>
-
-          <!-- calendar -->
-          <a
-            mat-tab-link
-            (click)="onNavClick(ROUTES_MAIN.MARKET_CALENDAR)"
-            [active]="activeLinkSignal() == ROUTES_MAIN.MARKET_CALENDAR"
-          >
-            <div class="gap-2 flex items-center">
+              Market
+            </button>
+            <button mat-button class="c-scale__item" (click)="onNavClick(ROUTES_MAIN.MARKET_CALENDAR)">
               <mat-icon>calendar_month</mat-icon>
-              <span>Calendar</span>
-            </div>
-          </a>
-        </nav>
+              Calendar
+            </button>
+          </div>
+        </div>
 
-        <div>
+        <!-- search -->
+        <a
+          (click)="onNavClick(ROUTES_MAIN.SEARCH)"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md hidden 2xl:block"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.SEARCH }"
+        >
+          <div class="gap-2 flex items-center">
+            <mat-icon>search</mat-icon>
+            <span>Search</span>
+          </div>
+        </a>
+
+        <!-- performers -->
+        <a
+          (click)="onNavClick(ROUTES_MAIN.TOP_PERFORMERS)"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md hidden 2xl:block"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.TOP_PERFORMERS }"
+        >
+          <div class="gap-2 flex items-center">
+            <mat-icon>travel_explore</mat-icon>
+            <span>Performers</span>
+          </div>
+        </a>
+
+        <!-- market -->
+        <a
+          (click)="onNavClick(ROUTES_MAIN.MARKET)"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md hidden 2xl:block"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.MARKET }"
+        >
+          <div class="gap-2 flex items-center">
+            <mat-icon>storefront</mat-icon>
+            <span>Market</span>
+          </div>
+        </a>
+
+        <!-- calendar -->
+        <a
+          (click)="onNavClick(ROUTES_MAIN.MARKET_CALENDAR)"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md hidden 2xl:block"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.MARKET_CALENDAR }"
+        >
+          <div class="gap-2 flex items-center">
+            <mat-icon>calendar_month</mat-icon>
+            <span>Calendar</span>
+          </div>
+        </a>
+
+        <div class="flex flex-1 justify-end">
           <!-- display logged in person -->
-          <button *ngIf="userDataSignal() as userDataSignal" mat-button [matMenuTriggerFor]="personMenu">
+          <div *ngIf="userDataSignal() as userDataSignal" class="group p-4 relative">
             <div class="flex items-center gap-3">
               <img
                 appDefaultImg
@@ -132,39 +154,53 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
               />
               <span>{{ userDataSignal.personal.displayName }}</span>
             </div>
-          </button>
 
-          <!-- menu -->
-          <mat-menu #personMenu="matMenu" [hasBackdrop]="false" class="min-w-[180px]">
-            <button mat-menu-item class="mb-2" (click)="onSettingClick()">
-              <mat-icon>settings</mat-icon>
-              Settings
-            </button>
-            <button mat-menu-item class="mb-2" (click)="onHelpClick()">
-              <mat-icon>help</mat-icon>
-              Help
-            </button>
-            <button mat-menu-item (click)="onLogOutClick()">
-              <mat-icon>logout</mat-icon>
-              Log out
-            </button>
-          </mat-menu>
+            <!-- menu -->
+            <div class="min-w-[220px] flex flex-col top-[60px] c-scale">
+              <button mat-button class="mb-2 c-scale__item" (click)="onSettingClick()">
+                <mat-icon>settings</mat-icon>
+                Settings
+              </button>
+              <button mat-button class="mb-2 c-scale__item" (click)="onHelpClick()">
+                <mat-icon>help</mat-icon>
+                Help
+              </button>
+              <button mat-button class="c-scale__item" (click)="onLogOutClick()">
+                <mat-icon>logout</mat-icon>
+                Log out
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </nav>
     </div>
-
-    <!-- tab panel - don't remove, console errors -->
-    <mat-tab-nav-panel #tabPanel class="hidden"> </mat-tab-nav-panel>
   `,
-  styles: `
-    :host {
-      display: block;
+  styles: [
+    `
+      :host {
+        display: block;
 
-      a {
-        max-width: 150px;
+        .c-scale {
+          @apply scale-0 group-hover:scale-100 z-10 bg-wt-gray-light absolute transition-all duration-300 px-2 py-3 rounded-md;
+        }
+
+        .c-scale__item {
+          @apply hover:bg-gray-100 hover:scale-95 duration-300 transition-all w-full;
+        }
+
+        a {
+          max-width: 150px;
+
+          &.c-active {
+            border-bottom: 2px solid var(--primary) !important;
+            > * {
+              color: var(--primary) !important;
+            }
+          }
+        }
       }
-    }
-  `,
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuTopNavigationComponent implements OnInit {
