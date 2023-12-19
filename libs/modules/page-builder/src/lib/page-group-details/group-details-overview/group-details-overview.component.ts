@@ -15,9 +15,11 @@ import {
   PortfolioStateComponent,
   PortfolioTransactionsTableComponent,
 } from '@market-monitor/modules/portfolio/ui';
+import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { PositionCardComponent, SectionTitleComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { switchMap } from 'rxjs';
 import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
@@ -40,6 +42,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     SortByKeyPipe,
     SectionTitleComponent,
     GroupUserHasRoleDirective,
+    UserDetailsDialogComponent,
   ],
   templateUrl: './group-details-overview.component.html',
   styles: [
@@ -83,5 +86,11 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
 
   onMemberClick(member: GroupMember): void {
     console.log('onMemberClick', member);
+    this.dialog.open(UserDetailsDialogComponent, {
+      data: <UserDetailsDialogComponentData>{
+        userId: member.id,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
   }
 }

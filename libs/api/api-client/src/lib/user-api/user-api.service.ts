@@ -49,6 +49,10 @@ export class UserApiService {
     return rxCollectionData(query(this.userCollection(), where('id', 'in', ids)));
   }
 
+  getUsersById(id: string): Observable<UserData | undefined> {
+    return rxDocData(this.getUserDocRef(id));
+  }
+
   /**
    *
    * @param name prefix name

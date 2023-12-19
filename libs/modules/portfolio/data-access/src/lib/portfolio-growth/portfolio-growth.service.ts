@@ -14,7 +14,7 @@ import {
   roundNDigits,
 } from '@market-monitor/shared/utils-general';
 import { format, isBefore, isSameDay, subDays } from 'date-fns';
-import { Observable, firstValueFrom, map } from 'rxjs';
+import { Observable, catchError, firstValueFrom, map, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -70,7 +70,13 @@ export class PortfolioGrowthService {
               format(new Date(transaction.startDate), 'yyyy-MM-dd'),
               yesterDay,
             )
-            .pipe(map((res) => ({ symbol: transaction.symbol, data: res }) satisfies HistoricalPriceSymbol)),
+            .pipe(
+              map((res) => ({ symbol: transaction.symbol, data: res }) satisfies HistoricalPriceSymbol),
+              catchError((err) => {
+                console.log(err);
+                return of([]);
+              }),
+            ),
         ),
       ),
     );

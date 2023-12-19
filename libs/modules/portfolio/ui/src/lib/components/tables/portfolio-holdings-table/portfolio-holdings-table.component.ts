@@ -60,7 +60,7 @@ export class PortfolioHoldingsTableComponent implements OnChanges {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = [
+  @Input() displayedColumns: string[] = [
     'symbol',
     'price',
     'bep',
