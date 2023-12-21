@@ -20,7 +20,7 @@ import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
 export class AuthenticationAccountService {
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
   private authenticatedUser$ = new BehaviorSubject<User | null>(null);
-  private loadedAuthentication$ = new Subject<boolean>();
+  private loadedAuthentication$ = new Subject<UserData['id'] | null>();
 
   constructor(
     private auth: Auth,
@@ -38,7 +38,7 @@ export class AuthenticationAccountService {
     return this.authenticatedUser$.asObservable();
   }
 
-  getLoadedAuthentication(): Observable<boolean> {
+  getLoadedAuthentication(): Observable<UserData['id'] | null> {
     return this.loadedAuthentication$.asObservable();
   }
 
@@ -78,8 +78,12 @@ export class AuthenticationAccountService {
       )
       .subscribe((userData) => {
         console.log('UPDATING USER', userData);
+        // update user data
         this.authenticatedUserData$.next(userData);
-        this.loadedAuthentication$.next(!!userData);
+
+        // notify about user change
+        const value = userData ? userData.id : null;
+        this.loadedAuthentication$.next(value);
       });
   }
 
@@ -91,11 +95,12 @@ export class AuthenticationAccountService {
       if (user) {
         // wait some time before updating last login date so that user is already saved in authenticatedUserData
         setTimeout(() => {
+          console.log('UPDATE LAST LOGIN');
           // update last login date
           this.userApiService.updateUser(user.uid, {
             lastLoginDate: dateFormatDate(new Date()),
           });
-        }, 1000);
+        }, 10_000);
       }
     });
   }

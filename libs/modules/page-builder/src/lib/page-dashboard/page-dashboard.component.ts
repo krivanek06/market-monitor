@@ -54,7 +54,7 @@ import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
           <app-portfolio-state
             [titleColor]="ColorScheme.PRIMARY_VAR"
             [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-            [showCashSegment]="!!authenticationUserService.state.getUserData().features.userPortfolioAllowCashAccount"
+            [showCashSegment]="!!authenticationUserService.state.userData()?.features?.userPortfolioAllowCashAccount"
             [portfolioState]="portfolioState"
           ></app-portfolio-state>
         </app-fancy-card>
@@ -70,7 +70,7 @@ import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
           <app-portfolio-state-transactions
             [titleColor]="ColorScheme.DANGER_VAR"
             [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-            [showFees]="!!authenticationUserService.state.getUserData().features.userPortfolioAllowCashAccount"
+            [showFees]="!!authenticationUserService.state.userData()?.features?.userPortfolioAllowCashAccount"
             [portfolioState]="portfolioState"
           ></app-portfolio-state-transactions>
         </app-fancy-card>
@@ -128,7 +128,7 @@ import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
       </div>
 
       <!-- transactions chart -->
-      <ng-container *ngIf="!!authenticationUserService.state.getUserData().features.userPortfolioAllowCashAccount">
+      <ng-container *ngIf="!!authenticationUserService.state.userData()?.features?.userPortfolioAllowCashAccount">
         <app-portfolio-transaction-chart
           [data]="portfolioUserFacadeService.getPortfolioTransactionToDate()"
         ></app-portfolio-transaction-chart>

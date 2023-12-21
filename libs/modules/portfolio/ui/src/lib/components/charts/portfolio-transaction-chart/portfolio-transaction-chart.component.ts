@@ -33,7 +33,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
 })
 export class PortfolioTransactionChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(input: PortfolioTransactionToDate[]) {
-    console.log('important!!', input);
+    console.log('PortfolioTransactionChartComponent', input);
     this.initChart(input);
   }
 

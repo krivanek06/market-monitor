@@ -10,7 +10,7 @@ import {
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { User } from 'firebase/auth';
 import { signalSlice } from 'ngxtension/signal-slice';
-import { combineLatest, map, of, switchMap } from 'rxjs';
+import { combineLatest, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
@@ -54,8 +54,10 @@ export class AuthenticationUserStoreService {
   };
 
   private loadedAuthenticationSource$ = this.authenticationAccountService.getLoadedAuthentication().pipe(
+    // prevent duplicate calls only when user id changes
+    distinctUntilChanged((prev, curr) => prev === curr),
     map((loaded) => ({
-      authenticationLoaded: loaded,
+      authenticationLoaded: !!loaded,
     })),
   );
 
@@ -81,6 +83,8 @@ export class AuthenticationUserStoreService {
    * Source used to get user watchList
    */
   private watchListSource$ = this.authenticationAccountService.getUserData().pipe(
+    // prevent duplicate calls only when user id changes
+    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
     switchMap((userData) =>
       userData ? this.userApiService.getUserWatchList(userData.id) : of(this.initialState.watchList),
     ),
@@ -91,6 +95,8 @@ export class AuthenticationUserStoreService {
    * Source used to get user portfolio transactions
    */
   private portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
+    // prevent duplicate calls only when user id changes
+    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
     switchMap((userData) =>
       userData
         ? this.userApiService.getUserPortfolioTransactions(userData.id).pipe(map((d) => d.transactions))
@@ -105,6 +111,8 @@ export class AuthenticationUserStoreService {
    * Source used to get user group data, owner, member, invitations, requested, watched
    */
   private userGroupDataSource$ = this.authenticationAccountService.getUserData().pipe(
+    // prevent duplicate calls only when user id changes
+    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
     map((user) => user?.groups),
     switchMap((groups) =>
       groups
