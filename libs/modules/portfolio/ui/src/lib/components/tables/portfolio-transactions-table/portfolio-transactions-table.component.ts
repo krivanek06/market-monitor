@@ -8,12 +8,14 @@ import {
   Output,
   SimpleChanges,
   TrackByFunction,
+  ViewChild,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioTransaction, PortfolioTransactionMore } from '@market-monitor/api-types';
-import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirective } from '@market-monitor/shared/ui';
 import { insertIntoArray } from '@market-monitor/shared/utils-general';
 
 @Component({
@@ -26,6 +28,8 @@ import { insertIntoArray } from '@market-monitor/shared/utils-general';
     MatButtonModule,
     MatIconModule,
     PercentageIncreaseDirective,
+    MatPaginatorModule,
+    StylePaginatorDirective,
   ],
   templateUrl: './portfolio-transactions-table.component.html',
   styles: [
@@ -42,6 +46,7 @@ export class PortfolioTransactionsTableComponent implements OnChanges {
 
   @Input({ required: true }) set data(values: PortfolioTransactionMore[]) {
     this.dataSource = new MatTableDataSource(values ?? []);
+    this.dataSource.paginator = this.paginator;
   }
   @Input() showTransactionFees = false;
 
@@ -57,6 +62,8 @@ export class PortfolioTransactionsTableComponent implements OnChanges {
 
   dataSource!: MatTableDataSource<PortfolioTransactionMore>;
   displayedColumns: string[] = ['symbol', 'transactionType', 'totalValue', 'unitPrice', 'units', 'return', 'date'];
+
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
 
   identity: TrackByFunction<PortfolioTransactionMore> = (index: number, item: PortfolioTransactionMore) =>
     item.transactionId;

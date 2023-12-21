@@ -49,11 +49,6 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
         display: block;
       }
 
-      mat-drawer-container {
-        overflow: visible;
-        height: 100vh !important;
-      }
-
       .c-content-wrapper {
         height: auto;
         padding: 24px 20px 40px 20px;

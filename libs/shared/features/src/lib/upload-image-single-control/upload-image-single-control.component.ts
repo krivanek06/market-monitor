@@ -39,7 +39,13 @@ import { EMPTY, Observable, catchError, first, map } from 'rxjs';
       [matRippleColor]="ColorScheme.GRAY_LIGHT_STRONG_VAR"
       (click)="fileUpload.click()"
     >
-      <input style="display: none" type="file" (change)="onFileSelected($event)" #fileUpload />
+      <input
+        style="display: none"
+        type="file"
+        (change)="onFileSelected($event)"
+        #fileUpload
+        [accept]="fileLimitExtensions"
+      />
       <div *ngIf="!lastFileUploadSignal()">Click To Upload</div>
 
       <!-- uploaded image -->
@@ -111,6 +117,7 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
    * path where to save the file
    */
   @Input() filePath = 'images';
+  @Input() fileLimitExtensions = '.jpg, .jpeg, .png';
 
   dialogServiceUtil = inject(DialogServiceUtil);
   storage = inject(Storage);
