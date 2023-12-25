@@ -22,11 +22,6 @@ export const sideNavigation = {
       title: 'Groups',
       icon: 'group',
     },
-    {
-      path: ROUTES_MAIN.SETTING,
-      title: 'Settings',
-      icon: 'settings',
-    },
   ],
   marketNavigation: [
     {

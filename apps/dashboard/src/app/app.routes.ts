@@ -50,10 +50,6 @@ export const appRoutes: Route[] = [
             loadComponent: () => import('./watchlist/watchlist.component').then((m) => m.WatchlistComponent),
           },
           {
-            path: ROUTES_MAIN.SETTING,
-            loadComponent: () => import('./settings/settings.component').then((m) => m.SettingsComponent),
-          },
-          {
             path: ROUTES_MAIN.TRADING,
             loadComponent: () => import('./trading/trading.component').then((m) => m.TradingComponent),
           },

@@ -110,6 +110,7 @@ export class AuthenticationAccountService {
     const newUserData = createNewUser(user.uid, {
       displayName: user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`,
       photoURL: user.photoURL,
+      providerId: user.providerData[0].providerId ?? 'unknown',
     });
 
     const newTransactions: UserPortfolioTransaction = {

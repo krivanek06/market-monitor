@@ -12,3 +12,8 @@ export const GROUP_OWNER_LIMIT = 5;
  * how many symbols a user can have in their holdings
  */
 export const USER_HOLDINGS_SYMBOL_LIMIT = 40;
+
+/**
+ * how many symbols a user can have in their watchList
+ */
+export const USER_WATCHLIST_SYMBOL_LIMIT = 40;

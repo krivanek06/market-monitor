@@ -1,3 +1,4 @@
+import { User } from 'firebase/auth';
 import { DataDocsWrapper } from './../constants/generic.model';
 import { PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
 import { SymbolType } from './symbol.model';
@@ -69,6 +70,7 @@ export type UserWatchlist = {
 export type UserPersonalInfo = {
   photoURL: string | null;
   displayName: string;
+  providerId: User['providerData'][0]['providerId'];
 };
 
 export type UserSettings = {
@@ -103,6 +105,11 @@ export type UserFeatures = {
   /**
    * if true, user can have unlimited number of symbols in portfolio, else it is limited - USER_HOLDINGS_SYMBOL_LIMIT
    */
-  userAllowUnlimitedSymbols?: boolean;
+  userAllowUnlimitedSymbolsInHoldings?: boolean;
+
+  /**
+   * if true, user can have unlimited number of symbols in watchList, else it is limited - USER_WATCHLIST_SYMBOL_LIMIT
+   */
+  userAllowUnlimitedSymbolsInWatchList?: boolean;
 };
 export type UserFeaturesType = keyof UserFeatures;

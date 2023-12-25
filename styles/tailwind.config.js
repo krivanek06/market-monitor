@@ -33,6 +33,9 @@ module.exports = {
         'wt-gray-medium': 'var(--gray-medium)',
         'wt-gray-light-strong': 'var(--gray-light-strong)',
         'wt-gray-light': 'var(--gray-light)',
+
+        /* other */
+        'wt-border': 'var(--border)',
       },
       flex: {
         2: '2 2 0%',

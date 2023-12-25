@@ -24,7 +24,7 @@ table:not([mat-table]) {
       }
 
       &:not(:last-child) {
-        border-bottom: 1px solid var(--table-border);
+        border-bottom: 1px solid var(--border);
       }
     }
   }
@@ -46,7 +46,7 @@ table[mat-table] {
     tr {
       td {
         @apply text-wt-gray-medium text-base;
-        border-bottom: 1px solid var(--table-border);
+        border-bottom: 1px solid var(--border);
 
         &:first-child {
           @apply pl-0 sm:pl-4;

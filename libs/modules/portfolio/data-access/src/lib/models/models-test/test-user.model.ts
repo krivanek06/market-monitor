@@ -17,6 +17,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
     personal: {
       displayName: 'Test User',
       photoURL: null,
+      providerId: 'google.com',
     },
     settings: {
       isProfilePublic: true,

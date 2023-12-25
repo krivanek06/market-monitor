@@ -38,7 +38,7 @@ export type PortfolioTradeDialogComponentData = {
 };
 
 @Component({
-  selector: 'market-monitor-portfolio-trade-dialog',
+  selector: 'app-portfolio-trade-dialog',
   standalone: true,
   imports: [
     CommonModule,
