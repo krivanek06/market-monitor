@@ -13,6 +13,7 @@ import {
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
 import { Confirmable, DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/utils-client';
+import { EMPTY, catchError, from, tap } from 'rxjs';
 import { AccountTypes, accountDescription, actionButtonTooltips } from './settings-dialog.model';
 
 @Component({
@@ -60,6 +61,10 @@ import { AccountTypes, accountDescription, actionButtonTooltips } from './settin
             <div class="c-text-item">
               <span>Account Type:</span>
               <span> {{ accountTypeSignal() }}</span>
+            </div>
+            <div *ngIf="accountTypeSignal() === 'Trading'" class="c-text-item">
+              <span>Starting Cash:</span>
+              <span> {{ userDataSignal().portfolioState.startingCash | currency }}</span>
             </div>
           </div>
         </div>
@@ -170,7 +175,13 @@ export class SettingsDialogComponent implements OnInit {
 
   @Confirmable('Are you sure you want to delete your account?')
   onDeleteAccount(): void {
-    console.log('delete');
+    from(this.authenticationAccountService.userDeleteAccount()).pipe(
+      tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been deleted')),
+      catchError((err) => {
+        this.dialogServiceUtil.handleError(err);
+        return EMPTY;
+      }),
+    );
   }
 
   onChangePassword(): void {}
@@ -179,6 +190,15 @@ export class SettingsDialogComponent implements OnInit {
 
   @Confirmable('Are you sure you want to reset your account? Your trading history will be removed')
   onResetTransactions(): void {
-    console.log('reset');
+    this.dialogServiceUtil.showNotificationBar('Sending request to reset your account');
+    from(this.authenticationAccountService.userResetTransactions())
+      .pipe(
+        tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been reset')),
+        catchError((err) => {
+          this.dialogServiceUtil.handleError(err);
+          return EMPTY;
+        }),
+      )
+      .subscribe();
   }
 }

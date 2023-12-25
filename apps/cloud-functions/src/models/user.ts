@@ -1,4 +1,5 @@
-import { UserData, UserPortfolioTransaction } from '@market-monitor/api-types';
+import { PortfolioState, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
 import { firestore } from 'firebase-admin';
 import { assignTypes, assignTypesOptional } from './assign-type';
 
@@ -12,3 +13,23 @@ export const userCollectionMoreInformationRef = (userId: string) =>
 
 export const userDocumentTransactionHistoryRef = (userId: string) =>
   userCollectionMoreInformationRef(userId).doc('transactions').withConverter(assignTypes<UserPortfolioTransaction>());
+
+export const userDocumentWatchListRef = (userId: string) =>
+  userCollectionMoreInformationRef(userId).doc('watchlist').withConverter(assignTypes<UserWatchlist>());
+
+export const userDefaultStartingCash = 25_000;
+export const userPortfolioStateEmpty: PortfolioState = {
+  cashOnHand: 0,
+  startingCash: userDefaultStartingCash,
+  holdingsBalance: 0,
+  invested: 0,
+  numberOfExecutedBuyTransactions: 0,
+  numberOfExecutedSellTransactions: 0,
+  transactionFees: 0,
+  totalGainsPercentage: 0,
+  totalGainsValue: 0,
+  balance: 0,
+  firstTransactionDate: null,
+  lastTransactionDate: null,
+  date: getCurrentDateDefaultFormat(),
+};

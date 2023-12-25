@@ -8,7 +8,7 @@ import {
   query,
   where,
 } from '@angular/fire/firestore';
-import { httpsCallable } from '@angular/fire/functions';
+import { getFunctions, httpsCallable } from '@angular/fire/functions';
 import {
   GroupBaseInput,
   GroupBaseInputInviteMembers,
@@ -27,7 +27,6 @@ import { assignTypesClient } from '@market-monitor/shared/utils-client';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { getApp } from 'firebase/app';
 import { limit } from 'firebase/firestore';
-import { getFunctions } from 'firebase/functions';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
 import { Observable, combineLatest, map, of, switchMap } from 'rxjs';

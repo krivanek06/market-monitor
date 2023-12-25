@@ -8,16 +8,18 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from '@angular/fire/auth';
+import { getFunctions, httpsCallable } from '@angular/fire/functions';
 import { UserApiService } from '@market-monitor/api-client';
-import { UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
+import { UserData } from '@market-monitor/api-types';
 import { dateFormatDate } from '@market-monitor/shared/utils-general';
-import { BehaviorSubject, Observable, Subject, map, switchMap } from 'rxjs';
-import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
-
+import { getApp } from 'firebase/app';
+import { BehaviorSubject, Observable, Subject, from, of, switchMap } from 'rxjs';
+import { LoginUserInput, RegisterUserInput } from '../model';
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationAccountService {
+  private functions = getFunctions(getApp());
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
   private authenticatedUser$ = new BehaviorSubject<User | null>(null);
   private loadedAuthentication$ = new Subject<UserData['id'] | null>();
@@ -67,13 +69,36 @@ export class AuthenticationAccountService {
     // todo
   }
 
+  async userResetTransactions(): Promise<void> {
+    const user = this.authenticatedUser$.value;
+    if (!user) {
+      throw new Error('User is not authenticated');
+    }
+
+    const callable = httpsCallable<string, void>(this.functions, 'userResetTransactionsCall');
+    await callable(user.uid);
+  }
+
+  async userDeleteAccount(): Promise<void> {
+    const user = this.authenticatedUser$.value;
+    if (!user) {
+      throw new Error('User is not authenticated');
+    }
+
+    const callable = httpsCallable<string, void>(this.functions, 'userDeleteAccountCall');
+    await callable(user.uid);
+    this.signOut();
+  }
+
   private listenOnUserChanges(): void {
     this.authenticatedUser$
       .pipe(
         switchMap((user) =>
           this.userApiService
             .getUserData(user?.uid)
-            .pipe(map((userData) => (userData ? userData : user ? this.createUser(user) : null))),
+            .pipe(
+              switchMap((userData) => (userData ? of(userData) : user ? from(this.userCreateAccount(user)) : of(null))),
+            ),
         ),
       )
       .subscribe((userData) => {
@@ -85,6 +110,12 @@ export class AuthenticationAccountService {
         const value = userData ? userData.id : null;
         this.loadedAuthentication$.next(value);
       });
+  }
+
+  private async userCreateAccount(user: User): Promise<UserData> {
+    const callable = httpsCallable<User, UserData>(this.functions, 'userCreateAccountCall');
+    const result = await callable(user);
+    return result.data;
   }
 
   private initAuthenticationUser(): void {
@@ -103,35 +134,5 @@ export class AuthenticationAccountService {
         }, 10_000);
       }
     });
-  }
-
-  private createUser(user: User): UserData {
-    // create new user data
-    const newUserData = createNewUser(user.uid, {
-      displayName: user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`,
-      photoURL: user.photoURL,
-      providerId: user.providerData[0].providerId ?? 'unknown',
-    });
-
-    const newTransactions: UserPortfolioTransaction = {
-      transactions: [],
-    };
-
-    const newWatchList: UserWatchlist = {
-      createdDate: dateFormatDate(new Date()),
-      data: [],
-    };
-
-    // update user
-    this.userApiService.updateUser(newUserData.id, newUserData);
-
-    // create portfolio for user
-    this.userApiService.updateUserPortfolioTransaction(newUserData.id, newTransactions);
-
-    // create empty watchList
-    this.userApiService.updateUserWatchList(newUserData.id, newWatchList);
-
-    // return new user data
-    return newUserData;
   }
 }
