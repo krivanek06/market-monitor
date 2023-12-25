@@ -87,6 +87,10 @@ export type UserSettings = {
 
 export type UserFeatures = {
   /**
+   * true if user is admin, grand access to all features
+   */
+  isAdmin?: boolean;
+  /**
    * if true, user can access group page and create groups limited by - GROUP_OWNER_LIMIT
    */
   groupAllowAccess?: boolean;

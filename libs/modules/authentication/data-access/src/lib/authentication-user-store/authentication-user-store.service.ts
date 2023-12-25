@@ -111,8 +111,16 @@ export class AuthenticationUserStoreService {
    * Source used to get user group data, owner, member, invitations, requested, watched
    */
   private userGroupDataSource$ = this.authenticationAccountService.getUserData().pipe(
-    // prevent duplicate calls only when user id changes
-    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
+    // prevent duplicate calls only when user id changes or groups changes
+    distinctUntilChanged(
+      (prev, curr) =>
+        prev?.id === curr?.id && // user id changes - user logged in or out
+        prev?.groups.groupOwner.length === curr?.groups.groupOwner.length && // group owner changes
+        prev?.groups.groupMember.length === curr?.groups.groupMember.length && // group member changes
+        prev?.groups.groupInvitations.length === curr?.groups.groupInvitations.length && // group invitations changes
+        prev?.groups.groupRequested.length === curr?.groups.groupRequested.length && // group requested changes
+        prev?.groups.groupWatched.length === curr?.groups.groupWatched.length, // group watched changes
+    ),
     map((user) => user?.groups),
     switchMap((groups) =>
       groups

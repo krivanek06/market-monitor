@@ -94,13 +94,24 @@ export class AuthenticationAccountService {
   }
 
   async deleteAccount(): Promise<void> {
-    const user = this.authenticatedUser$.value;
-    if (!user) {
+    const userData = this.authenticatedUserData$.value;
+    if (!userData) {
       throw new Error('User is not authenticated');
     }
+    try {
+      // delete groups
+      const groupsToRemove = userData.groups.groupOwner.map((groupId) =>
+        httpsCallable<string, unknown>(this.functions, 'groupDeleteCall')(groupId),
+      );
+      await Promise.all(groupsToRemove);
 
-    const callable = httpsCallable<string, void>(this.functions, 'userDeleteAccountCall');
-    await callable(user.uid);
+      // delete account
+      const callable = httpsCallable<string, void>(this.functions, 'userDeleteAccountCall');
+      await callable(userData.id);
+    } catch (error) {
+      console.error(error);
+    }
+
     this.signOut();
   }
 

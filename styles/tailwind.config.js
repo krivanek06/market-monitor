@@ -8,8 +8,8 @@ module.exports = {
   content: [join(__dirname, 'src/**/!(*.stories|*.spec).{ts,html}'), ...createGlobPatternsForDependencies(__dirname)],
   theme: {
     fontFamily: {
-      sans: ['sans-serif', 'Poppins'],
-      serif: ['sans-serif', 'Poppins'],
+      sans: ['system-ui', 'sans-serif', 'Poppins'],
+      serif: ['system-ui', 'sans-serif', 'Poppins'],
     },
     extend: {
       colors: {
