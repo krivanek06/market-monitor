@@ -168,7 +168,7 @@ import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
             </div>
 
             <!-- menu -->
-            <div class="min-w-[220px] flex flex-col top-[60px] c-scale">
+            <div class="min-w-[220px] flex flex-col top-[60px] c-scale ml-[-90px]">
               <button mat-button class="mb-2 c-scale__item" (click)="onSettingClick()">
                 <mat-icon>settings</mat-icon>
                 Settings

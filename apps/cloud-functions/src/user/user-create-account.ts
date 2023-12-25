@@ -1,17 +1,17 @@
-import { User } from '@angular/fire/auth';
 import { UserData, UserPersonalInfo, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
+import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { userDocumentTransactionHistoryRef, userDocumentWatchListRef, usersCollectionRef } from '../models';
 
 export const userCreateAccountCall = onCall(async (request) => {
-  const user = request.data as User;
   const userAuthId = request.auth?.uid;
 
-  // check if authenticated user is owner
-  if (userAuthId !== user.uid) {
-    throw new HttpsError('aborted', 'User is not owner');
+  if (!userAuthId) {
+    throw new HttpsError('aborted', 'User is not authenticated');
   }
+
+  const user = await getAuth().getUser(userAuthId);
 
   // check if user exists by email
   const matchingUsers = await usersCollectionRef().where('personal.email', '==', user.email).get();
@@ -22,7 +22,7 @@ export const userCreateAccountCall = onCall(async (request) => {
   // create new user data
   const newUserData = createNewUser(user.uid, {
     displayName: user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`,
-    photoURL: user.photoURL,
+    photoURL: user.photoURL ?? null,
     providerId: user.providerData[0].providerId ?? 'unknown',
   });
 

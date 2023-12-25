@@ -111,8 +111,6 @@ export class AuthenticationAccountService {
     } catch (error) {
       console.error(error);
     }
-
-    this.signOut();
   }
 
   private listenOnUserChanges(): void {
@@ -122,7 +120,7 @@ export class AuthenticationAccountService {
           this.userApiService
             .getUserData(user?.uid)
             .pipe(
-              switchMap((userData) => (userData ? of(userData) : user ? from(this.userCreateAccount(user)) : of(null))),
+              switchMap((userData) => (userData ? of(userData) : user ? from(this.userCreateAccount()) : of(null))),
             ),
         ),
       )
@@ -137,9 +135,9 @@ export class AuthenticationAccountService {
       });
   }
 
-  private async userCreateAccount(user: User): Promise<UserData> {
+  private async userCreateAccount(): Promise<UserData> {
     const callable = httpsCallable<User, UserData>(this.functions, 'userCreateAccountCall');
-    const result = await callable(user);
+    const result = await callable();
     return result.data;
   }
 
@@ -151,7 +149,7 @@ export class AuthenticationAccountService {
       if (user) {
         // wait some time before updating last login date so that user is already saved in authenticatedUserData
         setTimeout(() => {
-          console.log('UPDATE LAST LOGIN');
+          console.log(`UPDATE LAST LOGIN for user ${user.displayName} : ${user.uid}`);
           // update last login date
           this.userApiService.updateUser(user.uid, {
             lastLoginDate: dateFormatDate(new Date()),

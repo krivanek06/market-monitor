@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, NgZone, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +17,7 @@ import {
 } from '@market-monitor/modules/authentication/data-access';
 import { FormLoginComponent, FormRegisterComponent } from '@market-monitor/modules/authentication/ui';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/utils-client';
+import { DialogServiceModule, DialogServiceUtil, filterNullish } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, filter, from, switchMap, take, tap } from 'rxjs';
 
 @Component({
@@ -53,6 +53,7 @@ export class AuthenticationFormComponent {
   authenticationUserStoreService = inject(AuthenticationUserStoreService);
   dialogServiceUtil = inject(DialogServiceUtil);
   router = inject(Router);
+  private zone = inject(NgZone);
   loadingSnipperShowSignal = signal(false);
 
   constructor() {
@@ -128,13 +129,18 @@ export class AuthenticationFormComponent {
           from(this.authenticationAccountService.register(res)).pipe(
             switchMap(() =>
               this.authenticationAccountService.getUserData().pipe(
+                filterNullish(), // wait until there is a user initialized
                 tap(() => {
-                  this.router.navigate([ROUTES_MAIN.DASHBOARD]);
+                  // getting error: Navigation triggered outside Angular zone, did you forget to call 'ngZone.run()
+                  this.zone.run(() => {
+                    this.router.navigate([ROUTES_MAIN.DASHBOARD]);
+                  });
                   this.loadingSnipperShowSignal.set(false);
                 }),
               ),
             ),
             catchError((err) => {
+              console.log(err);
               if (err?.code === AUTHENTICATION_ERRORS.EMAIL_ALREADY_IN_USE) {
                 this.dialogServiceUtil.showNotificationBar(`Email already in use`, 'error');
               } else {

@@ -180,8 +180,15 @@ export class SettingsDialogComponent implements OnInit {
 
   @Confirmable('Are you sure you want to delete your account?')
   onDeleteAccount(): void {
+    // notify user
+    this.dialogServiceUtil.showNotificationBar('Sending request to delete your account');
+
+    // sign out to avoid errors
+    this.authenticationAccountService.signOut();
+
+    // perform delete account
     from(this.authenticationAccountService.deleteAccount()).pipe(
-      tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been deleted')),
+      tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been deleted', 'success')),
       catchError((err) => {
         this.dialogServiceUtil.handleError(err);
         return EMPTY;
@@ -200,7 +207,7 @@ export class SettingsDialogComponent implements OnInit {
       .pipe(
         filterNullish(),
         map((val) => this.authenticationAccountService.changeDisplayName(val)),
-        tap(() => this.dialogServiceUtil.showNotificationBar('Your display name has been changed')),
+        tap(() => this.dialogServiceUtil.showNotificationBar('Your display name has been changed', 'success')),
       )
       .subscribe((res) => console.log(res));
   }
