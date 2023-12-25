@@ -69,7 +69,21 @@ export class AuthenticationAccountService {
     // todo
   }
 
-  async userResetTransactions(): Promise<void> {
+  changeDisplayName(displayName: string): void {
+    const user = this.authenticatedUserData$.value;
+    if (!user) {
+      throw new Error('User is not authenticated');
+    }
+
+    this.userApiService.updateUser(user.id, {
+      personal: {
+        ...user.personal,
+        displayName,
+      },
+    });
+  }
+
+  async resetTransactions(): Promise<void> {
     const user = this.authenticatedUser$.value;
     if (!user) {
       throw new Error('User is not authenticated');
@@ -79,7 +93,7 @@ export class AuthenticationAccountService {
     await callable(user.uid);
   }
 
-  async userDeleteAccount(): Promise<void> {
+  async deleteAccount(): Promise<void> {
     const user = this.authenticatedUser$.value;
     if (!user) {
       throw new Error('User is not authenticated');

@@ -4,6 +4,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, firstValueFrom, of } from 'rxjs';
 import { ActionButtonDialog, ActionButtonDialogComponent } from './action-button-dialog/action-button-dialog.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import { SCREEN_DIALOGS } from './dialog.model';
+import {
+  InlineInputDialogComponent,
+  InlineInputDialogComponentData,
+} from './inline-input-dialog/inline-input-dialog.component';
 import { NotificationProgressComponent } from './notification-bar/notification-bar.component';
 
 /**
@@ -106,6 +111,21 @@ export class DialogServiceUtil {
         confirmButton,
         showCancelButton,
       },
+    });
+
+    const result = dialogRef.afterClosed();
+    return result;
+  }
+
+  showInlineInputDialog(data: InlineInputDialogComponentData): Observable<string | undefined> {
+    if (!this.matDialog) {
+      console.warn('DialogService.matDialog not initialized');
+      return of(undefined);
+    }
+
+    const dialogRef = this.matDialog.open(InlineInputDialogComponent, {
+      data: data,
+      panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });
 
     const result = dialogRef.afterClosed();

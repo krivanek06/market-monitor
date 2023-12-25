@@ -62,10 +62,6 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
       :host {
         @apply mt-10 block;
       }
-
-      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-        display: none;
-      }
     `,
   ],
 })

@@ -80,3 +80,8 @@ mat-divider {
 .mat-mdc-option .mat-pseudo-checkbox-full {
   margin-right: 8px !important;
 }
+
+// remove space for error message if not error is present
+.mat-mdc-form-field-bottom-align::before {
+  height: 0px !important;
+}

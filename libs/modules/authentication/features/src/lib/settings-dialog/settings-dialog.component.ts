@@ -12,8 +12,13 @@ import {
 } from '@market-monitor/modules/authentication/data-access';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
-import { Confirmable, DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/utils-client';
-import { EMPTY, catchError, from, tap } from 'rxjs';
+import {
+  Confirmable,
+  DialogServiceModule,
+  DialogServiceUtil,
+  filterNullish,
+} from '@market-monitor/shared/utils-client';
+import { EMPTY, catchError, from, map, tap } from 'rxjs';
 import { AccountTypes, accountDescription, actionButtonTooltips } from './settings-dialog.model';
 
 @Component({
@@ -80,15 +85,15 @@ import { AccountTypes, accountDescription, actionButtonTooltips } from './settin
 
       <!-- action buttons -->
       <div class="flex flex-col gap-y-2 min-w-[180px] pl-6">
-        <!-- <button
-      (click)="onChangeDisplayName()"
-      [matTooltip]="actionButtonTooltips.changeDisplayName"
-      type="button"
-      mat-stroked-button
-      color="accent"
-    >
-      Change Display Name
-    </button> -->
+        <button
+          (click)="onChangeDisplayName()"
+          [matTooltip]="actionButtonTooltips.changeDisplayName"
+          type="button"
+          mat-stroked-button
+          color="accent"
+        >
+          Change Display Name
+        </button>
         <button
           (click)="onResetTransactions()"
           [matTooltip]="actionButtonTooltips.resetTransactions"
@@ -175,7 +180,7 @@ export class SettingsDialogComponent implements OnInit {
 
   @Confirmable('Are you sure you want to delete your account?')
   onDeleteAccount(): void {
-    from(this.authenticationAccountService.userDeleteAccount()).pipe(
+    from(this.authenticationAccountService.deleteAccount()).pipe(
       tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been deleted')),
       catchError((err) => {
         this.dialogServiceUtil.handleError(err);
@@ -186,12 +191,24 @@ export class SettingsDialogComponent implements OnInit {
 
   onChangePassword(): void {}
 
-  onChangeDisplayName(): void {}
+  onChangeDisplayName(): void {
+    this.dialogServiceUtil
+      .showInlineInputDialog({
+        title: 'Change Display Name',
+        description: 'Enter a new display name',
+      })
+      .pipe(
+        filterNullish(),
+        map((val) => this.authenticationAccountService.changeDisplayName(val)),
+        tap(() => this.dialogServiceUtil.showNotificationBar('Your display name has been changed')),
+      )
+      .subscribe((res) => console.log(res));
+  }
 
   @Confirmable('Are you sure you want to reset your account? Your trading history will be removed')
   onResetTransactions(): void {
     this.dialogServiceUtil.showNotificationBar('Sending request to reset your account');
-    from(this.authenticationAccountService.userResetTransactions())
+    from(this.authenticationAccountService.resetTransactions())
       .pipe(
         tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been reset')),
         catchError((err) => {
