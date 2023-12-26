@@ -6,6 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { UserAccountTypes } from '@market-monitor/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
@@ -19,10 +20,10 @@ import {
   filterNullish,
 } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, from, map, tap } from 'rxjs';
-import { AccountTypes, accountDescription, actionButtonTooltips } from './settings-dialog.model';
+import { accountDescription, actionButtonTooltips } from './settings-dialog.model';
 
 @Component({
-  selector: 'app-settings-dialog',
+  selector: 'app-user-settings-dialog',
   standalone: true,
   imports: [
     CommonModule,
@@ -150,7 +151,7 @@ import { AccountTypes, accountDescription, actionButtonTooltips } from './settin
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SettingsDialogComponent implements OnInit {
+export class UserSettingsDialogComponent implements OnInit {
   authenticationUserStoreService = inject(AuthenticationUserStoreService);
   authenticationAccountService = inject(AuthenticationAccountService);
   dialogServiceUtil = inject(DialogServiceUtil);
@@ -165,7 +166,7 @@ export class SettingsDialogComponent implements OnInit {
 
   accountTypeSignal = computed(() => {
     const isCash = this.userDataSignal().features.userPortfolioAllowCashAccount;
-    return isCash ? AccountTypes.Trading : AccountTypes.Basic;
+    return isCash ? UserAccountTypes.Trading : UserAccountTypes.Basic;
   });
 
   accountDescriptionSignal = computed(() => {
@@ -215,7 +216,7 @@ export class SettingsDialogComponent implements OnInit {
   @Confirmable('Are you sure you want to reset your account? Your trading history will be removed')
   onResetTransactions(): void {
     this.dialogServiceUtil.showNotificationBar('Sending request to reset your account');
-    from(this.authenticationAccountService.resetTransactions())
+    from(this.authenticationAccountService.resetTransactions(UserAccountTypes.Trading))
       .pipe(
         tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been reset')),
         catchError((err) => {

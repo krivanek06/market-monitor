@@ -10,7 +10,7 @@ import {
 } from '@angular/fire/auth';
 import { getFunctions, httpsCallable } from '@angular/fire/functions';
 import { UserApiService } from '@market-monitor/api-client';
-import { UserData } from '@market-monitor/api-types';
+import { UserAccountTypes, UserData, UserResetTransactionsInput } from '@market-monitor/api-types';
 import { dateFormatDate } from '@market-monitor/shared/utils-general';
 import { getApp } from 'firebase/app';
 import { BehaviorSubject, Observable, Subject, from, of, switchMap } from 'rxjs';
@@ -83,14 +83,17 @@ export class AuthenticationAccountService {
     });
   }
 
-  async resetTransactions(): Promise<void> {
+  async resetTransactions(accountTypeSelected: UserAccountTypes): Promise<void> {
     const user = this.authenticatedUser$.value;
     if (!user) {
       throw new Error('User is not authenticated');
     }
 
-    const callable = httpsCallable<string, void>(this.functions, 'userResetTransactionsCall');
-    await callable(user.uid);
+    const callable = httpsCallable<UserResetTransactionsInput, void>(this.functions, 'userResetTransactionsCall');
+    await callable({
+      userId: user.uid,
+      accountTypeSelected,
+    });
   }
 
   async deleteAccount(): Promise<void> {

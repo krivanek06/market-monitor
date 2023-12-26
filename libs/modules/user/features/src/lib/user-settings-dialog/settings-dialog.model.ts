@@ -1,7 +1,4 @@
-export enum AccountTypes {
-  Trading = 'Trading',
-  Basic = 'Basic',
-}
+import { UserAccountTypes } from '@market-monitor/api-types';
 
 export const actionButtonTooltips = {
   deleteAccount: `Account will be deleted permanently and you will be logged out from the application. This action cannot be undone.`,
@@ -10,8 +7,8 @@ export const actionButtonTooltips = {
   changeDisplayName: `Use this action to change your display name, this name will be visible to other users. Affect takes place in 24h.`,
 };
 
-export const accountDescription: { [K in AccountTypes]: string[] } = {
-  [AccountTypes.Trading]: [
+export const accountDescription: { [K in UserAccountTypes]: string[] } = {
+  [UserAccountTypes.Trading]: [
     `
     With trading account you start with a specific amount of cash on hand.
     You can buy and sell stocks, ETFs, and other securities until you run out of cash.
@@ -20,7 +17,7 @@ export const accountDescription: { [K in AccountTypes]: string[] } = {
     `Your profile is public, meaning that other users can find you and see your portfolio and
     as your trading progress is monitored, you will be part of a ranking system,`,
   ],
-  [AccountTypes.Basic]: [
+  [UserAccountTypes.Basic]: [
     `With basic account you start with a clean portfolio and you can add stocks, ETFs, and other securities to your portfolio.`,
     `This account is intended for users who wants to mirror their real life portfolio and track their progress.`,
     `You can buy assets in the past and the application will calculate your current portfolio value based on the historical data.

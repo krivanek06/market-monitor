@@ -117,3 +117,19 @@ export type UserFeatures = {
   userAllowUnlimitedSymbolsInWatchList?: boolean;
 };
 export type UserFeaturesType = keyof UserFeatures;
+
+export enum UserAccountTypes {
+  Trading = 'Trading',
+  Basic = 'Basic',
+}
+
+export type UserResetTransactionsInput = {
+  /**
+   * user's id whom to to reset transactions
+   */
+  userId: string;
+  /**
+   * selected account type by the user
+   */
+  accountTypeSelected: UserAccountTypes;
+};

@@ -38,7 +38,7 @@ import { Subject, combineLatest, map, startWith } from 'rxjs';
         </div>
         <!-- date range -->
         <app-date-range-slider
-          *ngIf="selectedChartFormControl.value.value !== 'PortfolioAssets' && portfolioAssetsGrowth.length > 40"
+          *ngIf="selectedChartFormControl.value.value !== 'PortfolioAssets'"
           class="w-[550px]"
           [displayUpperDate]="false"
           [formControl]="portfolioRangeControl"

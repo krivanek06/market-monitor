@@ -18,9 +18,9 @@ export const userDocumentWatchListRef = (userId: string) =>
   userCollectionMoreInformationRef(userId).doc('watchlist').withConverter(assignTypes<UserWatchlist>());
 
 export const userDefaultStartingCash = 25_000;
-export const userPortfolioStateEmpty: PortfolioState = {
+export const createUserPortfolioStateEmpty = (startingCash = userDefaultStartingCash): PortfolioState => ({
   cashOnHand: 0,
-  startingCash: userDefaultStartingCash,
+  startingCash: startingCash,
   holdingsBalance: 0,
   invested: 0,
   numberOfExecutedBuyTransactions: 0,
@@ -32,4 +32,4 @@ export const userPortfolioStateEmpty: PortfolioState = {
   firstTransactionDate: null,
   lastTransactionDate: null,
   date: getCurrentDateDefaultFormat(),
-};
+});

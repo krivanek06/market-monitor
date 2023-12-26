@@ -21,7 +21,6 @@
       "@market-monitor/api-types": ["libs/api/api-types/src/index.ts"],
       "@market-monitor/modules/authentication/data-access": ["libs/modules/authentication/data-access/src/index.ts"],
       "@market-monitor/modules/authentication/features": ["libs/modules/authentication/features/src/index.ts"],
-      "@market-monitor/modules/authentication/ui": ["libs/modules/authentication/ui/src/index.ts"],
       "@market-monitor/modules/group/data-access": ["libs/modules/group/data-access/src/index.ts"],
       "@market-monitor/modules/group/features": ["libs/modules/group/features/src/index.ts"],
       "@market-monitor/modules/group/ui": ["libs/modules/group/ui/src/index.ts"],

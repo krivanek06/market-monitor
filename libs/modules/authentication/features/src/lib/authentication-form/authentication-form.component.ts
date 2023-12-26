@@ -15,10 +15,11 @@ import {
   LoginUserInput,
   RegisterUserInput,
 } from '@market-monitor/modules/authentication/data-access';
-import { FormLoginComponent, FormRegisterComponent } from '@market-monitor/modules/authentication/ui';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { DialogServiceModule, DialogServiceUtil, filterNullish } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, filter, from, switchMap, take, tap } from 'rxjs';
+import { FormLoginComponent } from './form-login/form-login.component';
+import { FormRegisterComponent } from './form-register/form-register.component';
 
 @Component({
   selector: 'app-authentication-form',
