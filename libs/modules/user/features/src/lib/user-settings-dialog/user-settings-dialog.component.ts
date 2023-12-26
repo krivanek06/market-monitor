@@ -11,7 +11,7 @@ import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
-import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
+import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
 import {
   Confirmable,

@@ -10,7 +10,7 @@ import {
 } from '@market-monitor/modules/authentication/data-access';
 import { UserSettingsDialogComponent } from '@market-monitor/modules/user/features';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { FeatureAccessDirective } from '@market-monitor/shared/features';
+import { FeatureAccessDirective } from '@market-monitor/shared/features/feature-access-directive';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 

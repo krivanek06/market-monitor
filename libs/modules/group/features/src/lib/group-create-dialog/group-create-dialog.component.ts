@@ -14,7 +14,7 @@ import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT, GroupCreateInput, UserData } fro
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserSearchControlComponent } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
+import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import {
   DatePickerComponent,
   DefaultImgDirective,

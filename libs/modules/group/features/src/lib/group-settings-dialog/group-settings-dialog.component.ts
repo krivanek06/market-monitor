@@ -12,7 +12,7 @@ import { GroupApiService } from '@market-monitor/api-client';
 import { GroupMember } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
+import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import {
   ArrayExcludePipe,
   DefaultImgDirective,

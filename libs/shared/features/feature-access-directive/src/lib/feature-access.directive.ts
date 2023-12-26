@@ -22,6 +22,9 @@ import { Subject, takeUntil } from 'rxjs';
   standalone: true,
 })
 export class FeatureAccessDirective implements OnInit, OnDestroy {
+  /**
+   * name of the feature user needs to have access to render the element
+   */
   @Input({ alias: 'appFeatureAccess', required: true }) featureName!: UserFeaturesType;
 
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);

@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'features',
-  preset: '../../../jest.preset.js',
+  displayName: 'upload-image-single-control',
+  preset: '../../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../../coverage/libs/shared/features',
+  coverageDirectory: '../../../../coverage/libs/shared/features/upload-image-single-control',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',
