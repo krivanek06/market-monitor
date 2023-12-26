@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { UserAccountTypes } from '@market-monitor/api-types';
+import { UserAccountTypes, accountDescription } from '@market-monitor/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
@@ -17,10 +17,11 @@ import {
   Confirmable,
   DialogServiceModule,
   DialogServiceUtil,
+  SCREEN_DIALOGS,
   filterNullish,
 } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, from, map, tap } from 'rxjs';
-import { accountDescription, actionButtonTooltips } from './settings-dialog.model';
+import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';
 
 @Component({
   selector: 'app-user-settings-dialog',
@@ -36,6 +37,7 @@ import { accountDescription, actionButtonTooltips } from './settings-dialog.mode
     UploadImageSingleControlComponent,
     ReactiveFormsModule,
     MatTooltipModule,
+    UserAccountTypeSelectDialogComponent,
   ],
   template: `
     <app-dialog-close-header title="Settings"></app-dialog-close-header>
@@ -87,6 +89,15 @@ import { accountDescription, actionButtonTooltips } from './settings-dialog.mode
       <!-- action buttons -->
       <div class="flex flex-col gap-y-2 min-w-[180px] pl-6">
         <button
+          (click)="onResetTransactions()"
+          [matTooltip]="actionButtonTooltips.resetTransactions"
+          type="button"
+          mat-flat-button
+          color="primary"
+        >
+          Reset Transactions
+        </button>
+        <button
           (click)="onChangeDisplayName()"
           [matTooltip]="actionButtonTooltips.changeDisplayName"
           type="button"
@@ -96,13 +107,13 @@ import { accountDescription, actionButtonTooltips } from './settings-dialog.mode
           Change Display Name
         </button>
         <button
-          (click)="onResetTransactions()"
-          [matTooltip]="actionButtonTooltips.resetTransactions"
+          (click)="onChangeAccountType()"
+          [matTooltip]="actionButtonTooltips.changeAccountType"
           type="button"
           mat-stroked-button
           color="primary"
         >
-          Reset Transactions
+          Change Account type
         </button>
         <button
           *ngIf="userDataSignal().personal.providerId === 'password'"
@@ -152,17 +163,25 @@ import { accountDescription, actionButtonTooltips } from './settings-dialog.mode
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserSettingsDialogComponent implements OnInit {
-  authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  authenticationAccountService = inject(AuthenticationAccountService);
-  dialogServiceUtil = inject(DialogServiceUtil);
-  dialog = inject(MatDialog);
+  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private authenticationAccountService = inject(AuthenticationAccountService);
+  private dialogServiceUtil = inject(DialogServiceUtil);
+  private dialog = inject(MatDialog);
+  private dialogRef = inject(MatDialogRef<UserSettingsDialogComponent>);
 
   userDataSignal = this.authenticationUserStoreService.state.getUserData;
   userSignal = this.authenticationUserStoreService.state.getUser;
   userImageControl = new FormControl<string | null>(null);
 
   accountDescription = accountDescription;
-  actionButtonTooltips = actionButtonTooltips;
+
+  actionButtonTooltips = {
+    deleteAccount: `Account will be deleted permanently and you will be logged out from the application. This action cannot be undone.`,
+    changePassword: `A form will be displayed to you to change your password`,
+    resetTransactions: `Use this action to delete your trading history. You will start as a new user with a clean portfolio.`,
+    changeDisplayName: `Use this action to change your display name, this name will be visible to other users. Affect takes place in 24h.`,
+    changeAccountType: `You will be presented with options to change your current account type between Basic and Trading`,
+  };
 
   accountTypeSignal = computed(() => {
     const isCash = this.userDataSignal().features.userPortfolioAllowCashAccount;
@@ -215,8 +234,12 @@ export class UserSettingsDialogComponent implements OnInit {
 
   @Confirmable('Are you sure you want to reset your account? Your trading history will be removed')
   onResetTransactions(): void {
+    // notify user
     this.dialogServiceUtil.showNotificationBar('Sending request to reset your account');
-    from(this.authenticationAccountService.resetTransactions(UserAccountTypes.Trading))
+    const currentAccountType = this.authenticationUserStoreService.state.getUserAccountType();
+
+    // perform operation
+    from(this.authenticationAccountService.resetTransactions(currentAccountType))
       .pipe(
         tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been reset')),
         catchError((err) => {
@@ -225,5 +248,11 @@ export class UserSettingsDialogComponent implements OnInit {
         }),
       )
       .subscribe();
+  }
+
+  onChangeAccountType(): void {
+    this.dialog.open(UserAccountTypeSelectDialogComponent, {
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
   }
 }

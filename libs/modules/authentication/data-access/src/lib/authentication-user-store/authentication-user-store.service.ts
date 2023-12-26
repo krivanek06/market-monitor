@@ -3,6 +3,7 @@ import { GroupApiService, UserApiService } from '@market-monitor/api-client';
 import {
   PortfolioTransaction,
   SymbolType,
+  UserAccountTypes,
   UserData,
   UserGroupData,
   UserWatchlist as UserWatchList,
@@ -165,6 +166,8 @@ export class AuthenticationUserStoreService {
     selectors: (state) => ({
       getUser: () => state().user!,
       getUserData: () => state().userData!,
+      getUserAccountType: () =>
+        state().userData!.features.userPortfolioAllowCashAccount ? UserAccountTypes.Trading : UserAccountTypes.Basic,
       getUserGroupData: () => state().userGroupData!,
       getUserPortfolioTransactions: () => state().portfolioTransactions,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
