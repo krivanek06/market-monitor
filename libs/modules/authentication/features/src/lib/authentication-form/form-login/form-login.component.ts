@@ -3,13 +3,13 @@ import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { LoginUserInput } from '@market-monitor/modules/authentication/data-access';
-import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
 import {
   emailValidator,
   maxLengthValidator,
   minLengthValidator,
   requiredValidator,
-} from '@market-monitor/shared/utils-client';
+} from '@market-monitor/shared/data-access';
+import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-form-login',

@@ -13,6 +13,7 @@ import { MarketApiService } from '@market-monitor/api-client';
 import { PortfolioTransactionType, SymbolSummary, USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { PortfolioTransactionCreate, PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
+import { minValueValidator, positiveNumberValidator, requiredValidator } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import {
   CastToNumberPipe,
@@ -23,7 +24,6 @@ import {
   InputTypeDateTimePickerConfig,
   NumberKeyboardComponent,
 } from '@market-monitor/shared/ui';
-import { minValueValidator, positiveNumberValidator, requiredValidator } from '@market-monitor/shared/utils-client';
 import { dateFormatDate, dateIsNotWeekend } from '@market-monitor/shared/utils-general';
 import { isSameDay } from 'date-fns';
 import { map, switchMap, tap } from 'rxjs';

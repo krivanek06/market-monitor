@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ColorScheme, GenericChartSeries } from '@market-monitor/shared/data-access';
-import { ChartConstructor } from '@market-monitor/shared/utils-client';
+import { ChartConstructor, ColorScheme, GenericChartSeries } from '@market-monitor/shared/data-access';
 import { formatValueIntoCurrency } from '@market-monitor/shared/utils-general';
 import { SeriesOptionsType } from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';

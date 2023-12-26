@@ -23,7 +23,7 @@ import {
   PortfolioStateHolding,
   PortfolioTransactionMore,
 } from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/utils-client';
+import { assignTypesClient } from '@market-monitor/shared/data-access';
 import { roundNDigits } from '@market-monitor/shared/utils-general';
 import { getApp } from 'firebase/app';
 import { limit } from 'firebase/firestore';

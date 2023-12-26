@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DocumentReference, Firestore, deleteDoc, doc, setDoc } from '@angular/fire/firestore';
 import { PortfolioRisk, PortfolioTransaction } from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/utils-client';
+import { assignTypesClient } from '@market-monitor/shared/data-access';
 import { Observable, of } from 'rxjs';
 
 @Injectable({

@@ -12,6 +12,7 @@ import { GroupApiService } from '@market-monitor/api-client';
 import { GroupMember } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
+import { maxLengthValidator, minLengthValidator, requiredValidator } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import {
@@ -20,12 +21,7 @@ import {
   DialogCloseHeaderComponent,
   FormMatInputWrapperComponent,
 } from '@market-monitor/shared/ui';
-import {
-  filterNullish,
-  maxLengthValidator,
-  minLengthValidator,
-  requiredValidator,
-} from '@market-monitor/shared/utils-client';
+import { filterNullish } from '@market-monitor/shared/utils-client';
 import { map, take } from 'rxjs';
 
 export type GroupSettingsDialogComponentData = {

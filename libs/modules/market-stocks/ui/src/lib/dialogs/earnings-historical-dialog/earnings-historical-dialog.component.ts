@@ -5,8 +5,8 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
 import { StocksApiService } from '@market-monitor/api-client';
+import { EstimatedChartDataType } from '@market-monitor/shared/data-access';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
-import { EstimatedChartDataType } from '@market-monitor/shared/utils-client';
 import { map } from 'rxjs';
 import { EarningsEstimationChartComponent, RevenueEstimationChartComponent } from '../../components';
 

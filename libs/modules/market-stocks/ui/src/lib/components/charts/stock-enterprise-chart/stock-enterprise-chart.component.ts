@@ -2,8 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { EnterpriseValue } from '@market-monitor/api-types';
 import { Recommendation } from '@market-monitor/modules/market-stocks/data-access';
-import { ColorScheme } from '@market-monitor/shared/data-access';
-import { ChartConstructor } from '@market-monitor/shared/utils-client';
+import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
 import { formatLargeNumber } from '@market-monitor/shared/utils-general';
 import { HighchartsChartModule } from 'highcharts-angular';
 

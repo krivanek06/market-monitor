@@ -20,7 +20,7 @@ import {
   UserPortfolioTransaction,
   UserWatchlist,
 } from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/utils-client';
+import { assignTypesClient } from '@market-monitor/shared/data-access';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
 import { Observable, filter, map, of } from 'rxjs';
