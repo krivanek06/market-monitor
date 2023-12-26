@@ -1,5 +1,5 @@
 import { UserData } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 
 export const USER_TEST_1_ID = 'USER_TEST_1';
 

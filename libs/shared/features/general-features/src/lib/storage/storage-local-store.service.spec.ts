@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { StorageLocalStoreService } from './storage-local-store.service';
 
 describe('StorageService', () => {
-  let service: StorageLocalStoreService;
+  let service: StorageLocalStoreService<any>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});

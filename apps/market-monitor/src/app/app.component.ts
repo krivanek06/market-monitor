@@ -5,7 +5,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Meta } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { DialogServiceModule } from '@market-monitor/shared/features/dialog-manager';
-import { LoaderMainService } from '@market-monitor/shared/utils-client';
+import { LoaderMainService } from '@market-monitor/shared/features/general-features';
 
 @Component({
   standalone: true,

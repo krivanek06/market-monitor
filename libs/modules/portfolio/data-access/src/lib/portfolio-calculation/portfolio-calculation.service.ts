@@ -12,7 +12,7 @@ import {
   GenericChartSeriesPie,
   ValueItem,
 } from '@market-monitor/shared/data-access';
-import { dateFormatDate, getObjectEntries, roundNDigits } from '@market-monitor/shared/utils-general';
+import { dateFormatDate, getObjectEntries, roundNDigits } from '@market-monitor/shared/features/general-util';
 import { subDays, subMonths, subWeeks, subYears } from 'date-fns';
 import { PortfolioChange, PortfolioGrowth, PortfolioTransactionToDate } from '../models';
 

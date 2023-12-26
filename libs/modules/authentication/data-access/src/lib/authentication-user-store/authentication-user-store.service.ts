@@ -8,7 +8,7 @@ import {
   UserGroupData,
   UserWatchlist as UserWatchList,
 } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { User } from 'firebase/auth';
 import { signalSlice } from 'ngxtension/signal-slice';
 import { combineLatest, distinctUntilChanged, map, of, switchMap } from 'rxjs';

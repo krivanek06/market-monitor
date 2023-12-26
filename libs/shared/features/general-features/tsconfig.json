@@ -10,7 +10,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "files": [],
-  "include": ["src/**/*.ts", "../../features/dialog-manager/src/lib/dialog-service.module.ts", "../../features/dialog-manager/src/lib/dialog-service.util.ts", "../../features/dialog-manager/src/lib/dialog.model.ts", "../../features/dialog-manager/src/lib/index.ts", "../../features/dialog-manager/src/lib/confirmable.ts", "../../data-access/src/lib/chart-helpers.util.ts", "../../data-access/src/lib/assign-type-client.ts", "../../data-access/src/lib/custom-form-field-validators.ts"],
+  "include": [],
   "references": [
     {
       "path": "./tsconfig.lib.json"

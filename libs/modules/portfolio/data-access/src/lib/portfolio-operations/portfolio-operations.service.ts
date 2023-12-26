@@ -2,7 +2,11 @@ import { Injectable } from '@angular/core';
 import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
 import { HistoricalPrice, PortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { dateFormatDate, dateGetDetailsInformationFromDate, roundNDigits } from '@market-monitor/shared/utils-general';
+import {
+  dateFormatDate,
+  dateGetDetailsInformationFromDate,
+  roundNDigits,
+} from '@market-monitor/shared/features/general-util';
 import { isBefore, isValid, isWeekend } from 'date-fns';
 import { firstValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';

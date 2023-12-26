@@ -20,7 +20,7 @@ import {
   GenericChartSeries,
   GenericChartSeriesPie,
 } from '@market-monitor/shared/data-access';
-import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/utils-general';
+import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
 import { format, isAfter, isBefore } from 'date-fns';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';

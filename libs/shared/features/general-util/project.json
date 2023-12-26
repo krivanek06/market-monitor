@@ -1,0 +1,30 @@
+{
+  "name": "general-util",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/features/general-util/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/shared/features/general-util",
+        "main": "libs/shared/features/general-util/src/index.ts",
+        "tsConfig": "libs/shared/features/general-util/tsconfig.lib.json",
+        "assets": ["libs/shared/features/general-util/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/shared/features/general-util/jest.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

@@ -14,7 +14,7 @@ import {
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
-import { filterNullish } from '@market-monitor/shared/utils-client';
+import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, catchError, from, map, tap } from 'rxjs';
 import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';
 
@@ -219,7 +219,7 @@ export class UserSettingsDialogComponent implements OnInit {
         description: 'Enter a new display name',
       })
       .pipe(
-        filterNullish(),
+        filterNil(),
         map((val) => this.authenticationAccountService.changeDisplayName(val)),
         tap(() => this.dialogServiceUtil.showNotificationBar('Your display name has been changed', 'success')),
       )

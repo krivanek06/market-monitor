@@ -20,7 +20,7 @@ import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@m
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { FancyCardComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
-import { filterNullish } from '@market-monitor/shared/utils-client';
+import { filterNil } from 'ngxtension/filter-nil';
 import { switchMap } from 'rxjs';
 
 @Component({
@@ -61,7 +61,7 @@ export class PageTradingComponent {
   selectedSummary = signal<SymbolSummary | null>(null);
   symbolSummary = toSignal(
     toObservable(this.selectedSummary).pipe(
-      filterNullish(),
+      filterNil(),
       switchMap((summary) => this.marketApiService.getSymbolSummary(summary.id)),
     ),
   );

@@ -1,5 +1,5 @@
 import { HistoricalPriceSymbol, PortfolioGrowthAssets, UserPortfolioTransaction } from '@market-monitor/api-types';
-import { roundNDigits } from '@market-monitor/shared/utils-general';
+import { roundNDigits } from '@market-monitor/shared/features/general-util';
 import { mockPortfolioTransaction } from './test-transaction.model';
 
 export const TestTransactionDates = {

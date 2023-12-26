@@ -21,7 +21,7 @@ import {
   DialogCloseHeaderComponent,
   FormMatInputWrapperComponent,
 } from '@market-monitor/shared/ui';
-import { filterNullish } from '@market-monitor/shared/utils-client';
+import { filterNil } from 'ngxtension/filter-nil';
 import { map, take } from 'rxjs';
 
 export type GroupSettingsDialogComponentData = {
@@ -135,7 +135,7 @@ export class GroupSettingsDialogComponent {
     // load groups data into the form once
     this.groupApiService
       .getGroupDataById(this.data.groupId)
-      .pipe(filterNullish(), take(1))
+      .pipe(filterNil(), take(1))
       .subscribe((groupData) => {
         this.form.patchValue({
           groupName: groupData.name,

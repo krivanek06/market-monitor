@@ -15,6 +15,7 @@ import { AuthenticationUserStoreService } from '@market-monitor/modules/authenti
 import { PortfolioTransactionCreate, PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
 import { minValueValidator, positiveNumberValidator, requiredValidator } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
+import { dateFormatDate, dateIsNotWeekend } from '@market-monitor/shared/features/general-util';
 import {
   CastToNumberPipe,
   DatePickerComponent,
@@ -24,7 +25,6 @@ import {
   InputTypeDateTimePickerConfig,
   NumberKeyboardComponent,
 } from '@market-monitor/shared/ui';
-import { dateFormatDate, dateIsNotWeekend } from '@market-monitor/shared/utils-general';
 import { isSameDay } from 'date-fns';
 import { map, switchMap, tap } from 'rxjs';
 

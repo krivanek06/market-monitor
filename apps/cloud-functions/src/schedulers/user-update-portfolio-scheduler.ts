@@ -3,7 +3,7 @@ import {
   getCurrentDateDefaultFormat,
   getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
-} from '@market-monitor/shared/utils-general';
+} from '@market-monitor/shared/features/general-util';
 import { format, subDays } from 'date-fns';
 import { userDocumentTransactionHistoryRef, usersCollectionRef } from '../models';
 import { transformPortfolioStateHoldingToPortfolioState } from '../utils';

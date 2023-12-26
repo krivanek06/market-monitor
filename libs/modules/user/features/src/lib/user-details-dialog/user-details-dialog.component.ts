@@ -13,7 +13,7 @@ import { PortfolioCalculationService, PortfolioGrowthService } from '@market-mon
 import { LabelValue } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { DefaultImgDirective, TabSelectControlComponent } from '@market-monitor/shared/ui';
-import { filterNullish } from '@market-monitor/shared/utils-client';
+import { filterNil } from 'ngxtension/filter-nil';
 import { forkJoin, from, map, share, switchMap, tap } from 'rxjs';
 import { UserDetailsHoldingsComponent } from './user-details-holdings/user-details-holdings.component';
 import { UserDetailsOverviewComponent } from './user-details-overview/user-details-overview.component';
@@ -89,7 +89,7 @@ export class UserDetailsDialogComponent {
           this.onDialogClose();
         }
       }),
-      filterNullish(),
+      filterNil(),
       share(),
     );
 

@@ -11,7 +11,7 @@ import {
 import { getFunctions, httpsCallable } from '@angular/fire/functions';
 import { UserApiService } from '@market-monitor/api-client';
 import { UserAccountTypes, UserData, UserResetTransactionsInput } from '@market-monitor/api-types';
-import { dateFormatDate } from '@market-monitor/shared/utils-general';
+import { dateFormatDate } from '@market-monitor/shared/features/general-util';
 import { getApp } from 'firebase/app';
 import { BehaviorSubject, Observable, Subject, from, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';

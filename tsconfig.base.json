@@ -38,17 +38,17 @@
       "@market-monitor/modules/user/features": ["libs/modules/user/features/src/index.ts"],
       "@market-monitor/modules/user/ui": ["libs/modules/user/ui/src/index.ts"],
       "@market-monitor/shared/data-access": ["libs/shared/data-access/src/index.ts"],
+      "@market-monitor/shared/features/general-util": ["libs/shared/features/general-util/src/index.ts"],
+      "@market-monitor/shared/features/dialog-manager": ["libs/shared/features/dialog-manager/src/index.ts"],
       "@market-monitor/shared/features/feature-access-directive": [
         "libs/shared/features/feature-access-directive/src/index.ts"
       ],
+      "@market-monitor/shared/features/general-features": ["libs/shared/features/general-features/src/index.ts"],
       "@market-monitor/shared/features/input-error": ["libs/shared/features/input-error/src/index.ts"],
       "@market-monitor/shared/features/upload-image-single-control": [
         "libs/shared/features/upload-image-single-control/src/index.ts"
       ],
-      "@market-monitor/shared/features/dialog-manager": ["libs/shared/features/dialog-manager/src/index.ts"],
-      "@market-monitor/shared/ui": ["libs/shared/ui/src/index.ts"],
-      "@market-monitor/shared/utils-client": ["libs/shared/utils/utils-client/src/index.ts"],
-      "@market-monitor/shared/utils-general": ["libs/shared/utils/utils-general/src/index.ts"]
+      "@market-monitor/shared/ui": ["libs/shared/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

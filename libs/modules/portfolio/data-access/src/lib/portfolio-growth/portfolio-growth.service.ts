@@ -12,7 +12,7 @@ import {
   getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
   roundNDigits,
-} from '@market-monitor/shared/utils-general';
+} from '@market-monitor/shared/features/general-util';
 import { format, isBefore, isSameDay, subDays } from 'date-fns';
 import { Observable, catchError, firstValueFrom, map, of } from 'rxjs';
 

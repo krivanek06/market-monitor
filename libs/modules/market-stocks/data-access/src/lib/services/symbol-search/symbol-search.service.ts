@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { StocksApiService } from '@market-monitor/api-client';
 import { SymbolSearch, SymbolSummary } from '@market-monitor/api-types';
-import { StorageLocalStoreService } from '@market-monitor/shared/utils-client';
+import { StorageLocalStoreService } from '@market-monitor/shared/features/general-features';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 
 @Injectable({

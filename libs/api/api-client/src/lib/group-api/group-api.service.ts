@@ -24,7 +24,7 @@ import {
   PortfolioTransactionMore,
 } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/data-access';
-import { roundNDigits } from '@market-monitor/shared/utils-general';
+import { roundNDigits } from '@market-monitor/shared/features/general-util';
 import { getApp } from 'firebase/app';
 import { limit } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';

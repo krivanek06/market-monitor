@@ -17,11 +17,10 @@ import {
 } from '@market-monitor/modules/authentication/data-access';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { filterNullish } from '@market-monitor/shared/utils-client';
+import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, catchError, filter, from, switchMap, take, tap } from 'rxjs';
 import { FormLoginComponent } from './form-login/form-login.component';
 import { FormRegisterComponent } from './form-register/form-register.component';
-
 @Component({
   selector: 'app-authentication-form',
   standalone: true,
@@ -130,7 +129,7 @@ export class AuthenticationFormComponent {
           from(this.authenticationAccountService.register(res)).pipe(
             switchMap(() =>
               this.authenticationAccountService.getUserData().pipe(
-                filterNullish(), // wait until there is a user initialized
+                filterNil(), // wait until there is a user initialized
                 tap(() => {
                   // getting error: Navigation triggered outside Angular zone, did you forget to call 'ngZone.run()
                   this.zone.run(() => {

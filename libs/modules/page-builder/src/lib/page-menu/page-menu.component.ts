@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
 import { DialogServiceModule } from '@market-monitor/shared/features/dialog-manager';
-import { LoaderMainService } from '@market-monitor/shared/utils-client';
+import { LoaderMainService } from '@market-monitor/shared/features/general-features';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
 
 @Component({

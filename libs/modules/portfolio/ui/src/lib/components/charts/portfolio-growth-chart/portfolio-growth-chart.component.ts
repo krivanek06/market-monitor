@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
-import { dateFormatDate, formatValueIntoCurrency } from '@market-monitor/shared/utils-general';
+import { dateFormatDate, formatValueIntoCurrency } from '@market-monitor/shared/features/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({

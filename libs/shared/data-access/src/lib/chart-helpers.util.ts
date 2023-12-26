@@ -2,7 +2,7 @@ import { Directive, Input, inject } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import HC_more from 'highcharts/highcharts-more';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
-import { PlatformService } from '../../../utils/utils-client/src/lib/platform';
+import { PlatformService } from '../../../features/general-features/src/lib/platform';
 
 @Directive()
 export abstract class ChartConstructor {
