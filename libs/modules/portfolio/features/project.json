@@ -2,7 +2,7 @@
   "name": "modules-portfolio-features",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/modules/portfolio/features/src",
-  "prefix": "market-monitor",
+  "prefix": "app",
   "tags": [],
   "projectType": "library",
   "targets": {

@@ -38,6 +38,7 @@ admin.firestore().settings({
 // -------- Production ---------
 export * from './group';
 export * from './market-functions';
+export * from './user';
 
 // -------- Scheduler ---------
 export * from './schedulers';

@@ -37,9 +37,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
         display: block;
       }
 
-      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-        display: none !important;
-      }
       ::ng-deep .mat-mdc-form-field-infix {
         height: 48px !important;
         min-height: 48px !important;

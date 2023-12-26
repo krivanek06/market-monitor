@@ -1,7 +1,6 @@
 export enum ROUTES_MAIN {
   DASHBOARD = 'dashboard',
   LOGIN = 'login',
-  SETTING = 'settings',
   TRADING = 'trading',
   GROUPS = 'groups',
   WATCHLIST = 'watchlist',

@@ -54,8 +54,6 @@ export class PageGroupsComponent {
   dialogServiceUtil = inject(DialogServiceUtil);
   dialog = inject(MatDialog);
   router = inject(Router);
-
-  // groupsSignal = toSignal(this.authenticationUserService..getUserGroupsData());
   groupsSignal = this.authenticationUserService.state.userGroupData;
   searchGroupControl = new FormControl<GroupData | null>(null);
 
@@ -80,22 +78,62 @@ export class PageGroupsComponent {
     });
   }
 
-  async onReceivedInvitationClick(group: GroupData) {
-    const result = await this.dialogServiceUtil.showActionButtonDialog({
-      dialogTitle: `Do you want to accept or decline the invitation from ${group.name}?`,
+  /**
+   * user clicks on received group invitation
+   */
+  async onReceivedInvitationClick(groupData: GroupData) {
+    const response = await this.dialogServiceUtil.showActionButtonDialog({
+      dialogTitle: `Do you want to accept or decline the invitation from ${groupData.name}?`,
       primaryButtonText: 'Accept',
       secondaryButtonText: 'Decline',
       secondaryButtonColor: 'warn',
     });
-    console.log('result', result);
+    const user = this.authenticationUserService.state.getUserData();
+
+    try {
+      // accept user
+      if (response === 'primary') {
+        this.dialogServiceUtil.showNotificationBar(`Accepting group ${groupData.name} invitation`);
+        await this.groupApiService.userAcceptsGroupInvitation(groupData.id);
+        this.dialogServiceUtil.showNotificationBar(`Accepted ${groupData.name} invitation`, 'success');
+      }
+
+      // decline user
+      else if (response === 'secondary') {
+        this.dialogServiceUtil.showNotificationBar(`Declining group ${groupData.name} invitation}`);
+        await this.groupApiService.userDeclinesGroupInvitation({
+          userId: user.id,
+          groupId: groupData.id,
+        });
+        this.dialogServiceUtil.showNotificationBar(`Declined ${groupData.name} invitation`, 'success');
+      }
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
   }
 
-  async onSentRequestClick(group: GroupData) {
-    const result = await this.dialogServiceUtil.showActionButtonDialog({
-      dialogTitle: `Do you want to remove your request from from ${group.name}?`,
+  /**
+   * user clicks on his own sent request to join a group
+   */
+  async onSentRequestClick(groupData: GroupData) {
+    const response = await this.dialogServiceUtil.showActionButtonDialog({
+      dialogTitle: `Do you want to remove your request from from ${groupData.name}?`,
       primaryButtonText: 'Remove',
     });
-    console.log('result', result);
+
+    try {
+      // remove request
+      if (response === 'primary') {
+        this.dialogServiceUtil.showNotificationBar(`Removing request from group ${groupData.name}`);
+        await this.groupApiService.removeRequestToJoinGroup({
+          groupId: groupData.id,
+          userId: this.authenticationUserService.state.getUserData().id,
+        });
+        this.dialogServiceUtil.showNotificationBar(`Removed request from group ${groupData.name}`, 'success');
+      }
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
   }
 
   onGroupClick(group: GroupData): void {

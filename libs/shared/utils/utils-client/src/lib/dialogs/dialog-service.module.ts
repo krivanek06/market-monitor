@@ -4,6 +4,7 @@ import { MatSnackBarModule, MatSnackBarRef } from '@angular/material/snack-bar';
 import { ActionButtonDialogComponent } from './action-button-dialog/action-button-dialog.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { DialogServiceUtil } from './dialog-service.util';
+import { InlineInputDialogComponent } from './inline-input-dialog/inline-input-dialog.component';
 import { NotificationBarModule } from './notification-bar/notification-bar.module';
 
 @NgModule({
@@ -14,6 +15,7 @@ import { NotificationBarModule } from './notification-bar/notification-bar.modul
     NotificationBarModule,
     ConfirmDialogComponent,
     ActionButtonDialogComponent,
+    InlineInputDialogComponent,
   ],
   exports: [
     MatSnackBarModule,
@@ -21,6 +23,7 @@ import { NotificationBarModule } from './notification-bar/notification-bar.modul
     NotificationBarModule,
     ConfirmDialogComponent,
     ActionButtonDialogComponent,
+    InlineInputDialogComponent,
   ],
   providers: [
     {

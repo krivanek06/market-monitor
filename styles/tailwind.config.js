@@ -8,8 +8,8 @@ module.exports = {
   content: [join(__dirname, 'src/**/!(*.stories|*.spec).{ts,html}'), ...createGlobPatternsForDependencies(__dirname)],
   theme: {
     fontFamily: {
-      sans: ['sans-serif', 'Poppins'],
-      serif: ['sans-serif', 'Poppins'],
+      sans: ['system-ui', 'sans-serif', 'Poppins'],
+      serif: ['system-ui', 'sans-serif', 'Poppins'],
     },
     extend: {
       colors: {
@@ -33,6 +33,9 @@ module.exports = {
         'wt-gray-medium': 'var(--gray-medium)',
         'wt-gray-light-strong': 'var(--gray-light-strong)',
         'wt-gray-light': 'var(--gray-light)',
+
+        /* other */
+        'wt-border': 'var(--border)',
       },
       flex: {
         2: '2 2 0%',

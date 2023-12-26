@@ -1,22 +1,15 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  forwardRef,
-  inject,
-  signal,
-} from '@angular/core';
-import { Storage, UploadTask, getDownloadURL, percentage, ref, uploadBytesResumable } from '@angular/fire/storage';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output, forwardRef, inject, signal } from '@angular/core';
+import { Storage, getDownloadURL, ref, uploadBytesResumable } from '@angular/fire/storage';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
 import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/utils-client';
-import { EMPTY, Observable, catchError, first, map } from 'rxjs';
 
 @Component({
   selector: 'app-upload-image-single-control',
@@ -28,10 +21,19 @@ import { EMPTY, Observable, catchError, first, map } from 'rxjs';
     DefaultImgDirective,
     MatProgressBarModule,
     ReactiveFormsModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
   ],
   template: `
     <div
-      class="relative grid w-full h-full text-center border rounded-md group border-wt-gray-medium hover:border-wt-gray-dark hover:shadow-lg ripple-container bg-wt-gray-light place-content-center hover:bg-wt-gray-medium opacity-80 hover:text-wt-gray-light g-clickable-hover"
+      class="relative grid text-center border rounded-md group border-wt-gray-medium hover:border-wt-gray-dark hover:shadow-lg bg-wt-gray-light place-content-center hover:bg-wt-gray-medium hover:text-wt-gray-light g-clickable-hover"
+      ngClass="{
+        'opacity-80': !isUploadingSignal(),
+        'opacity-50': isUploadingSignal(),
+      }"
+      [style.height.px]="heightPx"
+      [style.width.px]="heightPx"
       matRipple
       [matRippleCentered]="true"
       [matRippleDisabled]="false"
@@ -44,9 +46,14 @@ import { EMPTY, Observable, catchError, first, map } from 'rxjs';
         type="file"
         (change)="onFileSelected($event)"
         #fileUpload
-        [accept]="fileLimitExtensions"
+        accept=".jpg, .jpeg, .png"
       />
       <div *ngIf="!lastFileUploadSignal()">Click To Upload</div>
+
+      <!-- progress bar -->
+      <div *ngIf="isUploadingSignal()" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <mat-spinner></mat-spinner>
+      </div>
 
       <!-- uploaded image -->
       <ng-container *ngIf="lastFileUploadSignal() as downloadURL" class="p-3">
@@ -59,13 +66,15 @@ import { EMPTY, Observable, catchError, first, map } from 'rxjs';
       </ng-container>
     </div>
 
-    <!-- progress -->
-    <ng-container *ngIf="percentage$ | async as pct">
-      <div *ngIf="isUploadingSignal()" class="flex flex-col items-center mt-4">
-        <div class="text-center">{{ pct | number }}%</div>
-        <mat-progress-bar mode="determinate" [value]="pct" max="100"></mat-progress-bar>
-      </div>
-    </ng-container>
+    <!-- confirm or not -->
+    <div *ngIf="uploadFileSignal()" class="mt-2 flex items-center gap-4 px-2">
+      <button type="button" mat-icon-button (click)="onCancel()">
+        <mat-icon>cancel</mat-icon>
+      </button>
+      <button type="button" mat-flat-button color="primary" (click)="startUpload()" class="flex-1">
+        Confirm Upload
+      </button>
+    </div>
   `,
   providers: [
     {
@@ -78,32 +87,9 @@ import { EMPTY, Observable, catchError, first, map } from 'rxjs';
     `
       :host {
         display: block;
-        height: 100%;
-      }
-
-      .ripple-container {
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-
-        -webkit-user-drag: none;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      .progress-container {
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        margin-top: 16px;
-        width: 100%;
-
-        progress {
-          width: 80%;
-        }
       }
     `,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploadImageSingleControlComponent implements ControlValueAccessor {
   @Output() uploadedFilesEmitter: EventEmitter<string> = new EventEmitter<string>();
@@ -117,10 +103,16 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
    * path where to save the file
    */
   @Input() filePath = 'images';
-  @Input() fileLimitExtensions = '.jpg, .jpeg, .png';
+  @Input() fileMaxSizeMb = 20; // 20Mb
+  @Input() heightPx = 200;
+
+  get fileMaxSize(): number {
+    return this.fileMaxSizeMb * 1024 * 1024;
+  }
 
   dialogServiceUtil = inject(DialogServiceUtil);
   storage = inject(Storage);
+  cd = inject(ChangeDetectorRef);
 
   onChange: (value: string) => void = () => {};
   onTouched = () => {};
@@ -128,32 +120,48 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
   ColorScheme = ColorScheme;
 
   /**
-   * currently uploaded percentage
+   * stores image url displayed for the user
    */
-  percentage$!: Observable<number>;
+  lastFileUploadSignal = signal<string | null>(null);
 
+  /**
+   * stores the file to be uploaded
+   */
+  uploadFileSignal = signal<File | null>(null);
+
+  /**
+   * stores the upload progress
+   */
   isUploadingSignal = signal(false);
-  lastFileUploadSignal = signal<string | undefined>(undefined);
-
-  private task: UploadTask | undefined;
 
   onFileSelected(event: any) {
-    const limit = 1024 * 1024 * 20; // 20Mb
     const file: File = event.target.files[0];
     if (file) {
-      if (file.size < limit) {
+      if (file.size < this.fileMaxSize) {
         console.log('uploading !!!!!');
         // this.clearImages();
         // this.files.push(file);
-        this.startUpload(file);
+        //this.startUpload(file);
+        this.uploadFileSignal.set(file);
+
+        // preview image
+        const reader = new FileReader();
+        reader.onload = (e) => this.lastFileUploadSignal.set(reader.result as string);
+
+        reader.readAsDataURL(file);
       } else {
         const size = Math.round(file.size / 1024 / 1024);
         this.dialogServiceUtil.showNotificationBar(
-          `Unable to upload file, limit size is 20Mb, your size is ${size} Mb`,
+          `Unable to upload file, limit size is ${this.fileMaxSize}Mb, your size is ${size} Mb`,
           'error',
         );
       }
     }
+  }
+
+  onCancel() {
+    this.uploadFileSignal.set(null);
+    this.lastFileUploadSignal.set(null);
   }
 
   writeValue(downloadUrl: string): void {
@@ -173,44 +181,51 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
     this.onTouched = fn;
   }
 
-  private startUpload(file: File) {
+  startUpload() {
+    const file = this.uploadFileSignal();
+    if (!file) {
+      this.dialogServiceUtil.showNotificationBar('No file selected', 'error');
+      return;
+    }
+
     // The storage path
     const path = this.fileName ? `${this.filePath}/${this.fileName}` : `${this.filePath}/${Date.now()}_${file.name}`;
 
     // Reference to storage bucket
-    const refefence = ref(this.storage, path);
+    const reference = ref(this.storage, path);
 
     // The main task
-    this.task = uploadBytesResumable(refefence, file);
+    const task = uploadBytesResumable(reference, file);
 
     this.isUploadingSignal.set(true);
 
-    // Progress monitoring
-    this.percentage$ = percentage(this.task).pipe(map((x: any) => x.progress));
-
     // emit when finished
-    percentage(this.task)
-      .pipe(
-        first((x: any) => x.progress === 100),
-        catchError((err) => {
-          console.error(err);
-          this.dialogServiceUtil.showNotificationBar('Error uploading file', 'error');
-          return EMPTY;
-        }),
-      )
-      .subscribe(async (res) => {
-        // The file's download URL
-        console.log('final', res);
-        const downloadURL = await getDownloadURL(res.snapshot.ref);
+    task.on(
+      'state_changed',
+      (snapshot) => {
+        console.log('state_changed', snapshot);
+      },
+      (err) => {
+        console.error(err);
+        this.dialogServiceUtil.showNotificationBar('Error uploading file', 'error');
+      },
+      async () => {
+        console.log('complete');
+        const downloadURL = await getDownloadURL(task.snapshot.ref);
         this.dialogServiceUtil.showNotificationBar('File uploaded', 'success');
         console.log('emitting', downloadURL, path);
 
-        this.isUploadingSignal.set(false);
         this.lastFileUploadSignal.set(downloadURL);
+        this.uploadFileSignal.set(null);
 
         // notify parent
         this.onChange(downloadURL);
         this.uploadedFilesEmitter.emit(downloadURL);
-      });
+        this.isUploadingSignal.set(false);
+
+        // force change detection
+        this.cd.detectChanges();
+      },
+    );
   }
 }

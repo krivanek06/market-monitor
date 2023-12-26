@@ -1,20 +1,32 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
+import { UserSettingsDialogComponent } from '@market-monitor/modules/user/features';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { FeatureAccessDirective } from '@market-monitor/shared/features';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 
 @Component({
   selector: 'app-menu-top-navigation',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, DefaultImgDirective, MatButtonModule, FeatureAccessDirective],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatIconModule,
+    DefaultImgDirective,
+    MatButtonModule,
+    FeatureAccessDirective,
+    UserSettingsDialogComponent,
+    MatDialogModule,
+  ],
   template: `
     <div class="w-full shadow-md mb-4">
       <nav class="w-full py-4 pl-8 pr-12 flex items-center gap-4 max-w-[1620px] mx-auto">
@@ -156,7 +168,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
             </div>
 
             <!-- menu -->
-            <div class="min-w-[220px] flex flex-col top-[60px] c-scale">
+            <div class="min-w-[220px] flex flex-col top-[60px] c-scale ml-[-90px]">
               <button mat-button class="mb-2 c-scale__item" (click)="onSettingClick()">
                 <mat-icon>settings</mat-icon>
                 Settings
@@ -207,6 +219,7 @@ export class MenuTopNavigationComponent implements OnInit {
   private router = inject(Router);
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private authenticationService = inject(AuthenticationAccountService);
+  private dialog = inject(MatDialog);
 
   userDataSignal = this.authenticationUserStoreService.state.userData;
 
@@ -224,7 +237,11 @@ export class MenuTopNavigationComponent implements OnInit {
     this.router.navigate([navigation]);
   }
 
-  onSettingClick() {}
+  onSettingClick() {
+    this.dialog.open(UserSettingsDialogComponent, {
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
+  }
 
   onHelpClick() {}
 

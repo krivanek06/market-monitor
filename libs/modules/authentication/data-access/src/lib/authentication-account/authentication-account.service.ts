@@ -8,16 +8,18 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from '@angular/fire/auth';
+import { getFunctions, httpsCallable } from '@angular/fire/functions';
 import { UserApiService } from '@market-monitor/api-client';
-import { UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
+import { UserAccountTypes, UserData, UserResetTransactionsInput } from '@market-monitor/api-types';
 import { dateFormatDate } from '@market-monitor/shared/utils-general';
-import { BehaviorSubject, Observable, Subject, map, switchMap } from 'rxjs';
-import { LoginUserInput, RegisterUserInput, createNewUser } from '../model';
-
+import { getApp } from 'firebase/app';
+import { BehaviorSubject, Observable, Subject, from, of, switchMap } from 'rxjs';
+import { LoginUserInput, RegisterUserInput } from '../model';
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationAccountService {
+  private functions = getFunctions(getApp());
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
   private authenticatedUser$ = new BehaviorSubject<User | null>(null);
   private loadedAuthentication$ = new Subject<UserData['id'] | null>();
@@ -67,13 +69,62 @@ export class AuthenticationAccountService {
     // todo
   }
 
+  changeDisplayName(displayName: string): void {
+    const user = this.authenticatedUserData$.value;
+    if (!user) {
+      throw new Error('User is not authenticated');
+    }
+
+    this.userApiService.updateUser(user.id, {
+      personal: {
+        ...user.personal,
+        displayName,
+      },
+    });
+  }
+
+  async resetTransactions(accountTypeSelected: UserAccountTypes): Promise<void> {
+    const user = this.authenticatedUser$.value;
+    if (!user) {
+      throw new Error('User is not authenticated');
+    }
+
+    const callable = httpsCallable<UserResetTransactionsInput, void>(this.functions, 'userResetTransactionsCall');
+    await callable({
+      userId: user.uid,
+      accountTypeSelected,
+    });
+  }
+
+  async deleteAccount(): Promise<void> {
+    const userData = this.authenticatedUserData$.value;
+    if (!userData) {
+      throw new Error('User is not authenticated');
+    }
+    try {
+      // delete groups
+      const groupsToRemove = userData.groups.groupOwner.map((groupId) =>
+        httpsCallable<string, unknown>(this.functions, 'groupDeleteCall')(groupId),
+      );
+      await Promise.all(groupsToRemove);
+
+      // delete account
+      const callable = httpsCallable<string, void>(this.functions, 'userDeleteAccountCall');
+      await callable(userData.id);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   private listenOnUserChanges(): void {
     this.authenticatedUser$
       .pipe(
         switchMap((user) =>
           this.userApiService
             .getUserData(user?.uid)
-            .pipe(map((userData) => (userData ? userData : user ? this.createUser(user) : null))),
+            .pipe(
+              switchMap((userData) => (userData ? of(userData) : user ? from(this.userCreateAccount()) : of(null))),
+            ),
         ),
       )
       .subscribe((userData) => {
@@ -87,6 +138,12 @@ export class AuthenticationAccountService {
       });
   }
 
+  private async userCreateAccount(): Promise<UserData> {
+    const callable = httpsCallable<User, UserData>(this.functions, 'userCreateAccountCall');
+    const result = await callable();
+    return result.data;
+  }
+
   private initAuthenticationUser(): void {
     this.auth.onAuthStateChanged((user) => {
       console.log('authentication state change', user);
@@ -95,7 +152,7 @@ export class AuthenticationAccountService {
       if (user) {
         // wait some time before updating last login date so that user is already saved in authenticatedUserData
         setTimeout(() => {
-          console.log('UPDATE LAST LOGIN');
+          console.log(`UPDATE LAST LOGIN for user ${user.displayName} : ${user.uid}`);
           // update last login date
           this.userApiService.updateUser(user.uid, {
             lastLoginDate: dateFormatDate(new Date()),
@@ -103,34 +160,5 @@ export class AuthenticationAccountService {
         }, 10_000);
       }
     });
-  }
-
-  private createUser(user: User): UserData {
-    // create new user data
-    const newUserData = createNewUser(user.uid, {
-      displayName: user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`,
-      photoURL: user.photoURL,
-    });
-
-    const newTransactions: UserPortfolioTransaction = {
-      transactions: [],
-    };
-
-    const newWatchList: UserWatchlist = {
-      createdDate: dateFormatDate(new Date()),
-      data: [],
-    };
-
-    // update user
-    this.userApiService.updateUser(newUserData.id, newUserData);
-
-    // create portfolio for user
-    this.userApiService.updateUserPortfolioTransaction(newUserData.id, newTransactions);
-
-    // create empty watchList
-    this.userApiService.updateUserWatchList(newUserData.id, newWatchList);
-
-    // return new user data
-    return newUserData;
   }
 }
