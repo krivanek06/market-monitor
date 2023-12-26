@@ -15,7 +15,26 @@ import {
   selector: 'app-form-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormMatInputWrapperComponent, MatButtonModule],
-  templateUrl: './form-login.component.html',
+  template: `
+    <form [formGroup]="formGroup" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
+      <!-- email -->
+      <app-form-mat-input-wrapper
+        formControlName="email"
+        inputCaption="Email"
+        inputType="EMAIL"
+      ></app-form-mat-input-wrapper>
+
+      <!-- password -->
+      <app-form-mat-input-wrapper
+        formControlName="password"
+        inputCaption="Password"
+        inputType="PASSWORD"
+      ></app-form-mat-input-wrapper>
+
+      <!-- submit -->
+      <button mat-stroked-button color="primary" class="w-full" type="submit">Login</button>
+    </form>
+  `,
   styles: [
     `
       :host {
