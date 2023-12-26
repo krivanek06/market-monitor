@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { DynamicValidatorMessage } from '@market-monitor/shared/features/input-error';
 
 export type InlineInputDialogComponentData = {
   title: string;
@@ -14,27 +15,27 @@ export type InlineInputDialogComponentData = {
 @Component({
   selector: 'app-inline-input-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatInputModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    DynamicValidatorMessage,
+  ],
   template: `
     <div class="p-4">
       <div class="text-center text-wt-primary text-lg mb-3">{{ data.title }}</div>
       <div *ngIf="data.description" class="mb-3 text-wt-gray-medium text-sm text-center">{{ data.description }}</div>
 
       <!-- input -->
-      <mat-form-field class="w-full">
-        <mat-label>Enter Value</mat-label>
-        <input matInput [formControl]="inputValueControl" />
-
-        @if (inputValueControl.hasError('required')) {
-          <mat-error>Field is <strong>required</strong></mat-error>
-        }
-        @if (inputValueControl.hasError('minlength')) {
-          <mat-error>Min length is <strong>4</strong> characters</mat-error>
-        }
-        @if (inputValueControl.hasError('maxlength')) {
-          <mat-error>Max length is <strong>30</strong> characters</mat-error>
-        }
-      </mat-form-field>
+      <form [formGroup]="inputValueForm">
+        <mat-form-field class="w-full">
+          <mat-label>Enter Value</mat-label>
+          <input matInput formControlName="value" />
+        </mat-form-field>
+      </form>
 
       <!-- action buttons -->
       <div class="flex flex-col-reverse gap-4 mt-6 md:flex-row">
@@ -51,8 +52,10 @@ export type InlineInputDialogComponentData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InlineInputDialogComponent {
-  inputValueControl = new FormControl<string>('', {
-    validators: [Validators.required, Validators.minLength(4), Validators.maxLength(30)],
+  inputValueForm = new FormGroup({
+    value: new FormControl<string>('', {
+      validators: [Validators.required, Validators.minLength(4), Validators.maxLength(30)],
+    }),
   });
 
   constructor(
@@ -65,10 +68,10 @@ export class InlineInputDialogComponent {
   }
 
   confirm(): void {
-    if (!this.inputValueControl.valid) {
+    if (!this.inputValueForm.valid) {
       return;
     }
 
-    this.dialogRef.close(this.inputValueControl.value);
+    this.dialogRef.close(this.inputValueForm.controls.value.value);
   }
 }
