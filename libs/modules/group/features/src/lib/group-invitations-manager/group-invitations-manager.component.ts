@@ -4,9 +4,8 @@ import { MatRippleModule } from '@angular/material/core';
 import { GroupApiService } from '@market-monitor/api-client';
 import { GroupDetails, UserData } from '@market-monitor/api-types';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
+import { Confirmable, DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { GeneralCardComponent } from '@market-monitor/shared/ui';
-import { Confirmable, DialogServiceUtil } from '@market-monitor/shared/utils-client';
-
 @Component({
   selector: 'app-group-invitations-manager',
   standalone: true,

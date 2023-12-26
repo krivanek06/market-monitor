@@ -11,15 +11,10 @@ import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
-import {
-  Confirmable,
-  DialogServiceModule,
-  DialogServiceUtil,
-  SCREEN_DIALOGS,
-  filterNullish,
-} from '@market-monitor/shared/utils-client';
+import { filterNullish } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, from, map, tap } from 'rxjs';
 import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';
 
@@ -30,7 +25,6 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     CommonModule,
     MatIconModule,
     MatButtonModule,
-    DialogServiceModule,
     MatDialogModule,
     DialogCloseHeaderComponent,
     MatDividerModule,

@@ -8,8 +8,8 @@ import { Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { StockSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { DefaultImgDirective, PriceChangeItemsComponent } from '@market-monitor/shared/ui';
-import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError } from 'rxjs';
 import { SummaryActionButtonsComponent } from './summary-action-buttons/summary-action-buttons.component';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
@@ -28,7 +28,6 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
     PriceChangeItemsComponent,
     SummaryModalSkeletonComponent,
     AssetPriceChartInteractiveComponent,
-    DialogServiceModule,
     SummaryActionButtonsComponent,
   ],
   templateUrl: './stock-summary-dialog.component.html',

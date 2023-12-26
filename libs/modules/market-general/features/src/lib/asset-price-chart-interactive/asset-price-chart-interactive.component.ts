@@ -17,13 +17,13 @@ import {
   SymbolHistoricalPeriodsArrayPreload,
 } from '@market-monitor/api-types';
 import { ErrorEnum } from '@market-monitor/shared/data-access';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import {
   AssetPriceChartComponent,
   ClientStylesDirective,
   DefaultImgDirective,
   TimePeriodButtonsComponent,
 } from '@market-monitor/shared/ui';
-import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { catchError, startWith, switchMap, tap } from 'rxjs';
 
 @Component({

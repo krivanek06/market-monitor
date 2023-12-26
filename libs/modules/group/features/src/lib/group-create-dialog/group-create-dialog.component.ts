@@ -14,6 +14,7 @@ import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT, GroupCreateInput, UserData } fro
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserSearchControlComponent } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import {
   DatePickerComponent,
@@ -22,13 +23,7 @@ import {
   FormMatInputWrapperComponent,
   HideAfterDirective,
 } from '@market-monitor/shared/ui';
-import {
-  DialogServiceModule,
-  DialogServiceUtil,
-  maxLengthValidator,
-  minLengthValidator,
-  requiredValidator,
-} from '@market-monitor/shared/utils-client';
+import { maxLengthValidator, minLengthValidator, requiredValidator } from '@market-monitor/shared/utils-client';
 import { map, startWith } from 'rxjs';
 
 @Component({
@@ -46,7 +41,6 @@ import { map, startWith } from 'rxjs';
     MatCheckboxModule,
     DatePickerComponent,
     DefaultImgDirective,
-    DialogServiceModule,
     MatProgressSpinnerModule,
     DialogCloseHeaderComponent,
     UserSearchControlComponent,

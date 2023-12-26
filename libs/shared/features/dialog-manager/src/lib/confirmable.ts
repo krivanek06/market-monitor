@@ -1,4 +1,5 @@
-import { DialogServiceModule, DialogServiceUtil } from '../dialogs';
+import { DialogServiceModule } from './dialog-service.module';
+import { DialogServiceUtil } from './dialog-service.util';
 
 export function Confirmable(dialogTitle: string, confirmButton: string = 'Confirm', cancelButton: boolean = true) {
   return function (target: any, key: string | symbol, descriptor: PropertyDescriptor) {

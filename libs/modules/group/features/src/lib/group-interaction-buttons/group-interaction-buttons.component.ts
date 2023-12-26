@@ -8,7 +8,8 @@ import { GroupApiService } from '@market-monitor/api-client';
 import { GROUP_MEMBER_LIMIT, GroupDetails, UserData } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserSearchDialogComponent, UserSearchDialogData } from '@market-monitor/modules/user/features';
-import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS, filterNullish } from '@market-monitor/shared/utils-client';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
+import { filterNullish } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, filter, from, of, switchMap, take, tap } from 'rxjs';
 import {
   GroupSettingsDialogComponent,

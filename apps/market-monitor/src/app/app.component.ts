@@ -4,11 +4,12 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Meta } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
+import { DialogServiceModule } from '@market-monitor/shared/features/dialog-manager';
 import { LoaderMainService } from '@market-monitor/shared/utils-client';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterModule, MatProgressSpinnerModule],
+  imports: [CommonModule, RouterModule, MatProgressSpinnerModule, DialogServiceModule],
   selector: 'app-root',
   template: `
     <main class="min-h-screen min-w-full">

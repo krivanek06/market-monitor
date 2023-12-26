@@ -18,14 +18,9 @@ import {
 } from '@market-monitor/modules/portfolio/features';
 import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { FancyCardComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
-import {
-  Confirmable,
-  DialogServiceModule,
-  DialogServiceUtil,
-  SCREEN_DIALOGS,
-  filterNullish,
-} from '@market-monitor/shared/utils-client';
+import { filterNullish } from '@market-monitor/shared/utils-client';
 import { switchMap } from 'rxjs';
 
 @Component({
@@ -39,7 +34,6 @@ import { switchMap } from 'rxjs';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    DialogServiceModule,
     AssetPriceChartInteractiveComponent,
     StockSummaryListComponent,
     PortfolioTransactionsTableComponent,

@@ -6,7 +6,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
-import { DialogServiceModule, LoaderMainService } from '@market-monitor/shared/utils-client';
+import { DialogServiceModule } from '@market-monitor/shared/features/dialog-manager';
+import { LoaderMainService } from '@market-monitor/shared/utils-client';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
 
 @Component({

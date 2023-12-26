@@ -19,6 +19,7 @@ import {
   PortfolioTransactionChartComponent,
 } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import {
   DateRangeSliderValues,
   FancyCardComponent,
@@ -26,7 +27,6 @@ import {
   GeneralCardComponent,
   GenericChartComponent,
 } from '@market-monitor/shared/ui';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 
 @Component({
   selector: 'app-page-dashboard',

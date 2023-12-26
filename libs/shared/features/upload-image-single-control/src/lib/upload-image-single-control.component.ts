@@ -8,8 +8,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ColorScheme } from '@market-monitor/shared/data-access';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
-import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/utils-client';
 
 @Component({
   selector: 'app-upload-image-single-control',
@@ -17,7 +17,6 @@ import { DialogServiceModule, DialogServiceUtil } from '@market-monitor/shared/u
   imports: [
     CommonModule,
     MatRippleModule,
-    DialogServiceModule,
     DefaultImgDirective,
     MatProgressBarModule,
     ReactiveFormsModule,

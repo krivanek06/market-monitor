@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, forwardRef, inject } from '@angular
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { RegisterUserInput } from '@market-monitor/modules/authentication/data-access';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
 import {
-  DialogServiceUtil,
   emailValidator,
   maxLengthValidator,
   minLengthValidator,

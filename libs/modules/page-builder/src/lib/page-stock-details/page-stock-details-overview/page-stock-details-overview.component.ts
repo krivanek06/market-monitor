@@ -19,6 +19,7 @@ import {
   StockSummaryListComponent,
   StockUpgradesDowngradesTableComponent,
 } from '@market-monitor/modules/market-stocks/ui';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import {
   GeneralCardComponent,
   GenericChartComponent,
@@ -26,7 +27,6 @@ import {
   PriceChangeItemsComponent,
   SortByKeyPipe,
 } from '@market-monitor/shared/ui';
-import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { of, switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
@@ -35,7 +35,6 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   standalone: true,
   imports: [
     CommonModule,
-    DialogServiceModule,
     GenericChartComponent,
     GeneralCardComponent,
     StockRatingTableComponent,

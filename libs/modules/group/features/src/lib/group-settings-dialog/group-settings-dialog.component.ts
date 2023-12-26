@@ -12,6 +12,7 @@ import { GroupApiService } from '@market-monitor/api-client';
 import { GroupMember } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import {
   ArrayExcludePipe,
@@ -20,8 +21,6 @@ import {
   FormMatInputWrapperComponent,
 } from '@market-monitor/shared/ui';
 import {
-  DialogServiceModule,
-  DialogServiceUtil,
   filterNullish,
   maxLengthValidator,
   minLengthValidator,
@@ -47,7 +46,6 @@ export type GroupSettingsDialogComponentData = {
     FormMatInputWrapperComponent,
     MatCheckboxModule,
     DefaultImgDirective,
-    DialogServiceModule,
     DialogCloseHeaderComponent,
     UserDisplayItemComponent,
     UploadImageSingleControlComponent,

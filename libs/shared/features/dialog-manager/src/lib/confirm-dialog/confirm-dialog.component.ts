@@ -5,8 +5,24 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 
 @Component({
   selector: 'app-confirm-dialog',
-  templateUrl: './confirm-dialog.component.html',
-  styleUrls: ['./confirm-dialog.component.scss'],
+  template: `
+    <div class="max-w-xl p-4 text-center sm:min-w-[400px]">
+      <p class="text-xl">{{ data.dialogTitle }}</p>
+      <div class="flex flex-col-reverse gap-4 mt-6 md:flex-row">
+        <button mat-button *ngIf="data.showCancelButton" class="w-full" (click)="cancel()" color="primary">
+          Cancel
+        </button>
+        <button mat-flat-button class="w-full" color="primary" (click)="confirm()">{{ data.confirmButton }}</button>
+      </div>
+    </div>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatDialogModule],
@@ -14,7 +30,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 export class ConfirmDialogComponent {
   constructor(
     private dialogRef: MatDialogRef<ConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { dialogTitle: string; showCancelButton: boolean; confirmButton: string }
+    @Inject(MAT_DIALOG_DATA) public data: { dialogTitle: string; showCancelButton: boolean; confirmButton: string },
   ) {}
 
   confirm(): void {

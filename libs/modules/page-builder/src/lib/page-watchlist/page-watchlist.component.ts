@@ -8,7 +8,7 @@ import { SymbolSummary } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { StockSearchBasicComponent, StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { GetStocksSummaryPipe, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks/ui';
-import { DialogServiceModule, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
+import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { EMPTY, catchError, filter, from, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -23,7 +23,6 @@ import { EMPTY, catchError, filter, from, switchMap, tap } from 'rxjs';
     MatIconModule,
     ReactiveFormsModule,
     StockSearchBasicComponent,
-    DialogServiceModule,
   ],
   templateUrl: './page-watchlist.component.html',
   styles: [

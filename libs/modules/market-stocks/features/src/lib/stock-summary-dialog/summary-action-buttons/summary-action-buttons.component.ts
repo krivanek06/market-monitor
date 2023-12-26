@@ -19,7 +19,7 @@ import {
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
 import { SymbolFavoriteService } from '@market-monitor/modules/market-stocks/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 
 @Component({
   selector: 'app-summary-action-buttons',

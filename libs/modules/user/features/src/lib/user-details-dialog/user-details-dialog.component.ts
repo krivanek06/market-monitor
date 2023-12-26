@@ -11,8 +11,9 @@ import { GroupData, PortfolioGrowthAssets, PortfolioStateHoldings, UserData } fr
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { PortfolioCalculationService, PortfolioGrowthService } from '@market-monitor/modules/portfolio/data-access';
 import { LabelValue } from '@market-monitor/shared/data-access';
+import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { DefaultImgDirective, TabSelectControlComponent } from '@market-monitor/shared/ui';
-import { DialogServiceUtil, SCREEN_DIALOGS, filterNullish } from '@market-monitor/shared/utils-client';
+import { filterNullish } from '@market-monitor/shared/utils-client';
 import { forkJoin, from, map, share, switchMap, tap } from 'rxjs';
 import { UserDetailsHoldingsComponent } from './user-details-holdings/user-details-holdings.component';
 import { UserDetailsOverviewComponent } from './user-details-overview/user-details-overview.component';

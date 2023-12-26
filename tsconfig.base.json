@@ -41,10 +41,11 @@
       "@market-monitor/shared/features/feature-access-directive": [
         "libs/shared/features/feature-access-directive/src/index.ts"
       ],
+      "@market-monitor/shared/features/input-error": ["libs/shared/features/input-error/src/index.ts"],
       "@market-monitor/shared/features/upload-image-single-control": [
         "libs/shared/features/upload-image-single-control/src/index.ts"
       ],
-      "@market-monitor/shared/features/input-error": ["libs/shared/features/input-error/src/index.ts"],
+      "@market-monitor/shared/features/dialog-manager": ["libs/shared/features/dialog-manager/src/index.ts"],
       "@market-monitor/shared/ui": ["libs/shared/ui/src/index.ts"],
       "@market-monitor/shared/utils-client": ["libs/shared/utils/utils-client/src/index.ts"],
       "@market-monitor/shared/utils-general": ["libs/shared/utils/utils-general/src/index.ts"]
