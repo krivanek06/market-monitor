@@ -18,8 +18,8 @@ import {
 import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { PositionCardComponent, SectionTitleComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { switchMap } from 'rxjs';
 import { PageGroupsBaseComponent } from '../page-groups-base.component';
 

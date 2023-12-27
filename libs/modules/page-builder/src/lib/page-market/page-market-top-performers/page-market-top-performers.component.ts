@@ -7,20 +7,13 @@ import { MarketApiService } from '@market-monitor/api-client';
 import { SymbolSummary } from '@market-monitor/api-types';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { StockSummaryTableComponent } from '@market-monitor/modules/market-stocks/ui';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { RangeDirective } from '@market-monitor/shared/ui';
-import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 
 @Component({
   selector: 'app-page-market-top-performers',
   standalone: true,
-  imports: [
-    CommonModule,
-    StockSummaryTableComponent,
-    MatButtonModule,
-    MatDialogModule,
-    RangeDirective,
-    DialogServiceModule,
-  ],
+  imports: [CommonModule, StockSummaryTableComponent, MatButtonModule, MatDialogModule, RangeDirective],
   templateUrl: './page-market-top-performers.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [

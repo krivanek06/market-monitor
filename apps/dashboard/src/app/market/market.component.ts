@@ -5,12 +5,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
 import { PageMarketCustomComponent, PageMarketOverviewComponent } from '@market-monitor/modules/page-builder';
 import { ROUTES_MAIN, ROUTES_MARKET } from '@market-monitor/shared/data-access';
-import { DialogServiceModule } from '@market-monitor/shared/utils-client';
 
 @Component({
   selector: 'app-market',
   standalone: true,
-  imports: [CommonModule, MatCheckboxModule, RouterModule, DialogServiceModule, ReactiveFormsModule],
+  imports: [CommonModule, MatCheckboxModule, RouterModule, ReactiveFormsModule],
   template: `
     <div class="flex justify-end mb-6">
       <mat-checkbox [formControl]="isCustomCheckedControl" color="primary">Custom Chart</mat-checkbox>

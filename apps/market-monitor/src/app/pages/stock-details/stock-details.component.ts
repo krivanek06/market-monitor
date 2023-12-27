@@ -8,20 +8,11 @@ import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
 import { stockDetailsResolver } from '@market-monitor/modules/page-builder';
 import { LabelValue, ROUTES_STOCK_DETAILS, SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
 import { TabSelectControlComponent } from '@market-monitor/shared/ui';
-import { DialogServiceModule } from '@market-monitor/shared/utils-client';
 
 @Component({
   selector: 'app-stock-details',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    TabSelectControlComponent,
-    DialogServiceModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatIconModule,
-  ],
+  imports: [CommonModule, RouterModule, TabSelectControlComponent, ReactiveFormsModule, MatButtonModule, MatIconModule],
   template: `
     <section class="g-screen-size-default">
       <div class="flex justify-between mb-6">

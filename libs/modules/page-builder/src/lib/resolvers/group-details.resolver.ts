@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveFn, Router, RouterStateSnapshot } from '@angular/router';
 import { GroupApiService } from '@market-monitor/api-client';
 import { GroupDetails } from '@market-monitor/api-types';
-import { LoaderMainService } from '@market-monitor/shared/utils-client';
+import { LoaderMainService } from '@market-monitor/shared/features/general-features';
 import { catchError, map, of, tap } from 'rxjs';
 
 /**

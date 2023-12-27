@@ -12,21 +12,16 @@ import { GroupApiService } from '@market-monitor/api-client';
 import { GroupMember } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
+import { maxLengthValidator, minLengthValidator, requiredValidator } from '@market-monitor/shared/data-access';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
+import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import {
   ArrayExcludePipe,
   DefaultImgDirective,
   DialogCloseHeaderComponent,
   FormMatInputWrapperComponent,
 } from '@market-monitor/shared/ui';
-import {
-  DialogServiceModule,
-  DialogServiceUtil,
-  filterNullish,
-  maxLengthValidator,
-  minLengthValidator,
-  requiredValidator,
-} from '@market-monitor/shared/utils-client';
+import { filterNil } from 'ngxtension/filter-nil';
 import { map, take } from 'rxjs';
 
 export type GroupSettingsDialogComponentData = {
@@ -47,7 +42,6 @@ export type GroupSettingsDialogComponentData = {
     FormMatInputWrapperComponent,
     MatCheckboxModule,
     DefaultImgDirective,
-    DialogServiceModule,
     DialogCloseHeaderComponent,
     UserDisplayItemComponent,
     UploadImageSingleControlComponent,
@@ -141,7 +135,7 @@ export class GroupSettingsDialogComponent {
     // load groups data into the form once
     this.groupApiService
       .getGroupDataById(this.data.groupId)
-      .pipe(filterNullish(), take(1))
+      .pipe(filterNil(), take(1))
       .subscribe((groupData) => {
         this.form.patchValue({
           groupName: groupData.name,

@@ -75,6 +75,10 @@ import { DefaultImgDirective } from '../../../directives';
       fieldset {
         clear: both;
       }
+
+      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+        display: none !important;
+      }
     `,
   ],
 })

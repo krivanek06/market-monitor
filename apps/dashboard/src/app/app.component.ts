@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
-import { getApp } from '@angular/fire/app';
-import { connectFunctionsEmulator, getFunctions } from '@angular/fire/functions';
+import { Component, inject } from '@angular/core';
+import { Functions, connectFunctionsEmulator } from '@angular/fire/functions';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { RouterModule } from '@angular/router';
@@ -14,7 +13,7 @@ import { environment } from '../environments/environment';
   styles: [''],
 })
 export class AppComponent {
-  private functions = getFunctions(getApp());
+  private functions = inject(Functions);
 
   constructor() {
     if (!environment.production) {

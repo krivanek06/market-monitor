@@ -1,5 +1,5 @@
 import { UserData, UserPersonalInfo, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { userDocumentTransactionHistoryRef, userDocumentWatchListRef, usersCollectionRef } from '../models';

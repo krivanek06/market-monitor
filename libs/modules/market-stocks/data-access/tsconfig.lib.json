@@ -15,5 +15,5 @@
   ],
   "include": [
     "src/**/*.ts"
-, "../../../shared/utils/utils-transform/src/lib/stock-transform.service.ts", "src/lib/models/recommendation.model.ts", "src/lib/models/sheet-data.model.ts", "../../../api/api-client/src/lib/stocks-api/stocks-api.service.ts"  ]
+  ]
 }

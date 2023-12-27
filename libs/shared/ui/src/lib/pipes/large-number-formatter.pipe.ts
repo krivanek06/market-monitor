@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { formatLargeNumber } from '@market-monitor/shared/utils-general';
+import { formatLargeNumber } from '@market-monitor/shared/features/general-util';
 
 @Pipe({
   name: 'largeNumberFormatter',

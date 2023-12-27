@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   Auth,
   GoogleAuthProvider,
@@ -8,26 +8,35 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from '@angular/fire/auth';
-import { getFunctions, httpsCallable } from '@angular/fire/functions';
-import { UserApiService } from '@market-monitor/api-client';
+import {
+  CollectionReference,
+  DocumentData,
+  DocumentReference,
+  Firestore,
+  collection,
+  doc,
+  setDoc,
+} from '@angular/fire/firestore';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import { UserAccountTypes, UserData, UserResetTransactionsInput } from '@market-monitor/api-types';
-import { dateFormatDate } from '@market-monitor/shared/utils-general';
-import { getApp } from 'firebase/app';
+import { assignTypesClient } from '@market-monitor/shared/data-access';
+import { dateFormatDate } from '@market-monitor/shared/features/general-util';
+import { docData as rxDocData } from 'rxfire/firestore';
 import { BehaviorSubject, Observable, Subject, from, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationAccountService {
-  private functions = getFunctions(getApp());
+  private functions = inject(Functions);
+  private firestore = inject(Firestore);
+  private auth = inject(Auth);
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
   private authenticatedUser$ = new BehaviorSubject<User | null>(null);
   private loadedAuthentication$ = new Subject<UserData['id'] | null>();
 
-  constructor(
-    private auth: Auth,
-    private userApiService: UserApiService,
-  ) {
+  constructor() {
     this.initAuthenticationUser();
     this.listenOnUserChanges();
   }
@@ -75,7 +84,7 @@ export class AuthenticationAccountService {
       throw new Error('User is not authenticated');
     }
 
-    this.userApiService.updateUser(user.id, {
+    this.updateUser(user.id, {
       personal: {
         ...user.personal,
         displayName,
@@ -120,11 +129,9 @@ export class AuthenticationAccountService {
     this.authenticatedUser$
       .pipe(
         switchMap((user) =>
-          this.userApiService
-            .getUserData(user?.uid)
-            .pipe(
-              switchMap((userData) => (userData ? of(userData) : user ? from(this.userCreateAccount()) : of(null))),
-            ),
+          this.getUserById(user?.uid).pipe(
+            switchMap((userData) => (userData ? of(userData) : user ? from(this.userCreateAccount()) : of(null))),
+          ),
         ),
       )
       .subscribe((userData) => {
@@ -154,11 +161,30 @@ export class AuthenticationAccountService {
         setTimeout(() => {
           console.log(`UPDATE LAST LOGIN for user ${user.displayName} : ${user.uid}`);
           // update last login date
-          this.userApiService.updateUser(user.uid, {
+          this.updateUser(user.uid, {
             lastLoginDate: dateFormatDate(new Date()),
           });
         }, 10_000);
       }
     });
+  }
+
+  private getUserById(userId?: string): Observable<UserData | undefined> {
+    if (!userId) {
+      return of(undefined);
+    }
+    return rxDocData(this.getUserDocRef(userId), { idField: 'id' });
+  }
+
+  private updateUser(id: string, user: Partial<UserData>): void {
+    setDoc(this.getUserDocRef(id), user, { merge: true });
+  }
+
+  private getUserDocRef(userId: string): DocumentReference<UserData> {
+    return doc(this.userCollection(), userId);
+  }
+
+  private userCollection(): CollectionReference<UserData, DocumentData> {
+    return collection(this.firestore, 'users').withConverter(assignTypesClient<UserData>());
   }
 }

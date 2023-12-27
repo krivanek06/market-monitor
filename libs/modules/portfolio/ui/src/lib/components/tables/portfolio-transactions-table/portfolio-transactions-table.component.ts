@@ -15,8 +15,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioTransaction, PortfolioTransactionMore } from '@market-monitor/api-types';
+import { insertIntoArray } from '@market-monitor/shared/features/general-util';
 import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirective } from '@market-monitor/shared/ui';
-import { insertIntoArray } from '@market-monitor/shared/utils-general';
 
 @Component({
   selector: 'app-portfolio-transactions-table',

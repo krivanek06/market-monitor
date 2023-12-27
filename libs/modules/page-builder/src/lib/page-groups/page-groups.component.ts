@@ -15,9 +15,9 @@ import {
   GroupSearchControlComponent,
 } from '@market-monitor/modules/group/features';
 import { GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
-import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
+import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
-import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 
 @Component({
   selector: 'app-page-groups',

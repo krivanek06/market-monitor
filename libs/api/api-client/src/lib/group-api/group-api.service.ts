@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   CollectionReference,
   DocumentReference,
@@ -8,7 +8,7 @@ import {
   query,
   where,
 } from '@angular/fire/firestore';
-import { getFunctions, httpsCallable } from '@angular/fire/functions';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import {
   GroupBaseInput,
   GroupBaseInputInviteMembers,
@@ -23,9 +23,8 @@ import {
   PortfolioStateHolding,
   PortfolioTransactionMore,
 } from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/utils-client';
-import { roundNDigits } from '@market-monitor/shared/utils-general';
-import { getApp } from 'firebase/app';
+import { assignTypesClient } from '@market-monitor/shared/data-access';
+import { roundNDigits } from '@market-monitor/shared/features/general-util';
 import { limit } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
@@ -36,12 +35,9 @@ import { MarketApiService } from '../market-api/market-api.service';
   providedIn: 'root',
 })
 export class GroupApiService {
-  private functions = getFunctions(getApp());
-
-  constructor(
-    private firestore: Firestore,
-    private marketApiService: MarketApiService,
-  ) {}
+  private functions = inject(Functions);
+  private firestore = inject(Firestore);
+  private marketApiService = inject(MarketApiService);
 
   getGroupDataById(groupId: string): Observable<GroupData | undefined> {
     return rxDocData(this.getGroupDocRef(groupId), { idField: 'id' });

@@ -1,4 +1,4 @@
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentRef } from '../models';
 

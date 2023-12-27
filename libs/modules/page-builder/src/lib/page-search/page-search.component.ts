@@ -8,19 +8,12 @@ import { NewsSearchComponent } from '@market-monitor/modules/market-general/feat
 import { STOCK_SCREENER_DEFAULT_VALUES } from '@market-monitor/modules/market-stocks/data-access';
 import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks/features';
 import { CalendarRageToday } from '@market-monitor/shared/ui';
-import { DialogServiceModule } from '@market-monitor/shared/utils-client';
 import { forkJoin, take } from 'rxjs';
 
 @Component({
   selector: 'app-page-search',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    DialogServiceModule,
-    NewsSearchComponent,
-    StockSearchBasicCustomizedComponent,
-  ],
+  imports: [CommonModule, MatButtonModule, NewsSearchComponent, StockSearchBasicCustomizedComponent],
   template: `
     <div class="pt-[180px] pb-[260px] sm:pt-[200px] sm:pb-[300px]">
       <div class="max-w-[620px] mx-auto">

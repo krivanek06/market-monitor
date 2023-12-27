@@ -16,13 +16,13 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioStateHolding } from '@market-monitor/api-types';
+import { compare } from '@market-monitor/shared/features/general-util';
 import {
   DefaultImgDirective,
   LargeNumberFormatterPipe,
   PercentageIncreaseDirective,
   ProgressCurrencyComponent,
 } from '@market-monitor/shared/ui';
-import { compare } from '@market-monitor/shared/utils-general';
 
 @Component({
   selector: 'app-portfolio-holdings-table',

@@ -11,8 +11,9 @@ import { GroupData, PortfolioGrowthAssets, PortfolioStateHoldings, UserData } fr
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { PortfolioCalculationService, PortfolioGrowthService } from '@market-monitor/modules/portfolio/data-access';
 import { LabelValue } from '@market-monitor/shared/data-access';
+import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { DefaultImgDirective, TabSelectControlComponent } from '@market-monitor/shared/ui';
-import { DialogServiceUtil, SCREEN_DIALOGS, filterNullish } from '@market-monitor/shared/utils-client';
+import { filterNil } from 'ngxtension/filter-nil';
 import { forkJoin, from, map, share, switchMap, tap } from 'rxjs';
 import { UserDetailsHoldingsComponent } from './user-details-holdings/user-details-holdings.component';
 import { UserDetailsOverviewComponent } from './user-details-overview/user-details-overview.component';
@@ -81,14 +82,14 @@ export class UserDetailsDialogComponent {
     private dialogRef: MatDialogRef<UserDetailsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: UserDetailsDialogComponentData,
   ) {
-    const userRef$ = this.userApiService.getUsersById(this.data.userId).pipe(
+    const userRef$ = this.userApiService.getUserById(this.data.userId).pipe(
       tap((userData) => {
         if (!userData) {
           this.dialogServiceUtil.showNotificationBar(`User not found`, 'error');
           this.onDialogClose();
         }
       }),
-      filterNullish(),
+      filterNil(),
       share(),
     );
 

@@ -13,14 +13,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {
+  ChartConstructor,
   ChartType,
   ChartTypeKeys,
   ColorScheme,
   GenericChartSeries,
   GenericChartSeriesPie,
 } from '@market-monitor/shared/data-access';
-import { ChartConstructor } from '@market-monitor/shared/utils-client';
-import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/utils-general';
+import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
 import { format, isAfter, isBefore } from 'date-fns';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';

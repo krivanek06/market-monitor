@@ -7,8 +7,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { UserData } from '@market-monitor/api-types';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
-import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { UserSearchControlComponent } from '../user-search-control/user-search-control.component';
 
 export type UserSearchDialogData = {

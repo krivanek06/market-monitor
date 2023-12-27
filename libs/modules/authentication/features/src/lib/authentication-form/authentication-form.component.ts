@@ -16,11 +16,11 @@ import {
   RegisterUserInput,
 } from '@market-monitor/modules/authentication/data-access';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { DialogServiceModule, DialogServiceUtil, filterNullish } from '@market-monitor/shared/utils-client';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
+import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, catchError, filter, from, switchMap, take, tap } from 'rxjs';
 import { FormLoginComponent } from './form-login/form-login.component';
 import { FormRegisterComponent } from './form-register/form-register.component';
-
 @Component({
   selector: 'app-authentication-form',
   standalone: true,
@@ -32,7 +32,6 @@ import { FormRegisterComponent } from './form-register/form-register.component';
     MatIconModule,
     MatTabsModule,
     MatButtonModule,
-    DialogServiceModule,
     MatDividerModule,
     MatProgressSpinnerModule,
   ],
@@ -81,7 +80,7 @@ export class AuthenticationFormComponent {
 
   onDemoLogin(): void {
     this.loginUserInputControl.patchValue({
-      email: 'krivanek1234+2@gmail.com',
+      email: 'test_1@gmail.com',
       password: 'qwer1234',
     });
   }
@@ -130,7 +129,7 @@ export class AuthenticationFormComponent {
           from(this.authenticationAccountService.register(res)).pipe(
             switchMap(() =>
               this.authenticationAccountService.getUserData().pipe(
-                filterNullish(), // wait until there is a user initialized
+                filterNil(), // wait until there is a user initialized
                 tap(() => {
                   // getting error: Navigation triggered outside Angular zone, did you forget to call 'ngZone.run()
                   this.zone.run(() => {

@@ -34,20 +34,20 @@
     </div>
 
     @if (removingGroupMembers().length > 0) {
-    <!-- removing member -->
-    <div class="mt-8 mb-4 space-x-2 text-lg">
-      <span>Remove Members</span>
-    </div>
-
-    <!-- display selected users -->
-    <div class="grid md:grid-cols-2 gap-x-6 gap-y-2">
-      <div *ngFor="let user of removingGroupMembers()" class="flex gap-4 p-4 shadow-md">
-        <app-user-display-item [userData]="user"></app-user-display-item>
-        <button mat-icon-button type="button" matTooltip="Remove User" (click)="onAddUserBack(user)">
-          <mat-icon color="primary">add</mat-icon>
-        </button>
+      <!-- removing member -->
+      <div class="mt-8 mb-4 space-x-2 text-lg">
+        <span>Remove Members</span>
       </div>
-    </div>
+
+      <!-- display selected users -->
+      <div class="grid md:grid-cols-2 gap-x-6 gap-y-2">
+        <div *ngFor="let user of removingGroupMembers()" class="flex gap-4 p-4 shadow-md">
+          <app-user-display-item [userData]="user"></app-user-display-item>
+          <button mat-icon-button type="button" matTooltip="Remove User" (click)="onAddUserBack(user)">
+            <mat-icon color="primary">add</mat-icon>
+          </button>
+        </div>
+      </div>
     }
 
     <!-- current members -->

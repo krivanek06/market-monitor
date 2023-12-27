@@ -3,19 +3,38 @@ import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { LoginUserInput } from '@market-monitor/modules/authentication/data-access';
-import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
 import {
   emailValidator,
   maxLengthValidator,
   minLengthValidator,
   requiredValidator,
-} from '@market-monitor/shared/utils-client';
+} from '@market-monitor/shared/data-access';
+import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-form-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormMatInputWrapperComponent, MatButtonModule],
-  templateUrl: './form-login.component.html',
+  template: `
+    <form [formGroup]="formGroup" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
+      <!-- email -->
+      <app-form-mat-input-wrapper
+        formControlName="email"
+        inputCaption="Email"
+        inputType="EMAIL"
+      ></app-form-mat-input-wrapper>
+
+      <!-- password -->
+      <app-form-mat-input-wrapper
+        formControlName="password"
+        inputCaption="Password"
+        inputType="PASSWORD"
+      ></app-form-mat-input-wrapper>
+
+      <!-- submit -->
+      <button mat-stroked-button color="primary" class="w-full" type="submit">Login</button>
+    </form>
+  `,
   styles: [
     `
       :host {

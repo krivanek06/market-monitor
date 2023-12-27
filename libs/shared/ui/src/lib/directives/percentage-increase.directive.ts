@@ -1,5 +1,5 @@
 import { Directive, Input, OnInit, Renderer2, ViewContainerRef } from '@angular/core';
-import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/utils-general';
+import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
 import { PlatformService } from '../utils';
 
 /**

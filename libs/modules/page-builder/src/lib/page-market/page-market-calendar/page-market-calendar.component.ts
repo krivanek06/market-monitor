@@ -18,6 +18,12 @@ import {
   EarningsItemsDialogComponent,
 } from '@market-monitor/modules/market-stocks/ui';
 import { RouterManagement } from '@market-monitor/shared/data-access';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
+import {
+  fillOutMissingDatesForMonth,
+  generateDatesArrayForMonth,
+  groupValuesByDate,
+} from '@market-monitor/shared/features/general-util';
 import {
   CalendarRageToday,
   CalendarRange,
@@ -25,12 +31,6 @@ import {
   MarkerDirective,
   RangeDirective,
 } from '@market-monitor/shared/ui';
-import { DialogServiceModule, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
-import {
-  fillOutMissingDatesForMonth,
-  generateDatesArrayForMonth,
-  groupValuesByDate,
-} from '@market-monitor/shared/utils-general';
 import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap } from 'rxjs';
 
 @Component({
@@ -52,7 +52,6 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
     EarningsItemsDialogComponent,
     EarningsHistoricalDialogComponent,
     StockSummaryDialogComponent,
-    DialogServiceModule,
     MatDialogModule,
   ],
   templateUrl: './page-market-calendar.component.html',

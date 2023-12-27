@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ColorScheme } from '@market-monitor/shared/data-access';
-import { ChartConstructor, EstimatedChartDataType } from '@market-monitor/shared/utils-client';
-import { dateFormatDate, roundNDigits } from '@market-monitor/shared/utils-general';
+import { ChartConstructor, ColorScheme, EstimatedChartDataType } from '@market-monitor/shared/data-access';
+import { dateFormatDate, roundNDigits } from '@market-monitor/shared/features/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({

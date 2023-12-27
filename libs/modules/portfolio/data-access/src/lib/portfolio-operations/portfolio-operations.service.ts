@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
-import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
+import { MarketApiService } from '@market-monitor/api-client';
 import { HistoricalPrice, PortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { dateFormatDate, dateGetDetailsInformationFromDate, roundNDigits } from '@market-monitor/shared/utils-general';
+import {
+  dateFormatDate,
+  dateGetDetailsInformationFromDate,
+  roundNDigits,
+} from '@market-monitor/shared/features/general-util';
 import { isBefore, isValid, isWeekend } from 'date-fns';
 import { firstValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
@@ -28,8 +32,6 @@ export class PortfolioOperationsService {
   constructor(
     private marketApiService: MarketApiService,
     private authenticationUserService: AuthenticationUserStoreService,
-    private portfolioApiService: PortfolioApiService,
-    private userApiService: UserApiService,
   ) {}
 
   async createTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
@@ -55,22 +57,15 @@ export class PortfolioOperationsService {
     // create transaction
     const transaction = this.createTransaction(userId, input, symbolPrice, symbolHoldingBreakEvenPrice);
 
-    // save transaction into public transactions collection
-    this.portfolioApiService.addPortfolioTransactionForPublic(transaction);
-
     // save transaction into user document
-    this.userApiService.addPortfolioTransactionForUser(transaction);
+    this.authenticationUserService.addPortfolioTransactionForUser(transaction);
 
     // return data
     return transaction;
   }
 
   deleteTransactionOperation(transaction: PortfolioTransaction): void {
-    // remove transaction from public transactions collection
-    this.portfolioApiService.deletePortfolioTransactionForPublic(transaction.transactionId);
-
-    // remove transaction from user document
-    this.userApiService.deletePortfolioTransactionForUser(transaction);
+    this.authenticationUserService.deletePortfolioTransactionForUser(transaction);
   }
 
   private getCurrentInvestedFromTransactions(

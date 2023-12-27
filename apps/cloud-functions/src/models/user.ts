@@ -1,5 +1,5 @@
 import { PortfolioState, UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/utils-general';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { firestore } from 'firebase-admin';
 import { assignTypes, assignTypesOptional } from './assign-type';
 

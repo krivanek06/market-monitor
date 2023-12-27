@@ -11,15 +11,10 @@ import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
-import { UploadImageSingleControlComponent } from '@market-monitor/shared/features';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
+import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
-import {
-  Confirmable,
-  DialogServiceModule,
-  DialogServiceUtil,
-  SCREEN_DIALOGS,
-  filterNullish,
-} from '@market-monitor/shared/utils-client';
+import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, catchError, from, map, tap } from 'rxjs';
 import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';
 
@@ -30,7 +25,6 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     CommonModule,
     MatIconModule,
     MatButtonModule,
-    DialogServiceModule,
     MatDialogModule,
     DialogCloseHeaderComponent,
     MatDividerModule,
@@ -48,6 +42,8 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           <!-- user image -->
           <div>
             <app-upload-image-single-control
+              filePath="users"
+              [fileName]="userDataSignal().id"
               [heightPx]="225"
               [formControl]="userImageControl"
             ></app-upload-image-single-control>
@@ -195,7 +191,12 @@ export class UserSettingsDialogComponent implements OnInit {
   ngOnInit(): void {
     // set user image into the form control
     const userData = this.authenticationUserStoreService.state().userData;
-    this.userImageControl.setValue(userData?.personal.photoURL ?? null);
+    this.userImageControl.setValue(userData?.personal.photoURL ?? null, { emitEvent: false });
+
+    // update url
+    this.userImageControl.valueChanges
+      .pipe(filterNil())
+      .subscribe((imgUrl) => this.authenticationUserStoreService.changePhotoUrl(imgUrl));
   }
 
   @Confirmable('Are you sure you want to delete your account?')
@@ -225,7 +226,7 @@ export class UserSettingsDialogComponent implements OnInit {
         description: 'Enter a new display name',
       })
       .pipe(
-        filterNullish(),
+        filterNil(),
         map((val) => this.authenticationAccountService.changeDisplayName(val)),
         tap(() => this.dialogServiceUtil.showNotificationBar('Your display name has been changed', 'success')),
       )

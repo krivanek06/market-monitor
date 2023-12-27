@@ -18,8 +18,8 @@ import {
   StockSummaryTableComponent,
 } from '@market-monitor/modules/market-stocks/ui';
 import { RouterManagement } from '@market-monitor/shared/data-access';
+import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared/ui';
-import { DialogServiceModule, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { catchError, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -33,9 +33,7 @@ import { catchError, switchMap, tap } from 'rxjs';
     RangeDirective,
     ScrollNearEndDirective,
     MatDialogModule,
-    DialogServiceModule,
     MatButtonModule,
-    DialogServiceModule,
     MatDialogModule,
   ],
   templateUrl: './page-stock-screener.component.html',

@@ -8,13 +8,13 @@ import {
   PortfolioHoldingsTableComponent,
   PortfolioTransactionChartComponent,
 } from '@market-monitor/modules/portfolio/ui';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import {
   GeneralCardComponent,
   GenericChartBubbleComponent,
   GenericChartComponent,
   SectionTitleComponent,
 } from '@market-monitor/shared/ui';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { map } from 'rxjs';
 import { PageGroupsBaseComponent } from '../page-groups-base.component';
 

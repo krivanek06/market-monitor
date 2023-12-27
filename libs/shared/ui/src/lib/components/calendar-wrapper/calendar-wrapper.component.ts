@@ -3,7 +3,7 @@ import { Component, ContentChildren, Directive, Input, OnInit, TemplateRef, forw
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { dateIsNotWeekend, generateDatesArrayForMonth } from '@market-monitor/shared/utils-general';
+import { dateIsNotWeekend, generateDatesArrayForMonth } from '@market-monitor/shared/features/general-util';
 import { ClientStylesDirective, RangeDirective } from '../../directives';
 
 export type CalendarRange = { year: number; month: number };

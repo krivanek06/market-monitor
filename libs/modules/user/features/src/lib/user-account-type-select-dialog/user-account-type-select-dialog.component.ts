@@ -8,8 +8,8 @@ import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
-import { DialogServiceUtil } from '@market-monitor/shared/utils-client';
 import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
 
 @Component({

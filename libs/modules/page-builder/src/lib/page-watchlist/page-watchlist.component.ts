@@ -3,12 +3,11 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { UserApiService } from '@market-monitor/api-client';
 import { SymbolSummary } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { StockSearchBasicComponent, StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { GetStocksSummaryPipe, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks/ui';
-import { DialogServiceModule, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
+import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { EMPTY, catchError, filter, from, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -23,7 +22,6 @@ import { EMPTY, catchError, filter, from, switchMap, tap } from 'rxjs';
     MatIconModule,
     ReactiveFormsModule,
     StockSearchBasicComponent,
-    DialogServiceModule,
   ],
   templateUrl: './page-watchlist.component.html',
   styles: [
@@ -39,7 +37,6 @@ export class PageWatchlistComponent implements OnInit {
   readonly displayCheckValue = 25;
 
   authenticationUserService = inject(AuthenticationUserStoreService);
-  userApiService = inject(UserApiService);
   dialog = inject(MatDialog);
   dialogServiceUtil = inject(DialogServiceUtil);
 
@@ -62,15 +59,7 @@ export class PageWatchlistComponent implements OnInit {
       .pipe(
         filter((value): value is SymbolSummary => !!value),
         filter((summary) => !this.authenticationUserService.state.isSymbolInWatchList()(summary.id)),
-        switchMap((summary) =>
-          from(
-            this.userApiService.addSymbolToUserWatchList(
-              this.authenticationUserService.state().userData?.id!,
-              summary.id,
-              'STOCK',
-            ),
-          ),
-        ),
+        switchMap((summary) => from(this.authenticationUserService.addSymbolToUserWatchList(summary.id, 'STOCK'))),
         tap(() => this.dialogServiceUtil.showNotificationBar('Symbol added into watch List', 'success', 3000)),
         catchError((err) => {
           this.dialogServiceUtil.handleError(err);

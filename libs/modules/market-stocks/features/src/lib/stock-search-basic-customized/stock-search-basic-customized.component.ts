@@ -24,8 +24,8 @@ import {
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
 import { SymbolFavoriteService, SymbolSearchService } from '@market-monitor/modules/market-stocks/data-access';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { ElementFocusDirective, QuoteItemComponent } from '@market-monitor/shared/ui';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/utils-client';
 import { iif, startWith, switchMap } from 'rxjs';
 import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-basic.component';
 import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summary-dialog.component';
