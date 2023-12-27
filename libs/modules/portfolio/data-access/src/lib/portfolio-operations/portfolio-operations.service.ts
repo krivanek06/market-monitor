@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MarketApiService, UserApiService } from '@market-monitor/api-client';
+import { MarketApiService } from '@market-monitor/api-client';
 import { HistoricalPrice, PortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import {
@@ -32,7 +32,6 @@ export class PortfolioOperationsService {
   constructor(
     private marketApiService: MarketApiService,
     private authenticationUserService: AuthenticationUserStoreService,
-    private userApiService: UserApiService,
   ) {}
 
   async createTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
@@ -59,14 +58,14 @@ export class PortfolioOperationsService {
     const transaction = this.createTransaction(userId, input, symbolPrice, symbolHoldingBreakEvenPrice);
 
     // save transaction into user document
-    this.userApiService.addPortfolioTransactionForUser(transaction);
+    this.authenticationUserService.addPortfolioTransactionForUser(transaction);
 
     // return data
     return transaction;
   }
 
   deleteTransactionOperation(transaction: PortfolioTransaction): void {
-    this.userApiService.deletePortfolioTransactionForUser(transaction);
+    this.authenticationUserService.deletePortfolioTransactionForUser(transaction);
   }
 
   private getCurrentInvestedFromTransactions(

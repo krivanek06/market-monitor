@@ -1,17 +1,33 @@
 import { Injectable, InjectionToken, effect, inject } from '@angular/core';
-import { GroupApiService, UserApiService } from '@market-monitor/api-client';
+import {
+  CollectionReference,
+  DocumentData,
+  DocumentReference,
+  Firestore,
+  arrayRemove,
+  arrayUnion,
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+} from '@angular/fire/firestore';
+import { GroupApiService } from '@market-monitor/api-client';
 import {
   PortfolioTransaction,
   SymbolType,
   UserAccountTypes,
   UserData,
   UserGroupData,
+  UserPortfolioTransaction,
   UserWatchlist as UserWatchList,
+  UserWatchlist,
 } from '@market-monitor/api-types';
+import { assignTypesClient } from '@market-monitor/shared/data-access';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { User } from 'firebase/auth';
 import { signalSlice } from 'ngxtension/signal-slice';
-import { combineLatest, distinctUntilChanged, map, of, switchMap } from 'rxjs';
+import { docData as rxDocData } from 'rxfire/firestore';
+import { Observable, combineLatest, distinctUntilChanged, filter, map, of, switchMap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
@@ -39,8 +55,8 @@ type AuthenticationState = {
 })
 export class AuthenticationUserStoreService {
   private authenticationAccountService = inject(AuthenticationAccountService);
-  private userApiService = inject(UserApiService);
   private groupApiService = inject(GroupApiService);
+  private firestore = inject(Firestore);
 
   private initialState: AuthenticationState = {
     authenticationLoaded: false,
@@ -86,9 +102,7 @@ export class AuthenticationUserStoreService {
   private watchListSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-    switchMap((userData) =>
-      userData ? this.userApiService.getUserWatchList(userData.id) : of(this.initialState.watchList),
-    ),
+    switchMap((userData) => (userData ? this.getUserWatchList() : of(this.initialState.watchList))),
     map((watchList) => ({ watchList: watchList })),
   );
 
@@ -98,11 +112,7 @@ export class AuthenticationUserStoreService {
   private portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-    switchMap((userData) =>
-      userData
-        ? this.userApiService.getUserPortfolioTransactions(userData.id).pipe(map((d) => d.transactions))
-        : of([]),
-    ),
+    switchMap((userData) => (userData ? this.getUserPortfolioTransactions().pipe(map((d) => d.transactions)) : of([]))),
     map((transactions) => ({
       portfolioTransactions: transactions,
     })),
@@ -180,11 +190,99 @@ export class AuthenticationUserStoreService {
     });
   }
 
-  addSymbolToUserWatchList(userId: string, symbol: string, symbolType: SymbolType): Promise<void> {
-    return this.userApiService.addSymbolToUserWatchList(userId, symbol, symbolType);
+  updateUserWatchList(watchlist: Partial<UserWatchlist>): void {
+    setDoc(this.getUserWatchlistDocRef(), watchlist, { merge: true });
   }
 
-  removeSymbolFromUserWatchList(userId: string, symbol: string, symbolType: SymbolType): Promise<void> {
-    return this.userApiService.removeSymbolFromUserWatchList(userId, symbol, symbolType);
+  addSymbolToUserWatchList(symbol: string, symbolType: SymbolType): Promise<void> {
+    return updateDoc(this.getUserWatchlistDocRef(), {
+      data: arrayUnion({
+        symbol,
+        symbolType,
+      }),
+    });
+  }
+
+  removeSymbolFromUserWatchList(symbol: string, symbolType: SymbolType): Promise<void> {
+    return updateDoc(this.getUserWatchlistDocRef(), {
+      data: arrayRemove({
+        symbol,
+        symbolType,
+      }),
+    });
+  }
+
+  addPortfolioTransactionForUser(transaction: PortfolioTransaction): void {
+    updateDoc(this.getUserPortfolioTransactionDocRef(), {
+      transactions: arrayUnion(transaction),
+    });
+  }
+
+  deletePortfolioTransactionForUser(transaction: PortfolioTransaction): void {
+    updateDoc(this.getUserPortfolioTransactionDocRef(), {
+      transactions: arrayRemove(transaction),
+    });
+  }
+
+  updateUserPortfolioTransaction(transaction: Partial<UserPortfolioTransaction>): void {
+    setDoc(this.getUserPortfolioTransactionDocRef(), transaction, { merge: true });
+  }
+
+  changeDisplayName(displayName: string): void {
+    this.updateUser({
+      personal: {
+        ...this.state.getUserData().personal,
+        displayName,
+      },
+    });
+  }
+
+  changePhotoUrl(photoURL: string): void {
+    this.updateUser({
+      personal: {
+        ...this.state.getUserData().personal,
+        photoURL,
+      },
+    });
+  }
+
+  private updateUser(user: Partial<UserData>): void {
+    setDoc(this.getUserDocRef(), user, { merge: true });
+  }
+
+  private getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {
+    return rxDocData(this.getUserPortfolioTransactionDocRef()).pipe(
+      filter((d): d is UserPortfolioTransaction => !!d),
+      map((d) => ({
+        // sort ASC
+        transactions: d.transactions.slice().sort((a, b) => (a.date > b.date ? 1 : -1)),
+      })),
+    );
+  }
+
+  private getUserWatchList(): Observable<UserWatchlist> {
+    return rxDocData(this.getUserWatchlistDocRef()).pipe(filter((d): d is UserWatchlist => !!d));
+  }
+
+  private getUserPortfolioTransactionDocRef(): DocumentReference<UserPortfolioTransaction> {
+    return doc(this.userCollectionMoreInformationRef(), 'transactions').withConverter(
+      assignTypesClient<UserPortfolioTransaction>(),
+    );
+  }
+
+  private getUserWatchlistDocRef(): DocumentReference<UserWatchlist> {
+    return doc(this.userCollectionMoreInformationRef(), 'watchlist').withConverter(assignTypesClient<UserWatchlist>());
+  }
+
+  private userCollectionMoreInformationRef(): CollectionReference<DocumentData, DocumentData> {
+    return collection(this.getUserDocRef(), 'more_information');
+  }
+
+  private getUserDocRef(): DocumentReference<UserData> {
+    return doc(this.userCollection(), this.state.getUser().uid);
+  }
+
+  private userCollection(): CollectionReference<UserData, DocumentData> {
+    return collection(this.firestore, 'users').withConverter(assignTypesClient<UserData>());
   }
 }

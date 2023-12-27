@@ -102,7 +102,7 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
    * path where to save the file
    */
   @Input() filePath = 'images';
-  @Input() fileMaxSizeMb = 20; // 20Mb
+  @Input() fileMaxSizeMb = 2; // 2Mb
   @Input() heightPx = 200;
 
   get fileMaxSize(): number {
@@ -151,7 +151,7 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
       } else {
         const size = Math.round(file.size / 1024 / 1024);
         this.dialogServiceUtil.showNotificationBar(
-          `Unable to upload file, limit size is ${this.fileMaxSize}Mb, your size is ${size} Mb`,
+          `Unable to upload file, limit size is ${this.fileMaxSizeMb}Mb, your size is ${size} Mb`,
           'error',
         );
       }
@@ -196,6 +196,7 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
     // The main task
     const task = uploadBytesResumable(reference, file);
 
+    // Progress monitoring
     this.isUploadingSignal.set(true);
 
     // emit when finished
@@ -206,6 +207,7 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
       },
       (err) => {
         console.error(err);
+        this.isUploadingSignal.set(false);
         this.dialogServiceUtil.showNotificationBar('Error uploading file', 'error');
       },
       async () => {

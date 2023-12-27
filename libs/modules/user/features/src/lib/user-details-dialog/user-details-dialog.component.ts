@@ -82,7 +82,7 @@ export class UserDetailsDialogComponent {
     private dialogRef: MatDialogRef<UserDetailsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: UserDetailsDialogComponentData,
   ) {
-    const userRef$ = this.userApiService.getUsersById(this.data.userId).pipe(
+    const userRef$ = this.userApiService.getUserById(this.data.userId).pipe(
       tap((userData) => {
         if (!userData) {
           this.dialogServiceUtil.showNotificationBar(`User not found`, 'error');

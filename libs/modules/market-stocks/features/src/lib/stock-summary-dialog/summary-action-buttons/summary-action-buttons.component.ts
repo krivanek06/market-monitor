@@ -151,11 +151,7 @@ export class SummaryActionButtonsComponent implements OnInit {
   async onAddWatchList() {
     if (this.authenticationUserService) {
       // save data into fireStore
-      await this.authenticationUserService.addSymbolToUserWatchList(
-        this.authenticationUserService.state().userData?.id!,
-        this.symbolSummary.id,
-        'STOCK',
-      );
+      await this.authenticationUserService.addSymbolToUserWatchList(this.symbolSummary.id, 'STOCK');
 
       // show notification
       this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been added into watchlist`);
@@ -166,11 +162,7 @@ export class SummaryActionButtonsComponent implements OnInit {
   async onRemoveWatchList() {
     if (this.authenticationUserService) {
       // save data into fireStore
-      await this.authenticationUserService.removeSymbolFromUserWatchList(
-        this.authenticationUserService.state().userData!.id,
-        this.symbolSummary.id,
-        'STOCK',
-      );
+      await this.authenticationUserService.removeSymbolFromUserWatchList(this.symbolSummary.id, 'STOCK');
 
       // show notification
       this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been removed from watchlist`);

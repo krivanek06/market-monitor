@@ -42,6 +42,8 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           <!-- user image -->
           <div>
             <app-upload-image-single-control
+              filePath="users"
+              [fileName]="userDataSignal().id"
               [heightPx]="225"
               [formControl]="userImageControl"
             ></app-upload-image-single-control>
@@ -189,7 +191,12 @@ export class UserSettingsDialogComponent implements OnInit {
   ngOnInit(): void {
     // set user image into the form control
     const userData = this.authenticationUserStoreService.state().userData;
-    this.userImageControl.setValue(userData?.personal.photoURL ?? null);
+    this.userImageControl.setValue(userData?.personal.photoURL ?? null, { emitEvent: false });
+
+    // update url
+    this.userImageControl.valueChanges
+      .pipe(filterNil())
+      .subscribe((imgUrl) => this.authenticationUserStoreService.changePhotoUrl(imgUrl));
   }
 
   @Confirmable('Are you sure you want to delete your account?')
