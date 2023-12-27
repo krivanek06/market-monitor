@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MarketApiService, PortfolioApiService, UserApiService } from '@market-monitor/api-client';
+import { MarketApiService, UserApiService } from '@market-monitor/api-client';
 import { HistoricalPrice, PortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import {
@@ -32,7 +32,6 @@ export class PortfolioOperationsService {
   constructor(
     private marketApiService: MarketApiService,
     private authenticationUserService: AuthenticationUserStoreService,
-    private portfolioApiService: PortfolioApiService,
     private userApiService: UserApiService,
   ) {}
 
@@ -59,9 +58,6 @@ export class PortfolioOperationsService {
     // create transaction
     const transaction = this.createTransaction(userId, input, symbolPrice, symbolHoldingBreakEvenPrice);
 
-    // save transaction into public transactions collection
-    this.portfolioApiService.addPortfolioTransactionForPublic(transaction);
-
     // save transaction into user document
     this.userApiService.addPortfolioTransactionForUser(transaction);
 
@@ -70,10 +66,6 @@ export class PortfolioOperationsService {
   }
 
   deleteTransactionOperation(transaction: PortfolioTransaction): void {
-    // remove transaction from public transactions collection
-    this.portfolioApiService.deletePortfolioTransactionForPublic(transaction.transactionId);
-
-    // remove transaction from user document
     this.userApiService.deletePortfolioTransactionForUser(transaction);
   }
 
