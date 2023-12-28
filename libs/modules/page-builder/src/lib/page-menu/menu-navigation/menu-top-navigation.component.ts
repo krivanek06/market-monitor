@@ -12,8 +12,8 @@ import { UserSettingsDialogComponent } from '@market-monitor/modules/user/featur
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { FeatureAccessDirective } from '@market-monitor/shared/features/feature-access-directive';
+import { HelpDialogComponent } from '@market-monitor/shared/features/help-dialog';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
-
 @Component({
   selector: 'app-menu-top-navigation',
   standalone: true,
@@ -26,6 +26,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
     FeatureAccessDirective,
     UserSettingsDialogComponent,
     MatDialogModule,
+    HelpDialogComponent,
   ],
   template: `
     <div class="w-full shadow-md mb-4">
@@ -243,7 +244,11 @@ export class MenuTopNavigationComponent implements OnInit {
     });
   }
 
-  onHelpClick() {}
+  onHelpClick() {
+    this.dialog.open(HelpDialogComponent, {
+      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+    });
+  }
 
   async onLogOutClick() {
     this.router.navigate([ROUTES_MAIN.LOGIN]);
