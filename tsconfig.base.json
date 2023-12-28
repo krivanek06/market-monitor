@@ -42,9 +42,9 @@
       "@market-monitor/shared/features/feature-access-directive": [
         "libs/shared/features/feature-access-directive/src/index.ts"
       ],
-      "@market-monitor/shared/features/help-dialog": ["libs/shared/features/help-dialog/src/index.ts"],
       "@market-monitor/shared/features/general-features": ["libs/shared/features/general-features/src/index.ts"],
       "@market-monitor/shared/features/general-util": ["libs/shared/features/general-util/src/index.ts"],
+      "@market-monitor/shared/features/help-dialog": ["libs/shared/features/help-dialog/src/index.ts"],
       "@market-monitor/shared/features/input-error": ["libs/shared/features/input-error/src/index.ts"],
       "@market-monitor/shared/features/upload-image-single-control": [
         "libs/shared/features/upload-image-single-control/src/index.ts"

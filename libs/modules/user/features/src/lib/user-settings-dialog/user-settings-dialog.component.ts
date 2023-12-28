@@ -11,6 +11,7 @@ import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
+import { ChangePasswordDialogComponent } from '@market-monitor/modules/authentication/features';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
@@ -32,6 +33,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     ReactiveFormsModule,
     MatTooltipModule,
     UserAccountTypeSelectDialogComponent,
+    ChangePasswordDialogComponent,
   ],
   template: `
     <app-dialog-close-header title="Settings"></app-dialog-close-header>
@@ -217,7 +219,17 @@ export class UserSettingsDialogComponent implements OnInit {
     );
   }
 
-  onChangePassword(): void {}
+  onChangePassword(): void {
+    this.dialog.open(ChangePasswordDialogComponent, {
+      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+    });
+  }
+
+  onChangeAccountType(): void {
+    this.dialog.open(UserAccountTypeSelectDialogComponent, {
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
+  }
 
   onChangeDisplayName(): void {
     this.dialogServiceUtil
@@ -249,11 +261,5 @@ export class UserSettingsDialogComponent implements OnInit {
         }),
       )
       .subscribe();
-  }
-
-  onChangeAccountType(): void {
-    this.dialog.open(UserAccountTypeSelectDialogComponent, {
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
   }
 }

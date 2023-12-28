@@ -1,12 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import {
   Auth,
+  EmailAuthProvider,
   GoogleAuthProvider,
   User,
   UserCredential,
   createUserWithEmailAndPassword,
+  reauthenticateWithCredential,
   signInWithEmailAndPassword,
   signInWithPopup,
+  updatePassword,
 } from '@angular/fire/auth';
 import {
   CollectionReference,
@@ -41,6 +44,22 @@ export class AuthenticationAccountService {
     this.listenOnUserChanges();
   }
 
+  get currentUser(): User {
+    const user = this.authenticatedUser$.value;
+    if (!user) {
+      throw new Error('User is not authenticated');
+    }
+    return user;
+  }
+
+  get currentUserData(): UserData {
+    const user = this.authenticatedUserData$.value;
+    if (!user) {
+      throw new Error('User is not authenticated');
+    }
+    return user;
+  }
+
   getUserData(): Observable<UserData | null> {
     return this.authenticatedUserData$;
   }
@@ -70,8 +89,28 @@ export class AuthenticationAccountService {
     this.auth.signOut();
   }
 
-  changePassword() {
-    // todo
+  async changePassword(oldPassword: string, newPassword: string): Promise<void> {
+    if (!this.currentUser.email) {
+      throw new Error('User is not authenticated');
+    }
+
+    try {
+      // check if old password is correct
+      const credentials = EmailAuthProvider.credential(this.currentUser.email, oldPassword);
+      console.log('credentials', credentials);
+      const reauth = await reauthenticateWithCredential(this.currentUser, credentials);
+      console.log('reauth', reauth);
+    } catch (error) {
+      console.error(error);
+      throw new Error('Old password is incorrect');
+    }
+
+    try {
+      await updatePassword(this.currentUser, newPassword);
+    } catch (error) {
+      console.error(error);
+      throw new Error('Password change failed');
+    }
   }
 
   resetPassword() {
@@ -79,14 +118,9 @@ export class AuthenticationAccountService {
   }
 
   changeDisplayName(displayName: string): void {
-    const user = this.authenticatedUserData$.value;
-    if (!user) {
-      throw new Error('User is not authenticated');
-    }
-
-    this.updateUser(user.id, {
+    this.updateUser(this.currentUserData.id, {
       personal: {
-        ...user.personal,
+        ...this.currentUserData.personal,
         displayName,
       },
     });

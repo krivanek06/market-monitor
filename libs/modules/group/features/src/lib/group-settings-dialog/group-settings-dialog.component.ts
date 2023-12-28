@@ -10,7 +10,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { GroupApiService } from '@market-monitor/api-client';
 import { GroupMember } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { maxLengthValidator, minLengthValidator, requiredValidator } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
@@ -79,7 +78,6 @@ export class GroupSettingsDialogComponent {
 
   constructor(
     private dialogRef: MatDialogRef<GroupSettingsDialogComponent>,
-    private authenticationUserService: AuthenticationUserStoreService,
     private dialogServiceUtil: DialogServiceUtil,
     private groupApiService: GroupApiService,
     @Inject(MAT_DIALOG_DATA) public data: GroupSettingsDialogComponentData,
