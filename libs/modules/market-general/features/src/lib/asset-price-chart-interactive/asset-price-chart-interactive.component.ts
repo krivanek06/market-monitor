@@ -140,7 +140,7 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
         tap(() => this.stockHistoricalPriceSignal.set([])),
         tap(() => this.loadingSignal.set(true)),
         switchMap((period) =>
-          this.marketApiService.getHistoricalPrices(this.symbol + 'aaaaaaa', period).pipe(
+          this.marketApiService.getHistoricalPrices(this.symbol, period).pipe(
             tap(() => {
               this.errorLoadSignal.set(false);
               this.loadingSignal.set(false);
