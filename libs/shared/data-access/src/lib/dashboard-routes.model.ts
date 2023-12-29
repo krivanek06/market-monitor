@@ -11,6 +11,8 @@ export enum ROUTES_MAIN {
   MARKET_CALENDAR = 'calendar',
   TOP_PERFORMERS = 'top-performers',
   CRYPTO = 'crypto',
+  NEWS = 'news',
+  ECONOMICS = 'economics',
 }
 
 export enum ROUTES_MARKET {

@@ -5,7 +5,12 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
-import { LabelValue, SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
+import {
+  LabelValue,
+  SCREEN_LAYOUT,
+  ScreenLayoutType,
+  screenLayoutResolveType,
+} from '@market-monitor/shared/data-access';
 import { map, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -57,8 +62,8 @@ import { map, switchMap, tap } from 'rxjs';
 })
 export class TabSelectControlComponent<T> implements ControlValueAccessor {
   @Input({ required: true }) displayOptions: LabelValue<T>[] = [];
-  @Input() set screenLayoutSplit(value: SCREEN_LAYOUT) {
-    this.screenLayoutSplitSignal.set(value);
+  @Input() set screenLayoutSplit(value: ScreenLayoutType) {
+    this.screenLayoutSplitSignal.set(screenLayoutResolveType(value));
   }
 
   onChange: (data: T) => void = () => {};

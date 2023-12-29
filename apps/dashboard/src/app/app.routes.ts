@@ -92,31 +92,42 @@ export const appRoutes: Route[] = [
           {
             path: ROUTES_MAIN.MARKET,
             title: 'Market',
-            loadChildren: () => import('./market/market.component').then((m) => m.route),
-          },
-          {
-            path: ROUTES_MAIN.SEARCH,
-            title: 'Search',
-            loadComponent: () => import('./search/search.component').then((m) => m.SearchComponent),
-          },
-          {
-            path: ROUTES_MAIN.MARKET_CALENDAR,
-            title: 'Market Calendar',
-            loadComponent: () =>
-              import('./market-calendar/market-calendar.component').then((m) => m.MarketCalendarComponent),
-          },
-          {
-            path: ROUTES_MAIN.TOP_PERFORMERS,
-            title: 'Top Performers',
-            loadComponent: () =>
-              import('./market-top-performers/market-top-performers.component').then(
-                (m) => m.MarketTopPerformersComponent,
-              ),
-          },
-          {
-            path: ROUTES_MAIN.CRYPTO,
-            title: 'Crypto',
-            loadComponent: () => import('@market-monitor/modules/page-builder').then((m) => m.PageCryptoComponent),
+            loadComponent: () => import('./market/market.component').then((m) => m.MarketComponent),
+            children: [
+              {
+                path: '',
+                redirectTo: ROUTES_MAIN.TOP_PERFORMERS,
+                pathMatch: 'full',
+              },
+              {
+                path: ROUTES_MAIN.TOP_PERFORMERS,
+                title: 'Market Top Performers',
+                loadComponent: () =>
+                  import('./market/market-top-performers.component').then((m) => m.MarketTopPerformersComponent),
+              },
+              {
+                path: ROUTES_MAIN.MARKET_CALENDAR,
+                title: 'Market Calendar',
+                loadComponent: () =>
+                  import('./market/market-calendar.component').then((m) => m.MarketCalendarComponent),
+              },
+              {
+                path: ROUTES_MAIN.ECONOMICS,
+                title: 'Market Economics',
+                loadComponent: () =>
+                  import('./market/market-economics.component').then((m) => m.MarketEconomicsComponent),
+              },
+              {
+                path: ROUTES_MAIN.NEWS,
+                title: 'Market News',
+                loadComponent: () => import('./market/market-news.component').then((m) => m.MarketNewsComponent),
+              },
+              {
+                path: ROUTES_MAIN.CRYPTO,
+                title: 'Crypto',
+                loadComponent: () => import('@market-monitor/modules/page-builder').then((m) => m.PageCryptoComponent),
+              },
+            ],
           },
         ],
       },

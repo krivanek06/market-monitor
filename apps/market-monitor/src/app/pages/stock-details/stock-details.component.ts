@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
 import { stockDetailsResolver } from '@market-monitor/modules/page-builder';
-import { LabelValue, ROUTES_STOCK_DETAILS, SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
+import { LabelValue, ROUTES_STOCK_DETAILS } from '@market-monitor/shared/data-access';
 import { TabSelectControlComponent } from '@market-monitor/shared/ui';
 
 @Component({
@@ -27,7 +27,7 @@ import { TabSelectControlComponent } from '@market-monitor/shared/ui';
         <app-tab-select-control
           [formControl]="routesStockDetailsControl"
           [displayOptions]="routesStockDetails"
-          [screenLayoutSplit]="screenLayoutSplit"
+          screenLayoutSplit="LAYOUT_XL"
         ></app-tab-select-control>
       </div>
 
@@ -55,8 +55,6 @@ export class StockDetailsComponent {
     //{ label: 'Holders', value: ROUTES_STOCK_DETAILS.HOLDERS },
     { label: 'Trades', value: ROUTES_STOCK_DETAILS.TRADES },
   ];
-
-  screenLayoutSplit = SCREEN_LAYOUT.LAYOUT_XL;
 
   constructor() {
     this.resolveUrl();

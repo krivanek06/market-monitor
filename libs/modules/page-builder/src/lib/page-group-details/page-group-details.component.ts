@@ -4,7 +4,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { GroupInteractionButtonsComponent } from '@market-monitor/modules/group/features';
-import { LabelValue, SCREEN_LAYOUT } from '@market-monitor/shared/data-access';
+import { LabelValue } from '@market-monitor/shared/data-access';
 import { TabSelectControlComponent } from '@market-monitor/shared/ui';
 import { GroupDetailsHoldingsComponent } from './group-details-holdings/group-details-holdings.component';
 import { GroupDetailsOverviewComponent } from './group-details-overview/group-details-overview.component';
@@ -36,8 +36,8 @@ type GroupDetailsTab = 'overview' | 'holdings';
         <!-- navigation -->
         <app-tab-select-control
           [formControl]="groupDetailsTabControl"
-          [screenLayoutSplit]="screenSplit"
           [displayOptions]="displayOptions"
+          screenLayoutSplit="LAYOUT_LG"
         ></app-tab-select-control>
       </div>
 
@@ -68,7 +68,6 @@ export class PageGroupDetailsComponent extends PageGroupsBaseComponent {
     { label: 'Overview', value: 'overview' },
     { label: 'Holdings', value: 'holdings' },
   ];
-  screenSplit = SCREEN_LAYOUT.LAYOUT_LG;
 
   constructor() {
     super();

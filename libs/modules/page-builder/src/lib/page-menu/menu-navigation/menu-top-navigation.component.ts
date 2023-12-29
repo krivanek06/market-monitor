@@ -80,78 +80,27 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
           </div>
         </a>
 
-        <!-- market dropdown on smaller screen -->
-        <div class="p-4 hover:bg-gray-100 rounded-md block 2xl:hidden group relative">
-          <div class="gap-2 flex items-center">
-            <mat-icon>expand_more</mat-icon>
-            <span>Other</span>
-          </div>
-
-          <div class="w-[200px] c-scale top-[60px] -left-5">
-            <button mat-button class="mb-2 c-scale__item" (click)="onNavClick(ROUTES_MAIN.SEARCH)">
-              <mat-icon>search</mat-icon>
-              Search
-            </button>
-            <button mat-button class="mb-2 c-scale__item" (click)="onNavClick(ROUTES_MAIN.TOP_PERFORMERS)">
-              <mat-icon>travel_explore</mat-icon>
-              Performers
-            </button>
-            <button mat-button class="mb-2 c-scale__item" (click)="onNavClick(ROUTES_MAIN.MARKET)">
-              <mat-icon>storefront</mat-icon>
-              Market
-            </button>
-            <button mat-button class="c-scale__item" (click)="onNavClick(ROUTES_MAIN.MARKET_CALENDAR)">
-              <mat-icon>calendar_month</mat-icon>
-              Calendar
-            </button>
-          </div>
-        </div>
-
-        <!-- search -->
+        <!-- screener -->
         <a
-          (click)="onNavClick(ROUTES_MAIN.SEARCH)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md hidden 2xl:block"
-          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.SEARCH }"
+          (click)="onNavClick(ROUTES_MAIN.STOCK_SCREENER)"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.STOCK_SCREENER }"
         >
           <div class="gap-2 flex items-center">
             <mat-icon>search</mat-icon>
-            <span>Search</span>
-          </div>
-        </a>
-
-        <!-- performers -->
-        <a
-          (click)="onNavClick(ROUTES_MAIN.TOP_PERFORMERS)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md hidden 2xl:block"
-          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.TOP_PERFORMERS }"
-        >
-          <div class="gap-2 flex items-center">
-            <mat-icon>travel_explore</mat-icon>
-            <span>Performers</span>
+            <span>Screener</span>
           </div>
         </a>
 
         <!-- market -->
         <a
           (click)="onNavClick(ROUTES_MAIN.MARKET)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md hidden 2xl:block"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.MARKET }"
         >
           <div class="gap-2 flex items-center">
-            <mat-icon>storefront</mat-icon>
+            <mat-icon>travel_explore</mat-icon>
             <span>Market</span>
-          </div>
-        </a>
-
-        <!-- calendar -->
-        <a
-          (click)="onNavClick(ROUTES_MAIN.MARKET_CALENDAR)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md hidden 2xl:block"
-          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.MARKET_CALENDAR }"
-        >
-          <div class="gap-2 flex items-center">
-            <mat-icon>calendar_month</mat-icon>
-            <span>Calendar</span>
           </div>
         </a>
 
@@ -169,7 +118,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
             </div>
 
             <!-- menu -->
-            <div class="min-w-[220px] flex flex-col top-[60px] c-scale ml-[-90px]">
+            <div class="min-w-[220px] flex flex-col top-[60px] c-scale ml-[-60px]">
               <button mat-button class="mb-2 c-scale__item" (click)="onSettingClick()">
                 <mat-icon>settings</mat-icon>
                 Settings
@@ -202,8 +151,8 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         }
 
         a {
-          max-width: 150px;
-
+          padding-left: 8px;
+          padding-right: 8px;
           &.c-active {
             border-bottom: 2px solid var(--primary) !important;
             > * {

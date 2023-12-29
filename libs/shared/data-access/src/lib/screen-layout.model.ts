@@ -5,3 +5,9 @@ export enum SCREEN_LAYOUT {
   LAYOUT_XL = '(min-width: 1280px)',
   LAYOUT_2XL = '(min-width: 1536px)',
 }
+
+export type ScreenLayoutType = keyof typeof SCREEN_LAYOUT;
+
+export const screenLayoutResolveType = (val: ScreenLayoutType) => {
+  return SCREEN_LAYOUT[val];
+};
