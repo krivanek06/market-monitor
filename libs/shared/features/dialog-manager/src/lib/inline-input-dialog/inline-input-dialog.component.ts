@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -10,6 +10,7 @@ import { DynamicValidatorMessage } from '@market-monitor/shared/features/input-e
 export type InlineInputDialogComponentData = {
   title: string;
   description?: string;
+  initialValue?: string;
 };
 
 @Component({
@@ -40,7 +41,9 @@ export type InlineInputDialogComponentData = {
       <!-- action buttons -->
       <div class="flex flex-col-reverse gap-4 mt-6 md:flex-row">
         <button mat-flat-button class="w-full" (click)="cancel()">Cancel</button>
-        <button mat-flat-button class="w-full" color="primary" (click)="confirm()">Confirm</button>
+        <button mat-flat-button class="w-full" color="primary" (click)="confirm()" [disabled]="inputValueForm.invalid">
+          Confirm
+        </button>
       </div>
     </div>
   `,
@@ -51,7 +54,7 @@ export type InlineInputDialogComponentData = {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InlineInputDialogComponent {
+export class InlineInputDialogComponent implements OnInit {
   inputValueForm = new FormGroup({
     value: new FormControl<string>('', {
       validators: [Validators.required, Validators.minLength(4), Validators.maxLength(30)],
@@ -62,6 +65,12 @@ export class InlineInputDialogComponent {
     private dialogRef: MatDialogRef<InlineInputDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: InlineInputDialogComponentData,
   ) {}
+
+  ngOnInit(): void {
+    if (this.data.initialValue) {
+      this.inputValueForm.controls.value.patchValue(this.data.initialValue, { emitEvent: false });
+    }
+  }
 
   cancel(): void {
     this.dialogRef.close(undefined);

@@ -1,14 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { SymbolSummary } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { StockSearchBasicComponent, StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
+import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { GetStocksSummaryPipe, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks/ui';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { EMPTY, catchError, filter, from, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-page-watchlist',
@@ -20,8 +18,6 @@ import { EMPTY, catchError, filter, from, switchMap, tap } from 'rxjs';
     StockSummaryDialogComponent,
     MatDialogModule,
     MatIconModule,
-    ReactiveFormsModule,
-    StockSearchBasicComponent,
   ],
   templateUrl: './page-watchlist.component.html',
   styles: [
@@ -33,7 +29,7 @@ import { EMPTY, catchError, filter, from, switchMap, tap } from 'rxjs';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageWatchlistComponent implements OnInit {
+export class PageWatchlistComponent {
   readonly displayCheckValue = 25;
 
   authenticationUserService = inject(AuthenticationUserStoreService);
@@ -46,28 +42,10 @@ export class PageWatchlistComponent implements OnInit {
   userWatchListSymbolsSignal = computed(() =>
     this.authenticationUserService.state.watchList().data.map((d) => d.symbol),
   );
-
-  searchSymbolControl = new FormControl<SymbolSummary | null>(null, { nonNullable: true });
   /**
    * the number of results to currently display
    */
   displayResultsSignal = signal(this.displayCheckValue);
-
-  ngOnInit(): void {
-    // listen on symbol search control and add symbol to watch list
-    this.searchSymbolControl.valueChanges
-      .pipe(
-        filter((value): value is SymbolSummary => !!value),
-        filter((summary) => !this.authenticationUserService.state.isSymbolInWatchList()(summary.id)),
-        switchMap((summary) => from(this.authenticationUserService.addSymbolToUserWatchList(summary.id, 'STOCK'))),
-        tap(() => this.dialogServiceUtil.showNotificationBar('Symbol added into watch List', 'success', 3000)),
-        catchError((err) => {
-          this.dialogServiceUtil.handleError(err);
-          return EMPTY;
-        }),
-      )
-      .subscribe();
-  }
 
   onNearEndScroll(): void {
     // increase only if maxScreenerResults is less than screenerResults length

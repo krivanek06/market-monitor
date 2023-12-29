@@ -18,17 +18,16 @@ import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
         <article>
           <h2>Thank You</h2>
           <p>
-            Dear Member. We want to express our sincere gratitude for choosing GGfinance to manage your investment
-            portfolio and embark on a journey towards financial empowerment. Your trust in our platform means the world
-            to us.
+            We want to express our sincere gratitude for choosing GGfinance and embark on a journey towards financial
+            empowerment. Your trust in our platform means the world to us and we hope you will enjoy your experience
+            here and will stay with us on this journey. Thank you.
           </p>
           <p>
             We are a team of young passionate developers who love technologies and finance. Our goal is to create a
             platform where you will be able to view deep insight into your investment strategy. We want to highlight
             that we direct <strong>DO NOT MANAGE</strong> anybody's finances. This application is used for data
-            visualization / learning proper financial literacy.
+            visualization / learning.
           </p>
-          <p>We hope you will enjoy your experience here and will stay with us on this journey. Thank you.</p>
         </article>
         <!-- Help section -->
         <article>

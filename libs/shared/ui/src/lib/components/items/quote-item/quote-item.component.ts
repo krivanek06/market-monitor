@@ -31,7 +31,7 @@ import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
         </div>
         <!-- price & price change -->
         <div class="flex flex-col items-end xs:items-center gap-x-3 xs:flex-row min-w-max">
-          <span class="text-base text-wt-gray-ligh">{{ symbolQuote.price | currency }}</span>
+          <span class="text-base text-wt-gray-medium">{{ symbolQuote.price | currency }}</span>
           <span
             appPercentageIncrease
             [useCurrencySign]="true"

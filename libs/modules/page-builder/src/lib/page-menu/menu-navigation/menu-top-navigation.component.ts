@@ -8,6 +8,7 @@ import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
+import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks/features';
 import { UserSettingsDialogComponent } from '@market-monitor/modules/user/features';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
@@ -27,10 +28,11 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
     UserSettingsDialogComponent,
     MatDialogModule,
     HelpDialogComponent,
+    StockSearchBasicCustomizedComponent,
   ],
   template: `
     <div class="w-full shadow-md mb-4">
-      <nav class="w-full py-4 pl-8 pr-12 flex items-center gap-4 max-w-[1620px] mx-auto">
+      <nav class="w-full py-4 pl-8 pr-4 flex items-center gap-4 max-w-[1620px] mx-auto">
         <!-- dashboard -->
         <a
           (click)="onNavClick(ROUTES_MAIN.DASHBOARD)"
@@ -104,33 +106,57 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
           </div>
         </a>
 
-        <div class="flex flex-1 justify-end">
-          <!-- display logged in person -->
-          <div *ngIf="userDataSignal() as userDataSignal" class="group p-4 relative">
-            <div class="flex items-center gap-3">
-              <img
-                appDefaultImg
-                class="w-8 h-8 rounded-full"
-                [src]="userDataSignal.personal.photoURL"
-                [alt]="userDataSignal.personal.displayName"
-              />
-              <span>{{ userDataSignal.personal.displayName }}</span>
-            </div>
+        <div class="flex-1 flex justify-end">
+          <!-- search -->
+          <app-stock-search-basic-customized
+            [showValueChange]="true"
+            [showHint]="false"
+            displayValue="symbol"
+            class="w-[480px] scale-[0.8] -mb-4 -mr-10 hidden xl:block"
+          />
 
-            <!-- menu -->
-            <div class="min-w-[220px] flex flex-col top-[60px] c-scale ml-[-60px]">
-              <button mat-button class="mb-2 c-scale__item" (click)="onSettingClick()">
-                <mat-icon>settings</mat-icon>
-                Settings
-              </button>
-              <button mat-button class="mb-2 c-scale__item" (click)="onHelpClick()">
-                <mat-icon>help</mat-icon>
-                Help
-              </button>
-              <button mat-button class="c-scale__item" (click)="onLogOutClick()">
-                <mat-icon>logout</mat-icon>
-                Log out
-              </button>
+          <div class="flex gap-1 items-center">
+            <!-- display logged in person -->
+            <div *ngIf="userDataSignal() as userDataSignal" class="group p-4 relative">
+              <div class="flex items-center gap-3">
+                <img
+                  appDefaultImg
+                  class="w-8 h-8 rounded-full"
+                  [src]="userDataSignal.personal.photoURL"
+                  [alt]="userDataSignal.personal.displayName"
+                />
+                <span>{{ userDataSignal.personal.displayName }}</span>
+              </div>
+
+              <!-- menu -->
+              <div
+                class="min-w-[240px] flex flex-col top-[60px] scale-0 group-hover:scale-100 z-10 bg-wt-gray-light absolute transition-all duration-300 px-2 py-3 rounded-md ml-[-20px]"
+              >
+                <button
+                  mat-button
+                  class="mb-2 hover:bg-gray-100 hover:scale-95 duration-300 transition-all w-full"
+                  (click)="onSettingClick()"
+                >
+                  <mat-icon>settings</mat-icon>
+                  Settings
+                </button>
+                <button
+                  mat-button
+                  class="mb-2 hover:bg-gray-100 hover:scale-95 duration-300 transition-all w-full"
+                  (click)="onHelpClick()"
+                >
+                  <mat-icon>help</mat-icon>
+                  Help
+                </button>
+                <button
+                  mat-button
+                  class="hover:bg-gray-100 hover:scale-95 duration-300 transition-all w-full"
+                  (click)="onLogOutClick()"
+                >
+                  <mat-icon>logout</mat-icon>
+                  Log out
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -141,14 +167,6 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
     `
       :host {
         display: block;
-
-        .c-scale {
-          @apply scale-0 group-hover:scale-100 z-10 bg-wt-gray-light absolute transition-all duration-300 px-2 py-3 rounded-md;
-        }
-
-        .c-scale__item {
-          @apply hover:bg-gray-100 hover:scale-95 duration-300 transition-all w-full;
-        }
 
         a {
           padding-left: 8px;

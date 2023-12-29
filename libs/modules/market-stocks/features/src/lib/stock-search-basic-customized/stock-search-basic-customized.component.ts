@@ -43,7 +43,68 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
     MatCheckboxModule,
     ElementFocusDirective,
   ],
-  templateUrl: './stock-search-basic-customized.component.html',
+  template: `
+    <app-stock-search-basic
+      appElementFocus
+      (insideClick)="checkToDisplayOverlay(true, null)"
+      (inputHasValue)="checkToDisplayOverlay(null, $event)"
+      [formControl]="searchControl"
+      cdkOverlayOrigin
+      #trigger
+      #origin="cdkOverlayOrigin"
+      [showHint]="showHint"
+      [showValueChange]="showValueChange"
+      [displayValue]="displayValue"
+    ></app-stock-search-basic>
+
+    <ng-template
+      cdkConnectedOverlay
+      cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+      [cdkConnectedOverlayMinWidth]="overlayWidth()"
+      [cdkConnectedOverlayOrigin]="origin"
+      [cdkConnectedOverlayPositions]="[
+        {
+          originX: 'center',
+          originY: 'bottom',
+          overlayX: 'center',
+          overlayY: 'top'
+        }
+      ]"
+      [cdkConnectedOverlayOpen]="overlayIsOpen().isInputFocused && !overlayIsOpen().inputHasValue"
+    >
+      <div
+        [style.max-width.px]="overlayWidth()"
+        [style.min-width.px]="overlayWidth()"
+        appElementFocus
+        (outsideClick)="checkToDisplayOverlay(false, null)"
+        class="min-h-[200px] max-h-[400px] bg-wt-gray-light mt-[-18px] w-full rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
+      >
+        <!-- checkbox changing displayed stock summaries -->
+        <div *ngIf="!isUserAuthenticatedSignal()" class="flex items-center justify-between mb-1">
+          <span class="text-base text-wt-gray-medium">
+            <ng-container *ngIf="!showFavoriteStocks.value">Last Searched</ng-container>
+            <ng-container *ngIf="showFavoriteStocks.value">Favorite Stocks</ng-container>
+          </span>
+          <mat-checkbox color="primary" [formControl]="showFavoriteStocks"> Show Favorites </mat-checkbox>
+        </div>
+
+        <!-- display summaries as buttons -->
+        <button
+          mat-button
+          *ngFor="let summary of displayedStocksSignal()"
+          (click)="onSummaryClick(summary)"
+          class="w-full h-12 max-sm:mb-2"
+          type="button"
+        >
+          <app-quote-item
+            [displayValue]="displayValue"
+            [symbolQuote]="summary.quote"
+            [assetUrl]="summary.profile?.image"
+          ></app-quote-item>
+        </button>
+      </div>
+    </ng-template>
+  `,
   styles: [
     `
       :host {
@@ -63,6 +124,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
    * open modal on summary click
    */
   @Input() openModalOnClick = true;
+  @Input() displayValue: 'name' | 'symbol' = 'name';
 
   @ViewChild('trigger', { read: ElementRef }) trigger?: ElementRef<HTMLElement>;
 

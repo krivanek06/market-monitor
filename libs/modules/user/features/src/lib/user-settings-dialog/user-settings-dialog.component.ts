@@ -236,6 +236,7 @@ export class UserSettingsDialogComponent implements OnInit {
       .showInlineInputDialog({
         title: 'Change Display Name',
         description: 'Enter a new display name',
+        initialValue: this.userDataSignal().personal.displayName,
       })
       .pipe(
         filterNil(),
