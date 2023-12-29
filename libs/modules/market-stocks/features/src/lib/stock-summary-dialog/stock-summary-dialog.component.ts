@@ -30,8 +30,68 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
     AssetPriceChartInteractiveComponent,
     SummaryActionButtonsComponent,
   ],
-  templateUrl: './stock-summary-dialog.component.html',
-  styleUrls: ['./stock-summary-dialog.component.scss'],
+  template: `
+    <ng-container *ngIf="stockSummarySignal() as stockSummary; else showModalSkeleton">
+      <!-- heading -->
+      <div class="flex items-center justify-between p-4">
+        <div class="flex items-center gap-3">
+          <img appDefaultImg imageType="symbol" [src]="stockSummary.id" alt="Stock Image" class="w-11 h-11" />
+          <div class="grid">
+            <div class="flex gap-4 text-base text-wt-gray-medium">
+              <span>{{ stockSummary.id }}</span>
+              <span>|</span>
+              <span>{{ symbolType() }}</span>
+            </div>
+            <span class="text-lg text-wt-gray-medium">{{ stockSummary.quote.name }}</span>
+          </div>
+        </div>
+
+        <div>
+          <button mat-icon-button mat-dialog-close color="warn" type="button">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- action buttons -->
+      <app-summary-action-buttons
+        *ngIf="isSymbolTypeStock()"
+        (redirectClickedEmitter)="onDetailsRedirect()"
+        [symbolSummary]="stockSummary"
+      ></app-summary-action-buttons>
+
+      <mat-dialog-content>
+        <!-- display main metrics -->
+        <div *ngIf="isSymbolTypeStock()">
+          <app-summary-main-metrics [stockSummary]="stockSummary"></app-summary-main-metrics>
+        </div>
+
+        <!-- time period change -->
+        <div class="my-8">
+          <app-price-change-items [mainSymbolPriceChange]="stockSummary.priceChange"></app-price-change-items>
+        </div>
+
+        <!-- price & volume -->
+        <div class="max-w-full">
+          <app-asset-price-chart-interactive
+            [imageName]="data.symbol"
+            [title]="data.symbol"
+            [symbol]="data.symbol"
+          ></app-asset-price-chart-interactive>
+        </div>
+      </mat-dialog-content>
+    </ng-container>
+
+    <!-- skeleton modal -->
+    <ng-template #showModalSkeleton>
+      <app-summary-modal-skeleton></app-summary-modal-skeleton>
+    </ng-template>
+  `,
+  styles: `
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSummaryDialogComponent {
