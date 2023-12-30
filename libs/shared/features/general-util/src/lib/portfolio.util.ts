@@ -16,11 +16,11 @@ export const getPortfolioStateHoldingsUtil = (
   symbolSummaries: SymbolSummary[],
 ): PortfolioStateHoldings => {
   // accumulate cash on hand from transactions
-  const cashOnHandTransactions = transactions.reduce(
-    (acc, curr) =>
-      curr.transactionType === 'BUY' ? acc - curr.unitPrice * curr.units : acc + curr.unitPrice * curr.units,
-    0,
-  );
+  // const cashOnHandTransactions = transactions.reduce(
+  //   (acc, curr) =>
+  //     curr.transactionType === 'BUY' ? acc - curr.unitPrice * curr.units : acc + curr.unitPrice * curr.units,
+  //   0,
+  // );
   const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
   const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
   const transactionFees = transactions.reduce((acc, curr) => acc + curr.transactionFees, 0);
@@ -42,15 +42,19 @@ export const getPortfolioStateHoldingsUtil = (
     })
     .filter((d) => !!d) as PortfolioStateHolding[];
 
+  // value that user invested in all assets
   const invested = portfolioStateHolding.reduce((acc, curr) => acc + curr.invested, 0);
+  // value of all assets
   const holdingsBalance = portfolioStateHolding.reduce(
     (acc, curr) => acc + curr.symbolSummary.quote.price * curr.units,
     0,
   );
+  // current cash on hand
+  const cashOnHandTransactions = startingCash !== 0 ? startingCash - invested - transactionFees : 0;
 
-  const balance = holdingsBalance + cashOnHandTransactions + startingCash;
-  const totalGainsValue = balance - startingCash;
-  const totalGainsPercentage = holdingsBalance === 0 ? 0 : (balance - startingCash) / balance;
+  const balance = holdingsBalance + startingCash - transactionFees;
+  const totalGainsValue = balance - invested;
+  const totalGainsPercentage = holdingsBalance === 0 ? 0 : (balance - invested) / balance;
   const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
   const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
 
@@ -69,6 +73,9 @@ export const getPortfolioStateHoldingsUtil = (
     lastTransactionDate,
     date: getCurrentDateDefaultFormat(),
   };
+
+  console.log('calling balance method');
+  console.log(result);
 
   return {
     ...result,

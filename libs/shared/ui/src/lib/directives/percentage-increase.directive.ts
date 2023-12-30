@@ -29,55 +29,42 @@ export class PercentageIncreaseDirective implements OnInit {
   /**
    * choose to populate data for changeValues or currentValues
    */
-  @Input() changeValues?: ChangeValues;
-  @Input() currentValues?: CurrentValues;
+  @Input() set changeValues(data: ChangeValues) {
+    const change = data.change ? roundNDigits(data.change, 2) : null;
+    const changesPercentage = data.changePercentage ? roundNDigits(data.changePercentage, 2) : null;
+    this.createElement(change, changesPercentage);
+  }
+  @Input() set currentValues(data: CurrentValues) {
+    if (!data.valueToCompare) {
+      return;
+    }
+    const value = data.value - data.valueToCompare;
+    const change = roundNDigits(value, 2);
+    const changesPercentage = roundNDigits((value / Math.abs(data.valueToCompare)) * 100, 2);
+    const hideValue = data.hideValue;
+    this.createElement(change, changesPercentage, hideValue);
+  }
   @Input() useCurrencySign = false;
 
   @Input() changesPercentageSpanClasses: string[] = [];
   @Input() changesSpanClasses: string[] = [];
 
   constructor(
-    private rederer2: Renderer2,
+    private renderer2: Renderer2,
     private vr: ViewContainerRef,
     private platform: PlatformService,
   ) {}
 
   ngOnInit(): void {
-    // clear previous view -> switching SSR to CSR
-    const childElements = this.vr.element.nativeElement.childNodes;
-    for (let child of childElements) {
-      this.rederer2.removeChild(this.vr.element.nativeElement, child);
-    }
-
     if (this.platform.isServer) {
       // placeholders while SSR
-      const na = this.rederer2.createText('N/A');
-      this.rederer2.appendChild(this.vr.element.nativeElement, na);
+      const na = this.renderer2.createText('N/A');
+      this.renderer2.appendChild(this.vr.element.nativeElement, na);
       return;
+    } else {
+      // clear previous view on client side
+      this.vr.clear();
     }
-
-    if (this.changeValues) {
-      const change = this.changeValues.change ? roundNDigits(this.changeValues.change, 2) : null;
-      const changesPercentage = this.changeValues.changePercentage
-        ? roundNDigits(this.changeValues.changePercentage, 2)
-        : null;
-      this.createElement(change, changesPercentage);
-      return;
-    }
-
-    if (this.currentValues) {
-      if (!this.currentValues.valueToCompare) {
-        return;
-      }
-      const value = this.currentValues.value - this.currentValues.valueToCompare;
-      const change = roundNDigits(value, 2);
-      const changesPercentage = roundNDigits((value / Math.abs(this.currentValues.valueToCompare)) * 100, 2);
-      const hideValue = this.currentValues.hideValue;
-      this.createElement(change, changesPercentage, hideValue);
-      return;
-    }
-
-    throw new Error('[PerceptageIncreaseDirective]: define changeValues or currentValues');
   }
 
   /**
@@ -91,11 +78,17 @@ export class PercentageIncreaseDirective implements OnInit {
     const wrapper = this.vr.element.nativeElement;
 
     if (!changesPercentage && !change) {
-      const element = this.rederer2.createElement('span');
-      const text = this.rederer2.createText('N/A');
-      this.rederer2.appendChild(element, text);
-      this.rederer2.appendChild(wrapper, element);
+      const element = this.renderer2.createElement('span');
+      const text = this.renderer2.createText('N/A');
+      this.renderer2.appendChild(element, text);
+      this.renderer2.appendChild(wrapper, element);
       return;
+    }
+
+    // clear previous view
+    const childElements = this.vr.element.nativeElement.childNodes;
+    for (let child of childElements) {
+      this.renderer2.removeChild(this.vr.element.nativeElement, child);
     }
 
     // color to use
@@ -103,10 +96,10 @@ export class PercentageIncreaseDirective implements OnInit {
       (!!change && change > 0) || (!!changesPercentage && changesPercentage > 0) ? 'text-wt-success' : 'text-wt-danger';
 
     // add scss classes
-    this.rederer2.addClass(wrapper, 'flex');
+    this.renderer2.addClass(wrapper, 'flex');
 
-    this.rederer2.addClass(wrapper, 'items-center');
-    this.rederer2.addClass(wrapper, 'flex-wrap');
+    this.renderer2.addClass(wrapper, 'items-center');
+    this.renderer2.addClass(wrapper, 'flex-wrap');
     //this.rederer2.addClass(wrapper, 'gap-x-1');
 
     // this.rederer2.addClass(wrapper, 'flex-col');
@@ -115,59 +108,59 @@ export class PercentageIncreaseDirective implements OnInit {
     // display percentage
     if (changesPercentage) {
       // wrapper for value and icon
-      const valueChangeAndIconWrapper = this.rederer2.createElement('div');
+      const valueChangeAndIconWrapper = this.renderer2.createElement('div');
 
       // percentage
-      const changesPercentageSpan = this.rederer2.createElement('span');
-      const changesPercentageText = this.rederer2.createText(`${String(changesPercentage)}%`);
+      const changesPercentageSpan = this.renderer2.createElement('span');
+      const changesPercentageText = this.renderer2.createText(`${String(changesPercentage)}%`);
 
       // mat-icon
-      const matIcon = this.rederer2.createElement('mat-icon');
+      const matIcon = this.renderer2.createElement('mat-icon');
       const matIconText =
-        changesPercentage > 0 ? this.rederer2.createText('trending_up') : this.rederer2.createText('trending_down');
+        changesPercentage > 0 ? this.renderer2.createText('trending_up') : this.renderer2.createText('trending_down');
 
       // have value and icon in one div for 'col' styling
-      this.rederer2.addClass(valueChangeAndIconWrapper, 'flex');
-      this.rederer2.addClass(valueChangeAndIconWrapper, 'items-center');
+      this.renderer2.addClass(valueChangeAndIconWrapper, 'flex');
+      this.renderer2.addClass(valueChangeAndIconWrapper, 'items-center');
       //this.rederer2.addClass(valueChangeAndIconWrapper, 'gap-1');
-      this.rederer2.addClass(matIcon, color);
+      this.renderer2.addClass(matIcon, color);
 
       // classes mat-icon
-      this.rederer2.addClass(matIcon, 'mat-icon');
-      this.rederer2.addClass(matIcon, 'material-icons');
+      this.renderer2.addClass(matIcon, 'mat-icon');
+      this.renderer2.addClass(matIcon, 'material-icons');
 
       // colors
-      this.rederer2.addClass(changesPercentageSpan, color);
+      this.renderer2.addClass(changesPercentageSpan, color);
 
       // additional classes
-      this.changesPercentageSpanClasses.forEach((c) => this.rederer2.addClass(changesPercentageSpan, c));
+      this.changesPercentageSpanClasses.forEach((c) => this.renderer2.addClass(changesPercentageSpan, c));
 
       // attach to each other
-      this.rederer2.appendChild(matIcon, matIconText);
-      this.rederer2.appendChild(changesPercentageSpan, changesPercentageText);
-      this.rederer2.appendChild(valueChangeAndIconWrapper, changesPercentageSpan);
-      this.rederer2.appendChild(valueChangeAndIconWrapper, matIcon);
-      this.rederer2.appendChild(wrapper, valueChangeAndIconWrapper);
+      this.renderer2.appendChild(matIcon, matIconText);
+      this.renderer2.appendChild(changesPercentageSpan, changesPercentageText);
+      this.renderer2.appendChild(valueChangeAndIconWrapper, changesPercentageSpan);
+      this.renderer2.appendChild(valueChangeAndIconWrapper, matIcon);
+      this.renderer2.appendChild(wrapper, valueChangeAndIconWrapper);
     }
 
     // display value
     if (change && !hideValue) {
       const sign = this.useCurrencySign ? '$' : '';
 
-      const changeSpan = this.rederer2.createElement('span');
+      const changeSpan = this.renderer2.createElement('span');
       const text = `${sign} ${formatLargeNumber(change)}`;
-      const changeText = !!changesPercentage ? this.rederer2.createText(`(${text})`) : this.rederer2.createText(text);
+      const changeText = !!changesPercentage ? this.renderer2.createText(`(${text})`) : this.renderer2.createText(text);
 
       // changesPercentage does not exist -> changeSpan will be color
-      this.rederer2.addClass(changeSpan, color);
+      this.renderer2.addClass(changeSpan, color);
 
       // additional classes
-      this.changesSpanClasses.forEach((c) => this.rederer2.addClass(changeSpan, c));
+      this.changesSpanClasses.forEach((c) => this.renderer2.addClass(changeSpan, c));
 
       // show on DOM
-      this.rederer2.appendChild(changeSpan, changeText);
+      this.renderer2.appendChild(changeSpan, changeText);
 
-      this.rederer2.appendChild(wrapper, changeSpan);
+      this.renderer2.appendChild(wrapper, changeSpan);
     }
   }
 }
