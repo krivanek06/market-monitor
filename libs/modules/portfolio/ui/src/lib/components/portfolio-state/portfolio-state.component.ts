@@ -25,7 +25,9 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
       <!-- Cash -->
       <div *ngIf="showCashSegment" [class]="valueClasses">
         <div [appAddColor]="titleColor" class="text-xl">Cash</div>
-        <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.cashOnHand | currency }}</div>
+        <div [appAddColor]="valueColor" class="text-xl">
+          {{ portfolioState.cashOnHand | currency }} / {{ portfolioState.startingCash | currency }}
+        </div>
       </div>
 
       <!-- Total Gains -->

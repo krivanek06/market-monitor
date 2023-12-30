@@ -52,8 +52,8 @@ export const getPortfolioStateHoldingsUtil = (
   // current cash on hand
   const cashOnHandTransactions = startingCash !== 0 ? startingCash - invested - transactionFees : 0;
 
-  const balance = holdingsBalance + startingCash - transactionFees;
-  const totalGainsValue = balance - invested;
+  const balance = holdingsBalance + cashOnHandTransactions - transactionFees;
+  const totalGainsValue = holdingsBalance - invested - transactionFees;
   const totalGainsPercentage = holdingsBalance === 0 ? 0 : (balance - invested) / balance;
   const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
   const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
@@ -62,7 +62,7 @@ export const getPortfolioStateHoldingsUtil = (
     numberOfExecutedBuyTransactions,
     numberOfExecutedSellTransactions,
     transactionFees: roundNDigits(transactionFees, 2),
-    cashOnHand: roundNDigits(startingCash + cashOnHandTransactions, 2),
+    cashOnHand: roundNDigits(cashOnHandTransactions, 2),
     balance: roundNDigits(balance, 2),
     invested: roundNDigits(invested, 2),
     holdingsBalance: roundNDigits(holdingsBalance, 2),
@@ -73,9 +73,6 @@ export const getPortfolioStateHoldingsUtil = (
     lastTransactionDate,
     date: getCurrentDateDefaultFormat(),
   };
-
-  console.log('calling balance method');
-  console.log(result);
 
   return {
     ...result,
