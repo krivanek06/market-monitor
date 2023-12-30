@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
-import { dateFormatDate, formatValueIntoCurrency } from '@market-monitor/shared/features/general-util';
+import { formatValueIntoCurrency } from '@market-monitor/shared/features/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({
@@ -37,13 +37,28 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
   @Input() showOnlyTotalBalance = false;
 
   private initChart(data: PortfolioGrowth[], startingCashValue: number = 0) {
-    const marketTotalValue = data.map((point) => point.marketTotalValue);
-    const investedValue = data.map((point) => point.investedValue);
-    const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
-    const totalBalanceValues = data.map((point) => point.totalBalanceValue);
-
-    // if user has blocked settings if cash account it will be 0
     const isCashActive = startingCashValue > 0;
+
+    const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotalValue]);
+    const investedValue = data.map((point) => [new Date(point.date).getTime(), point.investedValue]);
+
+    //  const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
+    const totalBalanceValues = data.map((point) => [new Date(point.date).getTime(), point.totalBalanceValue]);
+
+    // determine if we should show the total balance or the market total value
+    const balance = isCashActive ? totalBalanceValues : marketTotalValue;
+
+    // get points when investment value change from previous day
+    const investmentChangePoints: [number, number][] = [];
+    for (let i = 0; i < data.length; i++) {
+      const curr = data[i];
+      const prev = data[i - 1];
+      if (prev && prev.investedValue !== curr.investedValue) {
+        investmentChangePoints.push([new Date(curr.date).getTime(), curr.investedValue]);
+      }
+    }
+
+    console.log('investmentChangePoints', investmentChangePoints);
 
     this.chartOptions = {
       chart: {
@@ -87,12 +102,13 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         labels: {
           rotation: -20,
           enabled: true,
+          format: '{value:%b %e. %Y}',
           style: {
             color: ColorScheme.GRAY_MEDIUM_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
-        categories: dates,
+        type: 'datetime',
       },
       title: {
         text: '',
@@ -112,7 +128,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         enabled: false,
       },
       legend: {
-        enabled: !this.showOnlyTotalBalance,
+        enabled: !isCashActive,
         //floating: true,
         verticalAlign: 'top',
         align: 'left',
@@ -185,8 +201,8 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           type: 'area',
           zIndex: 10,
           yAxis: 0,
-          visible: isCashActive,
-          showInLegend: isCashActive,
+          // visible: isCashActive,
+          // showInLegend: isCashActive,
           fillColor: {
             linearGradient: {
               x1: 1,
@@ -200,14 +216,27 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
             ],
           },
           name: 'Total Balance',
-          data: totalBalanceValues,
+          data: balance,
+        },
+        {
+          color: ColorScheme.PRIMARY_VAR,
+          type: 'column',
+          zIndex: 10,
+          yAxis: 0,
+          opacity: 0.8,
+          visible: !isCashActive,
+          showInLegend: !isCashActive,
+          name: 'Investment Value Change',
+          data: investmentChangePoints,
         },
         {
           color: ColorScheme.PRIMARY_VAR,
           type: 'area',
           zIndex: 10,
           yAxis: 0,
-          visible: !isCashActive && !this.showOnlyTotalBalance,
+          opacity: 0.3,
+          visible: false,
+          showInLegend: !isCashActive,
           fillColor: {
             linearGradient: {
               x1: 1,
@@ -221,7 +250,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
             ],
           },
           name: 'Investment Value',
-          data: marketTotalValue,
+          data: investedValue,
         },
       ],
     };
