@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowthAssets, PortfolioState } from '@market-monitor/api-types';
@@ -91,13 +91,20 @@ import { Subject, combineLatest, map, startWith } from 'rxjs';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PortfolioGrowthChartsComponent implements OnInit {
+export class PortfolioGrowthChartsComponent {
   @Input() showChartChangeSelect = false;
   @Input() heightPx = 500;
   @Input({ required: true }) portfolioState!: PortfolioState;
   @Input({ required: true }) portfolioAssetsGrowth!: PortfolioGrowthAssets[];
   @Input({ required: true }) set portfolioGrowth(data: PortfolioGrowth[]) {
     this.portfolioGrowth$.next(data);
+
+    const sliderValues: DateRangeSliderValues = {
+      dates: data.map((point) => point.date),
+      currentMinDateIndex: 0,
+      currentMaxDateIndex: data.length - 1,
+    };
+    this.portfolioRangeControl.patchValue(sliderValues);
   }
   private portfolioGrowth$ = new Subject<PortfolioGrowth[]>();
 
@@ -116,20 +123,6 @@ export class PortfolioGrowthChartsComponent implements OnInit {
       map(([dateRange, data]) => this.filterDataByDateRange(data, dateRange)),
     ),
   );
-
-  ngOnInit(): void {
-    this.portfolioGrowth$.subscribe((data) => {
-      console.log('PortfolioGrowthChartsComponent', data);
-
-      const sliderValues: DateRangeSliderValues = {
-        dates: data.map((point) => point.date),
-        currentMinDateIndex: 0,
-        currentMaxDateIndex: data.length - 1,
-      };
-
-      this.portfolioRangeControl.patchValue(sliderValues);
-    });
-  }
 
   private filterDataByDateRange(data: PortfolioGrowth[], dateRange: DateRangeSliderValues | null): PortfolioGrowth[] {
     if (!dateRange) {

@@ -56,8 +56,6 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
       }
     }
 
-    console.log('investmentChangePoints', investmentChangePoints);
-
     this.chartOptions = {
       chart: {
         type: 'area',
