@@ -7,7 +7,7 @@ import {
   SymbolSummary,
 } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from './date-service.util';
-import { roundNDigits } from './general-function.util';
+import { calculateGrowth, roundNDigits } from './general-function.util';
 
 export const getPortfolioStateHoldingsUtil = (
   startingCash: number,
@@ -54,7 +54,7 @@ export const getPortfolioStateHoldingsUtil = (
 
   const balance = holdingsBalance + cashOnHandTransactions - transactionFees;
   const totalGainsValue = holdingsBalance - invested - transactionFees;
-  const totalGainsPercentage = holdingsBalance === 0 ? 0 : (balance - invested) / balance;
+  const totalGainsPercentage = holdingsBalance === 0 ? 0 : calculateGrowth(balance, invested);
   const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
   const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
 
@@ -67,7 +67,7 @@ export const getPortfolioStateHoldingsUtil = (
     invested: roundNDigits(invested, 2),
     holdingsBalance: roundNDigits(holdingsBalance, 2),
     totalGainsValue: roundNDigits(totalGainsValue, 2),
-    totalGainsPercentage: roundNDigits(totalGainsPercentage, 6),
+    totalGainsPercentage: roundNDigits(totalGainsPercentage, 4),
     startingCash: roundNDigits(startingCash, 2),
     firstTransactionDate,
     lastTransactionDate,

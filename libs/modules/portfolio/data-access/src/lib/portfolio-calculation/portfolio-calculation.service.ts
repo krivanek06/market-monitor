@@ -12,8 +12,13 @@ import {
   GenericChartSeriesPie,
   ValueItem,
 } from '@market-monitor/shared/data-access';
-import { dateFormatDate, getObjectEntries, roundNDigits } from '@market-monitor/shared/features/general-util';
-import { subDays, subMonths, subWeeks, subYears } from 'date-fns';
+import {
+  calculateGrowth,
+  dateFormatDate,
+  getObjectEntries,
+  roundNDigits,
+} from '@market-monitor/shared/features/general-util';
+import { subMonths, subWeeks, subYears } from 'date-fns';
 import { PortfolioChange, PortfolioGrowth, PortfolioTransactionToDate } from '../models';
 
 @Injectable({
@@ -35,20 +40,24 @@ export class PortfolioCalculationService {
         // find index of element with same date
         const elementIndex = acc.findIndex((el) => el.date === dataItem.date);
 
-        // if elementIndex exists, add value to it => different symbol, same date
-        if (elementIndex > -1) {
-          acc[elementIndex].investedValue += dataItem.investedValue;
-          acc[elementIndex].marketTotalValue += dataItem.marketTotalValue;
-          return;
-        }
-
         // initial object
         const portfolioItem: PortfolioGrowth = {
           date: dataItem.date,
           investedValue: dataItem.investedValue,
           marketTotalValue: dataItem.marketTotalValue,
-          totalBalanceValue: dataItem.marketTotalValue - dataItem.investedValue + startingCashValue,
+          totalBalanceValue: dataItem.marketTotalValue - dataItem.investedValue,
         };
+
+        // if elementIndex exists, add value to it => different symbol, same date
+        if (elementIndex > -1) {
+          acc[elementIndex].investedValue += portfolioItem.investedValue;
+          acc[elementIndex].marketTotalValue += portfolioItem.marketTotalValue;
+          acc[elementIndex].totalBalanceValue += portfolioItem.totalBalanceValue;
+          return;
+        }
+
+        // add starting cash only once
+        portfolioItem.totalBalanceValue += startingCashValue;
 
         if (acc.length === 0 || dataItem.date < acc[0].date) {
           // data is not yet in the array, add it to the start
@@ -77,13 +86,13 @@ export class PortfolioCalculationService {
    * @returns
    */
   getPortfolioChange(growthData: PortfolioGrowth[]): PortfolioChange {
+    console.log('getPortfolioChange', growthData);
     // reverse data to start from DESC
     const reversedData = [...growthData].reverse();
     const today = new Date();
-    const todayBalance = reversedData.at(0)?.marketTotalValue;
 
     // return default values if no data
-    if (!todayBalance) {
+    if (reversedData.length <= 1) {
       return {
         '1_day': null,
         '1_week': null,
@@ -96,8 +105,9 @@ export class PortfolioCalculationService {
       };
     }
 
+    const todayChange = reversedData[0].totalBalanceValue;
+
     // construct dates
-    const day1ChangeDate = dateFormatDate(subDays(today, 1));
     const week1ChangeDate = dateFormatDate(subWeeks(today, 1));
     const week2ChangeDate = dateFormatDate(subWeeks(today, 2));
     const week3ChangeDate = dateFormatDate(subWeeks(today, 3));
@@ -107,7 +117,6 @@ export class PortfolioCalculationService {
     const year1ChangeDate = dateFormatDate(subYears(today, 1));
 
     // find index for data which date's are one smaller than the date we are looking for
-    const day1ChangeIndex = reversedData.findIndex((d) => d.date <= day1ChangeDate);
     const week1ChangeIndex = reversedData.findIndex((d) => d.date <= week1ChangeDate);
     const week2ChangeIndex = reversedData.findIndex((d) => d.date <= week2ChangeDate);
     const week3ChangeIndex = reversedData.findIndex((d) => d.date <= week3ChangeDate);
@@ -117,22 +126,24 @@ export class PortfolioCalculationService {
     const year1ChangeIndex = reversedData.findIndex((d) => d.date <= year1ChangeDate);
 
     // create helper function to create change value
-    const createPortfolioChangeValue = (growth: PortfolioGrowth): ValueItem =>
-      ({
-        value: roundNDigits(todayBalance - growth.marketTotalValue, 2),
-        valuePrct: roundNDigits((todayBalance - growth.marketTotalValue) / growth.marketTotalValue, 4),
-      }) satisfies ValueItem;
+    const createPortfolioChangeValue = (growth?: PortfolioGrowth | null): ValueItem | null =>
+      !growth
+        ? null
+        : ({
+            value: roundNDigits(todayChange - growth.totalBalanceValue, 2),
+            valuePrct: roundNDigits(calculateGrowth(todayChange, growth.totalBalanceValue), 4),
+          } satisfies ValueItem);
 
     // calculate change for each time period
     const result: PortfolioChange = {
-      '1_day': day1ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[day1ChangeIndex]) : null,
-      '1_week': week1ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[week1ChangeIndex]) : null,
-      '2_week': week2ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[week2ChangeIndex]) : null,
-      '3_week': week3ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[week3ChangeIndex]) : null,
-      '1_month': month1ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[month1ChangeIndex]) : null,
-      '3_month': month3ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[month3ChangeIndex]) : null,
-      '6_month': month6ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[month6ChangeIndex]) : null,
-      '1_year': year1ChangeIndex > -1 ? createPortfolioChangeValue(reversedData[year1ChangeIndex]) : null,
+      '1_day': createPortfolioChangeValue(reversedData[1]),
+      '1_week': createPortfolioChangeValue(reversedData[week1ChangeIndex]),
+      '2_week': createPortfolioChangeValue(reversedData[week2ChangeIndex]),
+      '3_week': createPortfolioChangeValue(reversedData[week3ChangeIndex]),
+      '1_month': createPortfolioChangeValue(reversedData[month1ChangeIndex]),
+      '3_month': createPortfolioChangeValue(reversedData[month3ChangeIndex]),
+      '6_month': createPortfolioChangeValue(reversedData[month6ChangeIndex]),
+      '1_year': createPortfolioChangeValue(reversedData[year1ChangeIndex]),
     };
 
     console.log('daily result', result);

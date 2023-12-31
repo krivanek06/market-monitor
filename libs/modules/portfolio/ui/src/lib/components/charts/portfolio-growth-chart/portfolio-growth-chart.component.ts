@@ -44,9 +44,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
 
     //  const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
     const totalBalanceValues = data.map((point) => [new Date(point.date).getTime(), point.totalBalanceValue]);
-
-    // determine if we should show the total balance or the market total value
-    const balance = isCashActive ? totalBalanceValues : marketTotalValue;
+    const threshold = data.map((point) => [new Date(point.date).getTime(), startingCashValue ?? 0]);
 
     // get points when investment value change from previous day
     const investmentChangePoints: [number, number][] = [];
@@ -128,7 +126,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         enabled: false,
       },
       legend: {
-        enabled: !isCashActive,
+        enabled: true,
         //floating: true,
         verticalAlign: 'top',
         align: 'left',
@@ -201,8 +199,6 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           type: 'area',
           zIndex: 10,
           yAxis: 0,
-          // visible: isCashActive,
-          // showInLegend: isCashActive,
           fillColor: {
             linearGradient: {
               x1: 1,
@@ -216,27 +212,16 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
             ],
           },
           name: 'Total Balance',
-          data: balance,
-        },
-        {
-          color: ColorScheme.PRIMARY_VAR,
-          type: 'column',
-          zIndex: 10,
-          yAxis: 0,
-          opacity: 0.8,
-          visible: !isCashActive,
-          showInLegend: !isCashActive,
-          name: 'Investment Value Change',
-          data: investmentChangePoints,
+          data: totalBalanceValues,
         },
         {
           color: ColorScheme.PRIMARY_VAR,
           type: 'area',
           zIndex: 10,
           yAxis: 0,
-          opacity: 0.3,
-          visible: false,
-          showInLegend: !isCashActive,
+          opacity: 0.65,
+          visible: !isCashActive,
+          showInLegend: true,
           fillColor: {
             linearGradient: {
               x1: 1,
@@ -249,8 +234,65 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
               [1, 'transparent'],
             ],
           },
+          name: 'Market Value',
+          data: marketTotalValue,
+        },
+        // {
+        //   color: ColorScheme.PRIMARY_VAR,
+        //   type: 'column',
+        //   zIndex: 10,
+        //   yAxis: 0,
+        //   opacity: 0.8,
+        //   visible: !isCashActive,
+        //   showInLegend: !isCashActive,
+        //   name: 'Investment Value Change',
+        //   data: investmentChangePoints,
+        // },
+        {
+          color: ColorScheme.ACCENT_2_VAR,
+          type: 'area',
+          zIndex: 10,
+          yAxis: 0,
+          opacity: 0.2,
+          visible: !isCashActive,
+          showInLegend: true,
+          fillColor: {
+            linearGradient: {
+              x1: 1,
+              y1: 0,
+              x2: 0,
+              y2: 1,
+            },
+            stops: [
+              [0, ColorScheme.ACCENT_2_VAR],
+              [1, 'transparent'],
+            ],
+          },
           name: 'Investment Value',
           data: investedValue,
+        },
+        {
+          color: ColorScheme.DANGER_VAR,
+          type: 'area',
+          zIndex: 10,
+          yAxis: 0,
+          opacity: 0.45,
+          visible: isCashActive,
+          showInLegend: true,
+          fillColor: {
+            linearGradient: {
+              x1: 1,
+              y1: 0,
+              x2: 0,
+              y2: 1,
+            },
+            stops: [
+              [0, ColorScheme.DANGER_VAR],
+              [1, 'transparent'],
+            ],
+          },
+          name: 'Threshold',
+          data: threshold,
         },
       ],
     };

@@ -6,6 +6,8 @@ export const isNumber = (value: string | number | unknown): boolean => {
   return value != null && value !== '' && typeof value === 'number' && !isNaN(Number(value.toString()));
 };
 
+export const calculateGrowth = (starting: number, ending: number) => ((starting - ending) / Math.abs(ending)) * 100;
+
 export const roundNDigits = (value?: number | null, n: number = 2, isPercent = false): number => {
   if (value === undefined || value === null || isNaN(value)) {
     return 0;
@@ -35,7 +37,7 @@ export const groupValuesByDate = <T extends { date: string }>(data: T[]): { data
 };
 
 export const formatValueIntoCurrency = (value?: string | number | null | unknown): string => {
-  if (!value || (!isNumber(value) && typeof value !== 'number')) {
+  if (value === undefined || value === null || (!isNumber(value) && typeof value !== 'number')) {
     return 'N/A';
   }
   // Create our number formatter.
