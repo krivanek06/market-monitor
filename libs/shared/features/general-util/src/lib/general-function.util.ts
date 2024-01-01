@@ -36,6 +36,10 @@ export const groupValuesByDate = <T extends { date: string }>(data: T[]): { data
   );
 };
 
+export const getRandomIndex = (max: number): number => {
+  return Math.floor(Math.random() * max);
+};
+
 export const formatValueIntoCurrency = (value?: string | number | null | unknown): string => {
   if (value === undefined || value === null || (!isNumber(value) && typeof value !== 'number')) {
     return 'N/A';

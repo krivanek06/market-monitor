@@ -19,9 +19,10 @@ import {
 import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { FancyCardComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
+import { getRandomIndex } from '@market-monitor/shared/features/general-util';
+import { FancyCardComponent, QuoteItemComponent, RangeDirective, SortByKeyPipe } from '@market-monitor/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
-import { switchMap } from 'rxjs';
+import { switchMap, take } from 'rxjs';
 
 @Component({
   selector: 'app-page-trading',
@@ -40,14 +41,16 @@ import { switchMap } from 'rxjs';
     PortfolioTradeDialogComponent,
     MatTooltipModule,
     SortByKeyPipe,
+    QuoteItemComponent,
+    RangeDirective,
   ],
   template: `
     <!-- account state -->
     <ng-container *ngIf="portfolioState() as portfolioState">
-      <div class="flex justify-between gap-x-10 mb-10 md:px-10">
+      <div class="flex flex-col md:flex-row justify-between mb-10">
         <!-- account state -->
         <app-portfolio-state
-          class="basis-3/5"
+          class="md:basis-3/5 md:pl-10"
           [titleColor]="ColorScheme.PRIMARY_VAR"
           [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
           [showCashSegment]="!!userDataSignal().features.userPortfolioAllowCashAccount"
@@ -60,6 +63,7 @@ import { switchMap } from 'rxjs';
             (clickedSummary)="onSummaryClick($event)"
             [openModalOnClick]="false"
             [showValueChange]="false"
+            [showHint]="false"
             class="scale-90 min-w-[600px] mb-2"
           ></app-stock-search-basic-customized>
 
@@ -93,6 +97,25 @@ import { switchMap } from 'rxjs';
         </div>
       </div>
 
+      <!-- top active -->
+      <div class="mb-10 hidden md:block">
+        <h2 class="text-xl text-wt-primary">Top Active</h2>
+
+        <div class="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-4 p-4">
+          @for (item of topPerformanceSignal()?.stockTopActive; track item.id) {
+            <app-quote-item
+              (click)="onSummaryClick(item)"
+              class="g-clickable-hover px-4 border-r border-l border-solid"
+              [showValueChange]="false"
+              [symbolQuote]="item.quote"
+              displayValue="symbol"
+            ></app-quote-item>
+          } @empty {
+            <div *ngRange="20" class="g-skeleton h-9"></div>
+          }
+        </div>
+      </div>
+
       <div>
         <h2 class="flex items-center gap-4 pl-1 mb-3 text-xl text-wt-primary">
           <mat-icon>history</mat-icon>
@@ -108,7 +131,10 @@ import { switchMap } from 'rxjs';
 
       <!-- templates -->
       <ng-template #noSelectedSummary>
-        <div class="h-[300px] grid place-content-center text-2xl">Please select a symbol</div>
+        <div class="flex flex-col gap-4 mb-6 lg:flex-row h-[450px]">
+          <div class="lg:basis-3/5 g-skeleton"></div>
+          <div class="lg:basis-2/5 g-skeleton"></div>
+        </div>
       </ng-template>
     </ng-container>
   `,
@@ -128,19 +154,32 @@ export class PageTradingComponent {
   dialog = inject(MatDialog);
   dialogServiceUtil = inject(DialogServiceUtil);
 
-  selectedSummary = signal<SymbolSummary | null>(null);
+  selectedSummary = signal<SymbolSummary | null | undefined>(null);
   symbolSummary = toSignal(
     toObservable(this.selectedSummary).pipe(
       filterNil(),
       switchMap((summary) => this.marketApiService.getSymbolSummary(summary.id)),
     ),
   );
+  topPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance());
 
   portfolioState = this.portfolioUserFacadeService.getPortfolioState;
   portfolioTransactionSignal = this.authenticationUserService.state.portfolioTransactions;
   userDataSignal = this.authenticationUserService.state.getUserData;
 
   ColorScheme = ColorScheme;
+
+  constructor() {
+    // preload one random symbol into selectedSummary
+    this.marketApiService
+      .getMarketTopPerformance()
+      .pipe(take(1))
+      .subscribe((topPerformance) => {
+        const randomNumber = getRandomIndex(topPerformance?.stockTopActive.length ?? 0);
+        const randomSummary = topPerformance?.stockTopActive[randomNumber];
+        this.selectedSummary.set(randomSummary);
+      });
+  }
 
   onSummaryClick(summary: SymbolSummary) {
     this.selectedSummary.set(summary);
