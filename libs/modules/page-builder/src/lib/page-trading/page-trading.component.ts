@@ -41,7 +41,77 @@ import { switchMap } from 'rxjs';
     MatTooltipModule,
     SortByKeyPipe,
   ],
-  templateUrl: './page-trading.component.html',
+  template: `
+    <!-- account state -->
+    <ng-container *ngIf="portfolioState() as portfolioState">
+      <div class="flex justify-between gap-x-10 mb-10 md:px-10">
+        <!-- account state -->
+        <app-portfolio-state
+          class="basis-3/5"
+          [titleColor]="ColorScheme.PRIMARY_VAR"
+          [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [showCashSegment]="!!userDataSignal().features.userPortfolioAllowCashAccount"
+          [portfolioState]="portfolioState"
+        ></app-portfolio-state>
+
+        <div>
+          <!-- search -->
+          <app-stock-search-basic-customized
+            (clickedSummary)="onSummaryClick($event)"
+            [openModalOnClick]="false"
+            [showValueChange]="false"
+            class="scale-90 min-w-[600px] mb-2"
+          ></app-stock-search-basic-customized>
+
+          <!-- action buttons -->
+          <div class="flex items-center gap-4 md:px-10">
+            <ng-container *ngIf="symbolSummary()">
+              <button (click)="onOperationClick('BUY')" class="flex-1" mat-stroked-button color="accent" type="button">
+                BUY
+              </button>
+              <button (click)="onOperationClick('SELL')" class="flex-1" mat-stroked-button color="warn" type="button">
+                SELL
+              </button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- historical chart & summary -->
+      <div
+        *ngIf="symbolSummary() as symbolSummary; else noSelectedSummary"
+        class="flex flex-col gap-4 mb-6 lg:flex-row"
+      >
+        <app-asset-price-chart-interactive
+          class="lg:basis-3/5"
+          [imageName]="symbolSummary.id"
+          [symbol]="symbolSummary.id"
+          [title]="'Historical Price: ' + symbolSummary.id"
+        ></app-asset-price-chart-interactive>
+        <div class="lg:basis-2/5">
+          <app-stock-summary-list [symbolSummary]="symbolSummary"></app-stock-summary-list>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="flex items-center gap-4 pl-1 mb-3 text-xl text-wt-primary">
+          <mat-icon>history</mat-icon>
+          Transaction History
+        </h2>
+        <app-portfolio-transactions-table
+          (deleteEmitter)="onTransactionDelete($event)"
+          [showTransactionFees]="!!userDataSignal().features.userPortfolioAllowCashAccount"
+          [showActionButton]="!userDataSignal().features.userPortfolioAllowCashAccount"
+          [data]="portfolioTransactionSignal() | sortByKey: 'date' : 'desc'"
+        ></app-portfolio-transactions-table>
+      </div>
+
+      <!-- templates -->
+      <ng-template #noSelectedSummary>
+        <div class="h-[300px] grid place-content-center text-2xl">Please select a symbol</div>
+      </ng-template>
+    </ng-container>
+  `,
   styles: [
     `
       :host {

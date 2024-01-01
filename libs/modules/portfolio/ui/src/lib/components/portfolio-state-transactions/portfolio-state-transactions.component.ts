@@ -9,32 +9,34 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
   standalone: true,
   imports: [CommonModule, AddColorDirective],
   template: `
-    <div [class]="classes">
-      <!-- Total -->
-      <div [class]="valueClasses">
-        <div [appAddColor]="titleColor" class="text-xl">Total</div>
-        <div [appAddColor]="valueColor" class="text-xl">
-          {{ portfolioState.numberOfExecutedBuyTransactions + portfolioState.numberOfExecutedSellTransactions }}
+    <div class="@container">
+      <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
+        <!-- Total -->
+        <div class="flex justify-between @md:flex-col">
+          <div [appAddColor]="titleColor" class="text-xl">Total</div>
+          <div [appAddColor]="valueColor" class="text-xl">
+            {{ portfolioState.numberOfExecutedBuyTransactions + portfolioState.numberOfExecutedSellTransactions }}
+          </div>
         </div>
-      </div>
 
-      <!-- Buy -->
-      <div [class]="valueClasses">
-        <div [appAddColor]="titleColor" class="text-xl">Buy</div>
-        <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedBuyTransactions }}</div>
-      </div>
+        <!-- Buy -->
+        <div class="flex justify-between @md:flex-col">
+          <div [appAddColor]="titleColor" class="text-xl">Buy</div>
+          <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedBuyTransactions }}</div>
+        </div>
 
-      <!-- Sell -->
-      <div [class]="valueClasses">
-        <div [appAddColor]="titleColor" class="text-xl">Sell</div>
-        <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedSellTransactions }}</div>
-      </div>
+        <!-- Sell -->
+        <div class="flex justify-between @md:flex-col">
+          <div [appAddColor]="titleColor" class="text-xl">Sell</div>
+          <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedSellTransactions }}</div>
+        </div>
 
-      <!-- Fees -->
-      <div *ngIf="showFees" [class]="valueClasses">
-        <div [appAddColor]="titleColor" class="text-xl">Fees</div>
-        <div [appAddColor]="valueColor" class="text-xl">
-          {{ portfolioState.transactionFees | currency }}
+        <!-- Fees -->
+        <div *ngIf="showFees" class="flex justify-between @md:flex-col">
+          <div [appAddColor]="titleColor" class="text-xl">Fees</div>
+          <div [appAddColor]="valueColor" class="text-xl">
+            {{ portfolioState.transactionFees | currency }}
+          </div>
         </div>
       </div>
     </div>
@@ -53,11 +55,4 @@ export class PortfolioStateTransactionsComponent {
   @Input() showFees = false;
   @Input() titleColor?: ColorScheme;
   @Input() valueColor?: ColorScheme;
-  @Input() isLayoutHorizontal = false;
-  @Input() classes = 'grid gap-4 sm:grid-cols-2';
-
-  get valueClasses(): string {
-    const position = this.isLayoutHorizontal ? 'flex-row justify-between' : 'flex-col';
-    return `flex gap-y-2 ${position}`;
-  }
 }

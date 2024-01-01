@@ -47,6 +47,7 @@ module.exports = {
     },
   },
   plugins: [
+    require('@tailwindcss/container-queries'),
     require('postcss-import'),
     require('tailwindcss/nesting')(require('postcss-nesting')),
     require('autoprefixer'),
