@@ -11,6 +11,10 @@ import { PageMenuComponent } from '@market-monitor/modules/page-builder';
       :host {
         display: block;
       }
+
+      app-page-menu {
+        overflow-x: clip;
+      }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

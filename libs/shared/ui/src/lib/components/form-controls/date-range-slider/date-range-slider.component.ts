@@ -72,7 +72,6 @@ export class DateRangeSliderComponent implements ControlValueAccessor {
     if (!value) {
       return;
     }
-    console.log('seeting', value);
     this.dateRangeSignal.set(value);
   }
 
