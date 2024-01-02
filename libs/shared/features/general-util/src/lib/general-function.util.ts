@@ -6,7 +6,16 @@ export const isNumber = (value: string | number | unknown): boolean => {
   return value != null && value !== '' && typeof value === 'number' && !isNaN(Number(value.toString()));
 };
 
-export const calculateGrowth = (starting: number, ending: number) => ((starting - ending) / Math.abs(ending)) * 100;
+/**
+ *
+ * @returns calculated growth in percentage between starting and ending values
+ */
+export const calculateGrowth = (starting: number, ending: number) => {
+  if (ending === 0) {
+    return 0;
+  }
+  return roundNDigits(((starting - ending) / Math.abs(ending)) * 100);
+};
 
 export const roundNDigits = (value?: number | null, n: number = 2, isPercent = false): number => {
   if (value === undefined || value === null || isNaN(value)) {

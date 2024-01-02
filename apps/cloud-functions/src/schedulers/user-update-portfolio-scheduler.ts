@@ -56,11 +56,12 @@ export const userUpdatePortfolioScheduler = async (): Promise<void> => {
 
       // get portfolio state
       const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
-        user.portfolioState.startingCash,
+        user.portfolioState,
         transactions.transactions,
         holdingsBase,
         summaries,
       );
+
       // remove holdings
       const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
 

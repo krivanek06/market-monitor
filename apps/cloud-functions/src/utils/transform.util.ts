@@ -26,6 +26,9 @@ export const transformUserToGroupMember = (
   };
 };
 
+/**
+ * transform PortfolioStateHoldings to PortfolioState
+ */
 export const transformPortfolioStateHoldingToPortfolioState = (holding: PortfolioStateHoldings): PortfolioState => {
   return {
     balance: holding.balance,
@@ -41,5 +44,7 @@ export const transformPortfolioStateHoldingToPortfolioState = (holding: Portfoli
     lastTransactionDate: holding.lastTransactionDate,
     date: holding.date,
     startingCash: holding.startingCash,
+    previousBalanceChange: holding.previousBalanceChange,
+    previousBalanceChangePercentage: holding.previousBalanceChangePercentage,
   };
 };

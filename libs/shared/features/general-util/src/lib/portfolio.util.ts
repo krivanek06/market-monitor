@@ -5,12 +5,14 @@ import {
   PortfolioStateHoldings,
   PortfolioTransaction,
   SymbolSummary,
+  USER_DEFAULT_STARTING_CASH,
 } from '@market-monitor/api-types';
+import { isSameDay, subDays } from 'date-fns';
 import { getCurrentDateDefaultFormat } from './date-service.util';
 import { calculateGrowth, roundNDigits } from './general-function.util';
 
 export const getPortfolioStateHoldingsUtil = (
-  startingCash: number,
+  previousPortfolioState: PortfolioState,
   transactions: PortfolioTransaction[],
   partialHoldings: PortfolioStateHoldingBase[],
   symbolSummaries: SymbolSummary[],
@@ -49,7 +51,9 @@ export const getPortfolioStateHoldingsUtil = (
     (acc, curr) => acc + curr.symbolSummary.quote.price * curr.units,
     0,
   );
+
   // current cash on hand
+  const startingCash = previousPortfolioState.startingCash;
   const cashOnHandTransactions = startingCash !== 0 ? startingCash - invested - transactionFees : 0;
 
   const balance = holdingsBalance + cashOnHandTransactions - transactionFees;
@@ -58,20 +62,31 @@ export const getPortfolioStateHoldingsUtil = (
   const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
   const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
 
+  // check if previous portfolio was done yesterday
+  const isPreviousPortfolioDoneYesterday = isSameDay(new Date(previousPortfolioState.date), subDays(new Date(), 1));
+
   const result: PortfolioState = {
     numberOfExecutedBuyTransactions,
     numberOfExecutedSellTransactions,
-    transactionFees: roundNDigits(transactionFees, 2),
-    cashOnHand: roundNDigits(cashOnHandTransactions, 2),
-    balance: roundNDigits(balance, 2),
-    invested: roundNDigits(invested, 2),
-    holdingsBalance: roundNDigits(holdingsBalance, 2),
-    totalGainsValue: roundNDigits(totalGainsValue, 2),
+    transactionFees: roundNDigits(transactionFees),
+    cashOnHand: roundNDigits(cashOnHandTransactions),
+    balance: roundNDigits(balance),
+    invested: roundNDigits(invested),
+    holdingsBalance: roundNDigits(holdingsBalance),
+    totalGainsValue: roundNDigits(totalGainsValue),
     totalGainsPercentage: roundNDigits(totalGainsPercentage, 4),
-    startingCash: roundNDigits(startingCash, 2),
+    startingCash: roundNDigits(startingCash),
     firstTransactionDate,
     lastTransactionDate,
     date: getCurrentDateDefaultFormat(),
+    // calculate data for previous portfolio
+    previousBalanceChange:
+      isPreviousPortfolioDoneYesterday && previousPortfolioState.balance !== 0
+        ? roundNDigits(balance - previousPortfolioState.balance)
+        : 0,
+    previousBalanceChangePercentage: isPreviousPortfolioDoneYesterday
+      ? calculateGrowth(balance, previousPortfolioState.balance)
+      : 0,
   };
 
   return {
@@ -116,3 +131,22 @@ export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransact
     }, [] as PortfolioStateHoldingBase[])
     .filter((d) => d.units > 0);
 };
+
+export const createEmptyPortfolioState = (startingCash = USER_DEFAULT_STARTING_CASH) =>
+  ({
+    balance: 0,
+    cashOnHand: 0,
+    holdingsBalance: 0,
+    invested: 0,
+    numberOfExecutedBuyTransactions: 0,
+    numberOfExecutedSellTransactions: 0,
+    startingCash: startingCash,
+    transactionFees: 0,
+    date: getCurrentDateDefaultFormat(),
+    totalGainsPercentage: 0,
+    totalGainsValue: 0,
+    firstTransactionDate: null,
+    lastTransactionDate: null,
+    previousBalanceChange: 0,
+    previousBalanceChangePercentage: 0,
+  }) satisfies PortfolioState;

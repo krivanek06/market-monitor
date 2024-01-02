@@ -5,6 +5,7 @@ import {
   HistoricalPriceSymbol,
   PortfolioGrowthAssets,
   PortfolioGrowthAssetsDataItem,
+  PortfolioState,
   PortfolioStateHoldings,
   PortfolioTransaction,
 } from '@market-monitor/api-types';
@@ -24,7 +25,7 @@ export class PortfolioGrowthService {
 
   getPortfolioStateHoldings(
     transactions: PortfolioTransaction[],
-    startingCash: number = 0,
+    previousPortfolioState: PortfolioState,
   ): Observable<PortfolioStateHoldings> {
     console.log(`PortfolioGrowthService: getPortfolioState`);
 
@@ -35,7 +36,11 @@ export class PortfolioGrowthService {
     // get symbol summaries from API
     return this.marketApiService
       .getSymbolSummaries(partialHoldingSymbols)
-      .pipe(map((summaries) => getPortfolioStateHoldingsUtil(startingCash, transactions, partialHoldings, summaries)));
+      .pipe(
+        map((summaries) =>
+          getPortfolioStateHoldingsUtil(previousPortfolioState, transactions, partialHoldings, summaries),
+        ),
+      );
   }
 
   async getPortfolioGrowthAssets(transactions: PortfolioTransaction[]): Promise<PortfolioGrowthAssets[]> {

@@ -1,5 +1,6 @@
-import { GroupData, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from '@market-monitor/api-types';
+import { GroupData, PortfolioStateHoldingBase, PortfolioTransaction } from '@market-monitor/api-types';
 import {
+  createEmptyPortfolioState,
   getCurrentDateDefaultFormat,
   getObjectEntries,
   roundNDigits,
@@ -117,23 +118,11 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
           totalGainsValue: 0,
           firstTransactionDate: null,
           lastTransactionDate: null,
+          previousBalanceChange: 0,
+          previousBalanceChangePercentage: 0,
         },
       }),
-      {
-        balance: 0,
-        cashOnHand: 0,
-        holdingsBalance: 0,
-        invested: 0,
-        numberOfExecutedBuyTransactions: 0,
-        numberOfExecutedSellTransactions: 0,
-        startingCash: 0,
-        transactionFees: 0,
-        date: getCurrentDateDefaultFormat(),
-        totalGainsPercentage: 0,
-        totalGainsValue: 0,
-        firstTransactionDate: null,
-        lastTransactionDate: null,
-      } satisfies PortfolioState,
+      createEmptyPortfolioState(),
     );
 
   // calculate additional fields
@@ -142,6 +131,12 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   );
   memberPortfolioState.totalGainsPercentage = roundNDigits(
     memberPortfolioState.totalGainsValue / memberPortfolioState.holdingsBalance,
+  );
+  memberPortfolioState.previousBalanceChange = roundNDigits(
+    memberPortfolioState.balance - memberPortfolioState.balance,
+  );
+  memberPortfolioState.previousBalanceChangePercentage = roundNDigits(
+    memberPortfolioState.previousBalanceChange / memberPortfolioState.balance,
   );
 
   // create group members, calculate current group position

@@ -17,3 +17,8 @@ export const USER_HOLDINGS_SYMBOL_LIMIT = 40;
  * how many symbols a user can have in their watchList
  */
 export const USER_WATCHLIST_SYMBOL_LIMIT = 40;
+
+/**
+ * default cash amount for user when creating a new trading account
+ */
+export const USER_DEFAULT_STARTING_CASH = 25_000;

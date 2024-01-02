@@ -2,7 +2,7 @@ import { Injectable, computed } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { PortfolioTransaction } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { from, switchMap } from 'rxjs';
+import { from, of, switchMap } from 'rxjs';
 import { PortfolioTransactionCreate } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.service';
@@ -25,10 +25,12 @@ export class PortfolioUserFacadeService {
   getPortfolioState = toSignal(
     toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
       switchMap((transactions) =>
-        this.portfolioGrowthService.getPortfolioStateHoldings(
-          transactions,
-          this.authenticationUserService.state.userData()?.portfolioState.startingCash,
-        ),
+        this.authenticationUserService.state.userData()
+          ? this.portfolioGrowthService.getPortfolioStateHoldings(
+              transactions,
+              this.authenticationUserService.state.getUserData().portfolioState,
+            )
+          : of(undefined),
       ),
     ),
   );

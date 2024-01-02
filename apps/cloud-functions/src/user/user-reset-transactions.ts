@@ -1,11 +1,13 @@
-import { UserAccountTypes, UserFeatures, UserResetTransactionsInput } from '@market-monitor/api-types';
+import {
+  USER_DEFAULT_STARTING_CASH,
+  UserAccountTypes,
+  UserFeatures,
+  UserResetTransactionsInput,
+} from '@market-monitor/api-types';
+import { createEmptyPortfolioState } from '@market-monitor/shared/features/general-util';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { userDocumentRef } from '../models';
-import {
-  createUserPortfolioStateEmpty,
-  userDefaultStartingCash,
-  userDocumentTransactionHistoryRef,
-} from './../models/user';
+import { userDocumentTransactionHistoryRef } from './../models/user';
 
 /**
  * Reset all transactions for a user
@@ -27,11 +29,11 @@ export const userResetTransactionsCall = onCall(async (request) => {
     throw new HttpsError('not-found', 'User does not exist');
   }
 
-  const startingCash = data.accountTypeSelected === UserAccountTypes.Trading ? userDefaultStartingCash : 0;
+  const startingCash = data.accountTypeSelected === UserAccountTypes.Trading ? USER_DEFAULT_STARTING_CASH : 0;
   const newUserData = {
     ...userData,
     portfolioState: {
-      ...createUserPortfolioStateEmpty(startingCash),
+      ...createEmptyPortfolioState(startingCash),
     },
     features: {
       ...getUserFeaturesByAccountType(data.accountTypeSelected),
