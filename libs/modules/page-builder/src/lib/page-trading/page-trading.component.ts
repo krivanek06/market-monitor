@@ -53,7 +53,7 @@ import { switchMap, take } from 'rxjs';
           class="md:basis-3/5 md:pl-10"
           [titleColor]="ColorScheme.PRIMARY_VAR"
           [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          [showCashSegment]="!!userDataSignal().features.userPortfolioAllowCashAccount"
+          [showCashSegment]="!!userDataSignal().features.allowPortfolioCashAccount"
           [portfolioState]="portfolioState"
         ></app-portfolio-state>
 
@@ -123,8 +123,8 @@ import { switchMap, take } from 'rxjs';
         </h2>
         <app-portfolio-transactions-table
           (deleteEmitter)="onTransactionDelete($event)"
-          [showTransactionFees]="!!userDataSignal().features.userPortfolioAllowCashAccount"
-          [showActionButton]="!userDataSignal().features.userPortfolioAllowCashAccount"
+          [showTransactionFees]="!!userDataSignal().features.allowPortfolioCashAccount"
+          [showActionButton]="!userDataSignal().features.allowPortfolioCashAccount"
           [data]="portfolioTransactionSignal() | sortByKey: 'date' : 'desc'"
         ></app-portfolio-transactions-table>
       </div>

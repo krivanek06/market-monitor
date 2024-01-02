@@ -83,7 +83,7 @@ export type PortfolioTradeDialogComponentData = {
         <ng-container *ngIf="!isLoadingSignal(); else showLoader">
           <!-- date picker -->
           <app-date-picker
-            *ngIf="!userDataSignal().features.userPortfolioAllowCashAccount"
+            *ngIf="!userDataSignal().features.allowPortfolioCashAccount"
             [inputTypeDateTimePickerConfig]="datePickerConfig"
             [formControl]="form.controls.date"
           ></app-date-picker>
@@ -112,7 +112,7 @@ export type PortfolioTradeDialogComponentData = {
             </div>
 
             <mat-checkbox
-              *ngIf="!userDataSignal().features.userPortfolioAllowCashAccount"
+              *ngIf="!userDataSignal().features.allowPortfolioCashAccount"
               matTooltip="Add Custom Value"
               color="primary"
               [formControl]="form.controls.useCustomTotalValueControl"
@@ -131,7 +131,7 @@ export type PortfolioTradeDialogComponentData = {
               <span>Owned Units</span>
               <span>{{ holdingSignal()?.units ?? 0 }}</span>
             </div>
-            <div *ngIf="userDataSignal().features.userPortfolioAllowCashAccount" class="g-item-wrapper">
+            <div *ngIf="userDataSignal().features.allowPortfolioCashAccount" class="g-item-wrapper">
               <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">Cash on Hand</span>
               <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">
                 {{ portfolioState()?.cashOnHand | currency }}
@@ -392,7 +392,7 @@ export class PortfolioTradeDialogComponent {
    */
   private listenOnInSufficientCash(): void {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((form) => {
-      if (this.data.transactionType === 'SELL' || !this.userDataSignal().features.userPortfolioAllowCashAccount) {
+      if (this.data.transactionType === 'SELL' || !this.userDataSignal().features.allowPortfolioCashAccount) {
         return;
       }
 

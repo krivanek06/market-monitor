@@ -93,28 +93,33 @@ export type UserFeatures = {
   /**
    * if true, user can access group page and create groups limited by - GROUP_OWNER_LIMIT
    */
-  groupAllowAccess?: boolean;
+  allowAccessGroups?: boolean;
 
   /**
    * if true, user can create unlimited number of groups
    */
-  groupAllowCreateUnlimited?: boolean;
+  allowCreateUnlimitedGroups?: boolean;
 
   /**
    * if true, user will have a starting cash balance and system
    * will always check whether user has enough cash to buy
    */
-  userPortfolioAllowCashAccount?: boolean;
+  allowPortfolioCashAccount?: boolean;
 
   /**
    * if true, user can have unlimited number of symbols in portfolio, else it is limited - USER_HOLDINGS_SYMBOL_LIMIT
    */
-  userAllowUnlimitedSymbolsInHoldings?: boolean;
+  allowUnlimitedSymbolsInHoldings?: boolean;
 
   /**
    * if true, user can have unlimited number of symbols in watchList, else it is limited - USER_WATCHLIST_SYMBOL_LIMIT
    */
-  userAllowUnlimitedSymbolsInWatchList?: boolean;
+  allowUnlimitedSymbolsInWatchList?: boolean;
+
+  /**
+   * if true (by default true), user will participate in hall of fame
+   */
+  allowAccessHallOfFame?: boolean;
 };
 export type UserFeaturesType = keyof UserFeatures;
 

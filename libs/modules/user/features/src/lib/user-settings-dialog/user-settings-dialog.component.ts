@@ -182,7 +182,7 @@ export class UserSettingsDialogComponent implements OnInit {
   };
 
   accountTypeSignal = computed(() => {
-    const isCash = this.userDataSignal().features.userPortfolioAllowCashAccount;
+    const isCash = this.userDataSignal().features.allowPortfolioCashAccount;
     return isCash ? UserAccountTypes.Trading : UserAccountTypes.Basic;
   });
 

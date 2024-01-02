@@ -54,7 +54,7 @@ import {
           <app-portfolio-state
             [titleColor]="ColorScheme.PRIMARY_VAR"
             [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-            [showCashSegment]="!!authenticationUserService.state.userData()?.features?.userPortfolioAllowCashAccount"
+            [showCashSegment]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
             [portfolioState]="portfolioState"
           ></app-portfolio-state>
         </app-fancy-card>
@@ -70,7 +70,7 @@ import {
           <app-portfolio-state-transactions
             [titleColor]="ColorScheme.DANGER_VAR"
             [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
-            [showFees]="!!authenticationUserService.state.userData()?.features?.userPortfolioAllowCashAccount"
+            [showFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
             [portfolioState]="portfolioState"
           ></app-portfolio-state-transactions>
         </app-fancy-card>
@@ -128,7 +128,7 @@ import {
       </div>
 
       <!-- transactions chart -->
-      <ng-container *ngIf="!!authenticationUserService.state.userData()?.features?.userPortfolioAllowCashAccount">
+      <ng-container *ngIf="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount">
         <app-portfolio-transaction-chart
           [data]="portfolioUserFacadeService.getPortfolioTransactionToDate()"
         ></app-portfolio-transaction-chart>

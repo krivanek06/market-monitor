@@ -71,7 +71,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
         <!-- groups -->
         <a
-          *appFeatureAccess="'groupAllowAccess'"
+          *appFeatureAccess="'allowAccessGroups'"
           (click)="onNavClick(ROUTES_MAIN.GROUPS)"
           class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.GROUPS }"
