@@ -87,6 +87,7 @@ export const getPortfolioStateHoldingsUtil = (
     previousBalanceChangePercentage: isPreviousPortfolioDoneYesterday
       ? calculateGrowth(balance, previousPortfolioState.balance)
       : 0,
+    accountResetDate: previousPortfolioState.accountResetDate,
   };
 
   return {
@@ -149,4 +150,5 @@ export const createEmptyPortfolioState = (startingCash = USER_DEFAULT_STARTING_C
     lastTransactionDate: null,
     previousBalanceChange: 0,
     previousBalanceChangePercentage: 0,
+    accountResetDate: getCurrentDateDefaultFormat(),
   }) satisfies PortfolioState;

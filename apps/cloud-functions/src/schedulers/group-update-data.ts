@@ -25,7 +25,7 @@ import { transformUserToBase, transformUserToGroupMember } from '../utils';
  * - transactions
  * - owner
  */
-export const groupUpdateDataScheduler = async (): Promise<void> => {
+export const groupUpdateData = async (): Promise<void> => {
   const today = getCurrentDateDefaultFormat();
   // get all non closed groups
   const group = await groupsCollectionRef()
@@ -120,6 +120,7 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
           lastTransactionDate: null,
           previousBalanceChange: 0,
           previousBalanceChangePercentage: 0,
+          accountResetDate: getCurrentDateDefaultFormat(),
         },
       }),
       createEmptyPortfolioState(),

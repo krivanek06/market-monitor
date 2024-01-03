@@ -1,6 +1,7 @@
 import {
   USER_DEFAULT_STARTING_CASH,
   UserAccountTypes,
+  UserData,
   UserFeatures,
   UserResetTransactionsInput,
 } from '@market-monitor/api-types';
@@ -38,7 +39,7 @@ export const userResetTransactionsCall = onCall(async (request) => {
     features: {
       ...getUserFeaturesByAccountType(data.accountTypeSelected),
     },
-  };
+  } satisfies UserData;
 
   // reset user portfolio state
   await userDocumentRef(data.userId).update({

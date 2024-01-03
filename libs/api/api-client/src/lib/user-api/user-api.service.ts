@@ -45,8 +45,7 @@ export class UserApiService {
    * @returns list of users by the name prefix
    */
   getUsersByName(name: string): Observable<UserData[]> {
-    // TODO: where('personal.displayName', '==', name)
-    return rxCollectionData(query(this.userCollection(), where('settings.isProfilePublic', '==', true), limit(10)));
+    return rxCollectionData(query(this.userCollection(), where('personal.displayName', '==', name), limit(10)));
   }
 
   /* user */

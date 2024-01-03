@@ -8,6 +8,7 @@ export const transformUserToBase = (user: UserData): UserBase => {
     portfolioState: user.portfolioState,
     personal: user.personal,
     lastLoginDate: user.lastLoginDate,
+    isAccountActive: user.isAccountActive,
   };
 };
 
@@ -46,5 +47,6 @@ export const transformPortfolioStateHoldingToPortfolioState = (holding: Portfoli
     startingCash: holding.startingCash,
     previousBalanceChange: holding.previousBalanceChange,
     previousBalanceChangePercentage: holding.previousBalanceChangePercentage,
+    accountResetDate: holding.accountResetDate,
   };
 };

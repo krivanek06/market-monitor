@@ -6,7 +6,7 @@ export const USER_TEST_1_ID = 'USER_TEST_1';
 export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
   const defaultUser: UserData = {
     id: USER_TEST_1_ID,
-    accountResets: [],
+    systemRank: {},
     groups: {
       groupInvitations: [],
       groupMember: [],
@@ -20,7 +20,6 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       providerId: 'google.com',
     },
     settings: {
-      isProfilePublic: true,
       allowReceivingGroupInvitations: true,
     },
     portfolioState: {
@@ -31,6 +30,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       data: [],
     },
     lastLoginDate: getCurrentDateDefaultFormat(),
+    isAccountActive: true,
     accountCreatedDate: getCurrentDateDefaultFormat(),
     features: {},
   };

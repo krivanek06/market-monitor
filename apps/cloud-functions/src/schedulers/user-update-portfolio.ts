@@ -1,4 +1,5 @@
 import { getSymbolSummaries } from '@market-monitor/api-external';
+import { USER_LOGIN_ACCOUNT_ACTIVE_DAYS, UserData } from '@market-monitor/api-types';
 import {
   getCurrentDateDefaultFormat,
   getPortfolioStateHoldingBaseUtil,
@@ -17,16 +18,15 @@ import { transformPortfolioStateHoldingToPortfolioState } from '../utils';
  *
  * At every 5th minute past every hour from 1 through 2am
  */
-export const userUpdatePortfolioScheduler = async (): Promise<void> => {
+export const userUpdatePortfolio = async (): Promise<void> => {
   const today = getCurrentDateDefaultFormat();
-  const twoWeeksBefore = format(subDays(new Date(), 14), 'yyyy-MM-dd');
+
   console.log('today', today);
   // load users to calculate balance
   const userToUpdate = usersCollectionRef()
-    // .where('lastLoginDate', '>=', twoWeeksBefore) // not able to use this filter
+    .where('isAccountActive', '==', true)
     .where('portfolioState.date', '!=', today)
     .orderBy('portfolioState.date', 'desc')
-    .orderBy('lastLoginDate', 'desc')
     .limit(200);
 
   const users = await userToUpdate.get();
@@ -65,6 +65,9 @@ export const userUpdatePortfolioScheduler = async (): Promise<void> => {
       // remove holdings
       const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
 
+      // account active threshold
+      const accountActiveThreshold = format(subDays(new Date(), USER_LOGIN_ACCOUNT_ACTIVE_DAYS), 'yyyy-MM-dd');
+
       // update user
       userDoc.ref.update({
         portfolioState: portfolioState,
@@ -72,7 +75,8 @@ export const userUpdatePortfolioScheduler = async (): Promise<void> => {
           data: holdingsBase,
           lastModifiedDate: today,
         },
-      });
+        isAccountActive: user.lastLoginDate > accountActiveThreshold,
+      } satisfies Partial<UserData>);
 
       // log
       console.log(`Updated user: ${user.personal.displayName}, ${userDoc.id}`);

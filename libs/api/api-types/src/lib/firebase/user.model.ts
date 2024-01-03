@@ -15,6 +15,11 @@ export type UserBase = {
   accountCreatedDate: string;
 
   lastLoginDate: string;
+  /**
+   * at each login is set to true, set to false
+   * only if lastLoginDate is more than USER_LOGIN_ACCOUNT_ACTIVE_DAYS ago
+   */
+  isAccountActive: boolean;
 };
 
 export type UserData = UserBase & {
@@ -38,20 +43,38 @@ export type UserData = UserBase & {
     groupWatched: string[];
   };
   settings: UserSettings;
-  accountResets: UserAccountResets[];
   /**
    * data about current holdings, calculated from previous transactions
    */
   holdingSnapshot: DataDocsWrapper<PortfolioStateHoldingBase>;
-
+  /**
+   * features that user has access to
+   */
   features: UserFeatures;
+  systemRank: UserSystemRank;
 };
 
-/**
- * user can reset its account and all previous data
- * such as groups, transactions, watchlist, etc. will be removed
- */
-export type UserAccountResets = {
+export type UserSystemRank = {
+  /**
+   * value calculate from portfolioState.totalGainsPercentage based on
+   * all users in the system
+   */
+  portfolioTotalGainsPercentage?: UserSystemRankItem;
+};
+
+export type UserSystemRankItem = {
+  rank: number;
+  /**
+   * previous rank, on first calculation it is null
+   */
+  rankPrevious: number | null;
+  /**
+   * difference between rank and rankPrevious, on first calculation it is null
+   */
+  rankChange?: number | null;
+  /**
+   * date when rank was calculated
+   */
   date: string;
 };
 
@@ -75,14 +98,11 @@ export type UserPersonalInfo = {
 
 export type UserSettings = {
   /**
-   * if true, other users will be able to find this user portfolio by searching
-   */
-  isProfilePublic: boolean;
-
-  /**
    * if true, user will be able to receive group invitations
    */
   allowReceivingGroupInvitations: boolean;
+
+  // TODO: darkModeEnabled: boolean
 };
 
 export type UserFeatures = {

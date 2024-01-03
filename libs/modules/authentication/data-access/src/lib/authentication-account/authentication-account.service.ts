@@ -23,7 +23,7 @@ import {
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { UserAccountTypes, UserData, UserResetTransactionsInput } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/data-access';
-import { dateFormatDate } from '@market-monitor/shared/features/general-util';
+import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { BehaviorSubject, Observable, Subject, from, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
@@ -196,7 +196,8 @@ export class AuthenticationAccountService {
           console.log(`UPDATE LAST LOGIN for user ${user.displayName} : ${user.uid}`);
           // update last login date
           this.updateUser(user.uid, {
-            lastLoginDate: dateFormatDate(new Date()),
+            lastLoginDate: getCurrentDateDefaultFormat(),
+            isAccountActive: true,
           });
         }, 10_000);
       }

@@ -1,8 +1,10 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { reloadMarketOverview } from '../market-functions/market-overview';
 import { corsMiddleWareHttp, firebaseSimpleErrorLogger } from '../utils';
-import { groupUpdateDataScheduler } from './group-update-data-scheduler';
-import { userUpdatePortfolioScheduler } from './user-update-portfolio-scheduler';
+import { groupUpdateData } from './group-update-data';
+import { hallOfFameUser } from './hall-of-fame-user';
+import { userPortfolioRank } from './user-portfolio-rank';
+import { userUpdatePortfolio } from './user-update-portfolio';
 
 // TESTING
 export const test_me = firebaseSimpleErrorLogger(
@@ -10,29 +12,59 @@ export const test_me = firebaseSimpleErrorLogger(
   corsMiddleWareHttp(async (request, response) => {
     console.log('Run Test Function');
 
-    await userUpdatePortfolioScheduler();
+    await userUpdatePortfolio();
     console.log('update groups');
-    await groupUpdateDataScheduler();
+    await groupUpdateData();
+    console.log('update portfolio rank');
+    await userPortfolioRank();
+    console.log('calculate hall of fame users');
+    await hallOfFameUser();
+    console.log('finished');
   }),
 );
 
 export const run_user_portfolio_state_scheduler = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '*/5 1-2 * * *',
+    schedule: '*/15 1-2 * * *',
   },
   async () => {
-    userUpdatePortfolioScheduler();
+    userUpdatePortfolio();
+  },
+);
+
+/**
+ * recalculates user portfolio rank only once par day after userUpdatePortfolio() finished
+ * and also hall of fame users
+ * monitor performance
+ */
+export const run_user_rank_and_hall_of_fame_scheduler = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '15 3 * * *',
+  },
+  async () => {
+    const startTime = performance.now();
+
+    console.log('calculate portfolio rank');
+    await userPortfolioRank();
+
+    console.log('calculate hall of fame users');
+    await hallOfFameUser();
+
+    const endTime = performance.now();
+    const secondsDiff = (endTime - startTime) / 1000;
+    console.log(`Function took: ${secondsDiff} seconds`);
   },
 );
 
 export const run_group_update_data_scheduler = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '*/5 2-3 * * *',
+    schedule: '*/15 2-3 * * *',
   },
   async () => {
-    groupUpdateDataScheduler();
+    groupUpdateData();
   },
 );
 
