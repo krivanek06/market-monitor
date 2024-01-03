@@ -1,4 +1,12 @@
-import { GroupMember, PortfolioState, PortfolioStateHoldings, UserBase, UserData } from '@market-monitor/api-types';
+import {
+  GroupBase,
+  GroupData,
+  GroupMember,
+  PortfolioState,
+  PortfolioStateHoldings,
+  UserBase,
+  UserData,
+} from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat, roundNDigits } from '@market-monitor/shared/features/general-util';
 
 export const transformUserToBase = (user: UserData): UserBase => {
@@ -9,6 +17,21 @@ export const transformUserToBase = (user: UserData): UserBase => {
     personal: user.personal,
     lastLoginDate: user.lastLoginDate,
     isAccountActive: user.isAccountActive,
+  };
+};
+
+export const transformGroupToBase = (group: GroupData): GroupBase => {
+  return {
+    id: group.id,
+    name: group.name,
+    ownerUserId: group.ownerUserId,
+    isClosed: group.isClosed,
+    createdDate: group.createdDate,
+    endDate: group.endDate,
+    imageUrl: group.imageUrl,
+    isPublic: group.isPublic,
+    ownerUser: group.ownerUser,
+    portfolioState: group.portfolioState,
   };
 };
 

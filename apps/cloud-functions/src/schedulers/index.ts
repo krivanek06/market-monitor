@@ -1,8 +1,10 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { reloadMarketOverview } from '../market-functions/market-overview';
 import { corsMiddleWareHttp, firebaseSimpleErrorLogger } from '../utils';
+import { groupPortfolioRank } from './group-portfolio.rank';
 import { groupUpdateData } from './group-update-data';
-import { hallOfFameUser } from './hall-of-fame-user';
+import { hallOfFameGroups } from './hall-of-fame-groups';
+import { hallOfFameUsers } from './hall-of-fame-users';
 import { userPortfolioRank } from './user-portfolio-rank';
 import { userUpdatePortfolio } from './user-update-portfolio';
 
@@ -10,16 +12,22 @@ import { userUpdatePortfolio } from './user-update-portfolio';
 export const test_me = firebaseSimpleErrorLogger(
   'test_function',
   corsMiddleWareHttp(async (request, response) => {
-    console.log('Run Test Function');
+    console.log('--- start ---');
 
+    console.log('[Users]: update portfolio');
     await userUpdatePortfolio();
-    console.log('update groups');
+    console.log('[Groups]: update portfolio');
     await groupUpdateData();
-    console.log('update portfolio rank');
+    console.log('[Users]: update rank');
     await userPortfolioRank();
-    console.log('calculate hall of fame users');
-    await hallOfFameUser();
-    console.log('finished');
+    console.log('[Users]: update hall of fame');
+    await hallOfFameUsers();
+    console.log('[Groups]: update rank');
+    await groupPortfolioRank();
+    console.log('[Groups]: update hall of fame');
+    await hallOfFameGroups();
+
+    console.log('--- finished ---');
   }),
 );
 
@@ -50,7 +58,7 @@ export const run_user_rank_and_hall_of_fame_scheduler = onSchedule(
     await userPortfolioRank();
 
     console.log('calculate hall of fame users');
-    await hallOfFameUser();
+    await hallOfFameUsers();
 
     const endTime = performance.now();
     const secondsDiff = (endTime - startTime) / 1000;

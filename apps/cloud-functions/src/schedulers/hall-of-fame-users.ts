@@ -3,7 +3,7 @@ import { usersCollectionRef } from '../models';
 import { aggregationHallOfFameUsersRef } from '../models/aggregation';
 import { transformUserToBase } from '../utils';
 
-export const hallOfFameUser = async (): Promise<void> => {
+export const hallOfFameUsers = async (): Promise<void> => {
   const searchableRef = usersCollectionRef().where('features.allowAccessHallOfFame', '==', true);
 
   // get top users by total gains
@@ -16,7 +16,7 @@ export const hallOfFameUser = async (): Promise<void> => {
     .limit(10);
   // get worst daily profit users
   const userWorstDailyProfitRef = searchableRef
-    .orderBy('portfolioState.previousBalanceChangePercentage', 'desc')
+    .orderBy('portfolioState.previousBalanceChangePercentage', 'asc')
     .limit(10);
 
   // get documents

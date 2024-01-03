@@ -129,5 +129,6 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
     portfolioState: {
       ...createEmptyPortfolioState(),
     },
+    systemRank: {},
   };
 };

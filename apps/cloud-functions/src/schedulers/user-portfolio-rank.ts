@@ -1,4 +1,4 @@
-import { UserSystemRankItem } from '@market-monitor/api-types';
+import { RankingItem } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { usersCollectionRef } from '../models';
 
@@ -24,7 +24,7 @@ export const userPortfolioRank = async (): Promise<void> => {
     const previousRank = userData.systemRank.portfolioTotalGainsPercentage?.rank ?? null;
     const rankChange = previousRank ? previousRank - rank : null;
 
-    const rankItem: UserSystemRankItem = {
+    const rankItem: RankingItem = {
       rank,
       rankPrevious: previousRank,
       rankChange: rankChange,

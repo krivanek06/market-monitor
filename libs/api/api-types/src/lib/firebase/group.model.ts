@@ -6,6 +6,7 @@ import {
   PortfolioTransaction,
   PortfolioTransactionMore,
 } from './portfolio.model';
+import { RankingItem } from './ranking.model';
 import { UserBase, UserData } from './user.model';
 
 export type GroupCreateInput = {
@@ -59,7 +60,7 @@ export type GroupMember = UserBase & {
 
 export type UserGroupData = { [K in keyof UserData['groups']]: GroupData[] };
 
-export type GroupData = {
+export type GroupBase = {
   id: string;
   name: string;
   imageUrl: string | null;
@@ -85,7 +86,13 @@ export type GroupData = {
    */
   ownerUserId: string;
   ownerUser: UserBase;
+  /**
+   * portfolio state calculated from transactions at the end of the day
+   */
+  portfolioState: PortfolioState;
+};
 
+export type GroupData = GroupBase & {
   /**
    * user ids that are members
    */
@@ -105,9 +112,17 @@ export type GroupData = {
   modifiedSubCollectionDate: string;
 
   /**
-   * portfolio state calculated from transactions at the end of the day
+   * some ranking data for the group
    */
-  portfolioState: PortfolioState;
+  systemRank: SystemRankGroup;
+};
+
+export type SystemRankGroup = {
+  /**
+   * value calculate from portfolioState.totalGainsPercentage based on
+   * all users in the system
+   */
+  portfolioTotalGainsPercentage?: RankingItem;
 };
 
 export type GroupTransactionsData = DataDocsWrapper<PortfolioTransaction>;

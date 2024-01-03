@@ -1,6 +1,7 @@
 import { User } from 'firebase/auth';
 import { DataDocsWrapper } from './../constants/generic.model';
 import { PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
+import { RankingItem } from './ranking.model';
 import { SymbolType } from './symbol.model';
 
 export type UserBase = {
@@ -51,31 +52,15 @@ export type UserData = UserBase & {
    * features that user has access to
    */
   features: UserFeatures;
-  systemRank: UserSystemRank;
+  systemRank: SystemRankUser;
 };
 
-export type UserSystemRank = {
+export type SystemRankUser = {
   /**
    * value calculate from portfolioState.totalGainsPercentage based on
    * all users in the system
    */
-  portfolioTotalGainsPercentage?: UserSystemRankItem;
-};
-
-export type UserSystemRankItem = {
-  rank: number;
-  /**
-   * previous rank, on first calculation it is null
-   */
-  rankPrevious: number | null;
-  /**
-   * difference between rank and rankPrevious, on first calculation it is null
-   */
-  rankChange?: number | null;
-  /**
-   * date when rank was calculated
-   */
-  date: string;
+  portfolioTotalGainsPercentage?: RankingItem;
 };
 
 export type UserPortfolioTransaction = {

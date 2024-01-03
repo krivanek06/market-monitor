@@ -1,5 +1,6 @@
 import { GroupData, PortfolioStateHoldingBase, PortfolioTransaction } from '@market-monitor/api-types';
 import {
+  calculateGrowth,
   createEmptyPortfolioState,
   getCurrentDateDefaultFormat,
   getObjectEntries,
@@ -87,8 +88,8 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
           (acc2, curr2) => ({
             ...acc2,
             [curr2.symbol]: {
-              invested: roundNDigits((acc[curr2.symbol]?.invested || 0) + curr2.invested),
-              units: (acc[curr2.symbol]?.units || 0) + curr2.units,
+              invested: roundNDigits((acc[curr2.symbol]?.invested ?? 0) + curr2.invested),
+              units: (acc[curr2.symbol]?.units ?? 0) + curr2.units,
               symbol: curr2.symbol,
               symbolType: curr2.symbolType,
             },
@@ -114,13 +115,17 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
           startingCash: acc.startingCash + curr.startingCash,
           transactionFees: acc.transactionFees + curr.transactionFees,
           date: getCurrentDateDefaultFormat(),
-          totalGainsPercentage: 0,
-          totalGainsValue: 0,
+
+          // ignore these
           firstTransactionDate: null,
           lastTransactionDate: null,
+          accountResetDate: getCurrentDateDefaultFormat(),
+
+          // calculate later
           previousBalanceChange: 0,
           previousBalanceChangePercentage: 0,
-          accountResetDate: getCurrentDateDefaultFormat(),
+          totalGainsPercentage: 0,
+          totalGainsValue: 0,
         },
       }),
       createEmptyPortfolioState(),
@@ -134,10 +139,11 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     memberPortfolioState.totalGainsValue / memberPortfolioState.holdingsBalance,
   );
   memberPortfolioState.previousBalanceChange = roundNDigits(
-    memberPortfolioState.balance - memberPortfolioState.balance,
+    memberPortfolioState.balance - group.portfolioState.balance,
   );
-  memberPortfolioState.previousBalanceChangePercentage = roundNDigits(
-    memberPortfolioState.previousBalanceChange / memberPortfolioState.balance,
+  memberPortfolioState.previousBalanceChangePercentage = calculateGrowth(
+    memberPortfolioState.balance,
+    group.portfolioState.balance,
   );
 
   // create group members, calculate current group position
