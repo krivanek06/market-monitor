@@ -10,7 +10,49 @@ import { GeneralCardComponent } from '@market-monitor/shared/ui';
   selector: 'app-group-invitations-manager',
   standalone: true,
   imports: [CommonModule, GeneralCardComponent, UserDisplayItemComponent, MatRippleModule],
-  templateUrl: './group-invitations-manager.component.html',
+  template: `
+    <app-general-card *ngIf="memberRequestUsers.length > 0 || memberInvitedUsers.length > 0" title="Invitations">
+      <div class="w-full min-h-[150px] p-2 grid gap-8">
+        <!-- received invitations -->
+        <div *ngIf="memberRequestUsers.length > 0">
+          <div class="mb-4 text-lg">Received Invitations</div>
+          <div class="flex flex-wrap gap-4">
+            <div
+              *ngFor="let user of memberRequestUsers"
+              (click)="onReceivedInvitationClick(user)"
+              matRipple
+              [matRippleCentered]="true"
+              [matRippleDisabled]="false"
+              [matRippleUnbounded]="false"
+              appearance="outlined"
+              class="p-2 border rounded-lg cursor-pointer border-wt-gray-light-strong g-clickable-hover"
+            >
+              <app-user-display-item [userData]="user"></app-user-display-item>
+            </div>
+          </div>
+        </div>
+
+        <!-- sent invitations -->
+        <div *ngIf="memberInvitedUsers.length > 0">
+          <div class="mb-4 text-lg">Sent Invitations</div>
+          <div class="flex flex-wrap gap-4">
+            <div
+              *ngFor="let user of memberInvitedUsers"
+              (click)="onSentInvitationClick(user)"
+              matRipple
+              [matRippleCentered]="true"
+              [matRippleDisabled]="false"
+              [matRippleUnbounded]="false"
+              appearance="outlined"
+              class="p-2 border rounded-lg cursor-pointer border-wt-gray-light-strong g-clickable-hover"
+            >
+              <app-user-display-item [userData]="user"></app-user-display-item>
+            </div>
+          </div>
+        </div>
+      </div>
+    </app-general-card>
+  `,
   styles: [
     `
       :host {

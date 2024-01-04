@@ -4,10 +4,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import { GroupApiService } from '@market-monitor/api-client';
 import { GROUP_MEMBER_LIMIT, GroupDetails, UserData } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { UserSearchDialogComponent, UserSearchDialogData } from '@market-monitor/modules/user/features';
+import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, catchError, filter, from, of, switchMap, take, tap } from 'rxjs';
@@ -30,7 +32,153 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
     GroupUserHasRoleDirective,
     GroupSettingsDialogComponent,
   ],
-  templateUrl: './group-interaction-buttons.component.html',
+  template: `
+    <ng-container *ngIf="!groupDetails.groupData.isClosed; else closedGroupActionButtons">
+      <!-- owner -->
+      <button
+        *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
+        (click)="onGroupCloseClick()"
+        type="button"
+        mat-stroked-button
+        color="warn"
+        [matTooltip]="tooltipClose"
+      >
+        <mat-icon>close</mat-icon>
+        Close Group
+      </button>
+
+      <button
+        *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']; exclude: ['groupMember']"
+        (click)="onAddOwnerToGroupClick()"
+        type="button"
+        mat-stroked-button
+        color="accent"
+        [matTooltip]="tooltipAddMyselfOwner"
+      >
+        <mat-icon>person</mat-icon>
+        Add Myself To Group
+      </button>
+
+      <!-- member -->
+      <button
+        *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupMember']"
+        (click)="onLeaveGroupClick()"
+        type="button"
+        mat-stroked-button
+        color="warn"
+        [matTooltip]="tooltipLeave"
+      >
+        <mat-icon>logout</mat-icon>
+        Leave Group
+      </button>
+
+      <!-- invited person -->
+      <button
+        *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupInvitations']"
+        (click)="onDeclineInvitationClick()"
+        type="button"
+        mat-stroked-button
+        color="warn"
+        [matTooltip]="tooltipInvitedCancel"
+      >
+        <mat-icon>logout</mat-icon>
+        Decline Invitation
+      </button>
+
+      <button
+        *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupInvitations']"
+        (click)="onAcceptInvitationClick()"
+        type="button"
+        mat-stroked-button
+        color="accent"
+        [matTooltip]="tooltipInvitedAccept"
+      >
+        <mat-icon>done</mat-icon>
+        Accept Invitation
+      </button>
+
+      <!-- request invitation person -->
+      <button
+        *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupRequested']"
+        (click)="onCancelRequestClick()"
+        type="button"
+        mat-stroked-button
+        color="warn"
+        [matTooltip]="tooltipDeclineRequest"
+      >
+        <mat-icon>logout</mat-icon>
+        Decline Request
+      </button>
+
+      <button
+        *appGroupUserHasRole="
+          groupDetails.groupData.id;
+          exclude: ['groupRequested', 'groupMember', 'groupInvitations', 'groupOwner']
+        "
+        (click)="onRequestToJoinClick()"
+        type="button"
+        mat-stroked-button
+        color="accent"
+        [matTooltip]="tooltipRequestToJoin"
+      >
+        <mat-icon>person</mat-icon>
+        Send Request To Join
+      </button>
+
+      <!-- owner - invite people -->
+      <button
+        *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
+        (click)="onInviteMembersClick()"
+        type="button"
+        mat-stroked-button
+        color="primary"
+        [matTooltip]="tooltipInviteMembers"
+      >
+        <mat-icon>add</mat-icon>
+        Invite Members
+      </button>
+
+      <!-- owner - settings -->
+      <button
+        *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
+        (click)="onGroupSettingsClick()"
+        type="button"
+        mat-stroked-button
+      >
+        <mat-icon>settings</mat-icon>
+        Group Settings
+      </button>
+    </ng-container>
+
+    <!-- closed group -->
+    <ng-template #closedGroupActionButtons>
+      <!-- owner -->
+      <button
+        *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
+        (click)="onGroupDeleteClick()"
+        type="button"
+        mat-flat-button
+        color="warn"
+        [matTooltip]="tooltipDelete"
+      >
+        <mat-icon>delete</mat-icon>
+        Delete Group
+      </button>
+
+      <!-- owner -->
+      <button
+        *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
+        (click)="onGroupReopenClick()"
+        type="button"
+        mat-stroked-button
+        color="accent"
+        [matTooltip]="tooltipClose"
+      >
+        <mat-icon>cached</mat-icon>
+        Reopen Group
+      </button>
+    </ng-template>
+  `,
   styles: [
     `
       :host {
@@ -47,10 +195,15 @@ export class GroupInteractionButtonsComponent {
   authenticationUserService = inject(AuthenticationUserStoreService);
   groupApiService = inject(GroupApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
-  dialog = inject(MatDialog);
+  private dialog = inject(MatDialog);
+  private router = inject(Router);
 
   get tooltipClose(): string {
     return `By closing a group, you will save its current state as a historical data and will not be able to make any changes to it.`;
+  }
+
+  get tooltipDelete(): string {
+    return `By deleting a group, you will remove it from the system and will not be able to recover it.`;
   }
 
   get tooltipAddMyselfOwner(): string {
@@ -257,6 +410,24 @@ export class GroupInteractionButtonsComponent {
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You sent a request to join the group', 'success');
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
+  }
+
+  @Confirmable('Are you sure you want to delete this group?')
+  async onGroupDeleteClick() {
+    try {
+      // show notification
+      this.dialogServiceUtil.showNotificationBar('Deleting Group', 'notification');
+
+      await this.groupApiService.deleteGroup(this.groupDetails.groupData.id);
+
+      // show notification
+      this.dialogServiceUtil.showNotificationBar('Group has been deleted', 'success');
+
+      // redirect user to the groups page
+      this.router.navigateByUrl(ROUTES_MAIN.GROUPS);
     } catch (error) {
       this.dialogServiceUtil.handleError(error);
     }
