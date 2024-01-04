@@ -90,6 +90,11 @@ export type GroupBase = {
    * portfolio state calculated from transactions at the end of the day
    */
   portfolioState: PortfolioState;
+
+  /**
+   * number of members (memberUserIds.length)
+   */
+  numberOfMembers: number;
 };
 
 export type GroupData = GroupBase & {

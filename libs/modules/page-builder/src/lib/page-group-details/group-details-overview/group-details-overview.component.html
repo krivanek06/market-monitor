@@ -1,7 +1,8 @@
 <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
-  <div class="flex flex-col justify-between mb-6 lg:flex-row">
+  <div class="flex flex-col justify-between mb-6 lg:flex-row gap-x-10">
     <!-- group info -->
     <app-group-display-info
+      class="flex-1"
       [clickableOwner]="true"
       [imageHeightPx]="150"
       [groupData]="groupDetailsSignal.groupData"
@@ -9,6 +10,7 @@
 
     <!-- portfolio info -->
     <app-portfolio-state
+      class="flex-1"
       [titleColor]="ColorScheme.PRIMARY_VAR"
       [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
       [showCashSegment]="true"
@@ -70,14 +72,14 @@
     />
     <div class="grid grid-cols-2 2xl:grid-cols-3 gap-x-6 gap-y-4">
       @for (user of groupDetailsSignal.groupMembersData; track user.id) {
-      <app-position-card
-        (clickedEmitter)="onMemberClick(user)"
-        [clickable]="true"
-        [currentPositions]="user.position.currentGroupMemberPosition"
-        [previousPosition]="user.position.previousGroupMemberPosition"
-      >
-        <app-user-display-item [userData]="user"></app-user-display-item>
-      </app-position-card>
+        <app-position-card
+          (clickedEmitter)="onMemberClick(user)"
+          [clickable]="true"
+          [currentPositions]="user.position.currentGroupMemberPosition"
+          [previousPosition]="user.position.previousGroupMemberPosition"
+        >
+          <app-user-display-item [userData]="user"></app-user-display-item>
+        </app-position-card>
       }
     </div>
   </div>

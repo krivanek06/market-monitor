@@ -50,6 +50,7 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
   await groupDocumentRef(data.groupId).update({
     memberUserIds: FieldValue.arrayUnion(userData.id),
     memberRequestUserIds: FieldValue.arrayRemove(userData.id),
+    numberOfMembers: FieldValue.increment(1), // increment number of members
   });
 
   // update group member data

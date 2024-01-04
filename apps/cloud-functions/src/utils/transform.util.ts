@@ -32,6 +32,7 @@ export const transformGroupToBase = (group: GroupData): GroupBase => {
     isPublic: group.isPublic,
     ownerUser: group.ownerUser,
     portfolioState: group.portfolioState,
+    numberOfMembers: group.numberOfMembers,
   };
 };
 

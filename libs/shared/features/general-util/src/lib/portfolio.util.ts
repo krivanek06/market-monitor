@@ -57,7 +57,7 @@ export const getPortfolioStateHoldingsUtil = (
   const cashOnHandTransactions = startingCash !== 0 ? startingCash - invested - transactionFees : 0;
 
   const balance = holdingsBalance + cashOnHandTransactions - transactionFees;
-  const totalGainsValue = holdingsBalance - invested - transactionFees;
+  const totalGainsValue = startingCash !== 0 ? balance - startingCash : holdingsBalance - invested;
   const totalGainsPercentage = holdingsBalance === 0 ? 0 : calculateGrowth(balance, invested);
   const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
   const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
