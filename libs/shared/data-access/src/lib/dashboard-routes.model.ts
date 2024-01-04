@@ -13,6 +13,7 @@ export enum ROUTES_MAIN {
   CRYPTO = 'crypto',
   NEWS = 'news',
   ECONOMICS = 'economics',
+  HALL_OF_FAME = 'hall-of-fame',
 }
 
 export enum ROUTES_MARKET {

@@ -54,6 +54,17 @@ export const appRoutes: Route[] = [
             loadComponent: () => import('./trading/trading.component').then((m) => m.TradingComponent),
           },
           {
+            path: ROUTES_MAIN.HALL_OF_FAME,
+            loadComponent: () => import('./hall-of-fame/hall-of-fame.component').then((m) => m.HallOfFameComponent),
+            canActivate: [
+              () => {
+                inject(AuthenticationUserStoreService).state.userData()?.features.allowAccessHallOfFame
+                  ? true
+                  : inject(Router).navigate([ROUTES_MAIN.DASHBOARD]);
+              },
+            ],
+          },
+          {
             path: ROUTES_MAIN.GROUPS,
             canActivate: [
               () => {
@@ -100,8 +111,14 @@ export const appRoutes: Route[] = [
                 pathMatch: 'full',
               },
               {
-                path: ROUTES_MAIN.TOP_PERFORMERS,
+                path: ROUTES_MAIN.STOCK_SCREENER,
                 title: 'Market Top Performers',
+                loadComponent: () =>
+                  import('./market/market-screener.component').then((m) => m.MarketCalendarComponent),
+              },
+              {
+                path: ROUTES_MAIN.TOP_PERFORMERS,
+                title: 'Stock Screener',
                 loadComponent: () =>
                   import('./market/market-top-performers.component').then((m) => m.MarketTopPerformersComponent),
               },

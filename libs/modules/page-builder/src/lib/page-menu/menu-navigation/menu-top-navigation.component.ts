@@ -82,8 +82,22 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
           </div>
         </a>
 
+        <!-- hall of fame -->
+        <a
+          *appFeatureAccess="'allowAccessHallOfFame'"
+          (click)="onNavClick(ROUTES_MAIN.HALL_OF_FAME)"
+          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.HALL_OF_FAME }"
+        >
+          <div class="gap-2 flex items-center">
+            <mat-icon>military_tech</mat-icon>
+            <span>Hall Of Fame</span>
+          </div>
+        </a>
+
         <!-- screener -->
         <a
+          *ngIf="userAccountTypeSignal() === 'Basic'"
           (click)="onNavClick(ROUTES_MAIN.STOCK_SCREENER)"
           class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.STOCK_SCREENER }"
@@ -190,6 +204,7 @@ export class MenuTopNavigationComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   userDataSignal = this.authenticationUserStoreService.state.userData;
+  userAccountTypeSignal = this.authenticationUserStoreService.state.getUserAccountType;
 
   ROUTES_MAIN = ROUTES_MAIN;
   activeLinkSignal = signal<ROUTES_MAIN>(ROUTES_MAIN.DASHBOARD);

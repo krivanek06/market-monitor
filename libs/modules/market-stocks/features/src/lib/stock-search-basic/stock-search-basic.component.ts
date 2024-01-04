@@ -61,7 +61,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
               [showValueChange]="showValueChange"
               [symbolQuote]="summary.quote"
               [displayValue]="displayValue"
-              [assetUrl]="summary.profile?.image"
             ></app-quote-item>
             <div *ngIf="!last" class="mt-2">
               <mat-divider></mat-divider>

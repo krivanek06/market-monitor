@@ -1,7 +1,3 @@
-export const getAssetUrl = (asset: string): string => {
-  return `https://get-asset-url.krivanek1234.workers.dev/${asset}`;
-};
-
 export const isNumber = (value: string | number | unknown): boolean => {
   return value != null && value !== '' && typeof value === 'number' && !isNaN(Number(value.toString()));
 };
