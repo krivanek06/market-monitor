@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { StockSummary } from '@market-monitor/api-types';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
+import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { DefaultImgDirective, PriceChangeItemsComponent } from '@market-monitor/shared/ui';
 import { EMPTY, catchError } from 'rxjs';
@@ -148,6 +149,6 @@ export class StockSummaryDialogComponent {
     this.dialogRef.close({ redirect: true });
 
     // routing kept here, because component is used in multiple places
-    this.route.navigate(['stock-details', this.data.symbol]);
+    this.route.navigateByUrl(`${ROUTES_MAIN.STOCK_DETAILS}/${this.data.symbol}`);
   }
 }

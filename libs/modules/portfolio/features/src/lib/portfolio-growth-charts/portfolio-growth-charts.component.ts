@@ -14,7 +14,7 @@ import {
   DateRangeSliderValues,
   FormMatInputWrapperComponent,
 } from '@market-monitor/shared/ui';
-import { isAfter, isBefore } from 'date-fns';
+import { addDays, isAfter, isBefore, subDays } from 'date-fns';
 import { Subject, combineLatest, map, startWith } from 'rxjs';
 
 @Component({
@@ -130,8 +130,8 @@ export class PortfolioGrowthChartsComponent {
     }
     return data.filter(
       (d) =>
-        isBefore(new Date(d.date), new Date(dateRange.dates[dateRange.currentMaxDateIndex])) &&
-        isAfter(new Date(d.date), new Date(dateRange.dates[dateRange.currentMinDateIndex])),
+        isBefore(subDays(new Date(d.date), 1), new Date(dateRange.dates[dateRange.currentMaxDateIndex])) &&
+        isAfter(addDays(new Date(d.date), 1), new Date(dateRange.dates[dateRange.currentMinDateIndex])),
     );
   }
 }
