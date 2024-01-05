@@ -1,3 +1,4 @@
+import { HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT, HALL_OF_FAME_PORTFOLIO_TOP_LIMIT } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { groupsCollectionRef } from '../models';
 import { aggregationHallOfFameGroupsRef } from '../models/aggregation';
@@ -7,17 +8,21 @@ export const hallOfFameGroups = async (): Promise<void> => {
   const searchableRef = groupsCollectionRef().where('isClosed', '==', false);
 
   // get top users by total gains
-  const groupBestProfitRef = searchableRef.orderBy('systemRank.portfolioTotalGainsPercentage.rank', 'asc').limit(25);
+  const groupBestProfitRef = searchableRef
+    .orderBy('systemRank.portfolioTotalGainsPercentage.rank', 'asc')
+    .limit(HALL_OF_FAME_PORTFOLIO_TOP_LIMIT);
   // get worst groups by total gains
-  const groupWorstProfitRef = searchableRef.orderBy('systemRank.portfolioTotalGainsPercentage.rank', 'desc').limit(25);
+  const groupWorstProfitRef = searchableRef
+    .orderBy('systemRank.portfolioTotalGainsPercentage.rank', 'desc')
+    .limit(HALL_OF_FAME_PORTFOLIO_TOP_LIMIT);
   // get top daily profit groups
   const groupBestDailyProfitRef = searchableRef
     .orderBy('portfolioState.previousBalanceChangePercentage', 'desc')
-    .limit(10);
+    .limit(HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT);
   // get worst daily profit groups
   const groupWorstDailyProfitRef = searchableRef
     .orderBy('portfolioState.previousBalanceChangePercentage', 'asc')
-    .limit(10);
+    .limit(HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT);
 
   // get documents
   const [groupBestProfitDoc, groupWorstProfitDoc, groupBestDailyProfitDoc, groupWorstDailyProfitDoc] =
