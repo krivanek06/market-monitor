@@ -10,10 +10,10 @@ import { HallOfFameUsersComponent } from './hall-of-fame-users/hall-of-fame-user
   standalone: true,
   imports: [CommonModule, TabSelectControlComponent, ReactiveFormsModule, HallOfFameUsersComponent],
   template: `
-    <div class="flex justify-end mb-4">
+    <div class="flex justify-end mb-6 lg:mb-10">
       <app-tab-select-control [formControl]="currentPageControl" [displayOptions]="navLabels"></app-tab-select-control>
     </div>
-    <div>
+    <div class="relative">
       @if (currentPageControl.value === 'users') {
         <app-hall-of-fame-users></app-hall-of-fame-users>
       } @else if (currentPageControl.value === 'groups') {

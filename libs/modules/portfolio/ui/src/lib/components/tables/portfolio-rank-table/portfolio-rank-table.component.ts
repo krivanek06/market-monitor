@@ -23,8 +23,13 @@ import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
       <!-- itemTemplate-->
       <ng-container matColumnDef="itemTemplate">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell"></th>
-        <td mat-cell *matCellDef="let row">
-          <ng-container [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{ data: row }" />
+        <td mat-cell *matCellDef="let row; let i = index">
+          <div class="flex items-center gap-3">
+            <!-- position -->
+            <span class="w-7 h-7 border border-solid text-center rounded-full">{{ i + 1 }}</span>
+            <!-- template from parent -->
+            <ng-container [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{ data: row }" />
+          </div>
         </td>
       </ng-container>
 
