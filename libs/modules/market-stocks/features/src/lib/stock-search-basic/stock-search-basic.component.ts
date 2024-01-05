@@ -71,8 +71,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
       <mat-hint *ngIf="showHint">Ex: 'AAPL, MSFT, UBER, NFLX'</mat-hint>
     </mat-form-field>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
@@ -86,7 +85,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
         margin: auto !important;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

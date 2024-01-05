@@ -85,13 +85,11 @@ import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manage
       </button>
     </mat-dialog-actions>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SummaryActionButtonsComponent implements OnInit {

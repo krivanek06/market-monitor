@@ -179,14 +179,12 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
       </button>
     </ng-template>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: flex;
         gap: 16px;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupInteractionButtonsComponent {

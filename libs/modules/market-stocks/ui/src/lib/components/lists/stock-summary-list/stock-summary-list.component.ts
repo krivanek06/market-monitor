@@ -23,13 +23,11 @@ import { RecommendationDirective } from '../../../directives';
     DefaultImgDirective,
   ],
   templateUrl: './stock-summary-list.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSummaryListComponent {

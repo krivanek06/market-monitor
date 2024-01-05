@@ -43,13 +43,11 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
   ],
   templateUrl: './page-market-overview.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
 })
 export class PageMarketOverviewComponent {
   marketApiService = inject(MarketApiService);

@@ -56,13 +56,11 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
   ],
   templateUrl: './page-market-calendar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
+  styles: `
       :host {
         @apply mt-10 block;
       }
     `,
-  ],
 })
 export class PageMarketCalendarComponent implements OnInit, RouterManagement {
   marketApiService = inject(MarketApiService);

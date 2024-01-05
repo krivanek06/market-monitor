@@ -8,13 +8,11 @@ import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
   standalone: true,
   imports: [CommonModule, PercentageIncreaseDirective],
   templateUrl: './portfolio-period-change.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioPeriodChangeComponent {

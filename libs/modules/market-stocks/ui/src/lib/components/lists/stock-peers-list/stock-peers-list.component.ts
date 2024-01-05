@@ -10,13 +10,11 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
   standalone: true,
   imports: [CommonModule, DefaultImgDirective, PercentageIncreaseDirective, MatButtonModule, MatDividerModule],
   templateUrl: './stock-peers-list.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockPeersListComponent {

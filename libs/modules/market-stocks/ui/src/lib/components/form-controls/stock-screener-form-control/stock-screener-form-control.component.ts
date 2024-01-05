@@ -33,13 +33,11 @@ import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
       multi: true,
     },
   ],
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
 })
 export class StockScreenerFormControlComponent implements OnInit, ControlValueAccessor {
   STOCK_SCREENER_COUNTRIES = STOCK_SCREENER_COUNTRIES;

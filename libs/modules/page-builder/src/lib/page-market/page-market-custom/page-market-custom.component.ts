@@ -38,13 +38,11 @@ import { map } from 'rxjs';
   ],
   templateUrl: './page-market-custom.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
 })
 export class PageMarketCustomComponent implements OnInit {
   marketApiService = inject(MarketApiService);

@@ -8,8 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-position-card',
   standalone: true,
   imports: [CommonModule, MatCardModule, MatRippleModule, MatIconModule],
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
@@ -67,7 +66,6 @@ import { MatIconModule } from '@angular/material/icon';
         }
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <mat-card

@@ -177,7 +177,7 @@ export class AuthenticationUserStoreService {
       getUser: () => state().user!,
       getUserData: () => state().userData!,
       getUserAccountType: () =>
-        state().userData!.features.allowPortfolioCashAccount ? UserAccountTypes.Trading : UserAccountTypes.Basic,
+        state().userData?.features?.allowPortfolioCashAccount ? UserAccountTypes.Trading : UserAccountTypes.Basic,
       getUserGroupData: () => state().userGroupData!,
       getUserPortfolioTransactions: () => state().portfolioTransactions,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),

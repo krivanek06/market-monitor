@@ -7,13 +7,11 @@ import { PageMarketCustomComponent } from '@market-monitor/modules/page-builder'
   standalone: true,
   imports: [CommonModule, PageMarketCustomComponent],
   template: `<app-page-market-custom></app-page-market-custom>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarketCustomComponent {}

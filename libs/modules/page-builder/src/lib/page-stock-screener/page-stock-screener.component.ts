@@ -38,13 +38,11 @@ import { catchError, switchMap, tap } from 'rxjs';
   ],
   templateUrl: './page-stock-screener.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
 })
 export class PageStockScreenerComponent implements OnInit, RouterManagement {
   private screenerDefault = 30;

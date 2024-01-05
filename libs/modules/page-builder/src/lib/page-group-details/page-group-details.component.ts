@@ -52,13 +52,11 @@ type GroupDetailsTab = 'overview' | 'holdings';
       </ng-container>
     </ng-container>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageGroupDetailsComponent extends PageGroupsBaseComponent {

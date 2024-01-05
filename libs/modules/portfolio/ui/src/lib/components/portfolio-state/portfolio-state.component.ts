@@ -61,13 +61,11 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
       </div>
     </div>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStateComponent {

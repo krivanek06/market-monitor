@@ -74,13 +74,11 @@ import { GenericChartComponent } from '@market-monitor/shared/ui';
       ></app-portfolio-growth-chart>
     </div>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

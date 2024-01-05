@@ -105,13 +105,11 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
         </div>
       </div>
     </ng-template> `,
-  styles: [
-    `
-      :host {
-        display: block;
-      }
-    `,
-  ],
+  styles: `
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewsSearchComponent {

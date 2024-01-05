@@ -137,13 +137,11 @@ import { take } from 'rxjs';
       </ng-template>
     </ng-container>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingComponent {

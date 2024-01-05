@@ -7,13 +7,11 @@ import { PageMarketCalendarComponent } from '@market-monitor/modules/page-builde
   standalone: true,
   imports: [CommonModule, PageMarketCalendarComponent],
   template: `<app-page-market-calendar></app-page-market-calendar>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarComponent {}

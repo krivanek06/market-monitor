@@ -101,13 +101,11 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
       </div>
     </ng-template>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {
   @Output() clickedSummary = new EventEmitter<SymbolSummary>();

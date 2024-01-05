@@ -22,13 +22,11 @@ import { LoaderMainService } from '@market-monitor/shared/features/general-featu
       </div>
     </main>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
 })
 export class AppComponent implements OnInit {
   loadingSignal = toSignal(inject(LoaderMainService).getLoading());

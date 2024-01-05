@@ -53,13 +53,11 @@ import { GeneralCardComponent } from '@market-monitor/shared/ui';
       </div>
     </app-general-card>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupInvitationsManagerComponent {

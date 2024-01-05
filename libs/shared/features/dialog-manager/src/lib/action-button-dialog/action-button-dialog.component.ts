@@ -54,13 +54,11 @@ export type ActionButtonDialog = {
       </div>
     </div>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActionButtonDialogComponent {

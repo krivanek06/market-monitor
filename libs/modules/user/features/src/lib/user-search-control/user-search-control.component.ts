@@ -31,13 +31,11 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
     UserDisplayItemComponent,
   ],
   templateUrl: './user-search-control.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

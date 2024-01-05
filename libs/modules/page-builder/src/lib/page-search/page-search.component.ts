@@ -27,13 +27,11 @@ import { forkJoin, take } from 'rxjs';
       <app-news-search [initialNewsToDisplay]="4" [searchData]="{ newsType: 'general' }"></app-news-search>
     </div>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageSearchComponent implements OnInit {

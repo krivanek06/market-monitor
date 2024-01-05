@@ -37,13 +37,11 @@ import { NotificationProgressService } from './notification-bar.service';
       </button>
     </div>
   `,
-  styles: [
-    `
+  styles: `
       mat-icon {
         min-width: 30px;
       }
     `,
-  ],
   //changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationProgressComponent implements OnInit {

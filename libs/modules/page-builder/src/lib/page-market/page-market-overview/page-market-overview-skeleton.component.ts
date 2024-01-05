@@ -6,13 +6,11 @@ import { RangeDirective } from '@market-monitor/shared/ui';
   selector: 'app-page-market-overview-skeleton',
   standalone: true,
   imports: [CommonModule, RangeDirective],
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex gap-3 p-2 mb-6 xl:justify-around md:grid-cols-2 max-md:overflow-x-scroll md:grid xl:flex">

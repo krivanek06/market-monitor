@@ -8,13 +8,11 @@ import { PageStockDetailsOverviewComponent } from '@market-monitor/modules/page-
   standalone: true,
   imports: [CommonModule, PageStockDetailsOverviewComponent],
   template: `<app-page-details-overview></app-page-details-overview> `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockDetailsOverviewComponent implements OnInit {

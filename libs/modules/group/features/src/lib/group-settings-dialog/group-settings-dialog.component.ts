@@ -130,13 +130,11 @@ export type GroupSettingsDialogComponentData = {
       </mat-dialog-actions>
     </form>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupSettingsDialogComponent {

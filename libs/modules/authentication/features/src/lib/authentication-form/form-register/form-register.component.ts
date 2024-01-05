@@ -43,13 +43,11 @@ import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
       <button mat-stroked-button class="w-full" color="primary" type="submit">Register</button>
     </form>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

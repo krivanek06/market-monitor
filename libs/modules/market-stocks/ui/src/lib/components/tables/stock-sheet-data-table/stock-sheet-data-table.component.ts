@@ -8,13 +8,11 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-m
   standalone: true,
   imports: [CommonModule, LargeNumberFormatterPipe, PercentageIncreaseDirective],
   templateUrl: './stock-sheet-data-table.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSheetDataTableComponent {

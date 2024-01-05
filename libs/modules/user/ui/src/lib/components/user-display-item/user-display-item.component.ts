@@ -11,13 +11,11 @@ import { isBefore, subDays } from 'date-fns';
   standalone: true,
   imports: [CommonModule, DefaultImgDirective, LargeNumberFormatterPipe, MatIconModule],
   templateUrl: './user-display-item.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserDisplayItemComponent {

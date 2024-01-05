@@ -82,13 +82,11 @@ import { Subject, combineLatest, map, startWith } from 'rxjs';
       <app-portfolio-asset-chart [data]="portfolioAssetsGrowth" [heightPx]="heightPx"></app-portfolio-asset-chart>
     </ng-container>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioGrowthChartsComponent {

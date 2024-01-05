@@ -135,13 +135,11 @@ import {
       </ng-container>
     </ng-container>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageDashboardComponent {

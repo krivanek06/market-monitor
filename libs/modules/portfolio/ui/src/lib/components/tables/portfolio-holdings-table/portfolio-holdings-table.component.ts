@@ -39,13 +39,11 @@ import {
     MatPaginatorModule,
   ],
   templateUrl: './portfolio-holdings-table.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioHoldingsTableComponent implements OnChanges {

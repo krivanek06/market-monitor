@@ -76,13 +76,11 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
       </div>
     </div>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDisplayItemComponent {

@@ -19,13 +19,11 @@ import { PortfolioBalancePieChartComponent } from '@market-monitor/modules/portf
     PortfolioBalancePieChartComponent,
   ],
   templateUrl: './group-display-card.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDisplayCardComponent {

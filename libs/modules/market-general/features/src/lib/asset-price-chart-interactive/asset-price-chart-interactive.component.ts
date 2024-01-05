@@ -103,13 +103,11 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
       </div>
     </ng-template>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {

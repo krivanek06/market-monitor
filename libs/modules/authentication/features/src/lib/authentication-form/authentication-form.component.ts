@@ -36,13 +36,11 @@ import { FormRegisterComponent } from './form-register/form-register.component';
     MatProgressSpinnerModule,
   ],
   templateUrl: './authentication-form.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthenticationFormComponent {

@@ -7,13 +7,11 @@ import { PageLoginComponent } from '@market-monitor/modules/page-builder';
   standalone: true,
   imports: [CommonModule, PageLoginComponent],
   template: `<app-page-login></app-page-login>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {

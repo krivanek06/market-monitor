@@ -18,13 +18,11 @@ import { MarketOverviewComponent } from './market-subpages/market-overview.compo
 
     <router-outlet></router-outlet>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarketComponent implements OnInit {

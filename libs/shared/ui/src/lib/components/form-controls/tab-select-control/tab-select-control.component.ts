@@ -17,8 +17,7 @@ import { map, switchMap, tap } from 'rxjs';
   selector: 'app-tab-select-control',
   standalone: true,
   imports: [CommonModule, MatTabsModule, MatSelectModule],
-  styles: [
-    `
+  styles: `
       ::ng-deep .mat-mdc-tab-group.mat-mdc-tab-group-stretch-tabs > .mat-mdc-tab-header .mat-mdc-tab {
         padding-left: 60px !important;
         padding-right: 60px !important;
@@ -28,7 +27,6 @@ import { map, switchMap, tap } from 'rxjs';
         margin-bottom: 8px !important;
       }
     `,
-  ],
   template: `
     <!-- tabs -->
     <div class="md:flex md:justify-end">

@@ -27,8 +27,7 @@ import { ColorScheme } from '@market-monitor/shared/data-access';
       <div class="c-fancy-circle c-lower-circle"></div>
     </div>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
@@ -64,7 +63,6 @@ import { ColorScheme } from '@market-monitor/shared/data-access';
         bottom: -35px;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FancyCardComponent {

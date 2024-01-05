@@ -22,13 +22,11 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     ReactiveFormsModule,
   ],
   templateUrl: './page-stock-details-financials.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageStockDetailsFinancialsComponent extends PageStockDetailsBase {

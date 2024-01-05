@@ -12,13 +12,11 @@ import { MatIconModule } from '@angular/material/icon';
       {{ title }}
     </h2>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SectionTitleComponent {

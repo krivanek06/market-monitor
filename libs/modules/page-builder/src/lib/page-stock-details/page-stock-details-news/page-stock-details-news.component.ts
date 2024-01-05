@@ -8,13 +8,11 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   standalone: true,
   imports: [CommonModule, NewsSearchComponent],
   templateUrl: './page-stock-details-news.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageStockDetailsNewsComponent extends PageStockDetailsBase {

@@ -45,13 +45,11 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     UserDetailsDialogComponent,
   ],
   templateUrl: './group-details-overview.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent implements OnInit {

@@ -8,13 +8,11 @@ import { PageMarketTopPerformersComponent } from '@market-monitor/modules/page-b
   standalone: true,
   imports: [CommonModule, PageMarketTopPerformersComponent],
   template: `<app-page-market-top-performers></app-page-market-top-performers>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopPerformersComponent implements OnInit {

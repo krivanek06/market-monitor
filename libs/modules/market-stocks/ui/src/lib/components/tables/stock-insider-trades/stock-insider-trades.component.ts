@@ -22,13 +22,11 @@ import { BubblePaginationDirective, LargeNumberFormatterPipe } from '@market-mon
     MatIconModule,
   ],
   templateUrl: './stock-insider-trades.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockInsiderTradesComponent implements AfterViewInit {

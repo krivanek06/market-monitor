@@ -7,13 +7,11 @@ import { PageStockDetailsRatiosComponent } from '@market-monitor/modules/page-bu
   standalone: true,
   imports: [CommonModule, PageStockDetailsRatiosComponent],
   template: ` <app-page-stock-details-ratios></app-page-stock-details-ratios>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockDetailsRatiosComponent implements OnInit {

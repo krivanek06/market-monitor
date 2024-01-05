@@ -27,13 +27,11 @@ import {
     RenderClientDirective,
   ],
   templateUrl: './stock-ownership-holders-table.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockOwnershipHoldersTableComponent implements AfterViewInit {

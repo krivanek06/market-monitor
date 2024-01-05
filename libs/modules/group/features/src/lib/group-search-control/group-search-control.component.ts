@@ -67,8 +67,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
       </mat-autocomplete>
     </mat-form-field>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
@@ -78,7 +77,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
         min-height: 48px !important;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

@@ -32,13 +32,11 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
     StylePaginatorDirective,
   ],
   templateUrl: './portfolio-transactions-table.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioTransactionsTableComponent implements OnChanges {

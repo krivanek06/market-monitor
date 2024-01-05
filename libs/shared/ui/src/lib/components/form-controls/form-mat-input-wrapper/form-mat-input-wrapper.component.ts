@@ -66,8 +66,7 @@ import { DefaultImgDirective } from '../../../directives';
       multi: true,
     },
   ],
-  styles: [
-    `
+  styles: `
       mat-form-field.mat-mdc-form-field {
         width: 100%;
       }
@@ -80,7 +79,6 @@ import { DefaultImgDirective } from '../../../directives';
         display: none !important;
       }
     `,
-  ],
 })
 export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, ControlValueAccessor {
   @Input({ required: true }) inputCaption!: string;

@@ -7,13 +7,11 @@ import { PageStockDetailsFinancialsComponent } from '@market-monitor/modules/pag
   standalone: true,
   imports: [CommonModule, PageStockDetailsFinancialsComponent],
   template: `<app-page-stock-details-financials></app-page-stock-details-financials>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockDetailsFinancialsComponent implements OnInit {

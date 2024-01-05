@@ -10,13 +10,11 @@ import { SheetDataPeriod, SheetDataTimePeriodForm } from '@market-monitor/module
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatRadioModule],
   templateUrl: './stock-sheet-data-time-period.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

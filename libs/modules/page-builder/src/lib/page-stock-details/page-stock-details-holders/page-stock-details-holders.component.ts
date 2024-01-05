@@ -30,13 +30,11 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     RangeDirective,
   ],
   templateUrl: './page-stock-details-holders.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { ngSkipHydration: 'true' },
 })

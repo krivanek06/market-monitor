@@ -49,13 +49,11 @@ import { map, startWith } from 'rxjs';
     HideAfterDirective,
   ],
   templateUrl: './group-create-dialog.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupCreateDialogComponent implements OnInit {

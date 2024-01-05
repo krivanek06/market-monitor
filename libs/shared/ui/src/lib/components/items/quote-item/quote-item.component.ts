@@ -8,13 +8,11 @@ import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
   selector: 'app-quote-item',
   standalone: true,
   imports: [CommonModule, PercentageIncreaseDirective, LargeNumberFormatterPipe, TruncatePipe, DefaultImgDirective],
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- first line -->

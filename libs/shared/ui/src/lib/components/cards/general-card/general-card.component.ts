@@ -8,8 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [CommonModule, MatCardModule, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
+  styles: `
       mat-card-content {
         height: inherit;
       }
@@ -24,7 +23,6 @@ import { MatIconModule } from '@angular/material/icon';
         display: none !important;
       }
     `,
-  ],
   template: `
     <mat-card
       appearance="outlined"

@@ -39,13 +39,11 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
     RangeDirective,
   ],
   templateUrl: './page-groups.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageGroupsComponent {

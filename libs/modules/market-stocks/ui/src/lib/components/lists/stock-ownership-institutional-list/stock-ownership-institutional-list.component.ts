@@ -8,8 +8,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-m
   standalone: true,
   imports: [CommonModule, PercentageIncreaseDirective, LargeNumberFormatterPipe],
   templateUrl: './stock-ownership-institutional-list.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
@@ -20,7 +19,6 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-m
         height: 28px;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockOwnershipInstitutionalListComponent {

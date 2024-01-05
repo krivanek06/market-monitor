@@ -8,13 +8,11 @@ import { PageStockDetailsNewsComponent } from '@market-monitor/modules/page-buil
   standalone: true,
   imports: [CommonModule, PageStockDetailsNewsComponent],
   template: `<app-page-stock-details-news></app-page-stock-details-news>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockDetailsNewsComponent implements OnInit {

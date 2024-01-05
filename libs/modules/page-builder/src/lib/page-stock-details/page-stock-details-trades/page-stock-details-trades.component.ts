@@ -10,13 +10,11 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   standalone: true,
   imports: [CommonModule, StockInsiderTradesComponent, GeneralCardComponent, RangeDirective],
   templateUrl: './page-stock-details-trades.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageStockDetailsTradesComponent extends PageStockDetailsBase {

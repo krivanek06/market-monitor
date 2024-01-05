@@ -8,13 +8,11 @@ import { DialogServiceModule } from '@market-monitor/shared/features/dialog-mana
   standalone: true,
   imports: [CommonModule, AuthenticationFormComponent, DialogServiceModule],
   templateUrl: './page-login.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageLoginComponent {}

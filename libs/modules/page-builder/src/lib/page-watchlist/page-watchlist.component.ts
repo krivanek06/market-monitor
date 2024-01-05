@@ -20,13 +20,11 @@ import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/featur
     MatIconModule,
   ],
   templateUrl: './page-watchlist.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageWatchlistComponent {

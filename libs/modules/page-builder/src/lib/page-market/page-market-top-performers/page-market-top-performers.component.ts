@@ -16,13 +16,11 @@ import { RangeDirective } from '@market-monitor/shared/ui';
   imports: [CommonModule, StockSummaryTableComponent, MatButtonModule, MatDialogModule, RangeDirective],
   templateUrl: './page-market-top-performers.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
 })
 export class PageMarketTopPerformersComponent {
   marketApiService = inject(MarketApiService);
