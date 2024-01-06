@@ -22,8 +22,56 @@ import { EarningsEstimationChartComponent, RevenueEstimationChartComponent } fro
     MatRadioModule,
     ReactiveFormsModule,
   ],
-  templateUrl: './earnings-historical-dialog.component.html',
-  styleUrls: ['./earnings-historical-dialog.component.scss'],
+  template: `
+    <app-dialog-close-header [title]="'Earnings: ' + data.symbol"></app-dialog-close-header>
+
+    <div class="flex items-center justify-between sm:pr-3 sm:pl-6">
+      <h2>Beat: {{ beatings ?? 0 }} / {{ displayDataNumberSignal() }}</h2>
+      <mat-radio-group
+        [formControl]="selectedChartTypeControl"
+        color="primary"
+        aria-label="Select an option"
+        class="flex justify-end gap-x-4"
+      >
+        <mat-radio-button value="earnings">Earnings</mat-radio-button>
+        <mat-radio-button value="revenue">Revenue</mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    <mat-dialog-content>
+      <ng-container *ngIf="!isDataLoading()">
+        <!-- earnings -->
+        <ng-container *ngIf="isEarningsSelected">
+          <app-earnings-estimation-chart
+            *ngIf="stockEarningsEstimationSignal() as data"
+            [heightPx]="500"
+            [data]="data"
+            [limitValues]="limitValues"
+            [showTitle]="true"
+          ></app-earnings-estimation-chart>
+        </ng-container>
+
+        <!-- revenue -->
+        <ng-container *ngIf="isRevenueSelected">
+          <app-revenue-estimation-chart
+            *ngIf="stockRevenueEstimationSignal() as data"
+            [heightPx]="500"
+            [data]="data"
+            [limitValues]="limitValues"
+            [showTitle]="true"
+          ></app-revenue-estimation-chart>
+        </ng-container>
+      </ng-container>
+
+      <ng-container *ngIf="isDataLoading()">
+        <div class="g-skeleton h-[500px] w-full mt-2"></div>
+      </ng-container>
+    </mat-dialog-content>
+  `,
+  styles: `
+  :host {
+    display: block;
+  }`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EarningsHistoricalDialogComponent {

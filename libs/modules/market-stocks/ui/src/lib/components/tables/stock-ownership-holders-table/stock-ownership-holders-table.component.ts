@@ -24,7 +24,130 @@ import {
     BubblePaginationDirective,
     MatSortModule,
   ],
-  templateUrl: './stock-ownership-holders-table.component.html',
+  template: `
+    <table mat-table [dataSource]="dataSource" matSort [trackBy]="identity">
+      <!-- investorName -->
+      <ng-container matColumnDef="investorName">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Investor</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="text-wt-gray-dark">{{ row.investorName | truncateWords: 5 }}</span>
+        </td>
+      </ng-container>
+
+      <!-- weight -->
+      <ng-container matColumnDef="weight">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Weight</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div *ngIf="row.weight > 0.01; else smalLWeight" class="flex items-center gap-2">
+            <span>{{ row.weight | number: '1.2-2' }}</span>
+            <div
+              appPercentageIncrease
+              [changeValues]="{
+                changePercentage: row.changeInWeightPercentage
+              }"
+            ></div>
+          </div>
+          <ng-template #smalLWeight>
+            <span>0.00 < </span>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <!-- performance -->
+      <ng-container matColumnDef="performance">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Performance</th>
+        <td mat-cell *matCellDef="let row">
+          <div class="flex items-center gap-2">
+            <span>{{ row.performance | largeNumberFormatter }}</span>
+            <div
+              appPercentageIncrease
+              [changeValues]="{
+                change: row.changeInPerformance,
+                changePercentage: row.performancePercentage
+              }"
+            ></div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- marketValue -->
+      <ng-container matColumnDef="marketValue">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Market Value</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
+          <div class="flex items-center gap-2">
+            <span>{{ row.marketValue | largeNumberFormatter }}</span>
+            <div
+              appPercentageIncrease
+              [changeValues]="{
+                changePercentage: row.changeInMarketValuePercentage
+              }"
+            ></div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- sharesNumber -->
+      <ng-container matColumnDef="sharesNumber">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Shares Number</th>
+        <td mat-cell *matCellDef="let row">
+          <div class="flex items-center gap-2">
+            <span>{{ row.sharesNumber | largeNumberFormatter }}</span>
+            <div
+              appPercentageIncrease
+              [changeValues]="{
+                changePercentage: row.changeInSharesNumberPercentage
+              }"
+            ></div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- avgPricePaid -->
+      <ng-container matColumnDef="avgPricePaid">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Avg. Paid</th>
+        <td mat-cell *matCellDef="let row" class="min-w-[120px]" class="hidden md:table-cell">
+          <span class="text-wt-gray-dark">{{ row.avgPricePaid | currency }}</span>
+        </td>
+      </ng-container>
+
+      <!-- holdingPeriod -->
+      <ng-container matColumnDef="holdingPeriod">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden 2xl:table-cell">Quarters</th>
+        <td mat-cell *matCellDef="let row" class="hidden 2xl:table-cell">
+          <span class="text-wt-gray-dark">{{ row.holdingPeriod }}</span>
+        </td>
+      </ng-container>
+
+      <!-- firstAdded -->
+      <ng-container matColumnDef="firstAdded">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">First Added</th>
+        <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
+          {{ row.firstAdded | date: 'MMMM d, y' }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="7">
+          <div class="g-table-empty">No data has been found</div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- pagination -->
+    <div *ngIf="dataSource.filteredData" class="flex items-center justify-end">
+      <mat-paginator
+        appBubblePagination
+        showFirstLastButtons
+        [length]="dataSource.filteredData.length"
+        [appCustomLength]="dataSource.filteredData.length"
+        [pageSize]="25"
+      ></mat-paginator>
+    </div>
+  `,
   styles: `
       :host {
         display: block;

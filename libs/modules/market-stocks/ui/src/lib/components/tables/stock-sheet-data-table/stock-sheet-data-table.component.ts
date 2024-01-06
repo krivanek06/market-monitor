@@ -7,7 +7,39 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-m
   selector: 'app-stock-sheet-data-table',
   standalone: true,
   imports: [CommonModule, LargeNumberFormatterPipe, PercentageIncreaseDirective],
-  templateUrl: './stock-sheet-data-table.component.html',
+  template: `
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th *ngFor="let period of data.timePeriods" class="hidden sm:table-cell">
+            {{ period }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let block of data.data">
+          <!-- name -->
+          <td class="text-wt-gray-dark">{{ block.name }}</td>
+          <!-- values -->
+          <td *ngFor="let value of block.values; let i = index; let last = last">
+            <div class="flex items-center gap-2">
+              <span>{{ value | largeNumberFormatter: block.isPercentage : false }}</span>
+              <span
+                *ngIf="!last && value !== 0"
+                appPercentageIncrease
+                [currentValues]="{
+                  hideValue: true,
+                  value: value,
+                  valueToCompare: block.values[i + 1]
+                }"
+              ></span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  `,
   styles: `
       :host {
         display: block;
