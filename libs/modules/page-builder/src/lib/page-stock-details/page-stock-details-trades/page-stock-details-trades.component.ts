@@ -9,7 +9,21 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   selector: 'app-page-stock-details-trades',
   standalone: true,
   imports: [CommonModule, StockInsiderTradesComponent, GeneralCardComponent, RangeDirective],
-  templateUrl: './page-stock-details-trades.component.html',
+  template: `
+    <app-general-card title="Insider trades">
+      <app-stock-insider-trades
+        *ngIf="stockInsiderTradesSignal() as stockInsiderTrades; else showSkeleton"
+        [data]="stockInsiderTrades"
+      ></app-stock-insider-trades>
+    </app-general-card>
+
+    <!-- skeleton -->
+    <ng-template #showSkeleton>
+      <div>
+        <div *ngRange="25" class="h-[50px] mb-1 g-skeleton"></div>
+      </div>
+    </ng-template>
+  `,
   styles: `
       :host {
         display: block;
@@ -19,8 +33,4 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
 })
 export class PageStockDetailsTradesComponent extends PageStockDetailsBase {
   stockInsiderTradesSignal = toSignal(this.stocksApiService.getStockInsiderTrades(this.stockSymbolSignal()));
-
-  constructor() {
-    super();
-  }
 }

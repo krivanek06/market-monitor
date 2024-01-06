@@ -38,7 +38,120 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
     SectionTitleComponent,
     RangeDirective,
   ],
-  templateUrl: './page-groups.component.html',
+  template: `
+    <div class="grid m-auto xl:w-11/12 gap-y-4">
+      <div class="flex justify-between w-full mb-6">
+        <!-- title -->
+        <div class="flex items-center gap-3">
+          <mat-icon color="primary">group</mat-icon>
+          <span class="text-xl text-wt-primary">Groups</span>
+        </div>
+
+        <div class="flex flex-col justify-between gap-2 md:flex-row">
+          <!-- search groups -->
+          <app-group-search-control [formControl]="searchGroupControl" class="w-[450px] hidden lg:block" />
+          <!-- create new group -->
+          <div [matTooltip]="isCreateGroupDisabledSignal() ? errorMessageGroupCreate : ''">
+            <button
+              [disabled]="isCreateGroupDisabledSignal()"
+              mat-stroked-button
+              type="button"
+              color="primary"
+              (click)="onCreateGroupClick()"
+            >
+              <mat-icon>add</mat-icon>
+              create group
+            </button>
+          </div>
+        </div>
+      </div>
+
+      @if (groupsSignal(); as groups) {
+        <!-- invitations - sent / received -->
+        <div
+          *ngIf="groups.groupInvitations.length > 0 || groups.groupRequested.length > 0"
+          class="grid lg:grid-cols-2 gap-x-6 gap-y-4 min-h-[100px] mb-6"
+        >
+          <!-- received invitations -->
+          <app-general-card title="Received Invitations">
+            <div class="flex items-center gap-2">
+              @for (group of groups.groupInvitations; track group.id) {
+                <app-group-display-item
+                  [groupData]="group"
+                  [clickable]="true"
+                  (click)="onReceivedInvitationClick(group)"
+                  class="flex-1"
+                />
+                <button
+                  mat-icon-button
+                  class="border-2 border-solid border-wt-gray-light-strong"
+                  (click)="onGroupClick(group)"
+                >
+                  <mat-icon>navigate_next</mat-icon>
+                </button>
+              }
+            </div>
+          </app-general-card>
+          <!-- sent invitations -->
+          <app-general-card title="Sent Invitations">
+            <div class="flex items-center gap-2">
+              @for (group of groups.groupRequested; track group.id) {
+                <app-group-display-item
+                  [groupData]="group"
+                  [clickable]="true"
+                  (click)="onSentRequestClick(group)"
+                  class="flex-1"
+                />
+                <button
+                  mat-icon-button
+                  class="border-2 border-solid border-wt-gray-light-strong"
+                  (click)="onGroupClick(group)"
+                >
+                  <mat-icon>navigate_next</mat-icon>
+                </button>
+              }
+            </div>
+          </app-general-card>
+        </div>
+
+        <div
+          *ngIf="groups.groupOwner.length === 0 && groups.groupMember.length === 0"
+          class="text-xl text-center text-wt-gray-medium absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        >
+          You are not a member of any group. You can create a new group or search for existing groups.
+        </div>
+
+        <!-- my groups -->
+        <div *ngIf="groups.groupOwner.length > 0">
+          <h2>My Groups</h2>
+          <div class="flex flex-col gap-3">
+            <app-group-display-card
+              *ngFor="let group of groups.groupOwner"
+              (groupClickEmitter)="onGroupClick(group)"
+              [groupData]="group"
+            ></app-group-display-card>
+          </div>
+        </div>
+
+        <!-- member of -->
+        <div *ngIf="groups.groupMember.length > 0">
+          <h2>Member of</h2>
+          <div class="flex flex-col gap-3">
+            <app-group-display-card
+              *ngFor="let group of groups.groupMember"
+              (groupClickEmitter)="onGroupClick(group)"
+              [groupData]="group"
+            ></app-group-display-card>
+          </div>
+        </div>
+      } @else {
+        <!-- skeleton -->
+        <div class="grid m-auto xl:w-11/12 gap-y-4">
+          <div *ngRange="5" class="g-skeleton h-[200px] w-full mb-2"></div>
+        </div>
+      }
+    </div>
+  `,
   styles: `
       :host {
         display: block;

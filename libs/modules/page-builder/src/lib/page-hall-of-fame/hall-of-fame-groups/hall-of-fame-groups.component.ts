@@ -2,13 +2,15 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 import { AggregationApiService } from '@market-monitor/api-client';
 import { GroupBase } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
 import { PortfolioRankTableComponent } from '@market-monitor/modules/portfolio/ui';
+import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
 
 @Component({
@@ -118,7 +120,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
 export class HallOfFameGroupsComponent {
   private aggregationApiService = inject(AggregationApiService);
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private dialog = inject(MatDialog);
+  private router = inject(Router);
 
   /**
    * limit number of groups to display, display rest on "show more"
@@ -156,6 +158,6 @@ export class HallOfFameGroupsComponent {
   }
 
   onGroupClick(group: GroupBase) {
-    console.log('group clicked', group);
+    this.router.navigateByUrl(`/${ROUTES_MAIN.GROUPS}/${group.id}`);
   }
 }

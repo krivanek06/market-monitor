@@ -29,7 +29,75 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     ReactiveFormsModule,
     RangeDirective,
   ],
-  templateUrl: './page-stock-details-holders.component.html',
+  template: `
+    <div class="grid gap-8 mb-6 md:grid-cols-2 xl:grid-cols-4">
+      <!-- Institution -->
+      <app-general-card title="Institution" additionalClasses="max-xl:w-full xl:min-w-[350px]">
+        <app-stock-ownership-institutional-list
+          displayType="institution"
+          [isLoading]="loadingSignal()"
+          [enterpriseValue]="enterpriseValueToQuarterSignal()"
+          [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal()"
+        ></app-stock-ownership-institutional-list>
+      </app-general-card>
+
+      <!-- Position -->
+      <app-general-card title="Position" additionalClasses="max-xl:w-full xl:min-w-[250px]">
+        <app-stock-ownership-institutional-list
+          displayType="position"
+          [isLoading]="loadingSignal()"
+          [enterpriseValue]="enterpriseValueToQuarterSignal()"
+          [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal()"
+        ></app-stock-ownership-institutional-list>
+      </app-general-card>
+
+      <!-- Option -->
+      <app-general-card title="Option" additionalClasses="max-xl:w-full xl:min-w-[300px]">
+        <app-stock-ownership-institutional-list
+          displayType="option"
+          [isLoading]="loadingSignal()"
+          [enterpriseValue]="enterpriseValueToQuarterSignal()"
+          [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal()"
+        ></app-stock-ownership-institutional-list>
+      </app-general-card>
+
+      <div class="w-full">
+        <!-- Available Quarters -->
+        <app-form-mat-input-wrapper
+          [formControl]="quarterFormControl"
+          inputCaption="Available Quarters"
+          inputType="SELECT"
+          [inputSource]="institutionalPortfolioInputSourceSignal()"
+        ></app-form-mat-input-wrapper>
+
+        <!-- additional data -->
+        <div class="grid gap-2 p-4 mt-2">
+          <div class="text-base g-item-wrapper">
+            <span> Date: </span>
+            <span>{{ quarterFormControl.value | date: 'MMMM d, y' }}</span>
+          </div>
+          <div class="text-base g-item-wrapper">
+            <span> Close Price: </span>
+            <span>{{ historicalPriceOnDateSignal() ? (historicalPriceOnDateSignal()?.close | currency) : 'N/A' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <app-general-card title="Ownership Holders">
+      <!-- skeleton -->
+      <div *ngIf="loadingSignal(); else showData" class="grid gap-2">
+        <div *ngRange="25" class="g-skeleton h-[50px]"></div>
+      </div>
+
+      <ng-template #showData>
+        <app-stock-ownership-holders-table
+          *ngIf="ownershipHoldersToDateSignal() as data"
+          [data]="data"
+        ></app-stock-ownership-holders-table>
+      </ng-template>
+    </app-general-card>
+  `,
   styles: `
       :host {
         display: block;

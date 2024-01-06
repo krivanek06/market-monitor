@@ -14,7 +14,42 @@ import { RangeDirective } from '@market-monitor/shared/ui';
   selector: 'app-page-market-top-performers',
   standalone: true,
   imports: [CommonModule, StockSummaryTableComponent, MatButtonModule, MatDialogModule, RangeDirective],
-  templateUrl: './page-market-top-performers.component.html',
+  template: `
+    <div *ngIf="marketTopPerformanceSignal() as marketOverview; else stockSummaryTableSkeleton" class="grid gap-y-14">
+      <div>
+        <app-stock-summary-table
+          tableTitle="Top Active"
+          (itemClickedEmitter)="onSummaryClick($event)"
+          [stockSummaries]="marketOverview.stockTopActive"
+        ></app-stock-summary-table>
+      </div>
+
+      <div>
+        <app-stock-summary-table
+          tableTitle="Top Gainer"
+          (itemClickedEmitter)="onSummaryClick($event)"
+          [stockSummaries]="marketOverview.stockTopGainers"
+        ></app-stock-summary-table>
+      </div>
+
+      <div>
+        <app-stock-summary-table
+          tableTitle="Top Losers"
+          (itemClickedEmitter)="onSummaryClick($event)"
+          [stockSummaries]="marketOverview.stockTopLosers"
+        ></app-stock-summary-table>
+      </div>
+    </div>
+
+    <!-- loading screen -->
+    <ng-template #stockSummaryTableSkeleton>
+      <div class="grid pt-2 gap-y-14">
+        <div *ngRange="3">
+          <div *ngRange="15" class="h-12 mb-1 g-skeleton"></div>
+        </div>
+      </div>
+    </ng-template>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
       :host {

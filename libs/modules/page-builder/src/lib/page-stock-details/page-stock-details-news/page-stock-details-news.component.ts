@@ -7,7 +7,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   selector: 'app-page-stock-details-news',
   standalone: true,
   imports: [CommonModule, NewsSearchComponent],
-  templateUrl: './page-stock-details-news.component.html',
+  template: `<app-news-search [searchData]="{ newsType: 'stocks', symbol: stockSymbolSignal() }"></app-news-search> `,
   styles: `
       :host {
         display: block;
@@ -15,8 +15,4 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageStockDetailsNewsComponent extends PageStockDetailsBase {
-  constructor() {
-    super();
-  }
-}
+export class PageStockDetailsNewsComponent extends PageStockDetailsBase {}

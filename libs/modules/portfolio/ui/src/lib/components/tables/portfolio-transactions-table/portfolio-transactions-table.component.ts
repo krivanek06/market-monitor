@@ -31,7 +31,138 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
     MatPaginatorModule,
     StylePaginatorDirective,
   ],
-  templateUrl: './portfolio-transactions-table.component.html',
+  template: `
+    <table mat-table [dataSource]="dataSource" [trackBy]="identity">
+      <!-- image & name -->
+      <ng-container matColumnDef="symbol">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Symbol</th>
+        <td mat-cell *matCellDef="let row">
+          <!-- logo + symbol -->
+          <div class="flex items-center gap-2">
+            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="w-10 h-10" />
+            <div>{{ row.symbol }}</div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- transactionType -->
+      <ng-container matColumnDef="transactionType">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Type</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div
+            [ngClass]="{
+              'text-wt-danger': row.transactionType === 'SELL',
+              'text-wt-success': row.transactionType === 'BUY'
+            }"
+          >
+            {{ row.transactionType }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- user -->
+      <ng-container matColumnDef="user">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">User</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div class="flex items-center gap-2">
+            <img class="rounded-full h-7 w-7" appDefaultImg [src]="row.userPhotoURL" />
+            <span>{{ row.userDisplayName ?? 'Unknown' }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- totalValue -->
+      <ng-container matColumnDef="totalValue">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Total Value</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div>
+            {{ row.unitPrice * row.units | currency }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- unitPrice -->
+      <ng-container matColumnDef="unitPrice">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Unit Price</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          {{ row.unitPrice | currency }}
+        </td>
+      </ng-container>
+
+      <!-- units -->
+      <ng-container matColumnDef="units">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Units</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          {{ row.units }}
+        </td>
+      </ng-container>
+
+      <!-- transactionFees -->
+      <ng-container matColumnDef="transactionFees">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Fees</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          {{ row.transactionFees | currency }}
+        </td>
+      </ng-container>
+
+      <!-- return -->
+      <ng-container matColumnDef="return">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Return</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [changeValues]="{ change: row.returnValue, changePercentage: row.returnChange }"
+          ></div>
+        </td>
+      </ng-container>
+
+      <!-- date -->
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Date</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          {{ row.date | date: 'MMMM d, y' }}
+        </td>
+      </ng-container>
+
+      <!-- action -->
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Action</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div class="flex items-center gap-2">
+            <button type="button" mat-icon-button color="warn" (click)="onDeleteClick(row)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"
+        [ngClass]="{ 'bg-wt-gray-light': even }"
+      ></tr>
+
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="11">
+          <div class="g-table-empty">No data has been found</div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- pagination -->
+    <div class="relative px-10">
+      <mat-paginator
+        appStylePaginator
+        showFirstLastButtons
+        [length]="dataSource.filteredData.length"
+        [appCustomLength]="dataSource.filteredData.length"
+        [pageSize]="20"
+      ></mat-paginator>
+    </div>
+  `,
   styles: `
       :host {
         display: block;
