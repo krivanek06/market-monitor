@@ -61,7 +61,7 @@ const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
     },
     personal: personal,
     portfolioState: {
-      ...createEmptyPortfolioState(0),
+      ...createEmptyPortfolioState(),
     },
     holdingSnapshot: {
       lastModifiedDate: getCurrentDateDefaultFormat(),

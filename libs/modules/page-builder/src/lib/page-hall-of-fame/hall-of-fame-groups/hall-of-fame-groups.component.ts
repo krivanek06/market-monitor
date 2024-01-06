@@ -5,16 +5,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { AggregationApiService } from '@market-monitor/api-client';
-import { UserBase } from '@market-monitor/api-types';
+import { GroupBase } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
+import { GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
 import { PortfolioRankTableComponent } from '@market-monitor/modules/portfolio/ui';
-import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@market-monitor/modules/user/features';
-import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
 
 @Component({
-  selector: 'app-hall-of-fame-users',
+  selector: 'app-hall-of-fame-groups',
   standalone: true,
   imports: [
     CommonModule,
@@ -22,22 +20,14 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
     DefaultImgDirective,
     SectionTitleComponent,
     MatButtonModule,
-    UserDisplayItemComponent,
     MatIconModule,
-    UserDetailsDialogComponent,
     MatDialogModule,
     PositionColoringDirective,
+    GroupDisplayItemComponent,
   ],
   template: `
-    <!-- display user rank -->
-    <app-section-title
-      class="absolute top-[-80px] left-0 hidden md:block"
-      matIcon="military_tech"
-      title="My rank: {{ userDataSignal().systemRank.portfolioTotalGainsPercentage?.rank }}"
-    />
-
     <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4">
-      @if (hallOfFameUsersSignal(); as hallOfFameUses) {
+      @if (hallOfFameGroupsSignal(); as hallOfFameGroups) {
         <div class="lg:basis-4/6 xl:basis-3/6">
           <div class="flex items-center justify-between lg:px-2">
             <!-- title -->
@@ -79,7 +69,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
 
           <!-- table -->
           <app-portfolio-rank-table
-            (clickedItem)="onUserClick($event)"
+            (clickedItem)="onGroupClick($event)"
             [data]="displayPortfolioSignal()"
             [template]="userTemplate"
           />
@@ -88,13 +78,8 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
           <!-- daily best -->
           <div>
             <app-section-title title="Daily Gainers" class="mb-6" />
-            @for (user of hallOfFameUses.bestDailyGains; track user.id) {
-              <app-user-display-item
-                (click)="onUserClick(user)"
-                class="g-clickable-hover"
-                [showLoginButton]="false"
-                [userData]="user"
-              />
+            @for (group of hallOfFameGroups.bestDailyGains; track group.id) {
+              <app-group-display-item (click)="onGroupClick(group)" [groupData]="group" class="g-clickable-hover" />
             } @empty {
               <div>No Data Found</div>
             }
@@ -103,13 +88,8 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
           <!-- daily worst -->
           <div>
             <app-section-title title="Daily Losers" class="mb-6" />
-            @for (user of hallOfFameUses.worstDailyGains; track user.id) {
-              <app-user-display-item
-                (click)="onUserClick(user)"
-                class="g-clickable-hover"
-                [showLoginButton]="false"
-                [userData]="user"
-              />
+            @for (group of hallOfFameGroups.worstDailyGains; track group.id) {
+              <app-group-display-item (click)="onGroupClick(group)" [groupData]="group" class="g-clickable-hover" />
             } @empty {
               <div>No Data Found</div>
             }
@@ -121,9 +101,9 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
     <!-- template for user data in table -->
     <ng-template #userTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
-        <img appDefaultImg [src]="data.personal.photoURL" alt="user image" class="w-10 h-10 rounded-lg" />
+        <img appDefaultImg [src]="data.imageUrl" alt="user image" class="w-10 h-10 rounded-lg" />
         <div class="grid">
-          <div appPositionColoring [position]="position">{{ data.personal.displayName }}</div>
+          <div appPositionColoring [position]="position">{{ data.name }}</div>
         </div>
       </div>
     </ng-template>
@@ -135,49 +115,37 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HallOfFameUsersComponent {
+export class HallOfFameGroupsComponent {
   private aggregationApiService = inject(AggregationApiService);
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private dialog = inject(MatDialog);
 
   /**
-   * limit number of users to display, display rest on "show more"
+   * limit number of groups to display, display rest on "show more"
    */
   private displayUsersLimit = 20;
 
-  userDataSignal = this.authenticationUserStoreService.state.getUserData;
-
-  hallOfFameUsersSignal = toSignal(this.aggregationApiService.getHallOfFameUsers());
+  hallOfFameGroupsSignal = toSignal(this.aggregationApiService.getHallOfFameGroups());
 
   displayPortfolioSignal = computed(() => {
     const data = this.showBestSignal()
-      ? this.hallOfFameUsersSignal()?.bestPortfolio ?? []
-      : this.hallOfFameUsersSignal()?.worstPortfolio ?? [];
+      ? this.hallOfFameGroupsSignal()?.bestPortfolio ?? []
+      : this.hallOfFameGroupsSignal()?.worstPortfolio ?? [];
     return !this.showMoreSignal() ? data.slice(0, this.displayUsersLimit) : data;
   });
 
   showMoreButtonVisibleSignal = computed(
-    () => (this.hallOfFameUsersSignal()?.bestPortfolio?.length ?? 0) > this.displayUsersLimit,
+    () => (this.hallOfFameGroupsSignal()?.bestPortfolio?.length ?? 0) > this.displayUsersLimit,
   );
-
   /**
-   * if true shows more users, if false shows less users
+   * if true shows more groups, if false shows less groups
    */
   showMoreSignal = signal(false);
 
   /**
-   * if true shows best users, if false shows worst users
+   * if true shows best groups, if false shows worst groups
    */
   showBestSignal = signal(true);
-
-  onUserClick(user: UserBase) {
-    this.dialog.open(UserDetailsDialogComponent, {
-      data: <UserDetailsDialogComponentData>{
-        userId: user.id,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
-  }
 
   showMoreToggle() {
     this.showMoreSignal.set(!this.showMoreSignal());
@@ -185,5 +153,9 @@ export class HallOfFameUsersComponent {
 
   showBestToggle() {
     this.showBestSignal.set(!this.showBestSignal());
+  }
+
+  onGroupClick(group: GroupBase) {
+    console.log('group clicked', group);
   }
 }

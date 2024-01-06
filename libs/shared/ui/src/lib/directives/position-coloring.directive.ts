@@ -25,7 +25,6 @@ export class PositionColoringDirective implements OnChanges {
 
   private colorElement(position: number, type: ColorType): void {
     const color = this.getColorByPosition(position, type);
-    console.log('colormix', color);
     this.renderer.setStyle(this.elementRef.nativeElement, type, color);
   }
 

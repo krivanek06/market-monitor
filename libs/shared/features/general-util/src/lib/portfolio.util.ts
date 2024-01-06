@@ -5,7 +5,6 @@ import {
   PortfolioStateHoldings,
   PortfolioTransaction,
   SymbolSummary,
-  USER_DEFAULT_STARTING_CASH,
 } from '@market-monitor/api-types';
 import { isSameDay, subDays } from 'date-fns';
 import { getCurrentDateDefaultFormat } from './date-service.util';
@@ -133,9 +132,9 @@ export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransact
     .filter((d) => d.units > 0);
 };
 
-export const createEmptyPortfolioState = (startingCash = USER_DEFAULT_STARTING_CASH) =>
+export const createEmptyPortfolioState = (startingCash = 0) =>
   ({
-    balance: 0,
+    balance: startingCash,
     cashOnHand: 0,
     holdingsBalance: 0,
     invested: 0,
