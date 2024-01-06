@@ -3,11 +3,12 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { PositionColoringDirective } from '../../../directives';
 
 @Component({
   selector: 'app-position-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatRippleModule, MatIconModule],
+  imports: [CommonModule, MatCardModule, MatRippleModule, MatIconModule, PositionColoringDirective],
   styles: `
       :host {
         display: block;
@@ -15,55 +16,6 @@ import { MatIconModule } from '@angular/material/icon';
 
       mat-card-content {
         height: inherit;
-      }
-
-      .c-position-wrapper {
-        margin-left: 5px;
-        font-size: 18px;
-      }
-
-      .c-position-first-bg {
-        background: linear-gradient(
-          135deg,
-          color-mix(in srgb, #e44736 50%, white),
-          color-mix(in srgb, #f31903 35%, white)
-        );
-
-        .c-position {
-          color: #f31903;
-        }
-      }
-
-      .c-position-second-bg {
-        background: linear-gradient(
-          135deg,
-          color-mix(in srgb, #f0a14d 50%, white),
-          color-mix(in srgb, #c76f12 35%, white)
-        );
-
-        .c-position {
-          color: #c76f12;
-        }
-      }
-
-      .c-position-third-bg {
-        background: linear-gradient(
-          135deg,
-          color-mix(in srgb, #31a5f7 50%, white),
-          color-mix(in srgb, #0272c2 35%, white)
-        );
-
-        .c-position {
-          color: #0272c2;
-        }
-      }
-
-      .c-position-irrelevant {
-        background-color: var(--gray-light-strong);
-
-        .c-position {
-          color: #8a0ba1;
-        }
       }
     `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,12 +27,11 @@ import { MatIconModule } from '@angular/material/icon';
       [matRippleDisabled]="!clickable"
       [matRippleUnbounded]="false"
       class="shadow-md pt-8 pb-3 px-6"
+      appPositionColoring
+      [position]="currentPositions"
+      positionType="background-color"
       (click)="onClick()"
       [ngClass]="{
-        'c-position-first-bg': currentPositions === 1,
-        'c-position-second-bg': currentPositions === 2,
-        'c-position-third-bg': currentPositions === 3,
-        'c-position-irrelevant': currentPositions > 3,
         'g-clickable-hover': clickable
       }"
     >
@@ -92,7 +43,9 @@ import { MatIconModule } from '@angular/material/icon';
             'w-10': !showPreviousPosition
           }"
         >
-          <div class="c-position c-position-wrapper">#{{ currentPositions }}</div>
+          <div class="c-position text-lg ml-2" appPositionColoring [position]="currentPositions">
+            #{{ currentPositions }}
+          </div>
           <div
             *ngIf="showPreviousPosition"
             class="flex items-center"

@@ -12,12 +12,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioState } from '@market-monitor/api-types';
-import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { PercentageIncreaseDirective, PositionColoringDirective } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-portfolio-rank-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatIconModule, MatPaginatorModule, PercentageIncreaseDirective],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatIconModule,
+    MatPaginatorModule,
+    PercentageIncreaseDirective,
+    PositionColoringDirective,
+  ],
   template: `
     <table mat-table class="table-hover" [dataSource]="dataSource" [trackBy]="identity">
       <!-- itemTemplate-->
@@ -26,9 +33,11 @@ import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
         <td mat-cell *matCellDef="let row; let i = index">
           <div class="flex items-center gap-3">
             <!-- position -->
-            <span class="w-7 h-7 border border-solid text-center rounded-full">{{ i + 1 }}</span>
+            <span appPositionColoring [position]="i + 1" class="w-7 h-7 border border-solid text-center rounded-full">
+              {{ i + 1 }}
+            </span>
             <!-- template from parent -->
-            <ng-container [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{ data: row }" />
+            <ng-container [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{ data: row, position: i + 1 }" />
           </div>
         </td>
       </ng-container>
@@ -36,8 +45,8 @@ import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
       <!-- balance-->
       <ng-container matColumnDef="balance">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Balance</th>
-        <td mat-cell *matCellDef="let row">
-          {{ row.portfolioState.balance | currency }}
+        <td mat-cell *matCellDef="let row; let i = index">
+          <span appPositionColoring [position]="i + 1">{{ row.portfolioState.balance | currency }}</span>
         </td>
       </ng-container>
 

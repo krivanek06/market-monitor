@@ -11,7 +11,7 @@ import { PortfolioRankTableComponent } from '@market-monitor/modules/portfolio/u
 import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { DefaultImgDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
+import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-hall-of-fame-users',
@@ -26,6 +26,7 @@ import { DefaultImgDirective, SectionTitleComponent } from '@market-monitor/shar
     MatIconModule,
     UserDetailsDialogComponent,
     MatDialogModule,
+    PositionColoringDirective,
   ],
   template: `
     <!-- display user rank -->
@@ -114,11 +115,11 @@ import { DefaultImgDirective, SectionTitleComponent } from '@market-monitor/shar
     </div>
 
     <!-- template for user data in table -->
-    <ng-template #userTemplate let-data="data">
+    <ng-template #userTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
         <img appDefaultImg [src]="data.personal.photoURL" alt="user image" class="w-10 h-10" />
         <div class="grid">
-          <div>{{ data.personal.displayName }}</div>
+          <div appPositionColoring [position]="position">{{ data.personal.displayName }}</div>
         </div>
       </div>
     </ng-template>

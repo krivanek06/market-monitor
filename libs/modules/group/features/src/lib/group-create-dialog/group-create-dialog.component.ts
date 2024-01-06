@@ -48,7 +48,116 @@ import { map, startWith } from 'rxjs';
     UploadImageSingleControlComponent,
     HideAfterDirective,
   ],
-  templateUrl: './group-create-dialog.component.html',
+  template: `
+    <app-dialog-close-header [showCloseButton]="false" title="Create Group"></app-dialog-close-header>
+    <!-- form -->
+    <form [formGroup]="form" (ngSubmit)="onFormSubmit()">
+      <mat-dialog-content *ngIf="!loaderSignal(); else showLoader">
+        <div *ngIf="allowCreateGroup()" class="flex gap-4">
+          <!-- upload image -->
+          <div>
+            <app-upload-image-single-control
+              [heightPx]="250"
+              filePath="groups"
+              formControlName="uploadedImage"
+            ></app-upload-image-single-control>
+          </div>
+
+          <!-- additional forms -->
+          <div class="flex-1">
+            <!-- group name -->
+            <app-form-mat-input-wrapper
+              formControlName="groupName"
+              inputCaption="Group Name"
+              inputType="TEXT"
+            ></app-form-mat-input-wrapper>
+
+            <!-- is public -->
+            <app-form-mat-input-wrapper
+              formControlName="isPublic"
+              inputCaption="Is Group Public"
+              inputType="CHECKBOX"
+              hintText="If selected people can request be member of a group"
+            ></app-form-mat-input-wrapper>
+
+            <!-- add owner as member -->
+            <app-form-mat-input-wrapper
+              formControlName="isOwnerMember"
+              inputCaption="Add owner as member"
+              inputType="CHECKBOX"
+              hintText="If selected the owner will be added as a member of the group"
+            ></app-form-mat-input-wrapper>
+
+            <!-- owner -->
+            <div *ngIf="form.controls.isOwnerMember.value" class="flex gap-4 p-4 mt-2 shadow-md">
+              <app-user-display-item
+                *ngIf="authenticatedUserDataSignal() as user"
+                [userData]="user"
+              ></app-user-display-item>
+            </div>
+          </div>
+        </div>
+
+        <!-- display how many groups can be created -->
+        @if (allowCreateGroup()) {
+          <div
+            *hideAfter="5000; let counter = counter"
+            class="p-4 mx-auto my-4 text-center rounded-md bg-wt-gray-light-strong lg:w-11/12"
+          >
+            You are limited to create only {{ createGroupLimitSignal() }} groups. If you want to create more groups
+            please contact support. Hidden after {{ counter }} seconds.
+          </div>
+        } @else {
+          <!-- error message if can not create more groups -->
+          <div class="p-4 mx-auto my-4 text-center rounded-md bg-wt-danger text-wt-gray-light lg:w-11/12">
+            You can not longer create any additional groups. If you want to create more groups please contact support.
+          </div>
+        }
+
+        <ng-container *ngIf="allowCreateGroup()">
+          <!-- invite member -->
+          <div class="my-8 space-x-2 text-lg">
+            <span>Invite People</span>
+            <span>{{ selectedUsersSignal().length }} / {{ memberLimitSignal() }}</span>
+          </div>
+
+          <!-- search user control -->
+          <div class="max-w-[450px] mb-8">
+            <app-user-search-control [formControl]="searchUserControl"></app-user-search-control>
+          </div>
+
+          <!-- display selected users -->
+          <div class="flex flex-wrap gap-4">
+            <div *ngFor="let user of selectedUsersSignal()" class="flex gap-4 p-4 shadow-md">
+              <app-user-display-item [userData]="user"></app-user-display-item>
+              <button mat-icon-button type="button" matTooltip="Remove User" (click)="onUserRemove(user)">
+                <mat-icon color="warn">delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+      </mat-dialog-content>
+
+      <div class="my-4">
+        <mat-divider></mat-divider>
+      </div>
+
+      <mat-dialog-actions *ngIf="!loaderSignal()">
+        <div class="g-mat-dialog-actions-end">
+          <button mat-flat-button mat-dialog-close type="button">Cancel</button>
+          <button type="submit" mat-flat-button color="primary" [disabled]="!allowCreateGroup()">Save</button>
+        </div>
+      </mat-dialog-actions>
+    </form>
+
+    <!-- loader -->
+    <ng-template #showLoader>
+      <div class="grid gap-5 py-16 place-content-center">
+        <mat-spinner [diameter]="100" class="m-auto"></mat-spinner>
+        <div class="text-center text-wt-gray-medium">This may time a while. Please wait...</div>
+      </div>
+    </ng-template>
+  `,
   styles: `
       :host {
         display: block;
