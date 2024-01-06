@@ -93,7 +93,7 @@ export class PortfolioOperationsService {
     breakEvenPrice: number,
   ): PortfolioTransaction {
     const isTransactionFeesActive =
-      this.authenticationUserService.state.getUserData().features.userPortfolioAllowCashAccount;
+      this.authenticationUserService.state.getUserData().features.allowPortfolioCashAccount;
 
     // if custom total value is provided calculate unit price, else use API price
     const unitPrice = input.customTotalValue
@@ -182,7 +182,7 @@ export class PortfolioOperationsService {
     const totalValue = roundNDigits(input.units * historicalPrice.close, 2);
 
     // check if user has enough cash on hand if BUY and cashAccountActive
-    if (input.transactionType === 'BUY' && userData.features.userPortfolioAllowCashAccount) {
+    if (input.transactionType === 'BUY' && userData.features.allowPortfolioCashAccount) {
       // calculate cash on hand from deposits
       const cashOnHandStarting = userData.portfolioState.startingCash;
       // calculate cash on hand from transactions

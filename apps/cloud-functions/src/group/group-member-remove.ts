@@ -43,6 +43,7 @@ export const groupMemberRemoveCall = onCall(async (request) => {
   // remove user from group
   await groupDocumentRef(data.groupId).update({
     memberUserIds: FieldValue.arrayRemove(data.userId),
+    numberOfMembers: FieldValue.increment(-1), // increment number of members
   });
 
   // remove user from group member

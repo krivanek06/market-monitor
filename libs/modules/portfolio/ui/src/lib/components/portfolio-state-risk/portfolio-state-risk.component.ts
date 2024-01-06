@@ -36,13 +36,11 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
       </div>
     </div>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStateRiskComponent {

@@ -6,13 +6,11 @@ import { PageGroupsComponent } from '@market-monitor/modules/page-builder';
   standalone: true,
   imports: [PageGroupsComponent],
   template: `<app-page-groups></app-page-groups>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupsComponent {}

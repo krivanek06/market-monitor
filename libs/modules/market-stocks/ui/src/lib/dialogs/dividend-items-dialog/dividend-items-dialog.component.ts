@@ -9,8 +9,23 @@ import { DividendItemComponent } from '../../components';
   selector: 'app-dividend-items-dialog',
   standalone: true,
   imports: [CommonModule, MatDialogModule, DialogCloseHeaderComponent, DividendItemComponent],
-  templateUrl: './dividend-items-dialog.component.html',
-  styleUrls: ['./dividend-items-dialog.component.scss'],
+  template: `
+    <app-dialog-close-header [title]="dialogTitle"></app-dialog-close-header>
+
+    <mat-dialog-content>
+      <app-dividend-item
+        *ngFor="let dividend of data.dividends; let last = last"
+        (itemClickedEmitter)="onDividendClicked(dividend)"
+        [dividend]="dividend"
+        [showBorder]="!last"
+      ></app-dividend-item>
+    </mat-dialog-content>
+  `,
+  styles: `
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DatePipe],
 })

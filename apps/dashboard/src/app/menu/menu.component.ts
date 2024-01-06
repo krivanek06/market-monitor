@@ -6,8 +6,7 @@ import { PageMenuComponent } from '@market-monitor/modules/page-builder';
   standalone: true,
   imports: [PageMenuComponent],
   template: `<app-page-menu></app-page-menu>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
@@ -16,7 +15,6 @@ import { PageMenuComponent } from '@market-monitor/modules/page-builder';
         overflow-x: clip;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuComponent {}

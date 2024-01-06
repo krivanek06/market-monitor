@@ -11,8 +11,7 @@ import { timePeriodDefaultButtons } from './time-period-buttons.model';
   standalone: true,
   imports: [CommonModule, MatSelectModule, MatButtonModule, ReactiveFormsModule],
   templateUrl: './time-period-buttons.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
@@ -21,7 +20,6 @@ import { timePeriodDefaultButtons } from './time-period-buttons.model';
         background-color: var(--gray-light) !important;
       }
     `,
-  ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

@@ -17,18 +17,6 @@ import { map, switchMap, tap } from 'rxjs';
   selector: 'app-tab-select-control',
   standalone: true,
   imports: [CommonModule, MatTabsModule, MatSelectModule],
-  styles: [
-    `
-      ::ng-deep .mat-mdc-tab-group.mat-mdc-tab-group-stretch-tabs > .mat-mdc-tab-header .mat-mdc-tab {
-        padding-left: 60px !important;
-        padding-right: 60px !important;
-      }
-
-      ::ng-deep .mat-mdc-tab-list {
-        margin-bottom: 8px !important;
-      }
-    `,
-  ],
   template: `
     <!-- tabs -->
     <div class="md:flex md:justify-end">
@@ -51,6 +39,16 @@ import { map, switchMap, tap } from 'rxjs';
       </mat-form-field>
     </ng-template>
   `,
+  styles: `
+    ::ng-deep .mat-mdc-tab-group.mat-mdc-tab-group-stretch-tabs > .mat-mdc-tab-header .mat-mdc-tab {
+      padding-left: 60px !important;
+      padding-right: 60px !important;
+    }
+
+    ::ng-deep .mat-mdc-tab-list {
+      margin-bottom: 8px !important;
+    }
+`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

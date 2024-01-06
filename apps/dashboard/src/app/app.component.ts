@@ -10,7 +10,11 @@ import { environment } from '../environments/environment';
   imports: [RouterModule, MatDatepickerModule, MatNativeDateModule],
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styles: [''],
+  styles: `
+      :host {
+        display: block;
+      }
+    `,
 })
 export class AppComponent {
   private functions = inject(Functions);

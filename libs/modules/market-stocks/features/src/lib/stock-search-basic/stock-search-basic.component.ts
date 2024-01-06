@@ -61,7 +61,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
               [showValueChange]="showValueChange"
               [symbolQuote]="summary.quote"
               [displayValue]="displayValue"
-              [assetUrl]="summary.profile?.image"
             ></app-quote-item>
             <div *ngIf="!last" class="mt-2">
               <mat-divider></mat-divider>
@@ -72,8 +71,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
       <mat-hint *ngIf="showHint">Ex: 'AAPL, MSFT, UBER, NFLX'</mat-hint>
     </mat-form-field>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
@@ -87,7 +85,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
         margin: auto !important;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

@@ -28,13 +28,11 @@ import { TabSelectControlComponent } from '@market-monitor/shared/ui';
     </section>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
+  styles: `
       :host {
         @apply mt-6 block;
       }
     `,
-  ],
 })
 export class StockDetailsComponent {
   router = inject(Router);

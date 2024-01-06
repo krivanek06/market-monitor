@@ -7,13 +7,11 @@ import { PageMarketOverviewComponent } from '@market-monitor/modules/page-builde
   standalone: true,
   imports: [CommonModule, PageMarketOverviewComponent],
   template: `<app-page-market-overview></app-page-market-overview>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarketOverviewComponent {}

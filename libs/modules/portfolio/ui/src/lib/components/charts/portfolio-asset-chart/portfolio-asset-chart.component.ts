@@ -44,13 +44,11 @@ import { Observable, map, startWith, tap } from 'rxjs';
     >
     </highcharts-chart>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioAssetChartComponent extends ChartConstructor {

@@ -7,13 +7,11 @@ import { PageStockDetailsHoldersComponent } from '@market-monitor/modules/page-b
   standalone: true,
   imports: [CommonModule, PageStockDetailsHoldersComponent],
   template: `<app-page-stock-details-holders></app-page-stock-details-holders>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockDetailsHoldersComponent {

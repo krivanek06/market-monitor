@@ -9,8 +9,32 @@ import { EarningsItemComponent } from '../../components';
   selector: 'app-earnings-items-dialog',
   standalone: true,
   imports: [CommonModule, MatDialogModule, DialogCloseHeaderComponent, EarningsItemComponent],
-  templateUrl: './earnings-items-dialog.component.html',
-  styleUrls: ['./earnings-items-dialog.component.scss'],
+  template: `
+    <app-dialog-close-header [title]="dialogTitle"></app-dialog-close-header>
+
+    <mat-dialog-content>
+      <div class="flex items-center justify-between mb-2">
+        <div></div>
+        <div class="space-x-4">
+          <span>Earnings</span>
+          <span>/</span>
+          <span>Revenue</span>
+        </div>
+      </div>
+      <app-earnings-item
+        *ngFor="let earning of data.earnings; let last = last"
+        (itemClickedEmitter)="onEarningsClicked(earning)"
+        [earning]="earning"
+        [showBorder]="!last"
+        [showRevenue]="true"
+      ></app-earnings-item>
+    </mat-dialog-content>
+  `,
+  styles: `
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DatePipe],
 })

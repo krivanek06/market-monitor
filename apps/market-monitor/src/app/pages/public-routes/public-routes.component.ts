@@ -27,8 +27,7 @@ import { environment } from 'apps/market-monitor/src/environments/environment';
       <router-outlet></router-outlet>
     </section>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
@@ -42,7 +41,6 @@ import { environment } from 'apps/market-monitor/src/environments/environment';
         @apply text-wt-gray-dark-strong;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicRoutesComponent implements OnInit {

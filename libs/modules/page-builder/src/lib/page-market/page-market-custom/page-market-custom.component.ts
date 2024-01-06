@@ -36,15 +36,111 @@ import { map } from 'rxjs';
     DateRangeSliderComponent,
     ReactiveFormsModule,
   ],
-  templateUrl: './page-market-custom.component.html',
+  template: `
+    <!-- slider to change dates -->
+    <div>
+      <app-date-range-slider [formControl]="dateRangeControl" class="w-[600px]"></app-date-range-slider>
+    </div>
+
+    <!-- chart -->
+    <div class="relative w-full mb-10" [ngClass]="{ 'g-shadow-background': showLoadingScreenSignal() }">
+      <app-generic-chart
+        [series]="selectedChartDataSignal()"
+        [heightPx]="450"
+        [enableZoom]="true"
+        [enableLegendTogging]="true"
+        [showLegend]="true"
+        [shareTooltip]="false"
+        [chartDateRestriction]="chartDateRestriction()"
+      ></app-generic-chart>
+
+      <mat-spinner *ngIf="showLoadingScreenSignal()" class="g-absolute-center" diameter="80"></mat-spinner>
+    </div>
+
+    <!-- options -->
+    <div class="flex flex-col w-full gap-6 mx-auto sm:px-4 lg:w-10/12">
+      <!-- sp500 -->
+      <h2 class="mb-0 text-lg text-wt-gray-dark">S&P 500</h2>
+      <div class="flex flex-wrap items-center gap-x-2">
+        <button
+          *ngFor="let dataSection of MARKET_OVERVIEW_ENDPOINTS.sp500.data"
+          (click)="onDataClick('sp500', dataSection.keyReadable, dataSection.name)"
+          mat-button
+          type="button"
+          [color]="(selectedOverviewSubKeys() | inArray: dataSection.keyReadable) ? 'primary' : ''"
+          class="text-sm"
+        >
+          {{ dataSection.name }}
+        </button>
+      </div>
+
+      <!-- bonds -->
+      <h2 class="mb-0 text-lg text-wt-gray-dark">Bonds</h2>
+      <div class="flex flex-wrap items-center gap-x-2">
+        <button
+          *ngFor="let dataSection of MARKET_OVERVIEW_ENDPOINTS.bonds.data"
+          (click)="onDataClick('bonds', dataSection.keyReadable, dataSection.name)"
+          mat-button
+          type="button"
+          [color]="(selectedOverviewSubKeys() | inArray: dataSection.keyReadable) ? 'primary' : ''"
+          class="text-sm"
+        >
+          {{ dataSection.name }}
+        </button>
+      </div>
+
+      <!-- treasury -->
+      <h2 class="mb-0 text-lg text-wt-gray-dark">Treasury</h2>
+      <div class="flex flex-wrap items-center gap-x-2">
+        <button
+          *ngFor="let dataSection of MARKET_OVERVIEW_ENDPOINTS.treasury.data"
+          (click)="onDataClick('treasury', dataSection.keyReadable, dataSection.name)"
+          mat-button
+          type="button"
+          [color]="(selectedOverviewSubKeys() | inArray: dataSection.keyReadable) ? 'primary' : ''"
+          class="text-sm"
+        >
+          {{ dataSection.name }}
+        </button>
+      </div>
+
+      <!-- Bitcoin -->
+      <h2 class="mb-0 text-lg text-wt-gray-dark">Bitcoin</h2>
+      <div class="flex flex-wrap items-center gap-x-2">
+        <button
+          *ngFor="let dataSection of MARKET_OVERVIEW_ENDPOINTS.bitcoin.data"
+          (click)="onDataClick('bitcoin', dataSection.keyReadable, dataSection.name)"
+          mat-button
+          type="button"
+          [color]="(selectedOverviewSubKeys() | inArray: dataSection.keyReadable) ? 'primary' : ''"
+          class="text-sm"
+        >
+          {{ dataSection.name }}
+        </button>
+      </div>
+
+      <!-- US data -->
+      <h2 class="mb-0 text-lg text-wt-gray-dark">US General</h2>
+      <div class="flex flex-wrap items-center gap-x-2">
+        <button
+          *ngFor="let dataSection of MARKET_OVERVIEW_ENDPOINTS.general.data"
+          (click)="onDataClick('general', dataSection.keyReadable, dataSection.name)"
+          mat-button
+          type="button"
+          [color]="(selectedOverviewSubKeys() | inArray: dataSection.keyReadable) ? 'primary' : ''"
+          class="text-sm"
+        >
+          {{ dataSection.name }}
+        </button>
+      </div>
+    </div>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
 })
 export class PageMarketCustomComponent implements OnInit {
   marketApiService = inject(MarketApiService);

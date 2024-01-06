@@ -19,14 +19,30 @@ import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/featur
     MatDialogModule,
     MatIconModule,
   ],
-  templateUrl: './page-watchlist.component.html',
-  styles: [
-    `
+  template: `
+    <div class="flex items-center justify-between">
+      <!-- title -->
+      <div class="flex items-center gap-2 mb-8 text-xl text-wt-primary">
+        <mat-icon>monitoring</mat-icon>
+        Watchlist
+      </div>
+    </div>
+
+    <!-- table -->
+    <app-stock-summary-table
+      appScrollNearEnd
+      (nearEnd)="onNearEndScroll()"
+      (itemClickedEmitter)="onSummaryClick($event)"
+      [stockSummaries]="
+        userWatchListSymbolsSignal() | slice: 0 : displayResultsSignal() | getStocksSummary: displayCheckValue | async
+      "
+    ></app-stock-summary-table>
+  `,
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageWatchlistComponent {

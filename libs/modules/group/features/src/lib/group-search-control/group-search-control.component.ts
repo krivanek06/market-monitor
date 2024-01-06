@@ -30,9 +30,44 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
     MatIconModule,
     GroupDisplayItemComponent,
   ],
-  templateUrl: './group-search-control.component.html',
-  styles: [
-    `
+  template: `
+    <mat-form-field class="w-full">
+      <mat-label>Search Group by Name</mat-label>
+      <input
+        type="text"
+        placeholder="Enter Group Name"
+        aria-label="Text"
+        matInput
+        [formControl]="searchControl"
+        [matAutocomplete]="auto"
+      />
+      <mat-icon matPrefix>search</mat-icon>
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        (optionSelected)="onSelect($event)"
+        [displayWith]="displayProperty"
+        [hideSingleSelectionIndicator]="true"
+        [autofocus]="false"
+        [autoActiveFirstOption]="false"
+      >
+        <!-- loading skeleton -->
+        <ng-container *ngIf="showLoadingIndicator()">
+          <mat-option *ngRange="5" class="h-10 mb-1 g-skeleton"></mat-option>
+        </ng-container>
+
+        <!-- loaded data -->
+        <ng-container *ngIf="!showLoadingIndicator()">
+          <mat-option *ngFor="let group of optionsSignal(); let last = last" [value]="group" class="py-2 rounded-md">
+            <app-group-display-item [groupData]="group" />
+            <div *ngIf="!last" class="mt-2">
+              <mat-divider></mat-divider>
+            </div>
+          </mat-option>
+        </ng-container>
+      </mat-autocomplete>
+    </mat-form-field>
+  `,
+  styles: `
       :host {
         display: block;
       }
@@ -42,7 +77,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
         min-height: 48px !important;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

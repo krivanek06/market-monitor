@@ -19,13 +19,11 @@ import { ErrorMessagePipe } from './error-message.pipe';
       </mat-error>
     }
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
 })
 export class InputErrorComponent {
   @Input({ required: true }) errors: ValidationErrors | undefined | null = null;

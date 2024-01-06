@@ -8,13 +8,11 @@ import { PageStockScreenerComponent } from '@market-monitor/modules/page-builder
   standalone: true,
   imports: [CommonModule, PageStockScreenerComponent],
   template: `<app-page-stock-screener></app-page-stock-screener>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockScreenerComponent implements OnInit {

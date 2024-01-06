@@ -36,13 +36,11 @@ export type UserSearchDialogData = {
     MatDividerModule,
   ],
   templateUrl: './user-search-dialog.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserSearchDialogComponent {

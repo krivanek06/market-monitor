@@ -7,13 +7,11 @@ import { PageCryptoComponent } from '@market-monitor/modules/page-builder';
   standalone: true,
   imports: [CommonModule, PageCryptoComponent],
   template: `<app-page-crypto></app-page-crypto>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CryptoComponent {}

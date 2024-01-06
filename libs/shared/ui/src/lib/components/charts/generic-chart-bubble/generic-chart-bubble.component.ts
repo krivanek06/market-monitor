@@ -21,13 +21,11 @@ import { HighchartsChartModule } from 'highcharts-angular';
     >
     </highcharts-chart>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenericChartBubbleComponent extends ChartConstructor {

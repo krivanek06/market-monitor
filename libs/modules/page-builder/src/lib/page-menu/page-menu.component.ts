@@ -44,8 +44,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
       <footer class="w-full h-12"></footer>
     </div>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
@@ -62,7 +61,6 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
         }
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageMenuComponent {

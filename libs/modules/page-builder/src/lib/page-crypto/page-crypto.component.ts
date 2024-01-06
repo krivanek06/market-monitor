@@ -5,8 +5,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   selector: 'app-page-crypto',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './page-crypto.component.html',
-  styleUrls: ['./page-crypto.component.scss'],
+  template: `Page works`,
+  styles: `
+      :host {
+        display: block;
+      }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageCryptoComponent {}

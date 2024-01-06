@@ -1,11 +1,14 @@
-import { UserAccountTypes, UserData, UserResetTransactionsInput } from '@market-monitor/api-types';
+import {
+  USER_DEFAULT_STARTING_CASH,
+  UserAccountTypes,
+  UserData,
+  UserFeatures,
+  UserResetTransactionsInput,
+} from '@market-monitor/api-types';
+import { createEmptyPortfolioState } from '@market-monitor/shared/features/general-util';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { userDocumentRef } from '../models';
-import {
-  createUserPortfolioStateEmpty,
-  userDefaultStartingCash,
-  userDocumentTransactionHistoryRef,
-} from './../models/user';
+import { userDocumentTransactionHistoryRef } from './../models/user';
 
 /**
  * Reset all transactions for a user
@@ -27,7 +30,16 @@ export const userResetTransactionsCall = onCall(async (request) => {
     throw new HttpsError('not-found', 'User does not exist');
   }
 
-  const newUserData = createUserDataByType(data.accountTypeSelected, userData);
+  const startingCash = data.accountTypeSelected === UserAccountTypes.Trading ? USER_DEFAULT_STARTING_CASH : 0;
+  const newUserData = {
+    ...userData,
+    portfolioState: {
+      ...createEmptyPortfolioState(startingCash),
+    },
+    features: {
+      ...getUserFeaturesByAccountType(data.accountTypeSelected),
+    },
+  } satisfies UserData;
 
   // reset user portfolio state
   await userDocumentRef(data.userId).update({
@@ -40,40 +52,20 @@ export const userResetTransactionsCall = onCall(async (request) => {
   });
 });
 
-const createUserDataByType = (accountType: UserAccountTypes, currentUser: UserData) => {
-  // trading account
-  if (accountType === UserAccountTypes.Trading) {
-    const userData: Partial<UserData> = {
-      ...currentUser,
-      portfolioState: {
-        ...createUserPortfolioStateEmpty(userDefaultStartingCash),
-      },
-      features: {
-        ...currentUser.features,
-        userPortfolioAllowCashAccount: true,
-        groupAllowAccess: true,
-      },
-    };
-
-    return userData;
+const getUserFeaturesByAccountType = (accountType: UserAccountTypes): UserFeatures => {
+  switch (accountType) {
+    case UserAccountTypes.Basic:
+      return {
+        allowPortfolioCashAccount: false,
+        allowAccessGroups: false,
+      };
+    case UserAccountTypes.Trading:
+      return {
+        allowPortfolioCashAccount: true,
+        allowAccessGroups: true,
+        allowAccessHallOfFame: true,
+      };
+    default:
+      throw new HttpsError('invalid-argument', 'Invalid account type');
   }
-
-  // basic account
-  if (accountType === UserAccountTypes.Basic) {
-    const userData: Partial<UserData> = {
-      ...currentUser,
-      portfolioState: {
-        ...createUserPortfolioStateEmpty(0),
-      },
-      features: {
-        ...currentUser.features,
-        userPortfolioAllowCashAccount: false,
-        groupAllowAccess: false,
-      },
-    };
-
-    return userData;
-  }
-
-  throw new HttpsError('invalid-argument', 'Invalid account type');
 };

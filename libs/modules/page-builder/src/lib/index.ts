@@ -2,6 +2,7 @@ export * from './page-crypto/page-crypto.component';
 export * from './page-dashboard/page-dashboard.component';
 export * from './page-group-details/page-group-details.component';
 export * from './page-groups/page-groups.component';
+export * from './page-hall-of-fame/page-hall-of-fame.component';
 export * from './page-login/page-login.component';
 export * from './page-market';
 export * from './page-menu/page-menu.component';

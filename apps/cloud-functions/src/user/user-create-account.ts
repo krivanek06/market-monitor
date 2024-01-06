@@ -1,5 +1,5 @@
 import { UserData, UserPersonalInfo, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { userDocumentTransactionHistoryRef, userDocumentWatchListRef, usersCollectionRef } from '../models';
@@ -57,33 +57,21 @@ const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
       groupRequested: [],
     },
     settings: {
-      isProfilePublic: true,
       allowReceivingGroupInvitations: true,
     },
     personal: personal,
-    accountResets: [],
     portfolioState: {
-      cashOnHand: 0,
-      startingCash: 0,
-      holdingsBalance: 0,
-      invested: 0,
-      numberOfExecutedBuyTransactions: 0,
-      numberOfExecutedSellTransactions: 0,
-      transactionFees: 0,
-      totalGainsPercentage: 0,
-      totalGainsValue: 0,
-      balance: 0,
-      firstTransactionDate: null,
-      lastTransactionDate: null,
-      date: getCurrentDateDefaultFormat(),
+      ...createEmptyPortfolioState(),
     },
     holdingSnapshot: {
       lastModifiedDate: getCurrentDateDefaultFormat(),
       data: [],
     },
     lastLoginDate: getCurrentDateDefaultFormat(),
+    isAccountActive: true,
     accountCreatedDate: getCurrentDateDefaultFormat(),
     features: {},
+    systemRank: {},
   };
   return newUser;
 };

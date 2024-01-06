@@ -17,13 +17,11 @@ import { SectionTitleComponent } from '@market-monitor/shared/ui';
       ></app-portfolio-holdings-table>
     </div>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

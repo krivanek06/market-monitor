@@ -11,13 +11,11 @@ import { HighchartsChartModule } from 'highcharts-angular';
   imports: [CommonModule, HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { ngSkipHydration: 'true' },
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   template: `
     <highcharts-chart
       *ngIf="isHighcharts"

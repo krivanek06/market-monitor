@@ -8,13 +8,11 @@ import { PageSearchComponent } from '@market-monitor/modules/page-builder';
   standalone: true,
   imports: [CommonModule, PageSearchComponent],
   template: `<app-page-search></app-page-search>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent implements OnInit {

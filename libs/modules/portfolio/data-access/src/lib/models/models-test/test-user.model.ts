@@ -1,12 +1,12 @@
-import { UserData } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { USER_DEFAULT_STARTING_CASH, UserData } from '@market-monitor/api-types';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 
 export const USER_TEST_1_ID = 'USER_TEST_1';
 
 export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
   const defaultUser: UserData = {
     id: USER_TEST_1_ID,
-    accountResets: [],
+    systemRank: {},
     groups: {
       groupInvitations: [],
       groupMember: [],
@@ -20,29 +20,17 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       providerId: 'google.com',
     },
     settings: {
-      isProfilePublic: true,
       allowReceivingGroupInvitations: true,
     },
     portfolioState: {
-      cashOnHand: 0,
-      startingCash: 1000,
-      holdingsBalance: 0,
-      invested: 0,
-      numberOfExecutedBuyTransactions: 0,
-      numberOfExecutedSellTransactions: 0,
-      transactionFees: 0,
-      totalGainsPercentage: 0,
-      totalGainsValue: 0,
-      balance: 0,
-      firstTransactionDate: null,
-      lastTransactionDate: null,
-      date: getCurrentDateDefaultFormat(),
+      ...createEmptyPortfolioState(USER_DEFAULT_STARTING_CASH),
     },
     holdingSnapshot: {
       lastModifiedDate: getCurrentDateDefaultFormat(),
       data: [],
     },
     lastLoginDate: getCurrentDateDefaultFormat(),
+    isAccountActive: true,
     accountCreatedDate: getCurrentDateDefaultFormat(),
     features: {},
   };

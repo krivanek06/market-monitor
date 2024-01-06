@@ -6,13 +6,11 @@ import { PageDashboardComponent } from '@market-monitor/modules/page-builder';
   standalone: true,
   imports: [PageDashboardComponent],
   template: `<app-page-dashboard></app-page-dashboard>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {}

@@ -1,6 +1,7 @@
 import { User } from 'firebase/auth';
 import { DataDocsWrapper } from './../constants/generic.model';
 import { PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
+import { RankingItem } from './ranking.model';
 import { SymbolType } from './symbol.model';
 
 export type UserBase = {
@@ -15,6 +16,11 @@ export type UserBase = {
   accountCreatedDate: string;
 
   lastLoginDate: string;
+  /**
+   * at each login is set to true, set to false
+   * only if lastLoginDate is more than USER_LOGIN_ACCOUNT_ACTIVE_DAYS ago
+   */
+  isAccountActive: boolean;
 };
 
 export type UserData = UserBase & {
@@ -38,21 +44,23 @@ export type UserData = UserBase & {
     groupWatched: string[];
   };
   settings: UserSettings;
-  accountResets: UserAccountResets[];
   /**
    * data about current holdings, calculated from previous transactions
    */
   holdingSnapshot: DataDocsWrapper<PortfolioStateHoldingBase>;
-
+  /**
+   * features that user has access to
+   */
   features: UserFeatures;
+  systemRank: SystemRankUser;
 };
 
-/**
- * user can reset its account and all previous data
- * such as groups, transactions, watchlist, etc. will be removed
- */
-export type UserAccountResets = {
-  date: string;
+export type SystemRankUser = {
+  /**
+   * value calculate from portfolioState.totalGainsPercentage based on
+   * all users in the system
+   */
+  portfolioTotalGainsPercentage?: RankingItem;
 };
 
 export type UserPortfolioTransaction = {
@@ -75,14 +83,11 @@ export type UserPersonalInfo = {
 
 export type UserSettings = {
   /**
-   * if true, other users will be able to find this user portfolio by searching
-   */
-  isProfilePublic: boolean;
-
-  /**
    * if true, user will be able to receive group invitations
    */
   allowReceivingGroupInvitations: boolean;
+
+  // TODO: darkModeEnabled: boolean
 };
 
 export type UserFeatures = {
@@ -93,28 +98,33 @@ export type UserFeatures = {
   /**
    * if true, user can access group page and create groups limited by - GROUP_OWNER_LIMIT
    */
-  groupAllowAccess?: boolean;
+  allowAccessGroups?: boolean;
 
   /**
    * if true, user can create unlimited number of groups
    */
-  groupAllowCreateUnlimited?: boolean;
+  allowCreateUnlimitedGroups?: boolean;
 
   /**
    * if true, user will have a starting cash balance and system
    * will always check whether user has enough cash to buy
    */
-  userPortfolioAllowCashAccount?: boolean;
+  allowPortfolioCashAccount?: boolean;
 
   /**
    * if true, user can have unlimited number of symbols in portfolio, else it is limited - USER_HOLDINGS_SYMBOL_LIMIT
    */
-  userAllowUnlimitedSymbolsInHoldings?: boolean;
+  allowUnlimitedSymbolsInHoldings?: boolean;
 
   /**
    * if true, user can have unlimited number of symbols in watchList, else it is limited - USER_WATCHLIST_SYMBOL_LIMIT
    */
-  userAllowUnlimitedSymbolsInWatchList?: boolean;
+  allowUnlimitedSymbolsInWatchList?: boolean;
+
+  /**
+   * if true (by default true), user will participate in hall of fame
+   */
+  allowAccessHallOfFame?: boolean;
 };
 export type UserFeaturesType = keyof UserFeatures;
 

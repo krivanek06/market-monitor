@@ -82,13 +82,11 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
       multi: true,
     },
   ],
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
 })
 export class UploadImageSingleControlComponent implements ControlValueAccessor {
   @Output() uploadedFilesEmitter: EventEmitter<string> = new EventEmitter<string>();

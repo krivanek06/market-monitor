@@ -96,22 +96,16 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
           class="w-full h-12 max-sm:mb-2"
           type="button"
         >
-          <app-quote-item
-            [displayValue]="displayValue"
-            [symbolQuote]="summary.quote"
-            [assetUrl]="summary.profile?.image"
-          ></app-quote-item>
+          <app-quote-item [displayValue]="displayValue" [symbolQuote]="summary.quote"></app-quote-item>
         </button>
       </div>
     </ng-template>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {
   @Output() clickedSummary = new EventEmitter<SymbolSummary>();

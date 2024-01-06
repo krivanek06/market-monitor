@@ -21,14 +21,23 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     StockSheetDataTimePeriodComponent,
     ReactiveFormsModule,
   ],
-  templateUrl: './page-stock-details-financials.component.html',
-  styles: [
-    `
+  template: `
+    <div class="mb-6">
+      <app-stock-sheet-data-time-period [formControl]="timePeriodControl"></app-stock-sheet-data-time-period>
+    </div>
+
+    <app-general-card additionalClasses="py-4 px-6">
+      <app-stock-sheet-data-table
+        *ngIf="sheetDataSignal() as balanceSheetDataSignal"
+        [data]="balanceSheetDataSignal"
+      ></app-stock-sheet-data-table>
+    </app-general-card>
+  `,
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageStockDetailsFinancialsComponent extends PageStockDetailsBase {

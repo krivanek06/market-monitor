@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { LabelValue, ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { TabSelectControlComponent } from '@market-monitor/shared/ui';
 
@@ -15,7 +16,7 @@ type MarketRoutes = ROUTES_MAIN.TOP_PERFORMERS | ROUTES_MAIN.ECONOMICS | ROUTES_
   template: `
     <app-tab-select-control
       [formControl]="currentRouteControl"
-      [displayOptions]="marketTabs"
+      [displayOptions]="marketTabsSignal()"
       screenLayoutSplit="LAYOUT_LG"
     />
 
@@ -23,20 +24,19 @@ type MarketRoutes = ROUTES_MAIN.TOP_PERFORMERS | ROUTES_MAIN.ECONOMICS | ROUTES_
       <router-outlet></router-outlet>
     </section>
   `,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarketComponent implements OnInit {
-  router = inject(Router);
-  route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
 
-  marketTabs: LabelValue<MarketRoutes>[] = [
+  private marketTabs: LabelValue<MarketRoutes>[] = [
     {
       label: 'Top Performers',
       value: ROUTES_MAIN.TOP_PERFORMERS,
@@ -54,6 +54,20 @@ export class MarketComponent implements OnInit {
       value: ROUTES_MAIN.NEWS,
     },
   ];
+
+  marketTabsSignal = computed(() => {
+    const userAccountType = this.authenticationUserStoreService.state.getUserAccountType();
+    if (userAccountType === 'Trading') {
+      return [
+        {
+          label: 'Screener',
+          value: ROUTES_MAIN.STOCK_SCREENER,
+        },
+        ...this.marketTabs,
+      ];
+    }
+    return this.marketTabs;
+  });
 
   currentRouteControl = new FormControl<MarketRoutes>(ROUTES_MAIN.TOP_PERFORMERS, { nonNullable: true });
 

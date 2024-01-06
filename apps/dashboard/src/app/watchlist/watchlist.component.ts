@@ -6,13 +6,11 @@ import { PageWatchlistComponent } from '@market-monitor/modules/page-builder';
   standalone: true,
   imports: [PageWatchlistComponent],
   template: `<app-page-watchlist></app-page-watchlist>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WatchlistComponent {}

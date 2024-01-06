@@ -45,6 +45,18 @@ export type PortfolioState = {
    * date when it was last calculated
    */
   date: string;
+  /**
+   * change in balance from previousBalanceDate
+   */
+  previousBalanceChange: number;
+  /**
+   * change in balance from previousBalanceDate in percentage
+   */
+  previousBalanceChangePercentage: number;
+  /**
+   * date when user portfolio was reset
+   */
+  accountResetDate: string;
 };
 
 export type PortfolioStateHoldingBase = {

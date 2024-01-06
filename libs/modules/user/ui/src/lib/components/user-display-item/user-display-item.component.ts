@@ -3,25 +3,55 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { UserBase } from '@market-monitor/api-types';
 import { USER_ACTIVE_ACCOUNT_TIME_DAYS } from '@market-monitor/modules/user/data-access';
-import { DefaultImgDirective, LargeNumberFormatterPipe } from '@market-monitor/shared/ui';
+import { DefaultImgDirective, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 import { isBefore, subDays } from 'date-fns';
 
 @Component({
   selector: 'app-user-display-item',
   standalone: true,
-  imports: [CommonModule, DefaultImgDirective, LargeNumberFormatterPipe, MatIconModule],
-  templateUrl: './user-display-item.component.html',
-  styles: [
-    `
+  imports: [CommonModule, DefaultImgDirective, LargeNumberFormatterPipe, MatIconModule, PercentageIncreaseDirective],
+  template: `
+    <div class="flex gap-4">
+      <img appDefaultImg [src]="userData.personal.photoURL" alt="User Image" class="w-16 h-16 rounded-md" />
+
+      <!-- info -->
+      <div class="flex flex-col">
+        <div class="flex">
+          <div class="text-wt-gray-dark w-[80px]">Name:</div>
+          <div class="mr-4">{{ userData.personal.displayName }}</div>
+          <mat-icon *ngIf="showLoginButton" [color]="isUserActive ? 'accent' : 'warn'"> radio_button_checked </mat-icon>
+        </div>
+
+        <div class="flex">
+          <div class="text-wt-gray-dark w-[80px]">Balance:</div>
+          <div class="flex items-center gap-2">
+            <div>{{ userData.portfolioState.balance | largeNumberFormatter: false : true }}</div>
+            <div
+              appPercentageIncrease
+              [changeValues]="{
+                changePercentage: userData.portfolioState.previousBalanceChangePercentage
+              }"
+            ></div>
+          </div>
+        </div>
+
+        <div class="flex">
+          <div class="text-wt-gray-dark w-[80px]">Login:</div>
+          <span>{{ userData.lastLoginDate | date: 'MMMM d, y' }}</span>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserDisplayItemComponent {
   @Input({ required: true }) userData!: UserBase;
+  @Input() showLoginButton = true;
 
   USER_ACTIVE_ACCOUNT_TIME_DAYS = USER_ACTIVE_ACCOUNT_TIME_DAYS;
 

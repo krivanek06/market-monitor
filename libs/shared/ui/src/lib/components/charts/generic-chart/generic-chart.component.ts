@@ -31,13 +31,11 @@ import { HighchartsChartModule } from 'highcharts-angular';
   standalone: true,
   imports: [CommonModule, HighchartsChartModule, MatButtonModule, MatIconModule, MatTooltipModule],
   host: { ngSkipHydration: 'true' },
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   template: `
     <div class="block relative">
       <button

@@ -6,13 +6,11 @@ import { PageTradingComponent } from '@market-monitor/modules/page-builder';
   standalone: true,
   imports: [PageTradingComponent],
   template: `<app-page-trading></app-page-trading>`,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingComponent {}

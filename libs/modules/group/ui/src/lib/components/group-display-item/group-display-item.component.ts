@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { GROUP_MEMBER_LIMIT, GroupData } from '@market-monitor/api-types';
+import { GROUP_MEMBER_LIMIT, GroupBase } from '@market-monitor/api-types';
 import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
 @Component({
@@ -17,18 +17,74 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
     PercentageIncreaseDirective,
     MatRippleModule,
   ],
-  templateUrl: './group-display-item.component.html',
-  styles: [
-    `
+  template: `
+    <div
+      matRipple
+      [matRippleCentered]="true"
+      [matRippleDisabled]="!clickable"
+      [matRippleUnbounded]="false"
+      [ngClass]="{
+        'g-clickable-hover': clickable
+      }"
+      class="flex flex-col gap-1 p-2"
+    >
+      <div class="flex items-center gap-4">
+        <!-- image -->
+        <img appDefaultImg [src]="groupData.imageUrl" alt="Group image" class="w-16 h-16" />
+
+        <!-- info -->
+        <div class="grid gap-1">
+          <div class="flex items-center gap-4">
+            <!-- name -->
+            <div
+              class="text-lg"
+              [ngClass]="{
+                'text-wt-primary': !groupData.isClosed,
+                'text-wt-danger': groupData.isClosed
+              }"
+            >
+              {{ groupData.name | titlecase }}
+            </div>
+            <!-- portfolio -->
+            <div
+              *ngIf="!groupData.isClosed"
+              appPercentageIncrease
+              [useCurrencySign]="true"
+              [changeValues]="{
+                change: groupData.portfolioState.totalGainsValue,
+                changePercentage: groupData.portfolioState.totalGainsPercentage
+              }"
+            ></div>
+            <!-- closed group display message -->
+            <div *ngIf="groupData.isClosed" class="text-wt-danger">(Closed)</div>
+          </div>
+          <div class="flex items-center gap-4">
+            <!-- owner -->
+            <div class="flex items-center gap-4">
+              <img
+                appDefaultImg
+                [src]="groupData.ownerUser.personal.photoURL"
+                alt="Owner image"
+                class="w-8 h-8 rounded-full"
+              />
+              <span>{{ groupData.ownerUser.personal.displayName | titlecase }}</span>
+            </div>
+            <!-- members -->
+            <div>[{{ groupData.numberOfMembers }} / {{ memberLimit }}]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDisplayItemComponent {
-  @Input({ required: true }) groupData!: GroupData;
+  @Input({ required: true }) groupData!: GroupBase;
   @Input() clickable = false;
 
   memberLimit = GROUP_MEMBER_LIMIT;

@@ -9,14 +9,93 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
   selector: 'app-group-display-info',
   standalone: true,
   imports: [CommonModule, DefaultImgDirective, MatButtonModule, MatIconModule, PercentageIncreaseDirective],
-  templateUrl: './group-display-info.component.html',
-  styles: [
-    `
+  template: `
+    <div class="flex items-center flex-1 gap-3">
+      <!-- image -->
+      <img
+        appDefaultImg
+        [src]="groupData.imageUrl"
+        alt="Group Image"
+        class="object-cover -mt-2"
+        [style.height.px]="imageHeightPx"
+        [style.width.px]="imageHeightPx"
+      />
+      <!-- data -->
+      <div class="flex flex-col">
+        <div class="flex gap-4 items-center">
+          <!-- name -->
+          <div
+            class="text-lg"
+            [ngClass]="{
+              'text-wt-primary': !groupData.isClosed,
+              'text-wt-danger': groupData.isClosed
+            }"
+          >
+            {{ groupData.name | titlecase }}
+          </div>
+          <!-- portfolio -->
+          <div
+            *ngIf="!groupData.isClosed"
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [changeValues]="{
+              change: groupData.portfolioState.totalGainsValue,
+              changePercentage: groupData.portfolioState.totalGainsPercentage
+            }"
+          ></div>
+          <!-- closed group display message -->
+          <div *ngIf="groupData.isClosed" class="text-wt-danger">(Closed)</div>
+        </div>
+        <!-- owner -->
+        <div
+          (click)="onOwnerClick()"
+          class="flex items-center gap-2 px-1 py-2 rounded-lg"
+          [ngClass]="{
+            'g-clickable-hover': clickableOwner,
+            'hover:shadow-lg': clickableOwner
+          }"
+        >
+          <img
+            appDefaultImg
+            [src]="groupData.ownerUser.personal.photoURL"
+            alt="Owner Image"
+            class="w-8 h-8 rounded-full"
+          />
+          <span>{{ groupData.ownerUser.personal.displayName | titlecase }}</span>
+        </div>
+        <!-- status -->
+        <div class="flex gap-2">
+          <div class="w-20">Status</div>
+          <div
+            class="flex items-center gap-2"
+            [ngClass]="{
+              'text-wt-success': groupData.isPublic,
+              'text-wt-danger': !groupData.isPublic
+            }"
+          >
+            <mat-icon *ngIf="groupData.isPublic" color="accent">lock_open</mat-icon>
+            <mat-icon *ngIf="!groupData.isPublic" color="warn">lock</mat-icon>
+            <span>{{ groupData.isPublic ? 'Open' : 'Closed' }}</span>
+          </div>
+        </div>
+        <!-- members -->
+        <div class="flex gap-2">
+          <div class="w-20">Members</div>
+          <div>{{ groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}</div>
+        </div>
+        <!-- created date -->
+        <div class="flex gap-2">
+          <div class="w-20">Created</div>
+          <div>{{ groupData.createdDate | date: 'MMMM d, y' }}</div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: `
       :host {
         display: block;
       }
     `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDisplayInfoComponent {

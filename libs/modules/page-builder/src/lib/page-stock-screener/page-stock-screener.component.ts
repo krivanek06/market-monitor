@@ -36,15 +36,42 @@ import { catchError, switchMap, tap } from 'rxjs';
     MatButtonModule,
     MatDialogModule,
   ],
-  templateUrl: './page-stock-screener.component.html',
+  template: `
+    <section class="pt-4 mx-auto mb-10 md:w-11/12 lg:w-10/12 xl:w-9/12">
+      <app-stock-screener-form-control [formControl]="screenerFormControl"></app-stock-screener-form-control>
+
+      <div class="flex items-center justify-between mt-8">
+        <h3>Total found: {{ loadingSignal() ? 'Loading...' : screenerResults()?.length }}</h3>
+
+        <button (click)="onFormReset()" mat-stroked-button color="warn" class="g-border-apply">Reset Form</button>
+      </div>
+    </section>
+
+    <!-- table of results -->
+    <ng-container *ngIf="!loadingSignal()">
+      <ng-container *ngIf="screenerResults() as screenerResults">
+        <section class="mt-6">
+          <app-stock-summary-table
+            appScrollNearEnd
+            (nearEnd)="onNearEndScroll()"
+            (itemClickedEmitter)="onSummaryClick($event)"
+            [stockSummaries]="screenerResults | slice: 0 : maxScreenerResults()"
+          ></app-stock-summary-table>
+        </section>
+      </ng-container>
+    </ng-container>
+
+    <!-- loading screen -->
+    <div *ngIf="loadingSignal()" class="mt-12">
+      <div *ngRange="20" class="mb-1 h-14 g-skeleton"></div>
+    </div>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
 })
 export class PageStockScreenerComponent implements OnInit, RouterManagement {
   private screenerDefault = 30;

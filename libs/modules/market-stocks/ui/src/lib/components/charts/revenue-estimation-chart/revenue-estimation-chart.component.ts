@@ -10,13 +10,6 @@ import { HighchartsChartModule } from 'highcharts-angular';
   imports: [CommonModule, HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { ngSkipHydration: 'true' },
-  styles: [
-    `
-      :host {
-        display: block;
-      }
-    `,
-  ],
   template: `
     <highcharts-chart
       *ngIf="isHighcharts"
@@ -29,6 +22,11 @@ import { HighchartsChartModule } from 'highcharts-angular';
     >
     </highcharts-chart>
   `,
+  styles: `
+      :host {
+        display: block;
+      }
+    `,
 })
 export class RevenueEstimationChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(values: EstimatedChartDataType[]) {

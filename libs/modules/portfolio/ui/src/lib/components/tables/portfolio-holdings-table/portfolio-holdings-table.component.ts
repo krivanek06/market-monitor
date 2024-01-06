@@ -38,14 +38,167 @@ import {
     MatChipsModule,
     MatPaginatorModule,
   ],
-  templateUrl: './portfolio-holdings-table.component.html',
-  styles: [
-    `
+  template: `
+    <table
+      mat-table
+      class="table-hover"
+      [dataSource]="dataSource"
+      [trackBy]="identity"
+      matSort
+      (matSortChange)="sortData($event)"
+    >
+      <!-- image & name -->
+      <ng-container matColumnDef="symbol">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Symbol</th>
+        <td mat-cell *matCellDef="let row">
+          <!-- logo + symbol -->
+          <div class="flex items-center gap-2">
+            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="w-10 h-10" />
+            <div class="flex flex-col">
+              <div class="space-x-1">
+                <span class="text-wt-gray-dark">{{ row.symbol }}</span>
+                <span class="text-wt-gray-medium">({{ row.units }})</span>
+              </div>
+              <div>{{ row.symbolSummary.profile?.sector || 'N/A' }}</div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- price -->
+      <ng-container matColumnDef="price">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Price +/-</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div class="flex flex-col">
+            <div>
+              {{ row.symbolSummary.quote.price | currency }}
+            </div>
+            <div
+              appPercentageIncrease
+              [useCurrencySign]="true"
+              [currentValues]="{
+                value: row.symbolSummary.quote.price * row.units,
+                valueToCompare: row.symbolSummary.quote.previousClose * row.units
+              }"
+            ></div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- BEP. -->
+      <ng-container matColumnDef="bep">
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">BEP +/-</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">{{ row.breakEvenPrice | currency }}</td>
+      </ng-container>
+
+      <!-- total -->
+      <ng-container matColumnDef="total">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Total +/-</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div class="flex flex-col">
+            <div>{{ row.symbolSummary.quote.price * row.units | currency }}</div>
+            <div
+              appPercentageIncrease
+              [useCurrencySign]="true"
+              [currentValues]="{
+                value: row.symbolSummary.quote.price * row.units,
+                valueToCompare: row.breakEvenPrice * row.units
+              }"
+            ></div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- invested -->
+      <ng-container matColumnDef="invested">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Invested</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          {{ row.invested | currency }}
+        </td>
+      </ng-container>
+
+      <!-- units -->
+      <ng-container matColumnDef="units">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Units</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">{{ row.units }}</td>
+      </ng-container>
+
+      <!-- portfolio % -->
+      <ng-container matColumnDef="portfolio">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Portfolio %</th>
+        <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
+          {{
+            holdingsBalance ? ((row.symbolSummary.quote.price * row.units) / holdingsBalance | percent: '1.2-2') : 'N/A'
+          }}
+        </td>
+      </ng-container>
+
+      <!-- beta -->
+      <ng-container matColumnDef="beta">
+        <th mat-header-cell *matHeaderCellDef class="hidden xl:table-cell">Beta</th>
+        <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
+          {{ row.symbolSummary.profile?.beta ? (row.symbolSummary.profile?.beta | number: '1.2-2') : 'N/A' }}
+        </td>
+      </ng-container>
+
+      <!-- pe -->
+      <ng-container matColumnDef="pe">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">PE</th>
+        <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
+          {{ (row.symbolSummary.quote.pe | number: '1.2-2') ?? 'N/A' }}
+        </td>
+      </ng-container>
+
+      <!-- market cap -->
+      <ng-container matColumnDef="marketCap">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">Market Cap.</th>
+        <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
+          {{ row.symbolSummary.quote.marketCap | largeNumberFormatter }}
+        </td>
+      </ng-container>
+
+      <!-- yearlyRange -->
+      <ng-container matColumnDef="yearlyRange">
+        <th mat-header-cell *matHeaderCellDef class="hidden xl:table-cell">52 Week Range</th>
+        <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
+          <app-progress-currency
+            [min]="row.symbolSummary.quote.yearLow"
+            [max]="row.symbolSummary.quote.yearHigh"
+            [value]="row.symbolSummary.quote.price"
+          ></app-progress-currency>
+        </td>
+      </ng-container>
+
+      <!-- sector -->
+      <ng-container matColumnDef="sector">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden 2xl:table-cell">Sector</th>
+        <td mat-cell *matCellDef="let row" class="hidden 2xl:table-cell">
+          <mat-chip-listbox aria-label="Asset sector">
+            <mat-chip>
+              {{ row.symbolSummary.profile?.sector || 'N/A' }}
+            </mat-chip>
+          </mat-chip-listbox>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"
+        (click)="onItemClicked(row)"
+      ></tr>
+
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="text-center mat-cell" colspan="10">No holdings to be found</td>
+      </tr>
+    </table>
+  `,
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioHoldingsTableComponent implements OnChanges {

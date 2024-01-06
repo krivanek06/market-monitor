@@ -5,7 +5,7 @@ import {
   GroupData,
   UserBase,
 } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
@@ -127,19 +127,9 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
     endDate: null,
     modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
     portfolioState: {
-      cashOnHand: 0,
-      firstTransactionDate: null,
-      lastTransactionDate: null,
-      holdingsBalance: 0,
-      invested: 0,
-      date: getCurrentDateDefaultFormat(),
-      numberOfExecutedBuyTransactions: 0,
-      numberOfExecutedSellTransactions: 0,
-      startingCash: 0,
-      totalGainsPercentage: 0,
-      totalGainsValue: 0,
-      transactionFees: 0,
-      balance: 0,
+      ...createEmptyPortfolioState(),
     },
+    systemRank: {},
+    numberOfMembers: 0,
   };
 };

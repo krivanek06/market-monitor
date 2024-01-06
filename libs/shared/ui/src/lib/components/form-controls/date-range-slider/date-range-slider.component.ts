@@ -15,13 +15,11 @@ export type DateRangeSliderValues = {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatSliderModule, GetDataByIndexPipe],
   templateUrl: './date-range-slider.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

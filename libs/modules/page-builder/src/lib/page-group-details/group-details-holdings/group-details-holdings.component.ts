@@ -33,13 +33,11 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     SectionTitleComponent,
   ],
   templateUrl: './group-details-holdings.component.html',
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDetailsHoldingsComponent extends PageGroupsBaseComponent {

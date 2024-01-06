@@ -8,13 +8,11 @@ import { WordsUpPipe } from '../../../pipes';
   standalone: true,
   imports: [CommonModule, WordsUpPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
+  styles: `
       :host {
         display: block;
       }
-    `,
-  ],
+  `,
   template: `
     <div *ngFor="let item of items" class="g-item-wrapper">
       <span>{{ item.name | wordsUp }}</span>
