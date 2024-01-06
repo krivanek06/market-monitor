@@ -2,11 +2,15 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { AggregationApiService } from '@market-monitor/api-client';
 import { UserBase } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { PortfolioRankTableComponent } from '@market-monitor/modules/portfolio/ui';
+import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
+import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { DefaultImgDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
 
 @Component({
@@ -19,6 +23,9 @@ import { DefaultImgDirective, SectionTitleComponent } from '@market-monitor/shar
     SectionTitleComponent,
     MatButtonModule,
     UserDisplayItemComponent,
+    MatIconModule,
+    UserDetailsDialogComponent,
+    MatDialogModule,
   ],
   template: `
     <!-- display user rank -->
@@ -43,6 +50,8 @@ import { DefaultImgDirective, SectionTitleComponent } from '@market-monitor/shar
                 mat-stroked-button
                 type="button"
               >
+                <mat-icon *ngIf="showBestUsersSignal()">arrow_drop_down</mat-icon>
+                <mat-icon *ngIf="!showBestUsersSignal()">arrow_drop_up</mat-icon>
                 @if (showBestUsersSignal()) {
                   Worst Users
                 } @else {
@@ -75,7 +84,14 @@ import { DefaultImgDirective, SectionTitleComponent } from '@market-monitor/shar
           <div>
             <app-section-title title="Daily Gainers" class="mb-6" />
             @for (user of hallOfFameUses.bestDailyGains; track user.id) {
-              <app-user-display-item [showLoginButton]="false" [userData]="user" />
+              <app-user-display-item
+                (click)="onUserClick(user)"
+                class="g-clickable-hover"
+                [showLoginButton]="false"
+                [userData]="user"
+              />
+            } @empty {
+              <div>No Data Found</div>
             }
           </div>
 
@@ -83,7 +99,14 @@ import { DefaultImgDirective, SectionTitleComponent } from '@market-monitor/shar
           <div>
             <app-section-title title="Daily Losers" class="mb-6" />
             @for (user of hallOfFameUses.worstDailyGains; track user.id) {
-              <app-user-display-item [showLoginButton]="false" [userData]="user" />
+              <app-user-display-item
+                (click)="onUserClick(user)"
+                class="g-clickable-hover"
+                [showLoginButton]="false"
+                [userData]="user"
+              />
+            } @empty {
+              <div>No Data Found</div>
             }
           </div>
         </div>
@@ -110,6 +133,7 @@ import { DefaultImgDirective, SectionTitleComponent } from '@market-monitor/shar
 export class HallOfFameUsersComponent {
   private aggregationApiService = inject(AggregationApiService);
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private dialog = inject(MatDialog);
 
   /**
    * limit number of users to display, display rest on "show more"
@@ -142,7 +166,12 @@ export class HallOfFameUsersComponent {
   showBestUsersSignal = signal(true);
 
   onUserClick(user: UserBase) {
-    console.log('user', user);
+    this.dialog.open(UserDetailsDialogComponent, {
+      data: <UserDetailsDialogComponentData>{
+        userId: user.id,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
   }
 
   showMoreToggle() {

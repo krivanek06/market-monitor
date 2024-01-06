@@ -8,7 +8,7 @@ import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
+import { Confirmable, DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
 import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
 
@@ -25,10 +25,17 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
     </p>
 
     <mat-dialog-content class="p-4">
-      <div class="grid md:grid-cols-2 gap-x-10 gap-y-4">
+      <div class="grid md:grid-cols-2 gap-x-10 gap-y-4 mb-10">
         @if (!showLoaderSignal()) {
           <!-- basic account -->
-          <div>
+          <div
+            class="p-3 rounded-lg border "
+            (click)="changeAccount(UserAccountTypes.Basic)"
+            [ngClass]="{
+              'border-wt-primary pointer-events-none': userAccountTypeSignal() === UserAccountTypes.Basic,
+              'g-clickable-hover opacity-85 hover:opacity-100': userAccountTypeSignal() !== UserAccountTypes.Basic
+            }"
+          >
             <div class="mb-2 text-lg text-wt-primary text-center">Basic Account</div>
             <div *ngFor="let text of accountDescription.Basic" class="mb-3 text-center">
               {{ text }}
@@ -36,33 +43,18 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
           </div>
 
           <!-- trading account -->
-          <div>
+          <div
+            (click)="changeAccount(UserAccountTypes.Trading)"
+            class="p-3 rounded-lg border"
+            [ngClass]="{
+              'border-wt-primary pointer-events-none': userAccountTypeSignal() === UserAccountTypes.Trading,
+              'g-clickable-hover opacity-85 hover:opacity-100': userAccountTypeSignal() !== UserAccountTypes.Trading
+            }"
+          >
             <div class="mb-2 text-lg text-wt-primary text-center">Trading Account</div>
             <div *ngFor="let text of accountDescription.Trading" class="mb-3 text-center">
               {{ text }}
             </div>
-          </div>
-
-          <!-- action buttons to align layout -->
-          <div class="my-6 flex justify-center">
-            <button
-              (click)="changeAccount(UserAccountTypes.Basic)"
-              mat-flat-button
-              color="primary"
-              [disabled]="userAccountTypeSignal() === UserAccountTypes.Basic"
-            >
-              Choose Basic Account
-            </button>
-          </div>
-          <div class="my-6 flex justify-center">
-            <button
-              (click)="changeAccount(UserAccountTypes.Trading)"
-              mat-flat-button
-              color="primary"
-              [disabled]="userAccountTypeSignal() === UserAccountTypes.Trading"
-            >
-              Choose Trading Account
-            </button>
           </div>
         } @else {
           <div class="col-span-2 p-4 grid place-content-center">
@@ -92,6 +84,7 @@ export class UserAccountTypeSelectDialogComponent {
 
   showLoaderSignal = signal(false);
 
+  @Confirmable('Are you sure you want to change your account type? This will reset all your transactions')
   changeAccount(selected: UserAccountTypes) {
     // notify user
     this.dialogServiceUtil.showNotificationBar('Changing account type, please wait...');

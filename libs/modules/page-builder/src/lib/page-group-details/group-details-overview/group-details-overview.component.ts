@@ -83,7 +83,6 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
   ngOnInit(): void {}
 
   onMemberClick(member: GroupMember): void {
-    console.log('onMemberClick', member);
     this.dialog.open(UserDetailsDialogComponent, {
       data: <UserDetailsDialogComponentData>{
         userId: member.id,

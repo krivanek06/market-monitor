@@ -17,10 +17,12 @@ export const hallOfFameGroups = async (): Promise<void> => {
     .limit(HALL_OF_FAME_PORTFOLIO_TOP_LIMIT);
   // get top daily profit groups
   const groupBestDailyProfitRef = searchableRef
+    .where('portfolioState.previousBalanceChangePercentage', '>', 0)
     .orderBy('portfolioState.previousBalanceChangePercentage', 'desc')
     .limit(HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT);
   // get worst daily profit groups
   const groupWorstDailyProfitRef = searchableRef
+    .where('portfolioState.previousBalanceChangePercentage', '<', 0)
     .orderBy('portfolioState.previousBalanceChangePercentage', 'asc')
     .limit(HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT);
 

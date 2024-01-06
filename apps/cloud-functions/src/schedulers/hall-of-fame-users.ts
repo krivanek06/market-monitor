@@ -17,10 +17,12 @@ export const hallOfFameUsers = async (): Promise<void> => {
     .limit(HALL_OF_FAME_PORTFOLIO_TOP_LIMIT);
   // get top daily profit users
   const userBestDailyProfitRef = searchableRef
+    .where('portfolioState.previousBalanceChangePercentage', '>', 0)
     .orderBy('portfolioState.previousBalanceChangePercentage', 'desc')
     .limit(HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT);
   // get worst daily profit users
   const userWorstDailyProfitRef = searchableRef
+    .where('portfolioState.previousBalanceChangePercentage', '<', 0)
     .orderBy('portfolioState.previousBalanceChangePercentage', 'asc')
     .limit(HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT);
 

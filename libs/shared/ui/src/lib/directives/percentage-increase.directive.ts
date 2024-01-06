@@ -74,6 +74,15 @@ export class PercentageIncreaseDirective implements OnInit {
    * @param changesPercentage - changed prct between the current and compared to item
    */
   private createElement(change: number | null, changesPercentage: number | null, hideValue = false): void {
+    // clear previous view on client side
+    this.vr.clear();
+
+    // clear previous view
+    const childElements = this.vr.element.nativeElement.childNodes;
+    for (let child of childElements) {
+      this.renderer2.removeChild(this.vr.element.nativeElement, child);
+    }
+
     // create elements
     const wrapper = this.vr.element.nativeElement;
 
@@ -83,12 +92,6 @@ export class PercentageIncreaseDirective implements OnInit {
       this.renderer2.appendChild(element, text);
       this.renderer2.appendChild(wrapper, element);
       return;
-    }
-
-    // clear previous view
-    const childElements = this.vr.element.nativeElement.childNodes;
-    for (let child of childElements) {
-      this.renderer2.removeChild(this.vr.element.nativeElement, child);
     }
 
     // color to use
