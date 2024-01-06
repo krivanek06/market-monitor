@@ -8,7 +8,6 @@ import {
   BubblePaginationDirective,
   LargeNumberFormatterPipe,
   PercentageIncreaseDirective,
-  RenderClientDirective,
   TruncateWordsPipe,
 } from '@market-monitor/shared/ui';
 
@@ -24,7 +23,6 @@ import {
     MatPaginatorModule,
     BubblePaginationDirective,
     MatSortModule,
-    RenderClientDirective,
   ],
   templateUrl: './stock-ownership-holders-table.component.html',
   styles: `

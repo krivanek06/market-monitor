@@ -20,12 +20,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MarketApiService } from '@market-monitor/api-client';
 import { AvailableQuotes, SymbolQuote } from '@market-monitor/api-types';
-import {
-  ClientStylesDirective,
-  DefaultImgDirective,
-  QuoteItemComponent,
-  RangeDirective,
-} from '@market-monitor/shared/ui';
+import { DefaultImgDirective, QuoteItemComponent, RangeDirective } from '@market-monitor/shared/ui';
 import { tap } from 'rxjs';
 
 @Component({
@@ -46,7 +41,6 @@ import { tap } from 'rxjs';
     MatProgressSpinnerModule,
     FormsModule,
     ScrollingModule,
-    ClientStylesDirective,
   ],
   template: `
     <mat-form-field class="w-full" [ngClass]="size">
@@ -76,13 +70,7 @@ import { tap } from 'rxjs';
 
         <!-- loaded data -->
         <ng-container *ngIf="!showLoadingIndicator()">
-          <cdk-virtual-scroll-viewport
-            [itemSize]="50"
-            appClientStyles
-            [appMinHeight]="8 * 50"
-            minBufferPx="380"
-            maxBufferPx="400"
-          >
+          <cdk-virtual-scroll-viewport [itemSize]="50" class="h-[400px]" minBufferPx="380" maxBufferPx="400">
             <mat-option
               *cdkVirtualFor="let quote of displayedOptions(); let last = last"
               [value]="quote"

@@ -11,7 +11,7 @@
   </mat-form-field>
 </div>
 
-<app-calendar-wrapper [minHeight]="315" [formControl]="currentDateRangeControl">
+<app-calendar-wrapper [formControl]="currentDateRangeControl">
   <ng-container *ngIf="!loadingSignal()">
     <!-- Dividends -->
     <ng-template marker *ngFor="let dividendsData of calendarDataDividendSignal()">

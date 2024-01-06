@@ -19,12 +19,7 @@ import {
   SymbolHistoricalPeriodsArrayPreload,
 } from '@market-monitor/api-types';
 import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import {
-  AssetPriceChartComponent,
-  ClientStylesDirective,
-  DefaultImgDirective,
-  TimePeriodButtonsComponent,
-} from '@market-monitor/shared/ui';
+import { AssetPriceChartComponent, DefaultImgDirective, TimePeriodButtonsComponent } from '@market-monitor/shared/ui';
 import { catchError, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -36,7 +31,6 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
     AssetPriceChartComponent,
     TimePeriodButtonsComponent,
     DefaultImgDirective,
-    ClientStylesDirective,
     MatButtonModule,
     MatIconModule,
   ],
@@ -89,7 +83,7 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
         <div class="g-skeleton w-[350px] h-6"></div>
       </div>
 
-      <div appClientStyles [appHeight]="chartHeightPx - 35" class="g-skeleton"></div>
+      <div [style.height.px]="chartHeightPx - 35" class="g-skeleton"></div>
     </ng-template>
 
     <!-- error loading -->

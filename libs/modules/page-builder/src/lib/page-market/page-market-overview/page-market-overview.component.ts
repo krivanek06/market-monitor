@@ -16,7 +16,6 @@ import {
   MultiplyDtaPipe,
   PercentageIncreaseDirective,
   RangeDirective,
-  RenderClientDirective,
   SortReversePipe,
 } from '@market-monitor/shared/ui';
 import { map } from 'rxjs';
@@ -35,7 +34,6 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     GeneralCardComponent,
     PercentageIncreaseDirective,
     PageMarketOverviewSkeletonComponent,
-    RenderClientDirective,
     RangeDirective,
     FlattenArrayPipe,
     SortReversePipe,

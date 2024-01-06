@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, ContentChildren, Directive, Input, OnInit, TemplateRef, forwardRef, signal } from '@angular/core';
+import { Component, ContentChildren, Directive, OnInit, TemplateRef, forwardRef, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { dateIsNotWeekend, generateDatesArrayForMonth } from '@market-monitor/shared/features/general-util';
-import { ClientStylesDirective, RangeDirective } from '../../directives';
+import { RangeDirective } from '../../directives';
 
 export type CalendarRange = { year: number; month: number };
 export const CalendarRageToday = {
@@ -21,9 +21,73 @@ export class MarkerDirective {}
 @Component({
   selector: 'app-calendar-wrapper',
   standalone: true,
-  imports: [CommonModule, RangeDirective, MatButtonModule, MatIconModule, MarkerDirective, ClientStylesDirective],
-  templateUrl: './calendar-wrapper.component.html',
-  styleUrls: ['./calendar-wrapper.component.scss'],
+  imports: [CommonModule, RangeDirective, MatButtonModule, MatIconModule, MarkerDirective],
+  template: `
+    <div class="flex flex-col justify-between px-6 mb-10 md:flex-row gap-y-3">
+      <div class="flex items-center gap-10">
+        <!-- current date range -->
+        <div class="justify-between space-x-4 text-wt-gray-medium max-md:flex max-md:flex-1">
+          <span>{{ dateRangeSignal()[0] | date: 'MMMM d, y' }}</span>
+          <span>-</span>
+          <span>{{ dateRangeSignal()[dateRangeSignal().length - 1] | date: 'MMMM d, y' }}</span>
+        </div>
+        <!-- current month button -->
+        <button class="hidden md:block" (click)="onCurrentMonthClick()" type="button" mat-stroked-button>
+          Current Date
+        </button>
+      </div>
+
+      <!-- left / right button -->
+      <div class="flex items-center gap-10 max-md:flex-1">
+        <button (click)="onMonthChange('previous')" mat-button type="button" class="max-md:flex-1">
+          <mat-icon>navigate_before</mat-icon>
+          Previous Month
+        </button>
+        <button (click)="onMonthChange('next')" mat-button type="button" class="max-md:flex-1">
+          Next Month
+          <mat-icon iconPositionEnd>navigate_next</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-5">
+      <!-- display day name -->
+      <div *ngRange="5; let i = index" class="mb-4 text-base text-center text-wt-gray-medium">
+        {{ dateRangeSignal()[i] | date: 'EEEE' }}
+      </div>
+
+      <!-- showing border if not last line on the bottom -->
+      <div
+        *ngFor="let date of dateRangeSignal(); let i = index"
+        class="p-2 g-border-bottom"
+        [ngClass]="{
+          'border-r': i % 5 !== 4,
+          'border-b':
+            dateRangeSignal().length % 5 < dateRangeSignal().length - i &&
+            (dateRangeSignal().length % 5 !== 0 || i < dateRangeSignal().length - 5)
+        }"
+      >
+        <!-- display day -->
+        <div class="flex justify-end mb-2">
+          <span class="p-2 text-center rounded-full text-wt-gray-medium w-9 h-9 bg-wt-gray-light">
+            {{ dateRangeSignal()[i] | date: 'd' }}
+          </span>
+        </div>
+
+        <!-- using an ng-container allows us to render the template without any additional wrapping -->
+        <div *ngIf="templates.length >= i">
+          <!-- using this hacky way because  templates[index] does not work -->
+          <ng-container *ngFor="let tmpl of templates; let tmplIndex = index">
+            <ng-container *ngIf="tmplIndex === i" [ngTemplateOutlet]="tmpl"></ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: `
+  :host {
+  display: block;
+}`,
   //changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
@@ -34,8 +98,6 @@ export class MarkerDirective {}
   ],
 })
 export class CalendarWrapperComponent implements OnInit, ControlValueAccessor {
-  @Input() minHeight = 250;
-
   @ContentChildren(MarkerDirective, { read: TemplateRef }) templates!: TemplateRef<any>[];
 
   selectedDate = CalendarRageToday;
