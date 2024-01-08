@@ -13,6 +13,10 @@ export const appRoutes: Route[] = [
     path: '',
     children: [
       {
+        path: ROUTES_MAIN.LOGIN,
+        loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
+      },
+      {
         path: '',
         loadComponent: () => import('./menu/menu.component').then((m) => m.MenuComponent),
         canActivate: [
@@ -146,15 +150,11 @@ export const appRoutes: Route[] = [
               },
             ],
           },
-          {
-            path: '**',
-            loadComponent: () => import('./not-found/not-found.component').then((m) => m.NotFoundComponent),
-          },
         ],
       },
       {
-        path: ROUTES_MAIN.LOGIN,
-        loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
+        path: '**',
+        loadComponent: () => import('./not-found/not-found.component').then((m) => m.NotFoundComponent),
       },
     ],
   },

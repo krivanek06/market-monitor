@@ -1,10 +1,10 @@
 import { provideHttpClient } from '@angular/common/http';
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { getAuth, provideAuth } from '@angular/fire/auth';
-import { getFirestore, provideFirestore } from '@angular/fire/firestore';
-import { getFunctions, provideFunctions } from '@angular/fire/functions';
-import { getStorage, provideStorage } from '@angular/fire/storage';
+import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
+import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { Functions, connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
+import { Storage, connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   PreloadAllModules,
@@ -51,6 +51,27 @@ export const appConfig: ApplicationConfig = {
     {
       provide: AUTHENTICATION_ACCOUNT_TOKEN,
       useExisting: AuthenticationUserStoreService,
+    },
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      deps: [Functions, Firestore, Storage, Auth],
+      useFactory: () => {
+        const localhost = 'http://127.0.0.1';
+        const functions = inject(Functions);
+        const firestore = inject(Firestore);
+        const storage = inject(Storage);
+        const auth = inject(Auth);
+
+        return () => {
+          if (!environment.production) {
+            connectFunctionsEmulator(functions, localhost, 5001);
+            connectFirestoreEmulator(firestore, localhost, 8080);
+            connectStorageEmulator(storage, localhost, 9199);
+            connectAuthEmulator(auth, `${localhost}:9099`);
+          }
+        };
+      },
     },
   ],
 };

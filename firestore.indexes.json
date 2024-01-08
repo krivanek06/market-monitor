@@ -1,15 +1,85 @@
 {
   "indexes": [
     {
-      "collectionGroup": "users",
+      "collectionGroup": "groups",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "role",
+          "fieldPath": "isClosed",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "lastPortfolioStateModifiedDate",
+          "fieldPath": "modifiedSubCollectionDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "groups",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isClosed",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "portfolioState.previousBalanceChangePercentage",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "groups",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isClosed",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "portfolioState.previousBalanceChangePercentage",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "groups",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isClosed",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "portfolioState.totalGainsPercentage",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "groups",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isClosed",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "systemRank.portfolioTotalGainsPercentage.rank",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "groups",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isClosed",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "systemRank.portfolioTotalGainsPercentage.rank",
           "order": "DESCENDING"
         }
       ]
@@ -19,15 +89,85 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "role",
+          "fieldPath": "features.allowAccessHallOfFame",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "lastPortfolioStateModifiedDate",
-          "order": "DESCENDING"
+          "fieldPath": "features.allowPortfolioCashAccount",
+          "order": "ASCENDING"
         },
         {
-          "fieldPath": "lastLoginDate",
+          "fieldPath": "portfolioState.totalGainsPercentage",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "features.allowAccessHallOfFame",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "portfolioState.previousBalanceChangePercentage",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "features.allowAccessHallOfFame",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "portfolioState.previousBalanceChangePercentage",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "features.allowAccessHallOfFame",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "systemRank.portfolioTotalGainsPercentage.rank",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "features.allowAccessHallOfFame",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "systemRank.portfolioTotalGainsPercentage.rank",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isAccountActive",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "portfolioState.date",
           "order": "DESCENDING"
         }
       ]

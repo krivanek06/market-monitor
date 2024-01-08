@@ -14,6 +14,7 @@
     "mm:cloud-function:kill": "kill -9 $(lsof -ti:4000,4001,9299)",
     "mm:cloud-function:debug": "npm run mm:cloud-function:build && firebase emulators:start --only functions --inspect-functions",
     "mm:cloud-function:deploy": "npm run mm:cloud-function:build && firebase deploy --only functions",
+    "firebase:export-indexes": "firebase firestore:indexes > firestore.indexes.json",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org eduard-krivanek --project javascript-angular apps/market-monitor && sentry-cli sourcemaps upload --org eduard-krivanek --project javascript-angular apps/market-monitor"
   },
   "private": true,
