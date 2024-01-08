@@ -146,6 +146,10 @@ export const appRoutes: Route[] = [
               },
             ],
           },
+          {
+            path: '**',
+            loadComponent: () => import('./not-found/not-found.component').then((m) => m.NotFoundComponent),
+          },
         ],
       },
       {

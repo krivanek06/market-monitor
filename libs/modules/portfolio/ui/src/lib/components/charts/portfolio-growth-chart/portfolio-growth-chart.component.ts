@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
 import { formatValueIntoCurrency } from '@market-monitor/shared/features/general-util';
@@ -8,18 +9,24 @@ import { HighchartsChartModule } from 'highcharts-angular';
 @Component({
   selector: 'app-portfolio-growth-chart',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
+  imports: [CommonModule, HighchartsChartModule, MatProgressSpinnerModule],
   template: `
-    <highcharts-chart
-      *ngIf="isHighcharts"
-      [(update)]="updateFromInput"
-      [Highcharts]="Highcharts"
-      [callbackFunction]="chartCallback"
-      [options]="chartOptions"
-      [style.height.px]="heightPx"
-      style="display: block; width: 100%"
-    >
-    </highcharts-chart>
+    @if (showLoadingSignal()) {
+      <div class="grid place-content-center" [style.height.px]="heightPx">
+        <mat-spinner></mat-spinner>
+      </div>
+    } @else {
+      <highcharts-chart
+        *ngIf="isHighcharts"
+        [(update)]="updateFromInput"
+        [Highcharts]="Highcharts"
+        [callbackFunction]="chartCallback"
+        [options]="chartOptions"
+        [style.height.px]="heightPx"
+        style="display: block; width: 100%"
+      >
+      </highcharts-chart>
+    }
   `,
   styles: `
       :host {
@@ -30,9 +37,19 @@ import { HighchartsChartModule } from 'highcharts-angular';
 })
 export class PortfolioGrowthChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(input: { values: PortfolioGrowth[]; startingCashValue: number }) {
+    // remove loading
+    if (input.values.length > 0) {
+      this.showLoadingSignal.set(false);
+    }
+
     this.initChart(input.values, input.startingCashValue);
+
+    // even if no data, remove loading after some time
+    setTimeout(() => this.showLoadingSignal.set(false), 4000);
   }
   @Input() showOnlyTotalBalance = false;
+
+  showLoadingSignal = signal<boolean>(true);
 
   private initChart(data: PortfolioGrowth[], startingCashValue: number = 0) {
     const isCashActive = startingCashValue > 0;

@@ -12,7 +12,7 @@ import { UserApiService } from '@market-monitor/api-client';
 import { UserData } from '@market-monitor/api-types';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { DefaultImgDirective, RangeDirective } from '@market-monitor/shared/ui';
-import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-user-search-control',
@@ -30,7 +30,43 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
     MatIconModule,
     UserDisplayItemComponent,
   ],
-  templateUrl: './user-search-control.component.html',
+  template: `
+    <mat-form-field class="w-full">
+      <mat-label>Search stock by ticker</mat-label>
+      <input
+        type="text"
+        placeholder="Enter ticker"
+        aria-label="Text"
+        matInput
+        [formControl]="searchControl"
+        [matAutocomplete]="auto"
+      />
+      <mat-icon matPrefix>search</mat-icon>
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        (optionSelected)="onSelectUser($event)"
+        [displayWith]="displayProperty"
+        [hideSingleSelectionIndicator]="true"
+        [autofocus]="false"
+        [autoActiveFirstOption]="false"
+      >
+        <!-- loading skeleton -->
+        <ng-container *ngIf="showLoadingIndicator()">
+          <mat-option *ngRange="5" class="h-10 mb-1 g-skeleton"></mat-option>
+        </ng-container>
+
+        <!-- loaded data -->
+        <ng-container *ngIf="!showLoadingIndicator()">
+          <mat-option *ngFor="let user of optionsSignal(); let last = last" [value]="user" class="py-2 rounded-md">
+            <app-user-display-item [userData]="user"></app-user-display-item>
+            <div *ngIf="!last" class="mt-2">
+              <mat-divider></mat-divider>
+            </div>
+          </mat-option>
+        </ng-container>
+      </mat-autocomplete>
+    </mat-form-field>
+  `,
   styles: `
       :host {
         display: block;
@@ -70,9 +106,10 @@ export class UserSearchControlComponent implements ControlValueAccessor {
           this.userApiService.getUsersByName(value).pipe(
             tap(() => this.showLoadingIndicator.set(false)),
             tap(console.log),
-            catchError(() => {
+            catchError((e) => {
+              console.log(e);
               this.showLoadingIndicator.set(false);
-              return [];
+              return of([]);
             }),
           ),
         ),

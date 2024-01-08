@@ -35,7 +35,54 @@ export type UserSearchDialogData = {
     UserDisplayItemComponent,
     MatDividerModule,
   ],
-  templateUrl: './user-search-dialog.component.html',
+  template: `
+    <mat-dialog-content>
+      <div class="text-xl text-center text-wt-primary">{{ data.title }}</div>
+
+      <!-- search user -->
+      <div class="p-4">
+        <app-user-search-control [formControl]="searchUserControl"></app-user-search-control>
+      </div>
+
+      <!-- display selected users -->
+      <ng-container *ngIf="data.multiple">
+        <ng-container *ngIf="selectedUsersSignal() as selectedUsersSignal">
+          <ng-container *ngIf="selectedUsersSignal.length > 0">
+            <div class="flex items-center justify-between pt-2">
+              <div class="my-4 space-x-1 text-lg">
+                <span>Selected Users: {{ selectedUsersSignal.length }}</span>
+                <span *ngIf="data.selectUsersCap">/ {{ data.selectUsersCap }}</span>
+              </div>
+
+              <div>Remove User By Clicking</div>
+            </div>
+
+            <div class="grid gap-4 lg:grid-cols-2">
+              <div
+                *ngFor="let user of selectedUsersSignal"
+                class="p-2 border cursor-pointer border-wt-gray-medium hover:scale-105"
+                (click)="onUserRemove(user)"
+              >
+                <app-user-display-item [userData]="user"></app-user-display-item>
+              </div>
+            </div>
+
+            <!-- divider -->
+            <div class="pt-6">
+              <mat-divider></mat-divider>
+            </div>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </mat-dialog-content>
+
+    <mat-dialog-actions *ngIf="data.multiple">
+      <div class="mt-2 g-mat-dialog-actions-full">
+        <button mat-flat-button mat-dialog-close type="button">Cancel</button>
+        <button type="button" (click)="onCloseDialog()" mat-flat-button color="primary">Save</button>
+      </div>
+    </mat-dialog-actions>
+  `,
   styles: `
       :host {
         display: block;

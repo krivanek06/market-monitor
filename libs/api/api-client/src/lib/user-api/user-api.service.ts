@@ -45,7 +45,15 @@ export class UserApiService {
    * @returns list of users by the name prefix
    */
   getUsersByName(name: string): Observable<UserData[]> {
-    return rxCollectionData(query(this.userCollection(), where('personal.displayName', '==', name), limit(10)));
+    // ignore case sensitive - https://stackoverflow.com/questions/50005587/firestore-database-query-ignore-case-case-insenstive-and-like-clause
+    return rxCollectionData(
+      query(
+        this.userCollection(),
+        where('personal.displayName', '>=', name.toUpperCase()),
+        where('personal.displayName', '<=', name.toLowerCase()),
+        limit(10),
+      ),
+    );
   }
 
   /* user */
