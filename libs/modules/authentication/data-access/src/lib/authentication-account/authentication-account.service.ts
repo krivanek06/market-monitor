@@ -126,6 +126,15 @@ export class AuthenticationAccountService {
     });
   }
 
+  changePhotoUrl(photoURL: string): void {
+    this.updateUser(this.currentUserData.id, {
+      personal: {
+        ...this.currentUserData.personal,
+        photoURL,
+      },
+    });
+  }
+
   async resetTransactions(accountTypeSelected: UserAccountTypes): Promise<void> {
     const user = this.authenticatedUser$.value;
     if (!user) {

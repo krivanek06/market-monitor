@@ -36,3 +36,13 @@ export const HALL_OF_FAME_PORTFOLIO_TOP_LIMIT = 25;
  * number how many entities to save for hall of fame portfolio daily change
  */
 export const HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT = 10;
+
+/**
+ * limit how far can we load historical prices for a symbol
+ */
+export const HISTORICAL_PRICE_RESTRICTION_YEARS = 6;
+
+/**
+ * users with trading account have a fee prct
+ */
+export const TRANSACTION_FEE_PRCT = 0.1;

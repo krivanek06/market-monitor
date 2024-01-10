@@ -11,7 +11,11 @@ export const userCreateAccountCall = onCall(async (request) => {
     throw new HttpsError('aborted', 'User is not authenticated');
   }
 
-  const user = await getAuth().getUser(userAuthId);
+  return userCreate(userAuthId);
+});
+
+export const userCreate = async (userId: string): Promise<UserData> => {
+  const user = await getAuth().getUser(userId);
 
   // check if user exists by email
   const matchingUsers = await usersCollectionRef().where('personal.email', '==', user.email).get();
@@ -44,7 +48,7 @@ export const userCreateAccountCall = onCall(async (request) => {
 
   // return data
   return newUserData;
-});
+};
 
 const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
   const newUser: UserData = {

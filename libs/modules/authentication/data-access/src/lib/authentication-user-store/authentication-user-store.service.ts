@@ -11,9 +11,11 @@ import {
   setDoc,
   updateDoc,
 } from '@angular/fire/firestore';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import { GroupApiService } from '@market-monitor/api-client';
 import {
   PortfolioTransaction,
+  PortfolioTransactionCreate,
   SymbolType,
   UserAccountTypes,
   UserData,
@@ -57,6 +59,7 @@ export class AuthenticationUserStoreService {
   private authenticationAccountService = inject(AuthenticationAccountService);
   private groupApiService = inject(GroupApiService);
   private firestore = inject(Firestore);
+  private functions = inject(Functions);
 
   private initialState: AuthenticationState = {
     authenticationLoaded: false,
@@ -212,42 +215,22 @@ export class AuthenticationUserStoreService {
     });
   }
 
-  addPortfolioTransactionForUser(transaction: PortfolioTransaction): void {
-    updateDoc(this.getUserPortfolioTransactionDocRef(), {
-      transactions: arrayUnion(transaction),
-    });
+  /**
+   * create a new transaction for the authenticated user
+   */
+  async createPortfolioTransactionForUser(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
+    const callable = httpsCallable<PortfolioTransactionCreate, PortfolioTransaction>(
+      this.functions,
+      'portfolioCreateOperationCall',
+    );
+    const result = await callable(input);
+    return result.data;
   }
 
   deletePortfolioTransactionForUser(transaction: PortfolioTransaction): void {
     updateDoc(this.getUserPortfolioTransactionDocRef(), {
       transactions: arrayRemove(transaction),
     });
-  }
-
-  updateUserPortfolioTransaction(transaction: Partial<UserPortfolioTransaction>): void {
-    setDoc(this.getUserPortfolioTransactionDocRef(), transaction, { merge: true });
-  }
-
-  changeDisplayName(displayName: string): void {
-    this.updateUser({
-      personal: {
-        ...this.state.getUserData().personal,
-        displayName,
-      },
-    });
-  }
-
-  changePhotoUrl(photoURL: string): void {
-    this.updateUser({
-      personal: {
-        ...this.state.getUserData().personal,
-        photoURL,
-      },
-    });
-  }
-
-  private updateUser(user: Partial<UserData>): void {
-    setDoc(this.getUserDocRef(), user, { merge: true });
   }
 
   private getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {

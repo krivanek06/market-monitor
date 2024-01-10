@@ -1,10 +1,10 @@
 import { provideHttpClient } from '@angular/common/http';
 import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
-import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { Auth, getAuth, provideAuth } from '@angular/fire/auth';
+import { Firestore, getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { Functions, connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
-import { Storage, connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
+import { Storage, getStorage, provideStorage } from '@angular/fire/storage';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   PreloadAllModules,
@@ -66,9 +66,9 @@ export const appConfig: ApplicationConfig = {
         return () => {
           if (!environment.production) {
             connectFunctionsEmulator(functions, localhost, 5001);
-            connectFirestoreEmulator(firestore, localhost, 8080);
-            connectStorageEmulator(storage, localhost, 9199);
-            connectAuthEmulator(auth, `${localhost}:9099`);
+            // connectFirestoreEmulator(firestore, localhost, 8080);
+            // connectStorageEmulator(storage, localhost, 9199);
+            // connectAuthEmulator(auth, `${localhost}:9099`);
           }
         };
       },
