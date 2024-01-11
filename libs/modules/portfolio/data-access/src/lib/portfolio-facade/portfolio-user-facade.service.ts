@@ -1,6 +1,5 @@
 import { Injectable, computed } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { PortfolioTransaction, PortfolioTransactionCreate } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { combineLatest, from, of, switchMap } from 'rxjs';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
@@ -63,12 +62,4 @@ export class PortfolioUserFacadeService {
     const transactions = this.authenticationUserService.state().portfolioTransactions;
     return this.portfolioCalculationService.getPortfolioTransactionToDate(transactions);
   });
-
-  createTransactionOperation(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
-    return this.authenticationUserService.createPortfolioTransactionForUser(input);
-  }
-
-  deleteTransactionOperation(transaction: PortfolioTransaction): void {
-    this.authenticationUserService.deletePortfolioTransactionForUser(transaction);
-  }
 }
