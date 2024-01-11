@@ -183,7 +183,7 @@ export class AuthenticationAccountService {
         this.authenticatedUserData$.next(userData);
 
         // notify about user change
-        const value = userData ? userData.id : null;
+        const value = userData && !!userData.personal ? userData.id : null;
         this.loadedAuthentication$.next(value);
       });
   }

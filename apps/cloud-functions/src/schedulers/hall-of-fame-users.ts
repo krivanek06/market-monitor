@@ -1,7 +1,6 @@
 import { HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT, HALL_OF_FAME_PORTFOLIO_TOP_LIMIT } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
-import { usersCollectionRef } from '../models';
-import { aggregationHallOfFameUsersRef } from '../models/aggregation';
+import { aggregationHallOfFameUsersRef, usersCollectionRef } from '../models';
 import { transformUserToBase } from '../utils';
 
 export const hallOfFameUsers = async (): Promise<void> => {

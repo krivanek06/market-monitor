@@ -179,6 +179,7 @@ export class AuthenticationUserStoreService {
     selectors: (state) => ({
       getUser: () => state().user!,
       getUserData: () => state().userData!,
+      getPortfolioState: () => state().userData?.portfolioState,
       getUserAccountType: () =>
         state().userData?.features?.allowPortfolioCashAccount ? UserAccountTypes.Trading : UserAccountTypes.Basic,
       getUserGroupData: () => state().userGroupData!,

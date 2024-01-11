@@ -135,7 +135,7 @@ export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransact
 export const createEmptyPortfolioState = (startingCash = 0) =>
   ({
     balance: startingCash,
-    cashOnHand: 0,
+    cashOnHand: startingCash,
     holdingsBalance: 0,
     invested: 0,
     numberOfExecutedBuyTransactions: 0,

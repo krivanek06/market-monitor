@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PageStockScreenerComponent } from '@market-monitor/modules/page-builder';
 
 @Component({
-  selector: 'app-market-calendar',
+  selector: 'app-market-stock-screener',
   standalone: true,
   imports: [CommonModule, PageStockScreenerComponent],
   template: `<app-page-stock-screener></app-page-stock-screener>`,

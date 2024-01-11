@@ -1,10 +1,10 @@
 import { provideHttpClient } from '@angular/common/http';
 import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { Auth, getAuth, provideAuth } from '@angular/fire/auth';
-import { Firestore, getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
+import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { Functions, connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
-import { Storage, getStorage, provideStorage } from '@angular/fire/storage';
+import { Storage, connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   PreloadAllModules,
@@ -57,7 +57,7 @@ export const appConfig: ApplicationConfig = {
       multi: true,
       deps: [Functions, Firestore, Storage, Auth],
       useFactory: () => {
-        const localhost = 'http://127.0.0.1';
+        const localhost = '127.0.0.1';
         const functions = inject(Functions);
         const firestore = inject(Firestore);
         const storage = inject(Storage);
@@ -65,10 +65,11 @@ export const appConfig: ApplicationConfig = {
 
         return () => {
           if (!environment.production) {
+            console.log('%c[Firebase]: Connect to emulator', 'color: #bada55; font-size: 16px;');
             connectFunctionsEmulator(functions, localhost, 5001);
-            // connectFirestoreEmulator(firestore, localhost, 8080);
-            // connectStorageEmulator(storage, localhost, 9199);
-            // connectAuthEmulator(auth, `${localhost}:9099`);
+            connectFirestoreEmulator(firestore, localhost, 8080);
+            connectStorageEmulator(storage, localhost, 9199);
+            connectAuthEmulator(auth, `http://${localhost}:9099`);
           }
         };
       },
