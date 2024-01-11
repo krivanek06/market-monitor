@@ -21,7 +21,7 @@ export const USER_WATCHLIST_SYMBOL_LIMIT = 40;
 /**
  * default cash amount for user when creating a new trading account
  */
-export const USER_DEFAULT_STARTING_CASH = 25_000;
+export const USER_DEFAULT_STARTING_CASH = 30_000;
 
 /**
  * how many days a user can be inactive before their account is deactivated -> isAccountActive = false

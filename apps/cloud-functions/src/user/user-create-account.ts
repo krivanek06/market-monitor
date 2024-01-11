@@ -28,6 +28,7 @@ export const userCreate = async (userId: string): Promise<UserData> => {
     displayName: user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`,
     photoURL: user.photoURL ?? null,
     providerId: user.providerData[0].providerId ?? 'unknown',
+    email: user.email ?? 'unknown',
   });
 
   const newTransactions: UserPortfolioTransaction = {

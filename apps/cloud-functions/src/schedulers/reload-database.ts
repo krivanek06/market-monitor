@@ -1,16 +1,20 @@
 import { faker } from '@faker-js/faker';
+import { PortfolioTransactionCreate, UserAccountTypes, UserData } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { addDays, format, subDays } from 'date-fns';
+import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
-import { groupsCollectionRef, userDocumentWatchListRef, usersCollectionRef } from '../models';
-import { aggregationCollectionRef } from '../models/aggregation';
-import { userCreate } from '../user';
+import { userDocumentWatchListRef } from '../models';
+import { createPortfolioCreateOperation } from '../portfolio';
+import { resetTransactionsForUser, userCreate } from '../user';
+import { isFirebaseEmulator } from '../utils';
 
 /**
  * Reload the database with new testing data
  * ONLY USE FOR TESTING / LOCAL DEVELOPMENT
  */
 export const reloadDatabase = async (): Promise<void> => {
-  if (process.env.NODE_ENV !== 'development') {
+  if (!isFirebaseEmulator()) {
     console.warn('reloadDatabase() should only be used for testing / local development');
     return;
   }
@@ -20,49 +24,51 @@ export const reloadDatabase = async (): Promise<void> => {
   // delete previous data
   await deletePreviousData();
 
-  // // load users data
-  // for (let i = 0; i < 100; i++) {
-  //   await createUserData();
-  // }
+  // load users data
 
-  // console.log('CREATE NEW USERS');
+  console.log('CREATE NEW USERS - START');
+
+  for (let i = 0; i < 3; i++) {
+    await createUserData();
+    // wait some seconds to avoid frequent calls into financial modeling api
+    await waitNSeconds(2);
+  }
+
+  console.log('CREATE NEW USERS - DONE');
+
+  // TODO - create new groups
+
+  // TODO - run all schedulers
 
   const endTime = performance.now();
   const secondsDiff = (endTime - startTime) / 1000;
   console.log(`Function took: ${secondsDiff} seconds`);
 };
 
+const waitNSeconds = async (seconds: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+};
+
 const deletePreviousData = async () => {
+  // auth users
   console.log('REMOVE AUTH USERS');
   const userIds = (await getAuth().listUsers()).users.map((u) => u.uid);
   await getAuth().deleteUsers(userIds);
 
+  // users
   console.log('REMOVE USERS');
-  await usersCollectionRef()
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        doc.ref.delete();
-      });
-    });
+  const userDoc = firestore().collection('users');
+  firestore().recursiveDelete(userDoc);
 
+  // groups
   console.log('REMOVE GROUPS');
-  await groupsCollectionRef()
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        doc.ref.delete();
-      });
-    });
+  const groupDoc = firestore().collection('groups');
+  firestore().recursiveDelete(groupDoc);
 
+  // aggregations
   console.log('REMOVE AGGREGATIONS');
-  await aggregationCollectionRef()
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        doc.ref.delete();
-      });
-    });
+  const aggregationDoc = firestore().collection('aggregations');
+  firestore().recursiveDelete(aggregationDoc);
 
   console.log('DELETED PREVIOUS DATA');
 };
@@ -75,8 +81,8 @@ const deletePreviousData = async () => {
  *
  * @returns array of user ids
  */
-const createUserData = async (): Promise<string[]> => {
-  const userIds: string[] = [];
+const createUserData = async (): Promise<UserData[]> => {
+  const userDataArray: UserData[] = [];
 
   // create user auth
   const user = await getAuth().createUser({
@@ -90,7 +96,10 @@ const createUserData = async (): Promise<string[]> => {
   });
 
   // create user document
-  await userCreate(user.uid);
+  const userData = await userCreate(user.uid);
+
+  // change user type to trading
+  await resetTransactionsForUser(userData, UserAccountTypes.Trading);
 
   // add symbols to watchlist
   const watchListSymbols = getStockSymbol(50);
@@ -103,12 +112,54 @@ const createUserData = async (): Promise<string[]> => {
   });
 
   // generate transactions
+  await generateTransaction(userData);
 
   // save user
-  userIds.push(user.uid);
+  userDataArray.push(userData);
 
   // return data
-  return userIds;
+  return userDataArray;
+};
+
+/**
+ *
+ * creates one buy and one sell transaction for each symbol
+ * @param userData
+ */
+const generateTransaction = async (userData: UserData): Promise<void> => {
+  const randomSymbols = getStockSymbol(10);
+
+  for await (const symbol of randomSymbols) {
+    console.log('symbol', symbol);
+    const pastDate = subDays(new Date(), getRandomNumber(50, 100));
+
+    const buyOperation: PortfolioTransactionCreate = {
+      date: format(pastDate, 'yyyy-MM-dd'),
+      symbol,
+      symbolType: 'STOCK',
+      units: getRandomNumber(20, 40),
+      transactionType: 'BUY',
+    };
+
+    const sellOperation: PortfolioTransactionCreate = {
+      date: format(addDays(pastDate, 30), 'yyyy-MM-dd'),
+      symbol,
+      symbolType: 'STOCK',
+      units: getRandomNumber(10, 18),
+      transactionType: 'SELL',
+    };
+
+    try {
+      await createPortfolioCreateOperation(userData.id, buyOperation);
+      await createPortfolioCreateOperation(userData.id, sellOperation);
+    } catch (err) {
+      console.log(`Symbol: ${symbol} - no data`);
+    }
+  }
+};
+
+const getRandomNumber = (min: number, max: number): number => {
+  return Math.ceil(Math.random() * (max - min) + min);
 };
 
 const getStockSymbol = (limit: number): string[] => {

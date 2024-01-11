@@ -1,6 +1,7 @@
 // The Firebase Admin SDK to access Firebase Features from within Cloud Functions.
 import * as admin from 'firebase-admin';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
+import { isFirebaseEmulator } from './utils';
 
 const DATABASE_URL = 'https://market-monitor-prod.firebaseio.com';
 
@@ -34,6 +35,10 @@ setGlobalOptions({ region: 'europe-west3', maxInstances: 3 });
 admin.firestore().settings({
   ignoreUndefinedProperties: true,
 });
+
+setTimeout(() => {
+  console.log(`Firebase emulator: ${isFirebaseEmulator()}`);
+}, 10_000);
 
 // -------- Production ---------
 export * from './group';

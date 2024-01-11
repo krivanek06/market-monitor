@@ -1,6 +1,6 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { reloadMarketOverview } from '../market-functions/market-overview';
-import { corsMiddleWareHttp, firebaseSimpleErrorLogger } from '../utils';
+import { corsMiddleWareHttp, firebaseSimpleErrorLogger, isFirebaseEmulator } from '../utils';
 import { groupUpdateData } from './group-update-data';
 import { hallOfFameUsers } from './hall-of-fame-users';
 import { reloadDatabase } from './reload-database';
@@ -67,7 +67,7 @@ export const run_reload_market_overview = onSchedule(
 export const test_me = firebaseSimpleErrorLogger(
   'test_function',
   corsMiddleWareHttp(async (request, response) => {
-    if (process.env.NODE_ENV !== 'development') {
+    if (!isFirebaseEmulator()) {
       console.warn('Function can be executed only in development mode');
       return;
     }

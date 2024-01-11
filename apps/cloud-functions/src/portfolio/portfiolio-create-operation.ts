@@ -12,7 +12,7 @@ import {
   dateGetDetailsInformationFromDate,
   roundNDigits,
 } from '@market-monitor/shared/features/general-util';
-import { isBefore, isValid, isWeekend } from 'date-fns';
+import { format, isBefore, isValid, isWeekend, subDays } from 'date-fns';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -41,6 +41,20 @@ export const portfolioCreateOperationCall = onCall(async (request) => {
     throw new HttpsError('aborted', 'User is not authenticated');
   }
 
+  return createPortfolioCreateOperation(userAuthId, data);
+});
+
+/**
+ * creates a new transaction for the provided user
+ *
+ * @param userAuthId - user id to which to add the transaction
+ * @param data - transaction data
+ * @returns - newly created transaction
+ */
+export const createPortfolioCreateOperation = async (
+  userAuthId: string,
+  data: PortfolioTransactionCreate,
+): Promise<PortfolioTransaction> => {
   const userDocRef = userDocumentRef(userAuthId);
   const userDocTransactionsRef = userDocumentTransactionHistoryRef(userAuthId);
 
@@ -52,6 +66,10 @@ export const portfolioCreateOperationCall = onCall(async (request) => {
     throw new HttpsError('not-found', 'User does not exist');
   }
 
+  // if weekend is used format to last friday
+  data.date = formatWeekendDate(data.date);
+
+  // load historical price for symbol on date
   const symbolPrice = await getHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date));
 
   // check if symbol exists
@@ -74,7 +92,7 @@ export const portfolioCreateOperationCall = onCall(async (request) => {
 
   // return data
   return transaction;
-});
+};
 
 const createTransaction = (
   userDocData: UserData,
@@ -110,6 +128,19 @@ const createTransaction = (
   };
 
   return result;
+};
+
+/**
+ * prevents selecting weekend for date
+ * @param date
+ * @returns
+ */
+const formatWeekendDate = (date: string): string => {
+  // check if date is weekend, if so use previous Friday
+  let dateObj = isWeekend(new Date(date)) ? subDays(new Date(date), 1) : new Date(date);
+  dateObj = isWeekend(dateObj) ? subDays(dateObj, 1) : dateObj;
+  const usedData = format(dateObj, 'yyyy-MM-dd');
+  return usedData;
 };
 
 const getCurrentInvestedFromTransactions = (
