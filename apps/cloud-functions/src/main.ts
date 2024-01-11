@@ -38,7 +38,7 @@ admin.firestore().settings({
 
 setTimeout(() => {
   console.log(`Firebase emulator: ${isFirebaseEmulator()}`);
-}, 10_000);
+}, 20_000);
 
 // -------- Production ---------
 export * from './group';
