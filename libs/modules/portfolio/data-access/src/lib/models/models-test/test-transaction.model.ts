@@ -1,5 +1,4 @@
-import { PortfolioTransaction } from '@market-monitor/api-types';
-import { PortfolioTransactionCreate } from '../portfolio-operation';
+import { PortfolioTransaction, PortfolioTransactionCreate } from '@market-monitor/api-types';
 import { USER_TEST_1_ID } from './test-user.model';
 
 export const mockCreatePortfolioTransactionCreate = (

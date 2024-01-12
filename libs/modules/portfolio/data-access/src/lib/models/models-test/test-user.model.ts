@@ -18,6 +18,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       displayName: 'Test User',
       photoURL: null,
       providerId: 'google.com',
+      email: 'test@test.sk',
     },
     settings: {
       allowReceivingGroupInvitations: true,

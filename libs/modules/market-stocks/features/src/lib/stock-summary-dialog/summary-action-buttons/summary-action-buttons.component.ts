@@ -13,7 +13,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { SymbolSummary } from '@market-monitor/api-types';
+import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@market-monitor/api-types';
 import {
   AUTHENTICATION_ACCOUNT_TOKEN,
   AuthenticationUserStoreService,
@@ -148,6 +148,18 @@ export class SummaryActionButtonsComponent implements OnInit {
 
   async onAddWatchList() {
     if (this.authenticationUserService) {
+      const userFeatures = this.authenticationUserService.state.getUserData().features;
+      const userWatchlist = this.authenticationUserService.state.watchList().data;
+
+      // check if user can add more symbols into watchlist
+      if (!userFeatures.allowUnlimitedSymbolsInWatchList && userWatchlist.length >= USER_WATCHLIST_SYMBOL_LIMIT) {
+        this.dialogServiceUtil.showNotificationBar(
+          `You can not add more than ${USER_WATCHLIST_SYMBOL_LIMIT} symbols into watchlist`,
+          'error',
+        );
+        return;
+      }
+
       // save data into fireStore
       await this.authenticationUserService.addSymbolToUserWatchList(this.symbolSummary.id, 'STOCK');
 

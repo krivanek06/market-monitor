@@ -9,7 +9,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router } from '@angular/router';
 import {
-  AUTHENTICATION_ERRORS,
   AuthenticationAccountService,
   AuthenticationUserStoreService,
   LoginUserInput,
@@ -66,8 +65,11 @@ export class AuthenticationFormComponent {
         switchMap(() =>
           this.authenticationAccountService.getUserData().pipe(
             tap(() => {
-              this.router.navigate([ROUTES_MAIN.DASHBOARD]);
-              this.loadingSnipperShowSignal.set(false);
+              this.dialogServiceUtil.showNotificationBar('Successfully login', 'success');
+              // getting error: Navigation triggered outside Angular zone, did you forget to call 'ngZone.run()
+              this.zone.run(() => {
+                this.router.navigate([ROUTES_MAIN.DASHBOARD]);
+              });
             }),
           ),
         ),
@@ -93,22 +95,17 @@ export class AuthenticationFormComponent {
             switchMap(() =>
               this.authenticationAccountService.getUserData().pipe(
                 tap(() => {
-                  this.router.navigate([ROUTES_MAIN.DASHBOARD]);
-                  this.loadingSnipperShowSignal.set(false);
+                  this.dialogServiceUtil.showNotificationBar('Successfully login', 'success');
+                  // getting error: Navigation triggered outside Angular zone, did you forget to call 'ngZone.run()
+                  this.zone.run(() => {
+                    this.router.navigate([ROUTES_MAIN.DASHBOARD]);
+                  });
                 }),
               ),
             ),
             catchError((err) => {
-              console.log(err.code);
+              this.dialogServiceUtil.handleError(err);
               this.loadingSnipperShowSignal.set(false);
-              if (
-                err?.code === AUTHENTICATION_ERRORS.WRONG_PASSWORD ||
-                err?.code === AUTHENTICATION_ERRORS.USER_NOT_FOUND
-              ) {
-                this.dialogServiceUtil.showNotificationBar(`Email or Password is invalid`, 'error');
-              } else {
-                this.dialogServiceUtil.showNotificationBar(`Unable to log in`, 'error');
-              }
               return EMPTY;
             }),
           ),
@@ -129,21 +126,16 @@ export class AuthenticationFormComponent {
               this.authenticationAccountService.getUserData().pipe(
                 filterNil(), // wait until there is a user initialized
                 tap(() => {
+                  this.dialogServiceUtil.showNotificationBar('User created successfully', 'success');
                   // getting error: Navigation triggered outside Angular zone, did you forget to call 'ngZone.run()
                   this.zone.run(() => {
                     this.router.navigate([ROUTES_MAIN.DASHBOARD]);
                   });
-                  this.loadingSnipperShowSignal.set(false);
                 }),
               ),
             ),
             catchError((err) => {
-              console.log(err);
-              if (err?.code === AUTHENTICATION_ERRORS.EMAIL_ALREADY_IN_USE) {
-                this.dialogServiceUtil.showNotificationBar(`Email already in use`, 'error');
-              } else {
-                this.dialogServiceUtil.showNotificationBar(`Unable to create new user`, 'error');
-              }
+              this.dialogServiceUtil.handleError(err);
               this.loadingSnipperShowSignal.set(false);
               return EMPTY;
             }),
@@ -151,6 +143,6 @@ export class AuthenticationFormComponent {
         ),
         takeUntilDestroyed(),
       )
-      .subscribe((e) => console.log('ee', e));
+      .subscribe();
   }
 }

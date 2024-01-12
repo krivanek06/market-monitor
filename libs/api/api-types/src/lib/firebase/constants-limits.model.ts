@@ -21,7 +21,7 @@ export const USER_WATCHLIST_SYMBOL_LIMIT = 40;
 /**
  * default cash amount for user when creating a new trading account
  */
-export const USER_DEFAULT_STARTING_CASH = 25_000;
+export const USER_DEFAULT_STARTING_CASH = 30_000;
 
 /**
  * how many days a user can be inactive before their account is deactivated -> isAccountActive = false
@@ -36,3 +36,13 @@ export const HALL_OF_FAME_PORTFOLIO_TOP_LIMIT = 25;
  * number how many entities to save for hall of fame portfolio daily change
  */
 export const HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT = 10;
+
+/**
+ * limit how far can we load historical prices for a symbol
+ */
+export const HISTORICAL_PRICE_RESTRICTION_YEARS = 6;
+
+/**
+ * users with trading account have a fee prct
+ */
+export const TRANSACTION_FEE_PRCT = 0.1;

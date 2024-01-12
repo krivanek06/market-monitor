@@ -1,27 +1,17 @@
-import { Component, inject } from '@angular/core';
-import { Functions, connectFunctionsEmulator } from '@angular/fire/functions';
+import { Component } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { RouterModule } from '@angular/router';
-import { environment } from '../environments/environment';
 
 @Component({
+  selector: 'app-root',
   standalone: true,
   imports: [RouterModule, MatDatepickerModule, MatNativeDateModule],
-  selector: 'app-root',
-  templateUrl: './app.component.html',
+  template: `<router-outlet></router-outlet> `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
-})
-export class AppComponent {
-  private functions = inject(Functions);
-
-  constructor() {
-    if (!environment.production) {
-      connectFunctionsEmulator(this.functions, '127.0.0.1', 5001);
+    :host {
+      display: block;
     }
-  }
-}
+  `,
+})
+export class AppComponent {}

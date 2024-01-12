@@ -30,27 +30,31 @@ export const userResetTransactionsCall = onCall(async (request) => {
     throw new HttpsError('not-found', 'User does not exist');
   }
 
-  const startingCash = data.accountTypeSelected === UserAccountTypes.Trading ? USER_DEFAULT_STARTING_CASH : 0;
+  resetTransactionsForUser(userData, data.accountTypeSelected);
+});
+
+export const resetTransactionsForUser = async (userData: UserData, accountType: UserAccountTypes): Promise<void> => {
+  const startingCash = accountType === UserAccountTypes.Trading ? USER_DEFAULT_STARTING_CASH : 0;
   const newUserData = {
     ...userData,
     portfolioState: {
       ...createEmptyPortfolioState(startingCash),
     },
     features: {
-      ...getUserFeaturesByAccountType(data.accountTypeSelected),
+      ...getUserFeaturesByAccountType(accountType),
     },
   } satisfies UserData;
 
   // reset user portfolio state
-  await userDocumentRef(data.userId).update({
+  await userDocumentRef(userData.id).update({
     ...newUserData,
   });
 
   // delete transactions
-  await userDocumentTransactionHistoryRef(data.userId).update({
+  await userDocumentTransactionHistoryRef(userData.id).update({
     transactions: [],
   });
-});
+};
 
 const getUserFeaturesByAccountType = (accountType: UserAccountTypes): UserFeatures => {
   switch (accountType) {

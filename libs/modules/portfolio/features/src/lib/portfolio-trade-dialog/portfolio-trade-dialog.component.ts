@@ -10,9 +10,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@market-monitor/api-client';
-import { PortfolioTransactionType, SymbolSummary, USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
+import {
+  PortfolioTransactionCreate,
+  PortfolioTransactionType,
+  SymbolSummary,
+  USER_HOLDINGS_SYMBOL_LIMIT,
+} from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { PortfolioTransactionCreate, PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
+import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
 import { minValueValidator, positiveNumberValidator, requiredValidator } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { dateFormatDate, dateIsNotWeekend } from '@market-monitor/shared/features/general-util';
@@ -346,12 +351,11 @@ export class PortfolioTradeDialogComponent {
     this.isLoadingSignal.set(true);
 
     try {
-      await this.portfolioUserFacadeService.createTransactionOperation(transactionCreate);
+      await this.authenticationUserService.createPortfolioTransactionForUser(transactionCreate);
       this.dialogServiceUtil.showNotificationBar('Transaction created', 'success');
       this.dialogRef.close();
     } catch (error) {
-      this.dialogServiceUtil.showNotificationBar(String(error), 'error');
-      console.log(error);
+      this.dialogServiceUtil.handleError(error);
     } finally {
       this.isLoadingSignal.set(false);
     }

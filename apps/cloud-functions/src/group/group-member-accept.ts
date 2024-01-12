@@ -16,6 +16,15 @@ export const groupMemberAcceptCall = onCall(async (request) => {
   const userAuthId = request.auth?.uid as string;
   const requestGroupId = request.data as string;
 
+  return groupMemberAccept(userAuthId, requestGroupId);
+});
+
+/**
+ *
+ * @param userAuthId - user id to which to add to the group
+ * @param requestGroupId - group id to which to add the user
+ */
+export const groupMemberAccept = async (userAuthId: string, requestGroupId: string): Promise<void> => {
   const userData = (await userDocumentRef(userAuthId).get()).data();
   const groupData = (await groupDocumentRef(requestGroupId).get()).data();
 
@@ -63,4 +72,4 @@ export const groupMemberAcceptCall = onCall(async (request) => {
       ...transformUserToGroupMember(userData, groupData.memberUserIds.length + 1),
     }),
   });
-});
+};

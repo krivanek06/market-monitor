@@ -79,6 +79,7 @@ export type UserPersonalInfo = {
   photoURL: string | null;
   displayName: string;
   providerId: User['providerData'][0]['providerId'];
+  email: string;
 };
 
 export type UserSettings = {

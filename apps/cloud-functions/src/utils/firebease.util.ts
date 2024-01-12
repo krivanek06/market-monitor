@@ -29,3 +29,6 @@ export const firebaseSimpleErrorLogger = (
     }
   });
 };
+
+export const isFirebaseEmulator = () =>
+  process.env.FUNCTIONS_EMULATOR === 'true' && process.env.FIRESTORE_EMULATOR_HOST === '127.0.0.1:8080';

@@ -198,7 +198,7 @@ export class UserSettingsDialogComponent implements OnInit {
     // update url
     this.userImageControl.valueChanges
       .pipe(filterNil())
-      .subscribe((imgUrl) => this.authenticationUserStoreService.changePhotoUrl(imgUrl));
+      .subscribe((imgUrl) => this.authenticationAccountService.changePhotoUrl(imgUrl));
   }
 
   @Confirmable('Are you sure you want to delete your account?')

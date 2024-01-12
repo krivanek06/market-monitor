@@ -13,9 +13,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { SymbolSummary } from '@market-monitor/api-types';
+import { compare } from '@market-monitor/shared/features/general-util';
 import {
   DefaultImgDirective,
   LargeNumberFormatterPipe,
@@ -42,6 +44,7 @@ import {
     MatPaginatorModule,
     TruncatePipe,
     MatChipsModule,
+    MatSortModule,
   ],
   template: `
     <div *ngIf="tableTitle" class="flex justify-between mb-2">
@@ -53,7 +56,14 @@ import {
       </div>
     </div>
 
-    <table mat-table [dataSource]="dataSource" class="table-hover" [trackBy]="identity">
+    <table
+      matSort
+      mat-table
+      (matSortChange)="sortData($event)"
+      [dataSource]="dataSource"
+      class="table-hover"
+      [trackBy]="identity"
+    >
       <!-- image & name -->
       <ng-container matColumnDef="symbol">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Symbol</th>
@@ -171,7 +181,7 @@ import {
 
       <!-- volume -->
       <ng-container matColumnDef="volumeChange">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Volume %</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">Volume %</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div
             appPercentageIncrease
@@ -219,7 +229,7 @@ import {
 
       <!-- Beta -->
       <ng-container matColumnDef="beta">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">Beta</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden xl:table-cell">Beta</th>
         <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
           {{ row.profile.beta ? (row.profile.beta | number: '1.2-2') : 'N/A' }}
         </td>
@@ -288,7 +298,7 @@ import {
 })
 export class StockSummaryTableComponent implements AfterViewInit {
   @Output() itemClickedEmitter = new EventEmitter<SymbolSummary>();
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
   @Input({ required: true }) set stockSummaries(data: SymbolSummary[] | null) {
     if (data === null) {
       return;
@@ -297,7 +307,13 @@ export class StockSummaryTableComponent implements AfterViewInit {
     const dataToAdd = data.filter((d) => this.dataSource.data.findIndex((d2) => d2.id === d.id) === -1);
     const keepData = this.dataSource.data.filter((d) => (data ?? []).findIndex((d2) => d2.id === d.id) !== -1);
 
-    this.dataSource.data = [...keepData, ...dataToAdd];
+    // sort data by market cap
+    this.dataSource.data = [...keepData, ...dataToAdd]
+      .slice()
+      .sort((a, b) => compare(a.quote.marketCap, b.quote.marketCap, false));
+
+    // update table
+    this.dataSource.sort = this.sort;
     this.dataSource._updateChangeSubscription();
     this.showLoadingSkeletonSignal.set(false);
   }
@@ -313,7 +329,7 @@ export class StockSummaryTableComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   toggleDisplayedValues(): void {
@@ -344,5 +360,41 @@ export class StockSummaryTableComponent implements AfterViewInit {
 
   onItemClicked(item: SymbolSummary): void {
     this.itemClickedEmitter.emit(item);
+  }
+
+  sortData(sort: Sort) {
+    const data = this.dataSource.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.dataSource.data = data;
+      return;
+    }
+
+    this.dataSource.data = data.sort((a: SymbolSummary, b: SymbolSummary) => {
+      const isAsc = sort.direction === 'asc';
+      switch (sort.active) {
+        case 'symbol':
+          return compare(a.id, b.id, isAsc);
+        case 'marketCap':
+          return compare(a.quote.marketCap, b.quote.marketCap, isAsc);
+        case 'price':
+          return compare(a.quote.price, b.quote.price, isAsc);
+        case 'priceChange':
+          return compare(a.quote.changesPercentage, b.quote.changesPercentage, isAsc);
+        case 'priceChangeMonthly':
+          return compare(a.priceChange['1M'], b.priceChange['1M'], isAsc);
+        case 'volume':
+          return compare(a.quote.volume, b.quote.volume, isAsc);
+        case 'shares':
+          return compare(a.quote.sharesOutstanding, b.quote.sharesOutstanding, isAsc);
+        case 'pe':
+          return compare(a.quote.pe, b.quote.pe, isAsc);
+        case 'eps':
+          return compare(a.quote.eps, b.quote.eps, isAsc);
+        case 'sector':
+          return compare(a.profile?.sector, b.profile?.sector, isAsc);
+        default:
+          return 0;
+      }
+    });
   }
 }
