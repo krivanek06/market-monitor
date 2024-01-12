@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { SymbolSummary } from '@market-monitor/api-types';
+import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { GetStocksSummaryPipe, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks/ui';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
+import { SectionTitleComponent } from '@market-monitor/shared/ui';
 
 @Component({
   selector: 'app-page-watchlist',
@@ -18,24 +19,15 @@ import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/featur
     StockSummaryDialogComponent,
     MatDialogModule,
     MatIconModule,
+    SectionTitleComponent,
   ],
   template: `
-    <div class="flex items-center justify-between">
-      <!-- title -->
-      <div class="flex items-center gap-2 mb-8 text-xl text-wt-primary">
-        <mat-icon>monitoring</mat-icon>
-        Watchlist
-      </div>
-    </div>
+    <app-section-title [title]="pageTitle()" matIcon="monitoring" class="mb-10" />
 
     <!-- table -->
     <app-stock-summary-table
-      appScrollNearEnd
-      (nearEnd)="onNearEndScroll()"
       (itemClickedEmitter)="onSummaryClick($event)"
-      [stockSummaries]="
-        userWatchListSymbolsSignal() | slice: 0 : displayResultsSignal() | getStocksSummary: displayCheckValue | async
-      "
+      [stockSummaries]="userWatchListSymbolsSignal() | getStocksSummary: displayCheckValue | async"
     ></app-stock-summary-table>
   `,
   styles: `
@@ -46,30 +38,29 @@ import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/featur
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageWatchlistComponent {
+  /**
+   * how many symbols to display before scrolling down
+   */
   readonly displayCheckValue = 25;
 
-  authenticationUserService = inject(AuthenticationUserStoreService);
-  dialog = inject(MatDialog);
-  dialogServiceUtil = inject(DialogServiceUtil);
+  private authenticationUserService = inject(AuthenticationUserStoreService);
+  private dialog = inject(MatDialog);
+  private dialogServiceUtil = inject(DialogServiceUtil);
+
+  watchList = this.authenticationUserService.state.watchList;
 
   /**
    * all symbols in the user's watchlist
    */
-  userWatchListSymbolsSignal = computed(() =>
-    this.authenticationUserService.state.watchList().data.map((d) => d.symbol),
-  );
-  /**
-   * the number of results to currently display
-   */
-  displayResultsSignal = signal(this.displayCheckValue);
+  userWatchListSymbolsSignal = computed(() => this.watchList().data.map((d) => d.symbol));
 
-  onNearEndScroll(): void {
-    // increase only if maxScreenerResults is less than screenerResults length
-    if (this.displayResultsSignal() > (this.userWatchListSymbolsSignal()?.length ?? 0)) {
-      return;
-    }
-    this.displayResultsSignal.update((prev) => prev + this.displayCheckValue);
-  }
+  pageTitle = computed(() => {
+    const userFeatures = this.authenticationUserService.state.getUserData().features;
+    const watchList = this.authenticationUserService.state.watchList();
+    return userFeatures.allowUnlimitedSymbolsInWatchList
+      ? `Watchlist: ${watchList.data.length}`
+      : `Watchlist: [${watchList.data.length} / ${USER_WATCHLIST_SYMBOL_LIMIT}]`;
+  });
 
   onSummaryClick(summary: SymbolSummary): void {
     this.dialog.open(StockSummaryDialogComponent, {

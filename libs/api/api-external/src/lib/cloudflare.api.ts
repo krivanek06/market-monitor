@@ -59,3 +59,17 @@ export const postMarketOverview = async (overview: MarketOverview): Promise<stri
   const data = (await response.data) as string;
   return data;
 };
+
+export const getStockHistoricalPricesOnDate = (symbol: string, date: string): Promise<HistoricalPrice | null> => {
+  return axios
+    .get<HistoricalPrice | null>(
+      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&date=${date}&type=specificDate`,
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return null;
+    });
+};

@@ -35,6 +35,10 @@ export const groupCreateCall = onCall(async (request) => {
     throw new Error('User not authenticated');
   }
 
+  return groupCreate(data, userAuthId);
+});
+
+export const groupCreate = async (data: GroupCreateInput, userAuthId: string): Promise<GroupData> => {
   // load user data from firebase
   const userDataDoc = await userDocumentRef(userAuthId).get();
   const userData = userDataDoc.data();
@@ -109,7 +113,7 @@ export const groupCreateCall = onCall(async (request) => {
   });
 
   return newGroup;
-});
+};
 
 const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
   return {

@@ -1,14 +1,20 @@
 import { faker } from '@faker-js/faker';
-import { PortfolioTransactionCreate, UserAccountTypes, UserData } from '@market-monitor/api-types';
+import { GroupCreateInput, PortfolioTransactionCreate, UserAccountTypes, UserData } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { addDays, format, subDays } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
+import { groupCreate, groupMemberAccept } from '../group';
 import { userDocumentWatchListRef } from '../models';
 import { createPortfolioCreateOperation } from '../portfolio';
+import { groupPortfolioRank } from '../schedulers/group-portfolio.rank';
+import { groupUpdateData } from '../schedulers/group-update-data';
+import { hallOfFameGroups } from '../schedulers/hall-of-fame-groups';
+import { hallOfFameUsers } from '../schedulers/hall-of-fame-users';
+import { userPortfolioRank } from '../schedulers/user-portfolio-rank';
+import { userUpdatePortfolio } from '../schedulers/user-update-portfolio';
 import { resetTransactionsForUser, userCreate } from '../user';
 import { isFirebaseEmulator } from '../utils';
-
 /**
  * Reload the database with new testing data
  * ONLY USE FOR TESTING / LOCAL DEVELOPMENT
@@ -25,24 +31,84 @@ export const reloadDatabase = async (): Promise<void> => {
   await deletePreviousData();
 
   // load users data
-
   console.log('CREATE NEW USERS - START');
+  const newUsers: UserData[] = [];
 
   for (let i = 0; i < 3; i++) {
-    await createUserData();
-    // wait some seconds to avoid frequent calls into financial modeling api
-    await waitNSeconds(2);
+    const userData = await createUserData();
+    newUsers.push(userData);
+
+    // create watchList
+    await createWatchList(userData);
+
+    // generate transactions
+    await generateTransaction(userData);
+
+    // wait 1 sec
+    await waitNSeconds(1);
   }
 
   console.log('CREATE NEW USERS - DONE');
 
-  // TODO - create new groups
+  // create group data
+  console.log('CREATE NEW GROUPS - START');
+  await createGroups(newUsers);
+  console.log('CREATE NEW GROUPS - DONE');
 
-  // TODO - run all schedulers
+  // run all schedulers
+  console.log('[Users]: update portfolio');
+  await userUpdatePortfolio();
+  console.log('[Groups]: update portfolio');
+  await groupUpdateData();
+  console.log('[Users]: update rank');
+  await userPortfolioRank();
+  console.log('[Users]: update hall of fame');
+  await hallOfFameUsers();
+  console.log('[Groups]: update rank');
+  await groupPortfolioRank();
+  console.log('[Groups]: update hall of fame');
+  await hallOfFameGroups();
 
   const endTime = performance.now();
-  const secondsDiff = (endTime - startTime) / 1000;
-  console.log(`Function took: ${secondsDiff} seconds`);
+  const secondsDiff = Math.round((endTime - startTime) / 1000);
+  console.log(`Function took: ~${secondsDiff} seconds`);
+};
+
+/**
+ * for N users create one group and invite some people
+ * for some people add them as members
+ */
+const createGroups = async (users: UserData[]): Promise<void> => {
+  // get 10 random users
+  const randomUsers = users.sort(() => 0.5 - Math.random()).slice(0, 10);
+
+  // create groups for each users
+  for await (const user of randomUsers) {
+    // select random users who is not owner
+    const randomUsersNotOwner = users
+      .filter((u) => u.id !== user.id)
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 20)
+      .map((u) => u.id);
+
+    const groupInput: GroupCreateInput = {
+      groupName: faker.company.name(),
+      imageUrl: faker.image.url(),
+      isOwnerMember: true,
+      isPublic: true,
+      memberInvitedUserIds: randomUsersNotOwner,
+    };
+
+    // create groups
+    const groupData = await groupCreate(groupInput, user.id);
+
+    // select random 15 users to be members of the group
+    const randomUsersNotOwnerAndMembers = randomUsersNotOwner.sort(() => 0.5 - Math.random()).slice(0, 15);
+    for await (const userId of randomUsersNotOwnerAndMembers) {
+      // add user to group
+      await groupMemberAccept(userId, groupData.id);
+    }
+  }
 };
 
 const waitNSeconds = async (seconds: number): Promise<void> => {
@@ -81,9 +147,7 @@ const deletePreviousData = async () => {
  *
  * @returns array of user ids
  */
-const createUserData = async (): Promise<UserData[]> => {
-  const userDataArray: UserData[] = [];
-
+const createUserData = async (): Promise<UserData> => {
   // create user auth
   const user = await getAuth().createUser({
     uid: faker.string.uuid(),
@@ -101,24 +165,20 @@ const createUserData = async (): Promise<UserData[]> => {
   // change user type to trading
   await resetTransactionsForUser(userData, UserAccountTypes.Trading);
 
+  // return data
+  return userData;
+};
+
+const createWatchList = async (userData: UserData): Promise<void> => {
   // add symbols to watchlist
-  const watchListSymbols = getStockSymbol(50);
-  await userDocumentWatchListRef(user.uid).set({
+  const watchListSymbols = getRandomSymbols(50);
+  await userDocumentWatchListRef(userData.id).set({
     createdDate: getCurrentDateDefaultFormat(),
     data: watchListSymbols.map((symbol) => ({
       symbol,
       symbolType: 'STOCK',
     })),
   });
-
-  // generate transactions
-  await generateTransaction(userData);
-
-  // save user
-  userDataArray.push(userData);
-
-  // return data
-  return userDataArray;
 };
 
 /**
@@ -127,11 +187,11 @@ const createUserData = async (): Promise<UserData[]> => {
  * @param userData
  */
 const generateTransaction = async (userData: UserData): Promise<void> => {
-  const randomSymbols = getStockSymbol(10);
+  const randomSymbols = getRandomSymbols(10);
 
   for await (const symbol of randomSymbols) {
-    console.log('symbol', symbol);
-    const pastDate = subDays(new Date(), getRandomNumber(50, 100));
+    // get a date 200 days before today
+    const pastDate = subDays(new Date(), 200);
 
     const buyOperation: PortfolioTransactionCreate = {
       date: format(pastDate, 'yyyy-MM-dd'),
@@ -142,7 +202,7 @@ const generateTransaction = async (userData: UserData): Promise<void> => {
     };
 
     const sellOperation: PortfolioTransactionCreate = {
-      date: format(addDays(pastDate, 30), 'yyyy-MM-dd'),
+      date: format(addDays(pastDate, 50), 'yyyy-MM-dd'),
       symbol,
       symbolType: 'STOCK',
       units: getRandomNumber(10, 18),
@@ -162,7 +222,13 @@ const getRandomNumber = (min: number, max: number): number => {
   return Math.ceil(Math.random() * (max - min) + min);
 };
 
-const getStockSymbol = (limit: number): string[] => {
+const getRandomSymbols = (limit: number) => {
+  const symbols = getSymbols();
+  const randomSymbols = symbols.sort(() => 0.5 - Math.random()).slice(0, limit);
+  return randomSymbols;
+};
+
+const getSymbols = () => {
   // list of symbols
   const symbols = [
     'AAPL',
@@ -170,7 +236,7 @@ const getStockSymbol = (limit: number): string[] => {
     'GOOGL',
     'MSFT',
     'TSLA',
-    'FB',
+    'META',
     'NVDA',
     'BABA',
     'JPM',
@@ -183,16 +249,8 @@ const getStockSymbol = (limit: number): string[] => {
     'DIS',
     'BA',
     'WMT',
-    'CMCSA',
     'VZ',
     'PEP',
-    'KO',
-    'GOOG',
-    'ABBV',
-    'CVX',
-    'XOM',
-    'PG',
-    'MRK',
     'PFE',
     'WFC',
     'BAC',
@@ -209,7 +267,6 @@ const getStockSymbol = (limit: number): string[] => {
     'CVS',
     'ABT',
     'JNJ',
-    'MRNA',
     'AZN',
     'PFE',
     'T',
@@ -217,9 +274,7 @@ const getStockSymbol = (limit: number): string[] => {
     'TMUS',
     'S',
     'NFLX',
-    'ATVI',
     'EA',
-    'TTWO',
     'SNE',
     'AMD',
     'MU',
@@ -237,153 +292,8 @@ const getStockSymbol = (limit: number): string[] => {
     'WORK',
     'ZM',
     'UBER',
-    'LYFT',
-    'BA',
-    'LMT',
-    'RTX',
-    'NOC',
-    'GD',
-    'LHX',
-    'HON',
-    'GE',
-    'MMM',
-    'CAT',
-    'UNP',
-    'CSX',
-    'NSC',
-    'FDX',
-    'UPS',
-    'GLW',
-    'TEL',
-    'AAPL',
-    'SAMSUNG',
-    'TM',
-    'HMC',
-    'F',
-    'GM',
-    'TSLA',
-    'FORD',
-    'NIO',
-    'GM',
-    'ABBV',
-    'GILD',
-    'BMY',
-    'CELG',
-    'REGN',
-    'BIIB',
-    'MRK',
-    'AMGN',
-    'JNJ',
-    'PFE',
-    'LLY',
-    'NVS',
-    'AZN',
-    'ABBV',
-    'GSK',
-    'SNY',
-    'ABBOTT',
-    'GILD',
-    'AMGN',
-    'BIIB',
-    'CELG',
-    'REGN',
-    'BMY',
-    'LLY',
-    'ABBOTT',
-    'SNY',
-    'GSK',
-    'NVS',
-    'V',
-    'MA',
-    'AXP',
-    'PYPL',
-    'SQ',
-    'WFC',
-    'JPM',
-    'GS',
-    'BAC',
-    'C',
-    'MS',
-    'VLO',
-    'CVX',
-    'XOM',
-    'COP',
-    'TOT',
-    'RDS-A',
-    'BP',
-    'HAL',
-    'SLB',
-    'APA',
-    'EOG',
-    'OXY',
-    'DVN',
-    'NOV',
-    'MRO',
-    'COP',
-    'CXO',
-    'PSX',
-    'KMI',
-    'XOM',
-    'CVX',
-    'TOT',
-    'RDS-A',
-    'BP',
-    'ECL',
-    'CLX',
-    'KMB',
-    'PG',
-    'CL',
-    'HSY',
-    'KO',
-    'PEP',
-    'NKE',
-    'LULU',
-    'UAA',
-    'NKE',
-    'SBUX',
-    'MCD',
-    'CMG',
-    'YUM',
-    'QSR',
-    'WEN',
-    'JACK',
-    'DPZ',
-    'MCD',
-    'YUM',
-    'CMG',
-    'SBUX',
-    'QSR',
-    'NKE',
-    'UA',
-    'LULU',
-    'VFC',
-    'GPS',
-    'ANF',
-    'AEO',
-    'URBN',
-    'ZARA',
-    'LVMUY',
-    'LUX',
-    'EL',
-    'COTY',
-    'REV',
-    'CCL',
-    'RCL',
-    'NCLH',
-    'DIS',
-    'T',
-    'TMUS',
-    'S',
-    'VZ',
-    'CIEN',
-    'AMZN',
-    'NFLX',
-    'DIS',
-    'CMCSA',
   ];
-
-  const randomSymbols = symbols.sort(() => 0.5 - Math.random()).slice(0, limit);
-  return randomSymbols;
+  return symbols;
 };
 
 /**

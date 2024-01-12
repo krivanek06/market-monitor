@@ -1,4 +1,4 @@
-import { getHistoricalPricesOnDate } from '@market-monitor/api-external';
+import { getStockHistoricalPricesOnDate } from '@market-monitor/api-external';
 import {
   HISTORICAL_PRICE_RESTRICTION_YEARS,
   HistoricalPrice,
@@ -70,7 +70,7 @@ export const createPortfolioCreateOperation = async (
   data.date = formatWeekendDate(data.date);
 
   // load historical price for symbol on date
-  const symbolPrice = await getHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date));
+  const symbolPrice = await getStockHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date));
 
   // check if symbol exists
   if (!symbolPrice) {

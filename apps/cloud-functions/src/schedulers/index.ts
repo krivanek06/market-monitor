@@ -1,9 +1,7 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { reloadMarketOverview } from '../market-functions/market-overview';
-import { corsMiddleWareHttp, firebaseSimpleErrorLogger, isFirebaseEmulator } from '../utils';
 import { groupUpdateData } from './group-update-data';
 import { hallOfFameUsers } from './hall-of-fame-users';
-import { reloadDatabase } from './reload-database';
 import { userPortfolioRank } from './user-portfolio-rank';
 import { userUpdatePortfolio } from './user-update-portfolio';
 
@@ -60,38 +58,4 @@ export const run_reload_market_overview = onSchedule(
   async () => {
     reloadMarketOverview();
   },
-);
-
-// DEVELOPMENT ----------------------------
-
-export const test_me = firebaseSimpleErrorLogger(
-  'test_function',
-  corsMiddleWareHttp(async (request, response) => {
-    if (!isFirebaseEmulator()) {
-      console.warn('Function can be executed only in development mode');
-      return;
-    }
-
-    console.log('--- start ---');
-
-    // console.log('[Users]: update portfolio');
-    // await userUpdatePortfolio();
-    // console.log('[Groups]: update portfolio');
-    // await groupUpdateData();
-    // console.log('[Users]: update rank');
-    // await userPortfolioRank();
-    // console.log('[Users]: update hall of fame');
-    //await hallOfFameUsers();
-    // console.log('[Groups]: update rank');
-    // await groupPortfolioRank();
-    // console.log('[Groups]: update hall of fame');
-    //await hallOfFameGroups();
-
-    // wait 5 second
-    // await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    await reloadDatabase();
-
-    console.log('--- finished ---');
-  }),
 );

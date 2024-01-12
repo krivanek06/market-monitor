@@ -13,7 +13,7 @@ import { ESGDataQuarterly } from '@market-monitor/api-types';
     <table mat-table [dataSource]="dataSource">
       <!-- date -->
       <ng-container matColumnDef="date">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Date</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Date</th>
         <td mat-cell *matCellDef="let row">
           <span class="text-wt-gray-dark">{{ row.date | date: 'MMMM d, y' }}</span>
         </td>
@@ -21,7 +21,7 @@ import { ESGDataQuarterly } from '@market-monitor/api-types';
 
       <!-- formType -->
       <ng-container matColumnDef="formType">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Form</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">Form</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <span>{{ row.formType }}</span>
         </td>
@@ -29,7 +29,7 @@ import { ESGDataQuarterly } from '@market-monitor/api-types';
 
       <!-- ESGScore -->
       <ng-container matColumnDef="ESGScore">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef>ESG</th>
+        <th mat-header-cell *matHeaderCellDef>ESG</th>
         <td mat-cell *matCellDef="let row">
           <span>
             {{ row.ESGScore }}
@@ -39,7 +39,7 @@ import { ESGDataQuarterly } from '@market-monitor/api-types';
 
       <!-- socialScore -->
       <ng-container matColumnDef="socialScore">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Social</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Social</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           {{ row.socialScore }}
         </td>
@@ -47,7 +47,7 @@ import { ESGDataQuarterly } from '@market-monitor/api-types';
 
       <!-- governanceScore -->
       <ng-container matColumnDef="governanceScore">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Governance</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Governance</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           {{ row.governanceScore }}
         </td>
@@ -55,7 +55,7 @@ import { ESGDataQuarterly } from '@market-monitor/api-types';
 
       <!-- environmentalScore -->
       <ng-container matColumnDef="environmentalScore">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Environmental</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Environmental</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           {{ row.environmentalScore }}
         </td>
@@ -63,7 +63,7 @@ import { ESGDataQuarterly } from '@market-monitor/api-types';
 
       <!-- redirect -->
       <ng-container matColumnDef="redirect">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Redirect</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden md:table-cell">Redirect</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           <a mat-icon-button [href]="row.url" target="_blank">
             <mat-icon>open_in_new</mat-icon>

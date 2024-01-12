@@ -1,5 +1,5 @@
-import { getHistoricalPricesOnDate } from '@market-monitor/api-external';
-import { RESPONSE_HEADER } from '@market-monitor/api-types';
+import { getHistoricalPricesOnDateRange } from '@market-monitor/api-external';
+import { HistoricalPrice, RESPONSE_HEADER } from '@market-monitor/api-types';
 import { Env } from './model';
 
 /**
@@ -22,4 +22,9 @@ export const getPriceOnDate = async (env: Env, symbol: string, searchParams: URL
 
 	// return data
 	return new Response(JSON.stringify(data), RESPONSE_HEADER);
+};
+
+const getHistoricalPricesOnDate = async (symbol: string, date: string): Promise<HistoricalPrice | null> => {
+	const data = await getHistoricalPricesOnDateRange(symbol, date, date);
+	return data[0] ?? null;
 };
