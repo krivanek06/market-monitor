@@ -7,12 +7,6 @@ import { getAuth } from 'firebase-admin/auth';
 import { groupCreate, groupMemberAccept } from '../group';
 import { userDocumentWatchListRef } from '../models';
 import { createPortfolioCreateOperation } from '../portfolio';
-import { groupPortfolioRank } from '../schedulers/group-portfolio.rank';
-import { groupUpdateData } from '../schedulers/group-update-data';
-import { hallOfFameGroups } from '../schedulers/hall-of-fame-groups';
-import { hallOfFameUsers } from '../schedulers/hall-of-fame-users';
-import { userPortfolioRank } from '../schedulers/user-portfolio-rank';
-import { userUpdatePortfolio } from '../schedulers/user-update-portfolio';
 import { resetTransactionsForUser, userCreate } from '../user';
 import { isFirebaseEmulator } from '../utils';
 /**
@@ -34,7 +28,8 @@ export const reloadDatabase = async (): Promise<void> => {
   console.log('CREATE NEW USERS - START');
   const newUsers: UserData[] = [];
 
-  for (let i = 0; i < 3; i++) {
+  const createUsers = 30;
+  for (let i = 0; i < createUsers; i++) {
     const userData = await createUserData();
     newUsers.push(userData);
 
@@ -46,6 +41,8 @@ export const reloadDatabase = async (): Promise<void> => {
 
     // wait 1 sec
     await waitNSeconds(1);
+
+    console.log(`User created: ${i + 1}/${createUsers}`);
   }
 
   console.log('CREATE NEW USERS - DONE');
@@ -54,20 +51,6 @@ export const reloadDatabase = async (): Promise<void> => {
   console.log('CREATE NEW GROUPS - START');
   await createGroups(newUsers);
   console.log('CREATE NEW GROUPS - DONE');
-
-  // run all schedulers
-  console.log('[Users]: update portfolio');
-  await userUpdatePortfolio();
-  console.log('[Groups]: update portfolio');
-  await groupUpdateData();
-  console.log('[Users]: update rank');
-  await userPortfolioRank();
-  console.log('[Users]: update hall of fame');
-  await hallOfFameUsers();
-  console.log('[Groups]: update rank');
-  await groupPortfolioRank();
-  console.log('[Groups]: update hall of fame');
-  await hallOfFameGroups();
 
   const endTime = performance.now();
   const secondsDiff = Math.round((endTime - startTime) / 1000);

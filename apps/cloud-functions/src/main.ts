@@ -36,10 +36,10 @@ admin.firestore().settings({
 });
 
 // -------- Production ---------
-export * from './general';
 export * from './group';
 export * from './market-functions';
 export * from './portfolio';
+export * from './testing-functions';
 export * from './user';
 
 // -------- Scheduler ---------
