@@ -23,7 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class DialogCloseHeaderComponent {
   @Output() dialogCloseEmitter = new EventEmitter<void>();
-  @Input({ required: true }) title!: string;
+  @Input({ required: true }) title?: string;
   @Input() showCloseButton = true;
 
   constructor(@Optional() @SkipSelf() private dialogRef: MatDialogRef<unknown>) {}

@@ -101,6 +101,9 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         }"
         [heightPx]="425"
         class="mb-6"
+        chartType="balance"
+        [displayHeader]="true"
+        headerTitle="Portfolio Growth"
       ></app-portfolio-growth-chart>
 
       <!-- invitations -->

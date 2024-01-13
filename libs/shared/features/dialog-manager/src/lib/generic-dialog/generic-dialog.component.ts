@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
 
 export type GenericDialogComponentData = {
-  title: string;
+  title?: string;
   /**
    * The component to render inside the dialog
    */

@@ -22,11 +22,10 @@ import { startWith } from 'rxjs';
     <!-- investment growth -->
     <div class="flex items-center justify-between">
       <!-- select chart title -->
-      <app-section-title *ngIf="title" [title]="title" />
+      <app-section-title title="Portfolio Change Chart" />
 
       <!-- date range -->
       <app-date-range-slider
-        *ngIf="displaySlider"
         class="w-[550px]"
         [displayUpperDate]="false"
         [formControl]="sliderControl"
@@ -52,9 +51,6 @@ import { startWith } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioChangeChartComponent extends ChartConstructor {
-  @Input() displaySlider = false;
-  @Input() title = '';
-
   sliderControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 
   @Input({ required: true }) set data(input: PortfolioGrowth[]) {

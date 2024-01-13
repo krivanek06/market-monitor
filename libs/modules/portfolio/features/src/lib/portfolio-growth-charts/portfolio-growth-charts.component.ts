@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { PortfolioGrowthAssets, PortfolioState } from '@market-monitor/api-types';
-import { PortfolioGrowth, dashboardChartOptionsInputSource } from '@market-monitor/modules/portfolio/data-access';
+import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
 import {
   PortfolioAssetChartComponent,
   PortfolioChangeChartComponent,
@@ -58,25 +58,16 @@ import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
         values: portfolioGrowthChartSignal,
         startingCashValue: portfolioState.startingCash
       }"
+      [displayHeader]="false"
       [heightPx]="heightPx"
       chartType="balance"
     ></app-portfolio-growth-chart>
 
     <!-- investment growth -->
-    <div class="flex items-center justify-between">
-      <!-- select chart title -->
-      <app-section-title title="Invested Value to Market" />
-
-      <!-- date range -->
-      <app-date-range-slider
-        class="w-[550px]"
-        [displayUpperDate]="false"
-        [formControl]="portfolioInvestedRangeControl"
-      ></app-date-range-slider>
-    </div>
-
     <app-portfolio-growth-chart
       *ngIf="portfolioInvestedChartSignal() as portfolioGrowthChartSignal"
+      headerTitle="Invested Value to Market"
+      [displayHeader]="true"
       [data]="{
         values: portfolioGrowthChartSignal,
         startingCashValue: portfolioState.startingCash
@@ -109,36 +100,26 @@ export class PortfolioGrowthChartsComponent {
     // patch values only if empty
     if ((this.portfolioGrowthRangeControl.value?.dates?.length ?? 0) === 0) {
       this.portfolioGrowthRangeControl.patchValue(sliderValues);
-      this.portfolioInvestedRangeControl.patchValue(sliderValues);
     }
   }
   private portfolioGrowth$ = new BehaviorSubject<PortfolioGrowth[]>([]);
   private dialogServiceUtil = inject(DialogServiceUtil);
 
-  dashboardChartOptionsInputSource = dashboardChartOptionsInputSource;
-
   portfolioGrowthRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
-  portfolioInvestedRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 
   portfolioGrowthChartSignal = toSignal(
     combineLatest([this.portfolioGrowthRangeControl.valueChanges.pipe(startWith(null)), this.portfolioGrowth$]).pipe(
       map(([dateRange, data]) => filterDataByDateRange(data, dateRange)),
     ),
   );
-  portfolioInvestedChartSignal = toSignal(
-    combineLatest([this.portfolioInvestedRangeControl.valueChanges.pipe(startWith(null)), this.portfolioGrowth$]).pipe(
-      map(([dateRange, data]) => filterDataByDateRange(data, dateRange)),
-    ),
-  );
+  portfolioInvestedChartSignal = toSignal(this.portfolioGrowth$);
 
   onPortfolioChangeChart(): void {
     const data = this.portfolioGrowth$.getValue();
     this.dialogServiceUtil.showGenericDialog({
-      title: 'Portfolio Change Chart',
       component: PortfolioChangeChartComponent,
       componentData: {
         data: data,
-        displaySlider: true,
       },
     });
   }
@@ -149,7 +130,6 @@ export class PortfolioGrowthChartsComponent {
       component: PortfolioAssetChartComponent,
       componentData: {
         data: this.portfolioAssetsGrowth,
-        displaySlider: true,
       },
     });
   }

@@ -157,7 +157,7 @@ export class PortfolioGrowthService {
         } satisfies PortfolioGrowthAssets;
       })
       .filter((d): d is PortfolioGrowthAssets => !!d);
-    console.log('result', result);
+    console.log('PortfolioGrowthService: getPortfolioGrowthAssets [result]', result);
     return result;
   }
 }

@@ -5,10 +5,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
-import {
-  PortfolioUserFacadeService,
-  dashboardChartOptionsInputSource,
-} from '@market-monitor/modules/portfolio/data-access';
+import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
 import { PortfolioGrowthChartsComponent } from '@market-monitor/modules/portfolio/features';
 import {
   PortfolioHoldingsTableComponent,
@@ -153,7 +150,6 @@ export class PageDashboardComponent {
   portfolioChangeDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 
   ColorScheme = ColorScheme;
-  dashboardChartOptionsInputSource = dashboardChartOptionsInputSource;
 
   USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
 
