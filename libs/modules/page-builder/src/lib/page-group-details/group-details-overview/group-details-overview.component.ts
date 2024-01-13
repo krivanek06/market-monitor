@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { UserApiService } from '@market-monitor/api-client';
-import { GROUP_MEMBER_LIMIT, GroupMember } from '@market-monitor/api-types';
+import { GROUP_MEMBER_LIMIT, UserBase } from '@market-monitor/api-types';
 import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@market-monitor/modules/group/features';
 import { GroupDisplayInfoComponent } from '@market-monitor/modules/group/ui';
 import { PortfolioCalculationService } from '@market-monitor/modules/portfolio/data-access';
@@ -50,6 +50,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         <!-- group info -->
         <app-group-display-info
           class="flex-1"
+          (ownerClickEmitter)="onMemberClick($event)"
           [clickableOwner]="true"
           [imageHeightPx]="150"
           [groupData]="groupDetailsSignal.groupData"
@@ -179,7 +180,7 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
 
   ngOnInit(): void {}
 
-  onMemberClick(member: GroupMember): void {
+  onMemberClick(member: UserBase): void {
     this.dialog.open(UserDetailsDialogComponent, {
       data: <UserDetailsDialogComponentData>{
         userId: member.id,

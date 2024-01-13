@@ -272,7 +272,6 @@ const getSymbols = () => {
     'IBM',
     'NOW',
     'SNOW',
-    'WORK',
     'ZM',
     'UBER',
   ];

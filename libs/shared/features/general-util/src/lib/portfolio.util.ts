@@ -89,8 +89,6 @@ export const getPortfolioStateHoldingsUtil = (
     accountResetDate: previousPortfolioState.accountResetDate,
   };
 
-  console.log('%c result', 'color: #00ffa2', result);
-
   return {
     ...result,
     holdings: portfolioStateHolding,
