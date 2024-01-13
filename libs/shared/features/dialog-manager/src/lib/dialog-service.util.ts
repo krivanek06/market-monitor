@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, firstValueFrom, of } from 'rxjs';
 import { ActionButtonDialog, ActionButtonDialogComponent } from './action-button-dialog/action-button-dialog.component';
-import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogComponentData } from './confirm-dialog/confirm-dialog.component';
 import { SCREEN_DIALOGS } from './dialog.model';
 import {
   InlineInputDialogComponent,
@@ -61,6 +61,7 @@ export class DialogServiceUtil {
     dialogTitle: string,
     confirmButton: string = 'Confirm',
     showCancelButton: boolean = true,
+    showTextWord: string = '',
   ): Promise<boolean> {
     if (!this.matDialog) {
       console.warn('DialogService.matDialog not initialized');
@@ -68,10 +69,11 @@ export class DialogServiceUtil {
     }
 
     const dialogRef = this.matDialog.open(ConfirmDialogComponent, {
-      data: {
+      data: <ConfirmDialogComponentData>{
         dialogTitle,
         confirmButton,
         showCancelButton,
+        showTextWord,
       },
     });
 
@@ -92,28 +94,6 @@ export class DialogServiceUtil {
     });
 
     const result = (await firstValueFrom(dialogRef.afterClosed())) as 'primary' | 'secondary';
-    return result;
-  }
-
-  showConfirmDialogObs(
-    dialogTitle: string,
-    confirmButton: string = 'Confirm',
-    showCancelButton: boolean = true,
-  ): Observable<boolean> {
-    if (!this.matDialog) {
-      console.warn('DialogService.matDialog not initialized');
-      return of(false);
-    }
-
-    const dialogRef = this.matDialog.open(ConfirmDialogComponent, {
-      data: {
-        dialogTitle,
-        confirmButton,
-        showCancelButton,
-      },
-    });
-
-    const result = dialogRef.afterClosed();
     return result;
   }
 

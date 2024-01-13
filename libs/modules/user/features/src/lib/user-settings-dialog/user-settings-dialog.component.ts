@@ -150,6 +150,10 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
       display: block;
     }
 
+    button {
+      @apply h-11;
+    }
+
     .c-text-item {
       display: flex;
       :first-child {
@@ -201,7 +205,7 @@ export class UserSettingsDialogComponent implements OnInit {
       .subscribe((imgUrl) => this.authenticationAccountService.changePhotoUrl(imgUrl));
   }
 
-  @Confirmable('Are you sure you want to delete your account?')
+  @Confirmable('Are you sure you want to delete your account?', 'Confirm', true, 'DELETE')
   onDeleteAccount(): void {
     // notify user
     this.dialogServiceUtil.showNotificationBar('Sending request to delete your account');

@@ -39,9 +39,9 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
     <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4">
       @if (hallOfFameUsersSignal(); as hallOfFameUses) {
         <div class="lg:basis-4/6 xl:basis-3/6">
-          <div class="flex items-center justify-between lg:px-2">
+          <div class="flex items-center justify-between lg:px-2 mb-4">
             <!-- title -->
-            <app-section-title title="Top Users" />
+            <app-section-title title="Top Users" class="mt-2" />
 
             <div class="flex items-center gap-4">
               <!-- best/worst button -->
@@ -53,11 +53,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
               >
                 <mat-icon *ngIf="showBestSignal()">arrow_drop_up</mat-icon>
                 <mat-icon *ngIf="!showBestSignal()">arrow_drop_down</mat-icon>
-                @if (showBestSignal()) {
-                  Best Users
-                } @else {
-                  Worst Users
-                }
+                {{ showBestSignal() ? 'Best Users' : ' Worst Users' }}
               </button>
 
               <!-- show more button -->
@@ -68,11 +64,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
                 color="primary"
                 type="button"
               >
-                @if (showMoreSignal()) {
-                  Show More
-                } @else {
-                  Show Less
-                }
+                {{ showMoreSignal() ? 'Show Less' : ' Show More' }}
               </button>
             </div>
           </div>
@@ -91,7 +83,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
             @for (user of hallOfFameUses.bestDailyGains; track user.id) {
               <app-user-display-item
                 (click)="onUserClick(user)"
-                class="g-clickable-hover"
+                class="g-clickable-hover mb-3"
                 [showLoginButton]="false"
                 [userData]="user"
               />
@@ -106,7 +98,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
             @for (user of hallOfFameUses.worstDailyGains; track user.id) {
               <app-user-display-item
                 (click)="onUserClick(user)"
-                class="g-clickable-hover"
+                class="g-clickable-hover mb-3"
                 [showLoginButton]="false"
                 [userData]="user"
               />

@@ -35,7 +35,7 @@ import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manage
           color="warn"
           (click)="onRemoveToFavorite()"
           type="button"
-          class="g-border-apply max-sm:w-full"
+          class="g-border-apply max-sm:w-full h-11"
         >
           <mat-icon>do_not_disturb_on</mat-icon>
           favorites - remove
@@ -46,7 +46,7 @@ import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manage
           color="accent"
           (click)="onAddToFavorite()"
           type="button"
-          class="g-border-apply max-sm:w-full"
+          class="g-border-apply max-sm:w-full h-11"
         >
           <mat-icon>star</mat-icon>
           favorite - add
@@ -61,7 +61,7 @@ import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manage
           color="warn"
           (click)="onRemoveWatchList()"
           type="button"
-          class="g-border-apply max-sm:w-full"
+          class="g-border-apply max-sm:w-full h-11"
         >
           <mat-icon>do_not_disturb_on</mat-icon>
           watchlist - remove
@@ -72,14 +72,14 @@ import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manage
           color="accent"
           (click)="onAddWatchList()"
           type="button"
-          class="g-border-apply max-sm:w-full"
+          class="g-border-apply max-sm:w-full h-11"
         >
           <mat-icon>star</mat-icon>
           watchlist - add
         </button>
       </ng-container>
 
-      <button class="max-sm:w-full" type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
+      <button class="max-sm:w-full h-11" type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
         Go to Details
         <mat-icon iconPositionEnd>navigate_next</mat-icon>
       </button>

@@ -58,6 +58,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
               type="button"
               color="primary"
               (click)="onCreateGroupClick()"
+              class="h-12"
             >
               <mat-icon>add</mat-icon>
               create group

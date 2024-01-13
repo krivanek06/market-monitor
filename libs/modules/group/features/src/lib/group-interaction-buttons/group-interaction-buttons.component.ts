@@ -184,6 +184,10 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         display: flex;
         gap: 16px;
       }
+
+      button {
+        @apply h-11;
+      }
     `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { ColorScheme } from '@market-monitor/shared/data-access';
 import { PositionColoringDirective } from '../../../directives';
 
 @Component({
@@ -29,6 +30,7 @@ import { PositionColoringDirective } from '../../../directives';
       class="shadow-md pt-8 pb-3 px-6"
       appPositionColoring
       [position]="currentPositions"
+      [defaultPositionColor]="ColorScheme.GRAY_LIGHT_VAR"
       positionType="background-color"
       (click)="onClick()"
       [ngClass]="{
@@ -72,6 +74,8 @@ export class PositionCardComponent {
   @Input({ required: true }) currentPositions!: number;
   @Input() previousPosition?: number | null;
   @Input() clickable = false;
+
+  ColorScheme = ColorScheme;
 
   get showPreviousPosition(): boolean {
     return !!this.previousPosition && this.currentPositions !== this.previousPosition;

@@ -31,9 +31,9 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
     <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4">
       @if (hallOfFameGroupsSignal(); as hallOfFameGroups) {
         <div class="lg:basis-4/6 xl:basis-3/6">
-          <div class="flex items-center justify-between lg:px-2">
+          <div class="flex items-center justify-between lg:px-2 mb-4">
             <!-- title -->
-            <app-section-title title="Top Users" />
+            <app-section-title title="Top Groups" class="mt-2" />
 
             <div class="flex items-center gap-4">
               <!-- best/worst button -->
@@ -45,11 +45,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
               >
                 <mat-icon *ngIf="showBestSignal()">arrow_drop_up</mat-icon>
                 <mat-icon *ngIf="!showBestSignal()">arrow_drop_down</mat-icon>
-                @if (showBestSignal()) {
-                  Best Users
-                } @else {
-                  Worst Users
-                }
+                {{ showBestSignal() ? 'Best Groups' : ' Worst Groups' }}
               </button>
 
               <!-- show more button -->
@@ -60,11 +56,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
                 color="primary"
                 type="button"
               >
-                @if (showMoreSignal()) {
-                  Show More
-                } @else {
-                  Show Less
-                }
+                {{ showMoreSignal() ? 'Show Less' : ' Show More' }}
               </button>
             </div>
           </div>
@@ -81,7 +73,11 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
           <div>
             <app-section-title title="Daily Gainers" class="mb-6" />
             @for (group of hallOfFameGroups.bestDailyGains; track group.id) {
-              <app-group-display-item (click)="onGroupClick(group)" [groupData]="group" class="g-clickable-hover" />
+              <app-group-display-item
+                (click)="onGroupClick(group)"
+                [groupData]="group"
+                class="g-clickable-hover mb-3"
+              />
             } @empty {
               <div>No Data Found</div>
             }
@@ -91,7 +87,11 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
           <div>
             <app-section-title title="Daily Losers" class="mb-6" />
             @for (group of hallOfFameGroups.worstDailyGains; track group.id) {
-              <app-group-display-item (click)="onGroupClick(group)" [groupData]="group" class="g-clickable-hover" />
+              <app-group-display-item
+                (click)="onGroupClick(group)"
+                [groupData]="group"
+                class="g-clickable-hover mb-3"
+              />
             } @empty {
               <div>No Data Found</div>
             }

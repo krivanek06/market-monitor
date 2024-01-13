@@ -14,6 +14,11 @@ export class PositionColoringDirective implements OnChanges {
   @Input() positionType: ColorType = 'color';
   @Input({ required: true }) position!: number;
 
+  /**
+   * color used to color elements after the first 3 positions
+   */
+  @Input() defaultPositionColor = ColorScheme.GRAY_MEDIUM_VAR;
+
   private renderer = inject(Renderer2);
   private elementRef = inject(ElementRef);
 
@@ -40,7 +45,7 @@ export class PositionColoringDirective implements OnChanges {
         return '#073dc6';
       }
 
-      return ColorScheme.GRAY_LIGHT_VAR;
+      return this.defaultPositionColor;
     }
     // background colors have some opacity
     if (type === 'background-color') {
@@ -54,7 +59,7 @@ export class PositionColoringDirective implements OnChanges {
         return '#073dc65e';
       }
 
-      return ColorScheme.GRAY_LIGHT_VAR;
+      return this.defaultPositionColor;
     }
 
     return '';
