@@ -101,8 +101,7 @@ export const appRoutes: Route[] = [
           {
             path: ROUTES_MAIN.STOCK_SCREENER,
             title: 'Stock Screener',
-            loadComponent: () =>
-              import('./stock-screener/stock-screener.component').then((m) => m.StockScreenerComponent),
+            loadComponent: () => import('./market/market-screener.component').then((m) => m.MarketCalendarComponent),
           },
           {
             path: ROUTES_MAIN.MARKET,

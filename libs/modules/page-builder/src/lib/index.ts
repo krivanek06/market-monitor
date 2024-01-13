@@ -8,7 +8,6 @@ export * from './page-market';
 export * from './page-menu/page-menu.component';
 export * from './page-search/page-search.component';
 export * from './page-stock-details';
-export * from './page-stock-screener/page-stock-screener.component';
 export * from './page-trading/page-trading.component';
 export * from './page-watchlist/page-watchlist.component';
 export * from './resolvers';

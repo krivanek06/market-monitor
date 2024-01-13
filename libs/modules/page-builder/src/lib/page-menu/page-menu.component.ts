@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
 import { DialogServiceModule } from '@market-monitor/shared/features/dialog-manager';
 import { LoaderMainService } from '@market-monitor/shared/features/general-features';
+import { MenuSideNavigationComponent } from './menu-navigation/menu-side-navigation.component';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
-
 @Component({
   selector: 'app-page-menu',
   standalone: true,
@@ -21,32 +22,56 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
     MatDividerModule,
     MatProgressSpinnerModule,
     MenuTopNavigationComponent,
-
+    MatSidenavModule,
+    MenuSideNavigationComponent,
     // do not remove - allows showing dialogs sub child routes
     DialogServiceModule,
   ],
   template: `
-    <!-- top navigation on big screen -->
-    <header>
-      <app-menu-top-navigation></app-menu-top-navigation>
-    </header>
+    <mat-drawer-container autosize class="h-full">
+      <!-- side nav -->
+      <mat-drawer
+        mode="over"
+        [opened]="isOpen()"
+        class="w-5/12 md:w-3/12 min-w-[275px] sm:min-w-[375px] block xl:hidden"
+        role="navigation"
+        (closed)="toggleMatDrawerExpandedView()"
+      >
+        <app-menu-side-navigation />
+      </mat-drawer>
 
-    <div class="c-content-wrapper">
-      <!-- content -->
-      <div *ngIf="loadingSignal()" class="grid place-content-center pb-[15%] min-h-screen min-w-full">
-        <mat-spinner></mat-spinner>
-      </div>
+      <mat-drawer-content>
+        <!-- top navigation on big screen -->
+        <header>
+          <app-menu-top-navigation (menuClickEmitter)="toggleMatDrawerExpandedView()"></app-menu-top-navigation>
+        </header>
 
-      <main [ngClass]="{ hidden: loadingSignal() }">
-        <router-outlet></router-outlet>
-      </main>
-      <!-- footer for additional space on bottom -->
-      <footer class="w-full h-12"></footer>
-    </div>
+        <div class="c-content-wrapper">
+          <!-- content -->
+          <div *ngIf="loadingSignal()" class="grid place-content-center pb-[15%] min-h-screen min-w-full">
+            <mat-spinner></mat-spinner>
+          </div>
+
+          <main [ngClass]="{ hidden: loadingSignal() }">
+            <router-outlet></router-outlet>
+          </main>
+          <!-- footer for additional space on bottom -->
+          <footer class="w-full h-12"></footer>
+        </div>
+      </mat-drawer-content>
+    </mat-drawer-container>
   `,
   styles: `
       :host {
         display: block;
+      }
+
+      .mat-drawer:not(.mat-drawer-side) {
+          position: fixed;
+      }
+
+      .mat-drawer-backdrop {
+          position: fixed !important;
       }
 
       .c-content-wrapper {
@@ -67,5 +92,12 @@ export class PageMenuComponent {
   loaderMainService = inject(LoaderMainService);
   loadingSignal = toSignal(this.loaderMainService.getLoading());
 
+  isOpen = signal<boolean>(false);
+
   constructor() {}
+
+  toggleMatDrawerExpandedView(): void {
+    this.isOpen.set(!this.isOpen());
+    console.log('toggleMatDrawerExpandedView', this.isOpen());
+  }
 }

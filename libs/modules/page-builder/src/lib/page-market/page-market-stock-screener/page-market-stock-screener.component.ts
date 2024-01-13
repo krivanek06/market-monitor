@@ -23,7 +23,7 @@ import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared/u
 import { catchError, switchMap, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-page-stock-screener',
+  selector: 'app-page-market-stock-screener',
   standalone: true,
   imports: [
     CommonModule,
@@ -73,7 +73,7 @@ import { catchError, switchMap, tap } from 'rxjs';
       }
   `,
 })
-export class PageStockScreenerComponent implements OnInit, RouterManagement {
+export class PageMarketStockScreenerComponent implements OnInit, RouterManagement {
   private screenerDefault = 30;
   stocksApiService = inject(StocksApiService);
   dialogServiceUtil = inject(DialogServiceUtil);

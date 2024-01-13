@@ -7,7 +7,7 @@ import { PageStockScreenerComponent } from '@market-monitor/modules/page-builder
   selector: 'app-stock-screener',
   standalone: true,
   imports: [CommonModule, PageStockScreenerComponent],
-  template: `<app-page-stock-screener></app-page-stock-screener>`,
+  template: `<app-page-market-stock-screener></app-page-market-stock-screener>`,
   styles: `
       :host {
         display: block;

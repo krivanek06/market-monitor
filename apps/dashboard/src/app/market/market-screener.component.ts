@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageStockScreenerComponent } from '@market-monitor/modules/page-builder';
+import { PageMarketStockScreenerComponent } from '@market-monitor/modules/page-builder';
 
 @Component({
   selector: 'app-market-stock-screener',
   standalone: true,
-  imports: [CommonModule, PageStockScreenerComponent],
-  template: `<app-page-stock-screener></app-page-stock-screener>`,
+  imports: [CommonModule, PageMarketStockScreenerComponent],
+  template: `<app-page-market-stock-screener></app-page-market-stock-screener>`,
   styles: `
     :host {
       display: block;

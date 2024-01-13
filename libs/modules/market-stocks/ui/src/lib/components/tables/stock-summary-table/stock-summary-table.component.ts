@@ -24,6 +24,7 @@ import {
   PercentageIncreaseDirective,
   ProgressCurrencyComponent,
   RangeDirective,
+  SectionTitleComponent,
   TruncatePipe,
 } from '@market-monitor/shared/ui';
 
@@ -45,10 +46,12 @@ import {
     TruncatePipe,
     MatChipsModule,
     MatSortModule,
+    SectionTitleComponent,
   ],
   template: `
     <div *ngIf="tableTitle" class="flex justify-between mb-2">
-      <h2>{{ tableTitle }}</h2>
+      <app-section-title [title]="tableTitle" />
+
       <div *ngIf="showMobileInfoButton" class="sm:hidden">
         <button mat-stroked-button class="w-[150px] text-sm" (click)="toggleDisplayedValues()">
           {{ displayInfoMobile() ? 'Info' : 'Price +/-' }}

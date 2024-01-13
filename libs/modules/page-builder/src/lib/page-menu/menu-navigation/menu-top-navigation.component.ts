@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,10 +33,17 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
   template: `
     <div class="w-full shadow-md mb-4">
       <nav class="w-full py-4 pl-8 pr-4 flex items-center gap-4 max-w-[1620px] mx-auto">
+        <!-- hide menu button -->
+        <div class="block xl:hidden">
+          <button type="button" mat-icon-button (click)="onMenuClick()">
+            <mat-icon>menu</mat-icon>
+          </button>
+        </div>
+
         <!-- dashboard -->
         <a
           (click)="onNavClick(ROUTES_MAIN.DASHBOARD)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.DASHBOARD }"
         >
           <div class="gap-2 flex items-center">
@@ -48,7 +55,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         <!-- watchlist -->
         <a
           (click)="onNavClick(ROUTES_MAIN.WATCHLIST)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.WATCHLIST }"
         >
           <div class="gap-2 flex items-center">
@@ -60,7 +67,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         <!-- trading -->
         <a
           (click)="onNavClick(ROUTES_MAIN.TRADING)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.TRADING }"
         >
           <div class="gap-2 flex items-center">
@@ -73,7 +80,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         <a
           *appFeatureAccess="'allowAccessGroups'"
           (click)="onNavClick(ROUTES_MAIN.GROUPS)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.GROUPS }"
         >
           <div class="gap-2 flex items-center">
@@ -86,7 +93,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         <a
           *appFeatureAccess="'allowAccessHallOfFame'"
           (click)="onNavClick(ROUTES_MAIN.HALL_OF_FAME)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.HALL_OF_FAME }"
         >
           <div class="gap-2 flex items-center">
@@ -99,7 +106,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         <a
           *ngIf="userAccountTypeSignal() === 'Basic'"
           (click)="onNavClick(ROUTES_MAIN.STOCK_SCREENER)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.STOCK_SCREENER }"
         >
           <div class="gap-2 flex items-center">
@@ -111,7 +118,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         <!-- market -->
         <a
           (click)="onNavClick(ROUTES_MAIN.MARKET)"
-          class="p-4 g-clickable-hover hover:bg-gray-100 rounded-md"
+          class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.MARKET }"
         >
           <div class="gap-2 flex items-center">
@@ -126,10 +133,10 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
             [showValueChange]="true"
             [showHint]="false"
             displayValue="symbol"
-            class="w-[480px] scale-[0.8] -mb-4 -mr-10 hidden xl:block"
+            class="w-[480px] scale-[0.8] -mb-4 -mr-10"
           />
 
-          <div class="flex gap-1 items-center">
+          <div class="gap-1 items-center hidden xl:flex">
             <!-- display logged in person -->
             <div *ngIf="userDataSignal() as userDataSignal" class="group p-4 relative">
               <div class="flex items-center gap-3">
@@ -182,8 +189,8 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         display: block;
 
         a {
-          padding-left: 8px;
-          padding-right: 8px;
+          @apply hidden xl:block p-4 hover:bg-gray-100 rounded-md px-4;
+
           &.c-active {
             border-bottom: 2px solid var(--primary) !important;
             > * {
@@ -196,6 +203,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuTopNavigationComponent implements OnInit {
+  @Output() menuClickEmitter = new EventEmitter<void>();
   private router = inject(Router);
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private authenticationService = inject(AuthenticationAccountService);
@@ -211,6 +219,10 @@ export class MenuTopNavigationComponent implements OnInit {
     // check if url is different than activeLinkSignal
     const url = this.router.url.replace('/', '') as ROUTES_MAIN;
     this.activeLinkSignal.set(url);
+  }
+
+  onMenuClick() {
+    this.menuClickEmitter.emit();
   }
 
   onNavClick(navigation: ROUTES_MAIN) {

@@ -15,6 +15,7 @@ type MarketRoutes = ROUTES_MAIN.TOP_PERFORMERS | ROUTES_MAIN.ECONOMICS | ROUTES_
   imports: [CommonModule, RouterModule, TabSelectControlComponent, ReactiveFormsModule],
   template: `
     <app-tab-select-control
+      class="hidden xl:block"
       [formControl]="currentRouteControl"
       [displayOptions]="marketTabsSignal()"
       screenLayoutSplit="LAYOUT_LG"
