@@ -49,27 +49,27 @@ import {
   ],
   template: `
     <ng-container *ngIf="portfolioUserFacadeService.getPortfolioState() as portfolioState">
-      <div class="flex flex-col gap-4 mx-auto mb-6 md:mb-12 xl:gap-10 md:flex-row 2xl:w-11/12">
-        <app-fancy-card class="sm:basis-3/6" title="Account" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mx-auto mb-6 sm:mb-12 xl:gap-10 2xl:w-11/12">
+        <app-fancy-card class="sm:col-span-2" title="Account" [colorPrimary]="ColorScheme.PRIMARY_VAR">
           <app-portfolio-state
             [titleColor]="ColorScheme.PRIMARY_VAR"
-            [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showCashSegment]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
             [portfolioState]="portfolioState"
           ></app-portfolio-state>
         </app-fancy-card>
 
-        <app-fancy-card title="Risk" [colorPrimary]="ColorScheme.SUCCESS_VAR" class="flex-1">
+        <app-fancy-card title="Risk" [colorPrimary]="ColorScheme.PRIMARY_VAR">
           <app-portfolio-state-risk
-            [titleColor]="ColorScheme.SUCCESS_VAR"
-            [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+            [titleColor]="ColorScheme.PRIMARY_VAR"
+            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
           ></app-portfolio-state-risk>
         </app-fancy-card>
 
-        <app-fancy-card title="Transactions" [colorPrimary]="ColorScheme.DANGER_VAR" class="flex-1">
+        <app-fancy-card title="Transactions" [colorPrimary]="ColorScheme.PRIMARY_VAR">
           <app-portfolio-state-transactions
-            [titleColor]="ColorScheme.DANGER_VAR"
-            [valueColor]="ColorScheme.GRAY_LIGHT_VAR"
+            [titleColor]="ColorScheme.PRIMARY_VAR"
+            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
             [portfolioState]="portfolioState"
           ></app-portfolio-state-transactions>

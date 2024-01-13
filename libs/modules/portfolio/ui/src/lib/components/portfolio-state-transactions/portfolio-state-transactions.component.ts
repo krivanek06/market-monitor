@@ -13,28 +13,28 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- Total -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Total</div>
-          <div [appAddColor]="valueColor" class="text-xl">
+          <div [appAddColor]="titleColor" class="text-lg">Total</div>
+          <div [appAddColor]="valueColor" class="text-lg">
             {{ portfolioState.numberOfExecutedBuyTransactions + portfolioState.numberOfExecutedSellTransactions }}
           </div>
         </div>
 
         <!-- Buy -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Buy</div>
-          <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedBuyTransactions }}</div>
+          <div [appAddColor]="titleColor" class="text-lg">Buy</div>
+          <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.numberOfExecutedBuyTransactions }}</div>
         </div>
 
         <!-- Sell -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Sell</div>
-          <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.numberOfExecutedSellTransactions }}</div>
+          <div [appAddColor]="titleColor" class="text-lg">Sell</div>
+          <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.numberOfExecutedSellTransactions }}</div>
         </div>
 
         <!-- Fees -->
         <div *ngIf="showFees" class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Fees</div>
-          <div [appAddColor]="valueColor" class="text-xl">
+          <div [appAddColor]="titleColor" class="text-lg">Fees</div>
+          <div [appAddColor]="valueColor" class="text-lg">
             {{ portfolioState.transactionFees | currency }}
           </div>
         </div>

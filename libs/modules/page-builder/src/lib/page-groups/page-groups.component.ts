@@ -231,6 +231,7 @@ export class PageGroupsComponent {
     const response = await this.dialogServiceUtil.showActionButtonDialog({
       dialogTitle: `Do you want to remove your request from from ${groupData.name}?`,
       primaryButtonText: 'Remove',
+      secondaryButtonText: 'Cancel',
     });
 
     try {

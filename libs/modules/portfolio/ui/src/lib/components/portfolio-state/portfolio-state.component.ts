@@ -13,29 +13,29 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- balance -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Balance</div>
-          <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.balance | currency }}</div>
+          <div [appAddColor]="titleColor" class="text-lg">Balance</div>
+          <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.balance | currency }}</div>
         </div>
 
         <!-- Invested -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Invested</div>
-          <div [appAddColor]="valueColor" class="text-xl">{{ portfolioState.invested | currency }}</div>
+          <div [appAddColor]="titleColor" class="text-lg">Invested</div>
+          <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.invested | currency }}</div>
         </div>
 
         <!-- Cash -->
         <div *ngIf="showCashSegment" class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Cash</div>
-          <div [appAddColor]="valueColor" class="text-xl">
+          <div [appAddColor]="titleColor" class="text-lg">Cash</div>
+          <div [appAddColor]="valueColor" class="text-lg">
             {{ portfolioState.cashOnHand | currency }} / {{ portfolioState.startingCash | currency }}
           </div>
         </div>
 
         <!-- Total Gains -->
         <div *ngIf="!showCashSegment" class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Total Gains</div>
+          <div [appAddColor]="titleColor" class="text-lg">Total Gains</div>
           <div
-            class="text-xl"
+            class="text-lg"
             [appAddColor]="valueColor"
             appPercentageIncrease
             [changeValues]="{
@@ -46,9 +46,9 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
 
         <!-- Total Return -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Total Return</div>
+          <div [appAddColor]="titleColor" class="text-lg">Total Return</div>
           <div
-            class="text-xl"
+            class="text-lg"
             [appAddColor]="valueColor"
             appPercentageIncrease
             [useCurrencySign]="true"

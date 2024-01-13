@@ -44,27 +44,33 @@ import { PercentageIncreaseDirective, PositionColoringDirective } from '@market-
 
       <!-- balance-->
       <ng-container matColumnDef="balance">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Balance</th>
-        <td mat-cell *matCellDef="let row; let i = index">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Balance</th>
+        <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
           <span appPositionColoring [position]="i + 1">{{ row.portfolioState.balance | currency }}</span>
         </td>
       </ng-container>
 
       <!-- profit-->
       <ng-container matColumnDef="profit">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Profit</th>
-        <td mat-cell *matCellDef="let row">
-          <div
-            appPercentageIncrease
-            [changeValues]="{
-              change: row.portfolioState.totalGainsValue,
-              changePercentage: row.portfolioState.totalGainsPercentage
-            }"
-          ></div>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Profit</th>
+        <td mat-cell *matCellDef="let row; let i = index">
+          <div class="flex flex-col">
+            <div appPositionColoring [position]="i + 1" class="block md:hidden text-end">
+              {{ row.portfolioState.balance | currency }}
+            </div>
+            <div
+              class="max-md:justify-end"
+              appPercentageIncrease
+              [changeValues]="{
+                change: row.portfolioState.totalGainsValue,
+                changePercentage: row.portfolioState.totalGainsPercentage
+              }"
+            ></div>
+          </div>
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden md:contents"></tr>
       <tr
         mat-row
         *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"

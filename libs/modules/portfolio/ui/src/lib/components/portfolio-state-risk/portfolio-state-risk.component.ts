@@ -12,26 +12,26 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- Alpha -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Alpha</div>
-          <div [appAddColor]="valueColor" class="text-xl">N/A</div>
+          <div [appAddColor]="titleColor" class="text-lg">Alpha</div>
+          <div [appAddColor]="valueColor" class="text-lg">N/A</div>
         </div>
 
         <!-- Beta -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Beta</div>
-          <div [appAddColor]="valueColor" class="text-xl">N/A</div>
+          <div [appAddColor]="titleColor" class="text-lg">Beta</div>
+          <div [appAddColor]="valueColor" class="text-lg">N/A</div>
         </div>
 
         <!-- Sharp Ratio -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Sharp Ratio</div>
-          <div [appAddColor]="valueColor" class="text-xl">N/A</div>
+          <div [appAddColor]="titleColor" class="text-lg">Sharp Ratio</div>
+          <div [appAddColor]="valueColor" class="text-lg">N/A</div>
         </div>
 
         <!-- Volatility -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-xl">Volatility</div>
-          <div [appAddColor]="valueColor" class="text-xl">N/A</div>
+          <div [appAddColor]="titleColor" class="text-lg">Volatility</div>
+          <div [appAddColor]="valueColor" class="text-lg">N/A</div>
         </div>
       </div>
     </div>

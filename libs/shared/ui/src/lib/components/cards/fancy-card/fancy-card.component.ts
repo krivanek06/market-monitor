@@ -68,11 +68,12 @@ import { ColorScheme } from '@market-monitor/shared/data-access';
 export class FancyCardComponent {
   @Input() title?: string;
   @Input() colorPrimary: ColorScheme = ColorScheme.PRIMARY_VAR;
+  @Input() colorBackground: string = ColorScheme.GRAY_LIGHT_STRONG_VAR;
 
   get backgroundLinear(): string {
     return `background: linear-gradient(135deg,
-        color-mix(in srgb, ${this.colorPrimary} 50%, white),
-        color-mix(in srgb, ${this.colorPrimary} 35%, white)
+        color-mix(in srgb, ${this.colorBackground} 50%, white),
+        color-mix(in srgb, ${this.colorBackground} 35%, white)
       );`;
   }
 }
