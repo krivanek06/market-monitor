@@ -5,6 +5,7 @@ import { Observable, firstValueFrom, of } from 'rxjs';
 import { ActionButtonDialog, ActionButtonDialogComponent } from './action-button-dialog/action-button-dialog.component';
 import { ConfirmDialogComponent, ConfirmDialogComponentData } from './confirm-dialog/confirm-dialog.component';
 import { SCREEN_DIALOGS } from './dialog.model';
+import { GenericDialogComponent, GenericDialogComponentData } from './generic-dialog/generic-dialog.component';
 import {
   InlineInputDialogComponent,
   InlineInputDialogComponentData,
@@ -54,6 +55,18 @@ export class DialogServiceUtil {
         message,
         type,
       },
+    });
+  }
+
+  showGenericDialog(data: GenericDialogComponentData, panelClass: SCREEN_DIALOGS = SCREEN_DIALOGS.DIALOG_BIG): void {
+    if (!this.matDialog) {
+      console.warn('DialogService.matDialog not initialized');
+      return;
+    }
+
+    this.matDialog.open(GenericDialogComponent, {
+      data: data,
+      panelClass: [panelClass],
     });
   }
 

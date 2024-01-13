@@ -48,11 +48,13 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
     setTimeout(() => this.showLoadingSignal.set(false), 4000);
   }
   @Input() showOnlyTotalBalance = false;
+  @Input() displayLegend = false;
+  @Input() chartType: 'all' | 'marketValue' | 'balance' = 'all';
 
   showLoadingSignal = signal<boolean>(true);
 
   private initChart(data: PortfolioGrowth[], startingCashValue: number = 0) {
-    const isCashActive = startingCashValue > 0;
+    //const isCashActive = startingCashValue > 0;
 
     const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotalValue]);
     const investedValue = data.map((point) => [new Date(point.date).getTime(), point.investedValue]);
@@ -139,7 +141,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         enabled: false,
       },
       legend: {
-        enabled: true,
+        enabled: this.displayLegend || this.chartType === 'all',
         //floating: true,
         verticalAlign: 'top',
         align: 'left',
@@ -212,6 +214,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           type: 'area',
           zIndex: 10,
           yAxis: 0,
+          visible: this.chartType === 'all' || this.chartType === 'balance',
           fillColor: {
             linearGradient: {
               x1: 1,
@@ -233,7 +236,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           zIndex: 10,
           yAxis: 0,
           opacity: 0.65,
-          visible: !isCashActive,
+          visible: this.chartType === 'all' || this.chartType === 'marketValue',
           showInLegend: true,
           fillColor: {
             linearGradient: {
@@ -267,7 +270,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           zIndex: 10,
           yAxis: 0,
           opacity: 0.2,
-          visible: !isCashActive,
+          visible: this.chartType === 'all' || this.chartType === 'marketValue',
           showInLegend: true,
           fillColor: {
             linearGradient: {
@@ -290,7 +293,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           zIndex: 10,
           yAxis: 0,
           opacity: 0.45,
-          visible: isCashActive,
+          visible: this.chartType === 'all' || this.chartType === 'balance',
           showInLegend: true,
           fillColor: {
             linearGradient: {

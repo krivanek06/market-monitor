@@ -31,7 +31,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
     StockSearchBasicCustomizedComponent,
   ],
   template: `
-    <div class="w-full shadow-md mb-4">
+    <div class="w-full shadow-md">
       <nav class="w-full py-4 pl-8 pr-4 flex items-center gap-4 max-w-[1620px] mx-auto">
         <!-- hide menu button -->
         <div class="block xl:hidden">

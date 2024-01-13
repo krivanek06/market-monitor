@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, forwardRef, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
+import { addDays, isAfter, isBefore, subDays } from 'date-fns';
 import { GetDataByIndexPipe } from '../../../pipes';
 
 export type DateRangeSliderValues = {
@@ -10,11 +11,79 @@ export type DateRangeSliderValues = {
   currentMaxDateIndex: number;
 };
 
+export const filterDataByDateRange = <T extends { date: string }>(
+  data: T[],
+  dateRange: DateRangeSliderValues | null,
+): T[] => {
+  if (!dateRange) {
+    return data;
+  }
+  return data.filter(
+    (d) =>
+      isBefore(subDays(new Date(d.date), 1), new Date(dateRange.dates[dateRange.currentMaxDateIndex])) &&
+      isAfter(addDays(new Date(d.date), 1), new Date(dateRange.dates[dateRange.currentMinDateIndex])),
+  );
+};
+
 @Component({
   selector: 'app-date-range-slider',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatSliderModule, GetDataByIndexPipe],
-  templateUrl: './date-range-slider.component.html',
+  template: `
+    <div *ngIf="dateRangeSignal() as values" class="flex flex-col w-full">
+      <!-- display current value from form -->
+      <div *ngIf="displayUpperDate" class="flex items-center justify-center gap-3">
+        <span class="text-sm text-wt-gray-medium">
+          {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
+        </span>
+        <span>-</span>
+        <span class="text-sm text-wt-gray-medium">
+          {{ values.dates | getDataByIndex: values.currentMaxDateIndex | date: 'MMM d, y' }}
+        </span>
+      </div>
+
+      <!-- display slider and min/max values -->
+      <div class="flex items-center w-full gap-4">
+        <!-- min value -->
+        <span class="text-sm text-wt-gray-medium">
+          <!-- min date -->
+          <ng-container *ngIf="displayUpperDate">
+            {{ values.dates | getDataByIndex: 0 | date: 'MMM d, y' }}
+          </ng-container>
+          <!-- current date -->
+          <ng-container *ngIf="!displayUpperDate">
+            {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
+          </ng-container>
+        </span>
+
+        <!-- slider -->
+        <mat-slider class="flex-1" [min]="0" [max]="values.dates.length - 1" showTickMarks>
+          <input
+            (valueChange)="onSliderValueChange($event, 'start')"
+            [value]="values.currentMinDateIndex"
+            matSliderStartThumb
+          />
+          <input
+            (valueChange)="onSliderValueChange($event, 'end')"
+            [value]="values.currentMaxDateIndex"
+            matSliderEndThumb
+          />
+        </mat-slider>
+
+        <!-- max value -->
+        <span class="text-sm text-wt-gray-medium">
+          <!-- max date -->
+          <ng-container *ngIf="displayUpperDate">
+            {{ values.dates | getDataByIndex: values.dates.length - 1 | date: 'MMM d, y' }}
+          </ng-container>
+          <!-- current date -->
+          <ng-container *ngIf="!displayUpperDate">
+            {{ values.dates | getDataByIndex: values.currentMaxDateIndex | date: 'MMM d, y' }}
+          </ng-container>
+        </span>
+      </div>
+    </div>
+  `,
   styles: `
       :host {
         display: block;

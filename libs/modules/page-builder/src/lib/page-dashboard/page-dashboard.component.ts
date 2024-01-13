@@ -49,39 +49,41 @@ import {
   ],
   template: `
     <ng-container *ngIf="portfolioUserFacadeService.getPortfolioState() as portfolioState">
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mx-auto mb-6 sm:mb-12 xl:gap-10 2xl:w-11/12">
-        <app-fancy-card class="sm:col-span-2" title="Account" [colorPrimary]="ColorScheme.PRIMARY_VAR">
-          <app-portfolio-state
-            [titleColor]="ColorScheme.PRIMARY_VAR"
-            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-            [showCashSegment]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
-            [portfolioState]="portfolioState"
-          ></app-portfolio-state>
-        </app-fancy-card>
+      <div class="grid xl:grid-cols-3 mb-6 sm:mb-10 gap-8">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2">
+          <app-fancy-card class="sm:col-span-2" title="Account" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+            <app-portfolio-state
+              [titleColor]="ColorScheme.PRIMARY_VAR"
+              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+              [showCashSegment]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
+              [portfolioState]="portfolioState"
+            ></app-portfolio-state>
+          </app-fancy-card>
 
-        <app-fancy-card title="Risk" [colorPrimary]="ColorScheme.PRIMARY_VAR">
-          <app-portfolio-state-risk
-            [titleColor]="ColorScheme.PRIMARY_VAR"
-            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          ></app-portfolio-state-risk>
-        </app-fancy-card>
+          <app-fancy-card title="Risk" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+            <app-portfolio-state-risk
+              [titleColor]="ColorScheme.PRIMARY_VAR"
+              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+            ></app-portfolio-state-risk>
+          </app-fancy-card>
 
-        <app-fancy-card title="Transactions" [colorPrimary]="ColorScheme.PRIMARY_VAR">
-          <app-portfolio-state-transactions
-            [titleColor]="ColorScheme.PRIMARY_VAR"
-            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-            [showFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
-            [portfolioState]="portfolioState"
-          ></app-portfolio-state-transactions>
-        </app-fancy-card>
-      </div>
+          <app-fancy-card title="Transactions" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+            <app-portfolio-state-transactions
+              [titleColor]="ColorScheme.PRIMARY_VAR"
+              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+              [showFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
+              [portfolioState]="portfolioState"
+            ></app-portfolio-state-transactions>
+          </app-fancy-card>
+        </div>
 
-      <!-- portfolio change -->
-      <div class="mb-12 lg:px-10">
-        <app-portfolio-period-change
-          *ngIf="portfolioUserFacadeService.getPortfolioChange() as portfolioChange"
-          [portfolioChange]="portfolioChange"
-        ></app-portfolio-period-change>
+        <!-- portfolio change -->
+        <div class="lg:pt-2">
+          <app-portfolio-period-change
+            *ngIf="portfolioUserFacadeService.getPortfolioChange() as portfolioChange"
+            [portfolioChange]="portfolioChange"
+          ></app-portfolio-period-change>
+        </div>
       </div>
 
       <!-- dashboard charts -->

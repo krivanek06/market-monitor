@@ -1,15 +1,38 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
 import { formatValueIntoCurrency } from '@market-monitor/shared/features/general-util';
+import {
+  DateRangeSliderComponent,
+  DateRangeSliderValues,
+  SectionTitleComponent,
+  filterDataByDateRange,
+} from '@market-monitor/shared/ui';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { filterNil } from 'ngxtension/filter-nil';
+import { startWith } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-change-chart',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
+  imports: [CommonModule, HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule, SectionTitleComponent],
   template: `
+    <!-- investment growth -->
+    <div class="flex items-center justify-between">
+      <!-- select chart title -->
+      <app-section-title *ngIf="title" [title]="title" />
+
+      <!-- date range -->
+      <app-date-range-slider
+        *ngIf="displaySlider"
+        class="w-[550px]"
+        [displayUpperDate]="false"
+        [formControl]="sliderControl"
+      ></app-date-range-slider>
+    </div>
+
     <highcharts-chart
       *ngIf="isHighcharts"
       [(update)]="updateFromInput"
@@ -29,15 +52,34 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioChangeChartComponent extends ChartConstructor {
-  @Input({ required: true }) set data(input: PortfolioGrowth[]) {
-    const data: number[][] = [];
-    for (let i = 1; i < input.length; i++) {
-      const current = input[i].totalBalanceValue;
-      const before = input[i - 1].totalBalanceValue;
+  @Input() displaySlider = false;
+  @Input() title = '';
 
-      data.push([Date.parse(input[i].date), current - before, (current / 100) * before]);
-    }
-    this.initChart(data);
+  sliderControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
+
+  @Input({ required: true }) set data(input: PortfolioGrowth[]) {
+    const sliderValues: DateRangeSliderValues = {
+      dates: input.map((point) => point.date),
+      currentMinDateIndex: 0,
+      currentMaxDateIndex: input.length - 1,
+    };
+
+    this.sliderControl.patchValue(sliderValues);
+    this.initSlider(input);
+  }
+
+  private initSlider(input: PortfolioGrowth[]): void {
+    this.sliderControl.valueChanges.pipe(startWith(this.sliderControl.value), filterNil()).subscribe((sliderValues) => {
+      const inputValues = filterDataByDateRange(input, sliderValues);
+      const data: number[][] = [];
+      for (let i = 1; i < inputValues.length; i++) {
+        const current = inputValues[i].totalBalanceValue;
+        const before = inputValues[i - 1].totalBalanceValue;
+
+        data.push([Date.parse(inputValues[i].date), current - before, (current / 100) * before]);
+      }
+      this.initChart(data);
+    });
   }
 
   private initChart(data: number[][]) {

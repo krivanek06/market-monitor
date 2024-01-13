@@ -11,7 +11,7 @@ import { ColorScheme } from '@market-monitor/shared/data-access';
       <!-- title -->
       <div *ngIf="title" class="pb-4 flex items-center gap-2">
         <div class="c-title-dot" [ngStyle]="{ 'background-color': colorPrimary }"></div>
-        <div class="text-xl" [ngStyle]="{ color: colorPrimary }">
+        <div class="text-lg" [ngStyle]="{ color: colorPrimary }">
           {{ title }}
         </div>
       </div>
