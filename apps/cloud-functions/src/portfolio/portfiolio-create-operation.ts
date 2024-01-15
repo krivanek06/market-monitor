@@ -67,7 +67,7 @@ export const createPortfolioCreateOperation = async (
   }
 
   // if weekend is used format to last friday
-  data.date = formatWeekendDate(data.date);
+  data.date = formatInternalDate(data.date);
 
   // load historical price for symbol on date
   const symbolPrice = await getStockHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date));
@@ -131,15 +131,22 @@ const createTransaction = (
 };
 
 /**
- * prevents selecting weekend for date
+ * prevents selecting weekend for date and add time to date
  * @param date
  * @returns
  */
-const formatWeekendDate = (date: string): string => {
+const formatInternalDate = (date: string): string => {
   // check if date is weekend, if so use previous Friday
   let dateObj = isWeekend(new Date(date)) ? subDays(new Date(date), 1) : new Date(date);
   dateObj = isWeekend(dateObj) ? subDays(dateObj, 1) : dateObj;
-  const usedData = format(dateObj, 'yyyy-MM-dd');
+
+  // set current hours, minutes, seconds
+  dateObj.setHours(new Date().getHours());
+  dateObj.setMinutes(new Date().getMinutes());
+  dateObj.setSeconds(new Date().getSeconds());
+
+  const usedData = format(dateObj, 'yyyy-MM-dd HH:mm:ss');
+
   return usedData;
 };
 

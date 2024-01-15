@@ -20,7 +20,13 @@ import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@m
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { getRandomIndex } from '@market-monitor/shared/features/general-util';
-import { FancyCardComponent, QuoteItemComponent, RangeDirective, SortByKeyPipe } from '@market-monitor/shared/ui';
+import {
+  FancyCardComponent,
+  QuoteItemComponent,
+  RangeDirective,
+  SectionTitleComponent,
+  SortByKeyPipe,
+} from '@market-monitor/shared/ui';
 import { take } from 'rxjs';
 
 @Component({
@@ -42,6 +48,7 @@ import { take } from 'rxjs';
     SortByKeyPipe,
     QuoteItemComponent,
     RangeDirective,
+    SectionTitleComponent,
   ],
   template: `
     <!-- account state -->
@@ -98,7 +105,7 @@ import { take } from 'rxjs';
 
       <!-- top active -->
       <div class="mb-10 hidden lg:block">
-        <h2 class="text-xl text-wt-primary">Top Active</h2>
+        <app-section-title title="Top Active" />
 
         <div class="grid grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-8 p-4">
           @for (item of topPerformanceSignal()?.stockTopActive; track item.id) {
@@ -116,10 +123,8 @@ import { take } from 'rxjs';
       </div>
 
       <div>
-        <h2 class="flex items-center gap-4 pl-1 mb-3 text-xl text-wt-primary">
-          <mat-icon>history</mat-icon>
-          Transaction History
-        </h2>
+        <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
+
         <app-portfolio-transactions-table
           (deleteEmitter)="onTransactionDelete($event)"
           [showTransactionFees]="!!userDataSignal().features.allowPortfolioCashAccount"

@@ -88,7 +88,7 @@ export type PortfolioTradeDialogComponentData = {
         <ng-container *ngIf="!isLoadingSignal(); else showLoader">
           <!-- date picker -->
           <app-date-picker
-            *ngIf="!userDataSignal().features.allowPortfolioCashAccount"
+            *ngIf="!allowPortfolioCashAccountSignal()"
             [inputTypeDateTimePickerConfig]="datePickerConfig"
             [formControl]="form.controls.date"
           ></app-date-picker>
@@ -117,7 +117,7 @@ export type PortfolioTradeDialogComponentData = {
             </div>
 
             <mat-checkbox
-              *ngIf="!userDataSignal().features.allowPortfolioCashAccount"
+              *ngIf="!allowPortfolioCashAccountSignal()"
               matTooltip="Add Custom Value"
               color="primary"
               [formControl]="form.controls.useCustomTotalValueControl"
@@ -136,7 +136,7 @@ export type PortfolioTradeDialogComponentData = {
               <span>Owned Units</span>
               <span>{{ holdingSignal()?.units ?? 0 }}</span>
             </div>
-            <div *ngIf="userDataSignal().features.allowPortfolioCashAccount" class="g-item-wrapper">
+            <div *ngIf="allowPortfolioCashAccountSignal()" class="g-item-wrapper">
               <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">Cash on Hand</span>
               <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">
                 {{ portfolioState()?.cashOnHand | currency }}
@@ -272,6 +272,7 @@ export class PortfolioTradeDialogComponent {
   insufficientCashErrorSignal = signal<boolean>(false);
 
   userDataSignal = this.authenticationUserService.state.getUserData;
+  allowPortfolioCashAccountSignal = computed(() => this.userDataSignal().features.allowPortfolioCashAccount ?? false);
 
   USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
 
@@ -316,6 +317,9 @@ export class PortfolioTradeDialogComponent {
     return userContainSymbol || userHoldingsLimit;
   });
 
+  /**
+   * if true user can enter custom total value
+   */
   get isCustomTotal(): boolean {
     return this.form.controls.useCustomTotalValueControl.value;
   }
@@ -394,7 +398,7 @@ export class PortfolioTradeDialogComponent {
    */
   private listenOnInSufficientCash(): void {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((form) => {
-      if (this.data.transactionType === 'SELL' || !this.userDataSignal().features.allowPortfolioCashAccount) {
+      if (this.data.transactionType === 'SELL' || !this.allowPortfolioCashAccountSignal()) {
         return;
       }
 
