@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
 import {
   MARKET_OVERVIEW_ENDPOINTS,
@@ -142,11 +141,8 @@ import { map } from 'rxjs';
       }
   `,
 })
-export class PageMarketCustomComponent implements OnInit {
+export class PageMarketCustomComponent {
   marketApiService = inject(MarketApiService);
-  router = inject(Router);
-  route = inject(ActivatedRoute);
-
   MARKET_OVERVIEW_ENDPOINTS = MARKET_OVERVIEW_ENDPOINTS;
 
   /**
@@ -177,14 +173,6 @@ export class PageMarketCustomComponent implements OnInit {
 
   showLoadingScreenSignal = signal<boolean>(false);
   selectedOverviewSubKeys = computed(() => this.selectedChartDataSignal().map((data) => data.additionalData?.id!));
-
-  // constructor() {
-  //   effect(() => this.updateQueryParams(this.selectedOverviewSubKeys()));
-  // }
-
-  ngOnInit(): void {
-    // this.loadQueryParams();
-  }
 
   onDataClick<T extends MarketOverviewKey>(
     key: T,

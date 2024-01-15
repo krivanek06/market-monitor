@@ -40,30 +40,34 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
   ],
   template: `
     <div class="grid m-auto xl:w-11/12 gap-y-4">
-      <div class="flex justify-between w-full mb-6">
+      <div class="flex flex-col md:flex-row w-full mb-6 items-center gap-x-8 gap-y-2">
         <!-- title -->
         <div class="flex items-center gap-3">
           <mat-icon color="primary">group</mat-icon>
           <span class="text-xl text-wt-primary">Groups</span>
         </div>
 
-        <div class="flex flex-col justify-between gap-2 md:flex-row">
+        <!-- create new group -->
+        <div [matTooltip]="isCreateGroupDisabledSignal() ? errorMessageGroupCreate : ''">
+          <button
+            [disabled]="isCreateGroupDisabledSignal()"
+            mat-stroked-button
+            type="button"
+            color="primary"
+            (click)="onCreateGroupClick()"
+            class="h-10"
+          >
+            <mat-icon>add</mat-icon>
+            create group
+          </button>
+        </div>
+
+        <div class="flex flex-col justify-end gap-2 md:flex-row flex-1">
           <!-- search groups -->
-          <app-group-search-control [formControl]="searchGroupControl" class="w-[450px] hidden lg:block" />
-          <!-- create new group -->
-          <div [matTooltip]="isCreateGroupDisabledSignal() ? errorMessageGroupCreate : ''">
-            <button
-              [disabled]="isCreateGroupDisabledSignal()"
-              mat-stroked-button
-              type="button"
-              color="primary"
-              (click)="onCreateGroupClick()"
-              class="h-12"
-            >
-              <mat-icon>add</mat-icon>
-              create group
-            </button>
-          </div>
+          <app-group-search-control
+            [formControl]="searchGroupControl"
+            class="w-full md:w-[500px] xl:w-[600px] hidden lg:block"
+          />
         </div>
       </div>
 

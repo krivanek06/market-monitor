@@ -26,25 +26,31 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
       [ngClass]="{
         'g-clickable-hover': clickable
       }"
-      class="flex flex-col gap-1 p-2"
+      class="flex flex-col gap-1 p-2 @container"
     >
-      <div class="flex items-center gap-4">
+      <div class="flex gap-4">
         <!-- image -->
         <img appDefaultImg [src]="groupData.imageUrl" alt="Group image" class="w-16 h-16" />
 
         <!-- info -->
         <div class="grid gap-1">
-          <div class="flex items-center gap-4">
-            <!-- name -->
-            <div
-              class="text-lg"
-              [ngClass]="{
-                'text-wt-primary': !groupData.isClosed,
-                'text-wt-danger': groupData.isClosed
-              }"
-            >
-              {{ groupData.name | titlecase }}
+          <div class="flex flex-col @md:flex-row @md:items-center gap-x-4">
+            <div class="flex gap-2">
+              <!-- name -->
+              <div
+                class="text-lg"
+                [ngClass]="{
+                  'text-wt-primary': !groupData.isClosed,
+                  'text-wt-danger': groupData.isClosed
+                }"
+              >
+                {{ groupData.name | titlecase }}
+              </div>
+
+              <!-- members -->
+              <div class="block @md:hidden">[{{ groupData.numberOfMembers }} / {{ memberLimit }}]</div>
             </div>
+
             <!-- portfolio -->
             <div
               *ngIf="!groupData.isClosed"
@@ -58,7 +64,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
             <!-- closed group display message -->
             <div *ngIf="groupData.isClosed" class="text-wt-danger">(Closed)</div>
           </div>
-          <div class="flex items-center gap-4">
+          <div class="hidden @md:flex items-center gap-4">
             <!-- owner -->
             <div class="flex items-center gap-4">
               <img

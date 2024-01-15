@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit, Type, ViewChild, ViewContainerRef } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
 
@@ -8,7 +8,7 @@ export type GenericDialogComponentData = {
   /**
    * The component to render inside the dialog
    */
-  component: any;
+  component: Type<unknown>;
   /**
    * The data to pass to the component
    */
