@@ -8,8 +8,32 @@ import { PriceChangeItemSelectorPipe } from './price-change-item-selector.pipe';
   selector: 'app-price-change-items',
   standalone: true,
   imports: [CommonModule, PercentageIncreaseDirective, PriceChangeItemSelectorPipe],
-  templateUrl: './price-change-items.component.html',
-  styleUrls: ['./price-change-items.component.scss'],
+  template: `
+    <div class="grid justify-around grid-cols-2 gap-4 md:flex md:flex-row md:flex-wrap">
+      <div *ngFor="let keys of priceChangeKeys" class="flex flex-row gap-x-4 sm:flex-col gap-y-1">
+        <!-- name => 1 day -->
+        <span class="text-center">{{ keys.label }}</span>
+        <!-- value -->
+        <div class="flex items-center justify-center">
+          <span
+            appPercentageIncrease
+            [changeValues]="{ changePercentage: mainSymbolPriceChange | priceChangeItemSelector: keys.key }"
+          ></span>
+          <span *ngIf="additionalSymbolPriceChange">/</span>
+          <span
+            *ngIf="additionalSymbolPriceChange"
+            appPercentageIncrease
+            [changeValues]="{ changePercentage: additionalSymbolPriceChange | priceChangeItemSelector: keys.key }"
+          ></span>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: `
+  :host {
+    display: block;
+  }
+  `,
 })
 export class PriceChangeItemsComponent {
   @Input({ required: true }) mainSymbolPriceChange!: PriceChange;

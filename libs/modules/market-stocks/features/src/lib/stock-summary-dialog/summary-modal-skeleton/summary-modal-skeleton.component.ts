@@ -22,13 +22,11 @@ import { RangeDirective } from '@market-monitor/shared/ui';
         </div>
       </div>
 
-      <div class="w-8 h-8 rounded-full g-skeleton"></div>
-    </div>
-
-    <!-- action buttons -->
-    <div class="flex flex-col justify-between px-4 mb-4 sm:flex-row gap-y-2">
-      <div class="g-skeleton w-full sm:w-[220px] h-11"></div>
-      <div class="g-skeleton w-full sm:w-[180px] h-11"></div>
+      <!-- action buttons -->
+      <div class="flex flex-col justify-between px-4 sm:flex-row gap-y-2 gap-x-8">
+        <div class="g-skeleton w-full sm:w-[220px] h-11"></div>
+        <div class="g-skeleton w-full sm:w-[180px] h-11"></div>
+      </div>
     </div>
 
     <!-- display main metrics -->

@@ -79,8 +79,8 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
         >
           <!-- received invitations -->
           <app-general-card title="Received Invitations">
-            <div class="flex items-center gap-2">
-              @for (group of groups.groupInvitations; track group.id) {
+            @for (group of groups.groupInvitations; track group.id) {
+              <div class="flex items-center gap-2">
                 <app-group-display-item
                   [groupData]="group"
                   [clickable]="true"
@@ -94,13 +94,13 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
                 >
                   <mat-icon>navigate_next</mat-icon>
                 </button>
-              }
-            </div>
+              </div>
+            }
           </app-general-card>
           <!-- sent invitations -->
           <app-general-card title="Sent Invitations">
-            <div class="flex items-center gap-2">
-              @for (group of groups.groupRequested; track group.id) {
+            @for (group of groups.groupRequested; track group.id) {
+              <div class="flex items-center gap-2">
                 <app-group-display-item
                   [groupData]="group"
                   [clickable]="true"
@@ -114,8 +114,8 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
                 >
                   <mat-icon>navigate_next</mat-icon>
                 </button>
-              }
-            </div>
+              </div>
+            }
           </app-general-card>
         </div>
 

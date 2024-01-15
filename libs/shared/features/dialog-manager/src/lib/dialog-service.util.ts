@@ -1,6 +1,7 @@
 import { Injectable, Optional } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { FirebaseError } from 'firebase/app';
 import { Observable, firstValueFrom, of } from 'rxjs';
 import { ActionButtonDialog, ActionButtonDialogComponent } from './action-button-dialog/action-button-dialog.component';
 import { ConfirmDialogComponent, ConfirmDialogComponentData } from './confirm-dialog/confirm-dialog.component';
@@ -25,6 +26,32 @@ export class DialogServiceUtil {
   handleError(error: any): void {
     console.log('error', error);
     const message = error?.message ?? '';
+    const code = error?.code satisfies FirebaseError['code'];
+
+    if (code === 'auth/email-already-in-use') {
+      this.showNotificationBar('Email already in use', 'error');
+      return;
+    }
+
+    if (code === 'auth/invalid-email') {
+      this.showNotificationBar('Invalid email', 'error');
+      return;
+    }
+
+    if (code === 'auth/weak-password') {
+      this.showNotificationBar('Weak password', 'error');
+      return;
+    }
+
+    if (code === 'auth/user-not-found') {
+      this.showNotificationBar('Wrong email or password', 'error');
+      return;
+    }
+
+    if (code === 'auth/wrong-password') {
+      this.showNotificationBar('Wrong email or password', 'error');
+      return;
+    }
 
     // check if error contains the work INTERNAL
     if (message === 'INTERNAL') {

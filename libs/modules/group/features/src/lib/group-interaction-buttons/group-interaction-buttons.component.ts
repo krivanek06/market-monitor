@@ -186,7 +186,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
       }
 
       button {
-        @apply h-11;
+        @apply h-10;
       }
     `,
   changeDetection: ChangeDetectionStrategy.OnPush,

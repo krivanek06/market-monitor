@@ -47,19 +47,13 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
           </div>
         </div>
 
-        <div>
-          <button mat-icon-button mat-dialog-close color="warn" type="button">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
+        <!-- action buttons -->
+        <app-summary-action-buttons
+          *ngIf="isSymbolTypeStock()"
+          (redirectClickedEmitter)="onDetailsRedirect()"
+          [symbolSummary]="stockSummary"
+        ></app-summary-action-buttons>
       </div>
-
-      <!-- action buttons -->
-      <app-summary-action-buttons
-        *ngIf="isSymbolTypeStock()"
-        (redirectClickedEmitter)="onDetailsRedirect()"
-        [symbolSummary]="stockSummary"
-      ></app-summary-action-buttons>
 
       <mat-dialog-content>
         <!-- display main metrics -->
@@ -68,7 +62,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
         </div>
 
         <!-- time period change -->
-        <div class="my-8">
+        <div class="mb-8 mt-4">
           <app-price-change-items [mainSymbolPriceChange]="stockSummary.priceChange"></app-price-change-items>
         </div>
 
