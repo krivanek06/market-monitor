@@ -25,6 +25,8 @@ import { format, isAfter, isBefore } from 'date-fns';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 
+type ChartInputType = GenericChartSeries[] | GenericChartSeriesPie[] | Highcharts.SeriesOptionsType[];
+
 @Component({
   selector: 'app-generic-chart',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -63,9 +65,9 @@ import { HighchartsChartModule } from 'highcharts-angular';
   `,
 })
 export class GenericChartComponent extends ChartConstructor implements OnChanges, OnDestroy {
-  @Output() expandEmitter: EventEmitter<any> = new EventEmitter<any>();
+  @Output() expandEmitter = new EventEmitter<any>();
 
-  @Input({ required: true }) series!: GenericChartSeries[] | GenericChartSeriesPie[];
+  @Input({ required: true }) series!: ChartInputType;
 
   @Input() chartType: ChartType | ChartTypeKeys = ChartType.line;
   @Input() chartTitle = '';
@@ -176,7 +178,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
     }
   }
 
-  private initChart(series: GenericChartSeries[] | GenericChartSeriesPie[]) {
+  private initChart(series: ChartInputType) {
     this.chartOptions = {
       chart: {
         type: this.chartType === ChartType.areaChange ? ChartType.areaspline : this.chartType,
@@ -187,26 +189,48 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
         //   mouseWheel: this.enableZoom,
         // },
       },
-      yAxis: {
-        title: {
-          text: '',
-        },
-        startOnTick: false,
-        endOnTick: false,
-        gridLineColor: '#66666655',
-        opposite: false,
-        gridLineWidth: 1,
-        minorTickInterval: 'auto',
-        tickPixelInterval: 30,
-        //minorGridLineWidth: 0, // gray-ish grid lines
-        visible: this.showYAxis,
-        labels: {
-          style: {
-            color: ColorScheme.GRAY_MEDIUM_VAR,
-            font: '10px Trebuchet MS, Verdana, sans-serif',
+      yAxis: [
+        {
+          title: {
+            text: '',
+          },
+          startOnTick: false,
+          endOnTick: false,
+          gridLineColor: '#66666655',
+          opposite: false,
+          gridLineWidth: 1,
+          minorTickInterval: 'auto',
+          tickPixelInterval: 30,
+          //minorGridLineWidth: 0, // gray-ish grid lines
+          visible: this.showYAxis,
+          labels: {
+            style: {
+              color: ColorScheme.GRAY_MEDIUM_VAR,
+              font: '10px Trebuchet MS, Verdana, sans-serif',
+            },
           },
         },
-      },
+        {
+          title: {
+            text: '',
+          },
+          startOnTick: false,
+          endOnTick: false,
+          gridLineColor: '#66666655',
+          opposite: true,
+          gridLineWidth: 1,
+          minorTickInterval: 'auto',
+          tickPixelInterval: 30,
+          //minorGridLineWidth: 0, // gray-ish grid lines
+          visible: this.showYAxis,
+          labels: {
+            style: {
+              color: ColorScheme.GRAY_MEDIUM_VAR,
+              font: '10px Trebuchet MS, Verdana, sans-serif',
+            },
+          },
+        },
+      ],
       xAxis: {
         visible: this.showXAxis,
         crosshair: true,
@@ -269,10 +293,10 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
           color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
         shared: this.shareTooltip,
-        outside: true,
+        outside: false,
         useHTML: true,
-        xDateFormat: '%b. %e, %Y',
-        headerFormat: this.showTooltipHeader ? '<span>{point.key}</span>' : '',
+        xDateFormat: '%A, %b %e, %Y',
+        headerFormat: this.showTooltipHeader ? '<p style="color:#909592; font-size: 12px">{point.key}</p>' : '',
 
         pointFormatter: function () {
           const that = this as any;
@@ -302,7 +326,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
           return `
           <div class="space-x-1">
             <span style="color: ${color}">● ${name}:</span>
-             <span>${value} ${currency}</b></span>
+             <span>${value} ${currency}</span>
           </div>`;
         },
         valueDecimals: 2,
@@ -439,7 +463,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
     this.series = this.series.map((s) => {
       const data: GenericChartSeries = {
         name: s.name,
-        data: s.data,
+        data: (s as any)?.data ?? [],
         color: {
           linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
           stops: [
@@ -458,7 +482,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
       console.warn('Cannot init initAreaChange in Generic chart, empty series');
       return;
     }
-    const data = this.series[0].data as any as number[];
+    const data = ((this.series[0] as any)?.data as number[]) ?? [];
     const oldestData = data[0] as number;
     const newestData = data[data.length - 1] as number;
     const color = oldestData > newestData ? '#ff1010' : '#0d920d';

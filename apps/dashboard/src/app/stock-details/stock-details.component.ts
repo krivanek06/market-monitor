@@ -43,7 +43,7 @@ export class StockDetailsComponent {
     { label: 'Financials', value: ROUTES_STOCK_DETAILS.FINANCIALS },
     { label: 'Ratios', value: ROUTES_STOCK_DETAILS.RATIOS },
     { label: 'News', value: ROUTES_STOCK_DETAILS.NEWS },
-    { label: 'Holders', value: ROUTES_STOCK_DETAILS.HOLDERS },
+    // { label: 'Holders', value: ROUTES_STOCK_DETAILS.HOLDERS },
     { label: 'Trades', value: ROUTES_STOCK_DETAILS.TRADES },
   ];
 

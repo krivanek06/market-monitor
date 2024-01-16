@@ -10,7 +10,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { Router } from '@angular/router';
 import {
   AuthenticationAccountService,
-  AuthenticationUserStoreService,
   LoginUserInput,
   RegisterUserInput,
 } from '@market-monitor/modules/authentication/data-access';
@@ -34,7 +33,50 @@ import { FormRegisterComponent } from './form-register/form-register.component';
     MatDividerModule,
     MatProgressSpinnerModule,
   ],
-  templateUrl: './authentication-form.component.html',
+  template: `
+    <mat-tab-group *ngIf="!loadingSnipperShowSignal(); else loader">
+      <mat-tab label="Login">
+        <app-form-login [formControl]="loginUserInputControl"></app-form-login>
+
+        <div class="my-4">
+          <mat-divider></mat-divider>
+        </div>
+
+        <!-- social media login -->
+        <h2 class="text-lg text-center text-wt-primary-dark">Social Media Login</h2>
+
+        <div class="px-4 mt-4">
+          <button mat-stroked-button (click)="onGoogleAuth()" color="warn" class="w-full">Google</button>
+        </div>
+
+        <div class="my-4">
+          <mat-divider></mat-divider>
+        </div>
+
+        <!-- development -->
+        <h2 class="text-lg text-center text-wt-primary-dark">Demo Account Login</h2>
+        <div class="px-4 mt-4">
+          <button mat-stroked-button color="accent" class="w-full" type="button" (click)="onDemoLogin()">
+            Demo Login
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Register">
+        <app-form-register [formControl]="registerUserInputControl"></app-form-register>
+      </mat-tab>
+      <!-- <mat-tab label="Forgot Password">
+    <app-form-forgot-password [formControl]="forgotPasswordInputControl"></app-form-forgot-password>
+  </mat-tab> -->
+    </mat-tab-group>
+
+    <!-- loader -->
+    <ng-template #loader>
+      <div class="grid w-full h-full gap-4 place-content-center place-items-center">
+        <mat-spinner diameter="120"></mat-spinner>
+        <div class="text-lg text-wt-gray-medium">Checking Authentication</div>
+      </div>
+    </ng-template>
+  `,
   styles: `
       :host {
         display: block;
@@ -46,10 +88,9 @@ export class AuthenticationFormComponent {
   loginUserInputControl = new FormControl<LoginUserInput | null>(null);
   registerUserInputControl = new FormControl<RegisterUserInput | null>(null);
 
-  authenticationAccountService = inject(AuthenticationAccountService);
-  authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  dialogServiceUtil = inject(DialogServiceUtil);
-  router = inject(Router);
+  private authenticationAccountService = inject(AuthenticationAccountService);
+  private dialogServiceUtil = inject(DialogServiceUtil);
+  private router = inject(Router);
   private zone = inject(NgZone);
   loadingSnipperShowSignal = signal(false);
 

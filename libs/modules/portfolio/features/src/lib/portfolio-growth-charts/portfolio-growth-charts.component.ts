@@ -85,7 +85,7 @@ import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
 })
 export class PortfolioGrowthChartsComponent {
   @Input() showChartChangeSelect = false;
-  @Input() heightPx = 450;
+  @Input() heightPx = 400;
   @Input({ required: true }) portfolioState!: PortfolioState;
   @Input({ required: true }) portfolioAssetsGrowth!: PortfolioGrowthAssets[];
   @Input({ required: true }) set portfolioGrowth(data: PortfolioGrowth[]) {
