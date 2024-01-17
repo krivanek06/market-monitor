@@ -111,6 +111,7 @@ export class PortfolioGrowthChartsComponent {
     combineLatest([this.portfolioGrowthRangeControl.valueChanges.pipe(startWith(null)), this.portfolioGrowth$]).pipe(
       map(([dateRange, data]) => filterDataByDateRange(data, dateRange)),
     ),
+    { initialValue: [] },
   );
   portfolioInvestedChartSignal = toSignal(this.portfolioGrowth$);
 

@@ -5,13 +5,7 @@ import {
   PortfolioStateHolding,
   PortfolioTransaction,
 } from '@market-monitor/api-types';
-import {
-  ChartType,
-  GenericChartSeries,
-  GenericChartSeriesData,
-  GenericChartSeriesPie,
-  ValueItem,
-} from '@market-monitor/shared/data-access';
+import { GenericChartSeries, ValueItem } from '@market-monitor/shared/data-access';
 import {
   calculateGrowth,
   dateFormatDate,
@@ -184,16 +178,13 @@ export class PortfolioCalculationService {
    * @param holdings
    * @returns
    */
-  getPortfolioSectorAllocationPieChart(holdings: PortfolioStateHolding[]): GenericChartSeriesPie {
+  getPortfolioSectorAllocationPieChart(holdings: PortfolioStateHolding[]): GenericChartSeries<'pie'> {
     const allocations = this.getPortfolioSectorAllocation(holdings, 'sector');
     const chartData = Object.entries(allocations)
-      .map(
-        ([name, value]) =>
-          ({
-            y: Number(value),
-            name,
-          }) satisfies GenericChartSeriesData,
-      )
+      .map(([name, value]) => ({
+        y: Number(value),
+        name,
+      }))
       .sort((a, b) => b.y - a.y);
 
     return {
@@ -204,9 +195,7 @@ export class PortfolioCalculationService {
     };
   }
 
-  getPortfolioHoldingBubbleChart(
-    holdings: PortfolioStateHolding[],
-  ): GenericChartSeries<{ name: string; value: number }>[] {
+  getPortfolioHoldingBubbleChart(holdings: PortfolioStateHolding[]): GenericChartSeries<'packedbubble'>[] {
     // limit bubbles, show rest as 'others'
     const dataLimit = 50;
     // sort symbols by value and divide them by first and rest
@@ -243,21 +232,21 @@ export class PortfolioCalculationService {
     const sectorDividerSeries = getObjectEntries(sectorsDivider).map(
       ([name, data]) =>
         ({
-          type: ChartType.packedbubble,
+          type: 'packedbubble',
           name,
           data,
-        }) satisfies GenericChartSeries<{ name: string; value: number }>,
+        }) satisfies GenericChartSeries<'packedbubble'>,
     );
 
     // add rest data as 'others'
     const restDataSeries = {
-      type: ChartType.packedbubble,
+      type: 'packedbubble',
       name: 'Others',
       data: restData.map((d) => ({
         name: d.symbol,
         value: d.symbolSummary.quote.price * d.units,
       })),
-    } satisfies GenericChartSeries<{ name: string; value: number }>;
+    } satisfies GenericChartSeries<'packedbubble'>;
 
     return [...sectorDividerSeries, restDataSeries];
   }
@@ -269,17 +258,14 @@ export class PortfolioCalculationService {
    * @param holdings
    * @returns
    */
-  getPortfolioAssetAllocationPieChart(holdings: PortfolioStateHolding[]): GenericChartSeriesPie {
+  getPortfolioAssetAllocationPieChart(holdings: PortfolioStateHolding[]): GenericChartSeries<'pie'> {
     const visibleData = 8;
     const allocations = this.getPortfolioSectorAllocation(holdings, 'asset');
     const chartData = Object.entries(allocations)
-      .map(
-        ([name, value]) =>
-          ({
-            y: Number(value),
-            name,
-          }) satisfies GenericChartSeriesData,
-      )
+      .map(([name, value]) => ({
+        y: Number(value),
+        name,
+      }))
       .sort((a, b) => b.y - a.y);
 
     // combine last elements into "Other" category
@@ -288,7 +274,7 @@ export class PortfolioCalculationService {
         acc.y += curr.y;
         return acc;
       },
-      { name: 'Other', y: 0 } as GenericChartSeriesData,
+      { name: 'Other', y: 0 },
     );
 
     // combine first N elements with "Other" category

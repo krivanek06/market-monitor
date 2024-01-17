@@ -12,20 +12,13 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {
-  ChartConstructor,
-  ChartType,
-  ChartTypeKeys,
-  ColorScheme,
-  GenericChartSeries,
-  GenericChartSeriesPie,
-} from '@market-monitor/shared/data-access';
+import { ChartConstructor, ColorScheme, GenericChartSeries } from '@market-monitor/shared/data-access';
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
-import { format, isAfter, isBefore } from 'date-fns';
+import { format } from 'date-fns';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 
-type ChartInputType = GenericChartSeries[] | GenericChartSeriesPie[] | Highcharts.SeriesOptionsType[];
+type ChartInputType = Highcharts.SeriesOptionsType[];
 
 @Component({
   selector: 'app-generic-chart',
@@ -64,12 +57,15 @@ type ChartInputType = GenericChartSeries[] | GenericChartSeriesPie[] | Highchart
     </div>
   `,
 })
-export class GenericChartComponent extends ChartConstructor implements OnChanges, OnDestroy {
+export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type']>
+  extends ChartConstructor
+  implements OnChanges, OnDestroy
+{
   @Output() expandEmitter = new EventEmitter<any>();
 
-  @Input({ required: true }) series!: ChartInputType;
+  @Input({ required: true }) series!: GenericChartSeries<T>[];
 
-  @Input() chartType: ChartType | ChartTypeKeys = ChartType.line;
+  @Input() chartType: Highcharts.SeriesOptionsType['type'] = 'line';
   @Input() chartTitle = '';
   @Input() chartTitlePosition: Highcharts.AlignValue = 'left';
   @Input() enableZoom = false;
@@ -92,7 +88,6 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
 
   @Input() showExpandableButton = false;
   @Input() applyFancyColor = 0;
-  @Input() chartDateRestriction?: [Date | string, Date | string];
   @Input() isCategoryDates = false;
 
   constructor() {
@@ -113,24 +108,6 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
 
     let series = this.series;
 
-    if (this.chartDateRestriction && this.chartType === 'line') {
-      const [startDate, endDate] = this.chartDateRestriction;
-      series = (series as GenericChartSeries[]).map((s) => {
-        const data = (s.data as [number, number][]).filter((d) => {
-          const date = d[0];
-          if (!date) {
-            return false;
-          }
-          const dateValue = new Date(date);
-          return isBefore(dateValue, new Date(endDate)) && isAfter(dateValue, new Date(startDate));
-        });
-        return {
-          ...s,
-          data,
-        };
-      });
-    }
-
     this.initChart(series);
 
     if (this.floatingLegend && this.chartOptions.legend) {
@@ -142,17 +119,17 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
       this.chartOptions.legend.verticalAlign = 'middle';
     }
 
-    if (this.chartType === ChartType.column && this.chartOptions.xAxis) {
+    if (this.chartType === 'column' && this.chartOptions.xAxis) {
       this.chartOptions.xAxis = {
         ...this.chartOptions.xAxis,
         type: 'category',
       };
-    } else if (this.chartType === ChartType.bar && this.chartOptions.xAxis) {
+    } else if (this.chartType === 'column' && this.chartOptions.xAxis) {
       this.chartOptions.xAxis = {
         ...this.chartOptions.xAxis,
         type: 'category',
       };
-    } else if (this.chartType === ChartType.areaChange) {
+    } else if (this.chartType === 'area') {
       this.initAreaChange();
     }
 
@@ -181,7 +158,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
   private initChart(series: ChartInputType) {
     this.chartOptions = {
       chart: {
-        type: this.chartType === ChartType.areaChange ? ChartType.areaspline : this.chartType,
+        type: this.chartType,
         backgroundColor: 'transparent',
         // zooming: {
         //   type: 'x',
@@ -296,7 +273,9 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
         outside: false,
         useHTML: true,
         xDateFormat: '%A, %b %e, %Y',
-        headerFormat: this.showTooltipHeader ? '<p style="color:#909592; font-size: 12px">{point.key}</p>' : '',
+        headerFormat: this.showTooltipHeader
+          ? `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p>`
+          : '',
 
         pointFormatter: function () {
           const that = this as any;
@@ -346,7 +325,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
         },
         column: {
           pointPadding: 0.2,
-          stacking: this.chartType === ChartType.columnStack ? 'normal' : undefined,
+          stacking: 'normal',
           // dataLabels: {
           //   enabled: this.showDataLabel,
           // },
@@ -461,7 +440,8 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
   private fancyColoring() {
     let count = this.applyFancyColor;
     this.series = this.series.map((s) => {
-      const data: GenericChartSeries = {
+      const data = {
+        type: s.type,
         name: s.name,
         data: (s as any)?.data ?? [],
         color: {
@@ -471,7 +451,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
             [1, (Highcharts.getOptions().colors as any[])[count % 10]],
           ],
         },
-      } as GenericChartSeries;
+      } as any; // todo fix type
       count += 1;
       return data;
     });
@@ -490,7 +470,7 @@ export class GenericChartComponent extends ChartConstructor implements OnChanges
     this.chartOptions = {
       ...this.chartOptions,
       chart: {
-        type: ChartType.areaspline,
+        type: 'areaspline',
       },
       plotOptions: {
         ...this.chartOptions.plotOptions,

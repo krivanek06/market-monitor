@@ -29,11 +29,11 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenericChartBubbleComponent extends ChartConstructor {
-  @Input({ required: true }) set data(input: GenericChartSeries<{ name: string; value: number }>[]) {
+  @Input({ required: true }) set data(input: GenericChartSeries<'packedbubble'>[]) {
     this.initChart(input);
   }
 
-  private initChart(data: GenericChartSeries<{ name: string; value: number }>[]) {
+  private initChart(data: GenericChartSeries<'packedbubble'>[]) {
     this.chartOptions = {
       chart: {
         type: 'packedbubble',
@@ -93,7 +93,7 @@ export class GenericChartBubbleComponent extends ChartConstructor {
           color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
         shared: true,
-        headerFormat: '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
+        headerFormat: `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p><br/>`,
         pointFormatter: function () {
           const that = this as any;
           const value = formatValueIntoCurrency(that.y);

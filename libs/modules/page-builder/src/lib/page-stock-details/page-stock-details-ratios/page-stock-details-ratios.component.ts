@@ -23,6 +23,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Market Cap."
         [series]="[
           {
+            type: 'line',
             name: 'Market Cap.',
             data: data.marketCap
           }
@@ -35,6 +36,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Enterprise Value"
         [series]="[
           {
+            type: 'line',
             name: 'Enterprise Value',
             data: data.enterpriseValue
           }
@@ -47,6 +49,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="PE Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'PE Ratio',
             data: data.ratios.peRatio
           }
@@ -59,6 +62,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Current Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Current Ratio',
             data: data.ratios.currentRatio
           }
@@ -71,6 +75,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Quick Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Quick Ratio',
             data: data.ratios.quickRatio
           }
@@ -83,6 +88,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Cash Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Cash Ratio',
             data: data.ratios.cashRatio
           }
@@ -95,6 +101,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Price to Sales Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Price to Sales Ratio',
             data: data.ratios.priceToSalesRatio
           }
@@ -107,6 +114,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Price to Cash Flow Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Price to Cash Flow Ratio',
             data: data.ratios.pocfratio
           }
@@ -119,6 +127,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Price to Free Cash Flow Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Price to Free Cash Flow Ratio',
             data: data.ratios.pfcfRatio
           }
@@ -131,6 +140,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Price to Book Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Price to Book Ratio',
             data: data.ratios.pbRatio
           }
@@ -143,6 +153,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Debt Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Debt Ratio',
             data: data.ratios.debtRatio
           }
@@ -155,6 +166,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Debt to Equity Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Debt to Equity Ratio',
             data: data.ratios.debtToEquity
           }
@@ -167,6 +179,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Debt to Assets Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Debt to Assets Ratio',
             data: data.ratios.debtToAssets
           }
@@ -179,6 +192,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Dividend Yield"
         [series]="[
           {
+            type: 'line',
             name: 'Dividend Yield',
             data: data.ratios.dividendYield
           }
@@ -191,6 +205,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Stock Compensation to Revenue Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Stock Compensation to Revenue Ratio',
             data: data.ratios.stockBasedCompensationToRevenue
           }
@@ -203,6 +218,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Gross Margin"
         [series]="[
           {
+            type: 'line',
             name: 'Gross Margin',
             data: data.margin.grossProfitMargin,
             additionalData: {
@@ -218,6 +234,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Net Profit Margin"
         [series]="[
           {
+            type: 'line',
             name: 'Net Profit Margin',
             data: data.margin.netProfitMargin,
             additionalData: {
@@ -233,6 +250,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Revenue per Share"
         [series]="[
           {
+            type: 'line',
             name: 'Revenue per Share',
             data: data.perShare.revenuePerShare
           }
@@ -245,6 +263,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Net Income per Share"
         [series]="[
           {
+            type: 'line',
             name: 'Net Income per Share',
             data: data.perShare.netIncomePerShare
           }
@@ -257,6 +276,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Cash per Share"
         [series]="[
           {
+            type: 'line',
             name: 'Cash per Share',
             data: data.perShare.cashPerShare
           }
@@ -269,6 +289,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Book Value per Share"
         [series]="[
           {
+            type: 'line',
             name: 'Book Value per Share',
             data: data.perShare.bookValuePerShare
           }
@@ -281,6 +302,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Free Cash Flow per Share"
         [series]="[
           {
+            type: 'line',
             name: 'Free Cash Flow per Share',
             data: data.perShare.freeCashFlowPerShare
           }
@@ -293,6 +315,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Payout Ratio"
         [series]="[
           {
+            type: 'line',
             name: 'Payout Ratio',
             data: data.dividends.dividendPayoutRatio,
             additionalData: {
@@ -308,6 +331,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         chartTitle="Dividend Yield"
         [series]="[
           {
+            type: 'line',
             name: 'Dividend Yield',
             data: data.dividends.dividendYield,
             additionalData: {

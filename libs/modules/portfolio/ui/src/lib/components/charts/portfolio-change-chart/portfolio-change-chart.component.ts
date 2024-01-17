@@ -74,6 +74,7 @@ export class PortfolioChangeChartComponent extends ChartConstructor {
 
         data.push([Date.parse(inputValues[i].date), current - before, (current / 100) * before]);
       }
+
       this.initChart(data);
     });
   }
@@ -117,7 +118,6 @@ export class PortfolioChangeChartComponent extends ChartConstructor {
         },
       },
       xAxis: {
-        gridLineColor: '#66666644',
         type: 'datetime',
         crosshair: true,
         dateTimeLabelFormats: {
@@ -171,7 +171,7 @@ export class PortfolioChangeChartComponent extends ChartConstructor {
           color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
         shared: true,
-        headerFormat: '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
+        headerFormat: `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p><br/>`,
         pointFormatter: function () {
           const that = this as any;
           const isPositive = that.y >= 0;
@@ -185,29 +185,9 @@ export class PortfolioChangeChartComponent extends ChartConstructor {
         {
           zoneAxis: 'y',
           type: 'area',
-          zones: [
-            {
-              value: 0,
-              //color: '#FF0000',
-              color: {
-                linearGradient: { x1: 0, x2: 0, y1: 1, y2: 0 },
-                stops: [
-                  [0, ColorScheme.DANGER_VAR],
-                  [1, 'transparent'],
-                ],
-              },
-            },
-            {
-              //color: '#0d920d'
-              color: {
-                linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
-                stops: [
-                  [0, ColorScheme.SUCCESS_VAR],
-                  [1, 'transparent'],
-                ],
-              },
-            },
-          ],
+          threshold: 0,
+          color: ColorScheme.SUCCESS_VAR,
+          negativeColor: ColorScheme.DANGER_VAR,
           data: data,
         },
       ],

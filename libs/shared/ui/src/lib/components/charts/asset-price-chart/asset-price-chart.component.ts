@@ -80,7 +80,6 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
           },
           startOnTick: false,
           endOnTick: false,
-          gridLineColor: '#66666644',
           opposite: false,
           gridLineWidth: 1,
           minorTickInterval: 'auto',
@@ -108,7 +107,6 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
 
           return dateFormatDate(date, 'MMMM d, y');
         }),
-        gridLineColor: '#66666644',
         labels: {
           rotation: -12,
           style: {

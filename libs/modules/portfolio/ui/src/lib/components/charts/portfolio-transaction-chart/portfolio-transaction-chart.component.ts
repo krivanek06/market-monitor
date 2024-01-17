@@ -97,7 +97,6 @@ export class PortfolioTransactionChartComponent extends ChartConstructor {
         dateTimeLabelFormats: {
           day: '%e of %b',
         },
-        gridLineColor: '#66666644',
         labels: {
           rotation: -20,
           enabled: true,
@@ -156,7 +155,7 @@ export class PortfolioTransactionChartComponent extends ChartConstructor {
           color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
         shared: true,
-        headerFormat: '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
+        headerFormat: `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p><br/>`,
         pointFormatter: function () {
           const value = this.series.name === 'Transaction fees' ? formatValueIntoCurrency(this.y) : this.y;
           return `<p><span style="color: ${this.series.color}; font-weight: bold">● ${this.series.name}: </span><span>${value}</span></p><br/>`;

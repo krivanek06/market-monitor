@@ -153,7 +153,6 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         },
       ],
       xAxis: {
-        gridLineColor: '#66666644',
         labels: {
           rotation: -20,
           enabled: true,
@@ -216,7 +215,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
         shared: true,
-        headerFormat: '<p style="color:#909592; font-size: 12px">{point.key}</p><br/>',
+        headerFormat: `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p><br/>`,
         pointFormatter: function () {
           const that = this as any;
           const value = formatValueIntoCurrency(that.y);

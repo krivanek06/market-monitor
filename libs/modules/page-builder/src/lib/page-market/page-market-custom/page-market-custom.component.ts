@@ -44,13 +44,12 @@ import { map } from 'rxjs';
     <!-- chart -->
     <div class="relative w-full mb-10" [ngClass]="{ 'g-shadow-background': showLoadingScreenSignal() }">
       <app-generic-chart
-        [series]="selectedChartDataSignal()"
+        [series]="selectedChartDataDisplaySignal()"
         [heightPx]="450"
         [enableZoom]="true"
         [enableLegendTogging]="true"
         [showLegend]="true"
         [shareTooltip]="false"
-        [chartDateRestriction]="chartDateRestriction()"
       ></app-generic-chart>
 
       <mat-spinner *ngIf="showLoadingScreenSignal()" class="g-absolute-center" diameter="80"></mat-spinner>
@@ -153,12 +152,12 @@ export class PageMarketCustomComponent {
   /**
    * both signals keep the selected data and values
    */
-  selectedChartDataSignal = signal<GenericChartSeries<[number, number]>[]>([]);
+  private selectedChartDataSignal = signal<GenericChartSeries<'line'>[]>([]);
 
   /**
    * restricting the chart to show only the selected date range
    */
-  chartDateRestriction = toSignal<[Date | string, Date | string] | undefined>(
+  private chartDateRestriction = toSignal<[Date | string, Date | string] | undefined>(
     this.dateRangeControl.valueChanges.pipe(
       map((dateRange) => {
         if (!dateRange) {
@@ -170,6 +169,23 @@ export class PageMarketCustomComponent {
       }),
     ),
   );
+
+  selectedChartDataDisplaySignal = computed(() => {
+    const data = this.selectedChartDataSignal();
+    const dateRestriction = this.chartDateRestriction();
+
+    if (!dateRestriction) {
+      return data;
+    }
+
+    return data.map((d) => ({
+      ...d,
+      data: ((d as any).data as [number, number][]).filter(([date]) => {
+        const dateObj = new Date(date);
+        return isBefore(dateObj, new Date(dateRestriction[1])) && isBefore(new Date(dateRestriction[0]), dateObj);
+      }),
+    })) satisfies GenericChartSeries<'line'>[];
+  });
 
   showLoadingScreenSignal = signal<boolean>(false);
   selectedOverviewSubKeys = computed(() => this.selectedChartDataSignal().map((data) => data.additionalData?.id!));
@@ -184,7 +200,8 @@ export class PageMarketCustomComponent {
       // filter out data
       this.selectedChartDataSignal.update((prev) => prev.filter((data) => data.additionalData?.id !== subKey));
       // update date range control
-      const nextCurrentDates = this.selectedChartDataSignal()[0]?.data?.map((d) => format(d[0], 'YYYY-MM-DD')) ?? [];
+      const nextCurrentDates =
+        (this.selectedChartDataSignal()[0] as any)?.data?.map((d: any) => format(d[0], 'YYYY-MM-DD')) ?? [];
       this.updateDateRangeControl(nextCurrentDates, true);
       return;
     }
@@ -194,7 +211,8 @@ export class PageMarketCustomComponent {
     this.marketApiService.getMarketOverviewData(key, subKey).subscribe((marketOverviewData) => {
       // transform data
       const displayName = `${MARKET_OVERVIEW_ENDPOINTS[key].name} - ${subKeyName}`;
-      const chartData: GenericChartSeries<[number, number]> = {
+      const chartData: GenericChartSeries<'line'> = {
+        type: 'line',
         name: displayName,
         additionalData: {
           showCurrencySign: false,

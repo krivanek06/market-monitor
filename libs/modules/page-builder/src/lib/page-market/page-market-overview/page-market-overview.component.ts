@@ -100,7 +100,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="PE Ratio"
             [heightPx]="300"
             [applyFancyColor]="2"
-            [series]="[{ data: data | flattenArray: 1, name: 'PE Ratio' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'PE Ratio' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -110,7 +110,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="Shiller PE Ratio"
             [heightPx]="300"
             [applyFancyColor]="2"
-            [series]="[{ data: data | flattenArray: 1, name: 'Shiller PE Ratio' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Shiller PE Ratio' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -120,7 +120,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="Price To Book"
             [heightPx]="300"
             [applyFancyColor]="2"
-            [series]="[{ data: data | flattenArray: 1, name: 'Price To Book' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Price To Book' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -130,7 +130,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="Price To Sales"
             [heightPx]="300"
             [applyFancyColor]="2"
-            [series]="[{ data: data | flattenArray: 1, name: 'Price To Sales' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Price To Sales' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -140,7 +140,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="Earning Yield"
             [heightPx]="300"
             [applyFancyColor]="2"
-            [series]="[{ data: data | flattenArray: 1, name: 'Earning Yield' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Earning Yield' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -150,7 +150,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="Dividend Yield"
             [heightPx]="300"
             [applyFancyColor]="2"
-            [series]="[{ data: data | flattenArray: 1, name: 'Dividend Yield' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Dividend Yield' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
         </div>
@@ -162,7 +162,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [isCategoryDates]="true"
             chartTitle="Treasury 3 Months"
             [heightPx]="250"
-            [series]="[{ data: data | flattenArray: 1, name: 'Treasury 3 Months' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 3 Months' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -171,7 +171,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [isCategoryDates]="true"
             chartTitle="Treasury 1 Year"
             [heightPx]="250"
-            [series]="[{ data: data | flattenArray: 1, name: 'Treasury 1 Year' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 1 Year' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -180,7 +180,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [isCategoryDates]="true"
             chartTitle="Treasury 10 Years"
             [heightPx]="250"
-            [series]="[{ data: data | flattenArray: 1, name: 'Treasury 10 Years' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 10 Years' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -189,7 +189,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [isCategoryDates]="true"
             chartTitle="Treasury 30 Years"
             [heightPx]="250"
-            [series]="[{ data: data | flattenArray: 1, name: 'Treasury 30 Years' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 30 Years' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
         </div>
@@ -201,7 +201,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [isCategoryDates]="true"
             chartTitle="Bonds US AAA Yield"
             [heightPx]="250"
-            [series]="[{ data: data | flattenArray: 1, name: 'Bonds US AAA Yield' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US AAA Yield' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -210,7 +210,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [isCategoryDates]="true"
             chartTitle="Bonds US AA Yield"
             [heightPx]="250"
-            [series]="[{ data: data | flattenArray: 1, name: 'Bonds US AA Yield' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US AA Yield' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -219,7 +219,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [isCategoryDates]="true"
             chartTitle="Bonds US BB Yield"
             [heightPx]="250"
-            [series]="[{ data: data | flattenArray: 1, name: 'Bonds US BB Yield' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US BB Yield' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -228,7 +228,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [isCategoryDates]="true"
             chartTitle="Bonds US CCC Yield"
             [heightPx]="250"
-            [series]="[{ data: data | flattenArray: 1, name: 'Bonds US CCC Yield' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US CCC Yield' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
         </div>
@@ -241,7 +241,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="US GDP"
             [heightPx]="250"
             [applyFancyColor]="3"
-            [series]="[{ data: data | flattenArray: 1, name: 'US GDP' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'US GDP' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -251,7 +251,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="GDP per Capita"
             [heightPx]="250"
             [applyFancyColor]="3"
-            [series]="[{ data: data | flattenArray: 1, name: 'GDP per Capita' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'GDP per Capita' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -261,7 +261,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="CPI"
             [heightPx]="250"
             [applyFancyColor]="3"
-            [series]="[{ data: data | flattenArray: 1, name: 'CPI' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'CPI' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -271,7 +271,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="Federal Funds"
             [heightPx]="250"
             [applyFancyColor]="3"
-            [series]="[{ data: data | flattenArray: 1, name: 'Federal Funds' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Federal Funds' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -281,7 +281,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="Inflation"
             [heightPx]="250"
             [applyFancyColor]="4"
-            [series]="[{ data: data | flattenArray: 1, name: 'Inflation' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Inflation' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
 
@@ -293,6 +293,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="4"
             [series]="[
               {
+                type: 'line',
                 data: (data | flattenArray: 1 | multiplyData: 1_000_000),
                 name: 'Unemployment'
               }
@@ -308,6 +309,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="4"
             [series]="[
               {
+                type: 'line',
                 data: data | flattenArray: 1,
                 name: 'Smooth Recession Probabilities'
               }
@@ -321,7 +323,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             chartTitle="Vehicle Sales"
             [heightPx]="250"
             [applyFancyColor]="4"
-            [series]="[{ data: data | flattenArray: 1 | multiplyData: 1_000_000, name: 'Vehicle Sales' }]"
+            [series]="[{ type: 'line', data: data | flattenArray: 1 | multiplyData: 1_000_000, name: 'Vehicle Sales' }]"
             [categories]="data | flattenArray: 0"
           ></app-generic-chart>
         </div>

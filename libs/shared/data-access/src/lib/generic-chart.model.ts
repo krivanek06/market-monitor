@@ -1,63 +1,14 @@
-export enum ChartType {
-  line = 'line',
-  column = 'column',
-  columnStack = 'column',
-  pie = 'pie',
-  area = 'area',
-  areaChange = 'area-change',
-  areaspline = 'areaspline',
-  bar = 'bar',
-  spline = 'spline',
-  histogram = 'histogram',
-  packedbubble = 'packedbubble',
-}
+import * as Highcharts from 'highcharts';
 
-export type ChartTypeKeys = keyof typeof ChartType;
-
-export type GenericChartSeriesAcceptedData =
-  | (number | null)
-  | [number | null, number | null]
-  | { name: string; y: number; color?: string }
-  | { name: string; value: number };
-
-export interface GenericChartSeries<TData extends GenericChartSeriesAcceptedData = GenericChartSeriesAcceptedData> {
-  type?: ChartType;
-  name?: string;
-  showInNavigator?: boolean;
-  colorByPoint?: boolean;
-  /**
-   * example: [value, value, ...] or [[timestamp, value], [timestamp, value], ...]
-   */
-  data: TData[];
-  color?:
-    | string
-    | {
-        linearGradient: { x1: number; x2: number; y1: number; y2: number };
-        stops: (number | string)[][];
-      };
+export type GenericChartSeries<T extends Highcharts.SeriesOptionsType['type']> = Highcharts.SeriesOptionsType & {
+  type: T;
   additionalData?: {
     id?: string;
     showCurrencySign?: boolean;
     showPercentageSign?: boolean;
     colorTooltipDefault?: boolean;
   };
-}
-
-// Used only for Pie charts
-export interface GenericChartSeriesPie {
-  name?: string;
-  data: GenericChartSeriesData[];
-  colorByPoint?: boolean;
-  innerSize?: string;
-  type: 'pie';
-}
-
-export interface GenericChartSeriesData {
-  name?: string;
-  y: number;
-  color?: string;
-  custom?: any;
-}
+};
 
 export const ChartGenericColors = [
   '#7712aa',

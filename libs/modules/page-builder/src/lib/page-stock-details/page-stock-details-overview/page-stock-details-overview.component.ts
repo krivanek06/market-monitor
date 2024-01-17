@@ -146,6 +146,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             [showTooltipHeader]="false"
             [series]="[
               {
+                type: 'column',
                 colorByPoint: true,
                 additionalData: {
                   colorTooltipDefault: true,
@@ -175,6 +176,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             [showTooltipHeader]="false"
             [series]="[
               {
+                type: 'column',
                 colorByPoint: true,
                 additionalData: {
                   colorTooltipDefault: true,

@@ -5,7 +5,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { PortfolioGrowthAssets } from '@market-monitor/api-types';
-import { ColorScheme, InputSource, getChartGenericColor } from '@market-monitor/shared/data-access';
+import { ColorScheme, GenericChartSeries, InputSource, getChartGenericColor } from '@market-monitor/shared/data-access';
 import { DefaultImgDirective, GenericChartComponent } from '@market-monitor/shared/ui';
 import * as Highcharts from 'highcharts';
 import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
@@ -68,7 +68,7 @@ export class PortfolioAssetChartComponent {
   private formatData(
     portfolioAssets: PortfolioGrowthAssets[],
     selectedSymbols: string[],
-  ): Highcharts.SeriesOptionsType[] {
+  ): GenericChartSeries<'line' | 'column'>[] {
     const portfolioFiltered = portfolioAssets.filter((asset) => selectedSymbols.includes(asset.symbol));
     const seriesData = portfolioFiltered.map(
       (d, index) =>
