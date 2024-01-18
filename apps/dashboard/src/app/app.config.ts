@@ -9,6 +9,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   PreloadAllModules,
   provideRouter,
+  withComponentInputBinding,
   withEnabledBlockingInitialNavigation,
   withInMemoryScrolling,
   withPreloading,
@@ -44,6 +45,8 @@ export const appConfig: ApplicationConfig = {
       withPreloading(PreloadAllModules),
       // add transition animations
       withViewTransitions(),
+      // enable component input binding
+      withComponentInputBinding(),
       // lazy load animation modules
       // provideAnimationsAsync()
     ),

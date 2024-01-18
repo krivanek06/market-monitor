@@ -14,6 +14,7 @@ export enum ROUTES_MAIN {
   NEWS = 'news',
   ECONOMICS = 'economics',
   HALL_OF_FAME = 'hall-of-fame',
+  NOT_FOUND = 'not-found',
 }
 
 export enum ROUTES_MARKET {

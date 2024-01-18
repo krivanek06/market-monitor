@@ -17,6 +17,10 @@ export const appRoutes: Route[] = [
         loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
       },
       {
+        path: ROUTES_MAIN.NOT_FOUND,
+        loadComponent: () => import('./not-found/not-found.component').then((m) => m.NotFoundComponent),
+      },
+      {
         path: '',
         loadComponent: () => import('./menu/menu.component').then((m) => m.MenuComponent),
         canActivate: [
@@ -153,7 +157,7 @@ export const appRoutes: Route[] = [
       },
       {
         path: '**',
-        loadComponent: () => import('./not-found/not-found.component').then((m) => m.NotFoundComponent),
+        redirectTo: ROUTES_MAIN.NOT_FOUND,
       },
     ],
   },
