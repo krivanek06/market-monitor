@@ -4,6 +4,7 @@ import {
   getCurrentDateDefaultFormat,
   getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
+  waitSeconds,
 } from '@market-monitor/shared/features/general-util';
 import { format, subDays } from 'date-fns';
 import { userDocumentTransactionHistoryRef, usersCollectionRef } from '../models';
@@ -35,6 +36,9 @@ export const userUpdatePortfolio = async (): Promise<void> => {
 
   // loop though users, load transactions and calculate balance
   for await (const userDoc of users.docs) {
+    // wait 0.25 seconds prevent too many requests
+    await waitSeconds(0.25);
+
     // load transaction per user
     const transactionRef = userDocumentTransactionHistoryRef(userDoc.id);
     const transactions = (await transactionRef.get()).data();

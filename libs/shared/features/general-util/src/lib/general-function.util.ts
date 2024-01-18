@@ -131,6 +131,10 @@ export const insertIntoArray = <T>(arr: T[], index: number, newItem: T): T[] => 
   ...arr.slice(index),
 ];
 
+export const waitSeconds = (seconds: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+};
+
 type Entries<T> = {
   [K in keyof T]: [K, T[K]];
 }[keyof T][];
