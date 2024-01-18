@@ -4,7 +4,6 @@ import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
-import { groupDetailsResolver } from '@market-monitor/modules/page-builder';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { map, take, tap } from 'rxjs';
 
@@ -91,9 +90,9 @@ export const appRoutes: Route[] = [
                 title: 'Group Details',
                 loadComponent: () =>
                   import('./groups/group-details/group-details.component').then((m) => m.GroupDetailsComponent),
-                resolve: {
-                  groupDetails: groupDetailsResolver,
-                },
+                // resolve: {
+                //   groupDetails: groupDetailsResolver,
+                // },
               },
             ],
           },

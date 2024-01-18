@@ -28,7 +28,7 @@ import { roundNDigits } from '@market-monitor/shared/features/general-util';
 import { limit } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
-import { Observable, combineLatest, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, combineLatest, map, of, switchMap } from 'rxjs';
 import { MarketApiService } from '../market-api/market-api.service';
 
 @Injectable({
@@ -84,7 +84,7 @@ export class GroupApiService {
     );
   }
 
-  getGroupDetailsById(groupId: string): Observable<GroupDetails> {
+  getGroupDetailsById(groupId: string): Observable<GroupDetails | null> {
     return combineLatest([
       this.getGroupDataById(groupId),
       this.getGroupMembersDataById(groupId),
@@ -93,16 +93,15 @@ export class GroupApiService {
       this.getGroupHoldingSnapshotsDataById(groupId).pipe(
         switchMap((groupHoldings) =>
           this.marketApiService.getSymbolSummaries(groupHoldings?.data?.map((h) => h.symbol)).pipe(
-            map(
-              (symbolSummaries) =>
-                groupHoldings?.data.map(
-                  (holding) =>
-                    ({
-                      ...holding,
-                      symbolSummary: symbolSummaries.find((s) => s.id === holding.symbol)!,
-                      breakEvenPrice: roundNDigits(holding.invested / holding.units),
-                    }) satisfies PortfolioStateHolding,
-                ),
+            map((symbolSummaries) =>
+              groupHoldings?.data.map(
+                (holding) =>
+                  ({
+                    ...holding,
+                    symbolSummary: symbolSummaries.find((s) => s.id === holding.symbol)!,
+                    breakEvenPrice: roundNDigits(holding.invested / holding.units),
+                  }) satisfies PortfolioStateHolding,
+              ),
             ),
           ),
         ),
@@ -139,6 +138,10 @@ export class GroupApiService {
           } satisfies GroupDetails;
         },
       ),
+      catchError((err) => {
+        console.error(err);
+        throw err;
+      }),
     );
   }
 

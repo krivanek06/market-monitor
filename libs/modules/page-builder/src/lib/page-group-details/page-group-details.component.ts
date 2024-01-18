@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -66,13 +66,4 @@ export class PageGroupDetailsComponent extends PageGroupsBaseComponent {
     { label: 'Overview', value: 'overview' },
     { label: 'Holdings', value: 'holdings' },
   ];
-
-  constructor() {
-    super();
-    console.log('GroupDetailsComponent');
-
-    effect(() => {
-      console.log(this.groupDetailsSignal());
-    });
-  }
 }

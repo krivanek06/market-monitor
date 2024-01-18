@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { UserApiService } from '@market-monitor/api-client';
@@ -20,7 +19,9 @@ import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { PositionCardComponent, SectionTitleComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
-import { switchMap } from 'rxjs';
+import { computedFrom } from 'ngxtension/computed-from';
+import { filterNil } from 'ngxtension/filter-nil';
+import { map, pipe, switchMap } from 'rxjs';
 import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
 @Component({
@@ -158,18 +159,26 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
   portfolioCalculationService = inject(PortfolioCalculationService);
   userApiService = inject(UserApiService);
 
-  memberRequestedUsersSignal = toSignal(
-    this.groupDetails$.pipe(
+  memberRequestedUsersSignal = computedFrom(
+    [this.groupDetailsSignal],
+    pipe(
+      map(([group]) => group),
+      filterNil(),
       switchMap((group) => this.userApiService.getUsersByIds(group.groupData.memberRequestUserIds)),
     ),
     { initialValue: [] },
   );
-  memberInvitedUsersSignal = toSignal(
-    this.groupDetails$.pipe(
+
+  memberInvitedUsersSignal = computedFrom(
+    [this.groupDetailsSignal],
+    pipe(
+      map(([group]) => group),
+      filterNil(),
       switchMap((group) => this.userApiService.getUsersByIds(group.groupData.memberInvitedUserIds)),
     ),
     { initialValue: [] },
   );
+
   portfolioGrowthSignal = computed(() =>
     this.portfolioCalculationService.getPortfolioGrowthFromPortfolioState(
       this.groupDetailsSignal()?.groupPortfolioSnapshotsData ?? [],
