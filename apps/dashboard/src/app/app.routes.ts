@@ -5,6 +5,7 @@ import {
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
+import { featureFlagGuard } from '@market-monitor/shared/features/feature-access-directive';
 import { map, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
@@ -63,23 +64,11 @@ export const appRoutes: Route[] = [
           {
             path: ROUTES_MAIN.HALL_OF_FAME,
             loadComponent: () => import('./hall-of-fame/hall-of-fame.component').then((m) => m.HallOfFameComponent),
-            canActivate: [
-              () => {
-                inject(AuthenticationUserStoreService).state.userData()?.features.allowAccessHallOfFame
-                  ? true
-                  : inject(Router).navigate([ROUTES_MAIN.DASHBOARD]);
-              },
-            ],
+            canActivate: [featureFlagGuard('allowAccessHallOfFame', ROUTES_MAIN.DASHBOARD)],
           },
           {
             path: ROUTES_MAIN.GROUPS,
-            canActivate: [
-              () => {
-                inject(AuthenticationUserStoreService).state.userData()?.features.allowAccessGroups
-                  ? true
-                  : inject(Router).navigate([ROUTES_MAIN.DASHBOARD]);
-              },
-            ],
+            canActivate: [featureFlagGuard('allowAccessGroups', ROUTES_MAIN.DASHBOARD)],
             children: [
               {
                 path: '',
@@ -90,9 +79,6 @@ export const appRoutes: Route[] = [
                 title: 'Group Details',
                 loadComponent: () =>
                   import('./groups/group-details/group-details.component').then((m) => m.GroupDetailsComponent),
-                // resolve: {
-                //   groupDetails: groupDetailsResolver,
-                // },
               },
             ],
           },

@@ -9,7 +9,6 @@ import {
 } from '@market-monitor/modules/portfolio/ui';
 import {
   GeneralCardComponent,
-  GenericChartBubbleComponent,
   GenericChartComponent,
   SectionTitleComponent,
   SortByKeyPipe,
@@ -25,7 +24,6 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     GeneralCardComponent,
     MatDialogModule,
     StockSummaryDialogComponent,
-    GenericChartBubbleComponent,
     PortfolioTransactionChartComponent,
     SectionTitleComponent,
     PortfolioTransactionsTableComponent,
@@ -35,10 +33,11 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
       <div class="grid mb-8 2xl:grid-cols-3">
         <div class="2xl:col-span-2">
-          <app-generic-chart-bubble
+          <app-generic-chart
             *ngIf="portfolioHoldingBubbleChartSignal() as portfolioHoldingBubbleChart"
-            [data]="portfolioHoldingBubbleChart"
-          ></app-generic-chart-bubble>
+            [heightPx]="380"
+            [series]="portfolioHoldingBubbleChart"
+          ></app-generic-chart>
         </div>
         <div class="hidden 2xl:block">
           <app-generic-chart

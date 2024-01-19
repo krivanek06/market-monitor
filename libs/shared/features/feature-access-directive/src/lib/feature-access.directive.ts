@@ -9,8 +9,10 @@ import {
   inject,
 } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { CanActivateFn, Router } from '@angular/router';
 import { UserFeaturesType } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
+import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { Subject, takeUntil } from 'rxjs';
 
 /**
@@ -60,3 +62,21 @@ export class FeatureAccessDirective implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+
+export const featureFlagGuard = (
+  featureName: UserFeaturesType,
+  fallbackUrl: string = ROUTES_MAIN.NOT_FOUND,
+): CanActivateFn => {
+  return () => {
+    const authenticationUserStoreService = inject(AuthenticationUserStoreService);
+    const router = inject(Router);
+
+    const enable = authenticationUserStoreService.state.getUserData().features[featureName];
+
+    if (!enable) {
+      router.navigateByUrl(fallbackUrl);
+    }
+
+    return true;
+  };
+};

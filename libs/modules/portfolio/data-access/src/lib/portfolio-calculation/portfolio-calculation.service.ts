@@ -235,6 +235,9 @@ export class PortfolioCalculationService {
           type: 'packedbubble',
           name,
           data,
+          additionalData: {
+            showCurrencySign: true,
+          },
         }) satisfies GenericChartSeries<'packedbubble'>,
     );
 
@@ -245,6 +248,9 @@ export class PortfolioCalculationService {
       data: restData.map((d) => ({
         name: d.symbol,
         value: d.symbolSummary.quote.price * d.units,
+        additionalData: {
+          showCurrencySign: true,
+        },
       })),
     } satisfies GenericChartSeries<'packedbubble'>;
 

@@ -13,7 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChartConstructor, ColorScheme, GenericChartSeries } from '@market-monitor/shared/data-access';
-import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
+import { formatLargeNumber, formatValueIntoCurrency, roundNDigits } from '@market-monitor/shared/features/general-util';
 import { format } from 'date-fns';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -289,7 +289,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           const isPercent = !!additionalData?.showPercentageSign;
           const showDollar = !!additionalData?.showCurrencySign;
 
-          const value = formatLargeNumber(this.y, isPercent, showDollar);
+          const value = showDollar ? formatValueIntoCurrency(this.y) : formatLargeNumber(this.y, isPercent, showDollar);
           const index = this.category;
           const name = this.name ?? this.series.name;
 
@@ -300,12 +300,10 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
             color = Highcharts.defaultOptions.colors[Number(index)];
           }
 
-          const currency = showDollar ? '$' : '';
-
           return `
           <div class="space-x-1">
             <span style="color: ${color}">● ${name}:</span>
-             <span>${value} ${currency}</span>
+             <span>${value}</span>
           </div>`;
         },
         valueDecimals: 2,
@@ -329,6 +327,31 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           // dataLabels: {
           //   enabled: this.showDataLabel,
           // },
+        },
+        packedbubble: {
+          minSize: '30px',
+          maxSize: '120px',
+          tooltip: {
+            headerFormat: `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{series.name}</p>`,
+          },
+          layoutAlgorithm: {
+            splitSeries: false,
+            gravitationalConstant: 0.006,
+            seriesInteraction: true,
+            dragBetweenSeries: true,
+            parentNodeLimit: true,
+          },
+          dataLabels: {
+            enabled: true,
+            format: '{point.name}',
+
+            style: {
+              color: 'black',
+              fontSize: '16px',
+              textOutline: 'none',
+              fontWeight: 'normal',
+            },
+          },
         },
         series: {
           //headerFormat: {},
