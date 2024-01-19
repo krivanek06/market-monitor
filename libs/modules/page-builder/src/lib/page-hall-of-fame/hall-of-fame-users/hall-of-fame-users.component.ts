@@ -76,35 +76,39 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
             [template]="userTemplate"
           />
         </div>
-        <div class="p-4 lg:basis-2/6 xl:basis-3/6 grid xl:grid-cols-2 gap-y-10">
+        <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-10">
           <!-- daily best -->
-          <div>
+          <div class="@container">
             <app-section-title title="Daily Gainers" class="mb-6" />
-            @for (user of hallOfFameUses.bestDailyGains; track user.id) {
-              <app-user-display-item
-                (click)="onUserClick(user)"
-                class="g-clickable-hover mb-3"
-                [showLoginButton]="false"
-                [userData]="user"
-              />
-            } @empty {
-              <div>No Data Found</div>
-            }
+            <div class="grid @xl:grid-cols-2 gap-3">
+              @for (user of hallOfFameUses.bestDailyGains; track user.id) {
+                <app-user-display-item
+                  (click)="onUserClick(user)"
+                  class="g-clickable-hover mb-3"
+                  [showLoginButton]="false"
+                  [userData]="user"
+                />
+              } @empty {
+                <div class="@xl:col-span-2">No Data Found</div>
+              }
+            </div>
           </div>
 
           <!-- daily worst -->
-          <div>
+          <div class="@container">
             <app-section-title title="Daily Losers" class="mb-6" />
-            @for (user of hallOfFameUses.worstDailyGains; track user.id) {
-              <app-user-display-item
-                (click)="onUserClick(user)"
-                class="g-clickable-hover mb-3"
-                [showLoginButton]="false"
-                [userData]="user"
-              />
-            } @empty {
-              <div>No Data Found</div>
-            }
+            <div class="grid @xl:grid-cols-2 gap-3">
+              @for (user of hallOfFameUses.worstDailyGains; track user.id) {
+                <app-user-display-item
+                  (click)="onUserClick(user)"
+                  class="g-clickable-hover mb-3"
+                  [showLoginButton]="false"
+                  [userData]="user"
+                />
+              } @empty {
+                <div class="@xl:col-span-2">No Data Found</div>
+              }
+            </div>
           </div>
         </div>
       }

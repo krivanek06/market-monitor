@@ -35,9 +35,9 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
         <!-- info -->
         <div class="grid gap-1">
           <div class="flex flex-col @md:flex-row @md:items-center gap-x-4">
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-x-2">
               <!-- name -->
-              <div
+              <span
                 class="text-lg"
                 [ngClass]="{
                   'text-wt-primary': !groupData.isClosed,
@@ -45,10 +45,10 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
                 }"
               >
                 {{ groupData.name | titlecase }}
-              </div>
+              </span>
 
               <!-- members -->
-              <div class="block @md:hidden">[{{ groupData.numberOfMembers }} / {{ memberLimit }}]</div>
+              <span class="block @md:hidden">[{{ groupData.numberOfMembers }} / {{ memberLimit }}]</span>
             </div>
 
             <!-- portfolio -->
