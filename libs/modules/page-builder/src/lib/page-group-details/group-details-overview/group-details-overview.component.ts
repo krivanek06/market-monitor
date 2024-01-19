@@ -6,19 +6,25 @@ import { UserApiService } from '@market-monitor/api-client';
 import { GROUP_MEMBER_LIMIT, UserBase } from '@market-monitor/api-types';
 import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@market-monitor/modules/group/features';
 import { GroupDisplayInfoComponent } from '@market-monitor/modules/group/ui';
+import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { PortfolioCalculationService } from '@market-monitor/modules/portfolio/data-access';
 import {
   PortfolioBalancePieChartComponent,
   PortfolioGrowthChartComponent,
+  PortfolioHoldingsTableComponent,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
-  PortfolioTransactionsTableComponent,
 } from '@market-monitor/modules/portfolio/ui';
 import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { PositionCardComponent, SectionTitleComponent, SortByKeyPipe } from '@market-monitor/shared/ui';
+import {
+  GeneralCardComponent,
+  PositionCardComponent,
+  SectionTitleComponent,
+  SortByKeyPipe,
+} from '@market-monitor/shared/ui';
 import { computedFrom } from 'ngxtension/computed-from';
 import { filterNil } from 'ngxtension/filter-nil';
 import { map, pipe, switchMap } from 'rxjs';
@@ -38,12 +44,14 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     GroupInvitationsManagerComponent,
     PositionCardComponent,
     UserDisplayItemComponent,
-    PortfolioTransactionsTableComponent,
+    PortfolioHoldingsTableComponent,
     MatIconModule,
     SortByKeyPipe,
     SectionTitleComponent,
     GroupUserHasRoleDirective,
     UserDetailsDialogComponent,
+    GeneralCardComponent,
+    StockSummaryDialogComponent,
   ],
   template: `
     <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
@@ -136,15 +144,14 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         </div>
       </div>
 
-      <!-- transactions -->
-      <div>
-        <app-section-title title="Transaction History" matIcon="history" additionalClasses="pl-1 mb-3" />
-        <app-portfolio-transactions-table
-          [showTransactionFees]="true"
-          [showUser]="true"
-          [data]="groupDetailsSignal.groupTransactionsData | sortByKey: 'date' : 'desc'"
-        ></app-portfolio-transactions-table>
-      </div>
+      <!-- holding table -->
+      <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">
+        <app-portfolio-holdings-table
+          (symbolClicked)="onSummaryClick($event)"
+          [holdings]="getGroupHoldingsSignal()"
+          [holdingsBalance]="groupDetailsSignal.groupData.portfolioState.holdingsBalance"
+        ></app-portfolio-holdings-table>
+      </app-general-card>
     </ng-container>
   `,
   styles: `
@@ -196,6 +203,15 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
     this.dialog.open(UserDetailsDialogComponent, {
       data: <UserDetailsDialogComponentData>{
         userId: member.id,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
+  }
+
+  onSummaryClick(symbol: string) {
+    this.dialog.open(StockSummaryDialogComponent, {
+      data: {
+        symbol: symbol,
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });

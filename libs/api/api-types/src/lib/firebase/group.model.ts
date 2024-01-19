@@ -1,7 +1,6 @@
 import { DataDocsWrapper } from '../constants';
 import {
   PortfolioState,
-  PortfolioStateHolding,
   PortfolioStateHoldingBase,
   PortfolioTransaction,
   PortfolioTransactionMore,
@@ -140,8 +139,4 @@ export type GroupDetails = {
   groupTransactionsData: PortfolioTransactionMore[];
   groupMembersData: GroupMember[];
   groupPortfolioSnapshotsData: PortfolioState[];
-  /**
-   * data about current holdings, calculated from users data
-   */
-  groupHoldingSnapshotsData: PortfolioStateHolding[];
 };

@@ -34,6 +34,20 @@ export abstract class PageGroupsBaseComponent {
     ),
   );
 
+  getGroupHoldingsSignal = toSignal(
+    toObservable(this.groupIdParam).pipe(
+      filterNil(),
+      switchMap((id) =>
+        this.groupApiService.getGroupHoldingsDataById(id).pipe(
+          catchError(() => {
+            return [];
+          }),
+        ),
+      ),
+    ),
+    { initialValue: [] },
+  );
+
   constructor() {
     effect(() => {
       console.log('[Groups]: groupIdParam', this.groupIdParam());

@@ -84,60 +84,56 @@ export class GroupApiService {
     );
   }
 
+  getGroupHoldingsDataById(groupId: string): Observable<PortfolioStateHolding[]> {
+    return this.getGroupHoldingSnapshotsDataById(groupId).pipe(
+      switchMap((groupHoldings) =>
+        !groupHoldings
+          ? of([])
+          : this.marketApiService.getSymbolSummaries(groupHoldings.data?.map((h) => h.symbol)).pipe(
+              map((symbolSummaries) =>
+                groupHoldings.data.map(
+                  (holding) =>
+                    ({
+                      ...holding,
+                      symbolSummary: symbolSummaries.find((s) => s.id === holding.symbol)!,
+                      breakEvenPrice: roundNDigits(holding.invested / holding.units),
+                    }) satisfies PortfolioStateHolding,
+                ),
+              ),
+            ),
+      ),
+    );
+  }
+
   getGroupDetailsById(groupId: string): Observable<GroupDetails | null> {
     return combineLatest([
       this.getGroupDataById(groupId),
       this.getGroupMembersDataById(groupId),
       this.getGroupPortfolioTransactionsDataById(groupId),
       this.getGroupPortfolioSnapshotsDataById(groupId),
-      this.getGroupHoldingSnapshotsDataById(groupId).pipe(
-        switchMap((groupHoldings) =>
-          this.marketApiService.getSymbolSummaries(groupHoldings?.data?.map((h) => h.symbol)).pipe(
-            map((symbolSummaries) =>
-              groupHoldings?.data.map(
-                (holding) =>
-                  ({
-                    ...holding,
-                    symbolSummary: symbolSummaries.find((s) => s.id === holding.symbol)!,
-                    breakEvenPrice: roundNDigits(holding.invested / holding.units),
-                  }) satisfies PortfolioStateHolding,
-              ),
-            ),
-          ),
-        ),
-      ),
     ]).pipe(
-      map(
-        ([
+      map(([groupData, groupMembersData, groupTransactionsData, groupPortfolioSnapshotsData]) => {
+        if (!groupData || !groupMembersData) {
+          throw new Error('Group data not found');
+        }
+
+        // merge transactions with user data
+        const portfolioTransactionsMore = (groupTransactionsData?.data ?? []).map(
+          (transaction) =>
+            ({
+              ...transaction,
+              userDisplayName: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.displayName,
+              userPhotoURL: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.photoURL,
+            }) satisfies PortfolioTransactionMore,
+        );
+
+        return {
           groupData,
-          groupMembersData,
-          groupTransactionsData,
-          groupPortfolioSnapshotsData,
-          groupHoldingSnapshotsData,
-        ]) => {
-          if (!groupData || !groupMembersData) {
-            throw new Error('Group data not found');
-          }
-
-          // merge transactions with user data
-          const portfolioTransactionsMore = (groupTransactionsData?.data ?? []).map(
-            (transaction) =>
-              ({
-                ...transaction,
-                userDisplayName: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.displayName,
-                userPhotoURL: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.photoURL,
-              }) satisfies PortfolioTransactionMore,
-          );
-
-          return {
-            groupData,
-            groupMembersData: groupMembersData.data ?? [],
-            groupTransactionsData: portfolioTransactionsMore,
-            groupPortfolioSnapshotsData: groupPortfolioSnapshotsData?.data ?? [],
-            groupHoldingSnapshotsData: groupHoldingSnapshotsData ?? [],
-          } satisfies GroupDetails;
-        },
-      ),
+          groupMembersData: groupMembersData.data ?? [],
+          groupTransactionsData: portfolioTransactionsMore,
+          groupPortfolioSnapshotsData: groupPortfolioSnapshotsData?.data ?? [],
+        } satisfies GroupDetails;
+      }),
       catchError((err) => {
         console.error(err);
         throw err;

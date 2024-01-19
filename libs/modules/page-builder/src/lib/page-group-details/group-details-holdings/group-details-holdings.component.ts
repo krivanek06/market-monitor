@@ -4,15 +4,15 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { PortfolioCalculationService } from '@market-monitor/modules/portfolio/data-access';
 import {
-  PortfolioHoldingsTableComponent,
   PortfolioTransactionChartComponent,
+  PortfolioTransactionsTableComponent,
 } from '@market-monitor/modules/portfolio/ui';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import {
   GeneralCardComponent,
   GenericChartBubbleComponent,
   GenericChartComponent,
   SectionTitleComponent,
+  SortByKeyPipe,
 } from '@market-monitor/shared/ui';
 import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
@@ -23,12 +23,13 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     CommonModule,
     GenericChartComponent,
     GeneralCardComponent,
-    PortfolioHoldingsTableComponent,
     MatDialogModule,
     StockSummaryDialogComponent,
     GenericChartBubbleComponent,
     PortfolioTransactionChartComponent,
     SectionTitleComponent,
+    PortfolioTransactionsTableComponent,
+    SortByKeyPipe,
   ],
   template: `
     <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
@@ -59,15 +60,14 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         ></app-portfolio-transaction-chart>
       </div>
 
-      <!-- holding table -->
-      <div class="">
-        <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">
-          <app-portfolio-holdings-table
-            (symbolClicked)="onSummaryClick($event)"
-            [holdings]="groupDetailsSignal.groupHoldingSnapshotsData"
-            [holdingsBalance]="groupDetailsSignal.groupData.portfolioState.holdingsBalance"
-          ></app-portfolio-holdings-table>
-        </app-general-card>
+      <!-- transactions -->
+      <div>
+        <app-section-title title="Transaction History" matIcon="history" additionalClasses="pl-1 mb-3" />
+        <app-portfolio-transactions-table
+          [showTransactionFees]="true"
+          [showUser]="true"
+          [data]="groupDetailsSignal.groupTransactionsData | sortByKey: 'date' : 'desc'"
+        ></app-portfolio-transactions-table>
       </div>
     </ng-container>
   `,
@@ -82,23 +82,10 @@ export class GroupDetailsHoldingsComponent extends PageGroupsBaseComponent {
   portfolioCalculationService = inject(PortfolioCalculationService);
 
   portfolioSectorAllocationSignal = computed(() =>
-    this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(
-      this.groupDetailsSignal()?.groupHoldingSnapshotsData ?? [],
-    ),
+    this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(this.getGroupHoldingsSignal()),
   );
 
   portfolioHoldingBubbleChartSignal = computed(() =>
-    this.portfolioCalculationService.getPortfolioHoldingBubbleChart(
-      this.groupDetailsSignal()?.groupHoldingSnapshotsData ?? [],
-    ),
+    this.portfolioCalculationService.getPortfolioHoldingBubbleChart(this.getGroupHoldingsSignal()),
   );
-
-  onSummaryClick(symbol: string) {
-    this.dialog.open(StockSummaryDialogComponent, {
-      data: {
-        symbol: symbol,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
-  }
 }
