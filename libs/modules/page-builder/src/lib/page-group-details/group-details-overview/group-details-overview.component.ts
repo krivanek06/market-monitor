@@ -103,7 +103,6 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <app-portfolio-growth-chart
         *ngIf="portfolioGrowthSignal() as portfolioGrowthChartSignal"
-        [showOnlyTotalBalance]="true"
         [data]="{
           values: portfolioGrowthChartSignal,
           startingCashValue: groupDetailsSignal.groupData.portfolioState.startingCash
@@ -112,6 +111,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         class="mb-6"
         chartType="balance"
         [displayHeader]="true"
+        [displayLegend]="true"
         headerTitle="Portfolio Growth"
       ></app-portfolio-growth-chart>
 

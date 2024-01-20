@@ -64,12 +64,15 @@ import { GenericChartComponent } from '@market-monitor/shared/ui';
     <!-- portfolio growth charts -->
     <div>
       <app-portfolio-growth-chart
-        [showOnlyTotalBalance]="true"
+        headerTitle="Portfolio Growth"
+        chartType="balance"
+        [displayHeader]="true"
+        [displayLegend]="true"
         [data]="{
           values: portfolioGrowth,
           startingCashValue: userData.portfolioState.startingCash
         }"
-        [heightPx]="400"
+        [heightPx]="375"
         class="mb-6"
       ></app-portfolio-growth-chart>
     </div>

@@ -93,6 +93,21 @@ import {
         ></app-portfolio-growth-charts>
       </div>
 
+      <!-- holding -->
+      <div class="mb-8">
+        <app-general-card
+          title="Holdings [{{ portfolioState.holdings.length }} / {{ USER_HOLDINGS_SYMBOL_LIMIT }}]"
+          titleScale="large"
+          matIcon="show_chart"
+        >
+          <app-portfolio-holdings-table
+            (symbolClicked)="onSummaryClick($event)"
+            [holdings]="portfolioState.holdings"
+            [holdingsBalance]="portfolioState.holdingsBalance"
+          ></app-portfolio-holdings-table>
+        </app-general-card>
+      </div>
+
       <!-- holdings pie charts -->
       <div class="flex justify-around mb-10 overflow-x-clip">
         <app-generic-chart
@@ -109,21 +124,6 @@ import {
           chartTitlePosition="center"
           [series]="[portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()]"
         ></app-generic-chart>
-      </div>
-
-      <!-- holding -->
-      <div class="mb-8">
-        <app-general-card
-          title="Holdings [{{ portfolioState.holdings.length }} / {{ USER_HOLDINGS_SYMBOL_LIMIT }}]"
-          titleScale="large"
-          matIcon="show_chart"
-        >
-          <app-portfolio-holdings-table
-            (symbolClicked)="onSummaryClick($event)"
-            [holdings]="portfolioState.holdings"
-            [holdingsBalance]="portfolioState.holdingsBalance"
-          ></app-portfolio-holdings-table>
-        </app-general-card>
       </div>
 
       <!-- transactions chart -->

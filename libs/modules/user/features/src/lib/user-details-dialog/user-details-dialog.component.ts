@@ -67,7 +67,7 @@ export type UserDetailsDialogComponentData = {
       </div>
     </div>
 
-    <mat-dialog-content class="h-[650px]">
+    <mat-dialog-content class="h-[675px]">
       @if (userDataSignal(); as userData) {
         <!-- overview -->
         <app-user-details-overview

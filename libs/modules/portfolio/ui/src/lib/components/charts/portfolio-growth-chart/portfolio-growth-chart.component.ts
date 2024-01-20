@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
@@ -11,9 +11,9 @@ import {
   SectionTitleComponent,
   filterDataByDateRange,
 } from '@market-monitor/shared/ui';
+import { SeriesOptionsType } from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { filterNil } from 'ngxtension/filter-nil';
-import { startWith } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-growth-chart',
@@ -63,57 +63,52 @@ import { startWith } from 'rxjs';
     `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PortfolioGrowthChartComponent extends ChartConstructor {
+export class PortfolioGrowthChartComponent extends ChartConstructor implements OnChanges {
   @Input() displayHeader = false;
   @Input() headerTitle: string = '';
-  @Input({ required: true }) set data(input: { values: PortfolioGrowth[]; startingCashValue: number }) {
-    // remove loading
-    if (input.values.length > 0) {
-      this.showLoadingSignal.set(false);
-    }
-
-    const sliderValuesInput: DateRangeSliderValues = {
-      dates: input.values.map((point) => point.date),
-      currentMinDateIndex: 0,
-      currentMaxDateIndex: input.values.length - 1,
-    };
-    this.sliderControl.patchValue(sliderValuesInput);
-
-    this.sliderControl.valueChanges.pipe(startWith(this.sliderControl.value), filterNil()).subscribe((sliderValues) => {
-      const inputValues = filterDataByDateRange(input.values, sliderValues);
-
-      this.initChart(inputValues, input.startingCashValue);
-    });
-
-    // even if no data, remove loading after some time
-    setTimeout(() => this.showLoadingSignal.set(false), 4000);
-  }
-  @Input() showOnlyTotalBalance = false;
+  @Input({ required: true }) data!: { values: PortfolioGrowth[]; startingCashValue: number };
   @Input() displayLegend = false;
   @Input() chartType: 'all' | 'marketValue' | 'balance' = 'all';
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data'].currentValue) {
+      console.log('render chart');
+      const input = changes['data'].currentValue as { values: PortfolioGrowth[]; startingCashValue: number };
+      // remove loading
+      if (input.values.length > 0) {
+        this.showLoadingSignal.set(false);
+      }
+
+      const sliderValuesInput: DateRangeSliderValues = {
+        dates: input.values.map((point) => point.date),
+        currentMinDateIndex: 0,
+        currentMaxDateIndex: input.values.length - 1,
+      };
+      this.sliderControl.patchValue(sliderValuesInput);
+
+      // init chart
+      const seriesData = this.createChartSeries(input.values, input.startingCashValue);
+      this.initChart(seriesData);
+
+      this.sliderControl.valueChanges.pipe(filterNil()).subscribe((sliderValues) => {
+        // filter out by valid dates
+        const inputValues = filterDataByDateRange(input.values, sliderValues);
+        const seriesDataUpdate = this.createChartSeries(inputValues, input.startingCashValue);
+        // update chart
+        this.chartOptions.series = seriesDataUpdate;
+        this.updateFromInput = true;
+      });
+
+      // even if no data, remove loading after some time
+      setTimeout(() => this.showLoadingSignal.set(false), 4000);
+    }
+  }
 
   showLoadingSignal = signal<boolean>(true);
   sliderControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 
-  private initChart(data: PortfolioGrowth[], startingCashValue: number = 0) {
+  private initChart(data: SeriesOptionsType[]) {
     //const isCashActive = startingCashValue > 0;
-
-    const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotalValue]);
-    const investedValue = data.map((point) => [new Date(point.date).getTime(), point.investedValue]);
-
-    //  const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
-    const totalBalanceValues = data.map((point) => [new Date(point.date).getTime(), point.totalBalanceValue]);
-    const threshold = data.map((point) => [new Date(point.date).getTime(), startingCashValue ?? 0]);
-
-    // get points when investment value change from previous day
-    const investmentChangePoints: [number, number][] = [];
-    for (let i = 0; i < data.length; i++) {
-      const curr = data[i];
-      const prev = data[i - 1];
-      if (prev && prev.investedValue !== curr.investedValue) {
-        investmentChangePoints.push([new Date(curr.date).getTime(), curr.investedValue]);
-      }
-    }
 
     this.chartOptions = {
       chart: {
@@ -249,109 +244,130 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           // },
         },
       },
-      series: [
-        {
-          color: ColorScheme.ACCENT_1_VAR,
-          type: 'area',
-          zIndex: 10,
-          yAxis: 0,
-          visible: this.chartType === 'all' || this.chartType === 'balance',
-          fillColor: {
-            linearGradient: {
-              x1: 1,
-              y1: 0,
-              x2: 0,
-              y2: 1,
-            },
-            stops: [
-              [0, ColorScheme.ACCENT_1_VAR],
-              [1, 'transparent'],
-            ],
-          },
-          name: 'Total Balance',
-          data: totalBalanceValues,
-        },
-        {
-          color: ColorScheme.PRIMARY_VAR,
-          type: 'area',
-          zIndex: 10,
-          yAxis: 0,
-          opacity: 0.65,
-          visible: this.chartType === 'all' || this.chartType === 'marketValue',
-          showInLegend: true,
-          fillColor: {
-            linearGradient: {
-              x1: 1,
-              y1: 0,
-              x2: 0,
-              y2: 1,
-            },
-            stops: [
-              [0, ColorScheme.PRIMARY_VAR],
-              [1, 'transparent'],
-            ],
-          },
-          name: 'Market Value',
-          data: marketTotalValue,
-        },
-        // {
-        //   color: ColorScheme.PRIMARY_VAR,
-        //   type: 'column',
-        //   zIndex: 10,
-        //   yAxis: 0,
-        //   opacity: 0.8,
-        //   visible: !isCashActive,
-        //   showInLegend: !isCashActive,
-        //   name: 'Investment Value Change',
-        //   data: investmentChangePoints,
-        // },
-        {
-          color: ColorScheme.ACCENT_2_VAR,
-          type: 'area',
-          zIndex: 10,
-          yAxis: 0,
-          opacity: 0.2,
-          visible: this.chartType === 'all' || this.chartType === 'marketValue',
-          showInLegend: true,
-          fillColor: {
-            linearGradient: {
-              x1: 1,
-              y1: 0,
-              x2: 0,
-              y2: 1,
-            },
-            stops: [
-              [0, ColorScheme.ACCENT_2_VAR],
-              [1, 'transparent'],
-            ],
-          },
-          name: 'Investment Value',
-          data: investedValue,
-        },
-        {
-          color: ColorScheme.DANGER_VAR,
-          type: 'area',
-          zIndex: 10,
-          yAxis: 0,
-          opacity: 0.45,
-          visible: this.chartType === 'all' || this.chartType === 'balance',
-          showInLegend: true,
-          fillColor: {
-            linearGradient: {
-              x1: 1,
-              y1: 0,
-              x2: 0,
-              y2: 1,
-            },
-            stops: [
-              [0, ColorScheme.DANGER_VAR],
-              [1, 'transparent'],
-            ],
-          },
-          name: 'Threshold',
-          data: threshold,
-        },
-      ],
+      series: data,
     };
+  }
+
+  private createChartSeries(data: PortfolioGrowth[], startingCashValue: number = 0): SeriesOptionsType[] {
+    const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotalValue]);
+    const investedValue = data.map((point) => [new Date(point.date).getTime(), point.investedValue]);
+
+    //  const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
+    const totalBalanceValues = data.map((point) => [new Date(point.date).getTime(), point.totalBalanceValue]);
+    const threshold = data.map((point) => [new Date(point.date).getTime(), startingCashValue ?? 0]);
+
+    // get points when investment value change from previous day
+    const investmentChangePoints: [number, number][] = [];
+    for (let i = 0; i < data.length; i++) {
+      const curr = data[i];
+      const prev = data[i - 1];
+      if (prev && prev.investedValue !== curr.investedValue) {
+        investmentChangePoints.push([new Date(curr.date).getTime(), curr.investedValue]);
+      }
+    }
+
+    return [
+      {
+        color: ColorScheme.ACCENT_1_VAR,
+        type: 'area',
+        zIndex: 10,
+        yAxis: 0,
+        visible: this.chartType === 'all' || this.chartType === 'balance',
+        fillColor: {
+          linearGradient: {
+            x1: 1,
+            y1: 0,
+            x2: 0,
+            y2: 1,
+          },
+          stops: [
+            [0, ColorScheme.ACCENT_1_VAR],
+            [1, 'transparent'],
+          ],
+        },
+        name: 'Total Balance',
+        data: totalBalanceValues,
+      },
+      {
+        color: ColorScheme.PRIMARY_VAR,
+        type: 'area',
+        zIndex: 10,
+        yAxis: 0,
+        opacity: 0.65,
+        visible: this.chartType === 'all' || this.chartType === 'marketValue',
+        showInLegend: true,
+        fillColor: {
+          linearGradient: {
+            x1: 1,
+            y1: 0,
+            x2: 0,
+            y2: 1,
+          },
+          stops: [
+            [0, ColorScheme.PRIMARY_VAR],
+            [1, 'transparent'],
+          ],
+        },
+        name: 'Market Value',
+        data: marketTotalValue,
+      },
+      // {
+      //   color: ColorScheme.PRIMARY_VAR,
+      //   type: 'column',
+      //   zIndex: 10,
+      //   yAxis: 0,
+      //   opacity: 0.8,
+      //   visible: !isCashActive,
+      //   showInLegend: !isCashActive,
+      //   name: 'Investment Value Change',
+      //   data: investmentChangePoints,
+      // },
+      {
+        color: ColorScheme.ACCENT_2_VAR,
+        type: 'area',
+        zIndex: 10,
+        yAxis: 0,
+        opacity: 0.2,
+        visible: this.chartType === 'all' || this.chartType === 'marketValue',
+        showInLegend: true,
+        fillColor: {
+          linearGradient: {
+            x1: 1,
+            y1: 0,
+            x2: 0,
+            y2: 1,
+          },
+          stops: [
+            [0, ColorScheme.ACCENT_2_VAR],
+            [1, 'transparent'],
+          ],
+        },
+        name: 'Investment Value',
+        data: investedValue,
+      },
+      {
+        color: ColorScheme.DANGER_VAR,
+        type: 'area',
+        zIndex: 10,
+        yAxis: 0,
+        opacity: 0.45,
+        visible: this.chartType === 'all' || this.chartType === 'balance',
+        showInLegend: true,
+        fillColor: {
+          linearGradient: {
+            x1: 1,
+            y1: 0,
+            x2: 0,
+            y2: 1,
+          },
+          stops: [
+            [0, ColorScheme.DANGER_VAR],
+            [1, 'transparent'],
+          ],
+        },
+        name: 'Threshold',
+        data: threshold,
+      },
+    ];
   }
 }
