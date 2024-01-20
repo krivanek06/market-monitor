@@ -1,4 +1,10 @@
-import { HistoricalPrice, HistoricalPriceSymbol, MarketOverview, SymbolSummary } from '@market-monitor/api-types';
+import {
+  HistoricalPrice,
+  HistoricalPriceSymbol,
+  MarketOverview,
+  SymbolHistoricalPeriods,
+  SymbolSummary,
+} from '@market-monitor/api-types';
 import axios from 'axios';
 
 export const getSymbolSummaries = async (symbols: string[]): Promise<SymbolSummary[]> => {
@@ -41,6 +47,27 @@ export const getPriceOnDateRange = async (
   }
   const data = (await response.json()) as HistoricalPrice[];
   return { symbol, data };
+};
+
+export const getHistoricalPricesCloudflare = async (
+  symbol: string,
+  period: SymbolHistoricalPeriods,
+): Promise<HistoricalPrice[]> => {
+  const url = `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&period=${period}&type=period`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
+    return [];
+  }
+
+  const data = (await response.json()) as HistoricalPrice[];
+  return data;
 };
 
 export const postMarketOverview = async (overview: MarketOverview): Promise<string> => {

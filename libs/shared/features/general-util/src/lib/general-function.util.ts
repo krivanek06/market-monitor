@@ -140,3 +140,23 @@ type Entries<T> = {
 }[keyof T][];
 
 export const getObjectEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
+
+/**
+ *
+ * function that executes a function and returns a default value in case of an error
+ */
+export const executeFnSafe = async <T>(...args: any[]): Promise<T | null> => {
+  try {
+    // Assuming the first argument is the function and the rest are its parameters
+    const fn = args[0];
+    if (typeof fn !== 'function') {
+      throw new Error('First argument must be a function');
+    }
+
+    // Call the function with the remaining arguments
+    return await fn(...args.slice(1));
+  } catch (e) {
+    console.error(e); // Optionally log the error for debugging
+    return null; // Return a default value in case of an error
+  }
+};
