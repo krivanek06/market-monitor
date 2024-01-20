@@ -1,4 +1,5 @@
 import { onRequest } from 'firebase-functions/v2/https';
+import { userPortfolioUpdate } from '../schedulers/user-portfolio-update';
 import { isFirebaseEmulator } from '../utils';
 import { test_runner } from './app-test';
 import { reloadDatabase } from './reload-database';
@@ -26,12 +27,18 @@ export const test_function = onRequest({ timeoutSeconds: 1200 }, async (req, res
     console.warn('Function can be executed only in development mode');
     return;
   }
-
+  const startTime = performance.now();
   console.log('--- start ---');
 
   await test_runner();
+  await userPortfolioUpdate();
 
   console.log('--- finished ---');
+
+  const endTime = performance.now();
+  const secondsDiff = Math.round((endTime - startTime) / 1000);
+  console.log(`Function took: ~${secondsDiff} seconds`);
+
   res.send('ok');
 });
 

@@ -28,6 +28,9 @@ export const getPortfolioStateHoldingsUtil = (
 
   console.log(`Getting Summaries: sending ${partialHoldings.length}, receiving: ${symbolSummaries.length}`);
 
+  // value that user invested in all assets
+  const invested = partialHoldings.reduce((acc, curr) => acc + curr.invested, 0);
+
   const portfolioStateHolding = symbolSummaries
     .map((symbolSummary) => {
       const holding = partialHoldings.find((d) => d.symbol === symbolSummary.id);
@@ -38,13 +41,12 @@ export const getPortfolioStateHoldingsUtil = (
       return {
         ...holding,
         breakEvenPrice: roundNDigits(holding.invested / holding.units, 2),
+        weight: roundNDigits(holding.invested / invested, 6),
         symbolSummary,
       } satisfies PortfolioStateHolding;
     })
     .filter((d) => !!d) as PortfolioStateHolding[];
 
-  // value that user invested in all assets
-  const invested = portfolioStateHolding.reduce((acc, curr) => acc + curr.invested, 0);
   // value of all assets
   const holdingsBalance = portfolioStateHolding.reduce(
     (acc, curr) => acc + curr.symbolSummary.quote.price * curr.units,

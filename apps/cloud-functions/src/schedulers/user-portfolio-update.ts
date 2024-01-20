@@ -67,11 +67,11 @@ export const userPortfolioUpdate = async (): Promise<void> => {
         summaries,
       );
 
-      // TODO: test risk calculation
-      await userPortfolioRisk(portfolioStateHoldings);
+      // calculation risk of investment
+      const portfolioRisk = await userPortfolioRisk(portfolioStateHoldings);
 
       // remove holdings
-      const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
+      const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings, portfolioRisk);
 
       // account active threshold
       const accountActiveThreshold = format(subDays(new Date(), USER_LOGIN_ACCOUNT_ACTIVE_DAYS), 'yyyy-MM-dd');

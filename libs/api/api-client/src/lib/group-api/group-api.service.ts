@@ -96,7 +96,8 @@ export class GroupApiService {
                     ({
                       ...holding,
                       symbolSummary: symbolSummaries.find((s) => s.id === holding.symbol)!,
-                      breakEvenPrice: roundNDigits(holding.invested / holding.units),
+                      breakEvenPrice: roundNDigits(holding.invested / holding.units, 6),
+                      weight: roundNDigits(holding.invested / holding.invested, 6),
                     }) satisfies PortfolioStateHolding,
                 ),
               ),

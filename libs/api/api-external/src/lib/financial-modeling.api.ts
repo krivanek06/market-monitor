@@ -691,7 +691,7 @@ export const getEconomicData = async (endpointKey?: MarketOverviewSubKey<'genera
 };
 
 export const getTreasuryRates = async (limitDays = 7): Promise<TreasuryRates[]> => {
-  const startDate = format(subDays(new Date(), 7), 'yyyy-MM-dd');
+  const startDate = format(subDays(new Date(), limitDays), 'yyyy-MM-dd');
   const today = format(new Date(), 'yyyy-MM-dd');
 
   const url = `https://financialmodelingprep.com/api/v4/treasury?from=${startDate}&to=${today}&apikey=${FINANCIAL_MODELING_KEY}`;

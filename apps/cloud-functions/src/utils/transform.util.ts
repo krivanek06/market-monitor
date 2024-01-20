@@ -2,6 +2,7 @@ import {
   GroupBase,
   GroupData,
   GroupMember,
+  PortfolioRisk,
   PortfolioState,
   PortfolioStateHoldings,
   UserBase,
@@ -54,7 +55,10 @@ export const transformUserToGroupMember = (
 /**
  * transform PortfolioStateHoldings to PortfolioState
  */
-export const transformPortfolioStateHoldingToPortfolioState = (holding: PortfolioStateHoldings): PortfolioState => {
+export const transformPortfolioStateHoldingToPortfolioState = (
+  holding: PortfolioStateHoldings,
+  portfolioRisk?: PortfolioRisk,
+): PortfolioState => {
   return {
     balance: holding.balance,
     cashOnHand: holding.cashOnHand,
@@ -72,5 +76,6 @@ export const transformPortfolioStateHoldingToPortfolioState = (holding: Portfoli
     previousBalanceChange: holding.previousBalanceChange,
     previousBalanceChangePercentage: holding.previousBalanceChangePercentage,
     accountResetDate: holding.accountResetDate,
+    portfolioRisk,
   };
 };

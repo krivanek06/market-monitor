@@ -1,14 +1,19 @@
 import { SymbolSummary, SymbolType } from './symbol.model';
 
 export type PortfolioRisk = {
+  /**
+   * excess return compared to SP500, by how much % did user beat the market
+   * so if user has 10% return and SP500 has 5% return, excess return is 5% and alpha is 5
+   */
   alpha: number;
   beta: number;
   sharpe: number;
-  volatilityMeanPrct: number;
-  estimatedReturnPrct: number;
-  estimatedReturnValue: number;
-  annualVariancePrct: number;
-  annualVolatilityPrct: number;
+  volatility: number;
+  calculationDate: string;
+  // estimatedReturnPrct: number;
+  // estimatedReturnValue: number;
+  // annualVariancePrct: number;
+  // annualVolatilityPrct: number;
 };
 
 export type PortfolioState = {
@@ -75,6 +80,7 @@ export type PortfolioStateHoldingBase = {
 
 export type PortfolioStateHolding = PortfolioStateHoldingBase & {
   breakEvenPrice: number; // calculated
+  weight: number; // calculated
   symbolSummary: SymbolSummary;
 };
 
