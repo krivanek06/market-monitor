@@ -59,6 +59,7 @@ import {
 
           <app-fancy-card title="Risk" [colorPrimary]="ColorScheme.PRIMARY_VAR">
             <app-portfolio-state-risk
+              [portfolioState]="authenticationUserService.state.getPortfolioState()"
               [titleColor]="ColorScheme.PRIMARY_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             ></app-portfolio-state-risk>

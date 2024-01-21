@@ -36,8 +36,10 @@ import {
   SymbolOwnershipInstitutional,
   SymbolQuote,
   TickerSearch,
+  TreasuryRates,
   UpgradesDowngrades,
 } from '@market-monitor/api-types';
+import { format, subDays } from 'date-fns';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
 import { filterOutSymbols, getDateRangeByMonthAndYear } from './helpers';
 
@@ -684,6 +686,21 @@ export const getEconomicData = async (endpointKey?: MarketOverviewSubKey<'genera
     return formattedData;
   } catch (e) {
     console.log('error in getEconomicData', e);
+    return [];
+  }
+};
+
+export const getTreasuryRates = async (limitDays = 7): Promise<TreasuryRates[]> => {
+  const startDate = format(subDays(new Date(), limitDays), 'yyyy-MM-dd');
+  const today = format(new Date(), 'yyyy-MM-dd');
+
+  const url = `https://financialmodelingprep.com/api/v4/treasury?from=${startDate}&to=${today}&apikey=${FINANCIAL_MODELING_KEY}`;
+  try {
+    const response = await fetch(url);
+    const data = (await response.json()) as TreasuryRates[];
+    return data;
+  } catch (e) {
+    console.log('error in getTreasuryRates', e);
     return [];
   }
 };

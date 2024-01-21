@@ -8,6 +8,7 @@ import {
 } from '@market-monitor/shared/features/general-util';
 import { format, subDays } from 'date-fns';
 import { userDocumentTransactionHistoryRef, usersCollectionRef } from '../models';
+import { userPortfolioRisk } from '../portfolio';
 import { transformPortfolioStateHoldingToPortfolioState } from '../utils';
 
 /**
@@ -19,7 +20,7 @@ import { transformPortfolioStateHoldingToPortfolioState } from '../utils';
  *
  * At every 5th minute past every hour from 1 through 2am
  */
-export const userUpdatePortfolio = async (): Promise<void> => {
+export const userPortfolioUpdate = async (): Promise<void> => {
   const today = getCurrentDateDefaultFormat();
 
   console.log('today', today);
@@ -28,7 +29,7 @@ export const userUpdatePortfolio = async (): Promise<void> => {
     .where('isAccountActive', '==', true)
     .where('portfolioState.date', '!=', today)
     .orderBy('portfolioState.date', 'desc')
-    .limit(200);
+    .limit(100);
 
   const users = await userToUpdate.get();
 
@@ -66,8 +67,11 @@ export const userUpdatePortfolio = async (): Promise<void> => {
         summaries,
       );
 
+      // calculation risk of investment
+      const portfolioRisk = await userPortfolioRisk(portfolioStateHoldings);
+
       // remove holdings
-      const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
+      const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings, portfolioRisk);
 
       // account active threshold
       const accountActiveThreshold = format(subDays(new Date(), USER_LOGIN_ACCOUNT_ACTIVE_DAYS), 'yyyy-MM-dd');

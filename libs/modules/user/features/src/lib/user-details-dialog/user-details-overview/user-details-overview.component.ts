@@ -42,6 +42,7 @@ import { GenericChartComponent } from '@market-monitor/shared/ui';
       <div class="flex-1 p-6 hidden sm:block">
         <app-portfolio-state-risk
           [titleColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [portfolioState]="userData.portfolioState"
           [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
         ></app-portfolio-state-risk>
       </div>
