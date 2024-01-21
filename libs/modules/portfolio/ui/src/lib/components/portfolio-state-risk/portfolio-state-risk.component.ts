@@ -16,7 +16,21 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
           <div [appAddColor]="titleColor" class="text-lg">Alpha</div>
           <div [appAddColor]="valueColor" class="text-lg">
             {{
-              portfolioState?.portfolioRisk?.alpha ? (portfolioState?.portfolioRisk?.alpha | number: '1.2-2') : 'N/A'
+              portfolioState?.portfolioRisk?.alpha
+                ? (portfolioState?.portfolioRisk?.alpha | number: '1.2-2') + '%'
+                : 'N/A'
+            }}
+          </div>
+        </div>
+
+        <!-- Volatility -->
+        <div class="flex justify-between @md:flex-col">
+          <div [appAddColor]="titleColor" class="text-lg">Volatility</div>
+          <div [appAddColor]="valueColor" class="text-lg">
+            {{
+              portfolioState?.portfolioRisk?.volatility
+                ? (portfolioState?.portfolioRisk?.volatility | percent: '1.2-2')
+                : 'N/A'
             }}
           </div>
         </div>
@@ -35,18 +49,6 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
           <div [appAddColor]="valueColor" class="text-lg">
             {{
               portfolioState?.portfolioRisk?.sharpe ? (portfolioState?.portfolioRisk?.sharpe | number: '1.2-2') : 'N/A'
-            }}
-          </div>
-        </div>
-
-        <!-- Volatility -->
-        <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Volatility</div>
-          <div [appAddColor]="valueColor" class="text-lg">
-            {{
-              portfolioState?.portfolioRisk?.volatility
-                ? (portfolioState?.portfolioRisk?.volatility | number: '1.2-2')
-                : 'N/A'
             }}
           </div>
         </div>

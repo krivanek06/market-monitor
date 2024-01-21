@@ -84,7 +84,7 @@ export const calculateMetricsForAllHoldings = async (
     const alpha = calculateAlpha({ sp500Data, symbolData, riskFreeRate, beta });
     const sharpeRatio = calculateSharpeRatio(symbolData, riskFreeRate) ?? 0;
 
-    console.log(`Symbol: ${holding.symbol}, beta: ${beta}, alpha: ${alpha}, sharpeRatio: ${sharpeRatio}`);
+    // console.log(`Symbol: ${holding.symbol}, beta: ${beta}, alpha: ${alpha}, sharpeRatio: ${sharpeRatio}`);
 
     // metrics.push({ symbol: holding.symbol, beta, alpha, sharpeRatio });
     metrics.alpha += alpha * holding.weight;
@@ -115,8 +115,10 @@ const getSymbolPricesAndReturn = async (symbol: string): Promise<SymbolReturns> 
 
   // format
   const data = { prices, yearlyReturn, dailyReturns };
+
   // save
   symbolReturnMap.set(symbol, data);
+
   // return data
   return data;
 };
@@ -148,9 +150,9 @@ const calculatePortfolioVolatility = async (portfolioState: PortfolioStateHoldin
   }
 
   // Calculate portfolio standard deviation (volatility)
-  const portfolioVolatility = sqrt(portfolioVariance);
+  const portfolioVolatility = roundNDigits(Number(sqrt(portfolioVariance)), 6);
 
-  return Number(portfolioVolatility);
+  return portfolioVolatility;
 };
 
 const calculateSharpeRatio = (symbolReturn: SymbolReturns, riskFreeRate: number): number | null => {
