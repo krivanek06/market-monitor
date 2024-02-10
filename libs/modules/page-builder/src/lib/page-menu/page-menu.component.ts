@@ -28,7 +28,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
     DialogServiceModule,
   ],
   template: `
-    <mat-drawer-container autosize class="h-full">
+    <mat-drawer-container autosize class="h-full min-h-[100vh]">
       <!-- side nav -->
       <mat-drawer
         mode="over"

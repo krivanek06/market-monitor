@@ -32,13 +32,13 @@ import { filterNil } from 'ngxtension/filter-nil';
         <mat-spinner></mat-spinner>
       </div>
     } @else {
-      <div *ngIf="displayHeader" class="flex items-center justify-between">
+      <div *ngIf="displayHeader" class="flex flex-col lg:flex-row gap-3 items-center justify-between">
         <!-- select chart title -->
         <app-section-title [title]="headerTitle" />
 
         <!-- date range -->
         <app-date-range-slider
-          class="w-[550px]"
+          class="w-full lg:w-[550px]"
           [displayUpperDate]="false"
           [formControl]="sliderControl"
         ></app-date-range-slider>

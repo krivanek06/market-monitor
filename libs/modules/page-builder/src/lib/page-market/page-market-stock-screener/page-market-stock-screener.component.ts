@@ -4,6 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StocksApiService } from '@market-monitor/api-client';
 import { StockScreenerValues, SymbolSummary } from '@market-monitor/api-types';
@@ -12,14 +13,17 @@ import {
   getScreenerInputIndexByKey,
   getScreenerInputValueByKey,
 } from '@market-monitor/modules/market-stocks/data-access';
-import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
+import {
+  StockSearchBasicCustomizedComponent,
+  StockSummaryDialogComponent,
+} from '@market-monitor/modules/market-stocks/features';
 import {
   StockScreenerFormControlComponent,
   StockSummaryTableComponent,
 } from '@market-monitor/modules/market-stocks/ui';
 import { RouterManagement } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { RangeDirective, ScrollNearEndDirective } from '@market-monitor/shared/ui';
+import { RangeDirective, ScrollNearEndDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
 import { catchError, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -35,10 +39,27 @@ import { catchError, switchMap, tap } from 'rxjs';
     MatDialogModule,
     MatButtonModule,
     MatDialogModule,
+    StockSearchBasicCustomizedComponent,
+    MatDividerModule,
+    SectionTitleComponent,
   ],
   template: `
-    <section class="pt-4 mx-auto mb-10 md:w-11/12 lg:w-10/12 xl:w-9/12">
-      <app-stock-screener-form-control [formControl]="screenerFormControl"></app-stock-screener-form-control>
+    <section class="md:pt-4 mx-auto mb-10 md:w-11/12 lg:w-10/12 xl:w-9/12">
+      <!-- specific search -->
+      <div class="sm:hidden mb-4">
+        <app-section-title title="Basic Search" matIcon="search" class="mb-3" />
+        <app-stock-search-basic-customized />
+
+        <div class="pt-4">
+          <mat-divider />
+        </div>
+      </div>
+
+      <!-- screener form -->
+      <div>
+        <app-section-title title="Advance Search" matIcon="filter_alt" class="mb-3" />
+        <app-stock-screener-form-control [formControl]="screenerFormControl" />
+      </div>
 
       <div class="flex items-center justify-between mt-8">
         <h3>Total found: {{ loadingSignal() ? 'Loading...' : screenerResults()?.length }}</h3>

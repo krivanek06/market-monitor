@@ -53,19 +53,25 @@ import {
     PieChartComponent,
   ],
   template: `
-    <ng-container *ngIf="portfolioUserFacadeService.getPortfolioState() as portfolioState">
+    <ng-container>
       <div class="grid xl:grid-cols-3 mb-6 sm:mb-10 gap-8">
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2">
-          <app-fancy-card class="sm:col-span-2" title="Account" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+        <div
+          class="flex flex-row max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2"
+        >
+          <app-fancy-card
+            class="sm:col-span-2 max-sm:min-w-[360px]"
+            title="Account"
+            [colorPrimary]="ColorScheme.PRIMARY_VAR"
+          >
             <app-portfolio-state
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
               [showCashSegment]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
-              [portfolioState]="portfolioState"
+              [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
             ></app-portfolio-state>
           </app-fancy-card>
 
-          <app-fancy-card title="Risk" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+          <app-fancy-card class="max-sm:min-w-[275px]" title="Risk" [colorPrimary]="ColorScheme.PRIMARY_VAR">
             <app-portfolio-state-risk
               [portfolioState]="authenticationUserService.state.getPortfolioState()"
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
@@ -73,12 +79,12 @@ import {
             ></app-portfolio-state-risk>
           </app-fancy-card>
 
-          <app-fancy-card title="Transactions" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+          <app-fancy-card class="max-sm:min-w-[275px]" title="Transactions" [colorPrimary]="ColorScheme.PRIMARY_VAR">
             <app-portfolio-state-transactions
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
               [showFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
-              [portfolioState]="portfolioState"
+              [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
             ></app-portfolio-state-transactions>
           </app-fancy-card>
         </div>
@@ -96,7 +102,7 @@ import {
       <div class="mb-8">
         <app-portfolio-growth-charts
           [showChartChangeSelect]="true"
-          [portfolioState]="portfolioState"
+          [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
           [portfolioAssetsGrowth]="portfolioUserFacadeService.getPortfolioGrowthAssets()"
           [portfolioGrowth]="portfolioUserFacadeService.getPortfolioGrowth()"
         ></app-portfolio-growth-charts>
@@ -105,14 +111,16 @@ import {
       <!-- holding -->
       <div class="mb-8">
         <app-general-card
-          title="Holdings [{{ portfolioState.holdings.length }} / {{ USER_HOLDINGS_SYMBOL_LIMIT }}]"
+          title="Holdings [{{ (portfolioUserFacadeService.getPortfolioState()?.holdings ?? []).length }} / {{
+            USER_HOLDINGS_SYMBOL_LIMIT
+          }}]"
           titleScale="large"
           matIcon="show_chart"
         >
           <app-portfolio-holdings-table
             (symbolClicked)="onSummaryClick($event)"
-            [holdings]="portfolioState.holdings"
-            [holdingsBalance]="portfolioState.holdingsBalance"
+            [holdings]="portfolioUserFacadeService.getPortfolioState()?.holdings ?? []"
+            [holdingsBalance]="portfolioUserFacadeService.getPortfolioState()?.holdingsBalance ?? 0"
           ></app-portfolio-holdings-table>
         </app-general-card>
       </div>
@@ -137,6 +145,7 @@ import {
             [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
           ></app-pie-chart>
           <app-pie-chart
+            class="hidden sm:block"
             [heightPx]="400"
             chartTitle="Sector Allocation"
             [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"

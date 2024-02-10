@@ -20,8 +20,8 @@ import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
       <!-- image and symbol -->
       <div class="flex items-center gap-3 max-w-[60%]">
         <img appDefaultImg imageType="symbol" [src]="symbolQuote.symbol" alt="stock image" class="w-7 h-7" />
-        <span class="block sm:hidden">{{ symbolQuote.symbol }}</span>
-        <span class="hidden sm:block text-start">
+        <span class="block sm:hidden text-wt-gray-dark">{{ symbolQuote.symbol }}</span>
+        <span class="hidden sm:block text-start text-wt-gray-dark">
           <ng-container *ngIf="displayValue === 'name'">{{ symbolQuote.name | truncate: 25 }}</ng-container>
           <ng-container *ngIf="displayValue === 'symbol'">{{ symbolQuote.symbol }}</ng-container>
         </span>

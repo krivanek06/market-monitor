@@ -165,6 +165,11 @@ export class MenuSideNavigationComponent implements OnInit {
         },
       ],
       marketNavigation: [
+        // {
+        //   path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.SEARCH}`,
+        //   title: 'Search',
+        //   icon: 'search',
+        // },
         {
           path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.STOCK_SCREENER}`,
           title: 'Screener',

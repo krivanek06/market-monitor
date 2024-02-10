@@ -103,6 +103,11 @@ export const appRoutes: Route[] = [
                 pathMatch: 'full',
               },
               {
+                path: ROUTES_MAIN.SEARCH,
+                title: 'Market Search',
+                loadComponent: () => import('./market/market-search.component').then((m) => m.MarketSearchComponent),
+              },
+              {
                 path: ROUTES_MAIN.STOCK_SCREENER,
                 title: 'Market Top Performers',
                 loadComponent: () =>

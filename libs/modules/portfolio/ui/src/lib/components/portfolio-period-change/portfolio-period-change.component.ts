@@ -9,7 +9,7 @@ import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
   imports: [CommonModule, PercentageIncreaseDirective],
   template: `
     <div class="@container">
-      <div class="grid @sm:grid-cols-2 @lg:grid-cols-6 gap-x-6 gap-y-2">
+      <div class="grid @md:grid-cols-2 @xl:grid-cols-6 gap-x-6 gap-y-2">
         <ng-container
           *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange['1_day'], name: 'Daily' }"
         ></ng-container>
@@ -34,9 +34,9 @@ import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
     <!-- template -->
     <ng-template #dataTemplate let-change="change" let-name="name">
       <div class="@container/item">
-        <div class="flex flex-col justify-between gap-1 @sm/item:flex-row">
+        <div class="flex sm:flex-col justify-between gap-1 flex-row">
           <!-- name: weekly -->
-          <div class="text-base text-center text-wt-gray-medium @sm/item:text-lg whitespace-nowrap">{{ name }}</div>
+          <div class="text-base text-center text-wt-gray-dark @sm/item:text-lg whitespace-nowrap">{{ name }}</div>
           <!-- change: weekly -->
           <ng-container *ngIf="change; else noData">
             <div

@@ -13,8 +13,8 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- Alpha -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Alpha</div>
-          <div [appAddColor]="valueColor" class="text-lg">
+          <div [appAddColor]="titleColor" class="sm:text-lg">Alpha</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">
             {{
               portfolioState?.portfolioRisk?.alpha
                 ? (portfolioState?.portfolioRisk?.alpha | number: '1.2-2') + '%'
@@ -25,8 +25,8 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
 
         <!-- Volatility -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Volatility</div>
-          <div [appAddColor]="valueColor" class="text-lg">
+          <div [appAddColor]="titleColor" class="sm:text-lg">Volatility</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">
             {{
               portfolioState?.portfolioRisk?.volatility
                 ? (portfolioState?.portfolioRisk?.volatility | percent: '1.2-2')
@@ -37,16 +37,16 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
 
         <!-- Beta -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Beta</div>
-          <div [appAddColor]="valueColor" class="text-lg">
+          <div [appAddColor]="titleColor" class="sm:text-lg">Beta</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">
             {{ portfolioState?.portfolioRisk?.beta ? (portfolioState?.portfolioRisk?.beta | number: '1.2-2') : 'N/A' }}
           </div>
         </div>
 
         <!-- Sharp Ratio -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Sharp Ratio</div>
-          <div [appAddColor]="valueColor" class="text-lg">
+          <div [appAddColor]="titleColor" class="sm:text-lg">Sharp Ratio</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">
             {{
               portfolioState?.portfolioRisk?.sharpe ? (portfolioState?.portfolioRisk?.sharpe | number: '1.2-2') : 'N/A'
             }}
@@ -63,7 +63,7 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStateRiskComponent {
-  @Input({ required: true }) portfolioState?: PortfolioState;
+  @Input() portfolioState?: PortfolioState;
   @Input() titleColor?: ColorScheme;
   @Input() valueColor?: ColorScheme;
 }

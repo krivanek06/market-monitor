@@ -25,7 +25,7 @@ import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
   standalone: true,
   imports: [CommonModule, FormMatInputWrapperComponent, ReactiveFormsModule],
   template: `
-    <form [formGroup]="screenerFormGroup" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4">
+    <form [formGroup]="screenerFormGroup" class="grid xs:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4">
       <!-- market cap. -->
       <app-form-mat-input-wrapper
         formControlName="marketCap"
@@ -52,6 +52,7 @@ import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
 
       <!-- dividends -->
       <app-form-mat-input-wrapper
+        class="hidden md:block"
         formControlName="dividends"
         inputCaption="Dividends"
         inputType="SELECT"
@@ -68,6 +69,7 @@ import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
 
       <!-- industries -->
       <app-form-mat-input-wrapper
+        class="hidden md:block"
         formControlName="industry"
         inputCaption="Industry"
         inputType="SELECT"
@@ -76,6 +78,7 @@ import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
 
       <!-- exchange -->
       <app-form-mat-input-wrapper
+        class="hidden md:block"
         formControlName="exchange"
         inputCaption="Exchange"
         inputType="SELECT"
@@ -84,6 +87,7 @@ import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
 
       <!-- countries -->
       <app-form-mat-input-wrapper
+        class="hidden md:block"
         formControlName="country"
         inputCaption="Country"
         inputType="SELECT"

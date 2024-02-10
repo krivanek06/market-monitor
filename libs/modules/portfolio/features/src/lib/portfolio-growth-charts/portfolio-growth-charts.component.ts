@@ -36,17 +36,21 @@ import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
   ],
   template: `
     <!-- portfolio growth -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col lg:flex-row lg:items-center gap-3 justify-between">
       <!-- select chart title -->
-      <div class="flex items-center gap-4">
-        <app-section-title title="Portfolio Growth" class="mr-6" />
-        <button (click)="onPortfolioChangeChart()" type="button" mat-stroked-button>Portfolio Change Chart</button>
-        <button (click)="onAssetGrowthChart()" type="button" mat-stroked-button>Asset Growth Chart</button>
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <app-section-title title="Portfolio Growth" class="mr-6 max-lg:flex-1" />
+        <button (click)="onPortfolioChangeChart()" type="button" class="hidden sm:block" mat-stroked-button>
+          Portfolio Change
+        </button>
+        <button (click)="onAssetGrowthChart()" type="button" class="hidden sm:block" mat-stroked-button>
+          Asset Growth
+        </button>
       </div>
 
       <!-- date range -->
       <app-date-range-slider
-        class="w-[550px]"
+        class="w-full lg:w-[550px]"
         [displayUpperDate]="false"
         [formControl]="portfolioGrowthRangeControl"
       ></app-date-range-slider>
@@ -56,7 +60,7 @@ import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
       *ngIf="portfolioGrowthChartSignal() as portfolioGrowthChartSignal"
       [data]="{
         values: portfolioGrowthChartSignal,
-        startingCashValue: portfolioState.startingCash
+        startingCashValue: portfolioState?.startingCash ?? 0
       }"
       [displayHeader]="false"
       [heightPx]="heightPx"
@@ -70,7 +74,7 @@ import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
       [displayHeader]="true"
       [data]="{
         values: portfolioGrowthChartSignal,
-        startingCashValue: portfolioState.startingCash
+        startingCashValue: portfolioState?.startingCash ?? 0
       }"
       [heightPx]="heightPx"
       chartType="marketValue"
@@ -86,7 +90,7 @@ import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
 export class PortfolioGrowthChartsComponent {
   @Input() showChartChangeSelect = false;
   @Input() heightPx = 400;
-  @Input({ required: true }) portfolioState!: PortfolioState;
+  @Input({ required: true }) portfolioState?: PortfolioState;
   @Input({ required: true }) portfolioAssetsGrowth!: PortfolioGrowthAssets[];
   @Input({ required: true }) set portfolioGrowth(data: PortfolioGrowth[]) {
     this.portfolioGrowth$.next(data);

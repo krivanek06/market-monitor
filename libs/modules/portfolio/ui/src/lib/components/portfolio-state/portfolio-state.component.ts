@@ -13,48 +13,48 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- balance -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Balance</div>
-          <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.balance | currency }}</div>
+          <div [appAddColor]="titleColor" class="sm:text-lg">Balance</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">{{ portfolioState?.balance | currency }}</div>
         </div>
 
         <!-- Invested -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Invested</div>
-          <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.invested | currency }}</div>
+          <div [appAddColor]="titleColor" class="sm:text-lg">Invested</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">{{ portfolioState?.invested | currency }}</div>
         </div>
 
         <!-- Cash -->
         <div *ngIf="showCashSegment" class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Cash</div>
-          <div [appAddColor]="valueColor" class="text-lg">
-            {{ portfolioState.cashOnHand | currency }} / {{ portfolioState.startingCash | currency }}
+          <div [appAddColor]="titleColor" class="sm:text-lg">Cash</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">
+            {{ portfolioState?.cashOnHand | currency }} / {{ portfolioState?.startingCash | currency }}
           </div>
         </div>
 
         <!-- Total Gains -->
         <div *ngIf="!showCashSegment" class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Total Gains</div>
+          <div [appAddColor]="titleColor" class="sm:text-lg">Total Gains</div>
           <div
-            class="text-lg"
+            class="sm:text-lg"
             [appAddColor]="valueColor"
             appPercentageIncrease
             [changeValues]="{
-              changePercentage: portfolioState.totalGainsPercentage
+              changePercentage: portfolioState?.totalGainsPercentage
             }"
           ></div>
         </div>
 
         <!-- Total Return -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Total Return</div>
+          <div [appAddColor]="titleColor" class="sm:text-lg">Total Return</div>
           <div
-            class="text-lg"
+            class="sm:text-lg"
             [appAddColor]="valueColor"
             appPercentageIncrease
             [useCurrencySign]="true"
             [changeValues]="{
-              change: portfolioState.totalGainsValue,
-              changePercentage: showCashSegment ? portfolioState.totalGainsPercentage : undefined
+              change: portfolioState?.totalGainsValue,
+              changePercentage: showCashSegment ? portfolioState?.totalGainsPercentage : undefined
             }"
           ></div>
         </div>
@@ -69,7 +69,7 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStateComponent {
-  @Input({ required: true }) portfolioState!: PortfolioState;
+  @Input() portfolioState?: PortfolioState;
   @Input() titleColor?: ColorScheme;
   @Input() valueColor?: ColorScheme;
   @Input() showCashSegment = false;

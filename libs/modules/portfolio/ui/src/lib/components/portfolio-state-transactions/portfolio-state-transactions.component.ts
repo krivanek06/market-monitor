@@ -13,29 +13,34 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- Total -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Total</div>
-          <div [appAddColor]="valueColor" class="text-lg">
-            {{ portfolioState.numberOfExecutedBuyTransactions + portfolioState.numberOfExecutedSellTransactions }}
+          <div [appAddColor]="titleColor" class="sm:text-lg">Total</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">
+            {{
+              (portfolioState?.numberOfExecutedBuyTransactions ?? 0) +
+                (portfolioState?.numberOfExecutedSellTransactions ?? 0)
+            }}
           </div>
         </div>
 
         <!-- Buy -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Buy</div>
-          <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.numberOfExecutedBuyTransactions }}</div>
+          <div [appAddColor]="titleColor" class="sm:text-lg">Buy</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">{{ portfolioState?.numberOfExecutedBuyTransactions }}</div>
         </div>
 
         <!-- Sell -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Sell</div>
-          <div [appAddColor]="valueColor" class="text-lg">{{ portfolioState.numberOfExecutedSellTransactions }}</div>
+          <div [appAddColor]="titleColor" class="sm:text-lg">Sell</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">
+            {{ portfolioState?.numberOfExecutedSellTransactions }}
+          </div>
         </div>
 
         <!-- Fees -->
         <div *ngIf="showFees" class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="text-lg">Fees</div>
-          <div [appAddColor]="valueColor" class="text-lg">
-            {{ portfolioState.transactionFees | currency }}
+          <div [appAddColor]="titleColor" class="sm:text-lg">Fees</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">
+            {{ portfolioState?.transactionFees | currency }}
           </div>
         </div>
       </div>
@@ -49,7 +54,7 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStateTransactionsComponent {
-  @Input({ required: true }) portfolioState!: PortfolioState;
+  @Input() portfolioState?: PortfolioState;
   @Input() showFees = false;
   @Input() titleColor?: ColorScheme;
   @Input() valueColor?: ColorScheme;
