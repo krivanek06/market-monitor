@@ -58,10 +58,10 @@ import {
             <img appDefaultImg imageType="symbol" [src]="row.symbol" class="w-10 h-10" />
             <div class="flex flex-col">
               <div class="space-x-1">
-                <span class="text-wt-gray-dark">{{ row.symbol }}</span>
+                <span class="text-wt-primary">{{ row.symbol }}</span>
                 <span class="text-wt-gray-medium">({{ row.units }})</span>
               </div>
-              <div>{{ row.symbolSummary.profile?.sector || 'N/A' }}</div>
+              <!-- <div>{{ row.symbolSummary.profile?.sector || 'N/A' }}</div> -->
             </div>
           </div>
         </td>
@@ -71,8 +71,8 @@ import {
       <ng-container matColumnDef="price">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Price +/-</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          <div class="flex flex-col">
-            <div>
+          <div class="flex flex-row gap-2">
+            <div class="text-wt-gray-dark">
               {{ row.symbolSummary.quote.price | currency }}
             </div>
             <div
@@ -80,34 +80,58 @@ import {
               [useCurrencySign]="true"
               [currentValues]="{
                 value: row.symbolSummary.quote.price * row.units,
-                valueToCompare: row.symbolSummary.quote.previousClose * row.units
+                valueToCompare: row.symbolSummary.quote.previousClose * row.units,
+                hideValue: true
               }"
             ></div>
           </div>
         </td>
       </ng-container>
 
+      <!-- price -->
+      <ng-container matColumnDef="dailyValueChange">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Daily +/-</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [currentValues]="{
+              value: row.symbolSummary.quote.price * row.units,
+              valueToCompare: row.symbolSummary.quote.previousClose * row.units,
+              hidePercentage: true
+            }"
+          ></div>
+        </td>
+      </ng-container>
+
       <!-- BEP. -->
       <ng-container matColumnDef="bep">
         <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">BEP +/-</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">{{ row.breakEvenPrice | currency }}</td>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell text-wt-gray-dark">
+          {{ row.breakEvenPrice | currency }}
+        </td>
       </ng-container>
 
-      <!-- total -->
-      <ng-container matColumnDef="total">
+      <!-- balance -->
+      <ng-container matColumnDef="balance">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Balance</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div class="text-wt-gray-dark">{{ row.symbolSummary.quote.price * row.units | currency }}</div>
+        </td>
+      </ng-container>
+
+      <!-- total change -->
+      <ng-container matColumnDef="totalChange">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Total +/-</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          <div class="flex flex-col">
-            <div>{{ row.symbolSummary.quote.price * row.units | currency }}</div>
-            <div
-              appPercentageIncrease
-              [useCurrencySign]="true"
-              [currentValues]="{
-                value: row.symbolSummary.quote.price * row.units,
-                valueToCompare: row.breakEvenPrice * row.units
-              }"
-            ></div>
-          </div>
+          <div
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [currentValues]="{
+              value: row.symbolSummary.quote.price * row.units,
+              valueToCompare: row.breakEvenPrice * row.units
+            }"
+          ></div>
         </td>
       </ng-container>
 
@@ -129,9 +153,13 @@ import {
       <ng-container matColumnDef="portfolio">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Portfolio %</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
-          {{
-            holdingsBalance ? ((row.symbolSummary.quote.price * row.units) / holdingsBalance | percent: '1.2-2') : 'N/A'
-          }}
+          <span class="text-wt-gray-dark">
+            {{
+              holdingsBalance
+                ? ((row.symbolSummary.quote.price * row.units) / holdingsBalance | percent: '1.2-2')
+                : 'N/A'
+            }}
+          </span>
         </td>
       </ng-container>
 
@@ -224,13 +252,18 @@ export class PortfolioHoldingsTableComponent implements OnChanges {
   @Input() displayedColumns: string[] = [
     'symbol',
     'price',
+    // 'units',
     'bep',
-    'total',
+
+    'balance',
     'invested',
+    'totalChange',
+    'dailyValueChange',
+
     //'units',
     'portfolio',
-    'beta',
-    'pe',
+    // 'beta',
+    // 'pe',
     'marketCap',
     'yearlyRange',
     // 'sector',
@@ -278,6 +311,20 @@ export class PortfolioHoldingsTableComponent implements OnChanges {
           return compare(a.invested, b.invested, isAsc);
         case 'pe':
           return compare(a.symbolSummary.quote.pe, b.symbolSummary.quote.pe, isAsc);
+        case 'dailyValueChange':
+          return compare(
+            a.symbolSummary.quote.price * a.units - a.symbolSummary.quote.previousClose * a.units,
+            b.symbolSummary.quote.price * b.units - b.symbolSummary.quote.previousClose * b.units,
+            isAsc,
+          );
+        case 'totalChange':
+          return compare(
+            a.symbolSummary.quote.price * a.units - a.breakEvenPrice * a.units,
+            b.symbolSummary.quote.price * b.units - b.breakEvenPrice * b.units,
+            isAsc,
+          );
+        case 'balance':
+          return compare(a.symbolSummary.quote.price * a.units, b.symbolSummary.quote.price * b.units, isAsc);
         case 'marketCap':
           return compare(a.symbolSummary.quote.marketCap, b.symbolSummary.quote.marketCap, isAsc);
         default:

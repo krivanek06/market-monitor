@@ -19,6 +19,8 @@ export type CurrentValues = {
 
   // whether to hide value and display only percentage change
   hideValue?: boolean;
+
+  hidePercentage?: boolean;
 };
 
 @Directive({
@@ -41,8 +43,7 @@ export class PercentageIncreaseDirective implements OnInit {
     const value = data.value - data.valueToCompare;
     const change = roundNDigits(value, 2);
     const changesPercentage = roundNDigits((value / Math.abs(data.valueToCompare)) * 100, 2);
-    const hideValue = data.hideValue;
-    this.createElement(change, changesPercentage, hideValue);
+    this.createElement(change, changesPercentage, data.hideValue, data.hidePercentage);
   }
   @Input() useCurrencySign = false;
 
@@ -73,7 +74,12 @@ export class PercentageIncreaseDirective implements OnInit {
    * @param change - changed value between the current and compared to item
    * @param changesPercentage - changed prct between the current and compared to item
    */
-  private createElement(change: number | null, changesPercentage: number | null, hideValue = false): void {
+  private createElement(
+    change: number | null,
+    changesPercentage: number | null,
+    hideValue = false,
+    hidePercentage = false,
+  ): void {
     // clear previous view on client side
     this.vr.clear();
 
@@ -109,7 +115,7 @@ export class PercentageIncreaseDirective implements OnInit {
     // this.rederer2.addClass(wrapper, 'items-start');
 
     // display percentage
-    if (changesPercentage) {
+    if (changesPercentage && !hidePercentage) {
       // wrapper for value and icon
       const valueChangeAndIconWrapper = this.renderer2.createElement('div');
 
@@ -152,7 +158,10 @@ export class PercentageIncreaseDirective implements OnInit {
 
       const changeSpan = this.renderer2.createElement('span');
       const text = `${sign} ${formatLargeNumber(change)}`;
-      const changeText = !!changesPercentage ? this.renderer2.createText(`(${text})`) : this.renderer2.createText(text);
+      const changeText =
+        !!changesPercentage && !hidePercentage
+          ? this.renderer2.createText(`(${text})`)
+          : this.renderer2.createText(text);
 
       // changesPercentage does not exist -> changeSpan will be color
       this.renderer2.addClass(changeSpan, color);
