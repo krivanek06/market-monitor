@@ -1,7 +1,13 @@
 import { GroupSettingsChangeInput } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
+import {
+  GROUP_NOT_FOUND_ERROR,
+  GROUP_USER_NOT_OWNER,
+  groupDocumentMembersRef,
+  groupDocumentRef,
+  userDocumentRef,
+} from '../models';
 
 /**
  * Change group settings - only owner
@@ -20,17 +26,17 @@ export const groupSettingsChangeCall = onCall(async (request) => {
 
   // check if group exists
   if (!groupData) {
-    throw new HttpsError('not-found', 'Group does not exist');
+    throw new HttpsError('not-found', GROUP_NOT_FOUND_ERROR);
   }
 
   // check if owner
   if (groupData.ownerUserId !== userAuthId) {
-    throw new HttpsError('failed-precondition', 'User is not owner');
+    throw new HttpsError('failed-precondition', GROUP_USER_NOT_OWNER);
   }
 
   // check if member data exists
   if (!groupMemberData) {
-    throw new HttpsError('not-found', 'Group member does not exist');
+    throw new HttpsError('not-found', GROUP_NOT_FOUND_ERROR);
   }
 
   // update group data

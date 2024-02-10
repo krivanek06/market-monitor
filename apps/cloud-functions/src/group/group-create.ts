@@ -10,6 +10,11 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  GROUP_MEMBERS_LIMIT_ERROR,
+  GROUP_OWNER_LIMIT_ERROR,
+  GROUP_SAME_NAME_ERROR,
+  USER_NOT_AUTHENTICATED_ERROR,
+  USER_NOT_FOUND_ERROR,
   groupDocumentHoldingSnapshotsRef,
   groupDocumentMembersRef,
   groupDocumentPortfolioStateSnapshotsRef,
@@ -32,7 +37,7 @@ export const groupCreateCall = onCall(async (request) => {
   const userAuthId = request.auth?.uid;
 
   if (!userAuthId) {
-    throw new Error('User not authenticated');
+    throw new Error(USER_NOT_AUTHENTICATED_ERROR);
   }
 
   return groupCreate(data, userAuthId);
@@ -45,7 +50,7 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
 
   // check if user exists
   if (!userData) {
-    throw new HttpsError('not-found', 'User does not exist');
+    throw new HttpsError('not-found', USER_NOT_FOUND_ERROR);
   }
 
   const userBase = transformUserToBase(userData);
@@ -53,22 +58,17 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
 
   // check if group already exists
   if (group) {
-    throw new HttpsError('already-exists', 'Group with same name already exists');
-  }
-
-  // check to load user
-  if (!userData) {
-    throw new HttpsError('cancelled', 'User not found');
+    throw new HttpsError('already-exists', GROUP_SAME_NAME_ERROR);
   }
 
   // check limit
   if (userData.groups.groupOwner.length >= GROUP_OWNER_LIMIT) {
-    throw new HttpsError('resource-exhausted', `User can only create ${GROUP_OWNER_LIMIT} groups`);
+    throw new HttpsError('resource-exhausted', GROUP_OWNER_LIMIT_ERROR);
   }
 
   // check members
   if (data.memberInvitedUserIds.length >= GROUP_MEMBER_LIMIT - (data.isOwnerMember ? 1 : 0)) {
-    throw new HttpsError('resource-exhausted', `Group can only have ${GROUP_MEMBER_LIMIT} members`);
+    throw new HttpsError('resource-exhausted', GROUP_MEMBERS_LIMIT_ERROR);
   }
 
   // create group

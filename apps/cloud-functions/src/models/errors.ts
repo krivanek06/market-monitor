@@ -1,7 +1,13 @@
+import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT } from '@market-monitor/api-types';
+
+// general
+export const GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR = 'Not sufficient permissions';
+
 // user
-export const USER_NOT_NOT_FOUND_ERROR = 'User not found';
+export const USER_NOT_FOUND_ERROR = 'User not found';
 export const USER_NOT_ENOUGH_CASH_ERROR = 'Not enough cash on hand';
 export const USER_NOT_UNITS_ON_HAND_ERROR = 'Not enough units on hand';
+export const USER_NOT_AUTHENTICATED_ERROR = 'User not authenticated';
 
 // symbol
 export const SYMBOL_NOT_FOUND_ERROR = 'Symbol not found';
@@ -16,3 +22,17 @@ export const DATE_INVALID_DATE = 'Invalid date';
 export const DATE_WEEKEND = 'Weekend date not allowed';
 export const DATE_FUTURE = 'Future date not allowed';
 export const DATE_TOO_OLD = 'Date too old';
+
+// groups
+export const GROUP_NOT_FOUND_ERROR = 'Group not found';
+export const GROUP_USER_NOT_OWNER = 'User is not owner';
+export const GROUP_ALREADY_CLOSED_ERROR = 'Group is already closed';
+export const GROUP_SAME_NAME_ERROR = 'Group with same name already exists';
+export const GROUP_OWNER_LIMIT_ERROR = `User can only create ${GROUP_OWNER_LIMIT} groups`;
+export const GROUP_MEMBERS_LIMIT_ERROR = `Group can only have ${GROUP_MEMBER_LIMIT} members`;
+export const GROUP_USER_ALREADY_MEMBER_ERROR = 'User is already a member';
+export const GROUP_USER_HAS_NO_INVITATION_ERROR = 'User has no invitation';
+export const GROUP_USER_ALREADY_REQUESTED_ERROR = 'User already requested to join';
+export const GROUPS_USER_ALREADY_INVITED_ERROR = 'User already invited';
+export const GROUP_IS_FULL_ERROR = 'Group is full';
+export const GROUP_USER_IS_OWNER_ERROR = 'User is owner';

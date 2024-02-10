@@ -1,7 +1,16 @@
 import { GroupBaseInput } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { groupDocumentRef, userDocumentRef } from '../models';
+import {
+  GROUPS_USER_ALREADY_INVITED_ERROR,
+  GROUP_NOT_FOUND_ERROR,
+  GROUP_USER_ALREADY_MEMBER_ERROR,
+  GROUP_USER_ALREADY_REQUESTED_ERROR,
+  GROUP_USER_IS_OWNER_ERROR,
+  GROUP_USER_NOT_OWNER,
+  groupDocumentRef,
+  userDocumentRef,
+} from '../models';
 
 /**
  * Invite a user to a group
@@ -20,32 +29,32 @@ export const groupMemberInviteCall = onCall(async (request) => {
 
   // check if group exists
   if (!groupData) {
-    throw new HttpsError('not-found', 'Group does not exist');
+    throw new HttpsError('not-found', GROUP_NOT_FOUND_ERROR);
   }
 
   // check if owner
   if (groupData.ownerUserId !== userAuthId) {
-    throw new HttpsError('failed-precondition', 'User is not owner');
+    throw new HttpsError('failed-precondition', GROUP_USER_NOT_OWNER);
   }
 
   // check if user is owner
   if (groupData.ownerUserId === data.userId) {
-    throw new HttpsError('failed-precondition', 'User is owner');
+    throw new HttpsError('failed-precondition', GROUP_USER_IS_OWNER_ERROR);
   }
 
   // check if user is already in group
   if (groupData.memberUserIds.includes(data.userId)) {
-    throw new HttpsError('already-exists', 'User is already in group');
+    throw new HttpsError('already-exists', GROUP_USER_ALREADY_MEMBER_ERROR);
   }
 
   // check if user already requested to join
   if (groupData.memberRequestUserIds.includes(data.userId)) {
-    throw new HttpsError('already-exists', 'User already requested to join');
+    throw new HttpsError('already-exists', GROUP_USER_ALREADY_REQUESTED_ERROR);
   }
 
   // check if user already invited
   if (groupData.memberInvitedUserIds.includes(data.userId)) {
-    throw new HttpsError('already-exists', 'User already invited');
+    throw new HttpsError('already-exists', GROUPS_USER_ALREADY_INVITED_ERROR);
   }
 
   // add user to invited list

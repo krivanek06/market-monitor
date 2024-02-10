@@ -1,7 +1,13 @@
 import { GroupBaseInput } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { groupDocumentRef, userDocumentRef } from '../models';
+import {
+  GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR,
+  GROUP_NOT_FOUND_ERROR,
+  GROUP_USER_HAS_NO_INVITATION_ERROR,
+  groupDocumentRef,
+  userDocumentRef,
+} from '../models';
 
 /**
  * Remove a group invitation sent to the user by the owner or the user itself
@@ -18,17 +24,17 @@ export const groupMemberInviteRemoveCall = onCall(async (request) => {
 
   // check if group exists
   if (!groupData) {
-    throw new HttpsError('not-found', 'Group does not exist');
+    throw new HttpsError('not-found', GROUP_NOT_FOUND_ERROR);
   }
 
   // check if requestor is owner
   if (groupData.ownerUserId !== userAuthId && data.userId !== userAuthId) {
-    throw new HttpsError('failed-precondition', 'User is not owner or the user itself');
+    throw new HttpsError('failed-precondition', GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR);
   }
 
   // check is user is invited
   if (!groupData.memberInvitedUserIds.includes(data.userId)) {
-    throw new HttpsError('failed-precondition', 'User is not invited');
+    throw new HttpsError('failed-precondition', GROUP_USER_HAS_NO_INVITATION_ERROR);
   }
 
   // group - remove user from invited list

@@ -1,5 +1,5 @@
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { groupDocumentRef } from '../models';
+import { GROUP_NOT_FOUND_ERROR, GROUP_USER_NOT_OWNER, groupDocumentRef } from '../models';
 
 /**
  * if the group is closed, reopen it
@@ -13,17 +13,12 @@ export const groupReopenCall = onCall(async (request) => {
 
   // check if group exists
   if (!groupData) {
-    throw new HttpsError('not-found', 'Group does not exist');
+    throw new HttpsError('not-found', GROUP_NOT_FOUND_ERROR);
   }
 
   // check if owner match request user id
   if (groupData.ownerUserId !== userAuthId) {
-    throw new HttpsError('failed-precondition', 'User is not owner');
-  }
-
-  // check if group is closed
-  if (!groupData.isClosed) {
-    throw new HttpsError('failed-precondition', 'Group is not closed');
+    throw new HttpsError('failed-precondition', GROUP_USER_NOT_OWNER);
   }
 
   // close group

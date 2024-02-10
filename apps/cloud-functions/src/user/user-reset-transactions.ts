@@ -7,7 +7,7 @@ import {
 } from '@market-monitor/api-types';
 import { createEmptyPortfolioState } from '@market-monitor/shared/features/general-util';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { userDocumentRef } from '../models';
+import { GROUP_USER_NOT_OWNER, userDocumentRef } from '../models';
 import { userDocumentTransactionHistoryRef } from './../models/user';
 
 /**
@@ -22,7 +22,7 @@ export const userResetTransactionsCall = onCall(async (request) => {
 
   // check if owner match request user id
   if (data.userId !== userAuthId) {
-    throw new HttpsError('failed-precondition', 'User is not owner');
+    throw new HttpsError('failed-precondition', GROUP_USER_NOT_OWNER);
   }
 
   // check if user exists

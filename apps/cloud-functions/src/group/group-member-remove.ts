@@ -1,7 +1,13 @@
 import { GroupBaseInput } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
+import {
+  GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR,
+  GROUP_NOT_FOUND_ERROR,
+  groupDocumentMembersRef,
+  groupDocumentRef,
+  userDocumentRef,
+} from '../models';
 
 /**
  * Remove a user from a group or user leaves the group
@@ -21,23 +27,18 @@ export const groupMemberRemoveCall = onCall(async (request) => {
 
   // check if group exists
   if (!groupData) {
-    throw new HttpsError('not-found', 'Group does not exist');
+    throw new HttpsError('not-found', GROUP_NOT_FOUND_ERROR);
   }
 
   // check if member data exists
   if (!groupMemberData) {
-    throw new HttpsError('not-found', 'Group member does not exist');
+    throw new HttpsError('not-found', GROUP_NOT_FOUND_ERROR);
   }
 
   // check if authenticated user is owner or the user who leaves
   const canBeUserRemove = groupData.ownerUserId === userAuthId || data.userId === userAuthId;
   if (!canBeUserRemove) {
-    throw new HttpsError('aborted', 'User can not be removed');
-  }
-
-  // check if user is in group
-  if (!groupData.memberUserIds.includes(data.userId)) {
-    throw new HttpsError('failed-precondition', 'User is not in group');
+    throw new HttpsError('aborted', GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR);
   }
 
   // remove user from group

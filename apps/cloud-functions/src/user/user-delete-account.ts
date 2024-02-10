@@ -1,6 +1,11 @@
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
+import {
+  GROUP_USER_NOT_OWNER,
+  userDocumentRef,
+  userDocumentTransactionHistoryRef,
+  userDocumentWatchListRef,
+} from '../models';
 
 /**
  * This function is called when a user deletes their account.
@@ -23,7 +28,7 @@ export const userDeleteAccountCall = onCall(async (request) => {
 
   // check if authenticated user is owner
   if (userAuthId !== userResetId && !userData?.features.isAdmin) {
-    throw new HttpsError('aborted', 'User is not owner');
+    throw new HttpsError('aborted', GROUP_USER_NOT_OWNER);
   }
 
   // delete user

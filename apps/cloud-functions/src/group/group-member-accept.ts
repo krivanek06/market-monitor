@@ -1,7 +1,16 @@
 import { GROUP_MEMBER_LIMIT, GroupMember } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
+import {
+  GROUP_IS_FULL_ERROR,
+  GROUP_NOT_FOUND_ERROR,
+  GROUP_USER_ALREADY_MEMBER_ERROR,
+  GROUP_USER_HAS_NO_INVITATION_ERROR,
+  USER_NOT_FOUND_ERROR,
+  groupDocumentMembersRef,
+  groupDocumentRef,
+  userDocumentRef,
+} from '../models';
 import { transformUserToGroupMember } from './../utils/transform.util';
 
 /**
@@ -30,27 +39,27 @@ export const groupMemberAccept = async (userAuthId: string, requestGroupId: stri
 
   // check if group exists
   if (!groupData) {
-    throw new HttpsError('not-found', 'Group does not exist');
+    throw new HttpsError('not-found', GROUP_NOT_FOUND_ERROR);
   }
 
   // check if user exists
   if (!userData) {
-    throw new HttpsError('not-found', 'User does not exist');
+    throw new HttpsError('not-found', USER_NOT_FOUND_ERROR);
   }
 
   // check if user is already in group
   if (userData.groups.groupMember.includes(requestGroupId)) {
-    throw new HttpsError('already-exists', 'User is already in group');
+    throw new HttpsError('already-exists', GROUP_USER_ALREADY_MEMBER_ERROR);
   }
 
   // check if user has an invitation
   if (!userData.groups.groupInvitations.includes(requestGroupId)) {
-    throw new HttpsError('failed-precondition', 'User has no invitation');
+    throw new HttpsError('failed-precondition', GROUP_USER_HAS_NO_INVITATION_ERROR);
   }
 
   // check if group will not have more than N members
   if (groupData.memberUserIds.length >= GROUP_MEMBER_LIMIT) {
-    throw new HttpsError('resource-exhausted', 'Group is full');
+    throw new HttpsError('resource-exhausted', GROUP_IS_FULL_ERROR);
   }
 
   // update user to join group
