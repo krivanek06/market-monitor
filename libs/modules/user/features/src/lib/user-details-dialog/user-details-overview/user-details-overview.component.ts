@@ -32,7 +32,7 @@ import { GenericChartComponent } from '@market-monitor/shared/ui';
       <!-- portfolio state -->
       <div class="p-6 max-lg:flex-1 lg:basis-[40%]">
         <app-portfolio-state
-          [titleColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [titleColor]="ColorScheme.GRAY_DARK_VAR"
           [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
           [portfolioState]="userData.portfolioState"
           [showCashSegment]="!!userData.features.allowPortfolioCashAccount"
@@ -41,7 +41,7 @@ import { GenericChartComponent } from '@market-monitor/shared/ui';
       <!-- risk -->
       <div class="flex-1 p-6 hidden sm:block">
         <app-portfolio-state-risk
-          [titleColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [titleColor]="ColorScheme.GRAY_DARK_VAR"
           [portfolioState]="userData.portfolioState"
           [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
         ></app-portfolio-state-risk>
@@ -50,7 +50,7 @@ import { GenericChartComponent } from '@market-monitor/shared/ui';
       <div class="flex-1 p-6 hidden lg:block">
         <app-portfolio-state-transactions
           [portfolioState]="userData.portfolioState"
-          [titleColor]="ColorScheme.GRAY_MEDIUM_VAR"
+          [titleColor]="ColorScheme.GRAY_DARK_VAR"
           [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
           [showFees]="!!userData.features.allowPortfolioCashAccount"
         >

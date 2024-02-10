@@ -122,6 +122,7 @@ import { take } from 'rxjs';
         </div>
       </div>
 
+      <!-- transaction history -->
       <div>
         <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
 

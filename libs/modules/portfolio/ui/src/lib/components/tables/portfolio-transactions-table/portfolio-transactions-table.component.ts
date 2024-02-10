@@ -40,7 +40,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
           <!-- logo + symbol -->
           <div class="flex items-center gap-2">
             <img appDefaultImg imageType="symbol" [src]="row.symbol" class="w-10 h-10" />
-            <div>{{ row.symbol }}</div>
+            <div class="text-wt-primary">{{ row.symbol }}</div>
           </div>
         </td>
       </ng-container>
@@ -75,9 +75,9 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
       <ng-container matColumnDef="totalValue">
         <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Total Value</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          <div>
+          <span class="text-wt-gray-dark">
             {{ row.unitPrice * row.units | currency }}
-          </div>
+          </span>
         </td>
       </ng-container>
 
@@ -85,7 +85,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
       <ng-container matColumnDef="unitPrice">
         <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Unit Price</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          {{ row.unitPrice | currency }}
+          <span class="text-wt-gray-dark">{{ row.unitPrice | currency }}</span>
         </td>
       </ng-container>
 
@@ -153,7 +153,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
     </table>
 
     <!-- pagination -->
-    <div class="relative px-10">
+    <div class="relative px-4">
       <mat-paginator
         appStylePaginator
         showFirstLastButtons

@@ -88,10 +88,10 @@ import {
         </td>
       </ng-container>
 
-      <!-- price -->
+      <!-- daily -->
       <ng-container matColumnDef="dailyValueChange">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Daily +/-</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Daily +/-</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div
             appPercentageIncrease
             [useCurrencySign]="true"
@@ -106,8 +106,8 @@ import {
 
       <!-- BEP. -->
       <ng-container matColumnDef="bep">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">BEP +/-</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell text-wt-gray-dark">
+        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">BEP +/-</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell text-wt-gray-dark">
           {{ row.breakEvenPrice | currency }}
         </td>
       </ng-container>
@@ -115,8 +115,21 @@ import {
       <!-- balance -->
       <ng-container matColumnDef="balance">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Balance</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          <div class="text-wt-gray-dark">{{ row.symbolSummary.quote.price * row.units | currency }}</div>
+        <td mat-cell *matCellDef="let row" class="table-cell">
+          <div class="flex flex-col">
+            <div class="text-wt-gray-dark max-sm:text-end">
+              {{ row.symbolSummary.quote.price * row.units | currency }}
+            </div>
+            <div
+              class="block sm:hidden justify-end text-end"
+              appPercentageIncrease
+              [useCurrencySign]="true"
+              [currentValues]="{
+                value: row.symbolSummary.quote.price * row.units,
+                valueToCompare: row.breakEvenPrice * row.units
+              }"
+            ></div>
+          </div>
         </td>
       </ng-container>
 
@@ -137,8 +150,8 @@ import {
 
       <!-- invested -->
       <ng-container matColumnDef="invested">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Invested</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Invested</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           {{ row.invested | currency }}
         </td>
       </ng-container>
@@ -189,8 +202,8 @@ import {
 
       <!-- yearlyRange -->
       <ng-container matColumnDef="yearlyRange">
-        <th mat-header-cell *matHeaderCellDef class="hidden xl:table-cell">52 Week Range</th>
-        <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
+        <th mat-header-cell *matHeaderCellDef class="hidden 2xl:table-cell">52 Week Range</th>
+        <td mat-cell *matCellDef="let row" class="hidden 2xl:table-cell">
           <app-progress-currency
             [min]="row.symbolSummary.quote.yearLow"
             [max]="row.symbolSummary.quote.yearHigh"

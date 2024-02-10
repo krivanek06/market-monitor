@@ -430,7 +430,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
               fontSize: '12px',
               width: 90,
             },
-            format: '<span style="color: {point.color}" >{point.name}</span><br>{point.percentage:.1f}%',
+            format: '<span style="color: {point.color}" >{point.name}</span><br>{point.percentage:.2f}%',
             //distance: -25,
             filter: {
               property: 'percentage',
@@ -438,19 +438,6 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
               value: 4,
             },
           },
-          colors: (Highcharts.getOptions().colors ?? ([] as any[])).map((color) => {
-            return {
-              radialGradient: {
-                cx: 0.5,
-                cy: 0.25,
-                r: 0.25,
-              },
-              stops: [
-                [0, color],
-                [1, Highcharts.color(color).brighten(-0.2).get('rgb')], // darken
-              ],
-            };
-          }),
         },
         areaspline: {
           threshold: null,

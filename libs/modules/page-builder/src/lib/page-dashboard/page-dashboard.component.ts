@@ -14,6 +14,7 @@ import {
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
   PortfolioTransactionChartComponent,
+  PortfolioTransactionsTableComponent,
 } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
@@ -23,6 +24,9 @@ import {
   FormMatInputWrapperComponent,
   GeneralCardComponent,
   GenericChartComponent,
+  PieChartComponent,
+  SectionTitleComponent,
+  SortByKeyPipe,
 } from '@market-monitor/shared/ui';
 
 @Component({
@@ -43,6 +47,10 @@ import {
     MatDialogModule,
     FormMatInputWrapperComponent,
     PortfolioTransactionChartComponent,
+    SectionTitleComponent,
+    PortfolioTransactionsTableComponent,
+    SortByKeyPipe,
+    PieChartComponent,
   ],
   template: `
     <ng-container *ngIf="portfolioUserFacadeService.getPortfolioState() as portfolioState">
@@ -50,7 +58,7 @@ import {
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2">
           <app-fancy-card class="sm:col-span-2" title="Account" [colorPrimary]="ColorScheme.PRIMARY_VAR">
             <app-portfolio-state
-              [titleColor]="ColorScheme.PRIMARY_VAR"
+              [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
               [showCashSegment]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
               [portfolioState]="portfolioState"
@@ -60,14 +68,14 @@ import {
           <app-fancy-card title="Risk" [colorPrimary]="ColorScheme.PRIMARY_VAR">
             <app-portfolio-state-risk
               [portfolioState]="authenticationUserService.state.getPortfolioState()"
-              [titleColor]="ColorScheme.PRIMARY_VAR"
+              [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             ></app-portfolio-state-risk>
           </app-fancy-card>
 
           <app-fancy-card title="Transactions" [colorPrimary]="ColorScheme.PRIMARY_VAR">
             <app-portfolio-state-transactions
-              [titleColor]="ColorScheme.PRIMARY_VAR"
+              [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
               [showFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
               [portfolioState]="portfolioState"
@@ -109,22 +117,31 @@ import {
         </app-general-card>
       </div>
 
-      <!-- holdings pie charts -->
-      <div class="flex justify-around mb-10 overflow-x-clip">
-        <app-generic-chart
-          chartTitle="Asset Allocation"
-          [heightPx]="380"
-          [showDataLabel]="true"
-          chartTitlePosition="center"
-          [series]="[portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()]"
-        ></app-generic-chart>
-        <app-generic-chart
-          [heightPx]="380"
-          chartTitle="Sector Allocation"
-          [showDataLabel]="true"
-          chartTitlePosition="center"
-          [series]="[portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()]"
-        ></app-generic-chart>
+      <div class="grid xl:grid-cols-3 gap-8">
+        <div class="xl:col-span-2">
+          <!-- transaction history -->
+          <div>
+            <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
+            <app-portfolio-transactions-table
+              [showTransactionFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
+              [data]="authenticationUserService.state.portfolioTransactions() | sortByKey: 'date' : 'desc'"
+            ></app-portfolio-transactions-table>
+          </div>
+        </div>
+
+        <!-- holdings pie charts -->
+        <div class="flex justify-between xl:justify-around xl:flex-col gap-10 mb-10 overflow-x-clip">
+          <app-pie-chart
+            chartTitle="Asset Allocation"
+            [heightPx]="400"
+            [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
+          ></app-pie-chart>
+          <app-pie-chart
+            [heightPx]="400"
+            chartTitle="Sector Allocation"
+            [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
+          ></app-pie-chart>
+        </div>
       </div>
 
       <!-- transactions chart -->
