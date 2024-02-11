@@ -8,7 +8,11 @@ import { AggregationApiService } from '@market-monitor/api-client';
 import { UserBase } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { PortfolioRankTableComponent } from '@market-monitor/modules/portfolio/ui';
-import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@market-monitor/modules/user/features';
+import {
+  UserDetailsDialogComponent,
+  UserDetailsDialogComponentData,
+  UserSearchControlComponent,
+} from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
@@ -27,14 +31,22 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
     UserDetailsDialogComponent,
     MatDialogModule,
     PositionColoringDirective,
+    UserSearchControlComponent,
   ],
   template: `
-    <!-- display user rank -->
-    <app-section-title
-      class="absolute top-[-80px] left-0 hidden md:block"
-      matIcon="military_tech"
-      title="My rank: {{ userDataSignal().systemRank.portfolioTotalGainsPercentage?.rank }}"
-    />
+    <div class="absolute top-[-100px] left-0 hidden md:flex items-center gap-6">
+      <!-- display user rank -->
+      <app-section-title
+        class=""
+        matIcon="military_tech"
+        title="My rank: {{ userDataSignal().systemRank.portfolioTotalGainsPercentage?.rank }}"
+      />
+      <!-- search users -->
+      <app-user-search-control
+        class="scale-90 w-[500px] mt-3"
+        (selectedUserEmitter)="onUserClick($event)"
+      ></app-user-search-control>
+    </div>
 
     <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4">
       @if (hallOfFameUsersSignal(); as hallOfFameUses) {
@@ -55,17 +67,6 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
                 <mat-icon *ngIf="!showBestSignal()">arrow_drop_down</mat-icon>
                 {{ showBestSignal() ? 'Best Users' : ' Worst Users' }}
               </button>
-
-              <!-- show more button -->
-              <button
-                *ngIf="showMoreButtonVisibleSignal()"
-                (click)="showMoreToggle()"
-                mat-stroked-button
-                color="primary"
-                type="button"
-              >
-                {{ showMoreSignal() ? 'Show Less' : ' Show More' }}
-              </button>
             </div>
           </div>
 
@@ -75,6 +76,13 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
             [data]="displayPortfolioSignal()"
             [template]="userTemplate"
           />
+
+          <!-- show more button -->
+          <div *ngIf="showMoreButtonVisibleSignal()" class="flex justify-end mt-4">
+            <button (click)="showMoreToggle()" mat-stroked-button color="primary" type="button">
+              {{ showMoreSignal() ? 'Show Less' : ' Show More' }}
+            </button>
+          </div>
         </div>
         <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
           <!-- daily best -->

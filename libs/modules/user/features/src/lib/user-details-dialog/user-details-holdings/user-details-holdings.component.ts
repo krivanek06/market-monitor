@@ -28,5 +28,5 @@ export class UserDetailsHoldingsComponent {
   @Input({ required: true }) holdingsBalance!: number;
   @Input({ required: true }) holdings!: PortfolioStateHolding[];
 
-  displayedColumns: string[] = ['symbol', 'price', 'balance', 'invested', 'totalChange', 'portfolio'];
+  displayedColumns: string[] = ['symbol', 'price', 'balance', 'invested', 'totalChange', 'portfolio', 'marketCap'];
 }

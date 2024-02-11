@@ -12,10 +12,10 @@ import { isBefore, subDays } from 'date-fns';
   imports: [CommonModule, DefaultImgDirective, LargeNumberFormatterPipe, MatIconModule, PercentageIncreaseDirective],
   template: `
     <div class="flex gap-4">
-      <img appDefaultImg [src]="userData.personal.photoURL" alt="User Image" class="w-16 h-16 rounded-md" />
+      <img appDefaultImg [src]="userData.personal.photoURL" alt="User Image" class="w-14 h-14 rounded-md" />
 
       <!-- info -->
-      <div class="flex flex-col">
+      <div class="flex flex-col text-sm">
         <div class="flex">
           <div class="text-wt-gray-dark w-[80px]">Name:</div>
           <div class="mr-4">{{ userData.personal.displayName }}</div>
@@ -27,6 +27,7 @@ import { isBefore, subDays } from 'date-fns';
           <div class="flex items-center gap-2">
             <div>{{ userData.portfolioState.balance | largeNumberFormatter: false : true }}</div>
             <div
+              *ngIf="userData.portfolioState.previousBalanceChangePercentage > 0"
               appPercentageIncrease
               [changeValues]="{
                 changePercentage: userData.portfolioState.previousBalanceChangePercentage

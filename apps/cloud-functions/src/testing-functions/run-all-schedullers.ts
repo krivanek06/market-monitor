@@ -5,6 +5,7 @@ import { hallOfFameUsers } from '../schedulers/hall-of-fame-users';
 import { userPortfolioRank } from '../schedulers/user-portfolio-rank';
 import { userPortfolioUpdate } from '../schedulers/user-portfolio-update';
 import { isFirebaseEmulator } from '../utils';
+import { updateAllUsersLastLoggedInDate } from './update-all-users-last-logged-in-date';
 
 export const runALlSchedulers = async (): Promise<void> => {
   if (!isFirebaseEmulator()) {
@@ -13,6 +14,7 @@ export const runALlSchedulers = async (): Promise<void> => {
   }
 
   const startTime = performance.now();
+  updateAllUsersLastLoggedInDate();
 
   // run all schedulers
   console.log('[Users]: update portfolio');

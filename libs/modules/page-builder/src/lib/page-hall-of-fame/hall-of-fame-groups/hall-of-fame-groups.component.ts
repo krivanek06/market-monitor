@@ -46,17 +46,6 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
                 <mat-icon *ngIf="!showBestSignal()">arrow_drop_down</mat-icon>
                 {{ showBestSignal() ? 'Best Groups' : ' Worst Groups' }}
               </button>
-
-              <!-- show more button -->
-              <button
-                *ngIf="showMoreButtonVisibleSignal()"
-                (click)="showMoreToggle()"
-                mat-stroked-button
-                color="primary"
-                type="button"
-              >
-                {{ showMoreSignal() ? 'Show Less' : ' Show More' }}
-              </button>
             </div>
           </div>
 
@@ -66,6 +55,13 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
             [data]="displayPortfolioSignal()"
             [template]="userTemplate"
           />
+
+          <!-- show more button -->
+          <div *ngIf="showMoreButtonVisibleSignal()" class="flex justify-end mt-4">
+            <button (click)="showMoreToggle()" mat-stroked-button color="primary" type="button">
+              {{ showMoreSignal() ? 'Show Less' : ' Show More' }}
+            </button>
+          </div>
         </div>
         <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
           <!-- daily best -->

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -82,6 +82,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, 
   ],
 })
 export class UserSearchControlComponent implements ControlValueAccessor {
+  @Output() selectedUserEmitter = new EventEmitter<UserData>();
   showLoadingIndicator = signal<boolean>(false);
   optionsSignal = signal<UserData[]>([]);
   searchControl = new FormControl<string>('', { nonNullable: true });
@@ -127,6 +128,7 @@ export class UserSearchControlComponent implements ControlValueAccessor {
       return;
     }
     this.onChange(userData);
+    this.selectedUserEmitter.emit(userData);
   }
 
   /*
