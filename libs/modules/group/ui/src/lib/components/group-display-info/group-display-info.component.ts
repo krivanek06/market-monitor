@@ -10,13 +10,23 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
   standalone: true,
   imports: [CommonModule, DefaultImgDirective, MatButtonModule, MatIconModule, PercentageIncreaseDirective],
   template: `
-    <div class="flex items-center flex-1 gap-3">
+    <!-- name -->
+    <div
+      class="block sm:hidden text-lg text-start mb-3"
+      [ngClass]="{
+        'text-wt-primary': !groupData.isClosed,
+        'text-wt-danger': groupData.isClosed
+      }"
+    >
+      {{ groupData.name | titlecase }}
+    </div>
+    <div class="flex flex-col xs:flex-row items-center flex-1 gap-3">
       <!-- image -->
       <img
         appDefaultImg
         [src]="groupData.imageUrl"
         alt="Group Image"
-        class="object-cover -mt-2"
+        class="object-cover -mt-2 hidden xs:block"
         [style.height.px]="imageHeightPx"
         [style.width.px]="imageHeightPx"
       />
@@ -25,7 +35,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
         <div class="flex gap-4 items-center">
           <!-- name -->
           <div
-            class="text-lg"
+            class="hidden sm:block text-lg"
             [ngClass]="{
               'text-wt-primary': !groupData.isClosed,
               'text-wt-danger': groupData.isClosed

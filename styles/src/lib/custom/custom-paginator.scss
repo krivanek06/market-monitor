@@ -43,5 +43,7 @@ mat-paginator {
 }
 
 .mat-mdc-paginator-range-actions {
-  margin-right: 12px !important;
+  @screen sm {
+    margin-right: 12px !important;
+  }
 }

@@ -69,8 +69,8 @@ import {
 
       <!-- price -->
       <ng-container matColumnDef="price">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Price +/-</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Price +/-</th>
+        <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           <div class="flex flex-row gap-2">
             <div class="text-wt-gray-dark">
               {{ row.symbolSummary.quote.price | currency }}
@@ -123,6 +123,7 @@ import {
             <div
               class="block sm:hidden justify-end text-end"
               appPercentageIncrease
+              [hideValueOnXsScreen]="true"
               [useCurrencySign]="true"
               [currentValues]="{
                 value: row.symbolSummary.quote.price * row.units,

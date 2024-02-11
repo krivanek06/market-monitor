@@ -128,6 +128,19 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         </a>
 
         <div class="flex-1 flex justify-end">
+          <!-- user on small screen -->
+          <div class="flex sm:hidden items-center gap-2 pr-6">
+            <!-- avatar -->
+            <img
+              appDefaultImg
+              [src]="userDataSignal()?.personal?.photoURL"
+              alt="User Image"
+              class="rounded-full w-8 h-8"
+            />
+            <!-- name -->
+            <div>{{ userDataSignal()?.personal?.displayName }}</div>
+          </div>
+
           <!-- search -->
           <app-stock-search-basic-customized
             [showValueChange]="true"

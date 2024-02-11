@@ -28,9 +28,9 @@ import { GenericChartComponent } from '@market-monitor/shared/ui';
       <mat-divider></mat-divider>
     </div>
     <!-- display portfolio -->
-    <div class="flex p-2 sm:divide-x-2 flex-row">
+    <div class="flex p-2 divide-x-2 flex-row max-lg:overflow-x-scroll">
       <!-- portfolio state -->
-      <div class="p-6 max-lg:flex-1 lg:basis-[40%]">
+      <div class="p-2 max-md:p-6 max-lg:flex-1 lg:basis-[40%] max-lg:min-w-[375px]">
         <app-portfolio-state
           [titleColor]="ColorScheme.GRAY_DARK_VAR"
           [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
@@ -39,7 +39,7 @@ import { GenericChartComponent } from '@market-monitor/shared/ui';
         ></app-portfolio-state>
       </div>
       <!-- risk -->
-      <div class="flex-1 p-6 hidden sm:block">
+      <div class="p-2 flex-1 max-md:p-6 max-lg:min-w-[300px]">
         <app-portfolio-state-risk
           [titleColor]="ColorScheme.GRAY_DARK_VAR"
           [portfolioState]="userData.portfolioState"
@@ -47,7 +47,7 @@ import { GenericChartComponent } from '@market-monitor/shared/ui';
         ></app-portfolio-state-risk>
       </div>
       <!-- transactions -->
-      <div class="flex-1 p-6 hidden lg:block">
+      <div class="p-2 flex-1 max-md:p-6 max-lg:min-w-[300px]">
         <app-portfolio-state-transactions
           [portfolioState]="userData.portfolioState"
           [titleColor]="ColorScheme.GRAY_DARK_VAR"

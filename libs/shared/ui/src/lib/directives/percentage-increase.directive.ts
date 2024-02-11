@@ -47,8 +47,7 @@ export class PercentageIncreaseDirective implements OnInit {
   }
   @Input() useCurrencySign = false;
 
-  @Input() changesPercentageSpanClasses: string[] = [];
-  @Input() changesSpanClasses: string[] = [];
+  @Input() hideValueOnXsScreen = false;
 
   constructor(
     private renderer2: Renderer2,
@@ -141,9 +140,6 @@ export class PercentageIncreaseDirective implements OnInit {
       // colors
       this.renderer2.addClass(changesPercentageSpan, color);
 
-      // additional classes
-      this.changesPercentageSpanClasses.forEach((c) => this.renderer2.addClass(changesPercentageSpan, c));
-
       // attach to each other
       this.renderer2.appendChild(matIcon, matIconText);
       this.renderer2.appendChild(changesPercentageSpan, changesPercentageText);
@@ -166,8 +162,10 @@ export class PercentageIncreaseDirective implements OnInit {
       // changesPercentage does not exist -> changeSpan will be color
       this.renderer2.addClass(changeSpan, color);
 
-      // additional classes
-      this.changesSpanClasses.forEach((c) => this.renderer2.addClass(changeSpan, c));
+      // hide value on small screen
+      if (this.hideValueOnXsScreen) {
+        this.renderer2.addClass(changeSpan, 'max-xs:hidden');
+      }
 
       // show on DOM
       this.renderer2.appendChild(changeSpan, changeText);

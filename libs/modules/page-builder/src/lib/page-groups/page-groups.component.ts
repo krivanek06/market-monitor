@@ -128,7 +128,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
 
         <!-- my groups -->
         <div *ngIf="groups.groupOwner.length > 0">
-          <h2>My Groups</h2>
+          <app-section-title title="My Groups" />
           <div class="flex flex-col gap-3">
             <app-group-display-card
               *ngFor="let group of groups.groupOwner"
@@ -140,7 +140,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
 
         <!-- member of -->
         <div *ngIf="groups.groupMember.length > 0">
-          <h2>Member of</h2>
+          <app-section-title title="Member of" />
           <div class="flex flex-col gap-3">
             <app-group-display-card
               *ngFor="let group of groups.groupMember"

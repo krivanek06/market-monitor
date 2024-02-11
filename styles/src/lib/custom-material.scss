@@ -39,6 +39,7 @@ $mat-theming-light: mat.define-light-theme(
       mat.define-typography-config(
         $font-family: 'Poppins, sans-serif',
       ),
+    density: -1,
   )
 );
 
@@ -54,6 +55,7 @@ $mat-theming-dark: mat.define-dark-theme(
       mat.define-typography-config(
         $font-family: 'Poppins, sans-serif',
       ),
+    density: -1,
   )
 );
 

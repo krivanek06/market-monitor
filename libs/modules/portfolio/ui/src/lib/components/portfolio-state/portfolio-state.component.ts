@@ -27,7 +27,7 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
         <div *ngIf="showCashSegment" class="flex justify-between @md:flex-col">
           <div [appAddColor]="titleColor" class="sm:text-lg">Cash</div>
           <div [appAddColor]="valueColor" class="sm:text-lg">
-            {{ portfolioState?.cashOnHand | currency }} / {{ portfolioState?.startingCash | currency }}
+            {{ portfolioState?.cashOnHand | currency }}
           </div>
         </div>
 

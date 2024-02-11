@@ -40,7 +40,22 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
           <!-- logo + symbol -->
           <div class="flex items-center gap-2">
             <img appDefaultImg imageType="symbol" [src]="row.symbol" class="w-10 h-10" />
-            <div class="text-wt-primary">{{ row.symbol }}</div>
+            <div class="flex flex-col">
+              <div class="flex items-center gap-2">
+                <div class="text-wt-primary">{{ row.symbol }}</div>
+                <div
+                  class="block sm:hidden"
+                  [ngClass]="{
+                    'text-wt-danger': row.transactionType === 'SELL',
+                    'text-wt-success': row.transactionType === 'BUY'
+                  }"
+                >
+                  {{ row.transactionType }}
+                </div>
+                <div class="block sm:hidden text-wt-gray-dark">[{{ row.units }}]</div>
+              </div>
+              <span class="block md:hidden"> {{ row.date | date: 'MMMM d, y' }}</span>
+            </div>
           </div>
         </td>
       </ng-container>
@@ -74,10 +89,10 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
       <!-- totalValue -->
       <ng-container matColumnDef="totalValue">
         <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Total Value</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          <span class="text-wt-gray-dark">
+        <td mat-cell *matCellDef="let row">
+          <div class="text-wt-gray-dark max-sm:text-end max-sm:mr-3">
             {{ row.unitPrice * row.units | currency }}
-          </span>
+          </div>
         </td>
       </ng-container>
 
@@ -99,16 +114,16 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
 
       <!-- transactionFees -->
       <ng-container matColumnDef="transactionFees">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Fees</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+        <th mat-header-cell *matHeaderCellDef class="hidden md:table-cell">Fees</th>
+        <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           {{ row.transactionFees | currency }}
         </td>
       </ng-container>
 
       <!-- return -->
       <ng-container matColumnDef="return">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Return</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">Return</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div
             appPercentageIncrease
             [useCurrencySign]="true"
@@ -119,8 +134,8 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
 
       <!-- date -->
       <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Date</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+        <th mat-header-cell *matHeaderCellDef class="hidden md:table-cell">Date</th>
+        <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           {{ row.date | date: 'MMMM d, y' }}
         </td>
       </ng-container>
@@ -153,7 +168,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
     </table>
 
     <!-- pagination -->
-    <div class="relative px-4">
+    <div class="relative md:px-4">
       <mat-paginator
         appStylePaginator
         showFirstLastButtons

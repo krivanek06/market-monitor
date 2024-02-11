@@ -50,7 +50,7 @@ export type UserDetailsDialogComponentData = {
         </div>
 
         <!-- action buttons -->
-        <div class="ml-8 -mb-4">
+        <div class="ml-8 -mb-4 hidden md:block">
           <!-- navigation -->
           <app-tab-select-control
             [formControl]="selectedTabControl"
