@@ -76,7 +76,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
             [template]="userTemplate"
           />
         </div>
-        <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-10">
+        <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
           <!-- daily best -->
           <div class="@container">
             <app-section-title title="Daily Gainers" class="mb-6" />
@@ -117,9 +117,22 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
     <!-- template for user data in table -->
     <ng-template #userTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
-        <img appDefaultImg [src]="data.personal.photoURL" alt="user image" class="w-10 h-10 rounded-lg" />
-        <div class="grid">
-          <div appPositionColoring [position]="position">{{ data.personal.displayName }}</div>
+        <mat-icon [color]="data.item.isAccountActive ? 'accent' : 'warn'"> radio_button_checked </mat-icon>
+        <img appDefaultImg [src]="data.item.personal.photoURL" alt="user image" class="w-10 h-10 rounded-lg" />
+        <div class="flex items-center gap-2">
+          <div appPositionColoring [position]="position">{{ data.item.personal.displayName }}</div>
+          <!-- display position change if any -->
+          @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
+            @if (rankChange !== 0) {
+              <div class="flex items-center gap-1 ml-4">
+                <span [ngClass]="{ 'text-wt-success': rankChange > 0, 'text-wt-danger': rankChange < 0 }">
+                  {{ rankChange }}
+                </span>
+                <mat-icon *ngIf="rankChange > 0" color="accent" class="scale-150">arrow_drop_up</mat-icon>
+                <mat-icon *ngIf="rankChange < 0" color="warn" class="scale-150">arrow_drop_down</mat-icon>
+              </div>
+            }
+          }
         </div>
       </div>
     </ng-template>

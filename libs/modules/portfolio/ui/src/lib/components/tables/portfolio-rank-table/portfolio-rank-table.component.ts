@@ -11,7 +11,7 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { PortfolioState } from '@market-monitor/api-types';
+import { HallOfFameTopRankData, PortfolioState } from '@market-monitor/api-types';
 import { PercentageIncreaseDirective, PositionColoringDirective } from '@market-monitor/shared/ui';
 
 @Component({
@@ -46,7 +46,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective } from '@market-
       <ng-container matColumnDef="balance">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Balance</th>
         <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
-          <span appPositionColoring [position]="i + 1">{{ row.portfolioState.balance | currency }}</span>
+          <span appPositionColoring [position]="i + 1">{{ row.item.portfolioState.balance | currency }}</span>
         </td>
       </ng-container>
 
@@ -56,14 +56,15 @@ import { PercentageIncreaseDirective, PositionColoringDirective } from '@market-
         <td mat-cell *matCellDef="let row; let i = index">
           <div class="flex flex-col">
             <div appPositionColoring [position]="i + 1" class="block md:hidden text-end">
-              {{ row.portfolioState.balance | currency }}
+              {{ row.item.portfolioState.balance | currency }}
             </div>
             <div
               class="max-md:justify-end"
               appPercentageIncrease
+              [useCurrencySign]="true"
               [changeValues]="{
-                change: row.portfolioState.totalGainsValue,
-                changePercentage: row.portfolioState.totalGainsPercentage
+                change: row.item.portfolioState.totalGainsValue,
+                changePercentage: row.item.portfolioState.totalGainsPercentage
               }"
             ></div>
           </div>
@@ -87,12 +88,12 @@ import { PercentageIncreaseDirective, PositionColoringDirective } from '@market-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioRankTableComponent<
-  T extends {
+  T extends HallOfFameTopRankData<{
     id: string;
     portfolioState: PortfolioState;
-  },
+  }>,
 > {
-  @Output() clickedItem = new EventEmitter<T>();
+  @Output() clickedItem = new EventEmitter<T['item']>();
   /**
    * template that is rendered in the 'name' section
    */
@@ -107,9 +108,9 @@ export class PortfolioRankTableComponent<
   displayedColumns: string[] = ['itemTemplate', 'balance', 'profit'];
   dataSource!: MatTableDataSource<T>;
 
-  identity: TrackByFunction<T> = (index: number, item: T) => item.id;
+  identity: TrackByFunction<T> = (index: number, item: T) => item.item.id;
 
   onItemClick(item: T): void {
-    this.clickedItem.emit(item);
+    this.clickedItem.emit(item.item);
   }
 }

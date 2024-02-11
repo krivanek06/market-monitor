@@ -31,11 +31,11 @@ export const USER_LOGIN_ACCOUNT_ACTIVE_DAYS = 20;
 /**
  * number how many entities to save for hall of fame portfolio best
  */
-export const HALL_OF_FAME_PORTFOLIO_TOP_LIMIT = 35;
+export const HALL_OF_FAME_PORTFOLIO_TOP_LIMIT = 50;
 /**
  * number how many entities to save for hall of fame portfolio daily change
  */
-export const HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT = 10;
+export const HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT = 15;
 
 /**
  * limit how far can we load historical prices for a symbol

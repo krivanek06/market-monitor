@@ -7,7 +7,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { AggregationApiService } from '@market-monitor/api-client';
 import { GroupBase } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
 import { PortfolioRankTableComponent } from '@market-monitor/modules/portfolio/ui';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
@@ -68,7 +67,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
             [template]="userTemplate"
           />
         </div>
-        <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-10">
+        <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
           <!-- daily best -->
           <div class="@container">
             <app-section-title title="Daily Gainers" class="mb-6" />
@@ -107,9 +106,21 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
     <!-- template for user data in table -->
     <ng-template #userTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
-        <img appDefaultImg [src]="data.imageUrl" alt="user image" class="w-10 h-10 rounded-lg" />
-        <div class="grid">
-          <div appPositionColoring [position]="position">{{ data.name }}</div>
+        <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="w-10 h-10 rounded-lg" />
+        <div class="flex items-center gap-2">
+          <div appPositionColoring [position]="position">{{ data.item.name }}</div>
+          <!-- display position change if any -->
+          @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
+            @if (rankChange !== 0) {
+              <div class="flex items-center gap-1 ml-4">
+                <span [ngClass]="{ 'text-wt-success': rankChange > 0, 'text-wt-danger': rankChange < 0 }">
+                  {{ rankChange }}
+                </span>
+                <mat-icon *ngIf="rankChange > 0" color="accent" class="scale-150">arrow_drop_up</mat-icon>
+                <mat-icon *ngIf="rankChange < 0" color="warn" class="scale-150">arrow_drop_down</mat-icon>
+              </div>
+            }
+          }
         </div>
       </div>
     </ng-template>
@@ -123,7 +134,6 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
 })
 export class HallOfFameGroupsComponent {
   private aggregationApiService = inject(AggregationApiService);
-  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private router = inject(Router);
 
   /**

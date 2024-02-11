@@ -1,4 +1,9 @@
-import { HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT, HALL_OF_FAME_PORTFOLIO_TOP_LIMIT } from '@market-monitor/api-types';
+import {
+  GroupBase,
+  HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT,
+  HALL_OF_FAME_PORTFOLIO_TOP_LIMIT,
+  HallOfFameTopRankData,
+} from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { groupsCollectionRef } from '../models';
 import { aggregationHallOfFameGroupsRef } from '../models/aggregation';
@@ -39,15 +44,30 @@ export const hallOfFameGroups = async (): Promise<void> => {
   const groupBestProfitData = groupBestProfitDoc.docs
     .map((d) => d.data())
     .filter((d) => !!d)
-    .map((d) => transformGroupToBase(d));
+    .map(
+      (d) =>
+        ({
+          item: transformGroupToBase(d),
+          portfolioTotalGainsPercentage: d.systemRank.portfolioTotalGainsPercentage,
+        }) satisfies HallOfFameTopRankData<GroupBase>,
+    );
+
   const groupWorstProfitData = groupWorstProfitDoc.docs
     .map((d) => d.data())
     .filter((d) => !!d)
-    .map((d) => transformGroupToBase(d));
+    .map(
+      (d) =>
+        ({
+          item: transformGroupToBase(d),
+          portfolioTotalGainsPercentage: d.systemRank.portfolioTotalGainsPercentage,
+        }) satisfies HallOfFameTopRankData<GroupBase>,
+    );
+
   const groupBestDailyProfitData = groupBestDailyProfitDoc.docs
     .map((d) => d.data())
     .filter((d) => !!d)
     .map((d) => transformGroupToBase(d));
+
   const groupWorstDailyProfitData = groupWorstDailyProfitDoc.docs
     .map((d) => d.data())
     .filter((d) => !!d)

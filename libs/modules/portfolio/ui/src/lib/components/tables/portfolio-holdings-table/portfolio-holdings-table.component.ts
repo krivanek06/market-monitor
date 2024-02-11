@@ -289,7 +289,9 @@ export class PortfolioHoldingsTableComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.holdings) {
-      const sorted = this.holdings.slice().sort((a, b) => (b.invested > a.invested ? 1 : -1));
+      const sorted = this.holdings
+        .slice()
+        .sort((a, b) => compare(b.symbolSummary.quote.price * b.units, a.symbolSummary.quote.price * a.units));
       this.dataSource = new MatTableDataSource(sorted);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
@@ -314,8 +316,6 @@ export class PortfolioHoldingsTableComponent implements OnChanges {
           return compare(a.symbol, b.symbol, isAsc);
         case 'price':
           return compare(a.symbolSummary.quote.price, b.symbolSummary.quote.price, isAsc);
-        case 'total':
-          return compare(a.symbolSummary.quote.price * a.units, b.symbolSummary.quote.price * b.units, isAsc);
         case 'invested':
           return compare(a.invested, b.invested, isAsc);
         case 'units':

@@ -10,7 +10,6 @@ import { SectionTitleComponent } from '@market-monitor/shared/ui';
   template: `
     <div class="p-4">
       <app-portfolio-holdings-table
-        (symbolClicked)="onSummaryClick($event)"
         [holdings]="holdings"
         [holdingsBalance]="holdingsBalance"
         [displayedColumns]="displayedColumns"
@@ -29,9 +28,5 @@ export class UserDetailsHoldingsComponent {
   @Input({ required: true }) holdingsBalance!: number;
   @Input({ required: true }) holdings!: PortfolioStateHolding[];
 
-  displayedColumns: string[] = ['symbol', 'price', 'bep', 'total', 'invested', 'portfolio', 'marketCap'];
-
-  constructor() {}
-
-  onSummaryClick(symbol: string) {}
+  displayedColumns: string[] = ['symbol', 'price', 'balance', 'invested', 'totalChange', 'portfolio'];
 }
