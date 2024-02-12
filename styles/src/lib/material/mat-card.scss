@@ -1,3 +1,10 @@
 .mat-mdc-card-outlined {
   border: none !important;
 }
+
+.mat-mdc-card-content {
+  padding: 0 8px !important;
+  @screen sm {
+    padding: 0 16px !important;
+  }
+}

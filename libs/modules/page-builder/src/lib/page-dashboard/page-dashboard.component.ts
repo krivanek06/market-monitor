@@ -125,8 +125,8 @@ import {
         </app-general-card>
       </div>
 
-      <div class="grid xl:grid-cols-3 gap-8">
-        <div class="xl:col-span-2">
+      <div class="flex flex-col-reverse xl:flex-row gap-y-4 gap-8">
+        <div class="xl:basis-2/3">
           <!-- transaction history -->
           <div>
             <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
@@ -138,14 +138,16 @@ import {
         </div>
 
         <!-- holdings pie charts -->
-        <div class="flex justify-between xl:justify-around xl:flex-col gap-10 mb-10 overflow-x-clip">
+        <div
+          class="flex justify-center md:justify-between xl:justify-around xl:flex-col gap-10 mb-10 overflow-x-clip max-sm:-ml-6"
+        >
           <app-pie-chart
             chartTitle="Asset Allocation"
             [heightPx]="400"
             [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
           ></app-pie-chart>
           <app-pie-chart
-            class="hidden sm:block"
+            class="hidden md:block"
             [heightPx]="400"
             chartTitle="Sector Allocation"
             [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"

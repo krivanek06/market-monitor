@@ -19,7 +19,10 @@ import { isBefore, subDays } from 'date-fns';
         <div class="flex">
           <div class="text-wt-gray-dark w-[80px]">Name:</div>
           <div class="mr-4">{{ userData.personal.displayName }}</div>
-          <mat-icon *ngIf="showLoginButton" [color]="isUserActive ? 'accent' : 'warn'"> radio_button_checked </mat-icon>
+          <!-- active user -->
+          <mat-icon *ngIf="showLoginButton" [color]="isUserActive ? 'accent' : 'warn'" class="hidden sm:block">
+            radio_button_checked
+          </mat-icon>
         </div>
 
         <div class="flex">

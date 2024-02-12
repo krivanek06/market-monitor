@@ -16,7 +16,7 @@ import { GeneralCardComponent } from '@market-monitor/shared/ui';
         <!-- received invitations -->
         <div *ngIf="memberRequestUsers.length > 0">
           <div class="mb-4 text-lg">Received Invitations</div>
-          <div class="flex flex-wrap gap-4">
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
             <div
               *ngFor="let user of memberRequestUsers"
               (click)="onReceivedInvitationClick(user)"
@@ -35,7 +35,7 @@ import { GeneralCardComponent } from '@market-monitor/shared/ui';
         <!-- sent invitations -->
         <div *ngIf="memberInvitedUsers.length > 0">
           <div class="mb-4 text-lg">Sent Invitations</div>
-          <div class="flex flex-wrap gap-4">
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
             <div
               *ngFor="let user of memberInvitedUsers"
               (click)="onSentInvitationClick(user)"

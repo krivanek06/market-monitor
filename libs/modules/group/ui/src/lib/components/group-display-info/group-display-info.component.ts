@@ -20,7 +20,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
     >
       {{ groupData.name | titlecase }}
     </div>
-    <div class="flex flex-col xs:flex-row items-center flex-1 gap-3">
+    <div class="flex flex-col xs:flex-row xs:items-center flex-1 gap-3">
       <!-- image -->
       <img
         appDefaultImg
@@ -75,7 +75,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
         </div>
         <!-- status -->
         <div class="flex gap-2">
-          <div class="w-20">Status</div>
+          <div class="w-20 text-wt-gray-dark">Status</div>
           <div
             class="flex items-center gap-2"
             [ngClass]="{
@@ -90,12 +90,12 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
         </div>
         <!-- members -->
         <div class="flex gap-2">
-          <div class="w-20">Members</div>
+          <div class="w-20 text-wt-gray-dark">Members</div>
           <div>{{ groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}</div>
         </div>
         <!-- created date -->
         <div class="flex gap-2">
-          <div class="w-20">Created</div>
+          <div class="w-20 text-wt-gray-dark">Created</div>
           <div>{{ groupData.createdDate | date: 'MMMM d, y' }}</div>
         </div>
       </div>

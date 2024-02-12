@@ -90,7 +90,7 @@ import { take } from 'rxjs';
       <!-- historical chart & summary -->
       <div
         *ngIf="symbolSummarySignal() as symbolSummary; else noSelectedSummary"
-        class="flex flex-col gap-4 mb-6 lg:flex-row"
+        class="flex flex-col gap-4 mb-6 xl:flex-row"
       >
         <app-asset-price-chart-interactive
           class="lg:basis-3/5"

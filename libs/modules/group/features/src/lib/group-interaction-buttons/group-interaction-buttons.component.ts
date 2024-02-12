@@ -33,7 +33,10 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
     GroupSettingsDialogComponent,
   ],
   template: `
-    <ng-container *ngIf="!groupDetails.groupData.isClosed; else closedGroupActionButtons">
+    <div
+      *ngIf="!groupDetails.groupData.isClosed; else closedGroupActionButtons"
+      class="flex flex-col gap-y-2 lg:flex-row gap-x-4 w-full"
+    >
       <!-- owner -->
       <button
         *appGroupUserHasRole="groupDetails.groupData.id; include: ['groupOwner']"
@@ -148,7 +151,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         <mat-icon>settings</mat-icon>
         Group Settings
       </button>
-    </ng-container>
+    </div>
 
     <!-- closed group -->
     <ng-template #closedGroupActionButtons>
@@ -244,7 +247,7 @@ export class GroupInteractionButtonsComponent {
     });
   }
 
-  @Confirmable('Are you sure you want to close this group?')
+  @Confirmable('Are you sure you want to close this group?', 'Confirm', true, 'CLOSE')
   async onGroupCloseClick() {
     try {
       // show notification

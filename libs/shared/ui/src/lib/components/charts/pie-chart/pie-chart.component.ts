@@ -20,6 +20,7 @@ import highcharts3d from 'highcharts/highcharts-3d';
       [oneToOne]="true"
       style="width: 100%; display: block"
       [style.height.px]="heightPx"
+      class="max-sm:w-[385px]"
     >
     </highcharts-chart>
   `,

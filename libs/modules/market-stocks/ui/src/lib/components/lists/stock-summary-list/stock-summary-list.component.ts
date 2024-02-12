@@ -27,7 +27,9 @@ import { RecommendationDirective } from '../../../directives';
       <ng-container *ngTemplateOutlet="priceChange; context: { name: '5 days', key: '5D' }"></ng-container>
       <ng-container *ngTemplateOutlet="priceChange; context: { name: '6 months', key: '6M' }"></ng-container>
       <ng-container *ngTemplateOutlet="priceChange; context: { name: '1 year', key: '1Y' }"></ng-container>
-      <ng-container *ngTemplateOutlet="priceChange; context: { name: '5 years', key: '5Y' }"></ng-container>
+      <div class="hidden sm:block">
+        <ng-container *ngTemplateOutlet="priceChange; context: { name: '5 years', key: '5Y' }"></ng-container>
+      </div>
     </div>
 
     <div class="g-item-wrapper">
@@ -62,6 +64,7 @@ import { RecommendationDirective } from '../../../directives';
         <span
           appPercentageIncrease
           [useCurrencySign]="true"
+          [hideValueOnXsScreen]="true"
           [currentValues]="{
             hideValue: false,
             value: symbolSummary.quote.price,
@@ -78,6 +81,7 @@ import { RecommendationDirective } from '../../../directives';
         <span
           appPercentageIncrease
           [useCurrencySign]="false"
+          [hideValueOnXsScreen]="true"
           [currentValues]="{
             hideValue: false,
             value: symbolSummary.quote.volume,

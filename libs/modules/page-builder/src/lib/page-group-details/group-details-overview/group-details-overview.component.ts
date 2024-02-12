@@ -55,7 +55,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
   ],
   template: `
     <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
-      <div class="flex flex-col justify-between mb-6 lg:flex-row gap-x-10">
+      <div class="flex flex-col justify-between mb-6 lg:flex-row gap-x-10 gap-y-6">
         <!-- group info -->
         <app-group-display-info
           class="flex-1"
@@ -68,7 +68,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         <!-- portfolio info -->
         <app-portfolio-state
           class="flex-1"
-          [titleColor]="ColorScheme.PRIMARY_VAR"
+          [titleColor]="ColorScheme.GRAY_DARK_VAR"
           [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
           [showCashSegment]="true"
           [portfolioState]="groupDetailsSignal.groupData.portfolioState"
@@ -130,7 +130,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
           title="Members [{{ groupDetailsSignal.groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}]"
           matIcon="group"
         />
-        <div class="grid grid-cols-2 2xl:grid-cols-3 gap-x-6 gap-y-4">
+        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-4">
           @for (user of groupDetailsSignal.groupMembersData; track user.id) {
             <app-position-card
               (clickedEmitter)="onMemberClick(user)"
