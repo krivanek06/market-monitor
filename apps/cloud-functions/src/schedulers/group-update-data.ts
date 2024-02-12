@@ -1,4 +1,12 @@
-import { GroupData, PortfolioStateHoldingBase, PortfolioTransaction } from '@market-monitor/api-types';
+import {
+  GroupData,
+  GroupHoldingSnapshotsData,
+  GroupMembersData,
+  GroupTransactionsData,
+  PortfolioStateHoldingBase,
+  PortfolioTransaction,
+  UserData,
+} from '@market-monitor/api-types';
 import {
   calculateGrowth,
   createEmptyPortfolioState,
@@ -16,7 +24,6 @@ import {
   groupsCollectionRef,
   userDocumentRef,
   userDocumentTransactionHistoryRef,
-  usersCollectionRef,
 } from '../models';
 import { transformUserToBase, transformUserToGroupMember } from '../utils';
 
@@ -53,6 +60,7 @@ export const groupUpdateData = async (): Promise<void> => {
 const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // load all members of the group
   const ownerData = (await userDocumentRef(group.ownerUserId).get()).data();
+  const isOwnerMember = !!group.memberUserIds.find((m) => m === group.ownerUserId);
 
   if (!ownerData) {
     console.error(`Owner not found for group ${group.id}`);
@@ -63,9 +71,10 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
    * difference is membersPreviousData can contain less people, those who accepted membership only today
    */
   const membersPreviousData = (await groupDocumentMembersRef(group.id).get()).data();
-  const membersCurrentData = (
-    await usersCollectionRef().where('groups.groupMember', 'array-contains', group.id).get()
-  ).docs.map((d) => d.data());
+  const memberIds = membersPreviousData?.data.map((d) => d.id) ?? [];
+  const membersCurrentData = (await Promise.all(memberIds.map((id) => userDocumentRef(id).get())))
+    .map((d) => d.data())
+    .filter((d): d is UserData => !!d);
 
   // load all transactions of the group members
   const memberTransactionHistory = await Promise.all(
@@ -81,23 +90,50 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
 
   // calculate holdings from all members
   const memberHoldingSnapshots = membersCurrentData
-    .map((d) => d.holdingSnapshot.data)
+    // calculate holdings from all members
+    .map((d) =>
+      d.holdingSnapshot.data.reduce(
+        (acc, curr) => ({
+          ...acc,
+          [curr.symbol]: {
+            invested: roundNDigits((acc[curr.symbol]?.invested ?? 0) + curr.invested),
+            units: (acc[curr.symbol]?.units ?? 0) + curr.units,
+            symbol: curr.symbol,
+            symbolType: curr.symbolType,
+          },
+        }),
+        {} as { [key: string]: PortfolioStateHoldingBase },
+      ),
+    )
+    // flatten array - merge all users data into one
     .reduce(
-      (acc, curr) =>
-        curr.reduce(
-          (acc2, curr2) => ({
-            ...acc2,
-            [curr2.symbol]: {
-              invested: roundNDigits((acc[curr2.symbol]?.invested ?? 0) + curr2.invested),
-              units: (acc[curr2.symbol]?.units ?? 0) + curr2.units,
-              symbol: curr2.symbol,
-              symbolType: curr2.symbolType,
-            },
-          }),
-          {} as { [key: string]: PortfolioStateHoldingBase },
-        ),
+      (acc, curr) => {
+        // merge all holdings
+        getObjectEntries(curr).forEach(([key, value]) => {
+          acc[key] = {
+            invested: roundNDigits((acc[key]?.invested ?? 0) + value.invested),
+            units: (acc[key]?.units ?? 0) + value.units,
+            symbol: value.symbol,
+            symbolType: value.symbolType,
+          };
+        });
+
+        return acc;
+      },
       {} as { [key: string]: PortfolioStateHoldingBase },
     );
+
+  // add owner data
+  if (isOwnerMember) {
+    ownerData.holdingSnapshot.data.forEach((holding) => {
+      memberHoldingSnapshots[holding.symbol] = {
+        invested: roundNDigits((memberHoldingSnapshots[holding.symbol]?.invested ?? 0) + holding.invested),
+        units: (memberHoldingSnapshots[holding.symbol]?.units ?? 0) + holding.units,
+        symbol: holding.symbol,
+        symbolType: holding.symbolType,
+      };
+    });
+  }
 
   // calculate portfolioState from all members
   const memberPortfolioState = membersCurrentData
@@ -150,32 +186,38 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   const updatedGroupMembers = membersCurrentData
     .slice()
     .sort((a, b) => b.portfolioState.totalGainsValue - a.portfolioState.totalGainsValue)
-    .map((d, index) => transformUserToGroupMember(d, index + 1, membersPreviousData?.data?.find((m) => m.id === d.id)));
+    .map((d, index) =>
+      transformUserToGroupMember(
+        d,
+        index + 1,
+        membersPreviousData?.data?.find((m) => m.id === d.id),
+      ),
+    );
 
   // update last transactions for the group
   await groupDocumentTransactionsRef(group.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
     data: lastTransactions,
-  });
+  } satisfies GroupTransactionsData);
 
   // update members for the group
   await groupDocumentMembersRef(group.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
     data: updatedGroupMembers,
-  });
+  } satisfies GroupMembersData);
 
   // update owner for group
   await groupDocumentRef(group.id).update({
     ownerUser: transformUserToBase(ownerData),
     modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
     portfolioState: memberPortfolioState,
-  });
+  } satisfies Partial<GroupData>);
 
   // save holding snapshots
   await groupDocumentHoldingSnapshotsRef(group.id).update({
     lastModifiedDate: getCurrentDateDefaultFormat(),
     data: getObjectEntries(memberHoldingSnapshots).map((d) => d[1]),
-  });
+  } satisfies GroupHoldingSnapshotsData);
 
   // save portfolio state
   await groupDocumentPortfolioStateSnapshotsRef(group.id).update({
