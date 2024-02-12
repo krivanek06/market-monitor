@@ -14,6 +14,8 @@ import {
   PortfolioHoldingsTableComponent,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
+  PortfolioTransactionChartComponent,
+  PortfolioTransactionsTableComponent,
 } from '@market-monitor/modules/portfolio/ui';
 import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@market-monitor/modules/user/features';
 import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
@@ -21,6 +23,8 @@ import { ColorScheme } from '@market-monitor/shared/data-access';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import {
   GeneralCardComponent,
+  GenericChartComponent,
+  PieChartComponent,
   PositionCardComponent,
   SectionTitleComponent,
   SortByKeyPipe,
@@ -52,6 +56,10 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     UserDetailsDialogComponent,
     GeneralCardComponent,
     StockSummaryDialogComponent,
+    PieChartComponent,
+    GenericChartComponent,
+    PortfolioTransactionsTableComponent,
+    PortfolioTransactionChartComponent,
   ],
   template: `
     <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
@@ -125,7 +133,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       ></app-group-invitations-manager>
 
       <!-- member -->
-      <div class="grid gap-4 mb-10">
+      <div class="grid gap-4 mb-12">
         <app-section-title
           title="Members [{{ groupDetailsSignal.groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}]"
           matIcon="group"
@@ -144,14 +152,52 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         </div>
       </div>
 
+      <div class="sm:grid mb-12 xl:grid-cols-3 gap-x-4 hidden">
+        <!-- bubble chart -->
+        <app-generic-chart
+          *ngIf="portfolioHoldingBubbleChartSignal() as portfolioHoldingBubbleChart"
+          class="xl:col-span-2 hidden sm:block w-full"
+          [heightPx]="380"
+          [series]="portfolioHoldingBubbleChart"
+        ></app-generic-chart>
+        <!-- sector allocation -->
+        <app-pie-chart
+          class="block max-xl:hidden"
+          *ngIf="portfolioSectorAllocationSignal() as portfolioSectorAllocation"
+          [heightPx]="380"
+          chartTitle="Sector Allocation"
+          [series]="portfolioSectorAllocation"
+        ></app-pie-chart>
+      </div>
+
       <!-- holding table -->
-      <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">
-        <app-portfolio-holdings-table
-          (symbolClicked)="onSummaryClick($event)"
-          [holdings]="getGroupHoldingsSignal()"
-          [holdingsBalance]="groupDetailsSignal.groupData.portfolioState.holdingsBalance"
-        ></app-portfolio-holdings-table>
-      </app-general-card>
+      <div class="mb-10">
+        <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">
+          <app-portfolio-holdings-table
+            (symbolClicked)="onSummaryClick($event)"
+            [holdings]="getGroupHoldingsSignal()"
+            [holdingsBalance]="groupDetailsSignal.groupData.portfolioState.holdingsBalance"
+          ></app-portfolio-holdings-table>
+        </app-general-card>
+      </div>
+
+      <!-- transaction chart -->
+      <div class="mb-6">
+        <app-section-title title="Last Transactions" matIcon="history" />
+        <app-portfolio-transaction-chart
+          [data]="groupDetailsSignal.groupPortfolioSnapshotsData"
+        ></app-portfolio-transaction-chart>
+      </div>
+
+      <!-- transactions -->
+      <div>
+        <app-section-title title="Transaction History" matIcon="history" additionalClasses="pl-1 mb-3" />
+        <app-portfolio-transactions-table
+          [showTransactionFees]="true"
+          [showUser]="true"
+          [data]="groupDetailsSignal.groupTransactionsData | sortByKey: 'date' : 'desc'"
+        ></app-portfolio-transactions-table>
+      </div>
     </ng-container>
   `,
   styles: `
@@ -165,6 +211,14 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
   GROUP_MEMBER_LIMIT = GROUP_MEMBER_LIMIT;
   portfolioCalculationService = inject(PortfolioCalculationService);
   userApiService = inject(UserApiService);
+
+  portfolioSectorAllocationSignal = computed(() =>
+    this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(this.getGroupHoldingsSignal()),
+  );
+
+  portfolioHoldingBubbleChartSignal = computed(() =>
+    this.portfolioCalculationService.getPortfolioHoldingBubbleChart(this.getGroupHoldingsSignal()),
+  );
 
   memberRequestedUsersSignal = computedFrom(
     [this.groupDetailsSignal],

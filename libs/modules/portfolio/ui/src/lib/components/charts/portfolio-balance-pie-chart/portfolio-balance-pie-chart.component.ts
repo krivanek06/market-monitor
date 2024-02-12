@@ -114,7 +114,7 @@ export class PortfolioBalancePieChartComponent extends ChartConstructor {
             },
             {
               name: 'Invested',
-              y: data.invested,
+              y: data.holdingsBalance,
               color: ColorScheme.ACCENT_1_VAR,
             },
           ],

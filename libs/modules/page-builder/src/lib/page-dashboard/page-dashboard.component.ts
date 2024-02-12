@@ -139,9 +139,10 @@ import {
 
         <!-- holdings pie charts -->
         <div
-          class="flex justify-center md:justify-between xl:justify-around xl:flex-col gap-10 mb-10 overflow-x-clip max-sm:-ml-6"
+          class="flex justify-center md:justify-between xl:justify-around xl:flex-col gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6"
         >
           <app-pie-chart
+            class="max-sm:w-[385px]"
             chartTitle="Asset Allocation"
             [heightPx]="400"
             [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"

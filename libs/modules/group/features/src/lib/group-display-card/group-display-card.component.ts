@@ -43,7 +43,7 @@ import { PortfolioBalancePieChartComponent } from '@market-monitor/modules/portf
           </div>
 
           <!-- portfolio chart -->
-          <div class="hidden xl:block -mt-4 w-[400px]">
+          <div class="hidden lg:block -mt-2 w-[400px]">
             <app-portfolio-balance-pie-chart
               *ngIf="groupData.portfolioState.balance > 0"
               [heightPx]="200"

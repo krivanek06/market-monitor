@@ -18,15 +18,18 @@ import highcharts3d from 'highcharts/highcharts-3d';
       [callbackFunction]="chartCallback"
       [(update)]="updateFromInput"
       [oneToOne]="true"
-      style="width: 100%; display: block"
       [style.height.px]="heightPx"
-      class="max-sm:w-[385px]"
     >
     </highcharts-chart>
   `,
   styles: `
     :host {
       display: block;
+
+      highcharts-chart {
+        width: 100% !important;
+        display: block !important;
+      }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

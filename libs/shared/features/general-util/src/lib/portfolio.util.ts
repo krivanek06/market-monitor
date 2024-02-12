@@ -127,7 +127,7 @@ export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransact
           symbolType: curr.symbolType,
           symbol: curr.symbol,
           units: curr.units,
-          invested: curr.unitPrice * curr.units,
+          invested: roundNDigits(curr.unitPrice * curr.units),
         } satisfies PortfolioStateHoldingBase,
       ];
     }, [] as PortfolioStateHoldingBase[])

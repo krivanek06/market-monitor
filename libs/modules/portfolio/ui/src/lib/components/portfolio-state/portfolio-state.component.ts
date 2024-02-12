@@ -20,7 +20,7 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
         <!-- Invested -->
         <div class="flex justify-between @md:flex-col">
           <div [appAddColor]="titleColor" class="sm:text-lg">Invested</div>
-          <div [appAddColor]="valueColor" class="sm:text-lg">{{ portfolioState?.invested | currency }}</div>
+          <div [appAddColor]="valueColor" class="sm:text-lg">{{ portfolioState?.holdingsBalance | currency }}</div>
         </div>
 
         <!-- Cash -->
