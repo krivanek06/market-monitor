@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { UserApiService } from '@market-monitor/api-client';
@@ -60,6 +61,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     GenericChartComponent,
     PortfolioTransactionsTableComponent,
     PortfolioTransactionChartComponent,
+    MatButtonModule,
   ],
   template: `
     <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
@@ -134,12 +136,30 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <!-- member -->
       <div class="grid gap-4 mb-12">
-        <app-section-title
-          title="Members [{{ groupDetailsSignal.groupData.memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}]"
-          matIcon="group"
-        />
+        <div class="flex items-center justify-between">
+          <app-section-title
+            title="Members [{{ groupDetailsSignal.groupMembersData.length }} / {{ GROUP_MEMBER_LIMIT }}]"
+            matIcon="group"
+          />
+          <!-- show more members button -->
+          <button
+            *ngIf="
+              displayMembersLimit() === displayHoldingLimitInitial &&
+              groupDetailsSignal.groupMembersData.length > displayHoldingLimitInitial
+            "
+            class="hidden sm:block"
+            (click)="onShowMoreMembers()"
+            type="button"
+            mat-stroked-button
+            color="primary"
+          >
+            <mat-icon>expand_more</mat-icon>
+            show {{ groupDetailsSignal.groupMembersData.length - displayMembersLimit() }} more members
+          </button>
+        </div>
+        <!-- member list -->
         <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-4">
-          @for (user of groupDetailsSignal.groupMembersData; track user.id) {
+          @for (user of groupDetailsSignal.groupMembersData | slice: 0 : displayMembersLimit(); track user.id) {
             <app-position-card
               (clickedEmitter)="onMemberClick(user)"
               [clickable]="true"
@@ -150,6 +170,21 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
             </app-position-card>
           }
         </div>
+        <!-- show more members button -->
+        <button
+          *ngIf="
+            displayMembersLimit() === displayHoldingLimitInitial &&
+            groupDetailsSignal.groupMembersData.length > displayHoldingLimitInitial
+          "
+          class="block w-full sm:hidden"
+          (click)="onShowMoreMembers()"
+          type="button"
+          mat-stroked-button
+          color="primary"
+        >
+          <mat-icon>expand_more</mat-icon>
+          show {{ groupDetailsSignal.groupMembersData.length - displayMembersLimit() }} more
+        </button>
       </div>
 
       <div class="sm:grid mb-12 xl:grid-cols-3 gap-x-4 hidden">
@@ -172,12 +207,29 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <!-- holding table -->
       <div class="mb-10">
-        <app-general-card title="Holdings" titleScale="large" matIcon="show_chart">
+        <app-general-card
+          [title]="'Holdings: ' + getGroupHoldingsSignal().length"
+          titleScale="large"
+          matIcon="show_chart"
+        >
           <app-portfolio-holdings-table
             (symbolClicked)="onSummaryClick($event)"
-            [holdings]="getGroupHoldingsSignal()"
+            [holdings]="getGroupHoldingsSignal() | slice: 0 : displayHoldingLimit()"
             [holdingsBalance]="groupDetailsSignal.groupData.portfolioState.holdingsBalance"
           ></app-portfolio-holdings-table>
+          <!-- show more button -->
+          <div
+            *ngIf="
+              getGroupHoldingsSignal().length > displayHoldingLimitInitial &&
+              displayHoldingLimit() === displayHoldingLimitInitial
+            "
+            class="flex justify-end mt-2 mr-2"
+          >
+            <button (click)="onShowMoreHolding()" type="button" mat-button color="primary">
+              <mat-icon>expand_more</mat-icon>
+              show {{ getGroupHoldingsSignal().length - displayHoldingLimit() }} more
+            </button>
+          </div>
         </app-general-card>
       </div>
 
@@ -191,7 +243,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <!-- transactions -->
       <div>
-        <app-section-title title="Transaction History" matIcon="history" additionalClasses="pl-1 mb-3" />
+        <app-section-title title="Last Transactions" matIcon="history" additionalClasses="pl-1 mb-3" />
         <app-portfolio-transactions-table
           [showTransactionFees]="true"
           [showUser]="true"
@@ -249,6 +301,10 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
     this.portfolioCalculationService.getPortfolioChange(this.portfolioGrowthSignal()),
   );
 
+  displayHoldingLimitInitial = 12;
+  displayHoldingLimit = signal(this.displayHoldingLimitInitial);
+  displayMembersLimit = signal(this.displayHoldingLimitInitial);
+
   ColorScheme = ColorScheme;
 
   ngOnInit(): void {}
@@ -269,5 +325,13 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });
+  }
+
+  onShowMoreHolding() {
+    this.displayHoldingLimit.set(1000);
+  }
+
+  onShowMoreMembers() {
+    this.displayMembersLimit.set(1000);
   }
 }

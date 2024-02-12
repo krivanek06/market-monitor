@@ -32,7 +32,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
   ],
   template: `
     <div class="w-full shadow-md">
-      <nav class="w-full py-1 sm:py-4 pl-3 sm:pl-8 sm:pr-4 flex items-center gap-4 max-w-[1620px] mx-auto">
+      <nav class="w-full pl-3 sm:pl-8 sm:pr-4 flex items-center gap-4 max-w-[1620px] mx-auto">
         <!-- hide menu button -->
         <div class="block xl:hidden">
           <button type="button" mat-icon-button (click)="onMenuClick()">
@@ -146,7 +146,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
             [showValueChange]="true"
             [showHint]="false"
             displayValue="symbol"
-            class="hidden sm:block w-[520px] scale-[0.8] -mb-4 -mr-10"
+            class="hidden sm:block w-[520px] scale-[0.8] -mb-4 -mr-10 mt-3"
           />
 
           <div class="gap-1 items-center hidden xl:flex">
