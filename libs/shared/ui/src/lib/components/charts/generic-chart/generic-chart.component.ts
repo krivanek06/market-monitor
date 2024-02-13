@@ -346,7 +346,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
             format: '{point.name}',
 
             style: {
-              color: 'black',
+              color: ColorScheme.GRAY_DARK_VAR,
               fontSize: '16px',
               textOutline: 'none',
               fontWeight: 'normal',

@@ -1,21 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, computed, inject, signal } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { GroupApiService, UserApiService } from '@market-monitor/api-client';
-import { GroupData, PortfolioGrowthAssets, PortfolioStateHoldings, UserData } from '@market-monitor/api-types';
+import { UserApiService } from '@market-monitor/api-client';
+import { PortfolioGrowthAssets, PortfolioStateHoldings, UserData } from '@market-monitor/api-types';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { PortfolioCalculationService, PortfolioGrowthService } from '@market-monitor/modules/portfolio/data-access';
-import { LabelValue } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { DefaultImgDirective, TabSelectControlComponent } from '@market-monitor/shared/ui';
+import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
+import { DefaultImgDirective } from '@market-monitor/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
-import { forkJoin, from, map, share, switchMap, tap } from 'rxjs';
-import { UserDetailsHoldingsComponent } from './user-details-holdings/user-details-holdings.component';
+import { from, map, share, switchMap, tap } from 'rxjs';
 import { UserDetailsOverviewComponent } from './user-details-overview/user-details-overview.component';
 
 export type UserDetailsDialogComponentData = {
@@ -34,28 +31,16 @@ export type UserDetailsDialogComponentData = {
     DefaultImgDirective,
     MatProgressSpinnerModule,
     UserDetailsOverviewComponent,
-    TabSelectControlComponent,
-    ReactiveFormsModule,
-    UserDetailsHoldingsComponent,
     StockSummaryDialogComponent,
   ],
   template: `
-    <div class="flex items-center justify-between p-4 mb-4">
+    <div class="flex items-center justify-between p-4">
       <!-- display user -->
       <div *ngIf="userDataSignal() as user" class="flex items-center gap-2">
         <img appDefaultImg [src]="user.personal.photoURL" alt="User Image" class="rounded-full w-14 h-14" />
         <div class="flex flex-col">
           <span class="text-xl">{{ user.personal.displayName }}</span>
           <span class="text-sm">{{ user.accountCreatedDate | date: 'MMMM d, y' }}</span>
-        </div>
-
-        <!-- action buttons -->
-        <div class="ml-8 -mb-4 hidden md:block">
-          <!-- navigation -->
-          <app-tab-select-control
-            [formControl]="selectedTabControl"
-            [displayOptions]="displayOptions"
-          ></app-tab-select-control>
         </div>
       </div>
 
@@ -67,21 +52,13 @@ export type UserDetailsDialogComponentData = {
       </div>
     </div>
 
-    <mat-dialog-content class="h-[675px]">
+    <mat-dialog-content class="md:h-[675px]">
       @if (userDataSignal(); as userData) {
-        <!-- overview -->
         <app-user-details-overview
-          *ngIf="selectedTabControl.value === 'overview'"
           [userData]="userData"
           [portfolioGrowth]="portfolioGrowthSignal()"
+          [holdings]="portfolioStateHoldingSignal()"
         ></app-user-details-overview>
-
-        <!-- holdings -->
-        <app-user-details-holdings
-          *ngIf="selectedTabControl.value === 'holdings'"
-          [holdings]="portfolioStateHoldingSignal()?.holdings ?? []"
-          [holdingsBalance]="portfolioStateHoldingSignal()?.balance ?? 0"
-        ></app-user-details-holdings>
       } @else {
         <mat-spinner></mat-spinner>
       }
@@ -96,20 +73,12 @@ export type UserDetailsDialogComponentData = {
 })
 export class UserDetailsDialogComponent {
   private userApiService = inject(UserApiService);
-  private groupApiService = inject(GroupApiService);
   private dialogServiceUtil = inject(DialogServiceUtil);
   private portfolioGrowthService = inject(PortfolioGrowthService);
   private portfolioCalculationService = inject(PortfolioCalculationService);
   private dialog = inject(MatDialog);
 
   userDataSignal = signal<UserData | undefined>(undefined);
-  userGroupDataSignal = signal<{
-    groupOwner: GroupData[];
-    groupMember: GroupData[];
-  }>({
-    groupMember: [],
-    groupOwner: [],
-  });
   portfolioStateHoldingSignal = signal<PortfolioStateHoldings | undefined>(undefined);
   portfolioGrowthAssetsSignal = signal<PortfolioGrowthAssets[]>([]);
   portfolioGrowthSignal = computed(() =>
@@ -118,12 +87,6 @@ export class UserDetailsDialogComponent {
       this.userDataSignal()?.portfolioState?.startingCash,
     ),
   );
-
-  selectedTabControl = new FormControl<'overview' | 'holdings'>('overview');
-  displayOptions: LabelValue<'overview' | 'holdings'>[] = [
-    { label: 'Overview', value: 'overview' },
-    { label: 'Holdings', value: 'holdings' },
-  ];
 
   constructor(
     private dialogRef: MatDialogRef<UserDetailsDialogComponent>,
@@ -154,23 +117,6 @@ export class UserDetailsDialogComponent {
       this.userDataSignal.set(userData);
     });
 
-    // load user group data
-    userRef$
-      .pipe(
-        switchMap((userData) =>
-          forkJoin([
-            this.groupApiService.getGroupDataByIds(userData.groups.groupOwner),
-            this.groupApiService.getGroupDataByIds(userData.groups.groupMember),
-          ]),
-        ),
-      )
-      .subscribe(([groupOwner, groupMember]) =>
-        this.userGroupDataSignal.set({
-          groupMember,
-          groupOwner,
-        }),
-      );
-
     // load user portfolio state
     userPortfolioTransactions$
       .pipe(
@@ -183,19 +129,6 @@ export class UserDetailsDialogComponent {
     userPortfolioTransactions$
       .pipe(switchMap((data) => from(this.portfolioGrowthService.getPortfolioGrowthAssets(data.transactions))))
       .subscribe((portfolioGrowthAssets) => this.portfolioGrowthAssetsSignal.set(portfolioGrowthAssets));
-  }
-
-  onSummaryClick(symbol: string) {
-    // close current dialog
-    this.onDialogClose();
-
-    // open new dialog
-    this.dialog.open(StockSummaryDialogComponent, {
-      data: {
-        symbol: symbol,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
   }
 
   onDialogClose() {

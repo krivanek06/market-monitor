@@ -90,8 +90,8 @@ import {
 
       <!-- daily -->
       <ng-container matColumnDef="dailyValueChange">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Daily +/-</th>
-        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">Daily +/-</th>
+        <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
           <div
             appPercentageIncrease
             [useCurrencySign]="true"

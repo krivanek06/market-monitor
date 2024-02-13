@@ -43,6 +43,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
             <div class="flex flex-col">
               <div class="flex items-center gap-2">
                 <div class="text-wt-primary">{{ row.symbol }}</div>
+                <!-- transaction -->
                 <div
                   class="block sm:hidden"
                   [ngClass]="{
@@ -52,7 +53,12 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
                 >
                   {{ row.transactionType }}
                 </div>
+                <!-- units -->
                 <div class="block sm:hidden text-wt-gray-dark">[{{ row.units }}]</div>
+                <!-- user -->
+                <div *ngIf="showUser" class="lg:hidden block">
+                  <img class="rounded-full h-6 w-6" appDefaultImg [src]="row.userPhotoURL" />
+                </div>
               </div>
               <span class="block md:hidden"> {{ row.date | date: 'MMMM d, y' }}</span>
             </div>
@@ -77,8 +83,8 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
 
       <!-- user -->
       <ng-container matColumnDef="user">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">User</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">User</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div class="flex items-center gap-2">
             <img class="rounded-full h-7 w-7" appDefaultImg [src]="row.userPhotoURL" />
             <span>{{ row.userDisplayName ?? 'Unknown' }}</span>

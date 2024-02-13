@@ -5,7 +5,7 @@ import {
   PortfolioStateHolding,
   PortfolioTransaction,
 } from '@market-monitor/api-types';
-import { GenericChartSeries, ValueItem } from '@market-monitor/shared/data-access';
+import { ColorScheme, GenericChartSeries, ValueItem } from '@market-monitor/shared/data-access';
 import {
   calculateGrowth,
   dateFormatDate,
@@ -235,6 +235,9 @@ export class PortfolioCalculationService {
           type: 'packedbubble',
           name,
           data,
+          dataLabels: {
+            color: ColorScheme.GRAY_DARK_VAR,
+          },
           additionalData: {
             showCurrencySign: true,
           },
@@ -248,6 +251,9 @@ export class PortfolioCalculationService {
       data: restData.map((d) => ({
         name: d.symbol,
         value: d.symbolSummary.quote.price * d.units,
+        dataLabels: {
+          color: ColorScheme.GRAY_DARK_VAR,
+        },
         additionalData: {
           showCurrencySign: true,
         },

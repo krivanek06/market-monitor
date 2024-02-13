@@ -38,11 +38,11 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
   template: `
     <app-dialog-close-header title="Settings"></app-dialog-close-header>
 
-    <mat-dialog-content class="min-h-[350px] flex flex-col-reverse md:flex-row">
+    <mat-dialog-content class="min-h-[350px] flex flex-col lg:flex-row gap-y-6 px-1 xs:px-6">
       <div class="flex-1 md:border-r border-wt-border">
-        <div class="flex gap-6">
+        <div class="flex flex-col sm:flex-row gap-6">
           <!-- user image -->
-          <div>
+          <div class="max-md:mx-auto">
             <app-upload-image-single-control
               filePath="users"
               [fileName]="userDataSignal().id"
@@ -50,6 +50,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
               [formControl]="userImageControl"
             ></app-upload-image-single-control>
           </div>
+
           <!-- user data -->
           <div class="pt-2 text-lg">
             <div class="c-text-item">
@@ -76,7 +77,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </div>
 
         <!-- explain account type -->
-        <div class="p-4">
+        <div class="p-4 hidden lg:block">
           <div class="mb-2 text-lg text-wt-primary">{{ accountTypeSignal() }} - Account</div>
           <div *ngFor="let text of accountDescriptionSignal()" class="mb-3">
             {{ text }}
@@ -85,7 +86,8 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
       </div>
 
       <!-- action buttons -->
-      <div class="flex flex-col gap-y-2 min-w-[180px] pl-6">
+      <div class="flex flex-col gap-y-2 min-w-[180px] lg:pl-6">
+        <!--  Reset Transactions -->
         <button
           (click)="onResetTransactions()"
           [matTooltip]="actionButtonTooltips.resetTransactions"
@@ -95,6 +97,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         >
           Reset Transactions
         </button>
+        <!--  Change Display Name -->
         <button
           (click)="onChangeDisplayName()"
           [matTooltip]="actionButtonTooltips.changeDisplayName"
@@ -104,6 +107,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         >
           Change Display Name
         </button>
+        <!--  Change Account type -->
         <button
           (click)="onChangeAccountType()"
           [matTooltip]="actionButtonTooltips.changeAccountType"
@@ -113,6 +117,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         >
           Change Account type
         </button>
+        <!--  Change Password -->
         <button
           *ngIf="userDataSignal().personal.providerId === 'password'"
           (click)="onChangePassword()"
@@ -123,6 +128,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         >
           Change Password
         </button>
+        <!--  Delete Account -->
         <button
           (click)="onDeleteAccount()"
           [matTooltip]="actionButtonTooltips.deleteAccount"
@@ -140,7 +146,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     </div>
 
     <mat-dialog-actions>
-      <div class="g-mat-dialog-actions-end">
+      <div class="g-mat-dialog-actions-end px-1 xs:px-6">
         <button mat-flat-button mat-dialog-close type="button">Cancel</button>
       </div>
     </mat-dialog-actions>

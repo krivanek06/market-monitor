@@ -13,7 +13,7 @@ import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
     <app-dialog-close-header title="Help Section" />
 
     <mat-dialog-content>
-      <section class="grid md:grid-cols-2 gap-x-10 gap-y-4">
+      <section class="grid lg:grid-cols-2 gap-x-10 gap-y-4">
         <!-- thank you section -->
         <article>
           <h2>Thank You</h2>

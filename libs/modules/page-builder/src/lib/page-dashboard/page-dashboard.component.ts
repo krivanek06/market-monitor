@@ -139,7 +139,7 @@ import {
 
         <!-- holdings pie charts -->
         <div
-          class="flex justify-center md:justify-between xl:justify-around xl:flex-col gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6"
+          class="flex justify-center lg:justify-between xl:justify-around xl:flex-col gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6"
         >
           <app-pie-chart
             class="max-sm:w-[385px]"
@@ -148,7 +148,7 @@ import {
             [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
           ></app-pie-chart>
           <app-pie-chart
-            class="hidden md:block"
+            class="hidden lg:block"
             [heightPx]="400"
             chartTitle="Sector Allocation"
             [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"

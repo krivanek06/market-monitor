@@ -32,7 +32,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
   ],
   template: `
     <div class="w-full shadow-md">
-      <nav class="w-full pl-3 sm:pl-8 sm:pr-4 flex items-center gap-4 max-w-[1620px] mx-auto">
+      <nav class="w-full pl-3 sm:pl-8 sm:pr-4 flex items-center gap-4 max-w-[1620px] mx-auto pb-1">
         <!-- hide menu button -->
         <div class="block xl:hidden">
           <button type="button" mat-icon-button (click)="onMenuClick()">

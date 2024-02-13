@@ -32,7 +32,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, 
   ],
   template: `
     <mat-form-field class="w-full">
-      <mat-label>Search stock by ticker</mat-label>
+      <mat-label>Search user by username</mat-label>
       <input
         type="text"
         placeholder="Enter ticker"

@@ -2,7 +2,7 @@
   background: var(--background-dialog) !important;
   color: var(--gray-medium) !important;
   padding-left: 16px !important;
-  padding-right: 16px !important;
+  padding-right: 4px !important;
   padding-bottom: 16px !important;
   padding-left: 0 !important;
   max-width: 100% !important;
@@ -45,15 +45,15 @@ mat-dialog-content {
     }
 
     @screen md {
-      width: 90vw !important;
+      width: 95vw !important;
     }
 
     @screen lg {
-      width: 80vw !important;
+      width: 90vw !important;
     }
 
     @screen xl {
-      width: 70vw !important;
+      width: 73vw !important;
     }
 
     // @screen 2xl {
