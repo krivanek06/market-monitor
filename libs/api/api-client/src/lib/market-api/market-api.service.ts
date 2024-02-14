@@ -17,7 +17,7 @@ import {
   SymbolQuote,
   SymbolSummary,
 } from '@market-monitor/api-types';
-import { chunk } from 'lodash-es';
+import { chunk } from '@market-monitor/shared/features/general-util';
 import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ApiCacheService } from '../utils';
 

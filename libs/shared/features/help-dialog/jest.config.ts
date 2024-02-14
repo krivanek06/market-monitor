@@ -2,7 +2,7 @@
 export default {
   displayName: 'help-dialog',
   preset: '../../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../../jest.setup.js'],
   coverageDirectory: '../../../../coverage/libs/shared/features/help-dialog',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

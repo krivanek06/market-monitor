@@ -2,7 +2,7 @@
 export default {
   displayName: 'upload-image-single-control',
   preset: '../../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../../jest.setup.js'],
   coverageDirectory: '../../../../coverage/libs/shared/features/upload-image-single-control',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

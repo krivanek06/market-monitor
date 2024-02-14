@@ -2,7 +2,7 @@
 export default {
   displayName: 'market-monitor',
   preset: '../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../jest.setup.js'],
   coverageDirectory: '../../coverage/apps/market-monitor',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

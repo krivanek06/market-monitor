@@ -2,7 +2,7 @@
 export default {
   displayName: 'dialog-manager',
   preset: '../../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../../jest.setup.js'],
   coverageDirectory: '../../../../coverage/libs/shared/features/dialog-manager',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
