@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { HallOfFameGroupsComponent } from './hall-of-fame-groups.component';
 
 describe('HallOfFameGroupsComponent', () => {
@@ -6,11 +7,9 @@ describe('HallOfFameGroupsComponent', () => {
   let fixture: ComponentFixture<HallOfFameGroupsComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [HallOfFameGroupsComponent],
-    }).compileComponents();
+    MockBuilder(HallOfFameGroupsComponent);
 
-    fixture = TestBed.createComponent(HallOfFameGroupsComponent);
+    fixture = MockRender(HallOfFameGroupsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

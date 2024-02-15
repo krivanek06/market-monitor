@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { UploadImageSingleControlComponent } from './upload-image-single-control.component';
 
 describe('UploadImageSingleControlComponent', () => {
@@ -6,11 +7,9 @@ describe('UploadImageSingleControlComponent', () => {
   let fixture: ComponentFixture<UploadImageSingleControlComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [UploadImageSingleControlComponent],
-    }).compileComponents();
+    MockBuilder(UploadImageSingleControlComponent);
 
-    fixture = TestBed.createComponent(UploadImageSingleControlComponent);
+    fixture = MockRender(UploadImageSingleControlComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
