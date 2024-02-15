@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { CalendarWrapperComponent } from './calendar-wrapper.component';
 
 describe('CalendarWrapperComponent', () => {
@@ -6,11 +7,9 @@ describe('CalendarWrapperComponent', () => {
   let fixture: ComponentFixture<CalendarWrapperComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [CalendarWrapperComponent],
-    }).compileComponents();
+    MockBuilder(CalendarWrapperComponent);
 
-    fixture = TestBed.createComponent(CalendarWrapperComponent);
+    fixture = MockRender(CalendarWrapperComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

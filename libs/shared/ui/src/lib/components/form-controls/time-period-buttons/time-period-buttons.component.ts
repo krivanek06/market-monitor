@@ -4,13 +4,48 @@ import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModu
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { SymbolHistoricalPeriods } from '@market-monitor/api-types';
-import { timePeriodDefaultButtons } from './time-period-buttons.model';
+
+export const timePeriodDefaultButtons = [
+  { labelButton: '1D', labelSelect: '1 day', value: SymbolHistoricalPeriods.day },
+  { labelButton: '1W', labelSelect: '1 week', value: SymbolHistoricalPeriods.week },
+  { labelButton: '1M', labelSelect: '1 month', value: SymbolHistoricalPeriods.month },
+  //  { labelButton: '3M', labelSelect: '3 months', value: SymbolHistoricalPeriods.threeMonths },
+  { labelButton: '6M', labelSelect: '6 months', value: SymbolHistoricalPeriods.sixMonths },
+  { labelButton: '1Y', labelSelect: '1 year', value: SymbolHistoricalPeriods.year },
+  { labelButton: '5Y', labelSelect: '5 years', value: SymbolHistoricalPeriods.fiveYears },
+  { labelButton: 'YTD', labelSelect: 'year to date', value: SymbolHistoricalPeriods.ytd },
+  { labelButton: 'ALL', labelSelect: 'All', value: SymbolHistoricalPeriods.all },
+] as const;
 
 @Component({
   selector: 'app-time-period-buttons',
   standalone: true,
   imports: [CommonModule, MatSelectModule, MatButtonModule, ReactiveFormsModule],
-  templateUrl: './time-period-buttons.component.html',
+  template: `
+    <!-- large screen buttons -->
+    <div class="flex-wrap items-center hidden gap-3 md:flex">
+      <button
+        *ngFor="let period of displayTimePeriods"
+        mat-stroked-button
+        type="button"
+        class="flex-1 min-h-[36px]"
+        [color]="period.value === activeTimePeriod.value ? 'primary' : ''"
+        (click)="onTimePeriodSelect(period.value)"
+      >
+        {{ period.labelButton }}
+      </button>
+    </div>
+
+    <!-- select on small screen -->
+    <mat-form-field class="block w-full md:hidden">
+      <mat-label>Time Period</mat-label>
+      <mat-select [value]="activeTimePeriod.value" (selectionChange)="onTimePeriodSelect($event.value)">
+        <mat-option *ngFor="let period of displayTimePeriods" [value]="period.value">
+          {{ period.labelSelect }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  `,
   styles: `
       :host {
         display: block;

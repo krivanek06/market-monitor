@@ -46,3 +46,8 @@ export const HISTORICAL_PRICE_RESTRICTION_YEARS = 6;
  * users with trading account have a fee prct
  */
 export const TRANSACTION_FEE_PRCT = 0.1;
+
+/**
+ * number in days when a user account is considered in-active
+ */
+export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT = 14;

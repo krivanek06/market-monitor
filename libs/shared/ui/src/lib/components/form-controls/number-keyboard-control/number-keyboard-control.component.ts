@@ -2,14 +2,55 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { KeyboardComponentType, KeyboardComponentValues } from './number-keyboard-control.model';
+
+export const KeyboardComponentValues = [
+  { label: 1, value: 1 },
+  { label: 2, value: 2 },
+  { label: 3, value: 3 },
+  { label: 4, value: 4 },
+  { label: 5, value: 5 },
+  { label: 6, value: 6 },
+  { label: 7, value: 7 },
+  { label: 8, value: 8 },
+  { label: 9, value: 9 },
+  { label: '.', value: '.' },
+  { label: 0, value: 0 },
+  { label: '<-', value: 'back' },
+] as const;
+
+export type KeyboardComponentType = (typeof KeyboardComponentValues)[number];
 
 @Component({
   selector: 'app-number-keyboard-control',
   standalone: true,
   imports: [CommonModule, MatButtonModule],
-  templateUrl: './number-keyboard-control.component.html',
-  styleUrls: ['./number-keyboard-control.component.scss'],
+  template: `
+    <div class="grid grid-cols-3 gap-2">
+      <ng-container *ngFor="let button of KeyboardComponent">
+        <button
+          *ngIf="enableDecimal || button.label !== '.'; else placeholder"
+          type="button"
+          mat-stroked-button
+          (click)="onButtonClick(button)"
+          class="min-h-[52px]"
+        >
+          {{ button.label }}
+        </button>
+
+        <!-- placeholder -->
+        <ng-template #placeholder>
+          <div></div>
+        </ng-template>
+      </ng-container>
+    </div>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
@@ -21,7 +62,7 @@ import { KeyboardComponentType, KeyboardComponentValues } from './number-keyboar
 })
 export class NumberKeyboardComponent {
   @Input() enableDecimal = true;
-  @Input({required: true}) value: string = ''
+  @Input({ required: true }) value: string = '';
 
   // outputting number with maximum 2 decimal -> i.e: 122.33
   onChange: (data: string) => void = () => {};

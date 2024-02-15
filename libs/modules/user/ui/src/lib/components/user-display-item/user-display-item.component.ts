@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { UserBase } from '@market-monitor/api-types';
-import { USER_ACTIVE_ACCOUNT_TIME_DAYS } from '@market-monitor/modules/user/data-access';
+import { USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT, UserBase } from '@market-monitor/api-types';
 import { DefaultImgDirective, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 import { isBefore, subDays } from 'date-fns';
 
@@ -57,9 +56,9 @@ export class UserDisplayItemComponent {
   @Input({ required: true }) userData!: UserBase;
   @Input() showLoginButton = true;
 
-  USER_ACTIVE_ACCOUNT_TIME_DAYS = USER_ACTIVE_ACCOUNT_TIME_DAYS;
+  USER_ACTIVE_ACCOUNT_TIME_DAYS = USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT;
 
   get isUserActive(): boolean {
-    return isBefore(subDays(new Date(), USER_ACTIVE_ACCOUNT_TIME_DAYS), new Date(this.userData.lastLoginDate));
+    return isBefore(subDays(new Date(), USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT), new Date(this.userData.lastLoginDate));
   }
 }
