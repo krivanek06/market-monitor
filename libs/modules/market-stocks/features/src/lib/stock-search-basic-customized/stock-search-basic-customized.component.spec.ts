@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { StockSearchBasicCustomizedComponent } from './stock-search-basic-customized.component';
 
 describe('StockSearchBasicCustomizedComponent', () => {
@@ -6,11 +7,9 @@ describe('StockSearchBasicCustomizedComponent', () => {
   let fixture: ComponentFixture<StockSearchBasicCustomizedComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [StockSearchBasicCustomizedComponent],
-    }).compileComponents();
+    MockBuilder(StockSearchBasicCustomizedComponent);
 
-    fixture = TestBed.createComponent(StockSearchBasicCustomizedComponent);
+    fixture = MockRender(StockSearchBasicCustomizedComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

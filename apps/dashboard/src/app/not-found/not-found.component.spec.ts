@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { NotFoundComponent } from './not-found.component';
 
 describe('NotFoundComponent', () => {
@@ -6,11 +7,9 @@ describe('NotFoundComponent', () => {
   let fixture: ComponentFixture<NotFoundComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [NotFoundComponent],
-    }).compileComponents();
+    MockBuilder(NotFoundComponent);
 
-    fixture = TestBed.createComponent(NotFoundComponent);
+    fixture = MockRender(NotFoundComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

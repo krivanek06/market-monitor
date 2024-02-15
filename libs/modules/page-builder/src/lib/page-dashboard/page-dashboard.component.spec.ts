@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { PageDashboardComponent } from './page-dashboard.component';
 
 describe('PageDashboardComponent', () => {
@@ -6,11 +7,9 @@ describe('PageDashboardComponent', () => {
   let fixture: ComponentFixture<PageDashboardComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [PageDashboardComponent],
-    }).compileComponents();
+    MockBuilder(PageDashboardComponent);
 
-    fixture = TestBed.createComponent(PageDashboardComponent);
+    fixture = MockRender(PageDashboardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

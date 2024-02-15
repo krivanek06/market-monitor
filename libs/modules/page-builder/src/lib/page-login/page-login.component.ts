@@ -7,7 +7,13 @@ import { DialogServiceModule } from '@market-monitor/shared/features/dialog-mana
   selector: 'app-page-login',
   standalone: true,
   imports: [CommonModule, AuthenticationFormComponent, DialogServiceModule],
-  templateUrl: './page-login.component.html',
+  template: `
+    <section>
+      <div class="mt-[200px] w-7/12 mx-auto">
+        <app-authentication-form></app-authentication-form>
+      </div>
+    </section>
+  `,
   styles: `
       :host {
         display: block;

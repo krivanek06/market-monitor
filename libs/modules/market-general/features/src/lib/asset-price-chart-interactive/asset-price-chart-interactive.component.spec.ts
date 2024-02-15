@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { AssetPriceChartInteractiveComponent } from './asset-price-chart-interactive.component';
 
 describe('AssetPriceChartInteractiveComponent', () => {
@@ -6,11 +7,9 @@ describe('AssetPriceChartInteractiveComponent', () => {
   let fixture: ComponentFixture<AssetPriceChartInteractiveComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AssetPriceChartInteractiveComponent],
-    }).compileComponents();
+    MockBuilder(AssetPriceChartInteractiveComponent);
 
-    fixture = TestBed.createComponent(AssetPriceChartInteractiveComponent);
+    fixture = MockRender(AssetPriceChartInteractiveComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

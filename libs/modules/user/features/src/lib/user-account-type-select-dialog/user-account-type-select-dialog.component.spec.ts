@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { UserAccountTypeSelectDialogComponent } from './user-account-type-select-dialog.component';
 
 describe('UserAccountTypeSelectDialogComponent', () => {
   let component: UserAccountTypeSelectDialogComponent;
   let fixture: ComponentFixture<UserAccountTypeSelectDialogComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [UserAccountTypeSelectDialogComponent],
-    }).compileComponents();
+  beforeEach(() => {
+    MockBuilder(UserAccountTypeSelectDialogComponent);
 
-    fixture = TestBed.createComponent(UserAccountTypeSelectDialogComponent);
+    fixture = MockRender(UserAccountTypeSelectDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

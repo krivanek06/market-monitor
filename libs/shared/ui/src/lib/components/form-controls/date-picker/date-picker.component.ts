@@ -28,8 +28,45 @@ export interface InputTypeDateTimePickerConfig {
     MatInputModule,
     MatNativeDateModule,
   ],
-  templateUrl: './date-picker.component.html',
-  styleUrls: ['./date-picker.component.scss'],
+  template: `
+    <mat-form-field class="h-0 scale-0">
+      <div class="hidden">
+        <input
+          [min]="inputTypeDateTimePickerConfig?.minDate"
+          [max]="inputTypeDateTimePickerConfig?.maxDate"
+          matInput
+          [matDatepicker]="datePicker"
+          [matDatepickerFilter]="inputTypeDateTimePickerConfig?.dateFilter ?? defaultDateFilter"
+          [formControl]="selectedDate"
+        />
+        <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+        <mat-datepicker #datePicker></mat-datepicker>
+      </div>
+    </mat-form-field>
+
+    <div class="mb-5">
+      <button
+        [disabled]="isDisabled"
+        (click)="datePicker.open()"
+        type="button"
+        mat-stroked-button
+        class="w-full min-h-[50px]"
+      >
+        {{ selectedDate.value ? 'Date: ' + (selectedDate.value | date: 'dd.MM.YYYY') : 'Please select a date' }}
+      </button>
+    </div>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+
+      ::ng-deep mat-datepicker-content {
+        margin-top: 45px !important;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

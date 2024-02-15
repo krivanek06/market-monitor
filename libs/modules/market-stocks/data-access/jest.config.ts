@@ -2,7 +2,7 @@
 export default {
   displayName: 'modules-market-stocks-data-access',
   preset: '../../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../../jest.setup.js'],
   coverageDirectory: '../../../../coverage/libs/modules/market-stocks/data-access',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
@@ -18,5 +18,5 @@ export default {
     'jest-preset-angular/build/serializers/no-ng-attributes',
     'jest-preset-angular/build/serializers/ng-snapshot',
     'jest-preset-angular/build/serializers/html-comment',
-  ]
+  ],
 };

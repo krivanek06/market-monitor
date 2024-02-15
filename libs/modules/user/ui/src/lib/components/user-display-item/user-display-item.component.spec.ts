@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { UserDisplayItemComponent } from './user-display-item.component';
 
 describe('UserDisplayItemComponent', () => {
   let component: UserDisplayItemComponent;
   let fixture: ComponentFixture<UserDisplayItemComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [UserDisplayItemComponent],
-    }).compileComponents();
+  beforeEach(() => {
+    MockBuilder(UserDisplayItemComponent);
 
-    fixture = TestBed.createComponent(UserDisplayItemComponent);
+    fixture = MockRender(UserDisplayItemComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -8,8 +8,50 @@ import { InputTypeSlider } from '@market-monitor/shared/data-access';
   selector: 'app-slider-control',
   standalone: true,
   imports: [CommonModule, MatSliderModule, ReactiveFormsModule],
-  templateUrl: './slider-control.component.html',
-  styleUrls: ['./slider-control.component.scss'],
+  template: `
+    <div
+      class="-mb-3 text-sm text-center"
+      [ngClass]="{
+        'text-wt-gray-dark': isDisabled,
+        'text-wt-gray-medium': !isDisabled
+      }"
+    >
+      {{ selectedValue.value | currency }}
+    </div>
+
+    <mat-slider
+      [max]="config.max"
+      [min]="config.min"
+      [step]="config.step"
+      [discrete]="true"
+      [showTickMarks]="false"
+      [displayWith]="formatLabel"
+    >
+      <input matSliderThumb [formControl]="selectedValue" />
+    </mat-slider>
+
+    <div
+      class="flex items-center justify-between -mt-5 text-sm"
+      [ngClass]="{
+        'text-wt-gray-dark': isDisabled,
+        'text-wt-gray-medium': !isDisabled
+      }"
+    >
+      <span>{{ config.min | currency }}</span>
+      <span class="-mr-3">{{ config.max | currency }}</span>
+    </div>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+
+        mat-slider {
+          @apply w-full;
+        }
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

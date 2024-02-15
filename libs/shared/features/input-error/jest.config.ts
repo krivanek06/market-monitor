@@ -2,7 +2,7 @@
 export default {
   displayName: 'input-error',
   preset: '../../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../../jest.setup.js'],
   coverageDirectory: '../../../../coverage/libs/shared/features/input-error',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { HelpDialogComponent } from './help-dialog.component';
 
 describe('HelpDialogComponent', () => {
@@ -6,11 +7,9 @@ describe('HelpDialogComponent', () => {
   let fixture: ComponentFixture<HelpDialogComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [HelpDialogComponent],
-    }).compileComponents();
+    MockBuilder(HelpDialogComponent);
 
-    fixture = TestBed.createComponent(HelpDialogComponent);
+    fixture = MockRender(HelpDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

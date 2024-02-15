@@ -2,7 +2,7 @@
 export default {
   displayName: 'api-client',
   preset: '../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../jest.setup.js'],
   coverageDirectory: '../../../coverage/libs/api/api-client',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { UserSearchDialogComponent } from './user-search-dialog.component';
 
 describe('UserSearchDialogComponent', () => {
@@ -6,11 +7,9 @@ describe('UserSearchDialogComponent', () => {
   let fixture: ComponentFixture<UserSearchDialogComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [UserSearchDialogComponent],
-    }).compileComponents();
+    MockBuilder(UserSearchDialogComponent);
 
-    fixture = TestBed.createComponent(UserSearchDialogComponent);
+    fixture = MockRender(UserSearchDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

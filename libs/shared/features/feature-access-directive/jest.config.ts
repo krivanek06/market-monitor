@@ -2,7 +2,7 @@
 export default {
   displayName: 'feature-access-directive',
   preset: '../../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../../jest.setup.js'],
   coverageDirectory: '../../../../coverage/libs/shared/features/feature-access-directive',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { NewsSearchComponent } from './news-search.component';
 
 describe('NewsSearchComponent', () => {
@@ -6,11 +7,9 @@ describe('NewsSearchComponent', () => {
   let fixture: ComponentFixture<NewsSearchComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [NewsSearchComponent],
-    }).compileComponents();
+    MockBuilder(NewsSearchComponent);
 
-    fixture = TestBed.createComponent(NewsSearchComponent);
+    fixture = MockRender(NewsSearchComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

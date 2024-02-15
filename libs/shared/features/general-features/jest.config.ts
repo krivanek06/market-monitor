@@ -2,7 +2,7 @@
 export default {
   displayName: 'general-features',
   preset: '../../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../../jest.setup.js'],
   coverageDirectory: '../../../../coverage/libs/shared/features/general-features',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { PageTradingComponent } from './page-trading.component';
 
 describe('PageTradingComponent', () => {
@@ -6,11 +7,9 @@ describe('PageTradingComponent', () => {
   let fixture: ComponentFixture<PageTradingComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [PageTradingComponent],
-    }).compileComponents();
+    MockBuilder(PageTradingComponent);
 
-    fixture = TestBed.createComponent(PageTradingComponent);
+    fixture = MockRender(PageTradingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

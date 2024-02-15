@@ -1,25 +1,20 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { AppComponent } from './app.component';
-import { NxWelcomeComponent } from './nx-welcome.component';
-import { RouterTestingModule } from '@angular/router/testing';
 
 describe('AppComponent', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AppComponent, NxWelcomeComponent, RouterTestingModule],
-    }).compileComponents();
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
+
+  beforeEach(() => {
+    MockBuilder(AppComponent);
+
+    fixture = MockRender(AppComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('should render title', () => {
-      const fixture = TestBed.createComponent(AppComponent);
-      fixture.detectChanges();
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.querySelector('h1')?.textContent).toContain('Welcome market-monitor-dashboard');
-  });
-
-  it(`should have as title 'market-monitor-dashboard'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('market-monitor-dashboard');
+  it('should create', () => {
+    expect(component).toBeTruthy();
   });
 });

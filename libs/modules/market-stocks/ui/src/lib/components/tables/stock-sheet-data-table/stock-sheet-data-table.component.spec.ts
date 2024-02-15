@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { StockSheetDataTableComponent } from '../sheet-data-table/sheet-data-table.component';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
+import { StockSheetDataTableComponent } from './stock-sheet-data-table.component';
 
 describe('StockSheetDataTableComponent', () => {
   let component: StockSheetDataTableComponent;
   let fixture: ComponentFixture<StockSheetDataTableComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [StockSheetDataTableComponent],
-    }).compileComponents();
+    MockBuilder(StockSheetDataTableComponent);
 
-    fixture = TestBed.createComponent(StockSheetDataTableComponent);
+    fixture = MockRender(StockSheetDataTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

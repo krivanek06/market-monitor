@@ -2,7 +2,7 @@
 export default {
   displayName: 'modules-page-builder',
   preset: '../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../jest.setup.js'],
   coverageDirectory: '../../../coverage/libs/modules/page-builder',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

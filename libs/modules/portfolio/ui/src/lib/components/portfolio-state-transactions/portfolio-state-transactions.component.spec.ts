@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { PortfolioStateTransactionsComponent } from './portfolio-state-transactions.component';
 
 describe('PortfolioStateTransactionsComponent', () => {
@@ -6,12 +7,9 @@ describe('PortfolioStateTransactionsComponent', () => {
   let fixture: ComponentFixture<PortfolioStateTransactionsComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ PortfolioStateTransactionsComponent ]
-    })
-    .compileComponents();
+    MockBuilder(PortfolioStateTransactionsComponent);
 
-    fixture = TestBed.createComponent(PortfolioStateTransactionsComponent);
+    fixture = MockRender(PortfolioStateTransactionsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

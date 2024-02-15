@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { QuoteSearchBasicComponent } from './quote-search-basic.component';
 
 describe('QuoteSearchBasicComponent', () => {
@@ -6,11 +7,9 @@ describe('QuoteSearchBasicComponent', () => {
   let fixture: ComponentFixture<QuoteSearchBasicComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [QuoteSearchBasicComponent],
-    }).compileComponents();
+    MockBuilder(QuoteSearchBasicComponent);
 
-    fixture = TestBed.createComponent(QuoteSearchBasicComponent);
+    fixture = MockRender(QuoteSearchBasicComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
