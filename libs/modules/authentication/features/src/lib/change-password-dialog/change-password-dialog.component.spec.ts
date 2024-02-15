@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { ChangePasswordDialogComponent } from './change-password-dialog.component';
 
 describe('ChangePasswordDialogComponent', () => {
@@ -6,11 +7,9 @@ describe('ChangePasswordDialogComponent', () => {
   let fixture: ComponentFixture<ChangePasswordDialogComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ChangePasswordDialogComponent],
-    }).compileComponents();
+    MockBuilder(ChangePasswordDialogComponent);
 
-    fixture = TestBed.createComponent(ChangePasswordDialogComponent);
+    fixture = MockRender(ChangePasswordDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

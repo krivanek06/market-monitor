@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { GroupDetailsOverviewComponent } from './group-details-overview.component';
 
 describe('GroupDetailsOverviewComponent', () => {
   let component: GroupDetailsOverviewComponent;
   let fixture: ComponentFixture<GroupDetailsOverviewComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GroupDetailsOverviewComponent],
-    }).compileComponents();
+  beforeEach(() => {
+    MockBuilder(GroupDetailsOverviewComponent);
 
-    fixture = TestBed.createComponent(GroupDetailsOverviewComponent);
+    fixture = MockRender(GroupDetailsOverviewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

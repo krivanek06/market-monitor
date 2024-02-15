@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { StockInsiderTradesComponent } from './stock-insider-trades.component';
 
 describe('StockInsiderTradesComponent', () => {
@@ -6,11 +7,9 @@ describe('StockInsiderTradesComponent', () => {
   let fixture: ComponentFixture<StockInsiderTradesComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [StockInsiderTradesComponent],
-    }).compileComponents();
+    MockBuilder(StockInsiderTradesComponent);
 
-    fixture = TestBed.createComponent(StockInsiderTradesComponent);
+    fixture = MockRender(StockInsiderTradesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

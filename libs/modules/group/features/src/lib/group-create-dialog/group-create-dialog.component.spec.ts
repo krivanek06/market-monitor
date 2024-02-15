@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { GroupCreateDialogComponent } from './group-create-dialog.component';
 
 describe('GroupCreateDialogComponent', () => {
@@ -6,11 +7,9 @@ describe('GroupCreateDialogComponent', () => {
   let fixture: ComponentFixture<GroupCreateDialogComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GroupCreateDialogComponent],
-    }).compileComponents();
+    MockBuilder(GroupCreateDialogComponent);
 
-    fixture = TestBed.createComponent(GroupCreateDialogComponent);
+    fixture = MockRender(GroupCreateDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

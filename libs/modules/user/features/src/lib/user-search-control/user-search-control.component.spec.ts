@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { UserSearchControlComponent } from './user-search-control.component';
 
 describe('UserSearchControlComponent', () => {
   let component: UserSearchControlComponent;
   let fixture: ComponentFixture<UserSearchControlComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [UserSearchControlComponent],
-    }).compileComponents();
+  beforeEach(() => {
+    MockBuilder(UserSearchControlComponent);
 
-    fixture = TestBed.createComponent(UserSearchControlComponent);
+    fixture = MockRender(UserSearchControlComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

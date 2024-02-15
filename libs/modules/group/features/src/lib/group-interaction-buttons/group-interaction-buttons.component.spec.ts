@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { GroupInteractionButtonsComponent } from './group-interaction-buttons.component';
 
 describe('GroupInteractionButtonsComponent', () => {
@@ -6,11 +7,9 @@ describe('GroupInteractionButtonsComponent', () => {
   let fixture: ComponentFixture<GroupInteractionButtonsComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GroupInteractionButtonsComponent],
-    }).compileComponents();
+    MockBuilder(GroupInteractionButtonsComponent);
 
-    fixture = TestBed.createComponent(GroupInteractionButtonsComponent);
+    fixture = MockRender(GroupInteractionButtonsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

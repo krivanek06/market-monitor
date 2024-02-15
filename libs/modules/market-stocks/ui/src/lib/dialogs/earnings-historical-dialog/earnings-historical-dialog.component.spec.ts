@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { EarningsHistoricalDialogComponent } from './earnings-historical-dialog.component';
 
 describe('EarningsHistoricalDialogComponent', () => {
@@ -6,11 +7,9 @@ describe('EarningsHistoricalDialogComponent', () => {
   let fixture: ComponentFixture<EarningsHistoricalDialogComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [EarningsHistoricalDialogComponent],
-    }).compileComponents();
+    MockBuilder(EarningsHistoricalDialogComponent);
 
-    fixture = TestBed.createComponent(EarningsHistoricalDialogComponent);
+    fixture = MockRender(EarningsHistoricalDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

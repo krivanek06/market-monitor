@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { StockUpgradesDowngradesTableComponent } from '../upgrades-downgrades-table/upgrades-downgrades-table.component';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
+import { StockUpgradesDowngradesTableComponent } from './stock-upgrades-downgrades-table.component';
 
 describe('StockUpgradesDowngradesTableComponent', () => {
   let component: StockUpgradesDowngradesTableComponent;
   let fixture: ComponentFixture<StockUpgradesDowngradesTableComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [StockUpgradesDowngradesTableComponent],
-    }).compileComponents();
+    MockBuilder(StockUpgradesDowngradesTableComponent);
 
-    fixture = TestBed.createComponent(StockUpgradesDowngradesTableComponent);
+    fixture = MockRender(StockUpgradesDowngradesTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

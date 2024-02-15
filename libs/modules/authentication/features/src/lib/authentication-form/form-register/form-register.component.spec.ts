@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { FormRegisterComponent } from './form-register.component';
 
 describe('FormRegisterComponent', () => {
@@ -6,12 +7,9 @@ describe('FormRegisterComponent', () => {
   let fixture: ComponentFixture<FormRegisterComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ FormRegisterComponent ]
-    })
-    .compileComponents();
+    MockBuilder(FormRegisterComponent);
 
-    fixture = TestBed.createComponent(FormRegisterComponent);
+    fixture = MockRender(FormRegisterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { StockSummaryTableComponent } from './stock-summary-table.component';
 
 describe('StockSummaryTableComponent', () => {
   let component: StockSummaryTableComponent;
   let fixture: ComponentFixture<StockSummaryTableComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [StockSummaryTableComponent],
-    }).compileComponents();
+  beforeEach(() => {
+    MockBuilder(StockSummaryTableComponent);
 
-    fixture = TestBed.createComponent(StockSummaryTableComponent);
+    fixture = MockRender(StockSummaryTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

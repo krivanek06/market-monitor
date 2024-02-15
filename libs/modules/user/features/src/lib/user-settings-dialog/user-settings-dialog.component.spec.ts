@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { UserSettingsDialogComponent } from './user-settings-dialog.component';
 
 describe('UserSettingsDialogComponent', () => {
@@ -6,11 +7,9 @@ describe('UserSettingsDialogComponent', () => {
   let fixture: ComponentFixture<UserSettingsDialogComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [UserSettingsDialogComponent],
-    }).compileComponents();
+    MockBuilder(UserSettingsDialogComponent);
 
-    fixture = TestBed.createComponent(UserSettingsDialogComponent);
+    fixture = MockRender(UserSettingsDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

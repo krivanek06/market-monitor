@@ -27,7 +27,6 @@ describe('PortfolioUserFacadeService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      // Provide the mock services here
       providers: [
         MockProvider(AuthenticationUserStoreService, {
           state: testAuthState,

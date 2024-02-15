@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { GroupSearchControlComponent } from './group-search-control.component';
 
 describe('GroupSearchControlComponent', () => {
@@ -6,11 +7,9 @@ describe('GroupSearchControlComponent', () => {
   let fixture: ComponentFixture<GroupSearchControlComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GroupSearchControlComponent],
-    }).compileComponents();
+    MockBuilder(GroupSearchControlComponent);
 
-    fixture = TestBed.createComponent(GroupSearchControlComponent);
+    fixture = MockRender(GroupSearchControlComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

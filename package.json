@@ -13,7 +13,8 @@
     "mm:cloud-function:deploy": "npm run mm:cloud-function:build && firebase deploy --only functions",
     "firebase:export-indexes": "firebase firestore:indexes > firestore.indexes.json",
     "firebase:serve": "npm run mm:cloud-function:build && nx run cloud-functions-base:emulate",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org eduard-krivanek --project javascript-angular apps/market-monitor && sentry-cli sourcemaps upload --org eduard-krivanek --project javascript-angular apps/market-monitor"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org eduard-krivanek --project javascript-angular apps/market-monitor && sentry-cli sourcemaps upload --org eduard-krivanek --project javascript-angular apps/market-monitor",
+    "test:all": " nx run-many --target=test --passWithNoTests"
   },
   "private": true,
   "dependencies": {

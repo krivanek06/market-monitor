@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { GroupDisplayItemComponent } from './group-display-item.component';
 
 describe('GroupDisplayItemComponent', () => {
@@ -6,11 +7,9 @@ describe('GroupDisplayItemComponent', () => {
   let fixture: ComponentFixture<GroupDisplayItemComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GroupDisplayItemComponent],
-    }).compileComponents();
+    MockBuilder(GroupDisplayItemComponent);
 
-    fixture = TestBed.createComponent(GroupDisplayItemComponent);
+    fixture = MockRender(GroupDisplayItemComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

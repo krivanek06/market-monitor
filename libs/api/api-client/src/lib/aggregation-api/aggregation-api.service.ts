@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
 import { CollectionReference, DocumentData, DocumentReference, Firestore, collection } from '@angular/fire/firestore';
-import { Functions } from '@angular/fire/functions';
 import { HallOfFameGroups, HallOfFameUsers } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/data-access';
 import { doc } from 'firebase/firestore';
@@ -11,7 +10,6 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AggregationApiService {
-  private functions = inject(Functions);
   private firestore = inject(Firestore);
 
   getHallOfFameUsers(): Observable<HallOfFameUsers | undefined> {

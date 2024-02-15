@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { PageCryptoComponent } from './page-crypto.component';
 
 describe('PageCryptoComponent', () => {
@@ -6,11 +7,9 @@ describe('PageCryptoComponent', () => {
   let fixture: ComponentFixture<PageCryptoComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [PageCryptoComponent],
-    }).compileComponents();
+    MockBuilder(PageCryptoComponent);
 
-    fixture = TestBed.createComponent(PageCryptoComponent);
+    fixture = MockRender(PageCryptoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

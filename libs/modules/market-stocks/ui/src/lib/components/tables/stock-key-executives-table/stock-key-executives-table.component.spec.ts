@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { StockKeyExecutivesTableComponent } from '../stock-key-executives/stock-key-executives.component';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
+import { StockKeyExecutivesTableComponent } from './stock-key-executives-table.component';
 
 describe('StockKeyExecutivesTableComponent', () => {
   let component: StockKeyExecutivesTableComponent;
   let fixture: ComponentFixture<StockKeyExecutivesTableComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [StockKeyExecutivesTableComponent],
-    }).compileComponents();
+    MockBuilder(StockKeyExecutivesTableComponent);
 
-    fixture = TestBed.createComponent(StockKeyExecutivesTableComponent);
+    fixture = MockRender(StockKeyExecutivesTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { DividendItemsDialogComponent } from './dividend-items-dialog.component';
 
 describe('DividendItemsDialogComponent', () => {
@@ -6,11 +7,9 @@ describe('DividendItemsDialogComponent', () => {
   let fixture: ComponentFixture<DividendItemsDialogComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [DividendItemsDialogComponent],
-    }).compileComponents();
+    MockBuilder(DividendItemsDialogComponent);
 
-    fixture = TestBed.createComponent(DividendItemsDialogComponent);
+    fixture = MockRender(DividendItemsDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

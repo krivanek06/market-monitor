@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { PageGroupDetailsComponent } from './page-group-details.component';
 
 describe('PageGroupDetailsComponent', () => {
@@ -6,11 +7,9 @@ describe('PageGroupDetailsComponent', () => {
   let fixture: ComponentFixture<PageGroupDetailsComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [PageGroupDetailsComponent],
-    }).compileComponents();
+    MockBuilder(PageGroupDetailsComponent);
 
-    fixture = TestBed.createComponent(PageGroupDetailsComponent);
+    fixture = MockRender(PageGroupDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

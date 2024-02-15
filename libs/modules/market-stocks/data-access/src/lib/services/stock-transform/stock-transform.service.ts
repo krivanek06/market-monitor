@@ -8,8 +8,6 @@ import { SheetData, SheetDataPeriod } from '../../models';
   providedIn: 'root',
 })
 export class StockTransformService {
-  constructor() {}
-
   createCompanyRatingTable(data?: StockDetails): CompanyRatingTable | null {
     if (!data) {
       return null;

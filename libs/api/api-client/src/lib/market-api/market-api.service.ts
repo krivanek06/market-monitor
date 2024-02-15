@@ -25,10 +25,6 @@ import { ApiCacheService } from '../utils';
   providedIn: 'root',
 })
 export class MarketApiService extends ApiCacheService {
-  constructor() {
-    super();
-  }
-
   getSymbolSummaries(symbols: string[] | undefined): Observable<SymbolSummary[]> {
     if (!symbols || symbols.length === 0) {
       return of([]);

@@ -23,10 +23,6 @@ import { ApiCacheService } from '../utils';
   providedIn: 'root',
 })
 export class StocksApiService extends ApiCacheService {
-  constructor() {
-    super();
-  }
-
   searchStockSummariesByPrefix(ticker: string): Observable<SymbolSummary[]> {
     if (!ticker) {
       return of([]);

@@ -1,23 +1,20 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { NotificationProgressComponent } from './notification-bar.component';
 
 describe('NotificationProgressComponent', () => {
-	let component: NotificationProgressComponent;
-	let fixture: ComponentFixture<NotificationProgressComponent>;
+  let component: NotificationProgressComponent;
+  let fixture: ComponentFixture<NotificationProgressComponent>;
 
-	beforeEach(async () => {
-		await TestBed.configureTestingModule({
-			declarations: [NotificationProgressComponent],
-		}).compileComponents();
-	});
+  beforeEach(async () => {
+    MockBuilder(NotificationProgressComponent);
 
-	beforeEach(() => {
-		fixture = TestBed.createComponent(NotificationProgressComponent);
-		component = fixture.componentInstance;
-		fixture.detectChanges();
-	});
+    fixture = MockRender(NotificationProgressComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-	it('should create', () => {
-		expect(component).toBeTruthy();
-	});
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
 });
