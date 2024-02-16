@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MarketApiService } from '@market-monitor/api-client';
 import {
   HistoricalPrice,
@@ -21,13 +21,13 @@ import { Observable, catchError, firstValueFrom, map, of } from 'rxjs';
   providedIn: 'root',
 })
 export class PortfolioGrowthService {
-  constructor(private marketApiService: MarketApiService) {}
+  private marketApiService = inject(MarketApiService);
 
   getPortfolioStateHoldings(
     transactions: PortfolioTransaction[],
     previousPortfolioState: PortfolioState,
   ): Observable<PortfolioStateHoldings> {
-    console.log(`PortfolioGrowthService: getPortfolioState`);
+    console.log(`PortfolioGrowthService: getPortfolioState`, transactions, previousPortfolioState);
 
     // get partial holdings calculations
     const partialHoldings = getPortfolioStateHoldingBaseUtil(transactions);

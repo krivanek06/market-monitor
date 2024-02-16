@@ -1,4 +1,10 @@
-import { PortfolioTransaction, PortfolioTransactionCreate } from '@market-monitor/api-types';
+import {
+  PortfolioState,
+  PortfolioTransaction,
+  PortfolioTransactionCreate,
+  SymbolSummary,
+} from '@market-monitor/api-types';
+import { getYesterdaysDate } from '@market-monitor/shared/features/general-util';
 import { USER_TEST_1_ID } from './test-user.model';
 
 export const mockCreatePortfolioTransactionCreate = (
@@ -47,13 +53,14 @@ export const testTransaction_BUY_AAPL_1 = mockPortfolioTransaction({
   units: testTransactionCreate_BUY_AAPL_1.units,
   date: testTransactionCreate_BUY_AAPL_1.date,
   transactionType: testTransactionCreate_BUY_AAPL_1.transactionType,
-  unitPrice: 45.5,
+  unitPrice: 100,
 });
 
 export const testTransactionCreate_BUY_AAPL_2 = mockCreatePortfolioTransactionCreate({
   symbol: 'AAPL',
   units: 5,
   date: '2023-09-11',
+  transactionType: 'BUY',
 });
 
 export const testTransaction_BUY_AAPL_2 = mockPortfolioTransaction({
@@ -61,7 +68,24 @@ export const testTransaction_BUY_AAPL_2 = mockPortfolioTransaction({
   units: testTransactionCreate_BUY_AAPL_2.units,
   date: testTransactionCreate_BUY_AAPL_2.date,
   transactionType: testTransactionCreate_BUY_AAPL_2.transactionType,
-  unitPrice: 123.21,
+  unitPrice: 120,
+  transactionFees: 0.2,
+});
+
+export const testTransactionCreate_SELL_AAPL_1 = mockCreatePortfolioTransactionCreate({
+  symbol: 'AAPL',
+  units: 5,
+  date: '2023-09-13',
+  transactionType: 'SELL',
+});
+
+export const testTransaction_SELL_AAPL_1 = mockPortfolioTransaction({
+  symbol: testTransactionCreate_SELL_AAPL_1.symbol,
+  units: testTransactionCreate_SELL_AAPL_1.units,
+  date: testTransactionCreate_SELL_AAPL_1.date,
+  transactionType: testTransactionCreate_SELL_AAPL_1.transactionType,
+  unitPrice: 130,
+  transactionFees: 0.5,
 });
 
 export const testTransactionCreate_BUY_MSFT_1 = mockCreatePortfolioTransactionCreate({
@@ -78,3 +102,57 @@ export const testTransaction_BUY_MSFT_1 = mockPortfolioTransaction({
   transactionType: testTransactionCreate_BUY_MSFT_1.transactionType,
   unitPrice: 85.5,
 });
+
+export const mockSymbolSummaryAAPL: SymbolSummary = {
+  id: 'AAPL',
+  priceChange: {} as SymbolSummary['priceChange'],
+  quote: {
+    price: 140,
+  } as SymbolSummary['quote'],
+};
+
+export const mockSymbolSummaryMSFT: SymbolSummary = {
+  id: 'MSFT',
+  priceChange: {} as SymbolSummary['priceChange'],
+  quote: {
+    price: 140,
+  } as SymbolSummary['quote'],
+};
+
+export const testPreviousTransactionEmpty: PortfolioState = {
+  accountResetDate: '2023-09-01',
+  balance: 0,
+  cashOnHand: 0,
+  date: getYesterdaysDate(),
+  firstTransactionDate: '2023-09-01',
+  holdingsBalance: 0,
+  invested: 0,
+  lastTransactionDate: '2023-09-01',
+  numberOfExecutedBuyTransactions: 0,
+  numberOfExecutedSellTransactions: 0,
+  previousBalanceChange: 0,
+  previousBalanceChangePercentage: 0,
+  startingCash: 0,
+  totalGainsPercentage: 0,
+  totalGainsValue: 0,
+  transactionFees: 0,
+};
+
+export const testPreviousTransactionNonEmpty: PortfolioState = {
+  accountResetDate: '2023-09-01',
+  balance: 12_000,
+  cashOnHand: 10_000,
+  date: getYesterdaysDate(),
+  firstTransactionDate: '2023-09-01',
+  holdingsBalance: 0,
+  invested: 2000,
+  lastTransactionDate: '2023-09-01',
+  numberOfExecutedBuyTransactions: 10,
+  numberOfExecutedSellTransactions: 10,
+  previousBalanceChange: 0,
+  previousBalanceChangePercentage: 0,
+  startingCash: 0,
+  totalGainsPercentage: 0,
+  totalGainsValue: 0,
+  transactionFees: 10,
+};

@@ -16,12 +16,6 @@ export const getPortfolioStateHoldingsUtil = (
   partialHoldings: PortfolioStateHoldingBase[],
   symbolSummaries: SymbolSummary[],
 ): PortfolioStateHoldings => {
-  // accumulate cash on hand from transactions
-  // const cashOnHandTransactions = transactions.reduce(
-  //   (acc, curr) =>
-  //     curr.transactionType === 'BUY' ? acc - curr.unitPrice * curr.units : acc + curr.unitPrice * curr.units,
-  //   0,
-  // );
   const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
   const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
   const transactionFees = transactions.reduce((acc, curr) => acc + curr.transactionFees, 0);
@@ -48,16 +42,14 @@ export const getPortfolioStateHoldingsUtil = (
     .filter((d) => !!d) as PortfolioStateHolding[];
 
   // value of all assets
-  const holdingsBalance = portfolioStateHolding.reduce(
-    (acc, curr) => acc + curr.symbolSummary.quote.price * curr.units,
-    0,
-  );
+  const holdingsBalance =
+    portfolioStateHolding.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0) - transactionFees;
 
   // current cash on hand
   const startingCash = previousPortfolioState.startingCash;
   const cashOnHandTransactions = startingCash !== 0 ? startingCash - invested - transactionFees : 0;
 
-  const balance = holdingsBalance + cashOnHandTransactions - transactionFees;
+  const balance = holdingsBalance + cashOnHandTransactions;
   const totalGainsValue = startingCash !== 0 ? balance - startingCash : holdingsBalance - invested;
   const totalGainsPercentage = holdingsBalance === 0 ? 0 : calculateGrowth(balance, invested + cashOnHandTransactions);
   const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;

@@ -8,7 +8,7 @@ import { GROUP_MEMBER_LIMIT, UserBase } from '@market-monitor/api-types';
 import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@market-monitor/modules/group/features';
 import { GroupDisplayInfoComponent } from '@market-monitor/modules/group/ui';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
-import { PortfolioCalculationService } from '@market-monitor/modules/portfolio/data-access';
+import { PortfolioCalculationService, PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
 import {
   PortfolioBalancePieChartComponent,
   PortfolioGrowthChartComponent,
@@ -293,10 +293,17 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
   );
 
   portfolioGrowthSignal = computed(() =>
-    this.portfolioCalculationService.getPortfolioGrowthFromPortfolioState(
-      this.groupDetailsSignal()?.groupPortfolioSnapshotsData ?? [],
+    (this.groupDetailsSignal()?.groupPortfolioSnapshotsData ?? []).map(
+      (portfolioStatePerDay) =>
+        ({
+          date: portfolioStatePerDay.date,
+          investedValue: portfolioStatePerDay.invested,
+          marketTotalValue: portfolioStatePerDay.holdingsBalance,
+          totalBalanceValue: portfolioStatePerDay.balance,
+        }) satisfies PortfolioGrowth,
     ),
   );
+
   portfolioChangeSignal = computed(() =>
     this.portfolioCalculationService.getPortfolioChange(this.portfolioGrowthSignal()),
   );

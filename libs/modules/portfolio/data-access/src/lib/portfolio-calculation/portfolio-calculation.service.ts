@@ -1,10 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  PortfolioGrowthAssets,
-  PortfolioState,
-  PortfolioStateHolding,
-  PortfolioTransaction,
-} from '@market-monitor/api-types';
+import { PortfolioGrowthAssets, PortfolioStateHolding, PortfolioTransaction } from '@market-monitor/api-types';
 import { ColorScheme, GenericChartSeries, ValueItem } from '@market-monitor/shared/data-access';
 import {
   calculateGrowth,
@@ -19,15 +14,6 @@ import { PortfolioChange, PortfolioGrowth, PortfolioTransactionToDate } from '..
   providedIn: 'root',
 })
 export class PortfolioCalculationService {
-  getPortfolioGrowthFromPortfolioState(data: PortfolioState[]): PortfolioGrowth[] {
-    return data.map((portfolioStatePerDay) => ({
-      date: portfolioStatePerDay.date,
-      investedValue: portfolioStatePerDay.invested,
-      marketTotalValue: portfolioStatePerDay.holdingsBalance,
-      totalBalanceValue: portfolioStatePerDay.balance,
-    }));
-  }
-
   getPortfolioGrowth(data: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
     return data.reduce((acc, curr) => {
       curr.data.forEach((dataItem) => {

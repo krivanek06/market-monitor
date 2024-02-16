@@ -14,3 +14,7 @@ import { TestBed } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
 
 TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
+
+// auto spy - https://ng-mocks.sudo.eu/extra/auto-spy
+import { ngMocks } from 'ng-mocks';
+ngMocks.autoSpy('jest');

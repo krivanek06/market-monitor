@@ -104,7 +104,11 @@ export const dateFormatDate = (inputDate: DateInput, formateStr: string = 'yyyy-
 };
 
 export const getCurrentDateDefaultFormat = (): string => {
-  return dateFormatDate(new Date(), 'yyyy-MM-dd');
+  return dateFormatDate(new Date());
+};
+
+export const getYesterdaysDate = (): string => {
+  return dateFormatDate(subDays(new Date(), 1));
 };
 
 export const dateIsNotWeekend = (date: DateInput): boolean => {
