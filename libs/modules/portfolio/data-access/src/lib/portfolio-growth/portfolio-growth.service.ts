@@ -12,9 +12,10 @@ import {
 import {
   getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
+  getYesterdaysDate,
   roundNDigits,
 } from '@market-monitor/shared/features/general-util';
-import { format, isBefore, isSameDay, subDays } from 'date-fns';
+import { format, isBefore, isSameDay } from 'date-fns';
 import { Observable, catchError, firstValueFrom, map, of } from 'rxjs';
 
 @Injectable({
@@ -43,6 +44,13 @@ export class PortfolioGrowthService {
       );
   }
 
+  /**
+   * method used to return growth for each asset based on the dates owned.
+   * the `data` contains the date and the value of the asset from the first date owned until today or fully sold
+   *
+   * @param transactions - executed transactions by user
+   * @returns - an array of {symbol: string, data: PortfolioGrowthAssetsDataItem[]}
+   */
   async getPortfolioGrowthAssets(transactions: PortfolioTransaction[]): Promise<PortfolioGrowthAssets[]> {
     console.log(`PortfolioGrowthService: getPortfolioGrowthAssets`, transactions);
     // from transactions get all distinct symbols with soonest date of transaction
@@ -65,7 +73,7 @@ export class PortfolioGrowthService {
     );
 
     // load historical prices for all holdings
-    const yesterDay = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+    const yesterDay = getYesterdaysDate();
     const historicalPricesPromise = await Promise.allSettled(
       transactionStart.map((transaction) =>
         firstValueFrom(
@@ -118,35 +126,40 @@ export class PortfolioGrowthService {
 
         // internal helper
         const aggregator = {
-          units: symbolTransactions[0].units,
+          units: 0,
           index: 0,
-          breakEvenPrice: symbolTransactions[0].unitPrice,
+          breakEvenPrice: 0,
         };
+
+        // loop though prices of specific symbol and calculate invested value and market total value
         const growthAssetItems = symbolHistoricalPrice.map((historicalPrice) => {
-          // check if the next transaction data is before the date then increase index
-          if (
-            !!symbolTransactions[aggregator.index + 1] &&
-            isSameDay(new Date(symbolTransactions[aggregator.index + 1].date), new Date(historicalPrice.date))
+          // modify the aggregator for every transaction that happened on that date
+          // can be multiple transactions on the same day for the same symbol
+          while (
+            !!symbolTransactions[aggregator.index] &&
+            isSameDay(new Date(symbolTransactions[aggregator.index].date), new Date(historicalPrice.date))
           ) {
-            aggregator.index += 1;
-            const nextTransaction = symbolTransactions[aggregator.index];
-            const isBuy = nextTransaction.transactionType === 'BUY';
+            const transaction = symbolTransactions[aggregator.index];
+            const isBuy = transaction.transactionType === 'BUY';
 
             // change break even price
             aggregator.breakEvenPrice = isBuy
-              ? (aggregator.units * aggregator.breakEvenPrice + nextTransaction.units * nextTransaction.unitPrice) /
-                (aggregator.units + nextTransaction.units)
+              ? (aggregator.units * aggregator.breakEvenPrice + transaction.units * transaction.unitPrice) /
+                (aggregator.units + transaction.units)
               : aggregator.breakEvenPrice;
 
             // add or subtract units depending on transaction type
-            aggregator.units += isBuy ? nextTransaction.units : -nextTransaction.units;
+            aggregator.units += isBuy ? transaction.units : -transaction.units;
+
+            // increment next transaction index
+            aggregator.index += 1;
           }
 
           return {
-            investedValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice, 2),
+            investedValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice),
             date: historicalPrice.date,
             units: aggregator.units,
-            marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close, 2),
+            marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close),
           } satisfies PortfolioGrowthAssetsDataItem;
         });
 
@@ -156,7 +169,9 @@ export class PortfolioGrowthService {
           data: growthAssetsNonNullUnits,
         } satisfies PortfolioGrowthAssets;
       })
-      .filter((d): d is PortfolioGrowthAssets => !!d);
+      // remove undefined or symbols which were bought and sold on the same day
+      .filter((d): d is PortfolioGrowthAssets => !!d && d.data.length > 0);
+
     console.log('PortfolioGrowthService: getPortfolioGrowthAssets [result]', result);
     return result;
   }

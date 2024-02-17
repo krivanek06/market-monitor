@@ -7,6 +7,16 @@ import {
 import { getYesterdaysDate } from '@market-monitor/shared/features/general-util';
 import { USER_TEST_1_ID } from './test-user.model';
 
+export const TestTransactionDates = {
+  ['2023-09-04']: '2023-09-04',
+  ['2023-09-05']: '2023-09-05',
+  ['2023-09-06']: '2023-09-06',
+  ['2023-09-07']: '2023-09-07',
+  ['2023-09-08']: '2023-09-08',
+  ['2023-09-11']: '2023-09-11',
+  ['2023-09-12']: '2023-09-12',
+} as const;
+
 export const mockCreatePortfolioTransactionCreate = (
   input?: Partial<PortfolioTransactionCreate>,
 ): PortfolioTransactionCreate => {
@@ -44,7 +54,7 @@ export const mockPortfolioTransaction = (input?: Partial<PortfolioTransaction>):
 export const testTransactionCreate_BUY_AAPL_1 = mockCreatePortfolioTransactionCreate({
   symbol: 'AAPL',
   units: 10,
-  date: '2023-09-04',
+  date: TestTransactionDates['2023-09-04'],
   transactionType: 'BUY',
 });
 
@@ -59,7 +69,7 @@ export const testTransaction_BUY_AAPL_1 = mockPortfolioTransaction({
 export const testTransactionCreate_BUY_AAPL_2 = mockCreatePortfolioTransactionCreate({
   symbol: 'AAPL',
   units: 5,
-  date: '2023-09-11',
+  date: TestTransactionDates['2023-09-11'],
   transactionType: 'BUY',
 });
 
@@ -75,7 +85,7 @@ export const testTransaction_BUY_AAPL_2 = mockPortfolioTransaction({
 export const testTransactionCreate_SELL_AAPL_1 = mockCreatePortfolioTransactionCreate({
   symbol: 'AAPL',
   units: 5,
-  date: '2023-09-13',
+  date: TestTransactionDates['2023-09-12'],
   transactionType: 'SELL',
 });
 
@@ -91,7 +101,7 @@ export const testTransaction_SELL_AAPL_1 = mockPortfolioTransaction({
 export const testTransactionCreate_BUY_MSFT_1 = mockCreatePortfolioTransactionCreate({
   symbol: 'MSFT',
   units: 10,
-  date: '2023-09-07',
+  date: TestTransactionDates['2023-09-07'],
   transactionType: 'BUY',
 });
 
@@ -107,6 +117,7 @@ export const mockSymbolSummaryAAPL: SymbolSummary = {
   id: 'AAPL',
   priceChange: {} as SymbolSummary['priceChange'],
   quote: {
+    symbol: 'AAPL',
     price: 140,
   } as SymbolSummary['quote'],
 };
@@ -115,6 +126,7 @@ export const mockSymbolSummaryMSFT: SymbolSummary = {
   id: 'MSFT',
   priceChange: {} as SymbolSummary['priceChange'],
   quote: {
+    symbol: 'MSFT',
     price: 140,
   } as SymbolSummary['quote'],
 };
@@ -124,10 +136,10 @@ export const testPreviousTransactionEmpty: PortfolioState = {
   balance: 0,
   cashOnHand: 0,
   date: getYesterdaysDate(),
-  firstTransactionDate: '2023-09-01',
+  firstTransactionDate: null,
   holdingsBalance: 0,
   invested: 0,
-  lastTransactionDate: '2023-09-01',
+  lastTransactionDate: null,
   numberOfExecutedBuyTransactions: 0,
   numberOfExecutedSellTransactions: 0,
   previousBalanceChange: 0,
@@ -156,3 +168,72 @@ export const testPreviousTransactionNonEmpty: PortfolioState = {
   totalGainsValue: 0,
   transactionFees: 10,
 };
+
+export const testHistoricalPriceSymbol_AAPL = {
+  symbol: 'AAPL',
+  data: [
+    {
+      date: TestTransactionDates['2023-09-04'],
+      volume: 1000,
+      close: 10,
+    },
+    {
+      date: TestTransactionDates['2023-09-05'],
+      volume: 1000,
+      close: 12,
+    },
+    {
+      date: TestTransactionDates['2023-09-06'],
+      volume: 1000,
+      close: 10,
+    },
+    {
+      date: TestTransactionDates['2023-09-07'],
+      volume: 1000,
+      close: 15,
+    },
+    {
+      date: TestTransactionDates['2023-09-08'],
+      volume: 1000,
+      close: 10,
+    },
+    // no data for 2023-09-09 and 2023-09-10 - weekends
+    {
+      date: TestTransactionDates['2023-09-11'],
+      volume: 1000,
+      close: 10,
+    },
+    {
+      date: TestTransactionDates['2023-09-12'],
+      volume: 1000,
+      close: 10,
+    },
+  ],
+} as const;
+
+export const testHistoricalPriceSymbol_MSFT = {
+  symbol: 'MSFT',
+  data: [
+    {
+      date: TestTransactionDates['2023-09-07'],
+      volume: 1000,
+      close: 20,
+    },
+    {
+      date: TestTransactionDates['2023-09-08'],
+      volume: 1000,
+      close: 22,
+    },
+    // no data for 2023-09-09 and 2023-09-10 - weekends
+    {
+      date: TestTransactionDates['2023-09-11'],
+      volume: 1000,
+      close: 30,
+    },
+    {
+      date: TestTransactionDates['2023-09-12'],
+      volume: 1000,
+      close: 31,
+    },
+  ],
+} as const;
