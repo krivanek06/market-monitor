@@ -1,4 +1,4 @@
-import { Injectable, computed } from '@angular/core';
+import { Injectable, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { combineLatest, from, of, switchMap } from 'rxjs';
@@ -12,11 +12,9 @@ import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.ser
   providedIn: 'root',
 })
 export class PortfolioUserFacadeService {
-  constructor(
-    private authenticationUserService: AuthenticationUserStoreService,
-    private portfolioGrowthService: PortfolioGrowthService,
-    private portfolioCalculationService: PortfolioCalculationService,
-  ) {}
+  private authenticationUserService = inject(AuthenticationUserStoreService);
+  private portfolioGrowthService = inject(PortfolioGrowthService);
+  private portfolioCalculationService = inject(PortfolioCalculationService);
 
   getPortfolioState = toSignal(
     combineLatest([

@@ -6,11 +6,14 @@ import { addDays, isAfter, isBefore, subDays } from 'date-fns';
 import { GetDataByIndexPipe } from '../../../pipes';
 
 export type DateRangeSliderValues = {
-  dates: (Date | string)[];
+  dates: (Date | string)[]; // YYYY-MM-DD
   currentMinDateIndex: number;
   currentMaxDateIndex: number;
 };
 
+/**
+ * use this function if data is in the format of { date: string }[]
+ */
 export const filterDataByDateRange = <T extends { date: string }>(
   data: T[],
   dateRange: DateRangeSliderValues | null,
@@ -22,6 +25,24 @@ export const filterDataByDateRange = <T extends { date: string }>(
     (d) =>
       isBefore(subDays(new Date(d.date), 1), new Date(dateRange.dates[dateRange.currentMaxDateIndex])) &&
       isAfter(addDays(new Date(d.date), 1), new Date(dateRange.dates[dateRange.currentMinDateIndex])),
+  );
+};
+
+/**
+ * use this function if data is in the format of [timestamp, ...number[]]
+ */
+export const filterDataByTimestamp = <T extends [number, ...number[]]>(
+  data: T[],
+  dateRange: DateRangeSliderValues | null,
+): T[] => {
+  if (!dateRange) {
+    return data;
+  }
+
+  return data.filter(
+    (d) =>
+      isBefore(subDays(new Date(d[0]), 1), new Date(dateRange.dates[dateRange.currentMaxDateIndex])) &&
+      isAfter(addDays(new Date(d[0]), 1), new Date(dateRange.dates[dateRange.currentMinDateIndex])),
   );
 };
 
@@ -99,7 +120,7 @@ export const filterDataByDateRange = <T extends { date: string }>(
   ],
 })
 export class DateRangeSliderComponent implements ControlValueAccessor {
-  @Input() displayUpperDate = true;
+  @Input() displayUpperDate = false;
   dateRangeSignal = signal<DateRangeSliderValues | null>(null);
 
   onChange: (data: DateRangeSliderValues) => void = () => {};

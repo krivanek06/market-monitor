@@ -25,11 +25,7 @@ import { startWith } from 'rxjs';
       <app-section-title title="Portfolio Change Chart" />
 
       <!-- date range -->
-      <app-date-range-slider
-        class="w-[550px]"
-        [displayUpperDate]="false"
-        [formControl]="sliderControl"
-      ></app-date-range-slider>
+      <app-date-range-slider class="w-[550px]" [formControl]="sliderControl"></app-date-range-slider>
     </div>
 
     <highcharts-chart

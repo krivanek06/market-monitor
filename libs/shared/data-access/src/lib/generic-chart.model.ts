@@ -7,7 +7,7 @@ export type GenericChartSeries<T extends Highcharts.SeriesOptionsType['type']> =
     showCurrencySign?: boolean;
     showPercentageSign?: boolean;
     colorTooltipDefault?: boolean;
-  };
+  } & Record<string, unknown>;
 };
 
 export const ChartGenericColors = [

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { PortfolioGrowthAssets, PortfolioState } from '@market-monitor/api-types';
 import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
 import {
@@ -33,6 +34,7 @@ import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
     PortfolioGrowthChartComponent,
     SectionTitleComponent,
     MatButtonModule,
+    MatTooltipModule,
   ],
   template: `
     <!-- portfolio growth -->
@@ -40,10 +42,22 @@ import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
       <!-- select chart title -->
       <div class="flex flex-col sm:flex-row items-center gap-4">
         <app-section-title title="Portfolio Growth" class="mr-6 max-lg:flex-1" />
-        <button (click)="onPortfolioChangeChart()" type="button" class="hidden sm:block" mat-stroked-button>
+        <button
+          (click)="onPortfolioChangeChart()"
+          matTooltip="Display daily portfolio change - profit/loss"
+          type="button"
+          class="hidden sm:block"
+          mat-stroked-button
+        >
           Portfolio Change
         </button>
-        <button (click)="onAssetGrowthChart()" type="button" class="hidden sm:block" mat-stroked-button>
+        <button
+          (click)="onAssetGrowthChart()"
+          matTooltip="Display invested amount per asset in your portfolio"
+          type="button"
+          class="hidden sm:block"
+          mat-stroked-button
+        >
           Asset Growth
         </button>
       </div>
@@ -51,7 +65,6 @@ import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
       <!-- date range -->
       <app-date-range-slider
         class="w-full lg:w-[550px]"
-        [displayUpperDate]="false"
         [formControl]="portfolioGrowthRangeControl"
       ></app-date-range-slider>
     </div>

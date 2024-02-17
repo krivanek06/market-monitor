@@ -37,11 +37,7 @@ import { filterNil } from 'ngxtension/filter-nil';
         <app-section-title [title]="headerTitle" />
 
         <!-- date range -->
-        <app-date-range-slider
-          class="w-full lg:w-[550px]"
-          [displayUpperDate]="false"
-          [formControl]="sliderControl"
-        ></app-date-range-slider>
+        <app-date-range-slider class="w-full lg:w-[550px]" [formControl]="sliderControl" />
       </div>
 
       <highcharts-chart
