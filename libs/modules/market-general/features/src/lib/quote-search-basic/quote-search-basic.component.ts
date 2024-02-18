@@ -46,7 +46,7 @@ import { tap } from 'rxjs';
     <mat-form-field class="w-full" [ngClass]="size()">
       <mat-label>Search quote</mat-label>
       <input
-        type()="text"
+        type="text"
         placeholder="Enter ticker"
         aria-label="Text"
         matInput

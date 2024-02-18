@@ -4,6 +4,7 @@ import { HistoricalPrice, SymbolHistoricalPeriods } from '@market-monitor/api-ty
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
 import { dateFormatDate, formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { input } from '@angular/core';
 
 @Component({
   selector: 'app-asset-price-chart',
@@ -29,12 +30,12 @@ import { HighchartsChartModule } from 'highcharts-angular';
   `,
 })
 export class AssetPriceChartComponent extends ChartConstructor implements OnInit, OnChanges {
-  @Input({ required: true }) period!: SymbolHistoricalPeriods;
-  @Input({ required: true }) historicalPrice!: HistoricalPrice[];
-  @Input() showTitle = false;
-  @Input() priceName = 'price';
-  @Input() displayVolume = true;
-  @Input() priceShowSign = true;
+  period = input.required<SymbolHistoricalPeriods>();
+  historicalPrice = input.required<HistoricalPrice[]>();
+  showTitle = input(false);
+  priceName = input('price');
+  displayVolume = input(true);
+  priceShowSign = input(true);
 
   ngOnInit(): void {}
   ngOnChanges(changes: SimpleChanges): void {
@@ -52,8 +53,8 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
     const price = data.map((d) => d.close);
     const volume = data.map((d) => d.volume);
     const dates = data.map((d) => d.date);
-    const priceNameLocal = this.priceName;
-    const priceShowSignLocal = this.priceShowSign;
+    const priceNameLocal = this.priceName();
+    const priceShowSignLocal = this.priceShowSign();
     const color = !!price[0] && price[0] < price[price.length - 1] ? ColorScheme.SUCCESS_VAR : ColorScheme.DANGER_VAR;
 
     this.chartOptions = {
@@ -98,10 +99,10 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         crosshair: true,
         type: 'category',
         categories: dates.map((date) => {
-          if ([SymbolHistoricalPeriods.day, SymbolHistoricalPeriods.week].includes(this.period)) {
+          if ([SymbolHistoricalPeriods.day, SymbolHistoricalPeriods.week].includes(this.period())) {
             return dateFormatDate(date, 'HH:mm, MMMM d, y');
           }
-          if (this.period === SymbolHistoricalPeriods.month) {
+          if (this.period() === SymbolHistoricalPeriods.month) {
             return dateFormatDate(date, 'HH:mm, MMMM d, y');
           }
 
@@ -116,7 +117,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         },
       },
       title: {
-        text: this.showTitle ? 'Historical Price Chart' : '',
+        text: this.showTitle() ? 'Historical Price Chart' : '',
         align: 'left',
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,
@@ -216,7 +217,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
         {
           type: 'column',
           name: 'Volume',
-          data: this.displayVolume ? volume : [],
+          data: this.displayVolume() ? volume : [],
           color: '#f48605',
           yAxis: 0,
           opacity: 0.6,

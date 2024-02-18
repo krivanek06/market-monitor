@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { input } from '@angular/core';
 
 @Component({
   selector: 'app-color-picker',
   standalone: true,
   imports: [CommonModule, FormsModule],
+
   template: `
     <input
-      [disabled]="componentDisabled"
+      [disabled]="componentDisabled()"
       type="color"
       name="color picker"
       [value]="selectedColor"
@@ -34,7 +36,7 @@ import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 export class ColorPickerComponent {
   selectedColor = '#9c1c1c';
 
-  @Input() componentDisabled = false;
+  componentDisabled = input(false);
 
   onChange: (value: string) => void = () => {};
   onTouched = () => {};

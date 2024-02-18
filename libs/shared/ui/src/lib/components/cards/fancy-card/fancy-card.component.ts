@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 
 @Component({
@@ -8,11 +8,11 @@ import { ColorScheme } from '@market-monitor/shared/data-access';
   imports: [CommonModule],
   template: `
     <div class="h-full relative overflow-hidden px-6 pb-4 pt-4 rounded-md shadow-md" [style]="backgroundLinear">
-      <!-- title -->
-      <div *ngIf="title" class="pb-4 flex items-center gap-2">
-        <div class="c-title-dot" [ngStyle]="{ 'background-color': colorPrimary }"></div>
-        <div class="text-lg" [ngStyle]="{ color: colorPrimary }">
-          {{ title }}
+      <!-- title() -->
+      <div *ngIf="title()" class="pb-4 flex items-center gap-2">
+        <div class="c-title()-dot" [ngStyle]="{ 'background-color': colorPrimary() }"></div>
+        <div class="text-lg" [ngStyle]="{ color: colorPrimary() }">
+          {{ title() }}
         </div>
       </div>
 
@@ -66,14 +66,14 @@ import { ColorScheme } from '@market-monitor/shared/data-access';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FancyCardComponent {
-  @Input() title?: string;
-  @Input() colorPrimary: ColorScheme = ColorScheme.PRIMARY_VAR;
-  @Input() colorBackground: string = ColorScheme.GRAY_LIGHT_STRONG_VAR;
+  title = input<string | undefined>();
+  colorPrimary = input<ColorScheme>(ColorScheme.PRIMARY_VAR);
+  colorBackground = input<string>(ColorScheme.GRAY_LIGHT_STRONG_VAR);
 
   get backgroundLinear(): string {
     return `background: linear-gradient(135deg,
-        color-mix(in srgb, ${this.colorBackground} 50%, white),
-        color-mix(in srgb, ${this.colorBackground} 35%, white)
+        color-mix(in srgb, ${this.colorBackground()} 50%, white),
+        color-mix(in srgb, ${this.colorBackground()} 35%, white)
       );`;
   }
 }

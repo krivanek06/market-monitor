@@ -6,10 +6,10 @@ import {
   HostListener,
   Inject,
   Injector,
-  Input,
   OnInit,
   Optional,
   forwardRef,
+  input,
   signal,
 } from '@angular/core';
 import {
@@ -81,30 +81,30 @@ import { DefaultImgDirective } from '../../../directives';
     `,
 })
 export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, ControlValueAccessor {
-  @Input({ required: true }) inputCaption!: string;
-  @Input() prefixIcon?: string;
-  @Input() inputType: InputTypeEnum | InputType = 'TEXT';
+  inputCaption = input.required<string>();
+  prefixIcon = input<string | undefined>();
+  inputType = input<InputTypeEnum | InputType>('TEXT');
 
   /*
 		disable input source
 	  */
-  @Input() disabled = false;
+  disabled = signal(false);
 
   /*
 		display hint text for input
 	  */
-  @Input() hintText?: string;
+  hintText = input<string | undefined>();
 
   /**
    * data which are displayed in Select.option
    * use only if inputType === 'SELECT' | 'MULTISELECT' | 'SELECTSEARCH'
    */
-  @Input() inputSource?: InputSource<T>[] | null = [];
+  inputSource = input<InputSource<T>[] | null | undefined>([]);
 
   /**
    * user only when inputType ==== 'SELECT_SOURCE_WRAPPER
    */
-  @Input() inputSourceWrapper?: InputSourceWrapper<T>[] | null = [];
+  inputSourceWrapper = input<InputSourceWrapper<T>[] | null | undefined>([]);
 
   onChange: (value: T | null) => void = () => {};
   onTouched = () => {};
@@ -180,7 +180,7 @@ export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, C
     this.onTouched = fn;
   }
 
-  setDisabledState?(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled.set(isDisabled);
   }
 }

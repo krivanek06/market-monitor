@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Directive, Input, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { input } from '@angular/core';
 
 class HideAfterContext {
   public get $implicit() {
@@ -21,8 +22,7 @@ export class HideAfterDirective implements OnInit {
   }
   private _delay = 0;
 
-  @Input('hideAfterThen')
-  placeholder: TemplateRef<HideAfterContext> | null = null;
+  placeholder = input<TemplateRef<HideAfterContext> | null>(null, { alias: 'hideAfterThen' });
 
   private context = new HideAfterContext();
 
@@ -40,8 +40,8 @@ export class HideAfterDirective implements OnInit {
     }, 1000);
     setTimeout(() => {
       this.viewContainerRef.clear();
-      if (this.placeholder) {
-        this.viewContainerRef.createEmbeddedView(this.placeholder, this.context);
+      if (this.placeholder()) {
+        this.viewContainerRef.createEmbeddedView(this.placeholder()!, this.context);
       }
       clearInterval(intervalId);
     }, this._delay);

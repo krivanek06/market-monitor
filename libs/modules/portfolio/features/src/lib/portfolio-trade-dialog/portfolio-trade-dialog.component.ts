@@ -176,11 +176,17 @@ export type PortfolioTradeDialogComponentData = {
 
           <!-- units / keyboard -->
           <div class="md:px-3">
+            <!-- units keyboard -->
             <app-number-keyboard-control
-              [value]="keyboardValue"
-              [enableDecimal]="false"
-              [formControl]="keyboardValuesControl"
-            ></app-number-keyboard-control>
+              *ngIf="activeTotalValueButtonSignal() === 'UNITS'"
+              [formControl]="form.controls.units"
+            />
+
+            <!-- custom total keyboard -->
+            <app-number-keyboard-control
+              *ngIf="activeTotalValueButtonSignal() === 'TOTAL_VALUE'"
+              [formControl]="form.controls.customTotalValue"
+            />
           </div>
         </ng-container>
 
@@ -228,7 +234,6 @@ export class PortfolioTradeDialogComponent {
     customTotalValue: new FormControl('', { nonNullable: true }),
     useCustomTotalValueControl: new FormControl(false, { nonNullable: true }),
   });
-  keyboardValuesControl = new FormControl('', { nonNullable: true });
 
   // config for date picker
   datePickerConfig: InputTypeDateTimePickerConfig = {
@@ -284,7 +289,6 @@ export class PortfolioTradeDialogComponent {
     private dialogServiceUtil: DialogServiceUtil,
     @Inject(MAT_DIALOG_DATA) public data: PortfolioTradeDialogComponentData,
   ) {
-    this.listenKeyboardChange();
     this.listenCustomTotalValueChange();
     this.listenOnInSufficientUnits();
     this.listenOnInSufficientCash();
@@ -322,11 +326,6 @@ export class PortfolioTradeDialogComponent {
    */
   get isCustomTotal(): boolean {
     return this.form.controls.useCustomTotalValueControl.value;
-  }
-
-  get keyboardValue(): string {
-    const useUnits = !this.isCustomTotal || this.activeTotalValueButtonSignal() === 'UNITS';
-    return useUnits ? this.form.controls.units.value : this.form.controls.customTotalValue.value;
   }
 
   async onFormSubmit(): Promise<void> {
@@ -376,19 +375,6 @@ export class PortfolioTradeDialogComponent {
     this.form.controls.useCustomTotalValueControl.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
       this.form.controls.units.patchValue('', { emitEvent: false });
       this.form.controls.customTotalValue.patchValue('', { emitEvent: false });
-    });
-  }
-
-  /**
-   * listen to keyboard change and save value to correct form control
-   */
-  private listenKeyboardChange(): void {
-    this.keyboardValuesControl.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
-      if (!this.isCustomTotal || this.activeTotalValueButtonSignal() === 'UNITS') {
-        this.form.controls.units.setValue(value);
-        return;
-      }
-      this.form.controls.customTotalValue.setValue(value);
     });
   }
 

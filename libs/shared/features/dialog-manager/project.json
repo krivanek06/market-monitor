@@ -1,5 +1,5 @@
 {
-  "name": "dialog-manager",
+  "name": "shared-dialog-manager",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/features/dialog-manager/src",
   "prefix": "market-monitor",

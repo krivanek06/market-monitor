@@ -3,7 +3,6 @@ import {
   Directive,
   EventEmitter,
   Host,
-  Input,
   OnChanges,
   OnInit,
   Optional,
@@ -12,6 +11,7 @@ import {
   Self,
   SimpleChanges,
   ViewContainerRef,
+  input,
 } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 
@@ -24,9 +24,9 @@ export class StylePaginatorDirective implements OnInit, OnChanges, AfterViewInit
   // remember rendered buttons on UI that we can remove them when page index change
   private _buttons: any[] = [];
 
-  @Input() showTotalPages: number = 4;
-  @Input() appCustomLength?: number | null;
-  @Input() appCustomPageIndex?: number | null;
+  showTotalPages = input<number>(4);
+  appCustomLength = input<number | null | undefined>();
+  appCustomPageIndex = input<number | null | undefined>();
 
   constructor(
     @Host() @Self() @Optional() private readonly matPag: MatPaginator,
@@ -51,7 +51,7 @@ export class StylePaginatorDirective implements OnInit, OnChanges, AfterViewInit
     }
 
     if (changes?.['appCustomPageIndex']?.currentValue !== changes?.['appCustomPageIndex']?.previousValue) {
-      const index = this.appCustomPageIndex ?? 0;
+      const index = this.appCustomPageIndex() ?? 0;
       this.switchPage(index);
       this.buildButtons();
     }
@@ -94,10 +94,7 @@ export class StylePaginatorDirective implements OnInit, OnChanges, AfterViewInit
   }
 
   private buildButtons(): void {
-    if (!this.appCustomLength) {
-      this.appCustomLength = 0;
-      // throw new Error('StylePaginatorDirective: this.appCustomLength is undefined');
-    }
+    const appCustomLength = this.appCustomLength() ?? 0;
     const actionContainer = this.vr.element.nativeElement.querySelector('div.mat-mdc-paginator-range-actions');
     const nextPageNode = this.vr.element.nativeElement.querySelector('button.mat-mdc-paginator-navigation-next');
 
@@ -106,7 +103,7 @@ export class StylePaginatorDirective implements OnInit, OnChanges, AfterViewInit
 
     // we want to render one button before (as previous)
     const currentIndex = this.matPag.pageIndex < 2 ? 0 : this.matPag.pageIndex - 2;
-    const maxPages = Math.ceil(this.appCustomLength / this.matPag.pageSize);
+    const maxPages = Math.ceil(appCustomLength / this.matPag.pageSize);
 
     // if there is only one page, do not render buttons
     if (maxPages === 1) {
@@ -122,7 +119,7 @@ export class StylePaginatorDirective implements OnInit, OnChanges, AfterViewInit
     }
 
     // display buttons
-    for (let index = currentIndex; index <= currentIndex + this.showTotalPages; index++) {
+    for (let index = currentIndex; index <= currentIndex + this.showTotalPages(); index++) {
       // do not render more than max page buttons
       if (maxPages > 1 && index < maxPages) {
         this.ren.insertBefore(actionContainer, this.createButton(index, this.matPag.pageIndex), nextPageNode);
@@ -131,7 +128,7 @@ export class StylePaginatorDirective implements OnInit, OnChanges, AfterViewInit
 
     // determine whether to show last bubble button that will navigate to the end
     // there used to be a bug when  maxPages === this.showTotalPage -> last bubble was showed twice
-    if (this.matPag.pageIndex + 3 < maxPages && maxPages !== this.showTotalPages) {
+    if (this.matPag.pageIndex + 3 < maxPages && maxPages !== this.showTotalPages()) {
       const lastIndex = maxPages - 1;
       const element = this.createDotsElement();
       this.ren.insertBefore(actionContainer, element, nextPageNode);

@@ -1,5 +1,6 @@
 import { Directive, ElementRef, Input, OnChanges, Renderer2, SimpleChanges, inject } from '@angular/core';
 import { ColorScheme } from '@market-monitor/shared/data-access';
+import { input } from '@angular/core';
 
 type ColorType = 'color' | 'background-color';
 
@@ -11,20 +12,20 @@ type ColorType = 'color' | 'background-color';
   standalone: true,
 })
 export class PositionColoringDirective implements OnChanges {
-  @Input() positionType: ColorType = 'color';
-  @Input({ required: true }) position!: number;
+  positionType = input<ColorType>('color');
+  position = input.required<number>();
 
   /**
    * color used to color elements after the first 3 positions
    */
-  @Input() defaultPositionColor = ColorScheme.GRAY_MEDIUM_VAR;
+  defaultPositionColor = input(ColorScheme.GRAY_MEDIUM_VAR);
 
   private renderer = inject(Renderer2);
   private elementRef = inject(ElementRef);
 
   ngOnChanges(changes: SimpleChanges): void {
-    const type = changes?.['type']?.currentValue ?? this.positionType;
-    const position = Number(changes?.['position']?.currentValue) ?? this.position;
+    const type = changes?.['type']?.currentValue ?? this.positionType();
+    const position = Number(changes?.['position']?.currentValue) ?? this.position();
     this.colorElement(position, type);
   }
 
@@ -45,7 +46,7 @@ export class PositionColoringDirective implements OnChanges {
         return '#073dc6';
       }
 
-      return this.defaultPositionColor;
+      return this.defaultPositionColor();
     }
     // background colors have some opacity
     if (type === 'background-color') {
@@ -59,7 +60,7 @@ export class PositionColoringDirective implements OnChanges {
         return '#073dc65e';
       }
 
-      return this.defaultPositionColor;
+      return this.defaultPositionColor();
     }
 
     return '';

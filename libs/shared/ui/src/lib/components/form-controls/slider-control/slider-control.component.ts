@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input, input, OnInit } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { InputTypeSlider } from '@market-monitor/shared/data-access';
@@ -8,38 +8,41 @@ import { InputTypeSlider } from '@market-monitor/shared/data-access';
   selector: 'app-slider-control',
   standalone: true,
   imports: [CommonModule, MatSliderModule, ReactiveFormsModule],
+
   template: `
-    <div
-      class="-mb-3 text-sm text-center"
-      [ngClass]="{
-        'text-wt-gray-dark': isDisabled,
-        'text-wt-gray-medium': !isDisabled
-      }"
-    >
-      {{ selectedValue.value | currency }}
-    </div>
+    @if (config(); as config) {
+      <div
+        class="-mb-3 text-sm text-center"
+        [ngClass]="{
+          'text-wt-gray-dark': isDisabled,
+          'text-wt-gray-medium': !isDisabled
+        }"
+      >
+        {{ selectedValue.value | currency }}
+      </div>
 
-    <mat-slider
-      [max]="config.max"
-      [min]="config.min"
-      [step]="config.step"
-      [discrete]="true"
-      [showTickMarks]="false"
-      [displayWith]="formatLabel"
-    >
-      <input matSliderThumb [formControl]="selectedValue" />
-    </mat-slider>
+      <mat-slider
+        [max]="config.max"
+        [min]="config.min"
+        [step]="config.step"
+        [discrete]="true"
+        [showTickMarks]="false"
+        [displayWith]="formatLabel"
+      >
+        <input matSliderThumb [formControl]="selectedValue" />
+      </mat-slider>
 
-    <div
-      class="flex items-center justify-between -mt-5 text-sm"
-      [ngClass]="{
-        'text-wt-gray-dark': isDisabled,
-        'text-wt-gray-medium': !isDisabled
-      }"
-    >
-      <span>{{ config.min | currency }}</span>
-      <span class="-mr-3">{{ config.max | currency }}</span>
-    </div>
+      <div
+        class="flex items-center justify-between -mt-5 text-sm"
+        [ngClass]="{
+          'text-wt-gray-dark': isDisabled,
+          'text-wt-gray-medium': !isDisabled
+        }"
+      >
+        <span>{{ config.min | currency }}</span>
+        <span class="-mr-3">{{ config.max | currency }}</span>
+      </div>
+    }
   `,
   styles: [
     `
@@ -62,7 +65,7 @@ import { InputTypeSlider } from '@market-monitor/shared/data-access';
   ],
 })
 export class SliderControlComponent implements OnInit, ControlValueAccessor {
-  @Input() config!: InputTypeSlider;
+  config = input<InputTypeSlider | undefined>();
   @Input() set componentDisabled(disabled: boolean) {
     this.isDisabled = disabled;
 
@@ -87,8 +90,9 @@ export class SliderControlComponent implements OnInit, ControlValueAccessor {
   }
 
   formatLabel(value: number): string {
-    if (this.config?.valueFormatter) {
-      return this.config.valueFormatter(value);
+    const config = this.config();
+    if (config?.valueFormatter) {
+      return config.valueFormatter(value);
     }
 
     if (value >= 1000) {

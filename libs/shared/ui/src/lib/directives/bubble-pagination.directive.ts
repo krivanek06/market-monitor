@@ -15,6 +15,7 @@ import {
 import { MatPaginator } from '@angular/material/paginator';
 import { map, startWith } from 'rxjs';
 import { PlatformService } from '../utils';
+import { input } from '@angular/core';
 
 /**
  * Works from angular-material version 15. since all classes got the new prefix 'mdc-'
@@ -32,24 +33,24 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
   /**
    * whether we want to display first/last button and dots
    */
-  @Input() showFirstButton = true;
-  @Input() showLastButton = true;
+  showFirstButton = input(true);
+  showLastButton = input(true);
 
   /**
    * how many buttons to display before and after
    * the selected button
    */
-  @Input() renderButtonsNumber = 2;
+  renderButtonsNumber = input(2);
 
   /**
    * how many elements are in the table
    */
-  @Input() appCustomLength: number = 0;
+  appCustomLength = input<number>(0);
 
   /**
    * set true to hide left and right arrows surrounding the bubbles
    */
-  @Input() hideDefaultArrows = false;
+  hideDefaultArrows = input(false);
 
   /**
    * references to DOM elements
@@ -134,7 +135,7 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
     this.buttonsRef.forEach((button) => this.ren.setStyle(button, 'display', 'none'));
 
     // show N previous buttons and X next buttons
-    const renderElements = this.renderButtonsNumber;
+    const renderElements = this.renderButtonsNumber();
     const endDots = newIndex < this.buttonsRef.length - renderElements - 1;
     const startDots = newIndex - renderElements > 0;
 
@@ -142,13 +143,13 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
     const lastButton = this.buttonsRef[this.buttonsRef.length - 1];
 
     // last bubble and dots
-    if (this.showLastButton) {
+    if (this.showLastButton()) {
       this.ren.setStyle(this.dotsEndRef, 'display', endDots ? 'block' : 'none');
       this.ren.setStyle(lastButton, 'display', endDots ? 'flex' : 'none');
     }
 
     // first bubble and dots
-    if (this.showFirstButton) {
+    if (this.showFirstButton()) {
       this.ren.setStyle(this.dotsStartRef, 'display', startDots ? 'block' : 'none');
       this.ren.setStyle(firstButton, 'display', startDots ? 'flex' : 'none');
     }
@@ -185,7 +186,7 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
     this.ren.setStyle(howManyDisplayedEl, 'font-size', '14px');
 
     // check whether the user wants to remove left & right default arrow
-    if (this.hideDefaultArrows) {
+    if (this.hideDefaultArrows()) {
       this.ren.setStyle(previousButton, 'display', 'none');
       this.ren.setStyle(nextButtonDefault, 'display', 'none');
     }
@@ -213,7 +214,7 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
    * end result: (1) .... (4) (5) (6) ... (25)
    */
   private buildButtons(): void {
-    const neededButtons = Math.ceil(this.appCustomLength / this.matPag.pageSize);
+    const neededButtons = Math.ceil(this.appCustomLength() / this.matPag.pageSize);
 
     // if there is only one page, do not render buttons
     if (neededButtons === 0 || neededButtons === 1) {

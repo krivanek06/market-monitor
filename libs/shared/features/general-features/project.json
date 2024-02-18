@@ -1,5 +1,5 @@
 {
-  "name": "general-features",
+  "name": "shared-general-features",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/features/general-features/src",
   "prefix": "app",
