@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ValidationErrors } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ErrorMessagePipe } from './error-message.pipe';
+import { input } from '@angular/core';
 
 /**
  * Simple component to display the error messages of a form control
@@ -12,8 +13,9 @@ import { ErrorMessagePipe } from './error-message.pipe';
   standalone: true,
   imports: [CommonModule, ErrorMessagePipe, MatFormFieldModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
+
   template: `
-    @for (error of errors | keyvalue; track error.key) {
+    @for (error of errors() | keyvalue; track error.key) {
       <mat-error class="pl-3 mb-2">
         {{ error.key | errorMessage: error.value }}
       </mat-error>
@@ -26,5 +28,5 @@ import { ErrorMessagePipe } from './error-message.pipe';
   `,
 })
 export class InputErrorComponent {
-  @Input({ required: true }) errors: ValidationErrors | undefined | null = null;
+  errors = input.required<ValidationErrors | undefined | null>();
 }

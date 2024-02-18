@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { SymbolSummary } from '@market-monitor/api-types';
@@ -10,7 +10,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
   standalone: true,
   imports: [CommonModule, DefaultImgDirective, PercentageIncreaseDirective, MatButtonModule, MatDividerModule],
   template: `
-    <div *ngFor="let data of peers; let last = last">
+    <div *ngFor="let data of peers(); let last = last">
       <button (click)="onItemClick(data)" class="w-full h-[50px]" mat-button type="button">
         <div class="g-item-wrapper">
           <div class="flex items-center gap-2">
@@ -41,7 +41,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
 })
 export class StockPeersListComponent {
   @Output() clickedEmitter = new EventEmitter<SymbolSummary>();
-  @Input() peers: SymbolSummary[] = [];
+  peers = input<SymbolSummary[]>([]);
 
   onItemClick(summary: SymbolSummary) {
     this.clickedEmitter.emit(summary);

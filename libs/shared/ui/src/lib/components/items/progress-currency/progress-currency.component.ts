@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, input } from '@angular/core';
 
 @Component({
   selector: 'app-progress-currency',
@@ -7,16 +7,16 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
     <div>
       <input
         type="range"
-        [min]="!min ? 0 : min"
-        [max]="!max ? value : max"
-        [value]="!value ? 0 : value"
+        [min]="!min() ? 0 : min()"
+        [max]="!max() ? value() : max()"
+        [value]="!value() ? 0 : value()"
         class="slider"
         disabled
       />
     </div>
     <div class="flex items-center justify-between">
-      <span class="text-xs text-wt-gray-medium">{{ min | currency }} </span>
-      <span class="text-xs text-wt-gray-medium">{{ max | currency }} </span>
+      <span class="text-xs text-wt-gray-medium">{{ min() | currency }} </span>
+      <span class="text-xs text-wt-gray-medium">{{ max() | currency }} </span>
     </div>
   `,
   styles: [
@@ -59,9 +59,9 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
   imports: [CommonModule],
 })
 export class ProgressCurrencyComponent implements OnInit {
-  @Input({ required: true }) min!: number;
-  @Input({ required: true }) max!: number;
-  @Input({ required: true }) value?: number | null;
+  min = input.required<number>();
+  max = input.required<number>();
+  value = input.required<number | null>();
 
   constructor() {}
 

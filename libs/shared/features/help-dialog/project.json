@@ -1,5 +1,5 @@
 {
-  "name": "help-dialog",
+  "name": "shared-help-dialog",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/features/help-dialog/src",
   "prefix": "app",

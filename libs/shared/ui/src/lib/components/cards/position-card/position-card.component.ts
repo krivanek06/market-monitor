@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,16 +25,16 @@ import { PositionColoringDirective } from '../../../directives';
       appearance="outlined"
       matRipple
       [matRippleCentered]="true"
-      [matRippleDisabled]="!clickable"
+      [matRippleDisabled]="!clickable()"
       [matRippleUnbounded]="false"
       class="shadow-md pt-8 pb-3 px-6"
       appPositionColoring
-      [position]="currentPositions"
+      [position]="currentPositions()"
       [defaultPositionColor]="ColorScheme.GRAY_LIGHT_VAR"
       positionType="background-color"
       (click)="onClick()"
       [ngClass]="{
-        'g-clickable-hover': clickable
+        'g-clickable()-hover': clickable()
       }"
     >
       <div class="relative">
@@ -42,23 +42,23 @@ import { PositionColoringDirective } from '../../../directives';
         <div
           class="absolute -top-6 -left-4 h-10 z-10 rounded-full bg-slate-200 flex items-center gap-4 opacity-90 border border-wt-gray-light-strong"
           [ngClass]="{
-            'w-10': !showPreviousPosition
+            'w-10': !showPreviousPosition()
           }"
         >
-          <div class="c-position text-lg ml-2" appPositionColoring [position]="currentPositions">
-            #{{ currentPositions }}
+          <div class="c-position text-lg ml-2" appPositionColoring [position]="currentPositions()">
+            #{{ currentPositions() }}
           </div>
           <div
-            *ngIf="showPreviousPosition"
+            *ngIf="showPreviousPosition()"
             class="flex items-center"
             [ngClass]="{
-              'text-wt-success': isPositionIncreased,
-              'text-wt-danger': !isPositionIncreased
+              'text-wt-success': isPositionIncreased(),
+              'text-wt-danger': !isPositionIncreased()
             }"
           >
-            <span *ngIf="previousPosition">{{ previousPosition - currentPositions }}</span>
-            <mat-icon *ngIf="isPositionIncreased" color="accent">expand_less</mat-icon>
-            <mat-icon *ngIf="!isPositionIncreased" color="warn">expand_more</mat-icon>
+            <span *ngIf="previousPosition() as previousPosition">{{ previousPosition - currentPositions() }}</span>
+            <mat-icon *ngIf="isPositionIncreased()" color="accent">expand_less</mat-icon>
+            <mat-icon *ngIf="!isPositionIncreased()" color="warn">expand_more</mat-icon>
           </div>
         </div>
 
@@ -71,22 +71,20 @@ import { PositionColoringDirective } from '../../../directives';
 export class PositionCardComponent {
   @Output() clickedEmitter = new EventEmitter<void>();
 
-  @Input({ required: true }) currentPositions!: number;
-  @Input() previousPosition?: number | null;
-  @Input() clickable = false;
+  currentPositions = input.required<number>();
+  previousPosition = input<number | null | undefined>();
+  clickable = input(false);
 
   ColorScheme = ColorScheme;
 
-  get showPreviousPosition(): boolean {
-    return !!this.previousPosition && this.currentPositions !== this.previousPosition;
-  }
-
-  get isPositionIncreased(): boolean {
-    return !!this.previousPosition && this.previousPosition - this.currentPositions > 0;
-  }
+  showPreviousPosition = computed(() => this.previousPosition() && this.currentPositions() !== this.previousPosition());
+  isPositionIncreased = computed(() => {
+    const previousPosition = this.previousPosition();
+    return previousPosition && previousPosition - this.currentPositions() > 0;
+  });
 
   onClick(): void {
-    if (this.clickable) {
+    if (this.clickable()) {
       this.clickedEmitter.emit();
     }
   }

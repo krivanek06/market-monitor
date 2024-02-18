@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, input, OnInit } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -32,11 +32,11 @@ export interface InputTypeDateTimePickerConfig {
     <mat-form-field class="h-0 scale-0">
       <div class="hidden">
         <input
-          [min]="inputTypeDateTimePickerConfig?.minDate"
-          [max]="inputTypeDateTimePickerConfig?.maxDate"
+          [min]="inputTypeDateTimePickerConfig()?.minDate"
+          [max]="inputTypeDateTimePickerConfig()?.maxDate"
           matInput
           [matDatepicker]="datePicker"
-          [matDatepickerFilter]="inputTypeDateTimePickerConfig?.dateFilter ?? defaultDateFilter"
+          [matDatepickerFilter]="inputTypeDateTimePickerConfig()?.dateFilter ?? defaultDateFilter"
           [formControl]="selectedDate"
         />
         <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
@@ -46,7 +46,7 @@ export interface InputTypeDateTimePickerConfig {
 
     <div class="mb-5">
       <button
-        [disabled]="isDisabled"
+        [disabled]="isDisabled()"
         (click)="datePicker.open()"
         type="button"
         mat-stroked-button
@@ -80,8 +80,8 @@ export class DatePickerComponent implements OnInit {
   /*
 		used when inputType === DATEPICKER
 	*/
-  @Input() inputTypeDateTimePickerConfig?: InputTypeDateTimePickerConfig;
-  @Input() isDisabled = false;
+  inputTypeDateTimePickerConfig = input<InputTypeDateTimePickerConfig | undefined>();
+  isDisabled = input(false);
 
   defaultDateFilter: DateFilterFn<any> = (d: Date) => true;
 

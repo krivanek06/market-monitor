@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject, input, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,7 +30,7 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
     TruncateWordsPipe,
     DefaultImgDirective,
   ],
-  template: `<form *ngIf="showForm" class="flex items-center gap-3 mb-2" [formGroup]="newSearchFormGroup">
+  template: `<form *ngIf="showForm()" class="flex items-center gap-3 mb-2" [formGroup]="newSearchFormGroup">
       <!-- news type -->
       <app-form-mat-input-wrapper
         inputCaption="Select News Type"
@@ -88,7 +88,7 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
     <ng-template #showSkeleton>
       <div class="columns-1 md:columns-2">
         <div
-          *ngRange="initialNewsToDisplay"
+          *ngRange="initialNewsToDisplay()"
           class="flex flex-col items-start gap-3 pt-2 pb-4 pl-2 pr-4 rounded-md max-lg:p-0 lg:flex-row"
         >
           <!-- image -->
@@ -113,8 +113,8 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewsSearchComponent {
-  @Input() showForm = false;
-  @Input() initialNewsToDisplay = 16;
+  showForm = input(false);
+  initialNewsToDisplay = input(16);
   @Input({ required: true }) set searchData(value: { newsType: NewsTypes; symbol?: string }) {
     this.newSearchFormGroup.patchValue({
       newsType: value.newsType,
@@ -135,14 +135,14 @@ export class NewsSearchComponent {
 
   private newDisplay = 16;
 
-  maximumNewsDisplayed = signal(this.initialNewsToDisplay);
+  maximumNewsDisplayed = signal(this.initialNewsToDisplay());
   loadingSignal = signal(false);
   marketStockNewsSignal = toSignal<News[]>(
     this.newSearchFormGroup.valueChanges.pipe(
       startWith(this.newSearchFormGroup.getRawValue()),
       tap(() => {
         this.loadingSignal.set(true);
-        this.maximumNewsDisplayed.set(this.initialNewsToDisplay);
+        this.maximumNewsDisplayed.set(this.initialNewsToDisplay());
       }),
       pairwise(),
       map(([prev, curr]) => {

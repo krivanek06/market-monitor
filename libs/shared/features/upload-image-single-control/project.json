@@ -1,5 +1,5 @@
 {
-  "name": "upload-image-single-control",
+  "name": "shared-upload-image-single-control",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/features/upload-image-single-control/src",
   "prefix": "app",

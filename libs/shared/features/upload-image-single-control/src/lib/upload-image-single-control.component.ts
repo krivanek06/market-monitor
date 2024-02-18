@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
+import { input } from '@angular/core';
 
 @Component({
   selector: 'app-upload-image-single-control',
@@ -24,6 +25,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
     MatIconModule,
     MatProgressSpinnerModule,
   ],
+
   template: `
     <div
       class="relative grid text-center border rounded-md group border-wt-gray-medium hover:border-wt-gray-dark hover:shadow-lg bg-wt-gray-light place-content-center hover:bg-wt-gray-medium hover:text-wt-gray-light g-clickable-hover"
@@ -31,8 +33,8 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         'opacity-80': !isUploadingSignal(),
         'opacity-50': isUploadingSignal(),
       }"
-      [style.height.px]="heightPx"
-      [style.width.px]="heightPx"
+      [style.height.px]="heightPx()"
+      [style.width.px]="heightPx()"
       matRipple
       [matRippleCentered]="true"
       [matRippleDisabled]="false"
@@ -94,17 +96,17 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
   /**
    * overwrites existing file name the user uploads
    */
-  @Input() fileName!: string;
+  fileName = input<string | undefined>();
 
   /**
    * path where to save the file
    */
-  @Input() filePath = 'images';
-  @Input() fileMaxSizeMb = 2; // 2Mb
-  @Input() heightPx = 200;
+  filePath = input('images');
+  fileMaxSizeMb = input(2); // 2Mb
+  heightPx = input(200);
 
   get fileMaxSize(): number {
-    return this.fileMaxSizeMb * 1024 * 1024;
+    return this.fileMaxSizeMb() * 1024 * 1024;
   }
 
   dialogServiceUtil = inject(DialogServiceUtil);
@@ -149,7 +151,7 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
       } else {
         const size = Math.round(file.size / 1024 / 1024);
         this.dialogServiceUtil.showNotificationBar(
-          `Unable to upload file, limit size is ${this.fileMaxSizeMb}Mb, your size is ${size} Mb`,
+          `Unable to upload file, limit size is ${this.fileMaxSizeMb()}Mb, your size is ${size} Mb`,
           'error',
         );
       }
@@ -186,7 +188,9 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
     }
 
     // The storage path
-    const path = this.fileName ? `${this.filePath}/${this.fileName}` : `${this.filePath}/${Date.now()}_${file.name}`;
+    const path = this.fileName()
+      ? `${this.filePath()}/${this.fileName()!}`
+      : `${this.filePath()}/${Date.now()}_${file.name}`;
 
     // Reference to storage bucket
     const reference = ref(this.storage, path);

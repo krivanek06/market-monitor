@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
   OnChanges,
   SimpleChanges,
   computed,
   inject,
+  input,
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
@@ -43,7 +43,7 @@ import { tap } from 'rxjs';
     ScrollingModule,
   ],
   template: `
-    <mat-form-field class="w-full" [ngClass]="size">
+    <mat-form-field class="w-full" [ngClass]="size()">
       <mat-label>Search quote</mat-label>
       <input
         type="text"
@@ -114,8 +114,8 @@ import { tap } from 'rxjs';
   ],
 })
 export class QuoteSearchBasicComponent implements ControlValueAccessor, OnChanges {
-  @Input({ required: true }) type!: AvailableQuotes;
-  @Input() size: 'small' = 'small';
+  type = input.required<AvailableQuotes>();
+  size = input<'small'>('small');
 
   marketApiService = inject(MarketApiService);
 
@@ -139,7 +139,7 @@ export class QuoteSearchBasicComponent implements ControlValueAccessor, OnChange
   private loadQuotesByType() {
     this.showLoadingIndicator.set(true);
     this.marketApiService
-      .getQuotesByType(this.type)
+      .getQuotesByType(this.type())
       .pipe(
         tap((quotes) => {
           this.options.set(quotes);

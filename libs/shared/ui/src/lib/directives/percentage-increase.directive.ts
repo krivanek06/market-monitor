@@ -1,6 +1,7 @@
 import { Directive, Input, OnInit, Renderer2, ViewContainerRef } from '@angular/core';
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
 import { PlatformService } from '../utils';
+import { input } from '@angular/core';
 
 /**
  * Use this if you already have the prct diff & diff
@@ -45,9 +46,9 @@ export class PercentageIncreaseDirective implements OnInit {
     const changesPercentage = roundNDigits((value / Math.abs(data.valueToCompare)) * 100, 2);
     this.createElement(change, changesPercentage, data.hideValue, data.hidePercentage);
   }
-  @Input() useCurrencySign = false;
+  useCurrencySign = input(false);
 
-  @Input() hideValueOnXsScreen = false;
+  hideValueOnXsScreen = input(false);
 
   constructor(
     private renderer2: Renderer2,
@@ -150,7 +151,7 @@ export class PercentageIncreaseDirective implements OnInit {
 
     // display value
     if (change && !hideValue) {
-      const sign = this.useCurrencySign ? '$' : '';
+      const sign = this.useCurrencySign() ? '$' : '';
 
       const changeSpan = this.renderer2.createElement('span');
       const text = `${sign} ${formatLargeNumber(change)}`;
@@ -163,7 +164,7 @@ export class PercentageIncreaseDirective implements OnInit {
       this.renderer2.addClass(changeSpan, color);
 
       // hide value on small screen
-      if (this.hideValueOnXsScreen) {
+      if (this.hideValueOnXsScreen()) {
         this.renderer2.addClass(changeSpan, 'max-xs:hidden');
       }
 

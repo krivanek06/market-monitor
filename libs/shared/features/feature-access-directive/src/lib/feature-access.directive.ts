@@ -1,19 +1,8 @@
-import {
-  ChangeDetectorRef,
-  Directive,
-  Input,
-  OnDestroy,
-  OnInit,
-  TemplateRef,
-  ViewContainerRef,
-  inject,
-} from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { ChangeDetectorRef, Directive, TemplateRef, ViewContainerRef, effect, inject, input } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { UserFeaturesType } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { Subject, takeUntil } from 'rxjs';
 
 /**
  * This directive is used to check if the user has access to a feature
@@ -23,44 +12,34 @@ import { Subject, takeUntil } from 'rxjs';
   selector: '[appFeatureAccess]',
   standalone: true,
 })
-export class FeatureAccessDirective implements OnInit, OnDestroy {
+export class FeatureAccessDirective {
   /**
    * name of the feature user needs to have access to render the element
    */
-  @Input({ alias: 'appFeatureAccess', required: true }) featureName!: UserFeaturesType;
+  featureName = input.required<UserFeaturesType>({ alias: 'appFeatureAccess' });
 
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private viewContainerRef = inject(ViewContainerRef);
   private templateRef = inject(TemplateRef<unknown>);
   private cd = inject(ChangeDetectorRef);
 
-  private destroy$ = new Subject<void>();
-  private getUserData$ = toObservable(this.authenticationUserStoreService.state.getUserData);
+  hasAccessEffect = effect(() => {
+    const userData = this.authenticationUserStoreService.state.getUserData();
+    const featureName = this.featureName();
 
-  ngOnInit(): void {
-    // by default clear the view
     this.viewContainerRef.clear();
-
-    this.getUserData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
+    if (!userData) {
+      return;
+    }
+    const hasAccess = userData.features[featureName];
+    console.log('changing access', hasAccess);
+    if (hasAccess) {
+      this.viewContainerRef.createEmbeddedView(this.templateRef);
+    } else {
       this.viewContainerRef.clear();
-      if (!userData) {
-        return;
-      }
-      const hasAccess = userData.features[this.featureName];
-      console.log('changing access', hasAccess);
-      if (hasAccess) {
-        this.viewContainerRef.createEmbeddedView(this.templateRef);
-      } else {
-        this.viewContainerRef.clear();
-      }
-      this.cd.markForCheck();
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+    }
+    this.cd.markForCheck();
+  });
 }
 
 export const featureFlagGuard = (

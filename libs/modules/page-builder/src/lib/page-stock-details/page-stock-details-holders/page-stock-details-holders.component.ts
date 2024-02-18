@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MarketApiService } from '@market-monitor/api-client';
 import {
   StockOwnershipHoldersTableComponent,
   StockOwnershipInstitutionalListComponent,
@@ -33,32 +32,44 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     <div class="grid gap-8 mb-6 md:grid-cols-2 xl:grid-cols-4">
       <!-- Institution -->
       <app-general-card title="Institution" additionalClasses="max-xl:w-full xl:min-w-[350px]">
-        <app-stock-ownership-institutional-list
-          displayType="institution"
-          [isLoading]="loadingSignal()"
-          [enterpriseValue]="enterpriseValueToQuarterSignal()"
-          [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal()"
-        ></app-stock-ownership-institutional-list>
+        @if (enterpriseValueToQuarterSignal(); as enterpriseValueToQuarterSignal) {
+          @if (ownershipInstitutionalToQuarterSignal(); as ownershipInstitutionalToQuarterSignal) {
+            <app-stock-ownership-institutional-list
+              displayType="institution"
+              [isLoading]="loadingSignal()"
+              [enterpriseValue]="enterpriseValueToQuarterSignal"
+              [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal"
+            ></app-stock-ownership-institutional-list>
+          }
+        }
       </app-general-card>
 
       <!-- Position -->
       <app-general-card title="Position" additionalClasses="max-xl:w-full xl:min-w-[250px]">
-        <app-stock-ownership-institutional-list
-          displayType="position"
-          [isLoading]="loadingSignal()"
-          [enterpriseValue]="enterpriseValueToQuarterSignal()"
-          [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal()"
-        ></app-stock-ownership-institutional-list>
+        @if (enterpriseValueToQuarterSignal(); as enterpriseValueToQuarterSignal) {
+          @if (ownershipInstitutionalToQuarterSignal(); as ownershipInstitutionalToQuarterSignal) {
+            <app-stock-ownership-institutional-list
+              displayType="position"
+              [isLoading]="loadingSignal()"
+              [enterpriseValue]="enterpriseValueToQuarterSignal"
+              [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal"
+            ></app-stock-ownership-institutional-list>
+          }
+        }
       </app-general-card>
 
       <!-- Option -->
       <app-general-card title="Option" additionalClasses="max-xl:w-full xl:min-w-[300px]">
-        <app-stock-ownership-institutional-list
-          displayType="option"
-          [isLoading]="loadingSignal()"
-          [enterpriseValue]="enterpriseValueToQuarterSignal()"
-          [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal()"
-        ></app-stock-ownership-institutional-list>
+        @if (enterpriseValueToQuarterSignal(); as enterpriseValueToQuarterSignal) {
+          @if (ownershipInstitutionalToQuarterSignal(); as ownershipInstitutionalToQuarterSignal) {
+            <app-stock-ownership-institutional-list
+              displayType="option"
+              [isLoading]="loadingSignal()"
+              [enterpriseValue]="enterpriseValueToQuarterSignal"
+              [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal"
+            ></app-stock-ownership-institutional-list>
+          }
+        }
       </app-general-card>
 
       <div class="w-full">
@@ -107,8 +118,6 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   host: { ngSkipHydration: 'true' },
 })
 export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
-  marketApiService = inject(MarketApiService);
-
   quarterFormControl = new FormControl<string | null>(null);
   loadingSignal = signal(false);
 
@@ -133,15 +142,14 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
     ),
   );
 
-  institutionalPortfolioInputSourceSignal = computed(
-    () =>
-      this.ownershipInstitutionalSignal()?.map(
-        (d) =>
-          ({
-            caption: dateFormatDate(d.date, 'MMMM d, yyyy'),
-            value: d.date,
-          }) as InputSource<string>,
-      ),
+  institutionalPortfolioInputSourceSignal = computed(() =>
+    this.ownershipInstitutionalSignal()?.map(
+      (d) =>
+        ({
+          caption: dateFormatDate(d.date, 'MMMM d, yyyy'),
+          value: d.date,
+        }) as InputSource<string>,
+    ),
   );
 
   historicalPriceOnDateSignal = toSignal(
@@ -161,11 +169,7 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   enterpriseValueToQuarterSignal = computed(() =>
     this.stockDetailsSignal().enterpriseValue.find((d) => d.date === this.quarterFormControlSignal()),
   );
-  ownershipInstitutionalToQuarterSignal = computed(
-    () => this.ownershipInstitutionalSignal()?.find((d) => d.date === this.quarterFormControlSignal()),
+  ownershipInstitutionalToQuarterSignal = computed(() =>
+    this.ownershipInstitutionalSignal()?.find((d) => d.date === this.quarterFormControlSignal()),
   );
-
-  constructor() {
-    super();
-  }
 }

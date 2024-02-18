@@ -82,6 +82,14 @@ export class MarketApiService extends ApiCacheService {
             stockTopLosers: losers,
             stockTopActive: actives,
           })),
+          catchError((e) => {
+            console.log(e);
+            return of({
+              stockTopGainers: [],
+              stockTopLosers: [],
+              stockTopActive: [],
+            });
+          }),
         ),
       ),
     );

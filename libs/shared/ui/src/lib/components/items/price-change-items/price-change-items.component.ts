@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { PriceChange } from '@market-monitor/api-types';
 import { PercentageIncreaseDirective } from '../../../directives';
 import { PriceChangeItemSelectorPipe } from './price-change-item-selector.pipe';
@@ -17,14 +17,15 @@ import { PriceChangeItemSelectorPipe } from './price-change-item-selector.pipe';
         <div class="flex items-center justify-center">
           <span
             appPercentageIncrease
-            [changeValues]="{ changePercentage: mainSymbolPriceChange | priceChangeItemSelector: keys.key }"
+            [changeValues]="{ changePercentage: mainSymbolPriceChange() | priceChangeItemSelector: keys.key }"
           ></span>
-          <span *ngIf="additionalSymbolPriceChange">/</span>
-          <span
-            *ngIf="additionalSymbolPriceChange"
-            appPercentageIncrease
-            [changeValues]="{ changePercentage: additionalSymbolPriceChange | priceChangeItemSelector: keys.key }"
-          ></span>
+          @if (additionalSymbolPriceChange(); as additionalSymbolPriceChange) {
+            <span>/</span>
+            <span
+              appPercentageIncrease
+              [changeValues]="{ changePercentage: additionalSymbolPriceChange | priceChangeItemSelector: keys.key }"
+            ></span>
+          }
         </div>
       </div>
     </div>
@@ -36,8 +37,8 @@ import { PriceChangeItemSelectorPipe } from './price-change-item-selector.pipe';
   `,
 })
 export class PriceChangeItemsComponent {
-  @Input({ required: true }) mainSymbolPriceChange!: PriceChange;
-  @Input() additionalSymbolPriceChange?: PriceChange | null = null;
+  mainSymbolPriceChange = input.required<PriceChange>();
+  additionalSymbolPriceChange = input<PriceChange | null | undefined>(null);
 
   priceChangeKeys: Array<{ key: keyof PriceChange; label: string }> = [
     //{ key: '1D', label: '1 day' },

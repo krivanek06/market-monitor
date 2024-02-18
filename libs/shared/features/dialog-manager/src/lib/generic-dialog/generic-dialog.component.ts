@@ -20,7 +20,7 @@ export type GenericDialogComponentData = {
   standalone: true,
   imports: [CommonModule, MatDialogModule, DialogCloseHeaderComponent],
   template: `
-    <app-dialog-close-header [title]="data.title" />
+    <app-dialog-close-header [title]="data.title ?? ''" />
     <mat-dialog-content>
       <ng-template #template></ng-template>
     </mat-dialog-content>

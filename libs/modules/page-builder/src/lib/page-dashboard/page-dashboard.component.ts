@@ -1,13 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
-import { PortfolioGrowthChartsComponent } from '@market-monitor/modules/portfolio/features';
 import {
+  PortfolioAssetChartComponent,
+  PortfolioChangeChartComponent,
+  PortfolioGrowthChartComponent,
   PortfolioHoldingsTableComponent,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
@@ -17,8 +21,9 @@ import {
   PortfolioTransactionsTableComponent,
 } from '@market-monitor/modules/portfolio/ui';
 import { ColorScheme } from '@market-monitor/shared/data-access';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
+import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import {
+  DateRangeSliderComponent,
   DateRangeSliderValues,
   FancyCardComponent,
   FormMatInputWrapperComponent,
@@ -27,7 +32,10 @@ import {
   PieChartComponent,
   SectionTitleComponent,
   SortByKeyPipe,
+  filterDataByDateRange,
 } from '@market-monitor/shared/ui';
+import { computedFrom } from 'ngxtension/computed-from';
+import { map, pipe, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-page-dashboard',
@@ -36,7 +44,6 @@ import {
     CommonModule,
     PortfolioStateComponent,
     FancyCardComponent,
-    PortfolioGrowthChartsComponent,
     PortfolioPeriodChangeComponent,
     GenericChartComponent,
     PortfolioStateTransactionsComponent,
@@ -51,6 +58,13 @@ import {
     PortfolioTransactionsTableComponent,
     SortByKeyPipe,
     PieChartComponent,
+    MatTooltipModule,
+    PortfolioGrowthChartComponent,
+    PortfolioChangeChartComponent,
+    DateRangeSliderComponent,
+    PortfolioAssetChartComponent,
+    ReactiveFormsModule,
+    MatButtonModule,
   ],
   template: `
     <ng-container>
@@ -100,12 +114,60 @@ import {
 
       <!-- dashboard charts -->
       <div class="mb-8">
-        <app-portfolio-growth-charts
-          [showChartChangeSelect]="true"
-          [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
-          [portfolioAssetsGrowth]="portfolioUserFacadeService.getPortfolioGrowthAssets()"
-          [portfolioGrowth]="portfolioUserFacadeService.getPortfolioGrowth()"
-        ></app-portfolio-growth-charts>
+        <!-- portfolio growth -->
+        <div class="flex flex-col lg:flex-row lg:items-center gap-3 justify-between">
+          <!-- select chart title -->
+          <div class="flex flex-col sm:flex-row items-center gap-4">
+            <app-section-title title="Portfolio Growth" class="mr-6 max-lg:flex-1" />
+            <button
+              (click)="onPortfolioChangeChart()"
+              matTooltip="Display daily portfolio change - profit/loss"
+              type="button"
+              class="hidden sm:block"
+              mat-stroked-button
+            >
+              Portfolio Change
+            </button>
+            <button
+              (click)="onAssetGrowthChart()"
+              matTooltip="Display invested amount per asset in your portfolio"
+              type="button"
+              class="hidden sm:block"
+              mat-stroked-button
+            >
+              Asset Growth
+            </button>
+          </div>
+
+          <!-- date range -->
+          <app-date-range-slider
+            class="w-full lg:w-[550px]"
+            [formControl]="portfolioGrowthRangeControl"
+          ></app-date-range-slider>
+        </div>
+
+        <!-- portfolio growth chart -->
+        <app-portfolio-growth-chart
+          [data]="{
+            values: portfolioGrowthChartSignal(),
+            startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0
+          }"
+          [displayHeader]="false"
+          [heightPx]="400"
+          chartType="balance"
+        ></app-portfolio-growth-chart>
+
+        <!-- investment growth -->
+        <app-portfolio-growth-chart
+          headerTitle="Invested Value to Market"
+          [displayHeader]="true"
+          [data]="{
+            values: portfolioUserFacadeService.getPortfolioGrowth(),
+            startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0
+          }"
+          [heightPx]="400"
+          chartType="marketValue"
+        ></app-portfolio-growth-chart>
       </div>
 
       <!-- holding -->
@@ -175,13 +237,40 @@ export class PageDashboardComponent {
   portfolioUserFacadeService = inject(PortfolioUserFacadeService);
   authenticationUserService = inject(AuthenticationUserStoreService);
   private dialog = inject(MatDialog);
+  private dialogServiceUtil = inject(DialogServiceUtil);
 
-  portfolioGrowthDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
-  portfolioChangeDateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
+  portfolioGrowthRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
+
+  portfolioGrowthChartSignal = computedFrom(
+    [
+      this.portfolioGrowthRangeControl.valueChanges.pipe(startWith(null)),
+      this.portfolioUserFacadeService.getPortfolioGrowth,
+    ],
+    pipe(map(([dateRange, data]) => filterDataByDateRange(data, dateRange))),
+  );
 
   ColorScheme = ColorScheme;
 
   USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
+
+  /**
+   * patching date values into the portfolio growth slider
+   */
+  patchSliderEffect = effect(
+    () => {
+      const data = this.portfolioUserFacadeService.getPortfolioGrowth();
+
+      // patch values only if empty
+      this.portfolioGrowthRangeControl.patchValue({
+        dates: data.map((point) => point.date),
+        currentMinDateIndex: 0,
+        currentMaxDateIndex: data.length - 1,
+      });
+    },
+    {
+      allowSignalWrites: true,
+    },
+  );
 
   onSummaryClick(symbol: string) {
     this.dialog.open(StockSummaryDialogComponent, {
@@ -189,6 +278,25 @@ export class PageDashboardComponent {
         symbol: symbol,
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
+  }
+
+  onPortfolioChangeChart(): void {
+    this.dialogServiceUtil.showGenericDialog({
+      component: PortfolioChangeChartComponent,
+      componentData: {
+        data: this.portfolioUserFacadeService.getPortfolioGrowth(),
+      },
+    });
+  }
+
+  onAssetGrowthChart(): void {
+    this.dialogServiceUtil.showGenericDialog({
+      title: 'Portfolio Asset Growth Chart',
+      component: PortfolioAssetChartComponent,
+      componentData: {
+        data: this.portfolioUserFacadeService.getPortfolioGrowthAssets(),
+      },
     });
   }
 }

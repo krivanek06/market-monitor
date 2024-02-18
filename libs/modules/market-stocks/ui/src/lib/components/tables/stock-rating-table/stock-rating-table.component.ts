@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { CompanyRatingTable } from '@market-monitor/api-types';
 import { LargeNumberFormatterPipe } from '@market-monitor/shared/ui';
 import { RecommendationDirective } from '../../../directives';
@@ -13,56 +13,56 @@ import { RecommendationDirective } from '../../../directives';
       <div class="g-item-wrapper">
         <div>Overall</div>
         <div class="flex items-center gap-2">
-          <span>{{ data?.rating }}</span>
-          <div>(<span [appRecommendation]="data?.ratingScore ?? 0"></span>)</div>
+          <span>{{ data()?.rating }}</span>
+          <div>(<span [appRecommendation]="data()?.ratingScore ?? 0"></span>)</div>
         </div>
       </div>
 
       <div class="g-item-wrapper">
         <div>Discounted Cash Flow</div>
         <div class="flex items-center gap-2">
-          <div>{{ data?.ratingDetailsDCFScoreValue | largeNumberFormatter: false : true }}</div>
-          <div>(<span [appRecommendation]="data?.ratingDetailsDCFScore"></span>)</div>
+          <div>{{ data()?.ratingDetailsDCFScoreValue | largeNumberFormatter: false : true }}</div>
+          <div>(<span [appRecommendation]="data()?.ratingDetailsDCFScore"></span>)</div>
         </div>
       </div>
 
       <div class="g-item-wrapper">
         <div>Price to Earnings</div>
         <div class="flex items-center gap-2">
-          <div>{{ data?.ratingDetailsPEScoreValue | largeNumberFormatter: false : false }}</div>
-          <div>(<span [appRecommendation]="data?.ratingDetailsPEScore"></span>)</div>
+          <div>{{ data()?.ratingDetailsPEScoreValue | largeNumberFormatter: false : false }}</div>
+          <div>(<span [appRecommendation]="data()?.ratingDetailsPEScore"></span>)</div>
         </div>
       </div>
 
       <div class="g-item-wrapper">
         <div>Price to Book</div>
         <div class="flex items-center gap-2">
-          <div>{{ data?.ratingDetailsPBScoreValue | largeNumberFormatter: false : false }}</div>
-          <div>(<span [appRecommendation]="data?.ratingDetailsPBScore"></span>)</div>
+          <div>{{ data()?.ratingDetailsPBScoreValue | largeNumberFormatter: false : false }}</div>
+          <div>(<span [appRecommendation]="data()?.ratingDetailsPBScore"></span>)</div>
         </div>
       </div>
 
       <div class="g-item-wrapper">
         <div>Return on Equity</div>
         <div class="flex items-center gap-2">
-          <div>{{ data?.ratingDetailsROEScoreValue | largeNumberFormatter: true : false }}</div>
-          <div>(<span [appRecommendation]="data?.ratingDetailsROEScore"></span>)</div>
+          <div>{{ data()?.ratingDetailsROEScoreValue | largeNumberFormatter: true : false }}</div>
+          <div>(<span [appRecommendation]="data()?.ratingDetailsROEScore"></span>)</div>
         </div>
       </div>
 
       <div class="g-item-wrapper">
         <div>Return on Assets</div>
         <div class="flex items-center gap-2">
-          <div>{{ data?.ratingDetailsROAScoreValue | largeNumberFormatter: true : false }}</div>
-          <div>(<span [appRecommendation]="data?.ratingDetailsROAScore"></span>)</div>
+          <div>{{ data()?.ratingDetailsROAScoreValue | largeNumberFormatter: true : false }}</div>
+          <div>(<span [appRecommendation]="data()?.ratingDetailsROAScore"></span>)</div>
         </div>
       </div>
 
       <div class="flex justify-between p-3">
         <div>Debt to Equity</div>
         <div class="flex items-center gap-2">
-          <div>{{ data?.ratingDetailsDEScoreValue | largeNumberFormatter: false : false }}</div>
-          <div>(<span [appRecommendation]="data?.ratingDetailsDEScore"></span>)</div>
+          <div>{{ data()?.ratingDetailsDEScoreValue | largeNumberFormatter: false : false }}</div>
+          <div>(<span [appRecommendation]="data()?.ratingDetailsDEScore"></span>)</div>
         </div>
       </div>
     </div>
@@ -75,5 +75,5 @@ import { RecommendationDirective } from '../../../directives';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockRatingTableComponent {
-  @Input({ required: true }) data!: CompanyRatingTable | null;
+  data = input.required<CompanyRatingTable | null>();
 }

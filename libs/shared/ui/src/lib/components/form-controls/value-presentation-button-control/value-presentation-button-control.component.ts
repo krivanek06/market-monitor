@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, forwardRef, Input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, input, OnInit, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { ValuePresentItem } from '@market-monitor/shared/data-access';
@@ -9,14 +9,14 @@ import { InArrayPipe } from '../../../pipes';
 @Component({
   selector: 'app-value-presentation-button-control',
   template: `
-    <div class="flex" [ngClass]="{ 'flex-col': !isFlexRow }">
+    <div class="flex" [ngClass]="{ 'flex-col': !isFlexRow() }">
       <button
-        *ngFor="let item of items"
+        *ngFor="let item of items()"
         mat-button
-        [ngClass]="{ 'w-max': isFlexRow }"
+        [ngClass]="{ 'w-max': isFlexRow() }"
         [style.--valueItemColor]="item.color"
         [style.--valueItemColorActive]="item.color + '44'"
-        [style]="(activeItems() | inArray: item.item : itemKey) ? 'background-color: ' + item.color + '44' : ''"
+        [style]="(activeItems() | inArray: item.item : itemKey()) ? 'background-color: ' + item.color + '44' : ''"
         (click)="onClick(item.item)"
         class="h-16"
       >
@@ -69,15 +69,15 @@ import { InArrayPipe } from '../../../pipes';
   ],
 })
 export class ValuePresentationButtonControlComponent<T> implements OnInit, ControlValueAccessor {
-  @Input() items: ValuePresentItem<T>[] | null = [];
-  @Input() itemKey!: keyof T;
-  @Input() multiSelect = true;
-  @Input() isFlexRow = true;
+  items = input.required<ValuePresentItem<T>[]>();
+  itemKey = input.required<keyof T>();
+  multiSelect = input(true);
+  isFlexRow = input(true);
 
   /**
    * put to false if you want to notify the parent only by <keyof T> or false for <T>
    */
-  @Input() selectWholeItem = true;
+  selectWholeItem = input(true);
 
   activeItems = signal<T[]>([]);
 
@@ -92,11 +92,11 @@ export class ValuePresentationButtonControlComponent<T> implements OnInit, Contr
   ngOnInit(): void {}
 
   onClick(item: T): void {
-    const inArray = this.activeItems().find((d) => d[this.itemKey] === item[this.itemKey]);
+    const inArray = this.activeItems().find((d) => d[this.itemKey()] === item[this.itemKey()]);
     if (inArray) {
-      this.activeItems.set(this.activeItems().filter((d) => d[this.itemKey] !== item[this.itemKey]));
+      this.activeItems.set(this.activeItems().filter((d) => d[this.itemKey()] !== item[this.itemKey()]));
     } else {
-      if (!this.multiSelect) {
+      if (!this.multiSelect()) {
         this.activeItems.set([item]);
       } else {
         this.activeItems.set([...this.activeItems(), item]);
@@ -104,10 +104,10 @@ export class ValuePresentationButtonControlComponent<T> implements OnInit, Contr
     }
 
     // notify parent
-    if (this.selectWholeItem) {
+    if (this.selectWholeItem()) {
       this.onChange(this.activeItems());
     } else {
-      const keyValue = this.activeItems().map((d) => d[this.itemKey]);
+      const keyValue = this.activeItems().map((d) => d[this.itemKey()]);
       this.onChange(keyValue);
     }
   }

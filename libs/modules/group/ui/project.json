@@ -1,5 +1,5 @@
 {
-  "name": "module-groups-ui",
+  "name": "modules-group-ui",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/modules/group/ui/src",
   "prefix": "app",

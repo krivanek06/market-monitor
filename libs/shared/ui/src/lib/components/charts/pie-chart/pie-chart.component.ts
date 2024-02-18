@@ -35,7 +35,7 @@ import highcharts3d from 'highcharts/highcharts-3d';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PieChartComponent extends ChartConstructor {
-  @Input() chartTitle = '';
+  chartTitle = input('');
   series = input.required<GenericChartSeries<'pie'>>();
 
   chartOptionsComputed = computed(() => this.innitChart(this.series()));
@@ -55,7 +55,7 @@ export class PieChartComponent extends ChartConstructor {
         },
       },
       title: {
-        text: this.chartTitle,
+        text: this.chartTitle(),
         align: 'center',
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,

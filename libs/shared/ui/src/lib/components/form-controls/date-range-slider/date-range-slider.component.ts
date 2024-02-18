@@ -4,6 +4,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@a
 import { MatSliderModule } from '@angular/material/slider';
 import { addDays, isAfter, isBefore, subDays } from 'date-fns';
 import { GetDataByIndexPipe } from '../../../pipes';
+import { input } from '@angular/core';
 
 export type DateRangeSliderValues = {
   dates: (Date | string)[]; // YYYY-MM-DD
@@ -50,10 +51,11 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
   selector: 'app-date-range-slider',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatSliderModule, GetDataByIndexPipe],
+
   template: `
     <div *ngIf="dateRangeSignal() as values" class="flex flex-col w-full">
       <!-- display current value from form -->
-      <div *ngIf="displayUpperDate" class="hidden sm:flex items-center justify-center gap-3">
+      <div *ngIf="displayUpperDate()" class="hidden sm:flex items-center justify-center gap-3">
         <span class="text-sm text-wt-gray-medium">
           {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
         </span>
@@ -68,11 +70,11 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
         <!-- min value -->
         <span class="max-sm:hidden text-sm text-wt-gray-medium">
           <!-- min date -->
-          <ng-container *ngIf="displayUpperDate">
+          <ng-container *ngIf="displayUpperDate()">
             {{ values.dates | getDataByIndex: 0 | date: 'MMM d, y' }}
           </ng-container>
           <!-- current date -->
-          <ng-container *ngIf="!displayUpperDate">
+          <ng-container *ngIf="!displayUpperDate()">
             {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
           </ng-container>
         </span>
@@ -94,11 +96,11 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
         <!-- max value -->
         <span class="max-sm:hidden text-sm text-wt-gray-medium">
           <!-- max date -->
-          <ng-container *ngIf="displayUpperDate">
+          <ng-container *ngIf="displayUpperDate()">
             {{ values.dates | getDataByIndex: values.dates.length - 1 | date: 'MMM d, y' }}
           </ng-container>
           <!-- current date -->
-          <ng-container *ngIf="!displayUpperDate">
+          <ng-container *ngIf="!displayUpperDate()">
             {{ values.dates | getDataByIndex: values.currentMaxDateIndex | date: 'MMM d, y' }}
           </ng-container>
         </span>
@@ -120,7 +122,7 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
   ],
 })
 export class DateRangeSliderComponent implements ControlValueAccessor {
-  @Input() displayUpperDate = false;
+  displayUpperDate = input(false);
   dateRangeSignal = signal<DateRangeSliderValues | null>(null);
 
   onChange: (data: DateRangeSliderValues) => void = () => {};

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnChanges, SimpleChanges, input, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
@@ -32,9 +32,9 @@ import { filterNil } from 'ngxtension/filter-nil';
         <mat-spinner></mat-spinner>
       </div>
     } @else {
-      <div *ngIf="displayHeader" class="flex flex-col lg:flex-row gap-3 items-center justify-between">
+      <div *ngIf="displayHeader()" class="flex flex-col lg:flex-row gap-3 items-center justify-between">
         <!-- select chart title -->
-        <app-section-title [title]="headerTitle" />
+        <app-section-title [title]="headerTitle()" />
 
         <!-- date range -->
         <app-date-range-slider class="w-full lg:w-[550px]" [formControl]="sliderControl" />
@@ -60,11 +60,14 @@ import { filterNil } from 'ngxtension/filter-nil';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioGrowthChartComponent extends ChartConstructor implements OnChanges {
-  @Input() displayHeader = false;
-  @Input() headerTitle: string = '';
-  @Input({ required: true }) data!: { values: PortfolioGrowth[]; startingCashValue: number };
-  @Input() displayLegend = false;
-  @Input() chartType: 'all' | 'marketValue' | 'balance' = 'all';
+  displayHeader = input(false);
+  headerTitle = input<string>('');
+  data = input.required<{
+    values: PortfolioGrowth[];
+    startingCashValue: number;
+  }>();
+  displayLegend = input(false);
+  chartType = input<'all' | 'marketValue' | 'balance'>('all');
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'].currentValue) {
@@ -173,7 +176,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor implements O
         enabled: false,
       },
       legend: {
-        enabled: this.displayLegend || this.chartType === 'all',
+        enabled: this.displayLegend() || this.chartType() === 'all',
         //floating: true,
         verticalAlign: 'top',
         align: 'left',
@@ -268,7 +271,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor implements O
         type: 'area',
         zIndex: 10,
         yAxis: 0,
-        visible: this.chartType === 'all' || this.chartType === 'balance',
+        visible: this.chartType() === 'all' || this.chartType() === 'balance',
         fillColor: {
           linearGradient: {
             x1: 1,
@@ -290,7 +293,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor implements O
         zIndex: 10,
         yAxis: 0,
         opacity: 0.65,
-        visible: this.chartType === 'all' || this.chartType === 'marketValue',
+        visible: this.chartType() === 'all' || this.chartType() === 'marketValue',
         showInLegend: true,
         fillColor: {
           linearGradient: {
@@ -324,7 +327,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor implements O
         zIndex: 10,
         yAxis: 0,
         opacity: 0.2,
-        visible: this.chartType === 'all' || this.chartType === 'marketValue',
+        visible: this.chartType() === 'all' || this.chartType() === 'marketValue',
         showInLegend: true,
         fillColor: {
           linearGradient: {
@@ -347,7 +350,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor implements O
         zIndex: 10,
         yAxis: 0,
         opacity: 0.45,
-        visible: this.chartType === 'all' || this.chartType === 'balance',
+        visible: this.chartType() === 'all' || this.chartType() === 'balance',
         showInLegend: true,
         fillColor: {
           linearGradient: {

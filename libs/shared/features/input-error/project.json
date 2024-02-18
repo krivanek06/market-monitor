@@ -1,5 +1,5 @@
 {
-  "name": "input-error",
+  "name": "shared-input-error",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/features/input-error/src",
   "prefix": "app",

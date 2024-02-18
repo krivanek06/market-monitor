@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -28,7 +28,7 @@ export type KeyboardComponentType = (typeof KeyboardComponentValues)[number];
     <div class="grid grid-cols-3 gap-2">
       <ng-container *ngFor="let button of KeyboardComponent">
         <button
-          *ngIf="enableDecimal || button.label !== '.'; else placeholder"
+          *ngIf="enableDecimal() || button.label !== '.'; else placeholder"
           type="button"
           mat-stroked-button
           (click)="onButtonClick(button)"
@@ -61,8 +61,12 @@ export type KeyboardComponentType = (typeof KeyboardComponentValues)[number];
   ],
 })
 export class NumberKeyboardComponent {
-  @Input() enableDecimal = true;
-  @Input({ required: true }) value: string = '';
+  enableDecimal = input(false);
+
+  /**
+   * string value typed by user
+   */
+  private storedValue = '';
 
   // outputting number with maximum 2 decimal -> i.e: 122.33
   onChange: (data: string) => void = () => {};
@@ -71,30 +75,38 @@ export class NumberKeyboardComponent {
   KeyboardComponent = KeyboardComponentValues;
 
   onButtonClick(keyboard: KeyboardComponentType) {
+    let value = this.storedValue;
     // remove last char
     if (keyboard.value === 'back') {
-      this.value = this.value.slice(0, this.value.length - 1);
-      this.onChange(this.value);
+      value = value.slice(0, value.length - 1);
+      this.storedValue = value;
+      this.onChange(value);
       return;
     }
 
     // prevent double decimal
-    if (this.value.includes('.') && keyboard.value === '.') {
+    else if (value.includes('.') && keyboard.value === '.') {
+      return;
+    }
+
+    // prevent decimal
+    else if (!this.enableDecimal() && keyboard.value === '.') {
       return;
     }
 
     // prevent more than 2 values after decimal
-    if (this.value.includes('.') && this.value.length - 1 - this.value.indexOf('.') == 2) {
-      this.value = this.value.slice(0, this.value.length - 1);
+    else if (value.includes('.') && value.length - 1 - value.indexOf('.') == 2) {
+      value = value.slice(0, value.length - 1);
     }
 
     // append chart
-    this.value = this.value + keyboard.value;
-    this.onChange(this.value);
+    value = value + keyboard.value;
+    this.storedValue = value;
+    this.onChange(value);
   }
 
   writeValue(value?: string): void {
-    this.value = value || '';
+    this.storedValue = value ?? '';
   }
 
   /**

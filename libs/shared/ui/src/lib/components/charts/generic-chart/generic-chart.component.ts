@@ -3,11 +3,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  Input,
   OnChanges,
   OnDestroy,
   Output,
   SimpleChanges,
+  input,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,7 +35,7 @@ type ChartInputType = Highcharts.SeriesOptionsType[];
     <div class="block relative">
       <button
         mat-icon-button
-        *ngIf="showExpandableButton"
+        *ngIf="showExpandableButton()"
         class="text-wt-gray-medium hover:text-wt-gray-medium z-10 absolute right-0 top-0"
         (click)="expand()"
         matTooltip="Expand chart"
@@ -63,36 +63,32 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
 {
   @Output() expandEmitter = new EventEmitter<any>();
 
-  @Input({ required: true }) series!: GenericChartSeries<T>[];
+  series = input.required<GenericChartSeries<T>[]>();
 
-  @Input() chartType: Highcharts.SeriesOptionsType['type'] = 'line';
-  @Input() chartTitle = '';
-  @Input() chartTitlePosition: Highcharts.AlignValue = 'left';
-  @Input() enableZoom = false;
-  @Input() showTooltip = true;
-  @Input() showDataLabel = false;
-  @Input() categories: string[] = [];
-  @Input() showYAxis = true;
-  @Input() showXAxis = true;
-  @Input() shareTooltip = true;
-  @Input() showTooltipHeader = true;
+  chartType = input<Highcharts.SeriesOptionsType['type']>('line');
+  chartTitle = input('');
+  chartTitlePosition = input<Highcharts.AlignValue>('left');
+  enableZoom = input(false);
+  showTooltip = input(true);
+  showDataLabel = input(false);
+  categories = input<string[]>([]);
+  showYAxis = input(true);
+  showXAxis = input(true);
+  shareTooltip = input(true);
+  showTooltipHeader = input(true);
 
   // legend
-  @Input() showLegend = false;
-  @Input() enableLegendTogging = false;
-  @Input() showLegendLatestValue = false;
-  @Input() legendAlign: 'left' | 'center' | 'right' = 'left';
-  @Input() legentLayout: 'vertical' | 'horizontal' = 'horizontal';
-  @Input() legendVerticalAlign: 'top' | 'middle' | 'bottom' = 'top';
-  @Input() floatingLegend = false;
+  showLegend = input(false);
+  enableLegendTogging = input(false);
+  showLegendLatestValue = input(false);
+  legendAlign = input<'left' | 'center' | 'right'>('left');
+  legentLayout = input<'vertical' | 'horizontal'>('horizontal');
+  legendVerticalAlign = input<'top' | 'middle' | 'bottom'>('top');
+  floatingLegend = input(false);
 
-  @Input() showExpandableButton = false;
-  @Input() applyFancyColor = 0;
-  @Input() isCategoryDates = false;
-
-  constructor() {
-    super();
-  }
+  showExpandableButton = input(false);
+  applyFancyColor = input(0);
+  isCategoryDates = input(false);
   ngOnDestroy(): void {
     console.log('GenericChartComponent: ngOnDestroy()');
   }
@@ -102,15 +98,11 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
       return;
     }
 
-    if (this.applyFancyColor > 0) {
-      this.fancyColoring();
-    }
-
-    let series = this.series;
+    const series = this.applyFancyColor() > 0 ? this.fancyColoring() : this.series();
 
     this.initChart(series);
 
-    if (this.floatingLegend && this.chartOptions.legend) {
+    if (this.floatingLegend() && this.chartOptions.legend) {
       this.chartOptions.legend.floating = true;
       this.chartOptions.legend.layout = 'vertical';
       this.chartOptions.legend.x = -150;
@@ -119,21 +111,21 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
       this.chartOptions.legend.verticalAlign = 'middle';
     }
 
-    if (this.chartType === 'column' && this.chartOptions.xAxis) {
+    if (this.chartType() === 'column' && this.chartOptions.xAxis) {
       this.chartOptions.xAxis = {
         ...this.chartOptions.xAxis,
         type: 'category',
       };
-    } else if (this.chartType === 'column' && this.chartOptions.xAxis) {
+    } else if (this.chartType() === 'column' && this.chartOptions.xAxis) {
       this.chartOptions.xAxis = {
         ...this.chartOptions.xAxis,
         type: 'category',
       };
-    } else if (this.chartType === 'area') {
+    } else if (this.chartType() === 'area') {
       this.initAreaChange();
     }
 
-    if (this.categories.length > 0) {
+    if (this.categories().length > 0) {
       this.initCategories();
     }
   }
@@ -147,9 +139,9 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
     if (this.chartOptions.xAxis) {
       this.chartOptions.xAxis = {
         ...this.chartOptions.xAxis,
-        categories: this.isCategoryDates
-          ? this.categories.map((d) => format(new Date(d), 'MMM dd, yyyy'))
-          : this.categories,
+        categories: this.isCategoryDates()
+          ? this.categories().map((d) => format(new Date(d), 'MMM dd, yyyy'))
+          : this.categories(),
         type: 'category',
       };
     }
@@ -158,7 +150,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
   private initChart(series: ChartInputType) {
     this.chartOptions = {
       chart: {
-        type: this.chartType,
+        type: this.chartType(),
         backgroundColor: 'transparent',
         // zooming: {
         //   type: 'x',
@@ -179,7 +171,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           minorTickInterval: 'auto',
           tickPixelInterval: 30,
           //minorGridLineWidth: 0, // gray-ish grid lines
-          visible: this.showYAxis,
+          visible: this.showYAxis(),
           labels: {
             style: {
               color: ColorScheme.GRAY_MEDIUM_VAR,
@@ -199,7 +191,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           minorTickInterval: 'auto',
           tickPixelInterval: 30,
           //minorGridLineWidth: 0, // gray-ish grid lines
-          visible: this.showYAxis,
+          visible: this.showYAxis(),
           labels: {
             style: {
               color: ColorScheme.GRAY_MEDIUM_VAR,
@@ -209,7 +201,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
         },
       ],
       xAxis: {
-        visible: this.showXAxis,
+        visible: this.showXAxis(),
         crosshair: true,
         type: 'datetime',
         dateTimeLabelFormats: {
@@ -225,8 +217,8 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
         },
       },
       title: {
-        text: this.chartTitle,
-        align: this.chartTitlePosition,
+        text: this.chartTitle(),
+        align: this.chartTitlePosition(),
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,
           fontSize: '13px',
@@ -241,20 +233,20 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
         enabled: false,
       },
       legend: {
-        enabled: this.showLegend,
+        enabled: this.showLegend(),
         itemStyle: {
           color: ColorScheme.GRAY_MEDIUM_VAR,
-          cursor: this.enableLegendTogging ? 'pointer' : 'default',
+          cursor: this.enableLegendTogging() ? 'pointer' : 'default',
         },
         itemHoverStyle: {
-          color: this.enableLegendTogging ? ColorScheme.GRAY_MEDIUM_VAR : ColorScheme.GRAY_MEDIUM_VAR,
+          color: this.enableLegendTogging() ? ColorScheme.GRAY_MEDIUM_VAR : ColorScheme.GRAY_MEDIUM_VAR,
         },
         itemHiddenStyle: {
-          color: this.enableLegendTogging ? ColorScheme.GRAY_DARK_VAR : ColorScheme.GRAY_MEDIUM_VAR,
+          color: this.enableLegendTogging() ? ColorScheme.GRAY_DARK_VAR : ColorScheme.GRAY_MEDIUM_VAR,
         },
-        verticalAlign: this.legendVerticalAlign,
-        align: this.legendAlign,
-        layout: this.legentLayout,
+        verticalAlign: this.legendVerticalAlign(),
+        align: this.legendAlign(),
+        layout: this.legentLayout(),
       },
       accessibility: {
         point: {
@@ -269,11 +261,11 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           fontSize: '15px',
           color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         },
-        shared: this.shareTooltip,
+        shared: this.shareTooltip(),
         outside: false,
         useHTML: true,
         xDateFormat: '%A, %b %e, %Y',
-        headerFormat: this.showTooltipHeader
+        headerFormat: this.showTooltipHeader()
           ? `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p>`
           : '',
 
@@ -363,15 +355,15 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           borderWidth: 0,
           dataLabels: {
             color: ColorScheme.GRAY_LIGHT_VAR,
-            enabled: this.showDataLabel,
+            enabled: this.showDataLabel(),
             formatter: function () {
               return roundNDigits(this.y, 2);
             },
           },
-          enableMouseTracking: this.showTooltip,
+          enableMouseTracking: this.showTooltip(),
           events: {
             legendItemClick: (e: any) => {
-              if (!this.enableLegendTogging) {
+              if (!this.enableLegendTogging()!) {
                 e.preventDefault(); // prevent toggling series visibility
               }
             },
@@ -396,7 +388,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           },
         },
         pie: {
-          showInLegend: this.showLegend,
+          showInLegend: this.showLegend(),
           allowPointSelect: false,
           depth: 35,
           minSize: 70,
@@ -447,9 +439,9 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
     };
   }
 
-  private fancyColoring() {
-    let count = this.applyFancyColor;
-    this.series = this.series.map((s) => {
+  private fancyColoring(): GenericChartSeries<T>[] {
+    let count = this.applyFancyColor();
+    const newSeries = this.series().map((s) => {
       const data = {
         type: s.type,
         name: s.name,
@@ -465,14 +457,16 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
       count += 1;
       return data;
     });
+
+    return newSeries;
   }
 
   private initAreaChange() {
-    if (this.series.length === 0) {
+    if (this.series().length === 0) {
       console.warn('Cannot init initAreaChange in Generic chart, empty series');
       return;
     }
-    const data = ((this.series[0] as any)?.data as number[]) ?? [];
+    const data = ((this.series()[0] as any)?.data as number[]) ?? [];
     const oldestData = data[0] as number;
     const newestData = data[data.length - 1] as number;
     const color = oldestData > newestData ? '#ff1010' : '#0d920d';

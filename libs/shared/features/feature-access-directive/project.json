@@ -1,5 +1,5 @@
 {
-  "name": "feature-access-directive",
+  "name": "shared-feature-access-directive",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/features/feature-access-directive/src",
   "prefix": "app",

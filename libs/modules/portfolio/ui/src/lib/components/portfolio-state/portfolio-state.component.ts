@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { PortfolioState } from '@market-monitor/api-types';
 import { ColorScheme } from '@market-monitor/shared/data-access';
 import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
@@ -13,48 +13,48 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- balance -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="sm:text-lg">Balance</div>
-          <div [appAddColor]="valueColor" class="sm:text-lg">{{ portfolioState?.balance | currency }}</div>
+          <div [appAddColor]="titleColor()" class="sm:text-lg">Balance</div>
+          <div [appAddColor]="valueColor()" class="sm:text-lg">{{ portfolioState()?.balance | currency }}</div>
         </div>
 
         <!-- Invested -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="sm:text-lg">Invested</div>
-          <div [appAddColor]="valueColor" class="sm:text-lg">{{ portfolioState?.holdingsBalance | currency }}</div>
+          <div [appAddColor]="titleColor()" class="sm:text-lg">Invested</div>
+          <div [appAddColor]="valueColor()" class="sm:text-lg">{{ portfolioState()?.holdingsBalance | currency }}</div>
         </div>
 
         <!-- Cash -->
-        <div *ngIf="showCashSegment" class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="sm:text-lg">Cash</div>
-          <div [appAddColor]="valueColor" class="sm:text-lg">
-            {{ portfolioState?.cashOnHand | currency }}
+        <div *ngIf="showCashSegment()" class="flex justify-between @md:flex-col">
+          <div [appAddColor]="titleColor()" class="sm:text-lg">Cash</div>
+          <div [appAddColor]="valueColor()" class="sm:text-lg">
+            {{ portfolioState()?.cashOnHand | currency }}
           </div>
         </div>
 
         <!-- Total Gains -->
-        <div *ngIf="!showCashSegment" class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="sm:text-lg">Total Gains</div>
+        <div *ngIf="!showCashSegment()" class="flex justify-between @md:flex-col">
+          <div [appAddColor]="titleColor()" class="sm:text-lg">Total Gains</div>
           <div
             class="sm:text-lg"
-            [appAddColor]="valueColor"
+            [appAddColor]="valueColor()"
             appPercentageIncrease
             [changeValues]="{
-              changePercentage: portfolioState?.totalGainsPercentage
+              changePercentage: portfolioState()?.totalGainsPercentage
             }"
           ></div>
         </div>
 
         <!-- Total Return -->
         <div class="flex justify-between @md:flex-col">
-          <div [appAddColor]="titleColor" class="sm:text-lg">Total Return</div>
+          <div [appAddColor]="titleColor()" class="sm:text-lg">Total Return</div>
           <div
             class="sm:text-lg"
-            [appAddColor]="valueColor"
+            [appAddColor]="valueColor()"
             appPercentageIncrease
             [useCurrencySign]="true"
             [changeValues]="{
-              change: portfolioState?.totalGainsValue,
-              changePercentage: showCashSegment ? portfolioState?.totalGainsPercentage : undefined
+              change: portfolioState()?.totalGainsValue,
+              changePercentage: showCashSegment() ? portfolioState()?.totalGainsPercentage : undefined
             }"
           ></div>
         </div>
@@ -69,8 +69,8 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStateComponent {
-  @Input() portfolioState?: PortfolioState;
-  @Input() titleColor?: ColorScheme;
-  @Input() valueColor?: ColorScheme;
-  @Input() showCashSegment = false;
+  portfolioState = input<PortfolioState | undefined>();
+  titleColor = input<ColorScheme | undefined>();
+  valueColor = input<ColorScheme | undefined>();
+  showCashSegment = input(false);
 }

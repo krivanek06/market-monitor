@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, forwardRef } from '@angular/core';
+import { Component, forwardRef, input } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
@@ -25,7 +25,7 @@ export const timePeriodDefaultButtons = [
     <!-- large screen buttons -->
     <div class="flex-wrap items-center hidden gap-3 md:flex">
       <button
-        *ngFor="let period of displayTimePeriods"
+        *ngFor="let period of displayTimePeriods()"
         mat-stroked-button
         type="button"
         class="flex-1 min-h-[36px]"
@@ -40,7 +40,7 @@ export const timePeriodDefaultButtons = [
     <mat-form-field class="block w-full md:hidden">
       <mat-label>Time Period</mat-label>
       <mat-select [value]="activeTimePeriod.value" (selectionChange)="onTimePeriodSelect($event.value)">
-        <mat-option *ngFor="let period of displayTimePeriods" [value]="period.value">
+        <mat-option *ngFor="let period of displayTimePeriods()" [value]="period.value">
           {{ period.labelSelect }}
         </mat-option>
       </mat-select>
@@ -64,7 +64,7 @@ export const timePeriodDefaultButtons = [
   ],
 })
 export class TimePeriodButtonsComponent implements ControlValueAccessor {
-  @Input() displayTimePeriods = timePeriodDefaultButtons;
+  displayTimePeriods = input(timePeriodDefaultButtons);
 
   activeTimePeriod = new FormControl<SymbolHistoricalPeriods | null>(null);
 

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { NameValueItem } from '@market-monitor/shared/data-access';
 import { WordsUpPipe } from '../../../pipes';
 
@@ -14,12 +14,12 @@ import { WordsUpPipe } from '../../../pipes';
       }
   `,
   template: `
-    <div *ngFor="let item of items" class="g-item-wrapper">
+    <div *ngFor="let item of items()" class="g-item-wrapper">
       <span>{{ item.name | wordsUp }}</span>
       <span>{{ item.value === null ? 'N/A' : item.value }}</span>
     </div>
   `,
 })
 export class NameValueListComponent {
-  @Input({ required: true }) items: NameValueItem[] = [];
+  items = input.required<NameValueItem[]>();
 }

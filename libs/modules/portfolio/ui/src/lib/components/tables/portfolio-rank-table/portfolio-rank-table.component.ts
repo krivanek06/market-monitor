@@ -7,6 +7,7 @@ import {
   Output,
   TemplateRef,
   TrackByFunction,
+  input,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -37,7 +38,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective } from '@market-
               {{ i + 1 }}
             </span>
             <!-- template from parent -->
-            <ng-container [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{ data: row, position: i + 1 }" />
+            <ng-container [ngTemplateOutlet]="template()" [ngTemplateOutletContext]="{ data: row, position: i + 1 }" />
           </div>
         </td>
       </ng-container>
@@ -97,7 +98,7 @@ export class PortfolioRankTableComponent<
   /**
    * template that is rendered in the 'name' section
    */
-  @Input({ required: true }) template!: TemplateRef<any>;
+  template = input.required<TemplateRef<any>>();
   /**
    * data to be displayed in the table
    */

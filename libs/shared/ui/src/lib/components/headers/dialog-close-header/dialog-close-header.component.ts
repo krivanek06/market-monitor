@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Optional, Output, SkipSelf } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Optional, Output, SkipSelf, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,9 +11,9 @@ import { MatIconModule } from '@angular/material/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex items-center justify-between p-4">
-      <h2 class="text-xl text-wt-primary mb-0">{{ title }}</h2>
+      <h2 class="text-xl text-wt-primary mb-0">{{ title() }}</h2>
 
-      <div *ngIf="showCloseButton">
+      <div *ngIf="showCloseButton()">
         <button mat-icon-button color="warn" type="button" (click)="onDialogClose()">
           <mat-icon>close</mat-icon>
         </button>
@@ -23,8 +23,8 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class DialogCloseHeaderComponent {
   @Output() dialogCloseEmitter = new EventEmitter<void>();
-  @Input({ required: true }) title?: string;
-  @Input() showCloseButton = true;
+  title = input.required<string>();
+  showCloseButton = input(true);
 
   constructor(@Optional() @SkipSelf() private dialogRef: MatDialogRef<unknown>) {}
 

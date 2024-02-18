@@ -9,6 +9,7 @@ import {
   TemplateRef,
   ViewContainerRef,
 } from '@angular/core';
+import { input } from '@angular/core';
 
 interface EmbeddedViewChange {
   inPreviousRange: boolean;
@@ -30,9 +31,9 @@ interface Context {
   standalone: true,
 })
 export class RangeDirective implements OnChanges {
-  @Input() ngRange: number = 0;
-  @Input() ngRangeMin: number = 0;
-  @Input() ngRangeStep: number = 1;
+  ngRange = input<number>(0);
+  ngRangeMin = input<number>(0);
+  ngRangeStep = input<number>(1);
 
   // Access template
   private readonly templateRef = inject(TemplateRef<unknown>);
@@ -104,11 +105,11 @@ export class RangeDirective implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const previousMin = this.getPreviousValue(changes['ngRangeMin']) ?? this.ngRangeMin;
-    const min = this.ngRangeMin;
+    const previousMin = this.getPreviousValue(changes['ngRangeMin']) ?? this.ngRangeMin();
+    const min = this.ngRangeMin();
 
-    const previousMax = this.getPreviousValue(changes['ngRange']) ?? this.ngRange;
-    const max = this.ngRange;
+    const previousMax = this.getPreviousValue(changes['ngRange']) ?? this.ngRange();
+    const max = this.ngRange();
 
     const viewChanges = this.getViewChanges(previousMin, min, previousMax, max);
 
@@ -120,7 +121,7 @@ export class RangeDirective implements OnChanges {
   }
 
   getContext(index: number, min: number, max: number): Context {
-    const displayIndex = index * this.ngRangeStep;
+    const displayIndex = index * this.ngRangeStep();
 
     return {
       index: displayIndex,

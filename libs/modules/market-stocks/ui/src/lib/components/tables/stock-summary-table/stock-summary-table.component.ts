@@ -7,6 +7,7 @@ import {
   Output,
   TrackByFunction,
   ViewChild,
+  input,
   signal,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -49,10 +50,10 @@ import {
     SectionTitleComponent,
   ],
   template: `
-    <div *ngIf="tableTitle" class="flex justify-between mb-2">
-      <app-section-title [title]="tableTitle" />
+    <div *ngIf="tableTitle()" class="flex justify-between mb-2">
+      <app-section-title [title]="tableTitle()" />
 
-      <div *ngIf="showMobileInfoButton" class="sm:hidden">
+      <div *ngIf="showMobileInfoButton()" class="sm:hidden">
         <button mat-stroked-button class="w-[150px] text-sm" (click)="toggleDisplayedValues()">
           {{ displayInfoMobile() ? 'Info' : 'Price +/-' }}
         </button>
@@ -320,8 +321,8 @@ export class StockSummaryTableComponent implements AfterViewInit {
     this.dataSource._updateChangeSubscription();
     this.showLoadingSkeletonSignal.set(false);
   }
-  @Input() tableTitle = '';
-  @Input() showMobileInfoButton = true;
+  tableTitle = input('');
+  showMobileInfoButton = input(true);
 
   showLoadingSkeletonSignal = signal(true);
 
