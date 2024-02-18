@@ -13,6 +13,7 @@ import { ControlContainer, FormGroupDirective, NgControl, NgForm } from '@angula
 import { EMPTY, fromEvent, iif, merge, startWith, Subscription } from 'rxjs';
 import { ErrorStateMatcher, OnTouchedErrorStateMatcher } from './error-state-matcher.service';
 import { InputErrorComponent } from './input-error.component';
+import { input } from '@angular/core';
 
 @Directive({
   selector: `
@@ -42,7 +43,7 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
   /**
    * configuration for the error state matcher - blur / touched / submitted
    */
-  @Input() errorStateMatcher = inject(ErrorStateMatcher);
+  errorStateMatcher = input(inject(ErrorStateMatcher));
 
   /**
    * container to render the error messages
@@ -50,7 +51,7 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
    *
    * using skipSelf to access mat-form-field container instead of the form control container
    */
-  @Input() container = inject(ViewContainerRef, { skipSelf: true });
+  container = input(inject(ViewContainerRef, { skipSelf: true }));
 
   /**
    * renderer to remove the previous error section for angular material
@@ -80,9 +81,9 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
 
   ngOnInit() {
     // used to remove the previous error section for angular material
-    const errorSection = this.container.element.nativeElement.children[1];
+    const errorSection = this.container().element.nativeElement.children[1];
     if (!!errorSection) {
-      this.renderer.removeChild(this.container.element.nativeElement, errorSection);
+      this.renderer.removeChild(this.container().element.nativeElement, errorSection);
     }
 
     queueMicrotask(() => {
@@ -105,10 +106,10 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
         )
         .subscribe(() => {
           // check if the component has any errors
-          if (this.errorStateMatcher.isErrorVisible(this.ngControl.control, this.form)) {
+          if (this.errorStateMatcher().isErrorVisible(this.ngControl.control, this.form)) {
             // create the component if it doesn't exist
             if (!this.componentRef) {
-              this.componentRef = this.container.createComponent(InputErrorComponent);
+              this.componentRef = this.container().createComponent(InputErrorComponent);
               this.componentRef.changeDetectorRef.markForCheck();
             }
             // provide the errors to the component
