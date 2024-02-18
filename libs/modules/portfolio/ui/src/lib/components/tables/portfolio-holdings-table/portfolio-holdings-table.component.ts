@@ -3,12 +3,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  Input,
   OnChanges,
   Output,
   SimpleChanges,
   TrackByFunction,
   ViewChild,
+  input,
   signal,
 } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
@@ -169,8 +169,8 @@ import {
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           <span class="text-wt-gray-dark">
             {{
-              holdingsBalance
-                ? ((row.symbolSummary.quote.price * row.units) / holdingsBalance | percent: '1.2-2')
+              holdingsBalance()
+                ? ((row.symbolSummary.quote.price * row.units) / holdingsBalance() | percent: '1.2-2')
                 : 'N/A'
             }}
           </span>
@@ -225,10 +225,10 @@ import {
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns()" class="hidden sm:contents"></tr>
       <tr
         mat-row
-        *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"
+        *matRowDef="let row; columns: displayedColumns(); let even = even; let odd = odd"
         (click)="onItemClicked(row)"
       ></tr>
 
@@ -236,7 +236,7 @@ import {
       <tr class="mat-row" *matNoDataRow>
         <td class="text-center mat-cell" colspan="10">
           @defer (on timer(5s)) {
-            <div class="grid place-content-center p-10">No holdings to be found</div>
+            <div class="grid place-content-center p-10">No holdings() to be found</div>
           } @placeholder {
             <div *ngRange="10" class="h-10 mb-1 g-skeleton"></div>
           }
@@ -257,23 +257,21 @@ export class PortfolioHoldingsTableComponent implements OnChanges {
   /**
    * Invested amount - closed price * units for each holdings
    */
-  @Input({ required: true }) holdingsBalance!: number;
-  @Input({ required: true }) holdings!: PortfolioStateHolding[];
+  holdingsBalance = input.required<number>();
+  holdings = input.required<PortfolioStateHolding[]>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  @Input() displayedColumns: string[] = [
+  displayedColumns = input<string[]>([
     'symbol',
     'price',
     // 'units',
     'bep',
-
     'balance',
     'invested',
     'totalChange',
     'dailyValueChange',
-
     //'units',
     'portfolio',
     // 'beta',
@@ -281,7 +279,7 @@ export class PortfolioHoldingsTableComponent implements OnChanges {
     'marketCap',
     'yearlyRange',
     // 'sector',
-  ];
+  ]);
   dataSource!: MatTableDataSource<PortfolioStateHolding>;
 
   showDailyChangeSignal = signal(false);
@@ -289,8 +287,8 @@ export class PortfolioHoldingsTableComponent implements OnChanges {
   identity: TrackByFunction<PortfolioStateHolding> = (index: number, item: PortfolioStateHolding) => item.symbol;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.holdings) {
-      const sorted = this.holdings
+    if (this.holdings()) {
+      const sorted = this.holdings()!
         .slice()
         .sort((a, b) => compare(b.symbolSummary.quote.price * b.units, a.symbolSummary.quote.price * a.units));
       this.dataSource = new MatTableDataSource(sorted);

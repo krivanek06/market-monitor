@@ -9,6 +9,7 @@ import {
   SimpleChanges,
   TrackByFunction,
   ViewChild,
+  input,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -56,7 +57,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
                 <!-- units -->
                 <div class="block sm:hidden text-wt-gray-dark">[{{ row.units }}]</div>
                 <!-- user -->
-                <div *ngIf="showUser" class="lg:hidden block">
+                <div *ngIf="showUser()" class="lg:hidden block">
                   <img class="rounded-full h-6 w-6" appDefaultImg [src]="row.userPhotoURL" />
                 </div>
               </div>
@@ -198,17 +199,17 @@ export class PortfolioTransactionsTableComponent implements OnChanges {
     this.dataSource = new MatTableDataSource(values ?? []);
     this.dataSource.paginator = this.paginator;
   }
-  @Input() showTransactionFees = false;
+  showTransactionFees = input(false);
 
   /**
    * Whether to show the action button column - delete button
    */
-  @Input() showActionButton = false;
+  showActionButton = input(false);
 
   /**
    * Whether to show the user column
    */
-  @Input() showUser = false;
+  showUser = input(false);
 
   dataSource!: MatTableDataSource<PortfolioTransactionMore>;
   displayedColumns: string[] = ['symbol', 'transactionType', 'totalValue', 'unitPrice', 'units', 'return', 'date'];
@@ -219,13 +220,13 @@ export class PortfolioTransactionsTableComponent implements OnChanges {
     item.transactionId;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.showTransactionFees && !this.displayedColumns.includes('transactionFees')) {
+    if (this.showTransactionFees() && !this.displayedColumns.includes('transactionFees')) {
       this.displayedColumns = insertIntoArray(this.displayedColumns, 6, 'transactionFees');
     }
-    if (this.showActionButton && !this.displayedColumns.includes('action')) {
+    if (this.showActionButton() && !this.displayedColumns.includes('action')) {
       this.displayedColumns = [...this.displayedColumns, 'action'];
     }
-    if (this.showUser && !this.displayedColumns.includes('user')) {
+    if (this.showUser() && !this.displayedColumns.includes('user')) {
       this.displayedColumns = insertIntoArray(this.displayedColumns, 2, 'user');
     }
   }

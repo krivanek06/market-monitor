@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { PortfolioChange } from '@market-monitor/modules/portfolio/data-access';
 import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
@@ -11,22 +11,22 @@ import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
     <div class="@container">
       <div class="grid @md:grid-cols-2 @xl:grid-cols-6 gap-x-6 gap-y-2">
         <ng-container
-          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange['1_day'], name: 'Daily' }"
+          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange()['1_day'], name: 'Daily' }"
         ></ng-container>
         <ng-container
-          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange['1_week'], name: 'Weekly' }"
+          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange()['1_week'], name: 'Weekly' }"
         ></ng-container>
         <ng-container
-          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange['2_week'], name: '2 Weeks' }"
+          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange()['2_week'], name: '2 Weeks' }"
         ></ng-container>
         <ng-container
-          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange['1_month'], name: 'Monthly' }"
+          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange()['1_month'], name: 'Monthly' }"
         ></ng-container>
         <ng-container
-          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange['3_month'], name: 'Quarterly' }"
+          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange()['3_month'], name: 'Quarterly' }"
         ></ng-container>
         <ng-container
-          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange['6_month'], name: 'Half Year' }"
+          *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange()['6_month'], name: 'Half Year' }"
         ></ng-container>
       </div>
     </div>
@@ -62,5 +62,5 @@ import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioPeriodChangeComponent {
-  @Input({ required: true }) portfolioChange!: PortfolioChange;
+  portfolioChange = input.required<PortfolioChange>();
 }
