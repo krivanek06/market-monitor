@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { EnterpriseValue, SymbolOwnershipInstitutional } from '@market-monitor/api-types';
 import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
@@ -9,216 +9,216 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-m
   imports: [CommonModule, PercentageIncreaseDirective, LargeNumberFormatterPipe],
   template: `
     <!-- institutional data -->
-    <ng-container *ngIf="displayType === 'institution'">
+    <ng-container *ngIf="displayType() === 'institution'">
       <div>
         <div class="g-item-wrapper">
           <div>Total Invested</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.totalInvested | largeNumberFormatter }}</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().totalInvested | largeNumberFormatter }}</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.totalInvested,
-                valueToCompare: ownershipInstitutional.lastTotalInvested,
+                value: ownershipInstitutional().totalInvested,
+                valueToCompare: ownershipInstitutional().lastTotalInvested,
                 hideValue: true
               }"
             ></span>
-            <span *ngIf="enterpriseValue">/</span>
-            <span *ngIf="enterpriseValue">{{ enterpriseValue.marketCapitalization | largeNumberFormatter }}</span>
+            <span *ngIf="enterpriseValue()">/</span>
+            <span *ngIf="enterpriseValue()">{{ enterpriseValue().marketCapitalization | largeNumberFormatter }}</span>
           </div>
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
 
         <div class="g-item-wrapper">
           <div>Held Shares</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.numberOf13Fshares | largeNumberFormatter }}</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().numberOf13Fshares | largeNumberFormatter }}</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.numberOf13Fshares,
-                valueToCompare: ownershipInstitutional.lastNumberOf13Fshares,
+                value: ownershipInstitutional().numberOf13Fshares,
+                valueToCompare: ownershipInstitutional().lastNumberOf13Fshares,
                 hideValue: true
               }"
             ></span>
-            <span *ngIf="enterpriseValue">/</span>
-            <span *ngIf="enterpriseValue">{{ enterpriseValue.numberOfShares | largeNumberFormatter }}</span>
+            <span *ngIf="enterpriseValue()">/</span>
+            <span *ngIf="enterpriseValue()">{{ enterpriseValue().numberOfShares | largeNumberFormatter }}</span>
           </div>
 
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
 
         <div class="g-item-wrapper">
           <div>Ownership</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.ownershipPercent | largeNumberFormatter }}%</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().ownershipPercent | largeNumberFormatter }}%</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.ownershipPercent,
-                valueToCompare: ownershipInstitutional.lastOwnershipPercent,
+                value: ownershipInstitutional().ownershipPercent,
+                valueToCompare: ownershipInstitutional().lastOwnershipPercent,
                 hideValue: true
               }"
             ></span>
           </div>
 
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
 
         <div class="g-item-wrapper">
           <div>Investors</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.investorsHolding }}</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().investorsHolding }}</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.investorsHolding,
-                valueToCompare: ownershipInstitutional.lastInvestorsHolding,
+                value: ownershipInstitutional().investorsHolding,
+                valueToCompare: ownershipInstitutional().lastInvestorsHolding,
                 hideValue: true
               }"
             ></span>
           </div>
 
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
       </div>
     </ng-container>
 
     <!-- positions -->
-    <ng-container *ngIf="displayType === 'position'">
+    <ng-container *ngIf="displayType() === 'position'">
       <div>
         <!-- line 1 -->
         <div class="g-item-wrapper">
           <div>Increased</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.increasedPositions }}</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().increasedPositions }}</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.increasedPositions,
-                valueToCompare: ownershipInstitutional.lastIncreasedPositions,
+                value: ownershipInstitutional().increasedPositions,
+                valueToCompare: ownershipInstitutional().lastIncreasedPositions,
                 hideValue: true
               }"
             ></span>
           </div>
 
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
 
         <!-- line 2-->
         <div class="g-item-wrapper">
           <div>Decreased</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.reducedPositions }}</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().reducedPositions }}</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.reducedPositions,
-                valueToCompare: ownershipInstitutional.lastReducedPositions,
+                value: ownershipInstitutional().reducedPositions,
+                valueToCompare: ownershipInstitutional().lastReducedPositions,
                 hideValue: true
               }"
             ></span>
           </div>
 
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
 
         <div class="g-item-wrapper">
           <div>New</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.newPositions }}</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().newPositions }}</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.newPositions,
-                valueToCompare: ownershipInstitutional.lastNewPositions,
+                value: ownershipInstitutional().newPositions,
+                valueToCompare: ownershipInstitutional().lastNewPositions,
                 hideValue: true
               }"
             ></span>
           </div>
 
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
 
         <div class="g-item-wrapper">
           <div>Sold</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.closedPositions }}</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().closedPositions }}</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.closedPositions,
-                valueToCompare: ownershipInstitutional.lastClosedPositions,
+                value: ownershipInstitutional().closedPositions,
+                valueToCompare: ownershipInstitutional().lastClosedPositions,
                 hideValue: true
               }"
             ></span>
           </div>
 
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
       </div>
     </ng-container>
 
     <!-- Options -->
-    <ng-container *ngIf="displayType === 'option'">
+    <ng-container *ngIf="displayType() === 'option'">
       <div>
         <div class="g-item-wrapper">
           <div>Calls</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.totalCalls | largeNumberFormatter }}</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().totalCalls | largeNumberFormatter }}</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.totalCalls,
-                valueToCompare: ownershipInstitutional.lastTotalCalls,
+                value: ownershipInstitutional().totalCalls,
+                valueToCompare: ownershipInstitutional().lastTotalCalls,
                 hideValue: false
               }"
             ></span>
           </div>
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
 
         <div class="g-item-wrapper">
           <div>Puts</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.totalPuts | largeNumberFormatter }}</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().totalPuts | largeNumberFormatter }}</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.totalPuts,
-                valueToCompare: ownershipInstitutional.lastTotalPuts,
+                value: ownershipInstitutional().totalPuts,
+                valueToCompare: ownershipInstitutional().lastTotalPuts,
                 hideValue: false
               }"
             ></span>
           </div>
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
 
         <div class="g-item-wrapper">
           <div>Put/Call Ratio</div>
-          <div *ngIf="!isLoading && ownershipInstitutional" class="flex items-center gap-2">
-            <span>{{ ownershipInstitutional.putCallRatio | largeNumberFormatter }}</span>
+          <div *ngIf="!isLoading() && ownershipInstitutional()" class="flex items-center gap-2">
+            <span>{{ ownershipInstitutional().putCallRatio | largeNumberFormatter }}</span>
             <span
               appPercentageIncrease
               [currentValues]="{
-                value: ownershipInstitutional.putCallRatio,
-                valueToCompare: ownershipInstitutional.lastPutCallRatio,
+                value: ownershipInstitutional().putCallRatio,
+                valueToCompare: ownershipInstitutional().lastPutCallRatio,
                 hideValue: true
               }"
             ></span>
           </div>
           <!-- loading -->
-          <div *ngIf="isLoading" class="g-skeleton c-loading-wrapper"></div>
+          <div *ngIf="isLoading()" class="g-skeleton c-loading-wrapper"></div>
         </div>
       </div>
     </ng-container>
@@ -240,8 +240,8 @@ export class StockOwnershipInstitutionalListComponent {
   /**
    * both inputs are associated with the same quarterly data
    */
-  @Input({ required: true }) ownershipInstitutional?: SymbolOwnershipInstitutional;
-  @Input({ required: true }) enterpriseValue?: EnterpriseValue;
-  @Input() isLoading = false;
-  @Input() displayType: 'institution' | 'position' | 'option' = 'institution';
+  ownershipInstitutional = input.required<SymbolOwnershipInstitutional>();
+  enterpriseValue = input.required<EnterpriseValue>();
+  isLoading = input(false);
+  displayType = input<'institution' | 'position' | 'option'>('institution');
 }

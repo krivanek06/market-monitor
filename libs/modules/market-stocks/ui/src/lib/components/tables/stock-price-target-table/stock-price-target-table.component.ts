@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -41,7 +41,7 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@market-monitor/sh
               appPercentageIncrease
               [currentValues]="{
                 hideValue: true,
-                value: currentPrice,
+                value: currentPrice(),
                 valueToCompare: row.priceTarget
               }"
             ></div>
@@ -90,7 +90,7 @@ export class StockPriceTargetTableComponent {
     this.dataSource = new MatTableDataSource(values ?? []);
   }
 
-  @Input({ required: true }) currentPrice!: number;
+  currentPrice = input.required<number>();
 
   dataSource!: MatTableDataSource<PriceTarget>;
 

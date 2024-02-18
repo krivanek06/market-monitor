@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, input } from '@angular/core';
 import { ChartConstructor, ColorScheme, EstimatedChartDataType } from '@market-monitor/shared/data-access';
 import { dateFormatDate, formatLargeNumber } from '@market-monitor/shared/features/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -32,15 +32,15 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
   @Input({ required: true }) set data(values: EstimatedChartDataType[]) {
     this.initChart(values);
   }
-  @Input() limitValues = 30;
-  @Input() showTitle = false;
+  limitValues = input(30);
+  showTitle = input(false);
 
   private initChart(values: EstimatedChartDataType[]): void {
     if (!this.Highcharts) {
       return;
     }
 
-    const workingData = values.slice(-this.limitValues);
+    const workingData = values.slice(-this.limitValues());
     const dates = workingData.map((x) => x.date);
 
     const revenueEstSeries = workingData
@@ -70,7 +70,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
         },
       },
       title: {
-        text: this.showTitle ? 'Revenue' : '',
+        text: this.showTitle() ? 'Revenue' : '',
         align: 'left',
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,

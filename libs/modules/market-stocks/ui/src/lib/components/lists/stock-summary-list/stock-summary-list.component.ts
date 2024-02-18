@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { SymbolSummary } from '@market-monitor/api-types';
 import {
@@ -35,40 +35,40 @@ import { RecommendationDirective } from '../../../directives';
     <div class="g-item-wrapper">
       <div>Company Name</div>
       <div class="flex items-center gap-2">
-        <img appDefaultImg imageType="symbol" [src]="symbolSummary.id" alt="Asset Image" class="w-6 h-6" />
-        <span>{{ symbolSummary.profile?.companyName }}</span>
+        <img appDefaultImg imageType="symbol" [src]="symbolSummary().id" alt="Asset Image" class="w-6 h-6" />
+        <span>{{ symbolSummary().profile?.companyName }}</span>
       </div>
     </div>
 
     <div class="g-item-wrapper">
       <span>Sector</span>
       <mat-chip-listbox>
-        <mat-chip class="m-0" color="primary">{{ symbolSummary.profile?.sector }}</mat-chip>
+        <mat-chip class="m-0" color="primary">{{ symbolSummary().profile?.sector }}</mat-chip>
       </mat-chip-listbox>
     </div>
 
     <div class="g-item-wrapper">
       <span>CEO</span>
-      <span>{{ !!symbolSummary.profile?.ceo ? symbolSummary.profile?.ceo : 'N/A' }}</span>
+      <span>{{ !!symbolSummary().profile?.ceo ? symbolSummary().profile?.ceo : 'N/A' }}</span>
     </div>
 
     <div class="g-item-wrapper">
       <span>Market Cap.</span>
-      <span>{{ symbolSummary.quote.price * symbolSummary.quote.sharesOutstanding | largeNumberFormatter }}</span>
+      <span>{{ symbolSummary().quote.price * symbolSummary().quote.sharesOutstanding | largeNumberFormatter }}</span>
     </div>
 
     <div class="g-item-wrapper">
       <span>Price</span>
       <div class="flex items-center gap-2">
-        <span>{{ symbolSummary.quote.price | currency }}</span>
+        <span>{{ symbolSummary().quote.price | currency }}</span>
         <span
           appPercentageIncrease
           [useCurrencySign]="true"
           [hideValueOnXsScreen]="true"
           [currentValues]="{
             hideValue: false,
-            value: symbolSummary.quote.price,
-            valueToCompare: symbolSummary.quote.previousClose
+            value: symbolSummary().quote.price,
+            valueToCompare: symbolSummary().quote.previousClose
           }"
         ></span>
       </div>
@@ -77,15 +77,15 @@ import { RecommendationDirective } from '../../../directives';
     <div class="g-item-wrapper">
       <span>Volume</span>
       <div class="flex items-center gap-2">
-        <span>{{ symbolSummary.quote.volume | largeNumberFormatter }}</span>
+        <span>{{ symbolSummary().quote.volume | largeNumberFormatter }}</span>
         <span
           appPercentageIncrease
           [useCurrencySign]="false"
           [hideValueOnXsScreen]="true"
           [currentValues]="{
             hideValue: false,
-            value: symbolSummary.quote.volume,
-            valueToCompare: symbolSummary.quote.avgVolume
+            value: symbolSummary().quote.volume,
+            valueToCompare: symbolSummary().quote.avgVolume
           }"
         ></span>
       </div>
@@ -93,22 +93,22 @@ import { RecommendationDirective } from '../../../directives';
 
     <div class="g-item-wrapper">
       <span>PE / EPS</span>
-      <span>{{ symbolSummary.quote.pe | number: '1.2-2' }} / {{ symbolSummary.quote.eps | number: '1.2-2' }}</span>
+      <span>{{ symbolSummary().quote.pe | number: '1.2-2' }} / {{ symbolSummary().quote.eps | number: '1.2-2' }}</span>
     </div>
 
     <!-- <div class="g-item-wrapper">
   <span>Rating</span>
   <div class="flex items-center gap-2">
-    <span>{{ symbolSummary.rating?.rating ?? 'N/A' }}</span>
-    <div>(<span [appRecommendation]="symbolSummary.rating?.ratingScore"></span>)</div>
+    <span>{{ symbolSummary().rating?.rating ?? 'N/A' }}</span>
+    <div>(<span [appRecommendation]="symbolSummary().rating?.ratingScore"></span>)</div>
   </div>
 </div> -->
 
     <div class="g-item-wrapper">
       <span>Earnings</span>
       <span>{{
-        symbolSummary.quote.earningsAnnouncement
-          ? (symbolSummary.quote.earningsAnnouncement | date: 'MMMM d, y')
+        symbolSummary().quote.earningsAnnouncement
+          ? (symbolSummary().quote.earningsAnnouncement | date: 'MMMM d, y')
           : 'N/A'
       }}</span>
     </div>
@@ -121,7 +121,7 @@ import { RecommendationDirective } from '../../../directives';
           appPercentageIncrease
           [useCurrencySign]="false"
           [changeValues]="{
-            changePercentage: symbolSummary.priceChange | priceChangeItemSelector: key
+            changePercentage: symbolSummary().priceChange | priceChangeItemSelector: key
           }"
         ></span>
       </div>
@@ -135,5 +135,5 @@ import { RecommendationDirective } from '../../../directives';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSummaryListComponent {
-  @Input({ required: true }) symbolSummary!: SymbolSummary;
+  symbolSummary = input.required<SymbolSummary>();
 }
