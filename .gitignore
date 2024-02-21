@@ -68,3 +68,5 @@ ui-debug.log
 package-lock.json
 firebase-export*
 .secret.local
+
+.astro
