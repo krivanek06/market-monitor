@@ -49,6 +49,7 @@
     "reflect-metadata": "^0.2.1",
     "rxfire": "~6.0.5",
     "rxjs": "^7.8.1",
+    "tailwind-merge": "^2.2.1",
     "tslib": "^2.6.2",
     "uuid": "^9.0.1",
     "zone.js": "0.14.3"
