@@ -9,9 +9,10 @@ import * as Highcharts from 'highcharts';
 
 export type HistoricalPriceChartProps = {
   historicalPrice: HistoricalPrice[];
+  symbolId?: string;
 };
 
-export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ historicalPrice }) => {
+export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ historicalPrice, symbolId }) => {
   const myChart = useSignal<HTMLElement>();
 
   // Hook to create the chart when the component is created
@@ -22,14 +23,13 @@ export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ his
 
     const colorSuccess = '#4caf50';
     const colorDanger = '#f44336';
-    const colorGray = '#7c7c7c';
+    const colorGray = '#4b5563';
 
     const price = historicalPrice.map((d) => d.close);
     const volume = historicalPrice.map((d) => d.volume);
     const dates = historicalPrice.map((d) => d.date);
     const color = !!price[0] && price[0] < price[price.length - 1] ? colorSuccess : colorDanger;
 
-    console.log('running useTask', myChart.value);
     Highcharts.chart(myChart.value, {
       chart: {
         animation: true,
@@ -57,9 +57,9 @@ export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ his
           opposite: false,
           gridLineWidth: 1,
           tickPixelInterval: 30,
-          lineColor: colorGray,
-          gridLineColor: colorGray,
-          tickColor: colorGray,
+          lineColor: '#2d2d2d',
+          gridLineColor: '#2d2d2d',
+          tickColor: '#2d2d2d',
           visible: true,
           labels: {
             style: {
@@ -104,11 +104,11 @@ export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ his
         backgroundColor: '#1d1d1d',
         style: {
           fontSize: '16px',
-          color: '#ececec',
+          color: '#d1d5db',
         },
         shared: true,
         //useHTML: true,
-        headerFormat: `<p style="color: #ececec; font-size: 12px">{point.key}</p><br/>`,
+        headerFormat: `<p style="color: #9ca3af; font-size: 12px">{point.key} - ${symbolId}</p><br/>`,
 
         pointFormatter: function () {
           const that = this as any;
@@ -131,7 +131,6 @@ export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ his
               <br/>
             `;
         },
-        footerFormat: '</table>',
         valueDecimals: 2,
       },
       rangeSelector: {
@@ -169,19 +168,19 @@ export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ his
       },
       series: [
         {
-          type: 'column',
-          name: 'Volume',
-          data: volume,
-          color: '#f48605',
-          yAxis: 0,
-          opacity: 0.6,
-        },
-        {
           type: 'area',
           name: 'Price',
           data: price,
           yAxis: 1,
           color: color,
+        },
+        {
+          type: 'column',
+          name: 'Volume',
+          data: volume,
+          color: '#f48605',
+          yAxis: 0,
+          opacity: 0.45,
         },
       ],
     });
@@ -189,7 +188,7 @@ export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ his
 
   return (
     <>
-      <div id="myChart" ref={myChart} style={{ width: '100%', height: '450px', display: 'block' }}></div>
+      <div id="myChart" ref={myChart} style={{ width: '100%', height: '480px', display: 'block' }}></div>
     </>
   );
 });

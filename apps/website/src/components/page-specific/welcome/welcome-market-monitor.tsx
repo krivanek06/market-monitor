@@ -1,7 +1,8 @@
 import { $, Resource, component$, useResource$, useSignal } from '@builder.io/qwik';
 import { getHistoricalPricesCloudflare, getSymbolSummaries } from '@market-monitor/api-external';
 import { SymbolHistoricalPeriods, SymbolSummary } from '@market-monitor/api-types';
-import { HistoricalPriceChart, SymbolChange } from '../../trading';
+import { CardBasic } from '../../shared';
+import { HistoricalPriceChart, SymbolChange, SymbolSummaryList } from '../../trading';
 import { CSS_HELPERS, stockSymbols } from '../../utils';
 
 export const WelcomeMarketMonitor = component$(() => {
@@ -54,7 +55,7 @@ const MarketSymbolsSection = component$(() => {
         value={loadedSummaries}
         onPending={() => <div>Loading...</div>}
         onResolved={(data) => (
-          <div class="grid grid-cols-4 gap-x-8 gap-y-4 ">
+          <div class="grid grid-cols-4 gap-x-8 gap-y-4 lg:px-10 ">
             {data.map((summary) => (
               <SymbolChange
                 isSelect={selectedSummary.value?.id === summary.id}
@@ -66,13 +67,21 @@ const MarketSymbolsSection = component$(() => {
           </div>
         )}
       ></Resource>
-      Selected {selectedSummary.value?.id}
       {/* historical price */}
-      <Resource
-        value={loadedHistoricalPrice}
-        onPending={() => <div class="rounded-lg bg-gray-800 animate-pulse h-[450px]"></div>}
-        onResolved={(data) => <HistoricalPriceChart historicalPrice={data} />}
-      ></Resource>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="col-span-2">
+          <Resource
+            value={loadedHistoricalPrice}
+            onPending={() => <div class="rounded-lg bg-gray-800 animate-pulse h-[480px]"></div>}
+            onResolved={(data) => <HistoricalPriceChart historicalPrice={data} symbolId={selectedSummary.value?.id} />}
+          ></Resource>
+        </div>
+        <div>
+          <CardBasic>
+            <SymbolSummaryList summary={selectedSummary.value} />
+          </CardBasic>
+        </div>
+      </div>
     </div>
   );
 });

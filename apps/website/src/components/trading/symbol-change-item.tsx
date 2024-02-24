@@ -1,7 +1,7 @@
 import { QRL, component$ } from '@builder.io/qwik';
 import { SymbolQuote } from '@market-monitor/api-types';
-import { roundNDigits } from '@market-monitor/shared/features/general-util';
 import { symbolUrl } from '../utils';
+import { PercentageIncrease } from './percentage-increase';
 
 export type SymbolChangeItemProps = {
   symbolQuote: SymbolQuote;
@@ -27,25 +27,7 @@ export const SymbolChange = component$<SymbolChangeItemProps>(({ symbolQuote, on
         </div>
 
         {/* price and price change */}
-        <div class="flex items-center gap-3">
-          <span>${roundNDigits(symbolQuote.price)}</span>
-          <span
-            class={[
-              symbolQuote.change > 0 ? 'text-green-500' : symbolQuote.change < 0 ? 'text-red-500' : '',
-              'flex items-center gap-1',
-            ]}
-          >
-            {symbolQuote.change > 0 ? '+' : ''}
-            {roundNDigits(symbolQuote.change)}
-
-            {/* icons */}
-            {symbolQuote.change > 0 ? (
-              <span class="material-symbols-outlined mt-2">trending_up</span>
-            ) : symbolQuote.change < 0 ? (
-              <span class="material-symbols-outlined mt-2">trending_down</span>
-            ) : null}
-          </span>
-        </div>
+        <PercentageIncrease value={symbolQuote.price} valueToCompare={symbolQuote.previousClose} isPrice={true} />
       </div>
     </button>
   );

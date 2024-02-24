@@ -6,8 +6,8 @@ export const isNumber = (value: string | number | unknown): boolean => {
  *
  * @returns calculated growth in percentage between starting and ending values
  */
-export const calculateGrowth = (starting: number, ending: number) => {
-  if (ending === 0) {
+export const calculateGrowth = (starting?: number, ending?: number) => {
+  if (!starting || !ending || ending === 0) {
     return 0;
   }
   return roundNDigits(((starting - ending) / Math.abs(ending)) * 100);
