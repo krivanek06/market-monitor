@@ -8,9 +8,9 @@ import { CSS_HELPERS, stockSymbols } from '../../utils';
 export const WelcomeMarketMonitor = component$(() => {
   return (
     <div class="p-10 grid place-content-center">
-      <h2 class={CSS_HELPERS.primaryTitle + ' text-7xl text-center'}>Market Monitoring</h2>
+      <h2 class={CSS_HELPERS.primaryTitle + ' text-7xl text-center mb-[100px]'}>Market Monitoring</h2>
 
-      <div class="flex justify-around gap-10 text-gray-300 text-center mt-[100px] mx-auto w-full lg:w-[80%] mb-[100px]">
+      <div class="flex justify-around gap-10 text-gray-300 text-center mx-auto w-full lg:w-[80%] mb-[100px]">
         <p class="p-4">
           Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolore corrupti natus maxime debitis, eos
           exercitationem hic perferendis sequi similique ducimus dolorum autem doloribus quod, animi ad eum deserunt,
