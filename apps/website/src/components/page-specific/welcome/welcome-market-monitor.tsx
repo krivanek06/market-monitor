@@ -1,6 +1,7 @@
-import { Resource, component$, useResource$ } from '@builder.io/qwik';
-import { getSymbolSummaries } from '@market-monitor/api-external';
-import { SymbolChange } from '../../trading';
+import { $, Resource, component$, useResource$, useSignal } from '@builder.io/qwik';
+import { getHistoricalPricesCloudflare, getSymbolSummaries } from '@market-monitor/api-external';
+import { SymbolHistoricalPeriods, SymbolSummary } from '@market-monitor/api-types';
+import { HistoricalPriceChart, SymbolChange } from '../../trading';
 import { CSS_HELPERS, stockSymbols } from '../../utils';
 
 export const WelcomeMarketMonitor = component$(() => {
@@ -30,25 +31,47 @@ export const WelcomeMarketMonitor = component$(() => {
 });
 
 const MarketSymbolsSection = component$(() => {
-  const data = useResource$(() => getSymbolSummaries(stockSymbols));
+  const selectedSummary = useSignal<SymbolSummary | null>(null);
+
+  const loadedSummaries = useResource$(() => getSymbolSummaries(stockSymbols));
+  const loadedHistoricalPrice = useResource$(async ({ track }) => {
+    track(() => selectedSummary.value);
+
+    return selectedSummary.value
+      ? getHistoricalPricesCloudflare(selectedSummary.value.id, SymbolHistoricalPeriods.year)
+      : [];
+  });
+
+  const onItemClick$ = $((summary: SymbolSummary) => {
+    console.log('clicked', summary);
+    selectedSummary.value = summary;
+  });
 
   return (
-    <div class="flex flex-wrap justify-center gap-4">
-      {/* <SymbolChange symbol="AAPL" price={150} /> */}
-
-      {/* {data.value.map((summary) => (
-        <SymbolChange symbolQuote={summary.quote} />
-      ))} */}
+    <div class="grid gap-10">
+      {/* loaded summaries about stocks */}
       <Resource
-        value={data}
+        value={loadedSummaries}
         onPending={() => <div>Loading...</div>}
         onResolved={(data) => (
           <div class="grid grid-cols-4 gap-x-8 gap-y-4 ">
             {data.map((summary) => (
-              <SymbolChange symbolQuote={summary.quote} />
+              <SymbolChange
+                isSelect={selectedSummary.value?.id === summary.id}
+                symbolQuote={summary.quote}
+                key={summary.id}
+                onItemClick$={() => onItemClick$(summary)}
+              />
             ))}
           </div>
         )}
+      ></Resource>
+      Selected {selectedSummary.value?.id}
+      {/* historical price */}
+      <Resource
+        value={loadedHistoricalPrice}
+        onPending={() => <div class="rounded-lg bg-gray-800 animate-pulse h-[450px]"></div>}
+        onResolved={(data) => <HistoricalPriceChart historicalPrice={data} />}
       ></Resource>
     </div>
   );
