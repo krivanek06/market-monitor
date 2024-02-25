@@ -18,18 +18,18 @@ body {
   font-family: Prociono, sans-serif;
   background-color: black;
   overflow-x: clip;
-  @apply text-gray-200;
+  @apply text-gray-300;
 }
 
 .g-item-wrapper {
   @apply flex justify-between items-center p-3 gap-4 w-full;
 
   & > :first-child {
-    @apply flex-1 text-gray-600;
+    @apply flex-1 text-gray-500;
   }
 
   & > :last-child {
-    @apply text-gray-400;
+    @apply text-gray-300;
   }
 
   &:not(:last-child) {
@@ -49,5 +49,9 @@ body {
 }
 
 .g-section-title {
-  @apply text-3xl text-cyan-700 text-center mb-[65px] capitalize;
+  @apply text-3xl text-cyan-700 text-center mb-16 capitalize;
+}
+
+.g-skeleton {
+  @apply rounded-lg bg-gray-800 animate-pulse;
 }

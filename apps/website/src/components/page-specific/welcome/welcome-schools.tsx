@@ -10,12 +10,12 @@ export const WelcomeSchools = component$(() => {
 
       {/* some info */}
       <div class="flex justify-around lg:w-9/12 mx-auto gap-x-10 gap-y-4 mb-[80px]">
-        <p class="text-center">
+        <p class="text-center text-base">
           Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur, eaque nobis necessitatibus, perspiciatis
           commodi dignissimos alias sit dolorem odit, vel deserunt at. Repellat voluptatibus veritatis dicta distinctio
           ab. Asperiores, ipsum.
         </p>
-        <p class="text-center">
+        <p class="text-center text-base">
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt, optio magnam? Accusantium, excepturi.
           Alias, saepe, assumenda ea magnam quidem veritatis modi repellendus distinctio eveniet veniam vitae quaerat
           itaque consectetur ratione?
@@ -23,7 +23,7 @@ export const WelcomeSchools = component$(() => {
       </div>
 
       {/* redirect dashboard button */}
-      <div class="grid place-content-center mb-[200px]">
+      <div class="grid place-content-center mb-[140px]">
         <Button onClick$={() => console.log('todo')} class="h-14">
           <div class="flex items-center gap-4 justify-center min-w-[200px]">
             <span>Dashboard</span>
@@ -33,24 +33,19 @@ export const WelcomeSchools = component$(() => {
       </div>
 
       {/* some info */}
-      <div class="grid lg:grid-cols-2 lg:px-10">
+      <div class="grid lg:grid-cols-2 lg:px-10 lg:w-10/12 mx-auto">
         <div class="lg:w-9/12 grid gap-8">
-          <p>
+          <p class="text-base">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Est excepturi earum, facere impedit fuga, nulla
             ipsum eligendi placeat veritatis dicta maiores. Necessitatibus, inventore quas quod aliquam quis rem numquam
             ex.
           </p>
-          <p>
+          <p class="text-base">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo pariatur deserunt modi voluptatem maxime.
             Nesciunt aliquam voluptatum iure qui, consectetur repudiandae eum? Et maiores quasi doloremque cupiditate
             natus accusantium libero.
           </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo pariatur deserunt modi voluptatem maxime.
-            Nesciunt aliquam voluptatum iure qui, consectetur repudiandae eum? Et maiores quasi doloremque cupiditate
-            natus accusantium libero.
-          </p>
-          <p>
+          <p class="text-base">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo pariatur deserunt modi voluptatem maxime.
             Nesciunt aliquam voluptatum iure qui, consectetur repudiandae eum? Et maiores quasi doloremque cupiditate
             natus accusantium libero.
@@ -76,7 +71,10 @@ const UserPortfolioChange = component$(() => {
   return (
     <div class="flex flex-col gap-2">
       {testUsers.map((user) => (
-        <div class="flex items-center justify-between gap-2 px-4 py-2 border border-cyan-800 border-solid bg-gray-900 rounded-lg bg-opacity-60">
+        <div
+          key={user.displayName}
+          class="flex items-center justify-between gap-2 px-4 py-2 border border-cyan-800 border-solid bg-gray-900 rounded-lg bg-opacity-60"
+        >
           <div class="items-center flex gap-2">
             <img src={user.image} alt="user image" class="h-7 w-7 rounded-lg" />
             <span>{user.displayName}</span>

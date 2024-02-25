@@ -45,6 +45,10 @@ export const getRandomIndex = (max: number): number => {
   return Math.floor(Math.random() * max);
 };
 
+export const getRandomElement = <T>(arr: T[], limit: number): T[] => {
+  return arr.sort(() => 0.5 - Math.random()).slice(0, limit);
+};
+
 export const formatValueIntoCurrency = (value?: string | number | null | unknown): string => {
   if (value === undefined || value === null || (!isNumber(value) && typeof value !== 'number')) {
     return 'N/A';
