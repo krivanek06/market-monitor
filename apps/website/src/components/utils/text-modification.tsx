@@ -19,7 +19,15 @@ export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
 
   const interval = useSignal<any>(null);
 
+  const stopRandomTextGenerationLoop = $(() => {
+    if (interval.value) {
+      clearInterval(interval.value);
+    }
+  });
+
   const startRandomTextGenerationLoop = $(() => {
+    stopRandomTextGenerationLoop();
+
     interval.value = setInterval(() => {
       const newMastedText = displayName.value
         .split('')
@@ -31,12 +39,6 @@ export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
       // change input
       displayName.value = newMastedText;
     }, 30);
-  });
-
-  const stopRandomTextGenerationLoop = $(() => {
-    if (interval) {
-      clearInterval(interval.value);
-    }
   });
 
   const generateText = $((inputText: string, alreadyDisplayedWork?: string): Promise<void> => {
@@ -83,15 +85,14 @@ export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
     await generateText(name, defaultMaskedText.value);
   });
 
-  return (
-    <span
-      onMouseEnter$={() => startRandomTextGenerationLoop()}
-      onMouseLeave$={() => {
-        stopRandomTextGenerationLoop();
-        generateBackToOriginal();
-      }}
-    >
-      {displayName}
-    </span>
-  );
+  const initAnimation = $(() => {
+    startRandomTextGenerationLoop();
+
+    setTimeout(() => {
+      generateBackToOriginal();
+      stopRandomTextGenerationLoop();
+    }, 500);
+  });
+
+  return <span onMouseEnter$={() => initAnimation()}>{displayName}</span>;
 });
