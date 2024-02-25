@@ -7,6 +7,8 @@ module.exports = {
     extend: {
       transitionDuration: {
         2000: '2000ms',
+        2500: '2500ms',
+        3000: '3000ms',
       },
       fontSize: {
         sm: 'clamp(0.8rem, 0.09vw + 0.78rem, 0.89rem)',

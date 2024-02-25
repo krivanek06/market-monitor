@@ -55,3 +55,12 @@ body {
 .g-skeleton {
   @apply rounded-lg bg-gray-800 animate-pulse;
 }
+
+@layer base {
+  .font-outline-2 {
+    -webkit-text-stroke: 2px black;
+  }
+  .font-outline-4 {
+    -webkit-text-stroke: 4px black;
+  }
+}
