@@ -5,6 +5,9 @@ module.exports = {
   content: [join(__dirname, 'src/**/*.{js,ts,jsx,tsx,mdx}')],
   theme: {
     extend: {
+      transitionDuration: {
+        2000: '2000ms',
+      },
       fontSize: {
         sm: 'clamp(0.8rem, 0.09vw + 0.78rem, 0.89rem)',
         base: 'clamp(1rem, 0.19vw + 0.95rem, 1.19rem)',
@@ -18,5 +21,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 };
