@@ -47,3 +47,7 @@ body {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+.g-section-title {
+  @apply text-3xl text-cyan-700 text-center mb-[65px] capitalize;
+}

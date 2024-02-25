@@ -1,6 +1,5 @@
 import { component$ } from '@builder.io/qwik';
 import { CardBasic, ImagePreview, ImagePreviewProps } from '../../shared';
-import { CSS_HELPERS } from '../../utils';
 
 export const WelcomeInvestmentAccount = component$(() => {
   const images = [
@@ -51,26 +50,26 @@ export const WelcomeInvestmentAccount = component$(() => {
   ] satisfies ImagePreviewProps['images'];
 
   return (
-    <div class="p-10 grid place-content-center">
-      <h2 class={CSS_HELPERS.primaryTitle + ' text-7xl text-center mb-[100px]'}>Investment Account</h2>
+    <section class="p-10 grid place-content-center">
+      <h2 class="g-section-title">Investment Account</h2>
 
       <div class="grid grid-cols-3 gap-4 mb-14">
         <CardBasic>
-          <h3 class={CSS_HELPERS.primaryTitle + ' text-2xl text-center mb-4 w-full'}>Portfolio Growth</h3>
+          <h3 class=" text-xl text-center mb-4 w-full text-cyan-800">Portfolio Growth</h3>
           <p class="text-center p-2">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime amet quia quos rem voluptas eaque placeat
             minima, quod at nemo cumque aliquid veritatis doloremque dolores! Mollitia magni dolorem facere aspernatur.
           </p>
         </CardBasic>
         <CardBasic>
-          <h3 class={CSS_HELPERS.primaryTitle + ' text-2xl text-center mb-4 w-full'}>Investment Risk</h3>
+          <h3 class=" text-xl text-center mb-4 w-full text-cyan-800">Investment Risk</h3>
           <p class="text-center p-2">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime amet quia quos rem voluptas eaque placeat
             minima, quod at nemo cumque aliquid veritatis doloremque dolores! Mollitia magni dolorem facere aspernatur.
           </p>
         </CardBasic>
         <CardBasic>
-          <h3 class={CSS_HELPERS.primaryTitle + ' text-2xl text-center mb-4 w-full'}>Allocation, Transaction & more</h3>
+          <h3 class=" text-xl text-center mb-4 w-full text-cyan-800">Allocation & Transaction</h3>
           <p class="text-center p-2">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime amet quia quos rem voluptas eaque placeat
             minima, quod at nemo cumque aliquid veritatis doloremque dolores! Mollitia magni dolorem facere aspernatur.
@@ -81,6 +80,6 @@ export const WelcomeInvestmentAccount = component$(() => {
       <div class="overflow-auto">
         <ImagePreview images={images} />
       </div>
-    </div>
+    </section>
   );
 });

@@ -10,23 +10,29 @@ import {
 
 export default component$(() => {
   return (
-    <div class="overflow-x-clip">
-      <div class="relative">
-        <WelcomeHero />
-        {/* <SVG1 class="absolute bottom-[-145px] left-[100px] opacity-30" />
+    <div class="overflow-x-clip ">
+      <img src="/images/hero-6.jpeg" class="absolute top-0 w-[100%] h-[70%] object-cover opacity-40" />
+
+      <div class="max-w-[1620px] mx-auto">
+        <div class="relative">
+          <WelcomeHero />
+          {/* <SVG1 class="absolute bottom-[-145px] left-[100px] opacity-30" />
         <SVG2 class="absolute bottom-0" /> */}
-      </div>
-      <div class="relative">
-        <WelcomeMarketMonitor />
-      </div>
-      <div class="relative">
-        <WelcomeInvestmentAccount />
-      </div>
-      <div class="relative">
-        <WelcomeSchools />
-      </div>
-      <div class="relative">
-        <WelcomeAboutUs />
+        </div>
+        <div class="relative mb-[120px]">
+          <WelcomeMarketMonitor />
+        </div>
+        <div class="relative mb-[120px]">
+          <WelcomeInvestmentAccount />
+        </div>
+        <div class="relative mb-[120px]">
+          <WelcomeSchools />
+        </div>
+        <div class="relative">
+          <WelcomeAboutUs />
+        </div>
+
+        <footer class="min-h-[100px]"></footer>
       </div>
     </div>
   );

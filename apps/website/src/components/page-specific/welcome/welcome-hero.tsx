@@ -4,9 +4,7 @@ import { CSS_HELPERS } from '../../utils';
 
 export const WelcomeHero = component$(() => {
   return (
-    <section class="w-screen h-screen grid place-content-center">
-      <img src="/images/hero-6.jpeg" class="absolute top-0 w-[100%] h-[70%] object-cover opacity-40" />
-
+    <section class="h-screen grid place-content-center">
       <h1 class={'lg:mt-[-180px] z-10 text-9xl ' + CSS_HELPERS.primaryTitle}>GG-Finance</h1>
 
       <div class="flex items-center gap-x-8 gap-y-4">

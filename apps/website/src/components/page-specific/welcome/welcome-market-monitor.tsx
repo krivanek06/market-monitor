@@ -3,12 +3,12 @@ import { getHistoricalPricesCloudflare, getSymbolSummaries } from '@market-monit
 import { SymbolHistoricalPeriods, SymbolSummary } from '@market-monitor/api-types';
 import { CardBasic } from '../../shared';
 import { HistoricalPriceChart, SymbolChange, SymbolSummaryList } from '../../trading';
-import { CSS_HELPERS, stockSymbols } from '../../utils';
+import { stockSymbols } from '../../utils';
 
 export const WelcomeMarketMonitor = component$(() => {
   return (
-    <div class="p-10 grid place-content-center">
-      <h2 class={CSS_HELPERS.primaryTitle + ' text-7xl text-center mb-[100px]'}>Market Monitoring</h2>
+    <section class="p-10 grid place-content-center">
+      <h2 class="g-section-title">Market Monitoring</h2>
 
       <div class="flex justify-around gap-10 text-gray-300 text-center mx-auto w-full lg:w-[80%] mb-[100px]">
         <p class="p-4">
@@ -27,7 +27,7 @@ export const WelcomeMarketMonitor = component$(() => {
       <div class="">
         <MarketSymbolsSection />
       </div>
-    </div>
+    </section>
   );
 });
 

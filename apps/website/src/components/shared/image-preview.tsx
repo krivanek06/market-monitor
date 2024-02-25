@@ -22,7 +22,7 @@ export const ImagePreview = component$<ImagePreviewProps>((props) => {
     <div>
       {/* preview selected image */}
       <div class="mb-10">
-        <h3 class="text-center mb-2 text-2xl capitalize">{selectedImage.value.alt}</h3>
+        <h3 class="text-center mb-2 text-xl capitalize">{selectedImage.value.alt}</h3>
         <CardBasic class="w-fit mx-auto">
           <img src={selectedImage.value.src} alt="image preview" class="h-[340px] rounded-lg" />
         </CardBasic>

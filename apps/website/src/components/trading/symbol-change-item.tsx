@@ -16,7 +16,7 @@ export const SymbolChange = component$<SymbolChangeItemProps>(({ symbolQuote, on
     <button type="button" onClick$={onItemClick$}>
       <div
         class={[
-          'flex items-center justify-between gap-x-10 text-lg px-4 py-2 hover:border-2  hover:border-cyan-800 border-solid rounded-lg hover:bg-gray-900 transition-all duration-300 hover:scale-105 cursor-pointer',
+          'flex items-center justify-between gap-x-10 text-base px-4 py-2 hover:border-2  hover:border-cyan-800 border-solid rounded-lg hover:bg-gray-900 transition-all duration-300 hover:scale-105 cursor-pointer',
           isSelect ? 'border-2 border-cyan-800 bg-gray-900' : '',
         ]}
       >
