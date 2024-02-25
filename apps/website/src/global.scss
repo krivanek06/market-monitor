@@ -17,6 +17,7 @@ body {
   margin: 0;
   font-family: Prociono, sans-serif;
   background-color: black;
+  overflow-x: clip;
   @apply text-gray-200;
 }
 
@@ -34,4 +35,15 @@ body {
   &:not(:last-child) {
     @apply border-b border-solid border-gray-800;
   }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.g-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.g-no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

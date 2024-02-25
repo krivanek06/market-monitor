@@ -1,21 +1,54 @@
 import { component$ } from '@builder.io/qwik';
-import { CardBasic, ImagePreview } from '../../shared';
+import { CardBasic, ImagePreview, ImagePreviewProps } from '../../shared';
 import { CSS_HELPERS } from '../../utils';
 
 export const WelcomeInvestmentAccount = component$(() => {
   const images = [
-    '/images/app-1.png',
-    '/images/app-2.png',
-    '/images/app-3.png',
-    '/images/app-4.png',
-    '/images/app-5.png',
-    '/images/app-6.png',
-    '/images/app-7.png',
-    '/images/app-8.png',
-    '/images/app-9.png',
-    '/images/app-10.png',
-    '/images/app-11.png',
-  ];
+    {
+      src: '/images/app-4.png',
+      alt: 'Portfolio Growth',
+    },
+    {
+      src: '/images/app-5.png',
+      alt: 'Trading',
+    },
+    {
+      src: '/images/app-1.png',
+      alt: 'Transactions',
+    },
+    {
+      src: '/images/app-2.png',
+      alt: 'Holdings',
+    },
+    {
+      src: '/images/app-3.png',
+      alt: 'Allocation Chart',
+    },
+    {
+      src: '/images/app-6.png',
+      alt: 'User Ranks',
+    },
+    {
+      src: '/images/app-7.png',
+      alt: 'SP500 stats',
+    },
+    {
+      src: '/images/app-8.png',
+      alt: 'Treasure Bonds',
+    },
+    {
+      src: '/images/app-9.png',
+      alt: 'Dividend Calendar',
+    },
+    {
+      src: '/images/app-10.png',
+      alt: 'Advance Stock Search',
+    },
+    {
+      src: '/images/app-11.png',
+      alt: 'Groups Info',
+    },
+  ] satisfies ImagePreviewProps['images'];
 
   return (
     <div class="p-10 grid place-content-center">
@@ -45,7 +78,7 @@ export const WelcomeInvestmentAccount = component$(() => {
         </CardBasic>
       </div>
 
-      <div>
+      <div class="overflow-auto">
         <ImagePreview images={images} />
       </div>
     </div>

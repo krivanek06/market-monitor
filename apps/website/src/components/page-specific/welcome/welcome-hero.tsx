@@ -10,8 +10,12 @@ export const WelcomeHero = component$(() => {
       <h1 class={'lg:mt-[-180px] z-10 text-9xl ' + CSS_HELPERS.primaryTitle}>GG-Finance</h1>
 
       <div class="flex items-center gap-x-8 gap-y-4">
-        <Button label="Search" onClick$={() => console.log('lll')} class="flex-1 text-xl" />
-        <Button label="Dashboard" onClick$={() => console.log('lll')} class="flex-1 text-xl" />
+        <Button onClick$={() => console.log('lll')} class="flex-1 text-xl">
+          <span>Search</span>
+        </Button>
+        <Button onClick$={() => console.log('lll')} class="flex-1 text-xl">
+          <span>Dashboard</span>
+        </Button>
       </div>
     </section>
   );

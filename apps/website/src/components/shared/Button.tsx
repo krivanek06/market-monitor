@@ -1,8 +1,7 @@
-import { QRL, component$ } from '@builder.io/qwik';
+import { QRL, Slot, component$ } from '@builder.io/qwik';
 import { twMerge } from 'tailwind-merge';
 
 export type ButtonProps = {
-  label: string;
   onClick$: QRL<() => void>;
   class?: string;
 };
@@ -17,7 +16,7 @@ export const Button = component$<ButtonProps>((props) => {
         props.class,
       )}
     >
-      {props.label}
+      <Slot />
     </button>
   );
 });
