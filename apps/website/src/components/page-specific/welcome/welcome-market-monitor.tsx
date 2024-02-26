@@ -1,4 +1,4 @@
-import { $, Resource, component$, useResource$, useSignal } from '@builder.io/qwik';
+import { $, Resource, component$, useResource$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import { getHistoricalPricesCloudflare, getSymbolSummaries } from '@market-monitor/api-external';
 import { SymbolHistoricalPeriods, SymbolSummary } from '@market-monitor/api-types';
 import { getRandomElement } from '@market-monitor/shared/features/general-util';
@@ -33,6 +33,7 @@ export const WelcomeMarketMonitor = component$(() => {
 const MarketSymbolsSection = component$(() => {
   const selectedSummary = useSignal<SymbolSummary | null>(null);
   const reloadSummaries = useSignal(0);
+  const loadedSummariesArray = useSignal<SymbolSummary[]>([]);
 
   const onItemClick$ = $((summary: SymbolSummary) => {
     console.log('clicked', summary);
@@ -52,36 +53,36 @@ const MarketSymbolsSection = component$(() => {
     // track random variable to reload data
     track(reloadSummaries);
     // load more symbols if some of them are undefined, and display 8
-    const randomSymbols = getRandomElement(stockSymbols, 12);
+    const randomSymbols = getRandomElement(stockSymbols, 15);
     const data = await getSymbolSummaries(randomSymbols);
-    console.log(data);
-    return data.slice(0, 8);
+
+    // save data into an array and use useVisibleTask$ to select first one
+    loadedSummariesArray.value = data;
+    return data.slice(0, 12);
   });
 
-  // useTask$(({ track }) => {
-  //   track(() => loadedSummaries);
-
-  //   console.log('loaded summaries', loadedSummaries.value);
-  // });
+  useVisibleTask$(() => {
+    selectedSummary.value = loadedSummariesArray.value?.[0] || null;
+  });
 
   return (
     <>
       {/* loaded summaries about stocks */}
-      <div class="flex items-center gap-4 mb-16">
+      <div class="flex items-center gap-4 mb-10">
         {/* left button */}
         <div>
-          <Button class="h-16" onClick$={() => reloadSummaries.value++}>
+          <Button class="h-20" onClick$={() => reloadSummaries.value++}>
             <span class="material-symbols-outlined">arrow_back_ios</span>
           </Button>
         </div>
         {/* data */}
-        <div class="grid grid-cols-4 gap-x-8 gap-y-4 lg:px-10 flex-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-8 gap-y-4 lg:px-2 flex-1">
           <Resource
             value={loadedSummaries}
             onPending={() => (
               <>
-                {Array.from({ length: 8 }, (_, index) => (
-                  <div class="g-skeleton h-12"></div>
+                {Array.from({ length: 12 }, (_, index) => (
+                  <div key={index} class="g-skeleton h-12"></div>
                 ))}
               </>
             )}
@@ -101,7 +102,7 @@ const MarketSymbolsSection = component$(() => {
         </div>
         {/* right button */}
         <div>
-          <Button class="h-16" onClick$={() => reloadSummaries.value++}>
+          <Button class="h-20" onClick$={() => reloadSummaries.value++}>
             <span class="material-symbols-outlined">arrow_forward_ios</span>
           </Button>
         </div>

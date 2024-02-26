@@ -1,4 +1,4 @@
-import { component$ } from '@builder.io/qwik';
+import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 import {
   WelcomeAboutUs,
@@ -10,16 +10,46 @@ import {
 import { SVG1, SVG2 } from '../components/shared';
 
 export default component$(() => {
+  const blobRef = useSignal<HTMLDivElement | undefined>(undefined);
+
+  useVisibleTask$(() => {
+    const blobVal = blobRef.value;
+    if (!blobVal) {
+      return;
+    }
+
+    // change blob position on mouse move
+    window.onpointermove = (event) => {
+      const { pageX, pageY, clientX, clientY } = event;
+      //console.log(event);
+      //console.log(clientX, clientY);
+      blobVal.animate(
+        {
+          left: `${pageX}px`,
+          top: `${pageY}px`,
+        },
+        { duration: 20000, fill: 'forwards' },
+      );
+    };
+
+    // on reload page scroll to top
+    window.onbeforeunload = function () {
+      window.scrollTo(0, 0);
+    };
+  });
+
   return (
-    <div class="overflow-x-clip ">
+    <div class="overflow-x-clip">
+      {/* some svgs */}
+      <SVG2 class="absolute top-[250px] right-[-100px]" />
+
+      <div id="blob" ref={blobRef}></div>
+
       <img src="/images/hero-6.jpeg" class="absolute top-0 w-[100%] h-[70%] object-cover opacity-40" />
 
       <div class="max-w-[1600px] mx-auto">
         <div class="relative">
           <WelcomeHero />
-          {/* <SVG1 class="absolute bottom-[-145px] left-[100px] opacity-30" />
-        <SVG2 class="absolute bottom-0" /> */}
-          <SVG2 class="absolute top-[300px] right-[-140px]" />
         </div>
         <div class="relative mb-[140px]">
           <WelcomeMarketMonitor />
@@ -38,7 +68,6 @@ export default component$(() => {
         <div class="relative">
           <WelcomeAboutUs />
         </div>
-
         <footer class="min-h-[100px]"></footer>
       </div>
     </div>

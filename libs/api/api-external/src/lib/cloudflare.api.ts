@@ -61,13 +61,18 @@ export const getHistoricalPricesCloudflare = async (
     },
   });
 
-  if (!response.ok) {
-    console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
+  try {
+    if (!response.ok) {
+      console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
+      return [];
+    }
+
+    const data = (await response.json()) as HistoricalPrice[];
+    return data;
+  } catch (error) {
+    console.log(error);
     return [];
   }
-
-  const data = (await response.json()) as HistoricalPrice[];
-  return data;
 };
 
 export const postMarketOverview = async (overview: MarketOverview): Promise<string> => {

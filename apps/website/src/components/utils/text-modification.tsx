@@ -1,4 +1,4 @@
-import { $, component$, useSignal } from '@builder.io/qwik';
+import { $, component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 
 export const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -93,6 +93,8 @@ export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
       stopRandomTextGenerationLoop();
     }, 500);
   });
+
+  useVisibleTask$(() => initAnimation());
 
   return <span onMouseEnter$={() => initAnimation()}>{displayName}</span>;
 });

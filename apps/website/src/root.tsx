@@ -21,6 +21,8 @@ export default component$(() => {
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
         />
+        <link rel="icon" type="image/svg+xml" href="/images/icon-finance.png" />
+        <title>GGFinance</title>
       </head>
       <body lang="en">
         <RouterOutlet />

@@ -64,3 +64,64 @@ body {
     -webkit-text-stroke: 4px black;
   }
 }
+
+/* ---------- blob ---------- */
+
+#blob {
+  -webkit-filter: blur(25px);
+  -moz-filter: blur(25px);
+  -o-filter: blur(25px);
+  -ms-filter: blur(25px);
+  width: 350px;
+  height: 350px;
+  background: #374151;
+  transition: 0.15s linear;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  opacity: 0.2;
+  animation:
+    blobRadius 5s ease infinite,
+    rotate 20s infinite;
+}
+
+@keyframes blobRadius {
+  0%,
+  100% {
+    border-radius: 43% 77% 80% 40% / 40% 40% 80% 80%;
+  }
+  20% {
+    border-radius: 47% 73% 61% 59% / 47% 75% 45% 73%;
+  }
+  40% {
+    border-radius: 46% 74% 74% 46% / 74% 58% 62% 46%;
+  }
+  60% {
+    border-radius: 47% 73% 61% 59% / 40% 40% 80% 80%;
+  }
+  80% {
+    border-radius: 50% 70% 52% 68% / 51% 61% 59% 69%;
+  }
+}
+
+@keyframes rotate {
+  from {
+    rotate: 0deg;
+    scale: 1 1;
+  }
+
+  30% {
+    scale: 1.3 1.8;
+  }
+
+  70% {
+    scale: 1.2 1.5;
+  }
+
+  to {
+    rotate: 360deg;
+    scale: 1 1;
+  }
+}
+/* -------------------- */
