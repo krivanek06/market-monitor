@@ -5,19 +5,56 @@ import { getRandomElement } from '@market-monitor/shared/features/general-util';
 import { Button, CardBasic } from '../../shared';
 import { HistoricalPriceChart, SymbolChange, SymbolSummaryList } from '../../trading';
 import { stockSymbols } from '../../utils';
-
 export const WelcomeMarketMonitor = component$(() => {
+  useVisibleTask$(() => {
+    // gsap.registerPlugin(ScrollTrigger);
+    // const p1 = new SplitType('#mm-p1', { types: 'chars' });
+    // const p2 = new SplitType('#mm-p2', { types: 'chars' });
+    // (p1.chars ?? []).forEach((char) => {
+    //   gsap.from(char, {
+    //     scrollTrigger: {
+    //       trigger: char,
+    //       start: 'top 80%',
+    //       end: 'top 20%',
+    //       scrub: false,
+    //       markers: true,
+    //     },
+    //     scaleY: 0,
+    //     y: -20,
+    //     transformOrigin: 'top',
+    //     stagger: 0.1,
+    //     duration: 1.5,
+    //   });
+    // });
+    // (p2.chars ?? []).forEach((char) => {
+    //   gsap.from(char, {
+    //     scrollTrigger: {
+    //       trigger: char,
+    //       start: 'top 80%',
+    //       end: 'top 20%',
+    //       scrub: false,
+    //       markers: true,
+    //     },
+    //     scaleY: 0,
+    //     y: -20,
+    //     transformOrigin: 'top',
+    //     stagger: 0.1,
+    //     duration: 1.5,
+    //   });
+    // });
+  });
+
   return (
     <section class="p-10 grid place-content-center">
       <h2 class="g-section-title">Market Monitoring</h2>
 
       <div class="flex justify-around gap-10 text-gray-300 text-center mx-auto w-full lg:w-[80%] mb-16">
-        <p class="p-4 text-base">
+        <p id="mm-p1" class="p-4 text-base">
           Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolore corrupti natus maxime debitis, eos
           exercitationem hic perferendis sequi similique ducimus dolorum autem doloribus quod, animi ad eum deserunt,
           odit velit?
         </p>
-        <p class="p-4 text-base">
+        <p id="mm-p2" class="p-4 text-base">
           Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolore corrupti natus maxime debitis, eos
           exercitationem hic perferendis sequi similique ducimus dolorum autem doloribus quod, animi ad eum deserunt,
           odit velit?
