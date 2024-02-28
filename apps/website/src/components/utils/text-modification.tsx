@@ -7,6 +7,8 @@ export type TextModifactorProps = {
 };
 
 export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
+  const canStartAnimationAgain = useSignal(true);
+
   // always changing value
   const displayName = useSignal(name);
   // transforms name to masked text - XXXX
@@ -19,15 +21,7 @@ export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
 
   const interval = useSignal<any>(null);
 
-  const stopRandomTextGenerationLoop = $(() => {
-    if (interval.value) {
-      clearInterval(interval.value);
-    }
-  });
-
   const startRandomTextGenerationLoop = $(() => {
-    stopRandomTextGenerationLoop();
-
     interval.value = setInterval(() => {
       const newMastedText = displayName.value
         .split('')
@@ -81,20 +75,32 @@ export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
   });
 
   const generateBackToOriginal = $(async () => {
+    // used to stop the random text generation
+    if (interval.value) {
+      clearInterval(interval.value);
+    }
+
     await generateText(defaultMaskedText.value, displayName.value);
     await generateText(name, defaultMaskedText.value);
   });
 
-  const initAnimation = $(() => {
+  const initAnimation = $(async () => {
+    if (!canStartAnimationAgain.value) {
+      return;
+    }
+
+    canStartAnimationAgain.value = false;
     startRandomTextGenerationLoop();
 
-    setTimeout(() => {
-      generateBackToOriginal();
-      stopRandomTextGenerationLoop();
-    }, 500);
+    setTimeout(async () => {
+      await generateBackToOriginal();
+      canStartAnimationAgain.value = true;
+    }, 750);
   });
 
-  useVisibleTask$(() => initAnimation());
+  useVisibleTask$(() => {
+    generateBackToOriginal();
+  });
 
   return <span onMouseEnter$={() => initAnimation()}>{displayName}</span>;
 });

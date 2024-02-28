@@ -22,7 +22,7 @@ export const SymbolChange = component$<SymbolChangeItemProps>(({ symbolQuote, on
       >
         {/* symbol image & name */}
         <div class="flex items-center gap-3">
-          <img src={symbolUrlMerged} alt="symbol image" class="h-8 w-8" />
+          <img srcset={symbolUrlMerged} alt="symbol image" width={32} height={32} />
           <span>{symbolQuote.symbol}</span>
         </div>
 

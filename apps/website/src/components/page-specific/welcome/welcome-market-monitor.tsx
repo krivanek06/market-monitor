@@ -148,7 +148,7 @@ const MarketSymbolsSection = component$(() => {
         <div class="col-span-2">
           <Resource
             value={loadedHistoricalPrice}
-            onPending={() => <div class="g-skeleton h-[480px]"></div>}
+            onPending={() => <div class="g-skeleton h-[500px]"></div>}
             onResolved={(data) => <HistoricalPriceChart historicalPrice={data} symbolId={selectedSummary.value?.id} />}
           ></Resource>
         </div>
