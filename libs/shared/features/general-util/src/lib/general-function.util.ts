@@ -6,8 +6,8 @@ export const isNumber = (value: string | number | unknown): boolean => {
  *
  * @returns calculated growth in percentage between starting and ending values
  */
-export const calculateGrowth = (starting: number, ending: number) => {
-  if (ending === 0) {
+export const calculateGrowth = (starting?: number, ending?: number) => {
+  if (!starting || !ending || ending === 0) {
     return 0;
   }
   return roundNDigits(((starting - ending) / Math.abs(ending)) * 100);
@@ -43,6 +43,10 @@ export const groupValuesByDate = <T extends { date: string }>(data: T[]): { data
 
 export const getRandomIndex = (max: number): number => {
   return Math.floor(Math.random() * max);
+};
+
+export const getRandomElement = <T>(arr: T[], limit: number): T[] => {
+  return arr.sort(() => 0.5 - Math.random()).slice(0, limit);
 };
 
 export const formatValueIntoCurrency = (value?: string | number | null | unknown): string => {

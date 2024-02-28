@@ -72,9 +72,9 @@ import { BehaviorSubject, combineLatest, map, pipe, startWith } from 'rxjs';
     </section>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -196,7 +196,7 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
           gridLineColor: '#66666655',
           opposite: true,
           gridLineWidth: 1,
-          minorTickInterval: 'auto',
+          minorTickInterval: 'auto', // TODO: this one may cause problem, check if needed
           tickPixelInterval: 30,
           //minorGridLineWidth: 0, // gray-ish grid lines
           visible: true,

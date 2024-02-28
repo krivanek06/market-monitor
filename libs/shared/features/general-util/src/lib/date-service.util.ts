@@ -9,19 +9,14 @@ import {
   getWeek,
   getWeeksInMonth,
   getYear,
-  isAfter,
   isBefore,
   isSameDay,
   isWeekend,
-  setHours,
-  setMinutes,
-  setSeconds,
   startOfMonth,
   subDays,
   subMinutes,
   subYears,
 } from 'date-fns';
-import { zonedTimeToUtc } from 'date-fns-tz';
 import { STOCK_MARKET_CLOSED_DATES } from './constants';
 import { Spread } from './typescript.util';
 
@@ -58,21 +53,6 @@ export const dateGetDayDifference = (first: DateInput, second: DateInput): numbe
   const firstDate = new Date(first);
   const secondDate = new Date(second);
   return Math.abs(differenceInDays(firstDate, secondDate));
-};
-
-export const dateIsStockMarketOpen = (input: DateInput) => {
-  const currentDate = new Date(input);
-  if (isWeekend(currentDate)) {
-    return false; // Market is closed on weekends
-  }
-
-  const timeZone = 'America/New_York';
-  const utcCurrentDate = zonedTimeToUtc(currentDate, timeZone);
-
-  const marketOpeningTime = setHours(setMinutes(setSeconds(utcCurrentDate, 0), 30), 13); // 9:30 AM ET -> 13:30 UTC
-  const marketClosingTime = setHours(setMinutes(setSeconds(utcCurrentDate, 0), 0), 20); // 4:00 PM ET -> 20:00 UTC
-
-  return isAfter(utcCurrentDate, marketOpeningTime) && isBefore(utcCurrentDate, marketClosingTime);
 };
 
 export const isStockMarketHolidayDate = (input: DateInput): boolean => {
