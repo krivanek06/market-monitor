@@ -5,6 +5,7 @@ import { getRandomElement } from '@market-monitor/shared/features/general-util';
 import { Button, CardBasic } from '../../shared';
 import { HistoricalPriceChart, SymbolChange, SymbolSummaryList } from '../../trading';
 import { stockSymbols } from '../../utils';
+
 export const WelcomeMarketMonitor = component$(() => {
   useVisibleTask$(() => {
     // gsap.registerPlugin(ScrollTrigger);
@@ -48,16 +49,14 @@ export const WelcomeMarketMonitor = component$(() => {
     <section class="p-10 grid place-content-center">
       <h2 class="g-section-title">Market Monitoring</h2>
 
-      <div class="flex justify-around gap-10 text-gray-300 text-center mx-auto w-full lg:w-[80%] mb-16">
-        <p id="mm-p1" class="p-4 text-base">
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolore corrupti natus maxime debitis, eos
-          exercitationem hic perferendis sequi similique ducimus dolorum autem doloribus quod, animi ad eum deserunt,
-          odit velit?
+      <div class="grid md:grid-cols-2 gap-10 text-gray-300 text-center mx-auto w-full lg:w-[80%] mb-16">
+        <p id="mm-p1" class="p-4 text-lg">
+          Whether you're tracking blue-chip stocks or uncovering hidden gems in small-cap companies, we bring the entire
+          marketplace to your screen.
         </p>
-        <p id="mm-p2" class="p-4 text-base">
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolore corrupti natus maxime debitis, eos
-          exercitationem hic perferendis sequi similique ducimus dolorum autem doloribus quod, animi ad eum deserunt,
-          odit velit?
+        <p id="mm-p2" class="p-4 text-lg">
+          Explore stocks across various sectors, geographies, market caps, and get detailed financial information on
+          companies you are interested in.
         </p>
       </div>
 
@@ -79,7 +78,6 @@ const MarketSymbolsSection = component$(() => {
 
   const loadedHistoricalPrice = useResource$(({ track }) => {
     track(() => selectedSummary.value);
-    console.log('reloading historical data');
 
     return selectedSummary.value
       ? getHistoricalPricesCloudflare(selectedSummary.value.id, SymbolHistoricalPeriods.year)
@@ -99,6 +97,7 @@ const MarketSymbolsSection = component$(() => {
   });
 
   useVisibleTask$(() => {
+    // select first summary
     selectedSummary.value = loadedSummariesArray.value?.[0] || null;
   });
 

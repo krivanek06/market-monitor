@@ -188,7 +188,7 @@ export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ his
 
   return (
     <>
-      <div id="myChart" ref={myChart} style={{ width: '100%', height: '480px', display: 'block' }}></div>
+      <div id="myChart" ref={myChart} style={{ width: '100%', height: '500px', display: 'block' }}></div>
     </>
   );
 });

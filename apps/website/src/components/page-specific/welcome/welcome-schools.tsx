@@ -10,15 +10,13 @@ export const WelcomeSchools = component$(() => {
 
       {/* some info */}
       <div class="flex justify-around lg:w-9/12 mx-auto gap-x-10 gap-y-4 mb-[80px]">
-        <p class="text-center text-base">
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur, eaque nobis necessitatibus, perspiciatis
-          commodi dignissimos alias sit dolorem odit, vel deserunt at. Repellat voluptatibus veritatis dicta distinctio
-          ab. Asperiores, ipsum.
+        <p class="text-center text-lg">
+          Most of us wish that we’ve already started investing from an early age, that’s why want to create a platform
+          which provides basic understanding of finances for young adults.
         </p>
-        <p class="text-center text-base">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt, optio magnam? Accusantium, excepturi.
-          Alias, saepe, assumenda ea magnam quidem veritatis modi repellendus distinctio eveniet veniam vitae quaerat
-          itaque consectetur ratione?
+        <p class="text-center text-lg">
+          Create a demo trading account for your school, and let your students learn about investing in a fun and
+          engaging way. Compete, learn, and have fun with your friends.
         </p>
       </div>
 
@@ -35,20 +33,18 @@ export const WelcomeSchools = component$(() => {
       {/* some info */}
       <div class="grid lg:grid-cols-2 lg:px-10 lg:w-10/12 mx-auto">
         <div class="lg:w-9/12 grid gap-8">
-          <p class="text-base">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Est excepturi earum, facere impedit fuga, nulla
-            ipsum eligendi placeat veritatis dicta maiores. Necessitatibus, inventore quas quod aliquam quis rem numquam
-            ex.
+          <p class="text-lg">
+            Create <span class="text-cyan-700">Groups</span> to gather all your friend/classmates in one place and
+            compete within each other and with other groups in the application
           </p>
-          <p class="text-base">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo pariatur deserunt modi voluptatem maxime.
-            Nesciunt aliquam voluptatum iure qui, consectetur repudiandae eum? Et maiores quasi doloremque cupiditate
-            natus accusantium libero.
+          <p class="text-lg">
+            Inside <span class="text-cyan-700">Hall of Fame</span> you compete with all of users who has a demo account.
+            You can compare your trading strategy with others to see who is the better investor
           </p>
-          <p class="text-base">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo pariatur deserunt modi voluptatem maxime.
-            Nesciunt aliquam voluptatum iure qui, consectetur repudiandae eum? Et maiores quasi doloremque cupiditate
-            natus accusantium libero.
+          <p class="text-lg">
+            Made some bad trades with your demo account? No worries, you can always{' '}
+            <span class="text-cyan-700">reset your account</span> to start again. All your trading history will be
+            removed and you start fresh
           </p>
         </div>
         <div>
