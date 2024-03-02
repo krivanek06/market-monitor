@@ -7,44 +7,6 @@ import { HistoricalPriceChart, SymbolChange, SymbolSummaryList } from '../../tra
 import { stockSymbols } from '../../utils';
 
 export const WelcomeMarketMonitor = component$(() => {
-  useVisibleTask$(() => {
-    // gsap.registerPlugin(ScrollTrigger);
-    // const p1 = new SplitType('#mm-p1', { types: 'chars' });
-    // const p2 = new SplitType('#mm-p2', { types: 'chars' });
-    // (p1.chars ?? []).forEach((char) => {
-    //   gsap.from(char, {
-    //     scrollTrigger: {
-    //       trigger: char,
-    //       start: 'top 80%',
-    //       end: 'top 20%',
-    //       scrub: false,
-    //       markers: true,
-    //     },
-    //     scaleY: 0,
-    //     y: -20,
-    //     transformOrigin: 'top',
-    //     stagger: 0.1,
-    //     duration: 1.5,
-    //   });
-    // });
-    // (p2.chars ?? []).forEach((char) => {
-    //   gsap.from(char, {
-    //     scrollTrigger: {
-    //       trigger: char,
-    //       start: 'top 80%',
-    //       end: 'top 20%',
-    //       scrub: false,
-    //       markers: true,
-    //     },
-    //     scaleY: 0,
-    //     y: -20,
-    //     transformOrigin: 'top',
-    //     stagger: 0.1,
-    //     duration: 1.5,
-    //   });
-    // });
-  });
-
   return (
     <section class="p-10 grid place-content-center">
       <h2 class="g-section-title">Market Monitoring</h2>
@@ -72,7 +34,7 @@ const MarketSymbolsSection = component$(() => {
   const loadedSummariesArray = useSignal<SymbolSummary[]>([]);
 
   const onItemClick$ = $((summary: SymbolSummary) => {
-    console.log('clicked', summary);
+    // console.log('clicked', summary);
     selectedSummary.value = summary;
   });
 
@@ -90,6 +52,8 @@ const MarketSymbolsSection = component$(() => {
     // load more symbols if some of them are undefined, and display 8
     const randomSymbols = getRandomElement(stockSymbols, 15);
     const data = await getSymbolSummaries(randomSymbols);
+
+    // console.log('loaded', data.length, 'symbols');
 
     // save data into an array and use useVisibleTask$ to select first one
     loadedSummariesArray.value = data;
