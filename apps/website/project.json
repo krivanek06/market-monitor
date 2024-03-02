@@ -11,7 +11,9 @@
         "outputPath": "dist/apps/website"
       },
       "configurations": {
-        "preview": {}
+        "emptyOutDir": {
+          "outputPath": "dist/apps/website"
+        }
       }
     },
     "build.client": {
@@ -23,22 +25,9 @@
     },
     "build.ssr": {
       "executor": "@nx/vite:build",
-      "defaultConfiguration": "preview",
       "options": {
-        "outputPath": "dist/apps/website"
-      },
-      "configurations": {
-        "preview": {
-          "ssr": "src/entry.preview.tsx",
-          "mode": "production"
-        }
-      }
-    },
-    "preview": {
-      "executor": "@nx/vite:preview-server",
-      "options": {
-        "buildTarget": "website:build",
-        "port": 4173
+        "outputPath": "dist/apps/website",
+        "configFile": "apps/website/adapters/cloudflare-pages/vite.config.ts"
       }
     },
     "test": {
@@ -69,6 +58,18 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/website/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "CLOUDFLARE_API_TOKEN=sGcAnkvEVxuEG3UY4j5jsPZzg5AkW49NeUuNOtYN CLOUDFLARE_ACCOUNT_ID=f1df8b715072f0acab628276164c0494 wrangler pages deploy ./dist/apps/website --env production --project-name=\"ggfinance-website\""
+      }
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "wrangler pages dev dist/apps/website"
       }
     }
   },

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { GroupCreateInput, PortfolioTransactionCreate, UserAccountTypes, UserData } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { getCurrentDateDefaultFormat, waitSeconds } from '@market-monitor/shared/features/general-util';
 import { addDays, format, subDays } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
@@ -40,7 +40,7 @@ export const reloadDatabase = async (): Promise<void> => {
     await generateTransaction(userData);
 
     // wait 1 sec
-    await waitNSeconds(1);
+    await waitSeconds(1);
 
     console.log(`User created: ${i + 1}/${createUsers}`);
   }
@@ -92,10 +92,6 @@ const createGroups = async (users: UserData[]): Promise<void> => {
       await groupMemberAccept(userId, groupData.id);
     }
   }
-};
-
-const waitNSeconds = async (seconds: number): Promise<void> => {
-  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 };
 
 const deletePreviousData = async () => {

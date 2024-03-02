@@ -1,4 +1,5 @@
 import { $, component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import { waitSeconds } from '@market-monitor/shared/features/general-util';
 
 export const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -92,13 +93,17 @@ export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
     canStartAnimationAgain.value = false;
     startRandomTextGenerationLoop();
 
-    setTimeout(async () => {
-      await generateBackToOriginal();
-      canStartAnimationAgain.value = true;
-    }, 750);
+    // persist animation for a while
+    await waitSeconds(0.75);
+
+    // cancel animation
+    await generateBackToOriginal();
+    canStartAnimationAgain.value = true;
   });
 
-  useVisibleTask$(() => {
+  useVisibleTask$(async () => {
+    await waitSeconds(1);
+
     generateBackToOriginal();
   });
 
