@@ -4,11 +4,10 @@
   "license": "MIT",
   "scripts": {
     "mm:serve": "nx run market-monitor:serve",
+    "mm:build": "nx run market-monitor:build",
     "mm:deploy": "firebase deploy --only hosting",
     "mmd:serve": "nx run dashboard:serve",
-    "mm:build-sentry:ssr": "npm run mm:build:ssr && npm run sentry:sourcemaps",
-    "mm:deploy:ssr": "nx build market-monitor && firebase target:apply hosting market-monitor market-monitor-prod && firebase deploy --only hosting:market-monitor-prod",
-    "mm:deploy-sentry:ssr": "nx build market-monitor && npm run sentry:sourcemaps && firebase target:apply hosting market-monitor market-monitor-prod && firebase deploy --only hosting:market-monitor-prod",
+    "mmd:build": "nx run dashboard:build",
     "mm:cloud-function:build": "nx run cloud-functions:build",
     "mm:cloud-function:deploy": "npm run mm:cloud-function:build && firebase deploy --only functions",
     "firebase:export-indexes": "firebase firestore:indexes > firestore.indexes.json",

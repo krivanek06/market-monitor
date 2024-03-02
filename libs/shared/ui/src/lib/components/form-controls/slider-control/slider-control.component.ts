@@ -28,6 +28,7 @@ import { InputTypeSlider } from '@market-monitor/shared/data-access';
         [discrete]="true"
         [showTickMarks]="false"
         [displayWith]="formatLabel"
+        class="w-full"
       >
         <input matSliderThumb [formControl]="selectedValue" />
       </mat-slider>
@@ -48,10 +49,6 @@ import { InputTypeSlider } from '@market-monitor/shared/data-access';
     `
       :host {
         display: block;
-
-        mat-slider {
-          @apply w-full;
-        }
       }
     `,
   ],

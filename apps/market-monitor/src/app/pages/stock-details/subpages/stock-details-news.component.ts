@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Meta } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PageStockDetailsNewsComponent } from '@market-monitor/modules/page-builder';
 
 @Component({
@@ -9,25 +8,10 @@ import { PageStockDetailsNewsComponent } from '@market-monitor/modules/page-buil
   imports: [CommonModule, PageStockDetailsNewsComponent],
   template: `<app-page-stock-details-news></app-page-stock-details-news>`,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockDetailsNewsComponent implements OnInit {
-  constructor(private metaTagService: Meta) {}
-
-  ngOnInit(): void {
-    this.metaTagService.addTags([
-      {
-        name: 'keywords',
-        content: 'Company News',
-      },
-      {
-        name: 'description',
-        content: 'Latest news about publicly traded companies.',
-      },
-    ]);
-  }
-}
+export class StockDetailsNewsComponent {}

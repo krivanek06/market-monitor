@@ -197,7 +197,8 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
       </nav>
     </div>
   `,
-  styles: `
+  styles: [
+    `
       :host {
         display: block;
 
@@ -213,6 +214,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
         }
       }
     `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuTopNavigationComponent implements OnInit {

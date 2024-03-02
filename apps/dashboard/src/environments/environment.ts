@@ -9,13 +9,6 @@ export const environment = {
     measurementId: 'G-82FD6D7MMR',
   },
 
-  sentry: {
-    dns: 'https://a2f4f951e0ad6b5221e3ee68c18f18d1@o4505699066052608.ingest.sentry.io/4505708168151040',
-  },
-
-  endpointFunctionsURL: 'localhost:5001/market-monitor-prod/europe-west3',
-  // endpointFunctionsURL: 'jhgz46ksfq-ey.a.run.app',
-
   production: false,
   version: '1.0.0',
 };

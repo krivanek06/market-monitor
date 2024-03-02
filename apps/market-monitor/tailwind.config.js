@@ -38,10 +38,5 @@ module.exports = {
       ...defaultTheme.screens,
     },
   },
-  plugins: [
-    require('postcss-import'),
-    require('tailwindcss/nesting')(require('postcss-nesting')),
-    require('autoprefixer'),
-    require('tailwindcss'),
-  ],
+  plugins: [require('postcss-import'), require('tailwindcss/nesting'), require('autoprefixer'), require('tailwindcss')],
 };

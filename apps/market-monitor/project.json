@@ -10,7 +10,7 @@
       "executor": "@angular-devkit/build-angular:browser-esbuild",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/market-monitor/browser",
+        "outputPath": "dist/apps/market-monitor",
         "index": "apps/market-monitor/src/index.html",
         "main": "apps/market-monitor/src/main.ts",
         "polyfills": ["zone.js"],

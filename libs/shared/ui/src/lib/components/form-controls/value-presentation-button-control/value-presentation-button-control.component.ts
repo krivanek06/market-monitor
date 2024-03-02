@@ -22,7 +22,7 @@ import { InArrayPipe } from '../../../pipes';
       >
         <div class="flex flex-col">
           <div class="flex flex-row gap-2">
-            <img *ngIf="item.imageSrc as imageSrc" appDefaultImg [src]="imageSrc" />
+            <img *ngIf="item.imageSrc as imageSrc" appDefaultImg [src]="imageSrc" height="24px" />
             <div class="mr-2 text-lg text-wt-gray-light">{{ item.name }}</div>
           </div>
           <div class="flex flex-row gap-2">
@@ -39,10 +39,6 @@ import { InArrayPipe } from '../../../pipes';
     `
       :host {
         display: block;
-
-        img {
-          height: 24px;
-        }
 
         button {
           @apply px-4 p-1 rounded-lg m-1;

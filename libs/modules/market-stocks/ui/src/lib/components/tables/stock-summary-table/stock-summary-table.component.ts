@@ -288,7 +288,6 @@ import {
   styles: `
     .mat-column-symbol {
       min-width: 130px;
-      //width: 50%;
 
       @screen xs {
         width: 60%;

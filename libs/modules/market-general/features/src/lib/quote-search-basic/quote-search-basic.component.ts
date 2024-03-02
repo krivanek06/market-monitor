@@ -84,26 +84,28 @@ import { tap } from 'rxjs';
       </mat-autocomplete>
     </mat-form-field>
   `,
-  styles: `
-  :host {
-    display: block;
-  }
-
-  ::ng-deep {
-    .mat-mdc-autocomplete-panel {
-      max-height: 420px !important;
-
-      @screen md {
-        min-width: 600px;
+  styles: [
+    `
+      :host {
+        display: block;
       }
-    }
 
-    .small .mat-mdc-form-field-infix {
-      max-height: 45px !important;
-      min-height: 45px !important;
-    }
-  }
-`,
+      ::ng-deep {
+        .mat-mdc-autocomplete-panel {
+          max-height: 420px !important;
+
+          @screen md {
+            min-width: 600px;
+          }
+        }
+
+        .small .mat-mdc-form-field-infix {
+          max-height: 45px !important;
+          min-height: 45px !important;
+        }
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

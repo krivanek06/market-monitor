@@ -1,7 +1,9 @@
 name = "ggfinance-website"
+compatibility_flags = [ "nodejs_als" ]
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
 # Docs: https://developers.cloudflare.com/workers/platform/environment-variables
-[vars]
+[vars.production]
 CLOUDFLARE_API_TOKEN = "sGcAnkvEVxuEG3UY4j5jsPZzg5AkW49NeUuNOtYN"
+CLOUDFLARE_ACCOUNT_ID = "f1df8b715072f0acab628276164c0494"

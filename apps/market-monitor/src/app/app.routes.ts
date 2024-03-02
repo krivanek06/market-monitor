@@ -14,6 +14,10 @@ export const appRoutes: Routes = [
         title: 'Stock Details',
         loadChildren: () => import('./pages/stock-details/stock-details.component').then((m) => m.route),
       },
+      {
+        path: '**',
+        redirectTo: '',
+      },
     ],
   },
 ];

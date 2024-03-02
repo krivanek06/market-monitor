@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
-import { Meta } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MarketApiService } from '@market-monitor/api-client';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
@@ -28,43 +27,24 @@ import { environment } from 'apps/market-monitor/src/environments/environment';
     </section>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
 
-      a {
-        @apply transition-all duration-300 text-base hover:text-wt-gray-dark-strong;
-        min-width: fit-content;
-      }
+    a {
+      @apply transition-all duration-300 text-base hover:text-wt-gray-dark-strong;
+      min-width: fit-content;
+    }
 
-      a.is-active {
-        @apply text-wt-gray-dark-strong;
-      }
-    `,
+    a.is-active {
+      @apply text-wt-gray-dark-strong;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PublicRoutesComponent implements OnInit {
+export class PublicRoutesComponent {
   ROUTES_MAIN = ROUTES_MAIN;
   version = environment.version;
-
-  constructor(private metaTagService: Meta) {}
-
-  ngOnInit(): void {
-    this.metaTagService.addTags([
-      {
-        name: 'og:url',
-        content: 'search',
-      },
-      {
-        name: 'keywords',
-        content: 'Search Stocks',
-      },
-      {
-        name: 'description',
-        content: 'Search publicly traded companies.',
-      },
-    ]);
-  }
 }
 
 export const route: Routes = [

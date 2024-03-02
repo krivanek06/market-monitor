@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Meta } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PageStockDetailsTradesComponent } from '@market-monitor/modules/page-builder';
 @Component({
   selector: 'app-stock-details-trades',
@@ -8,25 +7,10 @@ import { PageStockDetailsTradesComponent } from '@market-monitor/modules/page-bu
   imports: [CommonModule, PageStockDetailsTradesComponent],
   template: `<app-page-stock-details-trades></app-page-stock-details-trades>`,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockDetailsTradesComponent implements OnInit {
-  constructor(private metaTagService: Meta) {}
-
-  ngOnInit(): void {
-    this.metaTagService.addTags([
-      {
-        name: 'keywords',
-        content: 'Financial trades',
-      },
-      {
-        name: 'description',
-        content: 'Financial trades about publicly traded companies.',
-      },
-    ]);
-  }
-}
+export class StockDetailsTradesComponent {}
