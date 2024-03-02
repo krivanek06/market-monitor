@@ -11,7 +11,9 @@
         "outputPath": "dist/apps/website"
       },
       "configurations": {
-        "preview": {}
+        "emptyOutDir": {
+          "outputPath": "dist/apps/website"
+        }
       }
     },
     "build.client": {
