@@ -17,6 +17,7 @@
     "test:all": " nx run-many --target=test --passWithNoTests",
     "website:serve": "nx run website:serve",
     "website:build": "nx run website:build",
+    "website:preview": "nx run website:preview",
     "website:deploy": "nx run website:deploy"
   },
   "private": true,
