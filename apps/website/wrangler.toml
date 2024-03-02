@@ -1,0 +1,7 @@
+name = "ggfinance-website"
+
+# Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
+# Note: Use secrets to store sensitive data.
+# Docs: https://developers.cloudflare.com/workers/platform/environment-variables
+[vars]
+CLOUDFLARE_API_TOKEN = "sGcAnkvEVxuEG3UY4j5jsPZzg5AkW49NeUuNOtYN"
