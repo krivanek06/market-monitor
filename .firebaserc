@@ -7,6 +7,9 @@
       "hosting": {
         "market-monitor-prod": [
           "market-monitor-prod"
+        ],
+        "dashboard-prod": [
+          "market-monitor-dashboard-prod"
         ]
       }
     }

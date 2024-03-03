@@ -8,6 +8,7 @@
     "mm:deploy": "firebase deploy --only hosting",
     "mmd:serve": "nx run dashboard:serve",
     "mmd:build": "nx run dashboard:build",
+    "mmd:deploy": "firebase deploy --only hosting:dashboard-prod",
     "mm:cloud-function:build": "nx run cloud-functions:build",
     "mm:cloud-function:deploy": "npm run mm:cloud-function:build && firebase deploy --only functions",
     "firebase:export-indexes": "firebase firestore:indexes > firestore.indexes.json",

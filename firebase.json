@@ -10,6 +10,17 @@
           "destination": "/index.html"
         }
       ]
+    },
+    {
+      "target": "dashboard-prod",
+      "public": "./dist/apps/dashboard",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
     }
   ],
   "functions": [
