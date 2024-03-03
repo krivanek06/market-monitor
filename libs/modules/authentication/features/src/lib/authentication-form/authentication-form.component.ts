@@ -13,7 +13,7 @@ import {
   LoginUserInput,
   RegisterUserInput,
 } from '@market-monitor/modules/authentication/data-access';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
+import { IS_DEV_TOKEN, ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
 import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, catchError, filter, from, switchMap, take, tap } from 'rxjs';
@@ -34,6 +34,10 @@ import { FormRegisterComponent } from './form-register/form-register.component';
     MatProgressSpinnerModule,
   ],
   template: `
+    <div *ngIf="!isDevActive" class="mb-4 text-center text-xl">
+      Application is currently under development, please come back later.
+    </div>
+
     <mat-tab-group *ngIf="!loadingSnipperShowSignal(); else loader">
       <mat-tab label="Login">
         <app-form-login [formControl]="loginUserInputControl"></app-form-login>
@@ -46,7 +50,9 @@ import { FormRegisterComponent } from './form-register/form-register.component';
         <h2 class="text-lg text-center text-wt-primary-dark">Social Media Login</h2>
 
         <div class="px-4 mt-4">
-          <button mat-stroked-button (click)="onGoogleAuth()" color="warn" class="w-full">Google</button>
+          <button [disabled]="!isDevActive" mat-stroked-button (click)="onGoogleAuth()" color="warn" class="w-full">
+            Google
+          </button>
         </div>
 
         <div class="my-4">
@@ -56,17 +62,21 @@ import { FormRegisterComponent } from './form-register/form-register.component';
         <!-- development -->
         <h2 class="text-lg text-center text-wt-primary-dark">Demo Account Login</h2>
         <div class="px-4 mt-4">
-          <button mat-stroked-button color="accent" class="w-full" type="button" (click)="onDemoLogin()">
+          <button
+            [disabled]="!isDevActive"
+            mat-stroked-button
+            color="accent"
+            class="w-full"
+            type="button"
+            (click)="onDemoLogin()"
+          >
             Demo Login
           </button>
         </div>
       </mat-tab>
-      <mat-tab label="Register">
+      <mat-tab [disabled]="!isDevActive" label="Register">
         <app-form-register [formControl]="registerUserInputControl"></app-form-register>
       </mat-tab>
-      <!-- <mat-tab label="Forgot Password">
-    <app-form-forgot-password [formControl]="forgotPasswordInputControl"></app-form-forgot-password>
-  </mat-tab> -->
     </mat-tab-group>
 
     <!-- loader -->
@@ -78,10 +88,10 @@ import { FormRegisterComponent } from './form-register/form-register.component';
     </ng-template>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthenticationFormComponent {
@@ -92,6 +102,10 @@ export class AuthenticationFormComponent {
   private dialogServiceUtil = inject(DialogServiceUtil);
   private router = inject(Router);
   private zone = inject(NgZone);
+  isDevActive = inject(IS_DEV_TOKEN, {
+    optional: true,
+  });
+
   loadingSnipperShowSignal = signal(false);
 
   constructor() {

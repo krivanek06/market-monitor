@@ -19,6 +19,7 @@ import {
   AUTHENTICATION_ACCOUNT_TOKEN,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
+import { IS_DEV_TOKEN } from '@market-monitor/shared/data-access';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 // import { provideAnimationsAsync } from '@angular/platform-browser/animations-async';
@@ -54,6 +55,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: AUTHENTICATION_ACCOUNT_TOKEN,
       useExisting: AuthenticationUserStoreService,
+    },
+    {
+      provide: IS_DEV_TOKEN,
+      useValue: !environment.production,
     },
     {
       provide: APP_INITIALIZER,
