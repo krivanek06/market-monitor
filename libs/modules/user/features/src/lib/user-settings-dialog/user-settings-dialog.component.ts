@@ -237,7 +237,7 @@ export class UserSettingsDialogComponent implements OnInit {
 
   onChangeAccountType(): void {
     this.dialog.open(UserAccountTypeSelectDialogComponent, {
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
     });
   }
 

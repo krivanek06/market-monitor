@@ -19,7 +19,7 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
   template: `
     <app-dialog-close-header title="Available Account Types"></app-dialog-close-header>
 
-    <p class="text-center mb-6 md:w-9/12 mx-auto">
+    <p class="text-center mb-6 md:w-9/12 mx-auto text-xl">
       At the current application development we have two accounts available for user. Read below their use and select
       wisely. You can change you account type anytime, however your trading history will be reset.
     </p>
@@ -32,8 +32,9 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
             class="p-3 rounded-lg border "
             (click)="changeAccount(UserAccountTypes.Basic)"
             [ngClass]="{
-              'border-wt-primary pointer-events-none': userAccountTypeSignal() === UserAccountTypes.Basic,
-              'g-clickable-hover opacity-85 hover:opacity-100': userAccountTypeSignal() !== UserAccountTypes.Basic
+              'border-wt-primary border-2 pointer-events-none': userAccountTypeSignal() === UserAccountTypes.Basic,
+              'g-clickable-hover opacity-85 hover:opacity-100 bg-wt-gray-light-strong hover:bg-transparent':
+                userAccountTypeSignal() !== UserAccountTypes.Basic
             }"
           >
             <div class="mb-2 text-lg text-wt-primary text-center">Basic Account</div>
@@ -47,7 +48,7 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
             (click)="changeAccount(UserAccountTypes.Trading)"
             class="p-3 rounded-lg border"
             [ngClass]="{
-              'border-wt-primary pointer-events-none': userAccountTypeSignal() === UserAccountTypes.Trading,
+              'border-wt-primary border-2 pointer-events-none': userAccountTypeSignal() === UserAccountTypes.Trading,
               'g-clickable-hover opacity-85 hover:opacity-100': userAccountTypeSignal() !== UserAccountTypes.Trading
             }"
           >
