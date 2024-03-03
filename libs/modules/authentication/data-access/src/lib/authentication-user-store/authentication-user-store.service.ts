@@ -185,6 +185,7 @@ export class AuthenticationUserStoreService {
       getUserGroupData: () => state().userGroupData!,
       getUserPortfolioTransactions: () => state().portfolioTransactions,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
+      userHaveTransactions: () => state().portfolioTransactions.length > 0,
     }),
   });
 
@@ -213,6 +214,12 @@ export class AuthenticationUserStoreService {
         symbol,
         symbolType,
       }),
+    });
+  }
+
+  clearUserWatchList(): void {
+    updateDoc(this.getUserWatchlistDocRef(), {
+      data: [],
     });
   }
 

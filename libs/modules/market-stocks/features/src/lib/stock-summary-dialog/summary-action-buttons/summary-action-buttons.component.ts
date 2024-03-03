@@ -86,10 +86,10 @@ import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manage
     </mat-dialog-actions>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SummaryActionButtonsComponent implements OnInit {
@@ -164,7 +164,10 @@ export class SummaryActionButtonsComponent implements OnInit {
       await this.authenticationUserService.addSymbolToUserWatchList(this.symbolSummary.id, 'STOCK');
 
       // show notification
-      this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been added into watchlist`);
+      this.dialogServiceUtil.showNotificationBar(
+        `Symbol: ${this.symbolSummary.id} has been added into watchlist`,
+        'success',
+      );
       this.checkIfSymbolInWatchList();
     }
   }

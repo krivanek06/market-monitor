@@ -37,7 +37,11 @@ import { filterNil } from 'ngxtension/filter-nil';
         <app-section-title [title]="headerTitle()" />
 
         <!-- date range -->
-        <app-date-range-slider class="w-full lg:w-[550px]" [formControl]="sliderControl" />
+        <app-date-range-slider
+          *ngIf="data().values.length > 0"
+          class="w-full lg:w-[550px]"
+          [formControl]="sliderControl"
+        />
       </div>
 
       <highcharts-chart
@@ -53,10 +57,10 @@ import { filterNil } from 'ngxtension/filter-nil';
     }
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioGrowthChartComponent extends ChartConstructor implements OnChanges {
