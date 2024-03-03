@@ -183,8 +183,8 @@ export class AuthenticationUserStoreService {
       getUserAccountType: () =>
         state().userData?.features?.allowPortfolioCashAccount ? UserAccountTypes.Trading : UserAccountTypes.Basic,
       getUserGroupData: () => state().userGroupData!,
-      getUserPortfolioTransactions: () => state().portfolioTransactions,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
+      getUserPortfolioTransactions: () => state().portfolioTransactions,
       userHaveTransactions: () => state().portfolioTransactions.length > 0,
     }),
   });
