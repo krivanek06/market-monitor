@@ -1,6 +1,5 @@
 import { provideHttpClient } from '@angular/common/http';
 import { ApplicationConfig } from '@angular/core';
-import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   PreloadAllModules,
@@ -29,7 +28,7 @@ export const appConfig: ApplicationConfig = {
       // withViewTransitions(),
     ),
     provideAnimations(),
-    provideClientHydration(),
+    // provideClientHydration(),
     // withNoHttpTransferCache(),
     // {
     //   provide: ErrorHandler,

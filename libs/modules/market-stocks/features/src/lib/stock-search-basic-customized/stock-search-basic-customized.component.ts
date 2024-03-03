@@ -10,10 +10,10 @@ import {
   Optional,
   Output,
   ViewChild,
+  computed,
   inject,
   signal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -25,8 +25,7 @@ import {
 } from '@market-monitor/modules/authentication/data-access';
 import { SymbolFavoriteService, SymbolSearchService } from '@market-monitor/modules/market-stocks/data-access';
 import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { ElementFocusDirective, QuoteItemComponent } from '@market-monitor/shared/ui';
-import { iif, startWith, switchMap } from 'rxjs';
+import { ElementFocusDirective, QuoteItemComponent, RangeDirective } from '@market-monitor/shared/ui';
 import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-basic.component';
 import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summary-dialog.component';
 
@@ -42,6 +41,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
     MatButtonModule,
     MatCheckboxModule,
     ElementFocusDirective,
+    RangeDirective,
   ],
   template: `
     <app-stock-search-basic
@@ -82,10 +82,11 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
         <!-- checkbox changing displayed stock summaries -->
         <div *ngIf="!isUserAuthenticatedSignal()" class="flex items-center justify-between mb-1">
           <span class="text-base text-wt-gray-medium">
-            <ng-container *ngIf="!showFavoriteStocks.value">Last Searched</ng-container>
-            <ng-container *ngIf="showFavoriteStocks.value">Favorite Stocks</ng-container>
+            {{ showFavoriteStocks() ? 'Favorite Stocks' : 'Last Searched' }}
           </span>
-          <mat-checkbox color="primary" [formControl]="showFavoriteStocks"> Show Favorites </mat-checkbox>
+          <mat-checkbox color="primary" [checked]="showFavoriteStocks()" (change)="onShowFavoriteChange()">
+            Show Favorites
+          </mat-checkbox>
         </div>
 
         <!-- display summaries as buttons -->
@@ -98,14 +99,31 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
         >
           <app-quote-item [displayValue]="displayValue" [symbolQuote]="summary.quote"></app-quote-item>
         </button>
+
+        <!-- display default symbols -->
+        @if (getDefaultSymbols().length > 0) {
+          @if (!showFavoriteStocks() && displayedStocksSignal().length < 10) {
+            <button
+              mat-button
+              *ngFor="let summary of getDefaultSymbols()"
+              (click)="onSummaryClick(summary)"
+              class="w-full h-12 max-sm:mb-2"
+              type="button"
+            >
+              <app-quote-item [displayValue]="displayValue" [symbolQuote]="summary.quote"></app-quote-item>
+            </button>
+          }
+        } @else {
+          <div *ngRange="10" class="g-skeleton h-11 mb-1"></div>
+        }
       </div>
     </ng-template>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {
   @Output() clickedSummary = new EventEmitter<SymbolSummary>();
@@ -126,7 +144,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
    * selected stock summary from StockSearchBasicComponent
    */
   searchControl = new FormControl<SymbolSummary | null>(null);
-  showFavoriteStocks = new FormControl<boolean>(false, { nonNullable: true });
+  showFavoriteStocks = signal(false);
 
   overlayWidth = signal(0);
   overlayIsOpen = signal({
@@ -152,18 +170,13 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
   /**
    * display stock summaries based on whether showFavoriteStocks is true or false
    */
-  displayedStocksSignal = toSignal(
-    this.showFavoriteStocks.valueChanges.pipe(
-      startWith(this.showFavoriteStocks.value),
-      switchMap((showFavoriteStocks) =>
-        iif(
-          () => showFavoriteStocks,
-          this.symbolFavoriteService.getFavoriteSymbols(),
-          this.symbolSearchService.getSearchedSymbols(),
-        ),
-      ),
-    ),
+
+  displayedStocksSignal = computed(() =>
+    this.showFavoriteStocks()
+      ? this.symbolFavoriteService.getFavoriteSymbols()
+      : this.symbolSearchService.getSearchedSymbols(),
   );
+  getDefaultSymbols = this.symbolSearchService.getDefaultSymbols;
 
   ngOnInit(): void {
     this.searchControl.valueChanges.subscribe((value) => {
@@ -206,5 +219,9 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     }
 
     this.clickedSummary.emit(summary);
+  }
+
+  onShowFavoriteChange() {
+    this.showFavoriteStocks.set(!this.showFavoriteStocks());
   }
 }

@@ -115,9 +115,8 @@ export class SummaryActionButtonsComponent implements OnInit {
 
   ngOnInit(): void {
     // check if symbol in favorite
-    this.symbolFavoriteService.isSymbolInFavoriteObs(this.symbolSummary.id).subscribe((isInFavorite) => {
-      this.isSymbolInFavoriteSignal.set(isInFavorite);
-    });
+    const isInFavorite = this.symbolFavoriteService.isSymbolInFavoriteObs(this.symbolSummary.id);
+    this.isSymbolInFavoriteSignal.set(isInFavorite);
 
     // check if symbol in watchList
     this.checkIfSymbolInWatchList();
@@ -135,6 +134,7 @@ export class SummaryActionButtonsComponent implements OnInit {
       symbolType: 'STOCK',
       symbol: this.symbolSummary.id,
     });
+    this.isSymbolInFavoriteSignal.set(true);
     this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been added into favorites`);
   }
 
@@ -143,6 +143,7 @@ export class SummaryActionButtonsComponent implements OnInit {
       symbolType: 'STOCK',
       symbol: this.symbolSummary.id,
     });
+    this.isSymbolInFavoriteSignal.set(false);
     this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been removed from favorites`);
   }
 

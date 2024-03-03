@@ -1,30 +1,25 @@
-import { Injectable } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import { StocksApiService } from '@market-monitor/api-client';
 import { SymbolSearch, SymbolSummary } from '@market-monitor/api-types';
 import { StorageLocalStoreService } from '@market-monitor/shared/features/general-features';
-
-import { BehaviorSubject, Observable, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch[]> {
-  private favoriteSymbols$ = new BehaviorSubject<SymbolSummary[]>([]);
+  private favoriteSymbols = signal<SymbolSummary[]>([]);
 
   constructor(private stocksApiService: StocksApiService) {
     super('SYMBOL_FAVORITE', []);
     this.initService();
   }
 
-  getFavoriteSymbols(): Observable<SymbolSummary[]> {
-    return this.favoriteSymbols$.asObservable();
-  }
+  getFavoriteSymbols = computed(() => this.favoriteSymbols());
 
-  isSymbolInFavoriteObs(symbol: string): Observable<boolean> {
-    return this.favoriteSymbols$.asObservable().pipe(
-      map((values) => values.map((d) => d.id)),
-      map((symbols) => symbols.includes(symbol)),
-    );
+  isSymbolInFavoriteObs(symbol: string): boolean {
+    return this.favoriteSymbols()
+      .map((values) => values.id)
+      .includes(symbol);
   }
 
   addFavoriteSymbol(searchSymbol: SymbolSearch): void {
@@ -39,7 +34,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
     this.stocksApiService.getStockSummary(searchSymbol.symbol).subscribe((stockSummary) => {
       // save data into array, limit to 12
       if (stockSummary) {
-        this.persistData([searchSymbol, ...savedData], [stockSummary, ...this.favoriteSymbols$.getValue()]);
+        this.persistData([searchSymbol, ...savedData], [stockSummary, ...this.favoriteSymbols()]);
       }
     });
   }
@@ -49,7 +44,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
 
     // remove from favoriteSymbols$
     const newSavedData = savedData.filter((s) => s.symbol !== searchSymbol.symbol);
-    const newSummaries = this.favoriteSymbols$.getValue().filter((s) => s.id !== searchSymbol.symbol);
+    const newSummaries = this.favoriteSymbols().filter((s) => s.id !== searchSymbol.symbol);
 
     // remove from storage
     this.persistData(newSavedData, newSummaries);
@@ -63,7 +58,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
     this.saveData(symbolFavoriteSlice);
 
     // save into subject
-    this.favoriteSymbols$.next(symbolSummariesSlice);
+    this.favoriteSymbols.set(symbolSummariesSlice);
   }
 
   /**
@@ -75,7 +70,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
 
     // load favorite stocks from api and last searched stocks from api
     this.stocksApiService.getStockSummaries(symbols).subscribe((favoriteStocks) => {
-      this.favoriteSymbols$.next(favoriteStocks);
+      this.favoriteSymbols.set(favoriteStocks);
     });
   }
 }
