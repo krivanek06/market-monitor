@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { MarketApiService } from '@market-monitor/api-client';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { environment } from 'apps/market-monitor/src/environments/environment';
 
@@ -60,12 +59,6 @@ export const route: Routes = [
       {
         path: ROUTES_MAIN.SEARCH,
         title: 'Search',
-        resolve: {
-          generalNews: () => {
-            const marketApiService = inject(MarketApiService);
-            return marketApiService.getNews('general');
-          },
-        },
         loadComponent: () => import('./subpages/search.component').then((m) => m.SearchComponent),
       },
       {
