@@ -9,6 +9,7 @@ import {
   WelcomeSchools,
 } from '../components/page-specific/welcome';
 import { SVG1, SVG2 } from '../components/shared';
+import { websiteImageUrls } from '../components/utils';
 
 export default component$(() => {
   const wholePageRef = useSignal<HTMLDivElement | undefined>(undefined);
@@ -92,7 +93,7 @@ export default component$(() => {
       duration: 2000,
     });
 
-    // change BG color back to black
+    // remove / add css classes which should be applied after the animation
     if (wholePageRef.value) {
       wholePageRef.value.style.backgroundColor = 'black';
     }
@@ -102,10 +103,15 @@ export default component$(() => {
     if (blobRef.value) {
       blobRef.value.classList.remove('hidden');
     }
+    if (heroBgImageRef.value) {
+      heroBgImageRef.value.classList.remove('hidden');
+    }
   });
 
+  const heroImage = `${websiteImageUrls}/hero-6.webp`;
+
   return (
-    <div ref={wholePageRef} class="overflow-x-clip">
+    <div ref={wholePageRef} class="overflow-x-clip relative">
       {/* some svgs */}
       <SVG2 forwardRef={svg2Ref} class="absolute top-[250px] right-[-100px] hidden" />
 
@@ -114,8 +120,8 @@ export default component$(() => {
       <img
         ref={heroBgImageRef}
         id="hero-bg"
-        src="/images/hero-6.jpeg"
-        class="absolute top-0 w-[100%] h-[70%] object-cover opacity-40 hidden"
+        src={heroImage}
+        class="absolute top-0 w-[100%] h-[500px] object-cover opacity-40 hidden"
       />
 
       <div class="max-w-[1600px] mx-auto">

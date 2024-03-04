@@ -39,8 +39,10 @@ admin.firestore().settings({
 export * from './group';
 export * from './market-functions';
 export * from './portfolio';
-export * from './testing-functions';
 export * from './user';
 
 // -------- Scheduler ---------
 export * from './schedulers';
+
+// -------- Testing ---------
+// export * from './testing-functions';

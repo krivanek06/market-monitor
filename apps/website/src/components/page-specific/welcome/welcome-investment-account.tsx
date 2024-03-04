@@ -1,50 +1,51 @@
 import { component$ } from '@builder.io/qwik';
 import { CardBasic, ImagePreview, ImagePreviewProps } from '../../shared';
+import { websiteImageUrls } from '../../utils';
 
 export const WelcomeInvestmentAccount = component$(() => {
   const images = [
     {
-      src: '/images/app-4.png',
+      src: `${websiteImageUrls}/app-4.webp`,
       alt: 'Portfolio Growth',
     },
     {
-      src: '/images/app-5.png',
+      src: `${websiteImageUrls}/app-5.webp`,
       alt: 'Trading',
     },
     {
-      src: '/images/app-1.png',
+      src: `${websiteImageUrls}/app-1.webp`,
       alt: 'Transactions',
     },
     {
-      src: '/images/app-2.png',
+      src: `${websiteImageUrls}/app-2.webp`,
       alt: 'Holdings',
     },
     {
-      src: '/images/app-3.png',
+      src: `${websiteImageUrls}/app-3.webp`,
       alt: 'Allocation Chart',
     },
     {
-      src: '/images/app-6.png',
+      src: `${websiteImageUrls}/app-6.webp`,
       alt: 'User Ranks',
     },
     {
-      src: '/images/app-7.png',
+      src: `${websiteImageUrls}/app-7.webp`,
       alt: 'SP500 stats',
     },
     {
-      src: '/images/app-8.png',
+      src: `${websiteImageUrls}/app-8.webp`,
       alt: 'Treasure Bonds',
     },
     {
-      src: '/images/app-9.png',
+      src: `${websiteImageUrls}/app-9.webp`,
       alt: 'Dividend Calendar',
     },
     {
-      src: '/images/app-10.png',
+      src: `${websiteImageUrls}/app-10.webp`,
       alt: 'Advance Stock Search',
     },
     {
-      src: '/images/app-11.png',
+      src: `${websiteImageUrls}/app-11.webp`,
       alt: 'Groups Info',
     },
   ] satisfies ImagePreviewProps['images'];
