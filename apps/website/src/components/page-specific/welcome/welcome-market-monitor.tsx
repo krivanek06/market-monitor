@@ -85,11 +85,11 @@ const MarketSymbolsSection = component$(() => {
           <Resource
             value={loadedSummaries}
             onPending={() => (
-              <>
+              <div class="hidden md:grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-8 gap-y-4 ">
                 {Array.from({ length: 8 }, (_, index) => (
                   <div key={index} class="g-skeleton h-12"></div>
                 ))}
-              </>
+              </div>
             )}
             onResolved={(data) => (
               <>
