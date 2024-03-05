@@ -48,7 +48,7 @@ type AuthenticationState = {
   user: User | null;
   userData: UserData | null;
   userGroupData: UserGroupData | null;
-  portfolioTransactions: PortfolioTransaction[];
+  portfolioTransactions: PortfolioTransaction[] | null;
   watchList: UserWatchList;
 };
 
@@ -115,7 +115,9 @@ export class AuthenticationUserStoreService {
   private portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-    switchMap((userData) => (userData ? this.getUserPortfolioTransactions().pipe(map((d) => d.transactions)) : of([]))),
+    switchMap((userData) =>
+      userData ? this.getUserPortfolioTransactions().pipe(map((d) => d.transactions)) : of(null),
+    ),
     map((transactions) => ({
       portfolioTransactions: transactions,
     })),
@@ -185,7 +187,7 @@ export class AuthenticationUserStoreService {
       getUserGroupData: () => state().userGroupData!,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
       getUserPortfolioTransactions: () => state().portfolioTransactions,
-      userHaveTransactions: () => state().portfolioTransactions.length > 0,
+      userHaveTransactions: () => (state().portfolioTransactions?.length ?? 0) > 0,
     }),
   });
 

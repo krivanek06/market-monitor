@@ -23,7 +23,7 @@ export class PortfolioUserFacadeService {
     ]).pipe(
       switchMap(([transactions, portfolioState]) =>
         portfolioState
-          ? this.portfolioGrowthService.getPortfolioStateHoldings(transactions, portfolioState)
+          ? this.portfolioGrowthService.getPortfolioStateHoldings(transactions ?? [], portfolioState)
           : of(undefined),
       ),
     ),
@@ -37,7 +37,9 @@ export class PortfolioUserFacadeService {
    */
   getPortfolioGrowthAssets = toSignal(
     toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
-      switchMap((transactions) => from(this.portfolioGrowthService.getPortfolioGrowthAssets(transactions))),
+      switchMap((transactions) =>
+        transactions ? from(this.portfolioGrowthService.getPortfolioGrowthAssets(transactions)) : of(undefined),
+      ),
     ),
   );
 
@@ -46,6 +48,7 @@ export class PortfolioUserFacadeService {
    */
   getPortfolioGrowth = computed(() => {
     const growth = this.getPortfolioGrowthAssets();
+
     return growth
       ? this.portfolioCalculationService.getPortfolioGrowth(growth, this.getPortfolioState()?.startingCash)
       : null;
@@ -68,6 +71,6 @@ export class PortfolioUserFacadeService {
 
   getPortfolioTransactionToDate = computed(() => {
     const transactions = this.authenticationUserService.state.getUserPortfolioTransactions();
-    return this.portfolioCalculationService.getPortfolioTransactionToDate(transactions);
+    return this.portfolioCalculationService.getPortfolioTransactionToDate(transactions ?? []);
   });
 }

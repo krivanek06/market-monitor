@@ -31,8 +31,8 @@ export const WelcomeSchools = component$(() => {
       </div>
 
       {/* some info */}
-      <div class="grid lg:grid-cols-2 lg:px-10 lg:w-10/12 mx-auto p-4 md:p-10 gap-10">
-        <div class="lg:w-9/12 grid gap-8">
+      <div class="grid lg:grid-cols-2 xl:px-10 xl:w-10/12 mx-auto p-4 md:p-10 gap-10">
+        <div class="lg:w-11/12 xl:w-9/12 grid gap-8">
           <p class="text-lg">
             Create <span class="text-cyan-700">Groups</span> to gather all your friend/classmates in one place and
             compete within each other and with other groups in the application

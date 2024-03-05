@@ -7,7 +7,7 @@ export const WelcomeHero = component$(() => {
     <section class="h-screen grid place-content-center">
       <h1
         class={
-          'lg:mt-[-180px] z-10 text-6xl bg-clip-text text-transparent inline-block bg-gradient-to-b from-cyan-700 to-black animate-in fade-in zoom-in duration-2000 font-outline-4 '
+          ' mt-[-100px] md:mt-[-180px] z-10 text-6xl bg-clip-text text-transparent inline-block bg-gradient-to-b from-cyan-700 to-black animate-in fade-in zoom-in duration-2000 font-outline-4 '
         }
       >
         <TextModifactor name="GGFinance" />
