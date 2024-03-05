@@ -17,7 +17,7 @@ import { forkJoin, take } from 'rxjs';
   template: `
     <div class="pt-[180px] pb-[260px] sm:pt-[200px] sm:pb-[300px]">
       <div class="max-w-[620px] mx-auto">
-        <h1 class="text-xl text-center">Search Stock</h1>
+        <h1 class="text-2xl text-center">Search Stock</h1>
         <app-stock-search-basic-customized></app-stock-search-basic-customized>
       </div>
     </div>
@@ -28,9 +28,9 @@ import { forkJoin, take } from 'rxjs';
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

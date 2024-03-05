@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnChanges, SimpleChanges, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnChanges, SimpleChanges, input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
 import { formatValueIntoCurrency } from '@market-monitor/shared/features/general-util';
@@ -18,45 +17,36 @@ import { filterNil } from 'ngxtension/filter-nil';
 @Component({
   selector: 'app-portfolio-growth-chart',
   standalone: true,
-  imports: [
-    CommonModule,
-    HighchartsChartModule,
-    MatProgressSpinnerModule,
-    DateRangeSliderComponent,
-    ReactiveFormsModule,
-    SectionTitleComponent,
-  ],
+  imports: [CommonModule, HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule, SectionTitleComponent],
   template: `
-    @if (showLoadingSignal()) {
-      <div class="grid place-content-center" [style.height.px]="heightPx">
-        <mat-spinner></mat-spinner>
-      </div>
-    } @else {
-      <div *ngIf="displayHeader()" class="flex flex-col lg:flex-row gap-3 items-center justify-between">
-        <!-- select chart title -->
-        <app-section-title [title]="headerTitle()" />
+    <div *ngIf="displayHeader()" class="flex flex-col lg:flex-row gap-3 items-center justify-between">
+      <!-- select chart title -->
+      <app-section-title [title]="headerTitle()" />
 
-        <!-- date range -->
-        <app-date-range-slider class="w-full lg:w-[550px]" [formControl]="sliderControl" />
-      </div>
+      <!-- date range -->
+      <app-date-range-slider
+        *ngIf="data().values.length > 0"
+        class="w-full lg:w-[550px]"
+        [formControl]="sliderControl"
+      />
+    </div>
 
-      <highcharts-chart
-        *ngIf="isHighcharts"
-        [(update)]="updateFromInput"
-        [Highcharts]="Highcharts"
-        [callbackFunction]="chartCallback"
-        [options]="chartOptions"
-        [style.height.px]="heightPx"
-        style="display: block; width: 100%"
-      >
-      </highcharts-chart>
-    }
+    <highcharts-chart
+      *ngIf="isHighcharts"
+      [(update)]="updateFromInput"
+      [Highcharts]="Highcharts"
+      [callbackFunction]="chartCallback"
+      [options]="chartOptions"
+      [style.height.px]="heightPx"
+      style="display: block; width: 100%"
+    >
+    </highcharts-chart>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioGrowthChartComponent extends ChartConstructor implements OnChanges {
@@ -73,10 +63,6 @@ export class PortfolioGrowthChartComponent extends ChartConstructor implements O
     if (changes['data'].currentValue) {
       console.log('render chart');
       const input = changes['data'].currentValue as { values: PortfolioGrowth[]; startingCashValue: number };
-      // remove loading
-      if (input.values.length > 0) {
-        this.showLoadingSignal.set(false);
-      }
 
       const sliderValuesInput: DateRangeSliderValues = {
         dates: input.values.map((point) => point.date),
@@ -97,13 +83,8 @@ export class PortfolioGrowthChartComponent extends ChartConstructor implements O
         this.chartOptions.series = seriesDataUpdate;
         this.updateFromInput = true;
       });
-
-      // even if no data, remove loading after some time
-      setTimeout(() => this.showLoadingSignal.set(false), 4000);
     }
   }
-
-  showLoadingSignal = signal<boolean>(true);
   sliderControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 
   private initChart(data: SeriesOptionsType[]) {

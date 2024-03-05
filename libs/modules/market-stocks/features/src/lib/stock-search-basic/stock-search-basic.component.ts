@@ -49,13 +49,11 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
         [autofocus]="false"
         [autoActiveFirstOption]="false"
       >
-        <!-- loading skeleton -->
-        <ng-container *ngIf="showLoadingIndicator()">
+        @if (showLoadingIndicator()) {
+          <!-- loading skeleton -->
           <mat-option *ngRange="5" class="h-10 mb-1 g-skeleton"></mat-option>
-        </ng-container>
-
-        <!-- loaded data -->
-        <ng-container *ngIf="!showLoadingIndicator()">
+        } @else {
+          <!-- loaded data -->
           <mat-option *ngFor="let summary of options(); let last = last" [value]="summary" class="py-2 rounded-md">
             <app-quote-item
               [showValueChange]="showValueChange"
@@ -66,25 +64,25 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
               <mat-divider></mat-divider>
             </div>
           </mat-option>
-        </ng-container>
+        }
       </mat-autocomplete>
       <mat-hint *ngIf="showHint">Ex: 'AAPL, MSFT, UBER, NFLX'</mat-hint>
     </mat-form-field>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
 
-      ::ng-deep .mdc-menu-surface.mat-mdc-autocomplete-panel {
-        max-height: 452px !important;
-      }
+    ::ng-deep .mdc-menu-surface.mat-mdc-autocomplete-panel {
+      max-height: 452px !important;
+    }
 
-      ::ng-deep .mdc-menu-surface.mat-mdc-autocomplete-panel {
-        width: 95% !important;
-        margin: auto !important;
-      }
-    `,
+    ::ng-deep .mdc-menu-surface.mat-mdc-autocomplete-panel {
+      width: 95% !important;
+      margin: auto !important;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

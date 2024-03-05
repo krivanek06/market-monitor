@@ -97,9 +97,9 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
           ></div>
           <div class="flex flex-col w-full gap-1 lg:block">
             <!-- title -->
-            <div class="hidden w-full h-6 g-skeleton lg:block"></div>
+            <div class="hidden w-full h-6 g-skeleton lg:block mb-1"></div>
             <!-- creator -->
-            <div class="hidden w-full h-6 g-skeleton lg:block"></div>
+            <div class="hidden w-full h-6 g-skeleton lg:block mb-1"></div>
             <div class="hidden w-full h-20 lg:block g-skeleton"></div>
           </div>
         </div>

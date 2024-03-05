@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
 import { GetStocksSummaryPipe, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks/ui';
-import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { SectionTitleComponent } from '@market-monitor/shared/ui';
 
 @Component({
@@ -20,9 +21,17 @@ import { SectionTitleComponent } from '@market-monitor/shared/ui';
     MatDialogModule,
     MatIconModule,
     SectionTitleComponent,
+    MatButtonModule,
   ],
   template: `
-    <app-section-title [title]="pageTitle()" matIcon="monitoring" class="mb-10" />
+    <div class="flex items-center justify-between mb-10">
+      <app-section-title [title]="pageTitle()" matIcon="monitoring" />
+
+      <button mat-button color="warn" (click)="onClearWatchList()">
+        <mat-icon>delete_history</mat-icon>
+        Clear Watchlist
+      </button>
+    </div>
 
     <!-- table -->
     <app-stock-summary-table
@@ -31,9 +40,9 @@ import { SectionTitleComponent } from '@market-monitor/shared/ui';
     ></app-stock-summary-table>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -69,5 +78,11 @@ export class PageWatchlistComponent {
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });
+  }
+
+  @Confirmable('Are you sure you want to clear your watchlist?', 'Confirm', true, 'CLEAR')
+  onClearWatchList(): void {
+    this.authenticationUserService.clearUserWatchList();
+    this.dialogServiceUtil.showNotificationBar('Watchlist cleared', 'success');
   }
 }

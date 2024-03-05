@@ -49,7 +49,7 @@ import { BehaviorSubject, combineLatest, map, pipe, startWith } from 'rxjs';
       </mat-chip-listbox>
 
       <!-- time slider -->
-      <div class="absolute right-0 top-[120px]">
+      <div class="flex justify-end">
         <app-date-range-slider
           *ngIf="dateRangeControl.value"
           class="hidden md:block w-[550px]"

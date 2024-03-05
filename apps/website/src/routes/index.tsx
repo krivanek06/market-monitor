@@ -9,6 +9,7 @@ import {
   WelcomeSchools,
 } from '../components/page-specific/welcome';
 import { SVG1, SVG2 } from '../components/shared';
+import { websiteImageUrls } from '../components/utils';
 
 export default component$(() => {
   const wholePageRef = useSignal<HTMLDivElement | undefined>(undefined);
@@ -92,7 +93,7 @@ export default component$(() => {
       duration: 2000,
     });
 
-    // change BG color back to black
+    // remove / add css classes which should be applied after the animation
     if (wholePageRef.value) {
       wholePageRef.value.style.backgroundColor = 'black';
     }
@@ -102,10 +103,15 @@ export default component$(() => {
     if (blobRef.value) {
       blobRef.value.classList.remove('hidden');
     }
+    if (heroBgImageRef.value) {
+      heroBgImageRef.value.classList.remove('hidden');
+    }
   });
 
+  const heroImage = `${websiteImageUrls}/hero-6.webp`;
+
   return (
-    <div ref={wholePageRef} class="overflow-x-clip">
+    <div ref={wholePageRef} class="overflow-x-clip relative">
       {/* some svgs */}
       <SVG2 forwardRef={svg2Ref} class="absolute top-[250px] right-[-100px] hidden" />
 
@@ -114,29 +120,29 @@ export default component$(() => {
       <img
         ref={heroBgImageRef}
         id="hero-bg"
-        src="/images/hero-6.jpeg"
-        class="absolute top-0 w-[100%] h-[70%] object-cover opacity-40 hidden"
+        src={heroImage}
+        class="absolute top-0 w-[100%] h-[500px] object-cover opacity-40 hidden"
       />
 
       <div class="max-w-[1600px] mx-auto">
-        <div ref={heroPageRef} class="relative">
+        <div ref={heroPageRef} class="relative p-4 md:p-10">
           <WelcomeHero />
         </div>
-        <div class="relative mb-[140px]">
+        <div class="relative mb-16 md:mb-[140px] p-4 md:p-10">
           <WelcomeMarketMonitor />
         </div>
-        <div class="relative mb-[160px]">
+        <div class="relative mb-16 md:mb-[160px] p-4 md:p-10">
           <SVG2 class="absolute top-[300px] left-[-500px]" />
           <SVG1 class="absolute top-[-40px] left-0 opacity-25 w-[175px] h-[175px]" />
           <SVG1 class="absolute top-[120px] left-[120px] opacity-25 w-[175px] h-[175px]" />
           <WelcomeInvestmentAccount />
         </div>
-        <div class="relative mb-[160px]">
+        <div class="relative mb-16 md:mb-[160px] p-4 md:p-10">
           <SVG1 class="absolute top-[-40px] right-0 opacity-25 w-[175px] h-[175px]" />
           <SVG1 class="absolute top-[225px] right-[160px] opacity-25 w-[175px] h-[175px]" />
           <WelcomeSchools />
         </div>
-        <div class="relative">
+        <div class="relative p-4 md:p-10">
           <WelcomeAboutUs />
         </div>
         <footer class="min-h-[100px]"></footer>

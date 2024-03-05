@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/cor
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { USER_HOLDINGS_SYMBOL_LIMIT } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
@@ -65,6 +66,7 @@ import { map, pipe, startWith } from 'rxjs';
     PortfolioAssetChartComponent,
     ReactiveFormsModule,
     MatButtonModule,
+    MatProgressSpinner,
   ],
   template: `
     <ng-container>
@@ -119,55 +121,70 @@ import { map, pipe, startWith } from 'rxjs';
           <!-- select chart title -->
           <div class="flex flex-col sm:flex-row items-center gap-4">
             <app-section-title title="Portfolio Growth" class="mr-6 max-lg:flex-1" />
-            <button
-              (click)="onPortfolioChangeChart()"
-              matTooltip="Display daily portfolio change - profit/loss"
-              type="button"
-              class="hidden sm:block"
-              mat-stroked-button
-            >
-              Portfolio Change
-            </button>
-            <button
-              (click)="onAssetGrowthChart()"
-              matTooltip="Display invested amount per asset in your portfolio"
-              type="button"
-              class="hidden sm:block"
-              mat-stroked-button
-            >
-              Asset Growth
-            </button>
+            @if (portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0) {
+              <button
+                (click)="onPortfolioChangeChart()"
+                matTooltip="Display daily portfolio change - profit/loss"
+                type="button"
+                class="hidden sm:block"
+                mat-stroked-button
+              >
+                Portfolio Change
+              </button>
+              <button
+                (click)="onAssetGrowthChart()"
+                matTooltip="Display invested amount per asset in your portfolio"
+                type="button"
+                class="hidden sm:block"
+                mat-stroked-button
+              >
+                Asset Growth
+              </button>
+            }
           </div>
 
           <!-- date range -->
           <app-date-range-slider
+            *ngIf="portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0"
             class="w-full lg:w-[550px]"
             [formControl]="portfolioGrowthRangeControl"
           ></app-date-range-slider>
         </div>
 
         <!-- portfolio growth chart -->
-        <app-portfolio-growth-chart
-          [data]="{
-            values: portfolioGrowthChartSignal(),
-            startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0
-          }"
-          [displayHeader]="false"
-          [heightPx]="400"
-          chartType="balance"
-        ></app-portfolio-growth-chart>
+        @if (portfolioUserFacadeService.getPortfolioGrowth()) {
+          <app-portfolio-growth-chart
+            [data]="{
+              values: portfolioGrowthChartSignal(),
+              startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0
+            }"
+            [displayHeader]="false"
+            [heightPx]="400"
+            chartType="balance"
+          />
+        } @else {
+          <div class="grid place-content-center" [style.height.px]="400">
+            <mat-spinner></mat-spinner>
+          </div>
+        }
 
         <!-- investment growth -->
-        <app-portfolio-growth-chart
-          headerTitle="Invested Value to Market"
-          [displayHeader]="true"
-          [data]="{
-            values: portfolioUserFacadeService.getPortfolioGrowth(),
-            startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0
-          }"
-          [heightPx]="400"
-          chartType="marketValue"
-        ></app-portfolio-growth-chart>
+        @if (portfolioUserFacadeService.getPortfolioGrowth(); as portfolioGrowth) {
+          <app-portfolio-growth-chart
+            headerTitle="Invested Value to Market"
+            [displayHeader]="true"
+            [data]="{
+              values: portfolioGrowth,
+              startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0
+            }"
+            [heightPx]="400"
+            chartType="marketValue"
+          />
+        } @else {
+          <div class="grid place-content-center" [style.height.px]="400">
+            <mat-spinner></mat-spinner>
+          </div>
+        }
       </div>
 
       <!-- holding -->
@@ -187,49 +204,54 @@ import { map, pipe, startWith } from 'rxjs';
         </app-general-card>
       </div>
 
-      <div class="flex flex-col-reverse xl:flex-row gap-y-4 gap-8">
-        <div class="xl:basis-2/3">
-          <!-- transaction history -->
-          <div>
-            <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
-            <app-portfolio-transactions-table
-              [showTransactionFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
-              [data]="authenticationUserService.state.portfolioTransactions() | sortByKey: 'date' : 'desc'"
-            ></app-portfolio-transactions-table>
+      @if (authenticationUserService.state.userHaveTransactions()) {
+        @defer {
+          <div class="flex flex-col-reverse xl:flex-row gap-y-4 gap-8">
+            <div class="xl:basis-2/3">
+              <!-- transaction history -->
+              <div>
+                <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
+                <app-portfolio-transactions-table
+                  [showTransactionFees]="
+                    !!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount
+                  "
+                  [data]="authenticationUserService.state.portfolioTransactions() | sortByKey: 'date' : 'desc'"
+                ></app-portfolio-transactions-table>
+              </div>
+            </div>
+
+            <!-- holdings pie charts -->
+            <div
+              class="flex justify-center lg:justify-between xl:justify-around xl:flex-col gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6"
+            >
+              <app-pie-chart
+                class="max-sm:w-[385px]"
+                chartTitle="Asset Allocation"
+                [heightPx]="400"
+                [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
+              ></app-pie-chart>
+              <app-pie-chart
+                class="hidden lg:block"
+                [heightPx]="400"
+                chartTitle="Sector Allocation"
+                [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
+              ></app-pie-chart>
+            </div>
           </div>
-        </div>
 
-        <!-- holdings pie charts -->
-        <div
-          class="flex justify-center lg:justify-between xl:justify-around xl:flex-col gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6"
-        >
-          <app-pie-chart
-            class="max-sm:w-[385px]"
-            chartTitle="Asset Allocation"
-            [heightPx]="400"
-            [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
-          ></app-pie-chart>
-          <app-pie-chart
-            class="hidden lg:block"
-            [heightPx]="400"
-            chartTitle="Sector Allocation"
-            [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
-          ></app-pie-chart>
-        </div>
-      </div>
-
-      <!-- transactions chart -->
-      <ng-container *ngIf="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount">
-        <app-portfolio-transaction-chart
-          [data]="portfolioUserFacadeService.getPortfolioTransactionToDate()"
-        ></app-portfolio-transaction-chart>
-      </ng-container>
+          <!-- transactions chart -->
+          <app-portfolio-transaction-chart
+            *ngIf="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
+            [data]="portfolioUserFacadeService.getPortfolioTransactionToDate()"
+          ></app-portfolio-transaction-chart>
+        }
+      }
     </ng-container>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -246,7 +268,7 @@ export class PageDashboardComponent {
       this.portfolioGrowthRangeControl.valueChanges.pipe(startWith(null)),
       this.portfolioUserFacadeService.getPortfolioGrowth,
     ],
-    pipe(map(([dateRange, data]) => filterDataByDateRange(data, dateRange))),
+    pipe(map(([dateRange, data]) => filterDataByDateRange(data ?? [], dateRange))),
   );
 
   ColorScheme = ColorScheme;
@@ -258,7 +280,7 @@ export class PageDashboardComponent {
    */
   patchSliderEffect = effect(
     () => {
-      const data = this.portfolioUserFacadeService.getPortfolioGrowth();
+      const data = this.portfolioUserFacadeService.getPortfolioGrowth() ?? [];
 
       // patch values only if empty
       this.portfolioGrowthRangeControl.patchValue({
@@ -285,7 +307,7 @@ export class PageDashboardComponent {
     this.dialogServiceUtil.showGenericDialog({
       component: PortfolioChangeChartComponent,
       componentData: {
-        data: this.portfolioUserFacadeService.getPortfolioGrowth(),
+        data: this.portfolioUserFacadeService.getPortfolioGrowth() ?? [],
       },
     });
   }
@@ -295,7 +317,7 @@ export class PageDashboardComponent {
       title: 'Portfolio Asset Growth Chart',
       component: PortfolioAssetChartComponent,
       componentData: {
-        data: this.portfolioUserFacadeService.getPortfolioGrowthAssets(),
+        data: this.portfolioUserFacadeService.getPortfolioGrowthAssets() ?? [],
       },
     });
   }

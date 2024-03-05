@@ -8,10 +8,10 @@ import { stockSymbols } from '../../utils';
 
 export const WelcomeMarketMonitor = component$(() => {
   return (
-    <section class="p-10 grid place-content-center">
+    <section class="grid place-content-center">
       <h2 class="g-section-title">Market Monitoring</h2>
 
-      <div class="grid md:grid-cols-2 gap-10 text-gray-300 text-center mx-auto w-full lg:w-[80%] mb-16">
+      <div class="grid md:grid-cols-2 gap-x-10 gap-y-4 text-gray-300 text-center mx-auto w-full lg:w-[80%] mb-6 md:mb-16">
         <p id="mm-p1" class="p-4 text-lg">
           Whether you're tracking blue-chip stocks or uncovering hidden gems in small-cap companies, we bring the entire
           marketplace to your screen.
@@ -34,8 +34,13 @@ const MarketSymbolsSection = component$(() => {
   const loadedSummariesArray = useSignal<SymbolSummary[]>([]);
 
   const onItemClick$ = $((summary: SymbolSummary) => {
-    // console.log('clicked', summary);
+    console.log('clicked', summary);
     selectedSummary.value = summary;
+  });
+
+  const onItemLetterClick$ = $((symbols: string) => {
+    console.log('clicked', symbols);
+    selectedSummary.value = loadedSummariesArray.value?.find((summary) => summary.quote.symbol === symbols) || null;
   });
 
   const loadedHistoricalPrice = useResource$(({ track }) => {
@@ -50,14 +55,14 @@ const MarketSymbolsSection = component$(() => {
     // track random variable to reload data
     track(reloadSummaries);
     // load more symbols if some of them are undefined, and display 8
-    const randomSymbols = getRandomElement(stockSymbols, 15);
+    const randomSymbols = getRandomElement(stockSymbols, 10);
     const data = await getSymbolSummaries(randomSymbols);
 
     // console.log('loaded', data.length, 'symbols');
 
     // save data into an array and use useVisibleTask$ to select first one
     loadedSummariesArray.value = data;
-    return data.slice(0, 12);
+    return data.slice(0, 8);
   });
 
   useVisibleTask$(() => {
@@ -68,48 +73,65 @@ const MarketSymbolsSection = component$(() => {
   return (
     <>
       {/* loaded summaries about stocks */}
-      <div class="flex items-center gap-4 mb-10">
+      <div class="flex items-center gap-4 mb-6 md:mb-10">
         {/* left button */}
         <div>
-          <Button class="h-20" onClick$={() => reloadSummaries.value++}>
+          <Button class="h-20 hidden md:block" onClick$={() => reloadSummaries.value++}>
             <span class="material-symbols-outlined">arrow_back_ios</span>
           </Button>
         </div>
         {/* data */}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-8 gap-y-4 lg:px-2 flex-1">
+        <div class="lg:px-2 flex-1">
           <Resource
             value={loadedSummaries}
             onPending={() => (
               <>
-                {Array.from({ length: 12 }, (_, index) => (
+                {Array.from({ length: 8 }, (_, index) => (
                   <div key={index} class="g-skeleton h-12"></div>
                 ))}
               </>
             )}
             onResolved={(data) => (
               <>
-                {data.map((summary) => (
-                  <SymbolChange
-                    isSelect={selectedSummary.value?.id === summary.id}
-                    symbolQuote={summary.quote}
-                    key={summary.id}
-                    onItemClick$={() => onItemClick$(summary)}
-                  />
-                ))}
+                {/* items */}
+                <div class="hidden md:grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-8 gap-y-4 ">
+                  {data.map((summary) => (
+                    <SymbolChange
+                      isSelect={selectedSummary.value?.id === summary.id}
+                      symbolQuote={summary.quote}
+                      key={summary.id}
+                      onItemClick$={() => onItemClick$(summary)}
+                    />
+                  ))}
+                </div>
+                {/* select */}
+                <div class="block md:hidden">
+                  <select
+                    name="stocks"
+                    onChange$={(e) => onItemLetterClick$((e.target! as any)['value'])}
+                    class="w-full bg-transparent p-4 border border-cyan-800 border-solid rounded-lg"
+                  >
+                    {data.map((summary) => (
+                      <option value={summary.id} key={summary.id}>
+                        {summary.quote.symbol}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </>
             )}
           ></Resource>
         </div>
         {/* right button */}
         <div>
-          <Button class="h-20" onClick$={() => reloadSummaries.value++}>
+          <Button class="h-20 hidden md:block" onClick$={() => reloadSummaries.value++}>
             <span class="material-symbols-outlined">arrow_forward_ios</span>
           </Button>
         </div>
       </div>
       {/* historical price */}
-      <div class="grid grid-cols-3 gap-4">
-        <div class="col-span-2">
+      <div class="grid xl:grid-cols-3 gap-4">
+        <div class="xl:col-span-2">
           <Resource
             value={loadedHistoricalPrice}
             onPending={() => <div class="g-skeleton h-[500px]"></div>}

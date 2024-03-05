@@ -235,8 +235,8 @@ import {
       <!-- Row shown when there is no matching data. -->
       <tr class="mat-row" *matNoDataRow>
         <td class="text-center mat-cell" colspan="10">
-          @defer (on timer(5s)) {
-            <div class="grid place-content-center p-10">No holdings() to be found</div>
+          @defer (on timer(4s)) {
+            <div class="grid place-content-center p-10 min-h-[250px]">No data to be found</div>
           } @placeholder {
             <div *ngRange="10" class="h-10 mb-1 g-skeleton"></div>
           }
@@ -245,9 +245,9 @@ import {
     </table>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

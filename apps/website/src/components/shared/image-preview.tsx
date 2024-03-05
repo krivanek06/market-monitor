@@ -32,7 +32,7 @@ export const ImagePreview = component$<ImagePreviewProps>((props) => {
       <div class="flex gap-6 h-20">
         {/* left arrow */}
         <div class="grid">
-          <Button class="h-11/12" onClick$={() => indexChangeClick(-1)}>
+          <Button class="h-11/12 hidden md:block" onClick$={() => indexChangeClick(-1)}>
             <span class="material-symbols-outlined">arrow_back_ios</span>
           </Button>
         </div>
@@ -55,7 +55,7 @@ export const ImagePreview = component$<ImagePreviewProps>((props) => {
         </div>
         {/* right arrow */}
         <div class="grid">
-          <Button class="h-11/12" onClick$={() => indexChangeClick(1)}>
+          <Button class="h-11/12 hidden md:block" onClick$={() => indexChangeClick(1)}>
             <span class="material-symbols-outlined">arrow_forward_ios</span>
           </Button>
         </div>

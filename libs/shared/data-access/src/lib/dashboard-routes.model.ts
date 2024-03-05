@@ -5,7 +5,6 @@ export enum ROUTES_MAIN {
   GROUPS = 'groups',
   WATCHLIST = 'watchlist',
   STOCK_DETAILS = 'stock-details',
-  SEARCH = 'search',
   STOCK_SCREENER = 'stock-screener',
   MARKET = 'market',
   MARKET_CALENDAR = 'calendar',

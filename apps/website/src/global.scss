@@ -49,7 +49,7 @@ body {
 }
 
 .g-section-title {
-  @apply text-3xl text-cyan-700 text-center mb-16 capitalize;
+  @apply text-3xl text-cyan-700 text-center mb-8 md:mb-16 capitalize;
 }
 
 .g-skeleton {

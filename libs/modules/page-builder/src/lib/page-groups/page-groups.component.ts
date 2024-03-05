@@ -120,7 +120,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
 
         <div
           *ngIf="groups.groupOwner.length === 0 && groups.groupMember.length === 0"
-          class="text-xl text-center text-wt-gray-medium absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+          class="text-2xl text-center text-wt-gray-medium mt-[250px]"
         >
           You are not a member of any group. You can create a new group or search for existing groups.
         </div>
@@ -157,9 +157,9 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@ma
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
