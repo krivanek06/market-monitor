@@ -2,6 +2,7 @@ import { component$ } from '@builder.io/qwik';
 import { faker } from '@faker-js/faker';
 import { Button } from '../../shared';
 import { PercentageIncrease } from '../../trading';
+import { dashboardURL } from '../../utils';
 
 export const WelcomeSchools = component$(() => {
   return (
@@ -22,7 +23,7 @@ export const WelcomeSchools = component$(() => {
 
       {/* redirect dashboard button */}
       <div class="grid place-content-center mb-16 md:mb-[140px]">
-        <Button onClick$={() => console.log('todo')} class="h-14">
+        <Button onClick$={() => (window.location.href = dashboardURL)} class="h-14">
           <div class="flex items-center gap-4 justify-center min-w-[200px]">
             <span>Dashboard</span>
             <span class="material-symbols-outlined">open_in_new</span>

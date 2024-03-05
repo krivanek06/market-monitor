@@ -1,6 +1,6 @@
 import { component$ } from '@builder.io/qwik';
 import { Button } from '../../shared/Button';
-import { TextModifactor } from '../../utils';
+import { TextModifactor, dashboardURL, searchURL } from '../../utils';
 
 export const WelcomeHero = component$(() => {
   return (
@@ -14,10 +14,13 @@ export const WelcomeHero = component$(() => {
       </h1>
 
       <div class="flex flex-col sm:flex-row items-center gap-x-8 gap-y-4 animate-in fade-in duration-2000 mx-auto z-10 ">
-        <Button onClick$={() => console.log('lll')} class="w-[320px] sm:w-[220px] text-lg">
+        <Button onClick$={() => (window.location.href = searchURL)} class="w-[320px] sm:w-[220px] text-lg">
           <span>Search</span>
         </Button>
-        <Button onClick$={() => console.log('lll')} class="w-[320px] sm:w-[220px] text-lg animate-pulse duration-2500">
+        <Button
+          onClick$={() => (window.location.href = dashboardURL)}
+          class="w-[320px] sm:w-[220px] text-lg animate-pulse duration-2500"
+        >
           <span>Dashboard</span>
         </Button>
       </div>
