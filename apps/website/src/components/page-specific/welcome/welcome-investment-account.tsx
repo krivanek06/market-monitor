@@ -51,10 +51,10 @@ export const WelcomeInvestmentAccount = component$(() => {
   ] satisfies ImagePreviewProps['images'];
 
   return (
-    <section class="p-10 grid place-content-center relative z-10">
+    <section class="grid place-content-center relative z-10">
       <h2 class="g-section-title">Investment Account</h2>
 
-      <div class="grid grid-cols-3 gap-4 mb-16 lg:px-10">
+      <div class="grid md:grid-cols-3 gap-4 mb-8 md:mb-16 lg:px-10">
         <CardBasic>
           <h3 class=" text-xl text-center mb-4 w-full text-cyan-800">Portfolio Growth</h3>
           <p class="text-center p-4 text-lg">

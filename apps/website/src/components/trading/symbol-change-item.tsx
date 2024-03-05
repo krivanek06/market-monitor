@@ -7,13 +7,14 @@ export type SymbolChangeItemProps = {
   symbolQuote: SymbolQuote;
   isSelect?: boolean;
   onItemClick$?: QRL<(...args: any) => void>;
+  classes?: string;
 };
 
-export const SymbolChange = component$<SymbolChangeItemProps>(({ symbolQuote, onItemClick$, isSelect }) => {
+export const SymbolChange = component$<SymbolChangeItemProps>(({ symbolQuote, onItemClick$, classes, isSelect }) => {
   const symbolUrlMerged = `${symbolUrl}/${symbolQuote.symbol}`;
 
   return (
-    <button type="button" onClick$={onItemClick$}>
+    <button type="button" onClick$={onItemClick$} class={classes}>
       <div
         class={[
           'flex items-center justify-between gap-x-10 text-base px-4 py-2 hover:border-2  hover:border-cyan-800 border-solid rounded-lg hover:bg-gray-900 transition-all duration-300 hover:scale-105 cursor-pointer',

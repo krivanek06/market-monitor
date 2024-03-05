@@ -125,24 +125,24 @@ export default component$(() => {
       />
 
       <div class="max-w-[1600px] mx-auto">
-        <div ref={heroPageRef} class="relative">
+        <div ref={heroPageRef} class="relative p-4 md:p-10">
           <WelcomeHero />
         </div>
-        <div class="relative mb-[140px]">
+        <div class="relative mb-16 md:mb-[140px] p-4 md:p-10">
           <WelcomeMarketMonitor />
         </div>
-        <div class="relative mb-[160px]">
+        <div class="relative mb-16 md:mb-[160px] p-4 md:p-10">
           <SVG2 class="absolute top-[300px] left-[-500px]" />
           <SVG1 class="absolute top-[-40px] left-0 opacity-25 w-[175px] h-[175px]" />
           <SVG1 class="absolute top-[120px] left-[120px] opacity-25 w-[175px] h-[175px]" />
           <WelcomeInvestmentAccount />
         </div>
-        <div class="relative mb-[160px]">
+        <div class="relative mb-16 md:mb-[160px] p-4 md:p-10">
           <SVG1 class="absolute top-[-40px] right-0 opacity-25 w-[175px] h-[175px]" />
           <SVG1 class="absolute top-[225px] right-[160px] opacity-25 w-[175px] h-[175px]" />
           <WelcomeSchools />
         </div>
-        <div class="relative">
+        <div class="relative p-4 md:p-10">
           <WelcomeAboutUs />
         </div>
         <footer class="min-h-[100px]"></footer>

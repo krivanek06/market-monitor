@@ -8,7 +8,7 @@ export type TextModifactorProps = {
 };
 
 export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
-  const canStartAnimationAgain = useSignal(true);
+  const canStartAnimationAgain = useSignal(false);
 
   // always changing value
   const displayName = useSignal(name);
@@ -104,7 +104,8 @@ export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
   useVisibleTask$(async () => {
     await waitSeconds(1);
 
-    generateBackToOriginal();
+    await generateBackToOriginal();
+    canStartAnimationAgain.value = true;
   });
 
   return <span onMouseEnter$={() => initAnimation()}>{displayName}</span>;

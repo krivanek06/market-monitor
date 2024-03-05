@@ -9,7 +9,7 @@ export const WelcomeSchools = component$(() => {
       <h2 class="g-section-title">Support Early Investing</h2>
 
       {/* some info */}
-      <div class="flex justify-around lg:w-9/12 mx-auto gap-x-10 gap-y-4 mb-[80px]">
+      <div class="flex justify-center flex-col md:flex-row md:justify-around lg:w-9/12 mx-auto gap-x-10 gap-y-4 mb-10 md:mb-[80px]">
         <p class="text-center text-lg">
           Most of us wish that we’ve already started investing from an early age, that’s why want to create a platform
           which provides basic understanding of finances for young adults.
@@ -21,8 +21,8 @@ export const WelcomeSchools = component$(() => {
       </div>
 
       {/* redirect dashboard button */}
-      <div class="grid place-content-center mb-[140px]">
-        <Button onClick$={() => console.log('todo')} class="h-12">
+      <div class="grid place-content-center mb-16 md:mb-[140px]">
+        <Button onClick$={() => console.log('todo')} class="h-14">
           <div class="flex items-center gap-4 justify-center min-w-[200px]">
             <span>Dashboard</span>
             <span class="material-symbols-outlined">open_in_new</span>
@@ -31,7 +31,7 @@ export const WelcomeSchools = component$(() => {
       </div>
 
       {/* some info */}
-      <div class="grid lg:grid-cols-2 lg:px-10 lg:w-10/12 mx-auto">
+      <div class="grid lg:grid-cols-2 lg:px-10 lg:w-10/12 mx-auto p-4 md:p-10 gap-10">
         <div class="lg:w-9/12 grid gap-8">
           <p class="text-lg">
             Create <span class="text-cyan-700">Groups</span> to gather all your friend/classmates in one place and
