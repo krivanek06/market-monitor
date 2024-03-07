@@ -66,7 +66,7 @@ import { BehaviorSubject, combineLatest, map, pipe, startWith } from 'rxjs';
         [(update)]="updateFromInput"
         [oneToOne]="true"
         style="width: 100%; display: block"
-        [style.height.px]="450"
+        [style.height.px]="heightPx()"
       >
       </highcharts-chart>
     </section>

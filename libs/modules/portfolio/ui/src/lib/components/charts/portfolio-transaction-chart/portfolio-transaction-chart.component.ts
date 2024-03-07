@@ -4,7 +4,6 @@ import { PortfolioTransactionToDate } from '@market-monitor/modules/portfolio/da
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
 import { formatValueIntoCurrency } from '@market-monitor/shared/features/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { input } from '@angular/core';
 
 @Component({
   selector: 'app-portfolio-transaction-chart',
@@ -17,15 +16,15 @@ import { input } from '@angular/core';
       [Highcharts]="Highcharts"
       [callbackFunction]="chartCallback"
       [options]="chartOptions"
-      [style.height.px]="heightPx"
+      [style.height.px]="heightPx()"
       style="display: block; width: 100%"
     >
     </highcharts-chart>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

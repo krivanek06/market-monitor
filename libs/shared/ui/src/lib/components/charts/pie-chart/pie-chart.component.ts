@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { ChartConstructor, ColorScheme, GenericChartSeries } from '@market-monitor/shared/data-access';
 import { roundNDigits } from '@market-monitor/shared/features/general-util';
 import * as Highcharts from 'highcharts';
@@ -18,7 +18,7 @@ import highcharts3d from 'highcharts/highcharts-3d';
       [callbackFunction]="chartCallback"
       [(update)]="updateFromInput"
       [oneToOne]="true"
-      [style.height.px]="heightPx"
+      [style.height.px]="heightPx()"
     >
     </highcharts-chart>
   `,
