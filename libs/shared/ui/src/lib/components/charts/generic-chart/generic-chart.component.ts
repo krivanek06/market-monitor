@@ -27,9 +27,9 @@ type ChartInputType = Highcharts.SeriesOptionsType[];
   imports: [CommonModule, HighchartsChartModule, MatButtonModule, MatIconModule, MatTooltipModule],
   host: { ngSkipHydration: 'true' },
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   template: `
     <div class="block relative">
@@ -51,7 +51,7 @@ type ChartInputType = Highcharts.SeriesOptionsType[];
         [(update)]="updateFromInput"
         [oneToOne]="true"
         style="width: 100%; display: block"
-        [style.height.px]="heightPx"
+        [style.height.px]="heightPx()"
       >
       </highcharts-chart>
     </div>

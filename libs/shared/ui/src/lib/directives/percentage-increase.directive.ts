@@ -1,7 +1,5 @@
-import { Directive, Input, OnInit, Renderer2, ViewContainerRef } from '@angular/core';
+import { Directive, Renderer2, ViewContainerRef, effect, inject, input } from '@angular/core';
 import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
-import { PlatformService } from '../utils';
-import { input } from '@angular/core';
 
 /**
  * Use this if you already have the prct diff & diff
@@ -28,45 +26,41 @@ export type CurrentValues = {
   selector: '[appPercentageIncrease]',
   standalone: true,
 })
-export class PercentageIncreaseDirective implements OnInit {
+export class PercentageIncreaseDirective {
+  private renderer2 = inject(Renderer2);
+  private vr = inject(ViewContainerRef);
   /**
    * choose to populate data for changeValues or currentValues
    */
-  @Input() set changeValues(data: ChangeValues) {
-    const change = data.change ? roundNDigits(data.change, 2) : null;
-    const changesPercentage = data.changePercentage ? roundNDigits(data.changePercentage, 2) : null;
-    this.createElement(change, changesPercentage);
-  }
-  @Input() set currentValues(data: CurrentValues) {
-    if (!data.valueToCompare) {
-      return;
-    }
-    const value = data.value - data.valueToCompare;
-    const change = roundNDigits(value, 2);
-    const changesPercentage = roundNDigits((value / Math.abs(data.valueToCompare)) * 100, 2);
-    this.createElement(change, changesPercentage, data.hideValue, data.hidePercentage);
-  }
+  changeValues = input<ChangeValues>();
+  currentValues = input<CurrentValues>();
+  /**
+   * if true, it will display the currency sign inside ()
+   */
   useCurrencySign = input(false);
-
   hideValueOnXsScreen = input(false);
 
-  constructor(
-    private renderer2: Renderer2,
-    private vr: ViewContainerRef,
-    private platform: PlatformService,
-  ) {}
-
-  ngOnInit(): void {
-    if (this.platform.isServer) {
-      // placeholders while SSR
-      const na = this.renderer2.createText('N/A');
-      this.renderer2.appendChild(this.vr.element.nativeElement, na);
+  changeValuesEffect = effect(() => {
+    const changeValues = this.changeValues();
+    if (!changeValues) {
       return;
-    } else {
-      // clear previous view on client side
-      this.vr.clear();
     }
-  }
+    const change = changeValues.change ? roundNDigits(changeValues.change, 2) : null;
+    const changesPercentage = changeValues.changePercentage ? roundNDigits(changeValues.changePercentage, 2) : null;
+    this.createElement(change, changesPercentage);
+  });
+
+  currentValuesEffect = effect(() => {
+    const currentValues = this.currentValues();
+
+    if (!currentValues || !currentValues.valueToCompare) {
+      return;
+    }
+    const value = currentValues.value - currentValues.valueToCompare;
+    const change = roundNDigits(value, 2);
+    const changesPercentage = roundNDigits((value / Math.abs(currentValues.valueToCompare)) * 100, 2);
+    this.createElement(change, changesPercentage, currentValues.hideValue, currentValues.hidePercentage);
+  });
 
   /**
    * Creates element to the UI

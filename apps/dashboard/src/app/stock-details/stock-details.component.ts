@@ -18,6 +18,7 @@ import { TabSelectControlComponent } from '@market-monitor/shared/ui';
       <div class="flex justify-end mb-6">
         <!-- main navigation -->
         <app-tab-select-control
+          class="w-full md:w-[450px] xl:w-auto"
           [formControl]="routesStockDetailsControl"
           [displayOptions]="routesStockDetails"
           screenLayoutSplit="LAYOUT_XL"
@@ -29,10 +30,10 @@ import { TabSelectControlComponent } from '@market-monitor/shared/ui';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-      :host {
-        @apply mt-6 block;
-      }
-    `,
+    :host {
+      @apply mt-6 block;
+    }
+  `,
 })
 export class StockDetailsComponent {
   router = inject(Router);

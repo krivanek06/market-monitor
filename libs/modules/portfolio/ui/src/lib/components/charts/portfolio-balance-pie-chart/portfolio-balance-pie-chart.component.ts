@@ -16,15 +16,15 @@ import { HighchartsChartModule } from 'highcharts-angular';
       [Highcharts]="Highcharts"
       [callbackFunction]="chartCallback"
       [options]="chartOptions"
-      [style.height.px]="heightPx"
+      [style.height.px]="heightPx()"
       style="display: block; width: 100%"
     >
     </highcharts-chart>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

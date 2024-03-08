@@ -105,7 +105,7 @@ export class AuthenticationUserStoreService {
   private watchListSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-    switchMap((userData) => (userData ? this.getUserWatchList() : of(this.initialState.watchList))),
+    switchMap((userData) => (userData ? this.getUserWatchList(userData.id) : of(this.initialState.watchList))),
     map((watchList) => ({ watchList: watchList })),
   );
 
@@ -115,11 +115,9 @@ export class AuthenticationUserStoreService {
   private portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-    switchMap((userData) =>
-      userData ? this.getUserPortfolioTransactions().pipe(map((d) => d.transactions)) : of(null),
-    ),
+    switchMap((userData) => (userData ? this.getUserPortfolioTransactions(userData.id) : of(null))),
     map((transactions) => ({
-      portfolioTransactions: transactions,
+      portfolioTransactions: transactions?.transactions ?? null,
     })),
   );
 
@@ -198,11 +196,13 @@ export class AuthenticationUserStoreService {
   }
 
   updateUserWatchList(watchlist: Partial<UserWatchlist>): void {
-    setDoc(this.getUserWatchlistDocRef(), watchlist, { merge: true });
+    const userId = this.state.getUser().uid;
+    setDoc(this.getUserWatchlistDocRef(userId), watchlist, { merge: true });
   }
 
   addSymbolToUserWatchList(symbol: string, symbolType: SymbolType): Promise<void> {
-    return updateDoc(this.getUserWatchlistDocRef(), {
+    const userId = this.state.getUser().uid;
+    return updateDoc(this.getUserWatchlistDocRef(userId), {
       data: arrayUnion({
         symbol,
         symbolType,
@@ -211,7 +211,8 @@ export class AuthenticationUserStoreService {
   }
 
   removeSymbolFromUserWatchList(symbol: string, symbolType: SymbolType): Promise<void> {
-    return updateDoc(this.getUserWatchlistDocRef(), {
+    const userId = this.state.getUser().uid;
+    return updateDoc(this.getUserWatchlistDocRef(userId), {
       data: arrayRemove({
         symbol,
         symbolType,
@@ -220,7 +221,8 @@ export class AuthenticationUserStoreService {
   }
 
   clearUserWatchList(): void {
-    updateDoc(this.getUserWatchlistDocRef(), {
+    const userId = this.state.getUser().uid;
+    updateDoc(this.getUserWatchlistDocRef(userId), {
       data: [],
     });
   }
@@ -238,13 +240,14 @@ export class AuthenticationUserStoreService {
   }
 
   deletePortfolioTransactionForUser(transaction: PortfolioTransaction): void {
-    updateDoc(this.getUserPortfolioTransactionDocRef(), {
+    const userId = this.state.getUser().uid;
+    updateDoc(this.getUserPortfolioTransactionDocRef(userId), {
       transactions: arrayRemove(transaction),
     });
   }
 
-  private getUserPortfolioTransactions(): Observable<UserPortfolioTransaction> {
-    return rxDocData(this.getUserPortfolioTransactionDocRef()).pipe(
+  private getUserPortfolioTransactions(userId: string): Observable<UserPortfolioTransaction> {
+    return rxDocData(this.getUserPortfolioTransactionDocRef(userId)).pipe(
       filter((d): d is UserPortfolioTransaction => !!d),
       map((d) => ({
         // sort ASC
@@ -253,26 +256,28 @@ export class AuthenticationUserStoreService {
     );
   }
 
-  private getUserWatchList(): Observable<UserWatchlist> {
-    return rxDocData(this.getUserWatchlistDocRef()).pipe(filter((d): d is UserWatchlist => !!d));
+  private getUserWatchList(userId: string): Observable<UserWatchlist> {
+    return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchlist => !!d));
   }
 
-  private getUserPortfolioTransactionDocRef(): DocumentReference<UserPortfolioTransaction> {
-    return doc(this.userCollectionMoreInformationRef(), 'transactions').withConverter(
+  private getUserPortfolioTransactionDocRef(userId: string): DocumentReference<UserPortfolioTransaction> {
+    return doc(this.userCollectionMoreInformationRef(userId), 'transactions').withConverter(
       assignTypesClient<UserPortfolioTransaction>(),
     );
   }
 
-  private getUserWatchlistDocRef(): DocumentReference<UserWatchlist> {
-    return doc(this.userCollectionMoreInformationRef(), 'watchlist').withConverter(assignTypesClient<UserWatchlist>());
+  private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchlist> {
+    return doc(this.userCollectionMoreInformationRef(userId), 'watchlist').withConverter(
+      assignTypesClient<UserWatchlist>(),
+    );
   }
 
-  private userCollectionMoreInformationRef(): CollectionReference<DocumentData, DocumentData> {
-    return collection(this.getUserDocRef(), 'more_information');
+  private userCollectionMoreInformationRef(userId: string): CollectionReference<DocumentData, DocumentData> {
+    return collection(this.getUserDocRef(userId), 'more_information');
   }
 
-  private getUserDocRef(): DocumentReference<UserData> {
-    return doc(this.userCollection(), this.state.getUser().uid);
+  private getUserDocRef(userId: string): DocumentReference<UserData> {
+    return doc(this.userCollection(), userId);
   }
 
   private userCollection(): CollectionReference<UserData, DocumentData> {

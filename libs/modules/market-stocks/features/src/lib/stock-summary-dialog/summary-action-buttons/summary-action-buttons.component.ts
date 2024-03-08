@@ -4,10 +4,10 @@ import {
   Component,
   EventEmitter,
   Inject,
-  Input,
   OnInit,
   Optional,
   Output,
+  input,
   signal,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -94,7 +94,7 @@ import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manage
 })
 export class SummaryActionButtonsComponent implements OnInit {
   @Output() redirectClickedEmitter = new EventEmitter<void>();
-  @Input({ required: true }) symbolSummary!: SymbolSummary;
+  symbolSummary = input.required<SymbolSummary>();
 
   isSymbolInFavoriteSignal = signal<boolean>(false);
 
@@ -115,7 +115,7 @@ export class SummaryActionButtonsComponent implements OnInit {
 
   ngOnInit(): void {
     // check if symbol in favorite
-    const isInFavorite = this.symbolFavoriteService.isSymbolInFavoriteObs(this.symbolSummary.id);
+    const isInFavorite = this.symbolFavoriteService.isSymbolInFavoriteObs(this.symbolSummary().id);
     this.isSymbolInFavoriteSignal.set(isInFavorite);
 
     // check if symbol in watchList
@@ -124,7 +124,7 @@ export class SummaryActionButtonsComponent implements OnInit {
 
   private checkIfSymbolInWatchList(): void {
     if (this.authenticationUserService) {
-      const inWatchList = this.authenticationUserService.state.isSymbolInWatchList()(this.symbolSummary.id);
+      const inWatchList = this.authenticationUserService.state.isSymbolInWatchList()(this.symbolSummary().id);
       this.isSymbolInWatchList.set(inWatchList);
     }
   }
@@ -132,19 +132,19 @@ export class SummaryActionButtonsComponent implements OnInit {
   onAddToFavorite(): void {
     this.symbolFavoriteService.addFavoriteSymbol({
       symbolType: 'STOCK',
-      symbol: this.symbolSummary.id,
+      symbol: this.symbolSummary().id,
     });
     this.isSymbolInFavoriteSignal.set(true);
-    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been added into favorites`);
+    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been added into favorites`);
   }
 
   onRemoveToFavorite(): void {
     this.symbolFavoriteService.removeFavoriteSymbol({
       symbolType: 'STOCK',
-      symbol: this.symbolSummary.id,
+      symbol: this.symbolSummary().id,
     });
     this.isSymbolInFavoriteSignal.set(false);
-    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been removed from favorites`);
+    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been removed from favorites`);
   }
 
   async onAddWatchList() {
@@ -162,11 +162,11 @@ export class SummaryActionButtonsComponent implements OnInit {
       }
 
       // save data into fireStore
-      await this.authenticationUserService.addSymbolToUserWatchList(this.symbolSummary.id, 'STOCK');
+      await this.authenticationUserService.addSymbolToUserWatchList(this.symbolSummary().id, 'STOCK');
 
       // show notification
       this.dialogServiceUtil.showNotificationBar(
-        `Symbol: ${this.symbolSummary.id} has been added into watchlist`,
+        `Symbol: ${this.symbolSummary().id} has been added into watchlist`,
         'success',
       );
       this.checkIfSymbolInWatchList();
@@ -176,10 +176,10 @@ export class SummaryActionButtonsComponent implements OnInit {
   async onRemoveWatchList() {
     if (this.authenticationUserService) {
       // save data into fireStore
-      await this.authenticationUserService.removeSymbolFromUserWatchList(this.symbolSummary.id, 'STOCK');
+      await this.authenticationUserService.removeSymbolFromUserWatchList(this.symbolSummary().id, 'STOCK');
 
       // show notification
-      this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary.id} has been removed from watchlist`);
+      this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been removed from watchlist`);
       this.checkIfSymbolInWatchList();
     }
   }

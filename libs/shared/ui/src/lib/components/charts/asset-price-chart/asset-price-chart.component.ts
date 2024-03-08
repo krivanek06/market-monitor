@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnChanges, OnInit, SimpleChanges, input } from '@angular/core';
 import { HistoricalPrice, SymbolHistoricalPeriods } from '@market-monitor/api-types';
 import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
 import { dateFormatDate, formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { input } from '@angular/core';
 
 @Component({
   selector: 'app-asset-price-chart',
@@ -13,9 +12,9 @@ import { input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { ngSkipHydration: 'true' },
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   template: `
     <highcharts-chart
@@ -24,7 +23,7 @@ import { input } from '@angular/core';
       [options]="chartOptions"
       [callbackFunction]="chartCallback"
       style="width: 100%; display: block"
-      [style.height.px]="heightPx"
+      [style.height.px]="heightPx()"
     >
     </highcharts-chart>
   `,

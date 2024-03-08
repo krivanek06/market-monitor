@@ -1,16 +1,11 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, forwardRef, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, inject, input, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
-import {
-  LabelValue,
-  SCREEN_LAYOUT,
-  ScreenLayoutType,
-  screenLayoutResolveType,
-} from '@market-monitor/shared/data-access';
+import { LabelValue, SCREEN_LAYOUT, screenLayoutResolveType } from '@market-monitor/shared/data-access';
 import { map, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -48,7 +43,7 @@ import { map, switchMap, tap } from 'rxjs';
     ::ng-deep .mat-mdc-tab-list {
       margin-bottom: 8px !important;
     }
-`,
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
@@ -60,16 +55,12 @@ import { map, switchMap, tap } from 'rxjs';
 })
 export class TabSelectControlComponent<T> implements ControlValueAccessor {
   displayOptions = input.required<LabelValue<T>[]>();
-  @Input() set screenLayoutSplit(value: ScreenLayoutType) {
-    this.screenLayoutSplitSignal.set(screenLayoutResolveType(value));
-  }
-
   onChange: (data: T) => void = () => {};
   onTouched = () => {};
 
   selectedValueSignal = signal<{ value: T; index: number } | null>(null);
 
-  private screenLayoutSplitSignal = signal<SCREEN_LAYOUT>(SCREEN_LAYOUT.LAYOUT_SM);
+  screenLayoutSplit = input(SCREEN_LAYOUT.LAYOUT_SM, { transform: screenLayoutResolveType });
   private observer = inject(BreakpointObserver);
 
   /**
@@ -78,11 +69,11 @@ export class TabSelectControlComponent<T> implements ControlValueAccessor {
    * wasn't working correctly, when screenLayoutSplit was changed
    */
   showTabsSignal = toSignal(
-    toObservable(this.screenLayoutSplitSignal).pipe(
-      switchMap((screenLayoutSplit) =>
-        this.observer.observe(screenLayoutSplit).pipe(
+    toObservable(this.screenLayoutSplit).pipe(
+      switchMap((val) =>
+        this.observer.observe(val).pipe(
           map((d) => d.matches),
-          tap((x) => console.log('x', x, screenLayoutSplit)),
+          tap((x) => console.log('x', x, val)),
         ),
       ),
     ),

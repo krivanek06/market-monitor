@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -56,9 +56,9 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
           <!-- loaded data -->
           <mat-option *ngFor="let summary of options(); let last = last" [value]="summary" class="py-2 rounded-md">
             <app-quote-item
-              [showValueChange]="showValueChange"
+              [showValueChange]="showValueChange()"
               [symbolQuote]="summary.quote"
-              [displayValue]="displayValue"
+              [displayValue]="displayValue()"
             ></app-quote-item>
             <div *ngIf="!last" class="mt-2">
               <mat-divider></mat-divider>
@@ -66,7 +66,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
           </mat-option>
         }
       </mat-autocomplete>
-      <mat-hint *ngIf="showHint">Ex: 'AAPL, MSFT, UBER, NFLX'</mat-hint>
+      <mat-hint *ngIf="showHint()">Ex: 'AAPL, MSFT, UBER, NFLX'</mat-hint>
     </mat-form-field>
   `,
   styles: `
@@ -98,9 +98,9 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
    * emit whether searchControl has any value
    */
   @Output() inputHasValue = new EventEmitter<boolean>();
-  @Input() showHint = true;
-  @Input() showValueChange = true;
-  @Input() displayValue: 'name' | 'symbol' = 'name';
+  showHint = input(true);
+  showValueChange = input(true);
+  displayValue = input<'name' | 'symbol'>('name');
 
   searchControl = new FormControl<string>('', { nonNullable: true });
 

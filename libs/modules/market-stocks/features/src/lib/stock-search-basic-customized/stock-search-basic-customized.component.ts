@@ -5,13 +5,13 @@ import {
   ElementRef,
   EventEmitter,
   Inject,
-  Input,
   OnInit,
   Optional,
   Output,
   ViewChild,
   computed,
   inject,
+  input,
   signal,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -52,9 +52,9 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
       cdkOverlayOrigin
       #trigger
       #origin="cdkOverlayOrigin"
-      [showHint]="showHint"
-      [showValueChange]="showValueChange"
-      [displayValue]="displayValue"
+      [showHint]="showHint()"
+      [showValueChange]="showValueChange()"
+      [displayValue]="displayValue()"
     ></app-stock-search-basic>
 
     <ng-template
@@ -97,7 +97,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
           class="w-full h-12 max-sm:mb-2"
           type="button"
         >
-          <app-quote-item [displayValue]="displayValue" [symbolQuote]="summary.quote"></app-quote-item>
+          <app-quote-item [displayValue]="displayValue()" [symbolQuote]="summary.quote"></app-quote-item>
         </button>
 
         <!-- display default symbols -->
@@ -110,7 +110,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
               class="w-full h-12 max-sm:mb-2"
               type="button"
             >
-              <app-quote-item [displayValue]="displayValue" [symbolQuote]="summary.quote"></app-quote-item>
+              <app-quote-item [displayValue]="displayValue()" [symbolQuote]="summary.quote"></app-quote-item>
             </button>
           }
         } @else {
@@ -127,16 +127,16 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {
   @Output() clickedSummary = new EventEmitter<SymbolSummary>();
-  @Input() showHint = true;
+  showHint = input(true);
   /**
    * showing % change in overlay
    */
-  @Input() showValueChange = true;
+  showValueChange = input(true);
   /**
    * open modal on summary click
    */
-  @Input() openModalOnClick = true;
-  @Input() displayValue: 'name' | 'symbol' = 'name';
+  openModalOnClick = input(true);
+  displayValue = input<'name' | 'symbol'>('name');
 
   @ViewChild('trigger', { read: ElementRef }) trigger?: ElementRef<HTMLElement>;
 
@@ -209,7 +209,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     // weird bug: if we don't set isInputFocused to false, the overlay will not close
     this.overlayIsOpen.update((d) => ({ ...d, isInputFocused: false }));
 
-    if (this.openModalOnClick) {
+    if (this.openModalOnClick()) {
       this.dialog.open(StockSummaryDialogComponent, {
         data: {
           symbol: summary.id,
