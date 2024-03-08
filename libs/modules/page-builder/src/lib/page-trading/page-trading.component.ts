@@ -136,7 +136,7 @@ import { take } from 'rxjs';
 
       <!-- templates -->
       <ng-template #noSelectedSummary>
-        <div class="flex flex-col gap-4 mb-6 lg:flex-row h-[480px]">
+        <div class="flex flex-col gap-4 mb-6 xl:flex-row h-[480px]">
           <div class="lg:basis-3/5 g-skeleton"></div>
           <div class="lg:basis-2/5 g-skeleton"></div>
         </div>
@@ -144,9 +144,9 @@ import { take } from 'rxjs';
     </ng-container>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

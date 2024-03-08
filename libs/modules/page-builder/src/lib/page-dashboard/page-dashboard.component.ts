@@ -206,44 +206,30 @@ import { map, pipe, startWith } from 'rxjs';
 
       @if (authenticationUserService.state.userHaveTransactions()) {
         @defer {
-          <div class="flex flex-col-reverse xl:flex-row gap-y-4 gap-8">
-            <div class="xl:basis-2/3">
-              <!-- transaction history -->
-              <div>
-                <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
-                <app-portfolio-transactions-table
-                  [showTransactionFees]="
-                    !!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount
-                  "
-                  [data]="authenticationUserService.state.portfolioTransactions() | sortByKey: 'date' : 'desc'"
-                ></app-portfolio-transactions-table>
-              </div>
-            </div>
-
-            <!-- holdings pie charts -->
-            <div
-              class="flex justify-center lg:justify-between xl:justify-around xl:flex-col gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6"
-            >
-              <app-pie-chart
-                class="max-sm:w-[385px]"
-                chartTitle="Asset Allocation"
-                [heightPx]="400"
-                [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
-              ></app-pie-chart>
-              <app-pie-chart
-                class="hidden lg:block"
-                [heightPx]="400"
-                chartTitle="Sector Allocation"
-                [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
-              ></app-pie-chart>
-            </div>
+          <!-- holdings pie charts -->
+          <div class="flex justify-center lg:justify-between gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6">
+            <app-pie-chart
+              class="max-sm:w-[385px]"
+              chartTitle="Asset Allocation"
+              [heightPx]="400"
+              [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
+            ></app-pie-chart>
+            <app-pie-chart
+              class="hidden lg:block"
+              [heightPx]="400"
+              chartTitle="Sector Allocation"
+              [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
+            ></app-pie-chart>
           </div>
 
-          <!-- transactions chart -->
-          <app-portfolio-transaction-chart
-            *ngIf="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
-            [data]="portfolioUserFacadeService.getPortfolioTransactionToDate()"
-          ></app-portfolio-transaction-chart>
+          <!-- transaction history -->
+          <div>
+            <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
+            <app-portfolio-transactions-table
+              [showTransactionFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
+              [data]="authenticationUserService.state.portfolioTransactions() | sortByKey: 'date' : 'desc'"
+            ></app-portfolio-transactions-table>
+          </div>
         }
       }
     </ng-container>

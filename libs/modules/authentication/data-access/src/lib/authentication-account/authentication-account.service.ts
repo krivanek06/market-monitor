@@ -25,7 +25,7 @@ import { UserAccountTypes, UserData, UserResetTransactionsInput } from '@market-
 import { assignTypesClient } from '@market-monitor/shared/data-access';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { docData as rxDocData } from 'rxfire/firestore';
-import { BehaviorSubject, Observable, Subject, from, of, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, catchError, from, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
 
 @Injectable({
@@ -173,11 +173,26 @@ export class AuthenticationAccountService {
       .pipe(
         switchMap((user) =>
           this.getUserById(user?.uid).pipe(
-            switchMap((userData) => (userData ? of(userData) : user ? from(this.userCreateAccount()) : of(null))),
+            switchMap((userData) =>
+              userData
+                ? of(userData)
+                : user
+                  ? from(this.userCreateAccount()).pipe(
+                      catchError((error) => {
+                        console.log(error);
+                        return of(null);
+                      }),
+                    )
+                  : of(null),
+            ),
           ),
         ),
       )
       .subscribe((userData) => {
+        if (!userData) {
+          this.loadedAuthentication$.next(null);
+          return;
+        }
         console.log('UPDATING USER', userData);
         // update user data
         this.authenticatedUserData$.next(userData);
@@ -208,7 +223,7 @@ export class AuthenticationAccountService {
             lastLoginDate: getCurrentDateDefaultFormat(),
             isAccountActive: true,
           });
-        }, 10_000);
+        }, 20_000);
       }
     });
   }

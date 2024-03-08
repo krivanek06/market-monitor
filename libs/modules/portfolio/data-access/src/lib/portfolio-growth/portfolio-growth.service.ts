@@ -63,7 +63,7 @@ export class PortfolioGrowthService {
           return [...acc, { symbol: curr.symbol, startDate: curr.date }];
         }
         // compare dates and update if sooner
-        if (isBefore(new Date(curr.date), new Date(entry.startDate))) {
+        if (isBefore(curr.date, entry.startDate)) {
           return [...acc.filter((d) => d.symbol !== curr.symbol), { symbol: curr.symbol, startDate: curr.date }];
         }
         // else return original
