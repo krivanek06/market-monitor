@@ -1,4 +1,5 @@
 import { Directive, ElementRef, OnChanges, Renderer2, SimpleChanges, input } from '@angular/core';
+import { DefaultImageType } from '@market-monitor/shared/data-access';
 import { PlatformService } from '../utils';
 
 type ImageSrc = string | null | undefined;
@@ -9,7 +10,7 @@ type ImageSrc = string | null | undefined;
 })
 export class DefaultImgDirective implements OnChanges {
   src = input.required<ImageSrc>();
-  imageType = input<'default' | 'symbol'>('default');
+  imageType = input<DefaultImageType>('default');
 
   private symbolURL = 'https://get-asset-url.krivanek1234.workers.dev';
   private defaultLocalImage = 'assets/image-placeholder.jpg';

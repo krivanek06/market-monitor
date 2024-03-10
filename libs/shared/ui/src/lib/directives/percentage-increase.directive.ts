@@ -85,7 +85,6 @@ export class PercentageIncreaseDirective {
 
     // create elements
     const wrapper = this.vr.element.nativeElement;
-
     if (!changesPercentage && !change) {
       const element = this.renderer2.createElement('span');
       const text = this.renderer2.createText('N/A');

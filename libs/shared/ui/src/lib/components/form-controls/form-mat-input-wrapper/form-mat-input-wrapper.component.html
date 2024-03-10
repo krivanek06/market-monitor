@@ -33,8 +33,10 @@
             <img
               appDefaultImg
               *ngIf="selectedOption?.image as selectedOptionImage"
+              [imageType]="displayImageType()"
               [src]="selectedOptionImage"
               alt="Option image"
+              class="w-8 h-8"
             />
             {{ selectedOption.caption }}
           </mat-select-trigger>
@@ -45,7 +47,14 @@
               (onSelectionChange)="onSelectChange(optionData, $event)"
             >
               <div class="flex items-center gap-2">
-                <img *ngIf="optionData?.image" [src]="optionData.image" alt="" />
+                <img
+                  appDefaultImg
+                  [imageType]="displayImageType()"
+                  *ngIf="optionData?.image"
+                  [src]="optionData.image"
+                  class="w-8 h-8"
+                  alt=""
+                />
                 {{ optionData.caption }}
               </div>
             </mat-option>
@@ -75,8 +84,10 @@
             <img
               appDefaultImg
               *ngIf="selectedOption.image as selectedOptionImage"
+              [imageType]="displayImageType()"
               [src]="selectedOptionImage"
               alt="Option image"
+              class="w-8 h-8"
             />
             {{ selectedOption.caption }}
           </mat-select-trigger>
@@ -92,7 +103,14 @@
             (onSelectionChange)="onSelectChange(optionData, $event)"
           >
             <div class="flex items-center gap-2 min-w-max">
-              <img *ngIf="optionData?.image" [src]="optionData.image" alt="" />
+              <img
+                *ngIf="optionData?.image"
+                appDefaultImg
+                [imageType]="displayImageType()"
+                [src]="optionData.image"
+                class="w-8 h-8"
+                alt=""
+              />
               {{ optionData.caption }}
             </div>
           </mat-option>

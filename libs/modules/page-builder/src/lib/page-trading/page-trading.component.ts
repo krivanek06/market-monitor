@@ -1,12 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@market-monitor/api-client';
-import { PortfolioTransaction, PortfolioTransactionType, SymbolSummary } from '@market-monitor/api-types';
+import {
+  PortfolioStateHolding,
+  PortfolioTransaction,
+  PortfolioTransactionType,
+  SymbolSummary,
+} from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
 import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks/features';
@@ -22,6 +28,7 @@ import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/
 import { getRandomIndex } from '@market-monitor/shared/features/general-util';
 import {
   FancyCardComponent,
+  FormMatInputWrapperComponent,
   QuoteItemComponent,
   RangeDirective,
   SectionTitleComponent,
@@ -49,99 +56,121 @@ import { take } from 'rxjs';
     QuoteItemComponent,
     RangeDirective,
     SectionTitleComponent,
+    FormMatInputWrapperComponent,
+    ReactiveFormsModule,
   ],
   template: `
     <!-- account state -->
-    <ng-container *ngIf="portfolioState() as portfolioState">
-      <div class="flex flex-col lg:flex-row justify-between mb-10 gap-y-10">
-        <!-- account state -->
-        <app-portfolio-state
-          class="lg:basis-3/5 md:pl-10"
-          [titleColor]="ColorScheme.PRIMARY_VAR"
-          [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          [showCashSegment]="!!userDataSignal().features.allowPortfolioCashAccount"
-          [portfolioState]="portfolioState"
-        ></app-portfolio-state>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-6 xl:mb-2 gap-8">
+      <!-- account state -->
+      <app-portfolio-state
+        class="sm:pl-10"
+        [titleColor]="ColorScheme.PRIMARY_VAR"
+        [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+        [showCashSegment]="!!userDataSignal().features.allowPortfolioCashAccount"
+        [portfolioState]="portfolioState()"
+      ></app-portfolio-state>
 
-        <div>
-          <!-- search -->
-          <app-stock-search-basic-customized
-            (clickedSummary)="onSummaryClick($event)"
-            [openModalOnClick]="false"
-            [showValueChange]="false"
-            [showHint]="false"
-            class="scale-90 md:min-w-[600px] mb-2"
-          ></app-stock-search-basic-customized>
+      <div class="flex flex-col xl:flex-row gap-x-6 gap-y-6 xl:col-span-2 max-md:-ml-4">
+        <!-- holdings -->
+        <app-form-mat-input-wrapper
+          inputCaption="Select a holding"
+          inputType="SELECT"
+          [inputSource]="getHoldingsInputSource()"
+          displayImageType="symbol"
+          [formControl]="selectedHoldingControl"
+          class="scale-90 w-full h-12"
+        ></app-form-mat-input-wrapper>
 
-          <!-- action buttons -->
-          <div class="flex items-center gap-4 md:px-10">
-            <ng-container *ngIf="symbolSummarySignal()">
-              <button (click)="onOperationClick('BUY')" class="flex-1" mat-stroked-button color="accent" type="button">
-                BUY
-              </button>
-              <button (click)="onOperationClick('SELL')" class="flex-1" mat-stroked-button color="warn" type="button">
-                SELL
-              </button>
-            </ng-container>
-          </div>
-        </div>
+        <!-- search -->
+        <app-stock-search-basic-customized
+          (clickedSummary)="onSummaryClick($event)"
+          [openModalOnClick]="false"
+          [showHint]="false"
+          class="scale-90 w-full h-12"
+        ></app-stock-search-basic-customized>
       </div>
+    </div>
 
-      <!-- historical chart & summary -->
-      <div
-        *ngIf="symbolSummarySignal() as symbolSummary; else noSelectedSummary"
-        class="flex flex-col gap-4 mb-6 xl:flex-row"
+    <!-- action buttons -->
+    <div class="flex flex-col sm:flex-row xl:justify-end gap-4 mb-6">
+      <button
+        (click)="onOperationClick('BUY')"
+        class="w-full xl:w-[280px]"
+        mat-stroked-button
+        color="accent"
+        type="button"
       >
-        <app-asset-price-chart-interactive
-          class="lg:basis-3/5"
-          [imageName]="symbolSummary.id"
-          [symbol]="symbolSummary.id"
-          [title]="'Historical Price: ' + symbolSummary.id"
-        ></app-asset-price-chart-interactive>
-        <div class="lg:basis-2/5">
-          <app-stock-summary-list [symbolSummary]="symbolSummary"></app-stock-summary-list>
-        </div>
+        BUY
+      </button>
+      <button
+        (click)="onOperationClick('SELL')"
+        class="w-full xl:w-[280px]"
+        mat-stroked-button
+        color="warn"
+        type="button"
+      >
+        SELL
+      </button>
+    </div>
+
+    <!-- historical chart & summary -->
+    <div
+      *ngIf="symbolSummarySignal() as symbolSummary; else noSelectedSummary"
+      class="flex flex-col gap-4 mb-6 xl:flex-row"
+    >
+      <app-asset-price-chart-interactive
+        class="lg:basis-3/5"
+        [imageName]="symbolSummary.id"
+        [symbol]="symbolSummary.id"
+        [title]="'Historical Price: ' + symbolSummary.id"
+      ></app-asset-price-chart-interactive>
+      <div class="lg:basis-2/5">
+        <app-stock-summary-list [symbolSummary]="symbolSummary"></app-stock-summary-list>
       </div>
+    </div>
 
-      <!-- top active -->
-      <div class="mb-10 hidden lg:block">
-        <app-section-title title="Top Active" />
+    <!-- top active -->
+    <div class="mb-10 hidden lg:block">
+      <app-section-title title="Top Active" />
 
-        <div class="grid grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-8 p-4">
-          @for (item of topPerformanceSignal()?.stockTopActive; track item.id) {
-            <app-quote-item
-              (click)="onSummaryClick(item)"
-              class="g-clickable-hover px-4 border-r border-l border-solid"
-              [showValueChange]="false"
-              [symbolQuote]="item.quote"
-              displayValue="symbol"
-            ></app-quote-item>
-          } @empty {
-            <div *ngRange="20" class="g-skeleton h-9"></div>
-          }
-        </div>
+      <div class="grid grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-2 p-4">
+        @for (item of topPerformanceSignal()?.stockTopActive; track item.id) {
+          <div
+            (click)="onSummaryClick(item)"
+            [ngClass]="{
+              'border-wt-primary': item.id === symbolSummarySignal()?.id,
+              border: item.id === symbolSummarySignal()?.id
+            }"
+            class="g-clickable-hover py-2 px-4 border-r border-l border-solid hover:border rounded-lg"
+          >
+            <app-quote-item [symbolQuote]="item.quote" displayValue="symbol"></app-quote-item>
+          </div>
+        } @empty {
+          <div *ngRange="20" class="g-skeleton h-9"></div>
+        }
       </div>
+    </div>
 
-      <!-- transaction history -->
-      <div>
-        <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
+    <!-- transaction history -->
+    <div>
+      <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
 
-        <app-portfolio-transactions-table
-          (deleteEmitter)="onTransactionDelete($event)"
-          [showTransactionFees]="!!userDataSignal().features.allowPortfolioCashAccount"
-          [showActionButton]="!userDataSignal().features.allowPortfolioCashAccount"
-          [data]="portfolioTransactionSignal() | sortByKey: 'date' : 'desc'"
-        ></app-portfolio-transactions-table>
+      <app-portfolio-transactions-table
+        (deleteEmitter)="onTransactionDelete($event)"
+        [showTransactionFees]="!!userDataSignal().features.allowPortfolioCashAccount"
+        [showActionButton]="!userDataSignal().features.allowPortfolioCashAccount"
+        [data]="portfolioTransactionSignal() | sortByKey: 'date' : 'desc'"
+      ></app-portfolio-transactions-table>
+    </div>
+
+    <!-- templates -->
+    <ng-template #noSelectedSummary>
+      <div class="flex flex-col gap-4 mb-6 xl:flex-row h-[480px]">
+        <div class="lg:basis-3/5 g-skeleton"></div>
+        <div class="lg:basis-2/5 g-skeleton"></div>
       </div>
-
-      <!-- templates -->
-      <ng-template #noSelectedSummary>
-        <div class="flex flex-col gap-4 mb-6 xl:flex-row h-[480px]">
-          <div class="lg:basis-3/5 g-skeleton"></div>
-          <div class="lg:basis-2/5 g-skeleton"></div>
-        </div>
-      </ng-template>
-    </ng-container>
+    </ng-template>
   `,
   styles: `
     :host {
@@ -167,8 +196,14 @@ export class PageTradingComponent {
   portfolioState = this.portfolioUserFacadeService.getPortfolioState;
   portfolioTransactionSignal = this.authenticationUserService.state.portfolioTransactions;
   userDataSignal = this.authenticationUserService.state.getUserData;
+  getHoldingsInputSource = this.portfolioUserFacadeService.getHoldingsInputSource;
 
   ColorScheme = ColorScheme;
+
+  /**
+   * track the selected holding by user, null if else is selected
+   */
+  selectedHoldingControl = new FormControl<PortfolioStateHolding | null>(null);
 
   constructor() {
     // preload one random symbol into selectedSummary
@@ -180,10 +215,19 @@ export class PageTradingComponent {
         const randomSummary = topPerformance?.stockTopActive[randomNumber];
         this.onSummaryClick(randomSummary);
       });
+
+    // listen on selected holding change and load summary
+    this.selectedHoldingControl.valueChanges.subscribe((holding) => {
+      if (holding?.symbolSummary) {
+        this.symbolSummarySignal.set(holding.symbolSummary);
+      }
+    });
   }
 
   onSummaryClick(summary: SymbolSummary) {
     this.symbolSummarySignal.set(summary);
+    // reset holding selection
+    this.selectedHoldingControl.patchValue(null, { emitEvent: false });
   }
 
   @Confirmable('Please confirm removing transaction')
@@ -198,7 +242,6 @@ export class PageTradingComponent {
   }
 
   onOperationClick(transactionType: PortfolioTransactionType): void {
-    console.log('operation', transactionType);
     const summary = this.symbolSummarySignal();
     if (!summary) {
       this.dialogServiceUtil.showNotificationBar('Please select a stock first', 'notification');

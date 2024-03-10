@@ -302,7 +302,7 @@ export class PageDashboardComponent {
     this.dialogServiceUtil.showGenericDialog({
       title: 'Portfolio Asset Growth Chart',
       component: PortfolioAssetChartComponent,
-      componentData: {
+      componentData: <PortfolioAssetChartComponent>{
         data: this.portfolioUserFacadeService.getPortfolioGrowthAssets() ?? [],
       },
     });

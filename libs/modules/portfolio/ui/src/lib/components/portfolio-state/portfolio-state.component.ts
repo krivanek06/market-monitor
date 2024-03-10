@@ -14,20 +14,24 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
         <!-- balance -->
         <div class="flex justify-between @md:flex-col">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Balance</div>
-          <div [appAddColor]="valueColor()" class="sm:text-lg">{{ portfolioState()?.balance | currency }}</div>
+          <div [appAddColor]="valueColor()" class="sm:text-lg">
+            {{ (portfolioState()?.balance | currency) ?? 'N/A' }}
+          </div>
         </div>
 
         <!-- Invested -->
         <div class="flex justify-between @md:flex-col">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Invested</div>
-          <div [appAddColor]="valueColor()" class="sm:text-lg">{{ portfolioState()?.holdingsBalance | currency }}</div>
+          <div [appAddColor]="valueColor()" class="sm:text-lg">
+            {{ (portfolioState()?.holdingsBalance | currency) ?? 'N/A' }}
+          </div>
         </div>
 
         <!-- Cash -->
         <div *ngIf="showCashSegment()" class="flex justify-between @md:flex-col">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Cash</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
-            {{ portfolioState()?.cashOnHand | currency }}
+            {{ (portfolioState()?.cashOnHand | currency) ?? 'N/A' }}
           </div>
         </div>
 
@@ -62,9 +66,9 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

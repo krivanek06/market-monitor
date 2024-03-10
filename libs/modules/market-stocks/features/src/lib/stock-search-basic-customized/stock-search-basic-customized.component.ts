@@ -53,8 +53,6 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
       #trigger
       #origin="cdkOverlayOrigin"
       [showHint]="showHint()"
-      [showValueChange]="showValueChange()"
-      [displayValue]="displayValue()"
     ></app-stock-search-basic>
 
     <ng-template
@@ -97,7 +95,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
           class="w-full h-12 max-sm:mb-2"
           type="button"
         >
-          <app-quote-item [displayValue]="displayValue()" [symbolQuote]="summary.quote"></app-quote-item>
+          <app-quote-item [symbolQuote]="summary.quote"></app-quote-item>
         </button>
 
         <!-- display default symbols -->
@@ -110,7 +108,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
               class="w-full h-12 max-sm:mb-2"
               type="button"
             >
-              <app-quote-item [displayValue]="displayValue()" [symbolQuote]="summary.quote"></app-quote-item>
+              <app-quote-item [symbolQuote]="summary.quote"></app-quote-item>
             </button>
           }
         } @else {
@@ -129,14 +127,9 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
   @Output() clickedSummary = new EventEmitter<SymbolSummary>();
   showHint = input(true);
   /**
-   * showing % change in overlay
-   */
-  showValueChange = input(true);
-  /**
    * open modal on summary click
    */
   openModalOnClick = input(true);
-  displayValue = input<'name' | 'symbol'>('name');
 
   @ViewChild('trigger', { read: ElementRef }) trigger?: ElementRef<HTMLElement>;
 

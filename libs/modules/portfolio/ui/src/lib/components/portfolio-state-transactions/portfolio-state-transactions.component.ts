@@ -26,7 +26,7 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
         <div class="flex justify-between @md:flex-col">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Buy</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
-            {{ portfolioState()?.numberOfExecutedBuyTransactions }}
+            {{ portfolioState()?.numberOfExecutedBuyTransactions ?? 'N/A' }}
           </div>
         </div>
 
@@ -34,7 +34,7 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
         <div class="flex justify-between @md:flex-col">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Sell</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
-            {{ portfolioState()?.numberOfExecutedSellTransactions }}
+            {{ portfolioState()?.numberOfExecutedSellTransactions ?? 'N/A' }}
           </div>
         </div>
 
@@ -42,16 +42,16 @@ import { AddColorDirective } from '@market-monitor/shared/ui';
         <div *ngIf="showFees()" class="flex justify-between @md:flex-col">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Fees</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
-            {{ portfolioState()?.transactionFees | currency }}
+            {{ (portfolioState()?.transactionFees | currency) ?? 'N/A' }}
           </div>
         </div>
       </div>
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

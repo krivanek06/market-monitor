@@ -55,11 +55,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
         } @else {
           <!-- loaded data -->
           <mat-option *ngFor="let summary of options(); let last = last" [value]="summary" class="py-2 rounded-md">
-            <app-quote-item
-              [showValueChange]="showValueChange()"
-              [symbolQuote]="summary.quote"
-              [displayValue]="displayValue()"
-            ></app-quote-item>
+            <app-quote-item [symbolQuote]="summary.quote"></app-quote-item>
             <div *ngIf="!last" class="mt-2">
               <mat-divider></mat-divider>
             </div>
@@ -99,8 +95,6 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
    */
   @Output() inputHasValue = new EventEmitter<boolean>();
   showHint = input(true);
-  showValueChange = input(true);
-  displayValue = input<'name' | 'symbol'>('name');
 
   searchControl = new FormControl<string>('', { nonNullable: true });
 

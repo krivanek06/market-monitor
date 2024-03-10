@@ -35,7 +35,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { InputSource, InputSourceWrapper, InputType, InputTypeEnum } from '@market-monitor/shared/data-access';
+import {
+  DefaultImageType,
+  InputSource,
+  InputSourceWrapper,
+  InputType,
+  InputTypeEnum,
+} from '@market-monitor/shared/data-access';
 import { DefaultImgDirective } from '../../../directives';
 
 @Component({
@@ -67,23 +73,24 @@ import { DefaultImgDirective } from '../../../directives';
     },
   ],
   styles: `
-      mat-form-field.mat-mdc-form-field {
-        width: 100%;
-      }
+    mat-form-field.mat-mdc-form-field {
+      width: 100%;
+    }
 
-      fieldset {
-        clear: both;
-      }
+    fieldset {
+      clear: both;
+    }
 
-      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-        display: none !important;
-      }
-    `,
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      display: none !important;
+    }
+  `,
 })
 export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, ControlValueAccessor {
   inputCaption = input.required<string>();
   prefixIcon = input<string | undefined>();
   inputType = input<InputTypeEnum | InputType>('TEXT');
+  displayImageType = input<DefaultImageType>('default');
 
   /*
 		disable input source

@@ -3,8 +3,11 @@ export interface InputSourceWrapper<T> {
   items: InputSource<T>[];
 }
 
+export type DefaultImageType = 'default' | 'symbol';
+
 export interface InputSource<T> {
   image?: string;
+  imageType?: DefaultImageType;
   value: T;
   caption: string;
   additionalData?: unknown;

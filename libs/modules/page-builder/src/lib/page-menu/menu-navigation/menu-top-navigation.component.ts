@@ -158,10 +158,9 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
           <!-- search -->
           <app-stock-search-basic-customized
-            [showValueChange]="true"
             [showHint]="false"
             displayValue="symbol"
-            class="hidden sm:block w-[520px] scale-[0.8] -mb-4 -mr-10 mt-3"
+            class="hidden sm:block w-[520px] scale-[0.8] mb-1 -mr-10 mt-3"
           />
 
           <div class="gap-1 items-center hidden xl:flex">

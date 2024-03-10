@@ -1,6 +1,8 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { PortfolioStateHolding } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
+import { InputSource } from '@market-monitor/shared/data-access';
 import { combineLatest, from, of, switchMap } from 'rxjs';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.service';
@@ -72,5 +74,18 @@ export class PortfolioUserFacadeService {
   getPortfolioTransactionToDate = computed(() => {
     const transactions = this.authenticationUserService.state.getUserPortfolioTransactions();
     return this.portfolioCalculationService.getPortfolioTransactionToDate(transactions ?? []);
+  });
+
+  getHoldingsInputSource = computed(() => {
+    return (
+      this.getPortfolioState()?.holdings?.map(
+        (holding) =>
+          ({
+            value: holding,
+            caption: `${holding.symbolSummary.quote.name}`,
+            image: holding.symbolSummary.id,
+          }) satisfies InputSource<PortfolioStateHolding>,
+      ) ?? []
+    );
   });
 }
