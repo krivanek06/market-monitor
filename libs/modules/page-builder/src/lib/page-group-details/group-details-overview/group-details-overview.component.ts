@@ -165,6 +165,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
               [clickable]="true"
               [currentPositions]="user.position.currentGroupMemberPosition"
               [previousPosition]="user.position.previousGroupMemberPosition"
+              class="g-clickable-hover"
             >
               <app-user-display-item [userData]="user"></app-user-display-item>
             </app-position-card>
@@ -253,9 +254,9 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     </ng-container>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

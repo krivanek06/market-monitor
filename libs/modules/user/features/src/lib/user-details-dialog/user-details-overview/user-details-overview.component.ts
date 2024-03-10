@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, input } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { PortfolioStateHoldings, UserData } from '@market-monitor/api-types';
 import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
 import {
@@ -25,6 +26,7 @@ import { GenericChartComponent, SectionTitleComponent } from '@market-monitor/sh
     MatDividerModule,
     PortfolioHoldingsTableComponent,
     SectionTitleComponent,
+    MatProgressSpinner,
   ],
   template: `
     <div class="pb-2">
@@ -66,20 +68,24 @@ import { GenericChartComponent, SectionTitleComponent } from '@market-monitor/sh
     </div>
 
     <!-- portfolio growth charts -->
-    <div>
+    @if (portfolioGrowth(); as portfolioGrowth) {
       <app-portfolio-growth-chart
         headerTitle="Portfolio Growth"
         chartType="balance"
         [displayHeader]="true"
         [displayLegend]="true"
         [data]="{
-          values: portfolioGrowth(),
+          values: portfolioGrowth,
           startingCashValue: userData().portfolioState.startingCash
         }"
         [heightPx]="375"
         class="mb-6"
       ></app-portfolio-growth-chart>
-    </div>
+    } @else {
+      <div class="h-[375px] grid place-content-center">
+        <mat-spinner></mat-spinner>
+      </div>
+    }
 
     <div class="max-sm:pl-2">
       <app-section-title [title]="'Holdings: ' + (holdings()?.holdings ?? []).length" />
@@ -91,16 +97,16 @@ import { GenericChartComponent, SectionTitleComponent } from '@market-monitor/sh
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserDetailsOverviewComponent implements OnInit {
   userData = input.required<UserData>();
-  portfolioGrowth = input<PortfolioGrowth[]>([]);
+  portfolioGrowth = input.required<PortfolioGrowth[] | null>();
   holdings = input<PortfolioStateHoldings>();
 
   ColorScheme = ColorScheme;

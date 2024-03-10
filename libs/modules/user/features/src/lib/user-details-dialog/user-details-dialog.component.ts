@@ -65,9 +65,9 @@ export type UserDetailsDialogComponentData = {
     </mat-dialog-content>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -80,13 +80,14 @@ export class UserDetailsDialogComponent {
 
   userDataSignal = signal<UserData | undefined>(undefined);
   portfolioStateHoldingSignal = signal<PortfolioStateHoldings | undefined>(undefined);
-  portfolioGrowthAssetsSignal = signal<PortfolioGrowthAssets[]>([]);
-  portfolioGrowthSignal = computed(() =>
-    this.portfolioCalculationService.getPortfolioGrowth(
-      this.portfolioGrowthAssetsSignal(),
-      this.userDataSignal()?.portfolioState?.startingCash,
-    ),
-  );
+  portfolioGrowthAssetsSignal = signal<PortfolioGrowthAssets[] | null>(null);
+  portfolioGrowthSignal = computed(() => {
+    const growth = this.portfolioGrowthAssetsSignal();
+
+    return growth
+      ? this.portfolioCalculationService.getPortfolioGrowth(growth, this.userDataSignal()?.portfolioState?.startingCash)
+      : null;
+  });
 
   constructor(
     private dialogRef: MatDialogRef<UserDetailsDialogComponent>,
