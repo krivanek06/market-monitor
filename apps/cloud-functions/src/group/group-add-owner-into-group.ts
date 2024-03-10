@@ -1,7 +1,8 @@
-import { GroupMember } from '@market-monitor/api-types';
+import { GROUP_MEMBER_LIMIT, GroupMember } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {
+  GROUP_IS_FULL_ERROR,
   GROUP_NOT_FOUND_ERROR,
   GROUP_USER_NOT_OWNER,
   USER_NOT_FOUND_ERROR,
@@ -33,6 +34,11 @@ export const groupAddOwnerIntoGroupCall = onCall(async (request) => {
     throw new HttpsError('failed-precondition', GROUP_USER_NOT_OWNER);
   }
 
+  // check if group will not have more than N members
+  if (groupData.memberUserIds.length >= GROUP_MEMBER_LIMIT) {
+    throw new HttpsError('resource-exhausted', GROUP_IS_FULL_ERROR);
+  }
+
   // update group
   await groupDocumentRef(groupId).update({
     memberUserIds: FieldValue.arrayUnion(userAuthId),
@@ -42,7 +48,7 @@ export const groupAddOwnerIntoGroupCall = onCall(async (request) => {
   // update group member data
   await groupDocumentMembersRef(groupId).update({
     data: FieldValue.arrayUnion(<GroupMember>{
-      ...transformUserToGroupMember(userData, 1),
+      ...transformUserToGroupMember(userData, groupData.memberUserIds.length + 1),
     }),
   });
 

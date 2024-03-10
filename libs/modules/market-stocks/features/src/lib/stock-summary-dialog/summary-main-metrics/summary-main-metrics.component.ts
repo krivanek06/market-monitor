@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { SymbolSummary } from '@market-monitor/api-types';
 import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
 
@@ -20,13 +20,13 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         class="max-sm:w-full min-w-[275px]"
       >
         <div class="flex items-center justify-center gap-3">
-          <span>{{ stockSummary.quote.price | currency }}</span>
+          <span>{{ stockSummary().quote.price | currency }}</span>
           <span
             appPercentageIncrease
             [useCurrencySign]="true"
             [changeValues]="{
-              change: stockSummary.quote.change,
-              changePercentage: stockSummary.quote.changesPercentage
+              change: stockSummary().quote.change,
+              changePercentage: stockSummary().quote.changesPercentage
             }"
           ></span>
         </div>
@@ -42,19 +42,19 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         cardColor="bg-wt-gray-light-strong"
         class="hidden sm:block min-w-[150px]"
       >
-        <div class="text-center">{{ stockSummary.profile?.mktCap | largeNumberFormatter }}</div>
+        <div class="text-center">{{ stockSummary().profile?.mktCap | largeNumberFormatter }}</div>
       </app-general-card>
 
       <!-- volume -->
       <!-- <app-general-card [titleCenter]="true" title="Volume" additionalClasses="h-full"
     cardColor="bg-wt-gray-light-strong" class="hidden lg:block">
     <div>
-      <span>{{ stockSummary.quote.volume | largeNumberFormatter }}</span>
+      <span>{{ stockSummary().quote.volume | largeNumberFormatter }}</span>
       <span
         appPercentageIncrease
         [currentValues]="{
-        value: stockSummary.quote.volume,
-        valueToCompare: stockSummary.quote.avgVolume,
+        value: stockSummary().quote.volume,
+        valueToCompare: stockSummary().quote.avgVolume,
     }"
       ></span>
     </div>
@@ -70,7 +70,7 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         title="PE"
         class="hidden md:block min-w-[100px]"
       >
-        <div class="text-center">{{ stockSummary.quote.pe | number: '1.2-2' }}</div>
+        <div class="text-center">{{ stockSummary().quote.pe | number: '1.2-2' }}</div>
       </app-general-card>
 
       <!-- EPS -->
@@ -83,7 +83,7 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         title="EPS"
         class="hidden lg:block min-w-[100px]"
       >
-        <div class="text-center">{{ stockSummary.quote.eps ?? 'N/A' }}</div>
+        <div class="text-center">{{ stockSummary().quote.eps ?? 'N/A' }}</div>
       </app-general-card>
 
       <!-- Sector -->
@@ -96,7 +96,7 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         cardColor="bg-wt-gray-light-strong"
         class="hidden text-center xl:block"
       >
-        <div>{{ stockSummary.profile?.sector || 'N/A' }}</div>
+        <div>{{ stockSummary().profile?.sector || 'N/A' }}</div>
       </app-general-card>
     </div>
   `,
@@ -107,5 +107,5 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
   `,
 })
 export class SummaryMainMetricsComponent {
-  @Input({ required: true }) stockSummary!: SymbolSummary;
+  stockSummary = input.required<SymbolSummary>();
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { PortfolioStateHoldings, UserData } from '@market-monitor/api-types';
@@ -104,14 +104,11 @@ import { GenericChartComponent, SectionTitleComponent } from '@market-monitor/sh
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UserDetailsOverviewComponent implements OnInit {
+export class UserDetailsOverviewComponent {
   userData = input.required<UserData>();
   portfolioGrowth = input.required<PortfolioGrowth[] | null>();
   holdings = input<PortfolioStateHoldings>();
 
   ColorScheme = ColorScheme;
   displayedColumns: string[] = ['symbol', 'price', 'balance', 'invested', 'totalChange', 'portfolio', 'marketCap'];
-  constructor() {}
-
-  ngOnInit() {}
 }

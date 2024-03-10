@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 import { GroupApiService } from '@market-monitor/api-client';
 import { GroupDetails, UserData } from '@market-monitor/api-types';
@@ -11,14 +11,14 @@ import { GeneralCardComponent } from '@market-monitor/shared/ui';
   standalone: true,
   imports: [CommonModule, GeneralCardComponent, UserDisplayItemComponent, MatRippleModule],
   template: `
-    <app-general-card *ngIf="memberRequestUsers.length > 0 || memberInvitedUsers.length > 0" title="Invitations">
+    <app-general-card *ngIf="memberRequestUsers().length > 0 || memberInvitedUsers().length > 0" title="Invitations">
       <div class="w-full min-h-[150px] p-2 grid gap-8">
         <!-- received invitations -->
-        <div *ngIf="memberRequestUsers.length > 0">
+        <div *ngIf="memberRequestUsers().length > 0">
           <div class="mb-4 text-lg">Received Invitations</div>
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
             <div
-              *ngFor="let user of memberRequestUsers"
+              *ngFor="let user of memberRequestUsers()"
               (click)="onReceivedInvitationClick(user)"
               matRipple
               [matRippleCentered]="true"
@@ -33,11 +33,11 @@ import { GeneralCardComponent } from '@market-monitor/shared/ui';
         </div>
 
         <!-- sent invitations -->
-        <div *ngIf="memberInvitedUsers.length > 0">
+        <div *ngIf="memberInvitedUsers().length > 0">
           <div class="mb-4 text-lg">Sent Invitations</div>
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
             <div
-              *ngFor="let user of memberInvitedUsers"
+              *ngFor="let user of memberInvitedUsers()"
               (click)="onSentInvitationClick(user)"
               matRipple
               [matRippleCentered]="true"
@@ -54,16 +54,16 @@ import { GeneralCardComponent } from '@market-monitor/shared/ui';
     </app-general-card>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupInvitationsManagerComponent {
-  @Input({ required: true }) groupData!: GroupDetails;
-  @Input({ required: true }) memberRequestUsers!: UserData[];
-  @Input({ required: true }) memberInvitedUsers!: UserData[];
+  groupData = input.required<GroupDetails>();
+  memberRequestUsers = input.required<UserData[]>();
+  memberInvitedUsers = input.required<UserData[]>();
 
   groupApiService = inject(GroupApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
@@ -84,7 +84,7 @@ export class GroupInvitationsManagerComponent {
         this.dialogServiceUtil.showNotificationBar(`Accepting ${user.personal.displayName} to join the group`);
         await this.groupApiService.acceptUserRequestToGroup({
           userId: user.id,
-          groupId: this.groupData.groupData.id,
+          groupId: this.groupData().groupData.id,
         });
         this.dialogServiceUtil.showNotificationBar(`Accepted ${user.personal.displayName} to join`, 'success');
       }
@@ -94,7 +94,7 @@ export class GroupInvitationsManagerComponent {
         this.dialogServiceUtil.showNotificationBar(`Declining ${user.personal.displayName} to join the group`);
         await this.groupApiService.declineUserRequestToGroup({
           userId: user.id,
-          groupId: this.groupData.groupData.id,
+          groupId: this.groupData().groupData.id,
         });
         this.dialogServiceUtil.showNotificationBar(`Declined ${user.personal.displayName} to join`, 'success');
       }
@@ -111,7 +111,7 @@ export class GroupInvitationsManagerComponent {
 
       // remove invitation
       await this.groupApiService.removeUserInvitationToGroup({
-        groupId: this.groupData.groupData.id,
+        groupId: this.groupData().groupData.id,
         userId: user.id,
       });
 

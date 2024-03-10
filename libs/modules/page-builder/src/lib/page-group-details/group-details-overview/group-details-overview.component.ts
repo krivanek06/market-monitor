@@ -123,7 +123,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         [displayHeader]="true"
         [displayLegend]="true"
         headerTitle="Portfolio Growth"
-      ></app-portfolio-growth-chart>
+      />
 
       <!-- invitations -->
       <app-group-invitations-manager
@@ -132,7 +132,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         [groupData]="groupDetailsSignal"
         [memberRequestUsers]="memberRequestedUsersSignal()"
         [memberInvitedUsers]="memberInvitedUsersSignal()"
-      ></app-group-invitations-manager>
+      />
 
       <!-- member -->
       <div class="grid gap-4 mb-12">
@@ -159,11 +159,15 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         </div>
         <!-- member list -->
         <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-4">
-          @for (user of groupDetailsSignal.groupMembersData | slice: 0 : displayMembersLimit(); track user.id) {
+          @for (
+            user of groupDetailsSignal.groupMembersData | slice: 0 : displayMembersLimit();
+            track user.id;
+            let i = $index
+          ) {
             <app-position-card
               (clickedEmitter)="onMemberClick(user)"
               [clickable]="true"
-              [currentPositions]="user.position.currentGroupMemberPosition"
+              [currentPositions]="i + 1"
               [previousPosition]="user.position.previousGroupMemberPosition"
               class="g-clickable-hover"
             >
@@ -188,11 +192,11 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         </button>
       </div>
 
-      <div class="sm:grid mb-12 xl:grid-cols-3 gap-x-4 hidden">
+      <div class="sm:grid mb-12 xl:grid-cols-2 gap-x-4 hidden">
         <!-- bubble chart -->
         <app-generic-chart
           *ngIf="portfolioHoldingBubbleChartSignal() as portfolioHoldingBubbleChart"
-          class="xl:col-span-2 hidden sm:block w-full"
+          class="hidden sm:block w-full"
           [heightPx]="380"
           [series]="portfolioHoldingBubbleChart"
         ></app-generic-chart>
