@@ -189,10 +189,6 @@ export class AuthenticationAccountService {
         ),
       )
       .subscribe((userData) => {
-        if (!userData) {
-          this.loadedAuthentication$.next(null);
-          return;
-        }
         console.log('UPDATING USER', userData);
         // update user data
         this.authenticatedUserData$.next(userData);

@@ -50,7 +50,7 @@ export class UserApiService {
       query(
         this.userCollection(),
         where('personal.displayName', '>=', name.toUpperCase()),
-        where('personal.displayName', '<=', name.toLowerCase()),
+        where('personal.displayName', '<=', name.toLowerCase() + '\uf8ff'),
         limit(10),
       ),
     );

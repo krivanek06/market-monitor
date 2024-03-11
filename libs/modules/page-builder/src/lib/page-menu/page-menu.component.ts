@@ -40,7 +40,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
         <app-menu-side-navigation />
       </mat-drawer>
 
-      <mat-drawer-content>
+      <mat-drawer-content class="overflow-x-clip">
         <!-- top navigation on big screen -->
         <header>
           <app-menu-top-navigation (menuClickEmitter)="toggleMatDrawerExpandedView()"></app-menu-top-navigation>
@@ -62,30 +62,30 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
     </mat-drawer-container>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
 
-      .mat-drawer:not(.mat-drawer-side) {
-          position: fixed;
-      }
+    .mat-drawer:not(.mat-drawer-side) {
+      position: fixed;
+    }
 
-      .mat-drawer-backdrop {
-          position: fixed !important;
-      }
+    .mat-drawer-backdrop {
+      position: fixed !important;
+    }
 
-      .c-content-wrapper {
-        height: auto;
-        padding: 24px 20px 40px 20px;
-        max-width: 100%;
-        margin: auto;
+    .c-content-wrapper {
+      height: auto;
+      padding: 24px 20px 40px 20px;
+      max-width: 100%;
+      margin: auto;
 
-        @screen xl {
-          padding: 20px 32px 40px 32px;
-          max-width: 1560px;
-        }
+      @screen xl {
+        padding: 20px 32px 40px 32px;
+        max-width: 1560px;
       }
-    `,
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageMenuComponent {

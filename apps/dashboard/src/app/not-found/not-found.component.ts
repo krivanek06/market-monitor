@@ -15,7 +15,7 @@ import { RouterModule } from '@angular/router';
         <div class="text-xl font-bold text-center text-wt-primary">Page Not Found</div>
         <div class="text-lg text-center">The page you are looking for doesn't exist or an other error occurred.</div>
         <div class="text-lg text-center text-wt-primary">
-          <button mat-flat-button type="button" color="primary">
+          <button mat-flat-button type="button" color="primary" class="h-11">
             <mat-icon>arrow_back</mat-icon>
             <a routerLink="/">Go to Home</a>
           </button>

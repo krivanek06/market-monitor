@@ -155,31 +155,33 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
 
     <!-- closed group -->
     <ng-template #closedGroupActionButtons>
-      <!-- owner -->
-      <button
-        *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
-        (click)="onGroupDeleteClick()"
-        type="button"
-        mat-flat-button
-        color="warn"
-        [matTooltip]="tooltipDelete"
-      >
-        <mat-icon>delete</mat-icon>
-        Delete Group
-      </button>
+      <div class="flex flex-row gap-4">
+        <!-- owner -->
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          (click)="onGroupDeleteClick()"
+          type="button"
+          mat-flat-button
+          color="warn"
+          [matTooltip]="tooltipDelete"
+        >
+          <mat-icon>delete</mat-icon>
+          Delete Group
+        </button>
 
-      <!-- owner -->
-      <button
-        *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
-        (click)="onGroupReopenClick()"
-        type="button"
-        mat-stroked-button
-        color="accent"
-        [matTooltip]="tooltipClose"
-      >
-        <mat-icon>cached</mat-icon>
-        Reopen Group
-      </button>
+        <!-- owner -->
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          (click)="onGroupReopenClick()"
+          type="button"
+          mat-stroked-button
+          color="accent"
+          [matTooltip]="tooltipClose"
+        >
+          <mat-icon>cached</mat-icon>
+          Reopen Group
+        </button>
+      </div>
     </ng-template>
   `,
   styles: `

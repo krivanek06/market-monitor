@@ -7,7 +7,8 @@
 }
 
 .g-skeleton {
-  @apply rounded-lg bg-wt-gray-medium animate-pulse;
+  @apply rounded-lg animate-pulse;
+  background-color: var(--gray-medium) !important;
 }
 
 .g-width-lg {

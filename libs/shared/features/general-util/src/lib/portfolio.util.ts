@@ -81,6 +81,7 @@ export const getPortfolioStateHoldingsUtil = (
       ? calculateGrowth(balance, previousPortfolioState.balance)
       : 0,
     accountResetDate: previousPortfolioState.accountResetDate,
+    portfolioRisk: previousPortfolioState.portfolioRisk,
   };
 
   return {

@@ -135,7 +135,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       />
 
       <!-- member -->
-      <div class="grid gap-4 mb-12">
+      <div *ngIf="groupDetailsSignal.groupMembersData.length > 0" class="grid gap-4 mb-12">
         <div class="flex items-center justify-between">
           <app-section-title
             title="Members [{{ groupDetailsSignal.groupMembersData.length }} / {{ GROUP_MEMBER_LIMIT }}]"
@@ -192,7 +192,10 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         </button>
       </div>
 
-      <div class="sm:grid mb-12 xl:grid-cols-2 gap-x-4 hidden">
+      <div
+        *ngIf="groupDetailsSignal.groupTransactionsData.length > 0"
+        class="sm:grid mb-12 xl:grid-cols-2 gap-x-4 hidden"
+      >
         <!-- bubble chart -->
         <app-generic-chart
           *ngIf="portfolioHoldingBubbleChartSignal() as portfolioHoldingBubbleChart"
@@ -239,7 +242,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       </div>
 
       <!-- transaction chart -->
-      <div class="mb-6">
+      <div *ngIf="groupDetailsSignal.groupTransactionsData.length > 5" class="mb-6">
         <app-section-title title="Last Transactions" matIcon="history" />
         <app-portfolio-transaction-chart
           [data]="groupDetailsSignal.groupPortfolioSnapshotsData"
@@ -247,7 +250,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       </div>
 
       <!-- transactions -->
-      <div>
+      <div *ngIf="groupDetailsSignal.groupTransactionsData.length > 0">
         <app-section-title title="Last Transactions" matIcon="history" additionalClasses="pl-1 mb-3" />
         <app-portfolio-transactions-table
           [showTransactionFees]="true"

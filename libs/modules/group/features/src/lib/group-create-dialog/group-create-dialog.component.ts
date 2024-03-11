@@ -159,10 +159,10 @@ import { map, startWith } from 'rxjs';
     </ng-template>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupCreateDialogComponent implements OnInit {
@@ -171,8 +171,8 @@ export class GroupCreateDialogComponent implements OnInit {
       validators: [requiredValidator, minLengthValidator(4), maxLengthValidator(28)],
       nonNullable: true,
     }),
-    isPublic: new FormControl(true),
-    isOwnerMember: new FormControl(true),
+    isPublic: new FormControl(true, { nonNullable: true }),
+    isOwnerMember: new FormControl(true, { nonNullable: true }),
     uploadedImage: new FormControl<string | null>(null),
   });
 
@@ -231,15 +231,15 @@ export class GroupCreateDialogComponent implements OnInit {
     }
 
     // check if at least one user is added
-    if (this.selectedUsersSignal().length === 0) {
+    if (this.selectedUsersSignal().length === 0 && !this.form.controls.isOwnerMember.value) {
       this.dialogServiceUtil.showNotificationBar('Please add at least one user', 'error');
       return;
     }
 
     const value: GroupCreateInput = {
       groupName: this.form.controls.groupName.value,
-      isPublic: this.form.controls.isPublic.value ?? false,
-      isOwnerMember: this.form.controls.isOwnerMember.value ?? false,
+      isPublic: this.form.controls.isPublic.value,
+      isOwnerMember: this.form.controls.isOwnerMember.value,
       memberInvitedUserIds: this.selectedUsersSignal().map((d) => d.id),
       imageUrl: this.form.controls.uploadedImage.value ?? null,
     };

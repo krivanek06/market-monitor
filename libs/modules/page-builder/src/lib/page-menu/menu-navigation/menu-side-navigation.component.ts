@@ -33,9 +33,9 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
   template: `
     <div class="flex items-center gap-2 p-6 mb-2">
       <!-- avatar -->
-      <img appDefaultImg [src]="userData().personal.photoURL" alt="User Image" class="rounded-full w-8 h-8" />
+      <img appDefaultImg [src]="userData()?.personal?.photoURL" alt="User Image" class="rounded-full w-8 h-8" />
       <!-- name -->
-      <div>{{ userData().personal.displayName }}</div>
+      <div>{{ userData()?.personal?.displayName }}</div>
     </div>
 
     <!-- main navigation -->
@@ -130,7 +130,7 @@ export class MenuSideNavigationComponent implements OnInit {
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private dialog = inject(MatDialog);
 
-  userData = this.authenticationUserStoreService.state.getUserData;
+  userData = this.authenticationUserStoreService.state.getUserDataNormal;
 
   sideNavigation = computed(() => {
     const userAccountType = this.authenticationUserStoreService.state.getUserAccountType();

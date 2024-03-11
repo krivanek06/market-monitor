@@ -173,7 +173,8 @@ export class PageGroupsComponent {
   searchGroupControl = new FormControl<GroupData | null>(null);
 
   isCreateGroupDisabledSignal = computed(
-    () => this.authenticationUserService.state.getUserData().groups.groupOwner.length >= GROUP_OWNER_LIMIT,
+    () =>
+      (this.authenticationUserService.state.getUserDataNormal()?.groups?.groupOwner?.length ?? 99) >= GROUP_OWNER_LIMIT,
   );
 
   get errorMessageGroupCreate(): string {

@@ -78,7 +78,7 @@ export class GroupApiService {
       query(
         this.getGroupCollectionRef(),
         where('name', '>=', name.toUpperCase()),
-        where('name', '<=', name.toLowerCase()),
+        where('name', '<=', name.toLowerCase() + '\uf8ff'),
         limit(limitResult),
       ),
     );

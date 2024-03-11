@@ -38,7 +38,7 @@ export class GroupUserHasRoleDirective implements OnInit, OnDestroy {
   @Input({ alias: 'appGroupUserHasRoleExclude' }) groupRolesExclude: SubGroups = [];
 
   private groupId$ = new BehaviorSubject<string>('');
-  private getUserData$ = toObservable(this.authenticationUserService.state.getUserData);
+  private getUserData$ = toObservable(this.authenticationUserService.state.getUserDataNormal);
   private destroy$ = new Subject<void>();
   private context = new GroupUserHasRoleDirectiveContext();
 
@@ -61,6 +61,10 @@ export class GroupUserHasRoleDirective implements OnInit, OnDestroy {
     combineLatest([this.groupId$, this.getUserData$])
       .pipe(
         map(([groupId, userData]) => {
+          if (!userData) {
+            return false;
+          }
+
           const includeRoles = this.groupRolesInclude.every((role) => userData.groups[role].includes(groupId));
           const excludeRoles = this.groupRolesExclude.every((role) => !userData.groups[role].includes(groupId));
           console.log({

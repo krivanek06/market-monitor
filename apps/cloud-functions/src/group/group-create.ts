@@ -23,7 +23,7 @@ import {
   groupsCollectionRef,
   userDocumentRef,
 } from '../models';
-import { transformUserToBase } from '../utils';
+import { transformUserToBase, transformUserToGroupMember } from '../utils';
 
 /**
  * Create a new group
@@ -47,6 +47,7 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
   // load user data from firebase
   const userDataDoc = await userDocumentRef(userAuthId).get();
   const userData = userDataDoc.data();
+  const isOwnerMember = data.isOwnerMember;
 
   // check if user exists
   if (!userData) {
@@ -54,6 +55,7 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
   }
 
   const userBase = transformUserToBase(userData);
+  const groupMembers = transformUserToGroupMember(userData, 1);
   const group = (await groupsCollectionRef().where('name', '==', data.groupName).get()).docs[0];
 
   // check if group already exists
@@ -67,12 +69,12 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
   }
 
   // check members
-  if (data.memberInvitedUserIds.length >= GROUP_MEMBER_LIMIT - (data.isOwnerMember ? 1 : 0)) {
+  if (data.memberInvitedUserIds.length >= GROUP_MEMBER_LIMIT - (isOwnerMember ? 1 : 0)) {
     throw new HttpsError('resource-exhausted', GROUP_MEMBERS_LIMIT_ERROR);
   }
 
   // create group
-  const newGroup = createGroup(data, userBase);
+  const newGroup = createGroup(data, userBase, isOwnerMember);
   const groupRef = groupDocumentRef(newGroup.id);
 
   // save new group
@@ -84,16 +86,19 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
     data: [],
   });
 
+  // create members collection
   await groupDocumentMembersRef(newGroup.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    data: [],
+    data: isOwnerMember ? [groupMembers] : [],
   });
 
+  // create portfolio snapshots collection
   await groupDocumentPortfolioStateSnapshotsRef(newGroup.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
     data: [],
   });
 
+  // create holding snapshots collection
   await groupDocumentHoldingSnapshotsRef(newGroup.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
     data: [],
@@ -106,16 +111,16 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
     });
   }
 
-  // add group to owner list
+  // update the owner's data in users collection
   userDataDoc.ref.update({
-    'groups.groupMember': data.isOwnerMember ? FieldValue.arrayUnion(newGroup.id) : userData.groups.groupMember,
+    'groups.groupMember': isOwnerMember ? FieldValue.arrayUnion(newGroup.id) : userData.groups.groupMember,
     'groups.groupOwner': FieldValue.arrayUnion(newGroup.id),
   });
 
   return newGroup;
 };
 
-const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
+const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = false): GroupData => {
   return {
     id: uuidv4(),
     name: data.groupName,
@@ -127,7 +132,7 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
     createdDate: getCurrentDateDefaultFormat(),
     isClosed: false,
     memberRequestUserIds: [],
-    memberUserIds: [],
+    memberUserIds: isOwnerMember ? [owner.id] : [],
     endDate: null,
     modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
     portfolioState: {
