@@ -46,7 +46,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
     GenericDialogComponent,
   ],
   template: `
-    <div class="w-full shadow-md">
+    <div class="w-full shadow-md p-2">
       <nav class="w-full pl-3 sm:pl-8 sm:pr-4 flex items-center gap-4 max-w-[1620px] mx-auto pb-1">
         <!-- hide menu button -->
         <div class="block xl:hidden">
@@ -160,7 +160,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
           <app-stock-search-basic-customized
             [showHint]="false"
             displayValue="symbol"
-            class="hidden sm:block w-[520px] scale-[0.8] mb-1 -mr-10 mt-3"
+            class="hidden sm:block w-[520px] scale-[0.8] -mr-10 -mb-5"
           />
 
           <div class="gap-1 items-center hidden xl:flex">

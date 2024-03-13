@@ -28,6 +28,7 @@ import {
   PieChartComponent,
   PositionCardComponent,
   SectionTitleComponent,
+  ShowMoreButtonComponent,
   SortByKeyPipe,
 } from '@market-monitor/shared/ui';
 import { computedFrom } from 'ngxtension/computed-from';
@@ -62,6 +63,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     PortfolioTransactionsTableComponent,
     PortfolioTransactionChartComponent,
     MatButtonModule,
+    ShowMoreButtonComponent,
   ],
   template: `
     <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
@@ -142,28 +144,16 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
             matIcon="group"
           />
           <!-- show more members button -->
-          <button
-            *ngIf="
-              displayMembersLimit() === displayHoldingLimitInitial &&
-              groupDetailsSignal.groupMembersData.length > displayHoldingLimitInitial
-            "
+          <app-show-more-button
             class="hidden sm:block"
-            (click)="onShowMoreMembers()"
-            type="button"
-            mat-stroked-button
-            color="primary"
-          >
-            <mat-icon>expand_more</mat-icon>
-            show {{ groupDetailsSignal.groupMembersData.length - displayMembersLimit() }} more members
-          </button>
+            (showMoreClicked)="onShowMoreMembers()"
+            [itemsLimit]="displayLimitInitial"
+            [itemsTotal]="groupDetailsSignal.groupMembersData.length"
+          />
         </div>
         <!-- member list -->
         <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-4">
-          @for (
-            user of groupDetailsSignal.groupMembersData | slice: 0 : displayMembersLimit();
-            track user.id;
-            let i = $index
-          ) {
+          @for (user of displayedMembers(); track user.id; let i = $index) {
             <app-position-card
               (clickedEmitter)="onMemberClick(user)"
               [clickable]="true"
@@ -176,20 +166,14 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
           }
         </div>
         <!-- show more members button -->
-        <button
-          *ngIf="
-            displayMembersLimit() === displayHoldingLimitInitial &&
-            groupDetailsSignal.groupMembersData.length > displayHoldingLimitInitial
-          "
-          class="block w-full sm:hidden"
-          (click)="onShowMoreMembers()"
-          type="button"
-          mat-stroked-button
-          color="primary"
-        >
-          <mat-icon>expand_more</mat-icon>
-          show {{ groupDetailsSignal.groupMembersData.length - displayMembersLimit() }} more
-        </button>
+        <div class="flex justify-end">
+          <app-show-more-button
+            class="block sm:hidden"
+            (showMoreClicked)="onShowMoreMembers()"
+            [itemsLimit]="displayLimitInitial"
+            [itemsTotal]="groupDetailsSignal.groupMembersData.length"
+          />
+        </div>
       </div>
 
       <div
@@ -222,21 +206,17 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         >
           <app-portfolio-holdings-table
             (symbolClicked)="onSummaryClick($event)"
-            [holdings]="getGroupHoldingsSignal() | slice: 0 : displayHoldingLimit()"
+            [holdings]="displayedHoldings()"
             [holdingsBalance]="groupDetailsSignal.groupData.portfolioState.holdingsBalance"
           ></app-portfolio-holdings-table>
           <!-- show more button -->
-          <div
-            *ngIf="
-              getGroupHoldingsSignal().length > displayHoldingLimitInitial &&
-              displayHoldingLimit() === displayHoldingLimitInitial
-            "
-            class="flex justify-end mt-2 mr-2"
-          >
-            <button (click)="onShowMoreHolding()" type="button" mat-button color="primary">
-              <mat-icon>expand_more</mat-icon>
-              show {{ getGroupHoldingsSignal().length - displayHoldingLimit() }} more
-            </button>
+          <div class="flex justify-end mt-2 mr-4">
+            <app-show-more-button
+              (showMoreClicked)="onShowMoreHolding()"
+              [itemsLimit]="displayLimitInitial"
+              [itemsTotal]="getGroupHoldingsSignal().length"
+              [allowShowLess]="false"
+            />
           </div>
         </app-general-card>
       </div>
@@ -316,9 +296,24 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
     this.portfolioCalculationService.getPortfolioChange(this.portfolioGrowthSignal()),
   );
 
-  displayHoldingLimitInitial = 12;
-  displayHoldingLimit = signal(this.displayHoldingLimitInitial);
-  displayMembersLimit = signal(this.displayHoldingLimitInitial);
+  displayLimitInitial = 12;
+
+  /**
+   * whether to display all holdings or only the first N
+   */
+  displayEveryHolding = signal(false);
+  displayedHoldings = computed(() =>
+    this.displayEveryHolding()
+      ? this.getGroupHoldingsSignal()
+      : this.getGroupHoldingsSignal().slice(0, this.displayLimitInitial),
+  );
+
+  displayEveryMember = signal(false);
+  displayedMembers = computed(() =>
+    this.displayEveryMember()
+      ? this.groupDetailsSignal()?.groupMembersData
+      : this.groupDetailsSignal()?.groupMembersData?.slice(0, this.displayLimitInitial),
+  );
 
   ColorScheme = ColorScheme;
 
@@ -343,10 +338,10 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
   }
 
   onShowMoreHolding() {
-    this.displayHoldingLimit.set(1000);
+    this.displayEveryHolding.set(!this.displayEveryHolding());
   }
 
   onShowMoreMembers() {
-    this.displayMembersLimit.set(1000);
+    this.displayEveryMember.set(!this.displayEveryMember());
   }
 }
