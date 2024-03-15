@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, TrackByFunction, effect, input, signal, viewChild } from '@angular/core';
+import { Component, TrackByFunction, effect, input, output, signal, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
@@ -290,7 +290,7 @@ import {
   `,
 })
 export class StockSummaryTableComponent {
-  @Output() itemClickedEmitter = new EventEmitter<SymbolSummary>();
+  itemClickedEmitter = output<SymbolSummary>();
   sort = viewChild(MatSort);
   stockSummaries = input.required<SymbolSummary[] | null>();
 

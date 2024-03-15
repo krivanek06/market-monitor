@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -62,7 +62,7 @@ import { PortfolioBalancePieChartComponent } from '@market-monitor/modules/portf
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDisplayCardComponent {
-  @Output() groupClickEmitter = new EventEmitter<void>();
+  groupClickEmitter = output<void>();
   groupData = input.required<GroupData>();
 
   onGroupClick(): void {

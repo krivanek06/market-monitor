@@ -1,14 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  TemplateRef,
-  TrackByFunction,
-  input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, TemplateRef, TrackByFunction, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -94,7 +85,7 @@ export class PortfolioRankTableComponent<
     portfolioState: PortfolioState;
   }>,
 > {
-  @Output() clickedItem = new EventEmitter<T['item']>();
+  clickedItem = output<T['item']>();
   /**
    * template that is rendered in the 'name' section
    */

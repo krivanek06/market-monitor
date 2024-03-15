@@ -3,14 +3,13 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
-  EventEmitter,
   Inject,
   OnInit,
   Optional,
-  Output,
   computed,
   inject,
   input,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -124,7 +123,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
   `,
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {
-  @Output() clickedSummary = new EventEmitter<SymbolSummary>();
+  clickedSummary = output<SymbolSummary>();
   showHint = input(true);
   /**
    * open modal on summary click

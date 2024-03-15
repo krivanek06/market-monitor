@@ -1,14 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Output,
-  TrackByFunction,
-  effect,
-  input,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input, output, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -191,7 +182,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioTransactionsTableComponent {
-  @Output() deleteEmitter = new EventEmitter<PortfolioTransactionMore>();
+  deleteEmitter = output<PortfolioTransactionMore>();
 
   data = input.required<PortfolioTransactionMore[]>();
   showTransactionFees = input(false);

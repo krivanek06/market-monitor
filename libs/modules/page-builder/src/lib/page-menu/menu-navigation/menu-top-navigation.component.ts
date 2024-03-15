@@ -2,11 +2,10 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
   OnInit,
-  Output,
   TemplateRef,
   inject,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -230,7 +229,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuTopNavigationComponent implements OnInit {
-  @Output() menuClickEmitter = new EventEmitter<void>();
+  menuClickEmitter = output<void>();
   private router = inject(Router);
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private authenticationService = inject(AuthenticationAccountService);

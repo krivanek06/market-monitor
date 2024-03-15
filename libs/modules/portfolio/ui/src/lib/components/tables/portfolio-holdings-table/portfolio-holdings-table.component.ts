@@ -2,11 +2,10 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Output,
   TrackByFunction,
   effect,
   input,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -251,7 +250,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioHoldingsTableComponent {
-  @Output() symbolClicked = new EventEmitter<string>();
+  symbolClicked = output<string>();
 
   /**
    * Invested amount - closed price * units for each holdings

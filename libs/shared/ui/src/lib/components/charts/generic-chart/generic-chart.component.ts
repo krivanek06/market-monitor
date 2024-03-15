@@ -1,14 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  OnChanges,
-  OnDestroy,
-  Output,
-  SimpleChanges,
-  input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnChanges, OnDestroy, SimpleChanges, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -61,7 +52,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
   extends ChartConstructor
   implements OnChanges, OnDestroy
 {
-  @Output() expandEmitter = new EventEmitter<any>();
+  expandEmitter = output<void>();
 
   series = input.required<GenericChartSeries<T>[]>();
 

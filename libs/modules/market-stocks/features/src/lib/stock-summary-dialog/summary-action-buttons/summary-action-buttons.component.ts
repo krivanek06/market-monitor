@@ -1,15 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Inject,
-  OnInit,
-  Optional,
-  Output,
-  input,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit, Optional, input, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -93,7 +83,7 @@ import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manage
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SummaryActionButtonsComponent implements OnInit {
-  @Output() redirectClickedEmitter = new EventEmitter<void>();
+  redirectClickedEmitter = output<void>();
   symbolSummary = input.required<SymbolSummary>();
 
   isSymbolInFavoriteSignal = signal<boolean>(false);

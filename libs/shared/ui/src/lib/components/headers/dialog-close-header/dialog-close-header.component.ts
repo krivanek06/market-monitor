@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Optional, Output, SkipSelf, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Optional, SkipSelf, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,7 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
   `,
 })
 export class DialogCloseHeaderComponent {
-  @Output() dialogCloseEmitter = new EventEmitter<void>();
+  dialogCloseEmitter = output<void>();
   title = input.required<string>();
   showCloseButton = input(true);
 
