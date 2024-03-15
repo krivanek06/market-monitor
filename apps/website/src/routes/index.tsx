@@ -1,4 +1,4 @@
-import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import { $, component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 import anime from 'animejs';
 import {
@@ -9,7 +9,7 @@ import {
   WelcomeSchools,
 } from '../components/page-specific/welcome';
 import { SVG1, SVG2 } from '../components/shared';
-import { websiteImageUrls } from '../components/utils';
+import { isScreenLarger, websiteImageUrls } from '../components/utils';
 
 export default component$(() => {
   const wholePageRef = useSignal<HTMLDivElement | undefined>(undefined);
@@ -45,7 +45,28 @@ export default component$(() => {
     };
   });
 
+  const setDefaultValues = $(() => {
+    if (wholePageRef.value) {
+      wholePageRef.value.style.backgroundColor = 'black';
+    }
+    if (svg2Ref.value) {
+      svg2Ref.value.classList.add('md:block');
+    }
+    if (blobRef.value) {
+      blobRef.value.classList.add('md:block');
+    }
+    if (heroBgImageRef.value) {
+      heroBgImageRef.value.classList.remove('hidden');
+    }
+  });
+
   useVisibleTask$(() => {
+    // if mobile do not animate
+    if (!isScreenLarger('LAYOUT_SM')) {
+      setDefaultValues();
+      return;
+    }
+
     const rowDivs = Math.ceil((wholePageRef.value?.clientWidth ?? 0) / 100);
     const colDivs = Math.ceil((heroPageRef.value?.clientHeight ?? 0) / 100);
     console.log(rowDivs, colDivs);
@@ -94,34 +115,23 @@ export default component$(() => {
     });
 
     // remove / add css classes which should be applied after the animation
-    if (wholePageRef.value) {
-      wholePageRef.value.style.backgroundColor = 'black';
-    }
-    if (svg2Ref.value) {
-      svg2Ref.value.classList.remove('hidden');
-    }
-    if (blobRef.value) {
-      blobRef.value.classList.remove('hidden');
-    }
-    if (heroBgImageRef.value) {
-      heroBgImageRef.value.classList.remove('hidden');
-    }
+    setDefaultValues();
   });
 
   const heroImage = `${websiteImageUrls}/hero-6.webp`;
 
   return (
-    <div ref={wholePageRef} class="overflow-x-clip relative">
+    <div ref={wholePageRef} class="relative overflow-x-clip">
       {/* some svgs */}
       <SVG2 forwardRef={svg2Ref} class="absolute top-[250px] right-[-100px] hidden" />
-
+      {/* blob that follows mouse */}
       <div id="blob" ref={blobRef} class="hidden"></div>
 
       <img
         ref={heroBgImageRef}
         id="hero-bg"
         src={heroImage}
-        class="absolute top-0 w-[100%] h-[500px] object-cover opacity-40 hidden"
+        class="absolute top-0 w-[100%] object-cover opacity-30 hidden"
       />
 
       <div class="max-w-[1600px] mx-auto">
@@ -132,7 +142,7 @@ export default component$(() => {
           <WelcomeMarketMonitor />
         </div>
         <div class="relative mb-16 md:mb-[160px] p-4 md:p-10">
-          <SVG2 class="absolute top-[300px] left-[-500px]" />
+          <SVG2 class="absolute top-[300px] left-[-500px] hidden md:block" />
           <SVG1 class="absolute top-[-40px] left-0 opacity-25 w-[175px] h-[175px]" />
           <SVG1 class="absolute top-[120px] left-[120px] opacity-25 w-[175px] h-[175px]" />
           <WelcomeInvestmentAccount />

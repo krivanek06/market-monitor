@@ -12,13 +12,14 @@ export const SymbolSummaryList = component$<SymbolSummaryProps>(({ summary }) =>
   const symbolUrlMerged = `${symbolUrl}/${summary?.id}`;
 
   return (
-    <div class="flex flex-wrap justify-between">
+    <div class="flex flex-wrap justify-between @container">
       {/* company name */}
       <div class="g-item-wrapper">
         <div>Company Name</div>
         <div class="flex items-center gap-2">
           <img src={symbolUrlMerged} alt="Asset Image" class="w-6 h-6" />
-          <span>{summary?.profile?.companyName}</span>
+          <span class="hidden @md:block">{summary?.profile?.companyName}</span>
+          <span class="block @md:hidden">{summary?.id}</span>
         </div>
       </div>
 

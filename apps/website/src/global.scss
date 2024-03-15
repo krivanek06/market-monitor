@@ -16,9 +16,13 @@ body {
   scroll-behavior: smooth;
   margin: 0;
   font-family: Prociono, sans-serif;
-  background-color: #00181f;
+  background-color: black;
   overflow-x: clip;
   @apply text-gray-300;
+
+  @screen md {
+    background-color: #00181f;
+  }
 }
 
 .g-item-wrapper {

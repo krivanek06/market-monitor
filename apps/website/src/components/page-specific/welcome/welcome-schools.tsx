@@ -24,7 +24,7 @@ export const WelcomeSchools = component$(() => {
       {/* redirect dashboard button */}
       <div class="grid place-content-center mb-16 md:mb-[140px]">
         <Button onClick$={() => (window.location.href = dashboardURL)} class="h-14">
-          <div class="flex items-center gap-4 justify-center min-w-[200px]">
+          <div class="flex items-center gap-4 justify-center min-w-[200px] text-base">
             <span>Dashboard</span>
             <span class="material-symbols-outlined">open_in_new</span>
           </div>
@@ -33,22 +33,21 @@ export const WelcomeSchools = component$(() => {
 
       {/* some info */}
       <div class="grid lg:grid-cols-2 xl:px-10 xl:w-10/12 mx-auto p-4 md:p-10 gap-10">
-        <div class="lg:w-11/12 xl:w-9/12 grid gap-8">
+        <div class="lg:w-11/12 xl:w-9/12 grid gap-8 text-center sm:text-left">
           <p class="text-lg">
-            Create <span class="text-cyan-700">Groups</span> to gather all your friend/classmates in one place and
-            compete within each other and with other groups in the application
+            Create <span class="text-cyan-700">Groups</span> to gather all your friends in one place and compete with
+            each other and other groups
           </p>
           <p class="text-lg">
-            Inside <span class="text-cyan-700">Hall of Fame</span> you compete with all of users who has a demo account.
-            You can compare your trading strategy with others to see who is the better investor
+            In <span class="text-cyan-700">Hall of Fame</span> you compete with everybody with a demo account, you can
+            compare your tradings to see who is the better strategy
           </p>
           <p class="text-lg">
-            Made some bad trades with your demo account? No worries, you can always{' '}
-            <span class="text-cyan-700">reset your account</span> to start again. All your trading history will be
-            removed and you start fresh
+            You made some bad trades with your demo account? No worries, you can always{' '}
+            <span class="text-cyan-700">reset your account</span> and have a fresh start
           </p>
         </div>
-        <div>
+        <div class="hidden sm:block">
           <UserPortfolioChange />
         </div>
       </div>

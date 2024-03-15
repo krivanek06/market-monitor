@@ -32,9 +32,9 @@ export const PercentageIncrease = component$<PercentageIncreaseProps>(({ value, 
 
           {/* icons */}
           {change > 0 ? (
-            <span class="material-symbols-outlined mt-2">trending_up</span>
+            <span class="material-symbols-outlined mt-2 hidden sm:block">trending_up</span>
           ) : change < 0 ? (
-            <span class="material-symbols-outlined mt-2">trending_down</span>
+            <span class="material-symbols-outlined mt-2 hidden sm:block">trending_down</span>
           ) : null}
         </div>
       ) : (

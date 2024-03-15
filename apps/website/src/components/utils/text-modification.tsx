@@ -1,5 +1,6 @@
 import { $, component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import { waitSeconds } from '@market-monitor/shared/features/general-util';
+import { isScreenLarger } from './functions';
 
 export const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -86,6 +87,11 @@ export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
   });
 
   const initAnimation = $(async () => {
+    // if mobile do not animate
+    if (!isScreenLarger('LAYOUT_SM')) {
+      return;
+    }
+
     if (!canStartAnimationAgain.value) {
       return;
     }
@@ -102,6 +108,10 @@ export const TextModifactor = component$<TextModifactorProps>(({ name }) => {
   });
 
   useVisibleTask$(async () => {
+    // if mobile do not animate
+    if (!isScreenLarger('LAYOUT_SM')) {
+      return;
+    }
     await waitSeconds(1);
 
     await generateBackToOriginal();

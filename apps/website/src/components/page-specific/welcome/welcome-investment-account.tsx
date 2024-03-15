@@ -76,7 +76,7 @@ export const WelcomeInvestmentAccount = component$(() => {
         </CardBasic>
       </div>
 
-      <div class="overflow-auto">
+      <div class="overflow-auto hidden md:block">
         <ImagePreview images={images} />
       </div>
     </section>

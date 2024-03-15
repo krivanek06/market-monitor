@@ -19,9 +19,9 @@ module.exports = {
         '3xl': 'clamp(2.44rem, 1.32vw + 2.11rem, 3.75rem)',
         '4xl': 'clamp(3.05rem, 1.97vw + 2.56rem, 5rem)',
         '5xl': 'clamp(3.81rem, 2.88vw + 3.09rem, 6.66rem)',
-        '6xl': 'clamp(4.77rem, 4.16vw + 3.73rem, 8.88rem)',
+        '6xl': 'clamp(4.27rem, 4.16vw + 3.23rem, 8.88rem)',
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('@tailwindcss/container-queries'), require('tailwindcss-animate')],
 };

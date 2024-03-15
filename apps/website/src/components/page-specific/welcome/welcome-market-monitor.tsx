@@ -14,11 +14,11 @@ export const WelcomeMarketMonitor = component$(() => {
       <div class="grid md:grid-cols-2 gap-x-10 gap-y-4 text-gray-300 text-center mx-auto w-full lg:w-[80%] mb-6 md:mb-16">
         <p id="mm-p1" class="p-4 text-lg">
           Whether you're tracking blue-chip stocks or uncovering hidden gems in small-cap companies, we bring the entire
-          marketplace to your screen.
+          marketplace to your screen
         </p>
         <p id="mm-p2" class="p-4 text-lg">
           Explore stocks across various sectors, geographies, market caps, and get detailed financial information on
-          companies you are interested in.
+          companies you are interested in
         </p>
       </div>
 

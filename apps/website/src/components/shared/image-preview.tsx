@@ -43,8 +43,10 @@ export const ImagePreview = component$<ImagePreviewProps>((props) => {
               <img
                 src={image.src}
                 alt="image preview"
+                loading="lazy"
+                width={200}
                 class={[
-                  'min-w-[200px] h-full w-full object-cover rounded-lg hover:scale-105 transition-all duration-300 cursor-pointer hover:brightness-100',
+                  'min-w-[200px] h-full object-cover rounded-lg hover:scale-105 transition-all duration-300 cursor-pointer hover:brightness-100',
                   index === selectedImageIndex.value
                     ? 'outline outline-4 outline-cyan-700 brightness-100'
                     : 'brightness-50',
