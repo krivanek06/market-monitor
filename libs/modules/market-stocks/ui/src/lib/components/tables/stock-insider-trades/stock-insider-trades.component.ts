@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, Input, TrackByFunction, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -144,22 +144,24 @@ import { BubblePaginationDirective, LargeNumberFormatterPipe } from '@market-mon
     </ng-template>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockInsiderTradesComponent implements AfterViewInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class StockInsiderTradesComponent {
+  paginator = viewChild(MatPaginator);
+  sort = viewChild(MatSort);
+  data = input.required<CompanyInsideTrade[]>();
 
-  @Input({ required: true }) set data(values: CompanyInsideTrade[]) {
-    this.dataSource = new MatTableDataSource(values);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-  }
-  dataSource!: MatTableDataSource<CompanyInsideTrade>;
+  tableEffect = effect(() => {
+    this.dataSource = new MatTableDataSource(this.data());
+    this.dataSource.paginator = this.paginator() ?? null;
+    this.dataSource.sort = this.sort() ?? null;
+    this.dataSource._updateChangeSubscription();
+  });
+  dataSource: MatTableDataSource<CompanyInsideTrade> = new MatTableDataSource<CompanyInsideTrade>([]);
 
   displayedColumns: string[] = [
     'person',
@@ -171,11 +173,6 @@ export class StockInsiderTradesComponent implements AfterViewInit {
     'date',
     'redirect',
   ];
-
-  ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-  }
 
   identity: TrackByFunction<CompanyInsideTrade> = (index: number, item: CompanyInsideTrade) => item.filingDate;
 }

@@ -3,13 +3,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  OnChanges,
   Output,
-  SimpleChanges,
   TrackByFunction,
-  ViewChild,
+  effect,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -251,7 +250,7 @@ import {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PortfolioHoldingsTableComponent implements OnChanges {
+export class PortfolioHoldingsTableComponent {
   @Output() symbolClicked = new EventEmitter<string>();
 
   /**
@@ -259,9 +258,8 @@ export class PortfolioHoldingsTableComponent implements OnChanges {
    */
   holdingsBalance = input.required<number>();
   holdings = input.required<PortfolioStateHolding[]>();
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  paginator = viewChild(MatPaginator);
+  sort = viewChild(MatSort);
 
   displayedColumns = input<string[]>([
     'symbol',
@@ -284,18 +282,16 @@ export class PortfolioHoldingsTableComponent implements OnChanges {
 
   showDailyChangeSignal = signal(false);
 
-  identity: TrackByFunction<PortfolioStateHolding> = (index: number, item: PortfolioStateHolding) => item.symbol;
+  tableEffect = effect(() => {
+    const sorted = this.holdings()
+      .slice()
+      .sort((a, b) => compare(b.symbolSummary.quote.price * b.units, a.symbolSummary.quote.price * a.units));
+    this.dataSource = new MatTableDataSource(sorted);
+    this.dataSource.paginator = this.paginator() ?? null;
+    this.dataSource.sort = this.sort() ?? null;
+  });
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.holdings()) {
-      const sorted = this.holdings()!
-        .slice()
-        .sort((a, b) => compare(b.symbolSummary.quote.price * b.units, a.symbolSummary.quote.price * a.units));
-      this.dataSource = new MatTableDataSource(sorted);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-    }
-  }
+  identity: TrackByFunction<PortfolioStateHolding> = (index: number, item: PortfolioStateHolding) => item.symbol;
 
   onItemClicked(holding: PortfolioStateHolding) {
     this.symbolClicked.emit(holding.symbol);

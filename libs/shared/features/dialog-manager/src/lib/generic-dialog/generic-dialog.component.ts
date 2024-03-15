@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  Inject,
   OnInit,
   TemplateRef,
   Type,
   ViewChild,
   ViewContainerRef,
+  inject,
 } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
@@ -47,12 +47,11 @@ export type GenericDialogComponentData =
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenericDialogComponent implements OnInit {
-  @ViewChild('container', { read: ViewContainerRef, static: true }) vrc!: ViewContainerRef;
+  public data = inject<GenericDialogComponentData>(MAT_DIALOG_DATA);
+  private dialogRef = inject<MatDialogRef<GenericDialogComponent>>(MatDialogRef);
 
-  constructor(
-    private dialogRef: MatDialogRef<GenericDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: GenericDialogComponentData,
-  ) {}
+  // todo: had some problems converting to signal, components were not rendering inside this
+  @ViewChild('container', { read: ViewContainerRef, static: true }) vrc!: ViewContainerRef;
 
   ngOnInit(): void {
     // check if provided view is ng-template

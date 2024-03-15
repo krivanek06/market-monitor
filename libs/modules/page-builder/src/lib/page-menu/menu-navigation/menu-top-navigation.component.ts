@@ -6,9 +6,9 @@ import {
   OnInit,
   Output,
   TemplateRef,
-  ViewChild,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -236,7 +236,7 @@ export class MenuTopNavigationComponent implements OnInit {
   private authenticationService = inject(AuthenticationAccountService);
   private dialog = inject(MatDialog);
 
-  @ViewChild('menuOptions', { read: TemplateRef, static: true }) menuOptions!: TemplateRef<unknown>;
+  menuOptions = viewChild('menuOptions', { read: TemplateRef });
 
   userDataSignal = this.authenticationUserStoreService.state.userData;
   userAccountTypeSignal = this.authenticationUserStoreService.state.getUserAccountType;
@@ -283,7 +283,7 @@ export class MenuTopNavigationComponent implements OnInit {
     this.dialog.open(GenericDialogComponent, {
       data: <GenericDialogComponentData>{
         title: 'Options',
-        templateRef: this.menuOptions,
+        templateRef: this.menuOptions(),
       },
     });
   }

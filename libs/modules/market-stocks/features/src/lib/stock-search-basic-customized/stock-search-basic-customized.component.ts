@@ -8,11 +8,11 @@ import {
   OnInit,
   Optional,
   Output,
-  ViewChild,
   computed,
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -130,8 +130,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
    * open modal on summary click
    */
   openModalOnClick = input(true);
-
-  @ViewChild('trigger', { read: ElementRef }) trigger?: ElementRef<HTMLElement>;
+  trigger = viewChild('trigger', { read: ElementRef });
 
   /**
    * selected stock summary from StockSearchBasicComponent
@@ -194,7 +193,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     });
 
     // calculate overlay width based on screen size
-    const overlayWidth = this.trigger?.nativeElement.getBoundingClientRect().width ?? 620;
+    const overlayWidth = this.trigger()?.nativeElement.getBoundingClientRect().width ?? 620;
     this.overlayWidth.set(overlayWidth);
   }
 
