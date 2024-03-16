@@ -37,8 +37,8 @@ export const userPortfolioUpdate = async (): Promise<void> => {
 
   // loop though users, load transactions and calculate balance
   for await (const userDoc of users.docs) {
-    // wait 0.25 seconds prevent too many requests
-    await waitSeconds(0.25);
+    // wait N ms prevent too many requests
+    await waitSeconds(0.15);
 
     // load transaction per user
     const transactionRef = userDocumentTransactionHistoryRef(userDoc.id);
