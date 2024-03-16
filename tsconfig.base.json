@@ -19,8 +19,13 @@
       "@market-monitor/api-client": ["libs/api/api-client/src/index.ts"],
       "@market-monitor/api-external": ["libs/api/api-external/src/index.ts"],
       "@market-monitor/api-types": ["libs/api/api-types/src/index.ts"],
+      "@market-monitor/modules/authentication/features/authentication-forms": [
+        "libs/modules/authentication/features/authentication-forms/src/index.ts"
+      ],
+      "@market-monitor/modules/authentication/features/feature-access-directive": [
+        "libs/modules/authentication/features/feature-access-directive/src/index.ts"
+      ],
       "@market-monitor/modules/authentication/data-access": ["libs/modules/authentication/data-access/src/index.ts"],
-      "@market-monitor/modules/authentication/features": ["libs/modules/authentication/features/src/index.ts"],
       "@market-monitor/modules/group/data-access": ["libs/modules/group/data-access/src/index.ts"],
       "@market-monitor/modules/group/features": ["libs/modules/group/features/src/index.ts"],
       "@market-monitor/modules/group/ui": ["libs/modules/group/ui/src/index.ts"],
@@ -39,9 +44,6 @@
       "@market-monitor/modules/user/ui": ["libs/modules/user/ui/src/index.ts"],
       "@market-monitor/shared/data-access": ["libs/shared/data-access/src/index.ts"],
       "@market-monitor/shared/features/dialog-manager": ["libs/shared/features/dialog-manager/src/index.ts"],
-      "@market-monitor/shared/features/feature-access-directive": [
-        "libs/shared/features/feature-access-directive/src/index.ts"
-      ],
       "@market-monitor/shared/features/general-features": ["libs/shared/features/general-features/src/index.ts"],
       "@market-monitor/shared/features/general-util": ["libs/shared/features/general-util/src/index.ts"],
       "@market-monitor/shared/features/help-dialog": ["libs/shared/features/help-dialog/src/index.ts"],

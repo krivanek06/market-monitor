@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { AuthenticationFormComponent } from '@market-monitor/modules/authentication/features';
+import { AuthenticationFormComponent } from '@market-monitor/modules/authentication/features/authentication-forms';
 import { DialogServiceModule } from '@market-monitor/shared/features/dialog-manager';
 
 @Component({

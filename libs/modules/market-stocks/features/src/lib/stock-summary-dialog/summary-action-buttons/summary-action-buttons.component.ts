@@ -139,11 +139,11 @@ export class SummaryActionButtonsComponent implements OnInit {
 
   async onAddWatchList() {
     if (this.authenticationUserService) {
-      const userFeatures = this.authenticationUserService.state.getUserData().features;
+      const isPaid = this.authenticationUserService.state.isAccountNormalPaid();
       const userWatchlist = this.authenticationUserService.state.watchList().data;
 
       // check if user can add more symbols into watchlist
-      if (!userFeatures.allowUnlimitedSymbolsInWatchList && userWatchlist.length >= USER_WATCHLIST_SYMBOL_LIMIT) {
+      if (!isPaid && userWatchlist.length >= USER_WATCHLIST_SYMBOL_LIMIT) {
         this.dialogServiceUtil.showNotificationBar(
           `You can not add more than ${USER_WATCHLIST_SYMBOL_LIMIT} symbols into watchlist`,
           'error',

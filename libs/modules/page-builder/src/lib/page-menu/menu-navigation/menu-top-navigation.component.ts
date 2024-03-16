@@ -17,6 +17,7 @@ import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
+import { UserAccountTypeDirective } from '@market-monitor/modules/authentication/features/feature-access-directive';
 import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks/features';
 import { UserSettingsDialogComponent } from '@market-monitor/modules/user/features';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
@@ -25,7 +26,6 @@ import {
   GenericDialogComponentData,
   SCREEN_DIALOGS,
 } from '@market-monitor/shared/features/dialog-manager';
-import { FeatureAccessDirective } from '@market-monitor/shared/features/feature-access-directive';
 import { HelpDialogComponent } from '@market-monitor/shared/features/help-dialog';
 import { DefaultImgDirective } from '@market-monitor/shared/ui';
 @Component({
@@ -37,7 +37,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
     MatIconModule,
     DefaultImgDirective,
     MatButtonModule,
-    FeatureAccessDirective,
+    UserAccountTypeDirective,
     UserSettingsDialogComponent,
     MatDialogModule,
     HelpDialogComponent,
@@ -92,7 +92,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
         <!-- groups -->
         <a
-          *appFeatureAccess="'allowAccessGroups'"
+          *appUserAccountType="'DEMO_TRADING'"
           (click)="onNavClick(ROUTES_MAIN.GROUPS)"
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.GROUPS }"
@@ -105,7 +105,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
         <!-- hall of fame -->
         <a
-          *appFeatureAccess="'allowAccessHallOfFame'"
+          *appUserAccountType="'DEMO_TRADING'"
           (click)="onNavClick(ROUTES_MAIN.HALL_OF_FAME)"
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.HALL_OF_FAME }"
@@ -118,7 +118,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
         <!-- screener -->
         <a
-          *ngIf="userAccountTypeSignal() === 'Basic'"
+          *appUserAccountType="'NORMAL_BASIC'"
           (click)="onNavClick(ROUTES_MAIN.STOCK_SCREENER)"
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.STOCK_SCREENER }"
@@ -238,7 +238,6 @@ export class MenuTopNavigationComponent implements OnInit {
   menuOptions = viewChild('menuOptions', { read: TemplateRef });
 
   userDataSignal = this.authenticationUserStoreService.state.userData;
-  userAccountTypeSignal = this.authenticationUserStoreService.state.getUserAccountType;
 
   ROUTES_MAIN = ROUTES_MAIN;
   activeLinkSignal = signal<ROUTES_MAIN>(ROUTES_MAIN.DASHBOARD);

@@ -67,8 +67,8 @@ import { take } from 'rxjs';
         class="sm:pl-10"
         [titleColor]="ColorScheme.PRIMARY_VAR"
         [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-        [showCashSegment]="!!userDataSignal().features.allowPortfolioCashAccount"
-        [portfolioState]="portfolioState()"
+        [showCashSegment]="authenticationUserService.state.isAccountDemoTrading()"
+        [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
       ></app-portfolio-state>
 
       <div class="flex flex-col xl:flex-row gap-x-6 gap-y-6 xl:col-span-2 max-md:-ml-4">
@@ -76,7 +76,7 @@ import { take } from 'rxjs';
         <app-form-mat-input-wrapper
           inputCaption="Select a holding"
           inputType="SELECT"
-          [inputSource]="getHoldingsInputSource()"
+          [inputSource]="portfolioUserFacadeService.getHoldingsInputSource()"
           displayImageType="symbol"
           [formControl]="selectedHoldingControl"
           class="scale-90 w-full h-12"
@@ -158,9 +158,9 @@ import { take } from 'rxjs';
 
       <app-portfolio-transactions-table
         (deleteEmitter)="onTransactionDelete($event)"
-        [showTransactionFees]="!!userDataSignal().features.allowPortfolioCashAccount"
-        [showActionButton]="!userDataSignal().features.allowPortfolioCashAccount"
-        [data]="portfolioTransactionSignal() | sortByKey: 'date' : 'desc'"
+        [showTransactionFees]="authenticationUserService.state.isAccountDemoTrading()"
+        [showActionButton]="authenticationUserService.state.isAccountNormalBasic()"
+        [data]="authenticationUserService.state.portfolioTransactions() | sortByKey: 'date' : 'desc'"
       ></app-portfolio-transactions-table>
     </div>
 
@@ -180,11 +180,12 @@ import { take } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingComponent {
-  private portfolioUserFacadeService = inject(PortfolioUserFacadeService);
-  private authenticationUserService = inject(AuthenticationUserStoreService);
   private marketApiService = inject(MarketApiService);
   private dialog = inject(MatDialog);
   private dialogServiceUtil = inject(DialogServiceUtil);
+
+  authenticationUserService = inject(AuthenticationUserStoreService);
+  portfolioUserFacadeService = inject(PortfolioUserFacadeService);
 
   /**
    * displayed symbol summary
@@ -192,11 +193,6 @@ export class PageTradingComponent {
   symbolSummarySignal = signal<SymbolSummary | null>(null);
 
   topPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance());
-
-  portfolioState = this.portfolioUserFacadeService.getPortfolioState;
-  portfolioTransactionSignal = this.authenticationUserService.state.portfolioTransactions;
-  userDataSignal = this.authenticationUserService.state.getUserData;
-  getHoldingsInputSource = this.portfolioUserFacadeService.getHoldingsInputSource;
 
   ColorScheme = ColorScheme;
 

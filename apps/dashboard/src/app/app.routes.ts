@@ -1,11 +1,12 @@
 import { inject } from '@angular/core';
 import { Route, Router } from '@angular/router';
+import { UserAccountEnum } from '@market-monitor/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
+import { featureFlagGuard } from '@market-monitor/modules/authentication/features/feature-access-directive';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { featureFlagGuard } from '@market-monitor/shared/features/feature-access-directive';
 import { map, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
@@ -64,11 +65,11 @@ export const appRoutes: Route[] = [
           {
             path: ROUTES_MAIN.HALL_OF_FAME,
             loadComponent: () => import('./hall-of-fame/hall-of-fame.component').then((m) => m.HallOfFameComponent),
-            canActivate: [featureFlagGuard('allowAccessHallOfFame', ROUTES_MAIN.DASHBOARD)],
+            canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
           },
           {
             path: ROUTES_MAIN.GROUPS,
-            canActivate: [featureFlagGuard('allowAccessGroups', ROUTES_MAIN.DASHBOARD)],
+            canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
             children: [
               {
                 path: '',

@@ -17,7 +17,7 @@ import {
   PortfolioTransaction,
   PortfolioTransactionCreate,
   SymbolType,
-  UserAccountEnum,
+  UserAccountTypes,
   UserData,
   UserGroupData,
   UserPortfolioTransaction,
@@ -30,6 +30,7 @@ import { signalSlice } from 'ngxtension/signal-slice';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { Observable, combineLatest, distinctUntilChanged, filter, map, of, switchMap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
+import { hasUserAccess } from '../model';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
   'AUTHENTICATION_ACCOUNT_TOKEN',
@@ -180,12 +181,17 @@ export class AuthenticationUserStoreService {
       getUserData: () => state().userData!,
       getUserDataNormal: () => state().userData,
       getPortfolioState: () => state().userData?.portfolioState,
-      getUserAccountType: () =>
-        state().userData?.features?.allowPortfolioCashAccount ? UserAccountEnum.DEMO : UserAccountEnum.NORMAL_BASIC,
       getUserGroupData: () => state().userGroupData!,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
       getUserPortfolioTransactions: () => state().portfolioTransactions,
       userHaveTransactions: () => (state().portfolioTransactions?.length ?? 0) > 0,
+
+      // access computes
+      hasUserAccess: () => (accountType: UserAccountTypes) => hasUserAccess(state().userData!, accountType),
+      isAccountDemoTrading: () => hasUserAccess(state().userData, 'DEMO_TRADING'),
+      isAccountNormalBasic: () => hasUserAccess(state().userData, 'NORMAL_BASIC'),
+      isAccountNormalPaid: () => hasUserAccess(state().userData, 'NORMAL_PAID'),
+      isAccountAdmin: () => hasUserAccess(state().userData, 'ADMIN'),
     }),
   });
 

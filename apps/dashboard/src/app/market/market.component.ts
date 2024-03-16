@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { UserAccountEnum } from '@market-monitor/api-types';
 import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
 import { LabelValue, ROUTES_MAIN } from '@market-monitor/shared/data-access';
 import { TabSelectControlComponent } from '@market-monitor/shared/ui';
@@ -26,10 +27,10 @@ type MarketRoutes = ROUTES_MAIN.TOP_PERFORMERS | ROUTES_MAIN.ECONOMICS | ROUTES_
     </section>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarketComponent implements OnInit {
@@ -57,8 +58,8 @@ export class MarketComponent implements OnInit {
   ];
 
   marketTabsSignal = computed(() => {
-    const userAccountType = this.authenticationUserStoreService.state.getUserAccountType();
-    if (userAccountType === 'Trading') {
+    const userData = this.authenticationUserStoreService.state.getUserData();
+    if (userData.userAccountType === UserAccountEnum.DEMO_TRADING) {
       return [
         {
           label: 'Screener',

@@ -81,7 +81,7 @@ import { map, pipe, startWith } from 'rxjs';
           <app-portfolio-state
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-            [showCashSegment]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
+            [showCashSegment]="authenticationUserService.state.isAccountDemoTrading()"
             [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
           ></app-portfolio-state>
         </app-fancy-card>
@@ -98,7 +98,7 @@ import { map, pipe, startWith } from 'rxjs';
           <app-portfolio-state-transactions
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-            [showFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
+            [showFees]="!!authenticationUserService.state.isAccountDemoTrading()"
             [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
           ></app-portfolio-state-transactions>
         </app-fancy-card>
@@ -225,7 +225,7 @@ import { map, pipe, startWith } from 'rxjs';
         <div>
           <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
           <app-portfolio-transactions-table
-            [showTransactionFees]="!!authenticationUserService.state.userData()?.features?.allowPortfolioCashAccount"
+            [showTransactionFees]="!!authenticationUserService.state.isAccountDemoTrading()"
             [data]="authenticationUserService.state.portfolioTransactions() | sortByKey: 'date' : 'desc'"
           ></app-portfolio-transactions-table>
         </div>

@@ -6,12 +6,13 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { UserAccountEnum, accountDescription } from '@market-monitor/api-types';
+import { accountDescription } from '@market-monitor/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
 } from '@market-monitor/modules/authentication/data-access';
-import { ChangePasswordDialogComponent } from '@market-monitor/modules/authentication/features';
+import { ChangePasswordDialogComponent } from '@market-monitor/modules/authentication/features/authentication-forms';
+import { UserAccountTypeDirective } from '@market-monitor/modules/authentication/features/feature-access-directive';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
 import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
 import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
@@ -34,6 +35,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     MatTooltipModule,
     UserAccountTypeSelectDialogComponent,
     ChangePasswordDialogComponent,
+    UserAccountTypeDirective,
   ],
   template: `
     <app-dialog-close-header title="Settings"></app-dialog-close-header>
@@ -67,9 +69,9 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
             </div>
             <div class="c-text-item">
               <span>Account Type:</span>
-              <span> {{ accountTypeSignal() }}</span>
+              <span> {{ userDataSignal().userAccountType }}</span>
             </div>
-            <div *ngIf="accountTypeSignal() === 'Trading'" class="c-text-item">
+            <div *appUserAccountType="'DEMO_TRADING'" class="c-text-item">
               <span>Starting Cash:</span>
               <span> {{ userDataSignal().portfolioState.startingCash | currency }}</span>
             </div>
@@ -78,7 +80,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
 
         <!-- explain account type -->
         <div class="p-4 hidden lg:block">
-          <div class="mb-2 text-lg text-wt-primary">{{ accountTypeSignal() }} - Account</div>
+          <div class="mb-2 text-lg text-wt-primary">{{ userDataSignal().userAccountType }} - Account</div>
           <div *ngFor="let text of accountDescriptionSignal()" class="mb-3">
             {{ text }}
           </div>
@@ -191,13 +193,8 @@ export class UserSettingsDialogComponent implements OnInit {
     changeAccountType: `You will be presented with options to change your current account type between Basic and Trading`,
   };
 
-  accountTypeSignal = computed(() => {
-    const isCash = this.userDataSignal().features.allowPortfolioCashAccount;
-    return isCash ? UserAccountEnum.DEMO : UserAccountEnum.NORMAL_BASIC;
-  });
-
   accountDescriptionSignal = computed(() => {
-    return this.accountDescription[this.accountTypeSignal()];
+    return accountDescription[this.userDataSignal().userAccountType];
   });
 
   ngOnInit(): void {
@@ -260,7 +257,13 @@ export class UserSettingsDialogComponent implements OnInit {
   onResetTransactions(): void {
     // notify user
     this.dialogServiceUtil.showNotificationBar('Sending request to reset your account');
-    const currentAccountType = this.authenticationUserStoreService.state.getUserAccountType();
+    const currentAccountType = this.authenticationUserStoreService.state.getUserData().userAccountType;
+
+    // check account type
+    if (currentAccountType !== 'DEMO_TRADING' && currentAccountType !== 'NORMAL_BASIC') {
+      this.dialogServiceUtil.showNotificationBar('Account type not supported');
+      return;
+    }
 
     // perform operation
     from(this.authenticationAccountService.resetTransactions(currentAccountType))

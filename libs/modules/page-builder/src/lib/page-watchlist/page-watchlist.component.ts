@@ -64,9 +64,9 @@ export class PageWatchlistComponent {
   userWatchListSymbolsSignal = computed(() => this.watchList().data.map((d) => d.symbol));
 
   pageTitle = computed(() => {
-    const userFeatures = this.authenticationUserService.state.getUserData().features;
+    const isPaid = this.authenticationUserService.state.isAccountNormalPaid();
     const watchList = this.authenticationUserService.state.watchList();
-    return userFeatures.allowUnlimitedSymbolsInWatchList
+    return isPaid
       ? `Watchlist: ${watchList.data.length}`
       : `Watchlist: [${watchList.data.length} / ${USER_WATCHLIST_SYMBOL_LIMIT}]`;
   });

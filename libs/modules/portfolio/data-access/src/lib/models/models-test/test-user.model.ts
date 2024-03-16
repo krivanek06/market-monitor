@@ -1,4 +1,4 @@
-import { USER_DEFAULT_STARTING_CASH, UserData } from '@market-monitor/api-types';
+import { USER_DEFAULT_STARTING_CASH, UserAccountEnum, UserData } from '@market-monitor/api-types';
 import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 
 export const USER_TEST_1_ID = 'USER_TEST_1';
@@ -21,7 +21,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       email: 'test@test.sk',
     },
     settings: {
-      allowReceivingGroupInvitations: true,
+      isDarkMode: false,
     },
     portfolioState: {
       ...createEmptyPortfolioState(USER_DEFAULT_STARTING_CASH),
@@ -33,7 +33,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
     lastLoginDate: getCurrentDateDefaultFormat(),
     isAccountActive: true,
     accountCreatedDate: getCurrentDateDefaultFormat(),
-    features: {},
+    userAccountType: UserAccountEnum.NORMAL_BASIC,
   };
 
   return { ...defaultUser, ...data };

@@ -9,6 +9,7 @@ import { UserAccountEnum } from '@market-monitor/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
+  hasUserAccess,
 } from '@market-monitor/modules/authentication/data-access';
 import { UserSettingsDialogComponent } from '@market-monitor/modules/user/features';
 import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
@@ -133,7 +134,7 @@ export class MenuSideNavigationComponent implements OnInit {
   userData = this.authenticationUserStoreService.state.getUserDataNormal;
 
   sideNavigation = computed(() => {
-    const userAccountType = this.authenticationUserStoreService.state.getUserAccountType();
+    const userData = this.authenticationUserStoreService.state.getUserData();
     const data = {
       mainNavigation: [
         {
@@ -155,13 +156,13 @@ export class MenuSideNavigationComponent implements OnInit {
           path: ROUTES_MAIN.GROUPS,
           title: 'Groups',
           icon: 'group',
-          hidden: userAccountType !== UserAccountEnum.DEMO,
+          hidden: !hasUserAccess(userData, UserAccountEnum.DEMO_TRADING),
         },
         {
           path: ROUTES_MAIN.HALL_OF_FAME,
           title: 'Hall Of Fame',
           icon: 'military_tech',
-          hidden: userAccountType !== UserAccountEnum.DEMO,
+          hidden: !hasUserAccess(userData, UserAccountEnum.DEMO_TRADING),
         },
       ],
       marketNavigation: [

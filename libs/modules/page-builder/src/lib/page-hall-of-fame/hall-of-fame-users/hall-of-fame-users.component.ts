@@ -39,7 +39,7 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
       <app-section-title
         class=""
         matIcon="military_tech"
-        title="My rank: {{ userDataSignal().systemRank.portfolioTotalGainsPercentage?.rank }}"
+        title="My rank: {{ userDataSignal().systemRank?.portfolioTotalGainsPercentage?.rank ?? 'N/A' }}"
       />
       <!-- search users -->
       <app-user-search-control

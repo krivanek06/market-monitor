@@ -92,50 +92,14 @@ export type UserSettings = {
   isDarkMode?: boolean;
 };
 
-// export type UserFeatures = {
-//   /**
-//    * true if user is admin, grand access to all features
-//    */
-//   isAdmin?: boolean; // todo: delete
-//   /**
-//    * if true, user can access group page and create groups limited by - GROUP_OWNER_LIMIT
-//    */
-//   allowAccessGroups?: boolean; // todo: delete
-
-//   /**
-//    * if true, user can create unlimited number of groups
-//    */
-//   allowCreateUnlimitedGroups?: boolean;
-
-//   /**
-//    * if true, user will have a starting cash balance and system
-//    * will always check whether user has enough cash to buy
-//    */
-//   allowPortfolioCashAccount?: boolean; // todo: delete
-
-//   /**
-//    * if true, user can have unlimited number of symbols in portfolio, else it is limited - USER_HOLDINGS_SYMBOL_LIMIT
-//    */
-//   allowUnlimitedSymbolsInHoldings?: boolean;
-
-//   /**
-//    * if true, user can have unlimited number of symbols in watchList, else it is limited - USER_WATCHLIST_SYMBOL_LIMIT
-//    */
-//   allowUnlimitedSymbolsInWatchList?: boolean;
-
-//   /**
-//    * if true (by default true), user will participate in hall of fame
-//    */
-//   allowAccessHallOfFame?: boolean; // todo: delete
-// };
-//export type UserFeaturesType = keyof UserFeatures;
-
 export enum UserAccountEnum {
   DEMO_TRADING = 'DEMO_TRADING',
   NORMAL_BASIC = 'NORMAL_BASIC',
   NORMAL_PAID = 'NORMAL_PAID',
   ADMIN = 'ADMIN',
 }
+
+export type UserAccountTypes = keyof typeof UserAccountEnum;
 
 /**
  * picked account types user can choose from by default, others can added by the system
@@ -153,7 +117,7 @@ export type UserResetTransactionsInput = {
   accountTypeSelected: UserAccountBasicTypes;
 };
 
-export const accountDescription: { [K in UserAccountBasicTypes]: string[] } = {
+export const accountDescription: { [K in UserAccountEnum]: string[] } = {
   [UserAccountEnum.DEMO_TRADING]: [
     `
     With trading account you start with a specific amount of cash on hand.
@@ -170,4 +134,6 @@ export const accountDescription: { [K in UserAccountBasicTypes]: string[] } = {
     Later we plan to add easier functionalities to mirror your trading portfolio such as uploading a CSV file with your transactions.`,
     `Your profile is private, no one can see your portfolio. You do not participate in any ranking system.`,
   ],
+  [UserAccountEnum.NORMAL_PAID]: [`TODO`],
+  [UserAccountEnum.ADMIN]: [`TODO`],
 };
