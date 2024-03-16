@@ -13,21 +13,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
-import {
-  AuthenticationAccountService,
-  AuthenticationUserStoreService,
-} from '@market-monitor/modules/authentication/data-access';
-import { UserAccountTypeDirective } from '@market-monitor/modules/authentication/features/feature-access-directive';
-import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks/features';
-import { UserSettingsDialogComponent } from '@market-monitor/modules/user/features';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import {
-  GenericDialogComponent,
-  GenericDialogComponentData,
-  SCREEN_DIALOGS,
-} from '@market-monitor/shared/features/dialog-manager';
-import { HelpDialogComponent } from '@market-monitor/shared/features/help-dialog';
-import { DefaultImgDirective } from '@market-monitor/shared/ui';
+import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
+import { StockSearchBasicCustomizedComponent } from '@mm/market-stocks/features';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
+import { GenericDialogComponent, GenericDialogComponentData, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { HelpDialogComponent } from '@mm/shared/help-dialog';
+import { DefaultImgDirective } from '@mm/shared/ui';
+import { UserSettingsDialogComponent } from '@mm/user/features';
 @Component({
   selector: 'app-menu-top-navigation',
   standalone: true,

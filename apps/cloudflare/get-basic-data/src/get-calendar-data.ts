@@ -1,11 +1,5 @@
-import { getCalendarStockDividends, getCalendarStockEarnings, getCalendarStockIPOs } from '@market-monitor/api-external';
-import {
-	AllowedCalendarAssetTypes,
-	CalendarAssetDataTypes,
-	CalendarAssetTypes,
-	EXPIRATION_ONE_WEEK,
-	RESPONSE_HEADER,
-} from '@market-monitor/api-types';
+import { getCalendarStockDividends, getCalendarStockEarnings, getCalendarStockIPOs } from '@mm/api-external';
+import { AllowedCalendarAssetTypes, CalendarAssetDataTypes, CalendarAssetTypes, EXPIRATION_ONE_WEEK, RESPONSE_HEADER } from '@mm/api-types';
 import { Env } from './model';
 
 export const getCalendarData = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {

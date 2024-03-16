@@ -1,4 +1,4 @@
-import { CompanyFinancialsReport } from '@market-monitor/api-types';
+import { CompanyFinancialsReport } from '@mm/api-types';
 
 export type SheetData = {
   timePeriods: string[];

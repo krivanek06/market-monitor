@@ -12,14 +12,10 @@ import {
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MarketApiService } from '@market-monitor/api-client';
-import {
-  HistoricalPrice,
-  SymbolHistoricalPeriods,
-  SymbolHistoricalPeriodsArrayPreload,
-} from '@market-monitor/api-types';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { AssetPriceChartComponent, DefaultImgDirective, TimePeriodButtonsComponent } from '@market-monitor/shared/ui';
+import { MarketApiService } from '@mm/api-client';
+import { HistoricalPrice, SymbolHistoricalPeriods, SymbolHistoricalPeriodsArrayPreload } from '@mm/api-types';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { AssetPriceChartComponent, DefaultImgDirective, TimePeriodButtonsComponent } from '@mm/shared/ui';
 import { catchError, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -98,10 +94,10 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
     </ng-template>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {

@@ -7,9 +7,9 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ColorScheme } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { DefaultImgDirective } from '@market-monitor/shared/ui';
+import { ColorScheme } from '@mm/shared/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { DefaultImgDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-upload-image-single-control',

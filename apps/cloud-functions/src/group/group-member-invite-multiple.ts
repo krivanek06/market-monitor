@@ -1,4 +1,4 @@
-import { GroupBaseInputInviteMembers } from '@market-monitor/api-types';
+import { GroupBaseInputInviteMembers } from '@mm/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { GROUP_NOT_FOUND_ERROR, GROUP_USER_NOT_OWNER, groupDocumentRef, userDocumentRef } from '../models';

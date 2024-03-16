@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
-import { PriceChange } from '@market-monitor/api-types';
+import { PriceChange } from '@mm/api-types';
 import { PercentageIncreaseDirective } from '../../../directives';
 import { PriceChangeItemSelectorPipe } from './price-change-item-selector.pipe';
 
@@ -31,9 +31,9 @@ import { PriceChangeItemSelectorPipe } from './price-change-item-selector.pipe';
     </div>
   `,
   styles: `
-  :host {
-    display: block;
-  }
+    :host {
+      display: block;
+    }
   `,
 })
 export class PriceChangeItemsComponent {

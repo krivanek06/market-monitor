@@ -1,4 +1,4 @@
-import { UserAccountEnum } from '@market-monitor/api-types';
+import { UserAccountEnum } from '@mm/api-types';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {

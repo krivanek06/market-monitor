@@ -1,5 +1,5 @@
-import { USER_DEFAULT_STARTING_CASH, UserAccountEnum, UserData } from '@market-monitor/api-types';
-import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { USER_DEFAULT_STARTING_CASH, UserAccountEnum, UserData } from '@mm/api-types';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 
 export const USER_TEST_1_ID = 'USER_TEST_1';
 

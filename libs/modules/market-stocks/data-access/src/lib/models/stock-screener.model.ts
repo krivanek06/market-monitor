@@ -4,8 +4,8 @@ import {
   StockScreenerArray,
   StockScreenerValues,
   StockSectorTypes,
-} from '@market-monitor/api-types';
-import { InputSource } from '@market-monitor/shared/data-access';
+} from '@mm/api-types';
+import { InputSource } from '@mm/shared/data-access';
 
 export const STOCK_SCREENER_COUNTRIES: InputSource<string | null>[] = [
   { value: null, caption: 'All' },

@@ -1,4 +1,4 @@
-import { UserAccountEnum, UserAccountTypes, UserData } from '@market-monitor/api-types';
+import { UserAccountEnum, UserAccountTypes, UserData } from '@mm/api-types';
 
 export const hasUserAccess = (userData: UserData | undefined | null, accountType: UserAccountTypes) => {
   if (!userData) {

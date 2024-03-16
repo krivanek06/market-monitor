@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { PortfolioState } from '@market-monitor/api-types';
-import { ColorScheme } from '@market-monitor/shared/data-access';
-import { AddColorDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { PortfolioState } from '@mm/api-types';
+import { ColorScheme } from '@mm/shared/data-access';
+import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-portfolio-state',

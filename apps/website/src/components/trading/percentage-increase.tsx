@@ -1,10 +1,5 @@
 import { component$ } from '@builder.io/qwik';
-import {
-  calculateGrowth,
-  formatLargeNumber,
-  formatValueIntoCurrency,
-  roundNDigits,
-} from '@market-monitor/shared/features/general-util';
+import { calculateGrowth, formatLargeNumber, formatValueIntoCurrency, roundNDigits } from '@mm/shared/general-util';
 
 export type PercentageIncreaseProps = {
   value?: number;

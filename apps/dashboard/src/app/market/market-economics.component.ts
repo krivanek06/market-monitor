@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageMarketOverviewComponent } from '@market-monitor/modules/page-builder';
+import { PageMarketOverviewComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-market-economics',

@@ -1,4 +1,4 @@
-import { HallOfFameGroups, HallOfFameUsers } from '@market-monitor/api-types';
+import { HallOfFameGroups, HallOfFameUsers } from '@mm/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypesOptional } from './assign-type';
 

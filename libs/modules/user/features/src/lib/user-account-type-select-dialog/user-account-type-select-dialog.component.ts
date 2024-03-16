@@ -3,13 +3,10 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { UserAccountBasicTypes, UserAccountEnum, accountDescription } from '@market-monitor/api-types';
-import {
-  AuthenticationAccountService,
-  AuthenticationUserStoreService,
-} from '@market-monitor/modules/authentication/data-access';
-import { Confirmable, DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
+import { UserAccountBasicTypes, UserAccountEnum, accountDescription } from '@mm/api-types';
+import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { Confirmable, DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
 
 @Component({

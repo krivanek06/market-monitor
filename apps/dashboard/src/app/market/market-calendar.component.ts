@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageMarketCalendarComponent } from '@market-monitor/modules/page-builder';
+import { PageMarketCalendarComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-market-calendar',

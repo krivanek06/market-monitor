@@ -5,12 +5,8 @@ import {
   USER_DEFAULT_STARTING_CASH,
   UserAccountEnum,
   UserData,
-} from '@market-monitor/api-types';
-import {
-  createEmptyPortfolioState,
-  getCurrentDateDefaultFormat,
-  waitSeconds,
-} from '@market-monitor/shared/features/general-util';
+} from '@mm/api-types';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat, waitSeconds } from '@mm/shared/general-util';
 import { addDays, format, subDays } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';

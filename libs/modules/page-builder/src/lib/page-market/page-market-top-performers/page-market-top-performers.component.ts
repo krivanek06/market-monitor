@@ -3,12 +3,12 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MarketApiService } from '@market-monitor/api-client';
-import { SymbolSummary } from '@market-monitor/api-types';
-import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
-import { StockSummaryTableComponent } from '@market-monitor/modules/market-stocks/ui';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { RangeDirective } from '@market-monitor/shared/ui';
+import { MarketApiService } from '@mm/api-client';
+import { SymbolSummary } from '@mm/api-types';
+import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { StockSummaryTableComponent } from '@mm/market-stocks/ui';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { RangeDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-page-market-top-performers',
@@ -52,9 +52,9 @@ import { RangeDirective } from '@market-monitor/shared/ui';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
 })
 export class PageMarketTopPerformersComponent {

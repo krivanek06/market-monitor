@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
-import { ROUTES_MAIN, ROUTES_MARKET } from '@market-monitor/shared/data-access';
+import { ROUTES_MAIN, ROUTES_MARKET } from '@mm/shared/data-access';
 import { MarketCustomComponent } from './market-subpages/market-custom.component';
 import { MarketOverviewComponent } from './market-subpages/market-overview.component';
 
@@ -19,10 +19,10 @@ import { MarketOverviewComponent } from './market-subpages/market-overview.compo
     <router-outlet></router-outlet>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarketComponent implements OnInit {

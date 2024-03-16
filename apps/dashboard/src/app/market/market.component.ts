@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { UserAccountEnum } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { LabelValue, ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { TabSelectControlComponent } from '@market-monitor/shared/ui';
+import { UserAccountEnum } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { LabelValue, ROUTES_MAIN } from '@mm/shared/data-access';
+import { TabSelectControlComponent } from '@mm/shared/ui';
 
 // used routes in this component
 type MarketRoutes = ROUTES_MAIN.TOP_PERFORMERS | ROUTES_MAIN.ECONOMICS | ROUTES_MAIN.MARKET_CALENDAR | ROUTES_MAIN.NEWS;

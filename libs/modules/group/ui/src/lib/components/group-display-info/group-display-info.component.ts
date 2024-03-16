@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { GROUP_MEMBER_LIMIT, GroupData, UserBase } from '@market-monitor/api-types';
-import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { GROUP_MEMBER_LIMIT, GroupData, UserBase } from '@mm/api-types';
+import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-group-display-info',

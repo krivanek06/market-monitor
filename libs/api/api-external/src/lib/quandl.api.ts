@@ -1,4 +1,4 @@
-import { MARKET_OVERVIEW_ENDPOINTS } from '@market-monitor/api-types';
+import { MARKET_OVERVIEW_ENDPOINTS } from '@mm/api-types';
 import axios from 'axios';
 import { QUANDL_KEY, QUANDL_URL } from './environments';
 

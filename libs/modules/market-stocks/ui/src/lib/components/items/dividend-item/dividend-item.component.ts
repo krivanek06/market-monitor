@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { CalendarDividend, CompanyStockDividend } from '@market-monitor/api-types';
-import { DefaultImgDirective } from '@market-monitor/shared/ui';
+import { CalendarDividend, CompanyStockDividend } from '@mm/api-types';
+import { DefaultImgDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-dividend-item',

@@ -10,7 +10,7 @@ import {
   inject,
 } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
+import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 
 export type GenericDialogComponentData =
   | {

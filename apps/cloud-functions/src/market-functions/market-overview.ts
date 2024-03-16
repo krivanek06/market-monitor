@@ -1,9 +1,4 @@
-import {
-  getEconomicData,
-  getQuandlDataFormatter,
-  getTreasuryYieldUS,
-  postMarketOverview,
-} from '@market-monitor/api-external';
+import { getEconomicData, getQuandlDataFormatter, getTreasuryYieldUS, postMarketOverview } from '@mm/api-external';
 import {
   ChartDataType,
   MARKET_OVERVIEW_ENDPOINTS,
@@ -14,7 +9,7 @@ import {
   marketOverviewLoadGeneral,
   marketOverviewLoadSP500,
   marketOverviewLoadTreasury,
-} from '@market-monitor/api-types';
+} from '@mm/api-types';
 import { Request, Response } from 'express';
 
 export const getMarketOverviewDataWrapper = async (request: Request, response: Response<ChartDataType | string>) => {

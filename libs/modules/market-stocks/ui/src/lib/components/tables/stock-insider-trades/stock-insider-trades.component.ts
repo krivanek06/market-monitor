@@ -5,8 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { CompanyInsideTrade } from '@market-monitor/api-types';
-import { BubblePaginationDirective, LargeNumberFormatterPipe } from '@market-monitor/shared/ui';
+import { CompanyInsideTrade } from '@mm/api-types';
+import { BubblePaginationDirective, LargeNumberFormatterPipe } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-insider-trades',

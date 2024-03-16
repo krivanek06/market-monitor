@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { NameValueItem } from '@market-monitor/shared/data-access';
+import { NameValueItem } from '@mm/shared/data-access';
 import { WordsUpPipe } from '../../../pipes';
 
 @Component({
@@ -9,9 +9,9 @@ import { WordsUpPipe } from '../../../pipes';
   imports: [CommonModule, WordsUpPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   template: `
     <div *ngFor="let item of items()" class="g-item-wrapper">

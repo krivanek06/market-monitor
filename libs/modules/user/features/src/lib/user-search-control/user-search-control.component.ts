@@ -8,10 +8,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { UserApiService } from '@market-monitor/api-client';
-import { UserData } from '@market-monitor/api-types';
-import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { DefaultImgDirective, RangeDirective } from '@market-monitor/shared/ui';
+import { UserApiService } from '@mm/api-client';
+import { UserData } from '@mm/api-types';
+import { DefaultImgDirective, RangeDirective } from '@mm/shared/ui';
+import { UserDisplayItemComponent } from '@mm/user/ui';
 import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, tap } from 'rxjs';
 
 @Component({

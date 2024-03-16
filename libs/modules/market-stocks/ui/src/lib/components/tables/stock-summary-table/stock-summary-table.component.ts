@@ -7,8 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { SymbolSummary } from '@market-monitor/api-types';
-import { compare } from '@market-monitor/shared/features/general-util';
+import { SymbolSummary } from '@mm/api-types';
+import { compare } from '@mm/shared/general-util';
 import {
   DefaultImgDirective,
   LargeNumberFormatterPipe,
@@ -17,7 +17,7 @@ import {
   RangeDirective,
   SectionTitleComponent,
   TruncatePipe,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-summary-table',

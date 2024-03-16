@@ -4,7 +4,7 @@ import {
   MarketOverview,
   SymbolHistoricalPeriods,
   SymbolSummary,
-} from '@market-monitor/api-types';
+} from '@mm/api-types';
 import axios from 'axios';
 
 export const getSymbolSummaries = async (symbols: string[]): Promise<SymbolSummary[]> => {

@@ -1,11 +1,5 @@
-import {
-  UserAccountEnum,
-  UserData,
-  UserPersonalInfo,
-  UserPortfolioTransaction,
-  UserWatchList,
-} from '@market-monitor/api-types';
-import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { UserAccountEnum, UserData, UserPersonalInfo, UserPortfolioTransaction, UserWatchList } from '@mm/api-types';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { userDocumentTransactionHistoryRef, userDocumentWatchListRef, usersCollectionRef } from '../models';

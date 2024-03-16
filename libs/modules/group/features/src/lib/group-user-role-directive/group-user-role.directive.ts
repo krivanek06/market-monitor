@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Directive, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { UserData } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
+import { UserData } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { BehaviorSubject, Subject, combineLatest, map, takeUntil } from 'rxjs';
 
 type SubGroups = (keyof UserData['groups'])[];

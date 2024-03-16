@@ -5,12 +5,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { AggregationApiService } from '@market-monitor/api-client';
-import { GroupBase } from '@market-monitor/api-types';
-import { GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
-import { PortfolioRankTableComponent } from '@market-monitor/modules/portfolio/ui';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
+import { AggregationApiService } from '@mm/api-client';
+import { GroupBase } from '@mm/api-types';
+import { GroupDisplayItemComponent } from '@mm/group/ui';
+import { PortfolioRankTableComponent } from '@mm/portfolio/ui';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
+import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-hall-of-fame-groups',

@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, Input, inject, input, signal } from
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MarketApiService } from '@market-monitor/api-client';
-import { News, NewsAcceptableTypes, NewsTypes } from '@market-monitor/api-types';
-import { InputSource } from '@market-monitor/shared/data-access';
+import { MarketApiService } from '@mm/api-client';
+import { News, NewsAcceptableTypes, NewsTypes } from '@mm/api-types';
+import { InputSource } from '@mm/shared/data-access';
 import {
   DateAgoPipe,
   DefaultImgDirective,
@@ -13,7 +13,7 @@ import {
   RangeDirective,
   ScrollNearEndDirective,
   TruncateWordsPipe,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
 
 @Component({

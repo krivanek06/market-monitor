@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { ColorScheme } from '@market-monitor/shared/data-access';
+import { ColorScheme } from '@mm/shared/data-access';
 import { PositionColoringDirective } from '../../../directives';
 
 @Component({

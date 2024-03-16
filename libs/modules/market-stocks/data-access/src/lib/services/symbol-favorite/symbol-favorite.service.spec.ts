@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MockProvider } from 'ng-mocks';
 
-import { StocksApiService } from '@market-monitor/api-client';
+import { StocksApiService } from '@mm/api-client';
 import { of } from 'rxjs';
 import { SymbolFavoriteService } from './symbol-favorite.service';
 

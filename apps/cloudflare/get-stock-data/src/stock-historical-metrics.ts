@@ -1,4 +1,4 @@
-import { getCompanyKeyMetrics, getCompanyRatios } from '@market-monitor/api-external';
+import { getCompanyKeyMetrics, getCompanyRatios } from '@mm/api-external';
 import {
 	DataTimePeriod,
 	DataTimePeriodEnum,
@@ -6,8 +6,8 @@ import {
 	RESPONSE_HEADER,
 	StockMetricsHistoricalAPI,
 	StockMetricsHistoricalBasic,
-} from '@market-monitor/api-types';
-import { dateFormatDate } from '@market-monitor/shared/utils-general';
+} from '@mm/api-types';
+import { dateFormatDate } from '@mm/shared/general-util';
 import { Env } from './model';
 
 export const getStockHistoricalMetricWrapper = async (env: Env, symbol: string, searchParams: URLSearchParams): Promise<Response> => {

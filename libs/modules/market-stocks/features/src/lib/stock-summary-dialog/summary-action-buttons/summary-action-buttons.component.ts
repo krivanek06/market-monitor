@@ -3,13 +3,10 @@ import { ChangeDetectionStrategy, Component, Inject, OnInit, Optional, input, ou
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@market-monitor/api-types';
-import {
-  AUTHENTICATION_ACCOUNT_TOKEN,
-  AuthenticationUserStoreService,
-} from '@market-monitor/modules/authentication/data-access';
-import { SymbolFavoriteService } from '@market-monitor/modules/market-stocks/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
+import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@mm/api-types';
+import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { SymbolFavoriteService } from '@mm/market-stocks/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 
 @Component({
   selector: 'app-summary-action-buttons',

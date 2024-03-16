@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { EnterpriseValue, SymbolOwnershipInstitutional } from '@market-monitor/api-types';
-import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { EnterpriseValue, SymbolOwnershipInstitutional } from '@mm/api-types';
+import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-ownership-institutional-list',
@@ -224,16 +224,16 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-m
     </ng-container>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
 
-      .c-loading-wrapper {
-        width: 45%;
-        margin-right: 24px;
-        height: 28px;
-      }
-    `,
+    .c-loading-wrapper {
+      width: 45%;
+      margin-right: 24px;
+      height: 28px;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockOwnershipInstitutionalListComponent {

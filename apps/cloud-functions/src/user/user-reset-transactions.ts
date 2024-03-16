@@ -1,10 +1,5 @@
-import {
-  USER_DEFAULT_STARTING_CASH,
-  UserAccountEnum,
-  UserData,
-  UserResetTransactionsInput,
-} from '@market-monitor/api-types';
-import { createEmptyPortfolioState } from '@market-monitor/shared/features/general-util';
+import { USER_DEFAULT_STARTING_CASH, UserAccountEnum, UserData, UserResetTransactionsInput } from '@mm/api-types';
+import { createEmptyPortfolioState } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { GROUP_USER_NOT_OWNER, groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';

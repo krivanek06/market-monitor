@@ -5,10 +5,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { UserData } from '@market-monitor/api-types';
-import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
+import { UserData } from '@mm/api-types';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { DialogCloseHeaderComponent } from '@mm/shared/ui';
+import { UserDisplayItemComponent } from '@mm/user/ui';
 import { UserSearchControlComponent } from '../user-search-control/user-search-control.component';
 
 export type UserSearchDialogData = {
@@ -84,9 +84,9 @@ export type UserSearchDialogData = {
     </mat-dialog-actions>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

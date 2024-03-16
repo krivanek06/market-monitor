@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageMarketTopPerformersComponent } from '@market-monitor/modules/page-builder';
+import { PageMarketTopPerformersComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-market-top-performers',

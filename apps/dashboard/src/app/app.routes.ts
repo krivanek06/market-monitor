@@ -1,12 +1,9 @@
 import { inject } from '@angular/core';
 import { Route, Router } from '@angular/router';
-import { UserAccountEnum } from '@market-monitor/api-types';
-import {
-  AuthenticationAccountService,
-  AuthenticationUserStoreService,
-} from '@market-monitor/modules/authentication/data-access';
-import { featureFlagGuard } from '@market-monitor/modules/authentication/features/feature-access-directive';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
+import { UserAccountEnum } from '@mm/api-types';
+import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { featureFlagGuard } from '@mm/authentication/feature-access-directive';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { map, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
@@ -135,7 +132,7 @@ export const appRoutes: Route[] = [
               {
                 path: ROUTES_MAIN.CRYPTO,
                 title: 'Crypto',
-                loadComponent: () => import('@market-monitor/modules/page-builder').then((m) => m.PageCryptoComponent),
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageCryptoComponent),
               },
             ],
           },

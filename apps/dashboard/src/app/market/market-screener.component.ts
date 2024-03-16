@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageMarketStockScreenerComponent } from '@market-monitor/modules/page-builder';
+import { PageMarketStockScreenerComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-market-stock-screener',

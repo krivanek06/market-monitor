@@ -1,5 +1,5 @@
-import { getSymbolOwnershipInstitutional } from '@market-monitor/api-external';
-import { EXPIRATION_ONE_WEEK, RESPONSE_HEADER } from '@market-monitor/api-types';
+import { getSymbolOwnershipInstitutional } from '@mm/api-external';
+import { EXPIRATION_ONE_WEEK, RESPONSE_HEADER } from '@mm/api-types';
 import { Env } from './model';
 
 export const getStockOwnershipInstitutionalWrapper = async (env: Env, symbol: string, searchParams: URLSearchParams): Promise<Response> => {

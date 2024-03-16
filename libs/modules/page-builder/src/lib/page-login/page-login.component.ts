@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { AuthenticationFormComponent } from '@market-monitor/modules/authentication/features/authentication-forms';
-import { DialogServiceModule } from '@market-monitor/shared/features/dialog-manager';
+import { AuthenticationFormComponent } from '@mm/authentication/authentication-forms';
+import { DialogServiceModule } from '@mm/shared/dialog-manager';
 
 @Component({
   selector: 'app-page-login',

@@ -9,20 +9,20 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MarketApiService } from '@market-monitor/api-client';
+import { MarketApiService } from '@mm/api-client';
 import {
   PortfolioTransactionCreate,
   PortfolioTransactionType,
   SymbolSummary,
   USER_HOLDINGS_SYMBOL_LIMIT,
   UserAccountEnum,
-} from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { UserAccountTypeDirective } from '@market-monitor/modules/authentication/features/feature-access-directive';
-import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
-import { minValueValidator, positiveNumberValidator, requiredValidator } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { dateFormatDate, dateIsNotWeekend } from '@market-monitor/shared/features/general-util';
+} from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
+import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
+import { minValueValidator, positiveNumberValidator, requiredValidator } from '@mm/shared/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { dateFormatDate, dateIsNotWeekend } from '@mm/shared/general-util';
 import {
   CastToNumberPipe,
   DatePickerComponent,
@@ -31,7 +31,7 @@ import {
   FormMatInputWrapperComponent,
   InputTypeDateTimePickerConfig,
   NumberKeyboardComponent,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 import { isSameDay } from 'date-fns';
 import { map, switchMap, tap } from 'rxjs';
 

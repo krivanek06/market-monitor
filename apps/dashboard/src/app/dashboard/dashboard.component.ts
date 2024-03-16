@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageDashboardComponent } from '@market-monitor/modules/page-builder';
+import { PageDashboardComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-dashboard',
@@ -7,10 +7,10 @@ import { PageDashboardComponent } from '@market-monitor/modules/page-builder';
   imports: [PageDashboardComponent],
   template: `<app-page-dashboard></app-page-dashboard>`,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {}

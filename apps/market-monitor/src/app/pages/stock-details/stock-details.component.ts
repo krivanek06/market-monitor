@@ -5,9 +5,9 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
-import { stockDetailsResolver } from '@market-monitor/modules/page-builder';
-import { LabelValue, ROUTES_STOCK_DETAILS } from '@market-monitor/shared/data-access';
-import { TabSelectControlComponent } from '@market-monitor/shared/ui';
+import { stockDetailsResolver } from '@mm/page-builder';
+import { LabelValue, ROUTES_STOCK_DETAILS } from '@mm/shared/data-access';
+import { TabSelectControlComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-details',
@@ -36,10 +36,10 @@ import { TabSelectControlComponent } from '@market-monitor/shared/ui';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-      :host {
-        @apply mt-6 block;
-      }
-    `,
+    :host {
+      @apply mt-6 block;
+    }
+  `,
 })
 export class StockDetailsComponent {
   router = inject(Router);

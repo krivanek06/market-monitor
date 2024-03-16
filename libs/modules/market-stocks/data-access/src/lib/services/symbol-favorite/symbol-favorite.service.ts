@@ -1,7 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { StocksApiService } from '@market-monitor/api-client';
-import { SymbolSearch, SymbolSummary } from '@market-monitor/api-types';
-import { StorageLocalStoreService } from '@market-monitor/shared/features/general-features';
+import { StocksApiService } from '@mm/api-client';
+import { SymbolSearch, SymbolSummary } from '@mm/api-types';
+import { StorageLocalStoreService } from '@mm/shared/general-features';
 
 @Injectable({
   providedIn: 'root',

@@ -1,5 +1,5 @@
-import { getMostPerformingStocks } from '@market-monitor/api-external';
-import { MarketTopPerformanceSymbols, RESPONSE_HEADER } from '@market-monitor/api-types';
+import { getMostPerformingStocks } from '@mm/api-external';
+import { MarketTopPerformanceSymbols, RESPONSE_HEADER } from '@mm/api-types';
 import { Env } from './model';
 
 export const getTopSymbols = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {

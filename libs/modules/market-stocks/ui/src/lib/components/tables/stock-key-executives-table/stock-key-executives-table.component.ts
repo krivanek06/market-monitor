@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { CompanyKeyExecutive } from '@market-monitor/api-types';
-import { LargeNumberFormatterPipe, SplitStringPipe } from '@market-monitor/shared/ui';
+import { CompanyKeyExecutive } from '@mm/api-types';
+import { LargeNumberFormatterPipe, SplitStringPipe } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-key-executives-table',
@@ -53,7 +53,7 @@ import { LargeNumberFormatterPipe, SplitStringPipe } from '@market-monitor/share
     :host {
       display: block;
     }
-`,
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockKeyExecutivesTableComponent {

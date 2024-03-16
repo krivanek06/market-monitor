@@ -4,9 +4,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
-import { StocksApiService } from '@market-monitor/api-client';
-import { EstimatedChartDataType } from '@market-monitor/shared/data-access';
-import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
+import { StocksApiService } from '@mm/api-client';
+import { EstimatedChartDataType } from '@mm/shared/data-access';
+import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { map } from 'rxjs';
 import { EarningsEstimationChartComponent, RevenueEstimationChartComponent } from '../../components';
 
@@ -69,9 +69,10 @@ import { EarningsEstimationChartComponent, RevenueEstimationChartComponent } fro
     </mat-dialog-content>
   `,
   styles: `
-  :host {
-    display: block;
-  }`,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EarningsHistoricalDialogComponent {

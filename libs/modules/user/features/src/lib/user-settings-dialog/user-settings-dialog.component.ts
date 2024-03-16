@@ -6,16 +6,13 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { accountDescription } from '@market-monitor/api-types';
-import {
-  AuthenticationAccountService,
-  AuthenticationUserStoreService,
-} from '@market-monitor/modules/authentication/data-access';
-import { ChangePasswordDialogComponent } from '@market-monitor/modules/authentication/features/authentication-forms';
-import { UserAccountTypeDirective } from '@market-monitor/modules/authentication/features/feature-access-directive';
-import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
-import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
+import { accountDescription } from '@mm/api-types';
+import { ChangePasswordDialogComponent } from '@mm/authentication/authentication-forms';
+import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { DialogCloseHeaderComponent } from '@mm/shared/ui';
+import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
 import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, catchError, from, map, tap } from 'rxjs';
 import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';

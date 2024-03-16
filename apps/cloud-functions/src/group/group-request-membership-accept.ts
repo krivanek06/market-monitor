@@ -1,4 +1,4 @@
-import { GROUP_MEMBER_LIMIT, GroupBaseInput, GroupMember, UserAccountEnum } from '@market-monitor/api-types';
+import { GROUP_MEMBER_LIMIT, GroupBaseInput, GroupMember, UserAccountEnum } from '@mm/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {

@@ -8,8 +8,8 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-import { getNewsFromApi } from '@market-monitor/api-external';
-import { NewsAcceptableTypes, NewsTypes, RESPONSE_HEADER } from '@market-monitor/api-types';
+import { getNewsFromApi } from '@mm/api-external';
+import { NewsAcceptableTypes, NewsTypes, RESPONSE_HEADER } from '@mm/api-types';
 
 export interface Env {
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/

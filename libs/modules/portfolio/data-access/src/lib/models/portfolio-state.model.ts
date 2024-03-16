@@ -1,4 +1,4 @@
-import { PortfolioGrowthAssetsDataItem, PortfolioState } from '@market-monitor/api-types';
+import { PortfolioGrowthAssetsDataItem, PortfolioState } from '@mm/api-types';
 
 export type PortfolioTransactionToDate = Pick<
   PortfolioState,

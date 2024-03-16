@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageSearchComponent } from '@market-monitor/modules/page-builder';
+import { PageSearchComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-search',

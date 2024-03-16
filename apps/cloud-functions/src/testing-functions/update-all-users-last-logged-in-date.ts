@@ -1,4 +1,4 @@
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import admin from 'firebase-admin';
 import { usersCollectionRef } from '../models';
 

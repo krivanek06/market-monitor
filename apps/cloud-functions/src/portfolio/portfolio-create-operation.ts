@@ -1,4 +1,4 @@
-import { getStockHistoricalPricesOnDate } from '@market-monitor/api-external';
+import { getStockHistoricalPricesOnDate } from '@mm/api-external';
 import {
   HISTORICAL_PRICE_RESTRICTION_YEARS,
   HistoricalPrice,
@@ -7,12 +7,8 @@ import {
   TRANSACTION_FEE_PRCT,
   UserAccountEnum,
   UserData,
-} from '@market-monitor/api-types';
-import {
-  dateFormatDate,
-  dateGetDetailsInformationFromDate,
-  roundNDigits,
-} from '@market-monitor/shared/features/general-util';
+} from '@mm/api-types';
+import { dateFormatDate, dateGetDetailsInformationFromDate, roundNDigits } from '@mm/shared/general-util';
 import { format, isBefore, isValid, isWeekend, subDays } from 'date-fns';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';

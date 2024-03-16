@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { CalendarStockEarning, StockEarning } from '@market-monitor/api-types';
-import { DefaultImgDirective, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { CalendarStockEarning, StockEarning } from '@mm/api-types';
+import { DefaultImgDirective, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-earnings-item',

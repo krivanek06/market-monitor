@@ -1,4 +1,4 @@
-import { ColorScheme } from '@market-monitor/shared/data-access';
+import { ColorScheme } from '@mm/shared/data-access';
 
 export const Recommendation = {
   StrongSell: {

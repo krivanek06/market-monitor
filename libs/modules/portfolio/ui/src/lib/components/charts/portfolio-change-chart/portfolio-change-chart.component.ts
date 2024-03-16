@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
-import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
-import { formatValueIntoCurrency } from '@market-monitor/shared/features/general-util';
+import { PortfolioGrowth } from '@mm/portfolio/data-access';
+import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
+import { formatValueIntoCurrency } from '@mm/shared/general-util';
 import {
   DateRangeSliderComponent,
   DateRangeSliderValues,
   SectionTitleComponent,
   filterDataByDateRange,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { filterNil } from 'ngxtension/filter-nil';
 import { startWith } from 'rxjs';

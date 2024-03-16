@@ -1,4 +1,4 @@
-import { UserAccountEnum, UserData, UserPortfolioTransaction, UserWatchList } from '@market-monitor/api-types';
+import { UserAccountEnum, UserData, UserPortfolioTransaction, UserWatchList } from '@mm/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes, assignTypesOptional } from './assign-type';
 

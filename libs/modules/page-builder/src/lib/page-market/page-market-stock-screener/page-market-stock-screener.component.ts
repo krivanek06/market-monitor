@@ -6,24 +6,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { ActivatedRoute, Router } from '@angular/router';
-import { StocksApiService } from '@market-monitor/api-client';
-import { StockScreenerValues, SymbolSummary } from '@market-monitor/api-types';
+import { StocksApiService } from '@mm/api-client';
+import { StockScreenerValues, SymbolSummary } from '@mm/api-types';
 import {
   STOCK_SCREENER_DEFAULT_VALUES,
   getScreenerInputIndexByKey,
   getScreenerInputValueByKey,
-} from '@market-monitor/modules/market-stocks/data-access';
-import {
-  StockSearchBasicCustomizedComponent,
-  StockSummaryDialogComponent,
-} from '@market-monitor/modules/market-stocks/features';
-import {
-  StockScreenerFormControlComponent,
-  StockSummaryTableComponent,
-} from '@market-monitor/modules/market-stocks/ui';
-import { RouterManagement } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { RangeDirective, ScrollNearEndDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
+} from '@mm/market-stocks/data-access';
+import { StockSearchBasicCustomizedComponent, StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { StockScreenerFormControlComponent, StockSummaryTableComponent } from '@mm/market-stocks/ui';
+import { RouterManagement } from '@mm/shared/data-access';
+import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { RangeDirective, ScrollNearEndDirective, SectionTitleComponent } from '@mm/shared/ui';
 import { catchError, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -89,9 +83,9 @@ import { catchError, switchMap, tap } from 'rxjs';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
 })
 export class PageMarketStockScreenerComponent implements OnInit, RouterManagement {

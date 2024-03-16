@@ -1,6 +1,6 @@
 import { component$ } from '@builder.io/qwik';
-import { SymbolSummary } from '@market-monitor/api-types';
-import { dateFormatDate, formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
+import { SymbolSummary } from '@mm/api-types';
+import { dateFormatDate, formatLargeNumber, roundNDigits } from '@mm/shared/general-util';
 import { symbolUrl } from '../utils';
 import { PercentageIncrease } from './percentage-increase';
 

@@ -4,9 +4,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { GroupInteractionButtonsComponent } from '@market-monitor/modules/group/features';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { TabSelectControlComponent } from '@market-monitor/shared/ui';
+import { GroupInteractionButtonsComponent } from '@mm/group/features';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { TabSelectControlComponent } from '@mm/shared/ui';
 import { GroupDetailsOverviewComponent } from './group-details-overview/group-details-overview.component';
 import { PageGroupsBaseComponent } from './page-groups-base.component';
 
@@ -50,9 +50,9 @@ type GroupDetailsTab = 'overview' | 'holdings';
     </section>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

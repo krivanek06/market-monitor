@@ -1,8 +1,8 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { CalendarStockEarning, StockEarning } from '@market-monitor/api-types';
-import { DialogCloseHeaderComponent } from '@market-monitor/shared/ui';
+import { CalendarStockEarning, StockEarning } from '@mm/api-types';
+import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { EarningsItemComponent } from '../../components';
 
 @Component({

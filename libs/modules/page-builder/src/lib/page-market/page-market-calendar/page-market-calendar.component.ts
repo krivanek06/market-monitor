@@ -7,30 +7,26 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MarketApiService } from '@market-monitor/api-client';
-import { CalendarAssetDataTypes, CalendarDividend, CalendarStockEarning } from '@market-monitor/api-types';
-import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
+import { MarketApiService } from '@mm/api-client';
+import { CalendarAssetDataTypes, CalendarDividend, CalendarStockEarning } from '@mm/api-types';
+import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import {
   DividendItemComponent,
   DividendItemsDialogComponent,
   EarningsHistoricalDialogComponent,
   EarningsItemComponent,
   EarningsItemsDialogComponent,
-} from '@market-monitor/modules/market-stocks/ui';
-import { RouterManagement } from '@market-monitor/shared/data-access';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import {
-  fillOutMissingDatesForMonth,
-  generateDatesArrayForMonth,
-  groupValuesByDate,
-} from '@market-monitor/shared/features/general-util';
+} from '@mm/market-stocks/ui';
+import { RouterManagement } from '@mm/shared/data-access';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { fillOutMissingDatesForMonth, generateDatesArrayForMonth, groupValuesByDate } from '@mm/shared/general-util';
 import {
   CalendarRageToday,
   CalendarRange,
   CalendarWrapperComponent,
   MarkerDirective,
   RangeDirective,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap } from 'rxjs';
 
 @Component({
@@ -127,10 +123,10 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-      :host {
-        @apply mt-10 block;
-      }
-    `,
+    :host {
+      @apply mt-10 block;
+    }
+  `,
 })
 export class PageMarketCalendarComponent implements OnInit, RouterManagement {
   marketApiService = inject(MarketApiService);

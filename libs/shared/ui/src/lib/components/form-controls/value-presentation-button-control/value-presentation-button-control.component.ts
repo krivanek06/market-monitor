@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, forwardRef, input, OnInit, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { ValuePresentItem } from '@market-monitor/shared/data-access';
+import { ValuePresentItem } from '@mm/shared/data-access';
 import { DefaultImgDirective } from '../../../directives';
 import { InArrayPipe } from '../../../pipes';
 

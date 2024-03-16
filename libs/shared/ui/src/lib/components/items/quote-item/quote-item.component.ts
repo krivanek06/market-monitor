@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { SymbolQuote } from '@market-monitor/api-types';
+import { SymbolQuote } from '@mm/api-types';
 import { DefaultImgDirective, PercentageIncreaseDirective } from '../../../directives';
 import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
 

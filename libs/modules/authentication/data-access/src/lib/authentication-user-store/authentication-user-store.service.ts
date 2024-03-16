@@ -12,7 +12,7 @@ import {
   updateDoc,
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
-import { GroupApiService } from '@market-monitor/api-client';
+import { GroupApiService } from '@mm/api-client';
 import {
   PortfolioTransaction,
   PortfolioTransactionCreate,
@@ -22,9 +22,9 @@ import {
   UserGroupData,
   UserPortfolioTransaction,
   UserWatchList,
-} from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/data-access';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+} from '@mm/api-types';
+import { assignTypesClient } from '@mm/shared/data-access';
+import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { User } from 'firebase/auth';
 import { signalSlice } from 'ngxtension/signal-slice';
 import { docData as rxDocData } from 'rxfire/firestore';

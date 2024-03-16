@@ -4,18 +4,18 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { AggregationApiService } from '@market-monitor/api-client';
-import { UserBase } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { PortfolioRankTableComponent } from '@market-monitor/modules/portfolio/ui';
+import { AggregationApiService } from '@mm/api-client';
+import { UserBase } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { PortfolioRankTableComponent } from '@mm/portfolio/ui';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent } from '@mm/shared/ui';
 import {
   UserDetailsDialogComponent,
   UserDetailsDialogComponentData,
   UserSearchControlComponent,
-} from '@market-monitor/modules/user/features';
-import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
+} from '@mm/user/features';
+import { UserDisplayItemComponent } from '@mm/user/ui';
 
 @Component({
   selector: 'app-hall-of-fame-users',

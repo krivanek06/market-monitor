@@ -1,12 +1,12 @@
-import { getHistoricalPricesCloudflare, getTreasuryRates } from '@market-monitor/api-external';
+import { getHistoricalPricesCloudflare, getTreasuryRates } from '@mm/api-external';
 import {
   HistoricalPrice,
   PortfolioRisk,
   PortfolioStateHoldings,
   SYMBOL_SP500,
   SymbolHistoricalPeriods,
-} from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat, roundNDigits } from '@market-monitor/shared/features/general-util';
+} from '@mm/api-types';
+import { getCurrentDateDefaultFormat, roundNDigits } from '@mm/shared/general-util';
 import { divide, mean, pow, sqrt, std, variance } from 'mathjs';
 
 type SymbolReturns = {

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageMarketOverviewComponent } from '@market-monitor/modules/page-builder';
+import { PageMarketOverviewComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-market-overview',
@@ -8,10 +8,10 @@ import { PageMarketOverviewComponent } from '@market-monitor/modules/page-builde
   imports: [CommonModule, PageMarketOverviewComponent],
   template: `<app-page-market-overview></app-page-market-overview>`,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarketOverviewComponent {}

@@ -6,26 +6,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MarketApiService } from '@market-monitor/api-client';
-import {
-  PortfolioStateHolding,
-  PortfolioTransaction,
-  PortfolioTransactionType,
-  SymbolSummary,
-} from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
-import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks/features';
-import { StockSummaryListComponent } from '@market-monitor/modules/market-stocks/ui';
-import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
-import {
-  PortfolioTradeDialogComponent,
-  PortfolioTradeDialogComponentData,
-} from '@market-monitor/modules/portfolio/features';
-import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@market-monitor/modules/portfolio/ui';
-import { ColorScheme } from '@market-monitor/shared/data-access';
-import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { getRandomIndex } from '@market-monitor/shared/features/general-util';
+import { MarketApiService } from '@mm/api-client';
+import { PortfolioStateHolding, PortfolioTransaction, PortfolioTransactionType, SymbolSummary } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
+import { StockSearchBasicCustomizedComponent } from '@mm/market-stocks/features';
+import { StockSummaryListComponent } from '@mm/market-stocks/ui';
+import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
+import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
+import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
+import { ColorScheme } from '@mm/shared/data-access';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { getRandomIndex } from '@mm/shared/general-util';
 import {
   FancyCardComponent,
   FormMatInputWrapperComponent,
@@ -33,7 +25,7 @@ import {
   RangeDirective,
   SectionTitleComponent,
   SortByKeyPipe,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 import { take } from 'rxjs';
 
 @Component({

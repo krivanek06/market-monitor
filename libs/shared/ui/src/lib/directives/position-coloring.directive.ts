@@ -1,6 +1,5 @@
-import { Directive, ElementRef, Input, OnChanges, Renderer2, SimpleChanges, inject } from '@angular/core';
-import { ColorScheme } from '@market-monitor/shared/data-access';
-import { input } from '@angular/core';
+import { Directive, ElementRef, OnChanges, Renderer2, SimpleChanges, inject, input } from '@angular/core';
+import { ColorScheme } from '@mm/shared/data-access';
 
 type ColorType = 'color' | 'background-color';
 

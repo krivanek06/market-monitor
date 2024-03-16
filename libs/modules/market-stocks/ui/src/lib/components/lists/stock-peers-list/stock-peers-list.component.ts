@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
-import { SymbolSummary } from '@market-monitor/api-types';
-import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { SymbolSummary } from '@mm/api-types';
+import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-peers-list',

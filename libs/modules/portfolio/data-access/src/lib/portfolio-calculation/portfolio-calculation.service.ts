@@ -1,12 +1,7 @@
 import { Injectable } from '@angular/core';
-import { PortfolioGrowthAssets, PortfolioStateHolding, PortfolioTransaction } from '@market-monitor/api-types';
-import { ColorScheme, GenericChartSeries, ValueItem } from '@market-monitor/shared/data-access';
-import {
-  calculateGrowth,
-  dateFormatDate,
-  getObjectEntries,
-  roundNDigits,
-} from '@market-monitor/shared/features/general-util';
+import { PortfolioGrowthAssets, PortfolioStateHolding, PortfolioTransaction } from '@mm/api-types';
+import { ColorScheme, GenericChartSeries, ValueItem } from '@mm/shared/data-access';
+import { calculateGrowth, dateFormatDate, getObjectEntries, roundNDigits } from '@mm/shared/general-util';
 import { subMonths, subWeeks, subYears } from 'date-fns';
 import { PortfolioChange, PortfolioGrowth, PortfolioTransactionToDate } from '../models';
 

@@ -4,21 +4,21 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
-import { PortfolioGrowthAssets } from '@market-monitor/api-types';
+import { PortfolioGrowthAssets } from '@mm/api-types';
 import {
   ChartConstructor,
   ColorScheme,
   GenericChartSeries,
   InputSource,
   getChartGenericColor,
-} from '@market-monitor/shared/data-access';
-import { dateFormatDate, formatValueIntoCurrency } from '@market-monitor/shared/features/general-util';
+} from '@mm/shared/data-access';
+import { dateFormatDate, formatValueIntoCurrency } from '@mm/shared/general-util';
 import {
   DateRangeSliderComponent,
   DateRangeSliderValues,
   DefaultImgDirective,
   filterDataByTimestamp,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { computedFrom } from 'ngxtension/computed-from';

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageStockDetailsHoldersComponent } from '@market-monitor/modules/page-builder';
+import { PageStockDetailsHoldersComponent } from '@mm/page-builder';
 @Component({
   selector: 'app-stock-details-holders',
   standalone: true,

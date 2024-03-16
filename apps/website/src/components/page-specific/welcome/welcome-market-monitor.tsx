@@ -1,7 +1,7 @@
 import { $, Resource, component$, useResource$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
-import { getHistoricalPricesCloudflare, getSymbolSummaries } from '@market-monitor/api-external';
-import { SymbolHistoricalPeriods, SymbolSummary } from '@market-monitor/api-types';
-import { getRandomElement } from '@market-monitor/shared/features/general-util';
+import { getHistoricalPricesCloudflare, getSymbolSummaries } from '@mm/api-external';
+import { SymbolHistoricalPeriods, SymbolSummary } from '@mm/api-types';
+import { getRandomElement } from '@mm/shared/general-util';
 import { Button, CardBasic } from '../../shared';
 import { HistoricalPriceChart, SymbolChange, SymbolSummaryList } from '../../trading';
 import { stockSymbols } from '../../utils';

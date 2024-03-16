@@ -9,8 +9,8 @@ import {
   query,
   where,
 } from '@angular/fire/firestore';
-import { UserData, UserPortfolioTransaction } from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/data-access';
+import { UserData, UserPortfolioTransaction } from '@mm/api-types';
+import { assignTypesClient } from '@mm/shared/data-access';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
 import { Observable, filter, map, of } from 'rxjs';

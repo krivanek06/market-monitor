@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { CompanyRatingTable } from '@market-monitor/api-types';
-import { LargeNumberFormatterPipe } from '@market-monitor/shared/ui';
+import { CompanyRatingTable } from '@mm/api-types';
+import { LargeNumberFormatterPipe } from '@mm/shared/ui';
 import { RecommendationDirective } from '../../../directives';
 
 @Component({
@@ -68,10 +68,10 @@ import { RecommendationDirective } from '../../../directives';
     </div>
   `,
   styles: `
-  :host {
-    display: block;
-  }
-`,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockRatingTableComponent {

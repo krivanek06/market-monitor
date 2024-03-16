@@ -1,4 +1,4 @@
-import { ValueItem } from '@market-monitor/shared/data-access';
+import { ValueItem } from '@mm/shared/data-access';
 
 export type PortfolioChange = {
   '1_day': ValueItem | null;

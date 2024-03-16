@@ -2,17 +2,10 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import {
-  StockOwnershipHoldersTableComponent,
-  StockOwnershipInstitutionalListComponent,
-} from '@market-monitor/modules/market-stocks/ui';
-import { InputSource } from '@market-monitor/shared/data-access';
-import {
-  dateFormatDate,
-  getPreviousDate,
-  isStockMarketHolidayDate,
-} from '@market-monitor/shared/features/general-util';
-import { FormMatInputWrapperComponent, GeneralCardComponent, RangeDirective } from '@market-monitor/shared/ui';
+import { StockOwnershipHoldersTableComponent, StockOwnershipInstitutionalListComponent } from '@mm/market-stocks/ui';
+import { InputSource } from '@mm/shared/data-access';
+import { dateFormatDate, getPreviousDate, isStockMarketHolidayDate } from '@mm/shared/general-util';
+import { FormMatInputWrapperComponent, GeneralCardComponent, RangeDirective } from '@mm/shared/ui';
 import { catchError, filter, map, of, startWith, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
@@ -110,9 +103,9 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     </app-general-card>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { ngSkipHydration: 'true' },

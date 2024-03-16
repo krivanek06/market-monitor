@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { ColorScheme } from '@market-monitor/shared/data-access';
+import { ColorScheme } from '@mm/shared/data-access';
 
 @Component({
   selector: 'app-fancy-card',
@@ -28,41 +28,41 @@ import { ColorScheme } from '@market-monitor/shared/data-access';
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
 
-      .c-title-dot {
-        height: 20px;
-        width: 20px;
-        border-radius: 50%;
-        margin-right: 10px;
-      }
+    .c-title-dot {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
 
-      .c-fancy-circle {
-        position: absolute;
-        height: 100px;
-        width: 100px;
-        background-color: #ffffff47;
-        opacity: 0.6;
-        border-radius: 50%;
-      }
+    .c-fancy-circle {
+      position: absolute;
+      height: 100px;
+      width: 100px;
+      background-color: #ffffff47;
+      opacity: 0.6;
+      border-radius: 50%;
+    }
 
-      .c-upper-circle {
-        top: -30px;
-        right: -15px;
-      }
+    .c-upper-circle {
+      top: -30px;
+      right: -15px;
+    }
 
-      .c-left-circle {
-        left: -45px;
-        bottom: -50px;
-      }
+    .c-left-circle {
+      left: -45px;
+      bottom: -50px;
+    }
 
-      .c-lower-circle {
-        right: -25px;
-        bottom: -35px;
-      }
-    `,
+    .c-lower-circle {
+      right: -25px;
+      bottom: -35px;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FancyCardComponent {

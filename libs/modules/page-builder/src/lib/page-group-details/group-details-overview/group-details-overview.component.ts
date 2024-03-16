@@ -3,12 +3,12 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { UserApiService } from '@market-monitor/api-client';
-import { GROUP_MEMBER_LIMIT, UserBase } from '@market-monitor/api-types';
-import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@market-monitor/modules/group/features';
-import { GroupDisplayInfoComponent } from '@market-monitor/modules/group/ui';
-import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
-import { PortfolioCalculationService, PortfolioGrowth } from '@market-monitor/modules/portfolio/data-access';
+import { UserApiService } from '@mm/api-client';
+import { GROUP_MEMBER_LIMIT, UserBase } from '@mm/api-types';
+import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@mm/group/features';
+import { GroupDisplayInfoComponent } from '@mm/group/ui';
+import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { PortfolioCalculationService, PortfolioGrowth } from '@mm/portfolio/data-access';
 import {
   PortfolioBalancePieChartComponent,
   PortfolioGrowthChartComponent,
@@ -17,11 +17,9 @@ import {
   PortfolioStateComponent,
   PortfolioTransactionChartComponent,
   PortfolioTransactionsTableComponent,
-} from '@market-monitor/modules/portfolio/ui';
-import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@market-monitor/modules/user/features';
-import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { ColorScheme } from '@market-monitor/shared/data-access';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
+} from '@mm/portfolio/ui';
+import { ColorScheme } from '@mm/shared/data-access';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
   GeneralCardComponent,
   GenericChartComponent,
@@ -30,7 +28,9 @@ import {
   SectionTitleComponent,
   ShowMoreButtonComponent,
   SortByKeyPipe,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
+import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@mm/user/features';
+import { UserDisplayItemComponent } from '@mm/user/ui';
 import { computedFrom } from 'ngxtension/computed-from';
 import { filterNil } from 'ngxtension/filter-nil';
 import { map, pipe, switchMap } from 'rxjs';

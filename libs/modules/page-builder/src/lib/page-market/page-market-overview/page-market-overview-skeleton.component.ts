@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RangeDirective } from '@market-monitor/shared/ui';
+import { RangeDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-page-market-overview-skeleton',
   standalone: true,
   imports: [CommonModule, RangeDirective],
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `

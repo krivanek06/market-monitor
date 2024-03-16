@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageWatchlistComponent } from '@market-monitor/modules/page-builder';
+import { PageWatchlistComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-watchlist',
@@ -7,9 +7,9 @@ import { PageWatchlistComponent } from '@market-monitor/modules/page-builder';
   imports: [PageWatchlistComponent],
   template: `<app-page-watchlist></app-page-watchlist>`,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

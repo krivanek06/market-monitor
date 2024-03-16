@@ -1,5 +1,5 @@
-import { RankingItem } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { RankingItem } from '@mm/api-types';
+import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { usersCollectionDemoTradingRef } from '../models';
 
 /**

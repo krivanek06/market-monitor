@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Directive, TemplateRef, ViewContainerRef, effect, inject, input } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { UserAccountEnum, UserAccountTypes } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService, hasUserAccess } from '@market-monitor/modules/authentication/data-access';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
+import { UserAccountEnum, UserAccountTypes } from '@mm/api-types';
+import { AuthenticationUserStoreService, hasUserAccess } from '@mm/authentication/data-access';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
 
 /**
  * This directive is used to check if the user has access to a feature
