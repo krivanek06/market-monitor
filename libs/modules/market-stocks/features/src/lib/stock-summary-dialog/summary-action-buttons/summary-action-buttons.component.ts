@@ -1,25 +1,12 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Inject,
-  OnInit,
-  Optional,
-  Output,
-  input,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit, Optional, input, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@market-monitor/api-types';
-import {
-  AUTHENTICATION_ACCOUNT_TOKEN,
-  AuthenticationUserStoreService,
-} from '@market-monitor/modules/authentication/data-access';
-import { SymbolFavoriteService } from '@market-monitor/modules/market-stocks/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
+import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@mm/api-types';
+import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { SymbolFavoriteService } from '@mm/market-stocks/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 
 @Component({
   selector: 'app-summary-action-buttons',
@@ -93,7 +80,7 @@ import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manage
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SummaryActionButtonsComponent implements OnInit {
-  @Output() redirectClickedEmitter = new EventEmitter<void>();
+  redirectClickedEmitter = output<void>();
   symbolSummary = input.required<SymbolSummary>();
 
   isSymbolInFavoriteSignal = signal<boolean>(false);
@@ -149,11 +136,11 @@ export class SummaryActionButtonsComponent implements OnInit {
 
   async onAddWatchList() {
     if (this.authenticationUserService) {
-      const userFeatures = this.authenticationUserService.state.getUserData().features;
+      const isPaid = this.authenticationUserService.state.isAccountNormalPaid();
       const userWatchlist = this.authenticationUserService.state.watchList().data;
 
       // check if user can add more symbols into watchlist
-      if (!userFeatures.allowUnlimitedSymbolsInWatchList && userWatchlist.length >= USER_WATCHLIST_SYMBOL_LIMIT) {
+      if (!isPaid && userWatchlist.length >= USER_WATCHLIST_SYMBOL_LIMIT) {
         this.dialogServiceUtil.showNotificationBar(
           `You can not add more than ${USER_WATCHLIST_SYMBOL_LIMIT} symbols into watchlist`,
           'error',

@@ -8,18 +8,18 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { GroupApiService } from '@market-monitor/api-client';
-import { GroupMember } from '@market-monitor/api-types';
-import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { maxLengthValidator, minLengthValidator, requiredValidator } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
+import { GroupApiService } from '@mm/api-client';
+import { GroupMember } from '@mm/api-types';
+import { maxLengthValidator, minLengthValidator, requiredValidator } from '@mm/shared/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
   ArrayExcludePipe,
   DefaultImgDirective,
   DialogCloseHeaderComponent,
   FormMatInputWrapperComponent,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
+import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
+import { UserDisplayItemComponent } from '@mm/user/ui';
 import { filterNil } from 'ngxtension/filter-nil';
 import { map, take } from 'rxjs';
 
@@ -131,10 +131,10 @@ export type GroupSettingsDialogComponentData = {
     </form>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupSettingsDialogComponent {

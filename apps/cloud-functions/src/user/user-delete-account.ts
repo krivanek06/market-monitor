@@ -1,3 +1,4 @@
+import { UserAccountEnum } from '@mm/api-types';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {
@@ -22,12 +23,12 @@ export const userDeleteAccountCall = onCall(async (request) => {
   const userData = userDoc.data();
 
   // check if user exists
-  if (!userDoc.exists) {
+  if (!userData) {
     throw new HttpsError('failed-precondition', 'User does not exist');
   }
 
-  // check if authenticated user is owner
-  if (userAuthId !== userResetId && !userData?.features.isAdmin) {
+  // check if authenticated user is owner or admin
+  if (userAuthId !== userResetId && userData.userAccountType !== UserAccountEnum.ADMIN) {
     throw new HttpsError('aborted', GROUP_USER_NOT_OWNER);
   }
 

@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { LabelValue } from '@market-monitor/shared/data-access';
-import { TabSelectControlComponent } from '@market-monitor/shared/ui';
+import { LabelValue } from '@mm/shared/data-access';
+import { TabSelectControlComponent } from '@mm/shared/ui';
 import { HallOfFameGroupsComponent } from './hall-of-fame-groups/hall-of-fame-groups.component';
 import { HallOfFameUsersComponent } from './hall-of-fame-users/hall-of-fame-users.component';
 

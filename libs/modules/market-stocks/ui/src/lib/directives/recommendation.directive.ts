@@ -1,6 +1,5 @@
-import { Directive, ElementRef, Input, Renderer2 } from '@angular/core';
-import { recommendationData, recommendationDefault } from '@market-monitor/modules/market-stocks/data-access';
-import { input } from '@angular/core';
+import { Directive, ElementRef, Input, Renderer2, input } from '@angular/core';
+import { recommendationData, recommendationDefault } from '@mm/market-stocks/data-access';
 
 @Directive({
   selector: '[appRecommendation]',

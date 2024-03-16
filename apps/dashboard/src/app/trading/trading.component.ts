@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageTradingComponent } from '@market-monitor/modules/page-builder';
+import { PageTradingComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-trading',
@@ -7,10 +7,10 @@ import { PageTradingComponent } from '@market-monitor/modules/page-builder';
   imports: [PageTradingComponent],
   template: `<app-page-trading></app-page-trading>`,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingComponent {}

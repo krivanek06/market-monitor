@@ -63,5 +63,13 @@
     "@nx/angular:pipe": {
       "standalone": true
     }
-  }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    }
+  ]
 }

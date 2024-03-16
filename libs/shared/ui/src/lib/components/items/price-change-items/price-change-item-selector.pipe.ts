@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { PriceChange } from '@market-monitor/api-types';
+import { PriceChange } from '@mm/api-types';
 
 @Pipe({
   name: 'priceChangeItemSelector',

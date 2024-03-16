@@ -1,5 +1,5 @@
 import { Directive, Renderer2, ViewContainerRef, effect, inject, input } from '@angular/core';
-import { formatLargeNumber, roundNDigits } from '@market-monitor/shared/features/general-util';
+import { formatLargeNumber, roundNDigits } from '@mm/shared/general-util';
 
 /**
  * Use this if you already have the prct diff & diff

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { ESGDataQuarterly } from '@market-monitor/api-types';
+import { ESGDataQuarterly } from '@mm/api-types';
 
 @Component({
   selector: 'app-stock-esg-data-table',
@@ -83,10 +83,10 @@ import { ESGDataQuarterly } from '@market-monitor/api-types';
     </table>
   `,
   styles: `
-  :host {
-    display: block;
-  }
-`,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockEsgDataTableComponent {

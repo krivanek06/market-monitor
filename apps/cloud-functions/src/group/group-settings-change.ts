@@ -1,4 +1,4 @@
-import { GroupSettingsChangeInput } from '@market-monitor/api-types';
+import { GroupSettingsChangeInput } from '@mm/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {

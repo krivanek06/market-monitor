@@ -1,5 +1,5 @@
-import { getHistoricalPricesOnDateRange } from '@market-monitor/api-external';
-import { HistoricalPrice, RESPONSE_HEADER } from '@market-monitor/api-types';
+import { getHistoricalPricesOnDateRange } from '@mm/api-external';
+import { HistoricalPrice, RESPONSE_HEADER } from '@mm/api-types';
 import { Env } from './model';
 
 /**

@@ -35,13 +35,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {
-  DefaultImageType,
-  InputSource,
-  InputSourceWrapper,
-  InputType,
-  InputTypeEnum,
-} from '@market-monitor/shared/data-access';
+import { DefaultImageType, InputSource, InputSourceWrapper, InputType, InputTypeEnum } from '@mm/shared/data-access';
 import { DefaultImgDirective } from '../../../directives';
 
 @Component({

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { StocksApiService } from '@market-monitor/api-client';
+import { StocksApiService } from '@mm/api-client';
 import { MockProvider } from 'ng-mocks';
 import { of } from 'rxjs';
 import { SymbolSearchService } from './symbol-search.service';

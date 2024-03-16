@@ -1,5 +1,5 @@
-import { getHistoricalPricesByPeriod } from '@market-monitor/api-external';
-import { HistoricalLoadingPeriodsDates, HistoricalPrice, HistoricalPricePeriods, RESPONSE_HEADER } from '@market-monitor/api-types';
+import { getHistoricalPricesByPeriod } from '@mm/api-external';
+import { HistoricalLoadingPeriodsDates, HistoricalPrice, HistoricalPricePeriods, RESPONSE_HEADER } from '@mm/api-types';
 import { format, isWeekend, subDays } from 'date-fns';
 import { Env } from './model';
 

@@ -1,10 +1,5 @@
-import {
-  PortfolioState,
-  PortfolioTransaction,
-  PortfolioTransactionCreate,
-  SymbolSummary,
-} from '@market-monitor/api-types';
-import { getYesterdaysDate } from '@market-monitor/shared/features/general-util';
+import { PortfolioState, PortfolioTransaction, PortfolioTransactionCreate, SymbolSummary } from '@mm/api-types';
+import { getYesterdaysDate } from '@mm/shared/general-util';
 import { USER_TEST_1_ID } from './test-user.model';
 
 export const TestTransactionDates = {

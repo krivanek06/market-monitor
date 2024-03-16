@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, Input, TrackByFunction, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input, viewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { SymbolOwnershipHolders } from '@market-monitor/api-types';
+import { SymbolOwnershipHolders } from '@mm/api-types';
 import {
   BubblePaginationDirective,
   LargeNumberFormatterPipe,
   PercentageIncreaseDirective,
   TruncateWordsPipe,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-ownership-holders-table',
@@ -149,22 +149,27 @@ import {
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockOwnershipHoldersTableComponent implements AfterViewInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class StockOwnershipHoldersTableComponent {
+  paginator = viewChild(MatPaginator);
+  sort = viewChild(MatSort);
+  data = input.required<SymbolOwnershipHolders[]>();
 
-  @Input({ required: true }) set data(values: SymbolOwnershipHolders[]) {
-    this.dataSource = new MatTableDataSource(values);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-  }
-  dataSource!: MatTableDataSource<SymbolOwnershipHolders>;
+  tableEffect = effect(
+    () => {
+      this.dataSource = new MatTableDataSource(this.data());
+      this.dataSource.paginator = this.paginator() ?? null;
+      this.dataSource.sort = this.sort() ?? null;
+    },
+    { allowSignalWrites: true },
+  );
+
+  dataSource: MatTableDataSource<SymbolOwnershipHolders> = new MatTableDataSource();
 
   displayedColumns: string[] = [
     'investorName',
@@ -175,11 +180,6 @@ export class StockOwnershipHoldersTableComponent implements AfterViewInit {
     'holdingPeriod',
     'firstAdded',
   ];
-
-  ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-  }
 
   identity: TrackByFunction<SymbolOwnershipHolders> = (index: number, item: SymbolOwnershipHolders) => item.cik;
 }

@@ -4,10 +4,10 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { AuthenticationAccountService } from '@market-monitor/modules/authentication/data-access';
-import { maxLengthValidator, minLengthValidator, requiredValidator } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { DialogCloseHeaderComponent, FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
+import { AuthenticationAccountService } from '@mm/authentication/data-access';
+import { maxLengthValidator, minLengthValidator, requiredValidator } from '@mm/shared/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { DialogCloseHeaderComponent, FormMatInputWrapperComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-change-password-dialog',

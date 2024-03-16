@@ -1,22 +1,22 @@
 import { ChangeDetectorRef, Directive, TemplateRef, ViewContainerRef, effect, inject, input } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { UserFeaturesType } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
+import { UserAccountEnum, UserAccountTypes } from '@mm/api-types';
+import { AuthenticationUserStoreService, hasUserAccess } from '@mm/authentication/data-access';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
 
 /**
  * This directive is used to check if the user has access to a feature
  * behaves the same as *ngIf="userFeatures?.featureName === 'something' "
  */
 @Directive({
-  selector: '[appFeatureAccess]',
+  selector: '[appUserAccountType]',
   standalone: true,
 })
-export class FeatureAccessDirective {
+export class UserAccountTypeDirective {
   /**
    * name of the feature user needs to have access to render the element
    */
-  featureName = input.required<UserFeaturesType>({ alias: 'appFeatureAccess' });
+  accountType = input.required<UserAccountTypes>({ alias: 'appUserAccountType' });
 
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private viewContainerRef = inject(ViewContainerRef);
@@ -25,13 +25,13 @@ export class FeatureAccessDirective {
 
   hasAccessEffect = effect(() => {
     const userData = this.authenticationUserStoreService.state.getUserData();
-    const featureName = this.featureName();
+    const accountType = this.accountType();
 
     this.viewContainerRef.clear();
     if (!userData) {
       return;
     }
-    const hasAccess = userData.features[featureName];
+    const hasAccess = hasUserAccess(userData, accountType);
     console.log('changing access', hasAccess);
     if (hasAccess) {
       this.viewContainerRef.createEmbeddedView(this.templateRef);
@@ -43,16 +43,17 @@ export class FeatureAccessDirective {
 }
 
 export const featureFlagGuard = (
-  featureName: UserFeaturesType,
+  accountType: UserAccountEnum,
   fallbackUrl: string = ROUTES_MAIN.NOT_FOUND,
 ): CanActivateFn => {
   return () => {
     const authenticationUserStoreService = inject(AuthenticationUserStoreService);
     const router = inject(Router);
 
-    const enable = authenticationUserStoreService.state.getUserData().features[featureName];
+    const userData = authenticationUserStoreService.state.getUserData();
+    const hasAccess = hasUserAccess(userData, accountType);
 
-    if (!enable) {
+    if (!hasAccess) {
       router.navigateByUrl(fallbackUrl);
     }
 

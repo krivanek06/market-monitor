@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'feature-access-directive',
-  preset: '../../../../jest.preset.js',
-  setupFilesAfterEnv: ['../../../../jest.setup.js'],
-  coverageDirectory: '../../../../coverage/libs/shared/features/feature-access-directive',
+  displayName: 'authentication-forms',
+  preset: '../../../../../jest.preset.js',
+  setupFilesAfterEnv: ['../../../../../jest.setup.js'],
+  coverageDirectory: '../../../../../coverage/libs/modules/authentication/features/authentication-forms',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

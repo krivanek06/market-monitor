@@ -5,7 +5,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
-import { LabelValue, SCREEN_LAYOUT, screenLayoutResolveType } from '@market-monitor/shared/data-access';
+import { LabelValue, SCREEN_LAYOUT, screenLayoutResolveType } from '@mm/shared/data-access';
 import { map, switchMap, tap } from 'rxjs';
 
 @Component({

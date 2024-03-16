@@ -12,7 +12,7 @@ import {
   updateDoc,
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
-import { GroupApiService } from '@market-monitor/api-client';
+import { GroupApiService } from '@mm/api-client';
 import {
   PortfolioTransaction,
   PortfolioTransactionCreate,
@@ -21,16 +21,16 @@ import {
   UserData,
   UserGroupData,
   UserPortfolioTransaction,
-  UserWatchlist as UserWatchList,
-  UserWatchlist,
-} from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/data-access';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+  UserWatchList,
+} from '@mm/api-types';
+import { assignTypesClient } from '@mm/shared/data-access';
+import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { User } from 'firebase/auth';
 import { signalSlice } from 'ngxtension/signal-slice';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { Observable, combineLatest, distinctUntilChanged, filter, map, of, switchMap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
+import { hasUserAccess } from '../model';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
   'AUTHENTICATION_ACCOUNT_TOKEN',
@@ -181,12 +181,17 @@ export class AuthenticationUserStoreService {
       getUserData: () => state().userData!,
       getUserDataNormal: () => state().userData,
       getPortfolioState: () => state().userData?.portfolioState,
-      getUserAccountType: () =>
-        state().userData?.features?.allowPortfolioCashAccount ? UserAccountTypes.Trading : UserAccountTypes.Basic,
       getUserGroupData: () => state().userGroupData!,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
       getUserPortfolioTransactions: () => state().portfolioTransactions,
       userHaveTransactions: () => (state().portfolioTransactions?.length ?? 0) > 0,
+
+      // access computes
+      hasUserAccess: () => (accountType: UserAccountTypes) => hasUserAccess(state().userData!, accountType),
+      isAccountDemoTrading: () => hasUserAccess(state().userData, 'DEMO_TRADING'),
+      isAccountNormalBasic: () => hasUserAccess(state().userData, 'NORMAL_BASIC'),
+      isAccountNormalPaid: () => hasUserAccess(state().userData, 'NORMAL_PAID'),
+      isAccountAdmin: () => hasUserAccess(state().userData, 'ADMIN'),
     }),
   });
 
@@ -196,7 +201,7 @@ export class AuthenticationUserStoreService {
     });
   }
 
-  updateUserWatchList(watchlist: Partial<UserWatchlist>): void {
+  updateUserWatchList(watchlist: Partial<UserWatchList>): void {
     const userId = this.state.getUser().uid;
     setDoc(this.getUserWatchlistDocRef(userId), watchlist, { merge: true });
   }
@@ -257,8 +262,8 @@ export class AuthenticationUserStoreService {
     );
   }
 
-  private getUserWatchList(userId: string): Observable<UserWatchlist> {
-    return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchlist => !!d));
+  private getUserWatchList(userId: string): Observable<UserWatchList> {
+    return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchList => !!d));
   }
 
   private getUserPortfolioTransactionDocRef(userId: string): DocumentReference<UserPortfolioTransaction> {
@@ -267,9 +272,9 @@ export class AuthenticationUserStoreService {
     );
   }
 
-  private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchlist> {
+  private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchList> {
     return doc(this.userCollectionMoreInformationRef(userId), 'watchlist').withConverter(
-      assignTypesClient<UserWatchlist>(),
+      assignTypesClient<UserWatchList>(),
     );
   }
 

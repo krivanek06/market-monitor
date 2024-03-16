@@ -1,5 +1,5 @@
-import { getHistoricalPricesOnDateRange } from '@market-monitor/api-external';
-import { RESPONSE_HEADER } from '@market-monitor/api-types';
+import { getHistoricalPricesOnDateRange } from '@mm/api-external';
+import { RESPONSE_HEADER } from '@mm/api-types';
 import { format, isBefore, isSameDay, isValid } from 'date-fns';
 
 export const getPriceOnDateRange = async (symbolStrings: string, searchParams: URLSearchParams): Promise<Response> => {

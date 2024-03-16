@@ -1,13 +1,19 @@
 import { faker } from '@faker-js/faker';
-import { GroupCreateInput, PortfolioTransactionCreate, UserAccountTypes, UserData } from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat, waitSeconds } from '@market-monitor/shared/features/general-util';
+import {
+  GroupCreateInput,
+  PortfolioTransactionCreate,
+  USER_DEFAULT_STARTING_CASH,
+  UserAccountEnum,
+  UserData,
+} from '@mm/api-types';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat, waitSeconds } from '@mm/shared/general-util';
 import { addDays, format, subDays } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
 import { groupCreate, groupMemberAccept } from '../group';
-import { userDocumentWatchListRef } from '../models';
+import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
 import { createPortfolioCreateOperation } from '../portfolio';
-import { resetTransactionsForUser, userCreate } from '../user';
+import { userCreate } from '../user';
 import { isFirebaseEmulator } from '../utils';
 /**
  * Reload the database with new testing data
@@ -142,7 +148,23 @@ const createUserData = async (): Promise<UserData> => {
   const userData = await userCreate(user.uid);
 
   // change user type to trading
-  await resetTransactionsForUser(userData, UserAccountTypes.Trading);
+  const newUserData = {
+    ...userData,
+    portfolioState: {
+      ...createEmptyPortfolioState(USER_DEFAULT_STARTING_CASH),
+    },
+    userAccountType: UserAccountEnum.DEMO_TRADING,
+  } satisfies UserData;
+
+  // reset user portfolio state
+  await userDocumentRef(userData.id).update({
+    ...newUserData,
+  });
+
+  // delete transactions
+  await userDocumentTransactionHistoryRef(userData.id).update({
+    transactions: [],
+  });
 
   // return data
   return userData;

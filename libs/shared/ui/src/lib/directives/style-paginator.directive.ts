@@ -1,17 +1,16 @@
 import {
   AfterViewInit,
   Directive,
-  EventEmitter,
   Host,
   OnChanges,
   OnInit,
   Optional,
-  Output,
   Renderer2,
   Self,
   SimpleChanges,
   ViewContainerRef,
   input,
+  output,
 } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 
@@ -20,7 +19,7 @@ import { MatPaginator } from '@angular/material/paginator';
   standalone: true,
 })
 export class StylePaginatorDirective implements OnInit, OnChanges, AfterViewInit {
-  @Output() pageIndexChangeEmitter: EventEmitter<number> = new EventEmitter<number>();
+  pageIndexChangeEmitter = output<number>();
   // remember rendered buttons on UI that we can remove them when page index change
   private _buttons: any[] = [];
 

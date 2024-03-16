@@ -8,13 +8,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router } from '@angular/router';
-import {
-  AuthenticationAccountService,
-  LoginUserInput,
-  RegisterUserInput,
-} from '@market-monitor/modules/authentication/data-access';
-import { IS_DEV_TOKEN, ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
+import { AuthenticationAccountService, LoginUserInput, RegisterUserInput } from '@mm/authentication/data-access';
+import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, catchError, filter, from, switchMap, take, tap } from 'rxjs';
 import { FormLoginComponent } from './form-login/form-login.component';

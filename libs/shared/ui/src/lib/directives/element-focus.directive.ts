@@ -1,12 +1,12 @@
-import { Directive, ElementRef, EventEmitter, HostListener, Output } from '@angular/core';
+import { Directive, ElementRef, HostListener, output } from '@angular/core';
 
 @Directive({
   selector: '[appElementFocus]',
   standalone: true,
 })
 export class ElementFocusDirective {
-  @Output() insideClick: EventEmitter<MouseEvent> = new EventEmitter();
-  @Output() outsideClick: EventEmitter<MouseEvent> = new EventEmitter();
+  insideClick = output<MouseEvent>();
+  outsideClick = output<MouseEvent>();
 
   @HostListener('document:mousedown', ['$event'])
   onClick(event: MouseEvent): void {

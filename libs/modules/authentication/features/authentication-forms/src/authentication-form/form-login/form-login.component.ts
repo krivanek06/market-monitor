@@ -2,14 +2,9 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { LoginUserInput } from '@market-monitor/modules/authentication/data-access';
-import {
-  emailValidator,
-  maxLengthValidator,
-  minLengthValidator,
-  requiredValidator,
-} from '@market-monitor/shared/data-access';
-import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
+import { LoginUserInput } from '@mm/authentication/data-access';
+import { emailValidator, maxLengthValidator, minLengthValidator, requiredValidator } from '@mm/shared/data-access';
+import { FormMatInputWrapperComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-form-login',
@@ -36,10 +31,10 @@ import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
     </form>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

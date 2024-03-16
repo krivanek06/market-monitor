@@ -1,15 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  TrackByFunction,
-  ViewChild,
-  input,
-  signal,
-} from '@angular/core';
+import { Component, TrackByFunction, effect, input, output, signal, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
@@ -17,8 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { SymbolSummary } from '@market-monitor/api-types';
-import { compare } from '@market-monitor/shared/features/general-util';
+import { SymbolSummary } from '@mm/api-types';
+import { compare } from '@mm/shared/general-util';
 import {
   DefaultImgDirective,
   LargeNumberFormatterPipe,
@@ -27,7 +17,7 @@ import {
   RangeDirective,
   SectionTitleComponent,
   TruncatePipe,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-summary-table',
@@ -299,27 +289,31 @@ import {
     }
   `,
 })
-export class StockSummaryTableComponent implements AfterViewInit {
-  @Output() itemClickedEmitter = new EventEmitter<SymbolSummary>();
-  @ViewChild(MatSort) sort!: MatSort;
-  @Input({ required: true }) set stockSummaries(data: SymbolSummary[] | null) {
-    if (data === null) {
-      return;
-    }
-    // filtering out what do add and remove and update table to not rerender everything
-    const dataToAdd = data.filter((d) => this.dataSource.data.findIndex((d2) => d2.id === d.id) === -1);
-    const keepData = this.dataSource.data.filter((d) => (data ?? []).findIndex((d2) => d2.id === d.id) !== -1);
+export class StockSummaryTableComponent {
+  itemClickedEmitter = output<SymbolSummary>();
+  sort = viewChild(MatSort);
+  stockSummaries = input.required<SymbolSummary[] | null>();
 
-    // sort data by market cap
-    this.dataSource.data = [...keepData, ...dataToAdd]
-      .slice()
-      .sort((a, b) => compare(a.quote.marketCap, b.quote.marketCap, false));
+  tableEffect = effect(
+    () => {
+      const summaries = this.stockSummaries();
 
-    // update table
-    this.dataSource.sort = this.sort;
-    this.dataSource._updateChangeSubscription();
-    this.showLoadingSkeletonSignal.set(false);
-  }
+      // keep loading state
+      if (!summaries) {
+        return;
+      }
+      // sort data by market cap
+      const newData = summaries.slice().sort((a, b) => compare(a.quote.marketCap, b.quote.marketCap, false));
+      this.dataSource.data = newData;
+
+      // update table
+      this.dataSource.sort = this.sort() ?? null;
+      this.dataSource._updateChangeSubscription();
+      this.showLoadingSkeletonSignal.set(false);
+    },
+    { allowSignalWrites: true },
+  );
+
   tableTitle = input('');
   showMobileInfoButton = input(true);
 
@@ -327,19 +321,11 @@ export class StockSummaryTableComponent implements AfterViewInit {
 
   displayInfoMobile = signal(false);
 
-  constructor() {
-    this.dataSource = new MatTableDataSource([] as SymbolSummary[]);
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-  }
-
   toggleDisplayedValues(): void {
     this.displayInfoMobile.set(!this.displayInfoMobile());
   }
 
-  dataSource!: MatTableDataSource<SymbolSummary>;
+  dataSource: MatTableDataSource<SymbolSummary> = new MatTableDataSource([] as SymbolSummary[]);
 
   displayedColumns: string[] = [
     'symbol',

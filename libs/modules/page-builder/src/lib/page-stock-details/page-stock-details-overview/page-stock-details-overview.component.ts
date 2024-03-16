@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
-import { SymbolSummary } from '@market-monitor/api-types';
-import { AssetPriceChartInteractiveComponent } from '@market-monitor/modules/market-general/features';
-import { StockTransformService } from '@market-monitor/modules/market-stocks/data-access';
-import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
+import { SymbolSummary } from '@mm/api-types';
+import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
+import { StockTransformService } from '@mm/market-stocks/data-access';
+import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import {
   EarningsEstimationChartComponent,
   RevenueEstimationChartComponent,
@@ -18,15 +18,15 @@ import {
   StockRecommendationChartComponent,
   StockSummaryListComponent,
   StockUpgradesDowngradesTableComponent,
-} from '@market-monitor/modules/market-stocks/ui';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
+} from '@mm/market-stocks/ui';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
   GeneralCardComponent,
   GenericChartComponent,
   NameValueListComponent,
   PriceChangeItemsComponent,
   SortByKeyPipe,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 import { of, switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
@@ -263,9 +263,9 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

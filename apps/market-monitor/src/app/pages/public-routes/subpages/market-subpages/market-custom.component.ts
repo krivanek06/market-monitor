@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageMarketCustomComponent } from '@market-monitor/modules/page-builder';
+import { PageMarketCustomComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-market-custom',
@@ -8,10 +8,10 @@ import { PageMarketCustomComponent } from '@market-monitor/modules/page-builder'
   imports: [CommonModule, PageMarketCustomComponent],
   template: `<app-page-market-custom></app-page-market-custom>`,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarketCustomComponent {}

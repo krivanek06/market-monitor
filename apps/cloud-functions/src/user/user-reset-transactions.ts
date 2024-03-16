@@ -1,13 +1,8 @@
-import {
-  USER_DEFAULT_STARTING_CASH,
-  UserAccountTypes,
-  UserData,
-  UserFeatures,
-  UserResetTransactionsInput,
-} from '@market-monitor/api-types';
-import { createEmptyPortfolioState } from '@market-monitor/shared/features/general-util';
+import { USER_DEFAULT_STARTING_CASH, UserAccountEnum, UserData, UserResetTransactionsInput } from '@mm/api-types';
+import { createEmptyPortfolioState } from '@mm/shared/general-util';
+import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { GROUP_USER_NOT_OWNER, userDocumentRef } from '../models';
+import { GROUP_USER_NOT_OWNER, groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 import { userDocumentTransactionHistoryRef } from './../models/user';
 
 /**
@@ -30,46 +25,74 @@ export const userResetTransactionsCall = onCall(async (request) => {
     throw new HttpsError('not-found', 'User does not exist');
   }
 
-  resetTransactionsForUser(userData, data.accountTypeSelected);
-});
+  // reset user's data
+  const startingCash = data.accountTypeSelected === UserAccountEnum.DEMO_TRADING ? USER_DEFAULT_STARTING_CASH : 0;
 
-export const resetTransactionsForUser = async (userData: UserData, accountType: UserAccountTypes): Promise<void> => {
-  const startingCash = accountType === UserAccountTypes.Trading ? USER_DEFAULT_STARTING_CASH : 0;
-  const newUserData = {
+  // reset user portfolio state & groups
+  await userDocumentRef(userData.id).update({
     ...userData,
     portfolioState: {
       ...createEmptyPortfolioState(startingCash),
     },
-    features: {
-      ...getUserFeaturesByAccountType(accountType),
+    groups: {
+      groupInvitations: [],
+      groupMember: [],
+      groupOwner: [],
+      groupRequested: [],
+      groupWatched: [],
     },
-  } satisfies UserData;
-
-  // reset user portfolio state
-  await userDocumentRef(userData.id).update({
-    ...newUserData,
-  });
+    userAccountType: data.accountTypeSelected,
+  } satisfies UserData);
 
   // delete transactions
   await userDocumentTransactionHistoryRef(userData.id).update({
     transactions: [],
   });
+
+  // clear group history where user if member
+  await clearUserGroupMemberData(userData);
+  // clear group history where user has received invitations
+  await clearUserReceivedGroupInvitations(userData);
+  // clear group history where user has requested to join
+  await clearUserRequestGroup(userData);
+});
+
+/**
+ * remove user from group where user is member
+ * @param userData - user data to reset
+ */
+const clearUserGroupMemberData = async (userData: UserData) => {
+  for await (const groupId of userData.groups.groupMember) {
+    // remove user from group
+    await groupDocumentRef(groupId).update({
+      memberUserIds: FieldValue.arrayRemove(userData.id),
+      numberOfMembers: FieldValue.increment(-1), // increment number of members
+    });
+
+    const groupMemberData = (await groupDocumentMembersRef(groupId).get()).data();
+    // remove user from group member
+    if (groupMemberData) {
+      await groupDocumentMembersRef(groupId).update({
+        data: groupMemberData.data.filter((user) => user.id !== userData.id),
+      });
+    }
+  }
 };
 
-const getUserFeaturesByAccountType = (accountType: UserAccountTypes): UserFeatures => {
-  switch (accountType) {
-    case UserAccountTypes.Basic:
-      return {
-        allowPortfolioCashAccount: false,
-        allowAccessGroups: false,
-      };
-    case UserAccountTypes.Trading:
-      return {
-        allowPortfolioCashAccount: true,
-        allowAccessGroups: true,
-        allowAccessHallOfFame: true,
-      };
-    default:
-      throw new HttpsError('invalid-argument', 'Invalid account type');
+const clearUserReceivedGroupInvitations = async (userData: UserData) => {
+  for await (const groupId of userData.groups.groupInvitations) {
+    // remove user from group
+    await groupDocumentRef(groupId).update({
+      memberInvitedUserIds: FieldValue.arrayRemove(userData.id),
+    });
+  }
+};
+
+const clearUserRequestGroup = async (userData: UserData) => {
+  for await (const groupId of userData.groups.groupRequested) {
+    // remove user from group
+    await groupDocumentRef(groupId).update({
+      memberRequestUserIds: FieldValue.arrayRemove(userData.id),
+    });
   }
 };

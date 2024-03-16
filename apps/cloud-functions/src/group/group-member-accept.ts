@@ -1,4 +1,4 @@
-import { GROUP_MEMBER_LIMIT, GroupMember } from '@market-monitor/api-types';
+import { GROUP_MEMBER_LIMIT, GroupMember, UserAccountEnum } from '@mm/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {
@@ -45,6 +45,11 @@ export const groupMemberAccept = async (userAuthId: string, requestGroupId: stri
   // check if user exists
   if (!userData) {
     throw new HttpsError('not-found', USER_NOT_FOUND_ERROR);
+  }
+
+  // check user account type
+  if (userData.userAccountType !== UserAccountEnum.DEMO_TRADING) {
+    throw new HttpsError('aborted', 'User account type is not allowed to join group');
   }
 
   // check if user is already in group

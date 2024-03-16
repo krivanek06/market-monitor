@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { environment } from 'apps/market-monitor/src/environments/environment';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-public-routes',

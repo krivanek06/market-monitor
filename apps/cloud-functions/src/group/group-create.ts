@@ -1,11 +1,5 @@
-import {
-  GROUP_MEMBER_LIMIT,
-  GROUP_OWNER_LIMIT,
-  GroupCreateInput,
-  GroupData,
-  UserBase,
-} from '@market-monitor/api-types';
-import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT, GroupCreateInput, GroupData, UserBase } from '@mm/api-types';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';

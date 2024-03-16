@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageLoginComponent } from '@market-monitor/modules/page-builder';
+import { PageLoginComponent } from '@mm/page-builder';
 import { environment } from '../../environments/environment';
 
 @Component({

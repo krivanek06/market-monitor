@@ -1,11 +1,11 @@
-import { getSymbolSummaries } from '@market-monitor/api-external';
-import { USER_LOGIN_ACCOUNT_ACTIVE_DAYS, UserData } from '@market-monitor/api-types';
+import { getSymbolSummaries } from '@mm/api-external';
+import { USER_LOGIN_ACCOUNT_ACTIVE_DAYS, UserData } from '@mm/api-types';
 import {
   getCurrentDateDefaultFormat,
   getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
   waitSeconds,
-} from '@market-monitor/shared/features/general-util';
+} from '@mm/shared/general-util';
 import { format, subDays } from 'date-fns';
 import { userDocumentTransactionHistoryRef, usersCollectionRef } from '../models';
 import { userPortfolioRisk } from '../portfolio';
@@ -37,8 +37,8 @@ export const userPortfolioUpdate = async (): Promise<void> => {
 
   // loop though users, load transactions and calculate balance
   for await (const userDoc of users.docs) {
-    // wait 0.25 seconds prevent too many requests
-    await waitSeconds(0.25);
+    // wait N ms prevent too many requests
+    await waitSeconds(0.15);
 
     // load transaction per user
     const transactionRef = userDocumentTransactionHistoryRef(userDoc.id);

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { CollectionReference, DocumentData, DocumentReference, Firestore, collection } from '@angular/fire/firestore';
-import { HallOfFameGroups, HallOfFameUsers } from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/data-access';
+import { HallOfFameGroups, HallOfFameUsers } from '@mm/api-types';
+import { assignTypesClient } from '@mm/shared/data-access';
 import { doc } from 'firebase/firestore';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { Observable } from 'rxjs';

@@ -7,8 +7,8 @@ import {
 	getSectorPeersForSymbols,
 	getStockHistoricalEarnings,
 	getUpgradesDowngrades,
-} from '@market-monitor/api-external';
-import { EXPIRATION_ONE_WEEK, RESPONSE_HEADER, StockDetailsAPI } from '@market-monitor/api-types';
+} from '@mm/api-external';
+import { EXPIRATION_ONE_WEEK, RESPONSE_HEADER, StockDetailsAPI } from '@mm/api-types';
 import { Env } from './model';
 
 export const getStockDetailsWrapper = async (env: Env, symbol: string, searchParams: URLSearchParams): Promise<Response> => {
@@ -111,7 +111,7 @@ const reloadDetails = async (symbol: string): Promise<StockDetailsAPI> => {
 						dividendYielPercentageTTM: companyOutlook.ratios[0]?.dividendYielPercentageTTM,
 						dividendYielTTM: companyOutlook.ratios[0]?.dividendYielTTM,
 						payoutRatioTTM: companyOutlook.ratios[0]?.payoutRatioTTM,
-				  }
+					}
 				: null,
 		},
 	} satisfies StockDetailsAPI;

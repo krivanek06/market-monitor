@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { PortfolioState } from '@market-monitor/api-types';
-import { ChartConstructor, ColorScheme } from '@market-monitor/shared/data-access';
-import { formatValueIntoCurrency } from '@market-monitor/shared/features/general-util';
+import { PortfolioState } from '@mm/api-types';
+import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
+import { formatValueIntoCurrency } from '@mm/shared/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({

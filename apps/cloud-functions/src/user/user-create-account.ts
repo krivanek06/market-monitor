@@ -1,15 +1,8 @@
-import {
-  UserAccountTypes,
-  UserData,
-  UserPersonalInfo,
-  UserPortfolioTransaction,
-  UserWatchlist,
-} from '@market-monitor/api-types';
-import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { UserAccountEnum, UserData, UserPersonalInfo, UserPortfolioTransaction, UserWatchList } from '@mm/api-types';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { userDocumentTransactionHistoryRef, userDocumentWatchListRef, usersCollectionRef } from '../models';
-import { resetTransactionsForUser } from './user-reset-transactions';
 
 export const userCreateAccountCall = onCall(async (request) => {
   const userAuthId = request.auth?.uid;
@@ -42,7 +35,7 @@ export const userCreate = async (userId: string): Promise<UserData> => {
     transactions: [],
   };
 
-  const newWatchList: UserWatchlist = {
+  const newWatchList: UserWatchList = {
     createdDate: getCurrentDateDefaultFormat(),
     data: [],
   };
@@ -52,8 +45,6 @@ export const userCreate = async (userId: string): Promise<UserData> => {
   await userDocumentTransactionHistoryRef(newUserData.id).set(newTransactions);
   // update watchList
   await userDocumentWatchListRef(newUserData.id).set(newWatchList);
-  // change user type to trading
-  await resetTransactionsForUser(newUserData, UserAccountTypes.Trading);
 
   // return data
   return newUserData;
@@ -70,7 +61,7 @@ const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
       groupRequested: [],
     },
     settings: {
-      allowReceivingGroupInvitations: true,
+      isDarkMode: false,
     },
     personal: personal,
     portfolioState: {
@@ -83,7 +74,7 @@ const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
     lastLoginDate: getCurrentDateDefaultFormat(),
     isAccountActive: true,
     accountCreatedDate: getCurrentDateDefaultFormat(),
-    features: {},
+    userAccountType: UserAccountEnum.DEMO_TRADING,
     systemRank: {},
   };
   return newUser;

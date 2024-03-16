@@ -7,8 +7,8 @@ import {
   PortfolioStateHoldings,
   UserBase,
   UserData,
-} from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat, roundNDigits } from '@market-monitor/shared/features/general-util';
+} from '@mm/api-types';
+import { getCurrentDateDefaultFormat, roundNDigits } from '@mm/shared/general-util';
 
 export const transformUserToBase = (user: UserData): UserBase => {
   return {

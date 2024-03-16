@@ -1,4 +1,4 @@
-import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT } from '@market-monitor/api-types';
+import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT } from '@mm/api-types';
 
 // general
 export const GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR = 'Not sufficient permissions';

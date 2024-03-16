@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { MarketApiService } from '@market-monitor/api-client';
+import { MarketApiService } from '@mm/api-client';
 import {
   HistoricalPrice,
   HistoricalPriceSymbol,
@@ -8,13 +8,13 @@ import {
   PortfolioState,
   PortfolioStateHoldings,
   PortfolioTransaction,
-} from '@market-monitor/api-types';
+} from '@mm/api-types';
 import {
   getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
   getYesterdaysDate,
   roundNDigits,
-} from '@market-monitor/shared/features/general-util';
+} from '@mm/shared/general-util';
 import { format, isBefore, isSameDay } from 'date-fns';
 import { Observable, catchError, firstValueFrom, map, of } from 'rxjs';
 

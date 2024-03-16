@@ -3,8 +3,8 @@ import {
   HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT,
   HALL_OF_FAME_PORTFOLIO_TOP_LIMIT,
   HallOfFameTopRankData,
-} from '@market-monitor/api-types';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+} from '@mm/api-types';
+import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { groupsCollectionRef } from '../models';
 import { aggregationHallOfFameGroupsRef } from '../models/aggregation';
 import { transformGroupToBase } from '../utils';

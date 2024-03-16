@@ -38,7 +38,7 @@ import {
   TickerSearch,
   TreasuryRates,
   UpgradesDowngrades,
-} from '@market-monitor/api-types';
+} from '@mm/api-types';
 import { format, subDays } from 'date-fns';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
 import { filterOutSymbols, getDateRangeByMonthAndYear } from './helpers';

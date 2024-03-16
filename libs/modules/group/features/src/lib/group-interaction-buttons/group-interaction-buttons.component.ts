@@ -5,12 +5,12 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
-import { GroupApiService } from '@market-monitor/api-client';
-import { GROUP_MEMBER_LIMIT, GroupDetails, UserData } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { UserSearchDialogComponent, UserSearchDialogData } from '@market-monitor/modules/user/features';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
+import { GroupApiService } from '@mm/api-client';
+import { GROUP_MEMBER_LIMIT, GroupDetails, UserData } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { UserSearchDialogComponent, UserSearchDialogData } from '@mm/user/features';
 import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, catchError, filter, from, of, switchMap, take, tap } from 'rxjs';
 import {

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageGroupDetailsComponent } from '@market-monitor/modules/page-builder';
+import { PageGroupDetailsComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-group-details',
@@ -7,9 +7,9 @@ import { PageGroupDetailsComponent } from '@market-monitor/modules/page-builder'
   imports: [PageGroupDetailsComponent],
   template: `<app-page-group-details></app-page-group-details>`,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

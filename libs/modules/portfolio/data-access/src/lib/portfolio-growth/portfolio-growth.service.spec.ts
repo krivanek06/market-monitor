@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { MarketApiService } from '@market-monitor/api-client';
-import { PortfolioGrowthAssets, PortfolioStateHoldings } from '@market-monitor/api-types';
-import { calculateGrowth, getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { MarketApiService } from '@mm/api-client';
+import { PortfolioGrowthAssets, PortfolioStateHoldings } from '@mm/api-types';
+import { calculateGrowth, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { MockProvider, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
 import {

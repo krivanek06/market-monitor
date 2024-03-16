@@ -22,9 +22,9 @@ import {
   GroupTransactionsData,
   PortfolioStateHolding,
   PortfolioTransactionMore,
-} from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/data-access';
-import { roundNDigits } from '@market-monitor/shared/features/general-util';
+} from '@mm/api-types';
+import { assignTypesClient } from '@mm/shared/data-access';
+import { roundNDigits } from '@mm/shared/general-util';
 import { limit } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';

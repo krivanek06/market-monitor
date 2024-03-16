@@ -89,85 +89,67 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "features.allowAccessHallOfFame",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "features.allowPortfolioCashAccount",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "portfolioState.totalGainsPercentage",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "features.allowAccessHallOfFame",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "portfolioState.previousBalanceChangePercentage",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "features.allowAccessHallOfFame",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "portfolioState.previousBalanceChangePercentage",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "features.allowAccessHallOfFame",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "systemRank.portfolioTotalGainsPercentage.rank",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "features.allowAccessHallOfFame",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "systemRank.portfolioTotalGainsPercentage.rank",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
           "fieldPath": "isAccountActive",
           "order": "ASCENDING"
         },
         {
           "fieldPath": "portfolioState.date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userAccountType",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "portfolioState.previousBalanceChangePercentage",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userAccountType",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "portfolioState.previousBalanceChangePercentage",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userAccountType",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "systemRank.portfolioTotalGainsPercentage.rank",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userAccountType",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "systemRank.portfolioTotalGainsPercentage.rank",
           "order": "DESCENDING"
         }
       ]

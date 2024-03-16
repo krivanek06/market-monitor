@@ -7,7 +7,7 @@ import {
   StockScreenerArray,
   StockScreenerValues,
   StockSectorTypes,
-} from '@market-monitor/api-types';
+} from '@mm/api-types';
 import {
   STOCK_SCREENER_COUNTRIES,
   STOCK_SCREENER_DIVIDENDS,
@@ -17,8 +17,8 @@ import {
   STOCK_SCREENER_PRICE,
   STOCK_SCREENER_SECTORS,
   STOCK_SCREENER_VOLUME,
-} from '@market-monitor/modules/market-stocks/data-access';
-import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
+} from '@mm/market-stocks/data-access';
+import { FormMatInputWrapperComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-screener-form-control',
@@ -104,10 +104,10 @@ import { FormMatInputWrapperComponent } from '@market-monitor/shared/ui';
     },
   ],
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
 })
 export class StockScreenerFormControlComponent implements OnInit, ControlValueAccessor {
   STOCK_SCREENER_COUNTRIES = STOCK_SCREENER_COUNTRIES;

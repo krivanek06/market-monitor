@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output, forwardRef, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, forwardRef, inject, input, output, signal } from '@angular/core';
 import { Storage, getDownloadURL, ref, uploadBytesResumable } from '@angular/fire/storage';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,10 +7,9 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ColorScheme } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { DefaultImgDirective } from '@market-monitor/shared/ui';
-import { input } from '@angular/core';
+import { ColorScheme } from '@mm/shared/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { DefaultImgDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-upload-image-single-control',
@@ -85,13 +84,13 @@ import { input } from '@angular/core';
     },
   ],
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
 })
 export class UploadImageSingleControlComponent implements ControlValueAccessor {
-  @Output() uploadedFilesEmitter: EventEmitter<string> = new EventEmitter<string>();
+  uploadedFilesEmitter = output<string>();
 
   /**
    * overwrites existing file name the user uploads

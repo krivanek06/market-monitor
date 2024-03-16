@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { SheetData } from '@market-monitor/modules/market-stocks/data-access';
-import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { SheetData } from '@mm/market-stocks/data-access';
+import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-sheet-data-table',
@@ -41,9 +41,9 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-m
     </table>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { GROUP_MEMBER_LIMIT, GroupBase } from '@market-monitor/api-types';
-import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { GROUP_MEMBER_LIMIT, GroupBase } from '@mm/api-types';
+import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-group-display-item',
@@ -83,10 +83,10 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@market-monito
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDisplayItemComponent {

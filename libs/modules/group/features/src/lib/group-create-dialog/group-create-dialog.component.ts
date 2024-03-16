@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, OnInit, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,21 +9,21 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { GroupApiService } from '@market-monitor/api-client';
-import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT, GroupCreateInput, UserData } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { UserSearchControlComponent } from '@market-monitor/modules/user/features';
-import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { maxLengthValidator, minLengthValidator, requiredValidator } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
+import { GroupApiService } from '@mm/api-client';
+import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT, GroupCreateInput, UserData } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { maxLengthValidator, minLengthValidator, requiredValidator } from '@mm/shared/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
   DatePickerComponent,
   DefaultImgDirective,
   DialogCloseHeaderComponent,
   FormMatInputWrapperComponent,
   HideAfterDirective,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
+import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
+import { UserSearchControlComponent } from '@mm/user/features';
+import { UserDisplayItemComponent } from '@mm/user/ui';
 import { map, startWith } from 'rxjs';
 
 @Component({
@@ -166,6 +166,12 @@ import { map, startWith } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupCreateDialogComponent implements OnInit {
+  private dialogRef = inject(MatDialogRef<GroupCreateDialogComponent>);
+  private authenticationUserService = inject(AuthenticationUserStoreService);
+  private dialogServiceUtil = inject(DialogServiceUtil);
+  private groupApiService = inject(GroupApiService);
+  public data = inject<unknown>(MAT_DIALOG_DATA);
+
   form = new FormGroup({
     groupName: new FormControl('', {
       validators: [requiredValidator, minLengthValidator(4), maxLengthValidator(28)],
@@ -201,14 +207,6 @@ export class GroupCreateDialogComponent implements OnInit {
   allowCreateGroup = computed(() => this.createGroupLimitSignal() > 0);
 
   authenticatedUserDataSignal = this.authenticationUserService.state.userData;
-
-  constructor(
-    private dialogRef: MatDialogRef<GroupCreateDialogComponent>,
-    private authenticationUserService: AuthenticationUserStoreService,
-    private dialogServiceUtil: DialogServiceUtil,
-    private groupApiService: GroupApiService,
-    @Inject(MAT_DIALOG_DATA) public data: unknown,
-  ) {}
 
   ngOnInit(): void {
     this.listenOnAddingUsers();

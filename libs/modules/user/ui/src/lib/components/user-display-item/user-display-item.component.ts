@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT, UserBase } from '@market-monitor/api-types';
-import { DefaultImgDirective, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT, UserBase } from '@mm/api-types';
+import { DefaultImgDirective, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
 import { isBefore, subDays } from 'date-fns';
-import { input } from '@angular/core';
 
 @Component({
   selector: 'app-user-display-item',
@@ -48,9 +47,9 @@ import { input } from '@angular/core';
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

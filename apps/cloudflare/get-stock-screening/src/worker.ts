@@ -1,5 +1,5 @@
-import { getStockScreening } from '@market-monitor/api-external';
-import { RESPONSE_HEADER, StockScreenerValues } from '@market-monitor/api-types';
+import { getStockScreening } from '@mm/api-external';
+import { RESPONSE_HEADER, StockScreenerValues } from '@mm/api-types';
 
 export interface Env {
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/

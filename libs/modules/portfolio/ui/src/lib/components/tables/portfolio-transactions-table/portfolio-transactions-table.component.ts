@@ -1,23 +1,12 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  TrackByFunction,
-  ViewChild,
-  input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input, output, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { PortfolioTransaction, PortfolioTransactionMore } from '@market-monitor/api-types';
-import { insertIntoArray } from '@market-monitor/shared/features/general-util';
-import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirective } from '@market-monitor/shared/ui';
+import { PortfolioTransaction, PortfolioTransactionMore } from '@mm/api-types';
+import { insertIntoArray } from '@mm/shared/general-util';
+import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-portfolio-transactions-table',
@@ -186,19 +175,16 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PortfolioTransactionsTableComponent implements OnChanges {
-  @Output() deleteEmitter = new EventEmitter<PortfolioTransactionMore>();
+export class PortfolioTransactionsTableComponent {
+  deleteEmitter = output<PortfolioTransactionMore>();
 
-  @Input({ required: true }) set data(values: PortfolioTransactionMore[]) {
-    this.dataSource = new MatTableDataSource(values ?? []);
-    this.dataSource.paginator = this.paginator;
-  }
+  data = input.required<PortfolioTransactionMore[]>();
   showTransactionFees = input(false);
 
   /**
@@ -211,15 +197,12 @@ export class PortfolioTransactionsTableComponent implements OnChanges {
    */
   showUser = input(false);
 
-  dataSource!: MatTableDataSource<PortfolioTransactionMore>;
-  displayedColumns: string[] = ['symbol', 'transactionType', 'totalValue', 'unitPrice', 'units', 'return', 'date'];
+  tableEffect = effect(() => {
+    this.dataSource = new MatTableDataSource(this.data());
+    this.dataSource.paginator = this.paginator() ?? null;
+  });
 
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-
-  identity: TrackByFunction<PortfolioTransactionMore> = (index: number, item: PortfolioTransactionMore) =>
-    item.transactionId;
-
-  ngOnChanges(changes: SimpleChanges): void {
+  displayedColumnsEffect = effect(() => {
     if (this.showTransactionFees() && !this.displayedColumns.includes('transactionFees')) {
       this.displayedColumns = insertIntoArray(this.displayedColumns, 6, 'transactionFees');
     }
@@ -229,7 +212,15 @@ export class PortfolioTransactionsTableComponent implements OnChanges {
     if (this.showUser() && !this.displayedColumns.includes('user')) {
       this.displayedColumns = insertIntoArray(this.displayedColumns, 2, 'user');
     }
-  }
+  });
+
+  dataSource: MatTableDataSource<PortfolioTransactionMore> = new MatTableDataSource();
+  displayedColumns: string[] = ['symbol', 'transactionType', 'totalValue', 'unitPrice', 'units', 'return', 'date'];
+
+  paginator = viewChild(MatPaginator);
+
+  identity: TrackByFunction<PortfolioTransactionMore> = (index: number, item: PortfolioTransactionMore) =>
+    item.transactionId;
 
   onDeleteClick(item: PortfolioTransaction) {
     this.deleteEmitter.emit(item);

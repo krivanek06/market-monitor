@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageStockDetailsRatiosComponent } from '@market-monitor/modules/page-builder';
+import { PageStockDetailsRatiosComponent } from '@mm/page-builder';
 @Component({
   selector: 'app-stock-details-ratios',
   standalone: true,

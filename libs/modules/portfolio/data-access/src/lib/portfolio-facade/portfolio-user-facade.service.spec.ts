@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { PortfolioTransaction, UserAccountTypes, UserGroupData } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
+import { PortfolioTransaction, UserGroupData } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { User } from 'firebase/auth';
 import { MockProvider } from 'ng-mocks';
 import { mockCreateUser } from '../models';
@@ -19,7 +19,6 @@ describe('PortfolioUserFacadeService', () => {
     getUser: () => testUser,
     getUserData: () => testUserData,
     getPortfolioState: () => testUserData.portfolioState,
-    getUserAccountType: () => UserAccountTypes.Trading,
     getUserGroupData: () => testGroupData,
     getUserPortfolioTransactions: () => testPortfolioTransactions,
     isSymbolInWatchList: () => (symbol: string) => false,

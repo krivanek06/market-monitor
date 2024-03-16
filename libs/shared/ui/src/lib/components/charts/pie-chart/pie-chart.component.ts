@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { ChartConstructor, ColorScheme, GenericChartSeries } from '@market-monitor/shared/data-access';
-import { roundNDigits } from '@market-monitor/shared/features/general-util';
+import { ChartConstructor, ColorScheme, GenericChartSeries } from '@mm/shared/data-access';
+import { roundNDigits } from '@mm/shared/general-util';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import highcharts3d from 'highcharts/highcharts-3d';

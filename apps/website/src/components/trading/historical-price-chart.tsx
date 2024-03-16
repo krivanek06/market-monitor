@@ -1,10 +1,6 @@
 import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
-import { HistoricalPrice } from '@market-monitor/api-types';
-import {
-  dateFormatDate,
-  formatLargeNumber,
-  formatValueIntoCurrency,
-} from '@market-monitor/shared/features/general-util';
+import { HistoricalPrice } from '@mm/api-types';
+import { dateFormatDate, formatLargeNumber, formatValueIntoCurrency } from '@mm/shared/general-util';
 import * as Highcharts from 'highcharts';
 
 export type HistoricalPriceChartProps = {

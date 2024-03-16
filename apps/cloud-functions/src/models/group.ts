@@ -4,7 +4,7 @@ import {
   GroupMembersData,
   GroupPortfolioStateSnapshotsData,
   GroupTransactionsData,
-} from '@market-monitor/api-types';
+} from '@mm/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes, assignTypesOptional } from './assign-type';
 

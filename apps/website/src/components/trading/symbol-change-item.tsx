@@ -1,5 +1,5 @@
 import { QRL, component$ } from '@builder.io/qwik';
-import { SymbolQuote } from '@market-monitor/api-types';
+import { SymbolQuote } from '@mm/api-types';
 import { symbolUrl } from '../utils';
 import { PercentageIncrease } from './percentage-increase';
 

@@ -2,33 +2,25 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
   OnInit,
-  Output,
   TemplateRef,
-  ViewChild,
   inject,
+  output,
   signal,
+  viewChild,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
-import {
-  AuthenticationAccountService,
-  AuthenticationUserStoreService,
-} from '@market-monitor/modules/authentication/data-access';
-import { StockSearchBasicCustomizedComponent } from '@market-monitor/modules/market-stocks/features';
-import { UserSettingsDialogComponent } from '@market-monitor/modules/user/features';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import {
-  GenericDialogComponent,
-  GenericDialogComponentData,
-  SCREEN_DIALOGS,
-} from '@market-monitor/shared/features/dialog-manager';
-import { FeatureAccessDirective } from '@market-monitor/shared/features/feature-access-directive';
-import { HelpDialogComponent } from '@market-monitor/shared/features/help-dialog';
-import { DefaultImgDirective } from '@market-monitor/shared/ui';
+import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
+import { StockSearchBasicCustomizedComponent } from '@mm/market-stocks/features';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
+import { GenericDialogComponent, GenericDialogComponentData, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { HelpDialogComponent } from '@mm/shared/help-dialog';
+import { DefaultImgDirective } from '@mm/shared/ui';
+import { UserSettingsDialogComponent } from '@mm/user/features';
 @Component({
   selector: 'app-menu-top-navigation',
   standalone: true,
@@ -38,7 +30,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
     MatIconModule,
     DefaultImgDirective,
     MatButtonModule,
-    FeatureAccessDirective,
+    UserAccountTypeDirective,
     UserSettingsDialogComponent,
     MatDialogModule,
     HelpDialogComponent,
@@ -93,7 +85,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
         <!-- groups -->
         <a
-          *appFeatureAccess="'allowAccessGroups'"
+          *appUserAccountType="'DEMO_TRADING'"
           (click)="onNavClick(ROUTES_MAIN.GROUPS)"
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.GROUPS }"
@@ -106,7 +98,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
         <!-- hall of fame -->
         <a
-          *appFeatureAccess="'allowAccessHallOfFame'"
+          *appUserAccountType="'DEMO_TRADING'"
           (click)="onNavClick(ROUTES_MAIN.HALL_OF_FAME)"
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.HALL_OF_FAME }"
@@ -119,7 +111,7 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
 
         <!-- screener -->
         <a
-          *ngIf="userAccountTypeSignal() === 'Basic'"
+          *appUserAccountType="'NORMAL_BASIC'"
           (click)="onNavClick(ROUTES_MAIN.STOCK_SCREENER)"
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.STOCK_SCREENER }"
@@ -230,16 +222,15 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuTopNavigationComponent implements OnInit {
-  @Output() menuClickEmitter = new EventEmitter<void>();
+  menuClickEmitter = output<void>();
   private router = inject(Router);
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private authenticationService = inject(AuthenticationAccountService);
   private dialog = inject(MatDialog);
 
-  @ViewChild('menuOptions', { read: TemplateRef, static: true }) menuOptions!: TemplateRef<unknown>;
+  menuOptions = viewChild('menuOptions', { read: TemplateRef });
 
   userDataSignal = this.authenticationUserStoreService.state.userData;
-  userAccountTypeSignal = this.authenticationUserStoreService.state.getUserAccountType;
 
   ROUTES_MAIN = ROUTES_MAIN;
   activeLinkSignal = signal<ROUTES_MAIN>(ROUTES_MAIN.DASHBOARD);
@@ -283,7 +274,7 @@ export class MenuTopNavigationComponent implements OnInit {
     this.dialog.open(GenericDialogComponent, {
       data: <GenericDialogComponentData>{
         title: 'Options',
-        templateRef: this.menuOptions,
+        templateRef: this.menuOptions(),
       },
     });
   }

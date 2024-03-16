@@ -3,7 +3,7 @@ import { Component, ContentChildren, Directive, OnInit, TemplateRef, forwardRef,
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { dateIsNotWeekend, generateDatesArrayForMonth } from '@market-monitor/shared/features/general-util';
+import { dateIsNotWeekend, generateDatesArrayForMonth } from '@mm/shared/general-util';
 import { RangeDirective } from '../../directives';
 
 export type CalendarRange = { year: number; month: number };
@@ -85,9 +85,10 @@ export class MarkerDirective {}
     </div>
   `,
   styles: `
-  :host {
-  display: block;
-}`,
+    :host {
+      display: block;
+    }
+  `,
   //changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

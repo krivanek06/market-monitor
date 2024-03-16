@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
-import { SymbolSummary } from '@market-monitor/api-types';
+import { SymbolSummary } from '@mm/api-types';
 import {
   DefaultImgDirective,
   LargeNumberFormatterPipe,
   PercentageIncreaseDirective,
   PriceChangeItemSelectorPipe,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 import { RecommendationDirective } from '../../../directives';
 
 @Component({
@@ -128,9 +128,9 @@ import { RecommendationDirective } from '../../../directives';
     </ng-template>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

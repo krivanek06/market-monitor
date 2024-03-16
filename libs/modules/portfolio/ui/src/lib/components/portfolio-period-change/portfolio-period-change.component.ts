@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { PortfolioChange } from '@market-monitor/modules/portfolio/data-access';
-import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
+import { PortfolioChange } from '@mm/portfolio/data-access';
+import { PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-portfolio-period-change',
@@ -55,9 +55,9 @@ import { PercentageIncreaseDirective } from '@market-monitor/shared/ui';
     </ng-template>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

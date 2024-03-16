@@ -9,18 +9,20 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MarketApiService } from '@market-monitor/api-client';
+import { MarketApiService } from '@mm/api-client';
 import {
   PortfolioTransactionCreate,
   PortfolioTransactionType,
   SymbolSummary,
   USER_HOLDINGS_SYMBOL_LIMIT,
-} from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { PortfolioUserFacadeService } from '@market-monitor/modules/portfolio/data-access';
-import { minValueValidator, positiveNumberValidator, requiredValidator } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { dateFormatDate, dateIsNotWeekend } from '@market-monitor/shared/features/general-util';
+  UserAccountEnum,
+} from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
+import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
+import { minValueValidator, positiveNumberValidator, requiredValidator } from '@mm/shared/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { dateFormatDate, dateIsNotWeekend } from '@mm/shared/general-util';
 import {
   CastToNumberPipe,
   DatePickerComponent,
@@ -29,7 +31,7 @@ import {
   FormMatInputWrapperComponent,
   InputTypeDateTimePickerConfig,
   NumberKeyboardComponent,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 import { isSameDay } from 'date-fns';
 import { map, switchMap, tap } from 'rxjs';
 
@@ -57,6 +59,7 @@ export type PortfolioTradeDialogComponentData = {
     NumberKeyboardComponent,
     CastToNumberPipe,
     MatProgressSpinnerModule,
+    UserAccountTypeDirective,
   ],
   template: `
     <!-- form -->
@@ -88,7 +91,7 @@ export type PortfolioTradeDialogComponentData = {
         <ng-container *ngIf="!isLoadingSignal(); else showLoader">
           <!-- date picker -->
           <app-date-picker
-            *ngIf="!allowPortfolioCashAccountSignal()"
+            *appUserAccountType="'NORMAL_BASIC'"
             [inputTypeDateTimePickerConfig]="datePickerConfig"
             [formControl]="form.controls.date"
           ></app-date-picker>
@@ -116,8 +119,9 @@ export type PortfolioTradeDialogComponentData = {
               </ng-container>
             </div>
 
+            <!-- custom total value -->
             <mat-checkbox
-              *ngIf="!allowPortfolioCashAccountSignal()"
+              *appUserAccountType="'NORMAL_BASIC'"
               matTooltip="Add Custom Value"
               color="primary"
               [formControl]="form.controls.useCustomTotalValueControl"
@@ -136,7 +140,7 @@ export type PortfolioTradeDialogComponentData = {
               <span>Owned Units</span>
               <span>{{ holdingSignal()?.units ?? 0 }}</span>
             </div>
-            <div *ngIf="allowPortfolioCashAccountSignal()" class="g-item-wrapper">
+            <div *appUserAccountType="'DEMO_TRADING'" class="g-item-wrapper">
               <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">Cash on Hand</span>
               <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">
                 {{ portfolioState()?.cashOnHand | currency }}
@@ -218,9 +222,9 @@ export type PortfolioTradeDialogComponentData = {
     </form>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -277,7 +281,6 @@ export class PortfolioTradeDialogComponent {
   insufficientCashErrorSignal = signal<boolean>(false);
 
   userDataSignal = this.authenticationUserService.state.getUserData;
-  allowPortfolioCashAccountSignal = computed(() => this.userDataSignal().features.allowPortfolioCashAccount ?? false);
 
   USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
 
@@ -383,8 +386,12 @@ export class PortfolioTradeDialogComponent {
    * if user tries to buy more than he has cash and has portfolio cash active
    */
   private listenOnInSufficientCash(): void {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((form) => {
-      if (this.data.transactionType === 'SELL' || !this.allowPortfolioCashAccountSignal()) {
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      // no error is selling or no portfolio cash account
+      if (
+        this.data.transactionType === 'SELL' ||
+        this.userDataSignal().userAccountType !== UserAccountEnum.DEMO_TRADING
+      ) {
         return;
       }
 

@@ -4,21 +4,21 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MarketApiService } from '@market-monitor/api-client';
+import { MarketApiService } from '@mm/api-client';
 import {
   MARKET_OVERVIEW_ENDPOINTS,
   MarketOverviewKey,
   MarketOverviewName,
   MarketOverviewSubkeyReadable,
-} from '@market-monitor/api-types';
-import { GenericChartSeries } from '@market-monitor/shared/data-access';
+} from '@mm/api-types';
+import { GenericChartSeries } from '@mm/shared/data-access';
 import {
   DateRangeSliderComponent,
   DateRangeSliderValues,
   GenericChartComponent,
   InArrayPipe,
   ObjectArrayValueByKeyPipe,
-} from '@market-monitor/shared/ui';
+} from '@mm/shared/ui';
 import { format, isBefore } from 'date-fns';
 import { map } from 'rxjs';
 
@@ -135,9 +135,9 @@ import { map } from 'rxjs';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
 })
 export class PageMarketCustomComponent {

@@ -16,8 +16,8 @@ import {
   SymbolHistoricalPeriods,
   SymbolQuote,
   SymbolSummary,
-} from '@market-monitor/api-types';
-import { chunk } from '@market-monitor/shared/features/general-util';
+} from '@mm/api-types';
+import { chunk } from '@mm/shared/general-util';
 import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ApiCacheService } from '../utils';
 

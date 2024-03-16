@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, Input, input } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { PriceTarget } from '@market-monitor/api-types';
-import { PercentageIncreaseDirective, SplitStringPipe } from '@market-monitor/shared/ui';
+import { PriceTarget } from '@mm/api-types';
+import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-price-target-table',
@@ -79,10 +79,10 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@market-monitor/sh
     </table>
   `,
   styles: `
-  :host {
-    display: block;
-  }
-`,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockPriceTargetTableComponent {

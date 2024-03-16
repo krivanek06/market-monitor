@@ -6,14 +6,14 @@ import {
   PortfolioStateHoldingBase,
   PortfolioTransaction,
   UserData,
-} from '@market-monitor/api-types';
+} from '@mm/api-types';
 import {
   calculateGrowth,
   createEmptyPortfolioState,
   getCurrentDateDefaultFormat,
   getObjectEntries,
   roundNDigits,
-} from '@market-monitor/shared/features/general-util';
+} from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import {
   groupDocumentHoldingSnapshotsRef,

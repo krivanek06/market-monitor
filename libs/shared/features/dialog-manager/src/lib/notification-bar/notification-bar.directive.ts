@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, HostListener, Output, input } from '@angular/core';
+import { Directive, HostListener, input, output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BehaviorSubject, Observable, firstValueFrom, interval } from 'rxjs';
@@ -11,7 +11,7 @@ import { NotificationProgressService } from './notification-bar.service';
   selector: '[appNotificationProgress]',
 })
 export class NotificationProgressDirective {
-  @Output() notificationSuccessEmitter: EventEmitter<void> = new EventEmitter<void>();
+  notificationSuccessEmitter = output<void>();
 
   /*
     Messages to display

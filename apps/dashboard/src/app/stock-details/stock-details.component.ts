@@ -5,9 +5,9 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
-import { stockDetailsResolver } from '@market-monitor/modules/page-builder';
-import { LabelValue, ROUTES_STOCK_DETAILS } from '@market-monitor/shared/data-access';
-import { TabSelectControlComponent } from '@market-monitor/shared/ui';
+import { stockDetailsResolver } from '@mm/page-builder';
+import { LabelValue, ROUTES_STOCK_DETAILS } from '@mm/shared/data-access';
+import { TabSelectControlComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-details',
@@ -92,38 +92,32 @@ export const route: Routes = [
       {
         path: ROUTES_STOCK_DETAILS.OVERVIEW,
         title: 'Overview',
-        loadComponent: () =>
-          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsOverviewComponent),
+        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsOverviewComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.HOLDERS,
         title: 'Holders',
-        loadComponent: () =>
-          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsHoldersComponent),
+        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsHoldersComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.NEWS,
         title: 'News',
-        loadComponent: () =>
-          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsNewsComponent),
+        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsNewsComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.TRADES,
         title: 'Trades',
-        loadComponent: () =>
-          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsTradesComponent),
+        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsTradesComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.FINANCIALS,
         title: 'Financials',
-        loadComponent: () =>
-          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsFinancialsComponent),
+        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsFinancialsComponent),
       },
       {
         path: ROUTES_STOCK_DETAILS.RATIOS,
         title: 'Ratios',
-        loadComponent: () =>
-          import('@market-monitor/modules/page-builder').then((m) => m.PageStockDetailsRatiosComponent),
+        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsRatiosComponent),
       },
     ],
   },

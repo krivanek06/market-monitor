@@ -15,7 +15,7 @@ import {
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
   SymbolSummary,
-} from '@market-monitor/api-types';
+} from '@mm/api-types';
 import { Observable, catchError, filter, forkJoin, map, mergeMap, of, reduce, switchMap, tap } from 'rxjs';
 import { ApiCacheService } from '../utils';
 

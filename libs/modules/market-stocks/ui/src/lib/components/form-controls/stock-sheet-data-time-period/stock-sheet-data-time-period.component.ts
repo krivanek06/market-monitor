@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
-import { CompanyFinancialsReport } from '@market-monitor/api-types';
-import { SheetDataPeriod, SheetDataTimePeriodForm } from '@market-monitor/modules/market-stocks/data-access';
+import { CompanyFinancialsReport } from '@mm/api-types';
+import { SheetDataPeriod, SheetDataTimePeriodForm } from '@mm/market-stocks/data-access';
 
 @Component({
   selector: 'app-stock-sheet-data-time-period',
@@ -26,9 +26,9 @@ import { SheetDataPeriod, SheetDataTimePeriodForm } from '@market-monitor/module
     </form>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [

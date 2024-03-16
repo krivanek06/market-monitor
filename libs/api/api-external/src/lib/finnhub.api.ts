@@ -1,4 +1,4 @@
-import { RecommendationTrends } from '@market-monitor/api-types';
+import { RecommendationTrends } from '@mm/api-types';
 import { FINNHUB_KEY, FINNHUB_URL } from './environments';
 
 export const getRecommendationTrends = async (symbol: string): Promise<RecommendationTrends[]> => {

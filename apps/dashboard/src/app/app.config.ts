@@ -15,11 +15,8 @@ import {
   withPreloading,
   withViewTransitions,
 } from '@angular/router';
-import {
-  AUTHENTICATION_ACCOUNT_TOKEN,
-  AuthenticationUserStoreService,
-} from '@market-monitor/modules/authentication/data-access';
-import { IS_DEV_TOKEN } from '@market-monitor/shared/data-access';
+import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 // import { provideAnimationsAsync } from '@angular/platform-browser/animations-async';

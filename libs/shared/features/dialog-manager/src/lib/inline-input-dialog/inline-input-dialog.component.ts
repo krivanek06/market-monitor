@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { DynamicValidatorMessage } from '@market-monitor/shared/features/input-error';
+import { DynamicValidatorMessage } from '@mm/shared/input-error';
 
 export type InlineInputDialogComponentData = {
   title: string;

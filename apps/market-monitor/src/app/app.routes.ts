@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
 
 export const appRoutes: Routes = [
   {

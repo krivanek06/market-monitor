@@ -1,5 +1,5 @@
 import { $, component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
-import { waitSeconds } from '@market-monitor/shared/features/general-util';
+import { waitSeconds } from '@mm/shared/general-util';
 import { isScreenLarger } from './functions';
 
 export const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

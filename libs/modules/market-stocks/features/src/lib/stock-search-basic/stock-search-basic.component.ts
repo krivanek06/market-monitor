@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -8,9 +8,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { StocksApiService } from '@market-monitor/api-client';
-import { SymbolSummary } from '@market-monitor/api-types';
-import { DefaultImgDirective, QuoteItemComponent, RangeDirective } from '@market-monitor/shared/ui';
+import { StocksApiService } from '@mm/api-client';
+import { SymbolSummary } from '@mm/api-types';
+import { DefaultImgDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -93,7 +93,7 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
   /**
    * emit whether searchControl has any value
    */
-  @Output() inputHasValue = new EventEmitter<boolean>();
+  inputHasValue = output<boolean>();
   showHint = input(true);
 
   searchControl = new FormControl<string>('', { nonNullable: true });

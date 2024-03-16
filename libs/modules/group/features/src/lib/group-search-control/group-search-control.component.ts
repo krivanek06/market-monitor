@@ -8,10 +8,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { GroupApiService } from '@market-monitor/api-client';
-import { GroupData } from '@market-monitor/api-types';
-import { GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
-import { DefaultImgDirective, RangeDirective } from '@market-monitor/shared/ui';
+import { GroupApiService } from '@mm/api-client';
+import { GroupData } from '@mm/api-types';
+import { GroupDisplayItemComponent } from '@mm/group/ui';
+import { DefaultImgDirective, RangeDirective } from '@mm/shared/ui';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -68,15 +68,15 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
     </mat-form-field>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
 
-      ::ng-deep .mat-mdc-form-field-infix {
-        height: 48px !important;
-        min-height: 48px !important;
-      }
-    `,
+    ::ng-deep .mat-mdc-form-field-infix {
+      height: 48px !important;
+      min-height: 48px !important;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {

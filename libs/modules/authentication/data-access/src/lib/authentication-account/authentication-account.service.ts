@@ -21,9 +21,9 @@ import {
   setDoc,
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
-import { UserAccountTypes, UserData, UserResetTransactionsInput } from '@market-monitor/api-types';
-import { assignTypesClient } from '@market-monitor/shared/data-access';
-import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
+import { UserAccountBasicTypes, UserData, UserResetTransactionsInput } from '@mm/api-types';
+import { assignTypesClient } from '@mm/shared/data-access';
+import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { BehaviorSubject, Observable, Subject, catchError, from, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
@@ -135,7 +135,7 @@ export class AuthenticationAccountService {
     });
   }
 
-  async resetTransactions(accountTypeSelected: UserAccountTypes): Promise<void> {
+  async resetTransactions(accountTypeSelected: UserAccountBasicTypes): Promise<void> {
     const user = this.authenticatedUser$.value;
     if (!user) {
       throw new Error('User is not authenticated');

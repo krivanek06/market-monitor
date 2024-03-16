@@ -1,23 +1,12 @@
 import { DOCUMENT } from '@angular/common';
-import {
-  AfterViewInit,
-  Directive,
-  ElementRef,
-  EventEmitter,
-  HostListener,
-  Inject,
-  Input,
-  OnInit,
-  Output,
-} from '@angular/core';
-import { input } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, Inject, OnInit, input, output } from '@angular/core';
 
 @Directive({
   selector: '[appScrollNearEnd]',
   standalone: true,
 })
 export class ScrollNearEndDirective implements OnInit, AfterViewInit {
-  @Output() nearEnd: EventEmitter<void> = new EventEmitter<void>();
+  nearEnd = output<void>();
 
   /**
    * threshold in PX when to emit before page end scroll

@@ -2,20 +2,18 @@ import {
   AfterViewInit,
   Directive,
   ElementRef,
-  EventEmitter,
   Host,
-  Input,
   OnChanges,
   Optional,
-  Output,
   Renderer2,
   Self,
   SimpleChanges,
+  input,
+  output,
 } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { map, startWith } from 'rxjs';
 import { PlatformService } from '../utils';
-import { input } from '@angular/core';
 
 /**
  * Works from angular-material version 15. since all classes got the new prefix 'mdc-'
@@ -28,7 +26,7 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
   /**
    * custom emitter for parent component
    */
-  @Output() pageIndexChangeEmitter: EventEmitter<number> = new EventEmitter<number>();
+  pageIndexChangeEmitter = output<number>();
 
   /**
    * whether we want to display first/last button and dots

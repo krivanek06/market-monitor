@@ -3,7 +3,7 @@ import { Component, forwardRef, input } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import { SymbolHistoricalPeriods } from '@market-monitor/api-types';
+import { SymbolHistoricalPeriods } from '@mm/api-types';
 
 export const timePeriodDefaultButtons = [
   { labelButton: '1D', labelSelect: '1 day', value: SymbolHistoricalPeriods.day },
@@ -47,14 +47,14 @@ export const timePeriodDefaultButtons = [
     </mat-form-field>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
 
-      button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
-        background-color: var(--gray-light) !important;
-      }
-    `,
+    button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
+      background-color: var(--gray-light) !important;
+    }
+  `,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

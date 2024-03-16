@@ -1,4 +1,4 @@
-import { ChartDataType, MarketOverviewKey, MarketOverviewSubkeyReadable } from '@market-monitor/api-types';
+import { ChartDataType, MarketOverviewKey, MarketOverviewSubkeyReadable } from '@mm/api-types';
 
 export const getMarketOverviewDataAPI = async <T extends MarketOverviewKey>(
   key: T,

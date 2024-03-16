@@ -3,12 +3,12 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
-import { GetStocksSummaryPipe, StockSummaryTableComponent } from '@market-monitor/modules/market-stocks/ui';
-import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { SectionTitleComponent } from '@market-monitor/shared/ui';
+import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { GetStocksSummaryPipe, StockSummaryTableComponent } from '@mm/market-stocks/ui';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { SectionTitleComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-page-watchlist',
@@ -64,9 +64,9 @@ export class PageWatchlistComponent {
   userWatchListSymbolsSignal = computed(() => this.watchList().data.map((d) => d.symbol));
 
   pageTitle = computed(() => {
-    const userFeatures = this.authenticationUserService.state.getUserData().features;
+    const isPaid = this.authenticationUserService.state.isAccountNormalPaid();
     const watchList = this.authenticationUserService.state.watchList();
-    return userFeatures.allowUnlimitedSymbolsInWatchList
+    return isPaid
       ? `Watchlist: ${watchList.data.length}`
       : `Watchlist: [${watchList.data.length} / ${USER_WATCHLIST_SYMBOL_LIMIT}]`;
   });

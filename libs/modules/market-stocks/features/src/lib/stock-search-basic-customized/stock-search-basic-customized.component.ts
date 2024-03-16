@@ -3,29 +3,25 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
-  EventEmitter,
   Inject,
   OnInit,
   Optional,
-  Output,
-  ViewChild,
   computed,
   inject,
   input,
+  output,
   signal,
+  viewChild,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
-import { SymbolSummary } from '@market-monitor/api-types';
-import {
-  AUTHENTICATION_ACCOUNT_TOKEN,
-  AuthenticationUserStoreService,
-} from '@market-monitor/modules/authentication/data-access';
-import { SymbolFavoriteService, SymbolSearchService } from '@market-monitor/modules/market-stocks/data-access';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { ElementFocusDirective, QuoteItemComponent, RangeDirective } from '@market-monitor/shared/ui';
+import { SymbolSummary } from '@mm/api-types';
+import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { SymbolFavoriteService, SymbolSearchService } from '@mm/market-stocks/data-access';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { ElementFocusDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
 import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-basic.component';
 import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summary-dialog.component';
 
@@ -124,14 +120,13 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
   `,
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {
-  @Output() clickedSummary = new EventEmitter<SymbolSummary>();
+  clickedSummary = output<SymbolSummary>();
   showHint = input(true);
   /**
    * open modal on summary click
    */
   openModalOnClick = input(true);
-
-  @ViewChild('trigger', { read: ElementRef }) trigger?: ElementRef<HTMLElement>;
+  trigger = viewChild('trigger', { read: ElementRef });
 
   /**
    * selected stock summary from StockSearchBasicComponent
@@ -194,7 +189,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     });
 
     // calculate overlay width based on screen size
-    const overlayWidth = this.trigger?.nativeElement.getBoundingClientRect().width ?? 620;
+    const overlayWidth = this.trigger()?.nativeElement.getBoundingClientRect().width ?? 620;
     this.overlayWidth.set(overlayWidth);
   }
 

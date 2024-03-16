@@ -5,7 +5,7 @@ import {
   PortfolioStateHoldings,
   PortfolioTransaction,
   SymbolSummary,
-} from '@market-monitor/api-types';
+} from '@mm/api-types';
 import { isSameDay, subDays } from 'date-fns';
 import { getCurrentDateDefaultFormat } from './date-service.util';
 import { calculateGrowth, roundNDigits } from './general-function.util';

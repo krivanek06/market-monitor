@@ -1,5 +1,5 @@
-import { getQuotesByType } from '@market-monitor/api-external';
-import { AvailableQuotes, EXPIRATION_ONE_WEEK, RESPONSE_HEADER } from '@market-monitor/api-types';
+import { getQuotesByType } from '@mm/api-external';
+import { AvailableQuotes, EXPIRATION_ONE_WEEK, RESPONSE_HEADER } from '@mm/api-types';
 import { Env } from './model';
 
 export const getQuotesByTypeWrapper = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {

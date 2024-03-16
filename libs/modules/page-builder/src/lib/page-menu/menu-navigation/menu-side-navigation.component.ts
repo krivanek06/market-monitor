@@ -5,16 +5,17 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
-import { UserAccountTypes } from '@market-monitor/api-types';
+import { UserAccountEnum } from '@mm/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
-} from '@market-monitor/modules/authentication/data-access';
-import { UserSettingsDialogComponent } from '@market-monitor/modules/user/features';
-import { ROUTES_MAIN } from '@market-monitor/shared/data-access';
-import { SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { HelpDialogComponent } from '@market-monitor/shared/features/help-dialog';
-import { DefaultImgDirective } from '@market-monitor/shared/ui';
+  hasUserAccess,
+} from '@mm/authentication/data-access';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { HelpDialogComponent } from '@mm/shared/help-dialog';
+import { DefaultImgDirective } from '@mm/shared/ui';
+import { UserSettingsDialogComponent } from '@mm/user/features';
 
 @Component({
   selector: 'app-menu-side-navigation',
@@ -133,7 +134,7 @@ export class MenuSideNavigationComponent implements OnInit {
   userData = this.authenticationUserStoreService.state.getUserDataNormal;
 
   sideNavigation = computed(() => {
-    const userAccountType = this.authenticationUserStoreService.state.getUserAccountType();
+    const userData = this.authenticationUserStoreService.state.getUserData();
     const data = {
       mainNavigation: [
         {
@@ -155,13 +156,13 @@ export class MenuSideNavigationComponent implements OnInit {
           path: ROUTES_MAIN.GROUPS,
           title: 'Groups',
           icon: 'group',
-          hidden: userAccountType !== UserAccountTypes.Trading,
+          hidden: !hasUserAccess(userData, UserAccountEnum.DEMO_TRADING),
         },
         {
           path: ROUTES_MAIN.HALL_OF_FAME,
           title: 'Hall Of Fame',
           icon: 'military_tech',
-          hidden: userAccountType !== UserAccountTypes.Trading,
+          hidden: !hasUserAccess(userData, UserAccountEnum.DEMO_TRADING),
         },
       ],
       marketNavigation: [

@@ -6,18 +6,14 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
-import { GroupApiService } from '@market-monitor/api-client';
-import { GROUP_OWNER_LIMIT, GroupData } from '@market-monitor/api-types';
-import { AuthenticationUserStoreService } from '@market-monitor/modules/authentication/data-access';
-import {
-  GroupCreateDialogComponent,
-  GroupDisplayCardComponent,
-  GroupSearchControlComponent,
-} from '@market-monitor/modules/group/features';
-import { GroupDisplayItemComponent } from '@market-monitor/modules/group/ui';
-import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@market-monitor/shared/features/dialog-manager';
-import { UploadImageSingleControlComponent } from '@market-monitor/shared/features/upload-image-single-control';
-import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@market-monitor/shared/ui';
+import { GroupApiService } from '@mm/api-client';
+import { GROUP_OWNER_LIMIT, GroupData } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { GroupCreateDialogComponent, GroupDisplayCardComponent, GroupSearchControlComponent } from '@mm/group/features';
+import { GroupDisplayItemComponent } from '@mm/group/ui';
+import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
+import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
 
 @Component({
   selector: 'app-page-groups',

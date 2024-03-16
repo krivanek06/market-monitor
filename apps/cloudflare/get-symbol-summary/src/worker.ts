@@ -1,6 +1,6 @@
-import { getCompanyQuote, getProfile, getSymbolsPriceChanges, searchTicker } from '@market-monitor/api-external';
-import { RESPONSE_HEADER } from '@market-monitor/api-types';
-import { checkDataValidityMinutes } from '@market-monitor/shared/utils-general';
+import { getCompanyQuote, getProfile, getSymbolsPriceChanges, searchTicker } from '@mm/api-external';
+import { RESPONSE_HEADER } from '@mm/api-types';
+import { checkDataValidityMinutes } from '@mm/shared/general-util';
 
 /**
  * Welcome to Cloudflare Workers! This is your first worker.
@@ -150,7 +150,7 @@ export default {
 							})
 							.returning()
 							.all()
-				  ).map(formatSummaryToObject)
+					).map(formatSummaryToObject)
 				: [];
 
 		const savedIds = savedData.map((d) => d.id);

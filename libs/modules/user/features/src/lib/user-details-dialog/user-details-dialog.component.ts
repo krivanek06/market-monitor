@@ -5,20 +5,20 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { UserApiService } from '@market-monitor/api-client';
-import { PortfolioGrowthAssets, PortfolioStateHoldings, UserData } from '@market-monitor/api-types';
-import { StockSummaryDialogComponent } from '@market-monitor/modules/market-stocks/features';
-import { PortfolioCalculationService, PortfolioGrowthService } from '@market-monitor/modules/portfolio/data-access';
+import { UserApiService } from '@mm/api-client';
+import { PortfolioGrowthAssets, PortfolioStateHoldings, UserData } from '@mm/api-types';
+import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { PortfolioCalculationService, PortfolioGrowthService } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthChartComponent,
   PortfolioHoldingsTableComponent,
   PortfolioStateComponent,
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
-} from '@market-monitor/modules/portfolio/ui';
-import { ColorScheme } from '@market-monitor/shared/data-access';
-import { DialogServiceUtil } from '@market-monitor/shared/features/dialog-manager';
-import { DefaultImgDirective, GenericChartComponent, SectionTitleComponent } from '@market-monitor/shared/ui';
+} from '@mm/portfolio/ui';
+import { ColorScheme } from '@mm/shared/data-access';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { DefaultImgDirective, GenericChartComponent, SectionTitleComponent } from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
 import { from, map, share, switchMap, tap } from 'rxjs';
 
@@ -78,7 +78,7 @@ export type UserDetailsDialogComponentData = {
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
               [portfolioState]="portfolioStateHoldingSignal()"
-              [showCashSegment]="!!userData.features.allowPortfolioCashAccount"
+              [showCashSegment]="userData.userAccountType === 'DEMO_TRADING'"
             ></app-portfolio-state>
           </div>
           <!-- risk -->
@@ -95,7 +95,7 @@ export type UserDetailsDialogComponentData = {
               [portfolioState]="portfolioStateHoldingSignal()"
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-              [showFees]="!!userData.features.allowPortfolioCashAccount"
+              [showFees]="userData.userAccountType === 'DEMO_TRADING'"
             >
             </app-portfolio-state-transactions>
           </div>
@@ -161,7 +161,6 @@ export class UserDetailsDialogComponent {
       ? this.portfolioCalculationService.getPortfolioGrowth(growth, this.userDataSignal()?.portfolioState?.startingCash)
       : null;
   });
-
   ColorScheme = ColorScheme;
   displayedColumns: string[] = ['symbol', 'price', 'balance', 'invested', 'totalChange', 'portfolio', 'marketCap'];
 

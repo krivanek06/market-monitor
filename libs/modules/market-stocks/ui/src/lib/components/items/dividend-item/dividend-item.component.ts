@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { CalendarDividend, CompanyStockDividend } from '@market-monitor/api-types';
-import { DefaultImgDirective } from '@market-monitor/shared/ui';
+import { CalendarDividend, CompanyStockDividend } from '@mm/api-types';
+import { DefaultImgDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-dividend-item',
@@ -21,14 +21,14 @@ import { DefaultImgDirective } from '@market-monitor/shared/ui';
     </button>
   `,
   styles: `
-  :host {
-    display: block;
-  }
-`,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DividendItemComponent {
-  @Output() itemClickedEmitter = new EventEmitter<void>();
+  itemClickedEmitter = output<void>();
   dividend = input.required<CompanyStockDividend | CalendarDividend>();
   showBorder = input(false);
 

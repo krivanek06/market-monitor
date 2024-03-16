@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageStockDetailsNewsComponent } from '@market-monitor/modules/page-builder';
+import { PageStockDetailsNewsComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-stock-details-news',

@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, Input, input } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { UpgradesDowngrades } from '@market-monitor/api-types';
-import { PercentageIncreaseDirective, SplitStringPipe } from '@market-monitor/shared/ui';
+import { UpgradesDowngrades } from '@mm/api-types';
+import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-upgrades-downgrades-table',

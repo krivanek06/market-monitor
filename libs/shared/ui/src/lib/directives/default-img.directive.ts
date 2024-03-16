@@ -1,5 +1,5 @@
 import { Directive, ElementRef, OnChanges, Renderer2, SimpleChanges, input } from '@angular/core';
-import { DefaultImageType } from '@market-monitor/shared/data-access';
+import { DefaultImageType } from '@mm/shared/data-access';
 import { PlatformService } from '../utils';
 
 type ImageSrc = string | null | undefined;

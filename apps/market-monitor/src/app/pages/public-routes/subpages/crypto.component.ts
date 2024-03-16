@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PageCryptoComponent } from '@market-monitor/modules/page-builder';
+import { PageCryptoComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-crypto',
@@ -8,10 +8,10 @@ import { PageCryptoComponent } from '@market-monitor/modules/page-builder';
   imports: [CommonModule, PageCryptoComponent],
   template: `<app-page-crypto></app-page-crypto>`,
   styles: `
-      :host {
-        display: block;
-      }
-    `,
+    :host {
+      display: block;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CryptoComponent {}

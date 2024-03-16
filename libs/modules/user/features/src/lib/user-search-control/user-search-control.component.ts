@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -8,10 +8,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { UserApiService } from '@market-monitor/api-client';
-import { UserData } from '@market-monitor/api-types';
-import { UserDisplayItemComponent } from '@market-monitor/modules/user/ui';
-import { DefaultImgDirective, RangeDirective } from '@market-monitor/shared/ui';
+import { UserApiService } from '@mm/api-client';
+import { UserData } from '@mm/api-types';
+import { DefaultImgDirective, RangeDirective } from '@mm/shared/ui';
+import { UserDisplayItemComponent } from '@mm/user/ui';
 import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -68,9 +68,9 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, 
     </mat-form-field>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -82,7 +82,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, 
   ],
 })
 export class UserSearchControlComponent implements ControlValueAccessor {
-  @Output() selectedUserEmitter = new EventEmitter<UserData>();
+  selectedUserEmitter = output<UserData>();
   showLoadingIndicator = signal<boolean>(false);
   optionsSignal = signal<UserData[]>([]);
   searchControl = new FormControl<string>('', { nonNullable: true });

@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { ColorScheme } from '@market-monitor/shared/data-access';
+import { ColorScheme } from '@mm/shared/data-access';
 import { PositionColoringDirective } from '../../../directives';
 
 @Component({
@@ -11,14 +11,14 @@ import { PositionColoringDirective } from '../../../directives';
   standalone: true,
   imports: [CommonModule, MatCardModule, MatRippleModule, MatIconModule, PositionColoringDirective],
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
 
-      mat-card-content {
-        height: inherit;
-      }
-    `,
+    mat-card-content {
+      height: inherit;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <mat-card
@@ -69,7 +69,7 @@ import { PositionColoringDirective } from '../../../directives';
   `,
 })
 export class PositionCardComponent {
-  @Output() clickedEmitter = new EventEmitter<void>();
+  clickedEmitter = output<void>();
 
   currentPositions = input.required<number>();
   previousPosition = input<number | null | undefined>();

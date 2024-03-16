@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform, inject } from '@angular/core';
-import { StocksApiService } from '@market-monitor/api-client';
-import { StockSummary } from '@market-monitor/api-types';
-import { chunk } from '@market-monitor/shared/features/general-util';
+import { StocksApiService } from '@mm/api-client';
+import { StockSummary } from '@mm/api-types';
+import { chunk } from '@mm/shared/general-util';
 import { Observable, forkJoin, map, of } from 'rxjs';
 
 @Pipe({
