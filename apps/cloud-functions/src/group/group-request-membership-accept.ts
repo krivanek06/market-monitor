@@ -1,4 +1,4 @@
-import { GROUP_MEMBER_LIMIT, GroupBaseInput, GroupMember } from '@market-monitor/api-types';
+import { GROUP_MEMBER_LIMIT, GroupBaseInput, GroupMember, UserAccountEnum } from '@market-monitor/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {
@@ -43,6 +43,11 @@ export const groupRequestMembershipAcceptCall = onCall(async (request) => {
   // check if authenticated user is owner
   if (groupData.ownerUserId !== userAuthId) {
     throw new HttpsError('aborted', GROUP_USER_NOT_OWNER);
+  }
+
+  // only allow DEMO_TRADING users to join
+  if (userData.userAccountType !== UserAccountEnum.DEMO_TRADING) {
+    throw new HttpsError('aborted', 'User account type is not allowed to join group');
   }
 
   // check if user sent request

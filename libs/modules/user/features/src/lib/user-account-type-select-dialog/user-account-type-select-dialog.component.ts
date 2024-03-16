@@ -19,7 +19,7 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
   template: `
     <app-dialog-close-header title="Available Account Types"></app-dialog-close-header>
 
-    <p class="text-center mb-6 md:w-9/12 mx-auto text-xl">
+    <p *ngIf="!showLoaderSignal()" class="text-center mb-6 md:w-9/12 mx-auto text-xl">
       At the current application development we have two accounts available for user. Read below their use and select
       wisely. You can change you account type anytime, however your trading history will be reset.
     </p>
@@ -88,11 +88,22 @@ export class UserAccountTypeSelectDialogComponent {
 
   showLoaderSignal = signal(false);
 
-  @Confirmable('Are you sure you want to change your account type? This will reset all your transactions')
+  @Confirmable('Are you sure you want to reset your account? Your trading history & groups will be removed')
   changeAccount(selected: UserAccountBasicTypes) {
     // notify user
     this.dialogServiceUtil.showNotificationBar('Changing account type, please wait...');
     this.showLoaderSignal.set(true);
+
+    // check if user converting to basic account and is owner of groups
+    if (selected === UserAccountEnum.NORMAL_BASIC && this.userData().groups.groupOwner.length > 0) {
+      this.dialogServiceUtil.showNotificationBar(
+        'You are owner of one or more groups. You cannot change to basic account type. First delete groups where you are the owner',
+        'error',
+        6000,
+      );
+      this.showLoaderSignal.set(false);
+      return;
+    }
 
     // perform operation
     from(this.authenticationAccountService.resetTransactions(selected))

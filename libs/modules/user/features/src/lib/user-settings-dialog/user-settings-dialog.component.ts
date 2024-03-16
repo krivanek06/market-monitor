@@ -253,7 +253,7 @@ export class UserSettingsDialogComponent implements OnInit {
       .subscribe((res) => console.log(res));
   }
 
-  @Confirmable('Are you sure you want to reset your account? Your trading history will be removed')
+  @Confirmable('Are you sure you want to reset your account? Your trading history & groups will be removed')
   onResetTransactions(): void {
     // notify user
     this.dialogServiceUtil.showNotificationBar('Sending request to reset your account');
@@ -268,7 +268,7 @@ export class UserSettingsDialogComponent implements OnInit {
     // perform operation
     from(this.authenticationAccountService.resetTransactions(currentAccountType))
       .pipe(
-        tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been reset')),
+        tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been reset', 'success')),
         catchError((err) => {
           this.dialogServiceUtil.handleError(err);
           return EMPTY;
