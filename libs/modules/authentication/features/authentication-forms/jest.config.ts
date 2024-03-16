@@ -2,7 +2,7 @@
 export default {
   displayName: 'authentication-forms',
   preset: '../../../../../jest.preset.js',
-  setupFilesAfterEnv: ['../../../../jest.setup.js'],
+  setupFilesAfterEnv: ['../../../../../jest.setup.js'],
   coverageDirectory: '../../../../../coverage/libs/modules/authentication/features/authentication-forms',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

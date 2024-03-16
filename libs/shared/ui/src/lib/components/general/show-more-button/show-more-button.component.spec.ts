@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { ShowMoreButtonComponent } from './show-more-button.component';
 
 describe('ShowMoreButtonComponent', () => {
@@ -6,11 +7,9 @@ describe('ShowMoreButtonComponent', () => {
   let fixture: ComponentFixture<ShowMoreButtonComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ShowMoreButtonComponent],
-    }).compileComponents();
+    MockBuilder(ShowMoreButtonComponent);
 
-    fixture = TestBed.createComponent(ShowMoreButtonComponent);
+    fixture = MockRender(ShowMoreButtonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
