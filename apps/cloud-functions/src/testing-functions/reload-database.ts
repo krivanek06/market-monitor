@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { GroupCreateInput, PortfolioTransactionCreate, UserAccountTypes, UserData } from '@market-monitor/api-types';
+import { GroupCreateInput, PortfolioTransactionCreate, UserAccountEnum, UserData } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat, waitSeconds } from '@market-monitor/shared/features/general-util';
 import { addDays, format, subDays } from 'date-fns';
 import { firestore } from 'firebase-admin';
@@ -142,7 +142,7 @@ const createUserData = async (): Promise<UserData> => {
   const userData = await userCreate(user.uid);
 
   // change user type to trading
-  await resetTransactionsForUser(userData, UserAccountTypes.Trading);
+  await resetTransactionsForUser(userData, UserAccountEnum.DEMO_TRADING);
 
   // return data
   return userData;

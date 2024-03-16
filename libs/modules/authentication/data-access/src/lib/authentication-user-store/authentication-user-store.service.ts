@@ -17,12 +17,11 @@ import {
   PortfolioTransaction,
   PortfolioTransactionCreate,
   SymbolType,
-  UserAccountTypes,
+  UserAccountEnum,
   UserData,
   UserGroupData,
   UserPortfolioTransaction,
-  UserWatchlist as UserWatchList,
-  UserWatchlist,
+  UserWatchList,
 } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/data-access';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
@@ -182,7 +181,7 @@ export class AuthenticationUserStoreService {
       getUserDataNormal: () => state().userData,
       getPortfolioState: () => state().userData?.portfolioState,
       getUserAccountType: () =>
-        state().userData?.features?.allowPortfolioCashAccount ? UserAccountTypes.Trading : UserAccountTypes.Basic,
+        state().userData?.features?.allowPortfolioCashAccount ? UserAccountEnum.DEMO : UserAccountEnum.NORMAL_BASIC,
       getUserGroupData: () => state().userGroupData!,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
       getUserPortfolioTransactions: () => state().portfolioTransactions,
@@ -196,7 +195,7 @@ export class AuthenticationUserStoreService {
     });
   }
 
-  updateUserWatchList(watchlist: Partial<UserWatchlist>): void {
+  updateUserWatchList(watchlist: Partial<UserWatchList>): void {
     const userId = this.state.getUser().uid;
     setDoc(this.getUserWatchlistDocRef(userId), watchlist, { merge: true });
   }
@@ -257,8 +256,8 @@ export class AuthenticationUserStoreService {
     );
   }
 
-  private getUserWatchList(userId: string): Observable<UserWatchlist> {
-    return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchlist => !!d));
+  private getUserWatchList(userId: string): Observable<UserWatchList> {
+    return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchList => !!d));
   }
 
   private getUserPortfolioTransactionDocRef(userId: string): DocumentReference<UserPortfolioTransaction> {
@@ -267,9 +266,9 @@ export class AuthenticationUserStoreService {
     );
   }
 
-  private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchlist> {
+  private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchList> {
     return doc(this.userCollectionMoreInformationRef(userId), 'watchlist').withConverter(
-      assignTypesClient<UserWatchlist>(),
+      assignTypesClient<UserWatchList>(),
     );
   }
 

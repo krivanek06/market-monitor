@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { UserAccountTypes, accountDescription } from '@market-monitor/api-types';
+import { UserAccountEnum, accountDescription } from '@market-monitor/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
@@ -81,12 +81,12 @@ export class UserAccountTypeSelectDialogComponent {
   userAccountTypeSignal = this.authenticationUserStoreService.state.getUserAccountType;
 
   accountDescription = accountDescription;
-  UserAccountTypes = UserAccountTypes;
+  UserAccountTypes = UserAccountEnum;
 
   showLoaderSignal = signal(false);
 
   @Confirmable('Are you sure you want to change your account type? This will reset all your transactions')
-  changeAccount(selected: UserAccountTypes) {
+  changeAccount(selected: UserAccountEnum) {
     // notify user
     this.dialogServiceUtil.showNotificationBar('Changing account type, please wait...');
     this.showLoaderSignal.set(true);

@@ -1,8 +1,13 @@
-import { UserData, UserPortfolioTransaction, UserWatchlist } from '@market-monitor/api-types';
+import { UserAccountEnum, UserData, UserPortfolioTransaction, UserWatchList } from '@market-monitor/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes, assignTypesOptional } from './assign-type';
 
 export const usersCollectionRef = () => firestore().collection('users').withConverter(assignTypes<UserData>());
+export const usersCollectionDemoTradingRef = () =>
+  firestore()
+    .collection('users')
+    .where('userAccountType', '==', UserAccountEnum.DEMO_TRADING)
+    .withConverter(assignTypes<UserData>());
 
 export const userDocumentRef = (userId: string) =>
   usersCollectionRef().doc(userId).withConverter(assignTypesOptional<UserData>());
@@ -14,4 +19,4 @@ export const userDocumentTransactionHistoryRef = (userId: string) =>
   userCollectionMoreInformationRef(userId).doc('transactions').withConverter(assignTypes<UserPortfolioTransaction>());
 
 export const userDocumentWatchListRef = (userId: string) =>
-  userCollectionMoreInformationRef(userId).doc('watchlist').withConverter(assignTypes<UserWatchlist>());
+  userCollectionMoreInformationRef(userId).doc('watchlist').withConverter(assignTypes<UserWatchList>());

@@ -6,7 +6,7 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { UserAccountTypes, accountDescription } from '@market-monitor/api-types';
+import { UserAccountEnum, accountDescription } from '@market-monitor/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
@@ -193,7 +193,7 @@ export class UserSettingsDialogComponent implements OnInit {
 
   accountTypeSignal = computed(() => {
     const isCash = this.userDataSignal().features.allowPortfolioCashAccount;
-    return isCash ? UserAccountTypes.Trading : UserAccountTypes.Basic;
+    return isCash ? UserAccountEnum.DEMO : UserAccountEnum.NORMAL_BASIC;
   });
 
   accountDescriptionSignal = computed(() => {

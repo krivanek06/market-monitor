@@ -5,7 +5,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
-import { UserAccountTypes } from '@market-monitor/api-types';
+import { UserAccountEnum } from '@market-monitor/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
@@ -155,13 +155,13 @@ export class MenuSideNavigationComponent implements OnInit {
           path: ROUTES_MAIN.GROUPS,
           title: 'Groups',
           icon: 'group',
-          hidden: userAccountType !== UserAccountTypes.Trading,
+          hidden: userAccountType !== UserAccountEnum.DEMO,
         },
         {
           path: ROUTES_MAIN.HALL_OF_FAME,
           title: 'Hall Of Fame',
           icon: 'military_tech',
-          hidden: userAccountType !== UserAccountTypes.Trading,
+          hidden: userAccountType !== UserAccountEnum.DEMO,
         },
       ],
       marketNavigation: [

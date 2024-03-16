@@ -5,11 +5,11 @@ import {
   UserBase,
 } from '@market-monitor/api-types';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
-import { aggregationHallOfFameUsersRef, usersCollectionRef } from '../models';
+import { aggregationHallOfFameUsersRef, usersCollectionDemoTradingRef } from '../models';
 import { transformUserToBase } from '../utils';
 
 export const hallOfFameUsers = async (): Promise<void> => {
-  const searchableRef = usersCollectionRef().where('features.allowAccessHallOfFame', '==', true);
+  const searchableRef = usersCollectionDemoTradingRef();
 
   // get top users by total gains
   const userBestProfitRef = searchableRef
@@ -46,7 +46,7 @@ export const hallOfFameUsers = async (): Promise<void> => {
       (d) =>
         ({
           item: transformUserToBase(d),
-          portfolioTotalGainsPercentage: d.systemRank.portfolioTotalGainsPercentage,
+          portfolioTotalGainsPercentage: d.systemRank?.portfolioTotalGainsPercentage,
         }) satisfies HallOfFameTopRankData<UserBase>,
     );
 
@@ -57,7 +57,7 @@ export const hallOfFameUsers = async (): Promise<void> => {
       (d) =>
         ({
           item: transformUserToBase(d),
-          portfolioTotalGainsPercentage: d.systemRank.portfolioTotalGainsPercentage,
+          portfolioTotalGainsPercentage: d.systemRank?.portfolioTotalGainsPercentage,
         }) satisfies HallOfFameTopRankData<UserBase>,
     );
 

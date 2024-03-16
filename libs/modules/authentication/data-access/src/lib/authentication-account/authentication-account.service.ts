@@ -21,7 +21,7 @@ import {
   setDoc,
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
-import { UserAccountTypes, UserData, UserResetTransactionsInput } from '@market-monitor/api-types';
+import { UserAccountEnum, UserData, UserResetTransactionsInput } from '@market-monitor/api-types';
 import { assignTypesClient } from '@market-monitor/shared/data-access';
 import { getCurrentDateDefaultFormat } from '@market-monitor/shared/features/general-util';
 import { docData as rxDocData } from 'rxfire/firestore';
@@ -135,7 +135,7 @@ export class AuthenticationAccountService {
     });
   }
 
-  async resetTransactions(accountTypeSelected: UserAccountTypes): Promise<void> {
+  async resetTransactions(accountTypeSelected: UserAccountEnum): Promise<void> {
     const user = this.authenticatedUser$.value;
     if (!user) {
       throw new Error('User is not authenticated');

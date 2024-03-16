@@ -1,8 +1,8 @@
 import {
   USER_DEFAULT_STARTING_CASH,
-  UserAccountTypes,
+  UserAccountBasicTypes,
+  UserAccountEnum,
   UserData,
-  UserFeatures,
   UserResetTransactionsInput,
 } from '@market-monitor/api-types';
 import { createEmptyPortfolioState } from '@market-monitor/shared/features/general-util';
@@ -33,16 +33,17 @@ export const userResetTransactionsCall = onCall(async (request) => {
   resetTransactionsForUser(userData, data.accountTypeSelected);
 });
 
-export const resetTransactionsForUser = async (userData: UserData, accountType: UserAccountTypes): Promise<void> => {
-  const startingCash = accountType === UserAccountTypes.Trading ? USER_DEFAULT_STARTING_CASH : 0;
+export const resetTransactionsForUser = async (
+  userData: UserData,
+  accountType: UserAccountBasicTypes,
+): Promise<void> => {
+  const startingCash = accountType === UserAccountEnum.DEMO_TRADING ? USER_DEFAULT_STARTING_CASH : 0;
   const newUserData = {
     ...userData,
     portfolioState: {
       ...createEmptyPortfolioState(startingCash),
     },
-    features: {
-      ...getUserFeaturesByAccountType(accountType),
-    },
+    userAccountType: accountType,
   } satisfies UserData;
 
   // reset user portfolio state
@@ -54,22 +55,4 @@ export const resetTransactionsForUser = async (userData: UserData, accountType: 
   await userDocumentTransactionHistoryRef(userData.id).update({
     transactions: [],
   });
-};
-
-const getUserFeaturesByAccountType = (accountType: UserAccountTypes): UserFeatures => {
-  switch (accountType) {
-    case UserAccountTypes.Basic:
-      return {
-        allowPortfolioCashAccount: false,
-        allowAccessGroups: false,
-      };
-    case UserAccountTypes.Trading:
-      return {
-        allowPortfolioCashAccount: true,
-        allowAccessGroups: true,
-        allowAccessHallOfFame: true,
-      };
-    default:
-      throw new HttpsError('invalid-argument', 'Invalid account type');
-  }
 };

@@ -51,8 +51,11 @@ export type UserData = UserBase & {
   /**
    * features that user has access to
    */
-  features: UserFeatures;
-  systemRank: SystemRankUser;
+  userAccountType: UserAccountEnum;
+  /**
+   * only available for DEMO_TRADING users
+   */
+  systemRank?: SystemRankUser;
 };
 
 export type SystemRankUser = {
@@ -67,7 +70,7 @@ export type UserPortfolioTransaction = {
   transactions: PortfolioTransaction[];
 };
 
-export type UserWatchlist = {
+export type UserWatchList = {
   data: {
     symbol: string;
     symbolType: SymbolType;
@@ -82,57 +85,62 @@ export type UserPersonalInfo = {
   email: string;
 };
 
+/**
+ * settings which can be toggled by the user
+ */
 export type UserSettings = {
-  /**
-   * if true, user will be able to receive group invitations
-   */
-  allowReceivingGroupInvitations: boolean;
-
-  // TODO: darkModeEnabled: boolean
+  isDarkMode?: boolean;
 };
 
-export type UserFeatures = {
-  /**
-   * true if user is admin, grand access to all features
-   */
-  isAdmin?: boolean;
-  /**
-   * if true, user can access group page and create groups limited by - GROUP_OWNER_LIMIT
-   */
-  allowAccessGroups?: boolean;
+// export type UserFeatures = {
+//   /**
+//    * true if user is admin, grand access to all features
+//    */
+//   isAdmin?: boolean; // todo: delete
+//   /**
+//    * if true, user can access group page and create groups limited by - GROUP_OWNER_LIMIT
+//    */
+//   allowAccessGroups?: boolean; // todo: delete
 
-  /**
-   * if true, user can create unlimited number of groups
-   */
-  allowCreateUnlimitedGroups?: boolean;
+//   /**
+//    * if true, user can create unlimited number of groups
+//    */
+//   allowCreateUnlimitedGroups?: boolean;
 
-  /**
-   * if true, user will have a starting cash balance and system
-   * will always check whether user has enough cash to buy
-   */
-  allowPortfolioCashAccount?: boolean;
+//   /**
+//    * if true, user will have a starting cash balance and system
+//    * will always check whether user has enough cash to buy
+//    */
+//   allowPortfolioCashAccount?: boolean; // todo: delete
 
-  /**
-   * if true, user can have unlimited number of symbols in portfolio, else it is limited - USER_HOLDINGS_SYMBOL_LIMIT
-   */
-  allowUnlimitedSymbolsInHoldings?: boolean;
+//   /**
+//    * if true, user can have unlimited number of symbols in portfolio, else it is limited - USER_HOLDINGS_SYMBOL_LIMIT
+//    */
+//   allowUnlimitedSymbolsInHoldings?: boolean;
 
-  /**
-   * if true, user can have unlimited number of symbols in watchList, else it is limited - USER_WATCHLIST_SYMBOL_LIMIT
-   */
-  allowUnlimitedSymbolsInWatchList?: boolean;
+//   /**
+//    * if true, user can have unlimited number of symbols in watchList, else it is limited - USER_WATCHLIST_SYMBOL_LIMIT
+//    */
+//   allowUnlimitedSymbolsInWatchList?: boolean;
 
-  /**
-   * if true (by default true), user will participate in hall of fame
-   */
-  allowAccessHallOfFame?: boolean;
-};
-export type UserFeaturesType = keyof UserFeatures;
+//   /**
+//    * if true (by default true), user will participate in hall of fame
+//    */
+//   allowAccessHallOfFame?: boolean; // todo: delete
+// };
+//export type UserFeaturesType = keyof UserFeatures;
 
-export enum UserAccountTypes {
-  Trading = 'Trading',
-  Basic = 'Basic',
+export enum UserAccountEnum {
+  DEMO_TRADING = 'DEMO_TRADING',
+  NORMAL_BASIC = 'NORMAL_BASIC',
+  NORMAL_PAID = 'NORMAL_PAID',
+  ADMIN = 'ADMIN',
 }
+
+/**
+ * picked account types user can choose from by default, others can added by the system
+ */
+export type UserAccountBasicTypes = UserAccountEnum.NORMAL_BASIC | UserAccountEnum.DEMO_TRADING;
 
 export type UserResetTransactionsInput = {
   /**
@@ -142,11 +150,11 @@ export type UserResetTransactionsInput = {
   /**
    * selected account type by the user
    */
-  accountTypeSelected: UserAccountTypes;
+  accountTypeSelected: UserAccountBasicTypes;
 };
 
-export const accountDescription: { [K in UserAccountTypes]: string[] } = {
-  [UserAccountTypes.Trading]: [
+export const accountDescription: { [K in UserAccountBasicTypes]: string[] } = {
+  [UserAccountEnum.DEMO_TRADING]: [
     `
     With trading account you start with a specific amount of cash on hand.
     You can buy and sell stocks, ETFs, and other securities until you run out of cash.
@@ -155,7 +163,7 @@ export const accountDescription: { [K in UserAccountTypes]: string[] } = {
     `Your profile is public, meaning that other users can find you and see your portfolio and
     as your trading progress is monitored, you will be part of a ranking system,`,
   ],
-  [UserAccountTypes.Basic]: [
+  [UserAccountEnum.NORMAL_BASIC]: [
     `With basic account you start with a clean portfolio and you can add stocks, ETFs, and other securities to your portfolio.`,
     `This account is intended for users who wants to mirror their real life portfolio and track their progress.`,
     `You can buy assets in the past and the application will calculate your current portfolio value based on the historical data.

@@ -5,6 +5,7 @@ import {
   PortfolioTransaction,
   PortfolioTransactionCreate,
   TRANSACTION_FEE_PRCT,
+  UserAccountEnum,
   UserData,
 } from '@market-monitor/api-types';
 import {
@@ -78,7 +79,7 @@ export const createPortfolioCreateOperation = async (
   }
 
   // check data validity
-  executeTransactionOperationDataValidity(userDocData, data, symbolPrice, userTransactions);
+  transactionOperationDataValidity(userDocData, data, symbolPrice, userTransactions);
 
   // from previous transaction calculate invested and units - currently if I own that symbol
   const symbolHolding = getCurrentInvestedFromTransactions(data.symbol, userTransactions);
@@ -100,7 +101,7 @@ const createTransaction = (
   historicalPrice: HistoricalPrice,
   breakEvenPrice: number,
 ): PortfolioTransaction => {
-  const isTransactionFeesActive = userDocData.features.allowPortfolioCashAccount;
+  const isTransactionFeesActive = userDocData.userAccountType === UserAccountEnum.DEMO_TRADING;
 
   // if custom total value is provided calculate unit price, else use API price
   const unitPrice = input.customTotalValue ? roundNDigits(input.customTotalValue / input.units) : historicalPrice.close;
@@ -181,7 +182,7 @@ const getCurrentInvestedFromTransactions = (
  * @param historicalPrice
  * @param portfolioTransaction
  */
-const executeTransactionOperationDataValidity = (
+const transactionOperationDataValidity = (
   userData: UserData,
   input: PortfolioTransactionCreate,
   historicalPrice: HistoricalPrice,
@@ -225,7 +226,7 @@ const executeTransactionOperationDataValidity = (
   const totalValue = roundNDigits(input.units * historicalPrice.close, 2);
 
   // check if user has enough cash on hand if BUY and cashAccountActive
-  if (input.transactionType === 'BUY' && userData.features.allowPortfolioCashAccount) {
+  if (input.transactionType === 'BUY' && userData.userAccountType === UserAccountEnum.DEMO_TRADING) {
     // calculate cash on hand from deposits
     const cashOnHandStarting = userData.portfolioState.startingCash;
     // calculate cash on hand from transactions
