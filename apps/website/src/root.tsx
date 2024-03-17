@@ -24,6 +24,7 @@ export default component$(() => {
         />
         <link rel="icon" type="image/svg+xml" href="/images/icon-finance.png" />
         <title>GGFinance</title>
+        <meta name="description" content="Stock portfolio investment analyzer" />
       </head>
       <body lang="en">
         <RouterOutlet />

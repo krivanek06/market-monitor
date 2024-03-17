@@ -56,20 +56,20 @@ export const WelcomeInvestmentAccount = component$(() => {
 
       <div class="grid md:grid-cols-3 gap-4 mb-8 md:mb-16 lg:px-10">
         <CardBasic>
-          <h3 class=" text-xl text-center mb-4 w-full text-cyan-800">Portfolio Growth</h3>
+          <h3 class=" text-xl text-center mb-4 w-full text-cyan-700">Portfolio Growth</h3>
           <p class="text-center p-4 text-lg">
             Monitor your portfolio against indexes, see in-depth details of your holdings and view your last
             transactions
           </p>
         </CardBasic>
         <CardBasic>
-          <h3 class=" text-xl text-center mb-4 w-full text-cyan-800">Investment Risk</h3>
+          <h3 class=" text-xl text-center mb-4 w-full text-cyan-700">Investment Risk</h3>
           <p class="text-center p-4 text-lg">
             Have you ever wondered how risky your portfolio is? Use us to see your portfolio's risk and how it compares
           </p>
         </CardBasic>
         <CardBasic>
-          <h3 class=" text-xl text-center mb-4 w-full text-cyan-800">Allocations & Transactions</h3>
+          <h3 class=" text-xl text-center mb-4 w-full text-cyan-700">Allocations & Transactions</h3>
           <p class="text-center p-4 text-lg">
             See your portfolio's allocation, your transactions, and your performance over time.
           </p>

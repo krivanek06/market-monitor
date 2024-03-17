@@ -34,12 +34,12 @@ const MarketSymbolsSection = component$(() => {
   const loadedSummariesArray = useSignal<SymbolSummary[]>([]);
 
   const onItemClick$ = $((summary: SymbolSummary) => {
-    console.log('clicked', summary);
+    // console.log('clicked', summary);
     selectedSummary.value = summary;
   });
 
   const onItemLetterClick$ = $((symbols: string) => {
-    console.log('clicked', symbols);
+    // console.log('clicked', symbols);
     selectedSummary.value = loadedSummariesArray.value?.find((summary) => summary.quote.symbol === symbols) || null;
   });
 

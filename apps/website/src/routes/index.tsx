@@ -69,7 +69,7 @@ export default component$(() => {
 
     const rowDivs = Math.ceil((wholePageRef.value?.clientWidth ?? 0) / 100);
     const colDivs = Math.ceil((heroPageRef.value?.clientHeight ?? 0) / 100);
-    console.log(rowDivs, colDivs);
+    // console.log(rowDivs, colDivs);
 
     // generate bunch of divs to UI to animate
     for (let col = 0; col < colDivs; col++) {
@@ -130,7 +130,10 @@ export default component$(() => {
       <img
         ref={heroBgImageRef}
         id="hero-bg"
+        alt="hero background image"
         src={heroImage}
+        width={1980}
+        height={1080}
         class="absolute top-0 w-[100%] object-cover opacity-30 hidden"
       />
 
