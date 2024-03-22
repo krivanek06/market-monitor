@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioState, UserBase } from '@mm/api-types';
-import { DefaultImgDirective, NameInitialsPipe } from '@mm/shared/ui';
+import { DefaultImgDirective } from '@mm/shared/ui';
 
 export type PortfolioStateRiskTableComponentData = {
   portfolioState: PortfolioState;
@@ -12,7 +12,7 @@ export type PortfolioStateRiskTableComponentData = {
 @Component({
   selector: 'app-portfolio-state-risk-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, NameInitialsPipe, DefaultImgDirective],
+  imports: [CommonModule, MatTableModule, DefaultImgDirective],
   template: `
     <table mat-table [dataSource]="dataSource" [trackBy]="identity">
       <!-- name -->
@@ -21,7 +21,7 @@ export type PortfolioStateRiskTableComponentData = {
         <td mat-cell *matCellDef="let row">
           <div class="flex items-center gap-2">
             <img appDefaultImg [src]="row.userBase.personal.photoURL" alt="user" class="w-8 h-8 rounded-full" />
-            <span>{{ row.userBase.personal.displayName | nameInitials }}</span>
+            <span>{{ row.userBase.personal.displayNameInitials }}</span>
           </div>
         </td>
       </ng-container>

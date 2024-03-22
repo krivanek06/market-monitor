@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioState, UserBase } from '@mm/api-types';
-import { DefaultImgDirective, NameInitialsPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
+import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 export type PortfolioStateTableData = {
   portfolioState: PortfolioState;
@@ -12,7 +12,7 @@ export type PortfolioStateTableData = {
 @Component({
   selector: 'app-portfolio-state-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, DefaultImgDirective, NameInitialsPipe, PercentageIncreaseDirective],
+  imports: [CommonModule, MatTableModule, DefaultImgDirective, PercentageIncreaseDirective],
   template: `
     <div class="@container">
       <table mat-table [dataSource]="dataSource" [trackBy]="identity">
@@ -22,7 +22,7 @@ export type PortfolioStateTableData = {
           <td mat-cell *matCellDef="let row">
             <div class="flex items-center gap-2">
               <img appDefaultImg [src]="row.userBase.personal.photoURL" alt="user" class="w-8 h-8 rounded-full" />
-              <span>{{ row.userBase.personal.displayName | nameInitials }}</span>
+              <span>{{ row.userBase.personal.displayNameInitials }}</span>
             </div>
           </td>
         </ng-container>

@@ -16,6 +16,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
     },
     personal: {
       displayName: 'Test User',
+      displayNameInitials: 'TU',
       photoURL: null,
       providerId: 'google.com',
       email: 'test@test.sk',

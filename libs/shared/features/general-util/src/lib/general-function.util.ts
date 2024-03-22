@@ -164,3 +164,8 @@ export const executeFnSafe = async <T>(...args: any[]): Promise<T | null> => {
     return null; // Return a default value in case of an error
   }
 };
+
+export const createNameInitials = (name: string) => {
+  const words = name.split(' ').reduce((acc, word) => acc + (word.at(0) ?? '').toUpperCase(), '');
+  return `${words}.`;
+};

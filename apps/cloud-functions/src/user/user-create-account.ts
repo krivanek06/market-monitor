@@ -1,5 +1,5 @@
 import { UserAccountEnum, UserData, UserPersonalInfo, UserPortfolioTransaction, UserWatchList } from '@mm/api-types';
-import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
+import { createEmptyPortfolioState, createNameInitials, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { userDocumentTransactionHistoryRef, userDocumentWatchListRef, usersCollectionRef } from '../models';
@@ -24,8 +24,10 @@ export const userCreate = async (userId: string): Promise<UserData> => {
   }
 
   // create new user data
+  const userName = user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`;
   const newUserData = createNewUser(user.uid, {
-    displayName: user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`,
+    displayName: userName,
+    displayNameInitials: createNameInitials(userName),
     photoURL: user.photoURL ?? null,
     providerId: user.providerData[0].providerId ?? 'unknown',
     email: user.email ?? 'unknown',

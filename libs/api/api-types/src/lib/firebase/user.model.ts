@@ -81,6 +81,7 @@ export type UserWatchList = {
 export type UserPersonalInfo = {
   photoURL: string | null;
   displayName: string;
+  displayNameInitials: string;
   providerId: User['providerData'][0]['providerId'];
   email: string;
 };

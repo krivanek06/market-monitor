@@ -14,11 +14,11 @@ import {
   PortfolioStateTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { GeneralCardComponent, SectionTitleComponent } from '@mm/shared/ui';
+import { GeneralCardComponent, PieChartComponent, SectionTitleComponent } from '@mm/shared/ui';
 import { UserSearchControlComponent } from '@mm/user/features';
 import { UserDisplayItemComponent } from '@mm/user/ui';
 import { filterNil } from 'ngxtension/filter-nil';
-import { catchError, forkJoin, from, map, mergeMap, of, switchMap, take } from 'rxjs';
+import { forkJoin, from, map, mergeMap, of, switchMap, take } from 'rxjs';
 
 @Component({
   selector: 'app-compare-users',
@@ -35,6 +35,7 @@ import { catchError, forkJoin, from, map, mergeMap, of, switchMap, take } from '
     PortfolioPeriodChangeTableComponent,
     PortfolioStateTransactionsTableComponent,
     GeneralCardComponent,
+    PieChartComponent,
   ],
   template: `
     <div class="absolute top-[-100px] left-0 hidden md:flex items-center gap-6 mb=10">
@@ -74,10 +75,21 @@ import { catchError, forkJoin, from, map, mergeMap, of, switchMap, take } from '
       </app-general-card>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-10">
       <app-general-card title="Period Change">
         <app-portfolio-period-change-table [data]="selectedUsersData()" />
       </app-general-card>
+    </div>
+
+    <div class="flex flex-wrap justify-around">
+      @for (userData of selectedUsersData(); track userData.userBase.id) {
+        <app-pie-chart
+          class="max-sm:w-[325px]"
+          [chartTitle]="'Allocation: ' + userData.userBase.personal.displayNameInitials"
+          [heightPx]="365"
+          [series]="userData.portfolioAssetAllocation"
+        />
+      }
     </div>
   `,
   styles: `
@@ -125,6 +137,9 @@ export class CompareUsersComponent {
                   map((data) => ({
                     ...data,
                     portfolioChange: this.portfolioCalculationService.getPortfolioChange(data.portfolioGrowth),
+                    portfolioAssetAllocation: this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(
+                      data.portfolioState.holdings,
+                    ),
                   })),
                 ),
               ),
@@ -132,10 +147,6 @@ export class CompareUsersComponent {
           ),
         ),
       ),
-      catchError((error) => {
-        this.dialogServiceUtil.handleError(error);
-        return of([]);
-      }),
     ),
     { initialValue: [] },
   );

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input } fr
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { UserBase } from '@mm/api-types';
 import { PortfolioChange } from '@mm/portfolio/data-access';
-import { DefaultImgDirective, NameInitialsPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
+import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 export type PortfolioPeriodChangeTableComponentData = {
   portfolioChange: PortfolioChange;
@@ -13,7 +13,7 @@ export type PortfolioPeriodChangeTableComponentData = {
 @Component({
   selector: 'app-portfolio-period-change-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, PercentageIncreaseDirective, DefaultImgDirective, NameInitialsPipe],
+  imports: [CommonModule, MatTableModule, PercentageIncreaseDirective, DefaultImgDirective],
   template: `
     <table mat-table [dataSource]="dataSource" [trackBy]="identity">
       <!-- name -->
@@ -22,7 +22,7 @@ export type PortfolioPeriodChangeTableComponentData = {
         <td mat-cell *matCellDef="let row">
           <div class="flex items-center gap-2">
             <img appDefaultImg [src]="row.userBase.personal.photoURL" alt="user" class="w-8 h-8 rounded-full" />
-            <span>{{ row.userBase.personal.displayName | nameInitials }}</span>
+            <span>{{ row.userBase.personal.displayNameInitials }}</span>
           </div>
         </td>
       </ng-container>
