@@ -197,8 +197,15 @@ export class PortfolioTransactionsTableComponent {
    */
   showUser = input(false);
 
-  tableEffect = effect(() => {
-    this.dataSource = new MatTableDataSource(this.data());
+  tableEffect = effect(
+    () => {
+      this.dataSource.data = this.data();
+      this.dataSource._updateChangeSubscription();
+    },
+    { allowSignalWrites: true },
+  );
+
+  tableInitEffect = effect(() => {
     this.dataSource.paginator = this.paginator() ?? null;
   });
 
@@ -214,7 +221,7 @@ export class PortfolioTransactionsTableComponent {
     }
   });
 
-  dataSource: MatTableDataSource<PortfolioTransactionMore> = new MatTableDataSource();
+  dataSource = new MatTableDataSource<PortfolioTransactionMore>([]);
   displayedColumns: string[] = ['symbol', 'transactionType', 'totalValue', 'unitPrice', 'units', 'return', 'date'];
 
   paginator = viewChild(MatPaginator);

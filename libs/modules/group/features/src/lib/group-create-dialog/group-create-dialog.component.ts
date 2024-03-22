@@ -89,7 +89,7 @@ import { map, startWith } from 'rxjs';
             ></app-form-mat-input-wrapper>
 
             <!-- owner -->
-            <div *ngIf="form.controls.isOwnerMember.value" class="flex gap-4 p-4 mt-2 shadow-md">
+            <div *ngIf="form.controls.isOwnerMember.value" class="flex gap-4 p-4 mt-2 shadow-md rounded-md">
               <app-user-display-item
                 *ngIf="authenticatedUserDataSignal() as user"
                 [userData]="user"
@@ -128,7 +128,7 @@ import { map, startWith } from 'rxjs';
 
           <!-- display selected users -->
           <div class="flex flex-wrap gap-4">
-            <div *ngFor="let user of selectedUsersSignal()" class="flex gap-4 p-4 shadow-md">
+            <div *ngFor="let user of selectedUsersSignal()" class="flex gap-4 p-4 shadow-md rounded-md">
               <app-user-display-item [userData]="user"></app-user-display-item>
               <button mat-icon-button type="button" matTooltip="Remove User" (click)="onUserRemove(user)">
                 <mat-icon color="warn">delete</mat-icon>

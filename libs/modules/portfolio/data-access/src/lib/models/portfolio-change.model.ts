@@ -9,4 +9,5 @@ export type PortfolioChange = {
   '3_month': ValueItem | null;
   '6_month': ValueItem | null;
   '1_year': ValueItem | null;
+  total: ValueItem | null;
 };

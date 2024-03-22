@@ -9,20 +9,21 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [CommonModule, MatCardModule, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
-      mat-card-content {
-        height: inherit;
-      }
+    mat-card-content {
+      height: inherit;
+      padding-top: 0 !important;
+    }
 
-      .default {
-        display: grid;
-        min-height: 200px;
-        place-content: center;
-      }
+    .default {
+      display: grid;
+      min-height: 200px;
+      place-content: center;
+    }
 
-      .default:not(:only-child) {
-        display: none !important;
-      }
-    `,
+    .default:not(:only-child) {
+      display: none !important;
+    }
+  `,
   template: `
     <mat-card
       appearance="outlined"
@@ -31,13 +32,13 @@ import { MatIconModule } from '@angular/material/icon';
         'shadow-md': useShadow()
       }"
     >
-      <!-- title() -->
+      <!-- title -->
       <mat-card-header *ngIf="title()" [ngClass]="{ 'justify-center': titleCenter() }">
         <mat-card-title class="mb-2 flex items-center gap-2">
           <img *ngIf="titleImgUrl()" appDefaultImg [src]="titleImgUrl()" />
           <mat-icon *ngIf="matIcon()" color="primary">{{ matIcon() }}</mat-icon>
-          <h3
-            class="mb-0 text-wt-primary"
+          <h2
+            class="mb-0 text-wt-primary text-base"
             [ngClass]="{
               'text-xl': titleScale() === 'large',
               'text-base': titleScale() === 'medium',
@@ -45,7 +46,7 @@ import { MatIconModule } from '@angular/material/icon';
             }"
           >
             {{ title() }}
-          </h3>
+          </h2>
         </mat-card-title>
       </mat-card-header>
 

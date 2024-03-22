@@ -19,8 +19,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
       [options]="chartOptions"
       [style.height.px]="heightPx()"
       style="display: block; width: 100%"
-    >
-    </highcharts-chart>
+    />
   `,
 })
 export class EarningsEstimationChartComponent extends ChartConstructor {

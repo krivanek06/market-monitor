@@ -77,6 +77,7 @@ export class PortfolioCalculationService {
         '3_month': null,
         '6_month': null,
         '1_year': null,
+        total: null,
       };
     }
 
@@ -119,6 +120,7 @@ export class PortfolioCalculationService {
       '3_month': createPortfolioChangeValue(reversedData[month3ChangeIndex]),
       '6_month': createPortfolioChangeValue(reversedData[month6ChangeIndex]),
       '1_year': createPortfolioChangeValue(reversedData[year1ChangeIndex]),
+      total: createPortfolioChangeValue(reversedData[reversedData.length - 1]),
     };
 
     console.log('daily result', result);

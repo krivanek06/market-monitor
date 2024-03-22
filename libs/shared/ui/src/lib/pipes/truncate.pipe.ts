@@ -20,3 +20,20 @@ export class TruncateWordsPipe implements PipeTransform {
     return words.length > limit ? words.slice(0, limit).join(' ') + ' ' + ellipsis : value;
   }
 }
+
+/**
+ * based on the provided name it creates initials
+ * example: John Doe => JD.
+ * example JohnLoh => J.
+ * example superlongname => S.
+ */
+@Pipe({
+  name: 'nameInitials',
+  standalone: true,
+})
+export class NameInitialsPipe implements PipeTransform {
+  transform(value: string) {
+    const words = value.split(' ').reduce((acc, word) => acc + (word.at(0) ?? '').toUpperCase(), '');
+    return `${words}.`;
+  }
+}
