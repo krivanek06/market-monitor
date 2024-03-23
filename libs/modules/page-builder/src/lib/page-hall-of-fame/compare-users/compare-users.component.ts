@@ -73,6 +73,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       <app-user-search-control
         class="md:scale-90 w-full md:w-[500px] xl:mt-3"
         (selectedUserEmitter)="onUserClick($event)"
+        [isDisabled]="loadingState()"
       />
     </div>
 
@@ -101,14 +102,17 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     <div class="grid lg:grid-cols-2 xl:grid-cols-10 gap-x-4 gap-y-4 mb-10">
       <app-general-card title="State" class="lg:col-span-2 xl:col-span-4">
         <app-portfolio-state-table [data]="selectedUsersData()" />
+        <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
 
       <app-general-card title="Risk" class="xl:col-span-3">
         <app-portfolio-state-risk-table [data]="selectedUsersData()" />
+        <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
 
       <app-general-card title="Transactions" class="xl:col-span-3">
         <app-portfolio-state-transactions-table [data]="selectedUsersData()" />
+        <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
     </div>
 
@@ -116,6 +120,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     <div class="mb-10 hidden md:block">
       <app-general-card title="Period Change">
         <app-portfolio-period-change-table [data]="selectedUsersData()" />
+        <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
     </div>
 
@@ -194,6 +199,11 @@ export class CompareUsersComponent {
   private userApiService = inject(UserApiService);
   private dialog = inject(MatDialog);
   private dialogServiceUtil = inject(DialogServiceUtil);
+
+  /**
+   * toggled when selecting a new user and data is not yet loaded
+   */
+  loadingState = computed(() => this.selectedUsers().length !== this.selectedUsersData().length);
 
   selectedUsers = signal<UserBase[]>([this.authenticationUserStoreService.state.getUserData()]);
   selectedUserHoldingsControl = new FormControl<UserBase | null>(
