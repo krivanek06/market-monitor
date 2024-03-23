@@ -162,14 +162,14 @@ export class StockOwnershipHoldersTableComponent {
 
   tableEffect = effect(
     () => {
-      this.dataSource = new MatTableDataSource(this.data());
+      this.dataSource.data = this.data();
       this.dataSource.paginator = this.paginator() ?? null;
       this.dataSource.sort = this.sort() ?? null;
     },
     { allowSignalWrites: true },
   );
 
-  dataSource: MatTableDataSource<SymbolOwnershipHolders> = new MatTableDataSource();
+  dataSource = new MatTableDataSource<SymbolOwnershipHolders>([]);
 
   displayedColumns: string[] = [
     'investorName',

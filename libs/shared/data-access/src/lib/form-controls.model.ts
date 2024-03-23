@@ -6,7 +6,7 @@ export interface InputSourceWrapper<T> {
 export type DefaultImageType = 'default' | 'symbol';
 
 export interface InputSource<T> {
-  image?: string;
+  image?: string | null;
   imageType?: DefaultImageType;
   value: T;
   caption: string;

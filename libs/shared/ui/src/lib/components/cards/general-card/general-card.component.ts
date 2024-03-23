@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, contentChild, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -11,17 +11,6 @@ import { MatIconModule } from '@angular/material/icon';
   styles: `
     mat-card-content {
       height: inherit;
-      padding-top: 0 !important;
-    }
-
-    .default {
-      display: grid;
-      min-height: 200px;
-      place-content: center;
-    }
-
-    .default:not(:only-child) {
-      display: none !important;
     }
   `,
   template: `
@@ -34,15 +23,13 @@ import { MatIconModule } from '@angular/material/icon';
     >
       <!-- title -->
       <mat-card-header *ngIf="title()" [ngClass]="{ 'justify-center': titleCenter() }">
-        <mat-card-title class="mb-2 flex items-center gap-2">
+        <mat-card-title class="flex items-center gap-2">
           <img *ngIf="titleImgUrl()" appDefaultImg [src]="titleImgUrl()" />
           <mat-icon *ngIf="matIcon()" color="primary">{{ matIcon() }}</mat-icon>
           <h2
-            class="mb-0 text-wt-primary text-base"
+            class="mb-0 text-wt-primary text-lg"
             [ngClass]="{
-              'text-xl': titleScale() === 'large',
-              'text-base': titleScale() === 'medium',
-              'text-sm': titleScale() === 'small'
+              'text-xl': titleScale() === 'large'
             }"
           >
             {{ title() }}
@@ -53,9 +40,14 @@ import { MatIconModule } from '@angular/material/icon';
       <!-- content -->
       <mat-card-content>
         <!-- default content -->
-        <div class="default text-wt-gray-medium">No data has been found</div>
+        <div
+          *ngIf="cardContent()?.nativeElement.childNodes.length === 0"
+          class="text-wt-gray-medium min-h-[200px] grid place-content-center"
+        >
+          No data has been found
+        </div>
 
-        <ng-content></ng-content>
+        <ng-content #cardContent></ng-content>
       </mat-card-content>
     </mat-card>
   `,
@@ -64,9 +56,11 @@ export class GeneralCardComponent {
   title = input<string | null>(null);
   titleImgUrl = input<string | undefined>();
   matIcon = input<string | undefined>();
-  titleScale = input<'small' | 'medium' | 'large'>('medium');
+  titleScale = input<'large'>('large');
   useShadow = input(true);
   additionalClasses = input('');
   titleCenter = input(false);
   cardColor = input<'bg-wt-gray-medium' | 'bg-wt-gray-light-strong' | 'bg-wt-gray-light'>('bg-wt-gray-light');
+
+  cardContent = contentChild('cardContent', { read: ElementRef });
 }

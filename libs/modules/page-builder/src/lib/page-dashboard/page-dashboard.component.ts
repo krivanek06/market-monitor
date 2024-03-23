@@ -187,7 +187,6 @@ import { map, pipe, startWith } from 'rxjs';
         title="Holdings [{{ (portfolioUserFacadeService.getPortfolioState()?.holdings ?? []).length }} / {{
           USER_HOLDINGS_SYMBOL_LIMIT
         }}]"
-        titleScale="large"
         matIcon="show_chart"
       >
         <app-portfolio-holdings-table

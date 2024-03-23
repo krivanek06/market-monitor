@@ -277,18 +277,21 @@ export class PortfolioHoldingsTableComponent {
     'yearlyRange',
     // 'sector',
   ]);
-  dataSource!: MatTableDataSource<PortfolioStateHolding>;
+  dataSource = new MatTableDataSource<PortfolioStateHolding>([]);
 
   showDailyChangeSignal = signal(false);
 
-  tableEffect = effect(() => {
-    const sorted = this.holdings()
-      .slice()
-      .sort((a, b) => compare(b.symbolSummary.quote.price * b.units, a.symbolSummary.quote.price * a.units));
-    this.dataSource = new MatTableDataSource(sorted);
-    this.dataSource.paginator = this.paginator() ?? null;
-    this.dataSource.sort = this.sort() ?? null;
-  });
+  tableEffect = effect(
+    () => {
+      const sorted = this.holdings()
+        .slice()
+        .sort((a, b) => compare(b.symbolSummary.quote.price * b.units, a.symbolSummary.quote.price * a.units));
+      this.dataSource.data = sorted;
+      this.dataSource.paginator = this.paginator() ?? null;
+      this.dataSource.sort = this.sort() ?? null;
+    },
+    { allowSignalWrites: true },
+  );
 
   identity: TrackByFunction<PortfolioStateHolding> = (index: number, item: PortfolioStateHolding) => item.symbol;
 

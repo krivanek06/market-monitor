@@ -26,9 +26,7 @@ type SubPages = 'users' | 'groups' | 'compare-users';
     </div>
     <div class="relative">
       @if (currentPageControl.value === 'users') {
-        @defer {
-          <app-hall-of-fame-users />
-        }
+        <app-hall-of-fame-users />
       } @else if (currentPageControl.value === 'groups') {
         @defer {
           <app-hall-of-fame-groups />

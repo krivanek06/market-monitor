@@ -146,7 +146,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
           <!-- show more members button -->
           <app-show-more-button
             class="hidden sm:block"
-            (showMoreClicked)="onShowMoreMembers()"
+            [(showMoreToggle)]="displayEveryMember"
             [itemsLimit]="displayLimitInitial"
             [itemsTotal]="groupDetailsSignal.groupMembersData.length"
           />
@@ -169,7 +169,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         <div class="flex justify-end">
           <app-show-more-button
             class="block sm:hidden"
-            (showMoreClicked)="onShowMoreMembers()"
+            [(showMoreToggle)]="displayEveryMember"
             [itemsLimit]="displayLimitInitial"
             [itemsTotal]="groupDetailsSignal.groupMembersData.length"
           />
@@ -199,11 +199,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <!-- holding table -->
       <div class="mb-10">
-        <app-general-card
-          [title]="'Holdings: ' + getGroupHoldingsSignal().length"
-          titleScale="large"
-          matIcon="show_chart"
-        >
+        <app-general-card [title]="'Holdings: ' + getGroupHoldingsSignal().length" matIcon="show_chart">
           <app-portfolio-holdings-table
             (symbolClicked)="onSummaryClick($event)"
             [holdings]="displayedHoldings()"
@@ -212,7 +208,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
           <!-- show more button -->
           <div class="flex justify-end mt-2 mr-4">
             <app-show-more-button
-              (showMoreClicked)="onShowMoreHolding()"
+              [(showMoreToggle)]="displayEveryHolding"
               [itemsLimit]="displayLimitInitial"
               [itemsTotal]="getGroupHoldingsSignal().length"
               [allowShowLess]="false"
@@ -335,13 +331,5 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });
-  }
-
-  onShowMoreHolding() {
-    this.displayEveryHolding.set(!this.displayEveryHolding());
-  }
-
-  onShowMoreMembers() {
-    this.displayEveryMember.set(!this.displayEveryMember());
   }
 }

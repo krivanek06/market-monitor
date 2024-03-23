@@ -1,24 +1,37 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UserApiService } from '@mm/api-client';
 import { UserBase } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioCalculationService, PortfolioGrowthService } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthCompareChartComponent,
+  PortfolioHoldingsTableComponent,
   PortfolioPeriodChangeTableComponent,
   PortfolioStateRiskTableComponent,
   PortfolioStateTableComponent,
   PortfolioStateTransactionsTableComponent,
+  PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
-import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { GeneralCardComponent, PieChartComponent, SectionTitleComponent } from '@mm/shared/ui';
+import { InputSource } from '@mm/shared/data-access';
+import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import {
+  FormMatInputWrapperComponent,
+  GeneralCardComponent,
+  PieChartComponent,
+  SectionTitleComponent,
+  ShowMoreButtonComponent,
+  SortByKeyPipe,
+} from '@mm/shared/ui';
 import { UserSearchControlComponent } from '@mm/user/features';
 import { UserDisplayItemComponent } from '@mm/user/ui';
+import { computedFrom } from 'ngxtension/computed-from';
 import { filterNil } from 'ngxtension/filter-nil';
-import { forkJoin, from, map, mergeMap, of, switchMap, take } from 'rxjs';
+import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } from 'rxjs';
 
 @Component({
   selector: 'app-compare-users',
@@ -36,6 +49,14 @@ import { forkJoin, from, map, mergeMap, of, switchMap, take } from 'rxjs';
     PortfolioStateTransactionsTableComponent,
     GeneralCardComponent,
     PieChartComponent,
+    FormMatInputWrapperComponent,
+    ReactiveFormsModule,
+    PortfolioHoldingsTableComponent,
+    MatDialogModule,
+    StockSummaryDialogComponent,
+    PortfolioTransactionsTableComponent,
+    SortByKeyPipe,
+    ShowMoreButtonComponent,
   ],
   template: `
     <div class="absolute top-[-100px] left-0 hidden md:flex items-center gap-6 mb=10">
@@ -55,6 +76,7 @@ import { forkJoin, from, map, mergeMap, of, switchMap, take } from 'rxjs';
       }
     </div>
 
+    <!-- compare portfolio chart -->
     <div class="mb-10">
       <app-section-title title="Portfolio Compare" />
       <app-portfolio-growth-compare-chart [data]="selectedUsersData()" />
@@ -75,13 +97,15 @@ import { forkJoin, from, map, mergeMap, of, switchMap, take } from 'rxjs';
       </app-general-card>
     </div>
 
+    <!-- portfolio change table -->
     <div class="mb-10">
       <app-general-card title="Period Change">
         <app-portfolio-period-change-table [data]="selectedUsersData()" />
       </app-general-card>
     </div>
 
-    <div class="flex flex-wrap justify-around">
+    <app-section-title title="Asset Allocation" />
+    <div class="flex flex-wrap justify-around mb-10">
       @for (userData of selectedUsersData(); track userData.userBase.id) {
         <app-pie-chart
           class="max-sm:w-[325px]"
@@ -91,6 +115,52 @@ import { forkJoin, from, map, mergeMap, of, switchMap, take } from 'rxjs';
         />
       }
     </div>
+
+    <!-- holding title -->
+    @if (selectedUsersData().length > 0) {
+      <div class="flex items-center justify-between mb-4">
+        <app-section-title title="Selected User: {{ selectedUser()?.userData?.personal?.displayName }}" />
+
+        <app-form-mat-input-wrapper
+          class="w-[360px]"
+          inputCaption="Select User's Holdings"
+          inputType="SELECT"
+          [formControl]="selectedUserHoldingsControl"
+          [inputSource]="selectedUsersInputSource()"
+        />
+      </div>
+
+      <!-- table -->
+      <div class="mb-10">
+        <app-general-card
+          title="Holdings {{ (selectedUser()?.portfolioState?.holdings ?? []).length }}"
+          matIcon="show_chart"
+        >
+          <app-portfolio-holdings-table
+            (symbolClicked)="onSummaryClick($event)"
+            [holdings]="selectedUserHoldings()"
+            [holdingsBalance]="selectedUser()?.portfolioState?.holdingsBalance ?? 0"
+          ></app-portfolio-holdings-table>
+          <!-- show more members button -->
+          <div class="flex justify-end">
+            <app-show-more-button
+              [(showMoreToggle)]="selectedUserHoldingsToggle"
+              [itemsLimit]="12"
+              [itemsTotal]="(selectedUser()?.portfolioState?.holdings ?? []).length"
+            />
+          </div>
+        </app-general-card>
+      </div>
+
+      <!-- transaction history -->
+      <div class="mb-4">
+        <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
+        <app-portfolio-transactions-table
+          [showTransactionFees]="true"
+          [data]="selectedUser()?.userTransactions ?? [] | sortByKey: 'date' : 'desc'"
+        ></app-portfolio-transactions-table>
+      </div>
+    }
   `,
   styles: `
     :host {
@@ -104,9 +174,13 @@ export class CompareUsersComponent {
   private portfolioGrowthService = inject(PortfolioGrowthService);
   private portfolioCalculationService = inject(PortfolioCalculationService);
   private userApiService = inject(UserApiService);
+  private dialog = inject(MatDialog);
   private dialogServiceUtil = inject(DialogServiceUtil);
 
   selectedUsers = signal<UserBase[]>([this.authenticationUserStoreService.state.getUserData()]);
+  selectedUserHoldingsControl = new FormControl<UserBase | null>(
+    this.authenticationUserStoreService.state.getUserData(),
+  );
 
   /**
    * load user data when selected users change
@@ -151,6 +225,43 @@ export class CompareUsersComponent {
     { initialValue: [] },
   );
 
+  /**
+   * selected user from a dropdown
+   */
+  selectedUsersInputSource = computed(() =>
+    this.selectedUsers().map(
+      (user) =>
+        ({
+          value: user,
+          caption: user.personal.displayName,
+          image: user.personal.photoURL,
+          imageType: 'default',
+        }) satisfies InputSource<UserBase>,
+    ),
+  );
+
+  selectedUser = computedFrom(
+    [
+      this.selectedUserHoldingsControl.valueChanges.pipe(startWith(this.selectedUserHoldingsControl.value)),
+      this.selectedUsersData,
+    ],
+    pipe(
+      switchMap(([selectedUser, selectedUsersData]) =>
+        of(selectedUsersData.find((data) => data.userBase.id === selectedUser?.id)),
+      ),
+    ),
+  );
+
+  /**
+   * toggle to display every holding for the selected user
+   */
+  selectedUserHoldingsToggle = signal(false);
+  selectedUserHoldings = computed(() =>
+    this.selectedUserHoldingsToggle()
+      ? this.selectedUser()?.portfolioState?.holdings ?? []
+      : (this.selectedUser()?.portfolioState?.holdings ?? []).slice(0, 12),
+  );
+
   selectedUsersDataEffect = effect(() => {
     console.log('selectedUsersData', this.selectedUsersData());
   });
@@ -158,6 +269,17 @@ export class CompareUsersComponent {
   onUserClick(user: UserBase) {
     if (this.selectedUsers().length < 6) {
       this.selectedUsers.set([...this.selectedUsers(), user]);
+    } else {
+      this.dialogServiceUtil.showNotificationBar('You can compare up to 6 users', 'error');
     }
+  }
+
+  onSummaryClick(symbol: string) {
+    this.dialog.open(StockSummaryDialogComponent, {
+      data: {
+        symbol: symbol,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
   }
 }

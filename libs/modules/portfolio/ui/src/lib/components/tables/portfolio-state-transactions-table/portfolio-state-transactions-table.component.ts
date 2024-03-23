@@ -76,14 +76,17 @@ export type PortfolioStateTransactionsTableData = {
 export class PortfolioStateTransactionsTableComponent {
   data = input.required<PortfolioStateTransactionsTableData[]>();
 
-  tableEffect = effect(() => {
-    this.dataSource.data = this.data();
-    this.dataSource._updateChangeSubscription();
-  });
+  tableEffect = effect(
+    () => {
+      this.dataSource.data = this.data();
+      this.dataSource._updateChangeSubscription();
+    },
+    { allowSignalWrites: true },
+  );
 
   displayedColumns: string[] = ['user', 'total', 'buy', 'sell', 'fees'];
 
-  dataSource: MatTableDataSource<PortfolioStateTransactionsTableData> = new MatTableDataSource();
+  dataSource = new MatTableDataSource<PortfolioStateTransactionsTableData>([]);
 
   identity: TrackByFunction<PortfolioStateTransactionsTableData> = (
     index: number,

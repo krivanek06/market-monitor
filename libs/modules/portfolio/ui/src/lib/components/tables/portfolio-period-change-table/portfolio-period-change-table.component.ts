@@ -135,14 +135,17 @@ export type PortfolioPeriodChangeTableComponentData = {
 export class PortfolioPeriodChangeTableComponent {
   data = input.required<PortfolioPeriodChangeTableComponentData[]>();
 
-  tableEffect = effect(() => {
-    this.dataSource.data = this.data();
-    this.dataSource._updateChangeSubscription();
-  });
+  tableEffect = effect(
+    () => {
+      this.dataSource.data = this.data();
+      this.dataSource._updateChangeSubscription();
+    },
+    { allowSignalWrites: true },
+  );
 
   displayedColumns: string[] = ['user', '1_day', '1_week', '2_week', '1_month', '3_month'];
 
-  dataSource = new MatTableDataSource<PortfolioPeriodChangeTableComponentData>();
+  dataSource = new MatTableDataSource<PortfolioPeriodChangeTableComponentData>([]);
 
   identity: TrackByFunction<PortfolioPeriodChangeTableComponentData> = (
     index: number,

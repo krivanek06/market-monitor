@@ -69,6 +69,7 @@ import { DefaultImgDirective } from '../../../directives';
   styles: `
     mat-form-field.mat-mdc-form-field {
       width: 100%;
+      height: 60px;
     }
 
     fieldset {

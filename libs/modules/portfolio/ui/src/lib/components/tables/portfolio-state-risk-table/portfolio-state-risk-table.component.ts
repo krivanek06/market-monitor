@@ -92,14 +92,17 @@ export type PortfolioStateRiskTableComponentData = {
 export class PortfolioStateRiskTableComponent {
   data = input.required<PortfolioStateRiskTableComponentData[]>();
 
-  tableEffect = effect(() => {
-    this.dataSource.data = this.data();
-    this.dataSource._updateChangeSubscription();
-  });
+  tableEffect = effect(
+    () => {
+      this.dataSource.data = this.data();
+      this.dataSource._updateChangeSubscription();
+    },
+    { allowSignalWrites: true },
+  );
 
   displayedColumns: string[] = ['user', 'alpha', 'volatility', 'beta', 'sharpe'];
 
-  dataSource: MatTableDataSource<PortfolioStateRiskTableComponentData> = new MatTableDataSource();
+  dataSource = new MatTableDataSource<PortfolioStateRiskTableComponentData>([]);
 
   identity: TrackByFunction<PortfolioStateRiskTableComponentData> = (
     index: number,
