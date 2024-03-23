@@ -128,7 +128,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         <mat-icon [color]="data.item.isAccountActive ? 'accent' : 'warn'"> radio_button_checked </mat-icon>
         <img appDefaultImg [src]="data.item.personal.photoURL" alt="user image" class="w-10 h-10 rounded-lg" />
         <div class="flex items-center gap-2">
-          <div appPositionColoring [position]="position">{{ data.item.personal.displayName }}</div>
+          <div appPositionColoring [position]="position">{{ data.item.personal.displayNameInitials }}</div>
           <!-- display position change if any -->
           @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
             @if (rankChange !== 0) {

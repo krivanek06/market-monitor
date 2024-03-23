@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -274,11 +274,13 @@ export class CompareUsersComponent {
       : (this.selectedUser()?.portfolioState?.holdings ?? []).slice(0, 12),
   );
 
-  selectedUsersDataEffect = effect(() => {
-    console.log('selectedUsersData', this.selectedUsersData());
-  });
-
   onUserClick(user: UserBase) {
+    // prevent selecting same user twice
+    if (this.selectedUsers().find((u) => u.id === user.id)) {
+      return;
+    }
+
+    // select user
     if (this.selectedUsers().length < 6) {
       this.selectedUsers.set([...this.selectedUsers(), user]);
     } else {

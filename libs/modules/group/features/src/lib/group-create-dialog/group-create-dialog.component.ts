@@ -174,7 +174,7 @@ export class GroupCreateDialogComponent implements OnInit {
 
   form = new FormGroup({
     groupName: new FormControl('', {
-      validators: [requiredValidator, minLengthValidator(4), maxLengthValidator(28)],
+      validators: [requiredValidator, minLengthValidator(4), maxLengthValidator(20)],
       nonNullable: true,
     }),
     isPublic: new FormControl(true, { nonNullable: true }),

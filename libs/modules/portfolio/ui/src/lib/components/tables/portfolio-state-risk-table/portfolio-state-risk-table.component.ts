@@ -19,7 +19,7 @@ export type PortfolioStateRiskTableComponentData = {
       <ng-container matColumnDef="user">
         <th mat-header-cell *matHeaderCellDef>User</th>
         <td mat-cell *matCellDef="let row">
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 text-wt-gray-dark">
             <img appDefaultImg [src]="row.userBase.personal.photoURL" alt="user" class="w-8 h-8 rounded-full" />
             <span>{{ row.userBase.personal.displayNameInitials }}</span>
           </div>
