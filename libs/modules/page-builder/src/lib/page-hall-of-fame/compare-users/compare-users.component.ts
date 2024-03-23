@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -95,23 +95,33 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     <!-- compare portfolio chart -->
     <div class="mb-10">
       <app-section-title title="Portfolio Compare" />
-      <app-portfolio-growth-compare-chart [data]="selectedUsersData()" />
+      @if (!loadingState()) {
+        <app-portfolio-growth-compare-chart [heightPx]="400" [data]="selectedUsersData()" />
+      } @else {
+        <div class="g-skeleton h-[375px]"></div>
+      }
     </div>
 
     <!-- display compare tables -->
     <div class="grid lg:grid-cols-2 xl:grid-cols-10 gap-x-4 gap-y-4 mb-10">
       <app-general-card title="State" class="lg:col-span-2 xl:col-span-4">
+        <!-- table -->
         <app-portfolio-state-table [data]="selectedUsersData()" />
+        <!-- loading skeleton -->
         <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
 
       <app-general-card title="Risk" class="xl:col-span-3">
+        <!-- table -->
         <app-portfolio-state-risk-table [data]="selectedUsersData()" />
+        <!-- loading skeleton -->
         <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
 
       <app-general-card title="Transactions" class="xl:col-span-3">
+        <!-- table -->
         <app-portfolio-state-transactions-table [data]="selectedUsersData()" />
+        <!-- loading skeleton -->
         <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
     </div>
@@ -119,7 +129,9 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     <!-- portfolio change table -->
     <div class="mb-10 hidden md:block">
       <app-general-card title="Period Change">
+        <!-- table -->
         <app-portfolio-period-change-table [data]="selectedUsersData()" />
+        <!-- loading skeleton -->
         <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
     </div>
@@ -131,12 +143,14 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
         <div class="grid grid-cols-2 xl:grid-cols-3 mb-10">
           @for (userData of selectedUsersData(); track userData.userBase.id) {
             <app-pie-chart
-              class="max-sm:w-[325px]"
               [chartTitle]="'Allocation: ' + userData.userBase.personal.displayNameInitials"
               [heightPx]="365"
               [series]="userData.portfolioAssetAllocation"
             />
           }
+
+          <!-- loading skeleton -->
+          <div *ngIf="loadingState()" class="g-skeleton h-[350px]"></div>
         </div>
       </div>
 
@@ -235,7 +249,12 @@ export class CompareUsersComponent {
                       portfolioGrowth: from(
                         this.portfolioGrowthService.getPortfolioGrowthAssets(userTransactions.transactions),
                       ).pipe(
-                        map((portfolioGrowth) => this.portfolioCalculationService.getPortfolioGrowth(portfolioGrowth)),
+                        map((portfolioGrowth) =>
+                          this.portfolioCalculationService.getPortfolioGrowth(
+                            portfolioGrowth,
+                            userData.portfolioState.startingCash,
+                          ),
+                        ),
                       ),
                     }).pipe(
                       map((data) => ({
@@ -254,6 +273,8 @@ export class CompareUsersComponent {
     ),
     { initialValue: [] },
   );
+
+  selectedUsersDataEffect = effect(() => console.log('selectedUsersData', this.selectedUsersData()));
 
   /**
    * selected user from a dropdown

@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { UserBase } from '@mm/api-types';
 import { PortfolioGrowth } from '@mm/portfolio/data-access';
-import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
-import { formatValueIntoCurrency } from '@mm/shared/general-util';
-import { SeriesOptionsType } from 'highcharts';
+import { ChartConstructor, ColorScheme, GenericChartSeries } from '@mm/shared/data-access';
+import { fillOutMissingDatesForDate, formatValueIntoCurrency } from '@mm/shared/general-util';
+import { DateRangeSliderComponent, DateRangeSliderValues } from '@mm/shared/ui';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { map } from 'rxjs';
 
 export type PortfolioGrowthCompareChartData = {
   portfolioGrowth: PortfolioGrowth[];
@@ -15,17 +18,33 @@ export type PortfolioGrowthCompareChartData = {
 @Component({
   selector: 'app-portfolio-growth-compare-chart',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
+  imports: [CommonModule, HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule],
   template: `
-    <highcharts-chart
-      *ngIf="isHighcharts"
-      [(update)]="updateFromInput"
-      [Highcharts]="Highcharts"
-      [callbackFunction]="chartCallback"
-      [options]="chartOption()"
-      [style.height.px]="heightPx()"
-      style="display: block; width: 100%"
-    />
+    <!-- time slider -->
+    <div class="flex justify-end">
+      <app-date-range-slider
+        *ngIf="dateRangeControl.value.dates.length > 0"
+        class="hidden md:block w-[550px]"
+        [formControl]="dateRangeControl"
+      />
+    </div>
+
+    <!-- chart -->
+    @if (chartOptionsSignal() && dateRangeControl.value.dates.length > 0) {
+      @if (chartOptionsSignal(); as chartOptionsSignal) {
+        <highcharts-chart
+          *ngIf="isHighcharts"
+          [(update)]="updateFromInput"
+          [Highcharts]="Highcharts"
+          [callbackFunction]="chartCallback"
+          [options]="chartOptionsSignal"
+          [style.height.px]="heightPx()"
+          style="display: block; width: 100%"
+        />
+      }
+    } @else {
+      <div class="grid place-content-center text-base" [style.height.px]="heightPx()">No data available</div>
+    }
   `,
   styles: `
     :host {
@@ -35,23 +54,94 @@ export type PortfolioGrowthCompareChartData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
+  /**
+   * data range control for chart zoom
+   */
+  dateRangeControl = new FormControl<DateRangeSliderValues>(
+    {
+      dates: [],
+      currentMinDateIndex: 0,
+      currentMaxDateIndex: 0,
+    },
+    { nonNullable: true },
+  );
+
   data = input.required<PortfolioGrowthCompareChartData[]>();
 
-  renderChartEffect = effect(() => {
-    console.log('ttttt', this.data());
-    console.log(' this.initChart(this.data())', this.initChart(this.data()));
-  });
+  dateRangeControlEffect = effect(
+    () => {
+      // no data provided
+      if (this.data().length === 0) {
+        this.dateRangeControl.patchValue({
+          currentMaxDateIndex: 0,
+          currentMinDateIndex: 0,
+          dates: [],
+        });
+        return;
+      }
 
-  chartOption = computed(() => this.initChart(this.data()));
+      // find the data with minimum date
+      const dataMinimalDate = this.data().reduce((acc, curr) =>
+        acc.portfolioGrowth[0].date < curr.portfolioGrowth[0].date ? acc : curr,
+      );
+
+      // find the data with maximum date
+      const dataMaximalDate = this.data().reduce((acc, curr) =>
+        acc.portfolioGrowth[acc.portfolioGrowth.length - 1].date >
+        curr.portfolioGrowth[curr.portfolioGrowth.length - 1].date
+          ? acc
+          : curr,
+      );
+
+      // empty portfolio growth
+      if (dataMinimalDate.portfolioGrowth.length === 0 || dataMaximalDate.portfolioGrowth.length === 0) {
+        return;
+      }
+
+      // get starting and ending date and fill out missing dates
+      // each user can have different starting and ending date and date gap may exists
+      const startingDate = new Date(dataMinimalDate.portfolioGrowth[0].date);
+      const endingDate = new Date(dataMaximalDate.portfolioGrowth[dataMaximalDate.portfolioGrowth.length - 1].date);
+      const dateInterval = fillOutMissingDatesForDate(startingDate, endingDate);
+
+      this.dateRangeControl.patchValue({
+        currentMaxDateIndex: dataMaximalDate.portfolioGrowth.length - 1,
+        currentMinDateIndex: 0,
+        dates: dateInterval,
+      });
+    },
+    { allowSignalWrites: true },
+  );
+
+  /**
+   * create chart options only when date range triggers, otherwise chart is not created
+   */
+  chartOptionsSignal = toSignal(
+    this.dateRangeControl.valueChanges.pipe(
+      map((dateRange) => {
+        const data = this.data();
+        if (!data || !dateRange) {
+          return this.initChart([]);
+        }
+
+        const { currentMinDateIndex, currentMaxDateIndex } = dateRange;
+
+        // filter the data based on the date range
+        const filteredData = data.map((d) => ({
+          userBase: d.userBase,
+          portfolioGrowth: d.portfolioGrowth.slice(currentMinDateIndex, currentMaxDateIndex + 1),
+        }));
+
+        return this.initChart(filteredData);
+      }),
+    ),
+  );
 
   private initChart(data: PortfolioGrowthCompareChartData[]): Highcharts.Options {
     return {
       chart: {
         type: 'line',
         backgroundColor: 'transparent',
-        panning: {
-          enabled: true,
-        },
       },
       noData: {
         style: {
@@ -72,7 +162,7 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
           gridLineWidth: 1,
           minorTickInterval: 'auto',
           tickPixelInterval: 30,
-          minorGridLineWidth: 0,
+          //minorGridLineWidth: 0,
           visible: true,
           labels: {
             style: {
@@ -83,26 +173,23 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
         },
       ],
       xAxis: {
+        visible: true,
+        crosshair: true,
+        type: 'datetime',
+        dateTimeLabelFormats: {
+          day: '%e of %b',
+        },
         labels: {
           rotation: -20,
           enabled: true,
-          format: '{value:%b %e. %Y}',
           style: {
             color: ColorScheme.GRAY_MEDIUM_VAR,
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
-        type: 'datetime',
       },
       title: {
         text: '',
-        align: 'left',
-        y: 0,
-        floating: true,
-        style: {
-          color: ColorScheme.GRAY_MEDIUM_VAR,
-          fontSize: '13px',
-        },
       },
       subtitle: undefined,
       scrollbar: {
@@ -171,21 +258,15 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
         series: {
           borderWidth: 2,
           enableMouseTracking: true,
-          // events: {
-          // 	legendItemClick: function () {
-          // 		return false;
-          // 	},
-          // },
         },
       },
       series: data.map(
         (d) =>
           ({
-            color: ColorScheme.ACCENT_1_VAR,
             type: 'line',
             name: `${d.userBase.personal.displayName}`,
             data: d.portfolioGrowth.map((point) => [Date.parse(point.date), point.totalBalanceValue]),
-          }) satisfies SeriesOptionsType,
+          }) satisfies GenericChartSeries<'line'>,
       ),
     };
   }

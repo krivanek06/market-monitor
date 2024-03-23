@@ -161,6 +161,20 @@ export const fillOutMissingDatesForMonth = <T extends { date: string }>(
   });
 };
 
+export const fillOutMissingDatesForDate = (
+  startingDate: DateInput,
+  endingDate: DateInput,
+  ignoreWeekend = true,
+): string[] => {
+  const startDate = new Date(startingDate);
+  const endDate = new Date(endingDate);
+
+  const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
+  const filteredDates = dateRange.filter((date) => !ignoreWeekend || !isWeekend(date));
+
+  return filteredDates.map((date) => dateFormatDate(date));
+};
+
 /**
  * check if date is in format: yyyy-MM-dd and match
  * yyyy-03-31, yyyy-06-30, yyyy-09-30, yyyy-12-31
