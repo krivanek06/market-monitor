@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { UserApiService } from '@mm/api-client';
 import { UserBase } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
@@ -57,6 +59,8 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     PortfolioTransactionsTableComponent,
     SortByKeyPipe,
     ShowMoreButtonComponent,
+    MatButtonModule,
+    MatIconModule,
   ],
   template: `
     <div class="absolute top-[-100px] left-0 hidden md:flex items-center gap-6 mb=10">
@@ -70,9 +74,15 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     <!-- selected users -->
     <div class="flex items-center flex-wrap gap-x-6 gap-y-3 mb-10">
       @for (user of selectedUsers(); track user.id) {
-        <div class="p-4 block shadow-md min-w-[360px] rounded-md">
-          <app-user-display-item [userData]="user" />
-        </div>
+        <app-general-card>
+          <div class="flex gap-4">
+            <app-user-display-item [userData]="user" />
+            <!-- remove button -->
+            <button mat-icon-button color="warn" (click)="onRemoveUser(user)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </app-general-card>
       }
     </div>
 
@@ -104,20 +114,20 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       </app-general-card>
     </div>
 
-    <app-section-title title="Asset Allocation" />
-    <div class="flex flex-wrap justify-around mb-10">
-      @for (userData of selectedUsersData(); track userData.userBase.id) {
-        <app-pie-chart
-          class="max-sm:w-[325px]"
-          [chartTitle]="'Allocation: ' + userData.userBase.personal.displayNameInitials"
-          [heightPx]="365"
-          [series]="userData.portfolioAssetAllocation"
-        />
-      }
-    </div>
-
-    <!-- holding title -->
     @if (selectedUsersData().length > 0) {
+      <app-section-title title="Asset Allocation" />
+      <div class="flex flex-wrap justify-around mb-10">
+        @for (userData of selectedUsersData(); track userData.userBase.id) {
+          <app-pie-chart
+            class="max-sm:w-[325px]"
+            [chartTitle]="'Allocation: ' + userData.userBase.personal.displayNameInitials"
+            [heightPx]="365"
+            [series]="userData.portfolioAssetAllocation"
+          />
+        }
+      </div>
+
+      <!-- holding title -->
       <div class="flex items-center justify-between mb-4">
         <app-section-title title="Selected User: {{ selectedUser()?.userData?.personal?.displayName }}" />
 
@@ -188,38 +198,40 @@ export class CompareUsersComponent {
   selectedUsersData = toSignal(
     toObservable(this.selectedUsers).pipe(
       mergeMap((users) =>
-        forkJoin(
-          users.map((userBase) =>
-            forkJoin({
-              userData: this.userApiService.getUserById(userBase.id).pipe(filterNil(), take(1)),
-              userTransactions: this.userApiService.getUserPortfolioTransactions(userBase.id).pipe(take(1)),
-            }).pipe(
-              switchMap(({ userData, userTransactions }) =>
+        users.length === 0
+          ? of([])
+          : forkJoin(
+              users.map((userBase) =>
                 forkJoin({
-                  userBase: of(userBase),
-                  userData: of(userData),
-                  userTransactions: of(userTransactions.transactions),
-                  portfolioState: this.portfolioGrowthService
-                    .getPortfolioStateHoldings(userTransactions.transactions, userData.portfolioState)
-                    .pipe(take(1)),
-                  portfolioGrowth: from(
-                    this.portfolioGrowthService.getPortfolioGrowthAssets(userTransactions.transactions),
-                  ).pipe(
-                    map((portfolioGrowth) => this.portfolioCalculationService.getPortfolioGrowth(portfolioGrowth)),
-                  ),
+                  userData: this.userApiService.getUserById(userBase.id).pipe(filterNil(), take(1)),
+                  userTransactions: this.userApiService.getUserPortfolioTransactions(userBase.id).pipe(take(1)),
                 }).pipe(
-                  map((data) => ({
-                    ...data,
-                    portfolioChange: this.portfolioCalculationService.getPortfolioChange(data.portfolioGrowth),
-                    portfolioAssetAllocation: this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(
-                      data.portfolioState.holdings,
+                  switchMap(({ userData, userTransactions }) =>
+                    forkJoin({
+                      userBase: of(userBase),
+                      userData: of(userData),
+                      userTransactions: of(userTransactions.transactions),
+                      portfolioState: this.portfolioGrowthService
+                        .getPortfolioStateHoldings(userTransactions.transactions, userData.portfolioState)
+                        .pipe(take(1)),
+                      portfolioGrowth: from(
+                        this.portfolioGrowthService.getPortfolioGrowthAssets(userTransactions.transactions),
+                      ).pipe(
+                        map((portfolioGrowth) => this.portfolioCalculationService.getPortfolioGrowth(portfolioGrowth)),
+                      ),
+                    }).pipe(
+                      map((data) => ({
+                        ...data,
+                        portfolioChange: this.portfolioCalculationService.getPortfolioChange(data.portfolioGrowth),
+                        portfolioAssetAllocation: this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(
+                          data.portfolioState.holdings,
+                        ),
+                      })),
                     ),
-                  })),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
       ),
     ),
     { initialValue: [] },
@@ -272,6 +284,10 @@ export class CompareUsersComponent {
     } else {
       this.dialogServiceUtil.showNotificationBar('You can compare up to 6 users', 'error');
     }
+  }
+
+  onRemoveUser(user: UserBase) {
+    this.selectedUsers.set(this.selectedUsers().filter((u) => u.id !== user.id));
   }
 
   onSummaryClick(symbol: string) {
