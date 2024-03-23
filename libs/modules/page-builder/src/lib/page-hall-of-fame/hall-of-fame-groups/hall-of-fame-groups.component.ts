@@ -10,7 +10,13 @@ import { GroupBase } from '@mm/api-types';
 import { GroupDisplayItemComponent } from '@mm/group/ui';
 import { PortfolioRankTableComponent } from '@mm/portfolio/ui';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
-import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent } from '@mm/shared/ui';
+import {
+  DefaultImgDirective,
+  GeneralCardComponent,
+  PositionColoringDirective,
+  SectionTitleComponent,
+  ShowMoreButtonComponent,
+} from '@mm/shared/ui';
 
 @Component({
   selector: 'app-hall-of-fame-groups',
@@ -25,6 +31,8 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
     MatDialogModule,
     PositionColoringDirective,
     GroupDisplayItemComponent,
+    GeneralCardComponent,
+    ShowMoreButtonComponent,
   ],
   template: `
     <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4">
@@ -50,18 +58,22 @@ import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent }
           </div>
 
           <!-- table -->
-          <app-portfolio-rank-table
-            (clickedItem)="onGroupClick($event)"
-            [data]="displayPortfolioSignal()"
-            [template]="userTemplate"
-          />
+          <app-general-card>
+            <app-portfolio-rank-table
+              (clickedItem)="onGroupClick($event)"
+              [data]="displayPortfolioDataSignal()"
+              [template]="userTemplate"
+            />
 
-          <!-- show more button -->
-          <div *ngIf="showMoreButtonVisibleSignal()" class="flex justify-end mt-4">
-            <button (click)="showMoreToggle()" mat-stroked-button color="primary" type="button">
-              {{ showMoreSignal() ? 'Show Less' : ' Show More' }}
-            </button>
-          </div>
+            <!-- show more button -->
+            <div class="flex justify-end">
+              <app-show-more-button
+                [itemsTotal]="displayPortfolioSignal().length"
+                [itemsLimit]="displayGroupsLimit"
+                [(showMoreToggle)]="showMoreSignal"
+              />
+            </div>
+          </app-general-card>
         </div>
         <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
           <!-- daily best -->
@@ -135,20 +147,22 @@ export class HallOfFameGroupsComponent {
   /**
    * limit number of groups to display, display rest on "show more"
    */
-  private displayUsersLimit = 20;
+  readonly displayGroupsLimit = 20;
 
   hallOfFameGroupsSignal = toSignal(this.aggregationApiService.getHallOfFameGroups());
 
-  displayPortfolioSignal = computed(() => {
-    const data = this.showBestSignal()
+  displayPortfolioSignal = computed(() =>
+    this.showBestSignal()
       ? this.hallOfFameGroupsSignal()?.bestPortfolio ?? []
-      : this.hallOfFameGroupsSignal()?.worstPortfolio ?? [];
-    return !this.showMoreSignal() ? data.slice(0, this.displayUsersLimit) : data;
-  });
-
-  showMoreButtonVisibleSignal = computed(
-    () => (this.hallOfFameGroupsSignal()?.bestPortfolio?.length ?? 0) > this.displayUsersLimit,
+      : this.hallOfFameGroupsSignal()?.worstPortfolio ?? [],
   );
+
+  displayPortfolioDataSignal = computed(() =>
+    this.showMoreSignal()
+      ? this.displayPortfolioSignal()
+      : this.displayPortfolioSignal().slice(0, this.displayGroupsLimit),
+  );
+
   /**
    * if true shows more groups, if false shows less groups
    */
@@ -158,10 +172,6 @@ export class HallOfFameGroupsComponent {
    * if true shows best groups, if false shows worst groups
    */
   showBestSignal = signal(true);
-
-  showMoreToggle() {
-    this.showMoreSignal.set(!this.showMoreSignal());
-  }
 
   showBestToggle() {
     this.showBestSignal.set(!this.showBestSignal());

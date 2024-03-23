@@ -22,7 +22,11 @@ type SubPages = 'users' | 'groups' | 'compare-users';
   ],
   template: `
     <div class="flex justify-end mb-6 lg:mb-10">
-      <app-tab-select-control [formControl]="currentPageControl" [displayOptions]="navLabels"></app-tab-select-control>
+      <app-tab-select-control
+        class="max-md:w-full"
+        [formControl]="currentPageControl"
+        [displayOptions]="navLabels"
+      ></app-tab-select-control>
     </div>
     <div class="relative">
       @if (currentPageControl.value === 'users') {

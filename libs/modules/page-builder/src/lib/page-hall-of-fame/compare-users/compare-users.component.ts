@@ -63,19 +63,24 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     MatIconModule,
   ],
   template: `
-    <div class="absolute top-[-100px] left-0 hidden md:flex items-center gap-6 mb=10">
+    <div
+      class="xl:absolute xl:top-[-100px] xl:left-0 flex flex-col md:flex-row justify-between md:items-center gap-6 mb-10"
+    >
       <!-- title -->
       <app-section-title matIcon="diversity_3" title="Compare Users" />
 
       <!-- search users -->
-      <app-user-search-control class="scale-90 w-[500px] mt-3" (selectedUserEmitter)="onUserClick($event)" />
+      <app-user-search-control
+        class="md:scale-90 w-full md:w-[500px] xl:mt-3"
+        (selectedUserEmitter)="onUserClick($event)"
+      />
     </div>
 
     <!-- selected users -->
-    <div class="flex items-center flex-wrap gap-x-6 gap-y-3 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-3 mb-10">
       @for (user of selectedUsers(); track user.id) {
         <app-general-card>
-          <div class="flex gap-4">
+          <div class="flex gap-4 justify-between">
             <app-user-display-item [userData]="user" />
             <!-- remove button -->
             <button mat-icon-button color="warn" (click)="onRemoveUser(user)">
@@ -108,23 +113,26 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     </div>
 
     <!-- portfolio change table -->
-    <div class="mb-10">
+    <div class="mb-10 hidden md:block">
       <app-general-card title="Period Change">
         <app-portfolio-period-change-table [data]="selectedUsersData()" />
       </app-general-card>
     </div>
 
     @if (selectedUsersData().length > 0) {
-      <app-section-title title="Asset Allocation" />
-      <div class="flex flex-wrap justify-around mb-10">
-        @for (userData of selectedUsersData(); track userData.userBase.id) {
-          <app-pie-chart
-            class="max-sm:w-[325px]"
-            [chartTitle]="'Allocation: ' + userData.userBase.personal.displayNameInitials"
-            [heightPx]="365"
-            [series]="userData.portfolioAssetAllocation"
-          />
-        }
+      <!-- allocation charts -->
+      <div class="hidden md:block">
+        <app-section-title title="Asset Allocation" />
+        <div class="grid grid-cols-2 xl:grid-cols-3 mb-10">
+          @for (userData of selectedUsersData(); track userData.userBase.id) {
+            <app-pie-chart
+              class="max-sm:w-[325px]"
+              [chartTitle]="'Allocation: ' + userData.userBase.personal.displayNameInitials"
+              [heightPx]="365"
+              [series]="userData.portfolioAssetAllocation"
+            />
+          }
+        </div>
       </div>
 
       <!-- holding title -->

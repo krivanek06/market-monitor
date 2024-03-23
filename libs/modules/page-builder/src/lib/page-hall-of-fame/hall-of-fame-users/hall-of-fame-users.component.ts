@@ -9,7 +9,13 @@ import { UserBase } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { PortfolioRankTableComponent } from '@mm/portfolio/ui';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { DefaultImgDirective, PositionColoringDirective, SectionTitleComponent } from '@mm/shared/ui';
+import {
+  DefaultImgDirective,
+  GeneralCardComponent,
+  PositionColoringDirective,
+  SectionTitleComponent,
+  ShowMoreButtonComponent,
+} from '@mm/shared/ui';
 import {
   UserDetailsDialogComponent,
   UserDetailsDialogComponentData,
@@ -32,23 +38,26 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     MatDialogModule,
     PositionColoringDirective,
     UserSearchControlComponent,
+    ShowMoreButtonComponent,
+    GeneralCardComponent,
   ],
   template: `
-    <div class="absolute top-[-100px] left-0 hidden md:flex items-center gap-6">
+    <div
+      class="xl:absolute xl:top-[-100px] xl:left-0 flex flex-col md:flex-row justify-between md:items-center gap-6 mb-10"
+    >
       <!-- display user rank -->
       <app-section-title
-        class=""
         matIcon="military_tech"
         title="My rank: {{ userDataSignal().systemRank?.portfolioTotalGainsPercentage?.rank ?? 'N/A' }}"
       />
       <!-- search users -->
       <app-user-search-control
-        class="scale-90 w-[500px] mt-3"
+        class="md:scale-90 w-full md:w-[500px] xl:mt-3"
         (selectedUserEmitter)="onUserClick($event)"
       ></app-user-search-control>
     </div>
 
-    <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4">
+    <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4 overflow-y-clip">
       @if (hallOfFameUsersSignal(); as hallOfFameUses) {
         <div class="lg:basis-4/6 xl:basis-3/6">
           <div class="flex items-center justify-between lg:px-2 mb-4">
@@ -71,18 +80,22 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
           </div>
 
           <!-- table -->
-          <app-portfolio-rank-table
-            (clickedItem)="onUserClick($event)"
-            [data]="displayPortfolioSignal()"
-            [template]="userTemplate"
-          />
+          <app-general-card>
+            <app-portfolio-rank-table
+              (clickedItem)="onUserClick($event)"
+              [data]="displayPortfolioDataSignal()"
+              [template]="userTemplate"
+            />
 
-          <!-- show more button -->
-          <div *ngIf="showMoreButtonVisibleSignal()" class="flex justify-end mt-4">
-            <button (click)="showMoreToggle()" mat-stroked-button color="primary" type="button">
-              {{ showMoreSignal() ? 'Show Less' : ' Show More' }}
-            </button>
-          </div>
+            <!-- show more button -->
+            <div class="flex justify-end">
+              <app-show-more-button
+                [itemsTotal]="displayPortfolioSignal().length"
+                [itemsLimit]="displayUsersLimit"
+                [(showMoreToggle)]="showMoreSignal"
+              />
+            </div>
+          </app-general-card>
         </div>
         <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
           <!-- daily best -->
@@ -160,21 +173,21 @@ export class HallOfFameUsersComponent {
   /**
    * limit number of users to display, display rest on "show more"
    */
-  private displayUsersLimit = 20;
+  readonly displayUsersLimit = 20;
 
   userDataSignal = this.authenticationUserStoreService.state.getUserData;
 
   hallOfFameUsersSignal = toSignal(this.aggregationApiService.getHallOfFameUsers());
 
-  displayPortfolioSignal = computed(() => {
-    const data = this.showBestSignal()
+  displayPortfolioSignal = computed(() =>
+    this.showBestSignal()
       ? this.hallOfFameUsersSignal()?.bestPortfolio ?? []
-      : this.hallOfFameUsersSignal()?.worstPortfolio ?? [];
-    return !this.showMoreSignal() ? data.slice(0, this.displayUsersLimit) : data;
-  });
-
-  showMoreButtonVisibleSignal = computed(
-    () => (this.hallOfFameUsersSignal()?.bestPortfolio?.length ?? 0) > this.displayUsersLimit,
+      : this.hallOfFameUsersSignal()?.worstPortfolio ?? [],
+  );
+  displayPortfolioDataSignal = computed(() =>
+    this.showMoreSignal()
+      ? this.displayPortfolioSignal()
+      : this.displayPortfolioSignal().slice(0, this.displayUsersLimit),
   );
 
   /**
@@ -194,10 +207,6 @@ export class HallOfFameUsersComponent {
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });
-  }
-
-  showMoreToggle() {
-    this.showMoreSignal.set(!this.showMoreSignal());
   }
 
   showBestToggle() {

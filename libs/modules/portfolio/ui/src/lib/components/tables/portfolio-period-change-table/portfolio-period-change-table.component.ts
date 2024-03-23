@@ -18,7 +18,7 @@ export type PortfolioPeriodChangeTableComponentData = {
     <table mat-table [dataSource]="dataSource" [trackBy]="identity">
       <!-- name -->
       <ng-container matColumnDef="user">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">User</th>
+        <th mat-header-cell *matHeaderCellDef>User</th>
         <td mat-cell *matCellDef="let row">
           <div class="flex items-center gap-2 text-wt-gray-dark">
             <img appDefaultImg [src]="row.userBase.personal.photoURL" alt="user" class="w-8 h-8 rounded-full" />
@@ -29,7 +29,7 @@ export type PortfolioPeriodChangeTableComponentData = {
 
       <!-- 1_day -->
       <ng-container matColumnDef="1_day">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Return Daily</th>
+        <th mat-header-cell *matHeaderCellDef>Return Daily</th>
         <td mat-cell *matCellDef="let row">
           <div
             appPercentageIncrease
@@ -44,7 +44,7 @@ export type PortfolioPeriodChangeTableComponentData = {
 
       <!-- 1_week -->
       <ng-container matColumnDef="1_week">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Return Weekly</th>
+        <th mat-header-cell *matHeaderCellDef>Return Weekly</th>
         <td mat-cell *matCellDef="let row">
           <div
             appPercentageIncrease
@@ -59,7 +59,7 @@ export type PortfolioPeriodChangeTableComponentData = {
 
       <!-- 2_week -->
       <ng-container matColumnDef="2_week">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Return 2 Weeks</th>
+        <th mat-header-cell *matHeaderCellDef>Return 2 Weeks</th>
         <td mat-cell *matCellDef="let row">
           <div
             appPercentageIncrease
@@ -74,7 +74,7 @@ export type PortfolioPeriodChangeTableComponentData = {
 
       <!-- 1_month -->
       <ng-container matColumnDef="1_month">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Return Monthly</th>
+        <th mat-header-cell *matHeaderCellDef>Return Monthly</th>
         <td mat-cell *matCellDef="let row">
           <div
             appPercentageIncrease
@@ -89,8 +89,8 @@ export type PortfolioPeriodChangeTableComponentData = {
 
       <!-- 3_month -->
       <ng-container matColumnDef="3_month">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Return Quarterly</th>
-        <td mat-cell *matCellDef="let row">
+        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">Return Quarterly</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div
             appPercentageIncrease
             [useCurrencySign]="true"
@@ -104,8 +104,8 @@ export type PortfolioPeriodChangeTableComponentData = {
 
       <!-- total -->
       <ng-container matColumnDef="total">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Return Total</th>
-        <td mat-cell *matCellDef="let row">
+        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">Return Total</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div
             appPercentageIncrease
             [useCurrencySign]="true"
@@ -117,7 +117,7 @@ export type PortfolioPeriodChangeTableComponentData = {
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr
         mat-row
         *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"
