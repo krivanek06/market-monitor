@@ -63,12 +63,9 @@ import { BehaviorSubject, combineLatest, map, pipe, startWith } from 'rxjs';
         [Highcharts]="Highcharts"
         [options]="chartOptionsSignal()"
         [callbackFunction]="chartCallback"
-        [(update)]="updateFromInput"
-        [oneToOne]="true"
-        style="width: 100%; display: block"
         [style.height.px]="heightPx()"
-      >
-      </highcharts-chart>
+        style="width: 100%; display: block"
+      />
     </section>
   `,
   styles: `

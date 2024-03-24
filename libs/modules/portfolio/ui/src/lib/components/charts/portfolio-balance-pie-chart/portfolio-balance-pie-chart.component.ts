@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { PortfolioState } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
@@ -12,14 +12,12 @@ import { HighchartsChartModule } from 'highcharts-angular';
   template: `
     <highcharts-chart
       *ngIf="isHighcharts"
-      [(update)]="updateFromInput"
       [Highcharts]="Highcharts"
+      [options]="chartOptionSignal()"
       [callbackFunction]="chartCallback"
-      [options]="chartOptions"
       [style.height.px]="heightPx()"
       style="display: block; width: 100%"
-    >
-    </highcharts-chart>
+    />
   `,
   styles: `
     :host {
@@ -29,12 +27,12 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioBalancePieChartComponent extends ChartConstructor {
-  @Input({ required: true }) set data(input: PortfolioState) {
-    this.initChart(input);
-  }
+  data = input.required<PortfolioState>();
 
-  private initChart(data: PortfolioState) {
-    this.chartOptions = {
+  chartOptionSignal = computed(() => this.initChart(this.data()));
+
+  private initChart(data: PortfolioState): Highcharts.Options {
+    return {
       chart: {
         type: 'pie',
         backgroundColor: 'transparent',

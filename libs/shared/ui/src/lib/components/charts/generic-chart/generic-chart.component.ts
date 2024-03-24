@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnChanges, OnDestroy, SimpleChanges, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -37,21 +37,14 @@ type ChartInputType = Highcharts.SeriesOptionsType[];
       <highcharts-chart
         *ngIf="isHighcharts"
         [Highcharts]="Highcharts"
-        [options]="chartOptions"
-        [callbackFunction]="chartCallback"
-        [(update)]="updateFromInput"
-        [oneToOne]="true"
-        style="width: 100%; display: block"
+        [options]="chartOptionsSignal()"
         [style.height.px]="heightPx()"
-      >
-      </highcharts-chart>
+        style="width: 100%; display: block"
+      />
     </div>
   `,
 })
-export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type']>
-  extends ChartConstructor
-  implements OnChanges, OnDestroy
-{
+export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type']> extends ChartConstructor {
   expandEmitter = output<void>();
 
   series = input.required<GenericChartSeries<T>[]>();
@@ -80,66 +73,53 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
   showExpandableButton = input(false);
   applyFancyColor = input(0);
   isCategoryDates = input(false);
-  ngOnDestroy(): void {
-    console.log('GenericChartComponent: ngOnDestroy()');
-  }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (!this.Highcharts || this.platform.isServer) {
-      return;
+  chartOptionsSignal = computed(() => {
+    const series = this.applyFancyColor() > 0 ? this.fancyColoring(this.series()) : this.series();
+
+    const chartOptions = this.initChart(series);
+
+    if (this.floatingLegend() && chartOptions.legend) {
+      chartOptions.legend.floating = true;
+      chartOptions.legend.layout = 'vertical';
+      chartOptions.legend.x = -150;
+      chartOptions.legend.y = 10;
+      chartOptions.legend.align = 'center';
+      chartOptions.legend.verticalAlign = 'middle';
     }
 
-    const series = this.applyFancyColor() > 0 ? this.fancyColoring() : this.series();
-
-    this.initChart(series);
-
-    if (this.floatingLegend() && this.chartOptions.legend) {
-      this.chartOptions.legend.floating = true;
-      this.chartOptions.legend.layout = 'vertical';
-      this.chartOptions.legend.x = -150;
-      this.chartOptions.legend.y = 10;
-      this.chartOptions.legend.align = 'center';
-      this.chartOptions.legend.verticalAlign = 'middle';
-    }
-
-    if (this.chartType() === 'column' && this.chartOptions.xAxis) {
-      this.chartOptions.xAxis = {
-        ...this.chartOptions.xAxis,
+    if (this.chartType() === 'column' && chartOptions.xAxis) {
+      chartOptions.xAxis = {
+        ...chartOptions.xAxis,
         type: 'category',
       };
-    } else if (this.chartType() === 'column' && this.chartOptions.xAxis) {
-      this.chartOptions.xAxis = {
-        ...this.chartOptions.xAxis,
+    } else if (this.chartType() === 'column' && chartOptions.xAxis) {
+      chartOptions.xAxis = {
+        ...chartOptions.xAxis,
         type: 'category',
       };
-    } else if (this.chartType() === 'area') {
-      this.initAreaChange();
     }
 
-    if (this.categories().length > 0) {
-      this.initCategories();
-    }
-  }
-
-  expand() {
-    this.expandEmitter.emit();
-  }
-
-  private initCategories() {
-    //this.chartOptions.plotOptions!.series!.dataLabels!. = false;
-    if (this.chartOptions.xAxis) {
-      this.chartOptions.xAxis = {
-        ...this.chartOptions.xAxis,
+    if (this.categories().length > 0 && chartOptions.xAxis) {
+      //this.initCategories();
+      chartOptions.xAxis = {
+        ...chartOptions.xAxis,
         categories: this.isCategoryDates()
           ? this.categories().map((d) => format(new Date(d), 'MMM dd, yyyy'))
           : this.categories(),
         type: 'category',
       };
     }
+
+    return chartOptions;
+  });
+
+  expand() {
+    this.expandEmitter.emit();
   }
 
-  private initChart(series: ChartInputType) {
-    this.chartOptions = {
+  private initChart(series: ChartInputType): Highcharts.Options {
+    return {
       chart: {
         type: this.chartType(),
         backgroundColor: 'transparent',
@@ -422,17 +402,14 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
             },
           },
         },
-        areaspline: {
-          threshold: null,
-        },
       },
       series: [...series] as Highcharts.SeriesOptionsType[],
     };
   }
 
-  private fancyColoring(): GenericChartSeries<T>[] {
+  private fancyColoring<K extends GenericChartSeries<T>>(series: K[]): K[] {
     let count = this.applyFancyColor();
-    const newSeries = this.series().map((s) => {
+    const newSeries = series.map((s) => {
       const data = {
         type: s.type,
         name: s.name,
@@ -450,42 +427,5 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
     });
 
     return newSeries;
-  }
-
-  private initAreaChange() {
-    if (this.series().length === 0) {
-      console.warn('Cannot init initAreaChange in Generic chart, empty series');
-      return;
-    }
-    const data = ((this.series()[0] as any)?.data as number[]) ?? [];
-    const oldestData = data[0] as number;
-    const newestData = data[data.length - 1] as number;
-    const color = oldestData > newestData ? '#ff1010' : '#0d920d';
-
-    this.chartOptions = {
-      ...this.chartOptions,
-      chart: {
-        type: 'areaspline',
-      },
-      plotOptions: {
-        ...this.chartOptions.plotOptions,
-        areaspline: {
-          ...this.chartOptions.plotOptions!.area,
-          lineColor: color,
-          fillColor: {
-            linearGradient: {
-              x1: 0,
-              y1: 0,
-              x2: 0,
-              y2: 1,
-            },
-            stops: [
-              [0, color],
-              [1, 'rgb(15 26 69)'],
-            ],
-          },
-        },
-      },
-    };
   }
 }

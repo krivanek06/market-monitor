@@ -34,10 +34,9 @@ export type PortfolioGrowthCompareChartData = {
       @if (chartOptionsSignal(); as chartOptionsSignal) {
         <highcharts-chart
           *ngIf="isHighcharts"
-          [(update)]="updateFromInput"
           [Highcharts]="Highcharts"
-          [callbackFunction]="chartCallback"
           [options]="chartOptionsSignal"
+          [callbackFunction]="chartCallback"
           [style.height.px]="heightPx()"
           style="display: block; width: 100%"
         />

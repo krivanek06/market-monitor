@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnChanges, SimpleChanges, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowth } from '@mm/portfolio/data-access';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
@@ -12,7 +13,7 @@ import {
 } from '@mm/shared/ui';
 import { SeriesOptionsType } from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { filterNil } from 'ngxtension/filter-nil';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-growth-chart',
@@ -31,16 +32,19 @@ import { filterNil } from 'ngxtension/filter-nil';
       />
     </div>
 
-    <highcharts-chart
-      *ngIf="isHighcharts"
-      [(update)]="updateFromInput"
-      [Highcharts]="Highcharts"
-      [callbackFunction]="chartCallback"
-      [options]="chartOptions"
-      [style.height.px]="heightPx()"
-      style="display: block; width: 100%"
-    >
-    </highcharts-chart>
+    <!-- chart -->
+    @if ((chartOptionsSignal().series?.length ?? 0) > 0) {
+      <highcharts-chart
+        *ngIf="isHighcharts"
+        [Highcharts]="Highcharts"
+        [options]="chartOptionsSignal()"
+        [callbackFunction]="chartCallback"
+        [style.height.px]="heightPx()"
+        style="display: block; width: 100%"
+      />
+    } @else {
+      <div class="grid place-content-center text-base" [style.height.px]="heightPx()">No data available</div>
+    }
   `,
   styles: `
     :host {
@@ -49,7 +53,7 @@ import { filterNil } from 'ngxtension/filter-nil';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PortfolioGrowthChartComponent extends ChartConstructor implements OnChanges {
+export class PortfolioGrowthChartComponent extends ChartConstructor {
   displayHeader = input(false);
   headerTitle = input<string>('');
   data = input.required<{
@@ -59,38 +63,48 @@ export class PortfolioGrowthChartComponent extends ChartConstructor implements O
   displayLegend = input(false);
   chartType = input<'all' | 'marketValue' | 'balance'>('all');
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'].currentValue) {
-      console.log('render chart');
-      const input = changes['data'].currentValue as { values: PortfolioGrowth[]; startingCashValue: number };
+  sliderControl = new FormControl<DateRangeSliderValues>(
+    {
+      currentMaxDateIndex: 0,
+      currentMinDateIndex: 0,
+      dates: [],
+    },
+    { nonNullable: true },
+  );
 
+  initSliderEffect = effect(
+    () => {
+      const dataValues = this.data();
+
+      // create slider values
       const sliderValuesInput: DateRangeSliderValues = {
-        dates: input.values.map((point) => point.date),
+        dates: dataValues.values.map((point) => point.date),
         currentMinDateIndex: 0,
-        currentMaxDateIndex: input.values.length - 1,
+        currentMaxDateIndex: dataValues.values.length - 1,
       };
       this.sliderControl.patchValue(sliderValuesInput);
+    },
+    { allowSignalWrites: true },
+  );
 
-      // init chart
-      const seriesData = this.createChartSeries(input.values, input.startingCashValue);
-      this.initChart(seriesData);
+  chartOptionsSignal = toSignal(
+    this.sliderControl.valueChanges.pipe(
+      map((sliderValues) => {
+        const dataValues = this.data();
 
-      this.sliderControl.valueChanges.pipe(filterNil()).subscribe((sliderValues) => {
         // filter out by valid dates
-        const inputValues = filterDataByDateRange(input.values, sliderValues);
-        const seriesDataUpdate = this.createChartSeries(inputValues, input.startingCashValue);
-        // update chart
-        this.chartOptions.series = seriesDataUpdate;
-        this.updateFromInput = true;
-      });
-    }
-  }
-  sliderControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
+        const inputValues = filterDataByDateRange(dataValues.values, sliderValues);
+        const seriesDataUpdate = this.createChartSeries(inputValues, dataValues.startingCashValue);
 
-  private initChart(data: SeriesOptionsType[]) {
-    //const isCashActive = startingCashValue > 0;
+        // create chart
+        return this.initChart(seriesDataUpdate);
+      }),
+    ),
+    { initialValue: this.initChart([]) },
+  );
 
-    this.chartOptions = {
+  private initChart(data: SeriesOptionsType[]): Highcharts.Options {
+    return {
       chart: {
         type: 'area',
         backgroundColor: 'transparent',

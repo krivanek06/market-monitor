@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowth } from '@mm/portfolio/data-access';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
@@ -11,8 +12,7 @@ import {
   filterDataByDateRange,
 } from '@mm/shared/ui';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { filterNil } from 'ngxtension/filter-nil';
-import { startWith } from 'rxjs';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-change-chart',
@@ -30,14 +30,11 @@ import { startWith } from 'rxjs';
 
     <highcharts-chart
       *ngIf="isHighcharts"
-      [(update)]="updateFromInput"
       [Highcharts]="Highcharts"
-      [callbackFunction]="chartCallback"
-      [options]="chartOptions"
+      [options]="chartOptionSignal()"
       [style.height.px]="heightPx()"
       style="display: block; width: 100%"
-    >
-    </highcharts-chart>
+    />
   `,
   styles: `
     :host {
@@ -47,36 +44,52 @@ import { startWith } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioChangeChartComponent extends ChartConstructor {
-  sliderControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
-
-  @Input({ required: true }) set data(input: PortfolioGrowth[]) {
-    const sliderValues: DateRangeSliderValues = {
-      dates: input.map((point) => point.date),
+  data = input.required<PortfolioGrowth[] | null>();
+  sliderControl = new FormControl<DateRangeSliderValues>(
+    {
+      currentMaxDateIndex: 0,
       currentMinDateIndex: 0,
-      currentMaxDateIndex: input.length - 1,
-    };
+      dates: [],
+    },
+    { nonNullable: true },
+  );
 
-    this.sliderControl.patchValue(sliderValues);
-    this.initSlider(input);
-  }
+  chartOptionSignal = toSignal(
+    this.sliderControl.valueChanges.pipe(
+      map((sliderValues) => {
+        const inputData = this.data() ?? [];
+        const inputValues = filterDataByDateRange(inputData, sliderValues);
+        const data: number[][] = [];
+        for (let i = 1; i < inputValues.length; i++) {
+          const current = inputValues[i].totalBalanceValue;
+          const before = inputValues[i - 1].totalBalanceValue;
 
-  private initSlider(input: PortfolioGrowth[]): void {
-    this.sliderControl.valueChanges.pipe(startWith(this.sliderControl.value), filterNil()).subscribe((sliderValues) => {
-      const inputValues = filterDataByDateRange(input, sliderValues);
-      const data: number[][] = [];
-      for (let i = 1; i < inputValues.length; i++) {
-        const current = inputValues[i].totalBalanceValue;
-        const before = inputValues[i - 1].totalBalanceValue;
+          data.push([Date.parse(inputValues[i].date), current - before, (current / 100) * before]);
+        }
 
-        data.push([Date.parse(inputValues[i].date), current - before, (current / 100) * before]);
-      }
+        return this.initChart(data);
+      }),
+    ),
+    {
+      initialValue: this.initChart([]),
+    },
+  );
 
-      this.initChart(data);
-    });
-  }
+  initSliderEffect = effect(
+    () => {
+      const inputValues = this.data() ?? [];
+      const sliderValues: DateRangeSliderValues = {
+        dates: inputValues.map((point) => point.date),
+        currentMinDateIndex: 0,
+        currentMaxDateIndex: inputValues.length - 1,
+      };
+      this.sliderControl.patchValue(sliderValues);
+    },
+    { allowSignalWrites: true },
+  );
 
-  private initChart(data: number[][]) {
-    this.chartOptions = {
+  private initChart(data: number[][]): Highcharts.Options {
+    return {
       chart: {
         type: 'area',
         backgroundColor: 'transparent',

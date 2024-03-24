@@ -285,7 +285,7 @@ export class PageDashboardComponent {
     this.dialogServiceUtil.showGenericDialog({
       component: PortfolioChangeChartComponent,
       componentData: {
-        data: this.portfolioUserFacadeService.getPortfolioGrowth() ?? [],
+        data: this.portfolioUserFacadeService.getPortfolioGrowth,
       },
     });
   }

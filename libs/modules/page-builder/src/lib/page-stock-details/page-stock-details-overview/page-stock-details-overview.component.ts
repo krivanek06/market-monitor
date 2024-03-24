@@ -63,27 +63,27 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             [title]="stockDetailsSignal.quote.name"
             [symbol]="stockDetailsSignal.quote.symbol"
             [chartHeightPx]="480"
-          ></app-asset-price-chart-interactive>
+          />
         </div>
 
         <!-- summary -->
         <app-general-card class="xl:-mt-6" title="Summary">
-          <app-stock-summary-list [symbolSummary]="stockDetailsSignal"></app-stock-summary-list>
+          <app-stock-summary-list [symbolSummary]="stockDetailsSignal" />
         </app-general-card>
 
         <!-- financial strength -->
         <app-general-card additionalClasses="h-full" title="Financial Strength">
-          <app-name-value-list [items]="financialStrengthSignal()"></app-name-value-list>
+          <app-name-value-list [items]="financialStrengthSignal()" />
         </app-general-card>
 
         <!-- financial ratio 1 -->
         <app-general-card additionalClasses="h-full" title="Financial Ratio">
-          <app-name-value-list [items]="financialRatio1Signal()"></app-name-value-list>
+          <app-name-value-list [items]="financialRatio1Signal()" />
         </app-general-card>
 
         <!-- financial ratio 2 -->
         <app-general-card additionalClasses="h-full" title="Financial Ratio">
-          <app-name-value-list [items]="financialRatio2Signal()"></app-name-value-list>
+          <app-name-value-list [items]="financialRatio2Signal()" />
         </app-general-card>
 
         <!-- earnings -->
@@ -92,33 +92,27 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
             [data]="estimationChartDataSignal.earnings"
             [heightPx]="400"
-          ></app-earnings-estimation-chart>
+          />
         </app-general-card>
 
         <!-- recommendation -->
         <app-general-card title="Recommendation Chart">
-          <app-stock-recommendation-chart
-            [heightPx]="400"
-            [data]="stockDetailsSignal.recommendationTrends"
-          ></app-stock-recommendation-chart>
+          <app-stock-recommendation-chart [heightPx]="400" [data]="stockDetailsSignal.recommendationTrends" />
         </app-general-card>
 
         <!-- financial per share -->
         <app-general-card additionalClasses="h-full" title="Financial Per Share">
-          <app-name-value-list [items]="financialPerShareSignal()"></app-name-value-list>
+          <app-name-value-list [items]="financialPerShareSignal()" />
         </app-general-card>
 
         <!-- financial operating -->
         <app-general-card additionalClasses="h-full" title="Financial Operating">
-          <app-name-value-list [items]="financialOperatingSignal()"></app-name-value-list>
+          <app-name-value-list [items]="financialOperatingSignal()" />
         </app-general-card>
 
         <!-- dividends -->
         <app-general-card additionalClasses="h-full" title="Dividends">
-          <app-name-value-list
-            *ngIf="financialDividendsSignal().length > 0"
-            [items]="financialDividendsSignal()"
-          ></app-name-value-list>
+          <app-name-value-list *ngIf="financialDividendsSignal().length > 0" [items]="financialDividendsSignal()" />
         </app-general-card>
       </div>
 

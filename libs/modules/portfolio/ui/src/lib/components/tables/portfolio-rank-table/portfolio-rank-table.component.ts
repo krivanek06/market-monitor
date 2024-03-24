@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, TemplateRef, TrackByFunction, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, TrackByFunction, effect, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -93,12 +93,15 @@ export class PortfolioRankTableComponent<
   /**
    * data to be displayed in the table
    */
-  @Input({ required: true }) set data(input: T[]) {
-    this.dataSource = new MatTableDataSource(input);
-  }
+  data = input.required<T[]>();
+
+  tableEffect = effect(() => {
+    this.dataSource.data = this.data();
+    this.dataSource._updateChangeSubscription();
+  });
 
   displayedColumns: string[] = ['itemTemplate', 'balance', 'profit'];
-  dataSource!: MatTableDataSource<T>;
+  dataSource = new MatTableDataSource<T>([]);
 
   identity: TrackByFunction<T> = (index: number, item: T) => item.item.id;
 

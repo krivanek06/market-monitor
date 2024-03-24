@@ -220,9 +220,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       <!-- transaction chart -->
       <div *ngIf="groupDetailsSignal.groupTransactionsData.length > 5" class="mb-6">
         <app-section-title title="Last Transactions" matIcon="history" />
-        <app-portfolio-transaction-chart
-          [data]="groupDetailsSignal.groupPortfolioSnapshotsData"
-        ></app-portfolio-transaction-chart>
+        <app-portfolio-transaction-chart [data]="groupDetailsSignal.groupPortfolioSnapshotsData" />
       </div>
 
       <!-- transactions -->

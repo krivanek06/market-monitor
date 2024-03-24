@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { PortfolioTransactionToDate } from '@mm/portfolio/data-access';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
@@ -12,14 +12,12 @@ import { HighchartsChartModule } from 'highcharts-angular';
   template: `
     <highcharts-chart
       *ngIf="isHighcharts"
-      [(update)]="updateFromInput"
       [Highcharts]="Highcharts"
+      [options]="chartOptionsSignal()"
       [callbackFunction]="chartCallback"
-      [options]="chartOptions"
       [style.height.px]="heightPx()"
       style="display: block; width: 100%"
-    >
-    </highcharts-chart>
+    />
   `,
   styles: `
     :host {
@@ -29,13 +27,11 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioTransactionChartComponent extends ChartConstructor {
-  @Input({ required: true }) set data(input: PortfolioTransactionToDate[]) {
-    console.log('PortfolioTransactionChartComponent', input);
-    this.initChart(input);
-  }
+  data = input.required<PortfolioTransactionToDate[]>();
+  chartOptionsSignal = computed(() => this.initChart(this.data()));
 
-  private initChart(data: PortfolioTransactionToDate[]) {
-    this.chartOptions = {
+  private initChart(data: PortfolioTransactionToDate[]): Highcharts.Options {
+    return {
       chart: {
         type: 'area',
         backgroundColor: 'transparent',
@@ -108,13 +104,6 @@ export class PortfolioTransactionChartComponent extends ChartConstructor {
       },
       title: {
         text: '',
-        align: 'left',
-        y: 0,
-        floating: true,
-        style: {
-          color: ColorScheme.GRAY_MEDIUM_VAR,
-          fontSize: '13px',
-        },
       },
       subtitle: {
         text: '',
