@@ -9,10 +9,9 @@ import { HighchartsChartModule } from 'highcharts-angular';
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { ngSkipHydration: 'true' },
   template: `
     <highcharts-chart
-      *ngIf="isHighcharts"
+      *ngIf="isHighcharts()"
       [Highcharts]="Highcharts"
       [options]="chartOptionsSignal()"
       [callbackFunction]="chartCallback"

@@ -33,7 +33,7 @@ export type PortfolioGrowthCompareChartData = {
     @if (chartOptionsSignal() && dateRangeControl.value.dates.length > 0) {
       @if (chartOptionsSignal(); as chartOptionsSignal) {
         <highcharts-chart
-          *ngIf="isHighcharts"
+          *ngIf="isHighcharts()"
           [Highcharts]="Highcharts"
           [options]="chartOptionsSignal"
           [callbackFunction]="chartCallback"

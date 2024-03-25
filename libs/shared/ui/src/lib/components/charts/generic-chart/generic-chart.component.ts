@@ -35,7 +35,7 @@ type ChartInputType = Highcharts.SeriesOptionsType[];
       </button>
 
       <highcharts-chart
-        *ngIf="isHighcharts"
+        *ngIf="isHighcharts()"
         [Highcharts]="Highcharts"
         [options]="chartOptionsSignal()"
         [style.height.px]="heightPx()"
@@ -110,7 +110,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
         type: 'category',
       };
     }
-
+    console.log('chartOptions', chartOptions);
     return chartOptions;
   });
 

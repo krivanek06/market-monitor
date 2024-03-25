@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -115,12 +115,16 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
 export class NewsSearchComponent {
   showForm = input(false);
   initialNewsToDisplay = input(16);
-  @Input({ required: true }) set searchData(value: { newsType: NewsTypes; symbol?: string }) {
+
+  searchData = input.required<{ newsType: NewsTypes; symbol?: string }>();
+
+  searchDataEffect = effect(() => {
+    const value = this.searchData();
     this.newSearchFormGroup.patchValue({
       newsType: value.newsType,
       symbol: value.symbol ?? '',
     });
-  }
+  });
 
   marketApiService = inject(MarketApiService);
 

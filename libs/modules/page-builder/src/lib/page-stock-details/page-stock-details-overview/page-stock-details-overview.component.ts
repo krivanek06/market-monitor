@@ -219,7 +219,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
           <app-stock-price-target-table
             [data]="stockDetailsSignal.priceTarget | slice: 0 : 10"
             [currentPrice]="stockDetailsSignal.quote.price"
-          ></app-stock-price-target-table>
+          />
         </app-general-card>
 
         <!-- enterprise chart -->

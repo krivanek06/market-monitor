@@ -11,7 +11,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
   imports: [CommonModule, HighchartsChartModule],
   template: `
     <highcharts-chart
-      *ngIf="isHighcharts"
+      *ngIf="isHighcharts()"
       [Highcharts]="Highcharts"
       [options]="chartOptionSignal()"
       [callbackFunction]="chartCallback"

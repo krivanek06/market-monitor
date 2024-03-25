@@ -10,7 +10,6 @@ import { HighchartsChartModule } from 'highcharts-angular';
   selector: 'app-stock-enterprise-chart',
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
-  host: { ngSkipHydration: 'true' },
   styles: `
     :host {
       display: block;
@@ -19,7 +18,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <highcharts-chart
-      *ngIf="isHighcharts"
+      *ngIf="isHighcharts()"
       [Highcharts]="Highcharts"
       [options]="chartOptionSignal()"
       [callbackFunction]="chartCallback"

@@ -161,7 +161,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
               [previousPosition]="user.position.previousGroupMemberPosition"
               class="g-clickable-hover"
             >
-              <app-user-display-item [userData]="user"></app-user-display-item>
+              <app-user-display-item [userData]="user" />
             </app-position-card>
           }
         </div>
@@ -180,21 +180,27 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         *ngIf="groupDetailsSignal.groupTransactionsData.length > 0"
         class="sm:grid mb-12 xl:grid-cols-2 gap-x-4 hidden"
       >
-        <!-- bubble chart -->
-        <app-generic-chart
-          *ngIf="portfolioHoldingBubbleChartSignal() as portfolioHoldingBubbleChart"
-          class="hidden sm:block w-full"
-          [heightPx]="380"
-          [series]="portfolioHoldingBubbleChart"
-        ></app-generic-chart>
-        <!-- sector allocation -->
-        <app-pie-chart
-          class="block max-xl:hidden"
-          *ngIf="portfolioSectorAllocationSignal() as portfolioSectorAllocation"
-          [heightPx]="380"
-          chartTitle="Sector Allocation"
-          [series]="portfolioSectorAllocation"
-        ></app-pie-chart>
+        @if (portfolioHoldingBubbleChartSignal().length > 1) {
+          <!-- bubble chart -->
+          <app-generic-chart
+            class="hidden sm:block w-full"
+            chartType="packedbubble"
+            [heightPx]="380"
+            [series]="portfolioHoldingBubbleChartSignal()"
+          />
+
+          <!-- sector allocation -->
+          <app-pie-chart
+            class="block max-xl:hidden"
+            *ngIf="portfolioSectorAllocationSignal() as portfolioSectorAllocation"
+            [heightPx]="380"
+            chartTitle="Sector Allocation"
+            [series]="portfolioSectorAllocation"
+          />
+        } @else {
+          <div class="g-skeleton h-[300px]"></div>
+          <div class="g-skeleton h-[300px]"></div>
+        }
       </div>
 
       <!-- holding table -->
@@ -204,7 +210,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
             (symbolClicked)="onSummaryClick($event)"
             [holdings]="displayedHoldings()"
             [holdingsBalance]="groupDetailsSignal.groupData.portfolioState.holdingsBalance"
-          ></app-portfolio-holdings-table>
+          />
           <!-- show more button -->
           <div class="flex justify-end mt-2 mr-4">
             <app-show-more-button
@@ -230,7 +236,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
           [showTransactionFees]="true"
           [showUser]="true"
           [data]="groupDetailsSignal.groupTransactionsData | sortByKey: 'date' : 'desc'"
-        ></app-portfolio-transactions-table>
+        />
       </div>
     </ng-container>
   `,

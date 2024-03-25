@@ -35,7 +35,7 @@ import { map } from 'rxjs';
     <!-- chart -->
     @if ((chartOptionsSignal().series?.length ?? 0) > 0) {
       <highcharts-chart
-        *ngIf="isHighcharts"
+        *ngIf="isHighcharts()"
         [Highcharts]="Highcharts"
         [options]="chartOptionsSignal()"
         [callbackFunction]="chartCallback"

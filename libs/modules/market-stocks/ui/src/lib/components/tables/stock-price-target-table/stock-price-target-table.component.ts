@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -86,13 +86,15 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockPriceTargetTableComponent {
-  @Input({ required: true }) set data(values: PriceTarget[]) {
-    this.dataSource = new MatTableDataSource(values ?? []);
-  }
-
+  data = input.required<PriceTarget[]>();
   currentPrice = input.required<number>();
 
-  dataSource!: MatTableDataSource<PriceTarget>;
+  tableEffect = effect(() => {
+    this.dataSource.data = this.data();
+    this.dataSource._updateChangeSubscription();
+  });
+
+  dataSource = new MatTableDataSource<PriceTarget>([]);
 
   displayedColumns: string[] = ['person', 'priceWhenPosted', 'priceTarget', 'publishedDate', 'redirect'];
 }

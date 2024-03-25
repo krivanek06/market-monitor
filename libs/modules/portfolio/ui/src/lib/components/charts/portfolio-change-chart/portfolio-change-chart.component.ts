@@ -29,7 +29,7 @@ import { map } from 'rxjs';
     </div>
 
     <highcharts-chart
-      *ngIf="isHighcharts"
+      *ngIf="isHighcharts()"
       [Highcharts]="Highcharts"
       [options]="chartOptionSignal()"
       [style.height.px]="heightPx()"

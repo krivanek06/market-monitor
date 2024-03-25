@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CompanyKeyExecutive } from '@mm/api-types';
 import { LargeNumberFormatterPipe, SplitStringPipe } from '@mm/shared/ui';
@@ -57,10 +57,13 @@ import { LargeNumberFormatterPipe, SplitStringPipe } from '@mm/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockKeyExecutivesTableComponent {
-  @Input({ required: true }) set data(values: CompanyKeyExecutive[]) {
-    this.dataSource = new MatTableDataSource(values ?? []);
-  }
-  dataSource!: MatTableDataSource<CompanyKeyExecutive>;
+  data = input.required<CompanyKeyExecutive[]>();
+  dataSource = new MatTableDataSource<CompanyKeyExecutive>([]);
+
+  tableEffect = effect(() => {
+    this.dataSource.data = this.data();
+    this.dataSource._updateChangeSubscription();
+  });
 
   displayedColumns: string[] = ['person', 'pay', 'born'];
 }

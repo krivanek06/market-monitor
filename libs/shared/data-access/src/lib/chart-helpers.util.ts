@@ -1,8 +1,7 @@
-import { Directive, inject, input } from '@angular/core';
+import { Directive, afterNextRender, input, signal } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import HC_more from 'highcharts/highcharts-more';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
-import { PlatformService } from '../../../features/general-features/src/lib/platform';
 
 @Directive()
 export abstract class ChartConstructor {
@@ -15,17 +14,16 @@ export abstract class ChartConstructor {
     this.chart = chart;
   };
 
-  platform = inject(PlatformService);
-
   // determine whether we use SSR or not
   // https://github.com/highcharts/highcharts-angular/issues/216
   // isHighcharts = typeof Highcharts === 'object';
-  isHighcharts = this.platform.isBrowser;
+  isHighcharts = signal(false);
 
   constructor() {
-    if (this.platform.isServer) {
-      return;
-    }
+    afterNextRender(() => {
+      // init chart after next render to avoid SSR error
+      this.isHighcharts.set(true);
+    });
 
     // used in constructor to avoid SSR error
     NoDataToDisplay(Highcharts);
