@@ -12,13 +12,11 @@ export class ElementFocusDirective {
   onClick(event: MouseEvent): void {
     // click outside element
     if (!this.elementRef.nativeElement.contains(event.target)) {
-      console.log('clicked outside');
       this.outsideClick.emit(event);
     }
 
     // click inside element
     if (this.elementRef.nativeElement.contains(event.target)) {
-      console.log('clicked inside');
       this.insideClick.emit(event);
     }
   }

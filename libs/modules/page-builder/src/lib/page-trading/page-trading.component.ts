@@ -19,7 +19,6 @@ import { ColorScheme } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { getRandomIndex } from '@mm/shared/general-util';
 import {
-  FancyCardComponent,
   FormMatInputWrapperComponent,
   QuoteItemComponent,
   RangeDirective,
@@ -34,7 +33,6 @@ import { take } from 'rxjs';
   imports: [
     CommonModule,
     PortfolioStateComponent,
-    FancyCardComponent,
     StockSearchBasicCustomizedComponent,
     MatButtonModule,
     MatIconModule,

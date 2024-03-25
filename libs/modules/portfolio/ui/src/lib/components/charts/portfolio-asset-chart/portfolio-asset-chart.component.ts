@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -12,7 +12,11 @@ import {
   InputSource,
   getChartGenericColor,
 } from '@mm/shared/data-access';
-import { dateFormatDate, formatValueIntoCurrency } from '@mm/shared/general-util';
+import {
+  fillOutMissingDatesForDate,
+  formatValueIntoCurrency,
+  getCurrentDateDefaultFormat,
+} from '@mm/shared/general-util';
 import {
   DateRangeSliderComponent,
   DateRangeSliderValues,
@@ -22,7 +26,7 @@ import {
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { computedFrom } from 'ngxtension/computed-from';
-import { BehaviorSubject, combineLatest, map, pipe, startWith } from 'rxjs';
+import { map, pipe, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-asset-chart',
@@ -40,7 +44,11 @@ import { BehaviorSubject, combineLatest, map, pipe, startWith } from 'rxjs';
     <section class="relative">
       <!-- list of symbols -->
       <mat-chip-listbox aria-label="Asset Selection" [multiple]="true" [formControl]="symbolsControl" class="mt-2">
-        <mat-chip-option *ngFor="let inputSource of symbolInputSourceSignal()" class="h-10 mb-3 mr-1 g-mat-chip">
+        <mat-chip-option
+          *ngFor="let inputSource of symbolInputSourceSignal()"
+          class="h-10 mb-3 mr-1 g-mat-chip"
+          color="primary"
+        >
           <div class="flex flex-wrap items-center gap-4 px-2">
             <img appDefaultImg imageType="symbol" [src]="inputSource.value" [alt]="inputSource.caption" class="h-7" />
             <span class="text-base">{{ inputSource.caption }}</span>
@@ -49,26 +57,27 @@ import { BehaviorSubject, combineLatest, map, pipe, startWith } from 'rxjs';
       </mat-chip-listbox>
 
       <!-- time slider -->
-      <div class="flex justify-end">
-        <app-date-range-slider
-          *ngIf="dateRangeControl.value"
-          class="hidden md:block w-[550px]"
-          [formControl]="dateRangeControl"
-        />
+      <div class="flex justify-end" [ngClass]="{ hidden: symbolsControl.value.length === 0 }">
+        <app-date-range-slider class="hidden md:block w-[550px]" [formControl]="dateRangeControl" />
       </div>
 
       <!-- chart -->
-      <highcharts-chart
-        *ngIf="isHighcharts"
-        [Highcharts]="Highcharts"
-        [options]="chartOptionsSignal()"
-        [callbackFunction]="chartCallback"
-        [(update)]="updateFromInput"
-        [oneToOne]="true"
-        style="width: 100%; display: block"
-        [style.height.px]="heightPx()"
-      >
-      </highcharts-chart>
+      @if (symbolsControl.value.length > 0) {
+        @if (displayChart()) {
+          <highcharts-chart
+            *ngIf="isHighcharts()"
+            [Highcharts]="Highcharts"
+            [options]="chartOptionsSignal()"
+            [callbackFunction]="chartCallback"
+            [style.height.px]="heightPx()"
+            style="width: 100%; display: block"
+          />
+        } @else {
+          <div class="g-skeleton" [style.height.px]="heightPx()"></div>
+        }
+      } @else {
+        <div class="grid place-content-center text-base" [style.height.px]="heightPx() + 100">No data available</div>
+      }
     </section>
   `,
   styles: `
@@ -79,86 +88,117 @@ import { BehaviorSubject, combineLatest, map, pipe, startWith } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioAssetChartComponent extends ChartConstructor {
-  @Input({ required: true }) set data(input: PortfolioGrowthAssets[]) {
-    const inputSource = input.map(
-      (asset) => ({ caption: asset.symbol, value: asset.symbol }) satisfies InputSource<string>,
-    );
-    this.symbolInputSourceSignal.set(inputSource);
-    this.symbolsControl.setValue([]);
-    this.portfolioGrowth$.next(input);
-  }
+  data = input<PortfolioGrowthAssets[] | undefined>();
 
   /**
    * selected symbols by the user
    */
-  symbolsControl = new FormControl<string[]>([], {
-    nonNullable: true,
-  });
+  symbolsControl = new FormControl<string[]>([], { nonNullable: true });
 
   /**
    * data range control for chart zoom
    */
-  dateRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
+  dateRangeControl = new FormControl<DateRangeSliderValues>(
+    {
+      currentMaxDateIndex: 0,
+      currentMinDateIndex: 0,
+      dates: [],
+    },
+    { nonNullable: true },
+  );
 
   /**
-   * save provided data into the component
+   * used to destroy and recreate the chart
    */
-  private portfolioGrowth$ = new BehaviorSubject<PortfolioGrowthAssets[]>([]);
-
-  private chartDataSignal = toSignal(
-    combineLatest([
-      this.portfolioGrowth$.asObservable(),
-      this.symbolsControl.valueChanges.pipe(startWith(this.symbolsControl.value)),
-    ]).pipe(map(([portfolioAssets, selectedSymbols]) => this.formatData(portfolioAssets, selectedSymbols))),
-    { initialValue: [] },
-  );
+  displayChart = signal(false);
 
   /**
    * displayed symbols on the ui
    */
-  symbolInputSourceSignal = signal<InputSource<string>[]>([]);
+  symbolInputSourceSignal = computed(() =>
+    (this.data() ?? []).map((asset) => ({ caption: asset.symbol, value: asset.symbol }) satisfies InputSource<string>),
+  );
+
+  symbolsControlSignal = toSignal(this.symbolsControl.valueChanges, {
+    initialValue: this.symbolsControl.value,
+  });
 
   /**
-   * options config to the chart
+   * effect to patch value to the slider based on the selected symbols
+   */
+  dateRangeEffect = effect(
+    () => {
+      const allAssetsData = this.data() ?? [];
+      const selectedSymbols = this.symbolsControlSignal();
+
+      // nothing is selected or empty data
+      if (selectedSymbols.length === 0 || allAssetsData.length === 0) {
+        this.dateRangeControl.patchValue({
+          currentMaxDateIndex: 0,
+          currentMinDateIndex: 0,
+          dates: [],
+        });
+        return;
+      }
+
+      // create range of dates from the minimal date to the current date up to today
+      const minDate = allAssetsData
+        .filter((d) => selectedSymbols.includes(d.symbol))
+        .reduce((acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc), getCurrentDateDefaultFormat());
+
+      // generate missing dates between minDate and today
+      const missingDates = fillOutMissingDatesForDate(minDate, new Date());
+
+      // set value to the form
+      this.dateRangeControl.patchValue({
+        currentMaxDateIndex: missingDates.length - 1,
+        currentMinDateIndex: 0,
+        dates: missingDates,
+      });
+    },
+    { allowSignalWrites: true },
+  );
+
+  /**
+   * save provided data into the component
    */
   chartOptionsSignal = computedFrom(
-    [this.chartDataSignal, this.dateRangeControl.valueChanges.pipe(startWith(null))],
+    [
+      this.dateRangeControl.valueChanges.pipe(startWith(this.dateRangeControl.value)),
+      this.symbolsControl.valueChanges.pipe(startWith(this.symbolsControl.value)),
+    ],
     pipe(
-      map(([chartData, dateRange]) => {
-        // reduce data into the chart based on date range
-        const newData = chartData.map((d) => ({
+      map(([dateRange, selectedSymbols]) => {
+        const series = this.formatData(this.data() ?? [], selectedSymbols);
+        const newData = series.map((d) => ({
           ...d,
           data: filterDataByTimestamp(d.data as [number, number][], dateRange),
-        }));
+        })) satisfies Highcharts.SeriesOptionsType[];
 
         return this.initChart(newData);
       }),
     ),
   );
 
-  constructor() {
-    super();
+  /**
+   * effect used to destroy the chart and recreate it with updated series,
+   * otherwise new data inside the series is not showed
+   * TODO: remove this - it is a hack
+   */
+  chartOptionsSignalEffect = effect(
+    () => {
+      this.symbolsControlSignal();
+      console.log('EFFECT RUNNING', false);
 
-    // based on 'balance' length, patch value into dateRangeControl
-    toObservable(this.chartDataSignal)
-      .pipe(takeUntilDestroyed())
-      .subscribe((res) => {
-        const balance = res[0].data ?? [];
+      this.displayChart.set(false);
 
-        // nothing is selected yet
-        if (!balance || balance.length === 0) {
-          this.dateRangeControl.patchValue(null);
-          return;
-        }
-
-        // balance range changed
-        this.dateRangeControl.patchValue({
-          currentMaxDateIndex: balance.length - 1,
-          currentMinDateIndex: 0,
-          dates: balance.map((d) => dateFormatDate(new Date((d as [number, number])[0]))),
-        });
-      });
-  }
+      setTimeout(() => {
+        console.log('EFFECT RUNNING', true);
+        this.displayChart.set(true);
+      }, 300);
+    },
+    { allowSignalWrites: true },
+  );
 
   private initChart(series: Highcharts.SeriesOptionsType[]): Highcharts.Options {
     return {
@@ -176,7 +216,7 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
           gridLineColor: '#66666655',
           opposite: false,
           gridLineWidth: 1,
-          minorTickInterval: 'auto',
+          //minorTickInterval: 'auto',
           tickPixelInterval: 30,
           //minorGridLineWidth: 0, // gray-ish grid lines
           visible: true,
@@ -196,7 +236,7 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
           gridLineColor: '#66666655',
           opposite: true,
           gridLineWidth: 1,
-          minorTickInterval: 'auto', // TODO: this one may cause problem, check if needed
+          //minorTickInterval: 'auto', // TODO: this one may cause problem, check if needed
           tickPixelInterval: 30,
           //minorGridLineWidth: 0, // gray-ish grid lines
           visible: true,
@@ -301,7 +341,6 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
           stacking: 'normal',
         },
         series: {
-          showInNavigator: true,
           borderWidth: 0,
           dataLabels: {
             enabled: false,

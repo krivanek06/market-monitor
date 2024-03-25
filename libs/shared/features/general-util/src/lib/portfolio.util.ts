@@ -41,6 +41,11 @@ export const getPortfolioStateHoldingsUtil = (
     })
     .filter((d) => !!d) as PortfolioStateHolding[];
 
+  // sort holdings by balance
+  const portfolioStateHoldingSortedByBalance = [...portfolioStateHolding].sort(
+    (a, b) => b.symbolSummary.quote.price * b.units - a.symbolSummary.quote.price * a.units,
+  );
+
   // value of all assets
   const holdingsBalance =
     portfolioStateHolding.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0) - transactionFees;
@@ -86,7 +91,7 @@ export const getPortfolioStateHoldingsUtil = (
 
   return {
     ...result,
-    holdings: portfolioStateHolding,
+    holdings: portfolioStateHoldingSortedByBalance,
   };
 };
 

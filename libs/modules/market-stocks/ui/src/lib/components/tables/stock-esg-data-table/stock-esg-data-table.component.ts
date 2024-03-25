@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -90,11 +90,14 @@ import { ESGDataQuarterly } from '@mm/api-types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockEsgDataTableComponent {
-  @Input({ required: true }) set data(values: ESGDataQuarterly[]) {
-    this.dataSource = new MatTableDataSource(values ?? []);
-  }
+  data = input.required<ESGDataQuarterly[]>();
 
-  dataSource!: MatTableDataSource<ESGDataQuarterly>;
+  tableEffect = effect(() => {
+    this.dataSource.data = this.data();
+    this.dataSource._updateChangeSubscription();
+  });
+
+  dataSource = new MatTableDataSource<ESGDataQuarterly>([]);
 
   displayedColumns: string[] = [
     'date',

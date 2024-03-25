@@ -26,7 +26,6 @@ import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
   DateRangeSliderComponent,
   DateRangeSliderValues,
-  FancyCardComponent,
   FormMatInputWrapperComponent,
   GeneralCardComponent,
   GenericChartComponent,
@@ -44,7 +43,7 @@ import { map, pipe, startWith } from 'rxjs';
   imports: [
     CommonModule,
     PortfolioStateComponent,
-    FancyCardComponent,
+    GeneralCardComponent,
     PortfolioPeriodChangeComponent,
     GenericChartComponent,
     PortfolioStateTransactionsComponent,
@@ -73,35 +72,31 @@ import { map, pipe, startWith } from 'rxjs';
       <div
         class="flex flex-row max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2"
       >
-        <app-fancy-card
-          class="sm:col-span-2 max-sm:min-w-[360px]"
-          title="Account"
-          [colorPrimary]="ColorScheme.PRIMARY_VAR"
-        >
+        <app-general-card class="sm:col-span-2 max-sm:min-w-[360px]" title="Account">
           <app-portfolio-state
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showCashSegment]="authenticationUserService.state.isAccountDemoTrading()"
             [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
           ></app-portfolio-state>
-        </app-fancy-card>
+        </app-general-card>
 
-        <app-fancy-card class="max-sm:min-w-[275px]" title="Risk" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+        <app-general-card class="max-sm:min-w-[275px]" title="Risk">
           <app-portfolio-state-risk
             [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
           ></app-portfolio-state-risk>
-        </app-fancy-card>
+        </app-general-card>
 
-        <app-fancy-card class="max-sm:min-w-[275px]" title="Transactions" [colorPrimary]="ColorScheme.PRIMARY_VAR">
+        <app-general-card class="max-sm:min-w-[275px]" title="Transactions">
           <app-portfolio-state-transactions
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showFees]="!!authenticationUserService.state.isAccountDemoTrading()"
             [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
           ></app-portfolio-state-transactions>
-        </app-fancy-card>
+        </app-general-card>
       </div>
 
       <!-- portfolio change -->
@@ -192,7 +187,6 @@ import { map, pipe, startWith } from 'rxjs';
         title="Holdings [{{ (portfolioUserFacadeService.getPortfolioState()?.holdings ?? []).length }} / {{
           USER_HOLDINGS_SYMBOL_LIMIT
         }}]"
-        titleScale="large"
         matIcon="show_chart"
       >
         <app-portfolio-holdings-table
@@ -290,8 +284,8 @@ export class PageDashboardComponent {
   onPortfolioChangeChart(): void {
     this.dialogServiceUtil.showGenericDialog({
       component: PortfolioChangeChartComponent,
-      componentData: {
-        data: this.portfolioUserFacadeService.getPortfolioGrowth() ?? [],
+      componentData: <PortfolioChangeChartComponent>{
+        data: this.portfolioUserFacadeService.getPortfolioGrowth,
       },
     });
   }
@@ -301,7 +295,7 @@ export class PageDashboardComponent {
       title: 'Portfolio Asset Growth Chart',
       component: PortfolioAssetChartComponent,
       componentData: <PortfolioAssetChartComponent>{
-        data: this.portfolioUserFacadeService.getPortfolioGrowthAssets() ?? [],
+        data: this.portfolioUserFacadeService.getPortfolioGrowthAssets,
       },
     });
   }

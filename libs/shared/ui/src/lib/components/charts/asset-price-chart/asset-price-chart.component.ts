@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnChanges, OnInit, SimpleChanges, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { HistoricalPrice, SymbolHistoricalPeriods } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { dateFormatDate, formatLargeNumber, roundNDigits } from '@mm/shared/general-util';
@@ -10,7 +10,6 @@ import { HighchartsChartModule } from 'highcharts-angular';
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { ngSkipHydration: 'true' },
   styles: `
     :host {
       display: block;
@@ -18,17 +17,16 @@ import { HighchartsChartModule } from 'highcharts-angular';
   `,
   template: `
     <highcharts-chart
-      *ngIf="isHighcharts"
+      *ngIf="isHighcharts()"
       [Highcharts]="Highcharts"
-      [options]="chartOptions"
+      [options]="chartOptionsSignal()"
       [callbackFunction]="chartCallback"
-      style="width: 100%; display: block"
       [style.height.px]="heightPx()"
-    >
-    </highcharts-chart>
+      style="width: 100%; display: block"
+    />
   `,
 })
-export class AssetPriceChartComponent extends ChartConstructor implements OnInit, OnChanges {
+export class AssetPriceChartComponent extends ChartConstructor {
   period = input.required<SymbolHistoricalPeriods>();
   historicalPrice = input.required<HistoricalPrice[]>();
   showTitle = input(false);
@@ -36,19 +34,9 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
   displayVolume = input(true);
   priceShowSign = input(true);
 
-  ngOnInit(): void {}
-  ngOnChanges(changes: SimpleChanges): void {
-    const price = changes?.['historicalPrice'];
-    if (price && price?.currentValue) {
-      this.initChart(price.currentValue);
-    }
-  }
+  chartOptionsSignal = computed(() => this.initChart(this.historicalPrice()));
 
-  private initChart(data: HistoricalPrice[]) {
-    if (!this.Highcharts) {
-      return;
-    }
-
+  private initChart(data: HistoricalPrice[]): Highcharts.Options {
     const price = data.map((d) => d.close);
     const volume = data.map((d) => d.volume);
     const dates = data.map((d) => d.date);
@@ -56,7 +44,7 @@ export class AssetPriceChartComponent extends ChartConstructor implements OnInit
     const priceShowSignLocal = this.priceShowSign();
     const color = !!price[0] && price[0] < price[price.length - 1] ? ColorScheme.SUCCESS_VAR : ColorScheme.DANGER_VAR;
 
-    this.chartOptions = {
+    return {
       chart: {
         animation: true,
         plotBackgroundColor: undefined,

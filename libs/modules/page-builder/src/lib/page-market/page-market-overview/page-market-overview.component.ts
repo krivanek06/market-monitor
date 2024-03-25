@@ -74,7 +74,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
           [formControl]="selectedIndexSymbolQuoteControl"
           class="min-w-[300px] max-sm:w-full"
           type="index"
-        ></app-quote-search-basic>
+        />
       </div>
 
       <div class="mb-10">
@@ -85,7 +85,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
           [chartHeightPx]="400"
           [displayVolume]="false"
           [title]="selectedIndexSymbolQuoteControl.value?.name ?? 'S&P 500'"
-        ></app-asset-price-chart-interactive>
+        />
       </div>
 
       <div class="w-full mx-auto max-sm:pr-3 lg:w-11/12">
@@ -99,7 +99,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="2"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'PE Ratio' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.sp500.shillerPeRatio | sortReverse as data"
@@ -109,7 +109,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="2"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Shiller PE Ratio' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.sp500.priceToBook | sortReverse as data"
@@ -119,7 +119,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="2"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Price To Book' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.sp500.priceToSales | sortReverse as data"
@@ -129,7 +129,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="2"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Price To Sales' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.sp500.earningsYield | sortReverse as data"
@@ -139,7 +139,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="2"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Earning Yield' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.sp500.dividendYield | sortReverse as data"
@@ -149,7 +149,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="2"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Dividend Yield' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
         </div>
 
         <h2>Treasury</h2>
@@ -161,7 +161,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [heightPx]="250"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 3 Months' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.treasury.us1Year | sortReverse as data"
@@ -170,7 +170,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [heightPx]="250"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 1 Year' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.treasury.us10Year | sortReverse as data"
@@ -179,7 +179,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [heightPx]="250"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 10 Years' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.treasury.us30Year | sortReverse as data"
@@ -188,7 +188,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [heightPx]="250"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 30 Years' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
         </div>
 
         <h2>Bonds</h2>
@@ -200,7 +200,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [heightPx]="250"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US AAA Yield' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.bonds.usAAYield | sortReverse as data"
@@ -209,7 +209,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [heightPx]="250"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US AA Yield' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.bonds.usBBYield | sortReverse as data"
@@ -218,7 +218,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [heightPx]="250"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US BB Yield' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.bonds.usCCCYield | sortReverse as data"
@@ -227,7 +227,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [heightPx]="250"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US CCC Yield' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
         </div>
 
         <h2>US Data</h2>
@@ -240,7 +240,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="3"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'US GDP' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.general.realGDPPerCapita | sortReverse as data"
@@ -250,7 +250,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="3"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'GDP per Capita' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.general.CPI | sortReverse as data"
@@ -260,7 +260,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="3"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'CPI' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.general.federalFunds | sortReverse as data"
@@ -270,7 +270,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="3"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Federal Funds' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.general.inflation | sortReverse as data"
@@ -280,7 +280,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="4"
             [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Inflation' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.general.unemploymentRate | sortReverse as data"
@@ -296,7 +296,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
               }
             ]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.general.smoothedUSRecessionProbabilities | sortReverse as data"
@@ -312,7 +312,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
               }
             ]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
 
           <app-generic-chart
             *ngIf="marketOverviewSignalValues.general.totalVehicleSales | sortReverse as data"
@@ -322,14 +322,14 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [applyFancyColor]="4"
             [series]="[{ type: 'line', data: data | flattenArray: 1 | multiplyData: 1_000_000, name: 'Vehicle Sales' }]"
             [categories]="data | flattenArray: 0"
-          ></app-generic-chart>
+          />
         </div>
       </div>
     </ng-container>
 
     <!-- skeleton loading -->
     <ng-container *ngIf="!(marketOverviewSignal() && marketTopIndexQuotesSignal())">
-      <app-page-market-overview-skeleton></app-page-market-overview-skeleton>
+      <app-page-market-overview-skeleton />
     </ng-container>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

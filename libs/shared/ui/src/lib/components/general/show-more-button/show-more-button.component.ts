@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, model, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -34,7 +34,7 @@ import { MatIconModule } from '@angular/material/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShowMoreButtonComponent {
-  showMoreClicked = output<void>();
+  showMoreToggle = model.required<boolean>();
 
   allowShowLess = input<boolean>(true);
 
@@ -52,7 +52,7 @@ export class ShowMoreButtonComponent {
   buttonState = signal(true);
 
   onDisplayMoreClick() {
-    this.showMoreClicked.emit();
+    this.showMoreToggle.set(!this.showMoreToggle());
     this.buttonState.set(!this.buttonState());
   }
 }

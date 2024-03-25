@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RecommendationTrends } from '@mm/api-types';
 import { Recommendation } from '@mm/market-stocks/data-access';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
@@ -10,7 +10,6 @@ import { HighchartsChartModule } from 'highcharts-angular';
   selector: 'app-stock-recommendation-chart',
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
-  host: { ngSkipHydration: 'true' },
   styles: `
     :host {
       display: block;
@@ -19,28 +18,21 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <highcharts-chart
-      *ngIf="isHighcharts"
-      [(update)]="updateFromInput"
+      *ngIf="isHighcharts()"
       [Highcharts]="Highcharts"
+      [options]="chartOptionSignal()"
       [callbackFunction]="chartCallback"
-      [options]="chartOptions"
       [style.height.px]="heightPx()"
       style="display: block; width: 100%"
-    >
-    </highcharts-chart>
+    />
   `,
 })
 export class StockRecommendationChartComponent extends ChartConstructor {
-  @Input({ required: true }) set data(values: RecommendationTrends[]) {
-    this.initChart(values);
-  }
+  data = input.required<RecommendationTrends[]>();
 
-  private initChart(data: RecommendationTrends[]): void {
-    if (!this.Highcharts) {
-      return;
-    }
-
-    this.chartOptions = {
+  chartOptionSignal = computed(() => this.initChart(this.data()));
+  private initChart(data: RecommendationTrends[]): Highcharts.Options {
+    return {
       chart: {
         type: 'column',
         backgroundColor: 'transparent',

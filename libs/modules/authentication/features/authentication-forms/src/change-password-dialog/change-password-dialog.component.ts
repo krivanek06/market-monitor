@@ -28,21 +28,21 @@ import { DialogCloseHeaderComponent, FormMatInputWrapperComponent } from '@mm/sh
         <!-- old password -->
         <app-form-mat-input-wrapper
           formControlName="oldPassword"
-          inputCaption="Password"
+          inputCaption="Old Password"
           inputType="PASSWORD"
         ></app-form-mat-input-wrapper>
 
         <!-- password1 -->
         <app-form-mat-input-wrapper
           formControlName="newPassword1"
-          inputCaption="Password"
+          inputCaption="New Password"
           inputType="PASSWORD"
         ></app-form-mat-input-wrapper>
 
         <!-- password2 -->
         <app-form-mat-input-wrapper
           formControlName="newPassword2"
-          inputCaption="Password"
+          inputCaption="New Password Confirm"
           inputType="PASSWORD"
         ></app-form-mat-input-wrapper>
       </mat-dialog-content>

@@ -12,15 +12,12 @@ import highcharts3d from 'highcharts/highcharts-3d';
   imports: [CommonModule, HighchartsChartModule],
   template: `
     <highcharts-chart
-      *ngIf="isHighcharts"
+      *ngIf="isHighcharts()"
       [Highcharts]="Highcharts"
       [options]="chartOptionsComputed()"
       [callbackFunction]="chartCallback"
-      [(update)]="updateFromInput"
-      [oneToOne]="true"
       [style.height.px]="heightPx()"
-    >
-    </highcharts-chart>
+    />
   `,
   styles: `
     :host {

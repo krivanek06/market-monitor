@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { ChartConstructor, ColorScheme, EstimatedChartDataType } from '@mm/shared/data-access';
 import { dateFormatDate, formatLargeNumber } from '@mm/shared/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -9,18 +9,15 @@ import { HighchartsChartModule } from 'highcharts-angular';
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { ngSkipHydration: 'true' },
   template: `
     <highcharts-chart
-      *ngIf="isHighcharts"
-      [(update)]="updateFromInput"
+      *ngIf="isHighcharts()"
       [Highcharts]="Highcharts"
+      [options]="chartOptionSignal()"
       [callbackFunction]="chartCallback"
-      [options]="chartOptions"
       [style.height.px]="heightPx()"
       style="display: block; width: 100%"
-    >
-    </highcharts-chart>
+    />
   `,
   styles: `
     :host {
@@ -29,17 +26,13 @@ import { HighchartsChartModule } from 'highcharts-angular';
   `,
 })
 export class RevenueEstimationChartComponent extends ChartConstructor {
-  @Input({ required: true }) set data(values: EstimatedChartDataType[]) {
-    this.initChart(values);
-  }
+  data = input.required<EstimatedChartDataType[]>();
   limitValues = input(30);
   showTitle = input(false);
 
-  private initChart(values: EstimatedChartDataType[]): void {
-    if (!this.Highcharts) {
-      return;
-    }
+  chartOptionSignal = computed(() => this.initChart(this.data()));
 
+  private initChart(values: EstimatedChartDataType[]): Highcharts.Options {
     const workingData = values.slice(-this.limitValues());
     const dates = workingData.map((x) => x.date);
 
@@ -61,7 +54,7 @@ export class RevenueEstimationChartComponent extends ChartConstructor {
       color: ColorScheme.PRIMARY_VAR,
     }));
 
-    this.chartOptions = {
+    return {
       chart: {
         type: 'column',
         backgroundColor: 'transparent',

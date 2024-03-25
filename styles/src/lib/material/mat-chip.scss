@@ -1,17 +1,5 @@
-/* TODO(mdc-migration): The following rule targets internal classes of chips that may no longer apply for the MDC version. */
-mat-chip {
-  *,
-  ::before,
-  ::after {
-    border-color: transparent;
-  }
-}
 .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) .mdc-evolution-chip__text-label {
   color: var(--primary) !important;
-}
-
-.mat-mdc-standard-chip:not(.mdc-evolution-chip--selected) .mdc-evolution-chip__action--primary:before {
-  border: transparent !important;
 }
 
 mat-chip-option > span > button,
@@ -22,11 +10,14 @@ mat-chip > .mat-ripple {
 
 mat-chip-option,
 mat-chip {
-  background-color: transparent !important;
   cursor: pointer !important;
 }
-.mat-mdc-chip-selected {
-  background-color: var(--gray-light) !important;
+
+.mat-mdc-standard-chip.mdc-evolution-chip--selectable {
+  background-color: transparent !important;
+}
+.mat-mdc-standard-chip.mdc-evolution-chip--selected {
+  background-color: var(--gray-light-strong) !important;
 }
 
 .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) .mdc-evolution-chip__checkmark {

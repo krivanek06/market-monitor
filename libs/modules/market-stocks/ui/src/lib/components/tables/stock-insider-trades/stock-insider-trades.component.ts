@@ -155,13 +155,16 @@ export class StockInsiderTradesComponent {
   sort = viewChild(MatSort);
   data = input.required<CompanyInsideTrade[]>();
 
-  tableEffect = effect(() => {
-    this.dataSource = new MatTableDataSource(this.data());
-    this.dataSource.paginator = this.paginator() ?? null;
-    this.dataSource.sort = this.sort() ?? null;
-    this.dataSource._updateChangeSubscription();
-  });
-  dataSource: MatTableDataSource<CompanyInsideTrade> = new MatTableDataSource<CompanyInsideTrade>([]);
+  tableEffect = effect(
+    () => {
+      this.dataSource.data = this.data();
+      this.dataSource.paginator = this.paginator() ?? null;
+      this.dataSource.sort = this.sort() ?? null;
+      this.dataSource._updateChangeSubscription();
+    },
+    { allowSignalWrites: true },
+  );
+  dataSource = new MatTableDataSource<CompanyInsideTrade>([]);
 
   displayedColumns: string[] = [
     'person',
