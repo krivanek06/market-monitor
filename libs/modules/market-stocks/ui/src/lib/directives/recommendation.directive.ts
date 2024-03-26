@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, Renderer2, input } from '@angular/core';
+import { Directive, ElementRef, Renderer2, effect, inject, input } from '@angular/core';
 import { recommendationData, recommendationDefault } from '@mm/market-stocks/data-access';
 
 @Directive({
@@ -6,17 +6,17 @@ import { recommendationData, recommendationDefault } from '@mm/market-stocks/dat
   standalone: true,
 })
 export class RecommendationDirective {
-  @Input({ alias: 'appRecommendation', required: true }) set value(data: number | null | undefined) {
-    this.initRendering(data);
-  }
+  private elementRef = inject(ElementRef);
+  private ren = inject(Renderer2);
+
+  value = input.required<number | null | undefined>({ alias: 'appRecommendation' });
   recommendationText = input<string | undefined>();
 
-  constructor(
-    private elementRef: ElementRef,
-    private ren: Renderer2,
-  ) {}
+  valueEffect = effect(() => {
+    this.initRendering(this.value());
+  });
 
-  initRendering(value?: number | null): void {
+  private initRendering(value?: number | null): void {
     if (!value) {
       return;
     }

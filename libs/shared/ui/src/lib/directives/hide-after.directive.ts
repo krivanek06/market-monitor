@@ -1,5 +1,4 @@
-import { ChangeDetectorRef, Directive, Input, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
-import { input } from '@angular/core';
+import { ChangeDetectorRef, Directive, OnInit, TemplateRef, ViewContainerRef, effect, input } from '@angular/core';
 
 class HideAfterContext {
   public get $implicit() {
@@ -15,13 +14,10 @@ class HideAfterContext {
   standalone: true,
 })
 export class HideAfterDirective implements OnInit {
-  @Input('hideAfter')
-  set delay(value: number | null) {
-    this._delay = value ?? 0;
-    this.context.hideAfter = this.context.counter = this._delay / 1000;
-  }
-  private _delay = 0;
-
+  delay = input.required<number>({ alias: 'hideAfter' });
+  delayEffect = effect(() => {
+    this.context.hideAfter = this.context.counter = this.delay() / 1000;
+  });
   placeholder = input<TemplateRef<HideAfterContext> | null>(null, { alias: 'hideAfterThen' });
 
   private context = new HideAfterContext();
@@ -44,7 +40,7 @@ export class HideAfterDirective implements OnInit {
         this.viewContainerRef.createEmbeddedView(this.placeholder()!, this.context);
       }
       clearInterval(intervalId);
-    }, this._delay);
+    }, this.delay());
   }
 
   static ngTemplateContextGuard(dir: HideAfterDirective, ctx: unknown): ctx is HideAfterContext {
