@@ -70,8 +70,6 @@ export class GroupUserHasRoleDirective {
       excludeRoles &&
       (appGroupUserHasRoleInclude.length !== 0 || appGroupUserHasRoleExclude.length !== 0);
 
-    console.log('eval', evalValues);
-
     if (evalValues) {
       // create the view
       this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);

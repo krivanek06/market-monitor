@@ -1,46 +1,71 @@
-import { ChangeDetectorRef, Directive, OnInit, TemplateRef, ViewContainerRef, effect, input } from '@angular/core';
+import {
+  Directive,
+  Signal,
+  TemplateRef,
+  ViewContainerRef,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 
-class HideAfterContext {
-  public get $implicit() {
-    return this.hideAfter;
-  }
-  public hideAfter = 0;
-  public counter = 0;
-  public hideAfterThen = 1000;
-}
+export type HideAfterContext = {
+  // same as hideAfter;
+  $implicit: number;
+  hideAfter: number;
+  counter: Signal<number>;
+};
 
 @Directive({
   selector: '[hideAfter]',
   standalone: true,
 })
-export class HideAfterDirective implements OnInit {
-  delay = input.required<number>({ alias: 'hideAfter' });
-  delayEffect = effect(() => {
-    this.context.hideAfter = this.context.counter = this.delay() / 1000;
-  });
-  placeholder = input<TemplateRef<HideAfterContext> | null>(null, { alias: 'hideAfterThen' });
+export class HideAfterDirective {
+  /**
+   * time in milliseconds after which the element will be hidden
+   */
+  hideAfter = input.required<number>();
 
-  private context = new HideAfterContext();
+  private viewContainerRef = inject(ViewContainerRef);
+  private template = inject(TemplateRef<HideAfterContext>);
 
-  constructor(
-    private viewContainerRef: ViewContainerRef,
-    private template: TemplateRef<HideAfterContext>,
-    private cd: ChangeDetectorRef,
-  ) {}
+  contextChangeEffect = effect(
+    () => {
+      const delay = this.hideAfter();
+      const internalCounter = signal(0);
 
-  ngOnInit(): void {
-    this.viewContainerRef.createEmbeddedView(this.template, this.context);
-    const intervalId = setInterval(() => {
-      this.context.counter--;
-      this.cd.detectChanges();
-    }, 1000);
-    setTimeout(() => {
-      this.viewContainerRef.clear();
-      if (this.placeholder()) {
-        this.viewContainerRef.createEmbeddedView(this.placeholder()!, this.context);
-      }
-      clearInterval(intervalId);
-    }, this.delay());
+      internalCounter.set(Math.round(delay / 1000));
+      console.log('effect executing');
+
+      // prevent executing effect when counter changes
+      untracked(() => internalCounter());
+
+      this.viewContainerRef.createEmbeddedView(this.template, this.getContext(internalCounter));
+
+      // decrease counter every second
+      const intervalId = setInterval(() => {
+        // decrease counter
+        internalCounter.set(internalCounter() - 1);
+      }, 1000);
+
+      setTimeout(() => {
+        // clear view
+        this.viewContainerRef.clear();
+
+        // stop interval
+        clearInterval(intervalId);
+      }, delay);
+    },
+    { allowSignalWrites: true },
+  );
+
+  getContext(counter: Signal<number>): HideAfterContext {
+    return {
+      $implicit: this.hideAfter(),
+      hideAfter: this.hideAfter(),
+      counter: counter,
+    };
   }
 
   static ngTemplateContextGuard(dir: HideAfterDirective, ctx: unknown): ctx is HideAfterContext {

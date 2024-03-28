@@ -105,7 +105,7 @@ import { map, startWith } from 'rxjs';
             class="p-4 mx-auto my-4 text-center rounded-md bg-wt-gray-light-strong lg:w-11/12"
           >
             You are limited to create only {{ createGroupLimitSignal() }} groups. If you want to create more groups
-            please contact support. Hidden after {{ counter }} seconds.
+            please contact support. Hidden after {{ counter() }} seconds.
           </div>
         } @else {
           <!-- error message if can not create more groups -->
