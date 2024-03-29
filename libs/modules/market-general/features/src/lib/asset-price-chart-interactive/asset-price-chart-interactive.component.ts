@@ -1,14 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-  inject,
-  input,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, effect, inject, input, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -100,7 +91,7 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
+export class AssetPriceChartInteractiveComponent implements OnInit {
   symbol = input.required<string>();
   chartHeightPx = input(420);
   priceName = input('price');
@@ -154,12 +145,10 @@ export class AssetPriceChartInteractiveComponent implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    // trigger time period selection to load prices
-    if (changes?.['symbol']?.currentValue) {
-      this.timePeriodFormControl.setValue(SymbolHistoricalPeriods.week);
-    }
-  }
+  symbolChangeEffect = effect(() => {
+    const symbol = this.symbol();
+    this.timePeriodFormControl.setValue(SymbolHistoricalPeriods.week);
+  });
 
   onRefresh(): void {
     // trigger time period selection to load prices

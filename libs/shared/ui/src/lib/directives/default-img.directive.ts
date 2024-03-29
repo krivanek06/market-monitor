@@ -1,4 +1,4 @@
-import { Directive, ElementRef, OnChanges, Renderer2, SimpleChanges, input } from '@angular/core';
+import { Directive, ElementRef, Renderer2, effect, inject, input } from '@angular/core';
 import { DefaultImageType } from '@mm/shared/data-access';
 import { PlatformService } from '../utils';
 
@@ -8,22 +8,20 @@ type ImageSrc = string | null | undefined;
   selector: '[appDefaultImg]',
   standalone: true,
 })
-export class DefaultImgDirective implements OnChanges {
-  src = input.required<ImageSrc>();
+export class DefaultImgDirective {
+  private imageRef = inject(ElementRef);
+  private platformService = inject(PlatformService);
+  private renderer = inject(Renderer2);
+
+  src = input<ImageSrc | null | undefined>(null);
   imageType = input<DefaultImageType>('default');
+
+  srcChangeEffect = effect(() => {
+    this.initImage();
+  });
 
   private symbolURL = 'https://get-asset-url.krivanek1234.workers.dev';
   private defaultLocalImage = 'assets/image-placeholder.jpg';
-
-  constructor(
-    private imageRef: ElementRef,
-    private platformService: PlatformService,
-    private renderer: Renderer2,
-  ) {}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    this.initImage();
-  }
 
   private initImage() {
     if (this.platformService.isServer) {

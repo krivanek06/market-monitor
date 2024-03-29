@@ -7,4 +7,3 @@ export * from './percentage-increase.directive';
 export * from './position-coloring.directive';
 export * from './range.directive';
 export * from './scroll-near-end.directive';
-export * from './style-paginator.directive';

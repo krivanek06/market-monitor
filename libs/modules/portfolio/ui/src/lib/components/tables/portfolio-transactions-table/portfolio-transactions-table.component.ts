@@ -6,7 +6,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioTransaction, PortfolioTransactionMore } from '@mm/api-types';
 import { insertIntoArray } from '@mm/shared/general-util';
-import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirective } from '@mm/shared/ui';
+import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-portfolio-transactions-table',
@@ -19,7 +19,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
     MatIconModule,
     PercentageIncreaseDirective,
     MatPaginatorModule,
-    StylePaginatorDirective,
+    BubblePaginationDirective,
   ],
   template: `
     <table mat-table [dataSource]="dataSource" [trackBy]="identity">
@@ -164,9 +164,9 @@ import { DefaultImgDirective, PercentageIncreaseDirective, StylePaginatorDirecti
     </table>
 
     <!-- pagination -->
-    <div class="relative md:px-4">
+    <div class="relative">
       <mat-paginator
-        appStylePaginator
+        appBubblePagination
         showFirstLastButtons
         [length]="dataSource.filteredData.length"
         [appCustomLength]="dataSource.filteredData.length"

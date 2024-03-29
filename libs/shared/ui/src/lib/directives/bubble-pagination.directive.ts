@@ -1,16 +1,4 @@
-import {
-  AfterViewInit,
-  Directive,
-  ElementRef,
-  Host,
-  OnChanges,
-  Optional,
-  Renderer2,
-  Self,
-  SimpleChanges,
-  input,
-  output,
-} from '@angular/core';
+import { Directive, ElementRef, Host, Optional, Renderer2, Self, effect, input, output } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { map, startWith } from 'rxjs';
 import { PlatformService } from '../utils';
@@ -22,7 +10,7 @@ import { PlatformService } from '../utils';
   selector: '[appBubblePagination]',
   standalone: true,
 })
-export class BubblePaginationDirective implements AfterViewInit, OnChanges {
+export class BubblePaginationDirective {
   /**
    * custom emitter for parent component
    */
@@ -43,7 +31,7 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
   /**
    * how many elements are in the table
    */
-  appCustomLength = input<number>(0);
+  appCustomLength = input<number | null | undefined>(0);
 
   /**
    * set true to hide left and right arrows surrounding the bubbles
@@ -67,36 +55,33 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
     private platform: PlatformService,
   ) {}
 
-  ngAfterViewInit(): void {
+  buildButtonsEffect = effect(() => {
     if (this.platform.isServer) {
       return;
     }
+
+    const appCustomLength = this.appCustomLength() ?? 0;
+
+    // remove buttons before creating new ones
+    this.removeButtons();
+
+    // set some default styles to mat pagination
     this.styleDefaultPagination();
+
+    // create bubble container
     this.createBubbleDivRef();
-    this.renderButtons();
-  }
 
-  /**
-   * react on parent component changing the appCustomLength - rerender bubbles
-   */
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.platform.isServer) {
-      return;
-    }
+    // switch back to page 0
+    this.switchPage(0);
 
-    if (!changes?.['appCustomLength']?.firstChange) {
-      // remove buttons before creating new ones
-      this.removeButtons();
-      // switch back to page 0
-      this.switchPage(0);
-      this.renderButtons();
-    }
-  }
+    // create all buttons
+    this.buildButtons(appCustomLength);
 
-  private renderButtons(): void {
-    // build buttons to UI
-    this.buildButtons();
+    // listen on changing the buttons
+    this.listenOnPageChange();
+  });
 
+  private listenOnPageChange(): void {
     // when pagination change -> change button styles
     this.matPag.page
       .pipe(
@@ -105,6 +90,7 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
         // takeUntilDestroyed() // <-- does not work
       )
       .subscribe(([prev, curr]) => {
+        // console.log('aaaaaa', prev, curr);
         this.changeActiveButtonStyles(prev, curr);
       });
   }
@@ -211,14 +197,17 @@ export class BubblePaginationDirective implements AfterViewInit, OnChanges {
    *
    * end result: (1) .... (4) (5) (6) ... (25)
    */
-  private buildButtons(): void {
-    const neededButtons = Math.ceil(this.appCustomLength() / this.matPag.pageSize);
+  private buildButtons(appCustomLength: number): void {
+    const neededButtons = Math.ceil(appCustomLength / this.matPag.pageSize);
 
     // if there is only one page, do not render buttons
     if (neededButtons === 0 || neededButtons === 1) {
       this.ren.setStyle(this.elementRef.nativeElement, 'display', 'none');
       return;
     }
+
+    // set back from hidden to block
+    this.ren.setStyle(this.elementRef.nativeElement, 'display', 'block');
 
     // create first button
     this.buttonsRef = [this.createButton(0)];

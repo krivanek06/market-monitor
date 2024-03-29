@@ -1,4 +1,4 @@
-import { Directive, ElementRef, OnChanges, Renderer2, SimpleChanges, inject, input } from '@angular/core';
+import { Directive, ElementRef, Renderer2, effect, inject, input } from '@angular/core';
 import { ColorScheme } from '@mm/shared/data-access';
 
 type ColorType = 'color' | 'background-color';
@@ -10,23 +10,23 @@ type ColorType = 'color' | 'background-color';
   selector: '[appPositionColoring]',
   standalone: true,
 })
-export class PositionColoringDirective implements OnChanges {
+export class PositionColoringDirective {
   positionType = input<ColorType>('color');
-  position = input.required<number>();
+  position = input<number>(0);
 
   /**
    * color used to color elements after the first 3 positions
    */
   defaultPositionColor = input(ColorScheme.GRAY_MEDIUM_VAR);
 
+  positionChangeEffect = effect(() => {
+    const type = this.positionType();
+    const position = this.position();
+    this.colorElement(position, type);
+  });
+
   private renderer = inject(Renderer2);
   private elementRef = inject(ElementRef);
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const type = changes?.['type']?.currentValue ?? this.positionType();
-    const position = Number(changes?.['position']?.currentValue) ?? this.position();
-    this.colorElement(position, type);
-  }
 
   private colorElement(position: number, type: ColorType): void {
     const color = this.getColorByPosition(position, type);

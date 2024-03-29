@@ -1,15 +1,6 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnChanges,
-  SimpleChanges,
-  computed,
-  inject,
-  input,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatDividerModule } from '@angular/material/divider';
@@ -115,7 +106,7 @@ import { tap } from 'rxjs';
     },
   ],
 })
-export class QuoteSearchBasicComponent implements ControlValueAccessor, OnChanges {
+export class QuoteSearchBasicComponent implements ControlValueAccessor {
   type = input.required<AvailableQuotes>();
   size = input<'small'>('small');
 
@@ -131,17 +122,14 @@ export class QuoteSearchBasicComponent implements ControlValueAccessor, OnChange
   onChange: (value: SymbolQuote) => void = () => {};
   onTouched = () => {};
 
-  constructor() {}
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes?.['type']?.currentValue) {
-      this.loadQuotesByType();
-    }
-  }
+  loadQuotesEffect = effect(() => {
+    this.loadQuotesByType(this.type());
+  });
 
-  private loadQuotesByType() {
+  private loadQuotesByType(type: AvailableQuotes) {
     this.showLoadingIndicator.set(true);
     this.marketApiService
-      .getQuotesByType(this.type())
+      .getQuotesByType(type)
       .pipe(
         tap((quotes) => {
           this.options.set(quotes);
