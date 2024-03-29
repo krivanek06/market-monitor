@@ -188,12 +188,10 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   chartOptionsSignalEffect = effect(
     () => {
       this.symbolsControlSignal();
-      console.log('EFFECT RUNNING', false);
 
       this.displayChart.set(false);
 
       setTimeout(() => {
-        console.log('EFFECT RUNNING', true);
         this.displayChart.set(true);
       }, 300);
     },
