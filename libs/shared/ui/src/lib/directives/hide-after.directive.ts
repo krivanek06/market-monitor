@@ -10,7 +10,7 @@ import {
   untracked,
 } from '@angular/core';
 
-export type HideAfterContext = {
+type HideAfterContext = {
   // same as hideAfter;
   $implicit: number;
   hideAfter: number;

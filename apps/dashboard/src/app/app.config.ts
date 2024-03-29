@@ -49,6 +49,8 @@ export const appConfig: ApplicationConfig = {
       // provideAnimationsAsync()
     ),
     provideAnimations(),
+    // remove zone.js
+    // ɵprovideZonelessChangeDetection(),
     {
       provide: AUTHENTICATION_ACCOUNT_TOKEN,
       useExisting: AuthenticationUserStoreService,

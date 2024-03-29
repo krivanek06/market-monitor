@@ -33,128 +33,125 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
     GroupSettingsDialogComponent,
   ],
   template: `
-    <div
-      *ngIf="!groupDetails().groupData.isClosed; else closedGroupActionButtons"
-      class="flex flex-col gap-y-2 lg:flex-row gap-x-4 w-full"
-    >
-      <!-- owner -->
-      <button
-        *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
-        (click)="onGroupCloseClick()"
-        type="button"
-        mat-stroked-button
-        color="warn"
-        [matTooltip]="tooltipClose"
-      >
-        <mat-icon>close</mat-icon>
-        Close Group
-      </button>
+    @if (!groupDetails().groupData.isClosed) {
+      <div class="flex flex-col gap-y-2 lg:flex-row gap-x-4 w-full">
+        <!-- owner -->
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          (click)="onGroupCloseClick()"
+          type="button"
+          mat-stroked-button
+          color="warn"
+          [matTooltip]="tooltipClose"
+        >
+          <mat-icon>close</mat-icon>
+          Close Group
+        </button>
 
-      <button
-        *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']; exclude: ['groupMember']"
-        (click)="onAddOwnerToGroupClick()"
-        type="button"
-        mat-stroked-button
-        color="accent"
-        [matTooltip]="tooltipAddMyselfOwner"
-      >
-        <mat-icon>person</mat-icon>
-        Add Myself To Group
-      </button>
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']; exclude: ['groupMember']"
+          (click)="onAddOwnerToGroupClick()"
+          type="button"
+          mat-stroked-button
+          color="accent"
+          [matTooltip]="tooltipAddMyselfOwner"
+        >
+          <mat-icon>person</mat-icon>
+          Add Myself To Group
+        </button>
 
-      <!-- member -->
-      <button
-        *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupMember']"
-        (click)="onLeaveGroupClick()"
-        type="button"
-        mat-stroked-button
-        color="warn"
-        [matTooltip]="tooltipLeave"
-      >
-        <mat-icon>logout</mat-icon>
-        Leave Group
-      </button>
+        <!-- member -->
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupMember']"
+          (click)="onLeaveGroupClick()"
+          type="button"
+          mat-stroked-button
+          color="warn"
+          [matTooltip]="tooltipLeave"
+        >
+          <mat-icon>logout</mat-icon>
+          Leave Group
+        </button>
 
-      <!-- invited person -->
-      <button
-        *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupInvitations']"
-        (click)="onDeclineInvitationClick()"
-        type="button"
-        mat-stroked-button
-        color="warn"
-        [matTooltip]="tooltipInvitedCancel"
-      >
-        <mat-icon>logout</mat-icon>
-        Decline Invitation
-      </button>
+        <!-- invited person -->
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupInvitations']"
+          (click)="onDeclineInvitationClick()"
+          type="button"
+          mat-stroked-button
+          color="warn"
+          [matTooltip]="tooltipInvitedCancel"
+        >
+          <mat-icon>logout</mat-icon>
+          Decline Invitation
+        </button>
 
-      <button
-        *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupInvitations']"
-        (click)="onAcceptInvitationClick()"
-        type="button"
-        mat-stroked-button
-        color="accent"
-        [matTooltip]="tooltipInvitedAccept"
-      >
-        <mat-icon>done</mat-icon>
-        Accept Invitation
-      </button>
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupInvitations']"
+          (click)="onAcceptInvitationClick()"
+          type="button"
+          mat-stroked-button
+          color="accent"
+          [matTooltip]="tooltipInvitedAccept"
+        >
+          <mat-icon>done</mat-icon>
+          Accept Invitation
+        </button>
 
-      <!-- request invitation person -->
-      <button
-        *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupRequested']"
-        (click)="onCancelRequestClick()"
-        type="button"
-        mat-stroked-button
-        color="warn"
-        [matTooltip]="tooltipDeclineRequest"
-      >
-        <mat-icon>logout</mat-icon>
-        Decline Request
-      </button>
+        <!-- request invitation person -->
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupRequested']"
+          (click)="onCancelRequestClick()"
+          type="button"
+          mat-stroked-button
+          color="warn"
+          [matTooltip]="tooltipDeclineRequest"
+        >
+          <mat-icon>logout</mat-icon>
+          Decline Request
+        </button>
 
-      <button
-        *appGroupUserHasRole="
-          groupDetails().groupData.id;
-          exclude: ['groupRequested', 'groupMember', 'groupInvitations', 'groupOwner']
-        "
-        (click)="onRequestToJoinClick()"
-        type="button"
-        mat-stroked-button
-        color="accent"
-        [matTooltip]="tooltipRequestToJoin"
-      >
-        <mat-icon>person</mat-icon>
-        Send Request To Join
-      </button>
+        <button
+          *appGroupUserHasRole="
+            groupDetails().groupData.id;
+            exclude: ['groupRequested', 'groupMember', 'groupInvitations', 'groupOwner']
+          "
+          (click)="onRequestToJoinClick()"
+          type="button"
+          mat-stroked-button
+          color="accent"
+          [matTooltip]="tooltipRequestToJoin"
+        >
+          <mat-icon>person</mat-icon>
+          Send Request To Join
+        </button>
 
-      <!-- owner - invite people -->
-      <button
-        *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
-        (click)="onInviteMembersClick()"
-        type="button"
-        mat-stroked-button
-        color="primary"
-        [matTooltip]="tooltipInviteMembers"
-      >
-        <mat-icon>add</mat-icon>
-        Invite Members
-      </button>
+        <!-- owner - invite people -->
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          (click)="onInviteMembersClick()"
+          type="button"
+          mat-stroked-button
+          color="primary"
+          [matTooltip]="tooltipInviteMembers"
+        >
+          <mat-icon>add</mat-icon>
+          Invite Members
+        </button>
 
-      <!-- owner - settings -->
-      <button
-        *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
-        (click)="onGroupSettingsClick()"
-        type="button"
-        mat-stroked-button
-      >
-        <mat-icon>settings</mat-icon>
-        Group Settings
-      </button>
-    </div>
-
-    <!-- closed group -->
-    <ng-template #closedGroupActionButtons>
+        <!-- owner - settings -->
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          (click)="onGroupSettingsClick()"
+          type="button"
+          mat-stroked-button
+        >
+          <mat-icon>settings</mat-icon>
+          Group Settings
+        </button>
+      </div>
+    } @else {
+      <!-- closed group -->
       <div class="flex flex-row gap-4">
         <!-- owner -->
         <button
@@ -182,7 +179,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           Reopen Group
         </button>
       </div>
-    </ng-template>
+    }
   `,
   styles: `
     :host {

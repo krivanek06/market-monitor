@@ -4,15 +4,6 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 
 type SubGroups = (keyof UserData['groups'])[];
 
-class GroupUserHasRoleDirectiveContext {
-  public get $implicit() {
-    return this.groupId;
-  }
-  public groupId: string = '';
-  public appGroupUserHasRoleInclude: SubGroups = [];
-  public appGroupUserHasRoleExclude: SubGroups = [];
-}
-
 /**
  * This directive is used to check if the user is: owner
  */
@@ -22,7 +13,7 @@ class GroupUserHasRoleDirectiveContext {
 })
 export class GroupUserHasRoleDirective {
   private viewContainerRef = inject(ViewContainerRef);
-  private templateRef = inject(TemplateRef<GroupUserHasRoleDirectiveContext>);
+  private templateRef = inject(TemplateRef<unknown>);
   private authenticationUserService = inject(AuthenticationUserStoreService);
   private cd = inject(ChangeDetectorRef);
 
@@ -41,22 +32,15 @@ export class GroupUserHasRoleDirective {
    */
   groupRolesExclude = input<SubGroups>([], { alias: 'appGroupUserHasRoleExclude' });
 
-  private userData = this.authenticationUserService.state.getUserDataNormal;
-  private context = new GroupUserHasRoleDirectiveContext();
-
   rerenderEffect = effect(() => {
     // by default clear the view
     this.viewContainerRef.clear();
 
     // assign values to context
-    const userData = this.userData();
+    const userData = this.authenticationUserService.state.getUserDataNormal();
     const groupId = this.groupId();
     const appGroupUserHasRoleInclude = this.groupRolesInclude();
     const appGroupUserHasRoleExclude = this.groupRolesExclude();
-
-    this.context.groupId = groupId;
-    this.context.appGroupUserHasRoleInclude = appGroupUserHasRoleInclude;
-    this.context.appGroupUserHasRoleExclude = appGroupUserHasRoleExclude;
 
     if (!userData) {
       return;
@@ -72,15 +56,10 @@ export class GroupUserHasRoleDirective {
 
     if (evalValues) {
       // create the view
-      this.viewContainerRef.createEmbeddedView(this.templateRef, this.context);
-      // ui was not updating, so we need to manually trigger it
+      this.viewContainerRef.createEmbeddedView(this.templateRef);
       this.cd.detectChanges();
     } else {
       this.viewContainerRef.clear();
     }
   });
-
-  static ngTemplateContextGuard(dir: GroupUserHasRoleDirective, ctx: unknown): ctx is GroupUserHasRoleDirectiveContext {
-    return true;
-  }
 }
