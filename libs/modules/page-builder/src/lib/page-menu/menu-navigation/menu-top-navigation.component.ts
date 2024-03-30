@@ -38,7 +38,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
     GenericDialogComponent,
   ],
   template: `
-    <div class="w-full shadow-md p-2">
+    <div class="w-full shadow-md p-2 bg-wt-background-present">
       <nav class="w-full pl-3 sm:pl-8 sm:pr-4 flex items-center gap-4 max-w-[1620px] mx-auto pb-1">
         <!-- hide menu button -->
         <div class="block xl:hidden">

@@ -36,6 +36,7 @@ module.exports = {
 
         /* other */
         'wt-border': 'var(--border)',
+        'wt-background-present': 'var(--background-present)',
       },
       flex: {
         2: '2 2 0%',

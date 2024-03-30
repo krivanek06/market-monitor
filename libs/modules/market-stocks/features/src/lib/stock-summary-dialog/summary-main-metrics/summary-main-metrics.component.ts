@@ -11,12 +11,9 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
     <div class="flex justify-around">
       <!-- price -->
       <app-general-card
-        [useShadow]="false"
         [titleCenter]="true"
-        titleScale="large"
         title="Price"
         additionalClasses="h-full"
-        cardColor="bg-wt-gray-light-strong"
         class="max-sm:w-full min-w-[275px]"
       >
         <div class="flex items-center justify-center gap-3">
@@ -34,12 +31,9 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
 
       <!-- market cap -->
       <app-general-card
-        [useShadow]="false"
         [titleCenter]="true"
-        titleScale="large"
         title="Market Cap."
         additionalClasses="h-full"
-        cardColor="bg-wt-gray-light-strong"
         class="hidden sm:block min-w-[150px]"
       >
         <div class="text-center">{{ stockSummary().profile?.mktCap | largeNumberFormatter }}</div>
@@ -47,7 +41,7 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
 
       <!-- volume -->
       <!-- <app-general-card [titleCenter]="true" title="Volume" additionalClasses="h-full"
-    cardColor="bg-wt-gray-light-strong" class="hidden lg:block">
+  class="hidden lg:block">
     <div>
       <span>{{ stockSummary().quote.volume | largeNumberFormatter }}</span>
       <span
@@ -62,11 +56,8 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
 
       <!-- PE -->
       <app-general-card
-        [useShadow]="false"
         [titleCenter]="true"
-        titleScale="large"
         additionalClasses="h-full"
-        cardColor="bg-wt-gray-light-strong"
         title="PE"
         class="hidden md:block min-w-[100px]"
       >
@@ -75,11 +66,8 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
 
       <!-- EPS -->
       <app-general-card
-        [useShadow]="false"
         [titleCenter]="true"
-        titleScale="large"
         additionalClasses="h-full"
-        cardColor="bg-wt-gray-light-strong"
         title="EPS"
         class="hidden lg:block min-w-[100px]"
       >
@@ -88,12 +76,9 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
 
       <!-- Sector -->
       <app-general-card
-        [useShadow]="false"
         [titleCenter]="true"
-        titleScale="large"
         title="Sector"
         additionalClasses="h-full"
-        cardColor="bg-wt-gray-light-strong"
         class="hidden text-center xl:block"
       >
         <div>{{ stockSummary().profile?.sector || 'N/A' }}</div>

@@ -4,7 +4,7 @@
 }
 
 .mat-mdc-snack-bar-container .mdc-snackbar__surface {
-  background-color: var(--background-dialog) !important;
+  background-color: var(--background-present) !important;
 }
 .mat-mdc-snack-bar-container .mdc-snackbar__label {
   color: rgb(35, 35, 35) !important;
@@ -12,7 +12,7 @@
 }
 
 .dark-theme .mat-mdc-snack-bar-container .mdc-snackbar__surface {
-  background-color: var(--background-dialog) !important;
+  background-color: var(--background-present) !important;
 }
 .dark-theme .mat-mdc-snack-bar-container .mdc-snackbar__label {
   color: white !important;

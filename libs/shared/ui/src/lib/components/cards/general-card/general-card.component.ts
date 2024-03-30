@@ -14,24 +14,13 @@ import { MatIconModule } from '@angular/material/icon';
     }
   `,
   template: `
-    <mat-card
-      appearance="outlined"
-      [class]="additionalClasses() + ' ' + cardColor() + ' ' + 'h-full'"
-      [ngClass]="{
-        'shadow-md': useShadow()
-      }"
-    >
+    <mat-card appearance="outlined" [class]="additionalClasses() + ' ' + 'h-full shadow-md'">
       <!-- title -->
       <mat-card-header *ngIf="title()" [ngClass]="{ 'justify-center': titleCenter() }">
         <mat-card-title class="flex items-center gap-2">
           <img *ngIf="titleImgUrl()" appDefaultImg [src]="titleImgUrl()" />
           <mat-icon *ngIf="matIcon()" color="primary">{{ matIcon() }}</mat-icon>
-          <h2
-            class="mb-0 text-wt-primary text-lg"
-            [ngClass]="{
-              'text-xl': titleScale() === 'large'
-            }"
-          >
+          <h2 class="mb-0 text-wt-primary text-lg">
             {{ title() }}
           </h2>
         </mat-card-title>
@@ -40,13 +29,10 @@ import { MatIconModule } from '@angular/material/icon';
       <!-- content -->
       <mat-card-content>
         <!-- default content -->
-        <div
-          *ngIf="cardContent()?.nativeElement.childNodes.length === 0"
-          class="text-wt-gray-medium min-h-[200px] grid place-content-center"
-        >
-          No data has been found
-        </div>
-
+        @if (cardContent()?.nativeElement.childNodes.length === 0) {
+          <div class="text-wt-gray-medium min-h-[200px] grid place-content-center">No data has been found</div>
+        }
+        <!-- custom content -->
         <ng-content #cardContent></ng-content>
       </mat-card-content>
     </mat-card>
@@ -56,11 +42,8 @@ export class GeneralCardComponent {
   title = input<string | null>(null);
   titleImgUrl = input<string | undefined>();
   matIcon = input<string | undefined>();
-  titleScale = input<'large'>('large');
-  useShadow = input(true);
   additionalClasses = input('');
   titleCenter = input(false);
-  cardColor = input<'bg-wt-gray-medium' | 'bg-wt-gray-light-strong' | 'bg-wt-gray-light'>('bg-wt-gray-light');
 
   cardContent = contentChild('cardContent', { read: ElementRef });
 }

@@ -166,7 +166,10 @@ export class SummaryActionButtonsComponent implements OnInit {
       await this.authenticationUserService.removeSymbolFromUserWatchList(this.symbolSummary().id, 'STOCK');
 
       // show notification
-      this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been removed from watchlist`);
+      this.dialogServiceUtil.showNotificationBar(
+        `Symbol: ${this.symbolSummary().id} has been removed from watchlist`,
+        'success',
+      );
       this.checkIfSymbolInWatchList();
     }
   }
