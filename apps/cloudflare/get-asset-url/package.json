@@ -1,5 +1,5 @@
 {
-	"name": "get-asset-url",
+	"name": "cloudflare-get-asset-url",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
