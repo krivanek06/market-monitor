@@ -136,10 +136,9 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           },
           startOnTick: false,
           endOnTick: false,
-          gridLineColor: '#66666655',
+          gridLineColor: ColorScheme.GRAY_LIGHT_STRONG_VAR,
           opposite: false,
           gridLineWidth: 1,
-          minorTickInterval: 'auto',
           tickPixelInterval: 30,
           //minorGridLineWidth: 0, // gray-ish grid lines
           visible: this.showYAxis(),
@@ -156,10 +155,9 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           },
           startOnTick: false,
           endOnTick: false,
-          gridLineColor: '#66666655',
+          gridLineColor: ColorScheme.GRAY_LIGHT_STRONG_VAR,
           opposite: true,
           gridLineWidth: 1,
-          minorTickInterval: 'auto',
           tickPixelInterval: 30,
           //minorGridLineWidth: 0, // gray-ish grid lines
           visible: this.showYAxis(),
@@ -227,17 +225,17 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
       tooltip: {
         borderWidth: 1,
         padding: 12,
-        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
+        backgroundColor: ColorScheme.BACKGROUND_DASHBOARD_VAR,
         style: {
           fontSize: '15px',
-          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
+          color: ColorScheme.GRAY_DARK_VAR,
         },
         shared: this.shareTooltip(),
         outside: false,
         useHTML: true,
         xDateFormat: '%A, %b %e, %Y',
         headerFormat: this.showTooltipHeader()
-          ? `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p>`
+          ? `<p style="color:${ColorScheme.GRAY_DARK_VAR}; font-size: 12px">{point.key}</p>`
           : '',
 
         pointFormatter: function () {

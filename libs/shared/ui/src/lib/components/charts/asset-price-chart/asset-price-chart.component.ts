@@ -70,8 +70,8 @@ export class AssetPriceChartComponent extends ChartConstructor {
           endOnTick: false,
           opposite: false,
           gridLineWidth: 1,
-          minorTickInterval: 'auto',
           tickPixelInterval: 30,
+          gridLineColor: ColorScheme.GRAY_LIGHT_STRONG_VAR,
           visible: true,
           labels: {
             style: {
@@ -125,14 +125,14 @@ export class AssetPriceChartComponent extends ChartConstructor {
         borderWidth: 1,
         padding: 12,
         enabled: true,
-        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
+        backgroundColor: ColorScheme.BACKGROUND_DASHBOARD_VAR,
         style: {
           fontSize: '16px',
-          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
+          color: ColorScheme.GRAY_DARK_VAR,
         },
         shared: true,
         //useHTML: true,
-        headerFormat: `<p style="color: ${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p><br/>`,
+        headerFormat: `<p style="color: ${ColorScheme.GRAY_DARK_VAR}; font-size: 12px">{point.key}</p><br/>`,
 
         pointFormatter: function () {
           const that = this as any;

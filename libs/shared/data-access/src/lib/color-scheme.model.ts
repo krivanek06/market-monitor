@@ -12,6 +12,5 @@ export enum ColorScheme {
   GRAY_LIGHT_STRONG_VAR = 'var(--gray-light-strong)',
   GRAY_LIGHT_VAR = 'var(--gray-light)',
 
-  // additional colors
-  ACCOUNT_STATE = '#c90ff7',
+  BACKGROUND_DASHBOARD_VAR = 'var(--background-dashboard)',
 }

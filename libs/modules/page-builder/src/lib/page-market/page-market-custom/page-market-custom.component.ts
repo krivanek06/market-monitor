@@ -42,7 +42,7 @@ import { map } from 'rxjs';
     </div>
 
     <!-- chart -->
-    <div class="relative w-full mb-10" [ngClass]="{ 'g-shadow-background': showLoadingScreenSignal() }">
+    <div class="relative w-full mb-10">
       <app-generic-chart
         [series]="selectedChartDataDisplaySignal()"
         [heightPx]="450"

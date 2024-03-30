@@ -46,6 +46,7 @@ export class PieChartComponent extends ChartConstructor {
     return {
       chart: {
         type: 'pie',
+        backgroundColor: 'transparent',
         options3d: {
           enabled: true,
           alpha: 45,
@@ -56,7 +57,7 @@ export class PieChartComponent extends ChartConstructor {
         align: 'center',
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,
-          fontSize: '14px',
+          fontSize: '15px',
           fontWeight: 'normal',
         },
         y: 10,
@@ -73,10 +74,10 @@ export class PieChartComponent extends ChartConstructor {
       tooltip: {
         borderWidth: 1,
         padding: 12,
-        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
+        backgroundColor: ColorScheme.BACKGROUND_DASHBOARD_VAR,
         style: {
-          fontSize: '15px',
-          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
+          fontSize: '16px',
+          color: ColorScheme.GRAY_DARK_VAR,
         },
         shared: true,
       },
@@ -114,6 +115,7 @@ export class PieChartComponent extends ChartConstructor {
             style: {
               fontSize: '13px',
               width: 90,
+              textOutline: 'transparent',
             },
             formatter: function () {
               const that = this as any;

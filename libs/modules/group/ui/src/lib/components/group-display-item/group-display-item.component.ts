@@ -24,7 +24,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
       [matRippleDisabled]="!clickable()"
       [matRippleUnbounded]="false"
       [ngClass]="{
-        'g-clickable()-hover': clickable()
+        'g-clickable-hover': clickable()
       }"
       class="flex flex-col gap-1 p-2 @container"
     >

@@ -211,7 +211,7 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
           },
           startOnTick: false,
           endOnTick: false,
-          gridLineColor: '#66666655',
+          gridLineColor: ColorScheme.GRAY_LIGHT_STRONG_VAR,
           opposite: false,
           gridLineWidth: 1,
           //minorTickInterval: 'auto',
@@ -231,7 +231,7 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
           },
           startOnTick: false,
           endOnTick: false,
-          gridLineColor: '#66666655',
+          gridLineColor: ColorScheme.GRAY_LIGHT_STRONG_VAR,
           opposite: true,
           gridLineWidth: 1,
           //minorTickInterval: 'auto', // TODO: this one may cause problem, check if needed
@@ -290,16 +290,16 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
       tooltip: {
         borderWidth: 1,
         padding: 12,
-        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
+        backgroundColor: ColorScheme.BACKGROUND_DASHBOARD_VAR,
         style: {
           fontSize: '15px',
-          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
+          color: ColorScheme.GRAY_DARK_VAR,
         },
         shared: true,
         outside: false,
         useHTML: true,
         xDateFormat: '%A, %b %e, %Y',
-        headerFormat: `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p>`,
+        headerFormat: `<p style="color:${ColorScheme.GRAY_DARK_VAR}; font-size: 12px">{point.key}</p>`,
 
         pointFormatter: function () {
           const additionalData = (this as any).series.userOptions?.additionalData ?? {};
@@ -315,8 +315,8 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
           return `
           <div class="flex items-center gap-2">
             <div style="color: ${this.series.color}" class="min-w-[80px]">● ${this.series.name}:</div>
-            <div class="text-wt-gray-light min-w-[85px]">${value}</div>
-            <div class="text-wt-gray-light-strong">${unitsOnDate ? `[${unitsOnDate}]` : ''}</div>
+            <div class="min-w-[85px]" style="color: ${ColorScheme.GRAY_DARK_VAR}">${value}</div>
+            <div style="color: ${ColorScheme.GRAY_DARK_STRONG_VAR}">${unitsOnDate ? `[${unitsOnDate}]` : ''}</div>
           </div>`;
         },
         valueDecimals: 2,

@@ -9,6 +9,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
 import { DialogServiceModule } from '@mm/shared/dialog-manager';
 import { LoaderMainService } from '@mm/shared/general-features';
+import { ThemeService } from '@mm/shared/theme-switcher';
 import { MenuSideNavigationComponent } from './menu-navigation/menu-side-navigation.component';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
 @Component({
@@ -89,12 +90,14 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageMenuComponent {
+  /**
+   * used to init the service to set theme eagerly
+   */
+  private themeService = inject(ThemeService);
   loaderMainService = inject(LoaderMainService);
   loadingSignal = toSignal(this.loaderMainService.getLoading());
 
   isOpen = signal<boolean>(false);
-
-  constructor() {}
 
   toggleMatDrawerExpandedView(): void {
     this.isOpen.set(!this.isOpen());

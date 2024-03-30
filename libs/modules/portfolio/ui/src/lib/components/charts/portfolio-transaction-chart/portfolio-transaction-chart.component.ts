@@ -46,10 +46,9 @@ export class PortfolioTransactionChartComponent extends ChartConstructor {
           },
           startOnTick: false,
           endOnTick: false,
-          gridLineColor: '#66666655',
+          gridLineColor: ColorScheme.GRAY_LIGHT_STRONG_VAR,
           opposite: false,
           gridLineWidth: 1,
-          minorTickInterval: 'auto',
           tickPixelInterval: 30,
           minorGridLineWidth: 0,
           visible: true,
@@ -66,10 +65,9 @@ export class PortfolioTransactionChartComponent extends ChartConstructor {
           },
           startOnTick: false,
           endOnTick: false,
-          gridLineColor: '#66666655',
+          gridLineColor: ColorScheme.GRAY_LIGHT_STRONG_VAR,
           opposite: true,
           gridLineWidth: 1,
-          minorTickInterval: 'auto',
           tickPixelInterval: 30,
           minorGridLineWidth: 0,
           visible: true,
@@ -137,14 +135,14 @@ export class PortfolioTransactionChartComponent extends ChartConstructor {
       tooltip: {
         padding: 11,
         enabled: true,
-        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
+        backgroundColor: ColorScheme.BACKGROUND_DASHBOARD_VAR,
         xDateFormat: '%A, %b %e, %Y',
         style: {
           fontSize: '16px',
-          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
+          color: ColorScheme.GRAY_DARK_VAR,
         },
         shared: true,
-        headerFormat: `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.key}</p><br/>`,
+        headerFormat: `<p style="color:${ColorScheme.GRAY_DARK_VAR}; font-size: 12px">{point.key}</p><br/>`,
         pointFormatter: function () {
           const value = this.series.name === 'Transaction fees' ? formatValueIntoCurrency(this.y) : this.y;
           return `<p><span style="color: ${this.series.color}; font-weight: bold">● ${this.series.name}: </span><span>${value}</span></p><br/>`;

@@ -4,14 +4,14 @@
 }
 
 .g-bubble {
-  background-color: #aeaeae;
+  background-color: var(--gray-light-strong);
   border-radius: 50%;
   width: 34px;
   height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white !important;
+  color: var(--gray-dark);
   font-size: 14px;
   cursor: pointer;
   transition: 0.3s;
