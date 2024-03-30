@@ -17,10 +17,12 @@ import {
   PortfolioTransaction,
   PortfolioTransactionCreate,
   SymbolType,
+  UserAccountBasicTypes,
   UserAccountTypes,
   UserData,
   UserGroupData,
   UserPortfolioTransaction,
+  UserResetTransactionsInput,
   UserWatchList,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
@@ -201,9 +203,33 @@ export class AuthenticationUserStoreService {
     });
   }
 
-  updateUserWatchList(watchlist: Partial<UserWatchList>): void {
-    const userId = this.state.getUser().uid;
-    setDoc(this.getUserWatchlistDocRef(userId), watchlist, { merge: true });
+  changeUserPersonal(data: Partial<UserData['personal']>): void {
+    const userData = this.state.getUserData();
+    this.updateUser(userData.id, {
+      personal: {
+        ...userData.personal,
+        ...data,
+      },
+    });
+  }
+
+  async resetTransactions(accountTypeSelected: UserAccountBasicTypes): Promise<void> {
+    const userData = this.state.getUserData();
+    const callable = httpsCallable<UserResetTransactionsInput, void>(this.functions, 'userResetTransactionsCall');
+    await callable({
+      userId: userData.id,
+      accountTypeSelected,
+    });
+  }
+
+  changeUserSettings(data: Partial<UserData['settings']>): void {
+    const userData = this.state.getUserData();
+    this.updateUser(userData.id, {
+      settings: {
+        ...userData.settings,
+        ...data,
+      },
+    });
   }
 
   addSymbolToUserWatchList(symbol: string, symbolType: SymbolType): Promise<void> {
@@ -284,6 +310,10 @@ export class AuthenticationUserStoreService {
 
   private getUserDocRef(userId: string): DocumentReference<UserData> {
     return doc(this.userCollection(), userId);
+  }
+
+  private updateUser(id: string, user: Partial<UserData>): void {
+    setDoc(this.getUserDocRef(id), user, { merge: true });
   }
 
   private userCollection(): CollectionReference<UserData, DocumentData> {

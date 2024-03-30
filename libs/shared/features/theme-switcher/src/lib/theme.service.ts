@@ -1,38 +1,37 @@
 import { DOCUMENT } from '@angular/common';
-import { Inject, Injectable } from '@angular/core';
-import { StorageLocalStoreService } from '../../../general-features/src/lib/storage/storage-local-store.service';
+import { Injectable, computed, inject } from '@angular/core';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 
-export type ThemeType = 'light' | 'dark';
 @Injectable({
   providedIn: 'root',
 })
-export class ThemeService extends StorageLocalStoreService<ThemeType> {
-  private readonly LIGHT_THEME = 'light-theme';
+export class ThemeService {
+  private readonly DARK_THEME = 'dark-theme';
+  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private document = inject(DOCUMENT);
 
-  constructor(@Inject(DOCUMENT) private document: Document) {
-    super('STORAGE_THEME_PREFERENCE', 'light');
+  isDarkMode = computed(() => !!this.authenticationUserStoreService.state.getUserData().settings.isDarkMode);
+
+  constructor() {
     this.initTheme();
-  }
-
-  isLightMode(): boolean {
-    return this.getData() === 'light';
+    console.log('ThemeService created', this.authenticationUserStoreService.state.getUserData());
   }
 
   toggleTheme(): void {
-    const currentTheme = this.getData();
-    if (currentTheme === 'light') {
-      this.saveData('dark');
-      this.document.body.classList.remove(this.LIGHT_THEME);
+    if (this.isDarkMode()) {
+      this.document.body.classList.remove(this.DARK_THEME);
     } else {
-      this.saveData('light');
-      this.document.body.classList.add(this.LIGHT_THEME);
+      this.document.body.classList.add(this.DARK_THEME);
     }
+
+    this.authenticationUserStoreService.changeUserSettings({
+      isDarkMode: !this.isDarkMode(),
+    });
   }
 
   private initTheme(): void {
-    const currentTheme = this.getData();
-    if (currentTheme === 'light') {
-      this.document.body.classList.add(this.LIGHT_THEME);
+    if (this.isDarkMode()) {
+      this.document.body.classList.add(this.DARK_THEME);
     }
   }
 }

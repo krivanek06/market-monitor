@@ -21,9 +21,9 @@ import {
   setDoc,
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
-import { UserAccountBasicTypes, UserData, UserResetTransactionsInput } from '@mm/api-types';
+import { UserData } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { createNameInitials, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
+import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { BehaviorSubject, Observable, Subject, catchError, from, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
@@ -115,38 +115,6 @@ export class AuthenticationAccountService {
 
   resetPassword() {
     // todo
-  }
-
-  changeDisplayName(displayName: string): void {
-    this.updateUser(this.currentUserData.id, {
-      personal: {
-        ...this.currentUserData.personal,
-        displayName,
-        displayNameInitials: createNameInitials(displayName),
-      },
-    });
-  }
-
-  changePhotoUrl(photoURL: string): void {
-    this.updateUser(this.currentUserData.id, {
-      personal: {
-        ...this.currentUserData.personal,
-        photoURL,
-      },
-    });
-  }
-
-  async resetTransactions(accountTypeSelected: UserAccountBasicTypes): Promise<void> {
-    const user = this.authenticatedUser$.value;
-    if (!user) {
-      throw new Error('User is not authenticated');
-    }
-
-    const callable = httpsCallable<UserResetTransactionsInput, void>(this.functions, 'userResetTransactionsCall');
-    await callable({
-      userId: user.uid,
-      accountTypeSelected,
-    });
   }
 
   async deleteAccount(): Promise<void> {

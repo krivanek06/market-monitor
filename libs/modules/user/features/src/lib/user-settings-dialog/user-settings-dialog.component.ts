@@ -11,6 +11,8 @@ import { ChangePasswordDialogComponent } from '@mm/authentication/authentication
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { createNameInitials } from '@mm/shared/general-util';
+import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
 import { filterNil } from 'ngxtension/filter-nil';
@@ -33,6 +35,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     UserAccountTypeSelectDialogComponent,
     ChangePasswordDialogComponent,
     UserAccountTypeDirective,
+    ThemeSwitcherComponent,
   ],
   template: `
     <app-dialog-close-header title="Settings"></app-dialog-close-header>
@@ -52,25 +55,40 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
 
           <!-- user data -->
           <div class="pt-2 text-lg">
+            <!-- name -->
             <div class="c-text-item">
               <span>Display Name:</span>
               <span>{{ userDataSignal().personal.displayName }}</span>
             </div>
+            <!-- initials -->
+            <div class="c-text-item">
+              <span>Initials:</span>
+              <span>{{ userDataSignal().personal.displayNameInitials }}</span>
+            </div>
+            <!-- email -->
             <div class="c-text-item">
               <span>Email:</span>
               <span>{{ userSignal().email }}</span>
             </div>
+            <!-- created -->
             <div class="c-text-item">
               <span>Created:</span>
               <span>{{ userDataSignal().accountCreatedDate | date: 'MMMM d, y' }}</span>
             </div>
+            <!-- account type -->
             <div class="c-text-item">
               <span>Account Type:</span>
               <span> {{ userDataSignal().userAccountType }}</span>
             </div>
+            <!-- starting cash -->
             <div *appUserAccountType="'DEMO_TRADING'" class="c-text-item">
               <span>Starting Cash:</span>
               <span> {{ userDataSignal().portfolioState.startingCash | currency }}</span>
+            </div>
+            <!-- theme -->
+            <div class="flex items-center gap-6">
+              <span class="text-wt-gray-dark">Dark Mode:</span>
+              <app-theme-switcher />
             </div>
           </div>
         </div>
@@ -162,7 +180,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     .c-text-item {
       display: flex;
       :first-child {
-        min-width: 150px;
+        min-width: 170px;
         color: var(--gray-dark);
       }
     }
@@ -200,9 +218,11 @@ export class UserSettingsDialogComponent implements OnInit {
     this.userImageControl.setValue(userData?.personal.photoURL ?? null, { emitEvent: false });
 
     // update url
-    this.userImageControl.valueChanges
-      .pipe(filterNil())
-      .subscribe((imgUrl) => this.authenticationAccountService.changePhotoUrl(imgUrl));
+    this.userImageControl.valueChanges.pipe(filterNil()).subscribe((imgUrl) =>
+      this.authenticationUserStoreService.changeUserPersonal({
+        photoURL: imgUrl,
+      }),
+    );
   }
 
   @Confirmable('Are you sure you want to delete your account?', 'Confirm', true, 'DELETE')
@@ -244,7 +264,12 @@ export class UserSettingsDialogComponent implements OnInit {
       })
       .pipe(
         filterNil(),
-        map((val) => this.authenticationAccountService.changeDisplayName(val)),
+        map((val) =>
+          this.authenticationUserStoreService.changeUserPersonal({
+            displayName: val,
+            displayNameInitials: createNameInitials(val),
+          }),
+        ),
         tap(() => this.dialogServiceUtil.showNotificationBar('Your display name has been changed', 'success')),
       )
       .subscribe((res) => console.log(res));
@@ -263,7 +288,7 @@ export class UserSettingsDialogComponent implements OnInit {
     }
 
     // perform operation
-    from(this.authenticationAccountService.resetTransactions(currentAccountType))
+    from(this.authenticationUserStoreService.resetTransactions(currentAccountType))
       .pipe(
         tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been reset', 'success')),
         catchError((err) => {

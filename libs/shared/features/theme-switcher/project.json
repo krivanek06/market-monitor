@@ -2,7 +2,7 @@
   "name": "theme-switcher",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/features/theme-switcher/src",
-  "prefix": "market-monitor",
+  "prefix": "app",
   "tags": [],
   "projectType": "library",
   "targets": {
