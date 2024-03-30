@@ -71,7 +71,7 @@ export type UserDetailsDialogComponentData = {
           <mat-divider></mat-divider>
         </div>
         <!-- display portfolio -->
-        <div class="flex p-2 divide-x-2 flex-row">
+        <div class="flex p-2 divide-x-2 flex-row divide-wt-border">
           <!-- portfolio state -->
           <div class="p-2 max-lg:flex-1 lg:basis-[40%]">
             <app-portfolio-state

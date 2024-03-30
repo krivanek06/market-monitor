@@ -180,7 +180,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
       <div class="min-w-[320px] flex flex-col">
         <button
           mat-button
-          class="mb-2 hover:bg-gray-100 hover:scale-95 duration-300  w-full h-12"
+          class="mb-2 hover:bg-wt-gray-light-strong g-clickable-hover w-full h-12"
           (click)="onSettingClick()"
         >
           <mat-icon>settings</mat-icon>
@@ -188,13 +188,17 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
         </button>
         <button
           mat-button
-          class="mb-2 hover:bg-gray-100 hover:scale-95 duration-300 w-full h-12"
+          class="mb-2 hover:bg-wt-gray-light-strong g-clickable-hover w-full h-12"
           (click)="onHelpClick()"
         >
           <mat-icon>help</mat-icon>
           Help
         </button>
-        <button mat-button class="hover:bg-gray-100 hover:scale-95 duration-300 w-full h-12" (click)="onLogOutClick()">
+        <button
+          mat-button
+          class="hover:bg-wt-gray-light-strong g-clickable-hover w-full h-12"
+          (click)="onLogOutClick()"
+        >
           <mat-icon>logout</mat-icon>
           Log out
         </button>
@@ -207,7 +211,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
         display: block;
 
         a {
-          @apply hidden xl:block p-4 hover:bg-gray-100 rounded-md px-4;
+          @apply hidden xl:block p-4 hover:bg-wt-gray-light-strong rounded-md px-4;
 
           &.c-active {
             border-bottom: 2px solid var(--primary) !important;

@@ -25,7 +25,7 @@ import { PortfolioBalancePieChartComponent } from '@mm/portfolio/ui';
       [matRippleDisabled]="false"
       [matRippleUnbounded]="false"
       appearance="outlined"
-      class="shadow-md cursor-pointer bg-wt-gray-light"
+      class="shadow-md cursor-pointer"
       (click)="onGroupClick()"
       [ngClass]="{ 'g-overlay': groupData().isClosed }"
     >

@@ -73,12 +73,12 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         borderWidth: 1,
         enabled: true,
         shared: true,
-        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
+        backgroundColor: ColorScheme.BACKGROUND_DASHBOARD_VAR,
         style: {
           fontSize: '15px',
-          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
+          color: ColorScheme.GRAY_DARK_VAR,
         },
-        headerFormat: `<p style="color: ${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{point.x}</p><br/>`,
+        headerFormat: `<p style="color: ${ColorScheme.GRAY_DARK_VAR}; font-size: 12px">{point.x}</p><br/>`,
         pointFormatter: function () {
           const that = this as any;
           const name = that.name;
@@ -146,10 +146,9 @@ export class EarningsEstimationChartComponent extends ChartConstructor {
         endOnTick: false,
         opposite: false,
         gridLineWidth: 1,
-        minorTickInterval: 'auto',
         tickPixelInterval: 25,
         visible: true,
-        gridLineColor: '#66666655',
+        gridLineColor: ColorScheme.GRAY_LIGHT_STRONG_VAR,
         labels: {
           style: {
             color: ColorScheme.GRAY_MEDIUM_VAR,

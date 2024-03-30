@@ -30,8 +30,8 @@
 $mat-theming-light: mat.define-light-theme(
   (
     color: (
-      primary: mat.define-palette($custom-primary-light),
-      accent: mat.define-palette($custom-success-light),
+      primary: mat.define-palette($custom-primary),
+      accent: mat.define-palette($custom-success),
       warn: mat.define-palette($custom-warn),
     ),
     typography:
@@ -46,7 +46,7 @@ $mat-theming-light: mat.define-light-theme(
 $mat-theming-dark: mat.define-dark-theme(
   (
     color: (
-      primary: mat.define-palette($custom-primary),
+      primary: mat.define-palette($custom-primary-dark),
       accent: mat.define-palette($custom-success),
       warn: mat.define-palette($custom-warn),
     ),

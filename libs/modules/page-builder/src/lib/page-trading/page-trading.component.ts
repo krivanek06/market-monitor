@@ -132,7 +132,7 @@ import { take } from 'rxjs';
               'border-wt-primary': item.id === symbolSummarySignal()?.id,
               border: item.id === symbolSummarySignal()?.id
             }"
-            class="g-clickable-hover py-2 px-4 border-r border-l border-solid hover:border rounded-lg"
+            class="g-clickable-hover py-2 px-4 border-r border-l border-solid hover:border rounded-lg border-wt-border"
           >
             <app-quote-item [symbolQuote]="item.quote" displayValue="symbol"></app-quote-item>
           </div>

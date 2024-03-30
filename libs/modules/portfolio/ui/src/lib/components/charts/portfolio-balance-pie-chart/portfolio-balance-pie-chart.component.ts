@@ -80,6 +80,13 @@ export class PortfolioBalancePieChartComponent extends ChartConstructor {
             style: {
               //fontWeight: 'bold',
               fontSize: '14px',
+              textOutline: 'transparent',
+            },
+            formatter: function () {
+              const result = `
+                  <div style="color: ${ColorScheme.GRAY_DARK_VAR}">${this.key}</div>
+                `;
+              return result;
             },
           },
         },
@@ -87,11 +94,11 @@ export class PortfolioBalancePieChartComponent extends ChartConstructor {
       tooltip: {
         padding: 11,
         enabled: true,
-        backgroundColor: ColorScheme.GRAY_DARK_STRONG_VAR,
+        backgroundColor: ColorScheme.BACKGROUND_DASHBOARD_VAR,
         xDateFormat: '%A, %b %e, %Y',
         style: {
           fontSize: '16px',
-          color: ColorScheme.GRAY_LIGHT_STRONG_VAR,
+          color: ColorScheme.GRAY_DARK_VAR,
         },
         shared: true,
         headerFormat: '',

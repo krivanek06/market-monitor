@@ -33,21 +33,16 @@ import { PositionColoringDirective } from '../../../directives';
       [defaultPositionColor]="ColorScheme.GRAY_LIGHT_VAR"
       positionType="background-color"
       (click)="onClick()"
-      [ngClass]="{
-        'g-clickable()-hover': clickable()
-      }"
     >
       <div class="relative">
         <!-- position -->
         <div
-          class="absolute -top-6 -left-4 h-10 z-10 rounded-full bg-slate-200 flex items-center gap-4 opacity-90 border border-wt-gray-light-strong"
+          class="absolute -top-6 -left-4 h-10 z-10 rounded-full bg-wt-gray-light-strong flex items-center gap-4 opacity-90 border border-wt-gray-light-strong"
           [ngClass]="{
             'w-10': !showPreviousPosition()
           }"
         >
-          <div class="c-position text-lg ml-2" appPositionColoring [position]="currentPositions()">
-            #{{ currentPositions() }}
-          </div>
+          <div class="text-lg ml-2" appPositionColoring [position]="currentPositions()">#{{ currentPositions() }}</div>
           <div
             *ngIf="showPreviousPosition()"
             class="flex items-center"

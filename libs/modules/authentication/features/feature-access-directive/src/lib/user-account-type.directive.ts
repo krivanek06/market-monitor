@@ -32,7 +32,7 @@ export class UserAccountTypeDirective {
       return;
     }
     const hasAccess = hasUserAccess(userData, accountType);
-    console.log('changing access', hasAccess);
+    console.log('[UserAccountType]: changing access', hasAccess);
     if (hasAccess) {
       this.viewContainerRef.createEmbeddedView(this.templateRef);
     } else {

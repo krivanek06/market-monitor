@@ -33,4 +33,33 @@
 }
 
 :root .dark-theme {
+  /* primary */
+  --primary: #12aaaa;
+
+  /* success */
+  --success: #03aa06;
+
+  /* danger */
+  --danger: #d42626;
+
+  /* gray */
+  --gray-dark-strong: #ffffff;
+  --gray-dark: #d2d2d2;
+  --gray-medium: #949494;
+  --gray-light-strong: #2b2b2b;
+  --gray-light: #1d1d1d;
+
+  /* table */
+  --table-hover: #44444455;
+  --border: #373737;
+
+  --background-dashboard: #121212;
+  --background-present: #000000;
+
+  --disable-default: #262626;
+
+  /* accent */
+  --accent-1: #0e71c3;
+  --accent-2: #f36300;
+  --accent-3: #dd1ec2;
 }

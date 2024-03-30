@@ -103,7 +103,7 @@ export class UserAccountTypeSelectDialogComponent {
     }
 
     // perform operation
-    from(this.authenticationAccountService.resetTransactions(selected))
+    from(this.authenticationUserStoreService.resetTransactions(selected))
       .pipe(
         tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been changed and reset', 'success')),
         catchError((err) => {
