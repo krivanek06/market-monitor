@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable } from '@angular/core';
-import { StorageLocalStoreService } from '../storage/storage-local-store.service';
+import { StorageLocalStoreService } from '../../../general-features/src/lib/storage/storage-local-store.service';
 
 export type ThemeType = 'light' | 'dark';
 @Injectable({
