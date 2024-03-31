@@ -1,9 +1,10 @@
+import { GroupData } from '@mm/api-types';
 import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https';
 import { GROUP_ALREADY_CLOSED_ERROR, GROUP_NOT_FOUND_ERROR, GROUP_USER_NOT_OWNER, groupDocumentRef } from '../models';
 
-export const groupCloseCall = onCall(async (request) => {
-  const groupId = request.data as string;
+export const groupCloseCall = onCall(async (request: CallableRequest<string>): Promise<GroupData> => {
+  const groupId = request.data;
   const userAuthId = request.auth?.uid;
 
   const groupRef = await groupDocumentRef(groupId).get();
