@@ -15,7 +15,6 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { maxLengthValidator, minLengthValidator, requiredValidator } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
-  DatePickerComponent,
   DefaultImgDirective,
   DialogCloseHeaderComponent,
   FormMatInputWrapperComponent,
@@ -39,7 +38,6 @@ import { map, startWith } from 'rxjs';
     ReactiveFormsModule,
     FormMatInputWrapperComponent,
     MatCheckboxModule,
-    DatePickerComponent,
     DefaultImgDirective,
     MatProgressSpinnerModule,
     DialogCloseHeaderComponent,

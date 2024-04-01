@@ -23,9 +23,11 @@ import { forkJoin, take } from 'rxjs';
     </div>
 
     <!-- news -->
-    <div class="max-w-[1280px] mx-auto">
-      <app-news-search [initialNewsToDisplay]="4" [searchData]="{ newsType: 'general' }"></app-news-search>
-    </div>
+    @defer {
+      <div class="max-w-[1280px] mx-auto">
+        <app-news-search [initialNewsToDisplay]="4" [searchData]="{ newsType: 'general' }"></app-news-search>
+      </div>
+    }
   `,
   styles: `
     :host {

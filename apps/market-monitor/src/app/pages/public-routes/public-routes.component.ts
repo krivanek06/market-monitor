@@ -2,23 +2,23 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
+import { DialogServiceModule } from '@mm/shared/dialog-manager';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-public-routes',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, DialogServiceModule],
   template: `
     <nav
       class="flex sm:justify-center gap-6 sm:gap-4 pt-8 text-wt-gray-medium relative max-sm:overflow-scroll pb-6 max-sm:px-6"
     >
       <span class="hidden md:block absolute left-4 top-4 text-wt-gray-medium text-xs">Version {{ version }}</span>
-      <a routerLink="" routerLinkActive="is-active">Search</a>
+      <a [routerLink]="['/']" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="is-active">Search</a>
       <a [routerLink]="[ROUTES_MAIN.STOCK_SCREENER]" routerLinkActive="is-active">Screener</a>
       <a [routerLink]="[ROUTES_MAIN.TOP_PERFORMERS]" routerLinkActive="is-active">Top Performers</a>
       <a [routerLink]="[ROUTES_MAIN.MARKET]" routerLinkActive="is-active">Market</a>
       <a [routerLink]="[ROUTES_MAIN.MARKET_CALENDAR]" routerLinkActive="is-active">Calendar</a>
-      <!-- <a [routerLink]="ROUTES_MAIN.CRYPTO" routerLinkActive="is-active">Crypto</a> -->
     </nav>
 
     <section class="g-screen-size-default">

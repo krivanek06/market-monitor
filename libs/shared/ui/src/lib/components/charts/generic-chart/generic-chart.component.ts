@@ -110,7 +110,6 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
         type: 'category',
       };
     }
-    console.log('chartOptions', chartOptions);
     return chartOptions;
   });
 

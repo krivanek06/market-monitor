@@ -14,11 +14,20 @@
 
 html,
 body {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+body {
   height: 100%;
   scroll-behavior: smooth;
-}
-body {
   margin: 0;
-  font-family: Poppins, sans-serif;
+  font-family: system-ui, Poppins, sans-serif;
   background-color: var(--background-dashboard);
+  color: var(--gray-medium);
 }

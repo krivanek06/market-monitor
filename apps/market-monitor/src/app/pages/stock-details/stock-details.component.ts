@@ -7,12 +7,21 @@ import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
 import { stockDetailsResolver } from '@mm/page-builder';
 import { LabelValue, ROUTES_STOCK_DETAILS } from '@mm/shared/data-access';
+import { DialogServiceModule } from '@mm/shared/dialog-manager';
 import { TabSelectControlComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, TabSelectControlComponent, ReactiveFormsModule, MatButtonModule, MatIconModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    TabSelectControlComponent,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatIconModule,
+    DialogServiceModule,
+  ],
   template: `
     <section class="g-screen-size-default">
       <div class="flex justify-between mb-6">

@@ -10,7 +10,7 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, MatButtonModule, RouterModule, MatIconModule],
   template: `
     <section>
-      <div class="flex flex-col items-center mt-[25%] gap-4">
+      <div class="flex flex-col items-center mt-[250px] 2xl:mt-[400px] gap-4">
         <div class="text-4xl font-bold text-center text-wt-primary">404</div>
         <div class="text-xl font-bold text-center text-wt-primary">Page Not Found</div>
         <div class="text-lg text-center">The page you are looking for doesn't exist or an other error occurred.</div>
