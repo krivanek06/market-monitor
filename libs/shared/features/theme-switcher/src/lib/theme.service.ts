@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Injectable, computed, inject } from '@angular/core';
+import { Injectable, computed, effect, inject } from '@angular/core';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 
 @Injectable({
@@ -12,26 +12,18 @@ export class ThemeService {
 
   isDarkMode = computed(() => !!this.authenticationUserStoreService.state.getUserData().settings.isDarkMode);
 
-  constructor() {
-    this.initTheme();
-    console.log('ThemeService created', this.authenticationUserStoreService.state.getUserData());
-  }
+  isDarkModeEffect = effect(() => {
+    console.log('[ThemeService] is dark:', this.isDarkMode());
+    if (this.isDarkMode()) {
+      this.document.body.classList.add(this.DARK_THEME);
+    } else {
+      this.document.body.classList.remove(this.DARK_THEME);
+    }
+  });
 
   toggleTheme(): void {
-    if (this.isDarkMode()) {
-      this.document.body.classList.remove(this.DARK_THEME);
-    } else {
-      this.document.body.classList.add(this.DARK_THEME);
-    }
-
     this.authenticationUserStoreService.changeUserSettings({
       isDarkMode: !this.isDarkMode(),
     });
-  }
-
-  private initTheme(): void {
-    if (this.isDarkMode()) {
-      this.document.body.classList.add(this.DARK_THEME);
-    }
   }
 }
