@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   TrackByFunction,
+  computed,
   effect,
   input,
   output,
@@ -13,7 +14,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { PortfolioStateHolding } from '@mm/api-types';
+import { PortfolioState, PortfolioStateHolding } from '@mm/api-types';
 import { compare } from '@mm/shared/general-util';
 import {
   DefaultImgDirective,
@@ -255,10 +256,17 @@ export class PortfolioHoldingsTableComponent {
   /**
    * Invested amount - closed price * units for each holdings
    */
-  holdingsBalance = input.required<number>();
+  portfolioState = input.required<PortfolioState | undefined>();
   holdings = input.required<PortfolioStateHolding[]>();
   paginator = viewChild(MatPaginator);
   sort = viewChild(MatSort);
+
+  /**
+   * Total balance of all holdings - used to have wrong percentage calculation when fees wasn't accounted for
+   */
+  holdingsBalance = computed(
+    () => (this.portfolioState()?.holdingsBalance ?? 0) + (this.portfolioState()?.transactionFees ?? 0),
+  );
 
   displayedColumns = input<string[]>([
     'symbol',
@@ -318,7 +326,11 @@ export class PortfolioHoldingsTableComponent {
         case 'units':
           return compare(a.units, b.units, isAsc);
         case 'portfolio':
-          return compare(a.invested, b.invested, isAsc);
+          return compare(
+            (a.symbolSummary.quote.price * a.units) / this.holdingsBalance(),
+            (b.symbolSummary.quote.price * b.units) / this.holdingsBalance(),
+            isAsc,
+          );
         case 'pe':
           return compare(a.symbolSummary.quote.pe, b.symbolSummary.quote.pe, isAsc);
         case 'dailyValueChange':

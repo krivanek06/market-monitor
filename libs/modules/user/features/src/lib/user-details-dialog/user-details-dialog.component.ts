@@ -129,9 +129,9 @@ export type UserDetailsDialogComponentData = {
           <app-section-title [title]="'Holdings: ' + (portfolioStateHoldingSignal()?.holdings ?? []).length" />
           <app-portfolio-holdings-table
             [holdings]="portfolioStateHoldingSignal()?.holdings ?? []"
-            [holdingsBalance]="portfolioStateHoldingSignal()?.holdingsBalance ?? 0"
+            [portfolioState]="portfolioStateHoldingSignal()"
             [displayedColumns]="displayedColumns"
-          ></app-portfolio-holdings-table>
+          />
         </div>
       } @else {
         <mat-spinner></mat-spinner>

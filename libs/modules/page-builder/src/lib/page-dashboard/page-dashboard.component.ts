@@ -192,7 +192,7 @@ import { map, pipe, startWith } from 'rxjs';
         <app-portfolio-holdings-table
           (symbolClicked)="onSummaryClick($event)"
           [holdings]="portfolioUserFacadeService.getPortfolioState()?.holdings ?? []"
-          [holdingsBalance]="portfolioUserFacadeService.getPortfolioState()?.holdingsBalance ?? 0"
+          [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
         ></app-portfolio-holdings-table>
       </app-general-card>
     </div>
@@ -206,13 +206,13 @@ import { map, pipe, startWith } from 'rxjs';
             chartTitle="Asset Allocation"
             [heightPx]="400"
             [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
-          ></app-pie-chart>
+          />
           <app-pie-chart
             class="hidden lg:block"
             [heightPx]="400"
             chartTitle="Sector Allocation"
             [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
-          ></app-pie-chart>
+          />
         </div>
 
         <!-- transaction history -->

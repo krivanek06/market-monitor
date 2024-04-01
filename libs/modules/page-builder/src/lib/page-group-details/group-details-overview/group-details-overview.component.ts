@@ -209,7 +209,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
           <app-portfolio-holdings-table
             (symbolClicked)="onSummaryClick($event)"
             [holdings]="displayedHoldings()"
-            [holdingsBalance]="groupDetailsSignal.groupData.portfolioState.holdingsBalance"
+            [portfolioState]="groupDetailsSignal.groupData.portfolioState"
           />
           <!-- show more button -->
           <div class="flex justify-end mt-2 mr-4">

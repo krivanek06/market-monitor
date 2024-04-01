@@ -113,7 +113,7 @@ export class PieChartComponent extends ChartConstructor {
             overflow: 'allow',
             shadow: false,
             style: {
-              fontSize: '13px',
+              fontSize: '14px',
               width: 90,
               textOutline: 'transparent',
             },
@@ -123,10 +123,7 @@ export class PieChartComponent extends ChartConstructor {
               const color = Highcharts.getOptions()?.colors?.[this.colorIndex ?? 0] ?? ColorScheme.PRIMARY_VAR;
 
               const result = `
-              <div class="flex flex-col">
                   <div style="color: ${color}">${that.key}</div>
-                  <div>${rounded}%</div>
-              </div>
                 `;
               return result;
             },

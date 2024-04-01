@@ -176,7 +176,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
           <app-portfolio-holdings-table
             (symbolClicked)="onSummaryClick($event)"
             [holdings]="selectedUserHoldings()"
-            [holdingsBalance]="selectedUser()?.portfolioState?.holdingsBalance ?? 0"
+            [portfolioState]="selectedUser()?.portfolioState"
           ></app-portfolio-holdings-table>
           <!-- show more members button -->
           <div class="flex justify-end">
