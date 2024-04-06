@@ -1,6 +1,6 @@
 import { PortfolioState, PortfolioTransaction, PortfolioTransactionCreate, SymbolSummary } from '@mm/api-types';
 import { getYesterdaysDate } from '@mm/shared/general-util';
-import { USER_TEST_1_ID } from './test-user.model';
+import { USER_TEST_1_ID } from '../../../../../../../api/api-types/src/lib/testing/test-user.model';
 
 export const TestTransactionDates = {
   ['2023-09-04']: '2023-09-04',

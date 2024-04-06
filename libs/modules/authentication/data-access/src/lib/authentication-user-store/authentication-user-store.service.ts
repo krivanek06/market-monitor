@@ -165,7 +165,6 @@ export class AuthenticationUserStoreService {
       getUser: () => state().user!,
       getUserData: () => state().userData!,
       getUserDataNormal: () => state().userData,
-      getPortfolioState: () => state().userData?.portfolioState,
       getUserGroupData: () => state().userGroupData!,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
       getUserPortfolioTransactions: () => state().portfolioTransactions,

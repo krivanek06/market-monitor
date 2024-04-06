@@ -3,7 +3,6 @@ import { groupUpdateData } from '../schedulers/group-update-data';
 import { hallOfFameGroups } from '../schedulers/hall-of-fame-groups';
 import { hallOfFameUsers } from '../schedulers/hall-of-fame-users';
 import { userPortfolioRank } from '../schedulers/user-portfolio-rank';
-import { userPortfolioUpdate } from '../schedulers/user-portfolio-update';
 import { isFirebaseEmulator } from '../utils';
 import { updateAllUsersLastLoggedInDate } from './update-all-users-last-logged-in-date';
 
@@ -17,8 +16,6 @@ export const runALlSchedulers = async (): Promise<void> => {
   updateAllUsersLastLoggedInDate();
 
   // run all schedulers
-  console.log('[Users]: update portfolio');
-  await userPortfolioUpdate();
   console.log('[Groups]: update portfolio');
   await groupUpdateData();
   console.log('[Users]: update rank');

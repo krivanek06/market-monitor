@@ -13,6 +13,7 @@ import {
 } from '@angular/fire/auth';
 import { UserApiService } from '@mm/api-client';
 import { UserData } from '@mm/api-types';
+import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { BehaviorSubject, Observable, Subject, catchError, from, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
@@ -26,6 +27,10 @@ export class AuthenticationAccountService {
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
   private authenticatedUser$ = new BehaviorSubject<User | null>(null);
   private loadedAuthentication$ = new Subject<UserData['id'] | null>();
+
+  isDevActive = inject(IS_DEV_TOKEN, {
+    optional: true,
+  });
 
   constructor() {
     this.initAuthenticationUser();
@@ -152,6 +157,7 @@ export class AuthenticationAccountService {
     this.auth.onAuthStateChanged((user) => {
       console.log('authentication state change', user);
       this.authenticatedUser$.next(user);
+      const updateTime = this.isDevActive ? 3_000 : 20_000;
 
       if (user) {
         // wait some time before updating last login date so that user is already saved in authenticatedUserData
@@ -162,7 +168,7 @@ export class AuthenticationAccountService {
             lastLoginDate: getCurrentDateDefaultFormat(),
             isAccountActive: true,
           });
-        }, 20_000);
+        }, updateTime);
       }
     });
   }

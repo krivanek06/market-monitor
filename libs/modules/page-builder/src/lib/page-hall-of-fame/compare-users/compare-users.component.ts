@@ -243,7 +243,7 @@ export class CompareUsersComponent {
                       userData: of(userData),
                       userTransactions: of(userTransactions.transactions),
                       portfolioState: this.portfolioCalculationService
-                        .getPortfolioStateHoldings(userTransactions.transactions, userData.portfolioState)
+                        .getPortfolioStateHoldings(userData.portfolioState, userData.holdingSnapshot.data)
                         .pipe(take(1)),
                       portfolioGrowth: from(
                         this.portfolioCalculationService.getPortfolioGrowthAssets(userTransactions.transactions),

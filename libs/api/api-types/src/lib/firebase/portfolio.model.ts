@@ -65,7 +65,7 @@ export type PortfolioState = {
   /**
    * risk of the portfolio
    */
-  portfolioRisk?: PortfolioRisk;
+  portfolioRisk?: PortfolioRisk | null;
 };
 
 export type PortfolioStateHoldingBase = {

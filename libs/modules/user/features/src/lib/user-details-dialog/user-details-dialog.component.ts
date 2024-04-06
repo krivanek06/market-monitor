@@ -196,7 +196,10 @@ export class UserDetailsDialogComponent {
     userPortfolioTransactions$
       .pipe(
         switchMap((data) =>
-          this.portfolioCalculationService.getPortfolioStateHoldings(data.transactions, data.userData.portfolioState),
+          this.portfolioCalculationService.getPortfolioStateHoldings(
+            data.userData.portfolioState,
+            data.userData.holdingSnapshot.data,
+          ),
         ),
       )
       .subscribe((portfolioState) => this.portfolioStateHoldingSignal.set(portfolioState));

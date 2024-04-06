@@ -5,17 +5,6 @@ import { groupUpdateData } from './group-update-data';
 import { hallOfFameGroups } from './hall-of-fame-groups';
 import { hallOfFameUsers } from './hall-of-fame-users';
 import { userPortfolioRank } from './user-portfolio-rank';
-import { userPortfolioUpdate } from './user-portfolio-update';
-
-export const run_user_portfolio_state_scheduler = onSchedule(
-  {
-    timeoutSeconds: 200,
-    schedule: '*/15 1-2 * * *',
-  },
-  async () => {
-    userPortfolioUpdate();
-  },
-);
 
 /**
  * recalculates user portfolio rank only once par day after userUpdatePortfolio() finished

@@ -5,6 +5,7 @@ import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/a
 import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { Functions, connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
 import { Storage, connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
+import { MatNativeDateModule } from '@angular/material/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   PreloadAllModules,
@@ -48,6 +49,8 @@ export const appConfig: ApplicationConfig = {
       // lazy load animation modules
       // provideAnimationsAsync()
     ),
+    // used to avoid error: No provider found for DateAdapter
+    importProvidersFrom(MatNativeDateModule),
     provideAnimations(),
     // remove zone.js
     // ɵprovideZonelessChangeDetection(),

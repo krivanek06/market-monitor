@@ -1,9 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { PortfolioTransaction, UserGroupData } from '@mm/api-types';
+import { PortfolioTransaction, UserGroupData, mockCreateUser } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { User } from 'firebase/auth';
 import { MockProvider } from 'ng-mocks';
-import { mockCreateUser } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioCreateOperationService } from '../portfolio-create-operation/portfolio-create-operation.service';
 import { PortfolioUserFacadeService } from './portfolio-user-facade.service';

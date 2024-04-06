@@ -7,6 +7,7 @@ import {
   PortfolioGrowthAssetsDataItem,
   PortfolioState,
   PortfolioStateHolding,
+  PortfolioStateHoldingBase,
   PortfolioStateHoldings,
   PortfolioTransaction,
 } from '@mm/api-types';
@@ -15,8 +16,6 @@ import {
   calculateGrowth,
   dateFormatDate,
   getObjectEntries,
-  getPortfolioStateHoldingBaseUtil,
-  getPortfolioStateHoldingsUtil,
   getYesterdaysDate,
   roundNDigits,
 } from '@mm/shared/general-util';
@@ -31,23 +30,30 @@ export class PortfolioCalculationService {
   private marketApiService = inject(MarketApiService);
 
   getPortfolioStateHoldings(
-    transactions: PortfolioTransaction[],
-    previousPortfolioState: PortfolioState,
+    portfolioState: PortfolioState,
+    holdingSnapshot: PortfolioStateHoldingBase[],
   ): Observable<PortfolioStateHoldings> {
-    console.log(`PortfolioGrowthService: getPortfolioState`, transactions, previousPortfolioState);
+    console.log(`PortfolioGrowthService: getPortfolioState`, portfolioState);
 
     // get partial holdings calculations
-    const partialHoldings = getPortfolioStateHoldingBaseUtil(transactions);
-    const partialHoldingSymbols = partialHoldings.map((d) => d.symbol);
+    const holdingSymbols = holdingSnapshot.map((d) => d.symbol);
+    const invested = holdingSnapshot.reduce((acc, curr) => acc + curr.invested, 0);
 
     // get symbol summaries from API
-    return this.marketApiService
-      .getSymbolSummaries(partialHoldingSymbols)
-      .pipe(
-        map((summaries) =>
-          getPortfolioStateHoldingsUtil(previousPortfolioState, transactions, partialHoldings, summaries),
-        ),
-      );
+    return this.marketApiService.getSymbolSummaries(holdingSymbols).pipe(
+      map((summaries) => ({
+        ...portfolioState,
+        holdings: holdingSnapshot.map((holding) => {
+          const symbolSummary = summaries.find((d) => d.id === holding.symbol);
+          return {
+            ...holding,
+            symbolSummary: symbolSummary!,
+            breakEvenPrice: roundNDigits(holding.invested / holding.units, 2),
+            weight: roundNDigits(holding.invested / invested, 6),
+          } satisfies PortfolioStateHolding;
+        }),
+      })),
+    );
   }
 
   getPortfolioGrowth(data: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {

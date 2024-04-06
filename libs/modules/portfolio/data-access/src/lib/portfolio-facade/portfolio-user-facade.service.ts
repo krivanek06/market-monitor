@@ -1,9 +1,10 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { UserApiService } from '@mm/api-client';
 import { PortfolioStateHolding, PortfolioTransaction, PortfolioTransactionCreate } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { InputSource } from '@mm/shared/data-access';
-import { combineLatest, from, of, switchMap } from 'rxjs';
+import { distinctUntilChanged, from, of, switchMap } from 'rxjs';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioCreateOperationService } from '../portfolio-create-operation/portfolio-create-operation.service';
 
@@ -17,15 +18,18 @@ export class PortfolioUserFacadeService {
   private authenticationUserService = inject(AuthenticationUserStoreService);
   private portfolioCalculationService = inject(PortfolioCalculationService);
   private portfolioCreateOperationService = inject(PortfolioCreateOperationService);
+  private userApiService = inject(UserApiService);
 
   getPortfolioState = toSignal(
-    combineLatest([
-      toObservable(this.authenticationUserService.state.getUserPortfolioTransactions),
-      toObservable(this.authenticationUserService.state.getPortfolioState),
-    ]).pipe(
-      switchMap(([transactions, portfolioState]) =>
-        portfolioState
-          ? this.portfolioCalculationService.getPortfolioStateHoldings(transactions ?? [], portfolioState)
+    toObservable(this.authenticationUserService.state.getUserDataNormal).pipe(
+      // prevent execution if not portfolio state is changed
+      distinctUntilChanged((prev, curr) => prev?.portfolioState.balance === curr?.portfolioState.balance),
+      switchMap((userData) =>
+        userData
+          ? this.portfolioCalculationService.getPortfolioStateHoldings(
+              userData.portfolioState,
+              userData.holdingSnapshot.data,
+            )
           : of(undefined),
       ),
     ),
@@ -89,9 +93,13 @@ export class PortfolioUserFacadeService {
     );
   });
 
-  createPortfolioCreateOperation(data: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
+  createPortfolioOperation(data: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
     const userData = this.authenticationUserService.state.getUserData();
-    const portfolioState = this.getPortfolioState() ?? userData.portfolioState;
-    return this.portfolioCreateOperationService.createPortfolioCreateOperation(userData, portfolioState, data);
+    return this.portfolioCreateOperationService.createPortfolioCreateOperation(userData, data);
+  }
+
+  deletePortfolioOperation(transaction: PortfolioTransaction): void {
+    const userData = this.authenticationUserService.state.getUserData();
+    this.userApiService.deletePortfolioTransactionForUser(userData.id, transaction);
   }
 }

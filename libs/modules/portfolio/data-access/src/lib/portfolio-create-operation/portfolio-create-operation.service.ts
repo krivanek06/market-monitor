@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { UserApiService } from '@mm/api-client';
-import { getStockHistoricalPricesOnDate } from '@mm/api-external';
+import { StocksApiService, UserApiService } from '@mm/api-client';
 import {
   DATE_FUTURE,
   DATE_INVALID_DATE,
@@ -8,7 +7,6 @@ import {
   DATE_WEEKEND,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
   HistoricalPrice,
-  PortfolioState,
   PortfolioTransaction,
   PortfolioTransactionCreate,
   SYMBOL_NOT_FOUND_ERROR,
@@ -27,6 +25,7 @@ import {
   roundNDigits,
 } from '@mm/shared/general-util';
 import { isBefore, isValid, isWeekend } from 'date-fns';
+import { firstValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
@@ -34,16 +33,19 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class PortfolioCreateOperationService {
   private userApiService = inject(UserApiService);
+  private stocksApiService = inject(StocksApiService);
+
   async createPortfolioCreateOperation(
     userData: UserData,
-    portfolioState: PortfolioState,
     data: PortfolioTransactionCreate,
   ): Promise<PortfolioTransaction> {
     // if weekend is used format to last friday
     data.date = formatToLastLastWorkingDate(data.date);
 
     // load historical price for symbol on date
-    const symbolPrice = await getStockHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date));
+    const symbolPrice = await firstValueFrom(
+      this.stocksApiService.getStockHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date)),
+    );
 
     // check if symbol exists
     if (!symbolPrice) {
@@ -51,7 +53,7 @@ export class PortfolioCreateOperationService {
     }
 
     // check data validity
-    this.transactionOperationDataValidity(userData, data, symbolPrice, portfolioState);
+    this.transactionOperationDataValidity(userData, data, symbolPrice);
 
     // from previous transaction calculate invested and units - currently if I own that symbol
     const symbolHolding = userData.holdingSnapshot.data.find((d) => d.symbol === data.symbol);
@@ -64,7 +66,7 @@ export class PortfolioCreateOperationService {
     // create transaction
     const transaction = this.createTransaction(userData, data, symbolPrice, symbolHoldingBreakEvenPrice);
 
-    // save transaction into user document
+    // update user's transactions
     this.userApiService.addUserPortfolioTransactions(userData.id, transaction);
 
     // return data
@@ -127,7 +129,6 @@ export class PortfolioCreateOperationService {
     userData: UserData,
     input: PortfolioTransactionCreate,
     historicalPrice: HistoricalPrice,
-    portfolioState: PortfolioState,
   ): void {
     // negative units
     if (input.units <= 0) {
@@ -170,7 +171,7 @@ export class PortfolioCreateOperationService {
     if (
       input.transactionType === 'BUY' &&
       userData.userAccountType === UserAccountEnum.DEMO_TRADING &&
-      portfolioState.cashOnHand < totalValue
+      userData.portfolioState.cashOnHand < totalValue
     ) {
       throw new Error(USER_NOT_ENOUGH_CASH_ERROR);
     }

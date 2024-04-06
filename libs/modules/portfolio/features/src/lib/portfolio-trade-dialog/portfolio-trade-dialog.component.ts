@@ -357,7 +357,7 @@ export class PortfolioTradeDialogComponent {
     this.isLoadingSignal.set(true);
 
     try {
-      await this.portfolioUserFacadeService.createPortfolioCreateOperation(transactionCreate);
+      await this.portfolioUserFacadeService.createPortfolioOperation(transactionCreate);
       this.dialogServiceUtil.showNotificationBar('Transaction created', 'success');
       this.dialogRef.close();
     } catch (error) {
