@@ -8,7 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserApiService } from '@mm/api-client';
 import { PortfolioGrowthAssets, PortfolioStateHoldings, UserData } from '@mm/api-types';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
-import { PortfolioCalculationService, PortfolioGrowthService } from '@mm/portfolio/data-access';
+import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthChartComponent,
   PortfolioHoldingsTableComponent,
@@ -148,7 +148,6 @@ export type UserDetailsDialogComponentData = {
 export class UserDetailsDialogComponent {
   private userApiService = inject(UserApiService);
   private dialogServiceUtil = inject(DialogServiceUtil);
-  private portfolioGrowthService = inject(PortfolioGrowthService);
   private portfolioCalculationService = inject(PortfolioCalculationService);
 
   userDataSignal = signal<UserData | undefined>(undefined);
@@ -197,13 +196,13 @@ export class UserDetailsDialogComponent {
     userPortfolioTransactions$
       .pipe(
         switchMap((data) =>
-          this.portfolioGrowthService.getPortfolioStateHoldings(data.transactions, data.userData.portfolioState),
+          this.portfolioCalculationService.getPortfolioStateHoldings(data.transactions, data.userData.portfolioState),
         ),
       )
       .subscribe((portfolioState) => this.portfolioStateHoldingSignal.set(portfolioState));
 
     userPortfolioTransactions$
-      .pipe(switchMap((data) => from(this.portfolioGrowthService.getPortfolioGrowthAssets(data.transactions))))
+      .pipe(switchMap((data) => from(this.portfolioCalculationService.getPortfolioGrowthAssets(data.transactions))))
       .subscribe((portfolioGrowthAssets) => this.portfolioGrowthAssetsSignal.set(portfolioGrowthAssets));
   }
 

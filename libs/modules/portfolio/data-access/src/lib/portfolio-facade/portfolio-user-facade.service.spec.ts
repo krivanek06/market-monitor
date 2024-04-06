@@ -5,7 +5,6 @@ import { User } from 'firebase/auth';
 import { MockProvider } from 'ng-mocks';
 import { mockCreateUser } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
-import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.service';
 import { PortfolioUserFacadeService } from './portfolio-user-facade.service';
 
 describe('PortfolioUserFacadeService', () => {
@@ -30,16 +29,14 @@ describe('PortfolioUserFacadeService', () => {
         MockProvider(AuthenticationUserStoreService, {
           state: testAuthState,
         }),
-        MockProvider(PortfolioGrowthService, {
-          getPortfolioStateHoldings: jest.fn(),
-          getPortfolioGrowthAssets: jest.fn(),
-        }),
         MockProvider(PortfolioCalculationService, {
           getPortfolioGrowth: jest.fn(),
           getPortfolioChange: jest.fn(),
           getPortfolioSectorAllocationPieChart: jest.fn(),
           getPortfolioAssetAllocationPieChart: jest.fn(),
           getPortfolioTransactionToDate: jest.fn(),
+          getPortfolioStateHoldings: jest.fn(),
+          getPortfolioGrowthAssets: jest.fn(),
         }),
       ],
     });

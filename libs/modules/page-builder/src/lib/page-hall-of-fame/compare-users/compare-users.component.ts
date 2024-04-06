@@ -9,7 +9,7 @@ import { UserApiService } from '@mm/api-client';
 import { UserBase } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
-import { PortfolioCalculationService, PortfolioGrowthService } from '@mm/portfolio/data-access';
+import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthCompareChartComponent,
   PortfolioHoldingsTableComponent,
@@ -208,7 +208,6 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
 })
 export class CompareUsersComponent {
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private portfolioGrowthService = inject(PortfolioGrowthService);
   private portfolioCalculationService = inject(PortfolioCalculationService);
   private userApiService = inject(UserApiService);
   private dialog = inject(MatDialog);
@@ -243,11 +242,11 @@ export class CompareUsersComponent {
                       userBase: of(userBase),
                       userData: of(userData),
                       userTransactions: of(userTransactions.transactions),
-                      portfolioState: this.portfolioGrowthService
+                      portfolioState: this.portfolioCalculationService
                         .getPortfolioStateHoldings(userTransactions.transactions, userData.portfolioState)
                         .pipe(take(1)),
                       portfolioGrowth: from(
-                        this.portfolioGrowthService.getPortfolioGrowthAssets(userTransactions.transactions),
+                        this.portfolioCalculationService.getPortfolioGrowthAssets(userTransactions.transactions),
                       ).pipe(
                         map((portfolioGrowth) =>
                           this.portfolioCalculationService.getPortfolioGrowth(
