@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { UserApiService } from '@mm/api-client';
 import { PortfolioTransaction, UserGroupData, mockCreateUser } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { User } from 'firebase/auth';
@@ -17,7 +18,6 @@ describe('PortfolioUserFacadeService', () => {
   const testAuthState = {
     getUser: () => testUser,
     getUserData: () => testUserData,
-    getPortfolioState: () => testUserData.portfolioState,
     getUserGroupData: () => testGroupData,
     getUserPortfolioTransactions: () => testPortfolioTransactions,
     isSymbolInWatchList: () => (symbol: string) => false,
@@ -40,6 +40,9 @@ describe('PortfolioUserFacadeService', () => {
         }),
         MockProvider(PortfolioCreateOperationService, {
           createPortfolioCreateOperation: jest.fn(),
+        }),
+        MockProvider(UserApiService, {
+          deletePortfolioTransactionForUser: jest.fn(),
         }),
       ],
     });
