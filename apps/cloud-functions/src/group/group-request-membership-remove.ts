@@ -1,13 +1,12 @@
-import { GroupBaseInput } from '@mm/api-types';
-import { FieldValue } from 'firebase-admin/firestore';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {
   GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR,
   GROUP_NOT_FOUND_ERROR,
+  GroupBaseInput,
   USER_NOT_FOUND_ERROR,
-  groupDocumentRef,
-  userDocumentRef,
-} from '../models';
+} from '@mm/api-types';
+import { FieldValue } from 'firebase-admin/firestore';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { groupDocumentRef, userDocumentRef } from '../models';
 
 /**
  * Remove user who request to join the group - only owner or the requester can do it

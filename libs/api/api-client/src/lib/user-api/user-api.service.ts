@@ -3,14 +3,27 @@ import {
   CollectionReference,
   DocumentReference,
   Firestore,
+  arrayRemove,
   collection,
   doc,
   limit,
   query,
+  setDoc,
   where,
 } from '@angular/fire/firestore';
-import { UserData, UserPortfolioTransaction } from '@mm/api-types';
+import { Functions, httpsCallable } from '@angular/fire/functions';
+import {
+  PortfolioTransaction,
+  SymbolType,
+  UserAccountBasicTypes,
+  UserData,
+  UserPortfolioTransaction,
+  UserResetTransactionsInput,
+  UserWatchList,
+} from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
+import { User } from 'firebase/auth';
+import { arrayUnion, updateDoc } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
 import { Observable, filter, map, of } from 'rxjs';
@@ -20,6 +33,7 @@ import { Observable, filter, map, of } from 'rxjs';
 })
 export class UserApiService {
   private firestore = inject(Firestore);
+  private functions = inject(Functions);
 
   /* user portfolio */
   getUserPortfolioTransactions(userId: string): Observable<UserPortfolioTransaction> {
@@ -37,6 +51,36 @@ export class UserApiService {
       return of([]);
     }
     return rxCollectionData(query(this.userCollection(), where('id', 'in', ids)));
+  }
+
+  getUserWatchList(userId: string): Observable<UserWatchList> {
+    return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchList => !!d));
+  }
+
+  changeUserPersonal(currentData: UserData, data: Partial<UserData['personal']>): void {
+    this.updateUser(currentData.id, {
+      personal: {
+        ...currentData.personal,
+        ...data,
+      },
+    });
+  }
+
+  async resetTransactions(userId: string, accountTypeSelected: UserAccountBasicTypes): Promise<void> {
+    const callable = httpsCallable<UserResetTransactionsInput, void>(this.functions, 'userResetTransactionsCall');
+    await callable({
+      userId: userId,
+      accountTypeSelected,
+    });
+  }
+
+  changeUserSettings(currentData: UserData, data: Partial<UserData['settings']>): void {
+    this.updateUser(currentData.id, {
+      settings: {
+        ...currentData.settings,
+        ...data,
+      },
+    });
   }
 
   /**
@@ -64,10 +108,73 @@ export class UserApiService {
     return rxDocData(this.getUserDocRef(userId), { idField: 'id' });
   }
 
+  addUserPortfolioTransactions(userId: string, data: PortfolioTransaction): void {
+    updateDoc(this.getUserPortfolioTransactionDocRef(userId), {
+      transactions: arrayUnion(data),
+    });
+  }
+
+  addSymbolToUserWatchList(userId: string, symbol: string, symbolType: SymbolType): void {
+    updateDoc(this.getUserWatchlistDocRef(userId), {
+      data: arrayUnion({
+        symbol,
+        symbolType,
+      }),
+    });
+  }
+
+  removeSymbolFromUserWatchList(userId: string, symbol: string, symbolType: SymbolType): void {
+    updateDoc(this.getUserWatchlistDocRef(userId), {
+      data: arrayRemove({
+        symbol,
+        symbolType,
+      }),
+    });
+  }
+
+  clearUserWatchList(userId: string): void {
+    updateDoc(this.getUserWatchlistDocRef(userId), {
+      data: [],
+    });
+  }
+
+  updateUser(id: string, user: Partial<UserData>): void {
+    setDoc(this.getUserDocRef(id), user, { merge: true });
+  }
+
+  deletePortfolioTransactionForUser(userId: string, transaction: PortfolioTransaction): void {
+    updateDoc(this.getUserPortfolioTransactionDocRef(userId), {
+      transactions: arrayRemove(transaction),
+    });
+  }
+
+  async userCreateAccount(): Promise<UserData> {
+    const callable = httpsCallable<User, UserData>(this.functions, 'userCreateAccountCall');
+    const result = await callable();
+    return result.data;
+  }
+
+  async deleteAccount(userData: UserData): Promise<void> {
+    // delete groups
+    const groupsToRemove = userData.groups.groupOwner.map((groupId) =>
+      httpsCallable<string, unknown>(this.functions, 'groupDeleteCall')(groupId),
+    );
+    await Promise.all(groupsToRemove);
+
+    // delete account
+    const callable = httpsCallable<string, void>(this.functions, 'userDeleteAccountCall');
+    await callable(userData.id);
+  }
+
   /* private */
 
   private getUserDocRef(userId: string): DocumentReference<UserData> {
     return doc(this.userCollection(), userId);
+  }
+  private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchList> {
+    return doc(this.userCollectionMoreInformationRef(userId), 'watchlist').withConverter(
+      assignTypesClient<UserWatchList>(),
+    );
   }
 
   private getUserPortfolioTransactionDocRef(userId: string): DocumentReference<UserPortfolioTransaction> {

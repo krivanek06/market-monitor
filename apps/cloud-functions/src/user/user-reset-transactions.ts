@@ -1,8 +1,14 @@
-import { USER_DEFAULT_STARTING_CASH, UserAccountEnum, UserData, UserResetTransactionsInput } from '@mm/api-types';
+import {
+  GROUP_USER_NOT_OWNER,
+  USER_DEFAULT_STARTING_CASH,
+  UserAccountEnum,
+  UserData,
+  UserResetTransactionsInput,
+} from '@mm/api-types';
 import { createEmptyPortfolioState } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { GROUP_USER_NOT_OWNER, groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
+import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 import { userDocumentTransactionHistoryRef } from './../models/user';
 
 /**

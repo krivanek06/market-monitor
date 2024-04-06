@@ -1,13 +1,12 @@
-import { GroupBaseInput } from '@mm/api-types';
-import { FieldValue } from 'firebase-admin/firestore';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {
   GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR,
   GROUP_NOT_FOUND_ERROR,
   GROUP_USER_HAS_NO_INVITATION_ERROR,
-  groupDocumentRef,
-  userDocumentRef,
-} from '../models';
+  GroupBaseInput,
+} from '@mm/api-types';
+import { FieldValue } from 'firebase-admin/firestore';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { groupDocumentRef, userDocumentRef } from '../models';
 
 /**
  * Remove a group invitation sent to the user by the owner or the user itself

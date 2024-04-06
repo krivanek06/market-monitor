@@ -1,12 +1,7 @@
-import { UserAccountEnum } from '@mm/api-types';
+import { GROUP_USER_NOT_OWNER, UserAccountEnum } from '@mm/api-types';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import {
-  GROUP_USER_NOT_OWNER,
-  userDocumentRef,
-  userDocumentTransactionHistoryRef,
-  userDocumentWatchListRef,
-} from '../models';
+import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
 
 /**
  * This function is called when a user deletes their account.

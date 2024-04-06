@@ -1,16 +1,20 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { ThemeSwitcherComponent } from './theme-switcher.component';
+import { ThemeService } from './theme.service';
 
 describe('ThemeSwitcherComponent', () => {
   let component: ThemeSwitcherComponent;
   let fixture: ComponentFixture<ThemeSwitcherComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ThemeSwitcherComponent],
-    }).compileComponents();
+  let themeServiceMock = {
+    isDarkMode: () => false,
+  } as ThemeService;
 
-    fixture = TestBed.createComponent(ThemeSwitcherComponent);
+  beforeEach(async () => {
+    MockBuilder(ThemeSwitcherComponent).mock(ThemeService, themeServiceMock);
+
+    fixture = MockRender(ThemeSwitcherComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

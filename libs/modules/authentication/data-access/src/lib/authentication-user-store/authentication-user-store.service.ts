@@ -1,36 +1,18 @@
 import { Injectable, InjectionToken, effect, inject } from '@angular/core';
-import {
-  CollectionReference,
-  DocumentData,
-  DocumentReference,
-  Firestore,
-  arrayRemove,
-  arrayUnion,
-  collection,
-  doc,
-  setDoc,
-  updateDoc,
-} from '@angular/fire/firestore';
-import { Functions, httpsCallable } from '@angular/fire/functions';
-import { GroupApiService } from '@mm/api-client';
+import { GroupApiService, UserApiService } from '@mm/api-client';
 import {
   PortfolioTransaction,
-  PortfolioTransactionCreate,
   SymbolType,
   UserAccountBasicTypes,
   UserAccountTypes,
   UserData,
   UserGroupData,
-  UserPortfolioTransaction,
-  UserResetTransactionsInput,
   UserWatchList,
 } from '@mm/api-types';
-import { assignTypesClient } from '@mm/shared/data-access';
 import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { User } from 'firebase/auth';
 import { signalSlice } from 'ngxtension/signal-slice';
-import { docData as rxDocData } from 'rxfire/firestore';
-import { Observable, combineLatest, distinctUntilChanged, filter, map, of, switchMap } from 'rxjs';
+import { combineLatest, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
 import { hasUserAccess } from '../model';
 
@@ -60,8 +42,7 @@ type AuthenticationState = {
 export class AuthenticationUserStoreService {
   private authenticationAccountService = inject(AuthenticationAccountService);
   private groupApiService = inject(GroupApiService);
-  private firestore = inject(Firestore);
-  private functions = inject(Functions);
+  private userApiService = inject(UserApiService);
 
   private initialState: AuthenticationState = {
     authenticationLoaded: false,
@@ -107,7 +88,9 @@ export class AuthenticationUserStoreService {
   private watchListSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-    switchMap((userData) => (userData ? this.getUserWatchList(userData.id) : of(this.initialState.watchList))),
+    switchMap((userData) =>
+      userData ? this.userApiService.getUserWatchList(userData.id) : of(this.initialState.watchList),
+    ),
     map((watchList) => ({ watchList: watchList })),
   );
 
@@ -117,7 +100,7 @@ export class AuthenticationUserStoreService {
   private portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-    switchMap((userData) => (userData ? this.getUserPortfolioTransactions(userData.id) : of(null))),
+    switchMap((userData) => (userData ? this.userApiService.getUserPortfolioTransactions(userData.id) : of(null))),
     map((transactions) => ({
       portfolioTransactions: transactions?.transactions ?? null,
     })),
@@ -197,126 +180,31 @@ export class AuthenticationUserStoreService {
     }),
   });
 
-  constructor() {
-    effect(() => {
-      console.log('AuthenticationUserStoreService update', this.state());
-    });
-  }
+  userDataChange = effect(() => {
+    console.log('AuthenticationUserStoreService update', this.state());
+  });
 
   changeUserPersonal(data: Partial<UserData['personal']>): void {
-    const userData = this.state.getUserData();
-    this.updateUser(userData.id, {
-      personal: {
-        ...userData.personal,
-        ...data,
-      },
-    });
+    this.userApiService.changeUserPersonal(this.state.getUserData(), data);
   }
 
-  async resetTransactions(accountTypeSelected: UserAccountBasicTypes): Promise<void> {
-    const userData = this.state.getUserData();
-    const callable = httpsCallable<UserResetTransactionsInput, void>(this.functions, 'userResetTransactionsCall');
-    await callable({
-      userId: userData.id,
-      accountTypeSelected,
-    });
+  resetTransactions(data: UserAccountBasicTypes): Promise<void> {
+    return this.userApiService.resetTransactions(this.state.getUserData().id, data);
   }
 
   changeUserSettings(data: Partial<UserData['settings']>): void {
-    const userData = this.state.getUserData();
-    this.updateUser(userData.id, {
-      settings: {
-        ...userData.settings,
-        ...data,
-      },
-    });
+    this.userApiService.changeUserSettings(this.state.getUserData(), data);
   }
 
-  addSymbolToUserWatchList(symbol: string, symbolType: SymbolType): Promise<void> {
-    const userId = this.state.getUser().uid;
-    return updateDoc(this.getUserWatchlistDocRef(userId), {
-      data: arrayUnion({
-        symbol,
-        symbolType,
-      }),
-    });
+  addSymbolToUserWatchList(symbol: string, symbolType: SymbolType): void {
+    this.userApiService.addSymbolToUserWatchList(this.state.getUserData().id, symbol, symbolType);
   }
 
-  removeSymbolFromUserWatchList(symbol: string, symbolType: SymbolType): Promise<void> {
-    const userId = this.state.getUser().uid;
-    return updateDoc(this.getUserWatchlistDocRef(userId), {
-      data: arrayRemove({
-        symbol,
-        symbolType,
-      }),
-    });
+  removeSymbolFromUserWatchList(symbol: string, symbolType: SymbolType): void {
+    this.userApiService.removeSymbolFromUserWatchList(this.state.getUserData().id, symbol, symbolType);
   }
 
   clearUserWatchList(): void {
-    const userId = this.state.getUser().uid;
-    updateDoc(this.getUserWatchlistDocRef(userId), {
-      data: [],
-    });
-  }
-
-  /**
-   * create a new transaction for the authenticated user
-   */
-  async createPortfolioTransactionForUser(input: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
-    const callable = httpsCallable<PortfolioTransactionCreate, PortfolioTransaction>(
-      this.functions,
-      'portfolioCreateOperationCall',
-    );
-    const result = await callable(input);
-    return result.data;
-  }
-
-  deletePortfolioTransactionForUser(transaction: PortfolioTransaction): void {
-    const userId = this.state.getUser().uid;
-    updateDoc(this.getUserPortfolioTransactionDocRef(userId), {
-      transactions: arrayRemove(transaction),
-    });
-  }
-
-  private getUserPortfolioTransactions(userId: string): Observable<UserPortfolioTransaction> {
-    return rxDocData(this.getUserPortfolioTransactionDocRef(userId)).pipe(
-      filter((d): d is UserPortfolioTransaction => !!d),
-      map((d) => ({
-        // sort ASC
-        transactions: d.transactions.slice().sort((a, b) => (a.date > b.date ? 1 : -1)),
-      })),
-    );
-  }
-
-  private getUserWatchList(userId: string): Observable<UserWatchList> {
-    return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchList => !!d));
-  }
-
-  private getUserPortfolioTransactionDocRef(userId: string): DocumentReference<UserPortfolioTransaction> {
-    return doc(this.userCollectionMoreInformationRef(userId), 'transactions').withConverter(
-      assignTypesClient<UserPortfolioTransaction>(),
-    );
-  }
-
-  private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchList> {
-    return doc(this.userCollectionMoreInformationRef(userId), 'watchlist').withConverter(
-      assignTypesClient<UserWatchList>(),
-    );
-  }
-
-  private userCollectionMoreInformationRef(userId: string): CollectionReference<DocumentData, DocumentData> {
-    return collection(this.getUserDocRef(userId), 'more_information');
-  }
-
-  private getUserDocRef(userId: string): DocumentReference<UserData> {
-    return doc(this.userCollection(), userId);
-  }
-
-  private updateUser(id: string, user: Partial<UserData>): void {
-    setDoc(this.getUserDocRef(id), user, { merge: true });
-  }
-
-  private userCollection(): CollectionReference<UserData, DocumentData> {
-    return collection(this.firestore, 'users').withConverter(assignTypesClient<UserData>());
+    this.userApiService.clearUserWatchList(this.state.getUserData().id);
   }
 }

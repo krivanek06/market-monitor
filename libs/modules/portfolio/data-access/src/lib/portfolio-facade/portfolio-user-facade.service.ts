@@ -1,10 +1,11 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { PortfolioStateHolding } from '@mm/api-types';
+import { PortfolioStateHolding, PortfolioTransaction, PortfolioTransactionCreate } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { InputSource } from '@mm/shared/data-access';
 import { combineLatest, from, of, switchMap } from 'rxjs';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
+import { PortfolioCreateOperationService } from '../portfolio-create-operation/portfolio-create-operation.service';
 
 /**
  * service for authenticated user to perform portfolio operations
@@ -15,6 +16,7 @@ import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-
 export class PortfolioUserFacadeService {
   private authenticationUserService = inject(AuthenticationUserStoreService);
   private portfolioCalculationService = inject(PortfolioCalculationService);
+  private portfolioCreateOperationService = inject(PortfolioCreateOperationService);
 
   getPortfolioState = toSignal(
     combineLatest([
@@ -86,4 +88,10 @@ export class PortfolioUserFacadeService {
       ) ?? []
     );
   });
+
+  createPortfolioCreateOperation(data: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
+    const userData = this.authenticationUserService.state.getUserData();
+    const portfolioState = this.getPortfolioState() ?? userData.portfolioState;
+    return this.portfolioCreateOperationService.createPortfolioCreateOperation(userData, portfolioState, data);
+  }
 }

@@ -5,6 +5,7 @@ import { User } from 'firebase/auth';
 import { MockProvider } from 'ng-mocks';
 import { mockCreateUser } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
+import { PortfolioCreateOperationService } from '../portfolio-create-operation/portfolio-create-operation.service';
 import { PortfolioUserFacadeService } from './portfolio-user-facade.service';
 
 describe('PortfolioUserFacadeService', () => {
@@ -37,6 +38,9 @@ describe('PortfolioUserFacadeService', () => {
           getPortfolioTransactionToDate: jest.fn(),
           getPortfolioStateHoldings: jest.fn(),
           getPortfolioGrowthAssets: jest.fn(),
+        }),
+        MockProvider(PortfolioCreateOperationService, {
+          createPortfolioCreateOperation: jest.fn(),
         }),
       ],
     });

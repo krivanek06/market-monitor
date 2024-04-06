@@ -255,3 +255,28 @@ export const checkDataValidityMinutes = <T extends { lastUpdate: string | Date }
 export const getPreviousDate = (date: DateInput): string => {
   return subDays(new Date(date), 1).toDateString();
 };
+
+/**
+ * based on provided date it will format on last working date, prevents:
+ * - selecting weekend
+ * - selecting future date
+ * - selecting holiday
+ * @param date
+ * @returns
+ */
+export const formatToLastLastWorkingDate = (date: DateInput): string => {
+  const providedDate = new Date(date);
+
+  // check if date is weekend, if so use previous Friday
+  let dateObj = isWeekend(providedDate) ? subDays(providedDate, 1) : providedDate;
+  dateObj = isWeekend(dateObj) ? subDays(dateObj, 1) : dateObj;
+
+  // set current hours, minutes, seconds
+  dateObj.setHours(new Date().getHours());
+  dateObj.setMinutes(new Date().getMinutes());
+  dateObj.setSeconds(new Date().getSeconds());
+
+  const usedData = format(dateObj, 'yyyy-MM-dd HH:mm:ss');
+
+  return usedData;
+};

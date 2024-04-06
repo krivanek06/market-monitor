@@ -219,7 +219,7 @@ export class PageTradingComponent {
   @Confirmable('Please confirm removing transaction')
   onTransactionDelete(transaction: PortfolioTransaction) {
     try {
-      this.authenticationUserService.deletePortfolioTransactionForUser(transaction);
+      this.portfolioUserFacadeService.createPortfolioCreateOperation(transaction);
       this.dialogServiceUtil.showNotificationBar('Transaction removed', 'notification');
     } catch (e) {
       console.log(e);

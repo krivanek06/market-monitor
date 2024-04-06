@@ -1,4 +1,4 @@
-import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT } from '@mm/api-types';
+import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT } from './constants-limits.model';
 
 // general
 export const GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR = 'Not sufficient permissions';

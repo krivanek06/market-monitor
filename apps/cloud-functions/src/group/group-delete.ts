@@ -1,14 +1,7 @@
+import { GROUP_NOT_FOUND_ERROR, GROUP_USER_NOT_OWNER, USER_NOT_AUTHENTICATED_ERROR } from '@mm/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import {
-  GROUP_NOT_FOUND_ERROR,
-  GROUP_USER_NOT_OWNER,
-  USER_NOT_AUTHENTICATED_ERROR,
-  groupDocumentMembersRef,
-  groupDocumentRef,
-  groupDocumentTransactionsRef,
-  userDocumentRef,
-} from '../models';
+import { groupDocumentMembersRef, groupDocumentRef, groupDocumentTransactionsRef, userDocumentRef } from '../models';
 
 /**
  * Delete a group
