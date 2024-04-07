@@ -5,7 +5,7 @@ export type PortfolioTransactionToDate = Pick<
   'numberOfExecutedBuyTransactions' | 'numberOfExecutedSellTransactions' | 'transactionFees' | 'date'
 >;
 
-export type PortfolioGrowth = Pick<PortfolioGrowthAssetsDataItem, 'investedValue' | 'marketTotalValue'> & {
+export type PortfolioGrowth = Pick<PortfolioGrowthAssetsDataItem, 'breakEvenValue' | 'marketTotalValue'> & {
   date: string;
 
   /**

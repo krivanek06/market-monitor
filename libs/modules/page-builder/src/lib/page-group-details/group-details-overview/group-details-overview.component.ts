@@ -285,7 +285,7 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
       (portfolioStatePerDay) =>
         ({
           date: portfolioStatePerDay.date,
-          investedValue: portfolioStatePerDay.invested,
+          breakEvenValue: portfolioStatePerDay.invested,
           marketTotalValue: portfolioStatePerDay.holdingsBalance,
           totalBalanceValue: portfolioStatePerDay.balance,
         }) satisfies PortfolioGrowth,

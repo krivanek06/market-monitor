@@ -1,10 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 
 import { MarketApiService } from '@mm/api-client';
-import { PortfolioGrowthAssets, PortfolioStateHoldingBase, PortfolioStateHoldings } from '@mm/api-types';
+import {
+  PortfolioGrowthAssets,
+  PortfolioStateHoldingBase,
+  PortfolioStateHoldings,
+  USER_DEFAULT_STARTING_CASH,
+} from '@mm/api-types';
+import { roundNDigits } from '@mm/shared/general-util';
 import { MockProvider, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
 import {
+  PortfolioGrowth,
   TestTransactionDates,
   mockPortfolioTransaction,
   mockSymbolSummaryAAPL,
@@ -176,7 +183,7 @@ describe('PortfolioCalculationService', () => {
         symbol: testTransaction_BUY_AAPL_1.symbol,
         data: testHistoricalPriceSymbol_AAPL.data.map((d) => ({
           date: d.date,
-          investedValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
+          breakEvenValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
           units: testTransaction_BUY_AAPL_1.units,
           marketTotalValue: testTransaction_BUY_AAPL_1.units * d.close,
         })),
@@ -210,52 +217,60 @@ describe('PortfolioCalculationService', () => {
           data: [
             {
               date: TestTransactionDates['2023-09-04'],
-              investedValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
+              breakEvenValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
               marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[0].close,
               units: testTransaction_BUY_AAPL_1.units,
             },
             {
               date: TestTransactionDates['2023-09-05'],
-              investedValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
+              breakEvenValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
               marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[1].close,
               units: testTransaction_BUY_AAPL_1.units,
             },
             {
               date: TestTransactionDates['2023-09-06'],
-              investedValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
+              breakEvenValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
               marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[2].close,
               units: testTransaction_BUY_AAPL_1.units,
             },
             {
               date: TestTransactionDates['2023-09-07'],
-              investedValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
+              breakEvenValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
               marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[3].close,
               units: testTransaction_BUY_AAPL_1.units,
             },
             {
               date: TestTransactionDates['2023-09-08'],
-              investedValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
+              breakEvenValue: testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice,
               marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[4].close,
               units: testTransaction_BUY_AAPL_1.units,
             },
             {
               date: TestTransactionDates['2023-09-11'],
-              investedValue:
+              breakEvenValue:
                 testTransaction_BUY_AAPL_1.units * testTransaction_BUY_AAPL_1.unitPrice +
                 testTransaction_BUY_AAPL_2.units * testTransaction_BUY_AAPL_2.unitPrice,
               marketTotalValue:
                 (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units) *
-                testHistoricalPriceSymbol_AAPL.data[4].close,
+                testHistoricalPriceSymbol_AAPL.data[5].close,
               units: testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units,
             },
             {
               date: TestTransactionDates['2023-09-12'],
-              investedValue: 1066.67,
+              breakEvenValue: roundNDigits(
+                // break even price
+                ((testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+                  testTransaction_BUY_AAPL_2.unitPrice * testTransaction_BUY_AAPL_2.units) /
+                  (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units)) *
+                  (testTransaction_BUY_AAPL_1.units +
+                    testTransaction_BUY_AAPL_2.units -
+                    testTransaction_SELL_AAPL_1.units),
+              ),
               marketTotalValue:
                 (testTransaction_BUY_AAPL_1.units +
                   testTransaction_BUY_AAPL_2.units -
                   testTransaction_SELL_AAPL_1.units) *
-                testHistoricalPriceSymbol_AAPL.data[4].close,
+                testHistoricalPriceSymbol_AAPL.data[6].close,
               units:
                 testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units - testTransaction_SELL_AAPL_1.units,
             },
@@ -266,25 +281,25 @@ describe('PortfolioCalculationService', () => {
           data: [
             {
               date: TestTransactionDates['2023-09-07'],
-              investedValue: testTransaction_BUY_MSFT_1.units * testTransaction_BUY_MSFT_1.unitPrice,
+              breakEvenValue: testTransaction_BUY_MSFT_1.units * testTransaction_BUY_MSFT_1.unitPrice,
               marketTotalValue: testHistoricalPriceSymbol_MSFT.data[0].close * testTransaction_BUY_MSFT_1.units,
               units: testTransaction_BUY_MSFT_1.units,
             },
             {
               date: TestTransactionDates['2023-09-08'],
-              investedValue: testTransaction_BUY_MSFT_1.units * testTransaction_BUY_MSFT_1.unitPrice,
+              breakEvenValue: testTransaction_BUY_MSFT_1.units * testTransaction_BUY_MSFT_1.unitPrice,
               marketTotalValue: testHistoricalPriceSymbol_MSFT.data[1].close * testTransaction_BUY_MSFT_1.units,
               units: testTransaction_BUY_MSFT_1.units,
             },
             {
               date: TestTransactionDates['2023-09-11'],
-              investedValue: testTransaction_BUY_MSFT_1.units * testTransaction_BUY_MSFT_1.unitPrice,
+              breakEvenValue: testTransaction_BUY_MSFT_1.units * testTransaction_BUY_MSFT_1.unitPrice,
               marketTotalValue: testHistoricalPriceSymbol_MSFT.data[2].close * testTransaction_BUY_MSFT_1.units,
               units: testTransaction_BUY_MSFT_1.units,
             },
             {
               date: TestTransactionDates['2023-09-12'],
-              investedValue: testTransaction_BUY_MSFT_1.units * testTransaction_BUY_MSFT_1.unitPrice,
+              breakEvenValue: testTransaction_BUY_MSFT_1.units * testTransaction_BUY_MSFT_1.unitPrice,
               marketTotalValue: testHistoricalPriceSymbol_MSFT.data[3].close * testTransaction_BUY_MSFT_1.units,
               units: testTransaction_BUY_MSFT_1.units,
             },
@@ -386,15 +401,15 @@ describe('PortfolioCalculationService', () => {
           data: [
             {
               date: TestTransactionDates['2023-09-11'],
-              investedValue: 400,
-              marketTotalValue: 50,
-              units: 5,
+              breakEvenValue: trans3.unitPrice * trans3.units,
+              marketTotalValue: trans3.units * testHistoricalPriceSymbol_AAPL.data[5].close,
+              units: trans3.units,
             },
             {
               date: TestTransactionDates['2023-09-12'],
-              investedValue: 400,
-              marketTotalValue: 50,
-              units: 5,
+              breakEvenValue: trans3.unitPrice * trans3.units,
+              marketTotalValue: trans3.units * testHistoricalPriceSymbol_AAPL.data[6].close,
+              units: trans3.units,
             },
           ],
           symbol: 'AAPL',
@@ -412,6 +427,267 @@ describe('PortfolioCalculationService', () => {
           console.log('e', e);
           done.fail;
         });
+    });
+  });
+
+  describe('Test: getPortfolioGrowth', () => {
+    it('should calculate growth with starting cash on hand', async () => {
+      // mock methods
+      const marketApiService = TestBed.inject(MarketApiService);
+      ngMocks.stub(marketApiService, {
+        getHistoricalPricesDateRange: jest
+          .fn()
+          .mockReturnValueOnce(of(testHistoricalPriceSymbol_AAPL.data))
+          .mockReturnValueOnce(of(testHistoricalPriceSymbol_MSFT.data)),
+      });
+
+      const portfolioGrowthAssets = await service.getPortfolioGrowthAssets([
+        testTransaction_BUY_AAPL_1,
+        testTransaction_BUY_AAPL_2,
+        testTransaction_SELL_AAPL_1,
+        testTransaction_BUY_MSFT_1,
+      ]);
+
+      const portfolioGrowth = service.getPortfolioGrowth(portfolioGrowthAssets, USER_DEFAULT_STARTING_CASH);
+
+      const expectedResult = [
+        {
+          date: TestTransactionDates['2023-09-04'],
+          breakEvenValue: testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+          marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[0].close,
+          totalBalanceValue:
+            USER_DEFAULT_STARTING_CASH +
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[0].close -
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+        },
+        {
+          date: TestTransactionDates['2023-09-05'],
+          breakEvenValue: testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+          marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[1].close,
+          totalBalanceValue:
+            USER_DEFAULT_STARTING_CASH +
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[1].close -
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+        },
+        {
+          date: TestTransactionDates['2023-09-06'],
+          breakEvenValue: testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+          marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[2].close,
+          totalBalanceValue:
+            USER_DEFAULT_STARTING_CASH +
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[2].close -
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+        },
+        {
+          date: TestTransactionDates['2023-09-07'],
+          breakEvenValue:
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+            testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units,
+          marketTotalValue:
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[3].close +
+            testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[0].close,
+          totalBalanceValue:
+            USER_DEFAULT_STARTING_CASH +
+            (testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[3].close -
+              testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units) +
+            (testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[0].close -
+              testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units),
+        },
+        {
+          date: TestTransactionDates['2023-09-08'],
+          breakEvenValue:
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+            testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units,
+          marketTotalValue:
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[4].close +
+            testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[1].close,
+          totalBalanceValue:
+            USER_DEFAULT_STARTING_CASH +
+            (testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[4].close -
+              testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units) +
+            (testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[1].close -
+              testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units),
+        },
+        {
+          date: TestTransactionDates['2023-09-11'],
+          breakEvenValue:
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+            testTransaction_BUY_AAPL_2.unitPrice * testTransaction_BUY_AAPL_2.units +
+            testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units,
+          marketTotalValue:
+            (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units) *
+              testHistoricalPriceSymbol_AAPL.data[5].close +
+            testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[2].close,
+          totalBalanceValue:
+            USER_DEFAULT_STARTING_CASH +
+            ((testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units) *
+              testHistoricalPriceSymbol_AAPL.data[5].close -
+              testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units -
+              testTransaction_BUY_AAPL_2.unitPrice * testTransaction_BUY_AAPL_2.units) +
+            (testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[2].close -
+              testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units),
+        },
+        {
+          date: TestTransactionDates['2023-09-12'],
+          breakEvenValue: roundNDigits(
+            // break even price
+            ((testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+              testTransaction_BUY_AAPL_2.unitPrice * testTransaction_BUY_AAPL_2.units) /
+              (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units)) *
+              (testTransaction_BUY_AAPL_1.units +
+                testTransaction_BUY_AAPL_2.units -
+                testTransaction_SELL_AAPL_1.units) +
+              testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units,
+          ),
+          marketTotalValue:
+            (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units - testTransaction_SELL_AAPL_1.units) *
+              testHistoricalPriceSymbol_AAPL.data[6].close +
+            testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[3].close,
+          totalBalanceValue: roundNDigits(
+            USER_DEFAULT_STARTING_CASH +
+              ((testTransaction_BUY_AAPL_1.units +
+                testTransaction_BUY_AAPL_2.units -
+                testTransaction_SELL_AAPL_1.units) *
+                testHistoricalPriceSymbol_AAPL.data[6].close -
+                // break even price
+                ((testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+                  testTransaction_BUY_AAPL_2.unitPrice * testTransaction_BUY_AAPL_2.units) /
+                  (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units)) *
+                  (testTransaction_BUY_AAPL_1.units +
+                    testTransaction_BUY_AAPL_2.units -
+                    testTransaction_SELL_AAPL_1.units)) +
+              (testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[3].close -
+                testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units),
+          ),
+        },
+      ] satisfies PortfolioGrowth[];
+
+      expect(portfolioGrowth).toEqual(expectedResult);
+    });
+
+    it('should calculate growth without starting cash on hand', async () => {
+      // mock methods
+      const marketApiService = TestBed.inject(MarketApiService);
+      ngMocks.stub(marketApiService, {
+        getHistoricalPricesDateRange: jest
+          .fn()
+          .mockReturnValueOnce(of(testHistoricalPriceSymbol_AAPL.data))
+          .mockReturnValueOnce(of(testHistoricalPriceSymbol_MSFT.data)),
+      });
+
+      const portfolioGrowthAssets = await service.getPortfolioGrowthAssets([
+        testTransaction_BUY_AAPL_1,
+        testTransaction_BUY_AAPL_2,
+        testTransaction_SELL_AAPL_1,
+        testTransaction_BUY_MSFT_1,
+      ]);
+
+      const portfolioGrowth = service.getPortfolioGrowth(portfolioGrowthAssets);
+
+      const expectedResult = [
+        {
+          date: TestTransactionDates['2023-09-04'],
+          breakEvenValue: testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+          marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[0].close,
+          totalBalanceValue:
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[0].close -
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+        },
+        {
+          date: TestTransactionDates['2023-09-05'],
+          breakEvenValue: testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+          marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[1].close,
+          totalBalanceValue:
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[1].close -
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+        },
+        {
+          date: TestTransactionDates['2023-09-06'],
+          breakEvenValue: testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+          marketTotalValue: testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[2].close,
+          totalBalanceValue:
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[2].close -
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units,
+        },
+        {
+          date: TestTransactionDates['2023-09-07'],
+          breakEvenValue:
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+            testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units,
+          marketTotalValue:
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[3].close +
+            testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[0].close,
+          totalBalanceValue:
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[3].close -
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+            (testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[0].close -
+              testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units),
+        },
+        {
+          date: TestTransactionDates['2023-09-08'],
+          breakEvenValue:
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+            testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units,
+          marketTotalValue:
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[4].close +
+            testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[1].close,
+          totalBalanceValue:
+            testTransaction_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[4].close -
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+            (testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[1].close -
+              testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units),
+        },
+        {
+          date: TestTransactionDates['2023-09-11'],
+          breakEvenValue:
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+            testTransaction_BUY_AAPL_2.unitPrice * testTransaction_BUY_AAPL_2.units +
+            testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units,
+          marketTotalValue:
+            (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units) *
+              testHistoricalPriceSymbol_AAPL.data[5].close +
+            testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[2].close,
+          totalBalanceValue:
+            (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units) *
+              testHistoricalPriceSymbol_AAPL.data[5].close -
+            testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units -
+            testTransaction_BUY_AAPL_2.unitPrice * testTransaction_BUY_AAPL_2.units +
+            (testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[2].close -
+              testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units),
+        },
+        {
+          date: TestTransactionDates['2023-09-12'],
+          breakEvenValue: roundNDigits(
+            // break even price
+            ((testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+              testTransaction_BUY_AAPL_2.unitPrice * testTransaction_BUY_AAPL_2.units) /
+              (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units)) *
+              (testTransaction_BUY_AAPL_1.units +
+                testTransaction_BUY_AAPL_2.units -
+                testTransaction_SELL_AAPL_1.units) +
+              testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units,
+          ),
+          marketTotalValue:
+            (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units - testTransaction_SELL_AAPL_1.units) *
+              testHistoricalPriceSymbol_AAPL.data[6].close +
+            testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[3].close,
+          totalBalanceValue: roundNDigits(
+            (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units - testTransaction_SELL_AAPL_1.units) *
+              testHistoricalPriceSymbol_AAPL.data[6].close -
+              // break even price
+              ((testTransaction_BUY_AAPL_1.unitPrice * testTransaction_BUY_AAPL_1.units +
+                testTransaction_BUY_AAPL_2.unitPrice * testTransaction_BUY_AAPL_2.units) /
+                (testTransaction_BUY_AAPL_1.units + testTransaction_BUY_AAPL_2.units)) *
+                (testTransaction_BUY_AAPL_1.units +
+                  testTransaction_BUY_AAPL_2.units -
+                  testTransaction_SELL_AAPL_1.units) +
+              (testTransaction_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[3].close -
+                testTransaction_BUY_MSFT_1.unitPrice * testTransaction_BUY_MSFT_1.units),
+          ),
+        },
+      ] satisfies PortfolioGrowth[];
+
+      expect(portfolioGrowth).toEqual(expectedResult);
     });
   });
 });

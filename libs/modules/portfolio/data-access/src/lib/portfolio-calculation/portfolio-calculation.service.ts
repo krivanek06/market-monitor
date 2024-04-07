@@ -65,14 +65,14 @@ export class PortfolioCalculationService {
         // initial object
         const portfolioItem: PortfolioGrowth = {
           date: dataItem.date,
-          investedValue: dataItem.investedValue,
+          breakEvenValue: dataItem.breakEvenValue,
           marketTotalValue: dataItem.marketTotalValue,
-          totalBalanceValue: dataItem.marketTotalValue - dataItem.investedValue,
+          totalBalanceValue: dataItem.marketTotalValue - dataItem.breakEvenValue,
         };
 
         // if elementIndex exists, add value to it => different symbol, same date
         if (elementIndex > -1) {
-          acc[elementIndex].investedValue += portfolioItem.investedValue;
+          acc[elementIndex].breakEvenValue += portfolioItem.breakEvenValue;
           acc[elementIndex].marketTotalValue += portfolioItem.marketTotalValue;
           acc[elementIndex].totalBalanceValue += portfolioItem.totalBalanceValue;
           return;
@@ -310,7 +310,7 @@ export class PortfolioCalculationService {
    * @returns - an array of {symbol: string, data: PortfolioGrowthAssetsDataItem[]}
    */
   async getPortfolioGrowthAssets(transactions: PortfolioTransaction[]): Promise<PortfolioGrowthAssets[]> {
-    console.log(`PortfolioGrowthService: getPortfolioGrowthAssets`, transactions);
+    // console.log(`PortfolioGrowthService: getPortfolioGrowthAssets`, transactions);
     // from transactions get all distinct symbols with soonest date of transaction
     const transactionStart = transactions.reduce(
       (acc, curr) => {
@@ -414,7 +414,7 @@ export class PortfolioCalculationService {
           }
 
           return {
-            investedValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice),
+            breakEvenValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice),
             date: historicalPrice.date,
             units: aggregator.units,
             marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close),
@@ -430,7 +430,7 @@ export class PortfolioCalculationService {
       // remove undefined or symbols which were bought and sold on the same day
       .filter((d): d is PortfolioGrowthAssets => !!d && d.data.length > 0);
 
-    console.log('PortfolioGrowthService: getPortfolioGrowthAssets [result]', result);
+    // console.log('PortfolioGrowthService: getPortfolioGrowthAssets [result]', result);
     return result;
   }
 
