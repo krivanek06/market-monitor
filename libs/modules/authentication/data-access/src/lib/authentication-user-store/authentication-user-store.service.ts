@@ -175,7 +175,6 @@ export class AuthenticationUserStoreService {
       isAccountDemoTrading: () => hasUserAccess(state().userData, 'DEMO_TRADING'),
       isAccountNormalBasic: () => hasUserAccess(state().userData, 'NORMAL_BASIC'),
       isAccountNormalPaid: () => hasUserAccess(state().userData, 'NORMAL_PAID'),
-      isAccountAdmin: () => hasUserAccess(state().userData, 'ADMIN'),
     }),
   });
 

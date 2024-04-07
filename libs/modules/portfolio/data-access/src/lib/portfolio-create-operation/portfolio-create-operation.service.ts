@@ -1,10 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { StocksApiService, UserApiService } from '@mm/api-client';
 import {
-  DATE_FUTURE,
-  DATE_INVALID_DATE,
   DATE_TOO_OLD,
-  DATE_WEEKEND,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
   HistoricalPrice,
   PortfolioTransaction,
@@ -24,7 +21,6 @@ import {
   formatToLastLastWorkingDate,
   roundNDigits,
 } from '@mm/shared/general-util';
-import { isBefore, isValid, isWeekend } from 'date-fns';
 import { firstValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -39,7 +35,7 @@ export class PortfolioCreateOperationService {
     userData: UserData,
     data: PortfolioTransactionCreate,
   ): Promise<PortfolioTransaction> {
-    // if weekend is used format to last friday
+    // if weekend or holiday is used format to last friday
     data.date = formatToLastLastWorkingDate(data.date);
 
     // load historical price for symbol on date
@@ -55,16 +51,8 @@ export class PortfolioCreateOperationService {
     // check data validity
     this.transactionOperationDataValidity(userData, data, symbolPrice);
 
-    // from previous transaction calculate invested and units - currently if I own that symbol
-    const symbolHolding = userData.holdingSnapshot.data.find((d) => d.symbol === data.symbol);
-
-    // calculate break even price
-    const symbolHoldingBreakEvenPrice = !!symbolHolding
-      ? roundNDigits(symbolHolding.invested / symbolHolding.units, 2)
-      : 0;
-
     // create transaction
-    const transaction = this.createTransaction(userData, data, symbolPrice, symbolHoldingBreakEvenPrice);
+    const transaction = this.createTransaction(userData, data, symbolPrice);
 
     // update user's transactions
     this.userApiService.addUserPortfolioTransactions(userData.id, transaction);
@@ -77,21 +65,27 @@ export class PortfolioCreateOperationService {
     userDocData: UserData,
     input: PortfolioTransactionCreate,
     historicalPrice: HistoricalPrice,
-    breakEvenPrice: number,
   ): PortfolioTransaction {
-    const isTransactionFeesActive = userDocData.userAccountType === UserAccountEnum.DEMO_TRADING;
+    const isDemoAccount = userDocData.userAccountType === UserAccountEnum.DEMO_TRADING;
+    const isSell = input.transactionType === 'SELL';
 
     // if custom total value is provided calculate unit price, else use API price
-    const unitPrice = input.customTotalValue
-      ? roundNDigits(input.customTotalValue / input.units)
-      : historicalPrice.close;
+    const unitPrice =
+      !isDemoAccount && input.customTotalValue
+        ? roundNDigits(input.customTotalValue / input.units)
+        : historicalPrice.close;
 
-    const isSell = input.transactionType === 'SELL';
+    // from previous transaction calculate invested and units - currently if I own that symbol
+    const symbolHolding = userDocData.holdingSnapshot.data.find((d) => d.symbol === input.symbol);
+
+    // calculate break even price if SELL order
+    const breakEvenPrice = isSell ? roundNDigits((symbolHolding?.invested ?? 1) / (symbolHolding?.units ?? 1), 2) : 0;
+
     const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
     const returnChange = isSell ? roundNDigits((unitPrice - breakEvenPrice) / breakEvenPrice) : 0;
 
     // transaction fees are 0.01% of the transaction value
-    const transactionFeesCalc = isTransactionFeesActive ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
+    const transactionFeesCalc = isDemoAccount ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
     const transactionFees = roundNDigits(transactionFeesCalc, 2);
 
     const result: PortfolioTransaction = {
@@ -140,21 +134,6 @@ export class PortfolioCreateOperationService {
       throw new Error(TRANSACTION_INPUT_UNITS_INTEGER);
     }
 
-    // check if date is valid
-    if (!isValid(new Date(input.date))) {
-      throw new Error(DATE_INVALID_DATE);
-    }
-
-    // prevent adding future holdings
-    if (isBefore(new Date(), new Date(input.date))) {
-      throw new Error(DATE_FUTURE);
-    }
-
-    // do not allow selecting weekend for date
-    if (isWeekend(new Date(input.date))) {
-      throw new Error(DATE_WEEKEND);
-    }
-
     // get year data form input and today
     const { year: inputYear } = dateGetDetailsInformationFromDate(input.date);
     const { year: todayYear } = dateGetDetailsInformationFromDate(new Date());
@@ -181,7 +160,7 @@ export class PortfolioCreateOperationService {
       // check if user has any holdings of that symbol
       const symbolHoldings = userData.holdingSnapshot.data.find((d) => d.symbol === input.symbol);
 
-      if (!!symbolHoldings && symbolHoldings.units < input.units) {
+      if ((symbolHoldings?.units ?? -1) < input.units) {
         throw new Error(USER_NOT_UNITS_ON_HAND_ERROR);
       }
     }
