@@ -34,7 +34,6 @@ describe('PortfolioUserFacadeService', () => {
           getPortfolioChange: jest.fn(),
           getPortfolioSectorAllocationPieChart: jest.fn(),
           getPortfolioAssetAllocationPieChart: jest.fn(),
-          getPortfolioTransactionToDate: jest.fn(),
           getPortfolioStateHoldings: jest.fn(),
           getPortfolioGrowthAssets: jest.fn(),
         }),

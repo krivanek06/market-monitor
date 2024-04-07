@@ -2,6 +2,7 @@ import {
   differenceInBusinessDays,
   differenceInDays,
   eachDayOfInterval,
+  endOfDay,
   endOfMonth,
   format,
   getDaysInMonth,
@@ -265,18 +266,10 @@ export const getPreviousDate = (date: DateInput): string => {
  * @returns
  */
 export const formatToLastLastWorkingDate = (date: DateInput): string => {
-  const providedDate = new Date(date);
+  let usedDate = new Date(date);
+  while (isStockMarketHolidayDate(usedDate) || isWeekend(usedDate)) {
+    usedDate = endOfDay(subDays(new Date(usedDate), 1));
+  }
 
-  // check if date is weekend, if so use previous Friday
-  let dateObj = isWeekend(providedDate) ? subDays(providedDate, 1) : providedDate;
-  dateObj = isWeekend(dateObj) ? subDays(dateObj, 1) : dateObj;
-
-  // set current hours, minutes, seconds
-  dateObj.setHours(new Date().getHours());
-  dateObj.setMinutes(new Date().getMinutes());
-  dateObj.setSeconds(new Date().getSeconds());
-
-  const usedData = format(dateObj, 'yyyy-MM-dd HH:mm:ss');
-
-  return usedData;
+  return format(usedDate, 'yyyy-MM-dd HH:mm:ss');
 };

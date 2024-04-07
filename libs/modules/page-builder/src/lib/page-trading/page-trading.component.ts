@@ -150,8 +150,8 @@ import { take } from 'rxjs';
         (deleteEmitter)="onTransactionDelete($event)"
         [showTransactionFees]="authenticationUserService.state.isAccountDemoTrading()"
         [showActionButton]="authenticationUserService.state.isAccountNormalBasic()"
-        [data]="authenticationUserService.state.portfolioTransactions() | sortByKey: 'date' : 'desc'"
-      ></app-portfolio-transactions-table>
+        [data]="authenticationUserService.state.portfolioTransactions()"
+      />
     </div>
 
     <!-- templates -->

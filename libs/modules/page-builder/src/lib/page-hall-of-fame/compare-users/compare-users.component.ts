@@ -192,10 +192,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       <!-- transaction history -->
       <div class="mb-4">
         <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
-        <app-portfolio-transactions-table
-          [showTransactionFees]="true"
-          [data]="selectedUser()?.userTransactions ?? [] | sortByKey: 'date' : 'desc'"
-        ></app-portfolio-transactions-table>
+        <app-portfolio-transactions-table [showTransactionFees]="true" [data]="selectedUser()?.userTransactions" />
       </div>
     }
   `,

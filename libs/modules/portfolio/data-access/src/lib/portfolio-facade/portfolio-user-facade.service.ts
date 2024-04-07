@@ -75,11 +75,6 @@ export class PortfolioUserFacadeService {
     this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.getPortfolioState()?.holdings ?? []),
   );
 
-  getPortfolioTransactionToDate = computed(() => {
-    const transactions = this.authenticationUserService.state.getUserPortfolioTransactions();
-    return this.portfolioCalculationService.getPortfolioTransactionToDate(transactions ?? []);
-  });
-
   getHoldingsInputSource = computed(() => {
     return (
       this.getPortfolioState()?.holdings?.map(

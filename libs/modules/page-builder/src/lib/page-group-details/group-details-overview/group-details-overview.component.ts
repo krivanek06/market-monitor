@@ -235,7 +235,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         <app-portfolio-transactions-table
           [showTransactionFees]="true"
           [showUser]="true"
-          [data]="groupDetailsSignal.groupTransactionsData | sortByKey: 'date' : 'desc'"
+          [data]="groupDetailsSignal.groupTransactionsData"
         />
       </div>
     </ng-container>

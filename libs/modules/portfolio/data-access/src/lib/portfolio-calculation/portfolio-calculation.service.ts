@@ -21,7 +21,7 @@ import {
 } from '@mm/shared/general-util';
 import { format, isBefore, isSameDay, subMonths, subWeeks, subYears } from 'date-fns';
 import { Observable, catchError, firstValueFrom, map, of } from 'rxjs';
-import { PortfolioChange, PortfolioGrowth, PortfolioTransactionToDate } from '../models';
+import { PortfolioChange, PortfolioGrowth } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -172,34 +172,6 @@ export class PortfolioCalculationService {
 
     console.log('daily result', result);
     return result;
-  }
-
-  /**
-   *
-   * @param transactions
-   * @returns array of aggregated transaction by date
-   */
-  getPortfolioTransactionToDate(transactions: PortfolioTransaction[]): PortfolioTransactionToDate[] {
-    return transactions.reduce((acc, curr) => {
-      const existingTransaction = acc.find((d) => d.date === curr.date);
-      if (!existingTransaction) {
-        return [
-          ...acc,
-          {
-            date: curr.date,
-            numberOfExecutedBuyTransactions: curr.transactionType === 'BUY' ? 1 : 0,
-            numberOfExecutedSellTransactions: curr.transactionType === 'SELL' ? 1 : 0,
-            transactionFees: curr.transactionFees,
-          },
-        ];
-      }
-
-      existingTransaction.numberOfExecutedBuyTransactions += curr.transactionType === 'BUY' ? 1 : 0;
-      existingTransaction.numberOfExecutedSellTransactions += curr.transactionType === 'SELL' ? 1 : 0;
-      existingTransaction.transactionFees += curr.transactionFees;
-
-      return acc;
-    }, [] as PortfolioTransactionToDate[]);
   }
 
   /**
