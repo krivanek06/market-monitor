@@ -25,6 +25,11 @@ export const userPortfolioRisk = async (portfolioState: PortfolioStateHoldings):
   const treasureData = await getTreasuryRates();
   const riskFreeRate = treasureData[0].month3;
 
+  // user has no holdings
+  if (portfolioState.holdings.length === 0) {
+    return createEmptyPortfolioRisk();
+  }
+
   try {
     // preload all symbol data and save to cache
     const symbolDataPromises = portfolioState.holdings.map((holding) => getSymbolPricesAndReturn(holding.symbol));
@@ -47,13 +52,7 @@ export const userPortfolioRisk = async (portfolioState: PortfolioStateHoldings):
     };
   } catch (error) {
     console.log(error);
-    return {
-      beta: 0,
-      alpha: 0,
-      sharpe: 0,
-      volatility: 0,
-      calculationDate: getCurrentDateDefaultFormat(),
-    };
+    return createEmptyPortfolioRisk();
   }
 };
 
@@ -236,4 +235,14 @@ const calculateCovariance = (returns1: number[], returns2: number[]): number => 
   const mean2 = mean(returns2);
   const sum = returns1.reduce((acc, r1, i) => acc + (r1 - mean1) * (returns2[i] - mean2), 0);
   return sum / (returns1.length - 1);
+};
+
+const createEmptyPortfolioRisk = (): PortfolioRisk => {
+  return {
+    alpha: 0,
+    beta: 0,
+    sharpe: 0,
+    volatility: 0,
+    calculationDate: getCurrentDateDefaultFormat(),
+  };
 };

@@ -5,6 +5,20 @@ import { groupUpdateData } from './group-update-data';
 import { hallOfFameGroups } from './hall-of-fame-groups';
 import { hallOfFameUsers } from './hall-of-fame-users';
 import { userPortfolioRank } from './user-portfolio-rank';
+import { userPortfolioUpdate } from './user-portfolio-update';
+
+/**
+ * every 20 minutes update user portfolio state
+ */
+export const run_user_portfolio_state_scheduler = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '*/20 * * * *',
+  },
+  async () => {
+    userPortfolioUpdate();
+  },
+);
 
 /**
  * recalculates user portfolio rank only once par day after userUpdatePortfolio() finished

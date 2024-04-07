@@ -8,19 +8,17 @@ import {
   PortfolioTransaction,
   SymbolSummary,
   USER_LOGIN_ACCOUNT_ACTIVE_DAYS,
+  UserBase,
   UserData,
-  UserPortfolioTransaction,
 } from '@mm/api-types';
 import { calculateGrowth, getCurrentDateDefaultFormat, roundNDigits } from '@mm/shared/general-util';
 import { format, isSameDay, subDays } from 'date-fns';
 import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
-import { userDocumentRef } from '../models';
+import { userDocumentRef, userDocumentTransactionHistoryRef } from '../models';
 import { userPortfolioRisk } from './portfolio-risk-evaluation';
 
 export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_information/transactions', async (event) => {
-  const today = getCurrentDateDefaultFormat();
   const userId = event.params.userId;
-  const newTransactions = (event.data?.after.data() as UserPortfolioTransaction)?.transactions ?? [];
 
   // load user
   const userRef = userDocumentRef(userId);
@@ -31,9 +29,24 @@ export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_inform
     return;
   }
 
+  await updateUserPortfolioState(user);
+});
+
+/**
+ * loads transactions for the provided user and calculates portfolio state (balance, cash on hand, invested, risk, etc.)
+ *
+ * @param userData - user whom to update portfolio state
+ */
+export const updateUserPortfolioState = async (userData: UserBase): Promise<void> => {
+  const today = getCurrentDateDefaultFormat();
+
+  // load transaction per user
+  const transactionRef = userDocumentTransactionHistoryRef(userData.id);
+  const transactionData = (await transactionRef.get()).data()?.transactions ?? [];
+
   try {
     // get partial holdings calculations
-    const holdingsBase = getPortfolioStateHoldingBaseUtil(newTransactions);
+    const holdingsBase = getPortfolioStateHoldingBaseUtil(transactionData);
 
     // get symbol summaries from API
     const partialHoldingSymbols = holdingsBase.map((d) => d.symbol);
@@ -41,8 +54,8 @@ export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_inform
 
     // get portfolio state
     const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
-      user.portfolioState,
-      newTransactions,
+      userData.portfolioState,
+      transactionData,
       holdingsBase,
       summaries,
     );
@@ -57,21 +70,21 @@ export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_inform
     const accountActiveThreshold = format(subDays(new Date(), USER_LOGIN_ACCOUNT_ACTIVE_DAYS), 'yyyy-MM-dd');
 
     // update user
-    userRef.update({
+    userDocumentRef(userData.id).update({
       portfolioState: portfolioState,
       holdingSnapshot: {
         data: holdingsBase,
         lastModifiedDate: today,
       },
-      isAccountActive: user.lastLoginDate > accountActiveThreshold,
+      isAccountActive: userData.lastLoginDate > accountActiveThreshold,
     } satisfies Partial<UserData>);
 
     // log
-    console.log(`Updated user: ${user.personal.displayName}, ${user.id}`);
+    console.log(`Updated user: ${userData.personal.displayName}, ${userData.id}`);
   } catch (e) {
-    console.warn(`Error for user: ${user.personal.displayName}, ${user.id}: ${e}`);
+    console.warn(`Error for user: ${userData.personal.displayName}, ${userData.id}: ${e}`);
   }
-});
+};
 
 /**
  * transform PortfolioStateHoldings to PortfolioState
