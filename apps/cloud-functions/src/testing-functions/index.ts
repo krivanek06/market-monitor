@@ -1,5 +1,4 @@
 import { onRequest } from 'firebase-functions/v2/https';
-import { userPortfolioUpdate } from '../schedulers/user-portfolio-update';
 import { isFirebaseEmulator } from '../utils';
 import { test_runner } from './app-test';
 import { reloadDatabase } from './reload-database';
@@ -31,7 +30,6 @@ export const test_function = onRequest({ timeoutSeconds: 1200 }, async (req, res
   console.log('--- start ---');
 
   await test_runner();
-  await userPortfolioUpdate();
 
   console.log('--- finished ---');
 

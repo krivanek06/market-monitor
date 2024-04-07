@@ -80,17 +80,19 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
       }
 
       // find the data with minimum date
-      const dataMinimalDate = this.data().reduce((acc, curr) =>
-        acc.portfolioGrowth[0].date < curr.portfolioGrowth[0].date ? acc : curr,
-      );
+      const dataMinimalDate = this.data()
+        .filter((d) => d.portfolioGrowth.length > 1)
+        .reduce((acc, curr) => (acc.portfolioGrowth[0].date < curr.portfolioGrowth[0].date ? acc : curr));
 
       // find the data with maximum date
-      const dataMaximalDate = this.data().reduce((acc, curr) =>
-        acc.portfolioGrowth[acc.portfolioGrowth.length - 1].date >
-        curr.portfolioGrowth[curr.portfolioGrowth.length - 1].date
-          ? acc
-          : curr,
-      );
+      const dataMaximalDate = this.data()
+        .filter((d) => d.portfolioGrowth.length > 1)
+        .reduce((acc, curr) =>
+          acc.portfolioGrowth[acc.portfolioGrowth.length - 1].date >
+          curr.portfolioGrowth[curr.portfolioGrowth.length - 1].date
+            ? acc
+            : curr,
+        );
 
       // empty portfolio growth
       if (dataMinimalDate.portfolioGrowth.length === 0 || dataMaximalDate.portfolioGrowth.length === 0) {

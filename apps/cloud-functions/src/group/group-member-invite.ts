@@ -1,6 +1,3 @@
-import { GroupBaseInput } from '@mm/api-types';
-import { FieldValue } from 'firebase-admin/firestore';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {
   GROUPS_USER_ALREADY_INVITED_ERROR,
   GROUP_NOT_FOUND_ERROR,
@@ -8,9 +5,11 @@ import {
   GROUP_USER_ALREADY_REQUESTED_ERROR,
   GROUP_USER_IS_OWNER_ERROR,
   GROUP_USER_NOT_OWNER,
-  groupDocumentRef,
-  userDocumentRef,
-} from '../models';
+  GroupBaseInput,
+} from '@mm/api-types';
+import { FieldValue } from 'firebase-admin/firestore';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { groupDocumentRef, userDocumentRef } from '../models';
 
 /**
  * Invite a user to a group

@@ -1,12 +1,11 @@
-import { FieldValue } from 'firebase-admin/firestore';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {
   GROUPS_USER_ALREADY_INVITED_ERROR,
   GROUP_NOT_FOUND_ERROR,
   GROUP_USER_ALREADY_MEMBER_ERROR,
-  groupDocumentRef,
-  userDocumentRef,
-} from '../models';
+} from '@mm/api-types';
+import { FieldValue } from 'firebase-admin/firestore';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { groupDocumentRef, userDocumentRef } from '../models';
 
 /**
  * User request membership to a group

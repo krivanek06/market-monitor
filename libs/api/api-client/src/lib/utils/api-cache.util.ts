@@ -111,10 +111,4 @@ export abstract class ApiCacheService {
     }
     return isBefore(Date.now(), data.validity);
   }
-
-  // TODO create function that each minute will check if data is still valid
-  // if not, remove from cache
-  checkDataValidity() {
-    // todo
-  }
 }

@@ -1,15 +1,6 @@
-import { getSymbolSummaries } from '@mm/api-external';
-import { USER_LOGIN_ACCOUNT_ACTIVE_DAYS, UserData } from '@mm/api-types';
-import {
-  getCurrentDateDefaultFormat,
-  getPortfolioStateHoldingBaseUtil,
-  getPortfolioStateHoldingsUtil,
-  waitSeconds,
-} from '@mm/shared/general-util';
-import { format, subDays } from 'date-fns';
-import { userDocumentTransactionHistoryRef, usersCollectionRef } from '../models';
-import { userPortfolioRisk } from '../portfolio';
-import { transformPortfolioStateHoldingToPortfolioState } from '../utils';
+import { waitSeconds } from '@mm/shared/general-util';
+import { usersCollectionRef } from '../models';
+import { updateUserPortfolioState } from '../portfolio';
 
 /**
  * for each user who is active
@@ -21,15 +12,11 @@ import { transformPortfolioStateHoldingToPortfolioState } from '../utils';
  * At every 5th minute past every hour from 1 through 2am
  */
 export const userPortfolioUpdate = async (): Promise<void> => {
-  const today = getCurrentDateDefaultFormat();
-
-  console.log('today', today);
   // load users to calculate balance
   const userToUpdate = usersCollectionRef()
     .where('isAccountActive', '==', true)
-    .where('portfolioState.date', '!=', today)
     .orderBy('portfolioState.date', 'desc')
-    .limit(100);
+    .limit(50);
 
   const users = await userToUpdate.get();
 
@@ -40,58 +27,9 @@ export const userPortfolioUpdate = async (): Promise<void> => {
     // wait N ms prevent too many requests
     await waitSeconds(0.15);
 
-    // load transaction per user
-    const transactionRef = userDocumentTransactionHistoryRef(userDoc.id);
-    const transactions = (await transactionRef.get()).data();
     const user = userDoc.data();
 
-    // skip if no transactions
-    if (!transactions) {
-      console.log(`No transactions for user: ${user.personal.displayName}, ${userDoc.id}`);
-      continue;
-    }
-
-    try {
-      // get partial holdings calculations
-      const holdingsBase = getPortfolioStateHoldingBaseUtil(transactions.transactions);
-
-      // get symbol summaries from API
-      const partialHoldingSymbols = holdingsBase.map((d) => d.symbol);
-      const summaries = partialHoldingSymbols.length > 0 ? await getSymbolSummaries(partialHoldingSymbols) : [];
-
-      // get portfolio state
-      const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
-        user.portfolioState,
-        transactions.transactions,
-        holdingsBase,
-        summaries,
-      );
-
-      // calculation risk of investment
-      const portfolioRisk = await userPortfolioRisk(portfolioStateHoldings);
-
-      // remove holdings
-      const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings, portfolioRisk);
-
-      // account active threshold
-      const accountActiveThreshold = format(subDays(new Date(), USER_LOGIN_ACCOUNT_ACTIVE_DAYS), 'yyyy-MM-dd');
-
-      // update user
-      userDoc.ref.update({
-        portfolioState: portfolioState,
-        holdingSnapshot: {
-          data: holdingsBase,
-          lastModifiedDate: today,
-        },
-        isAccountActive: user.lastLoginDate > accountActiveThreshold,
-      } satisfies Partial<UserData>);
-
-      // log
-      console.log(`Updated user: ${user.personal.displayName}, ${userDoc.id}`);
-    } catch (e) {
-      console.warn(`Error for user: ${user.personal.displayName}, ${userDoc.id}: ${e}`);
-    }
-
-    console.log('Finished');
+    // update portfolio
+    await updateUserPortfolioState(user);
   }
 };

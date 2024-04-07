@@ -10,7 +10,7 @@ export class ThemeService {
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private document = inject(DOCUMENT);
 
-  isDarkMode = computed(() => !!this.authenticationUserStoreService.state.getUserData().settings.isDarkMode);
+  isDarkMode = computed(() => !!this.authenticationUserStoreService.state.getUserDataNormal()?.settings?.isDarkMode);
 
   isDarkModeEffect = effect(() => {
     console.log('[ThemeService] is dark:', this.isDarkMode());

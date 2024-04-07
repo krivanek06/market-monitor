@@ -97,7 +97,6 @@ export enum UserAccountEnum {
   DEMO_TRADING = 'DEMO_TRADING',
   NORMAL_BASIC = 'NORMAL_BASIC',
   NORMAL_PAID = 'NORMAL_PAID',
-  ADMIN = 'ADMIN',
 }
 
 export type UserAccountTypes = keyof typeof UserAccountEnum;
@@ -136,5 +135,4 @@ export const accountDescription: { [K in UserAccountEnum]: string[] } = {
     `Your profile is private, no one can see your portfolio. You do not participate in any ranking system.`,
   ],
   [UserAccountEnum.NORMAL_PAID]: [`TODO`],
-  [UserAccountEnum.ADMIN]: [`TODO`],
 };

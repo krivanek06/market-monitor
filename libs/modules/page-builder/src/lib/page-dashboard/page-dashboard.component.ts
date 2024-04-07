@@ -220,8 +220,8 @@ import { map, pipe, startWith } from 'rxjs';
           <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
           <app-portfolio-transactions-table
             [showTransactionFees]="!!authenticationUserService.state.isAccountDemoTrading()"
-            [data]="authenticationUserService.state.portfolioTransactions() | sortByKey: 'date' : 'desc'"
-          ></app-portfolio-transactions-table>
+            [data]="authenticationUserService.state.portfolioTransactions()"
+          />
         </div>
       }
     }

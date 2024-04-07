@@ -150,8 +150,8 @@ import { take } from 'rxjs';
         (deleteEmitter)="onTransactionDelete($event)"
         [showTransactionFees]="authenticationUserService.state.isAccountDemoTrading()"
         [showActionButton]="authenticationUserService.state.isAccountNormalBasic()"
-        [data]="authenticationUserService.state.portfolioTransactions() | sortByKey: 'date' : 'desc'"
-      ></app-portfolio-transactions-table>
+        [data]="authenticationUserService.state.portfolioTransactions()"
+      />
     </div>
 
     <!-- templates -->
@@ -218,13 +218,8 @@ export class PageTradingComponent {
 
   @Confirmable('Please confirm removing transaction')
   onTransactionDelete(transaction: PortfolioTransaction) {
-    try {
-      this.authenticationUserService.deletePortfolioTransactionForUser(transaction);
-      this.dialogServiceUtil.showNotificationBar('Transaction removed', 'notification');
-    } catch (e) {
-      console.log(e);
-      this.dialogServiceUtil.showNotificationBar('Transaction failed to remove', 'error');
-    }
+    this.portfolioUserFacadeService.deletePortfolioOperation(transaction);
+    this.dialogServiceUtil.showNotificationBar('Transaction removed', 'notification');
   }
 
   onOperationClick(transactionType: PortfolioTransactionType): void {

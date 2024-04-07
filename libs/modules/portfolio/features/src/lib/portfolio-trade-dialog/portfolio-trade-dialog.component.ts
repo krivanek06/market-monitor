@@ -345,7 +345,7 @@ export class PortfolioTradeDialogComponent {
 
     // create object
     const transactionCreate: PortfolioTransactionCreate = {
-      date: dateFormatDate(this.form.controls.date.value),
+      date: dateFormatDate(this.form.controls.date.value, 'yyyy-MM-dd HH:mm:ss'),
       symbol: this.data.summary.id,
       units: Number(this.form.controls.units.value),
       customTotalValue: this.isCustomTotal ? Number(this.form.controls.customTotalValue.value) : undefined,
@@ -357,7 +357,7 @@ export class PortfolioTradeDialogComponent {
     this.isLoadingSignal.set(true);
 
     try {
-      await this.authenticationUserService.createPortfolioTransactionForUser(transactionCreate);
+      await this.portfolioUserFacadeService.createPortfolioOperation(transactionCreate);
       this.dialogServiceUtil.showNotificationBar('Transaction created', 'success');
       this.dialogRef.close();
     } catch (error) {

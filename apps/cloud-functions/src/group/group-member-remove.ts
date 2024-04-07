@@ -1,13 +1,7 @@
-import { GroupBaseInput } from '@mm/api-types';
+import { GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR, GROUP_NOT_FOUND_ERROR, GroupBaseInput } from '@mm/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import {
-  GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR,
-  GROUP_NOT_FOUND_ERROR,
-  groupDocumentMembersRef,
-  groupDocumentRef,
-  userDocumentRef,
-} from '../models';
+import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 
 /**
  * Remove a user from a group or user leaves the group

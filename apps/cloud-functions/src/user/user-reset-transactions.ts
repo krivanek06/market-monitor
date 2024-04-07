@@ -1,8 +1,14 @@
-import { USER_DEFAULT_STARTING_CASH, UserAccountEnum, UserData, UserResetTransactionsInput } from '@mm/api-types';
+import {
+  GROUP_USER_NOT_OWNER,
+  USER_DEFAULT_STARTING_CASH,
+  UserAccountEnum,
+  UserData,
+  UserResetTransactionsInput,
+} from '@mm/api-types';
 import { createEmptyPortfolioState } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { GROUP_USER_NOT_OWNER, groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
+import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 import { userDocumentTransactionHistoryRef } from './../models/user';
 
 /**
@@ -28,6 +34,18 @@ export const userResetTransactionsCall = onCall(async (request) => {
   // reset user's data
   const startingCash = data.accountTypeSelected === UserAccountEnum.DEMO_TRADING ? USER_DEFAULT_STARTING_CASH : 0;
 
+  // clear group history where user if member
+  await clearUserGroupMemberData(userData);
+  // clear group history where user has received invitations
+  await clearUserReceivedGroupInvitations(userData);
+  // clear group history where user has requested to join
+  await clearUserRequestGroup(userData);
+
+  // delete transactions
+  await userDocumentTransactionHistoryRef(userData.id).update({
+    transactions: [],
+  });
+
   // reset user portfolio state & groups
   await userDocumentRef(userData.id).update({
     ...userData,
@@ -43,18 +61,6 @@ export const userResetTransactionsCall = onCall(async (request) => {
     },
     userAccountType: data.accountTypeSelected,
   } satisfies UserData);
-
-  // delete transactions
-  await userDocumentTransactionHistoryRef(userData.id).update({
-    transactions: [],
-  });
-
-  // clear group history where user if member
-  await clearUserGroupMemberData(userData);
-  // clear group history where user has received invitations
-  await clearUserReceivedGroupInvitations(userData);
-  // clear group history where user has requested to join
-  await clearUserRequestGroup(userData);
 });
 
 /**

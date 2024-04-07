@@ -243,7 +243,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
 
   private createChartSeries(data: PortfolioGrowth[], startingCashValue: number = 0): SeriesOptionsType[] {
     const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotalValue]);
-    const investedValue = data.map((point) => [new Date(point.date).getTime(), point.investedValue]);
+    const breakEvenValue = data.map((point) => [new Date(point.date).getTime(), point.breakEvenValue]);
 
     //  const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
     const totalBalanceValues = data.map((point) => [new Date(point.date).getTime(), point.totalBalanceValue]);
@@ -254,8 +254,8 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
     for (let i = 0; i < data.length; i++) {
       const curr = data[i];
       const prev = data[i - 1];
-      if (prev && prev.investedValue !== curr.investedValue) {
-        investmentChangePoints.push([new Date(curr.date).getTime(), curr.investedValue]);
+      if (prev && prev.breakEvenValue !== curr.breakEvenValue) {
+        investmentChangePoints.push([new Date(curr.date).getTime(), curr.breakEvenValue]);
       }
     }
 
@@ -336,7 +336,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           ],
         },
         name: 'Investment Value',
-        data: investedValue,
+        data: breakEvenValue,
       },
       {
         color: ColorScheme.DANGER_VAR,

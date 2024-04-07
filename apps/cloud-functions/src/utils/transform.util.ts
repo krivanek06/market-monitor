@@ -1,14 +1,5 @@
-import {
-  GroupBase,
-  GroupData,
-  GroupMember,
-  PortfolioRisk,
-  PortfolioState,
-  PortfolioStateHoldings,
-  UserBase,
-  UserData,
-} from '@mm/api-types';
-import { getCurrentDateDefaultFormat, roundNDigits } from '@mm/shared/general-util';
+import { GroupBase, GroupData, GroupMember, UserBase, UserData } from '@mm/api-types';
+import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 
 export const transformUserToBase = (user: UserData): UserBase => {
   return {
@@ -49,33 +40,5 @@ export const transformUserToGroupMember = (
       currentGroupMemberPosition: newPosition,
       previousGroupMemberPosition: userPreviousGroupData?.position?.currentGroupMemberPosition ?? null,
     },
-  };
-};
-
-/**
- * transform PortfolioStateHoldings to PortfolioState
- */
-export const transformPortfolioStateHoldingToPortfolioState = (
-  holding: PortfolioStateHoldings,
-  portfolioRisk?: PortfolioRisk,
-): PortfolioState => {
-  return {
-    balance: holding.balance,
-    cashOnHand: holding.cashOnHand,
-    invested: holding.invested,
-    numberOfExecutedBuyTransactions: holding.numberOfExecutedBuyTransactions,
-    numberOfExecutedSellTransactions: holding.numberOfExecutedSellTransactions,
-    transactionFees: holding.transactionFees,
-    holdingsBalance: holding.holdingsBalance,
-    totalGainsValue: roundNDigits(holding.totalGainsValue, 2),
-    totalGainsPercentage: roundNDigits(holding.totalGainsPercentage, 2),
-    firstTransactionDate: holding.firstTransactionDate,
-    lastTransactionDate: holding.lastTransactionDate,
-    date: holding.date,
-    startingCash: holding.startingCash,
-    previousBalanceChange: holding.previousBalanceChange,
-    previousBalanceChangePercentage: holding.previousBalanceChangePercentage,
-    accountResetDate: holding.accountResetDate,
-    portfolioRisk,
   };
 };

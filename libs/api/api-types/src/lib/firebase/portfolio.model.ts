@@ -65,7 +65,7 @@ export type PortfolioState = {
   /**
    * risk of the portfolio
    */
-  portfolioRisk?: PortfolioRisk;
+  portfolioRisk?: PortfolioRisk | null;
 };
 
 export type PortfolioStateHoldingBase = {
@@ -101,7 +101,7 @@ export type PortfolioGrowthAssetsDataItem = {
   /**
    * units * invested values - how much user invested in this asset
    */
-  investedValue: number;
+  breakEvenValue: number;
   // breakEvenPrice - investedValue / units
   units: number;
   /**

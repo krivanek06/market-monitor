@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { PortfolioTransaction, UserGroupData } from '@mm/api-types';
+import { UserApiService } from '@mm/api-client';
+import { PortfolioTransaction, UserGroupData, mockCreateUser } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { User } from 'firebase/auth';
 import { MockProvider } from 'ng-mocks';
-import { mockCreateUser } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
-import { PortfolioGrowthService } from '../portfolio-growth/portfolio-growth.service';
+import { PortfolioCreateOperationService } from '../portfolio-create-operation/portfolio-create-operation.service';
 import { PortfolioUserFacadeService } from './portfolio-user-facade.service';
 
 describe('PortfolioUserFacadeService', () => {
@@ -18,7 +18,6 @@ describe('PortfolioUserFacadeService', () => {
   const testAuthState = {
     getUser: () => testUser,
     getUserData: () => testUserData,
-    getPortfolioState: () => testUserData.portfolioState,
     getUserGroupData: () => testGroupData,
     getUserPortfolioTransactions: () => testPortfolioTransactions,
     isSymbolInWatchList: () => (symbol: string) => false,
@@ -30,16 +29,19 @@ describe('PortfolioUserFacadeService', () => {
         MockProvider(AuthenticationUserStoreService, {
           state: testAuthState,
         }),
-        MockProvider(PortfolioGrowthService, {
-          getPortfolioStateHoldings: jest.fn(),
-          getPortfolioGrowthAssets: jest.fn(),
-        }),
         MockProvider(PortfolioCalculationService, {
           getPortfolioGrowth: jest.fn(),
           getPortfolioChange: jest.fn(),
           getPortfolioSectorAllocationPieChart: jest.fn(),
           getPortfolioAssetAllocationPieChart: jest.fn(),
-          getPortfolioTransactionToDate: jest.fn(),
+          getPortfolioStateHoldings: jest.fn(),
+          getPortfolioGrowthAssets: jest.fn(),
+        }),
+        MockProvider(PortfolioCreateOperationService, {
+          createPortfolioCreateOperation: jest.fn(),
+        }),
+        MockProvider(UserApiService, {
+          deletePortfolioTransactionForUser: jest.fn(),
         }),
       ],
     });

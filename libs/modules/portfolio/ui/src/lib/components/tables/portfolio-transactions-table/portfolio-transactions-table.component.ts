@@ -184,7 +184,7 @@ import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirec
 export class PortfolioTransactionsTableComponent {
   deleteEmitter = output<PortfolioTransactionMore>();
 
-  data = input.required<PortfolioTransactionMore[]>();
+  data = input<PortfolioTransactionMore[] | null>();
   showTransactionFees = input(false);
 
   /**
@@ -199,7 +199,10 @@ export class PortfolioTransactionsTableComponent {
 
   tableEffect = effect(
     () => {
-      this.dataSource.data = this.data();
+      const usedData = this.data() ?? [];
+      const sortedDataByDate = usedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      this.dataSource.data = sortedDataByDate;
       this.dataSource._updateChangeSubscription();
     },
     { allowSignalWrites: true },

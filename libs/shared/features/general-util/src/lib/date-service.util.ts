@@ -2,6 +2,7 @@ import {
   differenceInBusinessDays,
   differenceInDays,
   eachDayOfInterval,
+  endOfDay,
   endOfMonth,
   format,
   getDaysInMonth,
@@ -254,4 +255,21 @@ export const checkDataValidityMinutes = <T extends { lastUpdate: string | Date }
 
 export const getPreviousDate = (date: DateInput): string => {
   return subDays(new Date(date), 1).toDateString();
+};
+
+/**
+ * based on provided date it will format on last working date, prevents:
+ * - selecting weekend
+ * - selecting future date
+ * - selecting holiday
+ * @param date
+ * @returns
+ */
+export const formatToLastLastWorkingDate = (date: DateInput): string => {
+  let usedDate = new Date(date);
+  while (isStockMarketHolidayDate(usedDate) || isWeekend(usedDate)) {
+    usedDate = endOfDay(subDays(new Date(usedDate), 1));
+  }
+
+  return format(usedDate, 'yyyy-MM-dd HH:mm:ss');
 };

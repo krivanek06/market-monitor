@@ -8,11 +8,6 @@ export const hasUserAccess = (userData: UserData | undefined | null, accountType
   const userAccountType = userData?.userAccountType;
   const providedAccountType = UserAccountEnum[accountType];
 
-  // if admin allow anything
-  if (userAccountType === UserAccountEnum.ADMIN) {
-    return true;
-  }
-
   // check if paid user
   if (
     userAccountType === UserAccountEnum.NORMAL_PAID &&

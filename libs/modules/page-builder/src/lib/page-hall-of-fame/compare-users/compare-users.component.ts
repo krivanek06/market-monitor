@@ -9,7 +9,7 @@ import { UserApiService } from '@mm/api-client';
 import { UserBase } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
-import { PortfolioCalculationService, PortfolioGrowthService } from '@mm/portfolio/data-access';
+import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthCompareChartComponent,
   PortfolioHoldingsTableComponent,
@@ -192,10 +192,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       <!-- transaction history -->
       <div class="mb-4">
         <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
-        <app-portfolio-transactions-table
-          [showTransactionFees]="true"
-          [data]="selectedUser()?.userTransactions ?? [] | sortByKey: 'date' : 'desc'"
-        ></app-portfolio-transactions-table>
+        <app-portfolio-transactions-table [showTransactionFees]="true" [data]="selectedUser()?.userTransactions" />
       </div>
     }
   `,
@@ -208,7 +205,6 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
 })
 export class CompareUsersComponent {
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private portfolioGrowthService = inject(PortfolioGrowthService);
   private portfolioCalculationService = inject(PortfolioCalculationService);
   private userApiService = inject(UserApiService);
   private dialog = inject(MatDialog);
@@ -243,11 +239,11 @@ export class CompareUsersComponent {
                       userBase: of(userBase),
                       userData: of(userData),
                       userTransactions: of(userTransactions.transactions),
-                      portfolioState: this.portfolioGrowthService
-                        .getPortfolioStateHoldings(userTransactions.transactions, userData.portfolioState)
+                      portfolioState: this.portfolioCalculationService
+                        .getPortfolioStateHoldings(userData.portfolioState, userData.holdingSnapshot.data)
                         .pipe(take(1)),
                       portfolioGrowth: from(
-                        this.portfolioGrowthService.getPortfolioGrowthAssets(userTransactions.transactions),
+                        this.portfolioCalculationService.getPortfolioGrowthAssets(userTransactions.transactions),
                       ).pipe(
                         map((portfolioGrowth) =>
                           this.portfolioCalculationService.getPortfolioGrowth(

@@ -11,20 +11,10 @@ import {
   signInWithPopup,
   updatePassword,
 } from '@angular/fire/auth';
-import {
-  CollectionReference,
-  DocumentData,
-  DocumentReference,
-  Firestore,
-  collection,
-  doc,
-  setDoc,
-} from '@angular/fire/firestore';
-import { Functions, httpsCallable } from '@angular/fire/functions';
+import { UserApiService } from '@mm/api-client';
 import { UserData } from '@mm/api-types';
-import { assignTypesClient } from '@mm/shared/data-access';
+import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
-import { docData as rxDocData } from 'rxfire/firestore';
 import { BehaviorSubject, Observable, Subject, catchError, from, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
 
@@ -32,12 +22,15 @@ import { LoginUserInput, RegisterUserInput } from '../model';
   providedIn: 'root',
 })
 export class AuthenticationAccountService {
-  private functions = inject(Functions);
-  private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private userApiService = inject(UserApiService);
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
   private authenticatedUser$ = new BehaviorSubject<User | null>(null);
   private loadedAuthentication$ = new Subject<UserData['id'] | null>();
+
+  isDevActive = inject(IS_DEV_TOKEN, {
+    optional: true,
+  });
 
   constructor() {
     this.initAuthenticationUser();
@@ -123,15 +116,7 @@ export class AuthenticationAccountService {
       throw new Error('User is not authenticated');
     }
     try {
-      // delete groups
-      const groupsToRemove = userData.groups.groupOwner.map((groupId) =>
-        httpsCallable<string, unknown>(this.functions, 'groupDeleteCall')(groupId),
-      );
-      await Promise.all(groupsToRemove);
-
-      // delete account
-      const callable = httpsCallable<string, void>(this.functions, 'userDeleteAccountCall');
-      await callable(userData.id);
+      this.userApiService.deleteAccount(userData);
     } catch (error) {
       console.error(error);
     }
@@ -141,12 +126,12 @@ export class AuthenticationAccountService {
     this.authenticatedUser$
       .pipe(
         switchMap((user) =>
-          this.getUserById(user?.uid).pipe(
+          this.userApiService.getUserById(user?.uid).pipe(
             switchMap((userData) =>
               userData
                 ? of(userData)
                 : user
-                  ? from(this.userCreateAccount()).pipe(
+                  ? from(this.userApiService.userCreateAccount()).pipe(
                       catchError((error) => {
                         console.log(error);
                         return of(null);
@@ -168,47 +153,23 @@ export class AuthenticationAccountService {
       });
   }
 
-  private async userCreateAccount(): Promise<UserData> {
-    const callable = httpsCallable<User, UserData>(this.functions, 'userCreateAccountCall');
-    const result = await callable();
-    return result.data;
-  }
-
   private initAuthenticationUser(): void {
     this.auth.onAuthStateChanged((user) => {
       console.log('authentication state change', user);
       this.authenticatedUser$.next(user);
+      const updateTime = this.isDevActive ? 3_000 : 20_000;
 
       if (user) {
         // wait some time before updating last login date so that user is already saved in authenticatedUserData
         setTimeout(() => {
           console.log(`UPDATE LAST LOGIN for user ${user.displayName} : ${user.uid}`);
           // update last login date
-          this.updateUser(user.uid, {
+          this.userApiService.updateUser(user.uid, {
             lastLoginDate: getCurrentDateDefaultFormat(),
             isAccountActive: true,
           });
-        }, 20_000);
+        }, updateTime);
       }
     });
-  }
-
-  private getUserById(userId?: string): Observable<UserData | undefined> {
-    if (!userId) {
-      return of(undefined);
-    }
-    return rxDocData(this.getUserDocRef(userId), { idField: 'id' });
-  }
-
-  private updateUser(id: string, user: Partial<UserData>): void {
-    setDoc(this.getUserDocRef(id), user, { merge: true });
-  }
-
-  private getUserDocRef(userId: string): DocumentReference<UserData> {
-    return doc(this.userCollection(), userId);
-  }
-
-  private userCollection(): CollectionReference<UserData, DocumentData> {
-    return collection(this.firestore, 'users').withConverter(assignTypesClient<UserData>());
   }
 }

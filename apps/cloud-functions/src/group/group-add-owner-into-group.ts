@@ -1,15 +1,14 @@
-import { GROUP_MEMBER_LIMIT, GroupMember } from '@mm/api-types';
-import { FieldValue } from 'firebase-admin/firestore';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {
   GROUP_IS_FULL_ERROR,
+  GROUP_MEMBER_LIMIT,
   GROUP_NOT_FOUND_ERROR,
   GROUP_USER_NOT_OWNER,
+  GroupMember,
   USER_NOT_FOUND_ERROR,
-  groupDocumentMembersRef,
-  groupDocumentRef,
-  userDocumentRef,
-} from '../models';
+} from '@mm/api-types';
+import { FieldValue } from 'firebase-admin/firestore';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 import { transformUserToGroupMember } from './../utils/transform.util';
 
 export const groupAddOwnerIntoGroupCall = onCall(async (request) => {

@@ -1,14 +1,20 @@
-import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT, GroupCreateInput, GroupData, UserBase } from '@mm/api-types';
+import {
+  GROUP_MEMBERS_LIMIT_ERROR,
+  GROUP_MEMBER_LIMIT,
+  GROUP_OWNER_LIMIT,
+  GROUP_OWNER_LIMIT_ERROR,
+  GROUP_SAME_NAME_ERROR,
+  GroupCreateInput,
+  GroupData,
+  USER_NOT_AUTHENTICATED_ERROR,
+  USER_NOT_FOUND_ERROR,
+  UserBase,
+} from '@mm/api-types';
 import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  GROUP_MEMBERS_LIMIT_ERROR,
-  GROUP_OWNER_LIMIT_ERROR,
-  GROUP_SAME_NAME_ERROR,
-  USER_NOT_AUTHENTICATED_ERROR,
-  USER_NOT_FOUND_ERROR,
   groupDocumentHoldingSnapshotsRef,
   groupDocumentMembersRef,
   groupDocumentPortfolioStateSnapshotsRef,

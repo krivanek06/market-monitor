@@ -1,16 +1,16 @@
-import { GROUP_MEMBER_LIMIT, GroupMember, UserAccountEnum } from '@mm/api-types';
-import { FieldValue } from 'firebase-admin/firestore';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import {
   GROUP_IS_FULL_ERROR,
+  GROUP_MEMBER_LIMIT,
   GROUP_NOT_FOUND_ERROR,
   GROUP_USER_ALREADY_MEMBER_ERROR,
   GROUP_USER_HAS_NO_INVITATION_ERROR,
+  GroupMember,
   USER_NOT_FOUND_ERROR,
-  groupDocumentMembersRef,
-  groupDocumentRef,
-  userDocumentRef,
-} from '../models';
+  UserAccountEnum,
+} from '@mm/api-types';
+import { FieldValue } from 'firebase-admin/firestore';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
 import { transformUserToGroupMember } from './../utils/transform.util';
 
 /**

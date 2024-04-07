@@ -1,6 +1,11 @@
-import { PortfolioState, PortfolioTransaction, PortfolioTransactionCreate, SymbolSummary } from '@mm/api-types';
+import {
+  PortfolioState,
+  PortfolioTransaction,
+  PortfolioTransactionCreate,
+  SymbolSummary,
+  USER_TEST_1_ID,
+} from '@mm/api-types';
 import { getYesterdaysDate } from '@mm/shared/general-util';
-import { USER_TEST_1_ID } from './test-user.model';
 
 export const TestTransactionDates = {
   ['2023-09-04']: '2023-09-04',
@@ -201,7 +206,7 @@ export const testHistoricalPriceSymbol_AAPL = {
     {
       date: TestTransactionDates['2023-09-12'],
       volume: 1000,
-      close: 10,
+      close: 11,
     },
   ],
 } as const;

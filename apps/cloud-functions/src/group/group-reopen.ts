@@ -1,5 +1,6 @@
+import { GROUP_NOT_FOUND_ERROR, GROUP_USER_NOT_OWNER } from '@mm/api-types';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { GROUP_NOT_FOUND_ERROR, GROUP_USER_NOT_OWNER, groupDocumentRef } from '../models';
+import { groupDocumentRef } from '../models';
 
 /**
  * if the group is closed, reopen it

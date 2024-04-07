@@ -1,18 +1,31 @@
 import { faker } from '@faker-js/faker';
+import { getStockHistoricalPricesOnDate } from '@mm/api-external';
 import {
   GroupCreateInput,
+  HistoricalPrice,
+  PortfolioTransaction,
   PortfolioTransactionCreate,
+  SYMBOL_NOT_FOUND_ERROR,
+  TRANSACTION_FEE_PRCT,
   USER_DEFAULT_STARTING_CASH,
   UserAccountEnum,
   UserData,
 } from '@mm/api-types';
-import { createEmptyPortfolioState, getCurrentDateDefaultFormat, waitSeconds } from '@mm/shared/general-util';
+import {
+  createEmptyPortfolioState,
+  dateFormatDate,
+  formatToLastLastWorkingDate,
+  getCurrentDateDefaultFormat,
+  roundNDigits,
+  waitSeconds,
+} from '@mm/shared/general-util';
 import { addDays, format, subDays } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
+import { HttpsError } from 'firebase-functions/v2/https';
+import { v4 as uuidv4 } from 'uuid';
 import { groupCreate, groupMemberAccept } from '../group';
 import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
-import { createPortfolioCreateOperation } from '../portfolio';
 import { userCreate } from '../user';
 import { isFirebaseEmulator } from '../utils';
 /**
@@ -217,6 +230,99 @@ const generateTransaction = async (userData: UserData): Promise<void> => {
       console.log(`Symbol: ${symbol} - no data`);
     }
   }
+};
+
+const createPortfolioCreateOperation = async (
+  userAuthId: string,
+  data: PortfolioTransactionCreate,
+): Promise<PortfolioTransaction> => {
+  const userDocRef = userDocumentRef(userAuthId);
+  const userDocTransactionsRef = userDocumentTransactionHistoryRef(userAuthId);
+
+  const userDocData = (await userDocRef.get()).data();
+  const userTransactions = (await userDocTransactionsRef.get()).data()?.transactions;
+
+  // check if user exists
+  if (!userDocData || !userTransactions) {
+    throw new HttpsError('not-found', 'User does not exist');
+  }
+
+  // if weekend is used format to last friday
+  data.date = formatToLastLastWorkingDate(data.date);
+
+  // load historical price for symbol on date
+  const symbolPrice = await getStockHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date));
+
+  // check if symbol exists
+  if (!symbolPrice) {
+    throw new HttpsError('aborted', SYMBOL_NOT_FOUND_ERROR);
+  }
+
+  // from previous transaction calculate invested and units - currently if I own that symbol
+  const symbolHolding = getCurrentInvestedFromTransactions(data.symbol, userTransactions);
+  const symbolHoldingBreakEvenPrice = roundNDigits(symbolHolding.invested / symbolHolding.units, 2);
+
+  // create transaction
+  const transaction = createTransaction(userDocData, data, symbolPrice, symbolHoldingBreakEvenPrice);
+
+  // save transaction into user document
+  userDocTransactionsRef.update({ transactions: [...userTransactions, transaction] });
+
+  // return data
+  return transaction;
+};
+
+const getCurrentInvestedFromTransactions = (
+  symbol: string,
+  userTransactions: PortfolioTransaction[],
+): { units: number; invested: number } => {
+  return userTransactions
+    .filter((d) => d.symbol === symbol)
+    .reduce(
+      (acc, curr) => ({
+        ...acc,
+        invested:
+          acc.invested + (curr.transactionType === 'BUY' ? curr.unitPrice * curr.units : -curr.unitPrice * curr.units),
+        units: acc.units + (curr.transactionType === 'BUY' ? curr.units : -curr.units),
+      }),
+      { invested: 0, units: 0 } as { units: number; invested: number },
+    );
+};
+
+const createTransaction = (
+  userDocData: UserData,
+  input: PortfolioTransactionCreate,
+  historicalPrice: HistoricalPrice,
+  breakEvenPrice: number,
+): PortfolioTransaction => {
+  const isTransactionFeesActive = userDocData.userAccountType === UserAccountEnum.DEMO_TRADING;
+
+  // if custom total value is provided calculate unit price, else use API price
+  const unitPrice = input.customTotalValue ? roundNDigits(input.customTotalValue / input.units) : historicalPrice.close;
+
+  const isSell = input.transactionType === 'SELL';
+  const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
+  const returnChange = isSell ? roundNDigits((unitPrice - breakEvenPrice) / breakEvenPrice) : 0;
+
+  // transaction fees are 0.01% of the transaction value
+  const transactionFeesCalc = isTransactionFeesActive ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
+  const transactionFees = roundNDigits(transactionFeesCalc, 2);
+
+  const result: PortfolioTransaction = {
+    transactionId: uuidv4(),
+    date: input.date,
+    symbol: input.symbol,
+    units: input.units,
+    transactionType: input.transactionType,
+    userId: userDocData.id,
+    symbolType: input.symbolType,
+    unitPrice,
+    transactionFees,
+    returnChange,
+    returnValue,
+  };
+
+  return result;
 };
 
 const getRandomNumber = (min: number, max: number): number => {

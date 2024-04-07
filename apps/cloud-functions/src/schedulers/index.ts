@@ -7,10 +7,13 @@ import { hallOfFameUsers } from './hall-of-fame-users';
 import { userPortfolioRank } from './user-portfolio-rank';
 import { userPortfolioUpdate } from './user-portfolio-update';
 
+/**
+ * every 20 minutes update user portfolio state
+ */
 export const run_user_portfolio_state_scheduler = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '*/15 1-2 * * *',
+    schedule: '*/20 * * * *',
   },
   async () => {
     userPortfolioUpdate();
