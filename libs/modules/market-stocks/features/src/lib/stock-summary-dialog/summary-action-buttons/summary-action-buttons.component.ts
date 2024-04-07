@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, OnInit, Optional, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@mm/api-types';
-import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { AUTHENTICATION_ACCOUNT_TOKEN } from '@mm/authentication/data-access';
 import { SymbolFavoriteService } from '@mm/market-stocks/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 
@@ -79,49 +79,37 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SummaryActionButtonsComponent implements OnInit {
+export class SummaryActionButtonsComponent {
+  private authenticationUserService = inject(AUTHENTICATION_ACCOUNT_TOKEN, {
+    optional: true,
+  });
+  private symbolFavoriteService = inject(SymbolFavoriteService);
+  private dialogServiceUtil = inject(DialogServiceUtil);
+
   redirectClickedEmitter = output<void>();
   symbolSummary = input.required<SymbolSummary>();
 
-  isSymbolInFavoriteSignal = signal<boolean>(false);
+  isSymbolInFavoriteSignal = computed(() => this.symbolFavoriteService.isSymbolInFavoriteObs(this.symbolSummary().id));
 
-  isUserAuthenticatedSignal = signal(false);
-  isSymbolInWatchList = signal(false);
-
-  constructor(
-    private symbolFavoriteService: SymbolFavoriteService,
-    private dialogServiceUtil: DialogServiceUtil,
-    @Inject(AUTHENTICATION_ACCOUNT_TOKEN)
-    @Optional()
-    private authenticationUserService: AuthenticationUserStoreService,
-  ) {
+  isUserAuthenticatedSignal = computed(() => {
     if (this.authenticationUserService) {
-      this.isUserAuthenticatedSignal.set(!!this.authenticationUserService.state().user);
+      return !!this.authenticationUserService.state().user;
     }
-  }
-
-  ngOnInit(): void {
-    // check if symbol in favorite
-    const isInFavorite = this.symbolFavoriteService.isSymbolInFavoriteObs(this.symbolSummary().id);
-    this.isSymbolInFavoriteSignal.set(isInFavorite);
-
-    // check if symbol in watchList
-    this.checkIfSymbolInWatchList();
-  }
-
-  private checkIfSymbolInWatchList(): void {
+    return false;
+  });
+  isSymbolInWatchList = computed(() => {
     if (this.authenticationUserService) {
-      const inWatchList = this.authenticationUserService.state.isSymbolInWatchList()(this.symbolSummary().id);
-      this.isSymbolInWatchList.set(inWatchList);
+      return this.authenticationUserService.state.isSymbolInWatchList()(this.symbolSummary().id);
     }
-  }
+    return false;
+  });
 
   onAddToFavorite(): void {
     this.symbolFavoriteService.addFavoriteSymbol({
       symbolType: 'STOCK',
       symbol: this.symbolSummary().id,
     });
-    this.isSymbolInFavoriteSignal.set(true);
+
     this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been added into favorites`);
   }
 
@@ -130,7 +118,7 @@ export class SummaryActionButtonsComponent implements OnInit {
       symbolType: 'STOCK',
       symbol: this.symbolSummary().id,
     });
-    this.isSymbolInFavoriteSignal.set(false);
+
     this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been removed from favorites`);
   }
 
@@ -156,7 +144,6 @@ export class SummaryActionButtonsComponent implements OnInit {
         `Symbol: ${this.symbolSummary().id} has been added into watchlist`,
         'success',
       );
-      this.checkIfSymbolInWatchList();
     }
   }
 
@@ -170,7 +157,6 @@ export class SummaryActionButtonsComponent implements OnInit {
         `Symbol: ${this.symbolSummary().id} has been removed from watchlist`,
         'success',
       );
-      this.checkIfSymbolInWatchList();
     }
   }
 

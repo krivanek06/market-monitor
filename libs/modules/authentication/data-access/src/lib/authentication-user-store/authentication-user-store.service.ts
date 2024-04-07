@@ -16,7 +16,7 @@ import { combineLatest, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
 import { hasUserAccess } from '../model';
 
-export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationAccountService>(
+export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationUserStoreService>(
   'AUTHENTICATION_ACCOUNT_TOKEN',
 );
 

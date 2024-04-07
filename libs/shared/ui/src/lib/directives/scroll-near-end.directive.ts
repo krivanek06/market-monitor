@@ -56,7 +56,6 @@ export class ScrollNearEndDirective implements OnInit, AfterViewInit {
     // console.log('scrollToBottom:', scrollToBottom);
 
     // console.log(currentScrolledY, innerHeight, heightOfWholePage, heightOfElement, spaceOfElementAndPage);
-
     if (scrollToBottom < this.threshold()) {
       // console.log('%c [ScrollNearEndDirective]: emit', 'color: #bada55; font-size: 16px');
       this.nearEnd.emit();
