@@ -169,10 +169,14 @@ const calculatePortfolioVolatility = async (portfolioState: PortfolioStateHoldin
       const symbolReturnI = await getSymbolPricesAndReturn(portfolioState.holdings[i].symbol);
       const symbolReturnJ = await getSymbolPricesAndReturn(portfolioState.holdings[j].symbol);
 
+      // make sure both data are the same length
+      const [symbolReturnISlice, symbolReturnJSlice] = createSymbolReturnSlices(symbolReturnI, symbolReturnJ);
+
       const covIJ =
         i === j
-          ? pow(std(symbolReturnI.dailyReturns), 2)
-          : calculateCovariance(symbolReturnI.dailyReturns, symbolReturnJ.dailyReturns);
+          ? pow(std(symbolReturnISlice.dailyReturns), 2)
+          : calculateCovariance(symbolReturnISlice.dailyReturns, symbolReturnJSlice.dailyReturns);
+
       portfolioVariance += weightI * weightJ * Number(covIJ);
     }
   }
