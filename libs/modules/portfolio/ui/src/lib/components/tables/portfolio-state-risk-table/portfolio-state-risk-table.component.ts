@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { PortfolioState, UserBase } from '@mm/api-types';
+import { PortfolioRisk, UserBase } from '@mm/api-types';
 import { DefaultImgDirective } from '@mm/shared/ui';
 
 export type PortfolioStateRiskTableComponentData = {
-  portfolioState: PortfolioState;
+  portfolioRisk?: PortfolioRisk | null;
   userBase: UserBase;
 };
 
@@ -30,11 +30,7 @@ export type PortfolioStateRiskTableComponentData = {
       <ng-container matColumnDef="alpha">
         <th mat-header-cell *matHeaderCellDef>Alpha</th>
         <td mat-cell *matCellDef="let row">
-          {{
-            row.portfolioState?.portfolioRisk?.alpha
-              ? (row.portfolioState?.portfolioRisk?.alpha | number: '1.2-2') + '%'
-              : 'N/A'
-          }}
+          {{ row.portfolioRisk?.alpha ? (row.portfolioRisk?.alpha | number: '1.2-2') + '%' : 'N/A' }}
         </td>
       </ng-container>
 
@@ -42,11 +38,7 @@ export type PortfolioStateRiskTableComponentData = {
       <ng-container matColumnDef="volatility">
         <th mat-header-cell *matHeaderCellDef>Volatility</th>
         <td mat-cell *matCellDef="let row">
-          {{
-            row.portfolioState?.portfolioRisk?.volatility
-              ? (row.portfolioState?.portfolioRisk?.volatility | percent: '1.2-2')
-              : 'N/A'
-          }}
+          {{ row.portfolioRisk?.volatility ? (row.portfolioRisk?.volatility | percent: '1.2-2') : 'N/A' }}
         </td>
       </ng-container>
 
@@ -54,11 +46,7 @@ export type PortfolioStateRiskTableComponentData = {
       <ng-container matColumnDef="beta">
         <th mat-header-cell *matHeaderCellDef>Beta</th>
         <td mat-cell *matCellDef="let row">
-          {{
-            row.portfolioState?.portfolioRisk?.beta
-              ? (row.portfolioState?.portfolioRisk?.beta | number: '1.2-2')
-              : 'N/A'
-          }}
+          {{ row.portfolioRisk?.beta ? (row.portfolioRisk?.beta | number: '1.2-2') : 'N/A' }}
         </td>
       </ng-container>
 
@@ -66,11 +54,7 @@ export type PortfolioStateRiskTableComponentData = {
       <ng-container matColumnDef="sharpe">
         <th mat-header-cell *matHeaderCellDef>Sharpe</th>
         <td mat-cell *matCellDef="let row">
-          {{
-            row.portfolioState?.portfolioRisk?.sharpe
-              ? (row.portfolioState?.portfolioRisk?.sharpe | number: '1.2-2')
-              : 'N/A'
-          }}
+          {{ row.portfolioRisk?.sharpe ? (row.portfolioRisk?.sharpe | number: '1.2-2') : 'N/A' }}
         </td>
       </ng-container>
 

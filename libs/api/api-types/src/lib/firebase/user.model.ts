@@ -1,6 +1,6 @@
 import { User } from 'firebase/auth';
 import { DataDocsWrapper } from './../constants/generic.model';
-import { PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
+import { PortfolioRisk, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
 import { RankingItem } from './ranking.model';
 import { SymbolType } from './symbol.model';
 
@@ -56,6 +56,10 @@ export type UserData = UserBase & {
    * only available for DEMO_TRADING users
    */
   systemRank?: SystemRankUser;
+  /**
+   * risk of the portfolio
+   */
+  portfolioRisk?: PortfolioRisk | null;
 };
 
 export type SystemRankUser = {

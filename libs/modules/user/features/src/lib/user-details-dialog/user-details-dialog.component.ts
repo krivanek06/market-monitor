@@ -85,7 +85,7 @@ export type UserDetailsDialogComponentData = {
           <div class="p-2 flex-1 hidden md:block">
             <app-portfolio-state-risk
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
-              [portfolioState]="portfolioStateHoldingSignal()"
+              [portfolioRisk]="userDataSignal()?.portfolioRisk"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             ></app-portfolio-state-risk>
           </div>

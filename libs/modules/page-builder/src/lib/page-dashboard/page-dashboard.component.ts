@@ -83,7 +83,7 @@ import { map, pipe, startWith } from 'rxjs';
 
         <app-general-card class="max-sm:min-w-[275px]" title="Risk">
           <app-portfolio-state-risk
-            [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
+            [portfolioRisk]="authenticationUserService.state.getUserDataNormal()?.portfolioRisk"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
           ></app-portfolio-state-risk>
@@ -234,10 +234,10 @@ import { map, pipe, startWith } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageDashboardComponent {
-  portfolioUserFacadeService = inject(PortfolioUserFacadeService);
-  authenticationUserService = inject(AuthenticationUserStoreService);
   private dialog = inject(MatDialog);
   private dialogServiceUtil = inject(DialogServiceUtil);
+  portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  authenticationUserService = inject(AuthenticationUserStoreService);
 
   portfolioGrowthRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 

@@ -18,7 +18,7 @@ admin.initializeApp({
 });
 
 // firebase functions region
-setGlobalOptions({ region: 'europe-west3', maxInstances: 3 });
+setGlobalOptions({ region: 'europe-central2', maxInstances: 3 });
 
 // sentry - not yet setup
 // GCPFunction.init({

@@ -78,6 +78,13 @@ const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
     accountCreatedDate: getCurrentDateDefaultFormat(),
     userAccountType: UserAccountEnum.DEMO_TRADING,
     systemRank: {},
+    portfolioRisk: {
+      alpha: 0,
+      beta: 0,
+      sharpe: 0,
+      volatility: 0,
+      calculationDate: getCurrentDateDefaultFormat(),
+    },
   };
   return newUser;
 };

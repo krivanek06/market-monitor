@@ -62,10 +62,6 @@ export type PortfolioState = {
    * date when user portfolio was reset
    */
   accountResetDate: string;
-  /**
-   * risk of the portfolio
-   */
-  portfolioRisk?: PortfolioRisk | null;
 };
 
 export type PortfolioStateHoldingBase = {

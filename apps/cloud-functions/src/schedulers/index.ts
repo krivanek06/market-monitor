@@ -8,12 +8,12 @@ import { userPortfolioRank } from './user-portfolio-rank';
 import { userPortfolioUpdate } from './user-portfolio-update';
 
 /**
- * every 20 minutes update user portfolio state
+ * every 20 minutes update user portfolio state from monday to friday
  */
 export const run_user_portfolio_state_scheduler = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '*/20 * * * *',
+    schedule: '*/20 * * * 1-5',
   },
   async () => {
     userPortfolioUpdate();

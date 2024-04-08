@@ -259,6 +259,7 @@ export class CompareUsersComponent {
                         portfolioAssetAllocation: this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(
                           data.portfolioState.holdings,
                         ),
+                        portfolioRisk: data.userData.portfolioRisk,
                       })),
                     ),
                   ),

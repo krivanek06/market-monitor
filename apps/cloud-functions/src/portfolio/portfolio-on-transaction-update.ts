@@ -1,6 +1,5 @@
 import { getSymbolSummaries } from '@mm/api-external';
 import {
-  PortfolioRisk,
   PortfolioState,
   PortfolioStateHolding,
   PortfolioStateHoldingBase,
@@ -60,11 +59,8 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
       summaries,
     );
 
-    // calculation risk of investment
-    const portfolioRisk = await userPortfolioRisk(portfolioStateHoldings);
-
     // remove holdings
-    const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings, portfolioRisk);
+    const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
 
     // account active threshold
     const accountActiveThreshold = format(subDays(new Date(), USER_LOGIN_ACCOUNT_ACTIVE_DAYS), 'yyyy-MM-dd');
@@ -79,6 +75,14 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
       isAccountActive: userData.lastLoginDate > accountActiveThreshold,
     } satisfies Partial<UserData>);
 
+    // calculation risk of investment
+    const portfolioRisk = await userPortfolioRisk(portfolioStateHoldings);
+
+    // update user
+    userDocumentRef(userData.id).update({
+      portfolioRisk: portfolioRisk,
+    } satisfies Partial<UserData>);
+
     // log
     console.log(`Updated user: ${userData.personal.displayName}, ${userData.id}`);
   } catch (e) {
@@ -89,10 +93,7 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
 /**
  * transform PortfolioStateHoldings to PortfolioState
  */
-const transformPortfolioStateHoldingToPortfolioState = (
-  holding: PortfolioStateHoldings,
-  portfolioRisk?: PortfolioRisk | null,
-): PortfolioState => {
+const transformPortfolioStateHoldingToPortfolioState = (holding: PortfolioStateHoldings): PortfolioState => {
   return {
     balance: holding.balance,
     cashOnHand: holding.cashOnHand,
@@ -110,7 +111,6 @@ const transformPortfolioStateHoldingToPortfolioState = (
     previousBalanceChange: holding.previousBalanceChange,
     previousBalanceChangePercentage: holding.previousBalanceChangePercentage,
     accountResetDate: holding.accountResetDate,
-    portfolioRisk: portfolioRisk ?? null,
   };
 };
 
@@ -190,7 +190,6 @@ const getPortfolioStateHoldingsUtil = (
       ? calculateGrowth(balance, previousPortfolioState.balance)
       : 0,
     accountResetDate: previousPortfolioState.accountResetDate,
-    portfolioRisk: previousPortfolioState.portfolioRisk,
   };
 
   return {
