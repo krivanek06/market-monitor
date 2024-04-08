@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, TrackByFunction, effect, input, output, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  TrackByFunction,
+  effect,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
@@ -275,6 +284,7 @@ import {
       <div *ngRange="10" class="h-12 mb-1 g-skeleton"></div>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .mat-column-symbol {
       min-width: 130px;

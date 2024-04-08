@@ -200,7 +200,8 @@ export class PortfolioTransactionsTableComponent {
   tableEffect = effect(
     () => {
       const usedData = this.data() ?? [];
-      const sortedDataByDate = usedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      // reverse transactions to show the latest first
+      const sortedDataByDate = usedData.reduce((acc, curr) => [curr, ...acc], [] as PortfolioTransactionMore[]);
 
       this.dataSource.data = sortedDataByDate;
       this.dataSource._updateChangeSubscription();

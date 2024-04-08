@@ -78,14 +78,20 @@ export const calculateMetricsForAllHoldings = async (
   for (const holding of portfolioState.holdings) {
     const symbolData = await getSymbolPricesAndReturn(holding.symbol);
 
+    const [sp500DataSlice, symbolDataSlice] = createSymbolReturnSlices(sp500Data, symbolData);
+
+    // both should be around 250
+    if (sp500DataSlice.prices.length !== symbolDataSlice.prices.length) {
+      console.log('Symbol data length does not match S&P 500 data length');
+      continue;
+    }
+
     // Calculate metrics for each symbol
-    const beta = await calculateBeta(sp500Data, symbolData);
-    const alpha = calculateAlpha({ sp500Data, symbolData, riskFreeRate, beta });
-    const sharpeRatio = calculateSharpeRatio(symbolData, riskFreeRate) ?? 0;
+    const beta = await calculateBeta(sp500DataSlice, symbolDataSlice);
+    const alpha = calculateAlpha({ sp500Data: sp500DataSlice, symbolData: symbolDataSlice, riskFreeRate, beta });
+    const sharpeRatio = calculateSharpeRatio(symbolDataSlice, riskFreeRate) ?? 0;
 
-    // console.log(`Symbol: ${holding.symbol}, beta: ${beta}, alpha: ${alpha}, sharpeRatio: ${sharpeRatio}`);
-
-    // metrics.push({ symbol: holding.symbol, beta, alpha, sharpeRatio });
+    // calculate weighted average
     metrics.alpha += alpha * holding.weight;
     metrics.beta += beta * holding.weight;
     metrics.sharpe += sharpeRatio * holding.weight;
@@ -96,6 +102,28 @@ export const calculateMetricsForAllHoldings = async (
     beta: roundNDigits(metrics.beta, 6),
     sharpe: roundNDigits(metrics.sharpe, 6),
   };
+};
+
+/**
+ * ensures that both data1 and data2 are the same length
+ *
+ * @param data1
+ * @param data2
+ */
+const createSymbolReturnSlices = (data1: SymbolReturns, data2: SymbolReturns): [SymbolReturns, SymbolReturns] => {
+  const data1Slice = {
+    prices: data1.prices.slice(-data2.prices.length),
+    dailyReturns: data1.dailyReturns.slice(-data2.dailyReturns.length),
+    yearlyReturn: data1.yearlyReturn,
+  } satisfies SymbolReturns;
+
+  const data2Slice = {
+    prices: data2.prices.slice(-data1.prices.length),
+    dailyReturns: data2.dailyReturns.slice(-data1.dailyReturns.length),
+    yearlyReturn: data2.yearlyReturn,
+  } satisfies SymbolReturns;
+
+  return [data1Slice, data2Slice];
 };
 
 const getSymbolPricesAndReturn = async (symbol: string): Promise<SymbolReturns> => {
@@ -126,8 +154,9 @@ const calculatePortfolioVolatility = async (portfolioState: PortfolioStateHoldin
   // Assuming holdings is an array of { symbol, weight }
   const totalWeights = portfolioState.holdings.reduce((total, holding) => total + holding.weight, 0);
 
+  // happens when no holdings
   if (totalWeights === 0) {
-    throw new Error('Total weight of holdings cannot be zero');
+    return 0;
   }
 
   let portfolioVariance = 0;
@@ -205,32 +234,29 @@ const calculateAlpha = (data: {
  * @returns - calculated beta for the past year
  */
 const calculateBeta = async (sp500Data: SymbolReturns, symbolData: SymbolReturns): Promise<number> => {
-  if (sp500Data.prices.length !== symbolData.prices.length) {
-    throw new Error('Data arrays must be of the same length');
+  try {
+    // calculate covariance
+    const covarianceCalc = calculateCovariance(sp500Data.dailyReturns, symbolData.dailyReturns);
+
+    // Calculate variance of market returns
+    const varianceCalc = variance(sp500Data.dailyReturns);
+
+    // Ensure variance is a single number
+    if (Array.isArray(varianceCalc)) {
+      throw new Error('Variance calculation returned an array instead of a single number.');
+    }
+
+    // Calculate beta
+    const beta = covarianceCalc / varianceCalc;
+
+    return roundNDigits(beta, 6);
+  } catch (error) {
+    console.log('Error calculating beta', error);
+    return 0;
   }
-
-  // calculate covariance
-  const covarianceCalc = calculateCovariance(sp500Data.dailyReturns, symbolData.dailyReturns);
-
-  // Calculate variance of market returns
-  const varianceCalc = variance(sp500Data.dailyReturns);
-
-  // Ensure variance is a single number
-  if (Array.isArray(varianceCalc)) {
-    throw new Error('Variance calculation returned an array instead of a single number.');
-  }
-
-  // Calculate beta
-  const beta = covarianceCalc / varianceCalc;
-
-  return roundNDigits(beta, 6);
 };
 
 const calculateCovariance = (returns1: number[], returns2: number[]): number => {
-  if (returns1.length !== returns2.length) {
-    throw new Error('Data arrays must be of the same length');
-  }
-
   const mean1 = mean(returns1);
   const mean2 = mean(returns2);
   const sum = returns1.reduce((acc, r1, i) => acc + (r1 - mean1) * (returns2[i] - mean2), 0);

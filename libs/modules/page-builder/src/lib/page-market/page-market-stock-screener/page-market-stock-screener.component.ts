@@ -71,7 +71,7 @@ import { catchError, switchMap, tap } from 'rxjs';
             (nearEnd)="onNearEndScroll()"
             (itemClickedEmitter)="onSummaryClick($event)"
             [stockSummaries]="screenerResults | slice: 0 : maxScreenerResults()"
-          ></app-stock-summary-table>
+          />
         </section>
       </ng-container>
     </ng-container>
