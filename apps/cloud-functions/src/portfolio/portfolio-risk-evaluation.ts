@@ -6,7 +6,7 @@ import {
   SYMBOL_SP500,
   SymbolHistoricalPeriods,
 } from '@mm/api-types';
-import { getCurrentDateDefaultFormat, roundNDigits } from '@mm/shared/general-util';
+import { getCurrentDateDetailsFormat, roundNDigits } from '@mm/shared/general-util';
 import { divide, mean, pow, sqrt, std, variance } from 'mathjs';
 
 type SymbolReturns = {
@@ -21,16 +21,16 @@ type SymbolReturns = {
 const symbolReturnMap = new Map<string, SymbolReturns>();
 
 export const userPortfolioRisk = async (portfolioState: PortfolioStateHoldings): Promise<PortfolioRisk> => {
-  const sp500Data = await getSymbolPricesAndReturn(SYMBOL_SP500);
-  const treasureData = await getTreasuryRates();
-  const riskFreeRate = treasureData[0].month3;
-
   // user has no holdings
   if (portfolioState.holdings.length === 0) {
     return createEmptyPortfolioRisk();
   }
 
   try {
+    const sp500Data = await getSymbolPricesAndReturn(SYMBOL_SP500);
+    const treasureData = await getTreasuryRates();
+    const riskFreeRate = treasureData.at(0)?.month3 ?? 4.5; // fallback 4.5% treasury
+
     // preload all symbol data and save to cache
     const symbolDataPromises = portfolioState.holdings.map((holding) => getSymbolPricesAndReturn(holding.symbol));
     await Promise.all(symbolDataPromises);
@@ -48,7 +48,7 @@ export const userPortfolioRisk = async (portfolioState: PortfolioStateHoldings):
       alpha,
       sharpe,
       volatility,
-      calculationDate: getCurrentDateDefaultFormat(),
+      date: getCurrentDateDetailsFormat(),
     };
   } catch (error) {
     console.log(error);
@@ -273,6 +273,6 @@ const createEmptyPortfolioRisk = (): PortfolioRisk => {
     beta: 0,
     sharpe: 0,
     volatility: 0,
-    calculationDate: getCurrentDateDefaultFormat(),
+    date: getCurrentDateDetailsFormat(),
   };
 };

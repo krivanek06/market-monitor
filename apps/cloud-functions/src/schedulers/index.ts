@@ -14,6 +14,7 @@ export const run_user_portfolio_state_scheduler = onSchedule(
   {
     timeoutSeconds: 200,
     schedule: '*/20 * * * 1-5',
+    memory: '256MiB',
   },
   async () => {
     userPortfolioUpdate();

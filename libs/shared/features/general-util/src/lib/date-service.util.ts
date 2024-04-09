@@ -88,6 +88,10 @@ export const getCurrentDateDefaultFormat = (): string => {
   return dateFormatDate(new Date());
 };
 
+export const getCurrentDateDetailsFormat = (): string => {
+  return dateFormatDate(new Date(), 'yyyy-MM-dd HH:mm:ss');
+};
+
 export const getYesterdaysDate = (): string => {
   return dateFormatDate(subDays(new Date(), 1));
 };

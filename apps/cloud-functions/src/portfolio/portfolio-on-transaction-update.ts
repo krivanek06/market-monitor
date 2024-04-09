@@ -10,7 +10,12 @@ import {
   UserBase,
   UserData,
 } from '@mm/api-types';
-import { calculateGrowth, getCurrentDateDefaultFormat, roundNDigits } from '@mm/shared/general-util';
+import {
+  calculateGrowth,
+  getCurrentDateDefaultFormat,
+  getCurrentDateDetailsFormat,
+  roundNDigits,
+} from '@mm/shared/general-util';
 import { format, isSameDay, subDays } from 'date-fns';
 import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { userDocumentRef, userDocumentTransactionHistoryRef } from '../models';
@@ -180,7 +185,7 @@ const getPortfolioStateHoldingsUtil = (
     startingCash: roundNDigits(startingCash),
     firstTransactionDate,
     lastTransactionDate,
-    date: getCurrentDateDefaultFormat(),
+    date: getCurrentDateDetailsFormat(),
     // calculate data for previous portfolio
     previousBalanceChange:
       isPreviousPortfolioDoneYesterday && previousPortfolioState.balance !== 0

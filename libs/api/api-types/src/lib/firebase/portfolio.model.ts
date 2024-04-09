@@ -9,7 +9,11 @@ export type PortfolioRisk = {
   beta: number;
   sharpe: number;
   volatility: number;
-  calculationDate: string;
+
+  /**
+   * date when it was last calculated
+   */
+  date: string;
   // estimatedReturnPrct: number;
   // estimatedReturnValue: number;
   // annualVariancePrct: number;
