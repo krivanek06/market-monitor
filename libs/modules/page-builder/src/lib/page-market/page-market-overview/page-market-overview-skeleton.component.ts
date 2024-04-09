@@ -19,7 +19,7 @@ import { RangeDirective } from '@mm/shared/ui';
 
     <!-- index select -->
     <div class="flex max-sm:w-full mb-3">
-      <div class="min-w-[300px] max-sm:w-full g-skeleton h-12"></div>
+      <div class="min-w-[500px] max-sm:w-full g-skeleton h-12"></div>
     </div>
 
     <!-- chart -->

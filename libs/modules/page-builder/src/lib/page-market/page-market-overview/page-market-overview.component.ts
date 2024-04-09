@@ -72,7 +72,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
       <div class="flex max-sm:w-full">
         <app-quote-search-basic
           [formControl]="selectedIndexSymbolQuoteControl"
-          class="min-w-[300px] max-sm:w-full"
+          class="min-w-[500px] max-sm:w-full"
           type="index"
         />
       </div>

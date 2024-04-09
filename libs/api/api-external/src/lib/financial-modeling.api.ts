@@ -534,11 +534,11 @@ export const getCalendarStockIPOs = async (
   }]
  */
 export const searchTicker = async (symbolPrefix: string, isCrypto = false): Promise<TickerSearch[]> => {
-  const stockExchange = 'NASDAQ,NYSE';
+  const stockExchange = 'NASDAQ,NYSE,AMEX';
   const cryptoExchange = 'CRYPTO';
   const usedExchange = isCrypto ? cryptoExchange : stockExchange;
   const prefixUppercase = symbolPrefix.toUpperCase();
-  const url = `${FINANCIAL_MODELING_URL}/v3/search?query=${prefixUppercase}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+  const url = `${FINANCIAL_MODELING_URL}/v3/search-ticker?query=${prefixUppercase}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
 
   const response = await fetch(url);
   const data = (await response.json()) as TickerSearch[];

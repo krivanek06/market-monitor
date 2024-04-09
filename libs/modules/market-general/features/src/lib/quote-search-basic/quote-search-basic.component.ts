@@ -120,9 +120,12 @@ export class QuoteSearchBasicComponent implements ControlValueAccessor {
   onChange: (value: SymbolQuote) => void = () => {};
   onTouched = () => {};
 
-  loadQuotesEffect = effect(() => {
-    this.loadQuotesByType(this.type());
-  });
+  loadQuotesEffect = effect(
+    () => {
+      this.loadQuotesByType(this.type());
+    },
+    { allowSignalWrites: true },
+  );
 
   private loadQuotesByType(type: AvailableQuotes) {
     this.showLoadingIndicator.set(true);
