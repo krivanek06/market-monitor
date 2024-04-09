@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, Inject, computed, signal } from '@a
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -70,21 +70,27 @@ export type PortfolioTradeDialogComponentData = {
           <div class="flex items-center gap-3">
             <img appDefaultImg imageType="symbol" [src]="data.summary.id" class="w-12 h-12" />
             <div class="flex flex-col">
-              <div class="text-lg text-wt-gray-dark">{{ data.summary.quote.symbol }}</div>
+              <div class="flex items-center gap-4">
+                <!-- name -->
+                <div class="text-lg text-wt-gray-dark">{{ data.summary.quote.symbol }}</div>
+                <span>-</span>
+                <!-- operation -->
+                <div
+                  [ngClass]="{
+                    'text-wt-danger': data.transactionType === 'SELL',
+                    'text-wt-success': data.transactionType === 'BUY'
+                  }"
+                >
+                  {{ data.transactionType | uppercase }} Operation
+                </div>
+              </div>
               <div class="hidden md:block">{{ data.summary.quote.name }}</div>
             </div>
           </div>
 
-          <!-- operation -->
-          <div class="flex flex-row items-center gap-3 text-xl">
-            <div
-              [ngClass]="{
-                'text-wt-danger': data.transactionType === 'SELL',
-                'text-wt-success': data.transactionType === 'BUY'
-              }"
-            >
-              {{ data.transactionType | uppercase }} Operation
-            </div>
+          <!-- if sell, checkbox to sell all -->
+          <div *ngIf="data.transactionType === 'SELL'">
+            <mat-checkbox (change)="onSellAllClick($event)" color="warn">Sell All</mat-checkbox>
           </div>
         </div>
 
@@ -97,7 +103,7 @@ export type PortfolioTradeDialogComponentData = {
           ></app-date-picker>
 
           <!-- custom -->
-          <div class="flex justify-between pt-6 pb-2">
+          <div class="flex justify-between pt-3 pb-2">
             <div class="flex items-center gap-3">
               <ng-container *ngIf="isCustomTotal">
                 <button
@@ -171,7 +177,9 @@ export type PortfolioTradeDialogComponentData = {
 
           <!-- errors -->
           <div class="flex flex-col gap-4 mb-7">
-            <div class="g-banner-error" *ngIf="insufficientUnitsErrorSignal()">Insufficient units to sell</div>
+            <div class="g-banner-error" *ngIf="insufficientUnitsErrorSignal() || isSellDisabledZeroUnits()">
+              Insufficient units to sell
+            </div>
             <div class="g-banner-error" *ngIf="insufficientCashErrorSignal()">Insufficient cash amount on hand</div>
             <div class="g-banner-error" *ngIf="!allowBuyOperationSignal()">
               Your Portfolio can contain maximum {{ USER_HOLDINGS_SYMBOL_LIMIT }} symbols
@@ -210,7 +218,13 @@ export type PortfolioTradeDialogComponentData = {
         <div class="g-mat-dialog-actions-full">
           <button mat-flat-button mat-dialog-close type="button">Cancel</button>
           <button
-            [disabled]="isLoadingSignal() || isError || !allowBuyOperationSignal()"
+            [disabled]="
+              isLoadingSignal() ||
+              isError ||
+              !allowBuyOperationSignal() ||
+              isSellDisabledZeroUnits() ||
+              !form.controls.units.value
+            "
             type="submit"
             mat-flat-button
             [color]="data.transactionType === 'BUY' ? 'accent' : 'warn'"
@@ -279,6 +293,7 @@ export class PortfolioTradeDialogComponent {
    * true if user tries to buy more than he has cash
    */
   insufficientCashErrorSignal = signal<boolean>(false);
+  isSellDisabledZeroUnits = computed(() => !this.holdingSignal() && this.data.transactionType === 'SELL');
 
   userDataSignal = this.authenticationUserService.state.getUserData;
 
@@ -369,6 +384,14 @@ export class PortfolioTradeDialogComponent {
 
   onActiveTotalValueButtonChange(value: 'UNITS' | 'TOTAL_VALUE'): void {
     this.activeTotalValueButtonSignal.set(value);
+  }
+
+  onSellAllClick(event: MatCheckboxChange): void {
+    if (event.checked) {
+      this.form.controls.units.patchValue(String(this.holdingSignal()?.units ?? 0));
+    } else {
+      this.form.controls.units.patchValue('');
+    }
   }
 
   /**
