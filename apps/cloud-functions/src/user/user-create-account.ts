@@ -83,7 +83,7 @@ const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
       beta: 0,
       sharpe: 0,
       volatility: 0,
-      calculationDate: getCurrentDateDefaultFormat(),
+      date: getCurrentDateDefaultFormat(),
     },
   };
   return newUser;
