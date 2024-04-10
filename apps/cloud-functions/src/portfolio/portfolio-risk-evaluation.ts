@@ -133,21 +133,26 @@ const getSymbolPricesAndReturn = async (symbol: string): Promise<SymbolReturns> 
     return savedData;
   }
 
-  const prices = await getHistoricalPricesCloudflare(symbol, SymbolHistoricalPeriods.year);
-  const yearlyReturn = (prices[prices.length - 1].close - prices[0].close) / prices[0].close;
-  const dailyReturns = prices
-    .map((price, index, arr) => (index > 0 ? (price.close - arr[index - 1].close) / arr[index - 1].close : 0))
-    // filter out first result
-    .slice(1);
+  try {
+    const prices = await getHistoricalPricesCloudflare(symbol, SymbolHistoricalPeriods.year);
+    const yearlyReturn = (prices[prices.length - 1].close - prices[0].close) / prices[0].close;
+    const dailyReturns = prices
+      .map((price, index, arr) => (index > 0 ? (price.close - arr[index - 1].close) / arr[index - 1].close : 0))
+      // filter out first result
+      .slice(1);
 
-  // format
-  const data = { prices, yearlyReturn, dailyReturns };
+    // format
+    const data = { prices, yearlyReturn, dailyReturns };
 
-  // save
-  symbolReturnMap.set(symbol, data);
+    // save
+    symbolReturnMap.set(symbol, data);
 
-  // return data
-  return data;
+    // return data
+    return data;
+  } catch (error) {
+    console.log(`Error getting symbol prices and return for ${symbol}`, error);
+    return { prices: [], dailyReturns: [], yearlyReturn: 0 };
+  }
 };
 
 const calculatePortfolioVolatility = async (portfolioState: PortfolioStateHoldings): Promise<number> => {

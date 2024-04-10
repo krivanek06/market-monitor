@@ -11,12 +11,12 @@ import { updateUserPortfolioState } from '../portfolio';
  *
  * At every 5th minute past every hour from 1 through 2am
  */
-export const userPortfolioUpdate = async (): Promise<void> => {
+export const userPortfolioUpdate = async (): Promise<number> => {
   // load users to calculate balance
   const userToUpdate = usersCollectionRef()
     .where('isAccountActive', '==', true)
     .orderBy('portfolioState.date', 'desc')
-    .limit(50);
+    .limit(100);
 
   const users = await userToUpdate.get();
 
@@ -30,6 +30,12 @@ export const userPortfolioUpdate = async (): Promise<void> => {
     const user = userDoc.data();
 
     // update portfolio
-    await updateUserPortfolioState(user);
+    try {
+      await updateUserPortfolioState(user);
+    } catch (error) {
+      console.error('Error updating user portfolio', user.id, error);
+    }
   }
+
+  return users.docs.length;
 };

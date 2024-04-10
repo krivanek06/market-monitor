@@ -16,12 +16,18 @@ export const getSymbolSummaries = async (symbols: string[]): Promise<SymbolSumma
     },
   });
 
-  if (!response.ok) {
-    console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
+  try {
+    if (!response.ok) {
+      console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
+      return [];
+    }
+    const data = (await response.json()) as SymbolSummary[];
+    return data;
+  } catch (error) {
+    console.log(`Failed to get symbol summaries for ${symbols}`);
+    console.log(error);
     return [];
   }
-  const data = (await response.json()) as SymbolSummary[];
-  return data;
 };
 
 export const getSymbolSummary = async (symbol: string): Promise<SymbolSummary | null> => {
@@ -70,6 +76,7 @@ export const getHistoricalPricesCloudflare = async (
     const data = (await response.json()) as HistoricalPrice[];
     return data;
   } catch (error) {
+    console.log(`Failed to get historical prices for ${symbol} with period ${period}`);
     console.log(error);
     return [];
   }
