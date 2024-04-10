@@ -235,6 +235,14 @@ export class BubblePaginationDirective {
       this.ren.removeChild(this.bubbleContainerRef, button);
     });
 
+    // remove dots
+    if (this.dotsStartRef) {
+      this.ren.removeChild(this.bubbleContainerRef, this.dotsStartRef);
+    }
+    if (this.dotsEndRef) {
+      this.ren.removeChild(this.bubbleContainerRef, this.dotsEndRef);
+    }
+
     // Empty state array
     this.buttonsRef.length = 0;
   }
