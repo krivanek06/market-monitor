@@ -14,6 +14,7 @@ import {
   PortfolioTransactionCreate,
   PortfolioTransactionType,
   SymbolSummary,
+  TRANSACTION_FEE_PRCT,
   USER_HOLDINGS_SYMBOL_LIMIT,
   UserAccountEnum,
 } from '@mm/api-types';
@@ -22,7 +23,7 @@ import { UserAccountTypeDirective } from '@mm/authentication/feature-access-dire
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { minValueValidator, positiveNumberValidator, requiredValidator } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { dateFormatDate, dateIsNotWeekend } from '@mm/shared/general-util';
+import { dateFormatDate, dateIsNotWeekend, roundNDigits } from '@mm/shared/general-util';
 import {
   CastToNumberPipe,
   DatePickerComponent,
@@ -33,7 +34,8 @@ import {
   NumberKeyboardComponent,
 } from '@mm/shared/ui';
 import { isSameDay } from 'date-fns';
-import { map, switchMap, tap } from 'rxjs';
+import { computedFrom } from 'ngxtension/computed-from';
+import { map, pipe, startWith, switchMap, tap } from 'rxjs';
 
 export type PortfolioTradeDialogComponentData = {
   summary: SymbolSummary;
@@ -163,15 +165,20 @@ export type PortfolioTradeDialogComponentData = {
               </span>
             </div>
             <div class="g-item-wrapper">
-              <span>Total Value</span>
-              <span>
-                <ng-container *ngIf="!isCustomTotal">
-                  {{ symbolPriceOnDate() * (form.controls.units.value | castToNumber) | currency }}
-                </ng-container>
-                <ng-container *ngIf="isCustomTotal">
-                  {{ form.controls.customTotalValue.value || 0 | currency }}
-                </ng-container>
-              </span>
+              <div class="space-x-2">
+                <span>Total Value</span>
+                <span *ngIf="isDemoAccount()">/</span>
+                <span *ngIf="isDemoAccount()">Fees</span>
+              </div>
+              <div class="space-x-2">
+                @if (!isCustomTotal) {
+                  <span>{{ symbolPriceOnDate() * (form.controls.units.value | castToNumber) | currency }}</span>
+                  <span *ngIf="isDemoAccount()">/</span>
+                  <span *ngIf="isDemoAccount()"> ~{{ calculatedFees() | currency }} </span>
+                } @else {
+                  <span> {{ form.controls.customTotalValue.value || 0 | currency }} </span>
+                }
+              </div>
             </div>
           </div>
 
@@ -296,6 +303,19 @@ export class PortfolioTradeDialogComponent {
   isSellDisabledZeroUnits = computed(() => !this.holdingSignal() && this.data.transactionType === 'SELL');
 
   userDataSignal = this.authenticationUserService.state.getUserData;
+
+  isDemoAccount = computed(() => this.authenticationUserService.state.isAccountDemoTrading());
+  calculatedFees = computedFrom(
+    [
+      this.form.controls.units.valueChanges.pipe(
+        startWith(this.form.controls.units.value),
+        map((d) => Number(d)),
+      ),
+      this.symbolPriceOnDate,
+    ],
+    pipe(map(([units, price]) => roundNDigits(((units * price) / 100) * TRANSACTION_FEE_PRCT))),
+    { initialValue: 0 },
+  );
 
   USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
 

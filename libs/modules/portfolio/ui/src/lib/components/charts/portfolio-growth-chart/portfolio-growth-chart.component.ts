@@ -344,7 +344,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         zIndex: 10,
         yAxis: 0,
         opacity: 0.45,
-        visible: this.chartType() === 'all' || this.chartType() === 'balance',
+        visible: (this.chartType() === 'all' || this.chartType() === 'balance') && startingCashValue > 0,
         showInLegend: true,
         fillColor: {
           linearGradient: {
