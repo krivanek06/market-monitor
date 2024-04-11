@@ -210,6 +210,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
             (symbolClicked)="onSummaryClick($event)"
             [holdings]="displayedHoldings()"
             [portfolioState]="groupDetailsSignal.groupData.portfolioState"
+            [showSkeletonLoading]="!getGroupHoldingsSignalNormal()"
           />
           <!-- show more button -->
           <div class="flex justify-end mt-2 mr-4">

@@ -177,7 +177,8 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
             (symbolClicked)="onSummaryClick($event)"
             [holdings]="selectedUserHoldings()"
             [portfolioState]="selectedUser()?.portfolioState"
-          ></app-portfolio-holdings-table>
+            [showSkeletonLoading]="!selectedUser()?.portfolioState"
+          />
           <!-- show more members button -->
           <div class="flex justify-end">
             <app-show-more-button

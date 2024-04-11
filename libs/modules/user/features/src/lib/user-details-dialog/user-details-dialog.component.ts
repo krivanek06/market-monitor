@@ -65,7 +65,7 @@ export type UserDetailsDialogComponentData = {
       </div>
     </div>
 
-    <mat-dialog-content class="md:h-[675px]">
+    <mat-dialog-content class="md:h-[75vh]">
       @if (userDataSignal(); as userData) {
         <div class="pb-2">
           <mat-divider></mat-divider>
@@ -120,17 +120,21 @@ export type UserDetailsDialogComponentData = {
             class="mb-6"
           ></app-portfolio-growth-chart>
         } @else {
-          <div class="h-[375px] grid place-content-center">
+          <div class="h-[400px] grid place-content-center">
             <mat-spinner></mat-spinner>
           </div>
         }
 
         <div class="max-sm:pl-2 mb-6">
-          <app-section-title [title]="'Holdings: ' + (portfolioStateHoldingSignal()?.holdings ?? []).length" />
+          <app-section-title
+            [title]="'Holdings: ' + (portfolioStateHoldingSignal()?.holdings ?? []).length"
+            class="mb-3"
+          />
           <app-portfolio-holdings-table
             [holdings]="portfolioStateHoldingSignal()?.holdings ?? []"
             [portfolioState]="portfolioStateHoldingSignal()"
             [displayedColumns]="displayedColumns"
+            [showSkeletonLoading]="!portfolioStateHoldingSignal()?.holdings"
           />
         </div>
       } @else {
