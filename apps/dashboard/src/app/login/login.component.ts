@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
   standalone: true,
   imports: [CommonModule, PageLoginComponent],
   template: ` <section>
-    <span>Version: {{ version }}</span>
+    <span class="absolute top-0 left-0">Version: {{ version }}</span>
     <app-page-login />
   </section>`,
   styles: `

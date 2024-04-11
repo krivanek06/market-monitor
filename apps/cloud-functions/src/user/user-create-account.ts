@@ -1,4 +1,11 @@
-import { UserAccountEnum, UserData, UserPersonalInfo, UserPortfolioTransaction, UserWatchList } from '@mm/api-types';
+import {
+  USER_DEFAULT_STARTING_CASH,
+  UserAccountEnum,
+  UserData,
+  UserPersonalInfo,
+  UserPortfolioTransaction,
+  UserWatchList,
+} from '@mm/api-types';
 import { createEmptyPortfolioState, createNameInitials, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
@@ -67,7 +74,7 @@ const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
     },
     personal: personal,
     portfolioState: {
-      ...createEmptyPortfolioState(),
+      ...createEmptyPortfolioState(USER_DEFAULT_STARTING_CASH),
     },
     holdingSnapshot: {
       lastModifiedDate: getCurrentDateDefaultFormat(),

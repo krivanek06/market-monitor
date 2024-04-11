@@ -9,7 +9,7 @@ import { DialogServiceModule } from '@mm/shared/dialog-manager';
   imports: [CommonModule, AuthenticationFormComponent, DialogServiceModule],
   template: `
     <section>
-      <div class="mt-[200px] w-full md:w-7/12 xl:w-6/12 mx-auto">
+      <div class="pt-[200px] w-full max-w-[800px] mx-auto h-lvh ">
         <app-authentication-form></app-authentication-form>
       </div>
     </section>

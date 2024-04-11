@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   Auth,
   EmailAuthProvider,
@@ -15,7 +16,7 @@ import { UserApiService } from '@mm/api-client';
 import { UserData } from '@mm/api-types';
 import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
-import { BehaviorSubject, Observable, Subject, catchError, from, of, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, catchError, from, map, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
 
 @Injectable({
@@ -52,6 +53,11 @@ export class AuthenticationAccountService {
     }
     return user;
   }
+
+  isUserNewUser = toSignal(
+    this.getUser().pipe(map((user) => (user ? user.metadata.creationTime === user.metadata.lastSignInTime : false))),
+    { initialValue: false },
+  );
 
   getUserData(): Observable<UserData | null> {
     return this.authenticatedUserData$;
