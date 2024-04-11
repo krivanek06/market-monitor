@@ -156,8 +156,10 @@ const getPortfolioStateHoldingsUtil = (
   );
 
   // value of all assets
-  const holdingsBalance =
-    portfolioStateHolding.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0) - transactionFees;
+  const holdingsBalance = portfolioStateHolding.reduce(
+    (acc, curr) => acc + curr.symbolSummary.quote.price * curr.units,
+    0,
+  );
 
   // current cash on hand
   const startingCash = previousPortfolioState.startingCash;
