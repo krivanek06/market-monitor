@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, NgZone, TemplateRef, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,9 +16,9 @@ import {
   RegisterUserInput,
 } from '@mm/authentication/data-access';
 import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
-import { DialogServiceUtil, GenericDialogComponent, GenericDialogComponentData } from '@mm/shared/dialog-manager';
+import { DialogServiceUtil, GenericDialogComponent } from '@mm/shared/dialog-manager';
 import { filterNil } from 'ngxtension/filter-nil';
-import { EMPTY, catchError, filter, first, from, switchMap, take, tap } from 'rxjs';
+import { EMPTY, Observable, catchError, first, from, map, of, switchMap, take, tap } from 'rxjs';
 import {
   AuthenticationNewAccountTypeChooseDialogComponent,
   SelectableAccountType,
@@ -95,14 +95,6 @@ import { FormRegisterComponent } from './form-register/form-register.component';
         <div class="text-lg text-wt-gray-medium">Checking Authentication</div>
       </div>
     </ng-template>
-
-    <!-- new user options -->
-    <ng-template #newUserTemplate>
-      <app-authentication-new-account-type-choose-dialog
-        (cancelEmitter)="onCancelAccountTypeDialog()"
-        (confirmEmitter)="onConfirmAccountType($event)"
-      />
-    </ng-template>
   `,
   styles: `
     :host {
@@ -115,13 +107,10 @@ export class AuthenticationFormComponent {
   loginUserInputControl = new FormControl<LoginUserInput | null>(null);
   registerUserInputControl = new FormControl<RegisterUserInput | null>(null);
 
-  newUserTemplate = viewChild('newUserTemplate', { read: TemplateRef });
-
   private authenticationAccountService = inject(AuthenticationAccountService);
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private dialogServiceUtil = inject(DialogServiceUtil);
   private router = inject(Router);
-  private zone = inject(NgZone);
   private dialog = inject(MatDialog);
 
   isDevActive = inject(IS_DEV_TOKEN, {
@@ -143,36 +132,34 @@ export class AuthenticationFormComponent {
           this.authenticationAccountService.getUserData().pipe(
             filterNil(), // wait until there is a user initialized
             first(),
-            tap(() => {
-              if (this.authenticationAccountService.isUserNewUser()) {
-                this.openSelectAccountType();
-              } else {
-                this.dialogServiceUtil.showNotificationBar('Successfully login', 'success');
-                // getting error: Navigation triggered outside Angular zone, did you forget to call 'ngZone.run()
-                this.zone.run(() => {
-                  this.router.navigate([ROUTES_MAIN.DASHBOARD]);
-                });
-              }
-            }),
+            switchMap((userData) =>
+              this.authenticationAccountService.isUserNewUser()
+                ? from(this.openSelectAccountType()).pipe(
+                    filterNil(),
+                    tap((accountType) => this.newUserAccountTypeSelect(accountType)),
+                    map(() => userData),
+                  )
+                : of(userData),
+            ),
           ),
         ),
         take(1),
       )
-      .subscribe((e) => console.log('google', e));
+      .subscribe((e) => {
+        // display success message
+        this.dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
+
+        // navigate to dashboard
+        this.router.navigate([ROUTES_MAIN.DASHBOARD]);
+      });
   }
 
   onDemoLogin(): void {
     // TODO create demo account
+    this.openSelectAccountType();
   }
 
-  onCancelAccountTypeDialog(): void {
-    // close dialogs
-    this.dialog.closeAll();
-    // hide loader
-    this.loadingSnipperShowSignal.set(false);
-  }
-
-  async onConfirmAccountType(type: SelectableAccountType) {
+  private async newUserAccountTypeSelect(type: SelectableAccountType) {
     this.dialog.closeAll();
     console.log('SelectableAccountType', type);
 
@@ -186,7 +173,7 @@ export class AuthenticationFormComponent {
     await this.authenticationUserStoreService.resetTransactions(type);
 
     // display success message
-    this.dialogServiceUtil.showNotificationBar('Successfully login', 'success');
+    this.dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
 
     // navigate to dashboard
     this.router.navigate([ROUTES_MAIN.DASHBOARD]);
@@ -195,18 +182,17 @@ export class AuthenticationFormComponent {
   private watchLoginUserFormControl(): void {
     this.loginUserInputControl.valueChanges
       .pipe(
-        filter((res): res is LoginUserInput => !!res),
+        filterNil(),
         tap(() => this.loadingSnipperShowSignal.set(true)),
         switchMap((res) =>
           from(this.authenticationAccountService.signIn(res)).pipe(
             switchMap(() =>
               this.authenticationAccountService.getUserData().pipe(
                 tap(() => {
-                  this.dialogServiceUtil.showNotificationBar('Successfully login', 'success');
-                  // getting error: Navigation triggered outside Angular zone, did you forget to call 'ngZone.run()
-                  this.zone.run(() => {
-                    this.router.navigate([ROUTES_MAIN.DASHBOARD]);
-                  });
+                  // display success message
+                  this.dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
+                  // navigate to dashboard
+                  this.router.navigate([ROUTES_MAIN.DASHBOARD]);
                 }),
               ),
             ),
@@ -225,7 +211,7 @@ export class AuthenticationFormComponent {
   private watchRegisterUserFormControl(): void {
     this.registerUserInputControl.valueChanges
       .pipe(
-        filter((res): res is RegisterUserInput => !!res),
+        filterNil(),
         tap(() => this.loadingSnipperShowSignal.set(true)),
         switchMap((res) =>
           from(this.authenticationAccountService.register(res)).pipe(
@@ -233,7 +219,12 @@ export class AuthenticationFormComponent {
               this.authenticationAccountService.getUserData().pipe(
                 filterNil(), // wait until there is a user initialized
                 first(),
-                tap(() => this.openSelectAccountType()),
+                switchMap(() =>
+                  from(this.openSelectAccountType()).pipe(
+                    filterNil(),
+                    switchMap((accountType) => from(this.newUserAccountTypeSelect(accountType))),
+                  ),
+                ),
               ),
             ),
             catchError((err) => {
@@ -248,12 +239,10 @@ export class AuthenticationFormComponent {
       .subscribe();
   }
 
-  private openSelectAccountType(): void {
-    this.dialog.open(GenericDialogComponent, {
-      data: <GenericDialogComponentData>{
-        title: 'Choose Account Type',
-        templateRef: this.newUserTemplate(),
-      },
-    });
+  private openSelectAccountType(): Observable<SelectableAccountType | undefined> {
+    return this.dialog
+      .open(AuthenticationNewAccountTypeChooseDialogComponent)
+      .afterClosed()
+      .pipe(tap(() => this.loadingSnipperShowSignal.set(false)));
   }
 }

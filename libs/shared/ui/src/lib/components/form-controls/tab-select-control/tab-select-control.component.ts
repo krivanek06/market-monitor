@@ -6,7 +6,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { LabelValue, SCREEN_LAYOUT, screenLayoutResolveType } from '@mm/shared/data-access';
-import { map, switchMap, tap } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-tab-select-control',
@@ -70,12 +70,7 @@ export class TabSelectControlComponent<T> implements ControlValueAccessor {
    */
   showTabsSignal = toSignal(
     toObservable(this.screenLayoutSplit).pipe(
-      switchMap((val) =>
-        this.observer.observe(val).pipe(
-          map((d) => d.matches),
-          tap((x) => console.log('x', x, val)),
-        ),
-      ),
+      switchMap((val) => this.observer.observe(val).pipe(map((d) => d.matches))),
     ),
   );
 
