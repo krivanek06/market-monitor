@@ -6,6 +6,7 @@ import { groupsCollectionRef } from '../models';
 export const groupPortfolioRank = async (): Promise<void> => {
   const searchableRef = groupsCollectionRef()
     .where('isClosed', '==', false)
+    .where('isDemo', '!=', true)
     .orderBy('portfolioState.totalGainsPercentage', 'desc');
 
   // get group docs

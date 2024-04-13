@@ -43,7 +43,7 @@ export const groupCreateCall = onCall(async (request) => {
   return groupCreate(data, userAuthId);
 });
 
-export const groupCreate = async (data: GroupCreateInput, userAuthId: string): Promise<GroupData> => {
+export const groupCreate = async (data: GroupCreateInput, userAuthId: string, isDemo = false): Promise<GroupData> => {
   // load user data from firebase
   const userDataDoc = await userDocumentRef(userAuthId).get();
   const userData = userDataDoc.data();
@@ -74,7 +74,7 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
   }
 
   // create group
-  const newGroup = createGroup(data, userBase, isOwnerMember);
+  const newGroup = createGroup(data, userBase, isOwnerMember, isDemo);
   const groupRef = groupDocumentRef(newGroup.id);
 
   // save new group
@@ -120,9 +120,18 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
   return newGroup;
 };
 
-const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = false): GroupData => {
+/**
+ *
+ * @param data - basic information about the group
+ * @param owner - who the group belongs to
+ * @param isOwnerMember - is the owner a member of the group or not
+ * @param isDemo - if true, group is for demo purposes
+ * @returns created group
+ */
+const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = false, isDemo = false): GroupData => {
+  const groupsId = isDemo ? `demo_${uuidv4()}` : uuidv4();
   return {
-    id: uuidv4(),
+    id: groupsId,
     name: data.groupName,
     imageUrl: data.imageUrl,
     isPublic: data.isPublic,
@@ -131,6 +140,7 @@ const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = fa
     ownerUser: owner,
     createdDate: getCurrentDateDefaultFormat(),
     isClosed: false,
+    isDemo: isDemo,
     memberRequestUserIds: [],
     memberUserIds: isOwnerMember ? [owner.id] : [],
     endDate: null,
@@ -139,6 +149,6 @@ const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = fa
       ...createEmptyPortfolioState(),
     },
     systemRank: {},
-    numberOfMembers: 0,
+    numberOfMembers: data.isOwnerMember ? 1 : 0,
   };
 };

@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router } from '@angular/router';
+import { UserAccountBasicTypes } from '@mm/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
@@ -19,10 +20,7 @@ import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil, GenericDialogComponent } from '@mm/shared/dialog-manager';
 import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, Observable, catchError, first, from, map, of, switchMap, take, tap } from 'rxjs';
-import {
-  AuthenticationNewAccountTypeChooseDialogComponent,
-  SelectableAccountType,
-} from './authentication-new-account-type-choose-dialog/authentication-new-account-type-choose-dialog.component';
+import { AuthenticationNewAccountTypeChooseDialogComponent } from './authentication-new-account-type-choose-dialog/authentication-new-account-type-choose-dialog.component';
 import { FormLoginComponent } from './form-login/form-login.component';
 import { FormRegisterComponent } from './form-register/form-register.component';
 @Component({
@@ -159,9 +157,8 @@ export class AuthenticationFormComponent {
     this.openSelectAccountType();
   }
 
-  private async newUserAccountTypeSelect(type: SelectableAccountType) {
+  private async newUserAccountTypeSelect(type: UserAccountBasicTypes) {
     this.dialog.closeAll();
-    console.log('SelectableAccountType', type);
 
     // check if user does not yet exist
     if (!this.authenticationUserStoreService.state.userData) {
@@ -239,7 +236,7 @@ export class AuthenticationFormComponent {
       .subscribe();
   }
 
-  private openSelectAccountType(): Observable<SelectableAccountType | undefined> {
+  private openSelectAccountType(): Observable<UserAccountBasicTypes | undefined> {
     return this.dialog
       .open(AuthenticationNewAccountTypeChooseDialogComponent)
       .afterClosed()

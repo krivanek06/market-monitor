@@ -1,4 +1,4 @@
-import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT } from './constants-limits.model';
+import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT } from './constants.model';
 
 // general
 export const GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR = 'Not sufficient permissions';

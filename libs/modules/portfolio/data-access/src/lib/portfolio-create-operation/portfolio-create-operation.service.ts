@@ -66,12 +66,12 @@ export class PortfolioCreateOperationService {
     input: PortfolioTransactionCreate,
     historicalPrice: HistoricalPrice,
   ): PortfolioTransaction {
-    const isDemoAccount = userDocData.userAccountType === UserAccountEnum.DEMO_TRADING;
+    const isDemoTradingAccount = userDocData.userAccountType === UserAccountEnum.DEMO_TRADING;
     const isSell = input.transactionType === 'SELL';
 
     // if custom total value is provided calculate unit price, else use API price
     const unitPrice =
-      !isDemoAccount && input.customTotalValue
+      !isDemoTradingAccount && input.customTotalValue
         ? roundNDigits(input.customTotalValue / input.units)
         : historicalPrice.close;
 
@@ -85,7 +85,7 @@ export class PortfolioCreateOperationService {
     const returnChange = isSell ? roundNDigits((unitPrice - breakEvenPrice) / breakEvenPrice) : 0;
 
     // transaction fees are 0.01% of the transaction value
-    const transactionFeesCalc = isDemoAccount ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
+    const transactionFeesCalc = isDemoTradingAccount ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
     const transactionFees = roundNDigits(transactionFeesCalc, 2);
 
     const result: PortfolioTransaction = {

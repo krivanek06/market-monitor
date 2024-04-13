@@ -9,6 +9,7 @@ export const transformUserToBase = (user: UserData): UserBase => {
     personal: user.personal,
     lastLoginDate: user.lastLoginDate,
     isAccountActive: user.isAccountActive,
+    isDemo: user.isDemo,
   };
 };
 
@@ -25,6 +26,7 @@ export const transformGroupToBase = (group: GroupData): GroupBase => {
     ownerUser: group.ownerUser,
     portfolioState: group.portfolioState,
     numberOfMembers: group.numberOfMembers,
+    isDemo: group.isDemo,
   };
 };
 

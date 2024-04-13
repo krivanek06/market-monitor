@@ -21,6 +21,10 @@ export type UserBase = {
    * only if lastLoginDate is more than USER_LOGIN_ACCOUNT_ACTIVE_DAYS ago
    */
   isAccountActive: boolean;
+  /**
+   * if true, account was created by the system for demo purposes
+   */
+  isDemo?: boolean;
 };
 
 export type UserData = UserBase & {

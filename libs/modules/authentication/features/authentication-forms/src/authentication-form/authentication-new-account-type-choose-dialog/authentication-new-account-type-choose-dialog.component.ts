@@ -2,9 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { UserAccountEnum, accountDescription } from '@mm/api-types';
-
-export type SelectableAccountType = UserAccountEnum.DEMO_TRADING | UserAccountEnum.NORMAL_BASIC;
+import { UserAccountBasicTypes, UserAccountEnum, accountDescription } from '@mm/api-types';
 
 @Component({
   selector: 'app-authentication-new-account-type-choose-dialog',
@@ -90,9 +88,9 @@ export class AuthenticationNewAccountTypeChooseDialogComponent {
   accountDescription = accountDescription;
   UserAccountEnum = UserAccountEnum;
 
-  selectedAccountTypeNewUser = signal<SelectableAccountType>(UserAccountEnum.DEMO_TRADING);
+  selectedAccountTypeNewUser = signal<UserAccountBasicTypes>(UserAccountEnum.DEMO_TRADING);
 
-  changeAccount(selected: SelectableAccountType): void {
+  changeAccount(selected: UserAccountBasicTypes): void {
     this.selectedAccountTypeNewUser.set(selected);
     // trigger change detection because the template does not update the selected class
     this.cd.detectChanges();

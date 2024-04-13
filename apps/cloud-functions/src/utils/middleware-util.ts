@@ -21,3 +21,16 @@ export const corsMiddleWareHttp =
 
     return handler(req, res);
   };
+
+export const measureFunctionExecutionTime = async (fn: () => Promise<unknown>) => {
+  const startTime = performance.now();
+  console.log('--- start ---');
+
+  await fn();
+
+  console.log('--- finished ---');
+
+  const endTime = performance.now();
+  const secondsDiff = Math.round((endTime - startTime) / 1000);
+  console.log(`Function took: ~${secondsDiff} seconds`);
+};
