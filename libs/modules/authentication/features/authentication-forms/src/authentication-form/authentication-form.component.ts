@@ -17,9 +17,9 @@ import {
   RegisterUserInput,
 } from '@mm/authentication/data-access';
 import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
-import { DialogServiceUtil, GenericDialogComponent } from '@mm/shared/dialog-manager';
+import { Confirmable, DialogServiceUtil, GenericDialogComponent } from '@mm/shared/dialog-manager';
 import { filterNil } from 'ngxtension/filter-nil';
-import { EMPTY, Observable, catchError, first, from, map, of, switchMap, take, tap } from 'rxjs';
+import { EMPTY, Observable, catchError, filter, first, from, map, of, switchMap, take, tap } from 'rxjs';
 import { AuthenticationNewAccountTypeChooseDialogComponent } from './authentication-new-account-type-choose-dialog/authentication-new-account-type-choose-dialog.component';
 import { FormLoginComponent } from './form-login/form-login.component';
 import { FormRegisterComponent } from './form-register/form-register.component';
@@ -152,9 +152,51 @@ export class AuthenticationFormComponent {
       });
   }
 
-  onDemoLogin(): void {
-    // TODO create demo account
-    this.openSelectAccountType();
+  @Confirmable(
+    'The account you are about to create will be valid for 7 days and then removed.\n You will see you account fill with data for demo purposes.',
+  )
+  onDemoLogin() {
+    this.openSelectAccountType()
+      .pipe(
+        take(1),
+        filterNil(),
+        tap(() => {
+          // show loader
+          this.loadingSnipperShowSignal.set(true);
+          // show notification
+          this.dialogServiceUtil.showNotificationBar(
+            'Creating demo account, it may take few seconds',
+            'notification',
+            5000,
+          );
+        }),
+        switchMap((accountType) =>
+          from(this.authenticationAccountService.registerDemoAccount(accountType)).pipe(
+            switchMap((result) =>
+              from(
+                this.dialogServiceUtil.showConfirmDialog(
+                  `Demo Account Created.\n\n Email: ${result.userData.personal.email}\nPassword: ${result.password}\n\n You can change you password in settings`,
+                ),
+              ).pipe(
+                filter((d) => !!d),
+                tap(() => {
+                  // login form will take care of login demo account
+                  this.loginUserInputControl.patchValue({
+                    email: result.userData.personal.email,
+                    password: result.password,
+                  });
+                }),
+              ),
+            ),
+            catchError((err) => {
+              this.dialogServiceUtil.handleError(err);
+              this.loadingSnipperShowSignal.set(false);
+              return EMPTY;
+            }),
+          ),
+        ),
+      )
+      .subscribe();
   }
 
   private async newUserAccountTypeSelect(type: UserAccountBasicTypes) {
@@ -185,6 +227,7 @@ export class AuthenticationFormComponent {
           from(this.authenticationAccountService.signIn(res)).pipe(
             switchMap(() =>
               this.authenticationAccountService.getUserData().pipe(
+                filterNil(), // wait until there is a user initialized
                 tap(() => {
                   // display success message
                   this.dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');

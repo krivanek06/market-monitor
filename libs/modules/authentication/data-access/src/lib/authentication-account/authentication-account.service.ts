@@ -12,8 +12,9 @@ import {
   signInWithPopup,
   updatePassword,
 } from '@angular/fire/auth';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import { UserApiService } from '@mm/api-client';
-import { UserData } from '@mm/api-types';
+import { UserAccountBasicTypes, UserData, UserDataDemoData } from '@mm/api-types';
 import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { BehaviorSubject, Observable, Subject, catchError, from, map, of, switchMap } from 'rxjs';
@@ -23,6 +24,7 @@ import { LoginUserInput, RegisterUserInput } from '../model';
   providedIn: 'root',
 })
 export class AuthenticationAccountService {
+  private functions = inject(Functions);
   private auth = inject(Auth);
   private userApiService = inject(UserApiService);
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
@@ -84,6 +86,15 @@ export class AuthenticationAccountService {
     return signInWithPopup(this.auth, provider);
   }
 
+  async registerDemoAccount(accountType: UserAccountBasicTypes): Promise<UserDataDemoData> {
+    const callable = httpsCallable<UserAccountBasicTypes, UserDataDemoData>(
+      this.functions,
+      'userCreateAccountDemoCall',
+    );
+    const result = await callable(accountType);
+    return result.data;
+  }
+
   signOut() {
     this.auth.signOut();
   }
@@ -122,7 +133,9 @@ export class AuthenticationAccountService {
       throw new Error('User is not authenticated');
     }
     try {
-      this.userApiService.deleteAccount(userData);
+      // delete account
+      const callable = httpsCallable<string, void>(this.functions, 'userDeleteAccountCall');
+      await callable(userData.id);
     } catch (error) {
       console.error(error);
     }
@@ -137,7 +150,7 @@ export class AuthenticationAccountService {
               userData
                 ? of(userData)
                 : user
-                  ? from(this.userApiService.userCreateAccount()).pipe(
+                  ? from(this.userCreateAccount()).pipe(
                       catchError((error) => {
                         console.log(error);
                         return of(null);
@@ -177,5 +190,11 @@ export class AuthenticationAccountService {
         }, updateTime);
       }
     });
+  }
+
+  private async userCreateAccount(): Promise<UserData> {
+    const callable = httpsCallable<User, UserData>(this.functions, 'userCreateAccountCall');
+    const result = await callable();
+    return result.data;
   }
 }

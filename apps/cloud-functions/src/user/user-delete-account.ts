@@ -32,6 +32,8 @@ export const userDeleteAccountCall = onCall(async (request) => {
   await userDocumentWatchListRef(userResetId).delete();
   await userDoc.ref.delete();
 
+  // todo: delete groups
+
   // delete from auth
   await getAuth().deleteUser(userResetId);
 });

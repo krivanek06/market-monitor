@@ -51,8 +51,3 @@ export const TRANSACTION_FEE_PRCT = 0.1;
  * number in days when a user account is considered in-active
  */
 export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT = 14;
-
-/**
- * random password for demo accounts
- */
-export const USER_DEMO_ACCOUNT_PASSWORD = 'QPAL1234';

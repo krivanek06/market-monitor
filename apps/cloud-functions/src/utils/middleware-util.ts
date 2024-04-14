@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { isFirebaseEmulator } from './firebease.util';
 export const corsMiddleWareHttp =
   (handler: (req: Request, res: Response<any>) => any, { authenticatedRoute = false } = {}) =>
   (req: Request, res: Response<any>) => {
@@ -33,4 +34,13 @@ export const measureFunctionExecutionTime = async (fn: () => Promise<unknown>) =
   const endTime = performance.now();
   const secondsDiff = Math.round((endTime - startTime) / 1000);
   console.log(`Function took: ~${secondsDiff} seconds`);
+};
+
+export const runFunctionInEmulator = async (fn: () => Promise<unknown>) => {
+  if (!isFirebaseEmulator()) {
+    console.warn('Function can be executed only in development mode');
+    return;
+  }
+
+  await measureFunctionExecutionTime(fn);
 };

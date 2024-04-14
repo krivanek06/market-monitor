@@ -66,6 +66,11 @@ export type UserData = UserBase & {
   portfolioRisk?: PortfolioRisk | null;
 };
 
+export type UserDataDemoData = {
+  userData: UserData;
+  password: string;
+};
+
 export type SystemRankUser = {
   /**
    * value calculate from portfolioState.totalGainsPercentage based on

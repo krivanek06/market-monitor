@@ -22,7 +22,6 @@ import {
   UserWatchList,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { User } from 'firebase/auth';
 import { arrayUnion, updateDoc } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
@@ -146,24 +145,6 @@ export class UserApiService {
     updateDoc(this.getUserPortfolioTransactionDocRef(userId), {
       transactions: arrayRemove(transaction),
     });
-  }
-
-  async userCreateAccount(): Promise<UserData> {
-    const callable = httpsCallable<User, UserData>(this.functions, 'userCreateAccountCall');
-    const result = await callable();
-    return result.data;
-  }
-
-  async deleteAccount(userData: UserData): Promise<void> {
-    // delete groups
-    const groupsToRemove = userData.groups.groupOwner.map((groupId) =>
-      httpsCallable<string, unknown>(this.functions, 'groupDeleteCall')(groupId),
-    );
-    await Promise.all(groupsToRemove);
-
-    // delete account
-    const callable = httpsCallable<string, void>(this.functions, 'userDeleteAccountCall');
-    await callable(userData.id);
   }
 
   /* private */
