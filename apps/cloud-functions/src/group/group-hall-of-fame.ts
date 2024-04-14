@@ -9,7 +9,7 @@ import { groupsCollectionRef } from '../models';
 import { aggregationHallOfFameGroupsRef } from '../models/aggregation';
 import { transformGroupToBase } from '../utils';
 
-export const hallOfFameGroups = async (): Promise<void> => {
+export const groupHallOfFame = async (): Promise<void> => {
   const searchableRef = groupsCollectionRef().where('isClosed', '==', false);
 
   // get top users by total gains

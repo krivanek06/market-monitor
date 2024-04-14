@@ -14,10 +14,10 @@ import {
 } from '@angular/fire/auth';
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { UserApiService } from '@mm/api-client';
-import { UserAccountBasicTypes, UserData, UserDataDemoData } from '@mm/api-types';
+import { UserAccountBasicTypes, UserCreateDemoAccountInput, UserData, UserDataDemoData } from '@mm/api-types';
 import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
-import { BehaviorSubject, Observable, Subject, catchError, from, map, of, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, catchError, firstValueFrom, from, map, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
 
 @Injectable({
@@ -87,11 +87,18 @@ export class AuthenticationAccountService {
   }
 
   async registerDemoAccount(accountType: UserAccountBasicTypes): Promise<UserDataDemoData> {
-    const callable = httpsCallable<UserAccountBasicTypes, UserDataDemoData>(
+    // get public IP
+    const publicIP = await firstValueFrom(this.userApiService.getUserPublicIp());
+
+    // create demo account
+    const callable = httpsCallable<UserCreateDemoAccountInput, UserDataDemoData>(
       this.functions,
       'userCreateAccountDemoCall',
     );
-    const result = await callable(accountType);
+    const result = await callable({
+      accountType,
+      publicIP,
+    });
     return result.data;
   }
 

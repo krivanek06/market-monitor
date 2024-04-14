@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
   CollectionReference,
@@ -33,6 +34,11 @@ import { Observable, filter, map, of } from 'rxjs';
 export class UserApiService {
   private firestore = inject(Firestore);
   private functions = inject(Functions);
+  private http = inject(HttpClient);
+
+  getUserPublicIp(): Observable<string> {
+    return this.http.get<{ ip: string }>('https://api.ipify.org?format=json').pipe(map((d) => d.ip));
+  }
 
   /* user portfolio */
   getUserPortfolioTransactions(userId: string): Observable<UserPortfolioTransaction> {

@@ -1,4 +1,4 @@
-import { GROUP_NOT_FOUND_ERROR, GROUP_USER_NOT_OWNER, USER_NOT_AUTHENTICATED_ERROR } from '@mm/api-types';
+import { GROUP_NOT_FOUND_ERROR, GROUP_USER_NOT_OWNER, GroupData, USER_NOT_AUTHENTICATED_ERROR } from '@mm/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentMembersRef, groupDocumentRef, groupDocumentTransactionsRef, userDocumentRef } from '../models';
@@ -20,6 +20,14 @@ export const groupDeleteCall = onCall(async (request) => {
     throw new HttpsError('unauthenticated', USER_NOT_AUTHENTICATED_ERROR);
   }
 
+  try {
+    return groupDeleteData(userAuthId, groupId);
+  } catch (error) {
+    throw new HttpsError('internal', 'Unable to delete group, please contact support');
+  }
+});
+
+export const groupDeleteData = async (userAuthId: string, groupId: string): Promise<GroupData> => {
   const groupRef = await groupDocumentRef(groupId).get();
   const groupData = groupRef.data();
 
@@ -55,4 +63,4 @@ export const groupDeleteCall = onCall(async (request) => {
 
   // return removed group
   return groupData;
-});
+};

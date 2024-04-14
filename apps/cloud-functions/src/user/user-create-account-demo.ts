@@ -6,8 +6,10 @@ import {
   PortfolioTransactionCreate,
   SYMBOL_NOT_FOUND_ERROR,
   TRANSACTION_FEE_PRCT,
+  USER_ALLOWED_DEMO_ACCOUNTS_PER_IP,
   UserAccountBasicTypes,
   UserAccountEnum,
+  UserCreateDemoAccountInput,
   UserData,
   UserDataDemoData,
   UserPortfolioTransaction,
@@ -23,18 +25,32 @@ import { addDays, format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
-import { userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
+import { userCollectionDemoAccountRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
 import { userCreate } from './user-create-account';
 
 export const userCreateAccountDemoCall = onCall(
-  async (request: CallableRequest<UserAccountBasicTypes>): Promise<UserDataDemoData> => {
-    const providedAccountType = request.data;
+  async (request: CallableRequest<UserCreateDemoAccountInput>): Promise<UserDataDemoData> => {
+    // check how many demo accounts are created per IP
+    const demoAccounts = await userCollectionDemoAccountRef()
+      .where('userPrivateInfo.publicIP', '==', request.data.publicIP)
+      .get();
 
+    console.log('demoAccounts', demoAccounts.docs.length, 'from IP', request.data.publicIP);
+
+    // throw error if too many demo accounts are created
+    if (demoAccounts.docs.length > USER_ALLOWED_DEMO_ACCOUNTS_PER_IP) {
+      throw new HttpsError('aborted', 'Too many demo accounts created from this IP');
+    }
+
+    // create random password
     const randomPassword = faker.internet.password();
+
+    // create new demo user
     const newUser = await createRandomUserAccounts({
       isDemo: true,
-      userAccountType: providedAccountType,
+      userAccountType: request.data.accountType,
       password: randomPassword,
+      publicIP: request.data.publicIP,
     });
 
     return { userData: newUser, password: randomPassword };
@@ -45,6 +61,7 @@ export const createRandomUserAccounts = async (data: {
   userAccountType: UserAccountBasicTypes;
   isDemo: boolean;
   password: string;
+  publicIP?: string;
 }): Promise<UserData> => {
   // create demo accounts
   const newDemoUser = await createRandomUser(data.isDemo, data.password);
@@ -53,6 +70,7 @@ export const createRandomUserAccounts = async (data: {
   const userData = await userCreate(newDemoUser, {
     isDemo: !!data.isDemo,
     userAccountType: data.userAccountType,
+    publicIP: data.publicIP,
   });
 
   // create watchList

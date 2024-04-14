@@ -15,6 +15,7 @@ import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchLi
 export type CreateUserAdditionalData = {
   isDemo?: boolean;
   userAccountType?: UserAccountBasicTypes;
+  publicIP?: string;
 };
 
 export const userCreateAccountCall = onCall(async (request) => {
@@ -93,8 +94,11 @@ const createNewUser = (id: string, personal: UserPersonalInfo, additional: Creat
     isAccountActive: true,
     isDemo: !!additional.isDemo,
     accountCreatedDate: getCurrentDateDefaultFormat(),
-    userAccountType: UserAccountEnum.DEMO_TRADING,
+    userAccountType: additional?.userAccountType ?? UserAccountEnum.DEMO_TRADING,
     systemRank: {},
+    userPrivateInfo: {
+      publicIP: additional.publicIP ?? null,
+    },
     portfolioRisk: {
       alpha: 0,
       beta: 0,

@@ -11,9 +11,13 @@ import { getRandomNumber, waitSeconds } from '@mm/shared/general-util';
 import { format, subDays } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
-import { groupCreate, groupMemberAccept } from '../group';
+import {
+  calculateGroupMembersPortfolioState,
+  groupCopyMembersAndTransactions,
+  groupCreate,
+  groupMemberAccept,
+} from '../group';
 import { groupDocumentPortfolioStateSnapshotsRef } from '../models';
-import { calculateGroupMembersPortfolioState, groupCopyMembersAndTransactions } from '../schedulers/group-update-data';
 import { createRandomUserAccounts } from '../user';
 import { isFirebaseEmulator } from '../utils';
 /**

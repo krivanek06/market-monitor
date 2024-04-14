@@ -1,19 +1,21 @@
-import { roundNDigits } from '@mm/shared/general-util';
 import axios from 'axios';
 import { onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
 import { reloadMarketOverview } from '../market-functions/market-overview';
+import {
+  userDeactivateInactiveAccounts,
+  userDeleteAccountInactive,
+  userHallOfFame,
+  userPortfolioRank,
+  userPortfolioUpdate,
+} from '../user';
 import { measureFunctionExecutionTime } from '../utils';
-import { groupUpdateData } from './group-update-data';
-import { hallOfFameGroups } from './hall-of-fame-groups';
-import { hallOfFameUsers } from './hall-of-fame-users';
-import { userPortfolioRank } from './user-portfolio-rank';
-import { userPortfolioUpdate } from './user-portfolio-update';
 
 /**
- * every 20 minutes update user portfolio state from monday to friday
+ * every 20 minutes from Monday to Friday
  */
-export const run_user_portfolio_state_scheduler = onSchedule(
+export const run_scheduler_frequent_week_days = onSchedule(
   {
     timeoutSeconds: 200,
     schedule: '*/20 * * * 1-5',
@@ -23,45 +25,51 @@ export const run_user_portfolio_state_scheduler = onSchedule(
   },
 );
 
+export const run_scheduler_once_a_day = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '0 1 * * *',
+  },
+  async () => {
+    measureFunctionExecutionTime(async () => {
+      console.log('[Users]: deactivate necessary accounts');
+      await userDeactivateInactiveAccounts();
+
+      console.log('[Users]: delete demo or inactive accounts');
+      await userDeleteAccountInactive();
+    });
+  },
+);
+
 /**
- * recalculates user portfolio rank only once par day after userUpdatePortfolio() finished
- * and also hall of fame users
- * at: At 03:15 every day
+ * every hour, every day
  */
-export const run_user_rank_and_hall_of_fame_scheduler = onSchedule(
+export const run_scheduler_once_per_hours = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '15 3 * * *',
+    schedule: '0 */1 * * *',
   },
   async () => {
-    const startTime = performance.now();
+    measureFunctionExecutionTime(async () => {
+      console.log('[Groups]: update data');
+      await groupUpdateData();
 
-    console.log('calculate portfolio rank');
-    await userPortfolioRank();
+      console.log('[Users]: update rank');
+      await userPortfolioRank();
 
-    console.log('calculate hall of fame users');
-    await hallOfFameUsers();
+      console.log('[Groups]: update rank');
+      await groupPortfolioRank();
 
-    console.log('calculate hall of fame groups');
-    await hallOfFameGroups();
+      console.log('[Users]: update hall of fame');
+      await userHallOfFame();
 
-    const endTime = performance.now();
-    const secondsDiff = roundNDigits((endTime - startTime) / 1000);
-    console.log(`Function took: ${secondsDiff} seconds`);
+      console.log('[Groups]: update hall of fame');
+      await groupHallOfFame();
+    });
   },
 );
 
-export const run_group_update_data_scheduler = onSchedule(
-  {
-    timeoutSeconds: 200,
-    schedule: '*/15 2 * * *',
-  },
-  async () => {
-    groupUpdateData();
-  },
-);
-
-export const run_reload_market_overview = onSchedule(
+export const run_scheduler_once_per_week = onSchedule(
   {
     timeoutSeconds: 200,
     schedule: '0 22 * * 5',

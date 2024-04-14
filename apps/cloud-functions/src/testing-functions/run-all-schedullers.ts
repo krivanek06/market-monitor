@@ -1,9 +1,5 @@
-import { groupPortfolioRank } from '../schedulers/group-portfolio.rank';
-import { groupUpdateData } from '../schedulers/group-update-data';
-import { hallOfFameGroups } from '../schedulers/hall-of-fame-groups';
-import { hallOfFameUsers } from '../schedulers/hall-of-fame-users';
-import { userPortfolioRank } from '../schedulers/user-portfolio-rank';
-import { userPortfolioUpdate } from '../schedulers/user-portfolio-update';
+import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
+import { userHallOfFame, userPortfolioRank, userPortfolioUpdate } from '../user';
 import { isFirebaseEmulator } from '../utils';
 
 export const runALlSchedulers = async (): Promise<void> => {
@@ -22,11 +18,11 @@ export const runALlSchedulers = async (): Promise<void> => {
   console.log('[Users]: update rank');
   await userPortfolioRank();
   console.log('[Users]: update hall of fame');
-  await hallOfFameUsers();
+  await userHallOfFame();
   console.log('[Groups]: update rank');
   await groupPortfolioRank();
   console.log('[Groups]: update hall of fame');
-  await hallOfFameGroups();
+  await groupHallOfFame();
 
   const endTime = performance.now();
   const secondsDiff = Math.round((endTime - startTime) / 1000);

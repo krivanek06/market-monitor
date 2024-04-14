@@ -64,11 +64,20 @@ export type UserData = UserBase & {
    * risk of the portfolio
    */
   portfolioRisk?: PortfolioRisk | null;
+  /**
+   * additional private info about the user
+   */
+  userPrivateInfo: UserPrivateInfo;
 };
 
 export type UserDataDemoData = {
   userData: UserData;
   password: string;
+};
+
+export type UserCreateDemoAccountInput = {
+  accountType: UserAccountBasicTypes;
+  publicIP?: string;
 };
 
 export type SystemRankUser = {
@@ -89,6 +98,13 @@ export type UserWatchList = {
     symbolType: SymbolType;
   }[];
   createdDate: string;
+};
+
+export type UserPrivateInfo = {
+  /**
+   * user's public IP
+   */
+  publicIP: string | null;
 };
 
 export type UserPersonalInfo = {

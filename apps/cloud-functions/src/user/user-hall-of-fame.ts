@@ -8,7 +8,7 @@ import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { aggregationHallOfFameUsersRef, usersCollectionDemoTradingRef } from '../models';
 import { transformUserToBase } from '../utils';
 
-export const hallOfFameUsers = async (): Promise<void> => {
+export const userHallOfFame = async (): Promise<void> => {
   const searchableRef = usersCollectionDemoTradingRef();
 
   // get top users by total gains

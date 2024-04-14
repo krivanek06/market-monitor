@@ -25,6 +25,9 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
     settings: {
       isDarkMode: false,
     },
+    userPrivateInfo: {
+      publicIP: null,
+    },
     portfolioState: {
       balance: USER_DEFAULT_STARTING_CASH,
       cashOnHand: USER_DEFAULT_STARTING_CASH,
