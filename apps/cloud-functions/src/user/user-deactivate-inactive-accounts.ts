@@ -1,4 +1,4 @@
-import { USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT } from '@mm/api-types';
+import { USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT, UserData } from '@mm/api-types';
 import { format, subDays } from 'date-fns';
 import { userCollectionActiveAccountRef } from '../models';
 
@@ -11,10 +11,12 @@ export const userDeactivateInactiveAccounts = async () => {
     .where('lastLoginDate', '<=', loginDeadline)
     .get();
 
+  console.log('User accounts to inactivate: ', userAccountsToInactivate.docs.length);
+
   // deactivate accounts
   for (const doc of userAccountsToInactivate.docs) {
     await doc.ref.update({
-      isActive: false,
-    });
+      isAccountActive: false,
+    } satisfies Partial<UserData>);
   }
 };

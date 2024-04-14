@@ -48,12 +48,12 @@ export const TRANSACTION_FEE_PRCT = 0.1;
 export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT = 20;
 
 /**
- * number in days when a user demo account will be deleted
+ * number in days when a demo user account will be deleted
  */
 export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_FOR_DEMO_DELETE = 7;
 
 /**
- * number in days when a user normal account will be deleted after not logging in
+ * number in days when a normal user account will be deleted after not logging in
  */
 export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DELETE = 60;
 

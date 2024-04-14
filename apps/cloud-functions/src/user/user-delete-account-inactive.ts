@@ -3,7 +3,7 @@ import {
   USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_FOR_DEMO_DELETE,
 } from '@mm/api-types';
 import { format, subDays } from 'date-fns';
-import { userCollectionDemoAccountRef, userCollectionNormalAccountRef } from '../models';
+import { userCollectionDemoAccountRef, usersCollectionRef } from '../models';
 import { userDeleteAccountById } from './user-delete-account';
 
 /**
@@ -24,6 +24,8 @@ const deleteDemoAccounts = async () => {
     .where('accountCreatedDate', '<=', demoAccountDeadline)
     .get();
 
+  console.log(`Delete demo accounts: ${userDemoAccountsToDelete.docs.length}`);
+
   // delete demo accounts
   for (const doc of userDemoAccountsToDelete.docs) {
     await userDeleteAccountById(doc.id);
@@ -33,9 +35,11 @@ const deleteDemoAccounts = async () => {
 const deleteNormalAccounts = async () => {
   // query normal accounts to be deleted
   const normalAccountDeadline = format(subDays(new Date(), USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DELETE), 'yyyy-MM-dd');
-  const userNormalAccountsToDelete = await userCollectionNormalAccountRef()
+  const userNormalAccountsToDelete = await usersCollectionRef()
     .where('lastLoginDate', '<=', normalAccountDeadline)
     .get();
+
+  console.log(`Delete demo accounts: ${userNormalAccountsToDelete.docs.length}`);
 
   // delete normal accounts
   for (const doc of userNormalAccountsToDelete.docs) {

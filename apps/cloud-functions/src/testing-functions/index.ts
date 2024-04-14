@@ -1,7 +1,14 @@
 import { onRequest } from 'firebase-functions/v2/https';
+import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
+import {
+  userDeactivateInactiveAccounts,
+  userDeleteAccountInactive,
+  userHallOfFame,
+  userPortfolioRank,
+  userPortfolioUpdate,
+} from '../user';
 import { runFunctionInEmulator } from './../utils';
 import { reloadDatabase } from './reload-database';
-import { runALlSchedulers } from './run-all-schedullers';
 
 // DEVELOPMENT ----------------------------
 export const test_reload_database = onRequest({ timeoutSeconds: 1200 }, async (req, res) => {
@@ -15,12 +22,39 @@ export const test_function = onRequest({ timeoutSeconds: 1200 }, async (req, res
     console.log('process.env.FIRESTORE_EMULATOR_HOST', process.env.FIRESTORE_EMULATOR_HOST);
 
     console.log('[Users]: update portfolio');
-  });
 
-  res.send('ok');
+    res.send('ok');
+  });
 });
 
 export const test_run_all_schedulers = onRequest({ timeoutSeconds: 1200 }, async (req, res) => {
-  await runFunctionInEmulator(runALlSchedulers);
-  res.send('ok');
+  await runFunctionInEmulator(async () => {
+    // run all schedulers
+    console.log('[Users]: update portfolio');
+    await userPortfolioUpdate();
+    console.log('[Groups]: update portfolio');
+    await groupUpdateData();
+    console.log('[Users]: update rank');
+    await userPortfolioRank();
+    console.log('[Users]: update hall of fame');
+    await userHallOfFame();
+    console.log('[Groups]: update rank');
+    await groupPortfolioRank();
+    console.log('[Groups]: update hall of fame');
+    await groupHallOfFame();
+
+    res.send('ok');
+  });
+});
+
+export const test_delete_user_accounts = onRequest({ timeoutSeconds: 1200 }, async (req, res) => {
+  await runFunctionInEmulator(async () => {
+    console.log('[Users]: deactivate necessary accounts');
+    await userDeactivateInactiveAccounts();
+
+    console.log('[Users]: delete demo or inactive accounts');
+    await userDeleteAccountInactive();
+
+    res.send('ok');
+  });
 });

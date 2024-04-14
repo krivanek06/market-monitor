@@ -2,11 +2,10 @@ import { UserAccountEnum, UserData, UserPortfolioTransaction, UserWatchList } fr
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './assign-type';
 
-const usersCollectionRef = () => firestore().collection('users').withConverter(assignTypes<UserData>());
+export const usersCollectionRef = () => firestore().collection('users').withConverter(assignTypes<UserData>());
 
 export const userCollectionDemoAccountRef = () => usersCollectionRef().where('isDemo', '==', true);
-export const userCollectionNormalAccountRef = () => usersCollectionRef().where('isDemo', '!=', true);
-export const userCollectionActiveAccountRef = () => usersCollectionRef().where('isActive', '==', true);
+export const userCollectionActiveAccountRef = () => usersCollectionRef().where('isAccountActive', '==', true);
 
 export const usersCollectionDemoTradingRef = () =>
   userCollectionActiveAccountRef()
