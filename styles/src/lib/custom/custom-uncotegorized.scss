@@ -65,3 +65,9 @@ h2 {
   background-color: #3e3e3e7a !important;
   opacity: 0.8;
 }
+
+.g-disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  background: var(--gray-dark);
+}

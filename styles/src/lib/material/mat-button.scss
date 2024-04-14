@@ -52,15 +52,21 @@ button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
   width: 100% !important;
 }
 
-.mat-mdc-outlined-button:disabled {
+// .mat-mdc-outlined-button:disabled {
+//   color: var(--gray-dark) !important;
+//   background-color: #4b55636b !important;
+//   pointer-events: none !important;
+// }
+
+.button[disabled] {
+  background: var(--gray-light) !important;
   color: var(--gray-dark) !important;
-  background-color: #4b55636b !important;
-  pointer-events: none !important;
+  background-color: var(--mdc-filled-button-disabled-container-color) !important;
 }
 
-.mat-mdc-unelevated-button[disabled][disabled] {
-  background: var(--gray-dark) !important;
-  color: white !important;
+button[mat-stroked-button][disabled] {
+  border: 1px solid var(--gray-light) !important;
+  background-color: var(--mdc-filled-button-disabled-container-color) !important;
 }
 
 @layer utilities {

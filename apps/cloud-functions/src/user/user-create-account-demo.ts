@@ -23,7 +23,7 @@ import { addDays, format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
-import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
+import { userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
 import { userCreate } from './user-create-account';
 
 export const userCreateAccountDemoCall = onCall(
@@ -72,16 +72,7 @@ export const createRandomUserAccounts = async (data: {
 const generateTransactionsForRandomSymbols = async (userData: UserData): Promise<void> => {
   const randomSymbols = getRandomSymbols(10);
 
-  const userDocRef = userDocumentRef(userData.id);
   const userDocTransactionsRef = userDocumentTransactionHistoryRef(userData.id);
-
-  const userDocData = (await userDocRef.get()).data();
-  const userTransactions = (await userDocTransactionsRef.get()).data()?.transactions;
-
-  // check if user exists
-  if (!userDocData || !userTransactions) {
-    return;
-  }
 
   const transactionsToSave: PortfolioTransaction[] = [];
 
@@ -106,10 +97,10 @@ const generateTransactionsForRandomSymbols = async (userData: UserData): Promise
     };
 
     try {
-      const t1 = await createPortfolioCreateOperation(buyOperation, userData, userTransactions);
-      const t2 = await createPortfolioCreateOperation(sellOperation, userData, userTransactions);
-
+      const t1 = await createPortfolioCreateOperation(buyOperation, userData, transactionsToSave);
       transactionsToSave.push(t1);
+
+      const t2 = await createPortfolioCreateOperation(sellOperation, userData, transactionsToSave);
       transactionsToSave.push(t2);
     } catch (err) {
       console.log(`Symbol: ${symbol} - no data`);

@@ -38,6 +38,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         <!-- owner -->
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          [disabled]="isDemoAccount()"
           (click)="onGroupCloseClick()"
           type="button"
           mat-stroked-button
@@ -50,6 +51,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
 
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']; exclude: ['groupMember']"
+          [disabled]="isDemoAccount()"
           (click)="onAddOwnerToGroupClick()"
           type="button"
           mat-stroked-button
@@ -63,6 +65,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         <!-- member -->
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupMember']"
+          [disabled]="isDemoAccount()"
           (click)="onLeaveGroupClick()"
           type="button"
           mat-stroked-button
@@ -76,6 +79,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         <!-- invited person -->
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupInvitations']"
+          [disabled]="isDemoAccount()"
           (click)="onDeclineInvitationClick()"
           type="button"
           mat-stroked-button
@@ -88,6 +92,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
 
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupInvitations']"
+          [disabled]="isDemoAccount()"
           (click)="onAcceptInvitationClick()"
           type="button"
           mat-stroked-button
@@ -101,6 +106,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         <!-- request invitation person -->
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupRequested']"
+          [disabled]="isDemoAccount()"
           (click)="onCancelRequestClick()"
           type="button"
           mat-stroked-button
@@ -116,6 +122,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
             groupDetails().groupData.id;
             exclude: ['groupRequested', 'groupMember', 'groupInvitations', 'groupOwner']
           "
+          [disabled]="isDemoAccount()"
           (click)="onRequestToJoinClick()"
           type="button"
           mat-stroked-button
@@ -129,6 +136,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         <!-- owner - invite people -->
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          [disabled]="isDemoAccount()"
           (click)="onInviteMembersClick()"
           type="button"
           mat-stroked-button
@@ -142,6 +150,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         <!-- owner - settings -->
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          [disabled]="isDemoAccount()"
           (click)="onGroupSettingsClick()"
           type="button"
           mat-stroked-button
@@ -156,6 +165,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         <!-- owner -->
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          [disabled]="isDemoAccount()"
           (click)="onGroupDeleteClick()"
           type="button"
           mat-flat-button
@@ -169,6 +179,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         <!-- owner -->
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          [disabled]="isDemoAccount()"
           (click)="onGroupReopenClick()"
           type="button"
           mat-stroked-button
@@ -199,6 +210,8 @@ export class GroupInteractionButtonsComponent {
   authenticationUserService = inject(AuthenticationUserStoreService);
   groupApiService = inject(GroupApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
+
+  isDemoAccount = this.authenticationUserService.state.isDemoAccount;
   private dialog = inject(MatDialog);
   private router = inject(Router);
 

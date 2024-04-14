@@ -153,7 +153,7 @@ export class AuthenticationFormComponent {
   }
 
   @Confirmable(
-    'The account you are about to create will be valid for 7 days and then removed.\n You will see you account fill with data for demo purposes.',
+    'The account you are about to create will be valid for 7 days and then removed.\n You will see you account filled with data for demo purposes.',
   )
   onDemoLogin() {
     this.openSelectAccountType()

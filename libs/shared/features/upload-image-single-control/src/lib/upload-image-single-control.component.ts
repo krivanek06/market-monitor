@@ -32,6 +32,7 @@ import { DefaultImgDirective } from '@mm/shared/ui';
         'opacity-80': !isUploadingSignal(),
         'opacity-50': isUploadingSignal(),
       }"
+      [ngClass]="{ 'g-disabled': isDisabled() }"
       [style.height.px]="heightPx()"
       [style.width.px]="heightPx()"
       matRipple
@@ -103,6 +104,7 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
   filePath = input('images');
   fileMaxSizeMb = input(2); // 2Mb
   heightPx = input(200);
+  isDisabled = input(false);
 
   get fileMaxSize(): number {
     return this.fileMaxSizeMb() * 1024 * 1024;
