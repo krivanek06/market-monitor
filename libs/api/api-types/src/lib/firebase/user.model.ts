@@ -24,7 +24,7 @@ export type UserBase = {
   /**
    * if true, account was created by the system for demo purposes
    */
-  isDemo?: boolean;
+  isDemo: boolean;
 };
 
 export type UserData = UserBase & {

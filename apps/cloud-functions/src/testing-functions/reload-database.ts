@@ -11,12 +11,7 @@ import { getRandomNumber, waitSeconds } from '@mm/shared/general-util';
 import { format, subDays } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
-import {
-  calculateGroupMembersPortfolioState,
-  groupCopyMembersAndTransactions,
-  groupCreate,
-  groupMemberAccept,
-} from '../group';
+import { calculateGroupMembersPortfolioState, groupCreate, groupMemberAccept } from '../group';
 import { groupDocumentPortfolioStateSnapshotsRef } from '../models';
 import { createRandomUserAccounts } from '../user';
 import { isFirebaseEmulator } from '../utils';
@@ -34,8 +29,24 @@ export const reloadDatabase = async (): Promise<void> => {
   await deletePreviousData();
 
   // create users
-  console.log('CREATE NEW USERS - START');
-  const limitUsers = 50;
+  console.log('CREATE NEW USERS - NORMAL - START');
+  const limitUsersNormal = 10;
+
+  for (let i = 0; i < limitUsersNormal; i++) {
+    await createRandomUserAccounts({
+      isDemo: false,
+      userAccountType: UserAccountEnum.NORMAL_BASIC,
+      password: 'qwer1234',
+    });
+    // wait 0.2s sec
+    await waitSeconds(0.2);
+    // log
+    console.log(`User normal created: [${i + 1}/${limitUsersNormal}]`);
+  }
+  console.log(`CREATE NEW USERS NORMAL DONE - ${limitUsersNormal} USERS`);
+
+  console.log('CREATE NEW USERS - TRADING - START');
+  const limitUsers = 40;
   const newUsers: UserData[] = [];
 
   for (let i = 0; i < limitUsers; i++) {
@@ -49,18 +60,15 @@ export const reloadDatabase = async (): Promise<void> => {
     // wait 0.2s sec
     await waitSeconds(0.2);
     // log
-    console.log(`User created: [${i + 1}/${limitUsers}]: ${newUser.personal.displayName}`);
+    console.log(`User trading created: [${i + 1}/${limitUsers}]: ${newUser.personal.displayName}`);
   }
 
-  console.log('CREATE NEW USERS - DONE');
+  console.log(`CREATE NEW USERS TRADING DONE - ${newUsers.length} USERS`);
 
   // create group data
   console.log('CREATE NEW GROUPS - START');
   // get 10 random users
-  const owners = newUsers
-    .filter((d) => d.userAccountType === UserAccountEnum.DEMO_TRADING)
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 10);
+  const owners = newUsers.filter((d) => d.userAccountType === UserAccountEnum.DEMO_TRADING).slice(0, 10);
 
   // generate groups
   for (const owner of owners) {
@@ -68,8 +76,6 @@ export const reloadDatabase = async (): Promise<void> => {
     const { createdGroup, groupMembers } = await createRandomGroup(owner, newUsers);
     console.log('Updating group data');
     await createGroupRandomPortfolioSnapshots(createdGroup, groupMembers);
-    console.log('Updating group data');
-    await groupCopyMembersAndTransactions(createdGroup);
   }
   console.log('CREATE NEW GROUPS - DONE');
 };
@@ -122,14 +128,12 @@ export const createRandomGroup = async (
   users: UserData[],
 ): Promise<{ createdGroup: GroupData; groupMembers: UserData[] }> => {
   // select users except owner to invite
-  const addedUsersToGroup = users
-    .filter((u) => u.id !== owner.id)
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 30);
+  const addedUsersToGroup = users.filter((u) => u.id !== owner.id).slice(0, 30);
+
   const randomUsersNotOwnerToInvite = addedUsersToGroup.map((u) => u.id);
 
   const groupInput: GroupCreateInput = {
-    groupName: 'demo_group',
+    groupName: `Demo_${faker.company.name()}`,
     imageUrl: faker.image.url(),
     isOwnerMember: true,
     isPublic: true,
@@ -143,7 +147,7 @@ export const createRandomGroup = async (
   console.log(`Group created: ${groupData.id} - ${groupData.name}`);
 
   // select random 15 users to be members of the group
-  const randomUsersNotOwnerAndMembers = randomUsersNotOwnerToInvite.sort(() => 0.5 - Math.random()).slice(0, 20);
+  const randomUsersNotOwnerAndMembers = randomUsersNotOwnerToInvite.slice(0, 25);
   for await (const userId of randomUsersNotOwnerAndMembers) {
     // add user to group
     await groupMemberAccept(userId, groupData.id);

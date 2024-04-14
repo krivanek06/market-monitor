@@ -32,11 +32,12 @@ export const userCreateAccountCall = onCall(async (request) => {
 export const userCreate = async (user: UserRecord, additional: CreateUserAdditionalData = {}): Promise<UserData> => {
   // create new user data
   const userName = user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`;
+  const userNamePrefix = additional.isDemo ? `Demo_${userName}` : userName;
   const newUserData = createNewUser(
     user.uid,
     {
-      displayName: userName,
-      displayNameInitials: createNameInitials(userName),
+      displayName: userNamePrefix,
+      displayNameInitials: createNameInitials(userNamePrefix),
       photoURL: user.photoURL ?? null,
       providerId: user.providerData[0].providerId ?? 'unknown',
       email: user.email ?? 'unknown',

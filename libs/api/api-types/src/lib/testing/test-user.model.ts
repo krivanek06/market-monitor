@@ -22,6 +22,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       providerId: 'google.com',
       email: 'test@test.sk',
     },
+    isDemo: false,
     settings: {
       isDarkMode: false,
     },
