@@ -110,6 +110,7 @@ export type UserPrivateInfo = {
 export type UserPersonalInfo = {
   photoURL: string | null;
   displayName: string;
+  displayNameLowercase: string;
   displayNameInitials: string;
   providerId: User['providerData'][0]['providerId'];
   email: string;

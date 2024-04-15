@@ -1,4 +1,4 @@
-import { GROUP_NOT_FOUND_ERROR, GROUP_USER_NOT_OWNER, GroupSettingsChangeInput } from '@mm/api-types';
+import { GROUP_NOT_FOUND_ERROR, GROUP_USER_NOT_OWNER, GroupData, GroupSettingsChangeInput } from '@mm/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
@@ -36,10 +36,11 @@ export const groupSettingsChangeCall = onCall(async (request) => {
   // update group data
   await groupDocumentRef(data.groupId).update({
     name: data.groupName,
+    nameLowerCase: data.groupName.toLowerCase(),
     isPublic: data.isPublic,
     imageUrl: data.imageUrl,
     memberUserIds: groupData.memberUserIds.filter((user) => !data.removingUserIds.includes(user)),
-  });
+  } satisfies Partial<GroupData>);
 
   // remove users from group member
   await groupDocumentMembersRef(data.groupId).update({

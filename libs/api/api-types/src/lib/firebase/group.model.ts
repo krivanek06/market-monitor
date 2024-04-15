@@ -62,6 +62,7 @@ export type UserGroupData = { [K in keyof UserData['groups']]: GroupData[] };
 export type GroupBase = {
   id: string;
   name: string;
+  nameLowerCase: string;
   imageUrl: string | null;
 
   /**

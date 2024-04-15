@@ -77,8 +77,8 @@ export class GroupApiService {
     return rxCollectionData(
       query(
         this.getGroupCollectionRef(),
-        where('name', '>=', name.toUpperCase()),
-        where('name', '<=', name.toLowerCase() + '\uf8ff'),
+        where('nameLowerCase', '>=', name.toUpperCase()),
+        where('nameLowerCase', '<=', name.toLowerCase() + '\uf8ff'),
         limit(limitResult),
       ),
     );

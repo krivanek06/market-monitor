@@ -22,12 +22,18 @@ import { PortfolioBalancePieChartComponent } from '@mm/portfolio/ui';
     <mat-card
       matRipple
       [matRippleCentered]="true"
-      [matRippleDisabled]="false"
+      [matRippleDisabled]="!clickable()"
       [matRippleUnbounded]="false"
       appearance="outlined"
-      class="shadow-md cursor-pointer"
-      (click)="onGroupClick()"
-      [ngClass]="{ 'g-overlay': groupData().isClosed }"
+      class="shadow-md"
+      (click)="onClick()"
+      (keydown.enter)="onClick()"
+      [tabIndex]="clickable() ? 0 : -1"
+      [ngClass]="{
+        'g-overlay': groupData().isClosed,
+        'g-clickable-hover': clickable(),
+        'g-hover-color': clickable()
+      }"
     >
       <mat-card-content>
         <div class="relative flex justify-between">
@@ -64,8 +70,11 @@ import { PortfolioBalancePieChartComponent } from '@mm/portfolio/ui';
 export class GroupDisplayCardComponent {
   groupClickEmitter = output<void>();
   groupData = input.required<GroupData>();
+  clickable = input<boolean>();
 
-  onGroupClick(): void {
-    this.groupClickEmitter.emit();
+  onClick(): void {
+    if (this.clickable()) {
+      this.groupClickEmitter.emit();
+    }
   }
 }

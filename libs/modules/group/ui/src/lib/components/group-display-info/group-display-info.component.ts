@@ -62,6 +62,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
           class="flex items-center gap-2 px-1 py-2 rounded-lg"
           [ngClass]="{
             'g-clickable-hover': clickableOwner(),
+            'g-hover-color': clickableOwner(),
             'hover:shadow-lg': clickableOwner()
           }"
         >

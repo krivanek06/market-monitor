@@ -159,7 +159,6 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
               [clickable]="true"
               [currentPositions]="i + 1"
               [previousPosition]="user.position.previousGroupMemberPosition"
-              class="g-clickable-hover"
             >
               <app-user-display-item [userData]="user" />
             </app-position-card>

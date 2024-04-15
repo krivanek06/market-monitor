@@ -27,6 +27,7 @@ export const transformGroupToBase = (group: GroupData): GroupBase => {
     portfolioState: group.portfolioState,
     numberOfMembers: group.numberOfMembers,
     isDemo: group.isDemo,
+    nameLowerCase: group.nameLowerCase,
   };
 };
 

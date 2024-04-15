@@ -123,7 +123,7 @@ const createGroupRandomPortfolioSnapshots = async (
   return groupPastPortfolioSnapshots;
 };
 
-export const createRandomGroup = async (
+const createRandomGroup = async (
   owner: UserData,
   users: UserData[],
 ): Promise<{ createdGroup: GroupData; groupMembers: UserData[] }> => {
@@ -166,9 +166,9 @@ export const createRandomGroup = async (
  */
 const createRandomPortfolioSnapshotsFromCurrentOne = (portfolioState: PortfolioState): PortfolioState[] => {
   const portfolioInPast: PortfolioState[] = [];
-  for (let i = 60; i > 1; i--) {
+  for (let i = 60; i > 0; i--) {
     const dayBefore = subDays(new Date(), i);
-    const modifyingNumber = getRandomNumber(-1000, 1000);
+    const modifyingNumber = getRandomNumber(-2000, 2000);
     // create modified portfolio state
     const modifiedPortfolioState = {
       ...portfolioState,

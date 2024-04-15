@@ -275,6 +275,7 @@ export class UserSettingsDialogComponent implements OnInit {
           this.authenticationUserStoreService.changeUserPersonal({
             displayName: val,
             displayNameInitials: createNameInitials(val),
+            displayNameLowercase: val.toLowerCase(),
           }),
         ),
         tap(() => this.dialogServiceUtil.showNotificationBar('Your display name has been changed', 'success')),

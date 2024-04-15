@@ -57,12 +57,14 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
 
         <!-- loaded data -->
         <ng-container *ngIf="!showLoadingIndicator()">
-          <mat-option *ngFor="let group of optionsSignal(); let last = last" [value]="group" class="py-2 rounded-md">
-            <app-group-display-item [groupData]="group" />
-            <div *ngIf="!last" class="mt-2">
-              <mat-divider></mat-divider>
-            </div>
-          </mat-option>
+          @for (group of optionsSignal(); let last = $last; track group.id) {
+            <mat-option [value]="group" class="py-2 rounded-md">
+              <app-group-display-item [groupData]="group" />
+              <div *ngIf="!last" class="mt-2">
+                <mat-divider></mat-divider>
+              </div>
+            </mat-option>
+          }
         </ng-container>
       </mat-autocomplete>
     </mat-form-field>

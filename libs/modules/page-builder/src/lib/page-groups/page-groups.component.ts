@@ -129,6 +129,7 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
               *ngFor="let group of groups.groupOwner"
               (groupClickEmitter)="onGroupClick(group)"
               [groupData]="group"
+              [clickable]="true"
             ></app-group-display-card>
           </div>
         </div>
@@ -141,6 +142,7 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
               *ngFor="let group of groups.groupMember"
               (groupClickEmitter)="onGroupClick(group)"
               [groupData]="group"
+              [clickable]="true"
             ></app-group-display-card>
           </div>
         </div>

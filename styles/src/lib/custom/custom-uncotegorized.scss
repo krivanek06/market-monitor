@@ -58,7 +58,17 @@ h2 {
 }
 
 .g-clickable-hover {
-  @apply hover:scale-95 duration-300 transition-all cursor-pointer ease-in-out;
+  @apply hover:scale-95 duration-500 transition-all cursor-pointer ease-in-out;
+}
+
+.g-hover-color {
+  &:hover {
+    background: var(--hover-color) !important;
+  }
+
+  &:active {
+    background: var(--hover-color) !important;
+  }
 }
 
 .g-overlay {

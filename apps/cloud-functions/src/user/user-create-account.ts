@@ -37,6 +37,7 @@ export const userCreate = async (user: UserRecord, additional: CreateUserAdditio
     user.uid,
     {
       displayName: userNamePrefix,
+      displayNameLowercase: userNamePrefix.toLowerCase(),
       displayNameInitials: createNameInitials(userNamePrefix),
       photoURL: user.photoURL ?? null,
       providerId: user.providerData[0].providerId ?? 'unknown',

@@ -10,7 +10,7 @@ import {
   USER_NOT_FOUND_ERROR,
   UserBase,
 } from '@mm/api-types';
-import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat, getYesterdaysDate } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
@@ -133,6 +133,7 @@ const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = fa
   return {
     id: groupsId,
     name: data.groupName,
+    nameLowerCase: data.groupName.toLowerCase(),
     imageUrl: data.imageUrl,
     isPublic: data.isPublic,
     memberInvitedUserIds: data.memberInvitedUserIds,
@@ -144,7 +145,7 @@ const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = fa
     memberRequestUserIds: [],
     memberUserIds: isOwnerMember ? [owner.id] : [],
     endDate: null,
-    modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
+    modifiedSubCollectionDate: getYesterdaysDate(),
     portfolioState: {
       ...createEmptyPortfolioState(),
     },
