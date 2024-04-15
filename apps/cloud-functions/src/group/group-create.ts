@@ -6,6 +6,7 @@ import {
   GROUP_SAME_NAME_ERROR,
   GroupCreateInput,
   GroupData,
+  USER_HAS_DEMO_ACCOUNT_ERROR,
   USER_NOT_AUTHENTICATED_ERROR,
   USER_NOT_FOUND_ERROR,
   UserBase,
@@ -61,6 +62,11 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string, is
   // check if group already exists
   if (group) {
     throw new HttpsError('already-exists', GROUP_SAME_NAME_ERROR);
+  }
+
+  // demo account can not be added to the group
+  if (userData.isDemo) {
+    throw new HttpsError('aborted', USER_HAS_DEMO_ACCOUNT_ERROR);
   }
 
   // check limit

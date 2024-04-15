@@ -18,12 +18,16 @@ export const test_reload_database = onRequest({ timeoutSeconds: 1200 }, async (r
 
     console.log('[Groups]: update portfolio');
     await groupUpdateData();
+
     console.log('[Users]: update rank');
     await userPortfolioRank();
-    console.log('[Users]: update hall of fame');
-    await userHallOfFame();
+
     console.log('[Groups]: update rank');
     await groupPortfolioRank();
+
+    console.log('[Users]: update hall of fame');
+    await userHallOfFame();
+
     console.log('[Groups]: update hall of fame');
     await groupHallOfFame();
 

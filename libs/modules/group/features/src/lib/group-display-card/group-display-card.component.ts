@@ -31,14 +31,13 @@ import { PortfolioBalancePieChartComponent } from '@mm/portfolio/ui';
       [tabIndex]="clickable() ? 0 : -1"
       [ngClass]="{
         'g-overlay': groupData().isClosed,
-        'g-clickable-hover': clickable(),
-        'g-hover-color': clickable()
+        'g-clickable-hover-color': clickable()
       }"
     >
       <mat-card-content>
         <div class="relative flex justify-between">
           <!-- group info -->
-          <app-group-display-info [imageHeightPx]="125" [groupData]="groupData()"></app-group-display-info>
+          <app-group-display-info [imageHeightPx]="125" [groupData]="groupData()" class="flex-1" />
 
           <!-- closed message -->
           <div

@@ -61,7 +61,9 @@ h2 {
   @apply hover:scale-95 duration-500 transition-all cursor-pointer ease-in-out;
 }
 
-.g-hover-color {
+.g-clickable-hover-color {
+  @apply hover:scale-95 duration-500 transition-all cursor-pointer ease-in-out;
+
   &:hover {
     background: var(--hover-color) !important;
   }

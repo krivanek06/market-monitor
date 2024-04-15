@@ -24,8 +24,7 @@ import { PositionColoringDirective } from '../../../directives';
       positionType="background-color"
       (click)="onClick()"
       [ngClass]="{
-        'g-clickable-hover': clickable(),
-        'g-hover-color': clickable()
+        'g-clickable-hover-color': clickable()
       }"
       (keydown.enter)="onClick()"
       [tabIndex]="clickable() ? 0 : -1"

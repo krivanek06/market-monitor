@@ -5,6 +5,8 @@ import {
   GROUP_USER_ALREADY_MEMBER_ERROR,
   GROUP_USER_HAS_NO_INVITATION_ERROR,
   GroupMember,
+  USER_HAS_DEMO_ACCOUNT_ERROR,
+  USER_INCORRECT_ACCOUNT_TYPE_ERROR,
   USER_NOT_FOUND_ERROR,
   UserAccountEnum,
 } from '@mm/api-types';
@@ -49,7 +51,12 @@ export const groupMemberAccept = async (userAuthId: string, requestGroupId: stri
 
   // check user account type
   if (userData.userAccountType !== UserAccountEnum.DEMO_TRADING) {
-    throw new HttpsError('aborted', 'User account type is not allowed to join group');
+    throw new HttpsError('aborted', USER_INCORRECT_ACCOUNT_TYPE_ERROR);
+  }
+
+  // demo account can not be added to the group
+  if (userData.isDemo) {
+    throw new HttpsError('aborted', USER_HAS_DEMO_ACCOUNT_ERROR);
   }
 
   // check if user is already in group
