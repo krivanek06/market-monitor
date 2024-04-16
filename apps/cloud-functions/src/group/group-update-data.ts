@@ -39,7 +39,7 @@ export const groupUpdateData = async (): Promise<void> => {
   const group = await groupsCollectionRef()
     .where('isClosed', '==', false)
     .orderBy('modifiedSubCollectionDate', 'asc')
-    .limit(25)
+    .limit(40)
     .get();
 
   console.log(`Loaded ${group.docs.length} groups`);

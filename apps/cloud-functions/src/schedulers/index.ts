@@ -18,7 +18,7 @@ import { measureFunctionExecutionTime } from '../utils';
 export const run_scheduler_frequent_week_days = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '*/20 * * * 1-5',
+    schedule: '*/30 * * * 1-5',
   },
   async () => {
     axios.get('https://user-portfolio-update-request-jhgz46ksfq-uc.a.run.app');
@@ -42,12 +42,12 @@ export const run_scheduler_once_a_day = onSchedule(
 );
 
 /**
- * every hour, every day
+ * every hour, every day of week
  */
-export const run_scheduler_once_per_hours = onSchedule(
+export const run_scheduler_once_per_hours_week_days = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '0 */1 * * *',
+    schedule: '0 */1 * * 1-5',
   },
   async () => {
     measureFunctionExecutionTime(async () => {

@@ -69,14 +69,7 @@ import { FormRegisterComponent } from './form-register/form-register.component';
         <!-- development -->
         <h2 class="text-lg text-center text-wt-primary-dark">Demo Account Login</h2>
         <div class="px-4 mt-4">
-          <button
-            [disabled]="!isDevActive"
-            mat-stroked-button
-            color="accent"
-            class="w-full"
-            type="button"
-            (click)="onDemoLogin()"
-          >
+          <button mat-stroked-button color="accent" class="w-full" type="button" (click)="onDemoLogin()">
             Demo Login
           </button>
         </div>
