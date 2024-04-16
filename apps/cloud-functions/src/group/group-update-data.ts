@@ -2,6 +2,7 @@ import {
   GroupData,
   GroupHoldingSnapshotsData,
   GroupMembersData,
+  GroupPortfolioStateSnapshotsData,
   GroupTransactionsData,
   PortfolioState,
   PortfolioStateHoldingBase,
@@ -15,7 +16,6 @@ import {
   getObjectEntries,
   roundNDigits,
 } from '@mm/shared/general-util';
-import { FieldValue } from 'firebase-admin/firestore';
 import {
   groupDocumentHoldingSnapshotsRef,
   groupDocumentMembersRef,
@@ -35,11 +35,10 @@ import { transformUserToBase, transformUserToGroupMember } from '../utils';
  * - owner
  */
 export const groupUpdateData = async (): Promise<void> => {
-  const today = getCurrentDateDefaultFormat();
   // get all non closed groups
   const group = await groupsCollectionRef()
-    .where('modifiedSubCollectionDate', '!=', today)
     .where('isClosed', '==', false)
+    .orderBy('modifiedSubCollectionDate', 'asc')
     .limit(25)
     .get();
 
@@ -74,6 +73,12 @@ export const groupCopyMembersAndTransactions = async (group: GroupData): Promise
 
   // load group member data from last computation
   const membersPreviousData = (await groupDocumentMembersRef(group.id).get()).data();
+  const portfolioSnapshotsData = (await groupDocumentPortfolioStateSnapshotsRef(group.id).get()).data();
+
+  if (!portfolioSnapshotsData || !membersPreviousData) {
+    console.error(`No previous data for group ${group.id}`);
+    return;
+  }
 
   // load userData all members of the group
   const membersCurrentData = (await Promise.all(group.memberUserIds.map((id) => userDocumentRef(id).get())))
@@ -94,9 +99,16 @@ export const groupCopyMembersAndTransactions = async (group: GroupData): Promise
 
   // calculate holdings from all members
   const memberHoldingSnapshots = calculateGroupMembersHoldings(membersCurrentData);
+  // remove last portfolio state if it is from today
+  const portfolioSnapshotsNewData =
+    portfolioSnapshotsData.data.at(-1)?.date === getCurrentDateDefaultFormat()
+      ? portfolioSnapshotsData.data.slice(0, -1)
+      : portfolioSnapshotsData.data;
 
+  // get last portfolio state from previous day
+  const previousPortfolio = portfolioSnapshotsNewData.at(-1) ?? group.portfolioState;
   // calculate portfolioState from all members
-  const memberPortfolioState = calculateGroupMembersPortfolioState(membersCurrentData, group.portfolioState);
+  const memberPortfolioState = calculateGroupMembersPortfolioState(membersCurrentData, previousPortfolio);
 
   // create group members, calculate current group position
   const updatedGroupMembers = membersCurrentData
@@ -137,8 +149,9 @@ export const groupCopyMembersAndTransactions = async (group: GroupData): Promise
 
   // save portfolio state
   await groupDocumentPortfolioStateSnapshotsRef(group.id).update({
-    data: FieldValue.arrayUnion(memberPortfolioState),
-  });
+    data: [...portfolioSnapshotsNewData, memberPortfolioState],
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+  } satisfies GroupPortfolioStateSnapshotsData);
 };
 
 export const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioStateHoldingBase[] => {
@@ -179,6 +192,12 @@ export const calculateGroupMembersHoldings = (groupMembers: UserData[]): Portfol
   return getObjectEntries(memberHoldingSnapshots).map((d) => d[1]);
 };
 
+/**
+ *
+ * @param groupMembers - all members of the group
+ * @param groupPreviousPortfolioState - previous portfolio state of the group (from previous date)
+ * @returns - portfolio state calculated from all members
+ */
 export const calculateGroupMembersPortfolioState = (
   groupMembers: UserData[],
   groupPreviousPortfolioState: PortfolioState,

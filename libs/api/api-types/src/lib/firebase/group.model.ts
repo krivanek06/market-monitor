@@ -95,11 +95,6 @@ export type GroupBase = {
    * number of members (memberUserIds.length)
    */
   numberOfMembers: number;
-
-  /**
-   * if true, group is created for demo purposes
-   */
-  isDemo?: boolean;
 };
 
 export type GroupData = GroupBase & {

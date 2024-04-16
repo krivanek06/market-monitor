@@ -105,7 +105,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
               @for (user of hallOfFameUses.bestDailyGains; track user.id) {
                 <app-user-display-item
                   (click)="onUserClick(user)"
-                  class="g-clickable-hover mb-3"
+                  class="g-clickable-hover-color mb-1 rounded-lg p-2"
                   [showLoginButton]="false"
                   [userData]="user"
                 />
@@ -122,7 +122,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
               @for (user of hallOfFameUses.worstDailyGains; track user.id) {
                 <app-user-display-item
                   (click)="onUserClick(user)"
-                  class="g-clickable-hover mb-3"
+                  class="g-clickable-hover-color mb-1 rounded-lg p-2"
                   [showLoginButton]="false"
                   [userData]="user"
                 />

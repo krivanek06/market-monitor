@@ -147,7 +147,6 @@ const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = fa
     ownerUser: owner,
     createdDate: getCurrentDateDefaultFormat(),
     isClosed: false,
-    isDemo: isDemo,
     memberRequestUserIds: [],
     memberUserIds: isOwnerMember ? [owner.id] : [],
     endDate: null,
