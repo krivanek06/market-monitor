@@ -10,16 +10,6 @@ import { PositionColoringDirective } from '../../../directives';
   selector: 'app-position-card',
   standalone: true,
   imports: [CommonModule, MatCardModule, MatRippleModule, MatIconModule, PositionColoringDirective],
-  styles: `
-    :host {
-      display: block;
-    }
-
-    mat-card-content {
-      height: inherit;
-    }
-  `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <mat-card
       appearance="outlined"
@@ -33,6 +23,11 @@ import { PositionColoringDirective } from '../../../directives';
       [defaultPositionColor]="ColorScheme.GRAY_LIGHT_VAR"
       positionType="background-color"
       (click)="onClick()"
+      [ngClass]="{
+        'g-clickable-hover-color': clickable()
+      }"
+      (keydown.enter)="onClick()"
+      [tabIndex]="clickable() ? 0 : -1"
     >
       <div class="relative">
         <!-- position -->
@@ -61,6 +56,16 @@ import { PositionColoringDirective } from '../../../directives';
         <ng-content> </ng-content>
       </div>
     </mat-card>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: `
+    :host {
+      display: block;
+    }
+
+    mat-card-content {
+      height: inherit;
+    }
   `,
 })
 export class PositionCardComponent {

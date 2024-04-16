@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
   CollectionReference,
@@ -22,7 +23,6 @@ import {
   UserWatchList,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { User } from 'firebase/auth';
 import { arrayUnion, updateDoc } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
@@ -34,6 +34,11 @@ import { Observable, filter, map, of } from 'rxjs';
 export class UserApiService {
   private firestore = inject(Firestore);
   private functions = inject(Functions);
+  private http = inject(HttpClient);
+
+  getUserPublicIp(): Observable<string> {
+    return this.http.get<{ ip: string }>('https://api.ipify.org?format=json').pipe(map((d) => d.ip));
+  }
 
   /* user portfolio */
   getUserPortfolioTransactions(userId: string): Observable<UserPortfolioTransaction> {
@@ -93,8 +98,9 @@ export class UserApiService {
     return rxCollectionData(
       query(
         this.userCollection(),
-        where('personal.displayName', '>=', name.toUpperCase()),
-        where('personal.displayName', '<=', name.toLowerCase() + '\uf8ff'),
+        where('personal.displayNameLowercase', '>=', name.toUpperCase()),
+        where('personal.displayNameLowercase', '<=', name.toLowerCase() + '\uf8ff'),
+        where('isDemo', '==', false),
         limit(10),
       ),
     );
@@ -146,24 +152,6 @@ export class UserApiService {
     updateDoc(this.getUserPortfolioTransactionDocRef(userId), {
       transactions: arrayRemove(transaction),
     });
-  }
-
-  async userCreateAccount(): Promise<UserData> {
-    const callable = httpsCallable<User, UserData>(this.functions, 'userCreateAccountCall');
-    const result = await callable();
-    return result.data;
-  }
-
-  async deleteAccount(userData: UserData): Promise<void> {
-    // delete groups
-    const groupsToRemove = userData.groups.groupOwner.map((groupId) =>
-      httpsCallable<string, unknown>(this.functions, 'groupDeleteCall')(groupId),
-    );
-    await Promise.all(groupsToRemove);
-
-    // delete account
-    const callable = httpsCallable<string, void>(this.functions, 'userDeleteAccountCall');
-    await callable(userData.id);
   }
 
   /* private */

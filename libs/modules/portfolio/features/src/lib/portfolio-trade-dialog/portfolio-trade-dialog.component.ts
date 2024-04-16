@@ -167,14 +167,14 @@ export type PortfolioTradeDialogComponentData = {
             <div class="g-item-wrapper">
               <div class="space-x-2">
                 <span>Total Value</span>
-                <span *ngIf="isDemoAccount()">/</span>
-                <span *ngIf="isDemoAccount()">Fees</span>
+                <span *ngIf="isDemoTradingAccount()">/</span>
+                <span *ngIf="isDemoTradingAccount()">Fees</span>
               </div>
               <div class="space-x-2">
                 @if (!isCustomTotal) {
                   <span>{{ symbolPriceOnDate() * (form.controls.units.value | castToNumber) | currency }}</span>
-                  <span *ngIf="isDemoAccount()">/</span>
-                  <span *ngIf="isDemoAccount()"> ~{{ calculatedFees() | currency }} </span>
+                  <span *ngIf="isDemoTradingAccount()">/</span>
+                  <span *ngIf="isDemoTradingAccount()"> ~{{ calculatedFees() | currency }} </span>
                 } @else {
                   <span> {{ form.controls.customTotalValue.value || 0 | currency }} </span>
                 }
@@ -304,7 +304,7 @@ export class PortfolioTradeDialogComponent {
 
   userDataSignal = this.authenticationUserService.state.getUserData;
 
-  isDemoAccount = computed(() => this.authenticationUserService.state.isAccountDemoTrading());
+  isDemoTradingAccount = computed(() => this.authenticationUserService.state.isAccountDemoTrading());
   calculatedFees = computedFrom(
     [
       this.form.controls.units.valueChanges.pipe(

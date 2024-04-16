@@ -17,7 +17,7 @@ export type ConfirmDialogComponentData = {
   selector: 'app-confirm-dialog',
   template: `
     <div class="max-w-xl p-4 text-center sm:min-w-[400px]">
-      <p class="text-xl">{{ data.dialogTitle }}</p>
+      <p class="text-xl whitespace-pre-line">{{ data.dialogTitle }}</p>
 
       <!-- input text if exists -->
       <mat-form-field *ngIf="data.showTextWord" class="w-full mt-5">
@@ -37,9 +37,9 @@ export type ConfirmDialogComponentData = {
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,

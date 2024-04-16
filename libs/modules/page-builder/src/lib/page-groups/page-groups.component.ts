@@ -45,7 +45,7 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
           </div>
 
           <!-- create new group -->
-          <div [matTooltip]="isCreateGroupDisabledSignal() ? errorMessageGroupCreate : ''">
+          <div>
             <button
               [disabled]="isCreateGroupDisabledSignal()"
               mat-stroked-button
@@ -129,6 +129,7 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
               *ngFor="let group of groups.groupOwner"
               (groupClickEmitter)="onGroupClick(group)"
               [groupData]="group"
+              [clickable]="true"
             ></app-group-display-card>
           </div>
         </div>
@@ -141,6 +142,7 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
               *ngFor="let group of groups.groupMember"
               (groupClickEmitter)="onGroupClick(group)"
               [groupData]="group"
+              [clickable]="true"
             ></app-group-display-card>
           </div>
         </div>
@@ -170,12 +172,9 @@ export class PageGroupsComponent {
 
   isCreateGroupDisabledSignal = computed(
     () =>
-      (this.authenticationUserService.state.getUserDataNormal()?.groups?.groupOwner?.length ?? 99) >= GROUP_OWNER_LIMIT,
+      (this.authenticationUserService.state.getUserDataNormal()?.groups?.groupOwner?.length ?? 99) >=
+        GROUP_OWNER_LIMIT || this.authenticationUserService.state.isDemoAccount(),
   );
-
-  get errorMessageGroupCreate(): string {
-    return `You can only create ${GROUP_OWNER_LIMIT} groups`;
-  }
 
   constructor() {
     this.searchGroupControl.valueChanges.subscribe((d) => {

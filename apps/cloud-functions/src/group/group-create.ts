@@ -6,11 +6,12 @@ import {
   GROUP_SAME_NAME_ERROR,
   GroupCreateInput,
   GroupData,
+  USER_HAS_DEMO_ACCOUNT_ERROR,
   USER_NOT_AUTHENTICATED_ERROR,
   USER_NOT_FOUND_ERROR,
   UserBase,
 } from '@mm/api-types';
-import { createEmptyPortfolioState, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
+import { createEmptyPortfolioState, getCurrentDateDefaultFormat, getYesterdaysDate } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
@@ -43,7 +44,7 @@ export const groupCreateCall = onCall(async (request) => {
   return groupCreate(data, userAuthId);
 });
 
-export const groupCreate = async (data: GroupCreateInput, userAuthId: string): Promise<GroupData> => {
+export const groupCreate = async (data: GroupCreateInput, userAuthId: string, isDemo = false): Promise<GroupData> => {
   // load user data from firebase
   const userDataDoc = await userDocumentRef(userAuthId).get();
   const userData = userDataDoc.data();
@@ -63,6 +64,11 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
     throw new HttpsError('already-exists', GROUP_SAME_NAME_ERROR);
   }
 
+  // demo account can not be added to the group
+  if (userData.isDemo) {
+    throw new HttpsError('aborted', USER_HAS_DEMO_ACCOUNT_ERROR);
+  }
+
   // check limit
   if (userData.groups.groupOwner.length >= GROUP_OWNER_LIMIT) {
     throw new HttpsError('resource-exhausted', GROUP_OWNER_LIMIT_ERROR);
@@ -74,7 +80,7 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
   }
 
   // create group
-  const newGroup = createGroup(data, userBase, isOwnerMember);
+  const newGroup = createGroup(data, userBase, isOwnerMember, isDemo);
   const groupRef = groupDocumentRef(newGroup.id);
 
   // save new group
@@ -120,10 +126,20 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string): P
   return newGroup;
 };
 
-const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = false): GroupData => {
+/**
+ *
+ * @param data - basic information about the group
+ * @param owner - who the group belongs to
+ * @param isOwnerMember - is the owner a member of the group or not
+ * @param isDemo - if true, group is for demo purposes
+ * @returns created group
+ */
+const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = false, isDemo = false): GroupData => {
+  const groupsId = isDemo ? `demo_${uuidv4()}` : uuidv4();
   return {
-    id: uuidv4(),
+    id: groupsId,
     name: data.groupName,
+    nameLowerCase: data.groupName.toLowerCase(),
     imageUrl: data.imageUrl,
     isPublic: data.isPublic,
     memberInvitedUserIds: data.memberInvitedUserIds,
@@ -134,11 +150,11 @@ const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = fa
     memberRequestUserIds: [],
     memberUserIds: isOwnerMember ? [owner.id] : [],
     endDate: null,
-    modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
+    modifiedSubCollectionDate: getYesterdaysDate(),
     portfolioState: {
       ...createEmptyPortfolioState(),
     },
     systemRank: {},
-    numberOfMembers: 0,
+    numberOfMembers: data.isOwnerMember ? 1 : 0,
   };
 };

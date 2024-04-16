@@ -1,8 +1,22 @@
-import { UserAccountEnum, UserData, UserPersonalInfo, UserPortfolioTransaction, UserWatchList } from '@mm/api-types';
+import {
+  USER_DEFAULT_STARTING_CASH,
+  UserAccountBasicTypes,
+  UserAccountEnum,
+  UserData,
+  UserPersonalInfo,
+  UserPortfolioTransaction,
+  UserWatchList,
+} from '@mm/api-types';
 import { createEmptyPortfolioState, createNameInitials, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
-import { getAuth } from 'firebase-admin/auth';
+import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { userDocumentTransactionHistoryRef, userDocumentWatchListRef, usersCollectionRef } from '../models';
+import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
+
+export type CreateUserAdditionalData = {
+  isDemo?: boolean;
+  userAccountType?: UserAccountBasicTypes;
+  publicIP?: string;
+};
 
 export const userCreateAccountCall = onCall(async (request) => {
   const userAuthId = request.auth?.uid;
@@ -11,27 +25,26 @@ export const userCreateAccountCall = onCall(async (request) => {
     throw new HttpsError('aborted', 'User is not authenticated');
   }
 
-  return userCreate(userAuthId);
+  const user = await getAuth().getUser(userAuthId);
+  return userCreate(user);
 });
 
-export const userCreate = async (userId: string): Promise<UserData> => {
-  const user = await getAuth().getUser(userId);
-
-  // check if user exists by email
-  const matchingUsers = await usersCollectionRef().where('personal.email', '==', user.email).get();
-  if (!matchingUsers.empty) {
-    throw new HttpsError('already-exists', 'User with the same email already exists');
-  }
-
+export const userCreate = async (user: UserRecord, additional: CreateUserAdditionalData = {}): Promise<UserData> => {
   // create new user data
   const userName = user.displayName ?? user.email?.split('@')[0] ?? `User_${user.uid}`;
-  const newUserData = createNewUser(user.uid, {
-    displayName: userName,
-    displayNameInitials: createNameInitials(userName),
-    photoURL: user.photoURL ?? null,
-    providerId: user.providerData[0].providerId ?? 'unknown',
-    email: user.email ?? 'unknown',
-  });
+  const userNamePrefix = additional.isDemo ? `Demo_${userName}` : userName;
+  const newUserData = createNewUser(
+    user.uid,
+    {
+      displayName: userNamePrefix,
+      displayNameLowercase: userNamePrefix.toLowerCase(),
+      displayNameInitials: createNameInitials(userNamePrefix),
+      photoURL: user.photoURL ?? null,
+      providerId: user.providerData[0].providerId ?? 'unknown',
+      email: user.email ?? 'unknown',
+    },
+    additional,
+  );
 
   const newTransactions: UserPortfolioTransaction = {
     transactions: [],
@@ -42,7 +55,7 @@ export const userCreate = async (userId: string): Promise<UserData> => {
     data: [],
   };
   // update user
-  await usersCollectionRef().doc(newUserData.id).set(newUserData);
+  await userDocumentRef(newUserData.id).set(newUserData);
   // update transactions
   await userDocumentTransactionHistoryRef(newUserData.id).set(newTransactions);
   // update watchList
@@ -52,7 +65,13 @@ export const userCreate = async (userId: string): Promise<UserData> => {
   return newUserData;
 };
 
-const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
+const createNewUser = (id: string, personal: UserPersonalInfo, additional: CreateUserAdditionalData = {}): UserData => {
+  // set starting cash to 0 for normal basic users
+  const startingCash =
+    !!additional.userAccountType && additional.userAccountType === UserAccountEnum.NORMAL_BASIC
+      ? 0
+      : USER_DEFAULT_STARTING_CASH;
+
   const newUser: UserData = {
     id,
     groups: {
@@ -67,7 +86,7 @@ const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
     },
     personal: personal,
     portfolioState: {
-      ...createEmptyPortfolioState(),
+      ...createEmptyPortfolioState(startingCash),
     },
     holdingSnapshot: {
       lastModifiedDate: getCurrentDateDefaultFormat(),
@@ -75,9 +94,13 @@ const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
     },
     lastLoginDate: getCurrentDateDefaultFormat(),
     isAccountActive: true,
+    isDemo: !!additional.isDemo,
     accountCreatedDate: getCurrentDateDefaultFormat(),
-    userAccountType: UserAccountEnum.DEMO_TRADING,
+    userAccountType: additional?.userAccountType ?? UserAccountEnum.DEMO_TRADING,
     systemRank: {},
+    userPrivateInfo: {
+      publicIP: additional.publicIP ?? null,
+    },
     portfolioRisk: {
       alpha: 0,
       beta: 0,
@@ -86,5 +109,5 @@ const createNewUser = (id: string, personal: UserPersonalInfo): UserData => {
       date: getCurrentDateDefaultFormat(),
     },
   };
-  return newUser;
+  return { ...newUser, ...additional };
 };

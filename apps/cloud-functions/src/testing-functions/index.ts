@@ -1,55 +1,79 @@
 import { onRequest } from 'firebase-functions/v2/https';
-import { isFirebaseEmulator } from '../utils';
-import { test_runner } from './app-test';
+import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
+import {
+  userDeactivateInactiveAccounts,
+  userDeleteAccountInactive,
+  userHallOfFame,
+  userPortfolioRank,
+  userPortfolioUpdate,
+} from '../user';
+import { runFunctionInEmulator } from './../utils';
 import { reloadDatabase } from './reload-database';
-import { runALlSchedulers } from './run-all-schedullers';
-
-export * from './app-test';
 
 // DEVELOPMENT ----------------------------
 export const test_reload_database = onRequest({ timeoutSeconds: 1200 }, async (req, res) => {
-  if (!isFirebaseEmulator()) {
-    console.warn('Function can be executed only in development mode');
-    return;
-  }
+  await runFunctionInEmulator(async () => {
+    // delete and reload data for users and groups
+    await reloadDatabase();
 
-  console.log('--- start ---');
+    console.log('[Groups]: update portfolio');
+    await groupUpdateData();
 
-  await reloadDatabase();
+    console.log('[Users]: update rank');
+    await userPortfolioRank();
 
-  console.log('--- finished ---');
-  res.send('ok');
+    console.log('[Groups]: update rank');
+    await groupPortfolioRank();
+
+    console.log('[Users]: update hall of fame');
+    await userHallOfFame();
+
+    console.log('[Groups]: update hall of fame');
+    await groupHallOfFame();
+
+    res.send('ok');
+  });
 });
 
 export const test_function = onRequest({ timeoutSeconds: 1200 }, async (req, res) => {
-  if (!isFirebaseEmulator()) {
-    console.warn('Function can be executed only in development mode');
-    return;
-  }
-  const startTime = performance.now();
-  console.log('--- start ---');
+  await runFunctionInEmulator(async () => {
+    console.log('process.env.FUNCTIONS_EMULATOR ', process.env.FUNCTIONS_EMULATOR);
+    console.log('process.env.FIRESTORE_EMULATOR_HOST', process.env.FIRESTORE_EMULATOR_HOST);
 
-  await test_runner();
+    console.log('[Users]: update portfolio');
 
-  console.log('--- finished ---');
-
-  const endTime = performance.now();
-  const secondsDiff = Math.round((endTime - startTime) / 1000);
-  console.log(`Function took: ~${secondsDiff} seconds`);
-
-  res.send('ok');
+    res.send('ok');
+  });
 });
 
 export const test_run_all_schedulers = onRequest({ timeoutSeconds: 1200 }, async (req, res) => {
-  if (!isFirebaseEmulator()) {
-    console.warn('Function can be executed only in development mode');
-    return;
-  }
+  await runFunctionInEmulator(async () => {
+    // run all schedulers
+    console.log('[Users]: update portfolio');
+    await userPortfolioUpdate();
+    console.log('[Groups]: update portfolio');
+    await groupUpdateData();
+    console.log('[Users]: update rank');
+    await userPortfolioRank();
+    console.log('[Users]: update hall of fame');
+    await userHallOfFame();
+    console.log('[Groups]: update rank');
+    await groupPortfolioRank();
+    console.log('[Groups]: update hall of fame');
+    await groupHallOfFame();
 
-  console.log('--- start ---');
+    res.send('ok');
+  });
+});
 
-  await runALlSchedulers();
+export const test_delete_user_accounts = onRequest({ timeoutSeconds: 1200 }, async (req, res) => {
+  await runFunctionInEmulator(async () => {
+    console.log('[Users]: deactivate necessary accounts');
+    await userDeactivateInactiveAccounts();
 
-  console.log('--- finished ---');
-  res.send('ok');
+    console.log('[Users]: delete demo or inactive accounts');
+    await userDeleteAccountInactive();
+
+    res.send('ok');
+  });
 });

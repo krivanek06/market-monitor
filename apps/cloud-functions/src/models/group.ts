@@ -6,12 +6,11 @@ import {
   GroupTransactionsData,
 } from '@mm/api-types';
 import { firestore } from 'firebase-admin';
-import { assignTypes, assignTypesOptional } from './assign-type';
+import { assignTypes } from './assign-type';
 
 export const groupsCollectionRef = () => firestore().collection('groups').withConverter(assignTypes<GroupData>());
-
-export const groupDocumentRef = (groupId: string) =>
-  groupsCollectionRef().doc(groupId).withConverter(assignTypesOptional<GroupData>());
+export const groupsCollectionDemoAccountRef = () => groupsCollectionRef().where('isDemo', '==', true);
+export const groupDocumentRef = (groupId: string) => groupsCollectionRef().doc(groupId);
 
 export const groupCollectionMoreInformationRef = (groupId: string) =>
   groupDocumentRef(groupId).collection('more_information');

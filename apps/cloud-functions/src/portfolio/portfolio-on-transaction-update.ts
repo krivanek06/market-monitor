@@ -6,7 +6,6 @@ import {
   PortfolioStateHoldings,
   PortfolioTransaction,
   SymbolSummary,
-  USER_LOGIN_ACCOUNT_ACTIVE_DAYS,
   UserBase,
   UserData,
 } from '@mm/api-types';
@@ -16,7 +15,7 @@ import {
   getCurrentDateDetailsFormat,
   roundNDigits,
 } from '@mm/shared/general-util';
-import { format, isSameDay, subDays } from 'date-fns';
+import { isSameDay, subDays } from 'date-fns';
 import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { userDocumentRef, userDocumentTransactionHistoryRef } from '../models';
 import { userPortfolioRisk } from './portfolio-risk-evaluation';
@@ -67,9 +66,6 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
     // remove holdings
     const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
 
-    // account active threshold
-    const accountActiveThreshold = format(subDays(new Date(), USER_LOGIN_ACCOUNT_ACTIVE_DAYS), 'yyyy-MM-dd');
-
     // update user
     userDocumentRef(userData.id).update({
       portfolioState: portfolioState,
@@ -77,7 +73,6 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
         data: holdingsBase,
         lastModifiedDate: today,
       },
-      isAccountActive: userData.lastLoginDate > accountActiveThreshold,
     } satisfies Partial<UserData>);
 
     // calculation risk of investment
@@ -156,8 +151,10 @@ const getPortfolioStateHoldingsUtil = (
   );
 
   // value of all assets
-  const holdingsBalance =
-    portfolioStateHolding.reduce((acc, curr) => acc + curr.symbolSummary.quote.price * curr.units, 0) - transactionFees;
+  const holdingsBalance = portfolioStateHolding.reduce(
+    (acc, curr) => acc + curr.symbolSummary.quote.price * curr.units,
+    0,
+  );
 
   // current cash on hand
   const startingCash = previousPortfolioState.startingCash;

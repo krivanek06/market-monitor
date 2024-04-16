@@ -31,7 +31,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
         [style.width.px]="imageHeightPx()"
       />
       <!-- data -->
-      <div class="flex flex-col">
+      <div class="flex flex-col flex-1 @container">
         <div class="flex gap-4 items-center">
           <!-- name -->
           <div
@@ -52,6 +52,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
               change: groupData().portfolioState.totalGainsValue,
               changePercentage: groupData().portfolioState.totalGainsPercentage
             }"
+            class="hidden @md:flex"
           ></div>
           <!-- closed group display message -->
           <div *ngIf="groupData().isClosed" class="text-wt-danger">(Closed)</div>
@@ -61,7 +62,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
           (click)="onOwnerClick()"
           class="flex items-center gap-2 px-1 py-2 rounded-lg"
           [ngClass]="{
-            'g-clickable-hover': clickableOwner(),
+            'g-clickable-hover-color': clickableOwner(),
             'hover:shadow-lg': clickableOwner()
           }"
         >

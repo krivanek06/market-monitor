@@ -16,7 +16,7 @@ import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
 import { filterNil } from 'ngxtension/filter-nil';
-import { EMPTY, catchError, from, map, tap } from 'rxjs';
+import { EMPTY, catchError, from, map, take, tap } from 'rxjs';
 import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';
 
 @Component({
@@ -47,6 +47,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           <div class="max-md:mx-auto">
             <app-upload-image-single-control
               filePath="users"
+              [isDisabled]="isDemoAccount()"
               [fileName]="userDataSignal().id"
               [heightPx]="225"
               [formControl]="userImageControl"
@@ -106,6 +107,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
       <div class="flex flex-col gap-y-2 min-w-[180px] lg:pl-6">
         <!--  Reset Transactions -->
         <button
+          [disabled]="isDemoAccount()"
           (click)="onResetTransactions()"
           [matTooltip]="actionButtonTooltips.resetTransactions"
           type="button"
@@ -116,6 +118,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </button>
         <!--  Change Display Name -->
         <button
+          [disabled]="isDemoAccount()"
           (click)="onChangeDisplayName()"
           [matTooltip]="actionButtonTooltips.changeDisplayName"
           type="button"
@@ -126,6 +129,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </button>
         <!--  Change Account type -->
         <button
+          [disabled]="isDemoAccount()"
           (click)="onChangeAccountType()"
           [matTooltip]="actionButtonTooltips.changeAccountType"
           type="button"
@@ -147,6 +151,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </button>
         <!--  Delete Account -->
         <button
+          [disabled]="isDemoAccount()"
           (click)="onDeleteAccount()"
           [matTooltip]="actionButtonTooltips.deleteAccount"
           type="button"
@@ -194,6 +199,7 @@ export class UserSettingsDialogComponent implements OnInit {
   private dialog = inject(MatDialog);
   private dialogRef = inject(MatDialogRef<UserSettingsDialogComponent>);
 
+  isDemoAccount = this.authenticationUserStoreService.state.isDemoAccount;
   userDataSignal = this.authenticationUserStoreService.state.getUserData;
   userSignal = this.authenticationUserStoreService.state.getUser;
   userImageControl = new FormControl<string | null>(null);
@@ -263,11 +269,13 @@ export class UserSettingsDialogComponent implements OnInit {
         initialValue: this.userDataSignal().personal.displayName,
       })
       .pipe(
+        take(1),
         filterNil(),
         map((val) =>
           this.authenticationUserStoreService.changeUserPersonal({
             displayName: val,
             displayNameInitials: createNameInitials(val),
+            displayNameLowercase: val.toLowerCase(),
           }),
         ),
         tap(() => this.dialogServiceUtil.showNotificationBar('Your display name has been changed', 'success')),
@@ -290,6 +298,7 @@ export class UserSettingsDialogComponent implements OnInit {
     // perform operation
     from(this.authenticationUserStoreService.resetTransactions(currentAccountType))
       .pipe(
+        take(1),
         tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been reset', 'success')),
         catchError((err) => {
           this.dialogServiceUtil.handleError(err);

@@ -75,7 +75,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
           [clickableOwner]="true"
           [imageHeightPx]="150"
           [groupData]="groupDetailsSignal.groupData"
-        ></app-group-display-info>
+        />
 
         <!-- portfolio info -->
         <app-portfolio-state
@@ -84,14 +84,11 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
           [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
           [showCashSegment]="true"
           [portfolioState]="groupDetailsSignal.groupData.portfolioState"
-        ></app-portfolio-state>
+        />
 
         <!-- portfolio chart -->
         <div class="-mt-10 w-[420px] hidden xl:block">
-          <app-portfolio-balance-pie-chart
-            [heightPx]="260"
-            [data]="groupDetailsSignal.groupData.portfolioState"
-          ></app-portfolio-balance-pie-chart>
+          <app-portfolio-balance-pie-chart [heightPx]="260" [data]="groupDetailsSignal.groupData.portfolioState" />
         </div>
       </div>
 
@@ -105,7 +102,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         <app-portfolio-period-change
           *ngIf="portfolioChangeSignal() as portfolioChange"
           [portfolioChange]="portfolioChange"
-        ></app-portfolio-period-change>
+        />
       </div>
 
       <!-- divider -->
@@ -159,7 +156,6 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
               [clickable]="true"
               [currentPositions]="i + 1"
               [previousPosition]="user.position.previousGroupMemberPosition"
-              class="g-clickable-hover"
             >
               <app-user-display-item [userData]="user" />
             </app-position-card>
@@ -210,6 +206,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
             (symbolClicked)="onSummaryClick($event)"
             [holdings]="displayedHoldings()"
             [portfolioState]="groupDetailsSignal.groupData.portfolioState"
+            [showSkeletonLoading]="!getGroupHoldingsSignalNormal()"
           />
           <!-- show more button -->
           <div class="flex justify-end mt-2 mr-4">

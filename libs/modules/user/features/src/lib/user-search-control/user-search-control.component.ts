@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, model, output, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject, model, output } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatDividerModule } from '@angular/material/divider';
@@ -8,11 +8,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { UserApiService } from '@mm/api-client';
+import { AggregationApiService, UserApiService } from '@mm/api-client';
 import { UserData } from '@mm/api-types';
 import { DefaultImgDirective, RangeDirective } from '@mm/shared/ui';
 import { UserDisplayItemComponent } from '@mm/user/ui';
-import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-user-search-control',
@@ -50,20 +50,15 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, 
         [autofocus]="false"
         [autoActiveFirstOption]="false"
       >
-        <!-- loading skeleton -->
-        <ng-container *ngIf="showLoadingIndicator()">
-          <mat-option *ngRange="5" class="h-10 mb-1 g-skeleton"></mat-option>
-        </ng-container>
-
         <!-- loaded data -->
-        <ng-container *ngIf="!showLoadingIndicator()">
-          <mat-option *ngFor="let user of optionsSignal(); let last = last" [value]="user" class="py-2 rounded-md">
+        @for (user of optionsSignal(); track user.id; let last = $last) {
+          <mat-option [value]="user" class="py-2 rounded-md">
             <app-user-display-item [userData]="user"></app-user-display-item>
             <div *ngIf="!last" class="mt-2">
               <mat-divider></mat-divider>
             </div>
           </mat-option>
-        </ng-container>
+        }
       </mat-autocomplete>
     </mat-form-field>
   `,
@@ -82,45 +77,39 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, 
   ],
 })
 export class UserSearchControlComponent implements ControlValueAccessor {
+  private userApiService = inject(UserApiService);
+  private aggregationApiService = inject(AggregationApiService);
+
   selectedUserEmitter = output<UserData>();
   isDisabled = model<boolean>(false);
 
-  showLoadingIndicator = signal<boolean>(false);
-  optionsSignal = signal<UserData[]>([]);
   searchControl = new FormControl<string>('', { nonNullable: true });
 
-  userApiService = inject(UserApiService);
+  optionsSignal = toSignal(
+    this.searchControl.valueChanges.pipe(
+      startWith(''),
+      filter((d) => d.length < 10),
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap((value) =>
+        value.length > 0
+          ? this.userApiService.getUsersByName(value).pipe(
+              //tap(console.log),
+              catchError((e) => {
+                console.log(e);
+                return [];
+              }),
+            )
+          : this.aggregationApiService
+              .getHallOfFameUsers()
+              .pipe(map((d) => d?.bestPortfolio.map((d) => d.item).slice(0, 10) ?? [])),
+      ),
+    ),
+    { initialValue: [] },
+  );
 
   onChange: (value: UserData) => void = () => {};
   onTouched = () => {};
-
-  constructor() {
-    this.searchControl.valueChanges
-      .pipe(
-        // check if type is string and not empty
-        filter((d) => typeof d === 'string'),
-        tap(() => {
-          this.showLoadingIndicator.set(true);
-          this.optionsSignal.set([]);
-        }),
-        debounceTime(400),
-        distinctUntilChanged(),
-        switchMap((value) =>
-          this.userApiService.getUsersByName(value).pipe(
-            tap(() => this.showLoadingIndicator.set(false)),
-            tap(console.log),
-            catchError((e) => {
-              console.log(e);
-              this.showLoadingIndicator.set(false);
-              return of([]);
-            }),
-          ),
-        ),
-        tap((data) => this.optionsSignal.set(data)),
-        takeUntilDestroyed(),
-      )
-      .subscribe();
-  }
 
   displayProperty = (userData: UserData) => '';
 

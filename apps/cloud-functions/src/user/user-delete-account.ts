@@ -1,6 +1,6 @@
-import { GROUP_USER_NOT_OWNER } from '@mm/api-types';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { groupDeleteData } from '../group/group-delete';
 import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
 
 /**
@@ -11,10 +11,21 @@ import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchLi
  * - delete user's storage
  */
 export const userDeleteAccountCall = onCall(async (request) => {
-  const userResetId = request.data as any;
   const userAuthId = request.auth?.uid;
 
-  const userDoc = await userDocumentRef(userResetId).get();
+  if (!userAuthId) {
+    throw new HttpsError('unauthenticated', 'User not authenticated');
+  }
+
+  try {
+    await userDeleteAccountById(userAuthId);
+  } catch (error) {
+    throw new HttpsError('internal', 'Unable to delete account, please contact support');
+  }
+});
+
+export const userDeleteAccountById = async (userId: string): Promise<void> => {
+  const userDoc = await userDocumentRef(userId).get();
   const userData = userDoc.data();
 
   // check if user exists
@@ -22,16 +33,16 @@ export const userDeleteAccountCall = onCall(async (request) => {
     throw new HttpsError('failed-precondition', 'User does not exist');
   }
 
-  // check if authenticated user is owner or admin
-  if (userAuthId !== userResetId) {
-    throw new HttpsError('aborted', GROUP_USER_NOT_OWNER);
-  }
-
   // delete user
-  await userDocumentTransactionHistoryRef(userResetId).delete();
-  await userDocumentWatchListRef(userResetId).delete();
+  await userDocumentTransactionHistoryRef(userId).delete();
+  await userDocumentWatchListRef(userId).delete();
   await userDoc.ref.delete();
 
+  // delete groups where user is the owner
+  for (const groupId of userData.groups.groupOwner) {
+    await groupDeleteData(userId, groupId);
+  }
+
   // delete from auth
-  await getAuth().deleteUser(userResetId);
-});
+  await getAuth().deleteUser(userId);
+};

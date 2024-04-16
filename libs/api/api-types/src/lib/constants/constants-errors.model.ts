@@ -1,4 +1,4 @@
-import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT } from './constants-limits.model';
+import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT } from './constants.model';
 
 // general
 export const GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR = 'Not sufficient permissions';
@@ -8,6 +8,8 @@ export const USER_NOT_FOUND_ERROR = 'User not found';
 export const USER_NOT_ENOUGH_CASH_ERROR = 'Not enough cash on hand';
 export const USER_NOT_UNITS_ON_HAND_ERROR = 'Not enough units on hand';
 export const USER_NOT_AUTHENTICATED_ERROR = 'User not authenticated';
+export const USER_HAS_DEMO_ACCOUNT_ERROR = 'User has demo account, operation not allowed';
+export const USER_INCORRECT_ACCOUNT_TYPE_ERROR = 'Incorrect account type, operation not allowed';
 
 // symbol
 export const SYMBOL_NOT_FOUND_ERROR = 'Symbol not found';

@@ -17,8 +17,7 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
     <app-dialog-close-header title="Available Account Types"></app-dialog-close-header>
 
     <p *ngIf="!showLoaderSignal()" class="text-center mb-6 md:w-9/12 mx-auto text-xl">
-      At the current application development we have two accounts available for user. Read below their use and select
-      wisely. You can change you account type anytime, however your trading history will be reset.
+      Change you account type from the below options. Note that changing account type will reset your trading history
     </p>
 
     <mat-dialog-content class="p-4">
@@ -52,7 +51,7 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
                 userData().userAccountType !== UserAccountTypes.DEMO_TRADING
             }"
           >
-            <div class="mb-2 text-lg text-wt-primary text-center">Trading Account</div>
+            <div class="mb-2 text-lg text-wt-primary text-center">Demo Trading</div>
             <div *ngFor="let text of accountDescription.DEMO_TRADING" class="mb-3 text-center">
               {{ text }}
             </div>

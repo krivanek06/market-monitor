@@ -143,6 +143,10 @@ type Entries<T> = {
   [K in keyof T]: [K, T[K]];
 }[keyof T][];
 
+export const getRandomNumber = (min: number, max: number): number => {
+  return Math.ceil(Math.random() * (max - min) + min);
+};
+
 export const getObjectEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
 
 /**

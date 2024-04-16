@@ -44,7 +44,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
               [matRippleDisabled]="false"
               [matRippleUnbounded]="false"
               appearance="outlined"
-              class="p-2 border rounded-lg cursor-pointer border-wt-gray-light-strong g-clickable-hover"
+              class="p-2 border border-wt-gray-light-strong g-clickable-hover-color"
             >
               <app-user-display-item [userData]="user"></app-user-display-item>
             </div>

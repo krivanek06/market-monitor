@@ -43,7 +43,12 @@ import { map, pipe, startWith } from 'rxjs';
   template: `
     <section class="relative">
       <!-- list of symbols -->
-      <mat-chip-listbox aria-label="Asset Selection" [multiple]="true" [formControl]="symbolsControl" class="mt-2">
+      <mat-chip-listbox
+        aria-label="Asset Selection"
+        [multiple]="true"
+        [formControl]="symbolsControl"
+        class="mt-3 max-h-[200px] overflow-y-scroll p-3"
+      >
         <mat-chip-option
           *ngFor="let inputSource of symbolInputSourceSignal()"
           class="h-10 mb-3 mr-1 g-mat-chip"

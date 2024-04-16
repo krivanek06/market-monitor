@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthenticationAccountService } from '@mm/authentication/data-access';
 import { maxLengthValidator, minLengthValidator, requiredValidator } from '@mm/shared/data-access';
@@ -65,6 +65,7 @@ import { DialogCloseHeaderComponent, FormMatInputWrapperComponent } from '@mm/sh
 export class ChangePasswordDialogComponent {
   private dialogServiceUtil = inject(DialogServiceUtil);
   private authenticationAccountService = inject(AuthenticationAccountService);
+  private dialogRef = inject(MatDialogRef<ChangePasswordDialogComponent>);
 
   passwordForm = new FormGroup({
     oldPassword: new FormControl('', {
@@ -80,10 +81,6 @@ export class ChangePasswordDialogComponent {
       nonNullable: true,
     }),
   });
-
-  constructor() {
-    this.passwordForm.valueChanges.subscribe((v) => console.log(v));
-  }
 
   async onSubmit(): Promise<void> {
     this.passwordForm.markAllAsTouched();
@@ -108,7 +105,8 @@ export class ChangePasswordDialogComponent {
     // change password
     try {
       await this.authenticationAccountService.changePassword(controls.oldPassword.value, controls.newPassword1.value);
-      this.dialogServiceUtil.showNotificationBar('Password changed successfully!', 'success');
+      this.dialogServiceUtil.showNotificationBar('Password changed successfully! Try to logout', 'success');
+      this.dialogRef.close();
     } catch (error) {
       this.dialogServiceUtil.handleError(error);
       return;

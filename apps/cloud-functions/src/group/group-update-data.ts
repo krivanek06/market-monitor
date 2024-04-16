@@ -2,7 +2,9 @@ import {
   GroupData,
   GroupHoldingSnapshotsData,
   GroupMembersData,
+  GroupPortfolioStateSnapshotsData,
   GroupTransactionsData,
+  PortfolioState,
   PortfolioStateHoldingBase,
   PortfolioTransaction,
   UserData,
@@ -14,7 +16,6 @@ import {
   getObjectEntries,
   roundNDigits,
 } from '@mm/shared/general-util';
-import { FieldValue } from 'firebase-admin/firestore';
 import {
   groupDocumentHoldingSnapshotsRef,
   groupDocumentMembersRef,
@@ -34,11 +35,10 @@ import { transformUserToBase, transformUserToGroupMember } from '../utils';
  * - owner
  */
 export const groupUpdateData = async (): Promise<void> => {
-  const today = getCurrentDateDefaultFormat();
   // get all non closed groups
   const group = await groupsCollectionRef()
-    .where('modifiedSubCollectionDate', '!=', today)
     .where('isClosed', '==', false)
+    .orderBy('modifiedSubCollectionDate', 'asc')
     .limit(25)
     .get();
 
@@ -48,7 +48,7 @@ export const groupUpdateData = async (): Promise<void> => {
     const groupData = groupDoc.data();
     console.log(`Updating group ${groupData.id}, name: ${groupData.name}`);
     try {
-      await copyMembersAndTransactions(groupData);
+      await groupCopyMembersAndTransactions(groupData);
     } catch (e) {
       console.error(`Error updating group ${groupData.id}, name: ${groupData.name}`, e);
     }
@@ -57,22 +57,31 @@ export const groupUpdateData = async (): Promise<void> => {
   console.log('Done');
 };
 
-const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
+/**
+ * for the provided group, copy member transactions into the group, updates current holdings and
+ * saved portfolio current snapshot
+ *
+ */
+export const groupCopyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // load all members of the group
   const ownerData = (await userDocumentRef(group.ownerUserId).get()).data();
-  const isOwnerMember = !!group.memberUserIds.find((m) => m === group.ownerUserId);
 
   if (!ownerData) {
     console.error(`Owner not found for group ${group.id}`);
     return;
   }
 
-  /**
-   * difference is membersPreviousData can contain less people, those who accepted membership only today
-   */
+  // load group member data from last computation
   const membersPreviousData = (await groupDocumentMembersRef(group.id).get()).data();
-  const memberIds = membersPreviousData?.data.map((d) => d.id) ?? [];
-  const membersCurrentData = (await Promise.all(memberIds.map((id) => userDocumentRef(id).get())))
+  const portfolioSnapshotsData = (await groupDocumentPortfolioStateSnapshotsRef(group.id).get()).data();
+
+  if (!portfolioSnapshotsData || !membersPreviousData) {
+    console.error(`No previous data for group ${group.id}`);
+    return;
+  }
+
+  // load userData all members of the group
+  const membersCurrentData = (await Promise.all(group.memberUserIds.map((id) => userDocumentRef(id).get())))
     .map((d) => d.data())
     .filter((d): d is UserData => !!d);
 
@@ -89,7 +98,64 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     .slice(0, 250);
 
   // calculate holdings from all members
-  const memberHoldingSnapshots = membersCurrentData
+  const memberHoldingSnapshots = calculateGroupMembersHoldings(membersCurrentData);
+  // remove last portfolio state if it is from today
+  const portfolioSnapshotsNewData =
+    portfolioSnapshotsData.data.at(-1)?.date === getCurrentDateDefaultFormat()
+      ? portfolioSnapshotsData.data.slice(0, -1)
+      : portfolioSnapshotsData.data;
+
+  // get last portfolio state from previous day
+  const previousPortfolio = portfolioSnapshotsNewData.at(-1) ?? group.portfolioState;
+  // calculate portfolioState from all members
+  const memberPortfolioState = calculateGroupMembersPortfolioState(membersCurrentData, previousPortfolio);
+
+  // create group members, calculate current group position
+  const updatedGroupMembers = membersCurrentData
+    .slice()
+    .sort((a, b) => b.portfolioState.totalGainsValue - a.portfolioState.totalGainsValue)
+    .map((d, index) =>
+      transformUserToGroupMember(
+        d,
+        index + 1,
+        membersPreviousData?.data?.find((m) => m.id === d.id),
+      ),
+    );
+
+  // update last transactions for the group
+  await groupDocumentTransactionsRef(group.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: lastTransactions,
+  } satisfies GroupTransactionsData);
+
+  // update members for the group
+  await groupDocumentMembersRef(group.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: updatedGroupMembers,
+  } satisfies GroupMembersData);
+
+  // update owner for group
+  await groupDocumentRef(group.id).update({
+    ownerUser: transformUserToBase(ownerData),
+    modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
+    portfolioState: memberPortfolioState,
+  } satisfies Partial<GroupData>);
+
+  // save holding snapshots
+  await groupDocumentHoldingSnapshotsRef(group.id).update({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: memberHoldingSnapshots,
+  } satisfies GroupHoldingSnapshotsData);
+
+  // save portfolio state
+  await groupDocumentPortfolioStateSnapshotsRef(group.id).update({
+    data: [...portfolioSnapshotsNewData, memberPortfolioState],
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+  } satisfies GroupPortfolioStateSnapshotsData);
+};
+
+export const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioStateHoldingBase[] => {
+  const memberHoldingSnapshots = groupMembers
     // calculate holdings from all members
     .map((d) =>
       d.holdingSnapshot.data.reduce(
@@ -123,20 +189,20 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
       {} as { [key: string]: PortfolioStateHoldingBase },
     );
 
-  // add owner data
-  if (isOwnerMember) {
-    ownerData.holdingSnapshot.data.forEach((holding) => {
-      memberHoldingSnapshots[holding.symbol] = {
-        invested: roundNDigits((memberHoldingSnapshots[holding.symbol]?.invested ?? 0) + holding.invested),
-        units: (memberHoldingSnapshots[holding.symbol]?.units ?? 0) + holding.units,
-        symbol: holding.symbol,
-        symbolType: holding.symbolType,
-      };
-    });
-  }
+  return getObjectEntries(memberHoldingSnapshots).map((d) => d[1]);
+};
 
-  // calculate portfolioState from all members
-  const memberPortfolioState = membersCurrentData
+/**
+ *
+ * @param groupMembers - all members of the group
+ * @param groupPreviousPortfolioState - previous portfolio state of the group (from previous date)
+ * @returns - portfolio state calculated from all members
+ */
+export const calculateGroupMembersPortfolioState = (
+  groupMembers: UserData[],
+  groupPreviousPortfolioState: PortfolioState,
+): PortfolioState => {
+  const memberPortfolioState = groupMembers
     .map((d) => d.portfolioState)
     .reduce(
       (acc, curr) => ({
@@ -175,52 +241,12 @@ const copyMembersAndTransactions = async (group: GroupData): Promise<void> => {
     memberPortfolioState.totalGainsValue / memberPortfolioState.holdingsBalance,
   );
   memberPortfolioState.previousBalanceChange = roundNDigits(
-    memberPortfolioState.balance - group.portfolioState.balance,
+    memberPortfolioState.balance - groupPreviousPortfolioState.balance,
   );
   memberPortfolioState.previousBalanceChangePercentage = calculateGrowth(
     memberPortfolioState.balance,
-    group.portfolioState.balance,
+    groupPreviousPortfolioState.balance,
   );
 
-  // create group members, calculate current group position
-  const updatedGroupMembers = membersCurrentData
-    .slice()
-    .sort((a, b) => b.portfolioState.totalGainsValue - a.portfolioState.totalGainsValue)
-    .map((d, index) =>
-      transformUserToGroupMember(
-        d,
-        index + 1,
-        membersPreviousData?.data?.find((m) => m.id === d.id),
-      ),
-    );
-
-  // update last transactions for the group
-  await groupDocumentTransactionsRef(group.id).set({
-    lastModifiedDate: getCurrentDateDefaultFormat(),
-    data: lastTransactions,
-  } satisfies GroupTransactionsData);
-
-  // update members for the group
-  await groupDocumentMembersRef(group.id).set({
-    lastModifiedDate: getCurrentDateDefaultFormat(),
-    data: updatedGroupMembers,
-  } satisfies GroupMembersData);
-
-  // update owner for group
-  await groupDocumentRef(group.id).update({
-    ownerUser: transformUserToBase(ownerData),
-    modifiedSubCollectionDate: getCurrentDateDefaultFormat(),
-    portfolioState: memberPortfolioState,
-  } satisfies Partial<GroupData>);
-
-  // save holding snapshots
-  await groupDocumentHoldingSnapshotsRef(group.id).update({
-    lastModifiedDate: getCurrentDateDefaultFormat(),
-    data: getObjectEntries(memberHoldingSnapshots).map((d) => d[1]),
-  } satisfies GroupHoldingSnapshotsData);
-
-  // save portfolio state
-  await groupDocumentPortfolioStateSnapshotsRef(group.id).update({
-    data: FieldValue.arrayUnion(memberPortfolioState),
-  });
+  return memberPortfolioState;
 };

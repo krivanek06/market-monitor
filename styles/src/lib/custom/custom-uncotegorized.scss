@@ -58,10 +58,32 @@ h2 {
 }
 
 .g-clickable-hover {
-  @apply hover:scale-95 duration-300 transition-all cursor-pointer ease-in-out;
+  @apply hover:scale-95 focus:scale-95 active:scale-95 duration-500 transition-all cursor-pointer ease-in-out rounded-lg;
+}
+
+.g-clickable-hover-color {
+  @apply hover:scale-95 focus:scale-95 active:scale-95 duration-500 transition-all cursor-pointer ease-in-out rounded-lg;
+
+  &:hover {
+    background: var(--hover-color) !important;
+  }
+
+  &:active {
+    background: var(--hover-color) !important;
+  }
+
+  &:focus {
+    background: var(--hover-color) !important;
+  }
 }
 
 .g-overlay {
   background-color: #3e3e3e7a !important;
   opacity: 0.8;
+}
+
+.g-disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  background: var(--gray-dark);
 }

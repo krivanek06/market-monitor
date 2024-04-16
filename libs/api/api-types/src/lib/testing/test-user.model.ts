@@ -21,9 +21,14 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       photoURL: null,
       providerId: 'google.com',
       email: 'test@test.sk',
+      displayNameLowercase: 'test user',
     },
+    isDemo: false,
     settings: {
       isDarkMode: false,
+    },
+    userPrivateInfo: {
+      publicIP: null,
     },
     portfolioState: {
       balance: USER_DEFAULT_STARTING_CASH,

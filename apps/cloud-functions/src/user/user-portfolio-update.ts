@@ -1,5 +1,5 @@
 import { waitSeconds } from '@mm/shared/general-util';
-import { usersCollectionRef } from '../models';
+import { userCollectionActiveAccountRef } from '../models';
 import { updateUserPortfolioState } from '../portfolio';
 
 /**
@@ -13,10 +13,7 @@ import { updateUserPortfolioState } from '../portfolio';
  */
 export const userPortfolioUpdate = async (): Promise<number> => {
   // load users to calculate balance
-  const userToUpdate = usersCollectionRef()
-    .where('isAccountActive', '==', true)
-    .orderBy('portfolioState.date', 'desc')
-    .limit(100);
+  const userToUpdate = userCollectionActiveAccountRef().orderBy('portfolioState.date', 'desc').limit(100);
 
   const users = await userToUpdate.get();
 

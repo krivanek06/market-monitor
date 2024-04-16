@@ -1,4 +1,4 @@
-import { effect, inject } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -34,7 +34,7 @@ export abstract class PageGroupsBaseComponent {
     ),
   );
 
-  getGroupHoldingsSignal = toSignal(
+  getGroupHoldingsSignalNormal = toSignal(
     toObservable(this.groupIdParam).pipe(
       filterNil(),
       switchMap((id) =>
@@ -45,8 +45,9 @@ export abstract class PageGroupsBaseComponent {
         ),
       ),
     ),
-    { initialValue: [] },
   );
+
+  getGroupHoldingsSignal = computed(() => this.getGroupHoldingsSignalNormal() ?? []);
 
   constructor() {
     effect(() => {

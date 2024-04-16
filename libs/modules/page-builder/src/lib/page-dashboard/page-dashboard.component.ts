@@ -190,10 +190,11 @@ import { map, pipe, startWith } from 'rxjs';
         matIcon="show_chart"
       >
         <app-portfolio-holdings-table
+          [showSkeletonLoading]="!portfolioUserFacadeService.getPortfolioState()?.holdings"
           (symbolClicked)="onSummaryClick($event)"
           [holdings]="portfolioUserFacadeService.getPortfolioState()?.holdings ?? []"
           [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
-        ></app-portfolio-holdings-table>
+        />
       </app-general-card>
     </div>
 

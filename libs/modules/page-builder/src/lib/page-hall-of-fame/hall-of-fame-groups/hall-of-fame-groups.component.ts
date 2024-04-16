@@ -84,7 +84,7 @@ import {
                 <app-group-display-item
                   (click)="onGroupClick(group)"
                   [groupData]="group"
-                  class="g-clickable-hover mb-3"
+                  class="g-clickable-hover-color mb-1 rounded-lg p-2"
                 />
               } @empty {
                 <div class="@xl:col-span-2">No Data Found</div>
@@ -100,7 +100,7 @@ import {
                 <app-group-display-item
                   (click)="onGroupClick(group)"
                   [groupData]="group"
-                  class="g-clickable-hover mb-3"
+                  class="g-clickable-hover-color mb-1 rounded-lg p-2"
                 />
               } @empty {
                 <div>No Data Found</div>
