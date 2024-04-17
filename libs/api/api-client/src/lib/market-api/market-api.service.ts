@@ -18,6 +18,7 @@ import {
   SymbolSummary,
 } from '@mm/api-types';
 import { chunk } from '@mm/shared/general-util';
+import { isBefore } from 'date-fns';
 import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ApiCacheService } from '../utils';
 
@@ -60,6 +61,9 @@ export class MarketApiService extends ApiCacheService {
   }
 
   getHistoricalPricesDateRange(symbol: string, dateStart: string, endDate: string): Observable<HistoricalPrice[]> {
+    if (isBefore(endDate, dateStart)) {
+      return of([]);
+    }
     return this.getData<HistoricalPrice[]>(
       `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&dateStart=${dateStart}&dateEnd=${endDate}&type=dateRange`,
       this.validity2Min,

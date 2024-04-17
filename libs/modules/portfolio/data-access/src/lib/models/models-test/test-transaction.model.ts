@@ -132,7 +132,6 @@ export const mockSymbolSummaryMSFT: SymbolSummary = {
 };
 
 export const testPreviousTransactionEmpty: PortfolioState = {
-  accountResetDate: '2023-09-01',
   balance: 0,
   cashOnHand: 0,
   date: getYesterdaysDate(),
@@ -151,7 +150,6 @@ export const testPreviousTransactionEmpty: PortfolioState = {
 };
 
 export const testPreviousTransactionNonEmpty: PortfolioState = {
-  accountResetDate: '2023-09-01',
   balance: 12_000,
   cashOnHand: 10_000,
   date: getYesterdaysDate(),

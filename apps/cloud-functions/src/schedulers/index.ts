@@ -46,7 +46,7 @@ export const run_scheduler_once_a_day = onSchedule(
  */
 export const run_scheduler_once_per_hours_week_days = onSchedule(
   {
-    timeoutSeconds: 200,
+    timeoutSeconds: 240,
     schedule: '0 */1 * * 1-5',
   },
   async () => {

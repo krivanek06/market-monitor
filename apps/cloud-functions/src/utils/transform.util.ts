@@ -10,6 +10,7 @@ export const transformUserToBase = (user: UserData): UserBase => {
     lastLoginDate: user.lastLoginDate,
     isAccountActive: user.isAccountActive,
     isDemo: user.isDemo,
+    userAccountType: user.userAccountType,
   };
 };
 

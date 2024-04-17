@@ -5,17 +5,17 @@ import {
   HistoricalPriceSymbol,
   PortfolioGrowthAssets,
   PortfolioGrowthAssetsDataItem,
-  PortfolioState,
   PortfolioStateHolding,
-  PortfolioStateHoldingBase,
   PortfolioStateHoldings,
   PortfolioTransaction,
+  UserData,
 } from '@mm/api-types';
 import { ColorScheme, GenericChartSeries, ValueItem } from '@mm/shared/data-access';
 import {
   calculateGrowth,
   dateFormatDate,
   getObjectEntries,
+  getPortfolioStateHoldingsUtil,
   getYesterdaysDate,
   roundNDigits,
 } from '@mm/shared/general-util';
@@ -30,30 +30,22 @@ export class PortfolioCalculationService {
   private marketApiService = inject(MarketApiService);
 
   getPortfolioStateHoldings(
-    portfolioState: PortfolioState,
-    holdingSnapshot: PortfolioStateHoldingBase[],
+    { userAccountType, holdingSnapshot }: UserData,
+    transactions: PortfolioTransaction[],
   ): Observable<PortfolioStateHoldings> {
-    console.log(`PortfolioGrowthService: getPortfolioState`, portfolioState);
+    console.log(`PortfolioGrowthService: getPortfolioState`, holdingSnapshot, transactions);
 
     // get partial holdings calculations
-    const holdingSymbols = holdingSnapshot.map((d) => d.symbol);
-    const invested = holdingSnapshot.reduce((acc, curr) => acc + curr.invested, 0);
+    const holdingSymbols = holdingSnapshot.data.map((d) => d.symbol);
 
     // get symbol summaries from API
-    return this.marketApiService.getSymbolSummaries(holdingSymbols).pipe(
-      map((summaries) => ({
-        ...portfolioState,
-        holdings: holdingSnapshot.map((holding) => {
-          const symbolSummary = summaries.find((d) => d.id === holding.symbol);
-          return {
-            ...holding,
-            symbolSummary: symbolSummary!,
-            breakEvenPrice: roundNDigits(holding.invested / holding.units, 2),
-            weight: roundNDigits(holding.invested / invested, 6),
-          } satisfies PortfolioStateHolding;
-        }),
-      })),
-    );
+    return this.marketApiService
+      .getSymbolSummaries(holdingSymbols)
+      .pipe(
+        map((summaries) =>
+          getPortfolioStateHoldingsUtil(userAccountType, transactions, holdingSnapshot.data, summaries),
+        ),
+      );
   }
 
   getPortfolioGrowth(data: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
