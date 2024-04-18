@@ -5,8 +5,6 @@ import {
   PortfolioStateHoldings,
   PortfolioTransaction,
   SymbolSummary,
-  USER_DEFAULT_STARTING_CASH,
-  UserAccountEnum,
 } from '@mm/api-types';
 import { getCurrentDateDefaultFormat, getCurrentDateDetailsFormat } from './date-service.util';
 import { calculateGrowth, roundNDigits } from './general-function.util';
@@ -21,10 +19,10 @@ import { calculateGrowth, roundNDigits } from './general-function.util';
  * @returns
  */
 export const getPortfolioStateHoldingsUtil = (
-  accountType: UserAccountEnum,
   transactions: PortfolioTransaction[],
   partialHoldings: PortfolioStateHoldingBase[],
   symbolSummaries: SymbolSummary[],
+  startingCash = 0,
 ): PortfolioStateHoldings => {
   const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
   const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
@@ -67,7 +65,6 @@ export const getPortfolioStateHoldingsUtil = (
   const transactionProfitLoss = transactions.reduce((acc, curr) => acc + (curr?.returnValue ?? 0), 0);
 
   // current cash on hand
-  const startingCash = accountType === UserAccountEnum.DEMO_TRADING ? USER_DEFAULT_STARTING_CASH : 0;
   const cashOnHandTransactions =
     (startingCash !== 0 ? startingCash - invested - transactionFees : 0) + transactionProfitLoss;
 

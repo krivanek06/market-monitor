@@ -198,8 +198,8 @@ import { map, pipe, startWith } from 'rxjs';
       </app-general-card>
     </div>
 
-    @if (authenticationUserService.state.userHaveTransactions()) {
-      @defer {
+    @defer {
+      @if ((portfolioUserFacadeService.getPortfolioState()?.holdings ?? []).length > 0) {
         <!-- holdings pie charts -->
         <div class="flex justify-center lg:justify-between gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6">
           <app-pie-chart
@@ -215,7 +215,9 @@ import { map, pipe, startWith } from 'rxjs';
             [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
           />
         </div>
+      }
 
+      @if (authenticationUserService.state.userHaveTransactions()) {
         <!-- transaction history -->
         <div>
           <app-section-title title="Transaction History" matIcon="history" class="mb-3" />

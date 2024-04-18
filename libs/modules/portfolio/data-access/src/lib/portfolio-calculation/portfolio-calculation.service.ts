@@ -8,13 +8,13 @@ import {
   PortfolioStateHolding,
   PortfolioStateHoldings,
   PortfolioTransaction,
-  UserData,
 } from '@mm/api-types';
 import { ColorScheme, GenericChartSeries, ValueItem } from '@mm/shared/data-access';
 import {
   calculateGrowth,
   dateFormatDate,
   getObjectEntries,
+  getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
   getYesterdaysDate,
   roundNDigits,
@@ -30,22 +30,19 @@ export class PortfolioCalculationService {
   private marketApiService = inject(MarketApiService);
 
   getPortfolioStateHoldings(
-    { userAccountType, holdingSnapshot }: UserData,
+    startingCash: number,
     transactions: PortfolioTransaction[],
   ): Observable<PortfolioStateHoldings> {
-    console.log(`PortfolioGrowthService: getPortfolioState`, holdingSnapshot, transactions);
-
     // get partial holdings calculations
-    const holdingSymbols = holdingSnapshot.data.map((d) => d.symbol);
+    const holdingsBase = getPortfolioStateHoldingBaseUtil(transactions);
+    const holdingSymbols = holdingsBase.map((d) => d.symbol);
+
+    console.log(`PortfolioGrowthService: getPortfolioState`, holdingSymbols, holdingsBase, transactions);
 
     // get symbol summaries from API
     return this.marketApiService
       .getSymbolSummaries(holdingSymbols)
-      .pipe(
-        map((summaries) =>
-          getPortfolioStateHoldingsUtil(userAccountType, transactions, holdingSnapshot.data, summaries),
-        ),
-      );
+      .pipe(map((summaries) => getPortfolioStateHoldingsUtil(transactions, holdingsBase, summaries, startingCash)));
   }
 
   getPortfolioGrowth(data: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
@@ -102,7 +99,7 @@ export class PortfolioCalculationService {
   getPortfolioChange(growthData: PortfolioGrowth[]): PortfolioChange {
     console.log('getPortfolioChange', growthData);
     // reverse data to start from DESC
-    const reversedData = [...growthData].reverse();
+    const reversedData = growthData.reduce((acc, curr) => [curr, ...acc], [] as PortfolioGrowth[]);
     const today = new Date();
 
     // return default values if no data
@@ -328,11 +325,7 @@ export class PortfolioCalculationService {
       transactionStart.map((transaction) =>
         firstValueFrom(
           this.marketApiService
-            .getHistoricalPricesDateRange(
-              transaction.symbol,
-              format(new Date(transaction.startDate), 'yyyy-MM-dd'),
-              yesterDay,
-            )
+            .getHistoricalPricesDateRange(transaction.symbol, format(transaction.startDate, 'yyyy-MM-dd'), yesterDay)
             .pipe(
               map((res) => ({ symbol: transaction.symbol, data: res }) satisfies HistoricalPriceSymbol),
               catchError((err) => {

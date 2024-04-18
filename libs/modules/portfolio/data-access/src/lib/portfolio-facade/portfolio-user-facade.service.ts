@@ -25,7 +25,7 @@ export class PortfolioUserFacadeService {
       switchMap((transactions) =>
         transactions
           ? this.portfolioCalculationService.getPortfolioStateHoldings(
-              this.authenticationUserService.state.getUserData(),
+              this.authenticationUserService.state.getUserData().portfolioState.startingCash,
               transactions,
             )
           : of(undefined),
@@ -52,10 +52,10 @@ export class PortfolioUserFacadeService {
    */
   getPortfolioGrowth = computed(() => {
     const growth = this.getPortfolioGrowthAssets();
+    const startingCash = this.getPortfolioState()?.startingCash;
+    const result = growth ? this.portfolioCalculationService.getPortfolioGrowth(growth, startingCash) : null;
 
-    return growth
-      ? this.portfolioCalculationService.getPortfolioGrowth(growth, this.getPortfolioState()?.startingCash)
-      : null;
+    return result;
   });
 
   /**

@@ -47,10 +47,10 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
 
     // get portfolio state
     const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
-      userData.userAccountType,
       transactionData,
       holdingsBase,
       summaries,
+      userData.portfolioState.startingCash,
     );
 
     // remove holdings
