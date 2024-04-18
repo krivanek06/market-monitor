@@ -105,6 +105,14 @@ export type PortfolioGrowthAssetsDataItem = {
    */
   marketTotalValue: number;
   // price - marketTotalValue / units
+  /**
+   * units * price of the asset on day - invested values
+   */
+  profit: number;
+  /**
+   * when transaction is SELL, this is the return from the transaction
+   */
+  accumulatedReturn: number;
 };
 
 export type PortfolioTransactionType = 'BUY' | 'SELL';

@@ -13,6 +13,8 @@ import { ColorScheme, GenericChartSeries, ValueItem } from '@mm/shared/data-acce
 import {
   calculateGrowth,
   dateFormatDate,
+  fillOutMissingDatesForDate,
+  getCurrentDateDefaultFormat,
   getObjectEntries,
   getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
@@ -45,46 +47,63 @@ export class PortfolioCalculationService {
       .pipe(map((summaries) => getPortfolioStateHoldingsUtil(transactions, holdingsBase, summaries, startingCash)));
   }
 
-  getPortfolioGrowth(data: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
-    return data.reduce((acc, curr) => {
-      curr.data.forEach((dataItem) => {
-        // find index of element with same date
-        const elementIndex = acc.findIndex((el) => el.date === dataItem.date);
+  getPortfolioGrowth(portfolioAssets: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
+    // get soonest date
+    const soonestDate = portfolioAssets.reduce(
+      (acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc),
+      getCurrentDateDefaultFormat(),
+    );
 
-        // initial object
-        const portfolioItem: PortfolioGrowth = {
-          date: dataItem.date,
-          breakEvenValue: dataItem.breakEvenValue,
-          marketTotalValue: dataItem.marketTotalValue,
-          totalBalanceValue: dataItem.marketTotalValue - dataItem.breakEvenValue,
-        };
+    // generate dates from soonest until today
+    const generatedDates = fillOutMissingDatesForDate(soonestDate, getCurrentDateDefaultFormat());
 
-        // if elementIndex exists, add value to it => different symbol, same date
-        if (elementIndex > -1) {
-          acc[elementIndex].breakEvenValue += portfolioItem.breakEvenValue;
-          acc[elementIndex].marketTotalValue += portfolioItem.marketTotalValue;
-          acc[elementIndex].totalBalanceValue += portfolioItem.totalBalanceValue;
-          return;
+    // result of portfolio growth
+    const result: PortfolioGrowth[] = [];
+
+    // accumulate return values, portfolioAssets for specific symbols can me shorter than today
+    const accumulatedReturn = new Set<number>();
+
+    // loop though all generated dates
+    for (const gDate of generatedDates) {
+      // initial object
+      const portfolioItem: PortfolioGrowth = {
+        date: gDate,
+        breakEvenValue: 9,
+        marketTotalValue: 0,
+        totalBalanceValue: startingCashValue,
+      };
+
+      // loop though all portfolio assets per date
+      for (const portfolioAsset of portfolioAssets) {
+        // find current portfolio asset on this date
+        const currentPortfolioAsset = portfolioAsset.data.find((d) => d.date === gDate);
+
+        // not found
+        if (!currentPortfolioAsset) {
+          continue;
         }
 
-        // add starting cash only once
-        portfolioItem.totalBalanceValue += startingCashValue;
+        // save accumulated return
+        accumulatedReturn.add(currentPortfolioAsset.accumulatedReturn);
 
-        if (acc.length === 0 || dataItem.date < acc[0].date) {
-          // data is not yet in the array, add it to the start
-          acc = [portfolioItem, ...acc];
-        } else if (dataItem.date > acc[acc.length - 1].date) {
-          // data in array, date in the future, add element to the end
-          acc = [...acc, portfolioItem];
-        } else {
-          // not yet in array, but date somewhere middle, find first larger date
-          const appendIndex = acc.findIndex((d) => dataItem.date < d.date);
-          acc.splice(appendIndex, 0, portfolioItem);
-        }
-      });
+        // add values to initial object
+        portfolioItem.marketTotalValue += currentPortfolioAsset.marketTotalValue;
+        portfolioItem.breakEvenValue += currentPortfolioAsset.breakEvenValue;
+        portfolioItem.totalBalanceValue +=
+          currentPortfolioAsset.marketTotalValue - currentPortfolioAsset.breakEvenValue;
+      }
 
-      return acc;
-    }, [] as PortfolioGrowth[]);
+      // add accumulated return to total balance
+      portfolioItem.totalBalanceValue += Array.from(accumulatedReturn).reduce((acc, curr) => acc + curr, 0);
+
+      // save result
+      result.push(portfolioItem);
+    }
+
+    // ignore holidays and weekends
+    const resultFiltered = result.filter((d) => d.marketTotalValue > 0);
+
+    return resultFiltered;
   }
 
   /**
@@ -299,7 +318,89 @@ export class PortfolioCalculationService {
    * @returns - an array of {symbol: string, data: PortfolioGrowthAssetsDataItem[]}
    */
   async getPortfolioGrowthAssets(transactions: PortfolioTransaction[]): Promise<PortfolioGrowthAssets[]> {
-    // console.log(`PortfolioGrowthService: getPortfolioGrowthAssets`, transactions);
+    const historicalPrices = await this.getHistoricalPricesForTransactionsSymbols(transactions);
+    const symbols = Object.keys(historicalPrices);
+
+    // create portfolio growth assets
+    const result: PortfolioGrowthAssets[] = symbols
+      .map((symbol) => {
+        // historical data per symbol
+        const symbolHistoricalPrice = historicalPrices[symbol];
+
+        if (!symbolHistoricalPrice) {
+          console.log(`Missing historical prices for ${symbol}`);
+          return null;
+        }
+
+        // get all transactions for this symbol in ASC order by date
+        const symbolTransactions = transactions.filter((d) => d.symbol === symbol);
+
+        // internal helper
+        const aggregator = {
+          units: 0,
+          index: 0,
+          breakEvenPrice: 0,
+          accumulatedReturn: 0,
+        };
+
+        // loop though prices of specific symbol and calculate invested value and market total value
+        const growthAssetItems = symbolHistoricalPrice.map((historicalPrice) => {
+          // modify the aggregator for every transaction that happened on that date
+          // can be multiple transactions on the same day for the same symbol
+          while (
+            !!symbolTransactions[aggregator.index] &&
+            isSameDay(new Date(symbolTransactions[aggregator.index].date), new Date(historicalPrice.date))
+          ) {
+            const transaction = symbolTransactions[aggregator.index];
+            const isBuy = transaction.transactionType === 'BUY';
+
+            // change break even price
+            aggregator.breakEvenPrice = isBuy
+              ? (aggregator.units * aggregator.breakEvenPrice + transaction.units * transaction.unitPrice) /
+                (aggregator.units + transaction.units)
+              : aggregator.breakEvenPrice;
+
+            // add or subtract units depending on transaction type
+            aggregator.units += isBuy ? transaction.units : -transaction.units;
+
+            // increment next transaction index
+            aggregator.index += 1;
+
+            // calculate accumulated return
+            aggregator.accumulatedReturn += transaction.returnValue;
+          }
+
+          return {
+            breakEvenValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice),
+            date: historicalPrice.date,
+            units: aggregator.units,
+            marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close),
+            profit: roundNDigits(
+              aggregator.units * historicalPrice.close - aggregator.units * aggregator.breakEvenPrice,
+            ),
+            accumulatedReturn: aggregator.accumulatedReturn,
+          } satisfies PortfolioGrowthAssetsDataItem;
+        });
+
+        return {
+          symbol,
+          data: growthAssetItems,
+        } satisfies PortfolioGrowthAssets;
+      })
+      // remove undefined or symbols which were bought and sold on the same day
+      .filter((d): d is PortfolioGrowthAssets => !!d && d.data.length > 0);
+
+    return result;
+  }
+
+  /**
+   *
+   * @param transactions
+   * @returns distinct symbols with historical prices
+   */
+  private async getHistoricalPricesForTransactionsSymbols(
+    transactions: PortfolioTransaction[],
+  ): Promise<{ [key: string]: HistoricalPrice[] }> {
     // from transactions get all distinct symbols with soonest date of transaction
     const transactionStart = transactions.reduce(
       (acc, curr) => {
@@ -351,72 +452,7 @@ export class PortfolioCalculationService {
       .map((d) => d.value)
       .reduce((acc, curr) => ({ ...acc, [curr.symbol]: curr.data }), {} as { [key: string]: HistoricalPrice[] });
 
-    // create portfolio growth assets
-    const result: PortfolioGrowthAssets[] = transactionStart
-      .map((d) => d.symbol)
-      .map((symbol) => {
-        const symbolHistoricalPrice = historicalPrices[symbol];
-
-        if (!symbolHistoricalPrice) {
-          console.log(`Missing historical prices for ${symbol}`);
-          return null;
-        }
-
-        // get all transactions for this symbol in ASC order by date
-        const symbolTransactions = transactions
-          .filter((d) => d.symbol === symbol)
-          .sort((a, b) => (isBefore(new Date(a.date), new Date(b.date)) ? -1 : 1));
-
-        // internal helper
-        const aggregator = {
-          units: 0,
-          index: 0,
-          breakEvenPrice: 0,
-        };
-
-        // loop though prices of specific symbol and calculate invested value and market total value
-        const growthAssetItems = symbolHistoricalPrice.map((historicalPrice) => {
-          // modify the aggregator for every transaction that happened on that date
-          // can be multiple transactions on the same day for the same symbol
-          while (
-            !!symbolTransactions[aggregator.index] &&
-            isSameDay(new Date(symbolTransactions[aggregator.index].date), new Date(historicalPrice.date))
-          ) {
-            const transaction = symbolTransactions[aggregator.index];
-            const isBuy = transaction.transactionType === 'BUY';
-
-            // change break even price
-            aggregator.breakEvenPrice = isBuy
-              ? (aggregator.units * aggregator.breakEvenPrice + transaction.units * transaction.unitPrice) /
-                (aggregator.units + transaction.units)
-              : aggregator.breakEvenPrice;
-
-            // add or subtract units depending on transaction type
-            aggregator.units += isBuy ? transaction.units : -transaction.units;
-
-            // increment next transaction index
-            aggregator.index += 1;
-          }
-
-          return {
-            breakEvenValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice),
-            date: historicalPrice.date,
-            units: aggregator.units,
-            marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close),
-          } satisfies PortfolioGrowthAssetsDataItem;
-        });
-
-        const growthAssetsNonNullUnits = growthAssetItems.filter((d) => d.units > 0);
-        return {
-          symbol,
-          data: growthAssetsNonNullUnits,
-        } satisfies PortfolioGrowthAssets;
-      })
-      // remove undefined or symbols which were bought and sold on the same day
-      .filter((d): d is PortfolioGrowthAssets => !!d && d.data.length > 0);
-
-    // console.log('PortfolioGrowthService: getPortfolioGrowthAssets [result]', result);
-    return result;
+    return historicalPrices;
   }
 
   /**
