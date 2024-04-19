@@ -10,6 +10,7 @@ import { accountDescription } from '@mm/api-types';
 import { ChangePasswordDialogComponent } from '@mm/authentication/authentication-forms';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
+import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { createNameInitials } from '@mm/shared/general-util';
 import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
@@ -129,7 +130,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </button>
         <!--  Change Account type -->
         <button
-          [disabled]="isDemoAccount()"
+          [disabled]="isDemoAccount() || !isDevActive"
           (click)="onChangeAccountType()"
           [matTooltip]="actionButtonTooltips.changeAccountType"
           type="button"
@@ -198,6 +199,9 @@ export class UserSettingsDialogComponent implements OnInit {
   private dialogServiceUtil = inject(DialogServiceUtil);
   private dialog = inject(MatDialog);
   private dialogRef = inject(MatDialogRef<UserSettingsDialogComponent>);
+  isDevActive = inject(IS_DEV_TOKEN, {
+    optional: true,
+  });
 
   isDemoAccount = this.authenticationUserStoreService.state.isDemoAccount;
   userDataSignal = this.authenticationUserStoreService.state.getUserData;

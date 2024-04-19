@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router } from '@angular/router';
-import { UserAccountBasicTypes } from '@mm/api-types';
+import { UserAccountBasicTypes, UserAccountEnum } from '@mm/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
@@ -273,9 +273,10 @@ export class AuthenticationFormComponent {
   }
 
   private openSelectAccountType(): Observable<UserAccountBasicTypes | undefined> {
-    return this.dialog
-      .open(AuthenticationNewAccountTypeChooseDialogComponent)
-      .afterClosed()
-      .pipe(tap(() => this.loadingSnipperShowSignal.set(false)));
+    // return this.dialog
+    //   .open(AuthenticationNewAccountTypeChooseDialogComponent)
+    //   .afterClosed()
+    //   .pipe(tap(() => this.loadingSnipperShowSignal.set(false)));
+    return of(UserAccountEnum.DEMO_TRADING);
   }
 }
