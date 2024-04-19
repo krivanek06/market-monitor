@@ -12,7 +12,7 @@ import { AggregationApiService, UserApiService } from '@mm/api-client';
 import { UserData } from '@mm/api-types';
 import { DefaultImgDirective, RangeDirective } from '@mm/shared/ui';
 import { UserDisplayItemComponent } from '@mm/user/ui';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-user-search-control',
@@ -100,9 +100,12 @@ export class UserSearchControlComponent implements ControlValueAccessor {
                 return [];
               }),
             )
-          : this.aggregationApiService
-              .getHallOfFameUsers()
-              .pipe(map((d) => d?.bestPortfolio.map((d) => d.item).slice(0, 10) ?? [])),
+          : of(
+              this.aggregationApiService
+                .hallOfFameUsers()
+                ?.bestPortfolio.map((d) => d.item)
+                .slice(0, 10) ?? [],
+            ),
       ),
     ),
     { initialValue: [] },

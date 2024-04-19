@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -159,7 +158,7 @@ export class HallOfFameGroupsComponent {
    */
   readonly displayGroupsLimit = 20;
 
-  hallOfFameGroupsSignal = toSignal(this.aggregationApiService.getHallOfFameGroups());
+  hallOfFameGroupsSignal = this.aggregationApiService.hallOfFameGroups;
 
   displayPortfolioSignal = computed(() =>
     this.showBestSignal()

@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -185,7 +184,7 @@ export class HallOfFameUsersComponent {
 
   userDataSignal = this.authenticationUserStoreService.state.getUserData;
 
-  hallOfFameUsersSignal = toSignal(this.aggregationApiService.getHallOfFameUsers());
+  hallOfFameUsersSignal = this.aggregationApiService.hallOfFameUsers;
 
   displayPortfolioSignal = computed(() =>
     this.showBestSignal()
