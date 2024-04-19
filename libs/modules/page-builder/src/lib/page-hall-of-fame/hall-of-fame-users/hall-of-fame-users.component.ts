@@ -13,6 +13,7 @@ import {
   DefaultImgDirective,
   GeneralCardComponent,
   PositionColoringDirective,
+  RangeDirective,
   SectionTitleComponent,
   ShowMoreButtonComponent,
 } from '@mm/shared/ui';
@@ -40,6 +41,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     UserSearchControlComponent,
     ShowMoreButtonComponent,
     GeneralCardComponent,
+    RangeDirective,
   ],
   template: `
     <div
@@ -54,54 +56,54 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       <app-user-search-control
         class="md:scale-90 w-full md:w-[500px] xl:mt-3"
         (selectedUserEmitter)="onUserClick($event)"
-      ></app-user-search-control>
+      />
     </div>
 
     <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4 overflow-y-clip">
-      @if (hallOfFameUsersSignal(); as hallOfFameUses) {
-        <div class="lg:basis-4/6 xl:basis-3/6">
-          <div class="flex items-center justify-between lg:px-2 mb-4">
-            <!-- title -->
-            <app-section-title title="Top Users" class="mt-2" />
+      <div class="lg:basis-4/6 xl:basis-3/6">
+        <div class="flex items-center justify-between lg:px-2 mb-4">
+          <!-- title -->
+          <app-section-title title="Top Users" class="mt-2" />
 
-            <div class="flex items-center gap-4">
-              <!-- best/worst button -->
-              <button
-                (click)="showBestToggle()"
-                [color]="showBestSignal() ? 'accent' : 'warn'"
-                mat-stroked-button
-                type="button"
-              >
-                <mat-icon *ngIf="showBestSignal()">arrow_drop_up</mat-icon>
-                <mat-icon *ngIf="!showBestSignal()">arrow_drop_down</mat-icon>
-                {{ showBestSignal() ? 'Best Users' : ' Worst Users' }}
-              </button>
-            </div>
+          <div class="flex items-center gap-4">
+            <!-- best/worst button -->
+            <button
+              (click)="showBestToggle()"
+              [color]="showBestSignal() ? 'accent' : 'warn'"
+              mat-stroked-button
+              type="button"
+            >
+              <mat-icon *ngIf="showBestSignal()">arrow_drop_up</mat-icon>
+              <mat-icon *ngIf="!showBestSignal()">arrow_drop_down</mat-icon>
+              {{ showBestSignal() ? 'Best Users' : ' Worst Users' }}
+            </button>
           </div>
-
-          <!-- table -->
-          <app-general-card>
-            <app-portfolio-rank-table
-              (clickedItem)="onUserClick($event)"
-              [data]="displayPortfolioDataSignal()"
-              [template]="userTemplate"
-            />
-
-            <!-- show more button -->
-            <div class="flex justify-end">
-              <app-show-more-button
-                [itemsTotal]="displayPortfolioSignal().length"
-                [itemsLimit]="displayUsersLimit"
-                [(showMoreToggle)]="showMoreSignal"
-              />
-            </div>
-          </app-general-card>
         </div>
-        <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
-          <!-- daily best -->
-          <div class="@container">
-            <app-section-title title="Daily Gainers" class="mb-6" />
-            <div class="grid @xl:grid-cols-2 gap-3">
+
+        <!-- table -->
+        <app-general-card>
+          <app-portfolio-rank-table
+            (clickedItem)="onUserClick($event)"
+            [data]="displayPortfolioDataSignal()"
+            [template]="userTemplate"
+          />
+
+          <!-- show more button -->
+          <div class="flex justify-end">
+            <app-show-more-button
+              [itemsTotal]="displayPortfolioSignal().length"
+              [itemsLimit]="displayUsersLimit"
+              [(showMoreToggle)]="showMoreSignal"
+            />
+          </div>
+        </app-general-card>
+      </div>
+      <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
+        <!-- daily best -->
+        <div class="@container">
+          <app-section-title title="Daily Gainers" class="mb-6" />
+          <div class="grid @xl:grid-cols-2 gap-3">
+            @if (hallOfFameUsersSignal(); as hallOfFameUses) {
               @for (user of hallOfFameUses.bestDailyGains; track user.id) {
                 <app-user-display-item
                   (itemClicked)="onUserClick(user)"
@@ -112,13 +114,17 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
               } @empty {
                 <div class="@xl:col-span-2">No Data Found</div>
               }
-            </div>
+            } @else {
+              <div *ngRange="10" class="g-skeleton h-16"></div>
+            }
           </div>
+        </div>
 
-          <!-- daily worst -->
-          <div class="@container">
-            <app-section-title title="Daily Losers" class="mb-6" />
-            <div class="grid @xl:grid-cols-2 gap-3">
+        <!-- daily worst -->
+        <div class="@container">
+          <app-section-title title="Daily Losers" class="mb-6" />
+          <div class="grid @xl:grid-cols-2 gap-3">
+            @if (hallOfFameUsersSignal(); as hallOfFameUses) {
               @for (user of hallOfFameUses.worstDailyGains; track user.id) {
                 <app-user-display-item
                   (itemClicked)="onUserClick(user)"
@@ -129,10 +135,12 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
               } @empty {
                 <div class="@xl:col-span-2">No Data Found</div>
               }
-            </div>
+            } @else {
+              <div *ngRange="10" class="g-skeleton h-16"></div>
+            }
           </div>
         </div>
-      }
+      </div>
     </div>
 
     <!-- template for user data in table -->

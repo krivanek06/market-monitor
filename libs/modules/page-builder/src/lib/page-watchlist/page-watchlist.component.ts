@@ -37,7 +37,7 @@ import { SectionTitleComponent } from '@mm/shared/ui';
     <app-stock-summary-table
       (itemClickedEmitter)="onSummaryClick($event)"
       [stockSummaries]="userWatchListSymbolsSignal() | getStocksSummary: displayCheckValue | async"
-    ></app-stock-summary-table>
+    />
   `,
   styles: `
     :host {
