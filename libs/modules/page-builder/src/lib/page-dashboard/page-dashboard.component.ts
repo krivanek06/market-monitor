@@ -72,7 +72,11 @@ import { map, pipe, startWith } from 'rxjs';
       <div
         class="flex flex-row max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2"
       >
-        <app-general-card class="sm:col-span-2 max-sm:min-w-[360px]" title="Account">
+        <app-general-card
+          class="sm:col-span-2 max-sm:min-w-[360px]"
+          title="Account"
+          [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
+        >
           <app-portfolio-state
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
@@ -81,7 +85,11 @@ import { map, pipe, startWith } from 'rxjs';
           ></app-portfolio-state>
         </app-general-card>
 
-        <app-general-card class="max-sm:min-w-[275px]" title="Risk">
+        <app-general-card
+          class="max-sm:min-w-[275px]"
+          title="Risk"
+          [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
+        >
           <app-portfolio-state-risk
             [portfolioRisk]="authenticationUserService.state.getUserDataNormal()?.portfolioRisk"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
@@ -89,7 +97,11 @@ import { map, pipe, startWith } from 'rxjs';
           ></app-portfolio-state-risk>
         </app-general-card>
 
-        <app-general-card class="max-sm:min-w-[275px]" title="Transactions">
+        <app-general-card
+          class="max-sm:min-w-[275px]"
+          title="Transactions"
+          [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
+        >
           <app-portfolio-state-transactions
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
