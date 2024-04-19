@@ -74,7 +74,9 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
     } satisfies Partial<UserData>);
 
     // log
-    console.log(`Updated user: ${userData.personal.displayName}, ${userData.id}`);
+    console.log(
+      `Updated user: ${userData.personal.displayName}, ${userData.id}, holdings: ${portfolioStateHoldings.holdings.length}`,
+    );
   } catch (e) {
     console.warn(`Error for user: ${userData.personal.displayName}, ${userData.id}: ${e}`);
   }

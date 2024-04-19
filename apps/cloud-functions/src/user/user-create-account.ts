@@ -4,8 +4,6 @@ import {
   UserAccountEnum,
   UserData,
   UserPersonalInfo,
-  UserPortfolioTransaction,
-  UserWatchList,
 } from '@mm/api-types';
 import { createEmptyPortfolioState, createNameInitials, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
@@ -46,20 +44,19 @@ export const userCreate = async (user: UserRecord, additional: CreateUserAdditio
     additional,
   );
 
-  const newTransactions: UserPortfolioTransaction = {
-    transactions: [],
-  };
-
-  const newWatchList: UserWatchList = {
-    createdDate: getCurrentDateDefaultFormat(),
-    data: [],
-  };
   // update user
   await userDocumentRef(newUserData.id).set(newUserData);
+
   // update transactions
-  await userDocumentTransactionHistoryRef(newUserData.id).set(newTransactions);
+  await userDocumentTransactionHistoryRef(newUserData.id).set({
+    transactions: [],
+  });
+
   // update watchList
-  await userDocumentWatchListRef(newUserData.id).set(newWatchList);
+  await userDocumentWatchListRef(newUserData.id).set({
+    createdDate: getCurrentDateDefaultFormat(),
+    data: [],
+  });
 
   // return data
   return newUserData;

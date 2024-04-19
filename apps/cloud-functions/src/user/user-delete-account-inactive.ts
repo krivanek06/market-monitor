@@ -11,7 +11,7 @@ import { userDeleteAccountById } from './user-delete-account';
  */
 export const userDeleteAccountInactive = async () => {
   await deleteDemoAccounts();
-  await deleteNormalAccounts();
+  // await deleteNormalAccounts();
 };
 
 const deleteDemoAccounts = async () => {

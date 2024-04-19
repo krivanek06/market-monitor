@@ -4,13 +4,7 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
 import { reloadMarketOverview } from '../market-functions/market-overview';
-import {
-  userDeactivateInactiveAccounts,
-  userDeleteAccountInactive,
-  userHallOfFame,
-  userPortfolioRank,
-  userPortfolioUpdate,
-} from '../user';
+import { userHallOfFame, userPortfolioRank, userPortfolioUpdate } from '../user';
 import { measureFunctionExecutionTime } from '../utils';
 
 /**
@@ -39,21 +33,21 @@ export const run_scheduler_update_groups = onSchedule(
   },
 );
 
-export const run_scheduler_once_a_day = onSchedule(
-  {
-    timeoutSeconds: 200,
-    schedule: '0 1 * * *',
-  },
-  async () => {
-    measureFunctionExecutionTime(async () => {
-      console.log('[Users]: deactivate necessary accounts');
-      await userDeactivateInactiveAccounts();
+// export const run_scheduler_once_a_day = onSchedule(
+//   {
+//     timeoutSeconds: 200,
+//     schedule: '0 1 * * *',
+//   },
+//   async () => {
+//     measureFunctionExecutionTime(async () => {
+//       console.log('[Users]: deactivate necessary accounts');
+//       await userDeactivateInactiveAccounts();
 
-      console.log('[Users]: delete demo or inactive accounts');
-      await userDeleteAccountInactive();
-    });
-  },
-);
+//       console.log('[Users]: delete demo or inactive accounts');
+//       await userDeleteAccountInactive();
+//     });
+//   },
+// );
 
 export const run_scheduler_once_per_week = onSchedule(
   {
