@@ -82,9 +82,10 @@ import {
             <div class="grid @xl:grid-cols-2 gap-3">
               @for (group of hallOfFameGroups.bestDailyGains; track group.id) {
                 <app-group-display-item
-                  (click)="onGroupClick(group)"
+                  (itemClicked)="onGroupClick(group)"
+                  [clickable]="true"
                   [groupData]="group"
-                  class="g-clickable-hover-color mb-1 rounded-lg p-2"
+                  class="mb-1 rounded-lg p-2"
                 />
               } @empty {
                 <div class="@xl:col-span-2">No Data Found</div>
@@ -98,9 +99,10 @@ import {
             <div class="grid @xl:grid-cols-2 gap-3">
               @for (group of hallOfFameGroups.worstDailyGains; track group.id) {
                 <app-group-display-item
-                  (click)="onGroupClick(group)"
+                  (itemClicked)="onGroupClick(group)"
+                  [clickable]="true"
                   [groupData]="group"
-                  class="g-clickable-hover-color mb-1 rounded-lg p-2"
+                  class="mb-1 rounded-lg p-2"
                 />
               } @empty {
                 <div>No Data Found</div>

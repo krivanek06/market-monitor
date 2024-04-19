@@ -79,7 +79,7 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
                 <app-group-display-item
                   [groupData]="group"
                   [clickable]="true"
-                  (click)="onReceivedInvitationClick(group)"
+                  (itemClicked)="onReceivedInvitationClick(group)"
                   class="flex-1"
                 />
                 <button
@@ -99,7 +99,7 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
                 <app-group-display-item
                   [groupData]="group"
                   [clickable]="true"
-                  (click)="onSentRequestClick(group)"
+                  (itemClicked)="onSentRequestClick(group)"
                   class="flex-1"
                 />
                 <button
@@ -127,7 +127,7 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
           <div class="flex flex-col gap-3">
             <app-group-display-card
               *ngFor="let group of groups.groupOwner"
-              (groupClickEmitter)="onGroupClick(group)"
+              (itemClicked)="onGroupClick(group)"
               [groupData]="group"
               [clickable]="true"
             ></app-group-display-card>
@@ -140,7 +140,7 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
           <div class="flex flex-col gap-3">
             <app-group-display-card
               *ngFor="let group of groups.groupMember"
-              (groupClickEmitter)="onGroupClick(group)"
+              (itemClicked)="onGroupClick(group)"
               [groupData]="group"
               [clickable]="true"
             ></app-group-display-card>

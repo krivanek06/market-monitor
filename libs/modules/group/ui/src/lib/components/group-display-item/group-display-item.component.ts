@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { GROUP_MEMBER_LIMIT, GroupBase } from '@mm/api-types';
-import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
+import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-group-display-item',
@@ -16,16 +16,14 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
     MatIconModule,
     PercentageIncreaseDirective,
     MatRippleModule,
+    ClickableDirective,
   ],
   template: `
     <div
       matRipple
       [matRippleCentered]="true"
-      [matRippleDisabled]="!clickable()"
+      [matRippleDisabled]="!clickableDirective.clickable()"
       [matRippleUnbounded]="false"
-      [ngClass]="{
-        'g-clickable-hover': clickable()
-      }"
       class="flex flex-col gap-1 p-2 @container"
     >
       <div class="flex gap-4">
@@ -88,10 +86,17 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    {
+      directive: ClickableDirective,
+      inputs: ['clickable'],
+      outputs: ['itemClicked'],
+    },
+  ],
 })
 export class GroupDisplayItemComponent {
+  clickableDirective = inject(ClickableDirective);
   groupData = input.required<GroupBase>();
-  clickable = input(false);
 
   memberLimit = GROUP_MEMBER_LIMIT;
 }

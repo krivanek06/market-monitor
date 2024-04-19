@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { GroupData } from '@mm/api-types';
 import { GroupDisplayInfoComponent } from '@mm/group/ui';
 import { PortfolioBalancePieChartComponent } from '@mm/portfolio/ui';
+import { ClickableDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-group-display-card',
@@ -17,21 +18,18 @@ import { PortfolioBalancePieChartComponent } from '@mm/portfolio/ui';
     MatRippleModule,
     MatIconModule,
     PortfolioBalancePieChartComponent,
+    ClickableDirective,
   ],
   template: `
     <mat-card
       matRipple
       [matRippleCentered]="true"
-      [matRippleDisabled]="!clickable()"
+      [matRippleDisabled]="!clickableDirective.clickable()"
       [matRippleUnbounded]="false"
       appearance="outlined"
       class="shadow-md"
-      (click)="onClick()"
-      (keydown.enter)="onClick()"
-      [tabIndex]="clickable() ? 0 : -1"
       [ngClass]="{
-        'g-overlay': groupData().isClosed,
-        'g-clickable-hover-color': clickable()
+        'g-overlay': groupData().isClosed
       }"
     >
       <mat-card-content>
@@ -65,15 +63,15 @@ import { PortfolioBalancePieChartComponent } from '@mm/portfolio/ui';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    {
+      directive: ClickableDirective,
+      inputs: ['clickable'],
+      outputs: ['itemClicked'],
+    },
+  ],
 })
 export class GroupDisplayCardComponent {
-  groupClickEmitter = output<void>();
+  clickableDirective = inject(ClickableDirective);
   groupData = input.required<GroupData>();
-  clickable = input<boolean>();
-
-  onClick(): void {
-    if (this.clickable()) {
-      this.groupClickEmitter.emit();
-    }
-  }
 }

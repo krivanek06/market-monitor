@@ -1,33 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ColorScheme } from '@mm/shared/data-access';
-import { PositionColoringDirective } from '../../../directives';
+import { ClickableDirective, PositionColoringDirective } from '../../../directives';
 
 @Component({
   selector: 'app-position-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatRippleModule, MatIconModule, PositionColoringDirective],
+  imports: [CommonModule, MatCardModule, MatRippleModule, MatIconModule, PositionColoringDirective, ClickableDirective],
   template: `
     <mat-card
       appearance="outlined"
       matRipple
       [matRippleCentered]="true"
-      [matRippleDisabled]="!clickable()"
+      [matRippleDisabled]="!clickableDirective.clickable()"
       [matRippleUnbounded]="false"
       class="shadow-md pt-8 pb-3 px-6"
       appPositionColoring
       [position]="currentPositions()"
       [defaultPositionColor]="ColorScheme.GRAY_LIGHT_VAR"
       positionType="background-color"
-      (click)="onClick()"
-      [ngClass]="{
-        'g-clickable-hover-color': clickable()
-      }"
-      (keydown.enter)="onClick()"
-      [tabIndex]="clickable() ? 0 : -1"
     >
       <div class="relative">
         <!-- position -->
@@ -67,13 +61,18 @@ import { PositionColoringDirective } from '../../../directives';
       height: inherit;
     }
   `,
+  hostDirectives: [
+    {
+      directive: ClickableDirective,
+      inputs: ['clickable'],
+      outputs: ['itemClicked'],
+    },
+  ],
 })
 export class PositionCardComponent {
-  clickedEmitter = output<void>();
-
+  protected clickableDirective = inject(ClickableDirective);
   currentPositions = input.required<number>();
   previousPosition = input<number | null | undefined>();
-  clickable = input(false);
 
   ColorScheme = ColorScheme;
 
@@ -82,10 +81,4 @@ export class PositionCardComponent {
     const previousPosition = this.previousPosition();
     return previousPosition && previousPosition - this.currentPositions() > 0;
   });
-
-  onClick(): void {
-    if (this.clickable()) {
-      this.clickedEmitter.emit();
-    }
-  }
 }

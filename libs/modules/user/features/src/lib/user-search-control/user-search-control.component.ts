@@ -53,7 +53,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, map, startWith,
         <!-- loaded data -->
         @for (user of optionsSignal(); track user.id; let last = $last) {
           <mat-option [value]="user" class="py-2 rounded-md">
-            <app-user-display-item [userData]="user"></app-user-display-item>
+            <app-user-display-item [userData]="user" />
             <div *ngIf="!last" class="mt-2">
               <mat-divider></mat-divider>
             </div>

@@ -104,9 +104,9 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
             <div class="grid @xl:grid-cols-2 gap-3">
               @for (user of hallOfFameUses.bestDailyGains; track user.id) {
                 <app-user-display-item
-                  (click)="onUserClick(user)"
-                  class="g-clickable-hover-color mb-1 rounded-lg p-2"
-                  [showLoginButton]="false"
+                  (itemClicked)="onUserClick(user)"
+                  [clickable]="true"
+                  class="mb-1 rounded-lg p-2"
                   [userData]="user"
                 />
               } @empty {
@@ -121,9 +121,9 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
             <div class="grid @xl:grid-cols-2 gap-3">
               @for (user of hallOfFameUses.worstDailyGains; track user.id) {
                 <app-user-display-item
-                  (click)="onUserClick(user)"
-                  class="g-clickable-hover-color mb-1 rounded-lg p-2"
-                  [showLoginButton]="false"
+                  (itemClicked)="onUserClick(user)"
+                  [clickable]="true"
+                  class="mb-1 rounded-lg p-2"
                   [userData]="user"
                 />
               } @empty {

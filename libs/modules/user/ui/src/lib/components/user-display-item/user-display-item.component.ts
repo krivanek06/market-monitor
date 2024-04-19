@@ -2,14 +2,25 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT, UserBase } from '@mm/api-types';
-import { DefaultImgDirective, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
+import {
+  ClickableDirective,
+  DefaultImgDirective,
+  LargeNumberFormatterPipe,
+  PercentageIncreaseDirective,
+} from '@mm/shared/ui';
 import { isBefore, subDays } from 'date-fns';
 
 @Component({
   selector: 'app-user-display-item',
   standalone: true,
-  imports: [CommonModule, DefaultImgDirective, LargeNumberFormatterPipe, MatIconModule, PercentageIncreaseDirective],
-
+  imports: [
+    CommonModule,
+    DefaultImgDirective,
+    LargeNumberFormatterPipe,
+    MatIconModule,
+    PercentageIncreaseDirective,
+    ClickableDirective,
+  ],
   template: `
     <div class="flex gap-4">
       <img appDefaultImg [src]="userData().personal.photoURL" alt="User Image" class="w-14 h-14 rounded-md" />
@@ -19,10 +30,6 @@ import { isBefore, subDays } from 'date-fns';
         <div class="flex">
           <div class="text-wt-gray-dark w-[80px]">Name:</div>
           <div class="mr-4">{{ userData().personal.displayName }}</div>
-          <!-- active user -->
-          <mat-icon *ngIf="showLoginButton()" [color]="isUserActive ? 'accent' : 'warn'" class="hidden sm:block">
-            radio_button_checked
-          </mat-icon>
         </div>
 
         <div class="flex">
@@ -52,10 +59,16 @@ import { isBefore, subDays } from 'date-fns';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    {
+      directive: ClickableDirective,
+      inputs: ['clickable'],
+      outputs: ['itemClicked'],
+    },
+  ],
 })
 export class UserDisplayItemComponent {
   userData = input.required<UserBase>();
-  showLoginButton = input(true);
 
   USER_ACTIVE_ACCOUNT_TIME_DAYS = USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT;
 
