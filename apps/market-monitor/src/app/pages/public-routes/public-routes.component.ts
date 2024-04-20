@@ -64,7 +64,7 @@ export const route: Routes = [
       {
         path: ROUTES_MAIN.MARKET,
         title: 'Market',
-        loadChildren: () => import('./subpages/market.component').then((m) => m.route),
+        loadComponent: () => import('./subpages/market.component').then((m) => m.MarketComponent),
       },
       {
         path: ROUTES_MAIN.MARKET_CALENDAR,
