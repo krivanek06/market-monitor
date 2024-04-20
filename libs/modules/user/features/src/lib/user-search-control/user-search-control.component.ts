@@ -107,6 +107,10 @@ export class UserSearchControlComponent implements ControlValueAccessor {
                 .slice(0, 10) ?? [],
             ),
       ),
+      catchError((e) => {
+        console.log(e);
+        return [];
+      }),
     ),
     { initialValue: [] },
   );

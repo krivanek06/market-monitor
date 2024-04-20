@@ -73,7 +73,7 @@ import { map, pipe, startWith } from 'rxjs';
         class="flex flex-row max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2"
       >
         <app-general-card
-          class="sm:col-span-2 max-sm:min-w-[360px]"
+          class="sm:col-span-2 max-sm:min-w-[360px] min-h-[210px]"
           title="Account"
           [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
         >
@@ -86,7 +86,7 @@ import { map, pipe, startWith } from 'rxjs';
         </app-general-card>
 
         <app-general-card
-          class="max-sm:min-w-[275px]"
+          class="max-sm:min-w-[275px] min-h-[210px]"
           title="Risk"
           [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
         >
@@ -98,7 +98,7 @@ import { map, pipe, startWith } from 'rxjs';
         </app-general-card>
 
         <app-general-card
-          class="max-sm:min-w-[275px]"
+          class="max-sm:min-w-[275px] min-h-[210px]"
           title="Transactions"
           [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
         >
