@@ -107,6 +107,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
                 <app-user-display-item
                   (itemClicked)="onUserClick(user)"
                   [clickable]="true"
+                  [showDailyPortfolioChange]="true"
                   class="mb-1 rounded-lg p-2"
                   [userData]="user"
                 />
@@ -128,6 +129,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
                 <app-user-display-item
                   (itemClicked)="onUserClick(user)"
                   [clickable]="true"
+                  [showDailyPortfolioChange]="true"
                   class="mb-1 rounded-lg p-2"
                   [userData]="user"
                 />

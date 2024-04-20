@@ -85,6 +85,7 @@ import {
                 <app-group-display-item
                   (itemClicked)="onGroupClick(group)"
                   [clickable]="true"
+                  [showDailyPortfolioChange]="true"
                   [groupData]="group"
                   class="mb-1 rounded-lg p-2"
                 />
@@ -106,6 +107,7 @@ import {
                 <app-group-display-item
                   (itemClicked)="onGroupClick(group)"
                   [clickable]="true"
+                  [showDailyPortfolioChange]="true"
                   [groupData]="group"
                   class="mb-1 rounded-lg p-2"
                 />

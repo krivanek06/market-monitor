@@ -40,7 +40,19 @@ import {
           <div class="text-wt-gray-dark w-[80px]">Balance:</div>
           <div class="flex items-center gap-2">
             <div>{{ userData().portfolioState.balance | largeNumberFormatter: false : true }}</div>
+
+            <!-- total portfolio change -->
             <div
+              *ngIf="!showDailyPortfolioChange()"
+              appPercentageIncrease
+              [changeValues]="{
+                changePercentage: userData().portfolioState.totalGainsPercentage
+              }"
+            ></div>
+
+            <!-- daily portfolio change -->
+            <div
+              *ngIf="showDailyPortfolioChange()"
               appPercentageIncrease
               [changeValues]="{
                 changePercentage: userData().portfolioState.previousBalanceChangePercentage
@@ -72,4 +84,8 @@ import {
 })
 export class UserDisplayItemComponent {
   userData = input.required<UserBase>();
+  /**
+   * whether to show daily portfolio change or total portfolio change
+   */
+  showDailyPortfolioChange = input(false);
 }

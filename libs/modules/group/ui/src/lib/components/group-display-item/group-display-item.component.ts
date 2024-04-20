@@ -50,15 +50,29 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
             </div>
 
             <!-- portfolio -->
-            <div
-              *ngIf="!groupData().isClosed"
-              appPercentageIncrease
-              [useCurrencySign]="true"
-              [changeValues]="{
-                change: groupData().portfolioState.totalGainsValue,
-                changePercentage: groupData().portfolioState.totalGainsPercentage
-              }"
-            ></div>
+            @if (!groupData().isClosed) {
+              <!-- total portfolio change -->
+              <div
+                *ngIf="!showDailyPortfolioChange()"
+                appPercentageIncrease
+                [useCurrencySign]="true"
+                [changeValues]="{
+                  change: groupData().portfolioState.totalGainsValue,
+                  changePercentage: groupData().portfolioState.totalGainsPercentage
+                }"
+              ></div>
+
+              <!-- daily portfolio change -->
+              <div
+                *ngIf="showDailyPortfolioChange()"
+                appPercentageIncrease
+                [useCurrencySign]="true"
+                [changeValues]="{
+                  change: groupData().portfolioState.previousBalanceChange,
+                  changePercentage: groupData().portfolioState.previousBalanceChangePercentage
+                }"
+              ></div>
+            }
             <!-- closed group display message -->
             <div *ngIf="groupData().isClosed" class="text-wt-danger">(Closed)</div>
           </div>
@@ -97,6 +111,11 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
 export class GroupDisplayItemComponent {
   clickableDirective = inject(ClickableDirective);
   groupData = input.required<GroupBase>();
+
+  /**
+   * whether to show daily portfolio change or total portfolio change
+   */
+  showDailyPortfolioChange = input(false);
 
   memberLimit = GROUP_MEMBER_LIMIT;
 }
