@@ -32,13 +32,13 @@ export class UserAccountTypeDirective {
       return;
     }
     const hasAccess = hasUserAccess(userData, accountType);
-    console.log('[UserAccountType]: changing access', hasAccess);
+
     if (hasAccess) {
       this.viewContainerRef.createEmbeddedView(this.templateRef);
     } else {
       this.viewContainerRef.clear();
     }
-    this.cd.markForCheck();
+    this.cd.detectChanges();
   });
 }
 

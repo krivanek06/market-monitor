@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   USER_DEFAULT_STARTING_CASH,
   UserAccountBasicTypes,
@@ -23,6 +24,13 @@ export const userCreateAccountCall = onCall(async (request) => {
     throw new HttpsError('aborted', 'User is not authenticated');
   }
 
+  // check if user already exists
+  const existingUser = await userDocumentRef(userAuthId).get();
+  if (existingUser.data()) {
+    throw new HttpsError('aborted', 'User already exists');
+  }
+
+  // create new user
   const user = await getAuth().getUser(userAuthId);
   return userCreate(user);
 });
@@ -37,7 +45,7 @@ export const userCreate = async (user: UserRecord, additional: CreateUserAdditio
       displayName: userNamePrefix,
       displayNameLowercase: userNamePrefix.toLowerCase(),
       displayNameInitials: createNameInitials(userNamePrefix),
-      photoURL: user.photoURL ?? null,
+      photoURL: user.photoURL ?? faker.image.avatarGitHub(),
       providerId: user.providerData[0].providerId ?? 'unknown',
       email: user.email ?? 'unknown',
     },

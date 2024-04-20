@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   AvailableQuotes,
   CalendarDividend,
@@ -6,6 +7,7 @@ import {
   CalendarStockIPO,
   ChartDataType,
   HistoricalPrice,
+  IsStockMarketOpenExtend,
   MarketOverview,
   MarketOverviewKey,
   MarketOverviewSubkeyReadable,
@@ -26,6 +28,8 @@ import { ApiCacheService } from '../utils';
   providedIn: 'root',
 })
 export class MarketApiService extends ApiCacheService {
+  getIsMarketOpenSignal = toSignal(this.getIsMarketOpen());
+
   getSymbolSummaries(symbols: string[] | undefined): Observable<SymbolSummary[]> {
     if (!symbols || symbols.length === 0) {
       return of([]);
@@ -128,6 +132,13 @@ export class MarketApiService extends ApiCacheService {
       `https://get-basic-data.krivanek1234.workers.dev/?type=quote-by-type&quoteType=${quoteType}`,
       this.validity10Min,
     ).pipe(map((data) => data.filter((quote) => !!quote.price && !!quote.name)));
+  }
+
+  getIsMarketOpen(): Observable<IsStockMarketOpenExtend> {
+    return this.getData<IsStockMarketOpenExtend>(
+      `https://get-basic-data.krivanek1234.workers.dev/?type=market-is-open`,
+      this.validity30Min,
+    );
   }
 
   getMarketCalendarDividends(month: string | number, year: string | number): Observable<CalendarDividend[]> {

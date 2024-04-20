@@ -53,6 +53,11 @@ export class DialogServiceUtil {
       return;
     }
 
+    if (code === 'auth/too-many-requests ') {
+      this.showNotificationBar('Too many requests', 'error');
+      return;
+    }
+
     // check if error contains the work INTERNAL
     if (message === 'INTERNAL') {
       this.showNotificationBar('Something went wrong', 'error');

@@ -16,7 +16,8 @@ import { Functions, httpsCallable } from '@angular/fire/functions';
 import { UserApiService } from '@mm/api-client';
 import { UserAccountBasicTypes, UserCreateDemoAccountInput, UserData, UserDataDemoData } from '@mm/api-types';
 import { IS_DEV_TOKEN } from '@mm/shared/data-access';
-import { BehaviorSubject, Observable, Subject, catchError, firstValueFrom, from, map, of, switchMap } from 'rxjs';
+import { filterNil } from 'ngxtension/filter-nil';
+import { BehaviorSubject, Observable, Subject, catchError, firstValueFrom, from, map, of, switchMap, take } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
 
 @Injectable({
@@ -151,24 +152,24 @@ export class AuthenticationAccountService {
     this.authenticatedUser$
       .pipe(
         switchMap((user) =>
-          this.userApiService.getUserById(user?.uid).pipe(
-            switchMap((userData) =>
-              userData
-                ? of(userData)
-                : user
-                  ? from(this.userCreateAccount()).pipe(
-                      catchError((error) => {
-                        console.log(error);
-                        return of(null);
-                      }),
-                    )
-                  : of(null),
-            ),
-          ),
+          user
+            ? this.userApiService.getUserById(user.uid).pipe(
+                switchMap((userData) =>
+                  userData
+                    ? of(userData)
+                    : from(this.userCreateAccount()).pipe(
+                        catchError((error) => {
+                          console.log(error);
+                          return of(null);
+                        }),
+                      ),
+                ),
+              )
+            : of(null),
         ),
       )
       .subscribe((userData) => {
-        console.log('UPDATING USER', userData);
+        console.log('[Auth]: UPDATING USER', userData);
         // update user data
         this.authenticatedUserData$.next(userData);
 
@@ -180,8 +181,21 @@ export class AuthenticationAccountService {
 
   private initAuthenticationUser(): void {
     this.auth.onAuthStateChanged((user) => {
-      console.log('authentication state change', user);
+      console.log('[Auth]: authentication state change', user);
       this.authenticatedUser$.next(user);
+
+      // update account to be active
+      if (user) {
+        this.authenticatedUserData$
+          .asObservable()
+          .pipe(filterNil(), take(1))
+          .subscribe((userData) => {
+            console.log('[Auth]: update user activate account');
+            this.userApiService.updateUser(userData.id, {
+              isAccountActive: true,
+            });
+          });
+      }
     });
   }
 

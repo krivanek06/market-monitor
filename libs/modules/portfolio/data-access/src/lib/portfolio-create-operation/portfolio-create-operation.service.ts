@@ -15,12 +15,7 @@ import {
   UserAccountEnum,
   UserData,
 } from '@mm/api-types';
-import {
-  dateFormatDate,
-  dateGetDetailsInformationFromDate,
-  formatToLastLastWorkingDate,
-  roundNDigits,
-} from '@mm/shared/general-util';
+import { dateFormatDate, dateGetDetailsInformationFromDate, roundNDigits } from '@mm/shared/general-util';
 import { firstValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -35,9 +30,6 @@ export class PortfolioCreateOperationService {
     userData: UserData,
     data: PortfolioTransactionCreate,
   ): Promise<PortfolioTransaction> {
-    // if weekend or holiday is used format to last friday
-    data.date = formatToLastLastWorkingDate(data.date);
-
     // load historical price for symbol on date
     const symbolPrice = await firstValueFrom(
       this.stocksApiService.getStockHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date)),

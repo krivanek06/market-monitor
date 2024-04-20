@@ -14,13 +14,7 @@ import {
   UserDataDemoData,
   UserPortfolioTransaction,
 } from '@mm/api-types';
-import {
-  dateFormatDate,
-  formatToLastLastWorkingDate,
-  getCurrentDateDefaultFormat,
-  getRandomNumber,
-  roundNDigits,
-} from '@mm/shared/general-util';
+import { dateFormatDate, getCurrentDateDefaultFormat, getRandomNumber, roundNDigits } from '@mm/shared/general-util';
 import { addDays, format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https';
@@ -134,9 +128,6 @@ const createPortfolioCreateOperation = async (
   userData: UserData,
   userTransactions: PortfolioTransaction[],
 ): Promise<PortfolioTransaction> => {
-  // if weekend is used format to last friday
-  data.date = formatToLastLastWorkingDate(data.date);
-
   // load historical price for symbol on date
   const symbolPrice = await getStockHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date));
 

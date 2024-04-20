@@ -2,7 +2,6 @@ import {
   differenceInBusinessDays,
   differenceInDays,
   eachDayOfInterval,
-  endOfDay,
   endOfMonth,
   format,
   getDaysInMonth,
@@ -18,7 +17,6 @@ import {
   subMinutes,
   subYears,
 } from 'date-fns';
-import { STOCK_MARKET_CLOSED_DATES } from './constants';
 import { Spread } from './typescript.util';
 
 export type DateServiceUtilDateInformation = {
@@ -54,22 +52,6 @@ export const dateGetDayDifference = (first: DateInput, second: DateInput): numbe
   const firstDate = new Date(first);
   const secondDate = new Date(second);
   return Math.abs(differenceInDays(firstDate, secondDate));
-};
-
-export const isStockMarketHolidayDate = (input: DateInput): boolean => {
-  const formattedDate = new Date(input);
-
-  // check if it's a holiday when the market is closed
-  for (let i = 0; i < STOCK_MARKET_CLOSED_DATES.length; i++) {
-    const monthFormatted = format(formattedDate, 'MM'); //  01, 02, ..., 12
-    const dayFormatted = format(formattedDate, 'dd'); // 	01, 02, ..., 31
-    const comparedDate = `${monthFormatted}-${dayFormatted}`;
-    //console.log(comparedDate, STOCK_MARKET_CLOSED_DATES[i]);
-    if (comparedDate === STOCK_MARKET_CLOSED_DATES[i]) {
-      return true;
-    }
-  }
-  return false;
 };
 
 /**
@@ -259,21 +241,4 @@ export const checkDataValidityMinutes = <T extends { lastUpdate: string | Date }
 
 export const getPreviousDate = (date: DateInput): string => {
   return subDays(new Date(date), 1).toDateString();
-};
-
-/**
- * based on provided date it will format on last working date, prevents:
- * - selecting weekend
- * - selecting future date
- * - selecting holiday
- * @param date
- * @returns
- */
-export const formatToLastLastWorkingDate = (date: DateInput): string => {
-  let usedDate = new Date(date);
-  while (isStockMarketHolidayDate(usedDate) || isWeekend(usedDate)) {
-    usedDate = endOfDay(subDays(new Date(usedDate), 1));
-  }
-
-  return format(usedDate, 'yyyy-MM-dd HH:mm:ss');
 };

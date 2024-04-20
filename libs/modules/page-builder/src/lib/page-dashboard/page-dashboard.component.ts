@@ -72,6 +72,7 @@ import { map, pipe, startWith } from 'rxjs';
       <div
         class="flex flex-row max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2"
       >
+        <!-- portfolio state -->
         <app-general-card
           class="sm:col-span-2 max-sm:min-w-[360px] min-h-[210px]"
           title="Account"
@@ -85,6 +86,7 @@ import { map, pipe, startWith } from 'rxjs';
           ></app-portfolio-state>
         </app-general-card>
 
+        <!-- portfolio risk -->
         <app-general-card
           class="max-sm:min-w-[275px] min-h-[210px]"
           title="Risk"
@@ -97,6 +99,7 @@ import { map, pipe, startWith } from 'rxjs';
           ></app-portfolio-state-risk>
         </app-general-card>
 
+        <!-- portfolio transactions -->
         <app-general-card
           class="max-sm:min-w-[275px] min-h-[210px]"
           title="Transactions"
@@ -127,6 +130,7 @@ import { map, pipe, startWith } from 'rxjs';
         <!-- select chart title -->
         <div class="flex flex-col sm:flex-row items-center gap-4">
           <app-section-title title="Portfolio Growth" class="mr-6 max-lg:flex-1" />
+          <!-- do not show buttons if not enough data -->
           @if (portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0) {
             <button
               (click)="onPortfolioChangeChart()"

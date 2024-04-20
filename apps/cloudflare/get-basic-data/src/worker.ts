@@ -1,5 +1,6 @@
 import { getCalendarData } from './get-calendar-data';
 import { getInstitutionalPortfolioDatesWrapper } from './get-institutional-portfolio';
+import { getIsMarketOpenWrapper } from './get-is-market-open';
 import { getMarketOverData, getMarketOverview, saveMarketOverview } from './get-market-overview';
 import { getQuotesByTypeWrapper } from './get-quotes-by-type';
 import { getTopSymbols } from './get-top-symbols';
@@ -12,7 +13,8 @@ type GetBasicDataType =
 	| 'calendar'
 	| 'market-overview'
 	| 'market-overview-save'
-	| 'market-overview-data';
+	| 'market-overview-data'
+	| 'market-is-open';
 
 /**
  * One endpoint for executing and caching basic HTTP requests
@@ -53,6 +55,10 @@ export default {
 
 		if (type === 'quote-by-type') {
 			return getQuotesByTypeWrapper(env, searchParams);
+		}
+
+		if (type === 'market-is-open') {
+			return getIsMarketOpenWrapper(env);
 		}
 
 		return new Response('Unsupported request', { status: 400 });

@@ -22,6 +22,8 @@ import {
   HistoricalLoadingPeriodsDates,
   HistoricalPrice,
   HistoricalPriceAPI,
+  IsStockMarketOpen,
+  IsStockMarketOpenExtend,
   MarketOverviewSubKey,
   MostPerformingStocks,
   News,
@@ -687,6 +689,34 @@ export const getEconomicData = async (endpointKey?: MarketOverviewSubKey<'genera
   } catch (e) {
     console.log('error in getEconomicData', e);
     return [];
+  }
+};
+
+export const getIsMarketOpen = async (exchange: string = 'NYSE'): Promise<IsStockMarketOpenExtend | null> => {
+  const url = `https://financialmodelingprep.com/api/v3/is-the-market-open?exchange=${exchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+
+  try {
+    const response = await fetch(url);
+    const data = (await response.json()) as IsStockMarketOpen;
+
+    const currentYear = new Date().getFullYear();
+
+    // { "New Years Day": "2019-01-01", "Good Friday": "2019-04-19", ... }
+    const currentHoliday =
+      data.stockMarketHolidays.find((holiday) => String(holiday['year']) === String(currentYear)) ?? {};
+
+    // get only the dates
+    const currentHolidayDates = Object.values(currentHoliday);
+
+    const holidaysThisYear = {
+      ...data,
+      currentHoliday: currentHolidayDates,
+    } satisfies IsStockMarketOpenExtend;
+
+    return holidaysThisYear;
+  } catch (e) {
+    console.log('error in getTreasuryRates', e);
+    return null;
   }
 };
 

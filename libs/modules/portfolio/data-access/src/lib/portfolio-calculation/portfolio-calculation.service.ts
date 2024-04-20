@@ -48,6 +48,9 @@ export class PortfolioCalculationService {
   }
 
   getPortfolioGrowth(portfolioAssets: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
+    // get holidays
+    const currentHoliday = this.marketApiService.getIsMarketOpenSignal()?.currentHoliday ?? [];
+
     // get soonest date
     const soonestDate = portfolioAssets.reduce(
       (acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc),
@@ -60,11 +63,16 @@ export class PortfolioCalculationService {
     // result of portfolio growth
     const result: PortfolioGrowth[] = [];
 
-    // accumulate return values, portfolioAssets for specific symbols can me shorter than today
-    const accumulatedReturn = new Set<number>();
+    // accumulate return values, because it is increasing per symbol - {symbol: accumulatedReturn}
+    const accumulatedReturn = new Map<string, number>();
 
     // loop though all generated dates
     for (const gDate of generatedDates) {
+      // check if holiday
+      if (currentHoliday.includes(gDate)) {
+        continue;
+      }
+
       // initial object
       const portfolioItem: PortfolioGrowth = {
         date: gDate,
@@ -80,11 +88,12 @@ export class PortfolioCalculationService {
 
         // not found
         if (!currentPortfolioAsset) {
+          console.log('data not found', gDate);
           continue;
         }
 
         // save accumulated return
-        accumulatedReturn.add(currentPortfolioAsset.accumulatedReturn);
+        accumulatedReturn.set(portfolioAsset.symbol, currentPortfolioAsset.accumulatedReturn);
 
         // add values to initial object
         portfolioItem.marketTotalValue += currentPortfolioAsset.marketTotalValue;
@@ -94,16 +103,16 @@ export class PortfolioCalculationService {
       }
 
       // add accumulated return to total balance
-      portfolioItem.totalBalanceValue += Array.from(accumulatedReturn).reduce((acc, curr) => acc + curr, 0);
+      portfolioItem.totalBalanceValue += Array.from(accumulatedReturn.entries()).reduce(
+        (acc, curr) => acc + curr[1],
+        0,
+      );
 
       // save result
       result.push(portfolioItem);
     }
 
-    // ignore holidays and weekends
-    const resultFiltered = result.filter((d) => d.marketTotalValue > 0);
-
-    return resultFiltered;
+    return result;
   }
 
   /**
@@ -367,7 +376,7 @@ export class PortfolioCalculationService {
             aggregator.index += 1;
 
             // calculate accumulated return
-            aggregator.accumulatedReturn += transaction.returnValue;
+            aggregator.accumulatedReturn += roundNDigits(transaction.returnValue - transaction.transactionFees);
           }
 
           return {
@@ -376,7 +385,9 @@ export class PortfolioCalculationService {
             units: aggregator.units,
             marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close),
             profit: roundNDigits(
-              aggregator.units * historicalPrice.close - aggregator.units * aggregator.breakEvenPrice,
+              aggregator.units * historicalPrice.close -
+                aggregator.units * aggregator.breakEvenPrice -
+                aggregator.accumulatedReturn,
             ),
             accumulatedReturn: aggregator.accumulatedReturn,
           } satisfies PortfolioGrowthAssetsDataItem;
