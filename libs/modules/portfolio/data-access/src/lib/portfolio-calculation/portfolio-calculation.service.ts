@@ -76,7 +76,7 @@ export class PortfolioCalculationService {
       // initial object
       const portfolioItem: PortfolioGrowth = {
         date: gDate,
-        breakEvenValue: 9,
+        breakEvenValue: 0,
         marketTotalValue: 0,
         totalBalanceValue: startingCashValue,
       };
