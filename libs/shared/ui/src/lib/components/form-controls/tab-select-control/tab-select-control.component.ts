@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, forwardRef, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, inject, input, model } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
@@ -17,7 +17,7 @@ import { map, switchMap } from 'rxjs';
     <div class="md:flex md:justify-end">
       <mat-tab-group
         *ngIf="showTabsSignal(); else showSelect"
-        [selectedIndex]="selectedValueSignal()?.index"
+        [selectedIndex]="selectedIndex()"
         (selectedTabChange)="onSelectTabChange($event)"
       >
         <mat-tab *ngFor="let option of displayOptions()" [label]="option.label"></mat-tab>
@@ -28,7 +28,7 @@ import { map, switchMap } from 'rxjs';
     <ng-template #showSelect>
       <mat-form-field class="w-full">
         <mat-label>Options</mat-label>
-        <mat-select [value]="selectedValueSignal()?.value" (selectionChange)="onSelectChange($event)">
+        <mat-select [value]="selectedValueSignal()" (selectionChange)="onSelectChange($event)">
           <mat-option *ngFor="let option of displayOptions()" [value]="option.value">{{ option.label }}</mat-option>
         </mat-select>
       </mat-form-field>
@@ -58,7 +58,8 @@ export class TabSelectControlComponent<T> implements ControlValueAccessor {
   onChange: (data: T) => void = () => {};
   onTouched = () => {};
 
-  selectedValueSignal = signal<{ value: T; index: number } | null>(null);
+  selectedValueSignal = model<T | null>(null);
+  selectedIndex = computed(() => this.displayOptions().findIndex((d) => d.value === this.selectedValueSignal()) ?? 0);
 
   screenLayoutSplit = input(SCREEN_LAYOUT.LAYOUT_SM, { transform: screenLayoutResolveType });
   private observer = inject(BreakpointObserver);
@@ -81,10 +82,7 @@ export class TabSelectControlComponent<T> implements ControlValueAccessor {
       return;
     }
 
-    this.selectedValueSignal.set({
-      index: event.index,
-      value: item.value,
-    });
+    this.selectedValueSignal.set(item.value);
 
     // notify parent
     this.onChange(item.value);
@@ -94,10 +92,7 @@ export class TabSelectControlComponent<T> implements ControlValueAccessor {
     const selectedValue = event.value as T;
     const index = this.displayOptions().findIndex((d) => d.value === selectedValue);
 
-    this.selectedValueSignal.set({
-      index: index,
-      value: selectedValue,
-    });
+    this.selectedValueSignal.set(selectedValue);
 
     // notify parent
     this.onChange(selectedValue);
@@ -105,10 +100,7 @@ export class TabSelectControlComponent<T> implements ControlValueAccessor {
 
   writeValue(value: T): void {
     const index = this.displayOptions().findIndex((d) => d.value === value);
-    this.selectedValueSignal.set({
-      index,
-      value,
-    });
+    this.selectedValueSignal.set(value);
   }
 
   /**

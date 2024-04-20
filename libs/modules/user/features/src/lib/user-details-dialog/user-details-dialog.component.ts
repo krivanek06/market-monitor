@@ -6,21 +6,20 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserApiService } from '@mm/api-client';
-import { PortfolioGrowthAssets, PortfolioStateHoldings, UserData } from '@mm/api-types';
-import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { PortfolioGrowthAssets, PortfolioStateHoldings, PortfolioTransaction, UserData } from '@mm/api-types';
 import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
-  PortfolioGrowthChartComponent,
-  PortfolioHoldingsTableComponent,
   PortfolioStateComponent,
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
 } from '@mm/portfolio/ui';
-import { ColorScheme } from '@mm/shared/data-access';
+import { ColorScheme, LabelValue } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { DefaultImgDirective, GenericChartComponent, SectionTitleComponent } from '@mm/shared/ui';
+import { DefaultImgDirective, SectionTitleComponent, TabSelectControlComponent } from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
 import { from, map, share, switchMap, tap } from 'rxjs';
+import { UserDetailsPortfolioComponent } from './user-details-portfolio/user-details-portfolio.component';
+import { UserDetailsTransactionsComponent } from './user-details-transactions/user-details-transactions.component';
 
 export type UserDetailsDialogComponentData = {
   userId: string;
@@ -37,24 +36,32 @@ export type UserDetailsDialogComponentData = {
     MatDividerModule,
     DefaultImgDirective,
     MatProgressSpinnerModule,
-    StockSummaryDialogComponent,
     SectionTitleComponent,
-    PortfolioHoldingsTableComponent,
-    GenericChartComponent,
     PortfolioStateTransactionsComponent,
     PortfolioStateRiskComponent,
     PortfolioStateComponent,
-    PortfolioGrowthChartComponent,
+    UserDetailsPortfolioComponent,
+    UserDetailsTransactionsComponent,
+    TabSelectControlComponent,
   ],
   template: `
     <div class="flex items-center justify-between p-4">
-      <!-- display user -->
-      <div *ngIf="userDataSignal() as user" class="flex items-center gap-2">
-        <img appDefaultImg [src]="user.personal.photoURL" alt="User Image" class="rounded-full w-14 h-14" />
-        <div class="flex flex-col">
-          <span class="text-xl">{{ user.personal.displayName }}</span>
-          <span class="text-sm">{{ user.accountCreatedDate | date: 'MMMM d, y' }}</span>
+      <div class="flex items-center gap-6">
+        <!-- display user -->
+        <div *ngIf="userDataSignal() as user" class="flex items-center gap-2">
+          <img appDefaultImg [src]="user.personal.photoURL" alt="User Image" class="rounded-full w-14 h-14" />
+          <div class="flex flex-col">
+            <span class="text-xl">{{ user.personal.displayName }}</span>
+            <span class="text-sm">{{ user.accountCreatedDate | date: 'MMMM d, y' }}</span>
+          </div>
         </div>
+
+        <!-- tabs -->
+        <app-tab-select-control
+          class="hidden lg:block"
+          [displayOptions]="displayOptions"
+          [(selectedValueSignal)]="selectedValueSignal"
+        />
       </div>
 
       <!-- close -->
@@ -74,30 +81,42 @@ export type UserDetailsDialogComponentData = {
         <div class="flex p-2 divide-x-2 flex-row divide-wt-border">
           <!-- portfolio state -->
           <div class="p-2 max-lg:flex-1 lg:basis-[40%]">
-            <app-portfolio-state
-              [titleColor]="ColorScheme.GRAY_DARK_VAR"
-              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-              [portfolioState]="portfolioStateHoldingSignal()"
-              [showCashSegment]="userData.userAccountType === 'DEMO_TRADING'"
-            ></app-portfolio-state>
+            @if (portfolioStateHoldingSignal(); as portfolioStateHoldingSignal) {
+              <app-portfolio-state
+                [titleColor]="ColorScheme.GRAY_DARK_VAR"
+                [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+                [portfolioState]="portfolioStateHoldingSignal"
+                [showCashSegment]="userData.userAccountType === 'DEMO_TRADING'"
+              ></app-portfolio-state>
+            } @else {
+              <div class="g-skeleton h-[120px]"></div>
+            }
           </div>
           <!-- risk -->
           <div class="p-2 flex-1 hidden md:block">
-            <app-portfolio-state-risk
-              [titleColor]="ColorScheme.GRAY_DARK_VAR"
-              [portfolioRisk]="userDataSignal()?.portfolioRisk"
-              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-            ></app-portfolio-state-risk>
+            @if (portfolioStateHoldingSignal()) {
+              <app-portfolio-state-risk
+                [titleColor]="ColorScheme.GRAY_DARK_VAR"
+                [portfolioRisk]="userDataSignal()?.portfolioRisk"
+                [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+              ></app-portfolio-state-risk>
+            } @else {
+              <div class="g-skeleton h-[120px]"></div>
+            }
           </div>
           <!-- transactions -->
           <div class="p-2 flex-1 hidden lg:block">
-            <app-portfolio-state-transactions
-              [portfolioState]="portfolioStateHoldingSignal()"
-              [titleColor]="ColorScheme.GRAY_DARK_VAR"
-              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-              [showFees]="userData.userAccountType === 'DEMO_TRADING'"
-            >
-            </app-portfolio-state-transactions>
+            @if (portfolioStateHoldingSignal(); as portfolioStateHoldingSignal) {
+              <app-portfolio-state-transactions
+                [portfolioState]="portfolioStateHoldingSignal"
+                [titleColor]="ColorScheme.GRAY_DARK_VAR"
+                [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+                [showFees]="userData.userAccountType === 'DEMO_TRADING'"
+              >
+              </app-portfolio-state-transactions>
+            } @else {
+              <div class="g-skeleton h-[120px]"></div>
+            }
           </div>
         </div>
 
@@ -105,37 +124,20 @@ export type UserDetailsDialogComponentData = {
           <mat-divider></mat-divider>
         </div>
 
-        <!-- portfolio growth charts -->
-        @if (portfolioGrowthSignal(); as portfolioGrowth) {
-          <app-portfolio-growth-chart
-            headerTitle="Portfolio Growth"
-            chartType="balance"
-            [displayHeader]="true"
-            [displayLegend]="true"
-            [data]="{
-              values: portfolioGrowth,
-              startingCashValue: userData.portfolioState.startingCash
-            }"
-            [heightPx]="375"
-            class="mb-6"
-          ></app-portfolio-growth-chart>
-        } @else {
-          <div class="h-[400px] grid place-content-center">
-            <mat-spinner></mat-spinner>
-          </div>
-        }
-
-        <div class="max-sm:pl-2 mb-6">
-          <app-section-title
-            [title]="'Holdings: ' + (portfolioStateHoldingSignal()?.holdings ?? []).length"
-            class="mb-3"
-          />
-          <app-portfolio-holdings-table
-            [holdings]="portfolioStateHoldingSignal()?.holdings ?? []"
-            [portfolioState]="portfolioStateHoldingSignal()"
-            [displayedColumns]="displayedColumns"
-            [showSkeletonLoading]="!portfolioStateHoldingSignal()?.holdings"
-          />
+        <div class="p-4">
+          @if (selectedValueSignal() === 'portfolio') {
+            <!-- portfolio growth -->
+            <app-user-details-portfolio
+              [userData]="userData"
+              [portfolioGrowth]="portfolioGrowthSignal()"
+              [portfolioStateHolding]="portfolioStateHoldingSignal()"
+            />
+          } @else if (selectedValueSignal() === 'transactions') {
+            <!-- transaction -->
+            <div class="pt-3">
+              <app-user-details-transactions [portfolioTransaction]="portfolioTransactions() ?? []" />
+            </div>
+          }
         </div>
       } @else {
         <mat-spinner></mat-spinner>
@@ -155,6 +157,7 @@ export class UserDetailsDialogComponent {
   private portfolioCalculationService = inject(PortfolioCalculationService);
 
   userDataSignal = signal<UserData | undefined>(undefined);
+  portfolioTransactions = signal<PortfolioTransaction[] | undefined>(undefined);
   portfolioStateHoldingSignal = signal<PortfolioStateHoldings | undefined>(undefined);
   portfolioGrowthAssetsSignal = signal<PortfolioGrowthAssets[] | null>(null);
   portfolioGrowthSignal = computed(() => {
@@ -165,7 +168,19 @@ export class UserDetailsDialogComponent {
       : null;
   });
   ColorScheme = ColorScheme;
-  displayedColumns: string[] = ['symbol', 'price', 'balance', 'invested', 'totalChange', 'portfolio', 'marketCap'];
+
+  displayOptions: LabelValue<'portfolio' | 'transactions'>[] = [
+    {
+      label: 'Portfolio',
+      value: 'portfolio',
+    },
+    {
+      label: 'Transactions',
+      value: 'transactions',
+    },
+  ];
+
+  selectedValueSignal = signal<'portfolio' | 'transactions'>('portfolio');
 
   constructor(
     private dialogRef: MatDialogRef<UserDetailsDialogComponent>,
@@ -194,6 +209,10 @@ export class UserDetailsDialogComponent {
     // load user data
     userRef$.subscribe((userData) => {
       this.userDataSignal.set(userData);
+    });
+
+    userPortfolioTransactions$.subscribe((data) => {
+      this.portfolioTransactions.set(data.transactions);
     });
 
     // load user portfolio state
