@@ -72,7 +72,12 @@ import { map, pipe, startWith } from 'rxjs';
       <div
         class="flex flex-row max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2"
       >
-        <app-general-card class="sm:col-span-2 max-sm:min-w-[360px]" title="Account">
+        <!-- portfolio state -->
+        <app-general-card
+          class="sm:col-span-2 max-sm:min-w-[360px] min-h-[210px]"
+          title="Account"
+          [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
+        >
           <app-portfolio-state
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
@@ -81,7 +86,12 @@ import { map, pipe, startWith } from 'rxjs';
           ></app-portfolio-state>
         </app-general-card>
 
-        <app-general-card class="max-sm:min-w-[275px]" title="Risk">
+        <!-- portfolio risk -->
+        <app-general-card
+          class="max-sm:min-w-[275px] min-h-[210px]"
+          title="Risk"
+          [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
+        >
           <app-portfolio-state-risk
             [portfolioRisk]="authenticationUserService.state.getUserDataNormal()?.portfolioRisk"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
@@ -89,7 +99,12 @@ import { map, pipe, startWith } from 'rxjs';
           ></app-portfolio-state-risk>
         </app-general-card>
 
-        <app-general-card class="max-sm:min-w-[275px]" title="Transactions">
+        <!-- portfolio transactions -->
+        <app-general-card
+          class="max-sm:min-w-[275px] min-h-[210px]"
+          title="Transactions"
+          [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
+        >
           <app-portfolio-state-transactions
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
@@ -115,6 +130,7 @@ import { map, pipe, startWith } from 'rxjs';
         <!-- select chart title -->
         <div class="flex flex-col sm:flex-row items-center gap-4">
           <app-section-title title="Portfolio Growth" class="mr-6 max-lg:flex-1" />
+          <!-- do not show buttons if not enough data -->
           @if (portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0) {
             <button
               (click)="onPortfolioChangeChart()"
@@ -198,8 +214,8 @@ import { map, pipe, startWith } from 'rxjs';
       </app-general-card>
     </div>
 
-    @if (authenticationUserService.state.userHaveTransactions()) {
-      @defer {
+    @defer {
+      @if ((portfolioUserFacadeService.getPortfolioState()?.holdings ?? []).length > 0) {
         <!-- holdings pie charts -->
         <div class="flex justify-center lg:justify-between gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6">
           <app-pie-chart
@@ -215,7 +231,9 @@ import { map, pipe, startWith } from 'rxjs';
             [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
           />
         </div>
+      }
 
+      @if (authenticationUserService.state.userHaveTransactions()) {
         <!-- transaction history -->
         <div>
           <app-section-title title="Transaction History" matIcon="history" class="mb-3" />

@@ -42,19 +42,17 @@ export const groupUpdateData = async (): Promise<void> => {
     .limit(40)
     .get();
 
-  console.log(`Loaded ${group.docs.length} groups`);
+  console.log(`[Groups]: Loaded ${group.docs.length} groups`);
 
   for await (const groupDoc of group.docs) {
     const groupData = groupDoc.data();
-    console.log(`Updating group ${groupData.id}, name: ${groupData.name}`);
+    console.log(`[Groups]: Updating ${groupData.id}, name: ${groupData.name}`);
     try {
       await groupCopyMembersAndTransactions(groupData);
     } catch (e) {
       console.error(`Error updating group ${groupData.id}, name: ${groupData.name}`, e);
     }
   }
-
-  console.log('Done');
 };
 
 /**
@@ -221,7 +219,6 @@ export const calculateGroupMembersPortfolioState = (
           // ignore these
           firstTransactionDate: null,
           lastTransactionDate: null,
-          accountResetDate: getCurrentDateDefaultFormat(),
 
           // calculate later
           previousBalanceChange: 0,

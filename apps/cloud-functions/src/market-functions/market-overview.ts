@@ -10,28 +10,32 @@ import {
   marketOverviewLoadSP500,
   marketOverviewLoadTreasury,
 } from '@mm/api-types';
-import { Request, Response } from 'express';
 
-export const getMarketOverviewDataWrapper = async (request: Request, response: Response<ChartDataType | string>) => {
-  // i.e: sp500
-  const key = request.query.key as MarketOverviewKey;
-  // i.e: peRatio
-  const subKey = request.query.subKey as MarketOverviewSubkeyReadable<MarketOverviewKey>;
+// export const reloadMarketOverviewData = onRequest({ timeoutSeconds: 240 }, async (req, res) => {
+//   const data = await reloadMarketOverview();
+//   res.send(data);
+// });
 
-  // if information not provided send error to client
-  if (!key || !subKey) {
-    response.status(400);
-    throw new Error('key or sub key to access data not provided');
-  }
+// export const getMarketOverviewDataWrapper = async (request: Request, response: Response<ChartDataType | string>) => {
+//   // i.e: sp500
+//   const key = request.query.key as MarketOverviewKey;
+//   // i.e: peRatio
+//   const subKey = request.query.subKey as MarketOverviewSubkeyReadable<MarketOverviewKey>;
 
-  try {
-    const result = await loadMarketOverviewData(key, subKey);
-    response.send(result);
-  } catch (e) {
-    console.log(e);
-    response.status(500).send(`Unable to Provide data for key=${key}, subkey=${subKey}`);
-  }
-};
+//   // if information not provided send error to client
+//   if (!key || !subKey) {
+//     response.status(400);
+//     throw new Error('key or sub key to access data not provided');
+//   }
+
+//   try {
+//     const result = await loadMarketOverviewData(key, subKey);
+//     response.send(result);
+//   } catch (e) {
+//     console.log(e);
+//     response.status(500).send(`Unable to Provide data for key=${key}, subkey=${subKey}`);
+//   }
+// };
 
 /**
  * reload market overview data and save into cloudflare

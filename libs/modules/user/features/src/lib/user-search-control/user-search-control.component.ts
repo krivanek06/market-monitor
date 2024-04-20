@@ -12,7 +12,7 @@ import { AggregationApiService, UserApiService } from '@mm/api-client';
 import { UserData } from '@mm/api-types';
 import { DefaultImgDirective, RangeDirective } from '@mm/shared/ui';
 import { UserDisplayItemComponent } from '@mm/user/ui';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-user-search-control',
@@ -53,7 +53,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, map, startWith,
         <!-- loaded data -->
         @for (user of optionsSignal(); track user.id; let last = $last) {
           <mat-option [value]="user" class="py-2 rounded-md">
-            <app-user-display-item [userData]="user"></app-user-display-item>
+            <app-user-display-item [userData]="user" />
             <div *ngIf="!last" class="mt-2">
               <mat-divider></mat-divider>
             </div>
@@ -100,10 +100,17 @@ export class UserSearchControlComponent implements ControlValueAccessor {
                 return [];
               }),
             )
-          : this.aggregationApiService
-              .getHallOfFameUsers()
-              .pipe(map((d) => d?.bestPortfolio.map((d) => d.item).slice(0, 10) ?? [])),
+          : of(
+              this.aggregationApiService
+                .hallOfFameUsers()
+                ?.bestPortfolio.map((d) => d.item)
+                .slice(0, 10) ?? [],
+            ),
       ),
+      catchError((e) => {
+        console.log(e);
+        return [];
+      }),
     ),
     { initialValue: [] },
   );

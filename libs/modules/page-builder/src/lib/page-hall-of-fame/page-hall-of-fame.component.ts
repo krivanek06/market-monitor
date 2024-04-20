@@ -32,13 +32,9 @@ type SubPages = 'users' | 'groups' | 'compare-users';
       @if (currentPageControl.value === 'users') {
         <app-hall-of-fame-users />
       } @else if (currentPageControl.value === 'groups') {
-        @defer {
-          <app-hall-of-fame-groups />
-        }
+        <app-hall-of-fame-groups />
       } @else if (currentPageControl.value === 'compare-users') {
-        @defer {
-          <app-compare-users />
-        }
+        <app-compare-users />
       } @else {
         Invalid page
       }

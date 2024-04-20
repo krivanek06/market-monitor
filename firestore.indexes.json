@@ -93,6 +93,10 @@
           "order": "ASCENDING"
         },
         {
+          "fieldPath": "isDemo",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "portfolioState.date",
           "order": "DESCENDING"
         }
@@ -103,6 +107,14 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "isAccountActive",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isDemo",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "userAccountType",
           "order": "ASCENDING"
         },
@@ -116,6 +128,14 @@
       "collectionGroup": "users",
       "queryScope": "COLLECTION",
       "fields": [
+        {
+          "fieldPath": "isAccountActive",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isDemo",
+          "order": "ASCENDING"
+        },
         {
           "fieldPath": "userAccountType",
           "order": "ASCENDING"
@@ -131,6 +151,14 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "isAccountActive",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isDemo",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "userAccountType",
           "order": "ASCENDING"
         },
@@ -145,12 +173,48 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "isAccountActive",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isDemo",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "userAccountType",
           "order": "ASCENDING"
         },
         {
           "fieldPath": "systemRank.portfolioTotalGainsPercentage.rank",
           "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isDemo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "accountCreatedDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isDemo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "personal.displayNameLowercase",
+          "order": "ASCENDING"
         }
       ]
     }

@@ -12,7 +12,7 @@ import { AggregationApiService, GroupApiService } from '@mm/api-client';
 import { GroupData } from '@mm/api-types';
 import { GroupDisplayItemComponent } from '@mm/group/ui';
 import { DefaultImgDirective, RangeDirective } from '@mm/shared/ui';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-group-search-control',
@@ -102,9 +102,12 @@ export class GroupSearchControlComponent implements ControlValueAccessor {
                 return [];
               }),
             )
-          : this.aggregationApiService
-              .getHallOfFameGroups()
-              .pipe(map((d) => d?.bestPortfolio.map((d) => d.item).slice(0, 10) ?? [])),
+          : of(
+              this.aggregationApiService
+                .hallOfFameGroups()
+                ?.bestPortfolio.map((d) => d.item)
+                .slice(0, 10) ?? [],
+            ),
       ),
     ),
     { initialValue: [] },

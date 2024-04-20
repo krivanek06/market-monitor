@@ -22,6 +22,8 @@ import {
   HistoricalLoadingPeriodsDates,
   HistoricalPrice,
   HistoricalPriceAPI,
+  IsStockMarketOpen,
+  IsStockMarketOpenExtend,
   MarketOverviewSubKey,
   MostPerformingStocks,
   News,
@@ -39,6 +41,7 @@ import {
   TreasuryRates,
   UpgradesDowngrades,
 } from '@mm/api-types';
+import axios from 'axios';
 import { format, subDays } from 'date-fns';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
 import { filterOutSymbols, getDateRangeByMonthAndYear } from './helpers';
@@ -680,13 +683,40 @@ export const getEconomicData = async (endpointKey?: MarketOverviewSubKey<'genera
 
   try {
     const url = `${FINANCIAL_MODELING_URL}/v4/economic?name=${endpointKey}&apikey=${FINANCIAL_MODELING_KEY}`;
-    const response = await fetch(url);
-    const data = (await response.json()) as { date: string; value: number }[];
-    const formattedData = data.map((d) => [d.date, d.value] as [string, number]) satisfies ChartDataType;
+    const response = await axios.get<{ date: string; value: number }[]>(url);
+    const formattedData = response.data.map((d) => [d.date, d.value] as [string, number]) satisfies ChartDataType;
     return formattedData;
   } catch (e) {
     console.log('error in getEconomicData', e);
     return [];
+  }
+};
+
+export const getIsMarketOpen = async (exchange: string = 'NYSE'): Promise<IsStockMarketOpenExtend | null> => {
+  const url = `https://financialmodelingprep.com/api/v3/is-the-market-open?exchange=${exchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+
+  try {
+    const response = await fetch(url);
+    const data = (await response.json()) as IsStockMarketOpen;
+
+    const currentYear = new Date().getFullYear();
+
+    // { "New Years Day": "2019-01-01", "Good Friday": "2019-04-19", ... }
+    const currentHoliday =
+      data.stockMarketHolidays.find((holiday) => String(holiday['year']) === String(currentYear)) ?? {};
+
+    // get only the dates
+    const currentHolidayDates = Object.values(currentHoliday);
+
+    const holidaysThisYear = {
+      ...data,
+      currentHoliday: currentHolidayDates,
+    } satisfies IsStockMarketOpenExtend;
+
+    return holidaysThisYear;
+  } catch (e) {
+    console.log('error in getTreasuryRates', e);
+    return null;
   }
 };
 

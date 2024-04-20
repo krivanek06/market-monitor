@@ -4,7 +4,7 @@ import { UserApiService } from '@mm/api-client';
 import { PortfolioStateHolding, PortfolioTransaction, PortfolioTransactionCreate } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { InputSource } from '@mm/shared/data-access';
-import { distinctUntilChanged, from, of, switchMap } from 'rxjs';
+import { from, of, switchMap } from 'rxjs';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioCreateOperationService } from '../portfolio-create-operation/portfolio-create-operation.service';
 
@@ -21,14 +21,12 @@ export class PortfolioUserFacadeService {
   private userApiService = inject(UserApiService);
 
   getPortfolioState = toSignal(
-    toObservable(this.authenticationUserService.state.getUserDataNormal).pipe(
-      // prevent execution if not portfolio state is changed
-      distinctUntilChanged((prev, curr) => prev?.portfolioState.balance === curr?.portfolioState.balance),
-      switchMap((userData) =>
-        userData
+    toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
+      switchMap((transactions) =>
+        transactions
           ? this.portfolioCalculationService.getPortfolioStateHoldings(
-              userData.portfolioState,
-              userData.holdingSnapshot.data,
+              this.authenticationUserService.state.getUserData().portfolioState.startingCash,
+              transactions,
             )
           : of(undefined),
       ),
@@ -54,10 +52,10 @@ export class PortfolioUserFacadeService {
    */
   getPortfolioGrowth = computed(() => {
     const growth = this.getPortfolioGrowthAssets();
+    const startingCash = this.getPortfolioState()?.startingCash;
+    const result = growth ? this.portfolioCalculationService.getPortfolioGrowth(growth, startingCash) : null;
 
-    return growth
-      ? this.portfolioCalculationService.getPortfolioGrowth(growth, this.getPortfolioState()?.startingCash)
-      : null;
+    return result;
   });
 
   /**

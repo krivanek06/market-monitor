@@ -152,7 +152,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
           @for (user of displayedMembers(); track user.id; let i = $index) {
             <app-position-card
-              (clickedEmitter)="onMemberClick(user)"
+              (itemClicked)="onMemberClick(user)"
               [clickable]="true"
               [currentPositions]="i + 1"
               [previousPosition]="user.position.previousGroupMemberPosition"

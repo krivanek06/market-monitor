@@ -4,9 +4,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { StockOwnershipHoldersTableComponent, StockOwnershipInstitutionalListComponent } from '@mm/market-stocks/ui';
 import { InputSource } from '@mm/shared/data-access';
-import { dateFormatDate, getPreviousDate, isStockMarketHolidayDate } from '@mm/shared/general-util';
+import { dateFormatDate } from '@mm/shared/general-util';
 import { FormMatInputWrapperComponent, GeneralCardComponent, RangeDirective } from '@mm/shared/ui';
-import { catchError, filter, map, of, startWith, switchMap, tap } from 'rxjs';
+import { filterNil } from 'ngxtension/filter-nil';
+import { catchError, filter, of, startWith, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
@@ -148,9 +149,7 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
   historicalPriceOnDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
       startWith(this.quarterFormControl.value),
-      filter((data): data is string => !!data),
-      // if date is YYYY-12-31 then it is a closed date -> subtract 1 day
-      map((quarter) => (isStockMarketHolidayDate(quarter) ? getPreviousDate(quarter) : quarter)),
+      filterNil(),
       switchMap((quarter) =>
         this.stocksApiService
           .getStockHistoricalPricesOnDate(this.stockSymbolSignal(), quarter)

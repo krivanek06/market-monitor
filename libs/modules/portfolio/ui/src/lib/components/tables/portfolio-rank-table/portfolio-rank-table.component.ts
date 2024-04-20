@@ -1,10 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, TemplateRef, TrackByFunction, effect, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  TemplateRef,
+  TrackByFunction,
+  effect,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { HallOfFameTopRankData, PortfolioState } from '@mm/api-types';
-import { PercentageIncreaseDirective, PositionColoringDirective } from '@mm/shared/ui';
+import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-portfolio-rank-table',
@@ -16,6 +25,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective } from '@mm/shar
     MatPaginatorModule,
     PercentageIncreaseDirective,
     PositionColoringDirective,
+    RangeDirective,
   ],
   template: `
     <table mat-table class="table-hover" [dataSource]="dataSource" [trackBy]="identity">
@@ -70,7 +80,19 @@ import { PercentageIncreaseDirective, PositionColoringDirective } from '@mm/shar
         [ngClass]="{ 'bg-wt-gray-light': even }"
         (click)="onItemClick(row)"
       ></tr>
+
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="13">
+          <div *ngIf="!showLoadingSkeletonSignal()" class="g-table-empty">No data has been found</div>
+        </td>
+      </tr>
     </table>
+
+    <!-- skeleton -->
+    <div *ngIf="showLoadingSkeletonSignal()">
+      <div *ngRange="20" class="h-12 mb-1 g-skeleton"></div>
+    </div>
   `,
   styles: `
     :host {
@@ -95,10 +117,16 @@ export class PortfolioRankTableComponent<
    */
   data = input.required<T[]>();
 
-  tableEffect = effect(() => {
-    this.dataSource.data = this.data();
-    this.dataSource._updateChangeSubscription();
-  });
+  showLoadingSkeletonSignal = signal(true);
+
+  tableEffect = effect(
+    () => {
+      this.dataSource.data = this.data();
+      this.dataSource._updateChangeSubscription();
+      this.showLoadingSkeletonSignal.set(this.data().length === 0);
+    },
+    { allowSignalWrites: true },
+  );
 
   displayedColumns: string[] = ['itemTemplate', 'balance', 'profit'];
   dataSource = new MatTableDataSource<T>([]);

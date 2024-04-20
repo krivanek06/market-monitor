@@ -69,7 +69,7 @@ export type PortfolioTradeDialogComponentData = {
       <mat-dialog-content>
         <div class="flex items-center justify-between pt-5">
           <!-- symbol & image -->
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 max-w-[70%]">
             <img appDefaultImg imageType="symbol" [src]="data.summary.id" class="w-12 h-12" />
             <div class="flex flex-col">
               <div class="flex items-center gap-4">

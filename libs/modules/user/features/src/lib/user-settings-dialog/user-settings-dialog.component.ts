@@ -6,10 +6,12 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import { accountDescription } from '@mm/api-types';
 import { ChangePasswordDialogComponent } from '@mm/authentication/authentication-forms';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
+import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { createNameInitials } from '@mm/shared/general-util';
 import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
@@ -129,7 +131,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </button>
         <!--  Change Account type -->
         <button
-          [disabled]="isDemoAccount()"
+          [disabled]="isDemoAccount() || !isDevActive"
           (click)="onChangeAccountType()"
           [matTooltip]="actionButtonTooltips.changeAccountType"
           type="button"
@@ -197,7 +199,11 @@ export class UserSettingsDialogComponent implements OnInit {
   private authenticationAccountService = inject(AuthenticationAccountService);
   private dialogServiceUtil = inject(DialogServiceUtil);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
   private dialogRef = inject(MatDialogRef<UserSettingsDialogComponent>);
+  isDevActive = inject(IS_DEV_TOKEN, {
+    optional: true,
+  });
 
   isDemoAccount = this.authenticationUserStoreService.state.isDemoAccount;
   userDataSignal = this.authenticationUserStoreService.state.getUserData;
@@ -234,19 +240,19 @@ export class UserSettingsDialogComponent implements OnInit {
   @Confirmable('Are you sure you want to delete your account?', 'Confirm', true, 'DELETE')
   onDeleteAccount(): void {
     // notify user
-    this.dialogServiceUtil.showNotificationBar('Sending request to delete your account');
+    this.dialogServiceUtil.showNotificationBar('Your account has been deleted', 'success');
 
     // sign out to avoid errors
     this.authenticationAccountService.signOut();
 
+    // close dialog
+    this.dialogRef.close();
+
+    // redirect to home
+    this.router.navigate([ROUTES_MAIN.LOGIN]);
+
     // perform delete account
-    from(this.authenticationAccountService.deleteAccount()).pipe(
-      tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been deleted', 'success')),
-      catchError((err) => {
-        this.dialogServiceUtil.handleError(err);
-        return EMPTY;
-      }),
-    );
+    this.authenticationAccountService.deleteAccount();
   }
 
   onChangePassword(): void {

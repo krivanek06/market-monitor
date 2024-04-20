@@ -1,21 +1,11 @@
 import { getSymbolSummaries } from '@mm/api-external';
+import { UserBase, UserData } from '@mm/api-types';
 import {
-  PortfolioState,
-  PortfolioStateHolding,
-  PortfolioStateHoldingBase,
-  PortfolioStateHoldings,
-  PortfolioTransaction,
-  SymbolSummary,
-  UserBase,
-  UserData,
-} from '@mm/api-types';
-import {
-  calculateGrowth,
   getCurrentDateDefaultFormat,
-  getCurrentDateDetailsFormat,
-  roundNDigits,
+  getPortfolioStateHoldingBaseUtil,
+  getPortfolioStateHoldingsUtil,
+  transformPortfolioStateHoldingToPortfolioState,
 } from '@mm/shared/general-util';
-import { isSameDay, subDays } from 'date-fns';
 import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { userDocumentRef, userDocumentTransactionHistoryRef } from '../models';
 import { userPortfolioRisk } from './portfolio-risk-evaluation';
@@ -57,10 +47,10 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
 
     // get portfolio state
     const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
-      userData.portfolioState,
       transactionData,
       holdingsBase,
       summaries,
+      userData.portfolioState.startingCash,
     );
 
     // remove holdings
@@ -84,155 +74,10 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
     } satisfies Partial<UserData>);
 
     // log
-    console.log(`Updated user: ${userData.personal.displayName}, ${userData.id}`);
+    console.log(
+      `Updated user: ${userData.personal.displayName}, ${userData.id}, holdings: ${portfolioStateHoldings.holdings.length}`,
+    );
   } catch (e) {
     console.warn(`Error for user: ${userData.personal.displayName}, ${userData.id}: ${e}`);
   }
-};
-
-/**
- * transform PortfolioStateHoldings to PortfolioState
- */
-const transformPortfolioStateHoldingToPortfolioState = (holding: PortfolioStateHoldings): PortfolioState => {
-  return {
-    balance: holding.balance,
-    cashOnHand: holding.cashOnHand,
-    invested: holding.invested,
-    numberOfExecutedBuyTransactions: holding.numberOfExecutedBuyTransactions,
-    numberOfExecutedSellTransactions: holding.numberOfExecutedSellTransactions,
-    transactionFees: holding.transactionFees,
-    holdingsBalance: holding.holdingsBalance,
-    totalGainsValue: roundNDigits(holding.totalGainsValue, 2),
-    totalGainsPercentage: roundNDigits(holding.totalGainsPercentage, 2),
-    firstTransactionDate: holding.firstTransactionDate,
-    lastTransactionDate: holding.lastTransactionDate,
-    date: holding.date,
-    startingCash: holding.startingCash,
-    previousBalanceChange: holding.previousBalanceChange,
-    previousBalanceChangePercentage: holding.previousBalanceChangePercentage,
-    accountResetDate: holding.accountResetDate,
-  };
-};
-
-const getPortfolioStateHoldingsUtil = (
-  previousPortfolioState: PortfolioState,
-  transactions: PortfolioTransaction[],
-  partialHoldings: PortfolioStateHoldingBase[],
-  symbolSummaries: SymbolSummary[],
-): PortfolioStateHoldings => {
-  const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
-  const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
-  const transactionFees = transactions.reduce((acc, curr) => acc + curr.transactionFees, 0);
-
-  console.log(`Getting Summaries: sending ${partialHoldings.length}, receiving: ${symbolSummaries.length}`);
-
-  // value that user invested in all assets
-  const invested = partialHoldings.reduce((acc, curr) => acc + curr.invested, 0);
-
-  const portfolioStateHolding = symbolSummaries
-    .map((symbolSummary) => {
-      const holding = partialHoldings.find((d) => d.symbol === symbolSummary.id);
-      if (!holding) {
-        console.log(`Holding not found for symbol ${symbolSummary.id}`);
-        return null;
-      }
-      return {
-        ...holding,
-        breakEvenPrice: roundNDigits(holding.invested / holding.units, 2),
-        weight: roundNDigits(holding.invested / invested, 6),
-        symbolSummary,
-      } satisfies PortfolioStateHolding;
-    })
-    .filter((d) => !!d) as PortfolioStateHolding[];
-
-  // sort holdings by balance
-  const portfolioStateHoldingSortedByBalance = [...portfolioStateHolding].sort(
-    (a, b) => b.symbolSummary.quote.price * b.units - a.symbolSummary.quote.price * a.units,
-  );
-
-  // value of all assets
-  const holdingsBalance = portfolioStateHolding.reduce(
-    (acc, curr) => acc + curr.symbolSummary.quote.price * curr.units,
-    0,
-  );
-
-  // current cash on hand
-  const startingCash = previousPortfolioState.startingCash;
-  const cashOnHandTransactions = startingCash !== 0 ? startingCash - invested - transactionFees : 0;
-
-  const balance = holdingsBalance + cashOnHandTransactions;
-  const totalGainsValue = startingCash !== 0 ? balance - startingCash : holdingsBalance - invested;
-  const totalGainsPercentage = holdingsBalance === 0 ? 0 : calculateGrowth(balance, invested + cashOnHandTransactions);
-  const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
-  const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
-
-  // check if previous portfolio was done yesterday
-  const isPreviousPortfolioDoneYesterday = isSameDay(new Date(previousPortfolioState.date), subDays(new Date(), 1));
-
-  const result: PortfolioState = {
-    numberOfExecutedBuyTransactions,
-    numberOfExecutedSellTransactions,
-    transactionFees: roundNDigits(transactionFees),
-    cashOnHand: roundNDigits(cashOnHandTransactions),
-    balance: roundNDigits(balance),
-    invested: roundNDigits(invested),
-    holdingsBalance: roundNDigits(holdingsBalance),
-    totalGainsValue: roundNDigits(totalGainsValue),
-    totalGainsPercentage: roundNDigits(totalGainsPercentage, 4),
-    startingCash: roundNDigits(startingCash),
-    firstTransactionDate,
-    lastTransactionDate,
-    date: getCurrentDateDetailsFormat(),
-    // calculate data for previous portfolio
-    previousBalanceChange:
-      isPreviousPortfolioDoneYesterday && previousPortfolioState.balance !== 0
-        ? roundNDigits(balance - previousPortfolioState.balance)
-        : 0,
-    previousBalanceChangePercentage: isPreviousPortfolioDoneYesterday
-      ? calculateGrowth(balance, previousPortfolioState.balance)
-      : 0,
-    accountResetDate: previousPortfolioState.accountResetDate,
-  };
-
-  return {
-    ...result,
-    holdings: portfolioStateHoldingSortedByBalance,
-  };
-};
-
-/**
- * get partial data for user's current holdings from all previous transactions, where units are more than 0
- *
- * @param transactions - user's transactions
- * @returns
- */
-const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransaction[]): PortfolioStateHoldingBase[] => {
-  return transactions
-    .reduce((acc, curr) => {
-      const existingHolding = acc.find((d) => d.symbol === curr.symbol);
-      const isSell = curr.transactionType === 'SELL';
-      // update existing holding
-      if (existingHolding) {
-        existingHolding.units += isSell ? -curr.units : curr.units;
-        existingHolding.invested += curr.unitPrice * curr.units * (isSell ? -1 : 1);
-        return acc;
-      }
-
-      // first value can not be sell
-      if (isSell) {
-        console.error('First transaction can not be sell');
-      }
-
-      // add new holding
-      return [
-        ...acc,
-        {
-          symbolType: curr.symbolType,
-          symbol: curr.symbol,
-          units: curr.units,
-          invested: roundNDigits(curr.unitPrice * curr.units),
-        } satisfies PortfolioStateHoldingBase,
-      ];
-    }, [] as PortfolioStateHoldingBase[])
-    .filter((d) => d.units > 0);
 };

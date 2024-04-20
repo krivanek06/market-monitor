@@ -9,14 +9,14 @@ import axios from 'axios';
 
 export const getSymbolSummaries = async (symbols: string[]): Promise<SymbolSummary[]> => {
   const url = `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`;
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
   try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
     if (!response.ok) {
       console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
       return [];
@@ -40,19 +40,25 @@ export const getPriceOnDateRange = async (
   endDate: string,
 ): Promise<HistoricalPriceSymbol | null> => {
   const url = `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&dateStart=${dateStart}&dateEnd=${endDate}&type=dateRange`;
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  if (!response.ok) {
-    console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
+    if (!response.ok) {
+      console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
+      return null;
+    }
+    const data = (await response.json()) as HistoricalPrice[];
+    return { symbol, data };
+  } catch (error) {
+    console.log(`Failed to get historical prices for ${symbol} with date range ${dateStart} - ${endDate}`);
+    console.log(error);
     return null;
   }
-  const data = (await response.json()) as HistoricalPrice[];
-  return { symbol, data };
 };
 
 export const getHistoricalPricesCloudflare = async (
@@ -60,14 +66,14 @@ export const getHistoricalPricesCloudflare = async (
   period: SymbolHistoricalPeriods,
 ): Promise<HistoricalPrice[]> => {
   const url = `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&period=${period}&type=period`;
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
   try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
     if (!response.ok) {
       console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
       return [];

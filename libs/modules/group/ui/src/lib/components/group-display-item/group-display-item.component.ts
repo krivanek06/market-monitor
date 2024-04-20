@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { GROUP_MEMBER_LIMIT, GroupBase } from '@mm/api-types';
-import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
+import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-group-display-item',
@@ -16,16 +16,14 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
     MatIconModule,
     PercentageIncreaseDirective,
     MatRippleModule,
+    ClickableDirective,
   ],
   template: `
     <div
       matRipple
       [matRippleCentered]="true"
-      [matRippleDisabled]="!clickable()"
+      [matRippleDisabled]="!clickableDirective.clickable()"
       [matRippleUnbounded]="false"
-      [ngClass]="{
-        'g-clickable-hover': clickable()
-      }"
       class="flex flex-col gap-1 p-2 @container"
     >
       <div class="flex gap-4">
@@ -52,15 +50,29 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
             </div>
 
             <!-- portfolio -->
-            <div
-              *ngIf="!groupData().isClosed"
-              appPercentageIncrease
-              [useCurrencySign]="true"
-              [changeValues]="{
-                change: groupData().portfolioState.totalGainsValue,
-                changePercentage: groupData().portfolioState.totalGainsPercentage
-              }"
-            ></div>
+            @if (!groupData().isClosed) {
+              <!-- total portfolio change -->
+              <div
+                *ngIf="!showDailyPortfolioChange()"
+                appPercentageIncrease
+                [useCurrencySign]="true"
+                [changeValues]="{
+                  change: groupData().portfolioState.totalGainsValue,
+                  changePercentage: groupData().portfolioState.totalGainsPercentage
+                }"
+              ></div>
+
+              <!-- daily portfolio change -->
+              <div
+                *ngIf="showDailyPortfolioChange()"
+                appPercentageIncrease
+                [useCurrencySign]="true"
+                [changeValues]="{
+                  change: groupData().portfolioState.previousBalanceChange,
+                  changePercentage: groupData().portfolioState.previousBalanceChangePercentage
+                }"
+              ></div>
+            }
             <!-- closed group display message -->
             <div *ngIf="groupData().isClosed" class="text-wt-danger">(Closed)</div>
           </div>
@@ -88,10 +100,22 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    {
+      directive: ClickableDirective,
+      inputs: ['clickable'],
+      outputs: ['itemClicked'],
+    },
+  ],
 })
 export class GroupDisplayItemComponent {
+  clickableDirective = inject(ClickableDirective);
   groupData = input.required<GroupBase>();
-  clickable = input(false);
+
+  /**
+   * whether to show daily portfolio change or total portfolio change
+   */
+  showDailyPortfolioChange = input(false);
 
   memberLimit = GROUP_MEMBER_LIMIT;
 }

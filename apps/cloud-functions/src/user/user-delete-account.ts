@@ -1,7 +1,8 @@
+import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDeleteData } from '../group/group-delete';
-import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
+import { userDocumentRef } from '../models';
 
 /**
  * This function is called when a user deletes their account.
@@ -33,15 +34,13 @@ export const userDeleteAccountById = async (userId: string): Promise<void> => {
     throw new HttpsError('failed-precondition', 'User does not exist');
   }
 
-  // delete user
-  await userDocumentTransactionHistoryRef(userId).delete();
-  await userDocumentWatchListRef(userId).delete();
-  await userDoc.ref.delete();
-
   // delete groups where user is the owner
   for (const groupId of userData.groups.groupOwner) {
     await groupDeleteData(userId, groupId);
   }
+
+  // delete user's sub collections
+  await firestore().recursiveDelete(userDoc.ref);
 
   // delete from auth
   await getAuth().deleteUser(userId);

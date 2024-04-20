@@ -2,7 +2,8 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
 import {
   userDeactivateInactiveAccounts,
-  userDeleteAccountInactive,
+  userDeleteDemoAccounts,
+  userDeleteNormalAccounts,
   userHallOfFame,
   userPortfolioRank,
   userPortfolioUpdate,
@@ -72,7 +73,10 @@ export const test_delete_user_accounts = onRequest({ timeoutSeconds: 1200 }, asy
     await userDeactivateInactiveAccounts();
 
     console.log('[Users]: delete demo or inactive accounts');
-    await userDeleteAccountInactive();
+    await userDeleteDemoAccounts();
+
+    console.log('[Users]: delete old inactive accounts');
+    await userDeleteNormalAccounts();
 
     res.send('ok');
   });

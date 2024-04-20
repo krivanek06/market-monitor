@@ -46,13 +46,11 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       lastTransactionDate: null,
       previousBalanceChange: 0,
       previousBalanceChangePercentage: 0,
-      accountResetDate: format(new Date(), 'yyyy-MM-dd'),
     },
     holdingSnapshot: {
       lastModifiedDate: format(new Date(), 'yyyy-MM-dd'),
       data: [],
     },
-    lastLoginDate: format(new Date(), 'yyyy-MM-dd'),
     isAccountActive: true,
     accountCreatedDate: format(new Date(), 'yyyy-MM-dd'),
     userAccountType: UserAccountEnum.NORMAL_BASIC,

@@ -901,3 +901,33 @@ export type TreasuryRates = {
   year20: number;
   year30: number;
 };
+
+export type IsStockMarketOpen = {
+  stockExchangeName: string;
+  stockMarketHours: {
+    openingHour: 'CLOSED' | 'OPEN';
+    closingHour: 'CLOSED' | 'OPEN';
+  };
+  isTheStockMarketOpen: boolean;
+  isTheEuronextMarketOpen: boolean;
+  isTheForexMarketOpen: boolean;
+  isTheCryptoMarketOpen: boolean;
+
+  /**
+   * example:
+   * "year": 2019,
+   * "New Years Day": "2019-01-01",
+   * "Martin Luther King, Jr. Day": "2019-01-21",
+   * "Washington's Birthday": "2019-02-18",
+   */
+  stockMarketHolidays: {
+    year: number;
+  } & Record<string, string>[];
+};
+
+export type IsStockMarketOpenExtend = IsStockMarketOpen & {
+  /**
+   * array of holidays for the current year
+   */
+  currentHoliday: string[];
+};

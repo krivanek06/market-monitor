@@ -82,7 +82,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
       margin: auto;
 
       @screen xl {
-        padding: 28px 32px 40px 32px;
+        padding: 28px 24px 40px 24px;
         max-width: 1560px;
       }
     }

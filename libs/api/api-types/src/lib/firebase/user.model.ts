@@ -14,8 +14,6 @@ export type UserBase = {
   portfolioState: PortfolioState;
 
   accountCreatedDate: string;
-
-  lastLoginDate: string;
   /**
    * at each login is set to true, set to false
    * only if lastLoginDate is more than USER_LOGIN_ACCOUNT_ACTIVE_DAYS ago
@@ -25,6 +23,10 @@ export type UserBase = {
    * if true, account was created by the system for demo purposes
    */
   isDemo: boolean;
+  /**
+   * features that user has access to
+   */
+  userAccountType: UserAccountEnum;
 };
 
 export type UserData = UserBase & {
@@ -52,10 +54,6 @@ export type UserData = UserBase & {
    * data about current holdings, calculated from previous transactions
    */
   holdingSnapshot: DataDocsWrapper<PortfolioStateHoldingBase>;
-  /**
-   * features that user has access to
-   */
-  userAccountType: UserAccountEnum;
   /**
    * only available for DEMO_TRADING users
    */

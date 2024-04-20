@@ -5,7 +5,8 @@ import { assignTypes } from './assign-type';
 export const usersCollectionRef = () => firestore().collection('users').withConverter(assignTypes<UserData>());
 
 export const userCollectionDemoAccountRef = () => usersCollectionRef().where('isDemo', '==', true);
-export const userCollectionActiveAccountRef = () => usersCollectionRef().where('isAccountActive', '==', true);
+export const userCollectionActiveAccountRef = () =>
+  usersCollectionRef().where('isDemo', '==', false).where('isAccountActive', '==', true);
 
 export const usersCollectionDemoTradingRef = () =>
   userCollectionActiveAccountRef()

@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +13,7 @@ import {
   DefaultImgDirective,
   GeneralCardComponent,
   PositionColoringDirective,
+  RangeDirective,
   SectionTitleComponent,
   ShowMoreButtonComponent,
 } from '@mm/shared/ui';
@@ -33,82 +33,93 @@ import {
     GroupDisplayItemComponent,
     GeneralCardComponent,
     ShowMoreButtonComponent,
+    RangeDirective,
   ],
   template: `
     <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4">
-      @if (hallOfFameGroupsSignal(); as hallOfFameGroups) {
-        <div class="lg:basis-4/6 xl:basis-3/6">
-          <div class="flex items-center justify-between lg:px-2 mb-4">
-            <!-- title -->
-            <app-section-title title="Top Groups" class="mt-2" />
+      <div class="lg:basis-4/6 xl:basis-3/6">
+        <div class="flex items-center justify-between lg:px-2 mb-4">
+          <!-- title -->
+          <app-section-title title="Top Groups" class="mt-2" />
 
-            <div class="flex items-center gap-4">
-              <!-- best/worst button -->
-              <button
-                (click)="showBestToggle()"
-                [color]="showBestSignal() ? 'accent' : 'warn'"
-                mat-stroked-button
-                type="button"
-              >
-                <mat-icon *ngIf="showBestSignal()">arrow_drop_up</mat-icon>
-                <mat-icon *ngIf="!showBestSignal()">arrow_drop_down</mat-icon>
-                {{ showBestSignal() ? 'Best Groups' : ' Worst Groups' }}
-              </button>
-            </div>
+          <div class="flex items-center gap-4">
+            <!-- best/worst button -->
+            <button
+              (click)="showBestToggle()"
+              [color]="showBestSignal() ? 'accent' : 'warn'"
+              mat-stroked-button
+              type="button"
+            >
+              <mat-icon *ngIf="showBestSignal()">arrow_drop_up</mat-icon>
+              <mat-icon *ngIf="!showBestSignal()">arrow_drop_down</mat-icon>
+              {{ showBestSignal() ? 'Best Groups' : ' Worst Groups' }}
+            </button>
           </div>
-
-          <!-- table -->
-          <app-general-card>
-            <app-portfolio-rank-table
-              (clickedItem)="onGroupClick($event)"
-              [data]="displayPortfolioDataSignal()"
-              [template]="userTemplate"
-            />
-
-            <!-- show more button -->
-            <div class="flex justify-end">
-              <app-show-more-button
-                [itemsTotal]="displayPortfolioSignal().length"
-                [itemsLimit]="displayGroupsLimit"
-                [(showMoreToggle)]="showMoreSignal"
-              />
-            </div>
-          </app-general-card>
         </div>
-        <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
-          <!-- daily best -->
-          <div class="@container">
-            <app-section-title title="Daily Gainers" class="mb-6" />
-            <div class="grid @xl:grid-cols-2 gap-3">
+
+        <!-- table -->
+        <app-general-card>
+          <app-portfolio-rank-table
+            (clickedItem)="onGroupClick($event)"
+            [data]="displayPortfolioDataSignal()"
+            [template]="userTemplate"
+          />
+
+          <!-- show more button -->
+          <div class="flex justify-end">
+            <app-show-more-button
+              [itemsTotal]="displayPortfolioSignal().length"
+              [itemsLimit]="displayGroupsLimit"
+              [(showMoreToggle)]="showMoreSignal"
+            />
+          </div>
+        </app-general-card>
+      </div>
+      <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
+        <!-- daily best -->
+        <div class="@container">
+          <app-section-title title="Daily Gainers" class="mb-6" />
+          <div class="grid @xl:grid-cols-2 gap-3">
+            @if (hallOfFameGroupsSignal(); as hallOfFameGroups) {
               @for (group of hallOfFameGroups.bestDailyGains; track group.id) {
                 <app-group-display-item
-                  (click)="onGroupClick(group)"
+                  (itemClicked)="onGroupClick(group)"
+                  [clickable]="true"
+                  [showDailyPortfolioChange]="true"
                   [groupData]="group"
-                  class="g-clickable-hover-color mb-1 rounded-lg p-2"
+                  class="mb-1 rounded-lg p-2"
                 />
               } @empty {
                 <div class="@xl:col-span-2">No Data Found</div>
               }
-            </div>
+            } @else {
+              <div *ngRange="10" class="g-skeleton h-16"></div>
+            }
           </div>
+        </div>
 
-          <!-- daily worst -->
-          <div class="@container">
-            <app-section-title title="Daily Losers" class="mb-6" />
-            <div class="grid @xl:grid-cols-2 gap-3">
+        <!-- daily worst -->
+        <div class="@container">
+          <app-section-title title="Daily Losers" class="mb-6" />
+          <div class="grid @xl:grid-cols-2 gap-3">
+            @if (hallOfFameGroupsSignal(); as hallOfFameGroups) {
               @for (group of hallOfFameGroups.worstDailyGains; track group.id) {
                 <app-group-display-item
-                  (click)="onGroupClick(group)"
+                  (itemClicked)="onGroupClick(group)"
+                  [clickable]="true"
+                  [showDailyPortfolioChange]="true"
                   [groupData]="group"
-                  class="g-clickable-hover-color mb-1 rounded-lg p-2"
+                  class="mb-1 rounded-lg p-2"
                 />
               } @empty {
                 <div>No Data Found</div>
               }
-            </div>
+            } @else {
+              <div *ngRange="10" class="g-skeleton h-16"></div>
+            }
           </div>
         </div>
-      }
+      </div>
     </div>
 
     <!-- template for user data in table -->
@@ -149,7 +160,7 @@ export class HallOfFameGroupsComponent {
    */
   readonly displayGroupsLimit = 20;
 
-  hallOfFameGroupsSignal = toSignal(this.aggregationApiService.getHallOfFameGroups());
+  hallOfFameGroupsSignal = this.aggregationApiService.hallOfFameGroups;
 
   displayPortfolioSignal = computed(() =>
     this.showBestSignal()

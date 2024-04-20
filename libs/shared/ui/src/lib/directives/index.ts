@@ -1,5 +1,6 @@
 export * from './add-color.directive';
 export * from './bubble-pagination.directive';
+export * from './clickable.directive';
 export * from './default-img.directive';
 export * from './element-focus.directive';
 export * from './hide-after.directive';

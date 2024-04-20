@@ -1,11 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   USER_DEFAULT_STARTING_CASH,
   UserAccountBasicTypes,
   UserAccountEnum,
   UserData,
   UserPersonalInfo,
-  UserPortfolioTransaction,
-  UserWatchList,
 } from '@mm/api-types';
 import { createEmptyPortfolioState, createNameInitials, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
@@ -25,6 +24,13 @@ export const userCreateAccountCall = onCall(async (request) => {
     throw new HttpsError('aborted', 'User is not authenticated');
   }
 
+  // check if user already exists
+  const existingUser = await userDocumentRef(userAuthId).get();
+  if (existingUser.data()) {
+    throw new HttpsError('aborted', 'User already exists');
+  }
+
+  // create new user
   const user = await getAuth().getUser(userAuthId);
   return userCreate(user);
 });
@@ -39,27 +45,26 @@ export const userCreate = async (user: UserRecord, additional: CreateUserAdditio
       displayName: userNamePrefix,
       displayNameLowercase: userNamePrefix.toLowerCase(),
       displayNameInitials: createNameInitials(userNamePrefix),
-      photoURL: user.photoURL ?? null,
+      photoURL: user.photoURL ?? faker.image.avatarGitHub(),
       providerId: user.providerData[0].providerId ?? 'unknown',
       email: user.email ?? 'unknown',
     },
     additional,
   );
 
-  const newTransactions: UserPortfolioTransaction = {
-    transactions: [],
-  };
-
-  const newWatchList: UserWatchList = {
-    createdDate: getCurrentDateDefaultFormat(),
-    data: [],
-  };
   // update user
   await userDocumentRef(newUserData.id).set(newUserData);
+
   // update transactions
-  await userDocumentTransactionHistoryRef(newUserData.id).set(newTransactions);
+  await userDocumentTransactionHistoryRef(newUserData.id).set({
+    transactions: [],
+  });
+
   // update watchList
-  await userDocumentWatchListRef(newUserData.id).set(newWatchList);
+  await userDocumentWatchListRef(newUserData.id).set({
+    createdDate: getCurrentDateDefaultFormat(),
+    data: [],
+  });
 
   // return data
   return newUserData;
@@ -92,7 +97,6 @@ const createNewUser = (id: string, personal: UserPersonalInfo, additional: Creat
       lastModifiedDate: getCurrentDateDefaultFormat(),
       data: [],
     },
-    lastLoginDate: getCurrentDateDefaultFormat(),
     isAccountActive: true,
     isDemo: !!additional.isDemo,
     accountCreatedDate: getCurrentDateDefaultFormat(),

@@ -1,36 +1,58 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT, UserBase } from '@mm/api-types';
-import { DefaultImgDirective, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
-import { isBefore, subDays } from 'date-fns';
+import { UserBase } from '@mm/api-types';
+import {
+  ClickableDirective,
+  DefaultImgDirective,
+  LargeNumberFormatterPipe,
+  PercentageIncreaseDirective,
+} from '@mm/shared/ui';
 
 @Component({
   selector: 'app-user-display-item',
   standalone: true,
-  imports: [CommonModule, DefaultImgDirective, LargeNumberFormatterPipe, MatIconModule, PercentageIncreaseDirective],
-
+  imports: [
+    CommonModule,
+    DefaultImgDirective,
+    LargeNumberFormatterPipe,
+    MatIconModule,
+    PercentageIncreaseDirective,
+    ClickableDirective,
+  ],
   template: `
-    <div class="flex gap-4">
+    <div class="flex gap-4 @container">
       <img appDefaultImg [src]="userData().personal.photoURL" alt="User Image" class="w-14 h-14 rounded-md" />
 
       <!-- info -->
       <div class="flex flex-col text-sm">
+        <!-- name -->
         <div class="flex">
           <div class="text-wt-gray-dark w-[80px]">Name:</div>
-          <div class="mr-4">{{ userData().personal.displayName }}</div>
-          <!-- active user -->
-          <mat-icon *ngIf="showLoginButton()" [color]="isUserActive ? 'accent' : 'warn'" class="hidden sm:block">
-            radio_button_checked
-          </mat-icon>
+          <div class="flex-1">
+            <span class="hidden @xs:block">{{ userData().personal.displayName }}</span>
+            <span class="block @xs:hidden">{{ userData().personal.displayNameInitials }}</span>
+          </div>
         </div>
 
+        <!-- balance -->
         <div class="flex">
           <div class="text-wt-gray-dark w-[80px]">Balance:</div>
           <div class="flex items-center gap-2">
             <div>{{ userData().portfolioState.balance | largeNumberFormatter: false : true }}</div>
+
+            <!-- total portfolio change -->
             <div
-              *ngIf="userData().portfolioState.previousBalanceChangePercentage > 0"
+              *ngIf="!showDailyPortfolioChange()"
+              appPercentageIncrease
+              [changeValues]="{
+                changePercentage: userData().portfolioState.totalGainsPercentage
+              }"
+            ></div>
+
+            <!-- daily portfolio change -->
+            <div
+              *ngIf="showDailyPortfolioChange()"
               appPercentageIncrease
               [changeValues]="{
                 changePercentage: userData().portfolioState.previousBalanceChangePercentage
@@ -40,8 +62,8 @@ import { isBefore, subDays } from 'date-fns';
         </div>
 
         <div class="flex">
-          <div class="text-wt-gray-dark w-[80px]">Login:</div>
-          <span>{{ userData().lastLoginDate | date: 'MMMM d, y' }}</span>
+          <div class="text-wt-gray-dark w-[80px]">Created:</div>
+          <span>{{ userData().accountCreatedDate | date: 'MMMM d, y' }}</span>
         </div>
       </div>
     </div>
@@ -52,14 +74,18 @@ import { isBefore, subDays } from 'date-fns';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    {
+      directive: ClickableDirective,
+      inputs: ['clickable'],
+      outputs: ['itemClicked'],
+    },
+  ],
 })
 export class UserDisplayItemComponent {
   userData = input.required<UserBase>();
-  showLoginButton = input(true);
-
-  USER_ACTIVE_ACCOUNT_TIME_DAYS = USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT;
-
-  get isUserActive(): boolean {
-    return isBefore(subDays(new Date(), USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT), new Date(this.userData().lastLoginDate));
-  }
+  /**
+   * whether to show daily portfolio change or total portfolio change
+   */
+  showDailyPortfolioChange = input(false);
 }
