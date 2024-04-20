@@ -89,7 +89,6 @@ const createNewUser = (id: string, personal: UserPersonalInfo, additional: Creat
       lastModifiedDate: getCurrentDateDefaultFormat(),
       data: [],
     },
-    lastLoginDate: getCurrentDateDefaultFormat(),
     isAccountActive: true,
     isDemo: !!additional.isDemo,
     accountCreatedDate: getCurrentDateDefaultFormat(),

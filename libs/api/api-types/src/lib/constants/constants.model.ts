@@ -45,12 +45,12 @@ export const TRANSACTION_FEE_PRCT = 0.1;
 /**
  * number in days when a user account is considered in-active
  */
-export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT = 45;
+export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT = 60;
 
 /**
  * number in days when a demo user account will be deleted
  */
-export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_FOR_DEMO_DELETE = 7;
+export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DEMO = 7;
 
 /**
  * number in days when a normal user account will be deleted after not logging in

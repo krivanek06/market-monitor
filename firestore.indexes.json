@@ -97,24 +97,6 @@
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "lastLoginDate",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "isAccountActive",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "isDemo",
-          "order": "ASCENDING"
-        },
-        {
           "fieldPath": "portfolioState.date",
           "order": "DESCENDING"
         }
@@ -205,20 +187,6 @@
         {
           "fieldPath": "systemRank.portfolioTotalGainsPercentage.rank",
           "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "isAccountActive",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "lastLoginDate",
-          "order": "ASCENDING"
         }
       ]
     },

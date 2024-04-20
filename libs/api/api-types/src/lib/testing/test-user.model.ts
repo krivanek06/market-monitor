@@ -51,7 +51,6 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
       lastModifiedDate: format(new Date(), 'yyyy-MM-dd'),
       data: [],
     },
-    lastLoginDate: format(new Date(), 'yyyy-MM-dd'),
     isAccountActive: true,
     accountCreatedDate: format(new Date(), 'yyyy-MM-dd'),
     userAccountType: UserAccountEnum.NORMAL_BASIC,

@@ -1,14 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT, UserBase } from '@mm/api-types';
+import { UserBase } from '@mm/api-types';
 import {
   ClickableDirective,
   DefaultImgDirective,
   LargeNumberFormatterPipe,
   PercentageIncreaseDirective,
 } from '@mm/shared/ui';
-import { isBefore, subDays } from 'date-fns';
 
 @Component({
   selector: 'app-user-display-item',
@@ -27,6 +26,7 @@ import { isBefore, subDays } from 'date-fns';
 
       <!-- info -->
       <div class="flex flex-col text-sm">
+        <!-- name -->
         <div class="flex">
           <div class="text-wt-gray-dark w-[80px]">Name:</div>
           <div class="flex-1">
@@ -35,6 +35,7 @@ import { isBefore, subDays } from 'date-fns';
           </div>
         </div>
 
+        <!-- balance -->
         <div class="flex">
           <div class="text-wt-gray-dark w-[80px]">Balance:</div>
           <div class="flex items-center gap-2">
@@ -49,8 +50,8 @@ import { isBefore, subDays } from 'date-fns';
         </div>
 
         <div class="flex">
-          <div class="text-wt-gray-dark w-[80px]">Login:</div>
-          <span>{{ userData().lastLoginDate | date: 'MMMM d, y' }}</span>
+          <div class="text-wt-gray-dark w-[80px]">Created:</div>
+          <span>{{ userData().accountCreatedDate | date: 'MMMM d, y' }}</span>
         </div>
       </div>
     </div>
@@ -71,10 +72,4 @@ import { isBefore, subDays } from 'date-fns';
 })
 export class UserDisplayItemComponent {
   userData = input.required<UserBase>();
-
-  USER_ACTIVE_ACCOUNT_TIME_DAYS = USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT;
-
-  get isUserActive(): boolean {
-    return isBefore(subDays(new Date(), USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT), new Date(this.userData().lastLoginDate));
-  }
 }

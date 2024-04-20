@@ -16,7 +16,6 @@ import { Functions, httpsCallable } from '@angular/fire/functions';
 import { UserApiService } from '@mm/api-client';
 import { UserAccountBasicTypes, UserCreateDemoAccountInput, UserData, UserDataDemoData } from '@mm/api-types';
 import { IS_DEV_TOKEN } from '@mm/shared/data-access';
-import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { BehaviorSubject, Observable, Subject, catchError, firstValueFrom, from, map, of, switchMap } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
 
@@ -183,19 +182,6 @@ export class AuthenticationAccountService {
     this.auth.onAuthStateChanged((user) => {
       console.log('authentication state change', user);
       this.authenticatedUser$.next(user);
-      const updateTime = this.isDevActive ? 3_000 : 20_000;
-
-      if (user) {
-        // wait some time before updating last login date so that user is already saved in authenticatedUserData
-        setTimeout(() => {
-          console.log(`UPDATE LAST LOGIN for user ${user.displayName} : ${user.uid}`);
-          // update last login date
-          this.userApiService.updateUser(user.uid, {
-            lastLoginDate: getCurrentDateDefaultFormat(),
-            isAccountActive: true,
-          });
-        }, updateTime);
-      }
     });
   }
 

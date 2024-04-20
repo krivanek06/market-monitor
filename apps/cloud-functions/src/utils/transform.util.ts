@@ -7,7 +7,6 @@ export const transformUserToBase = (user: UserData): UserBase => {
     accountCreatedDate: user.accountCreatedDate,
     portfolioState: user.portfolioState,
     personal: user.personal,
-    lastLoginDate: user.lastLoginDate,
     isAccountActive: user.isAccountActive,
     isDemo: user.isDemo,
     userAccountType: user.userAccountType,

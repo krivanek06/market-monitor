@@ -14,8 +14,6 @@ export type UserBase = {
   portfolioState: PortfolioState;
 
   accountCreatedDate: string;
-
-  lastLoginDate: string;
   /**
    * at each login is set to true, set to false
    * only if lastLoginDate is more than USER_LOGIN_ACCOUNT_ACTIVE_DAYS ago
