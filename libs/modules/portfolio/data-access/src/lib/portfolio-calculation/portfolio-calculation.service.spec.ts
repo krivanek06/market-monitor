@@ -19,14 +19,20 @@ import { PortfolioCalculationService } from './portfolio-calculation.service';
 describe('PortfolioCalculationService', () => {
   let service: PortfolioCalculationService;
 
-  // freezing time
-  jest.useFakeTimers().setSystemTime(new Date(getCurrentDateDetailsFormat()));
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [MockProvider(MarketApiService)],
     });
     service = TestBed.inject(PortfolioCalculationService);
+  });
+
+  beforeAll(() => {
+    // freezing time
+    jest.useFakeTimers().setSystemTime(new Date(getCurrentDateDetailsFormat()));
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
   });
 
   it('should be created', () => {
