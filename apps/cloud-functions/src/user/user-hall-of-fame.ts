@@ -4,7 +4,7 @@ import {
   HallOfFameTopRankData,
   UserBase,
 } from '@mm/api-types';
-import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
+import { getCurrentDateDetailsFormat } from '@mm/shared/general-util';
 import { aggregationHallOfFameUsersRef, usersCollectionDemoTradingRef } from '../models';
 import { transformUserToBase } from '../utils';
 
@@ -78,6 +78,6 @@ export const userHallOfFame = async (): Promise<void> => {
     worstPortfolio: userWorstProfitData,
     bestDailyGains: userBestDailyProfitData,
     worstDailyGains: userWorstDailyProfitData,
-    date: getCurrentDateDefaultFormat(),
+    date: getCurrentDateDetailsFormat(),
   });
 };

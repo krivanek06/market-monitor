@@ -4,7 +4,7 @@ import {
   HALL_OF_FAME_PORTFOLIO_TOP_LIMIT,
   HallOfFameTopRankData,
 } from '@mm/api-types';
-import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
+import { getCurrentDateDetailsFormat } from '@mm/shared/general-util';
 import { groupsCollectionRef } from '../models';
 import { aggregationHallOfFameGroupsRef } from '../models/aggregation';
 import { transformGroupToBase } from '../utils';
@@ -80,6 +80,6 @@ export const groupHallOfFame = async (): Promise<void> => {
     worstPortfolio: groupWorstProfitData,
     bestDailyGains: groupBestDailyProfitData,
     worstDailyGains: groupWorstDailyProfitData,
-    date: getCurrentDateDefaultFormat(),
+    date: getCurrentDateDetailsFormat(),
   });
 };

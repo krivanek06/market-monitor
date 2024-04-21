@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   CompanyInsideTrade,
   DataTimePeriod,
@@ -22,15 +22,18 @@ import { ApiCacheService } from '../utils';
 @Injectable({
   providedIn: 'root',
 })
-export class StocksApiService extends ApiCacheService {
+export class StocksApiService {
+  private apiCache = inject(ApiCacheService);
+
   searchStockSummariesByPrefix(ticker: string): Observable<SymbolSummary[]> {
     if (!ticker) {
       return of([]);
     }
-    return this.getData<SymbolSummary[]>(
-      `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${ticker}&isSearch=true`,
-      this.validity10Min,
-    ).pipe(map((summaries) => summaries.filter((d) => d.quote.marketCap !== 0)));
+    return this.apiCache
+      .getData<
+        SymbolSummary[]
+      >(`https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${ticker}&isSearch=true`, ApiCacheService.validity10Min)
+      .pipe(map((summaries) => summaries.filter((d) => d.quote.marketCap !== 0)));
   }
 
   getStockSummaries(symbols: string[]): Observable<StockSummary[]> {
@@ -38,10 +41,11 @@ export class StocksApiService extends ApiCacheService {
       return of([]);
     }
 
-    return this.getData<StockSummary[]>(
-      `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`,
-      this.validity3Min,
-    ).pipe(catchError(() => []));
+    return this.apiCache
+      .getData<
+        StockSummary[]
+      >(`https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`, ApiCacheService.validity3Min)
+      .pipe(catchError(() => []));
   }
 
   getStockSummary(symbol: string): Observable<StockSummary | null> {
@@ -62,72 +66,75 @@ export class StocksApiService extends ApiCacheService {
       }),
       filter((d): d is StockSummary => !!d),
       switchMap((summary) =>
-        this.getData<StockDetailsAPI>(
-          `https://get-stock-data.krivanek1234.workers.dev/?type=stock-details&symbol=${symbol}`,
-          this.validity1Hour,
-        ).pipe(
-          map((details) => {
-            return {
-              ...summary,
-              ...details,
-            };
-          }),
-        ),
+        this.apiCache
+          .getData<StockDetailsAPI>(
+            `https://get-stock-data.krivanek1234.workers.dev/?type=stock-details&symbol=${symbol}`,
+            ApiCacheService.validity1Hour,
+          )
+          .pipe(
+            map((details) => {
+              return {
+                ...summary,
+                ...details,
+              };
+            }),
+          ),
       ),
     );
   }
 
   getStockHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {
-    return this.getData<HistoricalPrice[]>(
+    return this.apiCache.getData<HistoricalPrice[]>(
       `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&period=${period}&type=period`,
     );
   }
 
   getStockHistoricalPricesOnDate(symbol: string, date: string): Observable<HistoricalPrice | null> {
-    return this.getData<HistoricalPrice | null>(
+    return this.apiCache.getData<HistoricalPrice | null>(
       `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&date=${date}&type=specificDate`,
-      this.validity2Min,
+      ApiCacheService.validity2Min,
     );
   }
 
   getStockScreening(screeningValue: StockScreenerValues): Observable<SymbolSummary[]> {
-    return this.postData<StockScreenerResults[], StockScreenerValues>(
-      'https://get-stock-screening.krivanek1234.workers.dev',
-      screeningValue,
-      this.validity5Min,
-    ).pipe(
-      map((stockScreeningResults) => {
-        // create multiple requests
-        const checkSize = 40;
-        const symbolsChunks = stockScreeningResults
-          .map((data) => data.symbol)
-          .reduce((acc, symbol, index) => {
-            // if (index % checkSize === 0) then create new array with symbol else add symbol to last array
-            return index % checkSize === 0
-              ? [...acc, [symbol]]
-              : [...acc.slice(0, -1), [...acc[acc.length - 1], symbol]];
-          }, [] as string[][]);
+    return this.apiCache
+      .postData<
+        StockScreenerResults[],
+        StockScreenerValues
+      >('https://get-stock-screening.krivanek1234.workers.dev', screeningValue, ApiCacheService.validity5Min)
+      .pipe(
+        map((stockScreeningResults) => {
+          // create multiple requests
+          const checkSize = 40;
+          const symbolsChunks = stockScreeningResults
+            .map((data) => data.symbol)
+            .reduce((acc, symbol, index) => {
+              // if (index % checkSize === 0) then create new array with symbol else add symbol to last array
+              return index % checkSize === 0
+                ? [...acc, [symbol]]
+                : [...acc.slice(0, -1), [...acc[acc.length - 1], symbol]];
+            }, [] as string[][]);
 
-        return symbolsChunks;
-      }),
-      // load summaries for chunks
-      switchMap((symbolsChunks) =>
-        // return empty array on error
-        forkJoin(symbolsChunks.map((chunk) => this.getStockSummaries(chunk).pipe(catchError(() => [])))),
-      ),
-      // flatten
-      mergeMap((d) => d),
-      // sort by ID
-      map((d) => d.slice().sort((a, b) => a.id.localeCompare(b.id))),
-      // Combine all summaries into a single array and emit only once
-      reduce((acc, curr) => [...acc, ...curr], [] as SymbolSummary[]),
-    );
+          return symbolsChunks;
+        }),
+        // load summaries for chunks
+        switchMap((symbolsChunks) =>
+          // return empty array on error
+          forkJoin(symbolsChunks.map((chunk) => this.getStockSummaries(chunk).pipe(catchError(() => [])))),
+        ),
+        // flatten
+        mergeMap((d) => d),
+        // sort by ID
+        map((d) => d.slice().sort((a, b) => a.id.localeCompare(b.id))),
+        // Combine all summaries into a single array and emit only once
+        reduce((acc, curr) => [...acc, ...curr], [] as SymbolSummary[]),
+      );
   }
 
   getStockEarnings(symbol: string): Observable<StockEarning[]> {
-    return this.getData<StockEarning[]>(
+    return this.apiCache.getData<StockEarning[]>(
       `https://get-stock-data.krivanek1234.workers.dev/?type=stock-earnings&symbol=${symbol}`,
-      this.validity30Min,
+      ApiCacheService.validity30Min,
     );
   }
 
@@ -135,37 +142,37 @@ export class StocksApiService extends ApiCacheService {
     symbol: string,
     period: DataTimePeriod = 'quarter',
   ): Observable<StockMetricsHistoricalBasic> {
-    return this.getData<StockMetricsHistoricalBasic>(
+    return this.apiCache.getData<StockMetricsHistoricalBasic>(
       `https://get-stock-data.krivanek1234.workers.dev/?type=stock-historical-metrics&symbol=${symbol}&timePeriod=${period}`,
-      this.validity2Min,
+      ApiCacheService.validity2Min,
     );
   }
 
   getStockOwnershipHoldersToDate(symbol: string, date: string): Observable<SymbolOwnershipHolders[]> {
-    return this.getData<SymbolOwnershipHolders[]>(
+    return this.apiCache.getData<SymbolOwnershipHolders[]>(
       `https://get-stock-data.krivanek1234.workers.dev/?type=stock-ownership-holders-to-date&symbol=${symbol}&date=${date}`,
-      this.validity1Hour,
+      ApiCacheService.validity1Hour,
     );
   }
 
   getStockOwnershipInstitutional(symbol: string): Observable<SymbolOwnershipInstitutional[]> {
-    return this.getData<SymbolOwnershipInstitutional[]>(
+    return this.apiCache.getData<SymbolOwnershipInstitutional[]>(
       `https://get-stock-data.krivanek1234.workers.dev/?type=stock-ownership-institutional&symbol=${symbol}`,
-      this.validity1Hour,
+      ApiCacheService.validity1Hour,
     );
   }
 
   getStockInsiderTrades(symbol: string): Observable<CompanyInsideTrade[]> {
-    return this.getData<CompanyInsideTrade[]>(
+    return this.apiCache.getData<CompanyInsideTrade[]>(
       `https://get-stock-data.krivanek1234.workers.dev/?type=stock-insider-trades&symbol=${symbol}`,
-      this.validity1Hour,
+      ApiCacheService.validity1Hour,
     );
   }
 
   getStockNews(symbol: string): Observable<News[]> {
-    return this.getData<News[]>(
+    return this.apiCache.getData<News[]>(
       `https://get-news.krivanek1234.workers.dev/?news_types=stocks&symbol=${symbol}`,
-      this.validity30Min,
+      ApiCacheService.validity30Min,
     );
   }
 }

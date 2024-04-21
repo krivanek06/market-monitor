@@ -43,7 +43,7 @@ export const getPortfolioStateHoldingsUtil = (
       }
       return {
         ...holding,
-        breakEvenPrice: roundNDigits(holding.invested / holding.units, 2),
+        breakEvenPrice: roundNDigits(holding.invested / holding.units),
         weight: roundNDigits(holding.invested / invested, 6),
         symbolSummary,
       } satisfies PortfolioStateHolding;

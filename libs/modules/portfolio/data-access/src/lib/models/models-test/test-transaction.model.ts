@@ -1,11 +1,4 @@
-import {
-  PortfolioState,
-  PortfolioTransaction,
-  PortfolioTransactionCreate,
-  SymbolSummary,
-  USER_TEST_1_ID,
-} from '@mm/api-types';
-import { getYesterdaysDate } from '@mm/shared/general-util';
+import { PortfolioTransaction, SymbolSummary, USER_TEST_1_ID } from '@mm/api-types';
 
 export const TestTransactionDates = {
   ['2023-09-04']: '2023-09-04',
@@ -16,21 +9,6 @@ export const TestTransactionDates = {
   ['2023-09-11']: '2023-09-11',
   ['2023-09-12']: '2023-09-12',
 } as const;
-
-export const mockCreatePortfolioTransactionCreate = (
-  input?: Partial<PortfolioTransactionCreate>,
-): PortfolioTransactionCreate => {
-  const data: PortfolioTransactionCreate = {
-    date: '2020-01-01',
-    symbol: 'AAPL',
-    transactionType: 'BUY',
-    units: 1,
-    symbolType: 'STOCK',
-    ...input,
-  };
-
-  return data;
-};
 
 export const mockPortfolioTransaction = (input?: Partial<PortfolioTransaction>): PortfolioTransaction => {
   const data: PortfolioTransaction = {
@@ -51,74 +29,13 @@ export const mockPortfolioTransaction = (input?: Partial<PortfolioTransaction>):
   return data;
 };
 
-export const testTransactionCreate_BUY_AAPL_1 = mockCreatePortfolioTransactionCreate({
-  symbol: 'AAPL',
-  units: 10,
-  date: TestTransactionDates['2023-09-04'],
-  transactionType: 'BUY',
-});
-
-export const testTransaction_BUY_AAPL_1 = mockPortfolioTransaction({
-  symbol: testTransactionCreate_BUY_AAPL_1.symbol,
-  units: testTransactionCreate_BUY_AAPL_1.units,
-  date: testTransactionCreate_BUY_AAPL_1.date,
-  transactionType: testTransactionCreate_BUY_AAPL_1.transactionType,
-  unitPrice: 100,
-});
-
-export const testTransactionCreate_BUY_AAPL_2 = mockCreatePortfolioTransactionCreate({
-  symbol: 'AAPL',
-  units: 5,
-  date: TestTransactionDates['2023-09-11'],
-  transactionType: 'BUY',
-});
-
-export const testTransaction_BUY_AAPL_2 = mockPortfolioTransaction({
-  symbol: testTransactionCreate_BUY_AAPL_2.symbol,
-  units: testTransactionCreate_BUY_AAPL_2.units,
-  date: testTransactionCreate_BUY_AAPL_2.date,
-  transactionType: testTransactionCreate_BUY_AAPL_2.transactionType,
-  unitPrice: 120,
-  transactionFees: 0.2,
-});
-
-export const testTransactionCreate_SELL_AAPL_1 = mockCreatePortfolioTransactionCreate({
-  symbol: 'AAPL',
-  units: 5,
-  date: TestTransactionDates['2023-09-12'],
-  transactionType: 'SELL',
-});
-
-export const testTransaction_SELL_AAPL_1 = mockPortfolioTransaction({
-  symbol: testTransactionCreate_SELL_AAPL_1.symbol,
-  units: testTransactionCreate_SELL_AAPL_1.units,
-  date: testTransactionCreate_SELL_AAPL_1.date,
-  transactionType: testTransactionCreate_SELL_AAPL_1.transactionType,
-  unitPrice: 130,
-  transactionFees: 0.5,
-});
-
-export const testTransactionCreate_BUY_MSFT_1 = mockCreatePortfolioTransactionCreate({
-  symbol: 'MSFT',
-  units: 10,
-  date: TestTransactionDates['2023-09-07'],
-  transactionType: 'BUY',
-});
-
-export const testTransaction_BUY_MSFT_1 = mockPortfolioTransaction({
-  symbol: testTransactionCreate_BUY_MSFT_1.symbol,
-  units: testTransactionCreate_BUY_MSFT_1.units,
-  date: testTransactionCreate_BUY_MSFT_1.date,
-  transactionType: testTransactionCreate_BUY_MSFT_1.transactionType,
-  unitPrice: 85.5,
-});
-
 export const mockSymbolSummaryAAPL: SymbolSummary = {
   id: 'AAPL',
   priceChange: {} as SymbolSummary['priceChange'],
   quote: {
     symbol: 'AAPL',
     price: 140,
+    change: 14,
   } as SymbolSummary['quote'],
 };
 
@@ -128,43 +45,8 @@ export const mockSymbolSummaryMSFT: SymbolSummary = {
   quote: {
     symbol: 'MSFT',
     price: 140,
+    change: 10,
   } as SymbolSummary['quote'],
-};
-
-export const testPreviousTransactionEmpty: PortfolioState = {
-  balance: 0,
-  cashOnHand: 0,
-  date: getYesterdaysDate(),
-  firstTransactionDate: null,
-  holdingsBalance: 0,
-  invested: 0,
-  lastTransactionDate: null,
-  numberOfExecutedBuyTransactions: 0,
-  numberOfExecutedSellTransactions: 0,
-  previousBalanceChange: 0,
-  previousBalanceChangePercentage: 0,
-  startingCash: 0,
-  totalGainsPercentage: 0,
-  totalGainsValue: 0,
-  transactionFees: 0,
-};
-
-export const testPreviousTransactionNonEmpty: PortfolioState = {
-  balance: 12_000,
-  cashOnHand: 10_000,
-  date: getYesterdaysDate(),
-  firstTransactionDate: '2023-09-01',
-  holdingsBalance: 0,
-  invested: 2000,
-  lastTransactionDate: '2023-09-01',
-  numberOfExecutedBuyTransactions: 10,
-  numberOfExecutedSellTransactions: 10,
-  previousBalanceChange: 0,
-  previousBalanceChangePercentage: 0,
-  startingCash: 0,
-  totalGainsPercentage: 0,
-  totalGainsValue: 0,
-  transactionFees: 10,
 };
 
 export const testHistoricalPriceSymbol_AAPL = {

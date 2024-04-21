@@ -57,7 +57,7 @@ import { SectionTitleComponent } from '@mm/shared/ui';
 export class UserDetailsPortfolioComponent {
   portfolioGrowth = input.required<PortfolioGrowth[] | null>();
   userData = input.required<UserData>();
-  portfolioStateHolding = input.required<PortfolioStateHoldings | undefined>();
+  portfolioStateHolding = input<PortfolioStateHoldings>();
 
   displayedColumns: string[] = ['symbol', 'price', 'balance', 'invested', 'totalChange', 'portfolio', 'marketCap'];
 }

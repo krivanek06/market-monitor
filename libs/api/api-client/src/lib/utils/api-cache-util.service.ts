@@ -1,20 +1,23 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { isBefore } from 'date-fns';
 import { Observable, of, retry, tap } from 'rxjs';
 
-export abstract class ApiCacheService {
+@Injectable({
+  providedIn: 'root',
+})
+export class ApiCacheService {
   private validityOneMinute = 1000 * 60;
   private cache = new Map<string, { data: any; validity: number }>();
 
-  validity1Min = 1;
-  validity2Min = 2;
-  validity3Min = 3;
-  validity5Min = 5;
-  validity10Min = 10;
-  validity30Min = 30;
-  validity1Hour = 60;
-  validity2Hour = 120;
+  static readonly validity1Min = 1;
+  static readonly validity2Min = 2;
+  static readonly validity3Min = 3;
+  static readonly validity5Min = 5;
+  static readonly validity10Min = 10;
+  static readonly validity30Min = 30;
+  static readonly validity1Hour = 60;
+  static readonly validity2Hour = 120;
 
   httpClient = inject(HttpClient);
 
@@ -33,7 +36,7 @@ export abstract class ApiCacheService {
     return new HttpHeaders(headersConfig);
   }
 
-  getData<T>(url: string, validityDefault = this.validity1Min): Observable<T> {
+  getData<T>(url: string, validityDefault = ApiCacheService.validity1Min): Observable<T> {
     // data cached
     if (this.checkDataAndValidity(url)) {
       const data = this.cache.get(url) as { data: any; validity: number };
@@ -64,7 +67,7 @@ export abstract class ApiCacheService {
     return this.httpClient.post<T>(`${url}`, JSON.stringify(data), { headers: this.headers });
   }
 
-  postData<T, D>(url: string, data?: D, validityDefault = this.validity1Min): Observable<T> {
+  postData<T, D>(url: string, data?: D, validityDefault = ApiCacheService.validity1Min): Observable<T> {
     // create hash
     const key = `${url}${JSON.stringify(data)}`;
 

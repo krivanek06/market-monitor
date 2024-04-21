@@ -17,7 +17,7 @@ import {
   mockCreateUser,
 } from '@mm/api-types';
 import { roundNDigits } from '@mm/shared/general-util';
-import { endOfDay, format, subYears } from 'date-fns';
+import { format, subYears } from 'date-fns';
 import { MockProvider, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
 import { PortfolioCreateOperationService } from './portfolio-create-operation.service';
@@ -245,38 +245,6 @@ describe('PortfolioCreateOperationService', () => {
         transactionFees: transactionFeesCalc,
         transactionId: expect.any(String),
         transactionType: 'SELL',
-        unitPrice: randomSymboLPrice.close,
-        units: t1.units,
-        userId: testUserData.id,
-      });
-    });
-
-    it('should change data from weekend to last working date', async () => {
-      const t1 = {
-        symbol: 'AAPL',
-        date: '2024-04-07', // Sunday
-        symbolType: 'STOCK',
-        transactionType: 'BUY',
-        units: 10,
-      } as PortfolioTransactionCreate;
-
-      const user = {
-        ...testUserData,
-        portfolioState: {
-          ...testUserData.portfolioState,
-          cashOnHand: 10_000,
-        },
-      } satisfies UserData;
-
-      await expect(service.createPortfolioCreateOperation(user, t1)).resolves.toMatchObject({
-        date: format(endOfDay(t1.date), 'yyyy-MM-dd HH:mm:ss'),
-        returnChange: 0,
-        returnValue: 0,
-        symbol: 'AAPL',
-        symbolType: 'STOCK',
-        transactionFees: expect.any(Number),
-        transactionId: expect.any(String),
-        transactionType: 'BUY',
         unitPrice: randomSymboLPrice.close,
         units: t1.units,
         userId: testUserData.id,

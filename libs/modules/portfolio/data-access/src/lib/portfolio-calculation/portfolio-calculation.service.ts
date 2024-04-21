@@ -386,7 +386,7 @@ export class PortfolioCalculationService {
             marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close),
             profit: roundNDigits(
               aggregator.units * historicalPrice.close -
-                aggregator.units * aggregator.breakEvenPrice -
+                aggregator.units * aggregator.breakEvenPrice +
                 aggregator.accumulatedReturn,
             ),
             accumulatedReturn: aggregator.accumulatedReturn,
@@ -395,7 +395,8 @@ export class PortfolioCalculationService {
 
         return {
           symbol,
-          data: growthAssetItems,
+          // remove data with 0 market value - empty holdings for this symbol
+          data: growthAssetItems.filter((d) => d.marketTotalValue > 0),
         } satisfies PortfolioGrowthAssets;
       })
       // remove undefined or symbols which were bought and sold on the same day

@@ -1,18 +1,19 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentRef } from '@angular/core';
+import { ComponentFixture } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { UserDetailsTransactionsComponent } from './user-details-transactions.component';
 
 describe('UserDetailsTransactionsComponent', () => {
   let component: UserDetailsTransactionsComponent;
+  let componentRef: ComponentRef<UserDetailsTransactionsComponent>;
   let fixture: ComponentFixture<UserDetailsTransactionsComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [UserDetailsTransactionsComponent],
-    }).compileComponents();
+    MockBuilder(UserDetailsTransactionsComponent);
 
-    fixture = TestBed.createComponent(UserDetailsTransactionsComponent);
+    fixture = MockRender(UserDetailsTransactionsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    componentRef = fixture.componentRef;
   });
 
   it('should create', () => {

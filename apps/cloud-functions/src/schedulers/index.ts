@@ -48,15 +48,15 @@ export const run_scheduler_once_a_day = onSchedule(
   },
 );
 
-export const run_scheduler_once_per_week = onSchedule(
-  {
-    timeoutSeconds: 200,
-    schedule: '0 22 * * 5',
-  },
-  async () => {
-    axios.get(`https://getmarketoverviewdata-${FIREBASE_DEPLOYMENT}`);
-  },
-);
+// export const run_scheduler_once_per_week = onSchedule(
+//   {
+//     timeoutSeconds: 200,
+//     schedule: '0 22 * * 5',
+//   },
+//   async () => {
+//     axios.get(`https://getmarketoverviewdata-${FIREBASE_DEPLOYMENT}`);
+//   },
+// );
 
 /**
  * create http call to update user portfolio - possible to fire from scheduler and from admin dashboard
