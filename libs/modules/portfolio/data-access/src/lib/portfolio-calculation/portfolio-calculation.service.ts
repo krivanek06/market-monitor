@@ -14,7 +14,6 @@ import {
   calculateGrowth,
   dateFormatDate,
   fillOutMissingDatesForDate,
-  getCurrentDateDefaultFormat,
   getObjectEntries,
   getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
@@ -54,11 +53,11 @@ export class PortfolioCalculationService {
     // get soonest date
     const soonestDate = portfolioAssets.reduce(
       (acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc),
-      getCurrentDateDefaultFormat(),
+      getYesterdaysDate(),
     );
 
     // generate dates from soonest until today
-    const generatedDates = fillOutMissingDatesForDate(soonestDate, getCurrentDateDefaultFormat());
+    const generatedDates = fillOutMissingDatesForDate(soonestDate, getYesterdaysDate());
 
     // result of portfolio growth
     const result: PortfolioGrowth[] = [];
@@ -88,7 +87,6 @@ export class PortfolioCalculationService {
 
         // not found
         if (!currentPortfolioAsset) {
-          console.log('data not found', gDate);
           continue;
         }
 
