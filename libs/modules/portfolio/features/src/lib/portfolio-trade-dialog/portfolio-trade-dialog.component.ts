@@ -35,7 +35,7 @@ import {
 } from '@mm/shared/ui';
 import { isSameDay } from 'date-fns';
 import { computedFrom } from 'ngxtension/computed-from';
-import { map, pipe, startWith, switchMap, tap } from 'rxjs';
+import { catchError, map, of, pipe, startWith, switchMap } from 'rxjs';
 export type PortfolioTradeDialogComponentData = {
   summary: SymbolSummary;
   transactionType: PortfolioTransactionType;
@@ -299,8 +299,11 @@ export class PortfolioTradeDialogComponent {
     this.form.controls.date.valueChanges.pipe(
       switchMap((date) =>
         this.marketApiService.getHistoricalPricesOnDate(this.data.summary.id, dateFormatDate(date)).pipe(
-          tap((d) => console.log('return', d)),
           map((data) => data?.close ?? 0),
+          catchError((e) => {
+            this.dialogServiceUtil.handleError(e);
+            return of(0);
+          }),
         ),
       ),
     ),

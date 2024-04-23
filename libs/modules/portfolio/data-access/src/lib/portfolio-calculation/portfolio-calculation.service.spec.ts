@@ -23,7 +23,7 @@ describe('PortfolioCalculationService', () => {
     TestBed.configureTestingModule({
       providers: [MockProvider(MarketApiService)],
     });
-    service = TestBed.inject(PortfolioCalculationService);
+    service = ngMocks.findInstance(PortfolioCalculationService);
   });
 
   beforeAll(() => {
@@ -46,7 +46,7 @@ describe('PortfolioCalculationService', () => {
 
     it('should call getSymbolSummaries', () => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getSymbolSummaries: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL])),
       });
@@ -58,7 +58,7 @@ describe('PortfolioCalculationService', () => {
 
     it('should return empty holding for no transactions', (done) => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getSymbolSummaries: jest.fn().mockReturnValue(of([])),
       });
@@ -93,7 +93,7 @@ describe('PortfolioCalculationService', () => {
 
     it('should return holding for one transaction without starting cash', (done) => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getSymbolSummaries: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL])),
       });
@@ -150,7 +150,7 @@ describe('PortfolioCalculationService', () => {
 
     it('should return holding for one transaction with starting cash', (done) => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getSymbolSummaries: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL])),
       });
@@ -217,7 +217,7 @@ describe('PortfolioCalculationService', () => {
 
     it('should return holding for one transaction and non-empty previous portfolio state', (done) => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getSymbolSummaries: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL, mockSymbolSummaryMSFT])),
       });
@@ -323,7 +323,7 @@ describe('PortfolioCalculationService', () => {
   describe('Test: getPortfolioGrowthAssets', () => {
     it('should return empty array for no transactions', (done) => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest.fn(),
       });
@@ -337,7 +337,7 @@ describe('PortfolioCalculationService', () => {
 
     it('should return portfolio asset growth for one transaction without transaction fees', (done) => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data)),
       });
@@ -377,7 +377,7 @@ describe('PortfolioCalculationService', () => {
 
     it('should return portfolio asset growth for one transaction with transaction fees', (done) => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data)),
       });
@@ -418,7 +418,7 @@ describe('PortfolioCalculationService', () => {
 
     it('should return portfolio asset growth for multiple transaction', (done) => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest
           .fn()
@@ -658,7 +658,7 @@ describe('PortfolioCalculationService', () => {
       });
 
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data)),
       });
@@ -700,7 +700,7 @@ describe('PortfolioCalculationService', () => {
       });
 
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data)),
       });
@@ -746,7 +746,7 @@ describe('PortfolioCalculationService', () => {
   describe('Test: getPortfolioGrowth', () => {
     it('should calculate growth with starting cash on hand', async () => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest
           .fn()
@@ -907,7 +907,7 @@ describe('PortfolioCalculationService', () => {
 
     it('should calculate growth without starting cash on hand', async () => {
       // mock methods
-      const marketApiService = TestBed.inject(MarketApiService);
+      const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest
           .fn()
