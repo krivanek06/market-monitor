@@ -145,7 +145,7 @@ export class MarketApiService {
   getIsMarketOpen(): Observable<IsStockMarketOpenExtend> {
     return this.apiCache.getData<IsStockMarketOpenExtend>(
       `https://get-basic-data.krivanek1234.workers.dev/?type=market-is-open`,
-      ApiCacheService.validity30Min,
+      ApiCacheService.validity5Min,
     );
   }
 

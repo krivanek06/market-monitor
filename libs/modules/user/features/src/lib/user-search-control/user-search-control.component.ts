@@ -97,7 +97,7 @@ export class UserSearchControlComponent implements ControlValueAccessor {
               //tap(console.log),
               catchError((e) => {
                 console.log(e);
-                return [];
+                return of([]);
               }),
             )
           : of(
@@ -109,7 +109,7 @@ export class UserSearchControlComponent implements ControlValueAccessor {
       ),
       catchError((e) => {
         console.log(e);
-        return [];
+        return of([]);
       }),
     ),
     { initialValue: [] },

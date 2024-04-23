@@ -47,7 +47,7 @@ import { DefaultImgDirective } from '@mm/shared/ui';
         type="file"
         (change)="onFileSelected($event)"
         #fileUpload
-        accept=".jpg, .jpeg, .png"
+        accept=".jpg, .jpeg, .png .webp"
       />
       <div *ngIf="!lastFileUploadSignal()">Click To Upload</div>
 

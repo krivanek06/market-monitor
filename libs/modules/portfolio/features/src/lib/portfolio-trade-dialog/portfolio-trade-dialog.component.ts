@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -36,7 +36,6 @@ import {
 import { isSameDay } from 'date-fns';
 import { computedFrom } from 'ngxtension/computed-from';
 import { map, pipe, startWith, switchMap, tap } from 'rxjs';
-
 export type PortfolioTradeDialogComponentData = {
   summary: SymbolSummary;
   transactionType: PortfolioTransactionType;
@@ -67,7 +66,7 @@ export type PortfolioTradeDialogComponentData = {
     <!-- form -->
     <form [formGroup]="form" (ngSubmit)="onFormSubmit()">
       <mat-dialog-content>
-        <div class="flex items-center justify-between pt-5">
+        <div class="flex items-start justify-between pt-5">
           <!-- symbol & image -->
           <div class="flex items-center gap-3 max-w-[70%]">
             <img appDefaultImg imageType="symbol" [src]="data.summary.id" class="w-12 h-12" />
@@ -90,9 +89,23 @@ export type PortfolioTradeDialogComponentData = {
             </div>
           </div>
 
-          <!-- if sell, checkbox to sell all -->
-          <div *ngIf="data.transactionType === 'SELL'">
-            <mat-checkbox (change)="onSellAllClick($event)" color="warn">Sell All</mat-checkbox>
+          <!-- left side -->
+          <div>
+            <!-- market open state -->
+            <div
+              [ngClass]="{
+                'text-wt-danger': !getIsMarketOpenSignal()?.isTheStockMarketOpen,
+                'text-wt-success': !!getIsMarketOpenSignal()?.isTheStockMarketOpen
+              }"
+              class="mb-1 text-base"
+            >
+              {{ !getIsMarketOpenSignal()?.isTheStockMarketOpen ? 'Market Closed' : 'Market Open' }}
+            </div>
+
+            <!-- if sell, checkbox to sell all -->
+            <div *ngIf="data.transactionType === 'SELL'">
+              <mat-checkbox (change)="onSellAllClick($event)" color="warn">Sell All</mat-checkbox>
+            </div>
           </div>
         </div>
 
@@ -250,6 +263,13 @@ export type PortfolioTradeDialogComponentData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioTradeDialogComponent {
+  private dialogRef = inject(MatDialogRef<PortfolioTradeDialogComponent>);
+  private portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  private marketApiService = inject(MarketApiService);
+  private dialogServiceUtil = inject(DialogServiceUtil);
+  authenticationUserService = inject(AuthenticationUserStoreService);
+  data = inject<PortfolioTradeDialogComponentData>(MAT_DIALOG_DATA);
+
   form = new FormGroup({
     date: new FormControl(this.lastDateMarketOpen, { validators: [requiredValidator], nonNullable: true }),
     units: new FormControl('', {
@@ -270,6 +290,7 @@ export class PortfolioTradeDialogComponent {
   // get holding information for symbol if there is any
   holdingSignal = this.portfolioUserFacadeService.getPortfolioStateHolding(this.data.summary.id);
   portfolioState = this.portfolioUserFacadeService.getPortfolioState;
+  getIsMarketOpenSignal = this.marketApiService.getIsMarketOpenSignal;
   /**
    * load current price or use from summary
    * can be mismatch during the weekend whe loading fails, however quote has the price from friday
@@ -319,14 +340,7 @@ export class PortfolioTradeDialogComponent {
 
   USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
 
-  constructor(
-    private dialogRef: MatDialogRef<PortfolioTradeDialogComponent>,
-    public authenticationUserService: AuthenticationUserStoreService,
-    private portfolioUserFacadeService: PortfolioUserFacadeService,
-    private marketApiService: MarketApiService,
-    private dialogServiceUtil: DialogServiceUtil,
-    @Inject(MAT_DIALOG_DATA) public data: PortfolioTradeDialogComponentData,
-  ) {
+  constructor() {
     this.listenCustomTotalValueChange();
     this.listenOnInSufficientUnits();
     this.listenOnInSufficientCash();

@@ -21,7 +21,7 @@ import {
     ClickableDirective,
   ],
   template: `
-    <div class="flex gap-4 @container">
+    <div class="flex gap-4">
       <img appDefaultImg [src]="userData().personal.photoURL" alt="User Image" class="w-14 h-14 rounded-md" />
 
       <!-- info -->
@@ -30,8 +30,7 @@ import {
         <div class="flex">
           <div class="text-wt-gray-dark w-[80px]">Name:</div>
           <div class="flex-1">
-            <span class="hidden @xs:block">{{ userData().personal.displayName }}</span>
-            <span class="block @xs:hidden">{{ userData().personal.displayNameInitials }}</span>
+            <span>{{ userData().personal.displayName }}</span>
           </div>
         </div>
 

@@ -58,8 +58,8 @@ export class MarketComponent implements OnInit {
   ];
 
   marketTabsSignal = computed(() => {
-    const userData = this.authenticationUserStoreService.state.getUserData();
-    if (userData.userAccountType === UserAccountEnum.DEMO_TRADING) {
+    const userData = this.authenticationUserStoreService.state.getUserDataNormal();
+    if (userData?.userAccountType === UserAccountEnum.DEMO_TRADING) {
       return [
         {
           label: 'Screener',

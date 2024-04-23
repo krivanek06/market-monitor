@@ -109,7 +109,7 @@ import { map, startWith } from 'rxjs';
           </div>
         }
 
-        <ng-container *ngIf="allowCreateGroup()">
+        @if (allowCreateGroup()) {
           <!-- invite member -->
           <div class="my-8 space-x-2 text-lg">
             <span>Invite People</span>
@@ -122,15 +122,17 @@ import { map, startWith } from 'rxjs';
           </div>
 
           <!-- display selected users -->
-          <div class="flex flex-wrap gap-4">
-            <div *ngFor="let user of selectedUsersSignal()" class="flex gap-4 p-4 shadow-md rounded-md">
-              <app-user-display-item [userData]="user" />
-              <button mat-icon-button type="button" matTooltip="Remove User" (click)="onUserRemove(user)">
-                <mat-icon color="warn">delete</mat-icon>
-              </button>
-            </div>
+          <div class="grid lg:grid-cols-2 gap-4">
+            @for (user of selectedUsersSignal(); track user.id) {
+              <div class="flex gap-4 p-4 shadow-md rounded-md justify-between">
+                <app-user-display-item [userData]="user" />
+                <button mat-icon-button type="button" matTooltip="Remove User" (click)="onUserRemove(user)">
+                  <mat-icon color="warn">delete</mat-icon>
+                </button>
+              </div>
+            }
           </div>
-        </ng-container>
+        }
       </mat-dialog-content>
 
       <div class="my-4">

@@ -82,7 +82,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       @for (user of selectedUsers(); track user.id) {
         <app-general-card>
           <div class="flex gap-4 justify-between">
-            <app-user-display-item [userData]="user" class="flex-1" />
+            <app-user-display-item [userData]="user" />
             <!-- remove button -->
             <button mat-icon-button color="warn" (click)="onRemoveUser(user)">
               <mat-icon>delete</mat-icon>

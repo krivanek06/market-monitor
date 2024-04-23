@@ -692,7 +692,9 @@ export const getEconomicData = async (endpointKey?: MarketOverviewSubKey<'genera
   }
 };
 
-export const getIsMarketOpen = async (exchange: string = 'NYSE'): Promise<IsStockMarketOpenExtend | null> => {
+export const getIsMarketOpen = async (
+  exchange: 'NYSE' | 'NASDAQ' = 'NASDAQ',
+): Promise<IsStockMarketOpenExtend | null> => {
   const url = `https://financialmodelingprep.com/api/v3/is-the-market-open?exchange=${exchange}&apikey=${FINANCIAL_MODELING_KEY}`;
 
   try {

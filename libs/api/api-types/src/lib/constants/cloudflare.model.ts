@@ -10,5 +10,8 @@ export const RESPONSE_HEADER = {
 } satisfies ResponseInit;
 
 // create expiration data
+export const EXPIRATION_ONE_MINUTE = 60;
+export const EXPIRATION_TEN_MINUTES = 60 * 10;
+export const EXPIRATION_ONE_HOUR = 60 * 60;
 export const EXPIRATION_ONE_DAY = 60 * 60 * 24;
 export const EXPIRATION_ONE_WEEK = EXPIRATION_ONE_DAY * 7;
