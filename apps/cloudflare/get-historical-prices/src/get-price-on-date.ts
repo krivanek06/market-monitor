@@ -1,5 +1,6 @@
 import { getHistoricalPricesOnDateRange } from '@mm/api-external';
 import { HistoricalPrice, RESPONSE_HEADER } from '@mm/api-types';
+import { format, subDays } from 'date-fns';
 import { Env } from './model';
 
 /**
@@ -17,8 +18,17 @@ export const getPriceOnDate = async (env: Env, symbol: string, searchParams: URL
 		return new Response('missing date', { status: 400 });
 	}
 
-	// load prices from api
-	const data = await getHistoricalPricesOnDate(symbol, date);
+	let data: HistoricalPrice | null = null;
+
+	// check if date is valid - not holiday, weekend, etc.
+	for (let i = 0; i < 5; i++) {
+		const usedDate = format(subDays(date, i), 'yyyy-MM-dd');
+		data = await getHistoricalPricesOnDate(symbol, usedDate);
+		// stop polling if data is found
+		if (data) {
+			break;
+		}
+	}
 
 	// return data
 	return new Response(JSON.stringify(data), RESPONSE_HEADER);

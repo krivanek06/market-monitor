@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -55,16 +55,14 @@ export type InlineInputDialogComponentData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InlineInputDialogComponent implements OnInit {
+  private dialogRef = inject(MatDialogRef<InlineInputDialogComponent>);
+  data = inject<InlineInputDialogComponentData>(MAT_DIALOG_DATA);
+
   inputValueForm = new FormGroup({
     value: new FormControl<string>('', {
       validators: [Validators.required, Validators.minLength(4), Validators.maxLength(30)],
     }),
   });
-
-  constructor(
-    private dialogRef: MatDialogRef<InlineInputDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: InlineInputDialogComponentData,
-  ) {}
 
   ngOnInit(): void {
     if (this.data.initialValue) {

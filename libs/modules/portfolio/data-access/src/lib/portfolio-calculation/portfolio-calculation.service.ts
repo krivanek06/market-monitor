@@ -48,7 +48,7 @@ export class PortfolioCalculationService {
 
   getPortfolioGrowth(portfolioAssets: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
     // get holidays
-    const currentHoliday = this.marketApiService.getIsMarketOpenSignal()?.currentHoliday ?? [];
+    const allHolidays = this.marketApiService.getIsMarketOpenSignal()?.allHolidays ?? [];
 
     // get soonest date
     const soonestDate = portfolioAssets.reduce(
@@ -68,7 +68,7 @@ export class PortfolioCalculationService {
     // loop though all generated dates
     for (const gDate of generatedDates) {
       // check if holiday
-      if (currentHoliday.includes(gDate)) {
+      if (allHolidays.includes(gDate)) {
         continue;
       }
 
@@ -342,11 +342,15 @@ export class PortfolioCalculationService {
         // get all transactions for this symbol in ASC order by date
         const symbolTransactions = transactions.filter((d) => d.symbol === symbol);
 
+        // check if historical prices first date is not after first transaction date
+        // transaction was weekend/holiday but prices are from next working date
+        const firstDate = symbolHistoricalPrice[0].date;
+
         // internal helper
         const aggregator = {
-          units: 0,
-          index: 0,
-          breakEvenPrice: 0,
+          units: isBefore(symbolTransactions[0].date, firstDate) ? symbolTransactions[0].units : 0,
+          index: isBefore(symbolTransactions[0].date, firstDate) ? 1 : 0,
+          breakEvenPrice: isBefore(symbolTransactions[0].date, firstDate) ? symbolTransactions[0].unitPrice : 0,
           accumulatedReturn: 0,
         };
 
@@ -356,7 +360,7 @@ export class PortfolioCalculationService {
           // can be multiple transactions on the same day for the same symbol
           while (
             !!symbolTransactions[aggregator.index] &&
-            isSameDay(new Date(symbolTransactions[aggregator.index].date), new Date(historicalPrice.date))
+            isSameDay(symbolTransactions[aggregator.index].date, historicalPrice.date)
           ) {
             const transaction = symbolTransactions[aggregator.index];
             const isBuy = transaction.transactionType === 'BUY';

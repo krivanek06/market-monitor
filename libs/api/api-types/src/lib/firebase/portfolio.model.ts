@@ -129,6 +129,12 @@ export type PortfolioTransaction = {
   returnChange: number;
   transactionType: PortfolioTransactionType;
   transactionFees: number;
+
+  /**
+   * differs from date, that date is when used created transaction, but it can be
+   * during weekend and market is closed during weekend, so this will be last open market date
+   */
+  priceFromDate?: string;
 };
 
 export type PortfolioTransactionMore = PortfolioTransaction & {

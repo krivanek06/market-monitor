@@ -697,6 +697,11 @@ export const getIsMarketOpen = async (
 ): Promise<IsStockMarketOpenExtend | null> => {
   const url = `https://financialmodelingprep.com/api/v3/is-the-market-open?exchange=${exchange}&apikey=${FINANCIAL_MODELING_KEY}`;
 
+  // function to check if value is number
+  const isNumber = (value: string | number | unknown): boolean => {
+    return value != null && value !== '' && typeof value === 'number' && !isNaN(Number(value.toString()));
+  };
+
   try {
     const response = await fetch(url);
     const data = (await response.json()) as IsStockMarketOpen;
@@ -706,6 +711,11 @@ export const getIsMarketOpen = async (
     // { "New Years Day": "2019-01-01", "Good Friday": "2019-04-19", ... }
     const currentHoliday =
       data.stockMarketHolidays.find((holiday) => String(holiday['year']) === String(currentYear)) ?? {};
+    // get all holidays
+    const allHolidays = data.stockMarketHolidays
+      .map((holiday) => Object.values(holiday))
+      .reduce((acc, val) => acc.concat(val), [])
+      .filter((d) => !isNumber(d)); // filter out years
 
     // get only the dates
     const currentHolidayDates = Object.values(currentHoliday);
@@ -713,6 +723,7 @@ export const getIsMarketOpen = async (
     const holidaysThisYear = {
       ...data,
       currentHoliday: currentHolidayDates,
+      allHolidays: allHolidays,
     } satisfies IsStockMarketOpenExtend;
 
     return holidaysThisYear;

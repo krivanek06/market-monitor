@@ -930,4 +930,8 @@ export type IsStockMarketOpenExtend = IsStockMarketOpen & {
    * array of holidays for the current year
    */
   currentHoliday: string[];
+  /**
+   * array of all holidays from API (last 3 years and future few years)
+   */
+  allHolidays: string[];
 };
