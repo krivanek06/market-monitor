@@ -3,7 +3,7 @@ import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { usersCollectionDemoTradingRef } from '../models';
 
 /**
- * Query all users (if profile is public and allowPortfolioCashAccount is true)
+ * Query all trading user accounts
  * and order them based on their portfolio balance.
  */
 export const userPortfolioRank = async (): Promise<void> => {
