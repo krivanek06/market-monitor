@@ -10,8 +10,6 @@ import { TabSelectControlComponent } from '@mm/shared/ui';
 import { GroupDetailsOverviewComponent } from './group-details-overview/group-details-overview.component';
 import { PageGroupsBaseComponent } from './page-groups-base.component';
 
-type GroupDetailsTab = 'overview' | 'holdings';
-
 @Component({
   selector: 'app-page-group-details',
   standalone: true,

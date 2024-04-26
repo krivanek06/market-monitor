@@ -78,8 +78,9 @@ import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirec
         <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">User</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div class="flex items-center gap-2">
-            <img class="rounded-full h-7 w-7" appDefaultImg [src]="row.userPhotoURL" />
-            <span>{{ row.userDisplayName ?? 'Unknown' }}</span>
+            <img class="rounded-lg h-7 w-7" appDefaultImg [src]="row.userPhotoURL" />
+            <span class="hidden 2xl:block">{{ row.userDisplayName ?? 'Unknown' }}</span>
+            <span class="block 2xl:hidden">{{ row.userDisplayNameInitials ?? 'Unknown' }}</span>
           </div>
         </td>
       </ng-container>

@@ -39,7 +39,7 @@ export const groupUpdateData = async (): Promise<void> => {
   const group = await groupsCollectionRef()
     .where('isClosed', '==', false)
     .orderBy('modifiedSubCollectionDate', 'asc')
-    .limit(40)
+    .limit(100)
     .get();
 
   console.log(`[Groups]: Loaded ${group.docs.length} groups`);
@@ -60,7 +60,7 @@ export const groupUpdateData = async (): Promise<void> => {
  * saved portfolio current snapshot
  *
  */
-export const groupCopyMembersAndTransactions = async (group: GroupData): Promise<void> => {
+const groupCopyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // load all members of the group
   const ownerData = (await userDocumentRef(group.ownerUserId).get()).data();
 
@@ -88,12 +88,9 @@ export const groupCopyMembersAndTransactions = async (group: GroupData): Promise
     membersCurrentData.map((m) => userDocumentTransactionHistoryRef(m.id).get()),
   );
 
-  // save only last N transactions for everybody - order by date desc
-  const lastTransactions = memberTransactionHistory
-    .map((d) => d.data())
-    .reduce((acc, val) => [...acc, ...(val?.transactions ?? []).slice(0, 10)], [] as PortfolioTransaction[])
-    .sort((a, b) => (b.date < a.date ? -1 : 1))
-    .slice(0, 250);
+  // get last, best and worst transactions by all users
+  const memberTransactionHistoryData = memberTransactionHistory.map((d) => d.data()).map((d) => d?.transactions ?? []);
+  const lastTransactions = getTransactionData(memberTransactionHistoryData);
 
   // calculate holdings from all members
   const memberHoldingSnapshots = calculateGroupMembersHoldings(membersCurrentData);
@@ -123,7 +120,9 @@ export const groupCopyMembersAndTransactions = async (group: GroupData): Promise
   // update last transactions for the group
   await groupDocumentTransactionsRef(group.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    data: lastTransactions,
+    data: lastTransactions.lastTransactions,
+    transactionBestReturn: lastTransactions.bestTransactions,
+    transactionsWorstReturn: lastTransactions.worstTransactions,
   } satisfies GroupTransactionsData);
 
   // update members for the group
@@ -152,7 +151,41 @@ export const groupCopyMembersAndTransactions = async (group: GroupData): Promise
   } satisfies GroupPortfolioStateSnapshotsData);
 };
 
-export const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioStateHoldingBase[] => {
+const getTransactionData = (
+  usersAllTransactions: PortfolioTransaction[][],
+): {
+  lastTransactions: PortfolioTransaction[];
+  bestTransactions: PortfolioTransaction[];
+  worstTransactions: PortfolioTransaction[];
+} => {
+  const usersAllTransactionsCombined = usersAllTransactions.reduce((acc, val) => [...acc, ...val]);
+
+  // get last N transactions for everybody - order by date desc
+  const lastTransactions = usersAllTransactions
+    .reduce((acc, val) => [...acc, ...val.slice(0, 10)])
+    .sort((a, b) => (a.date < b.date ? -1 : 1))
+    .slice(0, 150);
+
+  // get best N transactions
+  const bestTransactions = usersAllTransactionsCombined
+    .filter((d) => d.returnValue > 0)
+    .sort((a, b) => b.returnValue - a.returnValue)
+    .slice(0, 25);
+
+  // get worst N transactions
+  const worstTransactions = usersAllTransactionsCombined
+    .filter((d) => d.returnValue < 0)
+    .sort((a, b) => a.returnValue - b.returnValue)
+    .slice(0, 25);
+
+  return {
+    lastTransactions,
+    bestTransactions,
+    worstTransactions,
+  };
+};
+
+const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioStateHoldingBase[] => {
   const memberHoldingSnapshots = groupMembers
     // calculate holdings from all members
     .map((d) =>

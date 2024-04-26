@@ -140,6 +140,7 @@ export type PortfolioTransaction = {
 export type PortfolioTransactionMore = PortfolioTransaction & {
   userPhotoURL?: string | null;
   userDisplayName?: string;
+  userDisplayNameInitials?: string;
 };
 
 export type PortfolioTransactionCash = {

@@ -81,15 +81,16 @@ export const groupCreate = async (data: GroupCreateInput, userAuthId: string, is
 
   // create group
   const newGroup = createGroup(data, userBase, isOwnerMember, isDemo);
-  const groupRef = groupDocumentRef(newGroup.id);
 
   // save new group
-  await groupRef.set(newGroup);
+  await groupDocumentRef(newGroup.id).set(newGroup);
 
   // create additional documents for group
   await groupDocumentTransactionsRef(newGroup.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
     data: [],
+    transactionBestReturn: [],
+    transactionsWorstReturn: [],
   });
 
   // create members collection

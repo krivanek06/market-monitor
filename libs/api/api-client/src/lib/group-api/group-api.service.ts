@@ -21,6 +21,7 @@ import {
   GroupSettingsChangeInput,
   GroupTransactionsData,
   PortfolioStateHolding,
+  PortfolioTransaction,
   PortfolioTransactionMore,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
@@ -118,21 +119,30 @@ export class GroupApiService {
           throw new Error('Group data not found');
         }
 
-        // merge transactions with user data
-        const portfolioTransactionsMore = (groupTransactionsData?.data ?? []).map(
-          (transaction) =>
-            ({
+        // helper function to merge transactions with user data
+        const groupTransform = (dataT: PortfolioTransaction[]): PortfolioTransactionMore[] =>
+          dataT.map((transaction) => {
+            const user = groupMembersData.data.find((m) => m.id === transaction.userId);
+            return {
               ...transaction,
-              userDisplayName: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.displayName,
-              userPhotoURL: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.photoURL,
-            }) satisfies PortfolioTransactionMore,
-        );
+              userDisplayName: user?.personal.displayName,
+              userPhotoURL: user?.personal.photoURL,
+              userDisplayNameInitials: user?.personal.displayNameInitials,
+            } satisfies PortfolioTransactionMore;
+          });
+
+        // merge transactions with user data
+        const portfolioTransactionsMore = groupTransform(groupTransactionsData?.data ?? []);
+        const portfolioTransactionsBest = groupTransform(groupTransactionsData?.transactionBestReturn ?? []);
+        const portfolioTransactionsWorst = groupTransform(groupTransactionsData?.transactionsWorstReturn ?? []);
 
         return {
           groupData,
           groupMembersData: groupMembersData.data ?? [],
           groupTransactionsData: portfolioTransactionsMore,
           groupPortfolioSnapshotsData: groupPortfolioSnapshotsData?.data ?? [],
+          groupTransactionsDataBest: portfolioTransactionsBest,
+          groupTransactionsDataWorst: portfolioTransactionsWorst,
         } satisfies GroupDetails;
       }),
       catchError((err) => {
