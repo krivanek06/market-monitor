@@ -3,9 +3,10 @@ import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input, out
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioTransaction, PortfolioTransactionMore } from '@mm/api-types';
-import { insertIntoArray } from '@mm/shared/general-util';
+import { compare, insertIntoArray } from '@mm/shared/general-util';
 import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
@@ -20,12 +21,13 @@ import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirec
     PercentageIncreaseDirective,
     MatPaginatorModule,
     BubblePaginationDirective,
+    MatSortModule,
   ],
   template: `
-    <table mat-table [dataSource]="dataSource" [trackBy]="identity">
+    <table mat-table [dataSource]="dataSource" [trackBy]="identity" matSort (matSortChange)="sortData($event)">
       <!-- image & name -->
       <ng-container matColumnDef="symbol">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Symbol</th>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Symbol</th>
         <td mat-cell *matCellDef="let row">
           <!-- logo + symbol -->
           <div class="flex items-center gap-2">
@@ -58,7 +60,7 @@ import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirec
 
       <!-- transactionType -->
       <ng-container matColumnDef="transactionType">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Type</th>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Type</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           <div
             [ngClass]="{
@@ -84,7 +86,7 @@ import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirec
 
       <!-- totalValue -->
       <ng-container matColumnDef="totalValue">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Total Value</th>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Total Value</th>
         <td mat-cell *matCellDef="let row">
           <div class="text-wt-gray-dark max-sm:text-end max-sm:mr-3">
             {{ row.unitPrice * row.units | currency }}
@@ -102,7 +104,7 @@ import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirec
 
       <!-- units -->
       <ng-container matColumnDef="units">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Units</th>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Units</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           {{ row.units }}
         </td>
@@ -110,29 +112,37 @@ import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirec
 
       <!-- transactionFees -->
       <ng-container matColumnDef="transactionFees">
-        <th mat-header-cell *matHeaderCellDef class="hidden md:table-cell">Fees</th>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Fees</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           {{ row.transactionFees | currency }}
         </td>
       </ng-container>
 
       <!-- return -->
-      <ng-container matColumnDef="return">
-        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">Return</th>
+      <ng-container matColumnDef="returnPrct">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Return %</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div
             appPercentageIncrease
             [useCurrencySign]="true"
-            [changeValues]="{ change: row.returnValue, changePercentage: row.returnChange }"
+            [changeValues]="{ changePercentage: row.returnChange }"
           ></div>
+        </td>
+      </ng-container>
+
+      <!-- return -->
+      <ng-container matColumnDef="return">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Return $</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
+          <div appPercentageIncrease [useCurrencySign]="true" [changeValues]="{ change: row.returnValue }"></div>
         </td>
       </ng-container>
 
       <!-- date -->
       <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef class="hidden md:table-cell">Date</th>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Date</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
-          {{ row.date | date: 'MMMM d, y' }}
+          {{ row.date | date: 'MMM. d, y' }}
         </td>
       </ng-container>
 
@@ -170,7 +180,7 @@ import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirec
         showFirstLastButtons
         [length]="dataSource.filteredData.length"
         [appCustomLength]="dataSource.filteredData.length"
-        [pageSize]="20"
+        [pageSize]="18"
       ></mat-paginator>
     </div>
   `,
@@ -215,7 +225,7 @@ export class PortfolioTransactionsTableComponent {
 
   displayedColumnsEffect = effect(() => {
     if (this.showTransactionFees() && !this.displayedColumns.includes('transactionFees')) {
-      this.displayedColumns = insertIntoArray(this.displayedColumns, 6, 'transactionFees');
+      this.displayedColumns = insertIntoArray(this.displayedColumns, 5, 'transactionFees');
     }
     if (this.showActionButton() && !this.displayedColumns.includes('action')) {
       this.displayedColumns = [...this.displayedColumns, 'action'];
@@ -226,7 +236,16 @@ export class PortfolioTransactionsTableComponent {
   });
 
   dataSource = new MatTableDataSource<PortfolioTransactionMore>([]);
-  displayedColumns: string[] = ['symbol', 'transactionType', 'totalValue', 'unitPrice', 'units', 'return', 'date'];
+  displayedColumns: string[] = [
+    'symbol',
+    'transactionType',
+    'totalValue',
+    'unitPrice',
+    'units',
+    'return',
+    'returnPrct',
+    'date',
+  ];
 
   paginator = viewChild(MatPaginator);
 
@@ -235,5 +254,39 @@ export class PortfolioTransactionsTableComponent {
 
   onDeleteClick(item: PortfolioTransaction) {
     this.deleteEmitter.emit(item);
+  }
+
+  sortData(sort: Sort) {
+    const data = this.dataSource.data.slice();
+    if (!sort.active || sort.direction === '') {
+      this.dataSource.data = data;
+      return;
+    }
+
+    this.dataSource.data = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+
+      switch (sort.active) {
+        case 'symbol':
+          return compare(a.symbol, b.symbol, isAsc);
+        case 'transactionType':
+          return compare(a.transactionType, b.transactionType, isAsc);
+        case 'totalValue':
+          return compare(a.unitPrice * a.units, b.unitPrice * b.units, isAsc);
+        case 'units':
+          return compare(a.units, b.units, isAsc);
+        case 'transactionFees':
+          return compare(a.transactionFees, b.transactionFees, isAsc);
+        case 'date':
+          return compare(a.date, b.date, isAsc);
+        case 'returnPrct':
+          return compare(a.returnChange, b.returnChange, isAsc);
+        case 'return':
+          return compare(a.returnValue, b.returnValue, isAsc);
+        default: {
+          return 0;
+        }
+      }
+    });
   }
 }

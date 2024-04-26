@@ -334,7 +334,8 @@ export class PortfolioCalculationService {
         // historical data per symbol
         const symbolHistoricalPrice = historicalPrices[symbol];
 
-        if (!symbolHistoricalPrice) {
+        // check if historical prices are missing (symbol bought today)
+        if (!symbolHistoricalPrice || symbolHistoricalPrice.length === 0) {
           console.log(`Missing historical prices for ${symbol}`);
           return null;
         }
