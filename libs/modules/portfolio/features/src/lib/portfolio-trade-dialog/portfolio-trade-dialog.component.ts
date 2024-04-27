@@ -172,10 +172,19 @@ export type PortfolioTradeDialogComponentData = {
               <span>{{ symbolPriceOnDate() | currency }}</span>
             </div>
             <div class="g-item-wrapper">
-              <span [ngClass]="{ 'text-wt-danger': insufficientUnitsErrorSignal() }">Units</span>
-              <span [ngClass]="{ 'text-wt-danger': insufficientUnitsErrorSignal() }">
-                {{ form.controls.units.value || 0 }}
-              </span>
+              <div [ngClass]="{ 'text-wt-danger': insufficientUnitsErrorSignal() }">Units</div>
+              <div [ngClass]="{ 'text-wt-danger': insufficientUnitsErrorSignal() }" class="flex items-center gap-4">
+                <!-- remove units -->
+                <button mat-icon-button type="button" (click)="onIncreaseUnits(-1)">
+                  <mat-icon>remove</mat-icon>
+                </button>
+                <!-- units -->
+                <span>{{ form.controls.units.value || 0 }}</span>
+                <!-- add units -->
+                <button mat-icon-button type="button" (click)="onIncreaseUnits(1)">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
             </div>
             <div class="g-item-wrapper">
               <div class="space-x-2">
@@ -429,6 +438,16 @@ export class PortfolioTradeDialogComponent {
     } else {
       this.form.controls.units.patchValue('');
     }
+  }
+
+  onIncreaseUnits(value: number): void {
+    const currentVal = Number(this.form.controls.units.value);
+    // prevent negative values
+    if (currentVal + value < 0) {
+      return;
+    }
+    // increase or decrease units
+    this.form.controls.units.patchValue(String(Number(this.form.controls.units.value) + value));
   }
 
   /**
