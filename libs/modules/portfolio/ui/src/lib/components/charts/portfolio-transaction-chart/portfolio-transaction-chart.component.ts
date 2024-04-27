@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { PortfolioTransactionToDate } from '@mm/portfolio/data-access';
+import { PortfolioStateExecution } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -27,10 +27,10 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioTransactionChartComponent extends ChartConstructor {
-  data = input.required<PortfolioTransactionToDate[]>();
+  data = input.required<PortfolioStateExecution[]>();
   chartOptionsSignal = computed(() => this.initChart(this.data()));
 
-  private initChart(data: PortfolioTransactionToDate[]): Highcharts.Options {
+  private initChart(data: PortfolioStateExecution[]): Highcharts.Options {
     return {
       chart: {
         type: 'area',

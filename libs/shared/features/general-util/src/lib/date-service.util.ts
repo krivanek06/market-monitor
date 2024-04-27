@@ -66,6 +66,10 @@ export const dateFormatDate = (inputDate: DateInput, formateStr: string = 'yyyy-
   return format(date, formateStr);
 };
 
+/**
+ *
+ * @returns today in format yyyy-MM-dd
+ */
 export const getCurrentDateDefaultFormat = (): string => {
   return dateFormatDate(new Date());
 };

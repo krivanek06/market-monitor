@@ -245,8 +245,8 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <!-- transactions -->
       @if (groupDetailsSignal.groupTransactionsData.length > 0) {
-        <div #transactionSection>
-          @defer (on viewport(transactionSection)) {
+        <div>
+          @defer (on idle) {
             <app-section-title title="Last Transactions" matIcon="history" additionalClasses="pl-1 mb-6 lg:-mb-10" />
 
             <mat-tab-group class="hidden lg:block" mat-stretch-tabs="false" mat-align-tabs="end">
@@ -264,7 +264,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
                   <!-- best returns -->
                   <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
                     @for (
-                      item of groupDetailsSignal.groupTransactionsDataBest | slice: 0 : 15;
+                      item of groupDetailsSignal.groupTransactionsDataBest | slice: 0 : 12;
                       track item.transactionId;
                       let last = $last
                     ) {
@@ -277,7 +277,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
                   <!-- worst returns -->
                   <app-general-card title="Worst Returns" matIcon="trending_down" class="flex-1">
                     @for (
-                      item of groupDetailsSignal.groupTransactionsDataWorst | slice: 0 : 15;
+                      item of groupDetailsSignal.groupTransactionsDataWorst | slice: 0 : 12;
                       track item.transactionId;
                       let last = $last
                     ) {

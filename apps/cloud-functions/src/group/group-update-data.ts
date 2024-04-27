@@ -88,19 +88,20 @@ const groupCopyMembersAndTransactions = async (group: GroupData): Promise<void> 
     membersCurrentData.map((m) => userDocumentTransactionHistoryRef(m.id).get()),
   );
 
-  // get last, best and worst transactions by all users
+  // merge all data together
   const memberTransactionHistoryData = memberTransactionHistory.map((d) => d.data()).map((d) => d?.transactions ?? []);
+  // get last, best and worst transactions by all users
   const lastTransactions = getTransactionData(memberTransactionHistoryData);
 
   // calculate holdings from all members
   const memberHoldingSnapshots = calculateGroupMembersHoldings(membersCurrentData);
-  // remove last portfolio state if it is from today
+  // remove last portfolio state if it is from today - because we will recalculate it again
   const portfolioSnapshotsNewData =
     portfolioSnapshotsData.data.at(-1)?.date === getCurrentDateDefaultFormat()
       ? portfolioSnapshotsData.data.slice(0, -1)
       : portfolioSnapshotsData.data;
 
-  // get last portfolio state from previous day
+  // get last portfolio state from previous day or starting portfolio state
   const previousPortfolio = portfolioSnapshotsNewData.at(-1) ?? group.portfolioState;
   // calculate portfolioState from all members
   const memberPortfolioState = calculateGroupMembersPortfolioState(membersCurrentData, previousPortfolio);
@@ -151,6 +152,11 @@ const groupCopyMembersAndTransactions = async (group: GroupData): Promise<void> 
   } satisfies GroupPortfolioStateSnapshotsData);
 };
 
+/**
+ *
+ * @param usersAllTransactions - all transactions of all group members
+ * @returns - last, best and worst transactions
+ */
 const getTransactionData = (
   usersAllTransactions: PortfolioTransaction[][],
 ): {
@@ -158,6 +164,7 @@ const getTransactionData = (
   bestTransactions: PortfolioTransaction[];
   worstTransactions: PortfolioTransaction[];
 } => {
+  // combine all transactions
   const usersAllTransactionsCombined = usersAllTransactions.reduce((acc, val) => [...acc, ...val]);
 
   // get last N transactions for everybody - order by date desc

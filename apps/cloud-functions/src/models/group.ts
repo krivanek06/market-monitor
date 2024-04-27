@@ -21,11 +21,6 @@ export const groupDocumentTransactionsRef = (groupId: string) =>
 export const groupDocumentMembersRef = (groupId: string) =>
   groupCollectionMoreInformationRef(groupId).doc('members').withConverter(assignTypes<GroupMembersData>());
 
-/**
- *
- * @param groupId
- * @returns - historical snapshots of the group portfolio state for each day
- */
 export const groupDocumentPortfolioStateSnapshotsRef = (groupId: string) =>
   groupCollectionMoreInformationRef(groupId)
     .doc('portfolio_snapshots')

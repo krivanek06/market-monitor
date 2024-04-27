@@ -64,6 +64,11 @@ export type PortfolioState = {
   previousBalanceChangePercentage: number;
 };
 
+export type PortfolioStateExecution = Pick<
+  PortfolioState,
+  'numberOfExecutedBuyTransactions' | 'numberOfExecutedSellTransactions' | 'transactionFees' | 'date'
+>;
+
 export type PortfolioStateHoldingBase = {
   symbolType: SymbolType;
   symbol: string;
