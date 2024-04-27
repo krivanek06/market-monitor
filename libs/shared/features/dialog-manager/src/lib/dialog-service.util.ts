@@ -148,10 +148,13 @@ export class DialogServiceUtil {
       return of(undefined);
     }
 
-    const dialogRef = this.matDialog.open(InlineInputDialogComponent, {
-      data: data,
-      panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
-    });
+    const dialogRef = this.matDialog.open<InlineInputDialogComponent, InlineInputDialogComponentData>(
+      InlineInputDialogComponent,
+      {
+        data: data,
+        panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
+      },
+    );
 
     const result = dialogRef.afterClosed();
     return result;
