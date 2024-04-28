@@ -90,13 +90,13 @@ export class GroupApiService {
       switchMap((groupHoldings) =>
         !groupHoldings
           ? of([])
-          : this.marketApiService.getSymbolSummaries(groupHoldings.data?.map((h) => h.symbol)).pipe(
-              map((symbolSummaries) =>
+          : this.marketApiService.getSymbolQuotes(groupHoldings.data?.map((h) => h.symbol)).pipe(
+              map((symbolQuotes) =>
                 groupHoldings.data.map(
                   (holding) =>
                     ({
                       ...holding,
-                      symbolSummary: symbolSummaries.find((s) => s.id === holding.symbol)!,
+                      symbolQuote: symbolQuotes.find((s) => s.symbol === holding.symbol)!,
                       breakEvenPrice: roundNDigits(holding.invested / holding.units, 6),
                       weight: roundNDigits(holding.invested / holding.invested, 6),
                     }) satisfies PortfolioStateHolding,

@@ -412,6 +412,7 @@ export class PortfolioTradeDialogComponent {
       customTotalValue: this.isCustomTotal ? Number(this.form.controls.customTotalValue.value) : undefined,
       transactionType: this.data.transactionType,
       symbolType: 'STOCK',
+      sector: this.data.summary?.profile?.sector ?? 'Unknown',
     };
 
     // set loading

@@ -1,10 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { getStockHistoricalPricesOnDate } from '@mm/api-external';
+import { getStockHistoricalPricesOnDate, getSymbolSummaries } from '@mm/api-external';
 import {
   HistoricalPrice,
   PortfolioTransaction,
   PortfolioTransactionCreate,
   SYMBOL_NOT_FOUND_ERROR,
+  SymbolSummary,
   TRANSACTION_FEE_PRCT,
   USER_ALLOWED_DEMO_ACCOUNTS_PER_IP,
   UserAccountBasicTypes,
@@ -82,7 +83,7 @@ export const createRandomUserAccounts = async (data: {
  * @param userData
  */
 const generateTransactionsForRandomSymbols = async (userData: UserData): Promise<void> => {
-  const randomSymbols = getRandomSymbols(15);
+  const randomSymbols = await getRandomSymbolSummaries(15);
 
   const userDocTransactionsRef = userDocumentTransactionHistoryRef(userData.id);
 
@@ -94,7 +95,8 @@ const generateTransactionsForRandomSymbols = async (userData: UserData): Promise
   for await (const symbol of randomSymbols) {
     const buyOperation: PortfolioTransactionCreate = {
       date: pastDateBuy,
-      symbol,
+      symbol: symbol.id,
+      sector: symbol.profile?.sector ?? 'Unknown',
       symbolType: 'STOCK',
       units: getRandomNumber(20, 40),
       transactionType: 'BUY',
@@ -102,7 +104,8 @@ const generateTransactionsForRandomSymbols = async (userData: UserData): Promise
 
     const sellOperation: PortfolioTransactionCreate = {
       date: pastDateSell,
-      symbol,
+      symbol: symbol.id,
+      sector: symbol.profile?.sector ?? 'Unknown',
       symbolType: 'STOCK',
       units: getRandomNumber(10, 18),
       transactionType: 'SELL',
@@ -196,6 +199,7 @@ const createTransaction = (
     returnChange,
     returnValue,
     priceFromDate: historicalPrice.date,
+    sector: input.sector,
   };
 
   return result;
@@ -217,20 +221,23 @@ const createRandomUser = (isDemo: boolean, password: string): Promise<UserRecord
 
 const createWatchListWithRandomSymbols = async (userData: UserData): Promise<void> => {
   // add symbols to watchlist
-  const watchListSymbols = getRandomSymbols(35);
+  const watchListSymbols = await getRandomSymbolSummaries(35);
   await userDocumentWatchListRef(userData.id).set({
     createdDate: getCurrentDateDefaultFormat(),
     data: watchListSymbols.map((symbol) => ({
-      symbol,
+      symbol: symbol.id,
       symbolType: 'STOCK',
+      sector: symbol.profile?.sector ?? 'Unknown',
     })),
   });
 };
 
-const getRandomSymbols = (limit: number) => {
+const getRandomSymbolSummaries = async (limit: number): Promise<SymbolSummary[]> => {
   const symbols = getSymbols();
   const randomSymbols = symbols.sort(() => 0.5 - Math.random()).slice(0, limit);
-  return randomSymbols;
+  const summaries = await getSymbolSummaries(randomSymbols);
+
+  return summaries;
 };
 
 const getSymbols = () => {

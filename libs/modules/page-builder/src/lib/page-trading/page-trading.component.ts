@@ -58,7 +58,7 @@ import { startWith, switchMap } from 'rxjs';
         [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
         [showCashSegment]="authenticationUserService.state.isAccountDemoTrading()"
         [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
-      ></app-portfolio-state>
+      />
 
       <div class="flex flex-col xl:flex-row gap-x-6 gap-y-6 xl:col-span-2 max-md:-ml-4">
         <!-- holdings -->
@@ -203,8 +203,8 @@ export class PageTradingComponent {
         (holding) =>
           ({
             value: holding.symbol,
-            caption: `${holding.symbolSummary.quote.name}`,
-            image: holding.symbolSummary.id,
+            caption: `${holding.symbolQuote.name}`,
+            image: holding.symbolQuote.symbol,
           }) satisfies InputSource<string>,
       ) ?? []
     );

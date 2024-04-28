@@ -4,7 +4,7 @@ import {
   PortfolioStateHoldingBase,
   PortfolioStateHoldings,
   PortfolioTransaction,
-  SymbolSummary,
+  SymbolQuote,
 } from '@mm/api-types';
 import { getCurrentDateDefaultFormat, getCurrentDateDetailsFormat } from './date-service.util';
 import { calculateGrowth, roundNDigits } from './general-function.util';
@@ -21,45 +21,40 @@ import { calculateGrowth, roundNDigits } from './general-function.util';
 export const getPortfolioStateHoldingsUtil = (
   transactions: PortfolioTransaction[],
   partialHoldings: PortfolioStateHoldingBase[],
-  symbolSummaries: SymbolSummary[],
+  symbolQuotes: SymbolQuote[],
   startingCash = 0,
 ): PortfolioStateHoldings => {
   const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
   const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
   const transactionFees = transactions.reduce((acc, curr) => acc + curr.transactionFees, 0);
 
-  console.log(`Getting Summaries: sending ${partialHoldings.length}, receiving: ${symbolSummaries.length}`);
-
   // value that user invested in all assets
   const invested = partialHoldings.reduce((acc, curr) => acc + curr.invested, 0);
 
   // user's holdings with summary data
-  const portfolioStateHolding = symbolSummaries
-    .map((symbolSummary) => {
-      const holding = partialHoldings.find((d) => d.symbol === symbolSummary.id);
+  const portfolioStateHolding = symbolQuotes
+    .map((quote) => {
+      const holding = partialHoldings.find((d) => d.symbol === quote.symbol);
       if (!holding) {
-        console.log(`Holding not found for symbol ${symbolSummary.id}`);
+        console.log(`Holding not found for symbol ${quote.symbol}`);
         return null;
       }
       return {
         ...holding,
         breakEvenPrice: roundNDigits(holding.invested / holding.units),
         weight: roundNDigits(holding.invested / invested, 6),
-        symbolSummary,
+        symbolQuote: quote,
       } satisfies PortfolioStateHolding;
     })
     .filter((d) => !!d) as PortfolioStateHolding[];
 
   // sort holdings by balance
   const portfolioStateHoldingSortedByBalance = [...portfolioStateHolding].sort(
-    (a, b) => b.symbolSummary.quote.price * b.units - a.symbolSummary.quote.price * a.units,
+    (a, b) => b.symbolQuote.price * b.units - a.symbolQuote.price * a.units,
   );
 
   // value of all assets
-  const holdingsBalance = portfolioStateHolding.reduce(
-    (acc, curr) => acc + curr.symbolSummary.quote.price * curr.units,
-    0,
-  );
+  const holdingsBalance = portfolioStateHolding.reduce((acc, curr) => acc + curr.symbolQuote.price * curr.units, 0);
 
   // calculate profit/loss from created transactions
   const transactionProfitLoss = transactions.reduce((acc, curr) => acc + (curr?.returnValue ?? 0), 0);
@@ -76,10 +71,7 @@ export const getPortfolioStateHoldingsUtil = (
   const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
 
   // calculate daily portfolio change
-  const balanceChange = portfolioStateHolding.reduce(
-    (acc, curr) => acc + curr.symbolSummary.quote.change * curr.units,
-    0,
-  );
+  const balanceChange = portfolioStateHolding.reduce((acc, curr) => acc + curr.symbolQuote.change * curr.units, 0);
   const balanceChangePrct = holdingsBalance === 0 ? 0 : calculateGrowth(balance, balance - balanceChange);
 
   const result: PortfolioState = {
@@ -136,6 +128,7 @@ export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransact
         {
           symbolType: curr.symbolType,
           symbol: curr.symbol,
+          sector: curr.sector,
           units: curr.units,
           invested: roundNDigits(curr.unitPrice * curr.units),
         } satisfies PortfolioStateHoldingBase,

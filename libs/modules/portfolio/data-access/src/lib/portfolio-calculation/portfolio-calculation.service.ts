@@ -42,7 +42,7 @@ export class PortfolioCalculationService {
 
     // get symbol summaries from API
     return this.marketApiService
-      .getSymbolSummaries(holdingSymbols)
+      .getSymbolQuotes(holdingSymbols)
       .pipe(map((summaries) => getPortfolioStateHoldingsUtil(transactions, holdingsBase, summaries, startingCash)));
   }
 
@@ -196,7 +196,20 @@ export class PortfolioCalculationService {
    * @returns
    */
   getPortfolioSectorAllocationPieChart(holdings: PortfolioStateHolding[]): GenericChartSeries<'pie'> {
-    const allocations = this.getPortfolioSectorAllocation(holdings, 'sector');
+    const allocations = holdings.reduce(
+      (acc, curr) => {
+        const dataKey = curr.sector ?? curr.symbolType;
+        const existingData = acc[dataKey];
+        if (existingData) {
+          acc[dataKey] += curr.symbolQuote.price * curr.units;
+        } else {
+          acc[dataKey] = curr.symbolQuote.price * curr.units;
+        }
+        return acc;
+      },
+      {} as { [name: string]: number },
+    );
+
     const chartData = Object.entries(allocations)
       .map(([name, value]) => ({
         y: Number(value),
@@ -216,23 +229,20 @@ export class PortfolioCalculationService {
     // limit bubbles, show rest as 'others'
     const dataLimit = 50;
     // sort symbols by value and divide them by first and rest
-    const sortedHoldings = [...holdings].sort(
-      (a, b) => b.symbolSummary.quote.price * b.units - a.symbolSummary.quote.price * a.units,
-    );
+    const sortedHoldings = [...holdings].sort((a, b) => b.symbolQuote.price * b.units - a.symbolQuote.price * a.units);
     const firstNData = sortedHoldings.slice(0, dataLimit);
     const restData = sortedHoldings.slice(dataLimit);
 
     // divide symbols into sectors
     const sectorsDivider = firstNData.reduce(
       (acc, curr) => {
-        const sector = curr.symbolSummary.profile?.sector ?? curr.symbolType;
         return {
           ...acc,
-          [sector]: [
-            ...(acc[sector] ?? []),
+          [curr.sector]: [
+            ...(acc[curr.sector] ?? []),
             {
               name: curr.symbol,
-              value: curr.symbolSummary.quote.price * curr.units,
+              value: curr.symbolQuote.price * curr.units,
             },
           ],
         };
@@ -267,7 +277,7 @@ export class PortfolioCalculationService {
       name: 'Others',
       data: restData.map((d) => ({
         name: d.symbol,
-        value: d.symbolSummary.quote.price * d.units,
+        value: d.symbolQuote.price * d.units,
         dataLabels: {
           color: ColorScheme.GRAY_DARK_VAR,
         },
@@ -289,7 +299,19 @@ export class PortfolioCalculationService {
    */
   getPortfolioAssetAllocationPieChart(holdings: PortfolioStateHolding[]): GenericChartSeries<'pie'> {
     const visibleData = 8;
-    const allocations = this.getPortfolioSectorAllocation(holdings, 'asset');
+    const allocations = holdings.reduce(
+      (acc, curr) => {
+        const existingData = acc[curr.symbol];
+        if (existingData) {
+          acc[curr.symbol] += curr.symbolQuote.price * curr.units;
+        } else {
+          acc[curr.symbol] = curr.symbolQuote.price * curr.units;
+        }
+        return acc;
+      },
+      {} as { [name: string]: number },
+    );
+
     const chartData = Object.entries(allocations)
       .map(([name, value]) => ({
         y: Number(value),
@@ -468,35 +490,5 @@ export class PortfolioCalculationService {
       .reduce((acc, curr) => ({ ...acc, [curr.symbol]: curr.data }), {} as { [key: string]: HistoricalPrice[] });
 
     return historicalPrices;
-  }
-
-  /**
-   * generate array of sector\asset allocations, where name is the sector's/asset's name
-   * and value is the value allocated to that  sector\asset
-   *
-   * @param holdings
-   * @returns
-   */
-  private getPortfolioSectorAllocation(
-    transactions: PortfolioStateHolding[],
-    key: 'asset' | 'sector',
-  ): { [name: string]: number } {
-    if (transactions.length === 0) {
-      return {};
-    }
-
-    return transactions.reduce(
-      (acc, curr) => {
-        const dataKey = key === 'asset' ? curr.symbol : curr.symbolSummary.profile?.sector ?? curr.symbolType;
-        const existingData = acc[dataKey];
-        if (existingData) {
-          acc[dataKey] += curr.symbolSummary.quote.price * curr.units;
-        } else {
-          acc[dataKey] = curr.symbolSummary.quote.price * curr.units;
-        }
-        return acc;
-      },
-      {} as { [name: string]: number },
-    );
   }
 }

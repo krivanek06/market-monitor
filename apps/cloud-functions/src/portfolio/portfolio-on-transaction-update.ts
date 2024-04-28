@@ -1,4 +1,4 @@
-import { getSymbolSummaries } from '@mm/api-external';
+import { getSymbolQuotes } from '@mm/api-external';
 import { UserBase, UserData } from '@mm/api-types';
 import {
   getCurrentDateDefaultFormat,
@@ -43,13 +43,13 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
 
     // get symbol summaries from API
     const partialHoldingSymbols = holdingsBase.map((d) => d.symbol);
-    const summaries = partialHoldingSymbols.length > 0 ? await getSymbolSummaries(partialHoldingSymbols) : [];
+    const symbolQuotes = partialHoldingSymbols.length > 0 ? await getSymbolQuotes(partialHoldingSymbols) : [];
 
     // get portfolio state
     const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
       transactionData,
       holdingsBase,
-      summaries,
+      symbolQuotes,
       userData.portfolioState.startingCash,
     );
 

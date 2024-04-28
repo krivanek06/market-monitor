@@ -208,12 +208,20 @@ export class AuthenticationUserStoreService {
     this.userApiService.changeUserSettings(this.state.getUserData(), data);
   }
 
-  addSymbolToUserWatchList(symbol: string, symbolType: SymbolType): void {
-    this.userApiService.addSymbolToUserWatchList(this.state.getUserData().id, symbol, symbolType);
+  addSymbolToUserWatchList(symbol: string, symbolType: SymbolType, sector: string): void {
+    this.userApiService.addToUserWatchList(this.state.getUserData().id, {
+      sector,
+      symbol,
+      symbolType,
+    });
   }
 
-  removeSymbolFromUserWatchList(symbol: string, symbolType: SymbolType): void {
-    this.userApiService.removeSymbolFromUserWatchList(this.state.getUserData().id, symbol, symbolType);
+  removeSymbolFromUserWatchList(symbol: string, symbolType: SymbolType, sector: string): void {
+    this.userApiService.removeFromUserWatchList(this.state.getUserData().id, {
+      sector,
+      symbol,
+      symbolType,
+    });
   }
 
   clearUserWatchList(): void {

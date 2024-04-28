@@ -1,4 +1,5 @@
-import { SymbolSummary, SymbolType } from './symbol.model';
+import { SymbolQuote } from '../external-api';
+import { SymbolType } from './symbol.model';
 
 export type PortfolioRisk = {
   /**
@@ -69,9 +70,13 @@ export type PortfolioStateExecution = Pick<
   'numberOfExecutedBuyTransactions' | 'numberOfExecutedSellTransactions' | 'transactionFees' | 'date'
 >;
 
-export type PortfolioStateHoldingBase = {
+export type SymbolStoreBase = {
   symbolType: SymbolType;
   symbol: string;
+  sector: string;
+};
+
+export type PortfolioStateHoldingBase = SymbolStoreBase & {
   units: number;
   /**
    * how much user invested. Used to calculate BEP.
@@ -82,7 +87,7 @@ export type PortfolioStateHoldingBase = {
 export type PortfolioStateHolding = PortfolioStateHoldingBase & {
   breakEvenPrice: number; // calculated
   weight: number; // calculated
-  symbolSummary: SymbolSummary;
+  symbolQuote: SymbolQuote;
 };
 
 export type PortfolioStateHoldings = PortfolioState & {
@@ -122,11 +127,9 @@ export type PortfolioGrowthAssetsDataItem = {
 
 export type PortfolioTransactionType = 'BUY' | 'SELL';
 
-export type PortfolioTransaction = {
+export type PortfolioTransaction = SymbolStoreBase & {
   transactionId: string;
   userId: string;
-  symbolType: SymbolType;
-  symbol: string;
   units: number;
   unitPrice: number;
   date: string;
@@ -154,9 +157,7 @@ export type PortfolioTransactionCash = {
   amount: number;
 };
 
-export type PortfolioTransactionCreate = {
-  symbol: string;
-  symbolType: SymbolType;
+export type PortfolioTransactionCreate = SymbolStoreBase & {
   units: number;
   date: string;
   transactionType: PortfolioTransactionType;

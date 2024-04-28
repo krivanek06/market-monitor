@@ -1,8 +1,13 @@
 import { User } from 'firebase/auth';
 import { DataDocsWrapper } from './../constants/generic.model';
-import { PortfolioRisk, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
+import {
+  PortfolioRisk,
+  PortfolioState,
+  PortfolioStateHoldingBase,
+  PortfolioTransaction,
+  SymbolStoreBase,
+} from './portfolio.model';
 import { RankingItem } from './ranking.model';
-import { SymbolType } from './symbol.model';
 
 export type UserBase = {
   id: string;
@@ -91,10 +96,7 @@ export type UserPortfolioTransaction = {
 };
 
 export type UserWatchList = {
-  data: {
-    symbol: string;
-    symbolType: SymbolType;
-  }[];
+  data: SymbolStoreBase[];
   createdDate: string;
 };
 

@@ -23,6 +23,7 @@ export const mockPortfolioTransaction = (input?: Partial<PortfolioTransaction>):
     transactionId: new Date().getTime().toString(),
     unitPrice: 100,
     userId: USER_TEST_1_ID,
+    sector: 'Technology',
     ...input,
   };
 

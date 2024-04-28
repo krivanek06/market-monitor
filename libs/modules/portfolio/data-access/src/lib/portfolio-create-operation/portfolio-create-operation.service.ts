@@ -85,6 +85,7 @@ export class PortfolioCreateOperationService {
       date: input.date,
       symbol: input.symbol,
       units: input.units,
+      sector: input.sector,
       transactionType: input.transactionType,
       userId: userDocData.id,
       symbolType: input.symbolType,

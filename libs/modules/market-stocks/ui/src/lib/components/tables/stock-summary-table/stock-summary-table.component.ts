@@ -263,7 +263,7 @@ import {
 export class StockSummaryTableComponent {
   itemClickedEmitter = output<SymbolQuote>();
   sort = viewChild(MatSort);
-  symbolQuotes = input.required<SymbolQuote[] | null>();
+  symbolQuotes = input.required<SymbolQuote[] | null | undefined>();
 
   tableEffect = effect(
     () => {

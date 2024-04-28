@@ -68,10 +68,7 @@ export class PageWatchlistComponent {
     toObservable(this.watchList).pipe(
       switchMap((watchList) => this.marketApiService.getSymbolQuotes(watchList.data.map((d) => d.symbol))),
     ),
-    { initialValue: [] },
   );
-
-  //computed(() => this.watchList().data.map((d) => d.symbol));
 
   pageTitle = computed(() => {
     const isPaid = this.authenticationUserService.state.isAccountNormalPaid();

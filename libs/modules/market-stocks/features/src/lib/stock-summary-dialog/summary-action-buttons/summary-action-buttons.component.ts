@@ -137,7 +137,11 @@ export class SummaryActionButtonsComponent {
       }
 
       // save data into fireStore
-      this.authenticationUserService.addSymbolToUserWatchList(this.symbolSummary().id, 'STOCK');
+      this.authenticationUserService.addSymbolToUserWatchList(
+        this.symbolSummary().id,
+        'STOCK',
+        this.symbolSummary()?.profile?.sector ?? 'Unknown',
+      );
 
       // show notification
       this.dialogServiceUtil.showNotificationBar(
@@ -150,7 +154,11 @@ export class SummaryActionButtonsComponent {
   async onRemoveWatchList() {
     if (this.authenticationUserService) {
       // save data into fireStore
-      this.authenticationUserService.removeSymbolFromUserWatchList(this.symbolSummary().id, 'STOCK');
+      this.authenticationUserService.removeSymbolFromUserWatchList(
+        this.symbolSummary().id,
+        'STOCK',
+        this.symbolSummary()?.profile?.sector ?? 'Unknown',
+      );
 
       // show notification
       this.dialogServiceUtil.showNotificationBar(

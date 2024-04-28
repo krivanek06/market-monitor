@@ -204,7 +204,8 @@ const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioState
             units: (acc[curr.symbol]?.units ?? 0) + curr.units,
             symbol: curr.symbol,
             symbolType: curr.symbolType,
-          },
+            sector: curr.sector,
+          } satisfies PortfolioStateHoldingBase,
         }),
         {} as { [key: string]: PortfolioStateHoldingBase },
       ),
@@ -219,7 +220,8 @@ const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioState
             units: (acc[key]?.units ?? 0) + value.units,
             symbol: value.symbol,
             symbolType: value.symbolType,
-          };
+            sector: value.sector,
+          } satisfies PortfolioStateHoldingBase;
         });
 
         return acc;
