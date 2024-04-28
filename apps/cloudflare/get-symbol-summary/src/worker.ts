@@ -1,7 +1,7 @@
 import { getCompanyQuote, getProfile, getSymbolsPriceChanges, searchTicker } from '@mm/api-external';
-import { RESPONSE_HEADER } from '@mm/api-types';
-import { checkDataValidityMinutes } from '@mm/shared/general-util';
-
+import { CompanyProfile, PriceChange, RESPONSE_HEADER, SymbolQuote } from '@mm/api-types';
+import { chunk, getCurrentDateDetailsFormat } from '@mm/shared/general-util';
+import { isAfter, subMinutes } from 'date-fns';
 /**
  * Welcome to Cloudflare Workers! This is your first worker.
  *
@@ -12,7 +12,7 @@ import { checkDataValidityMinutes } from '@mm/shared/general-util';
  * Learn more at https://developers.cloudflare.com/workers/
  */
 import { inArray, sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/d1';
+import { DrizzleD1Database, drizzle } from 'drizzle-orm/d1';
 import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export interface Env {
@@ -34,9 +34,9 @@ export interface Env {
 
 const SymbolSummaryTable = sqliteTable('symbol_summary', {
 	id: text('id').primaryKey(),
-	quote: text('quote').notNull().$type<string>(),
-	profile: text('profile').$type<string>(),
-	priceChange: text('priceChange').notNull().$type<string>(),
+	quote: text('quote', { mode: 'json' }).notNull().$type<SymbolQuote>(),
+	profile: text('profile', { mode: 'json' }).$type<CompanyProfile | null>(),
+	priceChange: text('priceChange', { mode: 'json' }).$type<PriceChange | null>(),
 	lastUpdate: text('lastUpdate')
 		.notNull()
 		.default(sql`CURRENT_TIMESTAMP`),
@@ -46,24 +46,15 @@ type StockSummaryTable = typeof SymbolSummaryTable.$inferSelect;
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		const { searchParams } = new URL(request.url);
-		const symbolsString = searchParams.get('symbol') as string | undefined;
-
-		// set isSearch to true if searching for symbols with same prefix
-		const isSearchString = searchParams.get('isSearch') as string | undefined;
-		const isSearch = isSearchString === 'true';
-
-		// stock, crypto, etf, fund
-		const symbolType = searchParams.get('symbolType') as string | undefined;
-		const isSymbolTypeCrypto = symbolType === 'crypto';
+		const { symbol, isSearch, isOnlyQuote, isCrypto } = getParams(request.url);
 
 		// throw error if no symbols
-		if (!symbolsString) {
+		if (!symbol) {
 			return new Response('Symbol is required', { status: 400 });
 		}
 
 		// unique symbols adn not undefined
-		let symbolArray = symbolsString
+		let symbolArray = symbol
 			.split(',')
 			.filter((value, index, self) => self.indexOf(value) === index)
 			.filter((d) => !!d);
@@ -71,7 +62,7 @@ export default {
 		// if searching for symbols, get symbols from API
 		if (isSearch) {
 			// load searched symbols from API
-			const searchResults = await searchTicker(symbolArray[0], isSymbolTypeCrypto);
+			const searchResults = await searchTicker(symbolArray.at(0), isCrypto);
 			// rewrite symbolArray with searched symbols
 			symbolArray = searchResults.map((d) => d.symbol);
 		}
@@ -83,100 +74,153 @@ export default {
 
 		// check if data exists in db
 		const db = drizzle(env.DB);
-		let storedSymbolSummaries: StockSummaryTable[] = [];
-		let validStoredIds: string[] = [];
-		try {
-			// load data from db
-			storedSymbolSummaries = (await db.select().from(SymbolSummaryTable).where(inArray(SymbolSummaryTable.id, symbolArray)).all()).map(
-				formatSummaryToObject,
-			);
 
-			// check symbol validity 3min
-			validStoredIds = storedSymbolSummaries.filter((d) => checkDataValidityMinutes(d, 3)).map((d) => d.id);
-		} catch (e) {
-			console.log('error', e);
-		}
+		// data from DB
+		const { validStoredData, reloadIds: symbolsToUpdate } = await getSummariesFromDB(symbolArray, isOnlyQuote, db);
 
-		// symbols to update
-		const symbolsToUpdate = symbolArray.filter((symbol) => !validStoredIds.includes(symbol));
+		// load summaries
+		const summaries = !isOnlyQuote ? await loadSummaries(symbolsToUpdate) : await loadQuotes(symbolsToUpdate);
 
-		// load data from api with
-		const [updatedQuotes, stockPriceChanges, profiles] =
-			symbolsToUpdate.length > 0
-				? await Promise.all([getCompanyQuote(symbolsToUpdate), getSymbolsPriceChanges(symbolsToUpdate), getProfile(symbolsToUpdate)])
-				: [[], [], []];
-
-		console.log('validStoredIds', validStoredIds);
-		console.log('symbolsToUpdate', symbolsToUpdate);
-
-		// map to correct data structure
-		const summaries = symbolsToUpdate
-			.map((symbol) => {
-				// find data from loaded API - ensureFind throws error if not found
-				const quote = updatedQuotes.find((q) => q.symbol === symbol);
-				const priceChange = stockPriceChanges.find((p) => p.symbol === symbol);
-				const profile = profiles.find((p) => p.symbol === symbol);
-
-				// if any of the data is missing, return undefined
-				if (!quote || !priceChange || quote.marketCap === 0) {
-					return undefined;
-				}
-
-				// STRINGIFY DATA OTHERWISE NOT SAVED
-				return {
-					id: symbol,
-					quote: JSON.stringify(quote),
-					priceChange: JSON.stringify(priceChange),
-					profile: profile ? JSON.stringify(profile) : null,
-				};
-			}) // filter out undefined values
-			.filter((d): d is StockSummaryTable => !!d) satisfies StockSummaryTable[];
+		// logs
+		console.log('Request:', symbolArray.length, symbolArray);
+		console.log(
+			'Valid Saved',
+			validStoredData.length,
+			validStoredData.map((d) => d.id),
+		);
+		console.log('Reloaded', symbolsToUpdate.length, symbolsToUpdate);
 
 		// save new summaries into cache for 3min
-		const savedData =
-			summaries.length > 0
-				? (
-						await db
-							.insert(SymbolSummaryTable)
-							.values(summaries)
-							.onConflictDoUpdate({
-								set: {
-									quote: sql`excluded.quote`,
-									priceChange: sql`excluded.priceChange`,
-									profile: sql`excluded.profile`,
-									lastUpdate: sql`CURRENT_TIMESTAMP`,
-								},
-								target: SymbolSummaryTable.id,
-							})
-							.returning()
-							.all()
-					).map(formatSummaryToObject)
-				: [];
+		await saveSummariesIntoDB(summaries, db);
 
-		const savedIds = savedData.map((d) => d.id);
-		console.log('saved ids', savedIds);
-
-		// order [summaries, cachedSummaries] the same way as symbolArray
-		const orderedSummaries = symbolArray
-			.map((symbol) => {
-				const summary = savedData.find((d) => d.id === symbol);
-				if (summary) {
-					return summary;
-				}
-				return storedSymbolSummaries.find((d) => d.id === symbol);
-			})
-			.filter((d): d is StockSummaryTable => !!d);
+		// order data by id asc
+		const orderedSummaries = [...validStoredData, ...summaries].sort((a, b) => (a.id < b.id ? 1 : -1));
 
 		// return data
 		return new Response(JSON.stringify(orderedSummaries), RESPONSE_HEADER);
 	},
 };
 
-const formatSummaryToObject = (summary: StockSummaryTable) => {
-	return {
-		...summary,
-		quote: JSON.parse(summary.quote),
-		profile: summary.profile ? JSON.parse(summary.profile) : null,
-		priceChange: JSON.parse(summary.priceChange),
-	};
+const saveSummariesIntoDB = async (data: StockSummaryTable[], db: DrizzleD1Database<Record<string, never>>): Promise<void> => {
+	if (data.length === 0) {
+		return;
+	}
+
+	try {
+		const savedData = await db
+			.insert(SymbolSummaryTable)
+			.values(data)
+			.onConflictDoUpdate({
+				set: {
+					quote: sql`excluded.quote`,
+					priceChange: sql`excluded.priceChange`,
+					profile: sql`excluded.profile`,
+					lastUpdate: sql`CURRENT_TIMESTAMP`,
+				},
+				target: SymbolSummaryTable.id,
+			})
+			.returning()
+			.all();
+
+		const savedIds = savedData.map((d) => d.id);
+		console.log('Summary: saved ids', savedIds);
+	} catch (e) {
+		console.log('error', e);
+		console.log(
+			'Unable to save',
+			data.map((d) => d.id),
+		);
+	}
 };
+
+const loadQuotes = async (symbolsToUpdate: string[]): Promise<StockSummaryTable[]> => {
+	const symbolChunks = chunk(symbolsToUpdate, 30);
+	const loadedQuotes = (await Promise.all(symbolChunks.map((symbols) => getCompanyQuote(symbols)))).reduce(
+		(acc, curr) => [...acc, ...curr],
+		[],
+	);
+
+	return loadedQuotes.map((quote) => ({
+		id: quote.symbol,
+		lastUpdate: getCurrentDateDetailsFormat(),
+		quote,
+		priceChange: null,
+		profile: null,
+	}));
+};
+
+const getSummariesFromDB = async (symbols: string[], onlyQuotes: boolean, db: DrizzleD1Database<Record<string, never>>) => {
+	let storedSymbolSummaries: StockSummaryTable[] = [];
+	try {
+		// load data from db
+		storedSymbolSummaries = await db.select().from(SymbolSummaryTable).where(inArray(SymbolSummaryTable.id, symbols)).all();
+	} catch (e) {
+		console.log('error', e);
+		storedSymbolSummaries = [];
+	}
+
+	// check symbol validity 3min and some additional data must be present
+	const validStoredData = storedSymbolSummaries.filter((d) => checkDataValidityMinutes(d, 3) && (onlyQuotes || !!d.priceChange));
+	const validStoredDataIds = validStoredData.map((d) => d.id);
+
+	const reloadIds = symbols.filter((d) => !validStoredDataIds.includes(d));
+
+	// symbols to update
+	return { validStoredData, reloadIds };
+};
+
+const loadSummaries = async (symbolsToUpdate: string[]): Promise<StockSummaryTable[]> => {
+	// load data from api with
+	const [updatedQuotes, stockPriceChanges, profiles] =
+		symbolsToUpdate.length > 0
+			? await Promise.all([getCompanyQuote(symbolsToUpdate), getSymbolsPriceChanges(symbolsToUpdate), getProfile(symbolsToUpdate)])
+			: [[], [], []];
+
+	// map to correct data structure
+	const summaries = symbolsToUpdate
+		.map((symbol) => {
+			// find data from loaded API - ensureFind throws error if not found
+			const quote = updatedQuotes.find((q) => q.symbol === symbol);
+			const priceChange = stockPriceChanges.find((p) => p.symbol === symbol);
+			const profile = profiles.find((p) => p.symbol === symbol);
+
+			// if any of the data is missing, return undefined
+			if (!quote || !priceChange || quote.marketCap === 0) {
+				return undefined;
+			}
+
+			// STRINGIFY DATA OTHERWISE NOT SAVED
+			return {
+				id: symbol,
+				quote,
+				priceChange: priceChange,
+				profile: profile ?? null,
+				lastUpdate: getCurrentDateDetailsFormat(),
+			} satisfies StockSummaryTable;
+		}) // filter out undefined values
+		.filter((d) => !!d) as StockSummaryTable[];
+
+	return summaries;
+};
+
+const getParams = (requestUrl: string): { symbol: string | undefined; isSearch: boolean; isOnlyQuote: boolean; isCrypto: boolean } => {
+	const { searchParams } = new URL(requestUrl);
+	const symbolsString = searchParams.get('symbol') as string | undefined;
+
+	// set isSearch to true if searching for symbols with same prefix
+	const isSearchString = searchParams.get('isSearch') as string | undefined;
+	const isSearch = isSearchString === 'true';
+
+	// stock, crypto, etf, fund
+	const symbolType = searchParams.get('symbolType') as string | undefined;
+	const isCrypto = symbolType === 'crypto';
+
+	// check if to get only quote
+	const isOnlyQuoteString = searchParams.get('onlyQuote') as string | undefined;
+	const isOnlyQuote = isOnlyQuoteString === 'true';
+
+	return { symbol: symbolsString, isSearch, isOnlyQuote, isCrypto };
+};
+
+const checkDataValidityMinutes = <T extends { lastUpdate: string | Date }>(data: T | undefined, minutes: number) =>
+	!!data && isAfter(new Date(data.lastUpdate), subMinutes(new Date(), minutes));
