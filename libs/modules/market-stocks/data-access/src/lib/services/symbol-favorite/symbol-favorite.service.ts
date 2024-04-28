@@ -1,12 +1,12 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { MarketApiService } from '@mm/api-client';
-import { SymbolSearch, SymbolSummary } from '@mm/api-types';
+import { SymbolStoreBase, SymbolSummary } from '@mm/api-types';
 import { StorageLocalStoreService } from '@mm/shared/general-features';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch[]> {
+export class SymbolFavoriteService extends StorageLocalStoreService<SymbolStoreBase[]> {
   private favoriteSymbols = signal<SymbolSummary[]>([]);
 
   constructor(private marketApiService: MarketApiService) {
@@ -22,7 +22,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
       .includes(symbol);
   }
 
-  addFavoriteSymbol(searchSymbol: SymbolSearch): void {
+  addFavoriteSymbol(searchSymbol: SymbolStoreBase): void {
     const savedData = this.getData();
     const symbols = savedData.map((d) => d.symbol);
 
@@ -39,7 +39,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
     });
   }
 
-  removeFavoriteSymbol(searchSymbol: SymbolSearch): void {
+  removeFavoriteSymbol(searchSymbol: SymbolStoreBase): void {
     const savedData = this.getData();
 
     // remove from favoriteSymbols$
@@ -50,7 +50,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
     this.persistData(newSavedData, newSummaries);
   }
 
-  private persistData(symbolFavorite: SymbolSearch[], symbolSummaries: SymbolSummary[]): void {
+  private persistData(symbolFavorite: SymbolStoreBase[], symbolSummaries: SymbolSummary[]): void {
     const symbolFavoriteSlice = symbolFavorite.slice(0, 12);
     const symbolSummariesSlice = symbolSummaries.slice(0, 12);
 

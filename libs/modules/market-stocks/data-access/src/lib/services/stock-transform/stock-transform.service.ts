@@ -24,7 +24,7 @@ export class StockTransformService {
     const ratingDetailsROEScoreValue = companyRatio.returnOnEquityTTM;
     const ratingDetailsROAScoreValue = companyRatio.returnOnAssetsTTM;
     const ratingDetailsDEScoreValue = data.companyOutlook.profile.dcf;
-    const ratingDetailsPEScoreValue = data.quote.pe;
+    const ratingDetailsPEScoreValue = data.quote.pe ?? 0;
     const ratingDetailsPBScoreValue = companyRatio.priceToBookRatioTTM;
 
     const result = {

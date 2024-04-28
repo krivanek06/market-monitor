@@ -8,8 +8,3 @@ export type SymbolSummary = {
 };
 
 export type SymbolType = 'STOCK' | 'CRYPTO' | 'ETF' | 'FUND' | 'CURRENCY';
-
-export type SymbolSearch = {
-  symbolType: SymbolType;
-  symbol: string;
-};

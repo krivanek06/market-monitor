@@ -19,7 +19,7 @@ export type SymbolQuote = {
   open: number;
   previousClose: number;
   eps: number | null;
-  pe: number;
+  pe: number | null;
   earningsAnnouncement: string | null;
   timestamp: number;
 

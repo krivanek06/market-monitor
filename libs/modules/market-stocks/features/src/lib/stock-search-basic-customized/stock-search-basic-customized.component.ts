@@ -153,6 +153,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
         this.symbolSearchService.addSearchedSymbol({
           symbolType: 'STOCK',
           symbol: value.id,
+          sector: value?.profile?.sector ?? 'Unknown',
         });
         this.onSummaryClick(value);
       }
