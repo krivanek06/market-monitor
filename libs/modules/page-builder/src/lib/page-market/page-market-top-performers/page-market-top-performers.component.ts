@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MarketApiService } from '@mm/api-client';
-import { SymbolSummary } from '@mm/api-types';
+import { SymbolQuote } from '@mm/api-types';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import { StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
@@ -19,24 +19,24 @@ import { RangeDirective } from '@mm/shared/ui';
       <div>
         <app-stock-summary-table
           tableTitle="Top Active"
-          (itemClickedEmitter)="onSummaryClick($event)"
-          [stockSummaries]="marketOverview.stockTopActive"
+          (itemClickedEmitter)="onQuoteClick($event)"
+          [symbolQuotes]="marketOverview.stockTopActive"
         ></app-stock-summary-table>
       </div>
 
       <div>
         <app-stock-summary-table
           tableTitle="Top Gainer"
-          (itemClickedEmitter)="onSummaryClick($event)"
-          [stockSummaries]="marketOverview.stockTopGainers"
+          (itemClickedEmitter)="onQuoteClick($event)"
+          [symbolQuotes]="marketOverview.stockTopGainers"
         ></app-stock-summary-table>
       </div>
 
       <div>
         <app-stock-summary-table
           tableTitle="Top Losers"
-          (itemClickedEmitter)="onSummaryClick($event)"
-          [stockSummaries]="marketOverview.stockTopLosers"
+          (itemClickedEmitter)="onQuoteClick($event)"
+          [symbolQuotes]="marketOverview.stockTopLosers"
         ></app-stock-summary-table>
       </div>
     </div>
@@ -62,10 +62,10 @@ export class PageMarketTopPerformersComponent {
   dialog = inject(MatDialog);
   marketTopPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance());
 
-  onSummaryClick(summary: SymbolSummary) {
+  onQuoteClick(summary: SymbolQuote) {
     return this.dialog.open(StockSummaryDialogComponent, {
       data: {
-        symbol: summary.id,
+        symbol: summary.symbol,
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });

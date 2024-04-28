@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import {
   CompanyInsideTrade,
   DataTimePeriod,
-  HistoricalPrice,
   News,
   StockDetails,
   StockDetailsAPI,
@@ -11,12 +10,13 @@ import {
   StockScreenerResults,
   StockScreenerValues,
   StockSummary,
-  SymbolHistoricalPeriods,
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
+  SymbolQuote,
   SymbolSummary,
 } from '@mm/api-types';
 import { Observable, catchError, filter, forkJoin, map, mergeMap, of, reduce, switchMap, tap } from 'rxjs';
+import { MarketApiService } from '../market-api/market-api.service';
 import { ApiCacheService } from '../utils';
 
 @Injectable({
@@ -24,6 +24,7 @@ import { ApiCacheService } from '../utils';
 })
 export class StocksApiService {
   private apiCache = inject(ApiCacheService);
+  private marketApiService = inject(MarketApiService);
 
   searchStockSummariesByPrefix(ticker: string): Observable<SymbolSummary[]> {
     if (!ticker) {
@@ -36,24 +37,8 @@ export class StocksApiService {
       .pipe(map((summaries) => summaries.filter((d) => d.quote.marketCap !== 0)));
   }
 
-  getStockSummaries(symbols: string[]): Observable<StockSummary[]> {
-    if (symbols.length === 0) {
-      return of([]);
-    }
-
-    return this.apiCache
-      .getData<
-        StockSummary[]
-      >(`https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`, ApiCacheService.validity3Min)
-      .pipe(catchError(() => []));
-  }
-
-  getStockSummary(symbol: string): Observable<StockSummary | null> {
-    return this.getStockSummaries([symbol]).pipe(map((d) => d[0]));
-  }
-
   getStockDetails(symbol: string): Observable<StockDetails> {
-    return this.getStockSummary(symbol).pipe(
+    return this.marketApiService.getSymbolSummary(symbol).pipe(
       tap((summary) => {
         if (!summary || !summary.profile) {
           throw new Error('Invalid symbol');
@@ -83,20 +68,7 @@ export class StocksApiService {
     );
   }
 
-  getStockHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {
-    return this.apiCache.getData<HistoricalPrice[]>(
-      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&period=${period}&type=period`,
-    );
-  }
-
-  getStockHistoricalPricesOnDate(symbol: string, date: string): Observable<HistoricalPrice | null> {
-    return this.apiCache.getData<HistoricalPrice | null>(
-      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&date=${date}&type=specificDate`,
-      ApiCacheService.validity2Min,
-    );
-  }
-
-  getStockScreening(screeningValue: StockScreenerValues): Observable<SymbolSummary[]> {
+  getStockScreening(screeningValue: StockScreenerValues): Observable<SymbolQuote[]> {
     return this.apiCache
       .postData<
         StockScreenerResults[],
@@ -120,14 +92,16 @@ export class StocksApiService {
         // load summaries for chunks
         switchMap((symbolsChunks) =>
           // return empty array on error
-          forkJoin(symbolsChunks.map((chunk) => this.getStockSummaries(chunk).pipe(catchError(() => [])))),
+          forkJoin(
+            symbolsChunks.map((chunk) => this.marketApiService.getSymbolQuotes(chunk).pipe(catchError(() => []))),
+          ),
         ),
         // flatten
         mergeMap((d) => d),
         // sort by ID
-        map((d) => d.slice().sort((a, b) => a.id.localeCompare(b.id))),
+        map((d) => d.slice().sort((a, b) => a.symbol.localeCompare(b.symbol))),
         // Combine all summaries into a single array and emit only once
-        reduce((acc, curr) => [...acc, ...curr], [] as SymbolSummary[]),
+        reduce((acc, curr) => [...acc, ...curr], [] as SymbolQuote[]),
       );
   }
 

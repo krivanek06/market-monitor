@@ -1,9 +1,8 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { UserApiService } from '@mm/api-client';
-import { PortfolioStateHolding, PortfolioTransaction, PortfolioTransactionCreate } from '@mm/api-types';
+import { PortfolioTransaction, PortfolioTransactionCreate } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { InputSource } from '@mm/shared/data-access';
 import { from, of, switchMap } from 'rxjs';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
 import { PortfolioCreateOperationService } from '../portfolio-create-operation/portfolio-create-operation.service';
@@ -72,19 +71,6 @@ export class PortfolioUserFacadeService {
   getPortfolioAssetAllocationPieChart = computed(() =>
     this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.getPortfolioState()?.holdings ?? []),
   );
-
-  getHoldingsInputSource = computed(() => {
-    return (
-      this.getPortfolioState()?.holdings?.map(
-        (holding) =>
-          ({
-            value: holding,
-            caption: `${holding.symbolSummary.quote.name}`,
-            image: holding.symbolSummary.id,
-          }) satisfies InputSource<PortfolioStateHolding>,
-      ) ?? []
-    );
-  });
 
   createPortfolioOperation(data: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
     const userData = this.authenticationUserService.state.getUserData();

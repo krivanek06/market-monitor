@@ -1,5 +1,5 @@
 import { ChartDataType } from '../constants';
-import { SymbolSummary } from './symbol.model';
+import { SymbolQuote } from '../external-api';
 
 export type MarketTopPerformance<T> = {
   stockTopGainers: T[];
@@ -9,7 +9,7 @@ export type MarketTopPerformance<T> = {
 
 export type MarketTopPerformanceSymbols = MarketTopPerformance<string> & {};
 
-export type MarketTopPerformanceOverviewResponse = MarketTopPerformance<SymbolSummary> & {};
+export type MarketTopPerformanceOverviewResponse = MarketTopPerformance<SymbolQuote> & {};
 
 // ------------------ News ------------------
 

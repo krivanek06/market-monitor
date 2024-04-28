@@ -5,8 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { StocksApiService } from '@mm/api-client';
-import { StockSummary } from '@mm/api-types';
+import { MarketApiService } from '@mm/api-client';
+import { SymbolSummary } from '@mm/api-types';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
@@ -90,7 +90,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSummaryDialogComponent {
-  stockSummarySignal = signal<StockSummary | null>(null);
+  stockSummarySignal = signal<SymbolSummary | null>(null);
 
   symbolType = computed(() => {
     const summary = this.stockSummarySignal();
@@ -113,13 +113,13 @@ export class StockSummaryDialogComponent {
   constructor(
     private dialogRef: MatDialogRef<StockSummaryDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { symbol: string },
-    private stocksApiService: StocksApiService,
+    private marketApiService: MarketApiService,
     private dialogServiceUtil: DialogServiceUtil,
     private route: Router,
     private viewPortScroller: ViewportScroller,
   ) {
-    this.stocksApiService
-      .getStockSummary(this.data.symbol)
+    this.marketApiService
+      .getSymbolSummary(this.data.symbol)
       .pipe(
         catchError(() => EMPTY),
         takeUntilDestroyed(),

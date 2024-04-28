@@ -536,7 +536,11 @@ export const getCalendarStockIPOs = async (
     "exchangeShortName": "CRYPTO"
   }]
  */
-export const searchTicker = async (symbolPrefix: string, isCrypto = false): Promise<TickerSearch[]> => {
+export const searchTicker = async (symbolPrefix: string | undefined, isCrypto = false): Promise<TickerSearch[]> => {
+  if (!symbolPrefix) {
+    return [];
+  }
+
   const stockExchange = 'NASDAQ,NYSE,AMEX';
   const cryptoExchange = 'CRYPTO';
   const usedExchange = isCrypto ? cryptoExchange : stockExchange;

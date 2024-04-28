@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService, StocksApiService } from '@mm/api-client';
-import { INDEXES_DEFAULT_SYMBOLS } from '@mm/api-types';
 import { NewsSearchComponent } from '@mm/market-general/features';
 import { STOCK_SCREENER_DEFAULT_VALUES } from '@mm/market-stocks/data-access';
 import { StockSearchBasicCustomizedComponent } from '@mm/market-stocks/features';
@@ -49,7 +48,6 @@ export class PageSearchComponent implements OnInit {
       this.marketApiService.getNews('general'),
       this.marketApiService.getMarketTopPerformance(),
       this.stocksApiService.getStockScreening(STOCK_SCREENER_DEFAULT_VALUES),
-      this.marketApiService.getSymbolSummaries(INDEXES_DEFAULT_SYMBOLS),
       this.marketApiService.getMarketCalendarDividends(month, year),
       this.marketApiService.getMarketOverview(),
     ])

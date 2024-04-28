@@ -151,8 +151,8 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
       startWith(this.quarterFormControl.value),
       filterNil(),
       switchMap((quarter) =>
-        this.stocksApiService
-          .getStockHistoricalPricesOnDate(this.stockSymbolSignal(), quarter)
+        this.marketApiService
+          .getHistoricalPricesOnDate(this.stockSymbolSignal(), quarter)
           .pipe(catchError((e) => of(null))),
       ),
     ),

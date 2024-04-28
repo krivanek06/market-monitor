@@ -70,7 +70,7 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
         <div class="g-skeleton w-[350px] h-6"></div>
       </div>
 
-      <div [style.height.px]="chartHeightPx() - 35" class="g-skeleton"></div>
+      <div [style.height.px]="chartHeightPx() - 25" class="g-skeleton"></div>
     </ng-template>
 
     <!-- error loading -->

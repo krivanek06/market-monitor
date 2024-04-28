@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { StocksApiService, UserApiService } from '@mm/api-client';
+import { MarketApiService, UserApiService } from '@mm/api-client';
 import {
   DATE_TOO_OLD,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
@@ -43,15 +43,15 @@ describe('PortfolioCreateOperationService', () => {
         MockProvider(UserApiService, {
           addUserPortfolioTransactions: jest.fn(),
         }),
-        MockProvider(StocksApiService),
+        MockProvider(MarketApiService),
       ],
     });
     service = TestBed.inject(PortfolioCreateOperationService);
 
     // mock response
-    const stocksApiService = TestBed.inject(StocksApiService);
+    const stocksApiService = TestBed.inject(MarketApiService);
     ngMocks.stub(stocksApiService, {
-      getStockHistoricalPricesOnDate: jest.fn().mockReturnValue(of(randomSymboLPrice)),
+      getHistoricalPricesOnDate: jest.fn().mockReturnValue(of(randomSymboLPrice)),
     });
   });
 
@@ -253,9 +253,9 @@ describe('PortfolioCreateOperationService', () => {
 
     describe('Error states', () => {
       it('should throw error if symbol not found', async () => {
-        const stocksApiService = TestBed.inject(StocksApiService);
+        const stocksApiService = TestBed.inject(MarketApiService);
         ngMocks.stub(stocksApiService, {
-          getStockHistoricalPricesOnDate: jest.fn().mockReturnValue(of(null)),
+          getHistoricalPricesOnDate: jest.fn().mockReturnValue(of(null)),
         });
 
         const emptyTransaction = {

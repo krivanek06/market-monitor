@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { StocksApiService, UserApiService } from '@mm/api-client';
+import { MarketApiService, UserApiService } from '@mm/api-client';
 import {
   DATE_TOO_OLD,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class PortfolioCreateOperationService {
   private userApiService = inject(UserApiService);
-  private stocksApiService = inject(StocksApiService);
+  private marketApiService = inject(MarketApiService);
 
   async createPortfolioCreateOperation(
     userData: UserData,
@@ -32,7 +32,7 @@ export class PortfolioCreateOperationService {
   ): Promise<PortfolioTransaction> {
     // load historical price for symbol on date
     const symbolPrice = await firstValueFrom(
-      this.stocksApiService.getStockHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date)),
+      this.marketApiService.getHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date)),
     );
 
     // check if symbol exists

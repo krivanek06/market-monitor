@@ -14,7 +14,6 @@ import {
   isWeekend,
   startOfMonth,
   subDays,
-  subMinutes,
   subYears,
 } from 'date-fns';
 import { Spread } from './typescript.util';
@@ -237,11 +236,6 @@ export const DATA_VALIDITY = 7;
  */
 export const checkDataValidityDays = <T extends { lastUpdate: string | Date }>(data?: T, days = DATA_VALIDITY) =>
   !!data && !isBefore(new Date(data.lastUpdate), subDays(new Date(), days));
-
-export const checkDataValidityMinutes = <T extends { lastUpdate: string | Date }>(
-  data: T | undefined,
-  minutes: number,
-) => !!data && !isBefore(new Date(data.lastUpdate), subMinutes(new Date(), minutes));
 
 export const getPreviousDate = (date: DateInput): string => {
   return subDays(new Date(date), 1).toDateString();

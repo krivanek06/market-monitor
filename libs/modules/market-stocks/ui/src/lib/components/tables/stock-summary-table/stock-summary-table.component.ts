@@ -16,7 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { SymbolSummary } from '@mm/api-types';
+import { SymbolQuote } from '@mm/api-types';
 import { compare } from '@mm/shared/general-util';
 import {
   DefaultImgDirective,
@@ -73,10 +73,10 @@ import {
         <td mat-cell *matCellDef="let row">
           <!-- logo + symbol -->
           <div class="flex items-center gap-2">
-            <img appDefaultImg imageType="symbol" [src]="row.id" class="w-10 h-10" />
+            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="w-10 h-10" />
             <div class="flex flex-col">
               <!-- asset symbol + sector -->
-              <div class="text-wt-primary">{{ row.id }}</div>
+              <div class="text-wt-primary">{{ row.symbol }}</div>
             </div>
           </div>
         </td>
@@ -87,7 +87,7 @@ import {
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Price +/-</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           <div class="text-base text-wt-gray-medium">
-            {{ row.quote.price | currency }}
+            {{ row.price | currency }}
           </div>
         </td>
       </ng-container>
@@ -100,21 +100,7 @@ import {
             appPercentageIncrease
             [useCurrencySign]="false"
             [changeValues]="{
-              changePercentage: row.quote.changesPercentage
-            }"
-          ></div>
-        </td>
-      </ng-container>
-
-      <!-- price change week desktop -->
-      <ng-container matColumnDef="priceChangeMonthly">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden 2xl:table-cell">Monthly %</th>
-        <td mat-cell *matCellDef="let row" class="hidden 2xl:table-cell">
-          <div
-            appPercentageIncrease
-            [useCurrencySign]="false"
-            [changeValues]="{
-              changePercentage: row.priceChange['1M']
+              changePercentage: row.changesPercentage
             }"
           ></div>
         </td>
@@ -126,15 +112,15 @@ import {
         <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
           <ng-container *ngIf="!displayInfoMobile()">
             <div class="flex justify-end text-base text-wt-gray-medium">
-              {{ row.quote.price | currency }}
+              {{ row.price | currency }}
             </div>
             <div
               class="flex justify-end"
               appPercentageIncrease
               [useCurrencySign]="true"
               [changeValues]="{
-                change: row.quote.change,
-                changePercentage: row.quote.changesPercentage
+                change: row.change,
+                changePercentage: row.changesPercentage
               }"
             ></div>
           </ng-container>
@@ -150,22 +136,22 @@ import {
               <!-- market cap -->
               <div>
                 <span class="text-wt-gray-dark">Market Cap.:</span>
-                <span> {{ row.quote.marketCap | largeNumberFormatter }}</span>
+                <span> {{ row.marketCap | largeNumberFormatter }}</span>
               </div>
               <!-- PE -->
               <div class="hidden xs:block">
                 <span class="text-wt-gray-dark">PE:</span>
-                <span> {{ row.quote.pe ? (row.quote.pe | number: '1.2-2') : 'N/A' }}</span>
+                <span> {{ row.pe ? (row.pe | number: '1.2-2') : 'N/A' }}</span>
               </div>
               <!-- shares -->
               <div>
                 <span class="text-wt-gray-dark">Shares:</span>
-                <span> {{ row.quote.sharesOutstanding | largeNumberFormatter }}</span>
+                <span> {{ row.sharesOutstanding | largeNumberFormatter }}</span>
               </div>
               <!-- EPS -->
               <div class="hidden xs:block">
                 <span class="text-wt-gray-dark">EPS:</span>
-                <span> {{ row.quote.eps ? (row.quote.eps | number: '1.2-2') : 'N/A' }}</span>
+                <span> {{ row.eps ? (row.eps | number: '1.2-2') : 'N/A' }}</span>
               </div>
             </div>
           </ng-container>
@@ -177,7 +163,7 @@ import {
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Volume +/-</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div class="text-base text-wt-gray-medium">
-            {{ row.quote.volume | largeNumberFormatter }}
+            {{ row.volume | largeNumberFormatter }}
           </div>
         </td>
       </ng-container>
@@ -191,8 +177,8 @@ import {
             [useCurrencySign]="false"
             [currentValues]="{
               hideValue: true,
-              value: row.quote.volume,
-              valueToCompare: row.quote.avgVolume
+              value: row.volume,
+              valueToCompare: row.avgVolume
             }"
           ></div>
         </td>
@@ -202,7 +188,7 @@ import {
       <ng-container matColumnDef="marketCap">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Market Cap.</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          {{ row.quote.marketCap | largeNumberFormatter }}
+          {{ row.marketCap | largeNumberFormatter }}
         </td>
       </ng-container>
 
@@ -210,7 +196,7 @@ import {
       <ng-container matColumnDef="shares">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Shares</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
-          {{ row.quote.sharesOutstanding | largeNumberFormatter }}
+          {{ row.sharesOutstanding | largeNumberFormatter }}
         </td>
       </ng-container>
 
@@ -218,7 +204,7 @@ import {
       <ng-container matColumnDef="pe">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">PE</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          {{ row.quote.pe ? (row.quote.pe | number: '1.2-2') : 'N/A' }}
+          {{ row.pe ? (row.pe | number: '1.2-2') : 'N/A' }}
         </td>
       </ng-container>
 
@@ -226,28 +212,7 @@ import {
       <ng-container matColumnDef="eps">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">EPS</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
-          {{ row.quote.eps ? (row.quote.eps | number: '1.2-2') : 'N/A' }}
-        </td>
-      </ng-container>
-
-      <!-- Beta -->
-      <ng-container matColumnDef="beta">
-        <th mat-header-cell *matHeaderCellDef class="hidden xl:table-cell">Beta</th>
-        <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
-          {{ row.profile.beta ? (row.profile.beta | number: '1.2-2') : 'N/A' }}
-        </td>
-      </ng-container>
-
-      <!-- sector -->
-      <ng-container matColumnDef="sector">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden 2xl:table-cell">Sector</th>
-        <td mat-cell *matCellDef="let row" class="hidden 2xl:table-cell">
-          <mat-chip-listbox aria-label="Asset sector">
-            <mat-chip>
-              <!-- todo add image of sector -->
-              {{ row.profile.sector || 'N/A' }}
-            </mat-chip>
-          </mat-chip-listbox>
+          {{ row.eps ? (row.eps | number: '1.2-2') : 'N/A' }}
         </td>
       </ng-container>
 
@@ -255,11 +220,7 @@ import {
       <ng-container matColumnDef="52WeekRange">
         <th mat-header-cell *matHeaderCellDef class="hidden xl:table-cell">52 Week Range</th>
         <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
-          <app-progress-currency
-            [min]="row.quote.yearLow"
-            [max]="row.quote.yearHigh"
-            [value]="row.quote.price"
-          ></app-progress-currency>
+          <app-progress-currency [min]="row.yearLow" [max]="row.yearHigh" [value]="row.price"></app-progress-currency>
         </td>
       </ng-container>
 
@@ -300,20 +261,20 @@ import {
   `,
 })
 export class StockSummaryTableComponent {
-  itemClickedEmitter = output<SymbolSummary>();
+  itemClickedEmitter = output<SymbolQuote>();
   sort = viewChild(MatSort);
-  stockSummaries = input.required<SymbolSummary[] | null>();
+  symbolQuotes = input.required<SymbolQuote[] | null>();
 
   tableEffect = effect(
     () => {
-      const summaries = this.stockSummaries();
+      const summaries = this.symbolQuotes();
 
       // keep loading state
       if (!summaries) {
         return;
       }
       // sort data by market cap
-      const newData = summaries.slice().sort((a, b) => compare(a.quote.marketCap, b.quote.marketCap, false));
+      const newData = summaries.slice().sort((a, b) => compare(a.marketCap, b.marketCap, false));
       this.dataSource.data = newData;
 
       // update table
@@ -335,29 +296,26 @@ export class StockSummaryTableComponent {
     this.displayInfoMobile.set(!this.displayInfoMobile());
   }
 
-  dataSource: MatTableDataSource<SymbolSummary> = new MatTableDataSource([] as SymbolSummary[]);
+  dataSource: MatTableDataSource<SymbolQuote> = new MatTableDataSource([] as SymbolQuote[]);
 
   displayedColumns: string[] = [
     'symbol',
     'marketCap',
     'price',
     'priceChange',
-    'priceChangeMonthly',
     'priceMobile',
     'volume',
     'volumeChange',
     'shares',
     'pe',
     'eps',
-    'beta',
     '52WeekRange',
-    //'sector',
     'infoMobile',
   ];
 
-  identity: TrackByFunction<SymbolSummary> = (index: number, item: SymbolSummary) => item.id;
+  identity: TrackByFunction<SymbolQuote> = (index: number, item: SymbolQuote) => item.symbol;
 
-  onItemClicked(item: SymbolSummary): void {
+  onItemClicked(item: SymbolQuote): void {
     this.itemClickedEmitter.emit(item);
   }
 
@@ -368,29 +326,25 @@ export class StockSummaryTableComponent {
       return;
     }
 
-    this.dataSource.data = data.sort((a: SymbolSummary, b: SymbolSummary) => {
+    this.dataSource.data = data.sort((a, b) => {
       const isAsc = sort.direction === 'asc';
       switch (sort.active) {
         case 'symbol':
-          return compare(a.id, b.id, isAsc);
+          return compare(a.symbol, b.symbol, isAsc);
         case 'marketCap':
-          return compare(a.quote.marketCap, b.quote.marketCap, isAsc);
+          return compare(a.marketCap, b.marketCap, isAsc);
         case 'price':
-          return compare(a.quote.price, b.quote.price, isAsc);
+          return compare(a.price, b.price, isAsc);
         case 'priceChange':
-          return compare(a.quote.changesPercentage, b.quote.changesPercentage, isAsc);
-        case 'priceChangeMonthly':
-          return compare(a.priceChange['1M'], b.priceChange['1M'], isAsc);
+          return compare(a.changesPercentage, b.changesPercentage, isAsc);
         case 'volume':
-          return compare(a.quote.volume, b.quote.volume, isAsc);
+          return compare(a.volume, b.volume, isAsc);
         case 'shares':
-          return compare(a.quote.sharesOutstanding, b.quote.sharesOutstanding, isAsc);
+          return compare(a.sharesOutstanding, b.sharesOutstanding, isAsc);
         case 'pe':
-          return compare(a.quote.pe, b.quote.pe, isAsc);
+          return compare(a.pe, b.pe, isAsc);
         case 'eps':
-          return compare(a.quote.eps, b.quote.eps, isAsc);
-        case 'sector':
-          return compare(a.profile?.sector, b.profile?.sector, isAsc);
+          return compare(a.eps, b.eps, isAsc);
         default:
           return 0;
       }

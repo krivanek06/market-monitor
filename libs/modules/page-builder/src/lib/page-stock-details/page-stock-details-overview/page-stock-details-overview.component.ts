@@ -273,7 +273,7 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
         if (!details.sectorPeers || details.sectorPeers.peersList.length === 0) {
           return of([]);
         }
-        return this.stocksApiService.getStockSummaries(details.sectorPeers.peersList);
+        return this.marketApiService.getSymbolSummaries(details.sectorPeers.peersList);
       }),
     ),
   );
