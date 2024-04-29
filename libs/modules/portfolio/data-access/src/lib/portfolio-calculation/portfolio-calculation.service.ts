@@ -404,24 +404,23 @@ export class PortfolioCalculationService {
             aggregator.accumulatedReturn += roundNDigits(transaction.returnValue - transaction.transactionFees);
           }
 
+          const breakEvenValue = roundNDigits(aggregator.units * aggregator.breakEvenPrice);
+          const marketTotalValue = roundNDigits(aggregator.units * historicalPrice.close);
+
           return {
-            breakEvenValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice),
+            breakEvenValue: breakEvenValue,
             date: historicalPrice.date,
             units: aggregator.units,
-            marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close),
-            profit: roundNDigits(
-              aggregator.units * historicalPrice.close -
-                aggregator.units * aggregator.breakEvenPrice +
-                aggregator.accumulatedReturn,
-            ),
+            marketTotalValue: marketTotalValue,
+            profit: roundNDigits(marketTotalValue - breakEvenValue),
             accumulatedReturn: aggregator.accumulatedReturn,
           } satisfies PortfolioGrowthAssetsDataItem;
         });
 
         return {
           symbol,
-          // remove data with 0 market value - empty holdings for this symbol
-          data: growthAssetItems.filter((d) => d.marketTotalValue > 0),
+          // keep data with 0 market value - contains accumulatedReturn and profit
+          data: growthAssetItems,
         } satisfies PortfolioGrowthAssets;
       })
       // remove undefined or symbols which were bought and sold on the same day

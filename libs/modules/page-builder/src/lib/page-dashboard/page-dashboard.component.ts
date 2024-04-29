@@ -85,7 +85,7 @@ import { map, pipe, startWith } from 'rxjs';
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showCashSegment]="stateRef.isAccountDemoTrading()"
             [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
-          ></app-portfolio-state>
+          />
         </app-general-card>
 
         <!-- portfolio risk -->
@@ -98,7 +98,7 @@ import { map, pipe, startWith } from 'rxjs';
             [portfolioRisk]="stateRef.getUserDataNormal()?.portfolioRisk"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          ></app-portfolio-state-risk>
+          />
         </app-general-card>
 
         <!-- portfolio transactions -->
@@ -112,7 +112,7 @@ import { map, pipe, startWith } from 'rxjs';
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showFees]="!!stateRef.isAccountDemoTrading()"
             [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
-          ></app-portfolio-state-transactions>
+          />
         </app-general-card>
       </div>
 
@@ -121,7 +121,7 @@ import { map, pipe, startWith } from 'rxjs';
         <app-portfolio-period-change
           *ngIf="portfolioUserFacadeService.getPortfolioChange() as portfolioChange"
           [portfolioChange]="portfolioChange"
-        ></app-portfolio-period-change>
+        />
       </div>
     </div>
 
@@ -160,7 +160,7 @@ import { map, pipe, startWith } from 'rxjs';
           *ngIf="portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0"
           class="w-full lg:w-[550px]"
           [formControl]="portfolioGrowthRangeControl"
-        ></app-date-range-slider>
+        />
       </div>
 
       <!-- portfolio growth chart -->

@@ -83,7 +83,7 @@ export const createRandomUserAccounts = async (data: {
  * @param userData
  */
 const generateTransactionsForRandomSymbols = async (userData: UserData): Promise<void> => {
-  const randomSymbols = await getRandomSymbolSummaries(15);
+  const randomSymbols = await getRandomSymbolSummaries(13);
 
   const userDocTransactionsRef = userDocumentTransactionHistoryRef(userData.id);
 
@@ -221,7 +221,7 @@ const createRandomUser = (isDemo: boolean, password: string): Promise<UserRecord
 
 const createWatchListWithRandomSymbols = async (userData: UserData): Promise<void> => {
   // add symbols to watchlist
-  const watchListSymbols = await getRandomSymbolSummaries(35);
+  const watchListSymbols = await getRandomSymbolSummaries(20);
   await userDocumentWatchListRef(userData.id).set({
     createdDate: getCurrentDateDefaultFormat(),
     data: watchListSymbols.map((symbol) => ({

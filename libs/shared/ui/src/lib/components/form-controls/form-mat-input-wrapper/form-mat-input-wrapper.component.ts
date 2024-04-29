@@ -167,6 +167,12 @@ export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, C
 
   writeValue(obj: T): void {
     this.internalFormControl.patchValue(obj, { emitEvent: false });
+
+    const inputSource = this.inputSource();
+    if (inputSource) {
+      const source = inputSource.find((source) => source.value === obj);
+      this.internalSelectFormControl.set(source ?? null);
+    }
   }
   /**
    * Register Component's ControlValueAccessor onChange callback
