@@ -1,13 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input, output, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  TrackByFunction,
+  computed,
+  effect,
+  input,
+  output,
+  viewChild,
+} from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioTransaction, PortfolioTransactionMore } from '@mm/api-types';
+import { InputSource } from '@mm/shared/data-access';
 import { compare, insertIntoArray } from '@mm/shared/general-util';
-import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
+import {
+  BubblePaginationDirective,
+  DefaultImgDirective,
+  DropdownControlComponent,
+  PercentageIncreaseDirective,
+} from '@mm/shared/ui';
 
 @Component({
   selector: 'app-portfolio-transactions-table',
@@ -22,8 +38,31 @@ import { BubblePaginationDirective, DefaultImgDirective, PercentageIncreaseDirec
     MatPaginatorModule,
     BubblePaginationDirective,
     MatSortModule,
+    DropdownControlComponent,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatIconModule,
   ],
   template: `
+    <!-- filter -->
+    <div class="hidden lg:flex justify-end gap-3">
+      <app-dropdown-control
+        class="min-w-[400px]"
+        inputCaption="Symbol Filer"
+        inputType="SELECT"
+        displayImageType="symbol"
+        [inputSource]="tableSymbolFilter()"
+        [formControl]="tableSymbolFilterControl"
+      />
+
+      <div class="pt-2">
+        <button type="button" mat-icon-button (click)="onFilterReset()" [disabled]="!tableSymbolFilterControl.value">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- table -->
     <table mat-table [dataSource]="dataSource" [trackBy]="identity" matSort (matSortChange)="sortData($event)">
       <!-- image & name -->
       <ng-container matColumnDef="symbol">
@@ -208,6 +247,36 @@ export class PortfolioTransactionsTableComponent {
    */
   showUser = input(false);
 
+  tableSymbolFilter = computed(
+    () =>
+      this.data()
+        ?.map(
+          (d) =>
+            ({
+              caption: d.symbol,
+              image: d.symbol,
+              value: d.symbol,
+            }) satisfies InputSource<string>,
+        )
+        // remove same symbols
+        .filter((item, index, self) => self.findIndex((t) => t.caption === item.caption) === index)
+        // sort alphabetically
+        .sort((a, b) => a.caption.localeCompare(b.caption)) ?? [],
+  );
+  tableSymbolFilterControl = new FormControl<string | null>(null);
+
+  constructor() {
+    this.tableSymbolFilterControl.valueChanges.subscribe((value) => {
+      console.log(value);
+      const original = this.data() ?? [];
+      // decide which data to show based on the filter
+      const filtered = !!value ? original.filter((d) => d.symbol === value) : original;
+      // reverse transactions to show the latest first
+      this.dataSource.data = filtered.reduce((acc, curr) => [curr, ...acc], [] as PortfolioTransactionMore[]);
+      this.dataSource._updateChangeSubscription();
+    });
+  }
+
   tableEffect = effect(
     () => {
       const usedData = this.data() ?? [];
@@ -255,6 +324,10 @@ export class PortfolioTransactionsTableComponent {
 
   onDeleteClick(item: PortfolioTransaction) {
     this.deleteEmitter.emit(item);
+  }
+
+  onFilterReset() {
+    this.tableSymbolFilterControl.setValue(null);
   }
 
   sortData(sort: Sort) {

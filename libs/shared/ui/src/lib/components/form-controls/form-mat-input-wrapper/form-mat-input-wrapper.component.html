@@ -78,7 +78,7 @@
           [disableRipple]="disabled()"
           [formControl]="internalFormControl"
           [ngClass]="{ 'disabled()-element': disabled() }"
-          [multiple]="inputType() === InputType.MULTISELECT"
+          [multiple]="inputType() === 'MULTISELECT'"
         >
           <mat-select-trigger *ngIf="internalSelectFormControl() as selectedOption" class="flex items-center gap-2">
             <img
@@ -91,12 +91,7 @@
             />
             {{ selectedOption.caption }}
           </mat-select-trigger>
-          <input
-            *ngIf="inputType() === InputType.SELECTSEARCH || inputType() === InputType.MULTISELECT"
-            class="select-input"
-            placeholder="Search"
-            tabindex="0"
-          />
+          <input *ngIf="inputType() === 'MULTISELECT'" class="select-input" placeholder="Search" tabindex="0" />
           <mat-option
             *ngFor="let optionData of inputSource()"
             [value]="optionData.value"

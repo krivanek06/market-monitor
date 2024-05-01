@@ -237,7 +237,7 @@ import { map, pipe, startWith } from 'rxjs';
 
       @if (stateRef.userHaveTransactions()) {
         <!-- transaction history -->
-        <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
+        <app-section-title title="Transaction History" matIcon="history" class="mb-5 lg:-mb-10" />
         <div class="grid xl:grid-cols-3 gap-x-8 gap-y-4" [ngClass]="{ 'xl:h-[980px]': portfolioLength() > 15 }">
           <!-- all transactions -->
           <app-portfolio-transactions-table

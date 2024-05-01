@@ -19,22 +19,6 @@ export const NONE_INPUT_SOURCE: InputSource<number> = {
   value: NONE_INPUT_SOURCE_VALUE,
 };
 
-export enum InputTypeEnum {
-  TEXT = 'TEXT',
-  NUMBER = 'NUMBER',
-  EMAIL = 'EMAIL',
-  PASSWORD = 'PASSWORD',
-  CHECKBOX = 'CHECKBOX',
-  RADIO = 'RADIO',
-  SLIDE_TOGGLE = 'SLIDE_TOGGLE',
-  TIME = 'TIME',
-  SELECT = 'SELECT',
-  SELECTSEARCH = 'SELECTSEARCH',
-  TEXTAREA = 'TEXTAREA',
-  MULTISELECT = 'MULTISELECT',
-  SELECT_SOURCE_WRAPPER = 'SELECT_SOURCE_WRAPPER',
-}
-
 export type InputType =
   | 'TEXT'
   | 'NUMBER'
@@ -44,10 +28,10 @@ export type InputType =
   | 'RADIO'
   | 'SLIDE_TOGGLE'
   | 'SELECT'
-  | 'SELECTSEARCH'
   | 'MULTISELECT'
   | 'SELECT_SOURCE_WRAPPER'
-  | 'TEXTAREA';
+  | 'TEXTAREA'
+  | 'SELECT_AUTOCOMPLETE';
 
 // -------------------------------------------------
 

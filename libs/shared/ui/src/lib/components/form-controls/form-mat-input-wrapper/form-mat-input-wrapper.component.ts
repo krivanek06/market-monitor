@@ -35,7 +35,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DefaultImageType, InputSource, InputSourceWrapper, InputType, InputTypeEnum } from '@mm/shared/data-access';
+import { DefaultImageType, InputSource, InputSourceWrapper, InputType } from '@mm/shared/data-access';
 import { DefaultImgDirective } from '../../../directives';
 
 @Component({
@@ -84,7 +84,7 @@ import { DefaultImgDirective } from '../../../directives';
 export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, ControlValueAccessor {
   inputCaption = input.required<string>();
   prefixIcon = input<string | undefined>();
-  inputType = input<InputTypeEnum | InputType>('TEXT');
+  inputType = input<InputType>('TEXT');
   displayImageType = input<DefaultImageType>('default');
 
   /*
@@ -110,8 +110,6 @@ export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, C
 
   onChange: (value: T | null) => void = () => {};
   onTouched = () => {};
-
-  InputType = InputTypeEnum;
   internalFormControl = new FormControl<T | null>(null);
 
   /**
