@@ -19,20 +19,6 @@ export const NONE_INPUT_SOURCE: InputSource<number> = {
   value: NONE_INPUT_SOURCE_VALUE,
 };
 
-export type InputType =
-  | 'TEXT'
-  | 'NUMBER'
-  | 'PASSWORD'
-  | 'EMAIL'
-  | 'CHECKBOX'
-  | 'RADIO'
-  | 'SLIDE_TOGGLE'
-  | 'SELECT'
-  | 'MULTISELECT'
-  | 'SELECT_SOURCE_WRAPPER'
-  | 'TEXTAREA'
-  | 'SELECT_AUTOCOMPLETE';
-
 // -------------------------------------------------
 
 // -------------------------------------------------

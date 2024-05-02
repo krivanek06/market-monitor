@@ -47,38 +47,29 @@ export type GroupSettingsDialogComponentData = {
     ArrayExcludePipe,
   ],
   template: `
-    <app-dialog-close-header
-      [showCloseButton]="false"
-      [title]="'Group Settings: ' + groupDataSignal()?.name"
-    ></app-dialog-close-header>
+    <app-dialog-close-header [showCloseButton]="false" [title]="'Group Settings: ' + groupDataSignal()?.name" />
     <!-- form -->
     <form [formGroup]="form" (ngSubmit)="onFormSubmit()">
       <mat-dialog-content>
         <div class="flex gap-4">
           <!-- upload image -->
           <div class="w-[270px] h-[270px]">
-            <app-upload-image-single-control
-              filePath="groups"
-              formControlName="uploadedImage"
-            ></app-upload-image-single-control>
+            <app-upload-image-single-control filePath="groups" formControlName="uploadedImage" />
           </div>
 
           <!-- additional forms -->
           <div class="flex-1">
             <!-- group name -->
-            <app-form-mat-input-wrapper
-              formControlName="groupName"
-              inputCaption="Group Name"
-              inputType="TEXT"
-            ></app-form-mat-input-wrapper>
+            <app-form-mat-input-wrapper formControlName="groupName" inputCaption="Group Name" inputType="TEXT" />
 
             <!-- is public -->
-            <app-form-mat-input-wrapper
+            <mat-checkbox
+              color="primary"
               formControlName="isPublic"
-              inputCaption="Is Group Public"
-              inputType="CHECKBOX"
-              hintText="If selected people can request be member of a group"
-            ></app-form-mat-input-wrapper>
+              matTooltip="If selected people can request be member of a group"
+            >
+              Is Group Public
+            </mat-checkbox>
           </div>
         </div>
 

@@ -49,8 +49,8 @@ import {
       <app-dropdown-control
         class="min-w-[400px]"
         inputCaption="Symbol Filer"
-        inputType="SELECT"
         displayImageType="symbol"
+        [showClearButton]="true"
         [inputSource]="tableSymbolFilter()"
         [formControl]="tableSymbolFilterControl"
       />

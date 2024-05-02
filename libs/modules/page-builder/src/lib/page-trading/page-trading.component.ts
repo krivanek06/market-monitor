@@ -18,13 +18,14 @@ import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@m
 import { ColorScheme, InputSource } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
+  DropdownControlComponent,
   FormMatInputWrapperComponent,
   QuoteItemComponent,
   RangeDirective,
   SectionTitleComponent,
   SortByKeyPipe,
 } from '@mm/shared/ui';
-import { startWith, switchMap } from 'rxjs';
+import { catchError, of, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-page-trading',
@@ -47,6 +48,7 @@ import { startWith, switchMap } from 'rxjs';
     SectionTitleComponent,
     FormMatInputWrapperComponent,
     ReactiveFormsModule,
+    DropdownControlComponent,
   ],
   template: `
     <!-- account state -->
@@ -62,9 +64,8 @@ import { startWith, switchMap } from 'rxjs';
 
       <div class="flex flex-col xl:flex-row gap-x-6 gap-y-6 xl:col-span-2 max-md:-ml-4">
         <!-- holdings -->
-        <app-form-mat-input-wrapper
+        <app-dropdown-control
           inputCaption="Select a holding"
-          inputType="SELECT"
           [inputSource]="holdingsInputSource()"
           displayImageType="symbol"
           [formControl]="selectedSymbolControl"
@@ -184,7 +185,14 @@ export class PageTradingComponent {
   symbolSummarySignal = toSignal(
     this.selectedSymbolControl.valueChanges.pipe(
       startWith(this.selectedSymbolControl.value),
-      switchMap((symbol) => this.marketApiService.getSymbolSummary(symbol)),
+      switchMap((symbol) =>
+        this.marketApiService.getSymbolSummary(symbol).pipe(
+          catchError((e) => {
+            this.dialogServiceUtil.showNotificationBar('Error fetching symbol summary', 'error');
+            return of(null);
+          }),
+        ),
+      ),
     ),
   );
 

@@ -17,13 +17,14 @@ import {
   EarningsItemComponent,
   EarningsItemsDialogComponent,
 } from '@mm/market-stocks/ui';
-import { RouterManagement } from '@mm/shared/data-access';
+import { InputSource, RouterManagement } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { fillOutMissingDatesForMonth, generateDatesArrayForMonth, groupValuesByDate } from '@mm/shared/general-util';
 import {
   CalendarRageToday,
   CalendarRange,
   CalendarWrapperComponent,
+  DropdownControlComponent,
   MarkerDirective,
   RangeDirective,
 } from '@mm/shared/ui';
@@ -49,19 +50,19 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
     EarningsHistoricalDialogComponent,
     StockSummaryDialogComponent,
     MatDialogModule,
+    DropdownControlComponent,
   ],
   template: `
     <div class="flex flex-col items-center justify-between gap-3 mb-10 md:flex-row sm:pl-4">
-      <h2>Calendar type: {{ calendarTypeFormControl.value.caption }}</h2>
+      <h2>Calendar type: {{ calendarTypeFormControl.value | titlecase }}</h2>
+
       <!-- calendar change select -->
-      <mat-form-field class="h-[52px] min-w-[300px] max-md:w-full">
-        <mat-label>Calendar Types</mat-label>
-        <mat-select [formControl]="calendarTypeFormControl">
-          <mat-option *ngFor="let data of calendarTypeInputSource" [value]="data">
-            {{ data.caption }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <app-dropdown-control
+        class="min-w-[350px] max-md:w-full"
+        inputCaption="Calendar Types"
+        [formControl]="calendarTypeFormControl"
+        [inputSource]="calendarTypeInputSource"
+      />
     </div>
 
     <app-calendar-wrapper [formControl]="currentDateRangeControl">
@@ -141,12 +142,9 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
   calendarTypeInputSource = [
     { value: 'dividends', caption: 'Dividends' },
     { value: 'earnings', caption: 'Earnings' },
-  ] as const;
+  ] satisfies InputSource<string>[];
 
-  calendarTypeFormControl = new FormControl<(typeof this.calendarTypeInputSource)[number]>(
-    this.calendarTypeInputSource[0],
-    { nonNullable: true },
-  );
+  calendarTypeFormControl = new FormControl<string>(this.calendarTypeInputSource[0].value, { nonNullable: true });
 
   loadingSignal = signal<boolean>(true);
   datesInMonthSignal = toSignal(
@@ -171,10 +169,10 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
     combineLatest([this.currentDateRangeControl.valueChanges, this.calendarTypeFormControl.valueChanges]).pipe(
       tap(([dateRange, calendarType]) => {
         this.loadingSignal.set(true);
-        this.updateQueryParams(calendarType.value, dateRange);
+        this.updateQueryParams(calendarType, dateRange);
       }),
       switchMap(([dateRange, calendarType]) =>
-        this.resolveCalendarAPICall(calendarType.value, dateRange.month, dateRange.year).pipe(
+        this.resolveCalendarAPICall(calendarType, dateRange.month, dateRange.year).pipe(
           map((res) => groupValuesByDate(res)),
           map((res) => fillOutMissingDatesForMonth(res)),
         ),
@@ -244,12 +242,12 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
     // all of them must be present
     if (!type || !selectedType || isNaN(year) || isNaN(month)) {
       // trigger value change for both
-      this.calendarTypeFormControl.setValue(this.calendarTypeInputSource[0]);
+      this.calendarTypeFormControl.setValue(this.calendarTypeInputSource[0].value);
       this.currentDateRangeControl.setValue(CalendarRageToday);
       return;
     }
 
-    this.calendarTypeFormControl.setValue(selectedType);
+    this.calendarTypeFormControl.setValue(selectedType.value);
     this.currentDateRangeControl.setValue({
       year,
       month,

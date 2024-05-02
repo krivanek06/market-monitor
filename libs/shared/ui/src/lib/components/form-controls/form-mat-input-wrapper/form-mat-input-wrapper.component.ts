@@ -26,7 +26,6 @@ import {
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatOptionSelectionChange } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -35,12 +34,71 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DefaultImageType, InputSource, InputSourceWrapper, InputType } from '@mm/shared/data-access';
+import { DefaultImageType } from '@mm/shared/data-access';
 import { DefaultImgDirective } from '../../../directives';
 
 @Component({
   selector: 'app-form-mat-input-wrapper',
-  templateUrl: './form-mat-input-wrapper.component.html',
+  template: `
+    <fieldset [disabled]="disabled()">
+      <ng-container [ngSwitch]="inputType()">
+        <mat-form-field
+          appearance="fill"
+          [ngClass]="{ 'g-form-error': parentFormControl?.touched && parentFormControl?.invalid }"
+        >
+          <!-- label -->
+          <mat-label> {{ inputCaption() }}</mat-label>
+
+          <!-- textarea -->
+          <textarea
+            #textAreaElement
+            *ngSwitchCase="'TEXTAREA'"
+            [formControl]="internalFormControl"
+            cdkAutosizeMinRows="4"
+            cdkTextareaAutosize
+            matInput
+          >
+          </textarea>
+
+          <!-- number -->
+          <ng-container *ngSwitchCase="'NUMBER'">
+            <input
+              [formControl]="internalFormControl"
+              [readOnly]="disabled()"
+              type="number"
+              autocomplete="off"
+              matInput
+            />
+          </ng-container>
+
+          <!-- text, number, time, email -->
+          <input
+            *ngSwitchDefault
+            [formControl]="internalFormControl"
+            [readOnly]="disabled()"
+            [type]="inputType() | lowercase"
+            autocomplete="off"
+            matInput
+          />
+
+          <!-- hint -->
+          <mat-hint *ngIf="hintText()" class="hidden sm:block text-wt-gray-medium" matSuffix>
+            {{ hintText() }}
+          </mat-hint>
+
+          <!-- prefix icon -->
+          <mat-icon *ngIf="prefixIcon()" matPrefix class="icon-prefix">{{ prefixIcon() }}</mat-icon>
+        </mat-form-field>
+      </ng-container>
+    </fieldset>
+
+    <!-- errors -->
+    <ng-container *ngIf="showErrors">
+      <mat-error *ngFor="let inputError of parentFormControl?.errors | keyvalue" [id]="''">
+        {{ inputError.value.errorText }}
+      </mat-error>
+    </ng-container>
+  `,
   standalone: true,
   imports: [
     CommonModule,
@@ -84,7 +142,7 @@ import { DefaultImgDirective } from '../../../directives';
 export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, ControlValueAccessor {
   inputCaption = input.required<string>();
   prefixIcon = input<string | undefined>();
-  inputType = input<InputType>('TEXT');
+  inputType = input<'TEXT' | 'NUMBER' | 'PASSWORD' | 'EMAIL' | 'TEXTAREA'>('TEXT');
   displayImageType = input<DefaultImageType>('default');
 
   /*
@@ -97,25 +155,9 @@ export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, C
 	  */
   hintText = input<string | undefined>();
 
-  /**
-   * data which are displayed in Select.option
-   * use only if inputType === 'SELECT' | 'MULTISELECT' | 'SELECTSEARCH'
-   */
-  inputSource = input<InputSource<T>[] | null | undefined>([]);
-
-  /**
-   * user only when inputType ==== 'SELECT_SOURCE_WRAPPER
-   */
-  inputSourceWrapper = input<InputSourceWrapper<T>[] | null | undefined>([]);
-
   onChange: (value: T | null) => void = () => {};
   onTouched = () => {};
   internalFormControl = new FormControl<T | null>(null);
-
-  /**
-   * keep the last selected value by user to display custom caption and image in UI
-   */
-  internalSelectFormControl = signal<InputSource<T> | null>(null);
 
   // TODO: remove this if possible to get parent validators
   parentFormControl?: FormControl;
@@ -155,22 +197,8 @@ export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, C
     }
     return this.parentFormControl.errors;
   }
-
-  onSelectChange(inputSource: InputSource<T>, e: MatOptionSelectionChange) {
-    // prevent double execution
-    if (e.isUserInput) {
-      this.internalSelectFormControl.set(inputSource);
-    }
-  }
-
   writeValue(obj: T): void {
     this.internalFormControl.patchValue(obj, { emitEvent: false });
-
-    const inputSource = this.inputSource();
-    if (inputSource) {
-      const source = inputSource.find((source) => source.value === obj);
-      this.internalSelectFormControl.set(source ?? null);
-    }
   }
   /**
    * Register Component's ControlValueAccessor onChange callback
