@@ -247,6 +247,7 @@ import { map, pipe, startWith } from 'rxjs';
             }"
             [showTransactionFees]="!!stateRef.isAccountDemoTrading()"
             [data]="stateRef.portfolioTransactions()"
+            [showSymbolFilter]="true"
           />
 
           <!-- best / worst -->

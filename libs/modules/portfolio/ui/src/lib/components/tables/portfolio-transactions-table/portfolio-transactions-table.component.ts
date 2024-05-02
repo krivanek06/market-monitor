@@ -45,7 +45,7 @@ import {
   ],
   template: `
     <!-- filter -->
-    <div class="hidden lg:flex justify-end gap-3">
+    <div *ngIf="showSymbolFilter()" class="hidden lg:flex justify-end gap-3 mb-5">
       <app-dropdown-control
         class="min-w-[400px]"
         inputCaption="Symbol Filer"
@@ -235,6 +235,7 @@ export class PortfolioTransactionsTableComponent {
   deleteEmitter = output<PortfolioTransactionMore>();
 
   data = input<PortfolioTransactionMore[] | null>();
+  showSymbolFilter = input(false);
   showTransactionFees = input(false);
 
   /**
@@ -327,7 +328,7 @@ export class PortfolioTransactionsTableComponent {
   }
 
   onFilterReset() {
-    this.tableSymbolFilterControl.setValue(null);
+    this.tableSymbolFilterControl.reset();
   }
 
   sortData(sort: Sort) {

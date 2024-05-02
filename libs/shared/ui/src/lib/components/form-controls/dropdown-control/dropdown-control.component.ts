@@ -32,16 +32,16 @@ import { DefaultImgDirective } from '../../../directives';
       @switch (inputType()) {
         @case ('SELECT_SOURCE_WRAPPER') {
           <mat-select [disableRipple]="disabled()" [disabled]="disabled()">
-            <mat-select-trigger *ngIf="internalSelectValue() as selectedOption" class="flex items-center gap-2">
+            <mat-select-trigger class="flex items-center gap-2">
               <img
                 appDefaultImg
-                *ngIf="selectedOption?.image as selectedOptionImage"
+                *ngIf="internalSelectValue()?.image as selectedOptionImage"
                 [imageType]="displayImageType()"
                 [src]="selectedOptionImage"
                 alt="Option image"
                 class="w-8 h-8"
               />
-              {{ selectedOption.caption }}
+              {{ internalSelectValue()?.caption }}
             </mat-select-trigger>
             <mat-optgroup *ngFor="let source of inputSourceWrapper()" [label]="source.name">
               <!-- clear option -->
@@ -114,16 +114,16 @@ import { DefaultImgDirective } from '../../../directives';
         }
         @default {
           <mat-select [disableRipple]="disabled()">
-            <mat-select-trigger *ngIf="internalSelectValue() as selectedOption" class="flex items-center gap-2">
+            <mat-select-trigger class="flex items-center gap-2">
               <img
                 appDefaultImg
-                *ngIf="selectedOption.image as selectedOptionImage"
+                *ngIf="internalSelectValue()?.image as selectedOptionImage"
                 [imageType]="displayImageType()"
                 [src]="selectedOptionImage"
                 alt="Option image"
                 class="w-8 h-8"
               />
-              {{ selectedOption.caption }}
+              {{ internalSelectValue()?.caption }}
             </mat-select-trigger>
             <!-- clear option -->
             <mat-option *ngIf="internalSelectValue()" (click)="onClear()"> clear </mat-option>
@@ -160,6 +160,10 @@ import { DefaultImgDirective } from '../../../directives';
 
     ::ng-deep .mat-mdc-form-field-infix {
       height: 60px !important;
+    }
+
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      height: 0px !important;
     }
   `,
   providers: [
@@ -233,6 +237,11 @@ export class DropdownControlComponent<T> implements ControlValueAccessor {
       ...(this.inputSourceWrapper()?.flatMap((wrapper) => wrapper.items) ?? []),
     ];
 
+    if (!obj) {
+      this.onClear();
+      return;
+    }
+
     // multiple data
     if (Array.isArray(obj) && this.inputType() === 'MULTISELECT') {
       const sources = obj
@@ -247,6 +256,7 @@ export class DropdownControlComponent<T> implements ControlValueAccessor {
       const source = inputSource.find((source) => source.value === obj);
       if (source) {
         this.selectedValuesControl.patchValue([source.value], { emitEvent: false });
+        this.internalSelectValue.set(source);
       }
     }
   }

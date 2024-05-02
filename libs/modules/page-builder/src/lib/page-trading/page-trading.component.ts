@@ -147,13 +147,14 @@ import { startWith, switchMap } from 'rxjs';
 
     <!-- transaction history -->
     <div>
-      <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
+      <app-section-title title="Transaction History" matIcon="history" class="mb-5 lg:-mb-10" />
 
       <app-portfolio-transactions-table
         (deleteEmitter)="onTransactionDelete($event)"
         [showTransactionFees]="authenticationUserService.state.isAccountDemoTrading()"
         [showActionButton]="authenticationUserService.state.isAccountNormalBasic()"
         [data]="authenticationUserService.state.portfolioTransactions()"
+        [showSymbolFilter]="true"
       />
     </div>
   `,
