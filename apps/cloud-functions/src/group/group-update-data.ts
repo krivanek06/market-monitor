@@ -197,16 +197,21 @@ const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioState
     // calculate holdings from all members
     .map((d) =>
       d.holdingSnapshot.data.reduce(
-        (acc, curr) => ({
-          ...acc,
-          [curr.symbol]: {
-            invested: roundNDigits((acc[curr.symbol]?.invested ?? 0) + curr.invested),
-            units: (acc[curr.symbol]?.units ?? 0) + curr.units,
-            symbol: curr.symbol,
-            symbolType: curr.symbolType,
-            sector: curr.sector,
-          } satisfies PortfolioStateHoldingBase,
-        }),
+        (acc, curr) => {
+          const newInvested = roundNDigits((acc[curr.symbol]?.invested ?? 0) + curr.invested);
+          const newUnits = (acc[curr.symbol]?.units ?? 0) + curr.units;
+          return {
+            ...acc,
+            [curr.symbol]: {
+              invested: newInvested,
+              units: newUnits,
+              symbol: curr.symbol,
+              symbolType: curr.symbolType,
+              sector: curr.sector,
+              breakEvenPrice: roundNDigits(newInvested / newUnits),
+            } satisfies PortfolioStateHoldingBase,
+          };
+        },
         {} as { [key: string]: PortfolioStateHoldingBase },
       ),
     )
@@ -221,6 +226,7 @@ const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioState
             symbol: value.symbol,
             symbolType: value.symbolType,
             sector: value.sector,
+            breakEvenPrice: value.breakEvenPrice,
           } satisfies PortfolioStateHoldingBase;
         });
 

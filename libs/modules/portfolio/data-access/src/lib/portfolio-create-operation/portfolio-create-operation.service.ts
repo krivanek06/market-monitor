@@ -71,7 +71,7 @@ export class PortfolioCreateOperationService {
     const symbolHolding = userDocData.holdingSnapshot.data.find((d) => d.symbol === input.symbol);
 
     // calculate break even price if SELL order
-    const breakEvenPrice = isSell ? roundNDigits((symbolHolding?.invested ?? 1) / (symbolHolding?.units ?? 1), 2) : 0;
+    const breakEvenPrice = isSell ? roundNDigits(symbolHolding?.breakEvenPrice ?? 1, 2) : 0;
 
     const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
     const returnChange = isSell ? roundNDigits((unitPrice - breakEvenPrice) / breakEvenPrice) : 0;

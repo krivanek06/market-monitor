@@ -29,7 +29,7 @@ export const getPortfolioStateHoldingsUtil = (
   const transactionFees = transactions.reduce((acc, curr) => acc + curr.transactionFees, 0);
 
   // value that user invested in all assets
-  const invested = partialHoldings.reduce((acc, curr) => acc + curr.invested, 0);
+  const investedTotal = partialHoldings.reduce((acc, curr) => acc + curr.invested, 0);
 
   // user's holdings with summary data
   const portfolioStateHolding = symbolQuotes
@@ -42,7 +42,7 @@ export const getPortfolioStateHoldingsUtil = (
       return {
         ...holding,
         breakEvenPrice: roundNDigits(holding.invested / holding.units),
-        weight: roundNDigits(holding.invested / invested, 6),
+        weight: roundNDigits(holding.invested / investedTotal, 6),
         symbolQuote: quote,
       } satisfies PortfolioStateHolding;
     })
@@ -61,12 +61,12 @@ export const getPortfolioStateHoldingsUtil = (
 
   // current cash on hand
   const cashOnHandTransactions =
-    (startingCash !== 0 ? startingCash - invested - transactionFees : 0) + transactionProfitLoss;
+    (startingCash !== 0 ? startingCash - investedTotal - transactionFees : 0) + transactionProfitLoss;
 
   const balance = holdingsBalance + cashOnHandTransactions;
-  const totalGainsValue = startingCash !== 0 ? balance - startingCash : holdingsBalance - invested;
+  const totalGainsValue = startingCash !== 0 ? balance - startingCash : holdingsBalance - investedTotal;
   const totalGainsPercentage =
-    startingCash !== 0 ? calculateGrowth(balance, startingCash) : calculateGrowth(balance, invested);
+    startingCash !== 0 ? calculateGrowth(balance, startingCash) : calculateGrowth(balance, investedTotal);
   const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
   const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
 
@@ -80,7 +80,7 @@ export const getPortfolioStateHoldingsUtil = (
     transactionFees: roundNDigits(transactionFees),
     cashOnHand: roundNDigits(cashOnHandTransactions),
     balance: roundNDigits(balance),
-    invested: roundNDigits(invested),
+    invested: roundNDigits(investedTotal),
     holdingsBalance: roundNDigits(holdingsBalance),
     totalGainsValue: roundNDigits(totalGainsValue),
     totalGainsPercentage: roundNDigits(totalGainsPercentage, 4),
@@ -113,7 +113,10 @@ export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransact
       // update existing holding
       if (existingHolding) {
         existingHolding.units += isSell ? -curr.units : curr.units;
-        existingHolding.invested += curr.unitPrice * curr.units * (isSell ? -1 : 1);
+        existingHolding.invested += isSell
+          ? -(existingHolding.breakEvenPrice * curr.units)
+          : curr.unitPrice * curr.units;
+        existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units);
         return acc;
       }
 
@@ -131,6 +134,7 @@ export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransact
           sector: curr.sector,
           units: curr.units,
           invested: roundNDigits(curr.unitPrice * curr.units),
+          breakEvenPrice: curr.unitPrice,
         } satisfies PortfolioStateHoldingBase,
       ];
     }, [] as PortfolioStateHoldingBase[])

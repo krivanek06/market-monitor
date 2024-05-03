@@ -216,7 +216,7 @@ export class PageTradingComponent {
             image: holding.symbolQuote.symbol,
           }) satisfies InputSource<string>,
       ) ?? []
-    );
+    ).sort((a, b) => a.caption.localeCompare(b.caption));
   });
 
   ColorScheme = ColorScheme;

@@ -82,6 +82,7 @@ export type PortfolioStateHoldingBase = SymbolStoreBase & {
    * how much user invested. Used to calculate BEP.
    */
   invested: number;
+  breakEvenPrice: number;
 };
 
 export type PortfolioStateHolding = PortfolioStateHoldingBase & {
