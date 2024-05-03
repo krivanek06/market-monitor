@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, input, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -28,14 +28,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
             <mat-spinner></mat-spinner>
           </div>
         } @else {
-          <!-- default content -->
-          @if (!contentRef()?.nativeElement?.innerHTML?.trim()) {
-            <div class="text-wt-gray-medium min-h-[150px] grid place-content-center">No data has been found</div>
-          }
           <!-- custom content -->
-          <span #ref>
+          <div class="wrapper">
             <ng-content></ng-content>
-          </span>
+          </div>
+
+          <!-- default content -->
+          <div class="default">
+            <div class="text-wt-gray-medium min-h-[150px] h-[80%] grid place-content-center">
+              No data has been found
+            </div>
+          </div>
         }
       </mat-card-content>
     </mat-card>
@@ -48,11 +51,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     mat-card-content {
       height: inherit;
     }
+
+    .wrapper:not(:empty) + .default {
+      display: none;
+    }
   `,
 })
 export class GeneralCardComponent {
-  contentRef = viewChild('ref', { read: ElementRef });
-
   title = input<string | null>(null);
   titleImgUrl = input<string | undefined>();
   matIcon = input<string | undefined>();

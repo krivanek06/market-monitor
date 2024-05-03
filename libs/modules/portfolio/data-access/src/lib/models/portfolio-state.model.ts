@@ -1,9 +1,4 @@
-import { PortfolioGrowthAssetsDataItem, PortfolioState } from '@mm/api-types';
-
-export type PortfolioTransactionToDate = Pick<
-  PortfolioState,
-  'numberOfExecutedBuyTransactions' | 'numberOfExecutedSellTransactions' | 'transactionFees' | 'date'
->;
+import { PortfolioGrowthAssetsDataItem } from '@mm/api-types';
 
 export type PortfolioGrowth = Pick<PortfolioGrowthAssetsDataItem, 'breakEvenValue' | 'marketTotalValue'> & {
   date: string;

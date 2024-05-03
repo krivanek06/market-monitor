@@ -22,6 +22,7 @@ import {
 import { InputSource } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
+  DropdownControlComponent,
   FormMatInputWrapperComponent,
   GeneralCardComponent,
   PieChartComponent,
@@ -61,6 +62,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     ShowMoreButtonComponent,
     MatButtonModule,
     MatIconModule,
+    DropdownControlComponent,
   ],
   template: `
     <div
@@ -158,10 +160,9 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       <div class="flex items-center justify-between mb-4">
         <app-section-title title="Selected User: {{ selectedUser()?.userData?.personal?.displayName }}" />
 
-        <app-form-mat-input-wrapper
+        <app-dropdown-control
           class="w-[360px]"
           inputCaption="Select User's Holdings"
-          inputType="SELECT"
           [formControl]="selectedUserHoldingsControl"
           [inputSource]="selectedUsersInputSource()"
         />

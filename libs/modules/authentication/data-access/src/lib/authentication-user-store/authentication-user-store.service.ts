@@ -168,6 +168,19 @@ export class AuthenticationUserStoreService {
       getUserGroupData: () => state().userGroupData!,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
       getUserPortfolioTransactions: () => state().portfolioTransactions,
+      getUserPortfolioTransactionsBest: () =>
+        (state().portfolioTransactions ?? [])
+          .filter((d) => d.transactionType === 'SELL')
+          .filter((d) => d.returnValue > 0)
+          .sort((a, b) => b.returnValue - a.returnValue)
+          .slice(0, 6),
+      getUserPortfolioTransactionsWorst: () =>
+        (state().portfolioTransactions ?? [])
+          .filter((d) => d.transactionType === 'SELL')
+          .filter((d) => d.returnValue < 0)
+          .sort((a, b) => a.returnValue - b.returnValue)
+          .slice(0, 6),
+
       userHaveTransactions: () => (state().portfolioTransactions?.length ?? 0) > 0,
 
       // access computes
@@ -195,12 +208,20 @@ export class AuthenticationUserStoreService {
     this.userApiService.changeUserSettings(this.state.getUserData(), data);
   }
 
-  addSymbolToUserWatchList(symbol: string, symbolType: SymbolType): void {
-    this.userApiService.addSymbolToUserWatchList(this.state.getUserData().id, symbol, symbolType);
+  addSymbolToUserWatchList(symbol: string, symbolType: SymbolType, sector: string): void {
+    this.userApiService.addToUserWatchList(this.state.getUserData().id, {
+      sector,
+      symbol,
+      symbolType,
+    });
   }
 
-  removeSymbolFromUserWatchList(symbol: string, symbolType: SymbolType): void {
-    this.userApiService.removeSymbolFromUserWatchList(this.state.getUserData().id, symbol, symbolType);
+  removeSymbolFromUserWatchList(symbol: string, symbolType: SymbolType, sector: string): void {
+    this.userApiService.removeFromUserWatchList(this.state.getUserData().id, {
+      sector,
+      symbol,
+      symbolType,
+    });
   }
 
   clearUserWatchList(): void {

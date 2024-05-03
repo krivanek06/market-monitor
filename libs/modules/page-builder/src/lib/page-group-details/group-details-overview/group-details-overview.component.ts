@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 import { UserApiService } from '@mm/api-client';
 import { GROUP_MEMBER_LIMIT, UserBase } from '@mm/api-types';
 import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@mm/group/features';
@@ -16,6 +17,7 @@ import {
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
   PortfolioTransactionChartComponent,
+  PortfolioTransactionsItemComponent,
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
@@ -64,9 +66,11 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     PortfolioTransactionChartComponent,
     MatButtonModule,
     ShowMoreButtonComponent,
+    MatTabsModule,
+    PortfolioTransactionsItemComponent,
   ],
   template: `
-    <ng-container *ngIf="groupDetailsSignal() as groupDetailsSignal">
+    @if (groupDetailsSignal(); as groupDetailsSignal) {
       <div class="flex flex-col justify-between mb-6 lg:flex-row gap-x-10 gap-y-6">
         <!-- group info -->
         <app-group-display-info
@@ -172,32 +176,43 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         </div>
       </div>
 
-      <div
-        *ngIf="groupDetailsSignal.groupTransactionsData.length > 0"
-        class="sm:grid mb-12 xl:grid-cols-2 gap-x-4 hidden"
-      >
-        @if (portfolioHoldingBubbleChartSignal().length > 1) {
-          <!-- bubble chart -->
-          <app-generic-chart
-            class="hidden sm:block w-full"
-            chartType="packedbubble"
-            [heightPx]="380"
-            [series]="portfolioHoldingBubbleChartSignal()"
-          />
+      @if (groupDetailsSignal.groupTransactionsData.length > 0) {
+        <div #groupBubble class="sm:grid mb-12 xl:grid-cols-2 gap-x-4 hidden">
+          @if (portfolioHoldingBubbleChartSignal().length > 1) {
+            <!-- bubble chart -->
+            <div>
+              @defer (on viewport(groupBubble)) {
+                <app-generic-chart
+                  class="hidden sm:block w-full"
+                  chartType="packedbubble"
+                  [heightPx]="380"
+                  [series]="portfolioHoldingBubbleChartSignal()"
+                />
+              } @loading (minimum 1s) {
+                <div class="g-skeleton h-[350px] hidden sm:block"></div>
+              }
+            </div>
 
-          <!-- sector allocation -->
-          <app-pie-chart
-            class="block max-xl:hidden"
-            *ngIf="portfolioSectorAllocationSignal() as portfolioSectorAllocation"
-            [heightPx]="380"
-            chartTitle="Sector Allocation"
-            [series]="portfolioSectorAllocation"
-          />
-        } @else {
-          <div class="g-skeleton h-[300px]"></div>
-          <div class="g-skeleton h-[300px]"></div>
-        }
-      </div>
+            <!-- sector allocation -->
+            <div>
+              @defer (on viewport(groupBubble)) {
+                <app-pie-chart
+                  class="block max-xl:hidden"
+                  *ngIf="portfolioSectorAllocationSignal() as portfolioSectorAllocation"
+                  [heightPx]="380"
+                  chartTitle="Sector Allocation"
+                  [series]="portfolioSectorAllocation"
+                />
+              } @loading (minimum 1s) {
+                <div class="g-skeleton h-[350px] block max-xl:hidden"></div>
+              }
+            </div>
+          } @else {
+            <div class="g-skeleton h-[350px]"></div>
+            <div class="g-skeleton h-[350px]"></div>
+          }
+        </div>
+      }
 
       <!-- holding table -->
       <div class="mb-10">
@@ -221,21 +236,81 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       </div>
 
       <!-- transaction chart -->
-      <div *ngIf="groupDetailsSignal.groupTransactionsData.length > 5" class="mb-6">
-        <app-section-title title="Last Transactions" matIcon="history" />
-        <app-portfolio-transaction-chart [data]="groupDetailsSignal.groupPortfolioSnapshotsData" />
-      </div>
+      @if (groupDetailsSignal.groupPortfolioSnapshotsData.length > 5) {
+        <div class="mb-8">
+          <app-section-title title="Last Transactions" matIcon="history" />
+          <app-portfolio-transaction-chart [data]="groupDetailsSignal.groupPortfolioSnapshotsData" />
+        </div>
+      }
 
       <!-- transactions -->
-      <div *ngIf="groupDetailsSignal.groupTransactionsData.length > 0">
-        <app-section-title title="Last Transactions" matIcon="history" additionalClasses="pl-1 mb-3" />
-        <app-portfolio-transactions-table
-          [showTransactionFees]="true"
-          [showUser]="true"
-          [data]="groupDetailsSignal.groupTransactionsData"
-        />
-      </div>
-    </ng-container>
+      @if (groupDetailsSignal.groupTransactionsData.length > 0) {
+        <div>
+          @defer (on idle) {
+            <app-section-title title="Last Transactions" matIcon="history" additionalClasses="pl-1 mb-6 lg:-mb-10" />
+
+            <mat-tab-group class="hidden lg:block" mat-stretch-tabs="false" mat-align-tabs="end">
+              <!-- last transactions -->
+              <mat-tab label="Last Transactions">
+                <app-portfolio-transactions-table
+                  [showTransactionFees]="true"
+                  [showUser]="true"
+                  [data]="groupDetailsSignal.groupTransactionsData"
+                />
+              </mat-tab>
+              <!-- best / worst transactions -->
+              <mat-tab label="Top Transactions">
+                <div class="flex gap-4">
+                  <!-- best returns -->
+                  <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
+                    @for (
+                      item of groupDetailsSignal.groupTransactionsDataBest | slice: 0 : 12;
+                      track item.transactionId;
+                      let last = $last
+                    ) {
+                      <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+                        <app-portfolio-transactions-item [transaction]="item" [displayUser]="true" />
+                      </div>
+                    }
+                  </app-general-card>
+
+                  <!-- worst returns -->
+                  <app-general-card title="Worst Returns" matIcon="trending_down" class="flex-1">
+                    @for (
+                      item of groupDetailsSignal.groupTransactionsDataWorst | slice: 0 : 12;
+                      track item.transactionId;
+                      let last = $last
+                    ) {
+                      <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+                        <app-portfolio-transactions-item [transaction]="item" [displayUser]="true" />
+                      </div>
+                    }
+                  </app-general-card>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+
+            <!-- transaction table on smaller screen -->
+            <app-portfolio-transactions-table
+              class="block lg:hidden"
+              [showTransactionFees]="true"
+              [showUser]="true"
+              [data]="groupDetailsSignal.groupTransactionsData"
+            />
+          } @loading (minimum 1s) {
+            <div class="flex justify-between mb-4">
+              <div class="g-skeleton h-10 w-[220px]"></div>
+
+              <div class="flex gap-2">
+                <div class="g-skeleton h-10 w-[220px]"></div>
+                <div class="g-skeleton h-10 w-[220px]"></div>
+              </div>
+            </div>
+            <div class="g-skeleton h-[600px]"></div>
+          }
+        </div>
+      }
+    }
   `,
   styles: `
     :host {

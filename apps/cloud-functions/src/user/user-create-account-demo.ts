@@ -1,10 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { getStockHistoricalPricesOnDate } from '@mm/api-external';
+import { getStockHistoricalPricesOnDate, getSymbolSummaries } from '@mm/api-external';
 import {
   HistoricalPrice,
   PortfolioTransaction,
   PortfolioTransactionCreate,
   SYMBOL_NOT_FOUND_ERROR,
+  SymbolSummary,
   TRANSACTION_FEE_PRCT,
   USER_ALLOWED_DEMO_ACCOUNTS_PER_IP,
   UserAccountBasicTypes,
@@ -15,7 +16,7 @@ import {
   UserPortfolioTransaction,
 } from '@mm/api-types';
 import { dateFormatDate, getCurrentDateDefaultFormat, getRandomNumber, roundNDigits } from '@mm/shared/general-util';
-import { addDays, format, subDays } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
@@ -82,27 +83,29 @@ export const createRandomUserAccounts = async (data: {
  * @param userData
  */
 const generateTransactionsForRandomSymbols = async (userData: UserData): Promise<void> => {
-  const randomSymbols = getRandomSymbols(10);
+  const randomSymbols = await getRandomSymbolSummaries(13);
 
   const userDocTransactionsRef = userDocumentTransactionHistoryRef(userData.id);
 
   const transactionsToSave: PortfolioTransaction[] = [];
 
-  for await (const symbol of randomSymbols) {
-    // get a date 200 days before today
-    const pastDate = subDays(new Date(), 200);
+  const pastDateBuy = format(subDays(new Date(), 200), 'yyyy-MM-dd');
+  const pastDateSell = format(subDays(new Date(), 140), 'yyyy-MM-dd');
 
+  for await (const symbol of randomSymbols) {
     const buyOperation: PortfolioTransactionCreate = {
-      date: format(pastDate, 'yyyy-MM-dd'),
-      symbol,
+      date: pastDateBuy,
+      symbol: symbol.id,
+      sector: symbol.profile?.sector ?? 'Unknown',
       symbolType: 'STOCK',
       units: getRandomNumber(20, 40),
       transactionType: 'BUY',
     };
 
     const sellOperation: PortfolioTransactionCreate = {
-      date: format(addDays(pastDate, 50), 'yyyy-MM-dd'),
-      symbol,
+      date: pastDateSell,
+      symbol: symbol.id,
+      sector: symbol.profile?.sector ?? 'Unknown',
       symbolType: 'STOCK',
       units: getRandomNumber(10, 18),
       transactionType: 'SELL',
@@ -195,6 +198,8 @@ const createTransaction = (
     transactionFees,
     returnChange,
     returnValue,
+    priceFromDate: historicalPrice.date,
+    sector: input.sector,
   };
 
   return result;
@@ -216,20 +221,23 @@ const createRandomUser = (isDemo: boolean, password: string): Promise<UserRecord
 
 const createWatchListWithRandomSymbols = async (userData: UserData): Promise<void> => {
   // add symbols to watchlist
-  const watchListSymbols = getRandomSymbols(35);
+  const watchListSymbols = await getRandomSymbolSummaries(20);
   await userDocumentWatchListRef(userData.id).set({
     createdDate: getCurrentDateDefaultFormat(),
     data: watchListSymbols.map((symbol) => ({
-      symbol,
+      symbol: symbol.id,
       symbolType: 'STOCK',
+      sector: symbol.profile?.sector ?? 'Unknown',
     })),
   });
 };
 
-const getRandomSymbols = (limit: number) => {
+const getRandomSymbolSummaries = async (limit: number): Promise<SymbolSummary[]> => {
   const symbols = getSymbols();
   const randomSymbols = symbols.sort(() => 0.5 - Math.random()).slice(0, limit);
-  return randomSymbols;
+  const summaries = await getSymbolSummaries(randomSymbols);
+
+  return summaries;
 };
 
 const getSymbols = () => {

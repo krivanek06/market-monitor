@@ -9,6 +9,7 @@ import { InputSource } from '@mm/shared/data-access';
 import {
   DateAgoPipe,
   DefaultImgDirective,
+  DropdownControlComponent,
   FormMatInputWrapperComponent,
   RangeDirective,
   ScrollNearEndDirective,
@@ -29,15 +30,15 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
     DateAgoPipe,
     TruncateWordsPipe,
     DefaultImgDirective,
+    DropdownControlComponent,
   ],
   template: `<form *ngIf="showForm()" class="flex items-center gap-3 mb-2" [formGroup]="newSearchFormGroup">
       <!-- news type -->
-      <app-form-mat-input-wrapper
+      <app-dropdown-control
         inputCaption="Select News Type"
         formControlName="newsType"
-        inputType="SELECT"
         [inputSource]="newsTypesInputSource"
-      ></app-form-mat-input-wrapper>
+      ></app-dropdown-control>
 
       <!-- symbol -->
       <app-form-mat-input-wrapper

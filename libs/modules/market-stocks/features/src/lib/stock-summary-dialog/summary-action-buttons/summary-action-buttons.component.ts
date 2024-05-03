@@ -66,7 +66,14 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
         </button>
       </ng-container>
 
-      <button class="max-sm:w-full h-10" type="button" mat-stroked-button color="primary" (click)="onDetailsRedirect()">
+      <button
+        *ngIf="showRedirectButton()"
+        class="max-sm:w-full h-10"
+        type="button"
+        mat-stroked-button
+        color="primary"
+        (click)="onDetailsRedirect()"
+      >
         Go to Details
         <mat-icon iconPositionEnd>navigate_next</mat-icon>
       </button>
@@ -88,6 +95,7 @@ export class SummaryActionButtonsComponent {
 
   redirectClickedEmitter = output<void>();
   symbolSummary = input.required<SymbolSummary>();
+  showRedirectButton = input.required();
 
   isSymbolInFavoriteSignal = computed(() => this.symbolFavoriteService.isSymbolInFavoriteObs(this.symbolSummary().id));
 
@@ -108,6 +116,7 @@ export class SummaryActionButtonsComponent {
     this.symbolFavoriteService.addFavoriteSymbol({
       symbolType: 'STOCK',
       symbol: this.symbolSummary().id,
+      sector: this.symbolSummary()?.profile?.sector ?? 'Unknown',
     });
 
     this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been added into favorites`);
@@ -117,12 +126,13 @@ export class SummaryActionButtonsComponent {
     this.symbolFavoriteService.removeFavoriteSymbol({
       symbolType: 'STOCK',
       symbol: this.symbolSummary().id,
+      sector: this.symbolSummary()?.profile?.sector ?? 'Unknown',
     });
 
     this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been removed from favorites`);
   }
 
-  async onAddWatchList() {
+  onAddWatchList() {
     if (this.authenticationUserService) {
       const isPaid = this.authenticationUserService.state.isAccountNormalPaid();
       const userWatchlist = this.authenticationUserService.state.watchList().data;
@@ -137,7 +147,11 @@ export class SummaryActionButtonsComponent {
       }
 
       // save data into fireStore
-      this.authenticationUserService.addSymbolToUserWatchList(this.symbolSummary().id, 'STOCK');
+      this.authenticationUserService.addSymbolToUserWatchList(
+        this.symbolSummary().id,
+        'STOCK',
+        this.symbolSummary()?.profile?.sector ?? 'Unknown',
+      );
 
       // show notification
       this.dialogServiceUtil.showNotificationBar(
@@ -147,16 +161,17 @@ export class SummaryActionButtonsComponent {
     }
   }
 
-  async onRemoveWatchList() {
+  onRemoveWatchList() {
     if (this.authenticationUserService) {
       // save data into fireStore
-      this.authenticationUserService.removeSymbolFromUserWatchList(this.symbolSummary().id, 'STOCK');
+      this.authenticationUserService.removeSymbolFromUserWatchList(
+        this.symbolSummary().id,
+        'STOCK',
+        this.symbolSummary()?.profile?.sector ?? 'Unknown',
+      );
 
       // show notification
-      this.dialogServiceUtil.showNotificationBar(
-        `Symbol: ${this.symbolSummary().id} has been removed from watchlist`,
-        'success',
-      );
+      this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been removed from watchlist`);
     }
   }
 

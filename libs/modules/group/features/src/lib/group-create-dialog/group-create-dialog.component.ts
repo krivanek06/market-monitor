@@ -47,44 +47,38 @@ import { map, startWith } from 'rxjs';
     HideAfterDirective,
   ],
   template: `
-    <app-dialog-close-header [showCloseButton]="false" title="Create Group"></app-dialog-close-header>
+    <app-dialog-close-header [showCloseButton]="false" title="Create Group" />
     <!-- form -->
     <form [formGroup]="form" (ngSubmit)="onFormSubmit()">
       <mat-dialog-content *ngIf="!loaderSignal(); else showLoader">
         <div *ngIf="allowCreateGroup()" class="flex gap-4">
           <!-- upload image -->
           <div>
-            <app-upload-image-single-control
-              [heightPx]="250"
-              filePath="groups"
-              formControlName="uploadedImage"
-            ></app-upload-image-single-control>
+            <app-upload-image-single-control [heightPx]="250" filePath="groups" formControlName="uploadedImage" />
           </div>
 
           <!-- additional forms -->
           <div class="flex-1">
             <!-- group name -->
-            <app-form-mat-input-wrapper
-              formControlName="groupName"
-              inputCaption="Group Name"
-              inputType="TEXT"
-            ></app-form-mat-input-wrapper>
+            <app-form-mat-input-wrapper formControlName="groupName" inputCaption="Group Name" inputType="TEXT" />
 
             <!-- is public -->
-            <app-form-mat-input-wrapper
+            <mat-checkbox
+              color="primary"
               formControlName="isPublic"
-              inputCaption="Is Group Public"
-              inputType="CHECKBOX"
-              hintText="If selected people can request be member of a group"
-            ></app-form-mat-input-wrapper>
+              matTooltip="If selected people can request be member of a group"
+            >
+              Is Group Public
+            </mat-checkbox>
 
             <!-- add owner as member -->
-            <app-form-mat-input-wrapper
+            <mat-checkbox
+              color="primary"
               formControlName="isOwnerMember"
-              inputCaption="Add owner as member"
-              inputType="CHECKBOX"
-              hintText="If selected the owner will be added as a member of the group"
-            ></app-form-mat-input-wrapper>
+              matTooltip="If selected the owner will be added as a member of the group"
+            >
+              Add owner as member
+            </mat-checkbox>
 
             <!-- owner -->
             <div *ngIf="form.controls.isOwnerMember.value" class="flex gap-4 p-4 mt-2 shadow-md rounded-md">

@@ -1,5 +1,3 @@
-import { isFirebaseEmulator } from './firebease.util';
-
 export const measureFunctionExecutionTime = async (fn: () => Promise<unknown>) => {
   const startTime = performance.now();
   console.log('--- start ---');
@@ -21,3 +19,6 @@ export const runFunctionInEmulator = async (fn: () => Promise<unknown>) => {
 
   await measureFunctionExecutionTime(fn);
 };
+
+export const isFirebaseEmulator = () =>
+  process.env.FUNCTIONS_EMULATOR === 'true' && process.env.FIRESTORE_EMULATOR_HOST === '127.0.0.1:8080';

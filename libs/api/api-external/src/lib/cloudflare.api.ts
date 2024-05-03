@@ -3,6 +3,7 @@ import {
   HistoricalPriceSymbol,
   MarketOverview,
   SymbolHistoricalPeriods,
+  SymbolQuote,
   SymbolSummary,
 } from '@mm/api-types';
 import axios from 'axios';
@@ -30,8 +31,27 @@ export const getSymbolSummaries = async (symbols: string[]): Promise<SymbolSumma
   }
 };
 
-export const getSymbolSummary = async (symbol: string): Promise<SymbolSummary | null> => {
-  return getSymbolSummaries([symbol]).then((d) => d[0] ?? null);
+export const getSymbolQuotes = async (symbols: string[]): Promise<SymbolQuote[]> => {
+  const url = `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}&onlyQuote=true`;
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
+      return [];
+    }
+    const data = (await response.json()) as SymbolSummary[];
+    return data.map((d) => d.quote);
+  } catch (error) {
+    console.log(`Failed to get symbol summaries for ${symbols}`);
+    console.log(error);
+    return [];
+  }
 };
 
 export const getPriceOnDateRange = async (

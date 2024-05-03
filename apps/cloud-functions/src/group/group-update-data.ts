@@ -39,7 +39,7 @@ export const groupUpdateData = async (): Promise<void> => {
   const group = await groupsCollectionRef()
     .where('isClosed', '==', false)
     .orderBy('modifiedSubCollectionDate', 'asc')
-    .limit(40)
+    .limit(100)
     .get();
 
   console.log(`[Groups]: Loaded ${group.docs.length} groups`);
@@ -60,7 +60,7 @@ export const groupUpdateData = async (): Promise<void> => {
  * saved portfolio current snapshot
  *
  */
-export const groupCopyMembersAndTransactions = async (group: GroupData): Promise<void> => {
+const groupCopyMembersAndTransactions = async (group: GroupData): Promise<void> => {
   // load all members of the group
   const ownerData = (await userDocumentRef(group.ownerUserId).get()).data();
 
@@ -88,22 +88,20 @@ export const groupCopyMembersAndTransactions = async (group: GroupData): Promise
     membersCurrentData.map((m) => userDocumentTransactionHistoryRef(m.id).get()),
   );
 
-  // save only last N transactions for everybody - order by date desc
-  const lastTransactions = memberTransactionHistory
-    .map((d) => d.data())
-    .reduce((acc, val) => [...acc, ...(val?.transactions ?? []).slice(0, 10)], [] as PortfolioTransaction[])
-    .sort((a, b) => (b.date < a.date ? -1 : 1))
-    .slice(0, 250);
+  // merge all data together
+  const memberTransactionHistoryData = memberTransactionHistory.map((d) => d.data()).map((d) => d?.transactions ?? []);
+  // get last, best and worst transactions by all users
+  const lastTransactions = getTransactionData(memberTransactionHistoryData);
 
   // calculate holdings from all members
   const memberHoldingSnapshots = calculateGroupMembersHoldings(membersCurrentData);
-  // remove last portfolio state if it is from today
+  // remove last portfolio state if it is from today - because we will recalculate it again
   const portfolioSnapshotsNewData =
     portfolioSnapshotsData.data.at(-1)?.date === getCurrentDateDefaultFormat()
       ? portfolioSnapshotsData.data.slice(0, -1)
       : portfolioSnapshotsData.data;
 
-  // get last portfolio state from previous day
+  // get last portfolio state from previous day or starting portfolio state
   const previousPortfolio = portfolioSnapshotsNewData.at(-1) ?? group.portfolioState;
   // calculate portfolioState from all members
   const memberPortfolioState = calculateGroupMembersPortfolioState(membersCurrentData, previousPortfolio);
@@ -123,7 +121,9 @@ export const groupCopyMembersAndTransactions = async (group: GroupData): Promise
   // update last transactions for the group
   await groupDocumentTransactionsRef(group.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    data: lastTransactions,
+    data: lastTransactions.lastTransactions,
+    transactionBestReturn: lastTransactions.bestTransactions,
+    transactionsWorstReturn: lastTransactions.worstTransactions,
   } satisfies GroupTransactionsData);
 
   // update members for the group
@@ -152,20 +152,66 @@ export const groupCopyMembersAndTransactions = async (group: GroupData): Promise
   } satisfies GroupPortfolioStateSnapshotsData);
 };
 
-export const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioStateHoldingBase[] => {
+/**
+ *
+ * @param usersAllTransactions - all transactions of all group members
+ * @returns - last, best and worst transactions
+ */
+const getTransactionData = (
+  usersAllTransactions: PortfolioTransaction[][],
+): {
+  lastTransactions: PortfolioTransaction[];
+  bestTransactions: PortfolioTransaction[];
+  worstTransactions: PortfolioTransaction[];
+} => {
+  // combine all transactions
+  const usersAllTransactionsCombined = usersAllTransactions.reduce((acc, val) => [...acc, ...val]);
+
+  // get last N transactions for everybody - order by date desc
+  const lastTransactions = usersAllTransactions
+    .reduce((acc, val) => [...acc, ...val.slice(0, 10)])
+    .sort((a, b) => (a.date < b.date ? -1 : 1))
+    .slice(0, 150);
+
+  // get best N transactions
+  const bestTransactions = usersAllTransactionsCombined
+    .filter((d) => d.returnValue > 0)
+    .sort((a, b) => b.returnValue - a.returnValue)
+    .slice(0, 25);
+
+  // get worst N transactions
+  const worstTransactions = usersAllTransactionsCombined
+    .filter((d) => d.returnValue < 0)
+    .sort((a, b) => a.returnValue - b.returnValue)
+    .slice(0, 25);
+
+  return {
+    lastTransactions,
+    bestTransactions,
+    worstTransactions,
+  };
+};
+
+const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioStateHoldingBase[] => {
   const memberHoldingSnapshots = groupMembers
     // calculate holdings from all members
     .map((d) =>
       d.holdingSnapshot.data.reduce(
-        (acc, curr) => ({
-          ...acc,
-          [curr.symbol]: {
-            invested: roundNDigits((acc[curr.symbol]?.invested ?? 0) + curr.invested),
-            units: (acc[curr.symbol]?.units ?? 0) + curr.units,
-            symbol: curr.symbol,
-            symbolType: curr.symbolType,
-          },
-        }),
+        (acc, curr) => {
+          const newInvested = roundNDigits((acc[curr.symbol]?.invested ?? 0) + curr.invested);
+          const newUnits = (acc[curr.symbol]?.units ?? 0) + curr.units;
+          return {
+            ...acc,
+            [curr.symbol]: {
+              invested: newInvested,
+              units: newUnits,
+              symbol: curr.symbol,
+              symbolType: curr.symbolType,
+              sector: curr.sector,
+              breakEvenPrice: roundNDigits(newInvested / newUnits),
+            } satisfies PortfolioStateHoldingBase,
+          };
+        },
         {} as { [key: string]: PortfolioStateHoldingBase },
       ),
     )
@@ -179,7 +225,9 @@ export const calculateGroupMembersHoldings = (groupMembers: UserData[]): Portfol
             units: (acc[key]?.units ?? 0) + value.units,
             symbol: value.symbol,
             symbolType: value.symbolType,
-          };
+            sector: value.sector,
+            breakEvenPrice: value.breakEvenPrice,
+          } satisfies PortfolioStateHoldingBase;
         });
 
         return acc;

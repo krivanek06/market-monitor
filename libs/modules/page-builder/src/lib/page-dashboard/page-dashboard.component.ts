@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -19,6 +19,7 @@ import {
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
   PortfolioTransactionChartComponent,
+  PortfolioTransactionsItemComponent,
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
@@ -66,6 +67,7 @@ import { map, pipe, startWith } from 'rxjs';
     ReactiveFormsModule,
     MatButtonModule,
     MatProgressSpinner,
+    PortfolioTransactionsItemComponent,
   ],
   template: `
     <div class="grid xl:grid-cols-3 mb-6 sm:mb-10 gap-8">
@@ -81,9 +83,9 @@ import { map, pipe, startWith } from 'rxjs';
           <app-portfolio-state
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-            [showCashSegment]="authenticationUserService.state.isAccountDemoTrading()"
+            [showCashSegment]="stateRef.isAccountDemoTrading()"
             [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
-          ></app-portfolio-state>
+          />
         </app-general-card>
 
         <!-- portfolio risk -->
@@ -93,10 +95,10 @@ import { map, pipe, startWith } from 'rxjs';
           [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
         >
           <app-portfolio-state-risk
-            [portfolioRisk]="authenticationUserService.state.getUserDataNormal()?.portfolioRisk"
+            [portfolioRisk]="stateRef.getUserDataNormal()?.portfolioRisk"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          ></app-portfolio-state-risk>
+          />
         </app-general-card>
 
         <!-- portfolio transactions -->
@@ -108,9 +110,9 @@ import { map, pipe, startWith } from 'rxjs';
           <app-portfolio-state-transactions
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-            [showFees]="!!authenticationUserService.state.isAccountDemoTrading()"
+            [showFees]="!!stateRef.isAccountDemoTrading()"
             [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
-          ></app-portfolio-state-transactions>
+          />
         </app-general-card>
       </div>
 
@@ -119,7 +121,7 @@ import { map, pipe, startWith } from 'rxjs';
         <app-portfolio-period-change
           *ngIf="portfolioUserFacadeService.getPortfolioChange() as portfolioChange"
           [portfolioChange]="portfolioChange"
-        ></app-portfolio-period-change>
+        />
       </div>
     </div>
 
@@ -158,7 +160,7 @@ import { map, pipe, startWith } from 'rxjs';
           *ngIf="portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0"
           class="w-full lg:w-[550px]"
           [formControl]="portfolioGrowthRangeControl"
-        ></app-date-range-slider>
+        />
       </div>
 
       <!-- portfolio growth chart -->
@@ -214,7 +216,7 @@ import { map, pipe, startWith } from 'rxjs';
       </app-general-card>
     </div>
 
-    @defer {
+    @defer (on idle) {
       @if ((portfolioUserFacadeService.getPortfolioState()?.holdings ?? []).length > 0) {
         <!-- holdings pie charts -->
         <div class="flex justify-center lg:justify-between gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6">
@@ -233,14 +235,39 @@ import { map, pipe, startWith } from 'rxjs';
         </div>
       }
 
-      @if (authenticationUserService.state.userHaveTransactions()) {
+      @if (stateRef.userHaveTransactions()) {
         <!-- transaction history -->
-        <div>
-          <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
+        <app-section-title title="Transaction History" matIcon="history" class="mb-5 lg:-mb-10" />
+        <div class="grid xl:grid-cols-3 gap-x-8 gap-y-4" [ngClass]="{ 'xl:h-[980px]': portfolioLength() > 15 }">
+          <!-- all transactions -->
           <app-portfolio-transactions-table
-            [showTransactionFees]="!!authenticationUserService.state.isAccountDemoTrading()"
-            [data]="authenticationUserService.state.portfolioTransactions()"
+            [ngClass]="{
+              'xl:col-span-2': portfolioLength() > 15,
+              'xl:col-span-3': portfolioLength() <= 15
+            }"
+            [showTransactionFees]="!!stateRef.isAccountDemoTrading()"
+            [data]="stateRef.portfolioTransactions()"
+            [showSymbolFilter]="true"
           />
+
+          <!-- best / worst -->
+          <div *ngIf="portfolioLength() > 15" class="hidden sm:flex lg:max-xl:flex-row flex-col gap-4">
+            <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
+              @for (item of stateRef.getUserPortfolioTransactionsBest(); track item.transactionId; let last = $last) {
+                <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+                  <app-portfolio-transactions-item [transaction]="item" />
+                </div>
+              }
+            </app-general-card>
+
+            <app-general-card title="Worst Returns" matIcon="trending_down" class="flex-1">
+              @for (item of stateRef.getUserPortfolioTransactionsWorst(); track item.transactionId; let last = $last) {
+                <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+                  <app-portfolio-transactions-item [transaction]="item" />
+                </div>
+              }
+            </app-general-card>
+          </div>
         </div>
       }
     }
@@ -255,8 +282,12 @@ import { map, pipe, startWith } from 'rxjs';
 export class PageDashboardComponent {
   private dialog = inject(MatDialog);
   private dialogServiceUtil = inject(DialogServiceUtil);
+  private authenticationUserService = inject(AuthenticationUserStoreService);
   portfolioUserFacadeService = inject(PortfolioUserFacadeService);
-  authenticationUserService = inject(AuthenticationUserStoreService);
+
+  stateRef = this.authenticationUserService.state;
+
+  portfolioLength = computed(() => this.stateRef.portfolioTransactions()?.length ?? 0);
 
   portfolioGrowthRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 

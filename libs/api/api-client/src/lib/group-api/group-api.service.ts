@@ -21,6 +21,7 @@ import {
   GroupSettingsChangeInput,
   GroupTransactionsData,
   PortfolioStateHolding,
+  PortfolioTransaction,
   PortfolioTransactionMore,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
@@ -89,13 +90,13 @@ export class GroupApiService {
       switchMap((groupHoldings) =>
         !groupHoldings
           ? of([])
-          : this.marketApiService.getSymbolSummaries(groupHoldings.data?.map((h) => h.symbol)).pipe(
-              map((symbolSummaries) =>
+          : this.marketApiService.getSymbolQuotes(groupHoldings.data?.map((h) => h.symbol)).pipe(
+              map((symbolQuotes) =>
                 groupHoldings.data.map(
                   (holding) =>
                     ({
                       ...holding,
-                      symbolSummary: symbolSummaries.find((s) => s.id === holding.symbol)!,
+                      symbolQuote: symbolQuotes.find((s) => s.symbol === holding.symbol)!,
                       breakEvenPrice: roundNDigits(holding.invested / holding.units, 6),
                       weight: roundNDigits(holding.invested / holding.invested, 6),
                     }) satisfies PortfolioStateHolding,
@@ -118,21 +119,30 @@ export class GroupApiService {
           throw new Error('Group data not found');
         }
 
-        // merge transactions with user data
-        const portfolioTransactionsMore = (groupTransactionsData?.data ?? []).map(
-          (transaction) =>
-            ({
+        // helper function to merge transactions with user data
+        const groupTransform = (dataT: PortfolioTransaction[]): PortfolioTransactionMore[] =>
+          dataT.map((transaction) => {
+            const user = groupMembersData.data.find((m) => m.id === transaction.userId);
+            return {
               ...transaction,
-              userDisplayName: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.displayName,
-              userPhotoURL: groupMembersData.data.find((m) => m.id === transaction.userId)?.personal.photoURL,
-            }) satisfies PortfolioTransactionMore,
-        );
+              userDisplayName: user?.personal.displayName,
+              userPhotoURL: user?.personal.photoURL,
+              userDisplayNameInitials: user?.personal.displayNameInitials,
+            } satisfies PortfolioTransactionMore;
+          });
+
+        // merge transactions with user data
+        const portfolioTransactionsMore = groupTransform(groupTransactionsData?.data ?? []);
+        const portfolioTransactionsBest = groupTransform(groupTransactionsData?.transactionBestReturn ?? []);
+        const portfolioTransactionsWorst = groupTransform(groupTransactionsData?.transactionsWorstReturn ?? []);
 
         return {
           groupData,
           groupMembersData: groupMembersData.data ?? [],
           groupTransactionsData: portfolioTransactionsMore,
           groupPortfolioSnapshotsData: groupPortfolioSnapshotsData?.data ?? [],
+          groupTransactionsDataBest: portfolioTransactionsBest,
+          groupTransactionsDataWorst: portfolioTransactionsWorst,
         } satisfies GroupDetails;
       }),
       catchError((err) => {

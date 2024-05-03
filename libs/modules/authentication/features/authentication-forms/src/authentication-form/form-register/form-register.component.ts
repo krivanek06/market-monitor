@@ -53,9 +53,11 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
   ],
 })
 export class FormRegisterComponent implements ControlValueAccessor {
+  private dialogServiceUtil = inject(DialogServiceUtil);
+
   formGroup = new FormGroup({
     email: new FormControl('', {
-      validators: [emailValidator, requiredValidator, maxLengthValidator(100)],
+      validators: [emailValidator, requiredValidator, maxLengthValidator(30)],
       nonNullable: true,
     }),
     password1: new FormControl('', {
@@ -68,12 +70,8 @@ export class FormRegisterComponent implements ControlValueAccessor {
     }),
   });
 
-  dialogServiceUtil = inject(DialogServiceUtil);
-
   onChange: (value: RegisterUserInput) => void = () => {};
   onTouched = () => {};
-
-  constructor() {}
 
   onSubmit(): void {
     if (this.formGroup.invalid) {

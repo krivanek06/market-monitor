@@ -5,8 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { StocksApiService } from '@mm/api-client';
-import { StockSummary } from '@mm/api-types';
+import { MarketApiService } from '@mm/api-client';
+import { SymbolSummary } from '@mm/api-types';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
@@ -32,7 +32,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
     SummaryActionButtonsComponent,
   ],
   template: `
-    <ng-container *ngIf="stockSummarySignal() as stockSummary; else showModalSkeleton">
+    @if (stockSummarySignal(); as stockSummary) {
       <!-- heading -->
       <div class="flex items-center justify-between p-4">
         <div class="flex items-center gap-3">
@@ -49,38 +49,32 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
 
         <!-- action buttons -->
         <app-summary-action-buttons
-          *ngIf="isSymbolTypeStock()"
           (redirectClickedEmitter)="onDetailsRedirect()"
           [symbolSummary]="stockSummary"
-        ></app-summary-action-buttons>
+          [showRedirectButton]="isSymbolTypeStock()"
+        />
       </div>
 
       <mat-dialog-content>
         <!-- display main metrics -->
-        <div *ngIf="isSymbolTypeStock()">
-          <app-summary-main-metrics [stockSummary]="stockSummary"></app-summary-main-metrics>
+        <div>
+          <app-summary-main-metrics [stockSummary]="stockSummary" />
         </div>
 
         <!-- time period change -->
         <div class="mb-8 mt-4">
-          <app-price-change-items [mainSymbolPriceChange]="stockSummary.priceChange"></app-price-change-items>
+          <app-price-change-items [mainSymbolPriceChange]="stockSummary.priceChange" />
         </div>
 
         <!-- price & volume -->
         <div class="max-w-full">
-          <app-asset-price-chart-interactive
-            [imageName]="data.symbol"
-            [title]="data.symbol"
-            [symbol]="data.symbol"
-          ></app-asset-price-chart-interactive>
+          <app-asset-price-chart-interactive [imageName]="data.symbol" [title]="data.symbol" [symbol]="data.symbol" />
         </div>
       </mat-dialog-content>
-    </ng-container>
-
-    <!-- skeleton modal -->
-    <ng-template #showModalSkeleton>
-      <app-summary-modal-skeleton></app-summary-modal-skeleton>
-    </ng-template>
+    } @else {
+      <!-- skeleton modal -->
+      <app-summary-modal-skeleton />
+    }
   `,
   styles: `
     :host {
@@ -90,7 +84,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockSummaryDialogComponent {
-  stockSummarySignal = signal<StockSummary | null>(null);
+  stockSummarySignal = signal<SymbolSummary | null>(null);
 
   symbolType = computed(() => {
     const summary = this.stockSummarySignal();
@@ -113,13 +107,13 @@ export class StockSummaryDialogComponent {
   constructor(
     private dialogRef: MatDialogRef<StockSummaryDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { symbol: string },
-    private stocksApiService: StocksApiService,
+    private marketApiService: MarketApiService,
     private dialogServiceUtil: DialogServiceUtil,
     private route: Router,
     private viewPortScroller: ViewportScroller,
   ) {
-    this.stocksApiService
-      .getStockSummary(this.data.symbol)
+    this.marketApiService
+      .getSymbolSummary(this.data.symbol)
       .pipe(
         catchError(() => EMPTY),
         takeUntilDestroyed(),

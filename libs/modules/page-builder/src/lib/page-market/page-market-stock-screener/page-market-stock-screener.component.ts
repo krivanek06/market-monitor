@@ -7,7 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StocksApiService } from '@mm/api-client';
-import { StockScreenerValues, SymbolSummary } from '@mm/api-types';
+import { StockScreenerValues, SymbolQuote } from '@mm/api-types';
 import {
   STOCK_SCREENER_DEFAULT_VALUES,
   getScreenerInputIndexByKey,
@@ -69,8 +69,8 @@ import { catchError, switchMap, tap } from 'rxjs';
           <app-stock-summary-table
             appScrollNearEnd
             (nearEnd)="onNearEndScroll()"
-            (itemClickedEmitter)="onSummaryClick($event)"
-            [stockSummaries]="screenerResults | slice: 0 : maxScreenerResults()"
+            (itemClickedEmitter)="onQuoteClick($event)"
+            [symbolQuotes]="screenerResults | slice: 0 : maxScreenerResults()"
           />
         </section>
       </ng-container>
@@ -139,10 +139,10 @@ export class PageMarketStockScreenerComponent implements OnInit, RouterManagemen
     this.screenerFormControl.reset(STOCK_SCREENER_DEFAULT_VALUES);
   }
 
-  onSummaryClick(summary: SymbolSummary): void {
+  onQuoteClick(summary: SymbolQuote): void {
     this.dialog.open(StockSummaryDialogComponent, {
       data: {
-        symbol: summary.id,
+        symbol: summary.symbol,
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });

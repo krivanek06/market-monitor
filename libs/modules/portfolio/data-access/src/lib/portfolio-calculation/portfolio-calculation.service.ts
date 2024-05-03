@@ -42,13 +42,13 @@ export class PortfolioCalculationService {
 
     // get symbol summaries from API
     return this.marketApiService
-      .getSymbolSummaries(holdingSymbols)
+      .getSymbolQuotes(holdingSymbols)
       .pipe(map((summaries) => getPortfolioStateHoldingsUtil(transactions, holdingsBase, summaries, startingCash)));
   }
 
   getPortfolioGrowth(portfolioAssets: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
     // get holidays
-    const currentHoliday = this.marketApiService.getIsMarketOpenSignal()?.currentHoliday ?? [];
+    const allHolidays = this.marketApiService.getIsMarketOpenSignal()?.allHolidays ?? [];
 
     // get soonest date
     const soonestDate = portfolioAssets.reduce(
@@ -68,7 +68,7 @@ export class PortfolioCalculationService {
     // loop though all generated dates
     for (const gDate of generatedDates) {
       // check if holiday
-      if (currentHoliday.includes(gDate)) {
+      if (allHolidays.includes(gDate)) {
         continue;
       }
 
@@ -196,7 +196,20 @@ export class PortfolioCalculationService {
    * @returns
    */
   getPortfolioSectorAllocationPieChart(holdings: PortfolioStateHolding[]): GenericChartSeries<'pie'> {
-    const allocations = this.getPortfolioSectorAllocation(holdings, 'sector');
+    const allocations = holdings.reduce(
+      (acc, curr) => {
+        const dataKey = curr.sector ?? curr.symbolType;
+        const existingData = acc[dataKey];
+        if (existingData) {
+          acc[dataKey] += curr.symbolQuote.price * curr.units;
+        } else {
+          acc[dataKey] = curr.symbolQuote.price * curr.units;
+        }
+        return acc;
+      },
+      {} as { [name: string]: number },
+    );
+
     const chartData = Object.entries(allocations)
       .map(([name, value]) => ({
         y: Number(value),
@@ -216,23 +229,20 @@ export class PortfolioCalculationService {
     // limit bubbles, show rest as 'others'
     const dataLimit = 50;
     // sort symbols by value and divide them by first and rest
-    const sortedHoldings = [...holdings].sort(
-      (a, b) => b.symbolSummary.quote.price * b.units - a.symbolSummary.quote.price * a.units,
-    );
+    const sortedHoldings = [...holdings].sort((a, b) => b.symbolQuote.price * b.units - a.symbolQuote.price * a.units);
     const firstNData = sortedHoldings.slice(0, dataLimit);
     const restData = sortedHoldings.slice(dataLimit);
 
     // divide symbols into sectors
     const sectorsDivider = firstNData.reduce(
       (acc, curr) => {
-        const sector = curr.symbolSummary.profile?.sector ?? curr.symbolType;
         return {
           ...acc,
-          [sector]: [
-            ...(acc[sector] ?? []),
+          [curr.sector]: [
+            ...(acc[curr.sector] ?? []),
             {
               name: curr.symbol,
-              value: curr.symbolSummary.quote.price * curr.units,
+              value: curr.symbolQuote.price * curr.units,
             },
           ],
         };
@@ -267,7 +277,7 @@ export class PortfolioCalculationService {
       name: 'Others',
       data: restData.map((d) => ({
         name: d.symbol,
-        value: d.symbolSummary.quote.price * d.units,
+        value: d.symbolQuote.price * d.units,
         dataLabels: {
           color: ColorScheme.GRAY_DARK_VAR,
         },
@@ -289,7 +299,19 @@ export class PortfolioCalculationService {
    */
   getPortfolioAssetAllocationPieChart(holdings: PortfolioStateHolding[]): GenericChartSeries<'pie'> {
     const visibleData = 8;
-    const allocations = this.getPortfolioSectorAllocation(holdings, 'asset');
+    const allocations = holdings.reduce(
+      (acc, curr) => {
+        const existingData = acc[curr.symbol];
+        if (existingData) {
+          acc[curr.symbol] += curr.symbolQuote.price * curr.units;
+        } else {
+          acc[curr.symbol] = curr.symbolQuote.price * curr.units;
+        }
+        return acc;
+      },
+      {} as { [name: string]: number },
+    );
+
     const chartData = Object.entries(allocations)
       .map(([name, value]) => ({
         y: Number(value),
@@ -334,7 +356,8 @@ export class PortfolioCalculationService {
         // historical data per symbol
         const symbolHistoricalPrice = historicalPrices[symbol];
 
-        if (!symbolHistoricalPrice) {
+        // check if historical prices are missing (symbol bought today)
+        if (!symbolHistoricalPrice || symbolHistoricalPrice.length === 0) {
           console.log(`Missing historical prices for ${symbol}`);
           return null;
         }
@@ -342,11 +365,15 @@ export class PortfolioCalculationService {
         // get all transactions for this symbol in ASC order by date
         const symbolTransactions = transactions.filter((d) => d.symbol === symbol);
 
+        // check if historical prices first date is not after first transaction date
+        // transaction was weekend/holiday but prices are from next working date
+        const firstDate = symbolHistoricalPrice[0].date;
+
         // internal helper
         const aggregator = {
-          units: 0,
-          index: 0,
-          breakEvenPrice: 0,
+          units: isBefore(symbolTransactions[0].date, firstDate) ? symbolTransactions[0].units : 0,
+          index: isBefore(symbolTransactions[0].date, firstDate) ? 1 : 0,
+          breakEvenPrice: isBefore(symbolTransactions[0].date, firstDate) ? symbolTransactions[0].unitPrice : 0,
           accumulatedReturn: 0,
         };
 
@@ -356,7 +383,7 @@ export class PortfolioCalculationService {
           // can be multiple transactions on the same day for the same symbol
           while (
             !!symbolTransactions[aggregator.index] &&
-            isSameDay(new Date(symbolTransactions[aggregator.index].date), new Date(historicalPrice.date))
+            isSameDay(symbolTransactions[aggregator.index].date, historicalPrice.date)
           ) {
             const transaction = symbolTransactions[aggregator.index];
             const isBuy = transaction.transactionType === 'BUY';
@@ -377,24 +404,23 @@ export class PortfolioCalculationService {
             aggregator.accumulatedReturn += roundNDigits(transaction.returnValue - transaction.transactionFees);
           }
 
+          const breakEvenValue = roundNDigits(aggregator.units * aggregator.breakEvenPrice);
+          const marketTotalValue = roundNDigits(aggregator.units * historicalPrice.close);
+
           return {
-            breakEvenValue: roundNDigits(aggregator.units * aggregator.breakEvenPrice),
+            breakEvenValue: breakEvenValue,
             date: historicalPrice.date,
             units: aggregator.units,
-            marketTotalValue: roundNDigits(aggregator.units * historicalPrice.close),
-            profit: roundNDigits(
-              aggregator.units * historicalPrice.close -
-                aggregator.units * aggregator.breakEvenPrice +
-                aggregator.accumulatedReturn,
-            ),
+            marketTotalValue: marketTotalValue,
+            profit: roundNDigits(marketTotalValue - breakEvenValue),
             accumulatedReturn: aggregator.accumulatedReturn,
           } satisfies PortfolioGrowthAssetsDataItem;
         });
 
         return {
           symbol,
-          // remove data with 0 market value - empty holdings for this symbol
-          data: growthAssetItems.filter((d) => d.marketTotalValue > 0),
+          // keep data with 0 market value - contains accumulatedReturn and profit
+          data: growthAssetItems,
         } satisfies PortfolioGrowthAssets;
       })
       // remove undefined or symbols which were bought and sold on the same day
@@ -463,35 +489,5 @@ export class PortfolioCalculationService {
       .reduce((acc, curr) => ({ ...acc, [curr.symbol]: curr.data }), {} as { [key: string]: HistoricalPrice[] });
 
     return historicalPrices;
-  }
-
-  /**
-   * generate array of sector\asset allocations, where name is the sector's/asset's name
-   * and value is the value allocated to that  sector\asset
-   *
-   * @param holdings
-   * @returns
-   */
-  private getPortfolioSectorAllocation(
-    transactions: PortfolioStateHolding[],
-    key: 'asset' | 'sector',
-  ): { [name: string]: number } {
-    if (transactions.length === 0) {
-      return {};
-    }
-
-    return transactions.reduce(
-      (acc, curr) => {
-        const dataKey = key === 'asset' ? curr.symbol : curr.symbolSummary.profile?.sector ?? curr.symbolType;
-        const existingData = acc[dataKey];
-        if (existingData) {
-          acc[dataKey] += curr.symbolSummary.quote.price * curr.units;
-        } else {
-          acc[dataKey] = curr.symbolSummary.quote.price * curr.units;
-        }
-        return acc;
-      },
-      {} as { [name: string]: number },
-    );
   }
 }

@@ -31,6 +31,21 @@ export class MarketApiService {
   private apiCache = inject(ApiCacheService);
   getIsMarketOpenSignal = toSignal(this.getIsMarketOpen());
 
+  getSymbolQuotes(symbols: string[] | undefined): Observable<SymbolQuote[]> {
+    if (!symbols || symbols.length === 0) {
+      return of([]);
+    }
+
+    return this.apiCache
+      .getData<
+        SymbolSummary[]
+      >(`https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}&onlyQuote=true`, ApiCacheService.validity3Min)
+      .pipe(
+        map((d) => d.map((s) => s.quote)),
+        catchError(() => []),
+      );
+  }
+
   getSymbolSummaries(symbols: string[] | undefined): Observable<SymbolSummary[]> {
     if (!symbols || symbols.length === 0) {
       return of([]);
@@ -87,9 +102,9 @@ export class MarketApiService {
       .pipe(
         switchMap((topSymbols) =>
           forkJoin([
-            this.getSymbolSummaries(topSymbols.stockTopGainers),
-            this.getSymbolSummaries(topSymbols.stockTopLosers),
-            this.getSymbolSummaries(topSymbols.stockTopActive),
+            this.getSymbolQuotes(topSymbols.stockTopGainers),
+            this.getSymbolQuotes(topSymbols.stockTopLosers),
+            this.getSymbolQuotes(topSymbols.stockTopActive),
           ]).pipe(
             map(([gainers, losers, actives]) => ({
               stockTopGainers: gainers,

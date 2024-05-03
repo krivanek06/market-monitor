@@ -72,14 +72,14 @@ import {
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           <div class="flex flex-row gap-2">
             <div class="text-wt-gray-dark">
-              {{ row.symbolSummary.quote.price | currency }}
+              {{ row.symbolQuote.price | currency }}
             </div>
             <div
               appPercentageIncrease
               [useCurrencySign]="true"
               [currentValues]="{
-                value: row.symbolSummary.quote.price * row.units,
-                valueToCompare: row.symbolSummary.quote.previousClose * row.units,
+                value: row.symbolQuote.price * row.units,
+                valueToCompare: row.symbolQuote.previousClose * row.units,
                 hideValue: true
               }"
             ></div>
@@ -95,8 +95,8 @@ import {
             appPercentageIncrease
             [useCurrencySign]="true"
             [currentValues]="{
-              value: row.symbolSummary.quote.price * row.units,
-              valueToCompare: row.symbolSummary.quote.previousClose * row.units,
+              value: row.symbolQuote.price * row.units,
+              valueToCompare: row.symbolQuote.previousClose * row.units,
               hidePercentage: true
             }"
           ></div>
@@ -117,7 +117,7 @@ import {
         <td mat-cell *matCellDef="let row" class="table-cell">
           <div class="flex flex-col">
             <div class="text-wt-gray-dark max-sm:text-end">
-              {{ row.symbolSummary.quote.price * row.units | currency }}
+              {{ row.symbolQuote.price * row.units | currency }}
             </div>
             <div
               class="block sm:hidden justify-end text-end"
@@ -125,7 +125,7 @@ import {
               [hideValueOnXsScreen]="true"
               [useCurrencySign]="true"
               [currentValues]="{
-                value: row.symbolSummary.quote.price * row.units,
+                value: row.symbolQuote.price * row.units,
                 valueToCompare: row.breakEvenPrice * row.units
               }"
             ></div>
@@ -141,7 +141,7 @@ import {
             appPercentageIncrease
             [useCurrencySign]="true"
             [currentValues]="{
-              value: row.symbolSummary.quote.price * row.units,
+              value: row.symbolQuote.price * row.units,
               valueToCompare: row.breakEvenPrice * row.units
             }"
           ></div>
@@ -168,19 +168,9 @@ import {
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           <span class="text-wt-gray-dark">
             {{
-              holdingsBalance()
-                ? ((row.symbolSummary.quote.price * row.units) / holdingsBalance() | percent: '1.2-2')
-                : 'N/A'
+              holdingsBalance() ? ((row.symbolQuote.price * row.units) / holdingsBalance() | percent: '1.2-2') : 'N/A'
             }}
           </span>
-        </td>
-      </ng-container>
-
-      <!-- beta -->
-      <ng-container matColumnDef="beta">
-        <th mat-header-cell *matHeaderCellDef class="hidden xl:table-cell">Beta</th>
-        <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
-          {{ row.symbolSummary.profile?.beta ? (row.symbolSummary.profile?.beta | number: '1.2-2') : 'N/A' }}
         </td>
       </ng-container>
 
@@ -188,7 +178,7 @@ import {
       <ng-container matColumnDef="pe">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">PE</th>
         <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
-          {{ (row.symbolSummary.quote.pe | number: '1.2-2') ?? 'N/A' }}
+          {{ (row.symbolQuote.pe | number: '1.2-2') ?? 'N/A' }}
         </td>
       </ng-container>
 
@@ -196,7 +186,7 @@ import {
       <ng-container matColumnDef="marketCap">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">Market Cap.</th>
         <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
-          {{ row.symbolSummary.quote.marketCap | largeNumberFormatter }}
+          {{ row.symbolQuote.marketCap | largeNumberFormatter }}
         </td>
       </ng-container>
 
@@ -205,9 +195,9 @@ import {
         <th mat-header-cell *matHeaderCellDef class="hidden 2xl:table-cell">52 Week Range</th>
         <td mat-cell *matCellDef="let row" class="hidden 2xl:table-cell">
           <app-progress-currency
-            [min]="row.symbolSummary.quote.yearLow"
-            [max]="row.symbolSummary.quote.yearHigh"
-            [value]="row.symbolSummary.quote.price"
+            [min]="row.symbolQuote.yearLow"
+            [max]="row.symbolQuote.yearHigh"
+            [value]="row.symbolQuote.price"
           ></app-progress-currency>
         </td>
       </ng-container>
@@ -280,7 +270,6 @@ export class PortfolioHoldingsTableComponent {
     'dailyValueChange',
     //'units',
     'portfolio',
-    // 'beta',
     // 'pe',
     'marketCap',
     'yearlyRange',
@@ -294,7 +283,7 @@ export class PortfolioHoldingsTableComponent {
     () => {
       const sorted = this.holdings()
         .slice()
-        .sort((a, b) => compare(b.symbolSummary.quote.price * b.units, a.symbolSummary.quote.price * a.units));
+        .sort((a, b) => compare(b.symbolQuote.price * b.units, a.symbolQuote.price * a.units));
       this.dataSource.data = sorted;
       this.dataSource.paginator = this.paginator() ?? null;
       this.dataSource.sort = this.sort() ?? null;
@@ -321,35 +310,35 @@ export class PortfolioHoldingsTableComponent {
         case 'symbol':
           return compare(a.symbol, b.symbol, isAsc);
         case 'price':
-          return compare(a.symbolSummary.quote.price, b.symbolSummary.quote.price, isAsc);
+          return compare(a.symbolQuote.price, b.symbolQuote.price, isAsc);
         case 'invested':
           return compare(a.invested, b.invested, isAsc);
         case 'units':
           return compare(a.units, b.units, isAsc);
         case 'portfolio':
           return compare(
-            (a.symbolSummary.quote.price * a.units) / this.holdingsBalance(),
-            (b.symbolSummary.quote.price * b.units) / this.holdingsBalance(),
+            (a.symbolQuote.price * a.units) / this.holdingsBalance(),
+            (b.symbolQuote.price * b.units) / this.holdingsBalance(),
             isAsc,
           );
         case 'pe':
-          return compare(a.symbolSummary.quote.pe, b.symbolSummary.quote.pe, isAsc);
+          return compare(a.symbolQuote.pe, b.symbolQuote.pe, isAsc);
         case 'dailyValueChange':
           return compare(
-            a.symbolSummary.quote.price * a.units - a.symbolSummary.quote.previousClose * a.units,
-            b.symbolSummary.quote.price * b.units - b.symbolSummary.quote.previousClose * b.units,
+            a.symbolQuote.price * a.units - a.symbolQuote.previousClose * a.units,
+            b.symbolQuote.price * b.units - b.symbolQuote.previousClose * b.units,
             isAsc,
           );
         case 'totalChange':
           return compare(
-            a.symbolSummary.quote.price * a.units - a.breakEvenPrice * a.units,
-            b.symbolSummary.quote.price * b.units - b.breakEvenPrice * b.units,
+            a.symbolQuote.price * a.units - a.breakEvenPrice * a.units,
+            b.symbolQuote.price * b.units - b.breakEvenPrice * b.units,
             isAsc,
           );
         case 'balance':
-          return compare(a.symbolSummary.quote.price * a.units, b.symbolSummary.quote.price * b.units, isAsc);
+          return compare(a.symbolQuote.price * a.units, b.symbolQuote.price * b.units, isAsc);
         case 'marketCap':
-          return compare(a.symbolSummary.quote.marketCap, b.symbolSummary.quote.marketCap, isAsc);
+          return compare(a.symbolQuote.marketCap, b.symbolQuote.marketCap, isAsc);
         default:
           return 0;
       }

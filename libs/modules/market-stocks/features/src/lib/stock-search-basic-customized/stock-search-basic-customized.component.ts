@@ -1,24 +1,12 @@
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  ElementRef,
-  Inject,
-  OnInit,
-  Optional,
-  computed,
-  inject,
-  input,
-  output,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { Component, ElementRef, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { SymbolSummary } from '@mm/api-types';
-import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { AUTHENTICATION_ACCOUNT_TOKEN } from '@mm/authentication/data-access';
 import { SymbolFavoriteService, SymbolSearchService } from '@mm/market-stocks/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { ElementFocusDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
@@ -91,7 +79,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
           class="w-full h-12 max-sm:mb-2"
           type="button"
         >
-          <app-quote-item [symbolQuote]="summary.quote"></app-quote-item>
+          <app-quote-item [symbolQuote]="summary.quote" />
         </button>
 
         <!-- display default symbols -->
@@ -104,7 +92,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
               class="w-full h-12 max-sm:mb-2"
               type="button"
             >
-              <app-quote-item [symbolQuote]="summary.quote"></app-quote-item>
+              <app-quote-item [symbolQuote]="summary.quote" />
             </button>
           }
         } @else {
@@ -120,6 +108,13 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
   `,
 })
 export class StockSearchBasicCustomizedComponent implements OnInit {
+  private symbolFavoriteService = inject(SymbolFavoriteService);
+  private symbolSearchService = inject(SymbolSearchService);
+  private authenticationUserService = inject(AUTHENTICATION_ACCOUNT_TOKEN, {
+    optional: true,
+  });
+  private dialog = inject(MatDialog);
+
   clickedSummary = output<SymbolSummary>();
   showHint = input(true);
   /**
@@ -139,21 +134,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
     isInputFocused: false,
     inputHasValue: false,
   });
-  isUserAuthenticatedSignal = signal(false);
-  private symbolFavoriteService = inject(SymbolFavoriteService);
-  private symbolSearchService = inject(SymbolSearchService);
-  private dialog = inject(MatDialog);
-
-  constructor(
-    @Inject(AUTHENTICATION_ACCOUNT_TOKEN)
-    @Optional()
-    private authenticationUserService: AuthenticationUserStoreService,
-  ) {
-    // Authentication may not exists when app is available in public
-    if (this.authenticationUserService) {
-      this.isUserAuthenticatedSignal.set(true);
-    }
-  }
+  isUserAuthenticatedSignal = signal(!!this.authenticationUserService);
 
   /**
    * display stock summaries based on whether showFavoriteStocks is true or false
@@ -172,6 +153,7 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
         this.symbolSearchService.addSearchedSymbol({
           symbolType: 'STOCK',
           symbol: value.id,
+          sector: value?.profile?.sector ?? 'Unknown',
         });
         this.onSummaryClick(value);
       }

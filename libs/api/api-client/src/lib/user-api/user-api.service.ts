@@ -120,20 +120,22 @@ export class UserApiService {
     });
   }
 
-  addSymbolToUserWatchList(userId: string, symbol: string, symbolType: SymbolType): void {
+  addToUserWatchList(userId: string, data: { symbol: string; symbolType: SymbolType; sector: string }): void {
     updateDoc(this.getUserWatchlistDocRef(userId), {
       data: arrayUnion({
-        symbol,
-        symbolType,
+        symbol: data.symbol,
+        symbolType: data.symbolType,
+        sector: data.sector,
       }),
     });
   }
 
-  removeSymbolFromUserWatchList(userId: string, symbol: string, symbolType: SymbolType): void {
+  removeFromUserWatchList(userId: string, data: { symbol: string; symbolType: SymbolType; sector: string }): void {
     updateDoc(this.getUserWatchlistDocRef(userId), {
       data: arrayRemove({
-        symbol,
-        symbolType,
+        symbol: data.symbol,
+        symbolType: data.symbolType,
+        sector: data.sector,
       }),
     });
   }

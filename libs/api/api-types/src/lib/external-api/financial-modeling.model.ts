@@ -19,7 +19,7 @@ export type SymbolQuote = {
   open: number;
   previousClose: number;
   eps: number | null;
-  pe: number;
+  pe: number | null;
   earningsAnnouncement: string | null;
   timestamp: number;
 
@@ -930,4 +930,8 @@ export type IsStockMarketOpenExtend = IsStockMarketOpen & {
    * array of holidays for the current year
    */
   currentHoliday: string[];
+  /**
+   * array of all holidays from API (last 3 years and future few years)
+   */
+  allHolidays: string[];
 };

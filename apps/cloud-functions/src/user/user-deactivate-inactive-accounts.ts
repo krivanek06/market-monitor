@@ -33,15 +33,19 @@ export const userDeactivateInactiveAccounts = async () => {
 export const userDeleteDemoAccounts = async () => {
   // query demo accounts which are to be deleted
   const demoAccountDeadline = format(subDays(new Date(), USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DEMO), 'yyyy-MM-dd');
+
+  console.log('[Users demo]: deadline', demoAccountDeadline);
+
   const userDemoAccountsToDelete = await userCollectionDemoAccountRef()
     .where('accountCreatedDate', '<=', demoAccountDeadline)
     .get();
 
-  console.log(`[Users demo delete]: ${userDemoAccountsToDelete.docs.length}`);
+  console.log(`[Users demo]: delete ${userDemoAccountsToDelete.docs.length}`);
 
   // delete demo accounts
   for (const doc of userDemoAccountsToDelete.docs) {
     await userDeleteAccountById(doc.id);
+    console.log(`[Users demo]: deleted ${doc.id}`);
   }
 };
 

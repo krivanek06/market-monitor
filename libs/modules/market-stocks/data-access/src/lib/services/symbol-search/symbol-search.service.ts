@@ -1,12 +1,12 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { StocksApiService } from '@mm/api-client';
-import { SymbolSearch, SymbolSummary } from '@mm/api-types';
+import { MarketApiService } from '@mm/api-client';
+import { SymbolStoreBase, SymbolSummary } from '@mm/api-types';
 import { StorageLocalStoreService } from '@mm/shared/general-features';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SymbolSearchService extends StorageLocalStoreService<SymbolSearch[]> {
+export class SymbolSearchService extends StorageLocalStoreService<SymbolStoreBase[]> {
   private searchedSymbols = signal<SymbolSummary[]>([]);
 
   /**
@@ -14,7 +14,7 @@ export class SymbolSearchService extends StorageLocalStoreService<SymbolSearch[]
    */
   private defaultSymbols = signal<SymbolSummary[]>([]);
 
-  constructor(private stocksApiService: StocksApiService) {
+  constructor(private marketApiService: MarketApiService) {
     super('SYMBOL_SEARCH', []);
     this.initService();
   }
@@ -22,7 +22,7 @@ export class SymbolSearchService extends StorageLocalStoreService<SymbolSearch[]
   getSearchedSymbols = computed(() => this.searchedSymbols());
   getDefaultSymbols = computed(() => this.defaultSymbols());
 
-  addSearchedSymbol(searchSymbol: SymbolSearch): void {
+  addSearchedSymbol(searchSymbol: SymbolStoreBase): void {
     const savedData = this.getData();
     const symbols = savedData.map((d) => d.symbol);
 
@@ -31,7 +31,7 @@ export class SymbolSearchService extends StorageLocalStoreService<SymbolSearch[]
     }
 
     // load data from api
-    this.stocksApiService.getStockSummary(searchSymbol.symbol).subscribe((stockSummary) => {
+    this.marketApiService.getSymbolSummary(searchSymbol.symbol).subscribe((stockSummary) => {
       // save data into array, limit to 12
       if (stockSummary) {
         this.persistData([searchSymbol, ...savedData], [stockSummary, ...this.getSearchedSymbols()]);
@@ -39,7 +39,7 @@ export class SymbolSearchService extends StorageLocalStoreService<SymbolSearch[]
     });
   }
 
-  removeSearchedSymbol(searchSymbol: SymbolSearch): void {
+  removeSearchedSymbol(searchSymbol: SymbolStoreBase): void {
     const savedData = this.getData();
 
     // remove from searchedSymbols$
@@ -55,7 +55,7 @@ export class SymbolSearchService extends StorageLocalStoreService<SymbolSearch[]
    * @param searchSymbols - array of search symbols to saved into local storage
    * @param symbolSummaries - array of symbol summaries to persist locally
    */
-  private persistData(searchSymbols: SymbolSearch[], symbolSummaries: SymbolSummary[]): void {
+  private persistData(searchSymbols: SymbolStoreBase[], symbolSummaries: SymbolSummary[]): void {
     const searchSymbolsSlice = searchSymbols.slice(0, 20);
     const symbolSummariesSlice = symbolSummaries.slice(0, 20);
 
@@ -74,12 +74,12 @@ export class SymbolSearchService extends StorageLocalStoreService<SymbolSearch[]
     const symbols = data.map((d) => d.symbol);
 
     // load favorite stocks from api and last searched stocks from api
-    this.stocksApiService.getStockSummaries(symbols).subscribe((searchedStocks) => {
+    this.marketApiService.getSymbolSummaries(symbols).subscribe((searchedStocks) => {
       this.searchedSymbols.set(searchedStocks);
     });
 
     const defaultSymbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA'];
-    this.stocksApiService.getStockSummaries(defaultSymbols).subscribe((defaultStocks) => {
+    this.marketApiService.getSymbolSummaries(defaultSymbols).subscribe((defaultStocks) => {
       this.defaultSymbols.set(defaultStocks);
     });
   }

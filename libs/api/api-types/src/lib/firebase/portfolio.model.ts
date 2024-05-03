@@ -1,4 +1,5 @@
-import { SymbolSummary, SymbolType } from './symbol.model';
+import { SymbolQuote } from '../external-api';
+import { SymbolType } from './symbol.model';
 
 export type PortfolioRisk = {
   /**
@@ -64,20 +65,30 @@ export type PortfolioState = {
   previousBalanceChangePercentage: number;
 };
 
-export type PortfolioStateHoldingBase = {
+export type PortfolioStateExecution = Pick<
+  PortfolioState,
+  'numberOfExecutedBuyTransactions' | 'numberOfExecutedSellTransactions' | 'transactionFees' | 'date'
+>;
+
+export type SymbolStoreBase = {
   symbolType: SymbolType;
   symbol: string;
+  sector: string;
+};
+
+export type PortfolioStateHoldingBase = SymbolStoreBase & {
   units: number;
   /**
    * how much user invested. Used to calculate BEP.
    */
   invested: number;
+  breakEvenPrice: number;
 };
 
 export type PortfolioStateHolding = PortfolioStateHoldingBase & {
   breakEvenPrice: number; // calculated
   weight: number; // calculated
-  symbolSummary: SymbolSummary;
+  symbolQuote: SymbolQuote;
 };
 
 export type PortfolioStateHoldings = PortfolioState & {
@@ -117,11 +128,9 @@ export type PortfolioGrowthAssetsDataItem = {
 
 export type PortfolioTransactionType = 'BUY' | 'SELL';
 
-export type PortfolioTransaction = {
+export type PortfolioTransaction = SymbolStoreBase & {
   transactionId: string;
   userId: string;
-  symbolType: SymbolType;
-  symbol: string;
   units: number;
   unitPrice: number;
   date: string;
@@ -129,11 +138,18 @@ export type PortfolioTransaction = {
   returnChange: number;
   transactionType: PortfolioTransactionType;
   transactionFees: number;
+
+  /**
+   * differs from date, that date is when used created transaction, but it can be
+   * during weekend and market is closed during weekend, so this will be last open market date
+   */
+  priceFromDate?: string;
 };
 
 export type PortfolioTransactionMore = PortfolioTransaction & {
   userPhotoURL?: string | null;
   userDisplayName?: string;
+  userDisplayNameInitials?: string;
 };
 
 export type PortfolioTransactionCash = {
@@ -142,9 +158,7 @@ export type PortfolioTransactionCash = {
   amount: number;
 };
 
-export type PortfolioTransactionCreate = {
-  symbol: string;
-  symbolType: SymbolType;
+export type PortfolioTransactionCreate = SymbolStoreBase & {
   units: number;
   date: string;
   transactionType: PortfolioTransactionType;

@@ -61,7 +61,9 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         title="PE"
         class="hidden md:block min-w-[100px]"
       >
-        <div class="text-center">{{ stockSummary().quote.pe | number: '1.2-2' }}</div>
+        <div class="text-center">
+          {{ stockSummary().quote.pe ? (stockSummary().quote.pe | number: '1.2-2') : 'N/A' }}
+        </div>
       </app-general-card>
 
       <!-- EPS -->
@@ -71,7 +73,9 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         title="EPS"
         class="hidden lg:block min-w-[100px]"
       >
-        <div class="text-center">{{ stockSummary().quote.eps ?? 'N/A' }}</div>
+        <div class="text-center">
+          {{ stockSummary().quote.eps ? (stockSummary().quote.eps | number: '1.2-2') : 'N/A' }}
+        </div>
       </app-general-card>
 
       <!-- Sector -->

@@ -272,6 +272,7 @@ export class UserSettingsDialogComponent implements OnInit {
       .showInlineInputDialog({
         title: 'Change Display Name',
         description: 'Enter a new display name',
+        validatorMaxLength: 15,
         initialValue: this.userDataSignal().personal.displayName,
       })
       .pipe(

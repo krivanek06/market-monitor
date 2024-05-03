@@ -1,15 +1,15 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { StocksApiService } from '@mm/api-client';
-import { SymbolSearch, SymbolSummary } from '@mm/api-types';
+import { MarketApiService } from '@mm/api-client';
+import { SymbolStoreBase, SymbolSummary } from '@mm/api-types';
 import { StorageLocalStoreService } from '@mm/shared/general-features';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch[]> {
+export class SymbolFavoriteService extends StorageLocalStoreService<SymbolStoreBase[]> {
   private favoriteSymbols = signal<SymbolSummary[]>([]);
 
-  constructor(private stocksApiService: StocksApiService) {
+  constructor(private marketApiService: MarketApiService) {
     super('SYMBOL_FAVORITE', []);
     this.initService();
   }
@@ -22,7 +22,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
       .includes(symbol);
   }
 
-  addFavoriteSymbol(searchSymbol: SymbolSearch): void {
+  addFavoriteSymbol(searchSymbol: SymbolStoreBase): void {
     const savedData = this.getData();
     const symbols = savedData.map((d) => d.symbol);
 
@@ -31,7 +31,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
     }
 
     // load data from api
-    this.stocksApiService.getStockSummary(searchSymbol.symbol).subscribe((stockSummary) => {
+    this.marketApiService.getSymbolSummary(searchSymbol.symbol).subscribe((stockSummary) => {
       // save data into array, limit to 12
       if (stockSummary) {
         this.persistData([searchSymbol, ...savedData], [stockSummary, ...this.favoriteSymbols()]);
@@ -39,7 +39,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
     });
   }
 
-  removeFavoriteSymbol(searchSymbol: SymbolSearch): void {
+  removeFavoriteSymbol(searchSymbol: SymbolStoreBase): void {
     const savedData = this.getData();
 
     // remove from favoriteSymbols$
@@ -50,7 +50,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
     this.persistData(newSavedData, newSummaries);
   }
 
-  private persistData(symbolFavorite: SymbolSearch[], symbolSummaries: SymbolSummary[]): void {
+  private persistData(symbolFavorite: SymbolStoreBase[], symbolSummaries: SymbolSummary[]): void {
     const symbolFavoriteSlice = symbolFavorite.slice(0, 12);
     const symbolSummariesSlice = symbolSummaries.slice(0, 12);
 
@@ -69,7 +69,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolSearch
     const symbols = data.map((d) => d.symbol);
 
     // load favorite stocks from api and last searched stocks from api
-    this.stocksApiService.getStockSummaries(symbols).subscribe((favoriteStocks) => {
+    this.marketApiService.getSymbolSummaries(symbols).subscribe((favoriteStocks) => {
       this.favoriteSymbols.set(favoriteStocks);
     });
   }

@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS symbol_summary (
   id VARCHAR(25) PRIMARY KEY,
   quote TEXT NOT NULL,
   profile TEXT DEFAULT null,
-  priceChange TEXT NOT NULL,
-	lastUpdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  priceChange TEXT DEFAULT NULL,
+	lastUpdate TEXT DEFAULT NULL
 );
 
 /*

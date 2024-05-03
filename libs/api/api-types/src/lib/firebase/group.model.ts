@@ -130,7 +130,10 @@ export type SystemRankGroup = {
   portfolioTotalGainsPercentage?: RankingItem;
 };
 
-export type GroupTransactionsData = DataDocsWrapper<PortfolioTransaction>;
+export type GroupTransactionsData = DataDocsWrapper<PortfolioTransaction> & {
+  transactionBestReturn: PortfolioTransaction[];
+  transactionsWorstReturn: PortfolioTransaction[];
+};
 export type GroupMembersData = DataDocsWrapper<GroupMember>;
 export type GroupPortfolioStateSnapshotsData = DataDocsWrapper<PortfolioState>;
 export type GroupHoldingSnapshotsData = DataDocsWrapper<PortfolioStateHoldingBase>;
@@ -138,6 +141,8 @@ export type GroupHoldingSnapshotsData = DataDocsWrapper<PortfolioStateHoldingBas
 export type GroupDetails = {
   groupData: GroupData;
   groupTransactionsData: PortfolioTransactionMore[];
+  groupTransactionsDataBest: PortfolioTransactionMore[];
+  groupTransactionsDataWorst: PortfolioTransactionMore[];
   groupMembersData: GroupMember[];
   groupPortfolioSnapshotsData: PortfolioState[];
 };

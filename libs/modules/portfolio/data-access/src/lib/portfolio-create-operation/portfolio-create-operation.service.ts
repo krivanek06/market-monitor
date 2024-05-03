@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { StocksApiService, UserApiService } from '@mm/api-client';
+import { MarketApiService, UserApiService } from '@mm/api-client';
 import {
   DATE_TOO_OLD,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class PortfolioCreateOperationService {
   private userApiService = inject(UserApiService);
-  private stocksApiService = inject(StocksApiService);
+  private marketApiService = inject(MarketApiService);
 
   async createPortfolioCreateOperation(
     userData: UserData,
@@ -32,7 +32,7 @@ export class PortfolioCreateOperationService {
   ): Promise<PortfolioTransaction> {
     // load historical price for symbol on date
     const symbolPrice = await firstValueFrom(
-      this.stocksApiService.getStockHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date)),
+      this.marketApiService.getHistoricalPricesOnDate(data.symbol, dateFormatDate(data.date)),
     );
 
     // check if symbol exists
@@ -71,7 +71,7 @@ export class PortfolioCreateOperationService {
     const symbolHolding = userDocData.holdingSnapshot.data.find((d) => d.symbol === input.symbol);
 
     // calculate break even price if SELL order
-    const breakEvenPrice = isSell ? roundNDigits((symbolHolding?.invested ?? 1) / (symbolHolding?.units ?? 1), 2) : 0;
+    const breakEvenPrice = isSell ? roundNDigits(symbolHolding?.breakEvenPrice ?? 1, 2) : 0;
 
     const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
     const returnChange = isSell ? roundNDigits((unitPrice - breakEvenPrice) / breakEvenPrice) : 0;
@@ -85,6 +85,7 @@ export class PortfolioCreateOperationService {
       date: input.date,
       symbol: input.symbol,
       units: input.units,
+      sector: input.sector,
       transactionType: input.transactionType,
       userId: userDocData.id,
       symbolType: input.symbolType,

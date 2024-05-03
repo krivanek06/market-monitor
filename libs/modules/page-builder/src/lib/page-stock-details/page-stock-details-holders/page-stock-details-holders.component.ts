@@ -5,7 +5,12 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { StockOwnershipHoldersTableComponent, StockOwnershipInstitutionalListComponent } from '@mm/market-stocks/ui';
 import { InputSource } from '@mm/shared/data-access';
 import { dateFormatDate } from '@mm/shared/general-util';
-import { FormMatInputWrapperComponent, GeneralCardComponent, RangeDirective } from '@mm/shared/ui';
+import {
+  DropdownControlComponent,
+  FormMatInputWrapperComponent,
+  GeneralCardComponent,
+  RangeDirective,
+} from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
 import { catchError, filter, of, startWith, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
@@ -21,6 +26,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     FormMatInputWrapperComponent,
     ReactiveFormsModule,
     RangeDirective,
+    DropdownControlComponent,
   ],
   template: `
     <div class="grid gap-8 mb-6 md:grid-cols-2 xl:grid-cols-4">
@@ -68,12 +74,11 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
 
       <div class="w-full">
         <!-- Available Quarters -->
-        <app-form-mat-input-wrapper
+        <app-dropdown-control
           [formControl]="quarterFormControl"
           inputCaption="Available Quarters"
-          inputType="SELECT"
           [inputSource]="institutionalPortfolioInputSourceSignal()"
-        ></app-form-mat-input-wrapper>
+        ></app-dropdown-control>
 
         <!-- additional data -->
         <div class="grid gap-2 p-4 mt-2">
@@ -151,8 +156,8 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
       startWith(this.quarterFormControl.value),
       filterNil(),
       switchMap((quarter) =>
-        this.stocksApiService
-          .getStockHistoricalPricesOnDate(this.stockSymbolSignal(), quarter)
+        this.marketApiService
+          .getHistoricalPricesOnDate(this.stockSymbolSignal(), quarter)
           .pipe(catchError((e) => of(null))),
       ),
     ),

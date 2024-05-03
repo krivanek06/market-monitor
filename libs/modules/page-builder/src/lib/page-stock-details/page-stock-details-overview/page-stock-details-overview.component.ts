@@ -202,14 +202,14 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         </app-general-card>
 
         <!-- peers -->
-        <app-general-card additionalClasses="h-full" title="Peers" class="hidden lg:block">
-          <ng-container *ngIf="stockPeersSignal() as stockPeersSignal">
+        <app-general-card title="Peers" class="hidden lg:block">
+          @if (stockPeersSignal(); as stockPeersSignal) {
             <app-stock-peers-list
               *ngIf="stockPeersSignal.length > 0"
               (clickedEmitter)="onShowSummary($event)"
               [peers]="stockPeersSignal | slice: 0 : 12"
             ></app-stock-peers-list>
-          </ng-container>
+          }
         </app-general-card>
       </div>
 
@@ -273,7 +273,7 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
         if (!details.sectorPeers || details.sectorPeers.peersList.length === 0) {
           return of([]);
         }
-        return this.stocksApiService.getStockSummaries(details.sectorPeers.peersList);
+        return this.marketApiService.getSymbolSummaries(details.sectorPeers.peersList);
       }),
     ),
   );
