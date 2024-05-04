@@ -38,6 +38,7 @@ import { switchMap } from 'rxjs';
     <!-- table -->
     <app-stock-summary-table
       (itemClickedEmitter)="onQuoteClick($event)"
+      [symbolSkeletonLoaders]="watchList().data.length"
       [symbolQuotes]="userWatchListSymbolsSignal()"
     />
   `,

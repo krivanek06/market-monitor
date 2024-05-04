@@ -24,7 +24,6 @@ import {
   PercentageIncreaseDirective,
   ProgressCurrencyComponent,
   RangeDirective,
-  SectionTitleComponent,
   TruncatePipe,
 } from '@mm/shared/ui';
 
@@ -46,13 +45,10 @@ import {
     TruncatePipe,
     MatChipsModule,
     MatSortModule,
-    SectionTitleComponent,
   ],
   template: `
-    <div *ngIf="tableTitle()" class="flex justify-between mb-2">
-      <app-section-title [title]="tableTitle()" />
-
-      <div *ngIf="showMobileInfoButton()" class="sm:hidden">
+    <div class="flex sm:hidden justify-end mb-2">
+      <div>
         <button mat-stroked-button class="w-[150px] text-sm" (click)="toggleDisplayedValues()">
           {{ displayInfoMobile() ? 'Info' : 'Price +/-' }}
         </button>
@@ -242,7 +238,7 @@ import {
 
     <!-- skeleton -->
     <div *ngIf="showLoadingSkeletonSignal()">
-      <div *ngRange="10" class="h-12 mb-1 g-skeleton"></div>
+      <div *ngRange="symbolSkeletonLoaders()" class="h-12 mb-1 g-skeleton"></div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -251,7 +247,7 @@ import {
       min-width: 130px;
 
       @screen xs {
-        width: 60%;
+        width: 100px;
       }
       @screen sm {
         width: auto;
@@ -264,6 +260,7 @@ export class StockSummaryTableComponent {
   itemClickedEmitter = output<SymbolQuote>();
   sort = viewChild(MatSort);
   symbolQuotes = input.required<SymbolQuote[] | null | undefined>();
+  symbolSkeletonLoaders = input<number>(10);
 
   tableEffect = effect(
     () => {
@@ -284,9 +281,6 @@ export class StockSummaryTableComponent {
     },
     { allowSignalWrites: true },
   );
-
-  tableTitle = input('');
-  showMobileInfoButton = input(true);
 
   showLoadingSkeletonSignal = signal(true);
 
