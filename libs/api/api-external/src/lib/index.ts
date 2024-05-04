@@ -3,4 +3,3 @@ export * from './financial-modeling.api';
 export * from './finnhub.api';
 export * from './firebase-cloud-functions.api';
 export * from './helpers';
-export * from './quandl.api';
