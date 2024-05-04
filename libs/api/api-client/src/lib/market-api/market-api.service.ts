@@ -5,12 +5,8 @@ import {
   CalendarDividend,
   CalendarStockEarning,
   CalendarStockIPO,
-  ChartDataType,
   HistoricalPrice,
   IsStockMarketOpenExtend,
-  MarketOverview,
-  MarketOverviewKey,
-  MarketOverviewSubkeyReadable,
   MarketTopPerformanceOverviewResponse,
   MarketTopPerformanceSymbols,
   News,
@@ -130,23 +126,6 @@ export class MarketApiService {
         News[]
       >(`https://get-news.krivanek1234.workers.dev/?news_types=${newsType}&symbol=${symbol}`, ApiCacheService.validity30Min)
       .pipe(catchError(() => of([])));
-  }
-
-  getMarketOverview(): Observable<MarketOverview> {
-    return this.apiCache.getData<MarketOverview>(
-      `https://get-basic-data.krivanek1234.workers.dev/?type=market-overview`,
-      ApiCacheService.validity30Min,
-    );
-  }
-
-  getMarketOverviewData<T extends MarketOverviewKey>(
-    key: T,
-    subKey: MarketOverviewSubkeyReadable<T>,
-  ): Observable<ChartDataType> {
-    return this.apiCache.getData<ChartDataType>(
-      `https://get-basic-data.krivanek1234.workers.dev/?type=market-overview-data&key=${key}&subKey=${subKey}`,
-      ApiCacheService.validity30Min,
-    );
   }
 
   getQuotesByType(quoteType: AvailableQuotes): Observable<SymbolQuote[]> {

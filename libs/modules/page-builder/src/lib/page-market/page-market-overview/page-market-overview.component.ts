@@ -37,58 +37,57 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     MultiplyDtaPipe,
   ],
   template: `
-    <ng-container *ngIf="marketOverviewSignal() as marketOverviewSignalValues">
-      <div class="flex gap-3 p-2 mb-6 xl:justify-around md:grid-cols-2 max-md:overflow-x-scroll md:grid xl:flex">
-        <ng-container *ngIf="marketTopIndexQuotesSignal() as marketTopIndexQuotesSignal; else topIndexSkeleton">
-          <app-general-card
-            *ngFor="let index of marketTopIndexQuotesSignal"
-            [title]="index.name"
-            [titleCenter]="true"
-            additionalClasses="min-w-max px-6 py-3"
-            titleScale="large"
-          >
-            <div class="flex items-center justify-center gap-3 text-base">
-              <span>{{ index.summary.quote.price | number: '1.2-2' }}</span>
-              <span
-                appPercentageIncrease
-                [useCurrencySign]="false"
-                [changeValues]="{
-                  change: index.summary.quote.change,
-                  changePercentage: index.summary.quote.changesPercentage
-                }"
-              ></span>
-            </div>
-          </app-general-card>
-        </ng-container>
-
-        <!-- skeleton -->
-        <ng-template #topIndexSkeleton>
-          <div class="flex gap-3 p-2 mb-6 xl:justify-around md:grid-cols-2 max-md:overflow-x-scroll md:grid xl:flex">
-            <div *ngRange="4" class="w-full lg:min-w-[320px] px-6 py-3 h-[115px] g-skeleton"></div>
+    <div class="flex gap-3 p-2 mb-6 xl:justify-around md:grid-cols-2 max-md:overflow-x-scroll md:grid xl:flex">
+      <ng-container *ngIf="marketTopIndexQuotesSignal() as marketTopIndexQuotesSignal; else topIndexSkeleton">
+        <app-general-card
+          *ngFor="let index of marketTopIndexQuotesSignal"
+          [title]="index.name"
+          [titleCenter]="true"
+          additionalClasses="min-w-max px-6 py-3"
+          titleScale="large"
+        >
+          <div class="flex items-center justify-center gap-3 text-base">
+            <span>{{ index.summary.quote.price | number: '1.2-2' }}</span>
+            <span
+              appPercentageIncrease
+              [useCurrencySign]="false"
+              [changeValues]="{
+                change: index.summary.quote.change,
+                changePercentage: index.summary.quote.changesPercentage
+              }"
+            ></span>
           </div>
-        </ng-template>
-      </div>
+        </app-general-card>
+      </ng-container>
 
-      <div class="flex max-sm:w-full">
-        <app-quote-search-basic
-          [formControl]="selectedIndexSymbolQuoteControl"
-          class="min-w-[500px] max-sm:w-full"
-          type="index"
-        />
-      </div>
+      <!-- skeleton -->
+      <ng-template #topIndexSkeleton>
+        <div class="flex gap-3 p-2 mb-6 xl:justify-around md:grid-cols-2 max-md:overflow-x-scroll md:grid xl:flex">
+          <div *ngRange="4" class="w-full lg:min-w-[320px] px-6 py-3 h-[115px] g-skeleton"></div>
+        </div>
+      </ng-template>
+    </div>
 
-      <div class="mb-10">
-        <app-asset-price-chart-interactive
-          priceName="Value"
-          [priceShowSign]="false"
-          [symbol]="selectedIndexSymbolQuoteControl.value?.symbol ?? SYMBOL_SP500"
-          [chartHeightPx]="400"
-          [displayVolume]="false"
-          [title]="selectedIndexSymbolQuoteControl.value?.name ?? 'S&P 500'"
-        />
-      </div>
+    <div class="flex max-sm:w-full">
+      <app-quote-search-basic
+        [formControl]="selectedIndexSymbolQuoteControl"
+        class="min-w-[500px] max-sm:w-full"
+        type="index"
+      />
+    </div>
 
-      <div class="w-full mx-auto max-sm:pr-3 lg:w-11/12">
+    <div class="mb-10">
+      <app-asset-price-chart-interactive
+        priceName="Value"
+        [priceShowSign]="false"
+        [symbol]="selectedIndexSymbolQuoteControl.value?.symbol ?? SYMBOL_SP500"
+        [chartHeightPx]="400"
+        [displayVolume]="false"
+        [title]="selectedIndexSymbolQuoteControl.value?.name ?? 'S&P 500'"
+      />
+    </div>
+
+    <!-- <div class="w-full mx-auto max-sm:pr-3 lg:w-11/12">
         <h2>SP500 stats</h2>
         <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
           <app-generic-chart
@@ -151,186 +150,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
             [categories]="data | flattenArray: 0"
           />
         </div>
-
-        <h2>Treasury</h2>
-        <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.treasury.us3Month | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Treasury 3 Months"
-            [heightPx]="250"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 3 Months' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.treasury.us1Year | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Treasury 1 Year"
-            [heightPx]="250"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 1 Year' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.treasury.us10Year | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Treasury 10 Years"
-            [heightPx]="250"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 10 Years' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.treasury.us30Year | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Treasury 30 Years"
-            [heightPx]="250"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Treasury 30 Years' }]"
-            [categories]="data | flattenArray: 0"
-          />
-        </div>
-
-        <h2>Bonds</h2>
-        <div class="grid grid-cols-1 gap-4 mb-3 sm:grid-cols-2 lg:grid-cols-4">
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.bonds.usAAAYield | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Bonds US AAA Yield"
-            [heightPx]="250"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US AAA Yield' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.bonds.usAAYield | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Bonds US AA Yield"
-            [heightPx]="250"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US AA Yield' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.bonds.usBBYield | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Bonds US BB Yield"
-            [heightPx]="250"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US BB Yield' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.bonds.usCCCYield | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Bonds US CCC Yield"
-            [heightPx]="250"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Bonds US CCC Yield' }]"
-            [categories]="data | flattenArray: 0"
-          />
-        </div>
-
-        <h2>US Data</h2>
-        <div class="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2 lg:grid-cols-4">
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.general.GDP | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="US GDP"
-            [heightPx]="250"
-            [applyFancyColor]="3"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'US GDP' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.general.realGDPPerCapita | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="GDP per Capita"
-            [heightPx]="250"
-            [applyFancyColor]="3"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'GDP per Capita' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.general.CPI | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="CPI"
-            [heightPx]="250"
-            [applyFancyColor]="3"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'CPI' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.general.federalFunds | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Federal Funds"
-            [heightPx]="250"
-            [applyFancyColor]="3"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Federal Funds' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.general.inflation | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Inflation"
-            [heightPx]="250"
-            [applyFancyColor]="4"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Inflation' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.general.unemploymentRate | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Unemployment"
-            [heightPx]="250"
-            [applyFancyColor]="4"
-            [series]="[
-              {
-                type: 'line',
-                data: (data | flattenArray: 1 | multiplyData: 1_000_000),
-                name: 'Unemployment'
-              }
-            ]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.general.smoothedUSRecessionProbabilities | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Smooth Recession Probabilities"
-            [heightPx]="250"
-            [applyFancyColor]="4"
-            [series]="[
-              {
-                type: 'line',
-                data: data | flattenArray: 1,
-                name: 'Smooth Recession Probabilities'
-              }
-            ]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.general.totalVehicleSales | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Vehicle Sales"
-            [heightPx]="250"
-            [applyFancyColor]="4"
-            [series]="[{ type: 'line', data: data | flattenArray: 1 | multiplyData: 1_000_000, name: 'Vehicle Sales' }]"
-            [categories]="data | flattenArray: 0"
-          />
-        </div>
-      </div>
-    </ng-container>
-
-    <!-- skeleton loading -->
-    <ng-container *ngIf="!(marketOverviewSignal() && marketTopIndexQuotesSignal())">
-      <app-page-market-overview-skeleton />
-    </ng-container>
+       -->
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -345,8 +165,6 @@ export class PageMarketOverviewComponent {
   selectedIndexSymbolQuoteControl = new FormControl<SymbolQuote | null>(null);
 
   SYMBOL_SP500 = SYMBOL_SP500;
-
-  marketOverviewSignal = toSignal(this.marketApiService.getMarketOverview());
 
   marketTopIndexQuotesSignal = toSignal(
     this.marketApiService.getSymbolSummaries(INDEXES_DEFAULT_SYMBOLS).pipe(

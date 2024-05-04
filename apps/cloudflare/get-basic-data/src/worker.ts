@@ -1,7 +1,6 @@
 import { getCalendarData } from './get-calendar-data';
 import { getInstitutionalPortfolioDatesWrapper } from './get-institutional-portfolio';
 import { getIsMarketOpenWrapper } from './get-is-market-open';
-import { getMarketOverData, getMarketOverview, saveMarketOverview } from './get-market-overview';
 import { getQuotesByTypeWrapper } from './get-quotes-by-type';
 import { getTopSymbols } from './get-top-symbols';
 import { Env } from './model';
@@ -35,18 +34,6 @@ export default {
 
 		if (type === 'calendar') {
 			return getCalendarData(env, searchParams);
-		}
-
-		if (type === 'market-overview-save') {
-			return saveMarketOverview(env, request);
-		}
-
-		if (type === 'market-overview') {
-			return getMarketOverview(env);
-		}
-
-		if (type === 'market-overview-data') {
-			return getMarketOverData(env, searchParams);
 		}
 
 		if (type === 'institutional-portfolio-dates') {
