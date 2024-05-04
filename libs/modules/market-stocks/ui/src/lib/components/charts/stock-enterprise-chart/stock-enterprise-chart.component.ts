@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { EnterpriseValue } from '@mm/api-types';
 import { Recommendation } from '@mm/market-stocks/data-access';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
-import { formatLargeNumber } from '@mm/shared/general-util';
+import { dateFormatDate, formatLargeNumber } from '@mm/shared/general-util';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({
@@ -30,7 +30,14 @@ import { HighchartsChartModule } from 'highcharts-angular';
 export class StockEnterpriseChartComponent extends ChartConstructor {
   data = input.required<EnterpriseValue[]>();
 
-  chartOptionSignal = computed(() => this.initChart(this.data()));
+  chartOptionSignal = computed(() => {
+    const transformedData = this.data().map((d) => ({
+      ...d,
+      date: dateFormatDate(d.date, 'MMMM d, y'),
+    }));
+    return this.initChart(transformedData);
+  });
+
   private initChart(data: EnterpriseValue[]): Highcharts.Options {
     return {
       chart: {

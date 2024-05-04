@@ -2,6 +2,7 @@ import { Directive, afterNextRender, input, signal } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import HC_more from 'highcharts/highcharts-more';
 import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
+import { ColorScheme } from './color-scheme.model';
 
 @Directive()
 export abstract class ChartConstructor {
@@ -33,6 +34,22 @@ export abstract class ChartConstructor {
       lang: {
         numericSymbols: ['k', 'M', 'B', 'T', 'P', 'E'],
       },
+      colors: [
+        ColorScheme.PRIMARY_VAR,
+        ColorScheme.ACCENT_1_VAR,
+        ColorScheme.ACCENT_2_VAR,
+        ColorScheme.ACCENT_3_VAR,
+        '#2caffe',
+        '#544fc5',
+        '#00e272',
+        '#fe6a35',
+        '#6b8abc',
+        '#d568fb',
+        '#2ee0ca',
+        '#fa4b42',
+        '#feb56a',
+        '#91e8e1',
+      ],
     });
   }
 }

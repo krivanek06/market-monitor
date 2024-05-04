@@ -284,9 +284,15 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
         column: {
           pointPadding: 0.2,
           stacking: 'normal',
-          // dataLabels: {
-          //   enabled: this.showDataLabel,
-          // },
+          dataLabels: {
+            enabled: true,
+
+            style: {
+              color: ColorScheme.GRAY_DARK_VAR,
+              textOutline: 'none',
+              fontWeight: 'normal',
+            },
+          },
         },
         packedbubble: {
           minSize: '30px',
@@ -322,7 +328,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           showInNavigator: true,
           borderWidth: 0,
           dataLabels: {
-            color: ColorScheme.GRAY_LIGHT_VAR,
+            color: ColorScheme.GRAY_DARK_VAR,
             enabled: this.showDataLabel(),
             formatter: function () {
               return roundNDigits(this.y, 2);

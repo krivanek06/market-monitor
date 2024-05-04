@@ -251,7 +251,7 @@ import { map, pipe, startWith } from 'rxjs';
           />
 
           <!-- best / worst -->
-          <div *ngIf="portfolioLength() > 15" class="hidden sm:flex lg:max-xl:flex-row flex-col gap-4">
+          <div *ngIf="portfolioLength() > 15" class="hidden sm:flex lg:max-xl:flex-row flex-col gap-4 lg:pt-6">
             <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
               @for (item of stateRef.getUserPortfolioTransactionsBest(); track item.transactionId; let last = $last) {
                 <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">

@@ -231,7 +231,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
           <app-stock-enterprise-chart
             [heightPx]="520"
             [data]="stockDetailsSignal.enterpriseValue | sortByKey: 'date' : 'asc'"
-          ></app-stock-enterprise-chart>
+          />
         </app-general-card>
       </div>
 
