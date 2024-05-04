@@ -158,7 +158,10 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
 
       <!-- holding title -->
       <div class="flex items-center justify-between mb-4">
-        <app-section-title title="Selected User: {{ selectedUser()?.userData?.personal?.displayName }}" />
+        <h2 class="text-xl space-x-2">
+          <span class="text-wt-primary">Selected User: </span>
+          <span class="text-wt-gray-dark">{{ selectedUser()?.userData?.personal?.displayName }}</span>
+        </h2>
 
         <app-dropdown-control
           class="w-[360px]"

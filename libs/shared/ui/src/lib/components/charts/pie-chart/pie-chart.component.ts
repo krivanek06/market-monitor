@@ -37,6 +37,19 @@ export class PieChartComponent extends ChartConstructor {
 
   chartOptionsComputed = computed(() => this.innitChart(this.series()));
 
+  chartColors = [
+    '#2caffe',
+    '#544fc5',
+    '#00e272',
+    '#fe6a35',
+    '#6b8abc',
+    '#d568fb',
+    '#2ee0ca',
+    '#fa4b42',
+    '#feb56a',
+    '#91e8e1',
+  ];
+
   constructor() {
     super();
 
@@ -44,18 +57,6 @@ export class PieChartComponent extends ChartConstructor {
       lang: {
         numericSymbols: ['k', 'M', 'B', 'T', 'P', 'E'],
       },
-      colors: [
-        '#2caffe',
-        '#544fc5',
-        '#00e272',
-        '#fe6a35',
-        '#6b8abc',
-        '#d568fb',
-        '#2ee0ca',
-        '#fa4b42',
-        '#feb56a',
-        '#91e8e1',
-      ],
     });
 
     highcharts3d(Highcharts);
@@ -153,7 +154,7 @@ export class PieChartComponent extends ChartConstructor {
               value: 4,
             },
           },
-          colors: (Highcharts.getOptions().colors ?? ([] as any[])).map((color) => {
+          colors: (this.chartColors as any[]).map((color) => {
             return {
               radialGradient: {
                 cx: 0.5,

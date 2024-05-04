@@ -106,7 +106,7 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
       const dateInterval = fillOutMissingDatesForDate(startingDate, endingDate);
 
       this.dateRangeControl.patchValue({
-        currentMaxDateIndex: dataMaximalDate.portfolioGrowth.length - 1,
+        currentMaxDateIndex: dateInterval.length - 1,
         currentMinDateIndex: 0,
         dates: dateInterval,
       });
@@ -125,12 +125,15 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
           return this.initChart([]);
         }
 
-        const { currentMinDateIndex, currentMaxDateIndex } = dateRange;
+        const { currentMinDateIndex, currentMaxDateIndex, dates } = dateRange;
+
+        const startDate = dates[currentMinDateIndex];
+        const endDate = dates[currentMaxDateIndex];
 
         // filter the data based on the date range
         const filteredData = data.map((d) => ({
           userBase: d.userBase,
-          portfolioGrowth: d.portfolioGrowth.slice(currentMinDateIndex, currentMaxDateIndex + 1),
+          portfolioGrowth: d.portfolioGrowth.filter((d) => d.date >= startDate && d.date <= endDate),
         }));
 
         return this.initChart(filteredData);
