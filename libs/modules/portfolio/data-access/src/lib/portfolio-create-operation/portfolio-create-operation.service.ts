@@ -15,7 +15,12 @@ import {
   UserAccountEnum,
   UserData,
 } from '@mm/api-types';
-import { dateFormatDate, dateGetDetailsInformationFromDate, roundNDigits } from '@mm/shared/general-util';
+import {
+  dateFormatDate,
+  dateGetDetailsInformationFromDate,
+  getCurrentDateDetailsFormat,
+  roundNDigits,
+} from '@mm/shared/general-util';
 import { firstValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -93,6 +98,7 @@ export class PortfolioCreateOperationService {
       transactionFees,
       returnChange,
       returnValue,
+      dateExecuted: getCurrentDateDetailsFormat(),
     };
 
     return result;

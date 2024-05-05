@@ -46,7 +46,7 @@ export class UserApiService {
       filter((d): d is UserPortfolioTransaction => !!d),
       map((d) => ({
         // sort ASC
-        transactions: d.transactions.slice().sort((a, b) => (a.date > b.date ? 1 : -1)),
+        transactions: d.transactions,
       })),
     );
   }

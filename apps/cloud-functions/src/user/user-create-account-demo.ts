@@ -15,7 +15,13 @@ import {
   UserDataDemoData,
   UserPortfolioTransaction,
 } from '@mm/api-types';
-import { dateFormatDate, getCurrentDateDefaultFormat, getRandomNumber, roundNDigits } from '@mm/shared/general-util';
+import {
+  dateFormatDate,
+  getCurrentDateDefaultFormat,
+  getCurrentDateDetailsFormat,
+  getRandomNumber,
+  roundNDigits,
+} from '@mm/shared/general-util';
 import { format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https';
@@ -200,6 +206,7 @@ const createTransaction = (
     returnValue,
     priceFromDate: historicalPrice.date,
     sector: input.sector,
+    dateExecuted: getCurrentDateDetailsFormat(),
   };
 
   return result;

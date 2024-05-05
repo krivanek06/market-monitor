@@ -133,12 +133,19 @@ export type PortfolioTransaction = SymbolStoreBase & {
   userId: string;
   units: number;
   unitPrice: number;
-  date: string;
   returnValue: number;
   returnChange: number;
   transactionType: PortfolioTransactionType;
   transactionFees: number;
 
+  /**
+   * date to which to associate this transaction (if weekend then last trading date)
+   */
+  date: string;
+  /**
+   * date when transaction was executed (if weekend , stays weekend), used for sorting - [yyyy-MM-dd HH:mm:ss]
+   */
+  dateExecuted: string;
   /**
    * differs from date, that date is when used created transaction, but it can be
    * during weekend and market is closed during weekend, so this will be last open market date

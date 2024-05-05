@@ -24,6 +24,7 @@ export const mockPortfolioTransaction = (input?: Partial<PortfolioTransaction>):
     unitPrice: 100,
     userId: USER_TEST_1_ID,
     sector: 'Technology',
+    dateExecuted: '2020-01-01',
     ...input,
   };
 
