@@ -5,6 +5,8 @@ import {
   CalendarDividend,
   CalendarStockEarning,
   CalendarStockIPO,
+  DataDateValueArray,
+  FinancialEconomicTypes,
   HistoricalPrice,
   IsStockMarketOpenExtend,
   MarketTopPerformanceOverviewResponse,
@@ -14,6 +16,7 @@ import {
   SymbolHistoricalPeriods,
   SymbolQuote,
   SymbolSummary,
+  TreasureDataBySections,
 } from '@mm/api-types';
 import { chunk } from '@mm/shared/general-util';
 import { isBefore } from 'date-fns';
@@ -24,6 +27,10 @@ import { ApiCacheService } from '../utils';
   providedIn: 'root',
 })
 export class MarketApiService {
+  private readonly cloudflareBasicAPI = 'https://get-basic-data.krivanek1234.workers.dev';
+  private readonly cloudflareHistoricalPriceAPI = 'https://get-historical-prices.krivanek1234.workers.dev';
+  private readonly cloudflareSymbolSummaryAPI = 'https://get-symbol-summary.krivanek1234.workers.dev';
+
   private apiCache = inject(ApiCacheService);
   getIsMarketOpenSignal = toSignal(this.getIsMarketOpen());
 
@@ -35,7 +42,7 @@ export class MarketApiService {
     return this.apiCache
       .getData<
         SymbolSummary[]
-      >(`https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}&onlyQuote=true`, ApiCacheService.validity3Min)
+      >(`${this.cloudflareSymbolSummaryAPI}/?symbol=${symbols.join(',')}&onlyQuote=true`, ApiCacheService.validity3Min)
       .pipe(
         map((d) => d.map((s) => s.quote)),
         catchError(() => []),
@@ -55,7 +62,7 @@ export class MarketApiService {
     return this.apiCache
       .getData<
         SymbolSummary[]
-      >(`https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`, ApiCacheService.validity3Min)
+      >(`${this.cloudflareSymbolSummaryAPI}/?symbol=${symbols.join(',')}`, ApiCacheService.validity3Min)
       .pipe(catchError(() => []));
   }
 
@@ -65,7 +72,7 @@ export class MarketApiService {
 
   getHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {
     return this.apiCache.getData<HistoricalPrice[]>(
-      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&period=${period}&type=period`,
+      `${this.cloudflareHistoricalPriceAPI}?symbol=${symbol}&period=${period}&type=period`,
       ApiCacheService.validity2Min,
     );
   }
@@ -73,7 +80,7 @@ export class MarketApiService {
   getHistoricalPricesOnDate(symbol: string, date: string): Observable<HistoricalPrice | null> {
     return this.apiCache
       .getData<HistoricalPrice | null>(
-        `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&date=${date}&type=specificDate`,
+        `${this.cloudflareHistoricalPriceAPI}?symbol=${symbol}&date=${date}&type=specificDate`,
         ApiCacheService.validity2Min,
       )
       .pipe(map((d) => d));
@@ -84,7 +91,7 @@ export class MarketApiService {
       return of([]);
     }
     return this.apiCache.getData<HistoricalPrice[]>(
-      `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&dateStart=${dateStart}&dateEnd=${endDate}&type=dateRange`,
+      `${this.cloudflareHistoricalPriceAPI}?symbol=${symbol}&dateStart=${dateStart}&dateEnd=${endDate}&type=dateRange`,
       ApiCacheService.validity2Min,
     );
   }
@@ -92,7 +99,7 @@ export class MarketApiService {
   getMarketTopPerformance(): Observable<MarketTopPerformanceOverviewResponse> {
     return this.apiCache
       .getData<MarketTopPerformanceSymbols>(
-        `https://get-basic-data.krivanek1234.workers.dev/?type=top-symbols`,
+        `${this.cloudflareBasicAPI}/?type=top-symbols`,
         ApiCacheService.validity10Min,
       )
       .pipe(
@@ -124,7 +131,7 @@ export class MarketApiService {
     return this.apiCache
       .getData<
         News[]
-      >(`https://get-news.krivanek1234.workers.dev/?news_types=${newsType}&symbol=${symbol}`, ApiCacheService.validity30Min)
+      >(`${this.cloudflareBasicAPI}/?type=news&news_types=${newsType}&symbol=${symbol}`, ApiCacheService.validity30Min)
       .pipe(catchError(() => of([])));
   }
 
@@ -132,43 +139,68 @@ export class MarketApiService {
     return this.apiCache
       .getData<
         SymbolQuote[]
-      >(`https://get-basic-data.krivanek1234.workers.dev/?type=quote-by-type&quoteType=${quoteType}`, ApiCacheService.validity10Min)
+      >(`${this.cloudflareBasicAPI}/?type=quote-by-type&quoteType=${quoteType}`, ApiCacheService.validity10Min)
       .pipe(map((data) => data.filter((quote) => !!quote.price && !!quote.name)));
   }
 
   getIsMarketOpen(): Observable<IsStockMarketOpenExtend> {
     return this.apiCache.getData<IsStockMarketOpenExtend>(
-      `https://get-basic-data.krivanek1234.workers.dev/?type=market-is-open`,
+      `${this.cloudflareBasicAPI}/?type=market-is-open`,
       ApiCacheService.validity5Min,
     );
   }
 
   getMarketCalendarDividends(month: string | number, year: string | number): Observable<CalendarDividend[]> {
     return this.apiCache.getData<CalendarDividend[]>(
-      `https://get-basic-data.krivanek1234.workers.dev/?type=calendar&calendarType=dividends&month=${month}&year=${year}`,
+      `${this.cloudflareBasicAPI}/?type=calendar&calendarType=dividends&month=${month}&year=${year}`,
       ApiCacheService.validity30Min,
     );
   }
 
   getMarketCalendarEarnings(month: string | number, year: string | number): Observable<CalendarStockEarning[]> {
     return this.apiCache.getData<CalendarStockEarning[]>(
-      `https://get-basic-data.krivanek1234.workers.dev/?type=calendar&calendarType=earnings&month=${month}&year=${year}`,
+      `${this.cloudflareBasicAPI}/?type=calendar&calendarType=earnings&month=${month}&year=${year}`,
       ApiCacheService.validity30Min,
     );
   }
 
   getMarketCalendarIPOs(month: string | number, year: string | number): Observable<CalendarStockIPO[]> {
     return this.apiCache.getData<CalendarStockIPO[]>(
-      `https://get-basic-data.krivanek1234.workers.dev/?type=calendar&calendarType=ipo&month=${month}&year=${year}`,
+      `${this.cloudflareBasicAPI}/?type=calendar&calendarType=ipo&month=${month}&year=${year}`,
       ApiCacheService.validity30Min,
     );
   }
 
   getInstitutionalPortfolioDates(): Observable<string[]> {
     return this.apiCache.getData<string[]>(
-      `https://get-basic-data.krivanek1234.workers.dev/?type=institutional-portfolio-dates`,
+      `${this.cloudflareBasicAPI}/?type=institutional-portfolio-dates`,
       ApiCacheService.validity30Min,
     );
+  }
+
+  getMarketTreasuryData(): Observable<TreasureDataBySections> {
+    return this.apiCache.getData<TreasureDataBySections>(
+      `${this.cloudflareBasicAPI}/?type=market-treasury`,
+      ApiCacheService.validity30Min,
+    );
+  }
+
+  getMarketEconomicDataAll(): Observable<{ [K in FinancialEconomicTypes]: DataDateValueArray }> {
+    return this.apiCache.getData<{ [K in FinancialEconomicTypes]: DataDateValueArray }>(
+      `${this.cloudflareBasicAPI}/?type=market-economics`,
+      ApiCacheService.validity30Min,
+    );
+  }
+
+  getMarketEconomicData(economicType: FinancialEconomicTypes): Observable<DataDateValueArray> {
+    return this.apiCache
+      .getData<{
+        [K in FinancialEconomicTypes]: DataDateValueArray;
+      }>(
+        `${this.cloudflareBasicAPI}/?type=market-economics&economicType=${economicType}`,
+        ApiCacheService.validity30Min,
+      )
+      .pipe(map((d) => d[economicType]));
   }
 
   private getSymbolSummariesLong(symbols: string[]): Observable<SymbolSummary[]> {

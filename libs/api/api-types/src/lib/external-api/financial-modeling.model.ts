@@ -935,3 +935,30 @@ export type IsStockMarketOpenExtend = IsStockMarketOpen & {
    */
   allHolidays: string[];
 };
+
+export const financialEconomicTypesConst = [
+  'GDP',
+  'realGDP',
+  'nominalPotentialGDP',
+  'realGDPPerCapita',
+  'federalFunds',
+  'CPI',
+  'inflationRate',
+  'inflation',
+  'retailSales',
+  'consumerSentiment',
+  'durableGoods',
+  'unemploymentRate',
+  'totalNonfarmPayroll',
+  'initialClaims',
+  'industrialProductionTotalIndex',
+  'newPrivatelyOwnedHousingUnitsStartedTotalUnits',
+  'totalVehicleSales',
+  'retailMoneyFunds',
+  'smoothedUSRecessionProbabilities',
+  '3MonthOr90DayRatesAndYieldsCertificatesOfDeposit',
+  'commercialBankInterestRateOnCreditCardPlansAllAccounts',
+  '30YearFixedRateMortgageAverage',
+  '15YearFixedRateMortgageAverage',
+] as const;
+export type FinancialEconomicTypes = (typeof financialEconomicTypesConst)[number];

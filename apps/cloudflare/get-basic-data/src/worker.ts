@@ -1,8 +1,11 @@
 import { getCalendarData } from './get-calendar-data';
+import { getEconomicData } from './get-economic-data';
 import { getInstitutionalPortfolioDatesWrapper } from './get-institutional-portfolio';
 import { getIsMarketOpenWrapper } from './get-is-market-open';
+import { getNewsData } from './get-news-data';
 import { getQuotesByTypeWrapper } from './get-quotes-by-type';
 import { getTopSymbols } from './get-top-symbols';
+import { getTreasuryData } from './get-trasury-data';
 import { Env } from './model';
 
 type GetBasicDataType =
@@ -10,10 +13,10 @@ type GetBasicDataType =
 	| 'quote-by-type'
 	| 'institutional-portfolio-dates'
 	| 'calendar'
-	| 'market-overview'
-	| 'market-overview-save'
-	| 'market-overview-data'
-	| 'market-is-open';
+	| 'news'
+	| 'market-is-open'
+	| 'market-treasury'
+	| 'market-economics';
 
 /**
  * One endpoint for executing and caching basic HTTP requests
@@ -46,6 +49,18 @@ export default {
 
 		if (type === 'market-is-open') {
 			return getIsMarketOpenWrapper(env);
+		}
+
+		if (type === 'market-treasury') {
+			return getTreasuryData(env);
+		}
+
+		if (type === 'market-economics') {
+			return getEconomicData(env, searchParams);
+		}
+
+		if (type === 'news') {
+			return getNewsData(env, searchParams);
 		}
 
 		return new Response('Unsupported request', { status: 400 });

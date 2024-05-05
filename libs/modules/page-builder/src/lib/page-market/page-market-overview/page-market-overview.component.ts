@@ -13,9 +13,11 @@ import {
   MultiplyDtaPipe,
   PercentageIncreaseDirective,
   RangeDirective,
+  SectionTitleComponent,
   SortReversePipe,
 } from '@mm/shared/ui';
 import { map } from 'rxjs';
+import { economicData, treasuryData } from './page-market-overview-model';
 import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skeleton.component';
 
 @Component({
@@ -35,6 +37,8 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     FlattenArrayPipe,
     SortReversePipe,
     MultiplyDtaPipe,
+    SectionTitleComponent,
+    RangeDirective,
   ],
   template: `
     <div class="flex gap-3 p-2 mb-6 xl:justify-around md:grid-cols-2 max-md:overflow-x-scroll md:grid xl:flex">
@@ -87,70 +91,47 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
       />
     </div>
 
-    <!-- <div class="w-full mx-auto max-sm:pr-3 lg:w-11/12">
-        <h2>SP500 stats</h2>
-        <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.sp500.peRatio | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="PE Ratio"
-            [heightPx]="300"
-            [applyFancyColor]="2"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'PE Ratio' }]"
-            [categories]="data | flattenArray: 0"
-          />
+    <!-- treasury rates -->
+    <div class="w-full mx-auto max-sm:pr-3 lg:w-11/12">
+      <app-section-title title="Treasury Rates" class="mb-3" />
+      <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+        @if (marketTreasuryData(); as marketTreasuryData) {
+          @for (item of treasuryData; track item.key) {
+            <app-generic-chart
+              [isCategoryDates]="true"
+              [chartTitle]="item.chartTitle"
+              [heightPx]="300"
+              [applyFancyColor]="2"
+              [series]="[{ type: 'line', data: marketTreasuryData[item.key], name: item.chartTitle }]"
+              [categories]="marketTreasuryData.date"
+            />
+          }
+        } @else {
+          <div *ngRange="6" class="g-skeleton h-[300px]"></div>
+        }
+      </div>
+    </div>
 
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.sp500.shillerPeRatio | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Shiller PE Ratio"
-            [heightPx]="300"
-            [applyFancyColor]="2"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Shiller PE Ratio' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.sp500.priceToBook | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Price To Book"
-            [heightPx]="300"
-            [applyFancyColor]="2"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Price To Book' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.sp500.priceToSales | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Price To Sales"
-            [heightPx]="300"
-            [applyFancyColor]="2"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Price To Sales' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.sp500.earningsYield | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Earning Yield"
-            [heightPx]="300"
-            [applyFancyColor]="2"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Earning Yield' }]"
-            [categories]="data | flattenArray: 0"
-          />
-
-          <app-generic-chart
-            *ngIf="marketOverviewSignalValues.sp500.dividendYield | sortReverse as data"
-            [isCategoryDates]="true"
-            chartTitle="Dividend Yield"
-            [heightPx]="300"
-            [applyFancyColor]="2"
-            [series]="[{ type: 'line', data: data | flattenArray: 1, name: 'Dividend Yield' }]"
-            [categories]="data | flattenArray: 0"
-          />
-        </div>
-       -->
+    <!-- other economic data -->
+    <div class="w-full mx-auto max-sm:pr-3 lg:w-11/12">
+      <app-section-title title="Economic Data" class="mb-3" />
+      <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+        @if (marketEconomicData(); as marketEconomicData) {
+          @for (item of economicData; track item.key) {
+            <app-generic-chart
+              [isCategoryDates]="true"
+              [chartTitle]="item.chartTitle"
+              [heightPx]="300"
+              [applyFancyColor]="item.fancyColor"
+              [series]="[{ type: 'line', data: marketEconomicData[item.key].value, name: item.chartTitle }]"
+              [categories]="marketEconomicData[item.key].date"
+            />
+          }
+        } @else {
+          <div *ngRange="12" class="g-skeleton h-[300px]"></div>
+        }
+      </div>
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -164,7 +145,12 @@ export class PageMarketOverviewComponent {
 
   selectedIndexSymbolQuoteControl = new FormControl<SymbolQuote | null>(null);
 
+  marketTreasuryData = toSignal(this.marketApiService.getMarketTreasuryData());
+  marketEconomicData = toSignal(this.marketApiService.getMarketEconomicDataAll());
+
   SYMBOL_SP500 = SYMBOL_SP500;
+  economicData = economicData;
+  treasuryData = treasuryData;
 
   marketTopIndexQuotesSignal = toSignal(
     this.marketApiService.getSymbolSummaries(INDEXES_DEFAULT_SYMBOLS).pipe(
