@@ -370,10 +370,11 @@ export class PortfolioCalculationService {
         const firstDate = symbolHistoricalPrice[0].date;
 
         // internal helper
+        const isFirstTransactionBeforeFirstDate = isBefore(symbolTransactions[0].date, firstDate);
         const aggregator = {
-          units: isBefore(symbolTransactions[0].date, firstDate) ? symbolTransactions[0].units : 0,
-          index: isBefore(symbolTransactions[0].date, firstDate) ? 1 : 0,
-          breakEvenPrice: isBefore(symbolTransactions[0].date, firstDate) ? symbolTransactions[0].unitPrice : 0,
+          units: isFirstTransactionBeforeFirstDate ? symbolTransactions[0].units : 0,
+          index: isFirstTransactionBeforeFirstDate ? 1 : 0,
+          breakEvenPrice: isFirstTransactionBeforeFirstDate ? symbolTransactions[0].unitPrice : 0,
           accumulatedReturn: 0,
         };
 
@@ -412,19 +413,23 @@ export class PortfolioCalculationService {
             date: historicalPrice.date,
             units: aggregator.units,
             marketTotalValue: marketTotalValue,
-            profit: roundNDigits(marketTotalValue - breakEvenValue),
+            profit: roundNDigits(marketTotalValue - breakEvenValue + aggregator.accumulatedReturn),
             accumulatedReturn: aggregator.accumulatedReturn,
           } satisfies PortfolioGrowthAssetsDataItem;
         });
 
         return {
           symbol,
-          // keep data with 0 market value - contains accumulatedReturn and profit
-          data: growthAssetItems,
+          // remove data with 0 market value, however always keep last one (it has a different profit since it was SOLD)
+          data: growthAssetItems.filter(
+            (d, i) => !(d.marketTotalValue === 0 && growthAssetItems[i - 1]?.marketTotalValue === 0),
+          ),
         } satisfies PortfolioGrowthAssets;
       })
       // remove undefined or symbols which were bought and sold on the same day
       .filter((d): d is PortfolioGrowthAssets => !!d && d.data.length > 0);
+
+    // console.log('PortfolioGrowthService: getPortfolioGrowthAssets', result);
 
     return result;
   }

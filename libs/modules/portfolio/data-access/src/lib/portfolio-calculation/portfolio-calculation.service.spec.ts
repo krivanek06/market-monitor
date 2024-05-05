@@ -44,23 +44,23 @@ describe('PortfolioCalculationService', () => {
       expect(service.getPortfolioStateHoldings).toBeDefined();
     });
 
-    it('should call getSymbolSummaries', () => {
+    it('should call getSymbolQuotes', () => {
       // mock methods
       const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
-        getSymbolSummaries: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL])),
+        getSymbolQuotes: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL])),
       });
 
       service.getPortfolioStateHoldings(0, []).subscribe();
 
-      expect(marketApiService.getSymbolSummaries).toHaveBeenCalled();
+      expect(marketApiService.getSymbolQuotes).toHaveBeenCalled();
     });
 
     it('should return empty holding for no transactions', (done) => {
       // mock methods
       const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
-        getSymbolSummaries: jest.fn().mockReturnValue(of([])),
+        getSymbolQuotes: jest.fn().mockReturnValue(of([])),
       });
 
       const expectedResult = {
@@ -95,7 +95,7 @@ describe('PortfolioCalculationService', () => {
       // mock methods
       const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
-        getSymbolSummaries: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL])),
+        getSymbolQuotes: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL.quote])),
       });
 
       const t1 = mockPortfolioTransaction({
@@ -134,7 +134,8 @@ describe('PortfolioCalculationService', () => {
             invested: t1.units * t1.unitPrice,
             breakEvenPrice: t1.unitPrice,
             weight: 1,
-            symbolSummary: mockSymbolSummaryAAPL,
+            sector: 'Technology',
+            symbolQuote: mockSymbolSummaryAAPL.quote,
           },
         ],
       } satisfies PortfolioStateHoldings;
@@ -152,7 +153,7 @@ describe('PortfolioCalculationService', () => {
       // mock methods
       const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
-        getSymbolSummaries: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL])),
+        getSymbolQuotes: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL.quote])),
       });
 
       const startingCash = 8000;
@@ -201,7 +202,8 @@ describe('PortfolioCalculationService', () => {
             invested: testTransaction_BUY_AAPL_1_Change.units * testTransaction_BUY_AAPL_1_Change.unitPrice,
             breakEvenPrice: testTransaction_BUY_AAPL_1_Change.unitPrice,
             weight: 1,
-            symbolSummary: mockSymbolSummaryAAPL,
+            sector: 'Technology',
+            symbolQuote: mockSymbolSummaryAAPL.quote,
           },
         ],
       } satisfies PortfolioStateHoldings;
@@ -219,7 +221,7 @@ describe('PortfolioCalculationService', () => {
       // mock methods
       const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
-        getSymbolSummaries: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL, mockSymbolSummaryMSFT])),
+        getSymbolQuotes: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL.quote, mockSymbolSummaryMSFT.quote])),
       });
 
       const startingCash = 10_000;
@@ -239,6 +241,8 @@ describe('PortfolioCalculationService', () => {
         transactionType: 'SELL',
         unitPrice: 130,
         transactionFees: 0.5,
+        returnValue: 300, // random number
+        returnChange: 9.22, // random number
       });
 
       const t_BUY_MSFT_1_Change = mockPortfolioTransaction({
@@ -250,10 +254,10 @@ describe('PortfolioCalculationService', () => {
         transactionFees: 0.1,
       });
 
-      const aaplInvested =
-        t_BUY_AAPL_1_Change.units * t_BUY_AAPL_1_Change.unitPrice - t_Sell_AAPL.units * t_Sell_AAPL.unitPrice;
+      const totalReturn = t_Sell_AAPL.returnValue;
 
       const aaplUnits = t_BUY_AAPL_1_Change.units - t_Sell_AAPL.units;
+      const aaplInvested = aaplUnits * t_BUY_AAPL_1_Change.unitPrice;
 
       const msftInvested = t_BUY_MSFT_1_Change.units * t_BUY_MSFT_1_Change.unitPrice;
       const totalInvested = aaplInvested + msftInvested;
@@ -264,8 +268,11 @@ describe('PortfolioCalculationService', () => {
       const totalTransactionFees =
         t_BUY_AAPL_1_Change.transactionFees + t_Sell_AAPL.transactionFees + t_BUY_MSFT_1_Change.transactionFees;
 
-      const currentBalance = startingCash - totalTransactionFees - aaplInvested - msftInvested + totalHoldings;
-      const cashOnHandTransactions = startingCash - aaplInvested - msftInvested - totalTransactionFees;
+      const profit = t_BUY_AAPL_1_Change.returnValue + t_Sell_AAPL.returnValue + t_BUY_MSFT_1_Change.returnValue;
+
+      const cashOnHandTransactions = startingCash - totalInvested - totalTransactionFees + profit;
+      const currentBalance = cashOnHandTransactions + totalHoldings;
+
       const previousBalanceChange =
         aaplUnits * mockSymbolSummaryAAPL.quote.change + t_BUY_MSFT_1_Change.units * mockSymbolSummaryMSFT.quote.change;
 
@@ -277,14 +284,14 @@ describe('PortfolioCalculationService', () => {
         firstTransactionDate: TestTransactionDates['2023-09-04'],
         startingCash: startingCash,
         holdingsBalance: totalHoldings,
-        invested: aaplInvested + msftInvested,
+        invested: totalInvested,
         lastTransactionDate: TestTransactionDates['2023-09-07'],
         numberOfExecutedBuyTransactions: 2,
         numberOfExecutedSellTransactions: 1,
         previousBalanceChange: previousBalanceChange,
         previousBalanceChangePercentage: calculateGrowth(currentBalance, currentBalance - previousBalanceChange),
-        totalGainsPercentage: calculateGrowth(currentBalance, cashOnHandTransactions + aaplInvested + msftInvested),
-        totalGainsValue: totalHoldings - aaplInvested - msftInvested - totalTransactionFees,
+        totalGainsPercentage: calculateGrowth(currentBalance, startingCash),
+        totalGainsValue: totalHoldings - aaplInvested - msftInvested - totalTransactionFees + totalReturn,
         transactionFees: totalTransactionFees,
         holdings: [
           {
@@ -294,7 +301,8 @@ describe('PortfolioCalculationService', () => {
             invested: msftInvested,
             breakEvenPrice: roundNDigits(msftInvested / t_BUY_MSFT_1_Change.units),
             weight: roundNDigits(msftInvested / totalInvested, 6),
-            symbolSummary: mockSymbolSummaryMSFT,
+            sector: 'Technology',
+            symbolQuote: mockSymbolSummaryMSFT.quote,
           },
           {
             symbolType: 'STOCK',
@@ -303,7 +311,8 @@ describe('PortfolioCalculationService', () => {
             invested: aaplInvested,
             breakEvenPrice: roundNDigits(aaplInvested / aaplUnits),
             weight: roundNDigits(aaplInvested / totalInvested, 6),
-            symbolSummary: mockSymbolSummaryAAPL,
+            sector: 'Technology',
+            symbolQuote: mockSymbolSummaryAAPL.quote,
           },
         ],
       } satisfies PortfolioStateHoldings;
@@ -312,10 +321,17 @@ describe('PortfolioCalculationService', () => {
         .getPortfolioStateHoldings(startingCash, [t_BUY_AAPL_1_Change, t_Sell_AAPL, t_BUY_MSFT_1_Change])
         .subscribe({
           next: (res) => {
-            expect(res).toEqual(expectedResult);
-            done();
+            try {
+              expect(res).toEqual(expectedResult);
+              done();
+            } catch (e) {
+              console.error('e', e);
+            }
           },
-          error: done.fail,
+          error: (e) => {
+            console.error('e', e);
+            done.fail;
+          },
         });
     });
   });
@@ -370,7 +386,7 @@ describe('PortfolioCalculationService', () => {
           done();
         })
         .catch((e) => {
-          console.log('e', e);
+          console.error('e', e);
           done.fail;
         });
     });
@@ -411,7 +427,7 @@ describe('PortfolioCalculationService', () => {
           done();
         })
         .catch((e) => {
-          console.log('e', e);
+          console.error('e', e);
           done.fail;
         });
     });
@@ -629,7 +645,7 @@ describe('PortfolioCalculationService', () => {
           done();
         })
         .catch((e) => {
-          console.log('e', e);
+          console.error('e', e);
           done.fail;
         });
     });
@@ -660,18 +676,30 @@ describe('PortfolioCalculationService', () => {
       // mock methods
       const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
-        getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data)),
+        getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data.slice(1))),
       });
 
       // service
       service
         .getPortfolioGrowthAssets([trans1, trans2, trans3])
         .then((data) => {
-          expect(data).toEqual([]);
+          expect(data[0]).toEqual({
+            symbol: 'AAPL',
+            data: [
+              {
+                date: TestTransactionDates['2023-09-05'],
+                breakEvenValue: 0,
+                marketTotalValue: 0,
+                units: 0,
+                accumulatedReturn: 0,
+                profit: 0,
+              },
+            ],
+          });
           done();
         })
         .catch((e) => {
-          console.log('e', e);
+          console.error('e', e);
           done.fail;
         });
     });
@@ -702,42 +730,53 @@ describe('PortfolioCalculationService', () => {
       // mock methods
       const marketApiService = ngMocks.findInstance(MarketApiService);
       ngMocks.stub(marketApiService, {
-        getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data)),
+        getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data.slice(1))),
       });
 
-      const expectedResult = [
-        {
-          data: [
-            {
-              date: TestTransactionDates['2023-09-11'],
-              breakEvenValue: trans3.unitPrice * trans3.units,
-              marketTotalValue: trans3.units * testHistoricalPriceSymbol_AAPL.data[5].close,
-              units: trans3.units,
-              accumulatedReturn: 0,
-              profit: trans3.units * testHistoricalPriceSymbol_AAPL.data[5].close - trans3.units * trans3.unitPrice,
-            },
-            {
-              date: TestTransactionDates['2023-09-12'],
-              breakEvenValue: trans3.unitPrice * trans3.units,
-              marketTotalValue: trans3.units * testHistoricalPriceSymbol_AAPL.data[6].close,
-              units: trans3.units,
-              accumulatedReturn: 0,
-              profit: trans3.units * testHistoricalPriceSymbol_AAPL.data[6].close - trans3.units * trans3.unitPrice,
-            },
-          ],
-          symbol: 'AAPL',
-        },
-      ] satisfies PortfolioGrowthAssets[];
+      const expectedResult = {
+        data: [
+          {
+            date: TestTransactionDates['2023-09-05'],
+            breakEvenValue: 0,
+            marketTotalValue: 0,
+            units: 0,
+            accumulatedReturn: 0,
+            profit: 0,
+          },
+          {
+            date: TestTransactionDates['2023-09-11'],
+            breakEvenValue: trans3.unitPrice * trans3.units,
+            marketTotalValue: trans3.units * testHistoricalPriceSymbol_AAPL.data[5].close,
+            units: trans3.units,
+            accumulatedReturn: 0,
+            profit: trans3.units * testHistoricalPriceSymbol_AAPL.data[5].close - trans3.units * trans3.unitPrice,
+          },
+          {
+            date: TestTransactionDates['2023-09-12'],
+            breakEvenValue: trans3.unitPrice * trans3.units,
+            marketTotalValue: trans3.units * testHistoricalPriceSymbol_AAPL.data[6].close,
+            units: trans3.units,
+            accumulatedReturn: 0,
+            profit: trans3.units * testHistoricalPriceSymbol_AAPL.data[6].close - trans3.units * trans3.unitPrice,
+          },
+        ],
+        symbol: 'AAPL',
+      } satisfies PortfolioGrowthAssets;
 
       // service
       service
         .getPortfolioGrowthAssets([trans1, trans2, trans3])
         .then((data) => {
-          expect(data).toEqual(expectedResult);
+          console.log('aaa', data);
+          expect(data.length).toEqual(1);
+          expect(data[0].symbol).toEqual(expectedResult.symbol);
+          expect(data[0].data.length).toEqual(expectedResult.data.length);
+          expect(data[0].data).toEqual(expectedResult.data);
+          expect(data).toEqual([expectedResult]);
           done();
         })
         .catch((e) => {
-          console.log('e', e);
+          console.error('e', e);
           done.fail;
         });
     });

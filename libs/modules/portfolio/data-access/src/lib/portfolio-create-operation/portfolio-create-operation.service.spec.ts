@@ -115,6 +115,8 @@ describe('PortfolioCreateOperationService', () => {
               symbol: 'AAPL',
               symbolType: 'STOCK',
               units: 10,
+              sector: 'Technology',
+              breakEvenPrice: 10,
             },
           ],
         },
@@ -143,6 +145,7 @@ describe('PortfolioCreateOperationService', () => {
         transactionType: 'BUY',
         units: 10,
         customTotalValue: 300,
+        sector: 'Technology',
       } satisfies PortfolioTransactionCreate;
 
       const user = {
@@ -177,6 +180,7 @@ describe('PortfolioCreateOperationService', () => {
         transactionType: 'BUY',
         units: 10,
         customTotalValue: 300,
+        sector: 'Technology',
       } satisfies PortfolioTransactionCreate;
 
       const user = {
@@ -226,6 +230,8 @@ describe('PortfolioCreateOperationService', () => {
               symbol: 'AAPL',
               symbolType: 'STOCK',
               units: 10,
+              sector: 'Technology',
+              breakEvenPrice: 20,
             },
           ],
         },
@@ -346,6 +352,8 @@ describe('PortfolioCreateOperationService', () => {
                 symbol: 'AAPL',
                 symbolType: 'STOCK',
                 units: 9,
+                sector: 'Technology',
+                breakEvenPrice: 10,
               },
             ],
           },

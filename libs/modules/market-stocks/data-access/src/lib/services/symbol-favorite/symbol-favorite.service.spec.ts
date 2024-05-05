@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MockProvider } from 'ng-mocks';
 
-import { StocksApiService } from '@mm/api-client';
+import { MarketApiService } from '@mm/api-client';
 import { of } from 'rxjs';
 import { SymbolFavoriteService } from './symbol-favorite.service';
 
@@ -11,9 +11,9 @@ describe('SymbolFavouriteService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        MockProvider(StocksApiService, {
-          getStockSummary: jest.fn().mockReturnValue(of({})),
-          getStockSummaries: jest.fn().mockReturnValue(of([])),
+        MockProvider(MarketApiService, {
+          getSymbolSummary: jest.fn().mockReturnValue(of({})),
+          getSymbolSummaries: jest.fn().mockReturnValue(of([])),
         }),
       ],
     });

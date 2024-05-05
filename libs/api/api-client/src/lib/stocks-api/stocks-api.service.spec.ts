@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 
-import { HttpClient } from '@angular/common/http';
 import { MockProvider } from 'ng-mocks';
+import { MarketApiService } from '../market-api/market-api.service';
+import { ApiCacheService } from '../utils';
 import { StocksApiService } from './stocks-api.service';
 
 describe('StocksApiService', () => {
@@ -9,7 +10,7 @@ describe('StocksApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [MockProvider(HttpClient)],
+      providers: [MockProvider(ApiCacheService), MockProvider(MarketApiService)],
     });
     service = TestBed.inject(StocksApiService);
   });

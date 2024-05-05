@@ -74,7 +74,7 @@ export const getPortfolioStateHoldingsUtil = (
   const balanceChange = portfolioStateHolding.reduce((acc, curr) => acc + curr.symbolQuote.change * curr.units, 0);
   const balanceChangePrct = holdingsBalance === 0 ? 0 : calculateGrowth(balance, balance - balanceChange);
 
-  const result: PortfolioState = {
+  const result: PortfolioStateHoldings = {
     numberOfExecutedBuyTransactions,
     numberOfExecutedSellTransactions,
     transactionFees: roundNDigits(transactionFees),
@@ -91,12 +91,10 @@ export const getPortfolioStateHoldingsUtil = (
     // calculate data for previous portfolio
     previousBalanceChange: balanceChange,
     previousBalanceChangePercentage: balanceChangePrct,
-  };
-
-  return {
-    ...result,
     holdings: portfolioStateHoldingSortedByBalance,
   };
+
+  return result;
 };
 
 /**
