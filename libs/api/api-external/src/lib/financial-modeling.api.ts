@@ -5,7 +5,6 @@ import {
   CalendarDividend,
   CalendarStockEarning,
   CalendarStockIPO,
-  ChartDataType,
   CompanyInsideTrade,
   CompanyKeyMetrics,
   CompanyKeyMetricsTTM,
@@ -13,18 +12,20 @@ import {
   CompanyProfile,
   CompanyRatio,
   CompanyStockDividend,
+  DataDateValue,
+  DataSelection,
   DataTimePeriod,
   ESGDataQuarterly,
   ESGDataRatingYearly,
   Earnings,
   EnterpriseValue,
+  FinancialEconomicTypes,
   HistoricalLoadingPeriods,
   HistoricalLoadingPeriodsDates,
   HistoricalPrice,
   HistoricalPriceAPI,
   IsStockMarketOpen,
   IsStockMarketOpenExtend,
-  MarketOverviewSubKey,
   MostPerformingStocks,
   News,
   NewsTypes,
@@ -41,8 +42,7 @@ import {
   TreasuryRates,
   UpgradesDowngrades,
 } from '@mm/api-types';
-import axios from 'axios';
-import { format, subDays } from 'date-fns';
+import { format, startOfYear, subDays, subYears } from 'date-fns';
 import { FINANCIAL_MODELING_KEY, FINANCIAL_MODELING_URL } from './environments';
 import { filterOutSymbols, getDateRangeByMonthAndYear } from './helpers';
 
@@ -680,22 +680,6 @@ export const getStockScreening = async (values: StockScreenerValues): Promise<St
   return filteredResponse;
 };
 
-export const getEconomicData = async (endpointKey?: MarketOverviewSubKey<'general'>): Promise<ChartDataType> => {
-  if (!endpointKey) {
-    return [];
-  }
-
-  try {
-    const url = `${FINANCIAL_MODELING_URL}/v4/economic?name=${endpointKey}&apikey=${FINANCIAL_MODELING_KEY}`;
-    const response = await axios.get<{ date: string; value: number }[]>(url);
-    const formattedData = response.data.map((d) => [d.date, d.value] as [string, number]) satisfies ChartDataType;
-    return formattedData;
-  } catch (e) {
-    console.log('error in getEconomicData', e);
-    return [];
-  }
-};
-
 export const getIsMarketOpen = async (
   exchange: 'NYSE' | 'NASDAQ' = 'NASDAQ',
 ): Promise<IsStockMarketOpenExtend | null> => {
@@ -745,6 +729,32 @@ export const getTreasuryRates = async (limitDays = 7): Promise<TreasuryRates[]> 
   try {
     const response = await fetch(url);
     const data = (await response.json()) as TreasuryRates[];
+    return data;
+  } catch (e) {
+    console.log('error in getTreasuryRates', e);
+    return [];
+  }
+};
+
+/**
+ *
+ * @param type - type of economic data to query
+ * @param section - if partial then query only the last 2 years or if all then query all data
+ * @returns
+ */
+export const getEconomicDataByType = async (
+  type: FinancialEconomicTypes,
+  section: DataSelection = 'partial',
+): Promise<DataDateValue[]> => {
+  const fromDate = section === 'partial' ? format(startOfYear(subYears(new Date(), 5)), 'yyyy-MM-dd') : '1990-01-01';
+
+  const url = `https://financialmodelingprep.com/api/v4/economic?from=${fromDate}&name=${type}&apikey=${FINANCIAL_MODELING_KEY}`;
+
+  console.log('url', url);
+
+  try {
+    const response = await fetch(url);
+    const data = (await response.json()) as { date: string; value: number }[];
     return data;
   } catch (e) {
     console.log('error in getTreasuryRates', e);

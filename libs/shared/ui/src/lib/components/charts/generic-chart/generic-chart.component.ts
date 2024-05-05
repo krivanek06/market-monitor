@@ -188,8 +188,8 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
         text: this.chartTitle(),
         align: this.chartTitlePosition(),
         style: {
-          color: ColorScheme.GRAY_MEDIUM_VAR,
-          fontSize: '13px',
+          color: ColorScheme.GRAY_DARK_VAR,
+          fontSize: '14px',
           fontWeight: 'normal',
         },
         y: 10,

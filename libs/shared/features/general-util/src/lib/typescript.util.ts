@@ -13,8 +13,6 @@ type SpreadTwo<L, R> = Id<
 
 export type Spread<A extends readonly [...any]> = A extends [infer L, ...infer R] ? SpreadTwo<L, Spread<R>> : unknown;
 
-type Foo = Spread<[{ a: string }, { a?: number }]>;
-
 export function merge<A extends object[]>(...a: [...A]) {
   return Object.assign({}, ...a) as Spread<A>;
 }

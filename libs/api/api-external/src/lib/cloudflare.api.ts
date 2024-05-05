@@ -1,7 +1,6 @@
 import {
   HistoricalPrice,
   HistoricalPriceSymbol,
-  MarketOverview,
   SymbolHistoricalPeriods,
   SymbolQuote,
   SymbolSummary,
@@ -106,23 +105,6 @@ export const getHistoricalPricesCloudflare = async (
     console.log(error);
     return [];
   }
-};
-
-export const postMarketOverview = async (overview: MarketOverview): Promise<string> => {
-  const url = `https://get-basic-data.krivanek1234.workers.dev?type=market-overview-save`;
-  const response = await axios.post(
-    url,
-    {
-      ...overview,
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  );
-  const data = (await response.data) as string;
-  return data;
 };
 
 export const getStockHistoricalPricesOnDate = (symbol: string, date: string): Promise<HistoricalPrice | null> => {
