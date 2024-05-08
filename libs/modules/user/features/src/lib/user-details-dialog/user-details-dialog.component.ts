@@ -140,7 +140,9 @@ export type UserDetailsDialogComponentData = {
           }
         </div>
       } @else {
-        <mat-spinner></mat-spinner>
+        <div class="grid place-content-center h-[400px]">
+          <mat-spinner></mat-spinner>
+        </div>
       }
     </mat-dialog-content>
   `,

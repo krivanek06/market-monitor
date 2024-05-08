@@ -238,7 +238,7 @@ import {
 
     <!-- skeleton -->
     <div *ngIf="showLoadingSkeletonSignal()">
-      <div *ngRange="symbolSkeletonLoaders()" class="h-12 mb-1 g-skeleton"></div>
+      <div *ngRange="symbolSkeletonLoaders() || 10" class="h-12 mb-1 g-skeleton"></div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

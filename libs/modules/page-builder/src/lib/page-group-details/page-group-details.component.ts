@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GroupInteractionButtonsComponent } from '@mm/group/features';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { TabSelectControlComponent } from '@mm/shared/ui';
@@ -22,29 +23,33 @@ import { PageGroupsBaseComponent } from './page-groups-base.component';
     GroupDetailsOverviewComponent,
     ReactiveFormsModule,
     MatDialogModule,
+    MatProgressSpinnerModule,
   ],
   template: `
-    <section *ngIf="groupDetailsSignal() as groupDetailsSignal" class="relative">
-      <div class="flex justify-between md:mb-8 xl:mb-12">
-        <!-- group action buttons -->
-        <div class="lg:-mb-2 flex-1">
-          <app-group-interaction-buttons
-            class="hidden lg:block"
-            [groupDetails]="groupDetailsSignal"
-          ></app-group-interaction-buttons>
-          <button
-            mat-stroked-button
-            class="max-md:absolute max-md:right-0 max-md:top-6 block lg:hidden"
-            (click)="onGroupOptions()"
-          >
-            <mat-icon>settings</mat-icon>
-            Options
-          </button>
+    <section class="relative">
+      @if (groupDetailsSignal(); as groupDetailsSignal) {
+        <div class="flex justify-between md:mb-8 xl:mb-12">
+          <!-- group action buttons -->
+          <div class="lg:-mb-2 flex-1">
+            <app-group-interaction-buttons class="hidden lg:block" [groupDetails]="groupDetailsSignal" />
+            <button
+              mat-stroked-button
+              class="max-md:absolute max-md:right-0 max-md:top-6 block lg:hidden"
+              (click)="onGroupOptions()"
+            >
+              <mat-icon>settings</mat-icon>
+              Options
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- group overview -->
-      <app-group-details-overview></app-group-details-overview>
+        <!-- group overview -->
+        <app-group-details-overview />
+      } @else {
+        <div class="grid place-content-center h-[600px]">
+          <mat-spinner diameter="100" />
+        </div>
+      }
     </section>
   `,
   styles: `

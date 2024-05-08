@@ -105,13 +105,8 @@ import { catchError, of, startWith, switchMap } from 'rxjs';
     </div>
 
     <!-- historical chart & summary -->
-    @if (symbolSummarySignal()?.id !== selectedSymbolControl.value) {
-      <div class="flex flex-col gap-4 mb-6 xl:flex-row h-[480px]">
-        <div class="lg:basis-3/5 g-skeleton"></div>
-        <div class="lg:basis-2/5 g-skeleton"></div>
-      </div>
-    } @else {
-      <div *ngIf="symbolSummarySignal() as symbolSummary" class="flex flex-col gap-4 mb-6 xl:flex-row">
+    @if (symbolSummarySignal(); as symbolSummary) {
+      <div class="flex flex-col gap-4 mb-6 xl:flex-row">
         <app-asset-price-chart-interactive
           class="lg:basis-3/5"
           [imageName]="symbolSummary.id"
@@ -121,6 +116,11 @@ import { catchError, of, startWith, switchMap } from 'rxjs';
         <div class="lg:basis-2/5">
           <app-stock-summary-list [symbolSummary]="symbolSummary" />
         </div>
+      </div>
+    } @else {
+      <div class="flex flex-col gap-4 mb-6 xl:flex-row h-[480px]">
+        <div class="lg:basis-3/5 g-skeleton"></div>
+        <div class="lg:basis-2/5 g-skeleton"></div>
       </div>
     }
 
@@ -191,6 +191,7 @@ export class PageTradingComponent {
             this.dialogServiceUtil.showNotificationBar('Error fetching symbol summary', 'error');
             return of(null);
           }),
+          startWith(null),
         ),
       ),
     ),

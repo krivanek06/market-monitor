@@ -39,7 +39,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
               [isLoading]="loadingSignal()"
               [enterpriseValue]="enterpriseValueToQuarterSignal"
               [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal"
-            ></app-stock-ownership-institutional-list>
+            />
           }
         }
       </app-general-card>
@@ -53,7 +53,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
               [isLoading]="loadingSignal()"
               [enterpriseValue]="enterpriseValueToQuarterSignal"
               [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal"
-            ></app-stock-ownership-institutional-list>
+            />
           }
         }
       </app-general-card>
@@ -67,7 +67,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
               [isLoading]="loadingSignal()"
               [enterpriseValue]="enterpriseValueToQuarterSignal"
               [ownershipInstitutional]="ownershipInstitutionalToQuarterSignal"
-            ></app-stock-ownership-institutional-list>
+            />
           }
         }
       </app-general-card>
@@ -78,7 +78,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
           [formControl]="quarterFormControl"
           inputCaption="Available Quarters"
           [inputSource]="institutionalPortfolioInputSourceSignal()"
-        ></app-dropdown-control>
+        />
 
         <!-- additional data -->
         <div class="grid gap-2 p-4 mt-2">
@@ -101,10 +101,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
       </div>
 
       <ng-template #showData>
-        <app-stock-ownership-holders-table
-          *ngIf="ownershipHoldersToDateSignal() as data"
-          [data]="data"
-        ></app-stock-ownership-holders-table>
+        <app-stock-ownership-holders-table *ngIf="ownershipHoldersToDateSignal() as data" [data]="data" />
       </ng-template>
     </app-general-card>
   `,

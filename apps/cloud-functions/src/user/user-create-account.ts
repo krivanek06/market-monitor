@@ -86,7 +86,7 @@ const createNewUser = (id: string, personal: UserPersonalInfo, additional: Creat
       groupRequested: [],
     },
     settings: {
-      isDarkMode: false,
+      isDarkMode: true,
     },
     personal: personal,
     portfolioState: {

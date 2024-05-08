@@ -62,7 +62,7 @@ import {
           <app-portfolio-rank-table
             (clickedItem)="onGroupClick($event)"
             [data]="displayPortfolioDataSignal()"
-            [template]="userTemplate"
+            [template]="groupTemplate"
           />
 
           <!-- show more button -->
@@ -123,11 +123,13 @@ import {
     </div>
 
     <!-- template for user data in table -->
-    <ng-template #userTemplate let-data="data" let-position="position">
+    <ng-template #groupTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
         <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="w-10 h-10 rounded-lg" />
         <div class="flex items-center gap-2">
-          <div appPositionColoring [position]="position">{{ data.item.name }}</div>
+          <div appPositionColoring [position]="position" class="truncate text-ellipsis w-[200px]">
+            {{ data.item.name }}
+          </div>
           <!-- display position change if any -->
           @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
             @if (rankChange !== 0) {
