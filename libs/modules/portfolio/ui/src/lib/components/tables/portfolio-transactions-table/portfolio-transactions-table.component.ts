@@ -50,6 +50,7 @@ import {
         class="min-w-[400px]"
         inputCaption="Symbol Filer"
         displayImageType="symbol"
+        inputType="SELECT_AUTOCOMPLETE"
         [showClearButton]="true"
         [inputSource]="tableSymbolFilter()"
         [formControl]="tableSymbolFilterControl"
@@ -261,6 +262,11 @@ export class PortfolioTransactionsTableComponent {
         )
         // remove same symbols
         .filter((item, index, self) => self.findIndex((t) => t.caption === item.caption) === index)
+        // add number of occurrences
+        .map((item) => {
+          const count = this.data()?.filter((d) => d.symbol === item.caption).length;
+          return { ...item, caption: `${item.caption} [${count}]` };
+        })
         // sort alphabetically
         .sort((a, b) => a.caption.localeCompare(b.caption)) ?? [],
   );

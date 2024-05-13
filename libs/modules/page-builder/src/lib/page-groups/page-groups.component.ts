@@ -12,7 +12,7 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { GroupCreateDialogComponent, GroupDisplayCardComponent, GroupSearchControlComponent } from '@mm/group/features';
 import { GroupDisplayItemComponent } from '@mm/group/ui';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
+import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationShowItemLeft } from '@mm/shared/ui';
 import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
 
 @Component({
@@ -124,26 +124,20 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
         <!-- my groups -->
         <div *ngIf="groups.groupOwner.length > 0">
           <app-section-title title="My Groups" />
-          <div class="flex flex-col gap-3">
-            <app-group-display-card
-              *ngFor="let group of groups.groupOwner"
-              (itemClicked)="onGroupClick(group)"
-              [groupData]="group"
-              [clickable]="true"
-            ></app-group-display-card>
+          <div @showItemLeft class="flex flex-col gap-3">
+            @for (group of groups.groupOwner; track group.id) {
+              <app-group-display-card (itemClicked)="onGroupClick(group)" [groupData]="group" [clickable]="true" />
+            }
           </div>
         </div>
 
         <!-- member of -->
         <div *ngIf="groups.groupMember.length > 0">
           <app-section-title title="Member of" />
-          <div class="flex flex-col gap-3">
-            <app-group-display-card
-              *ngFor="let group of groups.groupMember"
-              (itemClicked)="onGroupClick(group)"
-              [groupData]="group"
-              [clickable]="true"
-            ></app-group-display-card>
+          <div @showItemLeft class="flex flex-col gap-3">
+            @for (group of groups.groupMember; track group.id) {
+              <app-group-display-card (itemClicked)="onGroupClick(group)" [groupData]="group" [clickable]="true" />
+            }
           </div>
         </div>
       } @else {
@@ -154,6 +148,7 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
       }
     </div>
   `,
+  animations: [animationShowItemLeft],
   styles: `
     :host {
       display: block;

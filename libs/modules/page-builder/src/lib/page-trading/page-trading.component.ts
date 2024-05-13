@@ -191,6 +191,7 @@ export class PageTradingComponent {
             this.dialogServiceUtil.showNotificationBar('Error fetching symbol summary', 'error');
             return of(null);
           }),
+          // to show loader every time the symbol changes
           startWith(null),
         ),
       ),
