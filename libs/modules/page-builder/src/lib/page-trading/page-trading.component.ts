@@ -7,7 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@mm/api-client';
-import { PortfolioTransaction, PortfolioTransactionType, SymbolQuote } from '@mm/api-types';
+import { PortfolioTransaction, PortfolioTransactionType, SymbolQuote, USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
 import { StockSearchBasicCustomizedComponent } from '@mm/market-stocks/features';
@@ -87,6 +87,7 @@ import { catchError, of, startWith, switchMap } from 'rxjs';
       <button
         (click)="onOperationClick('BUY')"
         class="w-full xl:w-[280px]"
+        [disabled]="!allowBuyOperationSignal()"
         mat-stroked-button
         color="accent"
         type="button"
@@ -198,6 +199,26 @@ export class PageTradingComponent {
     ),
   );
 
+  /**
+   * true if user has this symbol in his portfolio or he has not reached the limit of symbols
+   */
+  allowBuyOperationSignal = computed(() => {
+    const summary = this.symbolSummarySignal();
+    const portfolioState = this.portfolioUserFacadeService.getPortfolioState();
+
+    if (!summary || !portfolioState) {
+      return false;
+    }
+
+    // check if user has this symbol in his portfolio
+    const userContainSymbol = portfolioState.holdings.map((d) => d.symbol).includes(summary.id);
+
+    // check if user has reached the limit of symbols
+    const userHoldingsLimit = portfolioState.holdings.length < USER_HOLDINGS_SYMBOL_LIMIT;
+
+    return userContainSymbol || userHoldingsLimit;
+  });
+
   topPerformanceSignal = toSignal(
     this.marketApiService
       .getMarketTopPerformance()
@@ -243,7 +264,8 @@ export class PageTradingComponent {
     this.dialog.open(PortfolioTradeDialogComponent, {
       data: <PortfolioTradeDialogComponentData>{
         transactionType: transactionType,
-        summary: summary,
+        quote: summary.quote,
+        sector: summary.profile?.sector ?? '',
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });
