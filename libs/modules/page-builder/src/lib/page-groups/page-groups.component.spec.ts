@@ -1,20 +1,490 @@
-import { ComponentFixture } from '@angular/core/testing';
-import { MockBuilder, MockRender } from 'ng-mocks';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { Router } from '@angular/router';
+import { GroupApiService } from '@mm/api-client';
+import {
+  GROUP_TEST_ID_1,
+  GROUP_TEST_ID_2,
+  GROUP_TEST_ID_3,
+  GroupData,
+  UserAccountEnum,
+  UserGroupData,
+  mockCreateGroupData,
+  mockCreateUser,
+} from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { GroupCreateDialogComponent, GroupDisplayCardComponent, GroupSearchControlComponent } from '@mm/group/features';
+import { GroupDisplayItemComponent } from '@mm/group/ui';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { waitSeconds } from '@mm/shared/general-util';
+import { ClickableDirective } from '@mm/shared/ui';
+import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PageGroupsComponent } from './page-groups.component';
 
 describe('PageGroupsComponent', () => {
-  let component: PageGroupsComponent;
-  let fixture: ComponentFixture<PageGroupsComponent>;
+  const createGroupS = '[data-testid="page-groups-create-group"]';
+  const receivedInvitationsS = '[data-testid="page-groups-received-invitation"]';
+  const sentInvitationsS = '[data-testid="page-groups-sent-invitation"]';
+  const myGroupsS = '[data-testid="page-groups-my-groups"]';
+  const memberOfGroupsS = '[data-testid="page-groups-member-of-groups"]';
 
-  beforeEach(async () => {
-    MockBuilder(PageGroupsComponent);
+  const groupDataOwnerMock = mockCreateUser({
+    id: 'GROUP_OWNER_123',
+    userAccountType: UserAccountEnum.DEMO_TRADING,
+    groups: {
+      groupOwner: [GROUP_TEST_ID_1],
+      groupInvitations: [GROUP_TEST_ID_2],
+      groupMember: [GROUP_TEST_ID_1],
+      groupRequested: [GROUP_TEST_ID_3],
+      groupWatched: [],
+    },
+  });
 
-    fixture = MockRender(PageGroupsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  const groupDataT1Mock = mockCreateGroupData({
+    ownerUser: groupDataOwnerMock,
+    id: GROUP_TEST_ID_1,
+    ownerUserId: groupDataOwnerMock.id,
+  });
+
+  const groupDataT2Mock = mockCreateGroupData({
+    ownerUser: groupDataOwnerMock,
+    id: GROUP_TEST_ID_2,
+  });
+
+  const groupDataT3Mock = mockCreateGroupData({
+    ownerUser: groupDataOwnerMock,
+    id: GROUP_TEST_ID_3,
+  });
+
+  beforeEach(() => {
+    return MockBuilder(PageGroupsComponent)
+      .keep(NoopAnimationsModule)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .keep(MatButtonModule)
+      .keep(GroupDisplayItemComponent)
+      .keep(ClickableDirective)
+      .keep(GroupDisplayCardComponent)
+      .provide({
+        provide: AuthenticationUserStoreService,
+        useValue: {
+          state: {
+            getUserData: () => groupDataOwnerMock,
+            getUserDataNormal: () => groupDataOwnerMock,
+            isDemoAccount: () => false,
+            userGroupData: () => ({
+              groupMember: [groupDataT1Mock],
+              groupOwner: [groupDataT1Mock],
+              groupInvitations: [groupDataT3Mock],
+              groupRequested: [groupDataT2Mock] as GroupData[],
+              groupWatched: [] as GroupData[],
+            }),
+          } as AuthenticationUserStoreService['state'],
+        },
+      })
+      .provide({
+        provide: GroupApiService,
+        useValue: {
+          userAcceptsGroupInvitation: jest.fn(),
+          userDeclinesGroupInvitation: jest.fn(),
+          removeRequestToJoinGroup: jest.fn(),
+        },
+      })
+      .provide({
+        provide: DialogServiceUtil,
+        useValue: {
+          showActionButtonDialog: jest.fn(),
+          showNotificationBar: jest.fn(),
+          handleError: jest.fn(),
+        },
+      })
+      .provide({
+        provide: MatDialog,
+        useValue: {
+          open: jest.fn(),
+        },
+      })
+      .provide({
+        provide: Router,
+        useValue: {
+          navigate: jest.fn(),
+        },
+      });
+  });
+
+  afterEach(() => {
+    ngMocks.reset();
+    ngMocks.autoSpy('reset');
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = MockRender(PageGroupsComponent);
+    expect(fixture).toBeTruthy();
+  });
+
+  it('should have isCreateGroupDisabledSignal as false', () => {
+    const fixture = MockRender(PageGroupsComponent);
+    const component = fixture.point.componentInstance;
+
+    expect(component.isCreateGroupDisabledSignal()).toBe(false);
+  });
+
+  it('should have defined groupsSignal', () => {
+    const fixture = MockRender(PageGroupsComponent);
+    const component = fixture.point.componentInstance;
+
+    expect(component.groupsSignal).toBeDefined();
+    expect(component.groupsSignal()?.groupOwner[0]).toEqual(groupDataT1Mock);
+  });
+
+  it('should open create group dialog', () => {
+    const fixture = MockRender(PageGroupsComponent);
+    const component = fixture.point.componentInstance;
+    const dialog = ngMocks.findInstance(MatDialog);
+
+    fixture.detectChanges();
+
+    const onCreateGroupClickSpy = jest.spyOn(component, 'onCreateGroupClick');
+
+    // Click on create group button
+    ngMocks.click(createGroupS);
+
+    // check if the function is called
+    expect(onCreateGroupClickSpy).toHaveBeenCalled();
+    expect(dialog.open).toHaveBeenCalledWith(GroupCreateDialogComponent, expect.any(Object));
+  });
+
+  it('should not open create group dialog if user is owner of many groups', () => {
+    const dialog = ngMocks.findInstance(MatDialog);
+    const authService = ngMocks.findInstance(AuthenticationUserStoreService);
+
+    // Set user with many groups
+    ngMocks.stub(authService, {
+      state: {
+        userGroupData: () =>
+          ({
+            groupOwner: [
+              groupDataT1Mock,
+              groupDataT2Mock,
+              groupDataT3Mock,
+              groupDataT1Mock,
+              groupDataT2Mock,
+              groupDataT3Mock,
+            ],
+            groupInvitations: [],
+            groupMember: [],
+            groupRequested: [],
+            groupWatched: [],
+          }) as UserGroupData,
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+
+    fixture.detectChanges();
+
+    const component = fixture.point.componentInstance;
+    const createGroupEl = ngMocks.find<HTMLElement>(createGroupS);
+
+    const onCreateGroupClickSpy = jest.spyOn(component, 'onCreateGroupClick');
+
+    // Click on create group button
+    ngMocks.click(createGroupS);
+
+    // check if the function is called
+    expect(component.groupsSignal()?.groupOwner.length).toBe(6);
+    expect(component.isCreateGroupDisabledSignal()).toBe(true);
+    expect(createGroupEl.nativeElement.disabled).toBeTruthy();
+    expect(onCreateGroupClickSpy).not.toHaveBeenCalled();
+    expect(dialog.open).not.toHaveBeenCalled();
+  });
+
+  it('should not open create group dialog if user is demo account', () => {
+    const dialog = ngMocks.findInstance(MatDialog);
+    const authService = ngMocks.findInstance(AuthenticationUserStoreService);
+
+    // Set user as demo account
+    ngMocks.stub(authService, {
+      state: {
+        userGroupData: () =>
+          ({
+            groupOwner: [],
+            groupInvitations: [],
+            groupMember: [],
+            groupRequested: [],
+            groupWatched: [],
+          }) as UserGroupData,
+        isDemoAccount: () => true,
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+
+    fixture.detectChanges();
+
+    const component = fixture.point.componentInstance;
+
+    const onCreateGroupClickSpy = jest.spyOn(component, 'onCreateGroupClick');
+    const createGroupEl = ngMocks.find<HTMLElement>(createGroupS);
+
+    // Click on create group button
+    ngMocks.click(createGroupS);
+
+    // check if the function is called
+    expect(component.isCreateGroupDisabledSignal()).toBe(true);
+    expect(createGroupEl.nativeElement.disabled).toBeTruthy();
+    expect(onCreateGroupClickSpy).not.toHaveBeenCalled();
+    expect(dialog.open).not.toHaveBeenCalled();
+  });
+
+  it('should redirect to group page on group click', () => {
+    const fixture = MockRender(PageGroupsComponent);
+    fixture.detectChanges();
+
+    const router = ngMocks.findInstance(Router);
+    const component = fixture.point.componentInstance;
+    const searchControl = ngMocks.findInstance(GroupSearchControlComponent);
+
+    const onGroupSearchSpy = jest.spyOn(component, 'onGroupClick');
+
+    searchControl.selectedEmitter.emit(groupDataT1Mock);
+
+    // check if the function is called
+    expect(onGroupSearchSpy).toHaveBeenCalledWith(groupDataT1Mock);
+    expect(router.navigate).toHaveBeenCalledWith(['groups', groupDataT1Mock.id]);
+  });
+
+  it('should display received invitations and show confirmation dialog', () => {
+    const fixture = MockRender(PageGroupsComponent);
+    fixture.detectChanges();
+
+    const dialogService = ngMocks.findInstance(DialogServiceUtil);
+
+    const component = fixture.point.componentInstance;
+
+    // get all received invitations instances
+    const receivedInvitations = ngMocks.findInstances(receivedInvitationsS, GroupDisplayItemComponent);
+
+    const onAcceptInvitationSpy = jest.spyOn(component, 'onReceivedInvitationClick');
+
+    // check if the received invitations are displayed
+    expect(receivedInvitations.length).toBe(1);
+
+    // get the first received invitation and click on it
+    const fistInvitationEL = receivedInvitations[0];
+
+    // Click on accept invitation button
+    fistInvitationEL.clickableDirective.itemClicked.emit();
+
+    // check if the function is called
+    expect(onAcceptInvitationSpy).toHaveBeenCalledWith(groupDataT3Mock);
+    expect(dialogService.showActionButtonDialog).toHaveBeenCalled();
+  });
+
+  it('should accept group invitation by clicking on accept button', async () => {
+    const groupApiService = ngMocks.findInstance(GroupApiService);
+    const dialogService = ngMocks.findInstance(DialogServiceUtil);
+
+    // change dialog to return accept
+    ngMocks.stub(dialogService, {
+      showActionButtonDialog: jest.fn().mockResolvedValue('primary'),
+    });
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+    fixture.detectChanges();
+
+    // get all received invitations instances
+    const receivedInvitations = ngMocks.findInstances(receivedInvitationsS, GroupDisplayItemComponent);
+
+    // check if the received invitations are displayed
+    expect(receivedInvitations.length).toBe(1);
+
+    // Click on accept invitation button
+    receivedInvitations[0].clickableDirective.itemClicked.emit();
+
+    // wait for the dialog to close
+    await waitSeconds(0.5);
+
+    // check if the function is called
+    expect(groupApiService.userAcceptsGroupInvitation).toHaveBeenCalledWith(groupDataT3Mock.id);
+    expect(groupApiService.userDeclinesGroupInvitation).not.toHaveBeenCalled();
+    expect(dialogService.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
+  });
+
+  it('should accept group invitation by clicking on accept button', async () => {
+    const groupApiService = ngMocks.findInstance(GroupApiService);
+    const dialogService = ngMocks.findInstance(DialogServiceUtil);
+
+    // change dialog to return accept
+    ngMocks.stub(dialogService, {
+      showActionButtonDialog: jest.fn().mockResolvedValue('secondary'),
+    });
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+    fixture.detectChanges();
+
+    // get all received invitations instances
+    const receivedInvitations = ngMocks.findInstances(receivedInvitationsS, GroupDisplayItemComponent);
+
+    // check if the received invitations are displayed
+    expect(receivedInvitations.length).toBe(1);
+
+    // Click on accept invitation button
+    receivedInvitations[0].clickableDirective.itemClicked.emit();
+
+    // wait for the dialog to close
+    await waitSeconds(0.5);
+
+    // check if the function is called
+    expect(groupApiService.userAcceptsGroupInvitation).not.toHaveBeenCalled();
+    expect(groupApiService.userDeclinesGroupInvitation).toHaveBeenCalledWith({
+      userId: groupDataOwnerMock.id,
+      groupId: groupDataT3Mock.id,
+    });
+    expect(dialogService.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
+  });
+
+  it('should remove request to join group by clicking on decline button', async () => {
+    const groupApiService = ngMocks.findInstance(GroupApiService);
+    const dialogService = ngMocks.findInstance(DialogServiceUtil);
+
+    // change dialog to return accept
+    ngMocks.stub(dialogService, {
+      showActionButtonDialog: jest.fn().mockResolvedValue('primary'),
+    });
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+    fixture.detectChanges();
+
+    // get all received invitations instances
+    const sentInvitations = ngMocks.findInstances(sentInvitationsS, GroupDisplayItemComponent);
+
+    // check if the received invitations are displayed
+    expect(sentInvitations.length).toBe(1);
+
+    // Click on accept invitation button
+    sentInvitations[0].clickableDirective.itemClicked.emit();
+
+    // wait for the dialog to close
+    await waitSeconds(0.5);
+
+    // check if the function is called
+    expect(groupApiService.removeRequestToJoinGroup).toHaveBeenCalledWith({
+      groupId: groupDataT2Mock.id,
+      userId: groupDataOwnerMock.id,
+    });
+    expect(dialogService.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
+  });
+
+  it('should not remove request to join group by clicking on cancel button', async () => {
+    const groupApiService = ngMocks.findInstance(GroupApiService);
+    const dialogService = ngMocks.findInstance(DialogServiceUtil);
+
+    // change dialog to return accept
+    ngMocks.stub(dialogService, {
+      showActionButtonDialog: jest.fn().mockResolvedValue('secondary'),
+    });
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+    fixture.detectChanges();
+
+    // get all received invitations instances
+    const sentInvitations = ngMocks.findInstances(sentInvitationsS, GroupDisplayItemComponent);
+
+    // Click on accept invitation button
+    sentInvitations[0].clickableDirective.itemClicked.emit();
+
+    // wait for the dialog to close
+    await waitSeconds(0.5);
+
+    // check if the function is called
+    expect(groupApiService.removeRequestToJoinGroup).not.toHaveBeenCalled();
+  });
+
+  it('should not show send and received invitations if both are empty', () => {
+    const authService = ngMocks.findInstance(AuthenticationUserStoreService);
+
+    // Set user with many groups
+    ngMocks.stub(authService, {
+      state: {
+        userGroupData: () =>
+          ({
+            groupOwner: [],
+            groupInvitations: [],
+            groupMember: [],
+            groupRequested: [],
+            groupWatched: [],
+          }) as UserGroupData,
+        isDemoAccount: () => false,
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+    fixture.detectChanges();
+
+    const sentInvitations = ngMocks.findInstances(sentInvitationsS, GroupDisplayItemComponent);
+    const receivedInvitations = ngMocks.findInstances(receivedInvitationsS, GroupDisplayItemComponent);
+    const myGroups = ngMocks.findInstances(myGroupsS, GroupDisplayCardComponent);
+    const memberOfGroups = ngMocks.findInstances(memberOfGroupsS, GroupDisplayCardComponent);
+
+    expect(sentInvitations.length).toBe(0);
+    expect(receivedInvitations.length).toBe(0);
+    expect(myGroups.length).toBe(0);
+    expect(memberOfGroups.length).toBe(0);
+  });
+
+  it('should display groups that user created', () => {
+    const fixture = MockRender(PageGroupsComponent);
+    const router = ngMocks.findInstance(Router);
+
+    fixture.detectChanges();
+
+    // get all my groups
+    const myGroups = ngMocks.findInstances(myGroupsS, GroupDisplayCardComponent);
+
+    expect(myGroups.length).toBe(1);
+
+    // Click on accept invitation button
+    myGroups[0].clickableDirective.itemClicked.emit();
+
+    expect(router.navigate).toHaveBeenCalledWith(['groups', groupDataT1Mock.id]);
+  });
+
+  it('should display groups that user is member of', () => {
+    const fixture = MockRender(PageGroupsComponent);
+    const router = ngMocks.findInstance(Router);
+
+    fixture.detectChanges();
+
+    // get all my groups
+    const memberOfGroups = ngMocks.findInstances(memberOfGroupsS, GroupDisplayCardComponent);
+
+    expect(memberOfGroups.length).toBe(1);
+
+    // Click on accept invitation button
+    memberOfGroups[0].clickableDirective.itemClicked.emit();
+
+    expect(router.navigate).toHaveBeenCalledWith(['groups', groupDataT1Mock.id]);
   });
 });

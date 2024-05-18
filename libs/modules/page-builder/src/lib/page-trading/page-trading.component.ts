@@ -25,7 +25,7 @@ import {
   SectionTitleComponent,
   SortByKeyPipe,
 } from '@mm/shared/ui';
-import { catchError, of, startWith, switchMap } from 'rxjs';
+import { catchError, map, of, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-page-trading',
@@ -199,6 +199,8 @@ export class PageTradingComponent {
     ),
   );
 
+  topPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance().pipe(map((d) => d.stockTopActive)));
+
   /**
    * true if user has this symbol in his portfolio or he has not reached the limit of symbols
    */
@@ -206,6 +208,7 @@ export class PageTradingComponent {
     const summary = this.symbolSummarySignal();
     const portfolioState = this.portfolioUserFacadeService.getPortfolioState();
 
+    // disable buy operation until data is loaded
     if (!summary || !portfolioState) {
       return false;
     }
@@ -218,16 +221,6 @@ export class PageTradingComponent {
 
     return userContainSymbol || userHoldingsLimit;
   });
-
-  topPerformanceSignal = toSignal(
-    this.marketApiService
-      .getMarketTopPerformance()
-      .pipe(
-        switchMap((topPerformance) =>
-          this.marketApiService.getSymbolQuotes(topPerformance.stockTopActive.map((d) => d.symbol)),
-        ),
-      ),
-  );
 
   holdingsInputSource = computed(() => {
     return (
