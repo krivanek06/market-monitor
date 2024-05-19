@@ -4,20 +4,20 @@ import { Component, ElementRef, computed, inject, input, output, signal, viewChi
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
-import { SymbolSummary } from '@mm/api-types';
+import { SymbolQuote } from '@mm/api-types';
 import { AUTHENTICATION_ACCOUNT_TOKEN } from '@mm/authentication/data-access';
 import { SymbolFavoriteService, SymbolSearchService } from '@mm/market-stocks/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { ElementFocusDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
-import { StockSearchBasicComponent } from '../stock-search-basic/stock-search-basic.component';
+import { SymbolSearchBasicComponent } from '../symbol-search-basic/symbol-search-basic.component';
 import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summary-dialog.component';
 
 @Component({
-  selector: 'app-stock-search-basic-customized',
+  selector: 'app-symbol-search-basic-customized',
   standalone: true,
   imports: [
     CommonModule,
-    StockSearchBasicComponent,
+    SymbolSearchBasicComponent,
     OverlayModule,
     QuoteItemComponent,
     MatButtonModule,
@@ -26,7 +26,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
     RangeDirective,
   ],
   template: `
-    <app-stock-search-basic
+    <app-symbol-search-basic
       appElementFocus
       (insideClick)="checkToDisplayOverlay(true, null)"
       (inputHasValue)="checkToDisplayOverlay(null, $event)"
@@ -34,7 +34,6 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
       cdkOverlayOrigin
       #trigger
       #origin="cdkOverlayOrigin"
-      [showHint]="showHint()"
     />
 
     <ng-template
@@ -72,18 +71,18 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
         }
 
         <!-- display summaries as buttons -->
-        @for (summary of displayedStocksSignal(); track summary.id) {
-          <button mat-button (click)="onSummaryClick(summary)" class="w-full h-12 max-sm:mb-2" type="button">
-            <app-quote-item [symbolQuote]="summary.quote" />
+        @for (quote of displayedStocksSignal(); track quote.symbol) {
+          <button mat-button (click)="onSummaryClick(quote)" class="w-full h-12 max-sm:mb-2" type="button">
+            <app-quote-item [symbolQuote]="quote" />
           </button>
         }
 
         <!-- display default symbols -->
         @if (getDefaultSymbols().length > 0) {
           @if (!showFavoriteStocks() && displayedStocksSignal().length < 10) {
-            @for (summary of getDefaultSymbols(); track summary.id) {
-              <button mat-button (click)="onSummaryClick(summary)" class="w-full h-12 max-sm:mb-2" type="button">
-                <app-quote-item [symbolQuote]="summary.quote" />
+            @for (quote of getDefaultSymbols(); track quote.symbol) {
+              <button mat-button (click)="onSummaryClick(quote)" class="w-full h-12 max-sm:mb-2" type="button">
+                <app-quote-item [symbolQuote]="quote" />
               </button>
             }
           }
@@ -99,7 +98,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
     }
   `,
 })
-export class StockSearchBasicCustomizedComponent {
+export class SymbolSearchBasicCustomizedComponent {
   private symbolFavoriteService = inject(SymbolFavoriteService);
   private symbolSearchService = inject(SymbolSearchService);
   private authenticationUserService = inject(AUTHENTICATION_ACCOUNT_TOKEN, {
@@ -107,8 +106,8 @@ export class StockSearchBasicCustomizedComponent {
   });
   private dialog = inject(MatDialog);
 
-  clickedSummary = output<SymbolSummary>();
-  showHint = input(true);
+  clickedQuote = output<SymbolQuote>();
+
   /**
    * open modal on summary click
    */
@@ -138,16 +137,12 @@ export class StockSearchBasicCustomizedComponent {
   );
   getDefaultSymbols = this.symbolSearchService.getDefaultSymbols;
 
-  onSymbolSelect(summary: SymbolSummary) {
-    // save
-    this.symbolSearchService.addSearchedSymbol({
-      symbolType: 'STOCK',
-      symbol: summary.id,
-      sector: summary?.profile?.sector ?? 'Unknown',
-    });
-
+  onSymbolSelect(quote: SymbolQuote) {
     // open modal
-    this.onSummaryClick(summary);
+    this.onSummaryClick(quote);
+
+    // save
+    this.symbolSearchService.addSearchedSymbol(quote);
   }
 
   checkToDisplayOverlay(isInputFocused: boolean | null, inputHasValue: boolean | null): void {
@@ -161,20 +156,20 @@ export class StockSearchBasicCustomizedComponent {
     this.overlayWidth.set(overlayWidth);
   }
 
-  onSummaryClick(summary: SymbolSummary) {
+  onSummaryClick(quote: SymbolQuote) {
     // weird bug: if we don't set isInputFocused to false, the overlay will not close
     this.overlayIsOpen.update((d) => ({ ...d, isInputFocused: false }));
 
     if (this.openModalOnClick()) {
       this.dialog.open(StockSummaryDialogComponent, {
         data: {
-          symbol: summary.id,
+          symbol: quote.symbol,
         },
         panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
       });
     }
 
-    this.clickedSummary.emit(summary);
+    this.clickedQuote.emit(quote);
   }
 
   onShowFavoriteChange() {

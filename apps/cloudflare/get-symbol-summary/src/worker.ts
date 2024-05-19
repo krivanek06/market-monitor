@@ -96,8 +96,11 @@ export default {
 		// order data by id asc
 		const orderedSummaries = [...validStoredData, ...summaries].sort((a, b) => (a.id < b.id ? 1 : -1));
 
+		// check if to return only quote or all data
+		const result = isOnlyQuote ? orderedSummaries.map((d) => d.quote) : orderedSummaries;
+
 		// return data
-		return new Response(JSON.stringify(orderedSummaries), RESPONSE_HEADER);
+		return new Response(JSON.stringify(result), RESPONSE_HEADER);
 	},
 };
 

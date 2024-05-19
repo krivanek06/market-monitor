@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { MarketApiService } from '@mm/api-client';
-import { SymbolStoreBase, SymbolSummary } from '@mm/api-types';
+import { SymbolQuote } from '@mm/api-types';
 import { StorageLocalStoreService } from '@mm/shared/general-features';
 
 /**
@@ -10,54 +10,45 @@ import { StorageLocalStoreService } from '@mm/shared/general-features';
 @Injectable({
   providedIn: 'root',
 })
-export class SymbolFavoriteService extends StorageLocalStoreService<SymbolStoreBase[]> {
+export class SymbolFavoriteService extends StorageLocalStoreService<string[]> {
   private marketApiService = inject(MarketApiService);
-  private favoriteSymbols = signal<SymbolSummary[]>([]);
+  private favoriteSymbols = signal<SymbolQuote[]>([]);
 
   constructor() {
-    super('SYMBOL_FAVORITE', []);
+    super('SYMBOL_FAVORITE', [], 1);
     this.initService();
   }
 
-  getFavoriteSymbols = computed(() => this.favoriteSymbols().sort((a, b) => a.id.localeCompare(b.id)));
+  getFavoriteSymbols = computed(() => this.favoriteSymbols().sort((a, b) => a.symbol.localeCompare(b.symbol)));
 
   isSymbolInFavorite(symbol: string): boolean {
     return this.favoriteSymbols()
-      .map((values) => values.id)
+      .map((values) => values.symbol)
       .includes(symbol);
   }
 
-  addFavoriteSymbol(searchSymbol: SymbolStoreBase): void {
+  addFavoriteSymbol(searchSymbol: SymbolQuote): void {
     const savedData = this.getData();
-    const symbols = savedData.map((d) => d.symbol);
 
-    if (symbols.includes(searchSymbol.symbol)) {
+    if (savedData.includes(searchSymbol.symbol)) {
       return;
     }
 
     // load data from api
-    this.marketApiService.getSymbolSummary(searchSymbol.symbol).subscribe((stockSummary) => {
-      // save data into array, limit to 12
-      if (stockSummary) {
-        this.persistData([searchSymbol, ...savedData], [stockSummary, ...this.favoriteSymbols()]);
-      }
-    });
+    this.persistData([searchSymbol, ...this.favoriteSymbols()]);
   }
 
-  removeFavoriteSymbol(searchSymbol: SymbolStoreBase): void {
-    const savedData = this.getData();
-
+  removeFavoriteSymbol(searchSymbol: SymbolQuote): void {
     // remove from favoriteSymbols$
-    const newSavedData = savedData.filter((s) => s.symbol !== searchSymbol.symbol);
-    const newSummaries = this.favoriteSymbols().filter((s) => s.id !== searchSymbol.symbol);
+    const newQuotes = this.favoriteSymbols().filter((s) => s.symbol !== searchSymbol.symbol);
 
     // remove from storage
-    this.persistData(newSavedData, newSummaries);
+    this.persistData(newQuotes);
   }
 
-  private persistData(symbolFavorite: SymbolStoreBase[], symbolSummaries: SymbolSummary[]): void {
-    const symbolFavoriteSlice = symbolFavorite.slice(0, 12);
-    const symbolSummariesSlice = symbolSummaries.slice(0, 12);
+  private persistData(symbolQuotes: SymbolQuote[]): void {
+    const symbolFavoriteSlice = symbolQuotes.slice(0, 12).map((d) => d.symbol);
+    const symbolSummariesSlice = symbolQuotes.slice(0, 12);
 
     // save into storage
     this.saveData(symbolFavoriteSlice);
@@ -71,10 +62,9 @@ export class SymbolFavoriteService extends StorageLocalStoreService<SymbolStoreB
    */
   private initService(): void {
     const data = this.getData();
-    const symbols = data.map((d) => d.symbol);
 
     // load favorite stocks from api and last searched stocks from api
-    this.marketApiService.getSymbolSummaries(symbols).subscribe((favoriteStocks) => {
+    this.marketApiService.getSymbolQuotes(data).subscribe((favoriteStocks) => {
       this.favoriteSymbols.set(favoriteStocks);
     });
   }

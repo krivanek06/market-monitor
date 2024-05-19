@@ -46,11 +46,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
         </div>
 
         <!-- action buttons -->
-        <app-summary-action-buttons
-          [symbolId]="stockSummary.id"
-          [symbolSector]="stockSummary.profile?.sector ?? 'Unknown'"
-          [showRedirectButton]="isSymbolTypeStock()"
-        />
+        <app-summary-action-buttons [symbolSummary]="stockSummary" [showRedirectButton]="isSymbolTypeStock()" />
       </div>
 
       <mat-dialog-content>

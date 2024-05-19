@@ -15,7 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
-import { StockSearchBasicCustomizedComponent } from '@mm/market-stocks/features';
+import { SymbolSearchBasicCustomizedComponent } from '@mm/market-stocks/features';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { GenericDialogComponent, GenericDialogComponentData, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { HelpDialogComponent } from '@mm/shared/help-dialog';
@@ -34,7 +34,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
     UserSettingsDialogComponent,
     MatDialogModule,
     HelpDialogComponent,
-    StockSearchBasicCustomizedComponent,
+    SymbolSearchBasicCustomizedComponent,
     GenericDialogComponent,
   ],
   template: `
@@ -149,8 +149,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
           </div>
 
           <!-- search -->
-          <app-stock-search-basic-customized
-            [showHint]="false"
+          <app-symbol-search-basic-customized
             displayValue="symbol"
             class="hidden sm:block w-[520px] scale-[0.8] -mr-10 -mb-5"
           />

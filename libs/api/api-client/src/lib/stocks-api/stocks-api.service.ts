@@ -7,15 +7,11 @@ import {
   StockDetailsAPI,
   StockEarning,
   StockMetricsHistoricalBasic,
-  StockScreenerResults,
-  StockScreenerValues,
   StockSummary,
   SymbolOwnershipHolders,
   SymbolOwnershipInstitutional,
-  SymbolQuote,
-  SymbolSummary,
 } from '@mm/api-types';
-import { Observable, catchError, filter, forkJoin, map, mergeMap, of, reduce, switchMap, tap } from 'rxjs';
+import { Observable, filter, map, switchMap, tap } from 'rxjs';
 import { MarketApiService } from '../market-api/market-api.service';
 import { ApiCacheService } from '../utils';
 
@@ -25,17 +21,6 @@ import { ApiCacheService } from '../utils';
 export class StocksApiService {
   private apiCache = inject(ApiCacheService);
   private marketApiService = inject(MarketApiService);
-
-  searchStockSummariesByPrefix(ticker: string): Observable<SymbolSummary[]> {
-    if (!ticker) {
-      return of([]);
-    }
-    return this.apiCache
-      .getData<
-        SymbolSummary[]
-      >(`https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${ticker}&isSearch=true`, ApiCacheService.validity10Min)
-      .pipe(map((summaries) => summaries.filter((d) => d.quote.marketCap !== 0)));
-  }
 
   getStockDetails(symbol: string): Observable<StockDetails> {
     return this.marketApiService.getSymbolSummary(symbol).pipe(
@@ -66,43 +51,6 @@ export class StocksApiService {
           ),
       ),
     );
-  }
-
-  getStockScreening(screeningValue: StockScreenerValues): Observable<SymbolQuote[]> {
-    return this.apiCache
-      .postData<
-        StockScreenerResults[],
-        StockScreenerValues
-      >('https://get-stock-screening.krivanek1234.workers.dev', screeningValue, ApiCacheService.validity5Min)
-      .pipe(
-        map((stockScreeningResults) => {
-          // create multiple requests
-          const checkSize = 40;
-          const symbolsChunks = stockScreeningResults
-            .map((data) => data.symbol)
-            .reduce((acc, symbol, index) => {
-              // if (index % checkSize === 0) then create new array with symbol else add symbol to last array
-              return index % checkSize === 0
-                ? [...acc, [symbol]]
-                : [...acc.slice(0, -1), [...acc[acc.length - 1], symbol]];
-            }, [] as string[][]);
-
-          return symbolsChunks;
-        }),
-        // load summaries for chunks
-        switchMap((symbolsChunks) =>
-          // return empty array on error
-          forkJoin(
-            symbolsChunks.map((chunk) => this.marketApiService.getSymbolQuotes(chunk).pipe(catchError(() => []))),
-          ),
-        ),
-        // flatten
-        mergeMap((d) => d),
-        // sort by ID
-        map((d) => d.slice().sort((a, b) => a.symbol.localeCompare(b.symbol))),
-        // Combine all summaries into a single array and emit only once
-        reduce((acc, curr) => [...acc, ...curr], [] as SymbolQuote[]),
-      );
   }
 
   getStockEarnings(symbol: string): Observable<StockEarning[]> {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -8,13 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { StocksApiService } from '@mm/api-client';
-import { SymbolSummary } from '@mm/api-types';
+import { MarketApiService } from '@mm/api-client';
+import { SymbolQuote } from '@mm/api-types';
 import { DefaultImgDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-stock-search-basic',
+  selector: 'app-symbol-search-basic',
   standalone: true,
   imports: [
     CommonModule,
@@ -54,15 +54,14 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
           <mat-option *ngRange="5" class="h-10 mb-1 g-skeleton"></mat-option>
         } @else {
           <!-- loaded data -->
-          <mat-option *ngFor="let summary of options(); let last = last" [value]="summary" class="py-2 rounded-md">
-            <app-quote-item [symbolQuote]="summary.quote"></app-quote-item>
+          <mat-option *ngFor="let quote of options(); let last = last" [value]="quote" class="py-2 rounded-md">
+            <app-quote-item [symbolQuote]="quote"></app-quote-item>
             <div *ngIf="!last" class="mt-2">
               <mat-divider></mat-divider>
             </div>
           </mat-option>
         }
       </mat-autocomplete>
-      <mat-hint *ngIf="showHint()">Ex: 'AAPL, MSFT, UBER, NFLX'</mat-hint>
     </mat-form-field>
   `,
   styles: `
@@ -83,28 +82,25 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: StockSearchBasicComponent,
+      useExisting: SymbolSearchBasicComponent,
       multi: true,
     },
   ],
-  host: { ngSkipHydration: 'true' },
 })
-export class StockSearchBasicComponent implements ControlValueAccessor {
+export class SymbolSearchBasicComponent implements ControlValueAccessor {
+  private marketApiService = inject(MarketApiService);
+
   /**
    * emit whether searchControl has any value
    */
   inputHasValue = output<boolean>();
-  selectedValue = output<SymbolSummary>();
-
-  showHint = input(true);
+  selectedValue = output<SymbolQuote>();
 
   searchControl = new FormControl<string>('', { nonNullable: true });
-
-  stocksApiService = inject(StocksApiService);
   showLoadingIndicator = signal<boolean>(false);
-  options = signal<SymbolSummary[]>([]);
+  options = signal<SymbolQuote[]>([]);
 
-  onChange: (value: SymbolSummary) => void = () => {};
+  onChange: (value: SymbolQuote) => void = () => {};
   onTouched = () => {};
 
   constructor() {
@@ -120,7 +116,7 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
         debounceTime(400),
         distinctUntilChanged(),
         switchMap((value) =>
-          this.stocksApiService.searchStockSummariesByPrefix(value).pipe(
+          this.marketApiService.searchQuotesByPrefix(value).pipe(
             tap(() => this.showLoadingIndicator.set(false)),
             catchError(() => {
               this.showLoadingIndicator.set(false);
@@ -135,14 +131,14 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
   }
 
   onStockSelect(event: MatAutocompleteSelectedEvent): void {
-    const stock = event.option.value as SymbolSummary;
+    const stock = event.option.value as SymbolQuote;
     this.onTouched();
     this.onChange(stock);
     this.selectedValue.emit(stock);
     this.searchControl.setValue('', { emitEvent: true });
   }
 
-  displayProperty = (stock: SymbolSummary) => stock.id;
+  displayProperty = (stock: SymbolQuote) => stock.symbol;
 
   /*
     parent component adds value to child
@@ -152,14 +148,14 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
   /*
     method to notify parent that the value (disabled state) has been changed
   */
-  registerOnChange(fn: StockSearchBasicComponent['onChange']): void {
+  registerOnChange(fn: SymbolSearchBasicComponent['onChange']): void {
     this.onChange = fn;
   }
 
   /*
     method to notify parent that form control has been touched
   */
-  registerOnTouched(fn: StockSearchBasicComponent['onTouched']): void {
+  registerOnTouched(fn: SymbolSearchBasicComponent['onTouched']): void {
     this.onTouched = fn;
   }
 }

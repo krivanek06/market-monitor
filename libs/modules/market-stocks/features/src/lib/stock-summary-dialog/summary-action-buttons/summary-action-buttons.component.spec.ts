@@ -6,6 +6,7 @@ import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import {
   SymbolStoreBase,
+  SymbolSummary,
   USER_WATCHLIST_SYMBOL_LIMIT,
   UserAccountEnum,
   UserWatchList,
@@ -31,8 +32,16 @@ describe('SummaryActionButtonsComponent', () => {
   // used to change injection token from undefined to some value before rendering component
   let authServiceMockValue: AuthenticationUserStoreService | undefined = undefined;
 
-  const mockSymbol = 'AAPL';
-  const mockSector = 'Technology';
+  const mockSymbolSummary = {
+    id: 'AAPL',
+    quote: {
+      symbol: 'AAPL',
+      name: 'Apple Inc.',
+    },
+    profile: {
+      sector: 'Technology',
+    },
+  } as SymbolSummary;
 
   beforeEach(() => {
     ngMocks.defaultMock(BreakpointObserver, () => ({
@@ -90,29 +99,26 @@ describe('SummaryActionButtonsComponent', () => {
 
   it('should create', () => {
     const fixture = MockRender(SummaryActionButtonsComponent, {
-      symbolId: mockSymbol,
-      symbolSector: mockSector,
+      symbolSummary: mockSymbolSummary,
     });
     expect(fixture.point.componentInstance).toBeTruthy();
   });
 
   it('should set inputs correctly', () => {
     const fixture = MockRender(SummaryActionButtonsComponent, {
-      symbolId: mockSymbol,
-      symbolSector: mockSector,
+      symbolSummary: mockSymbolSummary,
     });
     const component = fixture.point.componentInstance;
 
     fixture.detectChanges();
 
-    expect(component.symbolId()).toBe(mockSymbol);
-    expect(component.symbolSector()).toBe(mockSector);
+    expect(component.symbolSummary().id).toBe(mockSymbolSummary.id);
+    expect(component.symbolSummary()).toBe(mockSymbolSummary);
   });
 
   it('should redirect user on details button', () => {
     const fixture = MockRender(SummaryActionButtonsComponent, {
-      symbolId: mockSymbol,
-      symbolSector: mockSector,
+      symbolSummary: mockSymbolSummary,
       showRedirectButton: true,
     });
     const component = fixture.point.componentInstance;
@@ -130,7 +136,7 @@ describe('SummaryActionButtonsComponent', () => {
 
     ngMocks.click(redirect);
 
-    expect(router.navigateByUrl).toHaveBeenCalledWith(`${ROUTES_MAIN.STOCK_DETAILS}/${mockSymbol}`);
+    expect(router.navigateByUrl).toHaveBeenCalledWith(`${ROUTES_MAIN.STOCK_DETAILS}/${mockSymbolSummary.id}`);
     expect(onDetailsRedirectSpy).toHaveBeenCalled();
     expect(dialogRef.close).toHaveBeenCalled();
     expect(viewPort.scrollToPosition).toHaveBeenCalledWith([0, 0]);
@@ -138,8 +144,7 @@ describe('SummaryActionButtonsComponent', () => {
 
   it('should not show redirect button', () => {
     const fixture = MockRender(SummaryActionButtonsComponent, {
-      symbolId: mockSymbol,
-      symbolSector: mockSector,
+      symbolSummary: mockSymbolSummary,
       showRedirectButton: false,
     });
 
@@ -167,8 +172,7 @@ describe('SummaryActionButtonsComponent', () => {
 
       // render component
       const fixture = MockRender(SummaryActionButtonsComponent, {
-        symbolId: mockSymbol,
-        symbolSector: mockSector,
+        symbolSummary: mockSymbolSummary,
       });
       const dialog = ngMocks.get(DialogServiceUtil);
 
@@ -179,8 +183,8 @@ describe('SummaryActionButtonsComponent', () => {
       const onAddWatchListSpy = jest.spyOn(component, 'onAddWatchList');
 
       expect(component.isSymbolInWatchList()).toBeFalsy();
-      expect(component.symbolId()).toBe(mockSymbol);
-      expect(component.symbolSector()).toBe(mockSector);
+      expect(component.symbolSummary().id).toBe(mockSymbolSummary.id);
+      expect(component.symbolSummary().profile?.sector).toBe(mockSymbolSummary.profile?.sector);
 
       // check if add to watchlist button is visible
       const addWatchlist = ngMocks.find<HTMLElement>(addWatchlisS);
@@ -194,11 +198,7 @@ describe('SummaryActionButtonsComponent', () => {
 
       // check if the function is called
       expect(onAddWatchListSpy).toHaveBeenCalled();
-      expect(symbolFavoriteService.addFavoriteSymbol).toHaveBeenCalledWith({
-        symbolType: 'STOCK',
-        symbol: mockSymbol,
-        sector: mockSector,
-      });
+      expect(symbolFavoriteService.addFavoriteSymbol).toHaveBeenCalledWith(mockSymbolSummary.quote);
       expect(symbolFavoriteService.removeFavoriteSymbol).not.toHaveBeenCalled();
       expect(dialog.showNotificationBar).toHaveBeenCalledWith(expect.any(String));
     });
@@ -215,8 +215,7 @@ describe('SummaryActionButtonsComponent', () => {
 
       // render component
       const fixture = MockRender(SummaryActionButtonsComponent, {
-        symbolId: mockSymbol,
-        symbolSector: mockSector,
+        symbolSummary: mockSymbolSummary,
       });
       const dialog = ngMocks.get(DialogServiceUtil);
 
@@ -240,11 +239,7 @@ describe('SummaryActionButtonsComponent', () => {
 
       // check if the function is called
       expect(onRemoveWatchListSpy).toHaveBeenCalled();
-      expect(symbolFavoriteService.removeFavoriteSymbol).toHaveBeenCalledWith({
-        symbolType: 'STOCK',
-        symbol: mockSymbol,
-        sector: mockSector,
-      });
+      expect(symbolFavoriteService.removeFavoriteSymbol).toHaveBeenCalledWith(mockSymbolSummary.quote);
       expect(symbolFavoriteService.addFavoriteSymbol).not.toHaveBeenCalled();
       expect(dialog.showNotificationBar).toHaveBeenCalledWith(expect.any(String));
     });
@@ -276,8 +271,7 @@ describe('SummaryActionButtonsComponent', () => {
 
       // render component
       const fixture = MockRender(SummaryActionButtonsComponent, {
-        symbolId: mockSymbol,
-        symbolSector: mockSector,
+        symbolSummary: mockSymbolSummary,
       });
       const dialog = ngMocks.get(DialogServiceUtil);
 
@@ -301,8 +295,8 @@ describe('SummaryActionButtonsComponent', () => {
       // check if the function is called
       expect(authUserService.addSymbolToUserWatchList).toHaveBeenCalledWith({
         symbolType: 'STOCK',
-        symbol: mockSymbol,
-        sector: mockSector,
+        symbol: mockSymbolSummary.id,
+        sector: mockSymbolSummary.profile?.sector,
       });
       expect(authUserService.removeSymbolFromUserWatchList).not.toHaveBeenCalled();
       expect(dialog.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
@@ -329,8 +323,7 @@ describe('SummaryActionButtonsComponent', () => {
 
       // render component
       const fixture = MockRender(SummaryActionButtonsComponent, {
-        symbolId: mockSymbol,
-        symbolSector: mockSector,
+        symbolSummary: mockSymbolSummary,
       });
       const dialog = ngMocks.get(DialogServiceUtil);
 
@@ -354,8 +347,8 @@ describe('SummaryActionButtonsComponent', () => {
       // check if the function is called
       expect(authUserService.removeSymbolFromUserWatchList).toHaveBeenCalledWith({
         symbolType: 'STOCK',
-        symbol: mockSymbol,
-        sector: mockSector,
+        symbol: mockSymbolSummary.id,
+        sector: mockSymbolSummary.profile?.sector,
       });
       expect(authUserService.addSymbolToUserWatchList).not.toHaveBeenCalled();
       expect(dialog.showNotificationBar).toHaveBeenCalledWith(expect.any(String));
@@ -392,8 +385,7 @@ describe('SummaryActionButtonsComponent', () => {
 
       // render component
       const fixture = MockRender(SummaryActionButtonsComponent, {
-        symbolId: mockSymbol,
-        symbolSector: mockSector,
+        symbolSummary: mockSymbolSummary,
       });
 
       const dialog = ngMocks.get(DialogServiceUtil);

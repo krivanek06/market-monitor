@@ -6,14 +6,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { ActivatedRoute, Router } from '@angular/router';
-import { StocksApiService } from '@mm/api-client';
+import { MarketApiService } from '@mm/api-client';
 import { StockScreenerValues, SymbolQuote } from '@mm/api-types';
 import {
   STOCK_SCREENER_DEFAULT_VALUES,
   getScreenerInputIndexByKey,
   getScreenerInputValueByKey,
 } from '@mm/market-stocks/data-access';
-import { StockSearchBasicCustomizedComponent, StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSearchBasicCustomizedComponent, StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import { StockScreenerFormControlComponent, StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { RouterManagement } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
@@ -33,7 +33,7 @@ import { catchError, switchMap, tap } from 'rxjs';
     MatDialogModule,
     MatButtonModule,
     MatDialogModule,
-    StockSearchBasicCustomizedComponent,
+    SymbolSearchBasicCustomizedComponent,
     MatDividerModule,
     SectionTitleComponent,
   ],
@@ -42,7 +42,7 @@ import { catchError, switchMap, tap } from 'rxjs';
       <!-- specific search -->
       <div class="sm:hidden mb-4">
         <app-section-title title="Basic Search" matIcon="search" class="mb-3" />
-        <app-stock-search-basic-customized />
+        <app-symbol-search-basic-customized />
 
         <div class="pt-4">
           <mat-divider />
@@ -90,7 +90,7 @@ import { catchError, switchMap, tap } from 'rxjs';
 })
 export class PageMarketStockScreenerComponent implements OnInit, RouterManagement {
   private screenerDefault = 30;
-  stocksApiService = inject(StocksApiService);
+  marketApiService = inject(MarketApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
   dialog = inject(MatDialog);
   router = inject(Router);
@@ -110,7 +110,7 @@ export class PageMarketStockScreenerComponent implements OnInit, RouterManagemen
         this.updateQueryParams(formValue);
       }),
       switchMap((values) =>
-        this.stocksApiService.getStockScreening(values).pipe(
+        this.marketApiService.getStockScreening(values).pipe(
           // set loading to false
           tap(() => this.loadingSignal.set(false)),
         ),
