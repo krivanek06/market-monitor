@@ -63,7 +63,7 @@ export class PageMarketTopPerformersComponent {
   marketTopPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance());
 
   onQuoteClick(summary: SymbolQuote) {
-    return this.dialog.open(StockSummaryDialogComponent, {
+    this.dialog.open(StockSummaryDialogComponent, {
       data: {
         symbol: summary.symbol,
       },

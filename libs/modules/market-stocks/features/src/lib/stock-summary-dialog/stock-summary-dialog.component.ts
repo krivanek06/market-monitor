@@ -1,14 +1,12 @@
-import { CommonModule, ViewportScroller } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, computed, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
 import { MarketApiService } from '@mm/api-client';
 import { SymbolSummary } from '@mm/api-types';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
-import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, PriceChangeItemsComponent } from '@mm/shared/ui';
 import { EMPTY, catchError } from 'rxjs';
@@ -49,8 +47,8 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
 
         <!-- action buttons -->
         <app-summary-action-buttons
-          (redirectClickedEmitter)="onDetailsRedirect()"
-          [symbolSummary]="stockSummary"
+          [symbolId]="stockSummary.id"
+          [symbolSector]="stockSummary.profile?.sector ?? 'Unknown'"
           [showRedirectButton]="isSymbolTypeStock()"
         />
       </div>
@@ -109,8 +107,6 @@ export class StockSummaryDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: { symbol: string },
     private marketApiService: MarketApiService,
     private dialogServiceUtil: DialogServiceUtil,
-    private route: Router,
-    private viewPortScroller: ViewportScroller,
   ) {
     this.marketApiService
       .getSymbolSummary(this.data.symbol)
@@ -127,16 +123,5 @@ export class StockSummaryDialogComponent {
         }
         this.stockSummarySignal.set(res);
       });
-  }
-
-  onDetailsRedirect(): void {
-    // scroll to top
-    this.viewPortScroller.scrollToPosition([0, 0]);
-
-    // close dialog
-    this.dialogRef.close({ redirect: true });
-
-    // routing kept here, because component is used in multiple places
-    this.route.navigateByUrl(`${ROUTES_MAIN.STOCK_DETAILS}/${this.data.symbol}`);
   }
 }

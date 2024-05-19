@@ -298,7 +298,7 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   );
 
   onShowSummary(summary: SymbolSummary) {
-    return this.dialog.open(StockSummaryDialogComponent, {
+    this.dialog.open(StockSummaryDialogComponent, {
       data: {
         symbol: summary.id,
       },

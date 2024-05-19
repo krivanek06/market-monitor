@@ -2,7 +2,7 @@ import { Injectable, InjectionToken, effect, inject } from '@angular/core';
 import { GroupApiService, UserApiService } from '@mm/api-client';
 import {
   PortfolioTransaction,
-  SymbolType,
+  SymbolStoreBase,
   UserAccountBasicTypes,
   UserAccountTypes,
   UserData,
@@ -187,7 +187,6 @@ export class AuthenticationUserStoreService {
       hasUserAccess: () => (accountType: UserAccountTypes) => hasUserAccess(state().userData!, accountType),
       isAccountDemoTrading: () => hasUserAccess(state().userData, 'DEMO_TRADING'),
       isAccountNormalBasic: () => hasUserAccess(state().userData, 'NORMAL_BASIC'),
-      isAccountNormalPaid: () => hasUserAccess(state().userData, 'NORMAL_PAID'),
       isDemoAccount: () => !!state().userData?.isDemo,
     }),
   });
@@ -208,20 +207,12 @@ export class AuthenticationUserStoreService {
     this.userApiService.changeUserSettings(this.state.getUserData(), data);
   }
 
-  addSymbolToUserWatchList(symbol: string, symbolType: SymbolType, sector: string): void {
-    this.userApiService.addToUserWatchList(this.state.getUserData().id, {
-      sector,
-      symbol,
-      symbolType,
-    });
+  addSymbolToUserWatchList(data: SymbolStoreBase): void {
+    this.userApiService.addToUserWatchList(this.state.getUserData().id, data);
   }
 
-  removeSymbolFromUserWatchList(symbol: string, symbolType: SymbolType, sector: string): void {
-    this.userApiService.removeFromUserWatchList(this.state.getUserData().id, {
-      sector,
-      symbol,
-      symbolType,
-    });
+  removeSymbolFromUserWatchList(data: SymbolStoreBase): void {
+    this.userApiService.removeFromUserWatchList(this.state.getUserData().id, data);
   }
 
   clearUserWatchList(): void {

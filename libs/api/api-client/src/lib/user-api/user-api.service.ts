@@ -15,7 +15,7 @@ import {
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import {
   PortfolioTransaction,
-  SymbolType,
+  SymbolStoreBase,
   UserAccountBasicTypes,
   UserData,
   UserPortfolioTransaction,
@@ -120,7 +120,7 @@ export class UserApiService {
     });
   }
 
-  addToUserWatchList(userId: string, data: { symbol: string; symbolType: SymbolType; sector: string }): void {
+  addToUserWatchList(userId: string, data: SymbolStoreBase): void {
     updateDoc(this.getUserWatchlistDocRef(userId), {
       data: arrayUnion({
         symbol: data.symbol,
@@ -130,7 +130,7 @@ export class UserApiService {
     });
   }
 
-  removeFromUserWatchList(userId: string, data: { symbol: string; symbolType: SymbolType; sector: string }): void {
+  removeFromUserWatchList(userId: string, data: SymbolStoreBase): void {
     updateDoc(this.getUserWatchlistDocRef(userId), {
       data: arrayRemove({
         symbol: data.symbol,

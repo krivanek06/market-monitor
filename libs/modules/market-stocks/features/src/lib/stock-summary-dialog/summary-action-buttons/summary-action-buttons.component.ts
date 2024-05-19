@@ -1,11 +1,13 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import { CommonModule, ViewportScroller } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@mm/api-types';
+import { Router } from '@angular/router';
+import { USER_WATCHLIST_SYMBOL_LIMIT } from '@mm/api-types';
 import { AUTHENTICATION_ACCOUNT_TOKEN } from '@mm/authentication/data-access';
 import { SymbolFavoriteService } from '@mm/market-stocks/data-access';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 
 @Component({
@@ -15,35 +17,9 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
   template: `
     <mat-dialog-actions class="flex flex-col px-4 sm:flex-row gap-y-2 gap-x-6">
       <!-- favorites button -->
-      <ng-container *ngIf="!isUserAuthenticatedSignal()">
+      @if (isSymbolInWatchList()) {
         <button
-          *ngIf="isSymbolInFavoriteSignal()"
-          mat-stroked-button
-          color="warn"
-          (click)="onRemoveToFavorite()"
-          type="button"
-          class="g-border-apply max-sm:w-full h-10"
-        >
-          <mat-icon>do_not_disturb_on</mat-icon>
-          favorites - remove
-        </button>
-        <button
-          *ngIf="!isSymbolInFavoriteSignal()"
-          mat-stroked-button
-          color="accent"
-          (click)="onAddToFavorite()"
-          type="button"
-          class="g-border-apply max-sm:w-full h-10"
-        >
-          <mat-icon>star</mat-icon>
-          favorite - add
-        </button>
-      </ng-container>
-
-      <!-- watchlist button -->
-      <ng-container *ngIf="isUserAuthenticatedSignal()">
-        <button
-          *ngIf="isSymbolInWatchList()"
+          data-testid="summary-action-buttons-remove-watchlist"
           mat-stroked-button
           color="warn"
           (click)="onRemoveWatchList()"
@@ -53,8 +29,9 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
           <mat-icon>do_not_disturb_on</mat-icon>
           watchlist - remove
         </button>
+      } @else {
         <button
-          *ngIf="!isSymbolInWatchList()"
+          data-testid="summary-action-buttons-add-watchlist"
           mat-stroked-button
           color="accent"
           (click)="onAddWatchList()"
@@ -64,19 +41,21 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
           <mat-icon>star</mat-icon>
           watchlist - add
         </button>
-      </ng-container>
+      }
 
-      <button
-        *ngIf="showRedirectButton()"
-        class="max-sm:w-full h-10"
-        type="button"
-        mat-stroked-button
-        color="primary"
-        (click)="onDetailsRedirect()"
-      >
-        Go to Details
-        <mat-icon iconPositionEnd>navigate_next</mat-icon>
-      </button>
+      @if (showRedirectButton()) {
+        <button
+          data-testid="summary-action-buttons-redirect"
+          class="max-sm:w-full h-10"
+          type="button"
+          mat-stroked-button
+          color="primary"
+          (click)="onDetailsRedirect()"
+        >
+          Go to Details
+          <mat-icon iconPositionEnd>navigate_next</mat-icon>
+        </button>
+      }
     </mat-dialog-actions>
   `,
   styles: `
@@ -92,90 +71,118 @@ export class SummaryActionButtonsComponent {
   });
   private symbolFavoriteService = inject(SymbolFavoriteService);
   private dialogServiceUtil = inject(DialogServiceUtil);
+  private route = inject(Router);
+  private viewPortScroller = inject(ViewportScroller);
+  private dialogRef = inject(MatDialogRef<any>);
 
-  redirectClickedEmitter = output<void>();
-  symbolSummary = input.required<SymbolSummary>();
-  showRedirectButton = input.required();
+  /**
+   * id of the symbol - AAPL, MSFT, BTC etc
+   */
+  symbolId = input.required<string>();
 
-  isSymbolInFavoriteSignal = computed(() => this.symbolFavoriteService.isSymbolInFavoriteObs(this.symbolSummary().id));
+  /**
+   * sector which the symbols belongs to (only for STOCK symbols)
+   */
+  symbolSector = input<string>('Unknown');
 
-  isUserAuthenticatedSignal = computed(() => {
-    if (this.authenticationUserService) {
-      return !!this.authenticationUserService.state().user;
-    }
-    return false;
-  });
+  /**
+   * whether to show the redirect button or not - used only for STOCK and ADR
+   */
+  showRedirectButton = input(false);
+
   isSymbolInWatchList = computed(() => {
     if (this.authenticationUserService) {
-      return this.authenticationUserService.state.isSymbolInWatchList()(this.symbolSummary().id);
+      return this.authenticationUserService.state.isSymbolInWatchList()(this.symbolId());
     }
-    return false;
+    return this.symbolFavoriteService.isSymbolInFavorite(this.symbolId());
   });
 
-  onAddToFavorite(): void {
+  onRemoveWatchList(): void {
+    if (this.authenticationUserService) {
+      this.removeWatchList();
+    } else {
+      this.removeToFavorite();
+    }
+  }
+
+  onAddWatchList(): void {
+    if (this.authenticationUserService) {
+      this.addWatchList();
+    } else {
+      this.addToFavorite();
+    }
+  }
+
+  private addToFavorite(): void {
     this.symbolFavoriteService.addFavoriteSymbol({
       symbolType: 'STOCK',
-      symbol: this.symbolSummary().id,
-      sector: this.symbolSummary()?.profile?.sector ?? 'Unknown',
+      symbol: this.symbolId(),
+      sector: this.symbolSector(),
     });
 
-    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been added into favorites`);
+    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolId()} has been added into favorites`);
   }
 
-  onRemoveToFavorite(): void {
+  private removeToFavorite(): void {
     this.symbolFavoriteService.removeFavoriteSymbol({
       symbolType: 'STOCK',
-      symbol: this.symbolSummary().id,
-      sector: this.symbolSummary()?.profile?.sector ?? 'Unknown',
+      symbol: this.symbolId(),
+      sector: this.symbolSector(),
     });
 
-    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been removed from favorites`);
+    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolId()} has been removed from favorites`);
   }
 
-  onAddWatchList() {
-    if (this.authenticationUserService) {
-      const isPaid = this.authenticationUserService.state.isAccountNormalPaid();
-      const userWatchlist = this.authenticationUserService.state.watchList().data;
+  private addWatchList() {
+    if (!this.authenticationUserService) {
+      return;
+    }
 
-      // check if user can add more symbols into watchlist
-      if (!isPaid && userWatchlist.length >= USER_WATCHLIST_SYMBOL_LIMIT) {
-        this.dialogServiceUtil.showNotificationBar(
-          `You can not add more than ${USER_WATCHLIST_SYMBOL_LIMIT} symbols into watchlist`,
-          'error',
-        );
-        return;
-      }
+    const userWatchlist = this.authenticationUserService.state.watchList().data;
 
-      // save data into fireStore
-      this.authenticationUserService.addSymbolToUserWatchList(
-        this.symbolSummary().id,
-        'STOCK',
-        this.symbolSummary()?.profile?.sector ?? 'Unknown',
-      );
-
-      // show notification
+    // check if user can add more symbols into watchlist
+    if (userWatchlist.length >= USER_WATCHLIST_SYMBOL_LIMIT) {
       this.dialogServiceUtil.showNotificationBar(
-        `Symbol: ${this.symbolSummary().id} has been added into watchlist`,
-        'success',
+        `You can not add more than ${USER_WATCHLIST_SYMBOL_LIMIT} symbols into watchlist`,
+        'error',
       );
+      return;
     }
+
+    // save data into fireStore
+    this.authenticationUserService.addSymbolToUserWatchList({
+      symbol: this.symbolId(),
+      symbolType: 'STOCK',
+      sector: this.symbolSector(),
+    });
+
+    // show notification
+    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolId()} has been added into watchlist`, 'success');
   }
 
-  onRemoveWatchList() {
-    if (this.authenticationUserService) {
-      // save data into fireStore
-      this.authenticationUserService.removeSymbolFromUserWatchList(
-        this.symbolSummary().id,
-        'STOCK',
-        this.symbolSummary()?.profile?.sector ?? 'Unknown',
-      );
-
-      // show notification
-      this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been removed from watchlist`);
+  private removeWatchList() {
+    if (!this.authenticationUserService) {
+      return;
     }
+    // save data into fireStore
+    this.authenticationUserService.removeSymbolFromUserWatchList({
+      symbol: this.symbolId(),
+      symbolType: 'STOCK',
+      sector: this.symbolSector(),
+    });
+
+    // show notification
+    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolId()} has been removed from watchlist`);
   }
 
   onDetailsRedirect(): void {
-    this.redirectClickedEmitter.emit();
+    // scroll to top
+    this.viewPortScroller.scrollToPosition([0, 0]);
+
+    // close dialog
+    this.dialogRef.close();
+
+    // routing kept here, because component is used in multiple places
+    this.route.navigateByUrl(`${ROUTES_MAIN.STOCK_DETAILS}/${this.symbolId()}`);
   }
 }

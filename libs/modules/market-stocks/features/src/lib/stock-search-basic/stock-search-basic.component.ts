@@ -94,11 +94,13 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
    * emit whether searchControl has any value
    */
   inputHasValue = output<boolean>();
+  selectedValue = output<SymbolSummary>();
+
   showHint = input(true);
 
   searchControl = new FormControl<string>('', { nonNullable: true });
 
-  StocksApiService = inject(StocksApiService);
+  stocksApiService = inject(StocksApiService);
   showLoadingIndicator = signal<boolean>(false);
   options = signal<SymbolSummary[]>([]);
 
@@ -118,7 +120,7 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
         debounceTime(400),
         distinctUntilChanged(),
         switchMap((value) =>
-          this.StocksApiService.searchStockSummariesByPrefix(value).pipe(
+          this.stocksApiService.searchStockSummariesByPrefix(value).pipe(
             tap(() => this.showLoadingIndicator.set(false)),
             catchError(() => {
               this.showLoadingIndicator.set(false);
@@ -134,7 +136,9 @@ export class StockSearchBasicComponent implements ControlValueAccessor {
 
   onStockSelect(event: MatAutocompleteSelectedEvent): void {
     const stock = event.option.value as SymbolSummary;
+    this.onTouched();
     this.onChange(stock);
+    this.selectedValue.emit(stock);
     this.searchControl.setValue('', { emitEvent: true });
   }
 

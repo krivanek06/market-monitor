@@ -1,4 +1,3 @@
-import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { GroupData } from '../firebase';
 
 export const GROUP_TEST_ID_1 = 'GROUP_TEST_ID_1';
@@ -33,7 +32,7 @@ export const mockCreateGroupData = (data: Partial<GroupData> = {}): GroupData =>
       numberOfExecutedSellTransactions: 0,
       startingCash: 0,
       transactionFees: 0,
-      date: getCurrentDateDefaultFormat(),
+      date: new Date().toISOString(),
       totalGainsPercentage: 0,
       totalGainsValue: 0,
       firstTransactionDate: null,

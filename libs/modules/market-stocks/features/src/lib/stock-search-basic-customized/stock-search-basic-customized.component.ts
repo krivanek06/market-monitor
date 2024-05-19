@@ -1,7 +1,6 @@
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
@@ -18,7 +17,6 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     StockSearchBasicComponent,
     OverlayModule,
     QuoteItemComponent,
@@ -32,12 +30,12 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
       appElementFocus
       (insideClick)="checkToDisplayOverlay(true, null)"
       (inputHasValue)="checkToDisplayOverlay(null, $event)"
-      [formControl]="searchControl"
+      (selectedValue)="onSymbolSelect($event)"
       cdkOverlayOrigin
       #trigger
       #origin="cdkOverlayOrigin"
       [showHint]="showHint()"
-    ></app-stock-search-basic>
+    />
 
     <ng-template
       cdkConnectedOverlay
@@ -62,38 +60,32 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
         class="min-h-[200px] max-h-[400px] bg-wt-gray-light mt-[-18px] w-full rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
       >
         <!-- checkbox changing displayed stock summaries -->
-        <div *ngIf="!isUserAuthenticatedSignal()" class="flex items-center justify-between mb-1">
-          <span class="text-base text-wt-gray-medium">
-            {{ showFavoriteStocks() ? 'Favorite Stocks' : 'Last Searched' }}
-          </span>
-          <mat-checkbox color="primary" [checked]="showFavoriteStocks()" (change)="onShowFavoriteChange()">
-            Show Favorites
-          </mat-checkbox>
-        </div>
+        @if (!isUserAuthenticatedSignal()) {
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-base text-wt-gray-medium">
+              {{ showFavoriteStocks() ? 'Watch List' : 'Last Searched' }}
+            </span>
+            <mat-checkbox color="primary" [checked]="showFavoriteStocks()" (change)="onShowFavoriteChange()">
+              Show Watch List
+            </mat-checkbox>
+          </div>
+        }
 
         <!-- display summaries as buttons -->
-        <button
-          mat-button
-          *ngFor="let summary of displayedStocksSignal()"
-          (click)="onSummaryClick(summary)"
-          class="w-full h-12 max-sm:mb-2"
-          type="button"
-        >
-          <app-quote-item [symbolQuote]="summary.quote" />
-        </button>
+        @for (summary of displayedStocksSignal(); track summary.id) {
+          <button mat-button (click)="onSummaryClick(summary)" class="w-full h-12 max-sm:mb-2" type="button">
+            <app-quote-item [symbolQuote]="summary.quote" />
+          </button>
+        }
 
         <!-- display default symbols -->
         @if (getDefaultSymbols().length > 0) {
           @if (!showFavoriteStocks() && displayedStocksSignal().length < 10) {
-            <button
-              mat-button
-              *ngFor="let summary of getDefaultSymbols()"
-              (click)="onSummaryClick(summary)"
-              class="w-full h-12 max-sm:mb-2"
-              type="button"
-            >
-              <app-quote-item [symbolQuote]="summary.quote" />
-            </button>
+            @for (summary of getDefaultSymbols(); track summary.id) {
+              <button mat-button (click)="onSummaryClick(summary)" class="w-full h-12 max-sm:mb-2" type="button">
+                <app-quote-item [symbolQuote]="summary.quote" />
+              </button>
+            }
           }
         } @else {
           <div *ngRange="10" class="g-skeleton h-11 mb-1"></div>
@@ -107,7 +99,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
     }
   `,
 })
-export class StockSearchBasicCustomizedComponent implements OnInit {
+export class StockSearchBasicCustomizedComponent {
   private symbolFavoriteService = inject(SymbolFavoriteService);
   private symbolSearchService = inject(SymbolSearchService);
   private authenticationUserService = inject(AUTHENTICATION_ACCOUNT_TOKEN, {
@@ -123,13 +115,13 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
   openModalOnClick = input(true);
   trigger = viewChild('trigger', { read: ElementRef });
 
-  /**
-   * selected stock summary from StockSearchBasicComponent
-   */
-  searchControl = new FormControl<SymbolSummary | null>(null);
   showFavoriteStocks = signal(false);
 
   overlayWidth = signal(0);
+
+  /**
+   * open overlay if input is focused and has no value. If value (search) happens, close it
+   */
   overlayIsOpen = signal({
     isInputFocused: false,
     inputHasValue: false,
@@ -139,7 +131,6 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
   /**
    * display stock summaries based on whether showFavoriteStocks is true or false
    */
-
   displayedStocksSignal = computed(() =>
     this.showFavoriteStocks()
       ? this.symbolFavoriteService.getFavoriteSymbols()
@@ -147,28 +138,23 @@ export class StockSearchBasicCustomizedComponent implements OnInit {
   );
   getDefaultSymbols = this.symbolSearchService.getDefaultSymbols;
 
-  ngOnInit(): void {
-    this.searchControl.valueChanges.subscribe((value) => {
-      if (value) {
-        this.symbolSearchService.addSearchedSymbol({
-          symbolType: 'STOCK',
-          symbol: value.id,
-          sector: value?.profile?.sector ?? 'Unknown',
-        });
-        this.onSummaryClick(value);
-      }
+  onSymbolSelect(summary: SymbolSummary) {
+    // save
+    this.symbolSearchService.addSearchedSymbol({
+      symbolType: 'STOCK',
+      symbol: summary.id,
+      sector: summary?.profile?.sector ?? 'Unknown',
     });
+
+    // open modal
+    this.onSummaryClick(summary);
   }
 
   checkToDisplayOverlay(isInputFocused: boolean | null, inputHasValue: boolean | null): void {
-    // console.log('checkToDisplayOverlay', isInputFocused, inputHasValue);
-
-    const previousOverlayIsOpen = this.overlayIsOpen();
-    this.overlayIsOpen.set({
-      // isInputFocused: true,
-      isInputFocused: isInputFocused !== null ? isInputFocused : previousOverlayIsOpen.isInputFocused,
-      inputHasValue: inputHasValue !== null ? inputHasValue : previousOverlayIsOpen.inputHasValue,
-    });
+    this.overlayIsOpen.update((d) => ({
+      isInputFocused: isInputFocused !== null ? isInputFocused : d.isInputFocused,
+      inputHasValue: inputHasValue !== null ? inputHasValue : d.inputHasValue,
+    }));
 
     // calculate overlay width based on screen size
     const overlayWidth = this.trigger()?.nativeElement.getBoundingClientRect().width ?? 620;

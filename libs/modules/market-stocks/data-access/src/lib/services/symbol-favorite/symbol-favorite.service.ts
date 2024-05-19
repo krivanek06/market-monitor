@@ -1,22 +1,27 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { MarketApiService } from '@mm/api-client';
 import { SymbolStoreBase, SymbolSummary } from '@mm/api-types';
 import { StorageLocalStoreService } from '@mm/shared/general-features';
 
+/**
+ * Service to manage (add/remove) favorite symbols into local storage
+ * for unauthenticated users
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class SymbolFavoriteService extends StorageLocalStoreService<SymbolStoreBase[]> {
+  private marketApiService = inject(MarketApiService);
   private favoriteSymbols = signal<SymbolSummary[]>([]);
 
-  constructor(private marketApiService: MarketApiService) {
+  constructor() {
     super('SYMBOL_FAVORITE', []);
     this.initService();
   }
 
-  getFavoriteSymbols = computed(() => this.favoriteSymbols());
+  getFavoriteSymbols = computed(() => this.favoriteSymbols().sort((a, b) => a.id.localeCompare(b.id)));
 
-  isSymbolInFavoriteObs(symbol: string): boolean {
+  isSymbolInFavorite(symbol: string): boolean {
     return this.favoriteSymbols()
       .map((values) => values.id)
       .includes(symbol);

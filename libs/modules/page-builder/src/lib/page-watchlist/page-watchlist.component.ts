@@ -72,11 +72,8 @@ export class PageWatchlistComponent {
   );
 
   pageTitle = computed(() => {
-    const isPaid = this.authenticationUserService.state.isAccountNormalPaid();
     const watchList = this.authenticationUserService.state.watchList();
-    return isPaid
-      ? `Watchlist: ${watchList.data.length}`
-      : `Watchlist: [${watchList.data.length} / ${USER_WATCHLIST_SYMBOL_LIMIT}]`;
+    return `Watchlist: [${watchList.data.length} / ${USER_WATCHLIST_SYMBOL_LIMIT}]`;
   });
 
   onQuoteClick(summary: SymbolQuote): void {
