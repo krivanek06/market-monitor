@@ -44,8 +44,8 @@ export const getSymbolQuotes = async (symbols: string[]): Promise<SymbolQuote[]>
       console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
       return [];
     }
-    const data = (await response.json()) as SymbolSummary[];
-    return data.map((d) => d.quote);
+    const data = (await response.json()) as SymbolQuote[];
+    return data;
   } catch (error) {
     console.log(`Failed to get symbol summaries for ${symbols}`);
     console.log(error);

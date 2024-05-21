@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -109,7 +109,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
       <div class="flex flex-col gap-y-2 min-w-[180px] lg:pl-6">
         <!--  Reset Transactions -->
         <button
-          [disabled]="isDemoAccount()"
+          [disabled]="!isDevActive"
           (click)="onResetTransactions()"
           [matTooltip]="actionButtonTooltips.resetTransactions"
           type="button"
@@ -120,7 +120,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </button>
         <!--  Change Display Name -->
         <button
-          [disabled]="isDemoAccount()"
+          [disabled]="!isDevActive"
           (click)="onChangeDisplayName()"
           [matTooltip]="actionButtonTooltips.changeDisplayName"
           type="button"
@@ -131,7 +131,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </button>
         <!--  Change Account type -->
         <button
-          [disabled]="isDemoAccount() || !isDevActive"
+          [disabled]="isDemoAccount() && !isDevActive"
           (click)="onChangeAccountType()"
           [matTooltip]="actionButtonTooltips.changeAccountType"
           type="button"
@@ -143,6 +143,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         <!--  Change Password -->
         <button
           *ngIf="userDataSignal().personal.providerId === 'password'"
+          [disabled]="!isDevActive"
           (click)="onChangePassword()"
           [matTooltip]="actionButtonTooltips.changePassword"
           type="button"
@@ -153,7 +154,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </button>
         <!--  Delete Account -->
         <button
-          [disabled]="isDemoAccount()"
+          [disabled]="!isDevActive"
           (click)="onDeleteAccount()"
           [matTooltip]="actionButtonTooltips.deleteAccount"
           type="button"
@@ -205,7 +206,7 @@ export class UserSettingsDialogComponent implements OnInit {
     optional: true,
   });
 
-  isDemoAccount = this.authenticationUserStoreService.state.isDemoAccount;
+  isDemoAccount = signal(true); // this.authenticationUserStoreService.state.isDemoAccount;
   userDataSignal = this.authenticationUserStoreService.state.getUserData;
   userSignal = this.authenticationUserStoreService.state.getUser;
   userImageControl = new FormControl<string | null>(null);

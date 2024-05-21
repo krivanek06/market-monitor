@@ -1,6 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MarketApiService } from '@mm/api-client';
-import { SymbolQuote, SymbolStoreBase } from '@mm/api-types';
+import { SymbolQuote } from '@mm/api-types';
 import { StorageLocalStoreService } from '@mm/shared/general-features';
 
 @Injectable({
@@ -9,10 +10,7 @@ import { StorageLocalStoreService } from '@mm/shared/general-features';
 export class SymbolSearchService extends StorageLocalStoreService<string[]> {
   private searchedSymbols = signal<SymbolQuote[]>([]);
 
-  /**
-   * default symbols to show when no data is available
-   */
-  private defaultSymbols = signal<SymbolQuote[]>([]);
+  readonly defaultSymbolsArr = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA'];
 
   constructor(private marketApiService: MarketApiService) {
     super('SYMBOL_SEARCH', [], 1);
@@ -20,22 +18,19 @@ export class SymbolSearchService extends StorageLocalStoreService<string[]> {
   }
 
   getSearchedSymbols = computed(() => this.searchedSymbols());
-  getDefaultSymbols = computed(() => this.defaultSymbols());
+  getDefaultSymbols = toSignal(this.marketApiService.getSymbolQuotes(this.defaultSymbolsArr), { initialValue: [] });
 
   addSearchedSymbol(quote: SymbolQuote): void {
-    const savedData = this.getData();
-
-    if (savedData.includes(quote.symbol)) {
-      return;
-    }
+    // remove from searchedSymbols$
+    const newQuotes = this.getSearchedSymbols().filter((s) => s.symbol !== quote.symbol);
 
     // save data into array, limit to 12
-    this.persistData([quote, ...this.getSearchedSymbols()]);
+    this.persistData([quote, ...newQuotes]);
   }
 
-  removeSearchedSymbol(searchSymbol: SymbolStoreBase): void {
+  removeSearchedSymbol(quote: SymbolQuote): void {
     // remove from searchedSymbols$
-    const newQuotes = this.getSearchedSymbols().filter((s) => s.symbol !== searchSymbol.symbol);
+    const newQuotes = this.getSearchedSymbols().filter((s) => s.symbol !== quote.symbol);
 
     // remove from storage
     this.persistData(newQuotes);
@@ -65,11 +60,6 @@ export class SymbolSearchService extends StorageLocalStoreService<string[]> {
     // load favorite stocks from api and last searched stocks from api
     this.marketApiService.getSymbolQuotes(data).subscribe((loadedQuotes) => {
       this.searchedSymbols.set(loadedQuotes);
-    });
-
-    const defaultSymbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA'];
-    this.marketApiService.getSymbolQuotes(defaultSymbols).subscribe((loadedQuotes) => {
-      this.defaultSymbols.set(loadedQuotes);
     });
   }
 }

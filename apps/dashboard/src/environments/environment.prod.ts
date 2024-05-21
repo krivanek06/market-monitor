@@ -10,5 +10,5 @@ export const environment = {
   },
 
   production: true,
-  version: '1.1.20',
+  version: '1.1.21',
 };

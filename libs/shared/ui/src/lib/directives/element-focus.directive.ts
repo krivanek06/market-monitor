@@ -1,25 +1,52 @@
-import { Directive, ElementRef, HostListener, output } from '@angular/core';
+import { Directive, ElementRef, OnDestroy, OnInit, Renderer2, inject, output } from '@angular/core';
 
+/**
+ * whenever user focus on the element, it will emit an event
+ */
 @Directive({
   selector: '[appElementFocus]',
   standalone: true,
 })
-export class ElementFocusDirective {
-  insideClick = output<MouseEvent>();
-  outsideClick = output<MouseEvent>();
+export class ElementFocusDirective implements OnInit, OnDestroy {
+  private renderer = inject(Renderer2);
+  private elementRef = inject(ElementRef);
 
-  @HostListener('document:mousedown', ['$event'])
-  onClick(event: MouseEvent): void {
+  insideClick = output<void>();
+  insideFocus = output<void>();
+  outsideClick = output<void>();
+
+  private focusRef: (() => void) | null = null;
+  private mouseDown: (() => void) | null = null;
+  private mousedownRef: (() => void) | null = null;
+
+  ngOnInit(): void {
+    this.focusRef = this.renderer.listen(this.elementRef.nativeElement, 'focus', () => {
+      this.insideFocus.emit();
+    });
+
+    this.mouseDown = this.renderer.listen('document', 'mousedown', (event: MouseEvent) => {
+      if (this.elementRef.nativeElement.contains(event.target)) {
+        this.insideClick.emit();
+      }
+    });
+
     // click outside element
-    if (!this.elementRef.nativeElement.contains(event.target)) {
-      this.outsideClick.emit(event);
-    }
-
-    // click inside element
-    if (this.elementRef.nativeElement.contains(event.target)) {
-      this.insideClick.emit(event);
-    }
+    this.mousedownRef = this.renderer.listen('document', 'mousedown', (event: MouseEvent) => {
+      if (!this.elementRef.nativeElement.contains(event.target)) {
+        this.outsideClick.emit();
+      }
+    });
   }
 
-  constructor(private elementRef: ElementRef) {}
+  ngOnDestroy(): void {
+    if (this.focusRef) {
+      this.focusRef();
+    }
+    if (this.mouseDown) {
+      this.mouseDown();
+    }
+    if (this.mousedownRef) {
+      this.mousedownRef();
+    }
+  }
 }
