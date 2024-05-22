@@ -21,6 +21,7 @@ import { GenericDialogComponent, GenericDialogComponentData, SCREEN_DIALOGS } fr
 import { HelpDialogComponent } from '@mm/shared/help-dialog';
 import { DefaultImgDirective } from '@mm/shared/ui';
 import { UserSettingsDialogComponent } from '@mm/user/features';
+
 @Component({
   selector: 'app-menu-top-navigation',
   standalone: true,

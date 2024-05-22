@@ -12,7 +12,6 @@ import {
   viewChild,
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
@@ -20,14 +19,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MarketApiService } from '@mm/api-client';
 import { SymbolQuote } from '@mm/api-types';
 import { AUTHENTICATION_ACCOUNT_TOKEN } from '@mm/authentication/data-access';
 import { SymbolFavoriteService, SymbolSearchService } from '@mm/market-stocks/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, ElementFocusDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
-import { debounceTime, distinctUntilChanged, map, startWith, switchMap } from 'rxjs';
+import { filter, map, of, startWith, switchMap } from 'rxjs';
 import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summary-dialog.component';
 
 @Component({
@@ -42,57 +40,26 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
     MatCheckboxModule,
     ElementFocusDirective,
     RangeDirective,
-    MatSelectModule,
     MatFormFieldModule,
     MatInputModule,
-    MatAutocompleteModule,
     DefaultImgDirective,
     MatDividerModule,
   ],
   template: `
     <mat-form-field class="w-full" cdkOverlayOrigin #trigger #origin="cdkOverlayOrigin">
+      <!-- search input -->
       <mat-label>Search stock by ticker</mat-label>
       <input
-        data-testid="search-basic-customized-input"
+        data-testid="search-basic-input"
         type="text"
         placeholder="Enter ticker"
         aria-label="Text"
         matInput
         [value]="searchValue()"
         (input)="onInputChange($event)"
-        [matAutocomplete]="auto"
         (focus)="onInputFocus(true)"
       />
       <mat-icon matPrefix>search</mat-icon>
-      <mat-autocomplete
-        #auto="matAutocomplete"
-        [displayWith]="displayProperty"
-        [hideSingleSelectionIndicator]="true"
-        [autofocus]="false"
-        [autoActiveFirstOption]="false"
-      >
-        @if (options().isLoading) {
-          <!-- loading skeleton -->
-          <mat-option *ngRange="5" class="h-10 mb-1 g-skeleton"></mat-option>
-        } @else {
-          <!-- loaded data -->
-          @for (quote of options().data; track quote.symbol; let last = $last) {
-            <mat-option
-              test-id="search-basic-customized-searched-quotes"
-              class="py-2 rounded-md"
-              [value]="quote"
-              (onSelectionChange)="onSummaryClick(quote)"
-            >
-              <app-quote-item [symbolQuote]="quote" />
-              @if (!last) {
-                <div class="mt-2">
-                  <mat-divider />
-                </div>
-              }
-            </mat-option>
-          }
-        }
-      </mat-autocomplete>
     </mat-form-field>
 
     <!-- overlay -->
@@ -109,33 +76,57 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
           overlayY: 'top'
         }
       ]"
-      [cdkConnectedOverlayOpen]="isInputFocused() && !searchValue()"
+      [cdkConnectedOverlayOpen]="isInputFocused()"
     >
       <div
         appElementFocus
         (outsideClick)="onInputFocus(false)"
-        data-testid="search-basic-customized-overlay"
+        data-testid="search-basic-overlay"
         [style.max-width.px]="overlayWidth()"
         [style.min-width.px]="overlayWidth()"
-        class="min-h-[200px] max-h-[400px] bg-wt-gray-light mt-[-18px] w-full rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
+        class="min-h-[200px] max-h-[400px] bg-wt-gray-light w-full rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
       >
-        <!-- checkbox changing displayed stock summaries -->
-        @if (!isUserAuthenticatedSignal()) {
-          <div data-testid="search-basic-customized-watchlist-checkbox" class="flex items-center justify-between mb-1">
+        <!-- checkbox changing displayed favorites -->
+        @if (!isUserAuthenticatedSignal() && searchValue().length === 0) {
+          <div class="flex items-center justify-between mb-1">
             <span class="text-base text-wt-gray-medium">
               {{ showFavoriteStocks() ? 'Watch List' : 'Last Searched' }}
             </span>
-            <mat-checkbox color="primary" [checked]="showFavoriteStocks()" (change)="onShowFavoriteChange()">
+            <mat-checkbox
+              data-testid="search-basic-watchlist-checkbox"
+              color="primary"
+              [checked]="showFavoriteStocks()"
+              (change)="onShowFavoriteChange()"
+            >
               Show Watch List
             </mat-checkbox>
           </div>
         }
 
-        <!-- display summaries as buttons -->
-        @for (quote of displayedStocksSignal(); track quote.symbol) {
-          <button mat-button (click)="onSummaryClick(quote)" class="w-full h-12 max-sm:mb-2" type="button">
-            <app-quote-item [symbolQuote]="quote" />
-          </button>
+        @if (displayQuotes().isLoading) {
+          <!-- loading skeleton -->
+          <div *ngRange="6" class="h-10 mb-1 g-skeleton"></div>
+        } @else {
+          <!-- display summaries as buttons -->
+          @for (quote of displayQuotes().data; track quote.symbol; let last = $last) {
+            <button
+              test-id="search-basic-quotes"
+              mat-button
+              type="button"
+              class="w-full h-12 max-sm:mb-2"
+              (click)="onSummaryClick(quote)"
+            >
+              <app-quote-item [symbolQuote]="quote" />
+            </button>
+
+            <!-- divider -->
+            <mat-divider *ngIf="!last" />
+          }
+
+          <!-- no data -->
+          @if (displayQuotes().noData) {
+            <div data-testid="search-basic-no-data" class="text-base grid place-content-center h-24">No data found</div>
+          }
         }
       </div>
     </ng-template>
@@ -160,9 +151,6 @@ export class SymbolSearchBasicCustomizedComponent {
   private symbolFavoriteService = inject(SymbolFavoriteService);
   private symbolSearchService = inject(SymbolSearchService);
   private marketApiService = inject(MarketApiService);
-  private authenticationUserService = inject(AUTHENTICATION_ACCOUNT_TOKEN, {
-    optional: true,
-  });
   private dialog = inject(MatDialog);
 
   /**
@@ -180,26 +168,6 @@ export class SymbolSearchBasicCustomizedComponent {
    */
   searchValue = signal('');
 
-  /**
-   * loaded symbol data by user's input typing
-   */
-  options = toSignal(
-    toObservable(this.searchValue).pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap((value) =>
-        this.marketApiService.searchQuotesByPrefix(value).pipe(
-          map((data) => ({
-            data: data,
-            isLoading: false,
-          })),
-          startWith({ isLoading: true, data: [] }),
-        ),
-      ),
-    ),
-    { initialValue: { isLoading: false, data: [] } },
-  );
-
   triggerRef = viewChild('trigger', { read: ElementRef });
 
   showFavoriteStocks = signal(false);
@@ -210,23 +178,58 @@ export class SymbolSearchBasicCustomizedComponent {
    * open overlay if input is focused and has no value
    */
   isInputFocused = signal(false);
-  isUserAuthenticatedSignal = signal(!!this.authenticationUserService);
 
   /**
-   * display stock summaries based on whether showFavoriteStocks is true or false
+   * check if user is authenticated
    */
-  displayedStocksSignal = computed(() => {
-    const favorites = this.symbolFavoriteService.getFavoriteSymbols();
+  isUserAuthenticatedSignal = signal(
+    !!inject(AUTHENTICATION_ACCOUNT_TOKEN, {
+      optional: true,
+    }),
+  );
+
+  /**
+   * loaded symbol data by user's input typing
+   */
+  private loadedQuotesByInput = toSignal(
+    toObservable(this.searchValue).pipe(
+      filter((value) => value.length > 0),
+      switchMap((value) =>
+        value.length <= 5 // prevent too many requests
+          ? this.marketApiService.searchQuotesByPrefix(value).pipe(
+              map((data) => ({
+                data: data,
+                isLoading: false,
+                noData: data.length === 0,
+              })),
+              startWith({ isLoading: true, data: [], noData: false }),
+            )
+          : of({ isLoading: false, data: [], noData: true }),
+      ),
+    ),
+    { initialValue: { isLoading: false, data: [], noData: false } },
+  );
+
+  displayQuotes = computed(() => {
+    // return searched symbols by input
+    if (this.searchValue().length > 0) {
+      return { ...this.loadedQuotesByInput(), type: 'searched' as const };
+    }
+
+    // return favorite symbols
+    if (this.showFavoriteStocks()) {
+      const favorites = this.symbolFavoriteService.getFavoriteSymbols();
+      return { data: favorites, isLoading: false, noData: false, type: 'favorites' as const };
+    }
+
     // combine last searched and default symbols
     const lastSearch = [
       ...this.symbolSearchService.getSearchedSymbols(),
       ...this.symbolSearchService.getDefaultSymbols(),
     ].slice(0, 10);
 
-    return this.showFavoriteStocks() ? favorites : lastSearch;
+    return { data: lastSearch, isLoading: false, noData: false, type: 'lastSearched' as const };
   });
-
-  displayProperty = (stock: SymbolQuote) => stock.symbol;
 
   onInputFocus(isFocused: boolean) {
     this.isInputFocused.set(isFocused);

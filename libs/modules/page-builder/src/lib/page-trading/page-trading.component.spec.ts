@@ -1,5 +1,4 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MarketApiService } from '@mm/api-client';
@@ -72,7 +71,6 @@ describe('PageTradingComponent', () => {
               stockTopActive: [quoteNFLXMock],
             }),
           ),
-
           getSymbolSummary: jest.fn().mockImplementation((symbol: string) => {
             switch (symbol) {
               case 'AAPL':
@@ -108,7 +106,7 @@ describe('PageTradingComponent', () => {
       .provide({
         provide: PortfolioUserFacadeService,
         useValue: {
-          getPortfolioState: signal(mockPortfolioState),
+          getPortfolioState: () => mockPortfolioState,
           deletePortfolioOperation: jest.fn(),
         },
       });

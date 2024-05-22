@@ -12,8 +12,7 @@ describe('SymbolFavouriteService', () => {
     TestBed.configureTestingModule({
       providers: [
         MockProvider(MarketApiService, {
-          getSymbolSummary: jest.fn().mockReturnValue(of({})),
-          getSymbolSummaries: jest.fn().mockReturnValue(of([])),
+          getSymbolQuotes: jest.fn().mockReturnValue(of([])),
         }),
       ],
     });
