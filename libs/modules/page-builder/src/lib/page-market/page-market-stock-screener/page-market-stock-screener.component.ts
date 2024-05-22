@@ -13,7 +13,7 @@ import {
   getScreenerInputIndexByKey,
   getScreenerInputValueByKey,
 } from '@mm/market-stocks/data-access';
-import { SymbolSearchBasicCustomizedComponent, StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSearchBasicComponent, StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import { StockScreenerFormControlComponent, StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { RouterManagement } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
@@ -33,7 +33,7 @@ import { catchError, switchMap, tap } from 'rxjs';
     MatDialogModule,
     MatButtonModule,
     MatDialogModule,
-    SymbolSearchBasicCustomizedComponent,
+    SymbolSearchBasicComponent,
     MatDividerModule,
     SectionTitleComponent,
   ],
@@ -42,7 +42,7 @@ import { catchError, switchMap, tap } from 'rxjs';
       <!-- specific search -->
       <div class="sm:hidden mb-4">
         <app-section-title title="Basic Search" matIcon="search" class="mb-3" />
-        <app-symbol-search-basic-customized />
+        <app-symbol-search-basic />
 
         <div class="pt-4">
           <mat-divider />

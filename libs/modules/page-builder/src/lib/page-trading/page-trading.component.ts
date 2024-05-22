@@ -10,7 +10,7 @@ import { MarketApiService } from '@mm/api-client';
 import { PortfolioTransaction, PortfolioTransactionType, SymbolQuote, USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
-import { SymbolSearchBasicCustomizedComponent } from '@mm/market-stocks/features';
+import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { StockSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
@@ -33,7 +33,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
   imports: [
     CommonModule,
     PortfolioStateComponent,
-    SymbolSearchBasicCustomizedComponent,
+    SymbolSearchBasicComponent,
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
@@ -73,7 +73,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
         />
 
         <!-- search -->
-        <app-symbol-search-basic-customized
+        <app-symbol-search-basic
           (clickedQuote)="onSymbolQuoteClick($event)"
           [openModalOnClick]="false"
           class="scale-90 w-full h-12"

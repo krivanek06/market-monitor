@@ -29,7 +29,7 @@ import { filter, map, of, startWith, switchMap } from 'rxjs';
 import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summary-dialog.component';
 
 @Component({
-  selector: 'app-symbol-search-basic-customized',
+  selector: 'app-symbol-search-basic',
   standalone: true,
   imports: [
     CommonModule,
@@ -147,7 +147,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SymbolSearchBasicCustomizedComponent {
+export class SymbolSearchBasicComponent {
   private symbolFavoriteService = inject(SymbolFavoriteService);
   private symbolSearchService = inject(SymbolSearchService);
   private marketApiService = inject(MarketApiService);

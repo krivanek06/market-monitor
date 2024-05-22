@@ -15,9 +15,9 @@ import { ElementFocusDirective } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
 import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summary-dialog.component';
-import { SymbolSearchBasicCustomizedComponent } from './symbol-search-basic-customized.component';
+import { SymbolSearchBasicComponent } from './symbol-search-basic.component';
 
-describe('SymbolSearchBasicCustomizedComponent', () => {
+describe('SymbolSearchBasicComponent', () => {
   const watchlistS = '[data-testid="search-basic-watchlist-checkbox"]';
   const overlayContentS = '[data-testid="search-basic-overlay"]';
   const overlayS = '.cdk-overlay-pane';
@@ -43,7 +43,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
 
   beforeEach(() => {
     return (
-      MockBuilder(SymbolSearchBasicCustomizedComponent)
+      MockBuilder(SymbolSearchBasicComponent)
         .keep(MatCheckboxModule)
         .keep(MatFormFieldModule)
         .keep(MatInputModule)
@@ -95,12 +95,12 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
   });
 
   it('should create', () => {
-    const fixture = MockRender(SymbolSearchBasicCustomizedComponent);
+    const fixture = MockRender(SymbolSearchBasicComponent);
     expect(fixture.point.componentInstance).toBeTruthy();
   });
 
   it('should not display overlay by default', () => {
-    const fixture = MockRender(SymbolSearchBasicCustomizedComponent);
+    const fixture = MockRender(SymbolSearchBasicComponent);
     const component = fixture.point.componentInstance;
     const overlay = fixture.debugElement.query(By.css(overlayContentS));
 
@@ -119,7 +119,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
   });
 
   it('should display overlay when search input field is focused', () => {
-    const fixture = MockRender(SymbolSearchBasicCustomizedComponent);
+    const fixture = MockRender(SymbolSearchBasicComponent);
     const component = fixture.point.componentInstance;
 
     // find form field and input
@@ -156,7 +156,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
   });
 
   it('should close overlay when clicked outside of opened overlay', () => {
-    const fixture = MockRender(SymbolSearchBasicCustomizedComponent);
+    const fixture = MockRender(SymbolSearchBasicComponent);
     const component = fixture.point.componentInstance;
 
     // find form field and input
@@ -206,7 +206,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
     });
 
     ngMocks.flushTestBed();
-    const fixture = MockRender(SymbolSearchBasicCustomizedComponent);
+    const fixture = MockRender(SymbolSearchBasicComponent);
     const component = fixture.point.componentInstance;
 
     fixture.detectChanges();
@@ -249,7 +249,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
 
     ngMocks.flushTestBed();
 
-    const fixture = MockRender(SymbolSearchBasicCustomizedComponent);
+    const fixture = MockRender(SymbolSearchBasicComponent);
     const component = fixture.point.componentInstance;
 
     fixture.detectChanges();
@@ -278,7 +278,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
   });
 
   it('should prevent loading symbol for input with more than 6 characters', () => {
-    const fixture = MockRender(SymbolSearchBasicCustomizedComponent);
+    const fixture = MockRender(SymbolSearchBasicComponent);
     const component = fixture.point.componentInstance;
     const marketApi = ngMocks.get(MarketApiService);
 
@@ -315,7 +315,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
   });
 
   it('should NOT display favorite checkbox when user is authenticated', () => {
-    const fixture = MockRender(SymbolSearchBasicCustomizedComponent);
+    const fixture = MockRender(SymbolSearchBasicComponent);
     const component = fixture.point.componentInstance;
     fixture.detectChanges();
 
@@ -343,7 +343,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
 
     ngMocks.flushTestBed();
 
-    const fixture = MockRender(SymbolSearchBasicCustomizedComponent, {
+    const fixture = MockRender(SymbolSearchBasicComponent, {
       openModalOnClick: true,
     });
     const component = fixture.point.componentInstance;
@@ -388,7 +388,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
   });
 
   it('should display NOT summary dialog on symbol click if disabled', () => {
-    const fixture = MockRender(SymbolSearchBasicCustomizedComponent, {
+    const fixture = MockRender(SymbolSearchBasicComponent, {
       openModalOnClick: false,
     });
     const component = fixture.point.componentInstance;
@@ -430,7 +430,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
     });
 
     it('should display favorite checkbox when user is NOT authenticated', () => {
-      const fixture = MockRender(SymbolSearchBasicCustomizedComponent);
+      const fixture = MockRender(SymbolSearchBasicComponent);
       const component = fixture.point.componentInstance;
       fixture.detectChanges();
 
@@ -453,7 +453,7 @@ describe('SymbolSearchBasicCustomizedComponent', () => {
     });
 
     it('should NOT display favorite checkbox when user is NOT authenticated and search has value', () => {
-      const fixture = MockRender(SymbolSearchBasicCustomizedComponent);
+      const fixture = MockRender(SymbolSearchBasicComponent);
       const component = fixture.point.componentInstance;
       fixture.detectChanges();
 
