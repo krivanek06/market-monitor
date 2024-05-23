@@ -11,11 +11,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
 import { PortfolioStateHoldings } from '@mm/api-types';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { GeneralCardComponent, SectionTitleComponent, ShowMoreButtonComponent } from '@mm/shared/ui';
+import { GeneralCardComponent, ShowMoreButtonComponent } from '@mm/shared/ui';
 import { PortfolioHoldingsTableComponent } from '../tables';
 
 @Component({
@@ -27,27 +26,27 @@ import { PortfolioHoldingsTableComponent } from '../tables';
     PortfolioHoldingsTableComponent,
     StockSummaryDialogComponent,
     ShowMoreButtonComponent,
-    MatIconModule,
-    SectionTitleComponent,
   ],
   template: `
     <app-general-card title="Holdings {{ (portfolioStateHolding()?.holdings ?? []).length }}" matIcon="show_chart">
       <!-- invisible el - use if to prevent immediate camera scroll -->
       @if (selectedHoldingsToggle()) {
-        <div #startSection></div>
+        <div data-testid="portfolio-holding-table-card-start" #startSection></div>
       }
 
       <!-- table -->
       <app-portfolio-holdings-table
+        data-testid="portfolio-holding-table-card-table"
         (symbolClicked)="onSummaryClick($event)"
         [holdings]="selectedHoldings()"
         [portfolioState]="portfolioStateHolding()"
-        [showSkeletonLoading]="!portfolioStateHolding()"
         [displayedColumns]="displayedColumns()"
       />
+
       <!-- show more members button -->
       <div class="flex justify-end">
         <app-show-more-button
+          data-testid="portfolio-holding-table-card-show-more"
           [(showMoreToggle)]="selectedHoldingsToggle"
           [itemsLimit]="initialItemsLimit()"
           [itemsTotal]="(portfolioStateHolding()?.holdings ?? []).length"
@@ -101,7 +100,7 @@ export class PortfolioHoldingsTableCardComponent {
     const sectionRef = this.startSectionRef();
     if (!this.selectedHoldingsToggle() && sectionRef) {
       // camera jump back to the title section when clicking show less
-      sectionRef.nativeElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'center' });
+      sectionRef.nativeElement?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'center' });
     }
   });
 

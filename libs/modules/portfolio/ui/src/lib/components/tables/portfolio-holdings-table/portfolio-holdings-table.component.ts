@@ -224,7 +224,7 @@ import {
       <!-- Row shown when there is no matching data. -->
       <tr class="mat-row" *matNoDataRow>
         <td class="text-center mat-cell" colspan="10">
-          @if (showSkeletonLoading()) {
+          @if (!portfolioState()) {
             <div *ngRange="12" class="h-10 mb-1 g-skeleton"></div>
           } @else {
             <div class="grid place-content-center p-10 min-h-[250px]">No data to be found</div>
@@ -250,7 +250,6 @@ export class PortfolioHoldingsTableComponent {
   holdings = input.required<PortfolioStateHolding[]>();
   paginator = viewChild(MatPaginator);
   sort = viewChild(MatSort);
-  showSkeletonLoading = input(false);
 
   /**
    * Total balance of all holdings - used to have wrong percentage calculation when fees wasn't accounted for
