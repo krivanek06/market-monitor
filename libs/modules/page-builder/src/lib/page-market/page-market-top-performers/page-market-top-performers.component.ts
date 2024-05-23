@@ -8,47 +8,54 @@ import { SymbolQuote } from '@mm/api-types';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import { StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { RangeDirective } from '@mm/shared/ui';
+import { RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-page-market-top-performers',
   standalone: true,
-  imports: [CommonModule, StockSummaryTableComponent, MatButtonModule, MatDialogModule, RangeDirective],
+  imports: [
+    CommonModule,
+    StockSummaryTableComponent,
+    MatButtonModule,
+    MatDialogModule,
+    RangeDirective,
+    SectionTitleComponent,
+  ],
   template: `
-    <div *ngIf="marketTopPerformanceSignal() as marketOverview; else stockSummaryTableSkeleton" class="grid gap-y-14">
-      <div>
-        <app-stock-summary-table
-          tableTitle="Top Active"
-          (itemClickedEmitter)="onQuoteClick($event)"
-          [symbolQuotes]="marketOverview.stockTopActive"
-        ></app-stock-summary-table>
-      </div>
+    @if (marketTopPerformanceSignal(); as marketOverview) {
+      <div class="grid gap-y-14">
+        <div>
+          <app-section-title title="Top Active" class="mb-6" />
+          <app-stock-summary-table
+            (itemClickedEmitter)="onQuoteClick($event)"
+            [symbolQuotes]="marketOverview.stockTopActive"
+          />
+        </div>
 
-      <div>
-        <app-stock-summary-table
-          tableTitle="Top Gainer"
-          (itemClickedEmitter)="onQuoteClick($event)"
-          [symbolQuotes]="marketOverview.stockTopGainers"
-        ></app-stock-summary-table>
-      </div>
+        <div>
+          <app-section-title title="Top Gainer" class="mb-6" />
+          <app-stock-summary-table
+            (itemClickedEmitter)="onQuoteClick($event)"
+            [symbolQuotes]="marketOverview.stockTopGainers"
+          />
+        </div>
 
-      <div>
-        <app-stock-summary-table
-          tableTitle="Top Losers"
-          (itemClickedEmitter)="onQuoteClick($event)"
-          [symbolQuotes]="marketOverview.stockTopLosers"
-        ></app-stock-summary-table>
+        <div>
+          <app-section-title title="Top Losers" class="mb-6" />
+          <app-stock-summary-table
+            (itemClickedEmitter)="onQuoteClick($event)"
+            [symbolQuotes]="marketOverview.stockTopLosers"
+          />
+        </div>
       </div>
-    </div>
-
-    <!-- loading screen -->
-    <ng-template #stockSummaryTableSkeleton>
-      <div class="grid pt-2 gap-y-14">
+    } @else {
+      <!-- loading screen -->
+      <div class="grid pt-8 gap-y-14">
         <div *ngRange="3">
           <div *ngRange="15" class="h-12 mb-1 g-skeleton"></div>
         </div>
       </div>
-    </ng-template>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
