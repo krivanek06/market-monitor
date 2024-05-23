@@ -25,8 +25,7 @@ import {
 } from '@mm/shared/ui';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { computedFrom } from 'ngxtension/computed-from';
-import { map, pipe, startWith } from 'rxjs';
+import { combineLatest, map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-asset-chart',
@@ -70,9 +69,9 @@ import { map, pipe, startWith } from 'rxjs';
       @if (symbolsControl.value.length > 0) {
         @if (displayChart()) {
           <highcharts-chart
-            *ngIf="isHighcharts()"
+            *ngIf="chartOptionsSignal() as chartOptionsSignal"
             [Highcharts]="Highcharts"
-            [options]="chartOptionsSignal()"
+            [options]="chartOptionsSignal"
             [callbackFunction]="chartCallback"
             [style.height.px]="heightPx()"
             style="width: 100%; display: block"
@@ -167,12 +166,11 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   /**
    * save provided data into the component
    */
-  chartOptionsSignal = computedFrom(
-    [
+  chartOptionsSignal = toSignal(
+    combineLatest([
       this.dateRangeControl.valueChanges.pipe(startWith(this.dateRangeControl.value)),
       this.symbolsControl.valueChanges.pipe(startWith(this.symbolsControl.value)),
-    ],
-    pipe(
+    ]).pipe(
       map(([dateRange, selectedSymbols]) => {
         const series = this.formatData(this.data() ?? [], selectedSymbols);
         const newData = series.map((d) => ({

@@ -1,0 +1,116 @@
+import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { PortfolioStateHoldings } from '@mm/api-types';
+import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { GeneralCardComponent, SectionTitleComponent, ShowMoreButtonComponent } from '@mm/shared/ui';
+import { PortfolioHoldingsTableComponent } from '../tables';
+
+@Component({
+  selector: 'app-portfolio-holdings-table-card',
+  standalone: true,
+  imports: [
+    CommonModule,
+    GeneralCardComponent,
+    PortfolioHoldingsTableComponent,
+    StockSummaryDialogComponent,
+    ShowMoreButtonComponent,
+    MatIconModule,
+    SectionTitleComponent,
+  ],
+  template: `
+    <app-general-card title="Holdings {{ (portfolioStateHolding()?.holdings ?? []).length }}" matIcon="show_chart">
+      <!-- invisible el - use if to prevent immediate camera scroll -->
+      @if (selectedHoldingsToggle()) {
+        <div #startSection></div>
+      }
+
+      <!-- table -->
+      <app-portfolio-holdings-table
+        (symbolClicked)="onSummaryClick($event)"
+        [holdings]="selectedHoldings()"
+        [portfolioState]="portfolioStateHolding()"
+        [showSkeletonLoading]="!portfolioStateHolding()"
+        [displayedColumns]="displayedColumns()"
+      />
+      <!-- show more members button -->
+      <div class="flex justify-end">
+        <app-show-more-button
+          [(showMoreToggle)]="selectedHoldingsToggle"
+          [itemsLimit]="initialItemsLimit()"
+          [itemsTotal]="(portfolioStateHolding()?.holdings ?? []).length"
+        />
+      </div>
+    </app-general-card>
+  `,
+  styles: `
+    :host {
+      display: block;
+    }
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class PortfolioHoldingsTableCardComponent {
+  private dialog = inject(MatDialog);
+
+  startSectionRef = viewChild('startSection', { read: ElementRef });
+
+  portfolioStateHolding = input.required<PortfolioStateHoldings | undefined>();
+
+  /**
+   * how many items to show initially
+   */
+  initialItemsLimit = input(15);
+
+  displayedColumns = input<string[]>([
+    'symbol',
+    'price',
+    'bep',
+    'balance',
+    'invested',
+    'totalChange',
+    'dailyValueChange',
+    'portfolio',
+    'marketCap',
+    'yearlyRange',
+  ]);
+
+  /**
+   * toggle to display every holding for the selected user
+   */
+  selectedHoldingsToggle = signal(false);
+  selectedHoldings = computed(() =>
+    this.selectedHoldingsToggle()
+      ? this.portfolioStateHolding()?.holdings ?? []
+      : (this.portfolioStateHolding()?.holdings ?? []).slice(0, this.initialItemsLimit()),
+  );
+
+  selectionHoldingEffect = effect(() => {
+    const sectionRef = this.startSectionRef();
+    if (!this.selectedHoldingsToggle() && sectionRef) {
+      // camera jump back to the title section when clicking show less
+      sectionRef.nativeElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'center' });
+    }
+  });
+
+  onSummaryClick(symbol: string) {
+    this.dialog.open(StockSummaryDialogComponent, {
+      data: {
+        symbol: symbol,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
+  }
+}

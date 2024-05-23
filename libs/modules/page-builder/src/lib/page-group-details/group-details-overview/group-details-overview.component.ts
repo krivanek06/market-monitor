@@ -13,7 +13,7 @@ import { PortfolioCalculationService, PortfolioGrowth } from '@mm/portfolio/data
 import {
   PortfolioBalancePieChartComponent,
   PortfolioGrowthChartComponent,
-  PortfolioHoldingsTableComponent,
+  PortfolioHoldingsTableCardComponent,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
   PortfolioTransactionChartComponent,
@@ -33,7 +33,7 @@ import {
 } from '@mm/shared/ui';
 import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@mm/user/features';
 import { UserDisplayItemComponent } from '@mm/user/ui';
-import { computedFrom } from 'ngxtension/computed-from';
+import { derivedFrom } from 'ngxtension/derived-from';
 import { filterNil } from 'ngxtension/filter-nil';
 import { map, pipe, switchMap } from 'rxjs';
 import { PageGroupsBaseComponent } from '../page-groups-base.component';
@@ -52,7 +52,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     GroupInvitationsManagerComponent,
     PositionCardComponent,
     UserDisplayItemComponent,
-    PortfolioHoldingsTableComponent,
+    PortfolioHoldingsTableCardComponent,
     MatIconModule,
     SortByKeyPipe,
     SectionTitleComponent,
@@ -216,23 +216,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <!-- holding table -->
       <div class="mb-10">
-        <app-general-card [title]="'Holdings: ' + getGroupHoldingsSignal().length" matIcon="show_chart">
-          <app-portfolio-holdings-table
-            (symbolClicked)="onSummaryClick($event)"
-            [holdings]="displayedHoldings()"
-            [portfolioState]="groupDetailsSignal.groupData.portfolioState"
-            [showSkeletonLoading]="!getGroupHoldingsSignalNormal()"
-          />
-          <!-- show more button -->
-          <div class="flex justify-end mt-2 mr-4">
-            <app-show-more-button
-              [(showMoreToggle)]="displayEveryHolding"
-              [itemsLimit]="displayLimitInitial"
-              [itemsTotal]="getGroupHoldingsSignal().length"
-              [allowShowLess]="false"
-            />
-          </div>
-        </app-general-card>
+        <app-portfolio-holdings-table-card [portfolioStateHolding]="groupPortfolioStateHolding()" />
       </div>
 
       <!-- transaction chart -->
@@ -320,7 +304,9 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent implements OnInit {
-  GROUP_MEMBER_LIMIT = GROUP_MEMBER_LIMIT;
+  readonly GROUP_MEMBER_LIMIT = GROUP_MEMBER_LIMIT;
+  readonly displayLimitInitial = 12;
+
   portfolioCalculationService = inject(PortfolioCalculationService);
   userApiService = inject(UserApiService);
 
@@ -332,7 +318,7 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
     this.portfolioCalculationService.getPortfolioHoldingBubbleChart(this.getGroupHoldingsSignal()),
   );
 
-  memberRequestedUsersSignal = computedFrom(
+  memberRequestedUsersSignal = derivedFrom(
     [this.groupDetailsSignal],
     pipe(
       map(([group]) => group),
@@ -342,7 +328,7 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
     { initialValue: [] },
   );
 
-  memberInvitedUsersSignal = computedFrom(
+  memberInvitedUsersSignal = derivedFrom(
     [this.groupDetailsSignal],
     pipe(
       map(([group]) => group),
@@ -368,18 +354,6 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
     this.portfolioCalculationService.getPortfolioChange(this.portfolioGrowthSignal()),
   );
 
-  displayLimitInitial = 12;
-
-  /**
-   * whether to display all holdings or only the first N
-   */
-  displayEveryHolding = signal(false);
-  displayedHoldings = computed(() =>
-    this.displayEveryHolding()
-      ? this.getGroupHoldingsSignal()
-      : this.getGroupHoldingsSignal().slice(0, this.displayLimitInitial),
-  );
-
   displayEveryMember = signal(false);
   displayedMembers = computed(() =>
     this.displayEveryMember()
@@ -395,15 +369,6 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
     this.dialog.open(UserDetailsDialogComponent, {
       data: <UserDetailsDialogComponentData>{
         userId: member.id,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
-  }
-
-  onSummaryClick(symbol: string) {
-    this.dialog.open(StockSummaryDialogComponent, {
-      data: {
-        symbol: symbol,
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
     });

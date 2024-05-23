@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
@@ -13,7 +13,7 @@ import {
   PortfolioAssetChartComponent,
   PortfolioChangeChartComponent,
   PortfolioGrowthChartComponent,
-  PortfolioHoldingsTableComponent,
+  PortfolioHoldingsTableCardComponent,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
   PortfolioStateRiskComponent,
@@ -23,7 +23,7 @@ import {
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
-import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
   DateRangeSliderComponent,
   DateRangeSliderValues,
@@ -35,7 +35,7 @@ import {
   SortByKeyPipe,
   filterDataByDateRange,
 } from '@mm/shared/ui';
-import { computedFrom } from 'ngxtension/computed-from';
+import { derivedFrom } from 'ngxtension/derived-from';
 import { map, pipe, startWith } from 'rxjs';
 
 @Component({
@@ -49,7 +49,6 @@ import { map, pipe, startWith } from 'rxjs';
     GenericChartComponent,
     PortfolioStateTransactionsComponent,
     PortfolioStateRiskComponent,
-    PortfolioHoldingsTableComponent,
     GeneralCardComponent,
     StockSummaryDialogComponent,
     MatDialogModule,
@@ -68,6 +67,7 @@ import { map, pipe, startWith } from 'rxjs';
     MatButtonModule,
     MatProgressSpinner,
     PortfolioTransactionsItemComponent,
+    PortfolioHoldingsTableCardComponent,
   ],
   template: `
     <div class="grid xl:grid-cols-3 mb-6 sm:mb-10 gap-8">
@@ -176,7 +176,7 @@ import { map, pipe, startWith } from 'rxjs';
         />
       } @else {
         <div class="grid place-content-center" [style.height.px]="400">
-          <mat-spinner></mat-spinner>
+          <mat-spinner />
         </div>
       }
 
@@ -201,19 +201,7 @@ import { map, pipe, startWith } from 'rxjs';
 
     <!-- holding -->
     <div class="mb-8">
-      <app-general-card
-        title="Holdings [{{ (portfolioUserFacadeService.getPortfolioState()?.holdings ?? []).length }} / {{
-          USER_HOLDINGS_SYMBOL_LIMIT
-        }}]"
-        matIcon="show_chart"
-      >
-        <app-portfolio-holdings-table
-          [showSkeletonLoading]="!portfolioUserFacadeService.getPortfolioState()?.holdings"
-          (symbolClicked)="onSummaryClick($event)"
-          [holdings]="portfolioUserFacadeService.getPortfolioState()?.holdings ?? []"
-          [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
-        />
-      </app-general-card>
+      <app-portfolio-holdings-table-card [portfolioStateHolding]="portfolioUserFacadeService.getPortfolioState()" />
     </div>
 
     @defer (on idle) {
@@ -280,7 +268,6 @@ import { map, pipe, startWith } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageDashboardComponent {
-  private dialog = inject(MatDialog);
   private dialogServiceUtil = inject(DialogServiceUtil);
   private authenticationUserService = inject(AuthenticationUserStoreService);
   portfolioUserFacadeService = inject(PortfolioUserFacadeService);
@@ -291,7 +278,7 @@ export class PageDashboardComponent {
 
   portfolioGrowthRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
 
-  portfolioGrowthChartSignal = computedFrom(
+  portfolioGrowthChartSignal = derivedFrom(
     [
       this.portfolioGrowthRangeControl.valueChanges.pipe(startWith(null)),
       this.portfolioUserFacadeService.getPortfolioGrowth,
@@ -321,15 +308,6 @@ export class PageDashboardComponent {
       allowSignalWrites: true,
     },
   );
-
-  onSummaryClick(symbol: string) {
-    this.dialog.open(StockSummaryDialogComponent, {
-      data: {
-        symbol: symbol,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
-  }
 
   onPortfolioChangeChart(): void {
     this.dialogServiceUtil.showGenericDialog({

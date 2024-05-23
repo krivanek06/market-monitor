@@ -225,7 +225,7 @@ import {
       <tr class="mat-row" *matNoDataRow>
         <td class="text-center mat-cell" colspan="10">
           @if (showSkeletonLoading()) {
-            <div *ngRange="10" class="h-10 mb-1 g-skeleton"></div>
+            <div *ngRange="12" class="h-10 mb-1 g-skeleton"></div>
           } @else {
             <div class="grid place-content-center p-10 min-h-[250px]">No data to be found</div>
           }

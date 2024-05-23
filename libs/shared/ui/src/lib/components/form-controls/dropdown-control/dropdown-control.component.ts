@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { DefaultImageType, InputSource, InputSourceWrapper } from '@mm/shared/data-access';
-import { computedFrom } from 'ngxtension/computed-from';
+import { derivedFrom } from 'ngxtension/derived-from';
 import { filterNil } from 'ngxtension/filter-nil';
 import { distinctUntilChanged, filter, map, pipe, startWith } from 'rxjs';
 import { DefaultImgDirective } from '../../../directives';
@@ -210,7 +210,7 @@ export class DropdownControlComponent<T> implements ControlValueAccessor {
   /**
    * data which are displayed in MatOption for autocomplete
    */
-  autoCompleteInputSource = computedFrom(
+  autoCompleteInputSource = derivedFrom(
     [this.autoCompleteControl.valueChanges.pipe(startWith('')), this.inputSource],
     pipe(
       map(([value, inputSource]) =>

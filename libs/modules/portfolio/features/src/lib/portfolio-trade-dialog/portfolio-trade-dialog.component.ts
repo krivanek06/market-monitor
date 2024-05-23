@@ -33,7 +33,7 @@ import {
   NumberKeyboardComponent,
 } from '@mm/shared/ui';
 import { isSameDay } from 'date-fns';
-import { computedFrom } from 'ngxtension/computed-from';
+import { derivedFrom } from 'ngxtension/derived-from';
 import { catchError, map, of, pipe, startWith, switchMap } from 'rxjs';
 export type PortfolioTradeDialogComponentData = {
   quote: SymbolQuote;
@@ -380,7 +380,7 @@ export class PortfolioTradeDialogComponent {
   isSellDisabledZeroUnits = computed(() => !this.holdingSignal() && this.data().transactionType === 'SELL');
 
   isDemoTradingAccount = computed(() => this.authenticationUserService.state.isAccountDemoTrading());
-  calculatedFees = computedFrom(
+  calculatedFees = derivedFrom(
     [
       this.form.controls.units.valueChanges.pipe(
         startWith(this.form.controls.units.value),

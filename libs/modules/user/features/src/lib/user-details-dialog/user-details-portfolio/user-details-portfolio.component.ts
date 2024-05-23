@@ -3,7 +3,11 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { PortfolioStateHoldings, UserData } from '@mm/api-types';
 import { PortfolioGrowth } from '@mm/portfolio/data-access';
-import { PortfolioGrowthChartComponent, PortfolioHoldingsTableComponent } from '@mm/portfolio/ui';
+import {
+  PortfolioGrowthChartComponent,
+  PortfolioHoldingsTableCardComponent,
+  PortfolioHoldingsTableComponent,
+} from '@mm/portfolio/ui';
 import { SectionTitleComponent } from '@mm/shared/ui';
 
 @Component({
@@ -15,6 +19,7 @@ import { SectionTitleComponent } from '@mm/shared/ui';
     MatProgressSpinner,
     PortfolioHoldingsTableComponent,
     SectionTitleComponent,
+    PortfolioHoldingsTableCardComponent,
   ],
   template: `
     <!-- portfolio growth charts -->
@@ -38,12 +43,9 @@ import { SectionTitleComponent } from '@mm/shared/ui';
     }
 
     <div class="max-sm:pl-2 mb-6">
-      <app-section-title [title]="'Holdings: ' + (portfolioStateHolding()?.holdings ?? []).length" class="mb-3" />
-      <app-portfolio-holdings-table
-        [holdings]="portfolioStateHolding()?.holdings ?? []"
-        [portfolioState]="portfolioStateHolding()"
+      <app-portfolio-holdings-table-card
         [displayedColumns]="displayedColumns"
-        [showSkeletonLoading]="!portfolioStateHolding()?.holdings"
+        [portfolioStateHolding]="portfolioStateHolding()"
       />
     </div>
   `,

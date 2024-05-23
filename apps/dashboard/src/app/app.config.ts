@@ -24,13 +24,11 @@ import { appRoutes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    importProvidersFrom([
-      provideFirebaseApp(() => initializeApp(environment.firebase)),
-      provideFirestore(() => getFirestore()),
-      provideAuth(() => getAuth()),
-      provideStorage(() => getStorage()),
-      provideFunctions(() => getFunctions()),
-    ]),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirestore(() => getFirestore()),
+    provideAuth(() => getAuth()),
+    provideStorage(() => getStorage()),
+    provideFunctions(() => getFunctions()),
     provideHttpClient(),
     provideRouter(
       appRoutes,
