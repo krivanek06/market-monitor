@@ -20,7 +20,7 @@ import { map } from 'rxjs';
   standalone: true,
   imports: [CommonModule, HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule, SectionTitleComponent],
   template: `
-    <div *ngIf="displayHeader()" class="flex flex-col lg:flex-row gap-3 items-center justify-between">
+    <div class="flex flex-col lg:flex-row gap-3 items-center justify-between">
       <!-- select chart title -->
       <app-section-title [title]="headerTitle()" />
 
@@ -54,7 +54,6 @@ import { map } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioGrowthChartComponent extends ChartConstructor {
-  displayHeader = input(false);
   headerTitle = input<string>('');
   data = input.required<{
     values: PortfolioGrowth[];

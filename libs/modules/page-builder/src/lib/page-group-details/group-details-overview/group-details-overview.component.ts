@@ -123,7 +123,6 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         [heightPx]="425"
         class="mb-6"
         chartType="balance"
-        [displayHeader]="true"
         [displayLegend]="true"
         headerTitle="Portfolio Growth"
       />
@@ -231,8 +230,6 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       @if (groupDetailsSignal.groupTransactionsData.length > 0) {
         <div>
           @defer (on idle) {
-            <app-section-title title="Last Transactions" matIcon="history" additionalClasses="pl-1 mb-6 lg:-mb-10" />
-
             <mat-tab-group class="hidden lg:block" mat-stretch-tabs="false" mat-align-tabs="end">
               <!-- last transactions -->
               <mat-tab label="Last Transactions">

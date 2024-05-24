@@ -27,7 +27,6 @@ import { SectionTitleComponent } from '@mm/shared/ui';
       <app-portfolio-growth-chart
         headerTitle="Portfolio Growth"
         chartType="balance"
-        [displayHeader]="true"
         [displayLegend]="true"
         [data]="{
           values: portfolioGrowth,

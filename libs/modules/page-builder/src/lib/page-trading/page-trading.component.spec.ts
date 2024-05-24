@@ -22,10 +22,6 @@ import { of } from 'rxjs';
 import { PageTradingComponent } from './page-trading.component';
 
 describe('PageTradingComponent', () => {
-  // let component: PageTradingComponent;
-  // let fixture: ComponentFixture<PageTradingComponent>;
-  // let loader: HarnessLoader;
-
   const mockPortfolioState = {
     balance: 1000,
     cashOnHand: 500,

@@ -23,6 +23,7 @@ import {
   DefaultImgDirective,
   DropdownControlComponent,
   PercentageIncreaseDirective,
+  SectionTitleComponent,
 } from '@mm/shared/ui';
 
 @Component({
@@ -42,26 +43,39 @@ import {
     ReactiveFormsModule,
     MatButtonModule,
     MatIconModule,
+    SectionTitleComponent,
   ],
   template: `
-    <!-- filter -->
-    <div *ngIf="showSymbolFilter()" class="hidden lg:flex justify-end gap-3 mb-5">
-      <app-dropdown-control
-        class="min-w-[400px]"
-        inputCaption="Symbol Filer"
-        displayImageType="symbol"
-        inputType="SELECT_AUTOCOMPLETE"
-        [showClearButton]="true"
-        [inputSource]="tableSymbolFilter()"
-        [formControl]="tableSymbolFilterControl"
-      />
+    <!-- title -->
+    <app-section-title
+      title="Transaction History"
+      matIcon="history"
+      class="mb-5"
+      [ngClass]="{
+        'lg:-mb-10': showActionBarComp()
+      }"
+    />
 
-      <div class="pt-2">
-        <button type="button" mat-icon-button (click)="onFilterReset()" [disabled]="!tableSymbolFilterControl.value">
-          <mat-icon>close</mat-icon>
-        </button>
+    <!-- filter -->
+    @if (showActionBarComp()) {
+      <div class="hidden lg:flex justify-end gap-3 mb-5">
+        <app-dropdown-control
+          class="min-w-[400px]"
+          inputCaption="Symbol Filer"
+          displayImageType="symbol"
+          inputType="SELECT_AUTOCOMPLETE"
+          [showClearButton]="true"
+          [inputSource]="tableSymbolFilter()"
+          [formControl]="tableSymbolFilterControl"
+        />
+
+        <div class="pt-2">
+          <button type="button" mat-icon-button (click)="onFilterReset()" [disabled]="!tableSymbolFilterControl.value">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
       </div>
-    </div>
+    }
 
     <!-- table -->
     <table mat-table [dataSource]="dataSource" [trackBy]="identity" matSort (matSortChange)="sortData($event)">
@@ -248,6 +262,8 @@ export class PortfolioTransactionsTableComponent {
    * Whether to show the user column
    */
   showUser = input(false);
+
+  showActionBarComp = computed(() => this.showSymbolFilter() && (this.data()?.length ?? 0) > 15);
 
   tableSymbolFilter = computed(
     () =>
