@@ -1,11 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
@@ -25,18 +23,13 @@ import {
 import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
-  DateRangeSliderComponent,
-  DateRangeSliderValues,
   FormMatInputWrapperComponent,
   GeneralCardComponent,
   GenericChartComponent,
   PieChartComponent,
   SectionTitleComponent,
   SortByKeyPipe,
-  filterDataByDateRange,
 } from '@mm/shared/ui';
-import { derivedFrom } from 'ngxtension/derived-from';
-import { map, pipe, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-page-dashboard',
@@ -61,16 +54,14 @@ import { map, pipe, startWith } from 'rxjs';
     MatTooltipModule,
     PortfolioGrowthChartComponent,
     PortfolioChangeChartComponent,
-    DateRangeSliderComponent,
     PortfolioAssetChartComponent,
-    ReactiveFormsModule,
     MatButtonModule,
     MatProgressSpinner,
     PortfolioTransactionsItemComponent,
     PortfolioHoldingsTableCardComponent,
   ],
   template: `
-    <div class="grid xl:grid-cols-3 mb-6 sm:mb-10 gap-8">
+    <div class="grid xl:grid-cols-3 mb-6 sm:mb-8 gap-8">
       <div
         class="flex flex-row max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2"
       >
@@ -81,6 +72,7 @@ import { map, pipe, startWith } from 'rxjs';
           [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
         >
           <app-portfolio-state
+            data-testid="page-dashboard-portfolio-state"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showCashSegment]="stateRef.isAccountDemoTrading()"
@@ -95,6 +87,7 @@ import { map, pipe, startWith } from 'rxjs';
           [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
         >
           <app-portfolio-state-risk
+            data-testid="page-dashboard-portfolio-risk"
             [portfolioRisk]="stateRef.getUserDataNormal()?.portfolioRisk"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
@@ -108,6 +101,7 @@ import { map, pipe, startWith } from 'rxjs';
           [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
         >
           <app-portfolio-state-transactions
+            data-testid="page-dashboard-portfolio-transactions"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showFees]="!!stateRef.isAccountDemoTrading()"
@@ -120,59 +114,51 @@ import { map, pipe, startWith } from 'rxjs';
       <div class="lg:pt-2">
         <app-portfolio-period-change
           *ngIf="portfolioUserFacadeService.getPortfolioChange() as portfolioChange"
+          data-testid="page-dashboard-period-change"
           [portfolioChange]="portfolioChange"
         />
       </div>
     </div>
 
+    <div class="flex flex-col sm:flex-row gap-4 mb-3">
+      <!-- do not show buttons if not enough data -->
+      @if (portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0) {
+        <button
+          data-testid="page-dashboard-portfolio-change-button"
+          matTooltip="Display daily portfolio change - profit/loss"
+          type="button"
+          class="hidden sm:block"
+          (click)="onPortfolioChangeChart()"
+          mat-stroked-button
+        >
+          Portfolio Change
+        </button>
+        <button
+          data-testid="page-dashboard-asset-growth-button"
+          matTooltip="Display invested amount per asset in your portfolio"
+          type="button"
+          class="hidden sm:block"
+          (click)="onAssetGrowthChart()"
+          mat-stroked-button
+        >
+          Asset Growth
+        </button>
+      }
+    </div>
+
     <!-- dashboard charts -->
     <div class="mb-8">
-      <!-- portfolio growth -->
-      <div class="flex flex-col lg:flex-row lg:items-center gap-3 justify-between">
-        <!-- select chart title -->
-        <div class="flex flex-col sm:flex-row items-center gap-4">
-          <app-section-title title="Portfolio Growth" class="mr-6 max-lg:flex-1" />
-          <!-- do not show buttons if not enough data -->
-          @if (portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0) {
-            <button
-              (click)="onPortfolioChangeChart()"
-              matTooltip="Display daily portfolio change - profit/loss"
-              type="button"
-              class="hidden sm:block"
-              mat-stroked-button
-            >
-              Portfolio Change
-            </button>
-            <button
-              (click)="onAssetGrowthChart()"
-              matTooltip="Display invested amount per asset in your portfolio"
-              type="button"
-              class="hidden sm:block"
-              mat-stroked-button
-            >
-              Asset Growth
-            </button>
-          }
-        </div>
-
-        <!-- date range -->
-        <app-date-range-slider
-          *ngIf="portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0"
-          class="w-full lg:w-[550px]"
-          [formControl]="portfolioGrowthRangeControl"
-        />
-      </div>
-
       <!-- portfolio growth chart -->
-      @if (portfolioUserFacadeService.getPortfolioGrowth()) {
+      @if (portfolioUserFacadeService.getPortfolioGrowth(); as getPortfolioGrowth) {
         <app-portfolio-growth-chart
+          data-testid="page-dashboard-portfolio-growth-chart"
+          headerTitle="Portfolio Growth"
+          chartType="balance"
           [data]="{
-            values: portfolioGrowthChartSignal(),
+            values: getPortfolioGrowth,
             startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0
           }"
-          [displayHeader]="false"
           [heightPx]="400"
-          chartType="balance"
         />
       } @else {
         <div class="grid place-content-center" [style.height.px]="400">
@@ -183,67 +169,80 @@ import { map, pipe, startWith } from 'rxjs';
       <!-- investment growth -->
       @if (portfolioUserFacadeService.getPortfolioGrowth(); as portfolioGrowth) {
         <app-portfolio-growth-chart
+          data-testid="page-dashboard-investment-growth-chart"
           headerTitle="Invested Value to Market"
-          [displayHeader]="true"
+          chartType="marketValue"
           [data]="{
             values: portfolioGrowth,
             startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0
           }"
           [heightPx]="400"
-          chartType="marketValue"
         />
       } @else {
         <div class="grid place-content-center" [style.height.px]="400">
-          <mat-spinner></mat-spinner>
+          <mat-spinner />
         </div>
       }
     </div>
 
     <!-- holding -->
     <div class="mb-8">
-      <app-portfolio-holdings-table-card [portfolioStateHolding]="portfolioUserFacadeService.getPortfolioState()" />
+      <app-portfolio-holdings-table-card
+        data-testid="page-dashboard-portfolio-holdings-table"
+        [portfolioStateHolding]="portfolioUserFacadeService.getPortfolioState()"
+      />
     </div>
 
-    @defer (on idle) {
-      @if ((portfolioUserFacadeService.getPortfolioState()?.holdings ?? []).length > 0) {
-        <!-- holdings pie charts -->
-        <div class="flex justify-center lg:justify-between gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6">
+    <!-- holdings pie charts -->
+    <div class="flex justify-center lg:justify-between gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6">
+      @if (portfolioUserFacadeService.getPortfolioState()?.holdings; as holdings) {
+        @if (holdings.length > 0) {
           <app-pie-chart
+            data-testid="page-dashboard-portfolio-asset-allocation"
             class="max-sm:w-[385px]"
             chartTitle="Asset Allocation"
             [heightPx]="400"
             [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
           />
           <app-pie-chart
+            data-testid="page-dashboard-portfolio-sector-allocation"
             class="hidden lg:block"
-            [heightPx]="400"
             chartTitle="Sector Allocation"
+            [heightPx]="400"
             [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
           />
-        </div>
+        }
+      } @else {
+        <div class="g-skeleton h-[420px] w-full"></div>
+        <div class="g-skeleton h-[420px] w-full"></div>
       }
+    </div>
 
-      @if (stateRef.userHaveTransactions()) {
-        <!-- transaction history -->
-        <app-section-title title="Transaction History" matIcon="history" class="mb-5 lg:-mb-10" />
-        <div class="grid xl:grid-cols-3 gap-x-8 gap-y-4" [ngClass]="{ 'xl:h-[980px]': portfolioLength() > 15 }">
-          <!-- all transactions -->
-          <app-portfolio-transactions-table
-            [ngClass]="{
-              'xl:col-span-2': portfolioLength() > 15,
-              'xl:col-span-3': portfolioLength() <= 15
-            }"
-            [showTransactionFees]="!!stateRef.isAccountDemoTrading()"
-            [data]="stateRef.portfolioTransactions()"
-            [showSymbolFilter]="true"
-          />
+    @if (stateRef.userHaveTransactions()) {
+      <!-- transaction history -->
+      <div class="grid xl:grid-cols-3 gap-x-8 gap-y-4" [ngClass]="{ 'xl:h-[980px]': hasEnoughTransactions() }">
+        <!-- all transactions -->
+        <app-portfolio-transactions-table
+          data-testid="page-dashboard-portfolio-transactions-table"
+          [ngClass]="{
+            'xl:col-span-2': hasEnoughTransactions(),
+            'xl:col-span-3': !hasEnoughTransactions()
+          }"
+          [showTransactionFees]="!!stateRef.isAccountDemoTrading()"
+          [data]="stateRef.portfolioTransactions()"
+          [showSymbolFilter]="true"
+        />
 
-          <!-- best / worst -->
-          <div *ngIf="portfolioLength() > 15" class="hidden sm:flex lg:max-xl:flex-row flex-col gap-4 lg:pt-6">
+        <!-- best / worst -->
+        @if (hasEnoughTransactions()) {
+          <div class="hidden sm:flex lg:max-xl:flex-row flex-col gap-4 lg:pt-6">
             <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
               @for (item of stateRef.getUserPortfolioTransactionsBest(); track item.transactionId; let last = $last) {
                 <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
-                  <app-portfolio-transactions-item [transaction]="item" />
+                  <app-portfolio-transactions-item
+                    data-testid="page-dashboard-best-transactions"
+                    [transaction]="item"
+                  />
                 </div>
               }
             </app-general-card>
@@ -251,13 +250,16 @@ import { map, pipe, startWith } from 'rxjs';
             <app-general-card title="Worst Returns" matIcon="trending_down" class="flex-1">
               @for (item of stateRef.getUserPortfolioTransactionsWorst(); track item.transactionId; let last = $last) {
                 <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
-                  <app-portfolio-transactions-item [transaction]="item" />
+                  <app-portfolio-transactions-item
+                    data-testid="page-dashboard-worst-transactions"
+                    [transaction]="item"
+                  />
                 </div>
               }
             </app-general-card>
           </div>
-        </div>
-      }
+        }
+      </div>
     }
   `,
   styles: `
@@ -272,42 +274,16 @@ export class PageDashboardComponent {
   private authenticationUserService = inject(AuthenticationUserStoreService);
   portfolioUserFacadeService = inject(PortfolioUserFacadeService);
 
+  /**
+   * Transaction limit to show best and worst transactions
+   */
+  readonly transactionLimit = 15;
+
   stateRef = this.authenticationUserService.state;
 
-  portfolioLength = computed(() => this.stateRef.portfolioTransactions()?.length ?? 0);
-
-  portfolioGrowthRangeControl = new FormControl<DateRangeSliderValues | null>(null, { nonNullable: true });
-
-  portfolioGrowthChartSignal = derivedFrom(
-    [
-      this.portfolioGrowthRangeControl.valueChanges.pipe(startWith(null)),
-      this.portfolioUserFacadeService.getPortfolioGrowth,
-    ],
-    pipe(map(([dateRange, data]) => filterDataByDateRange(data ?? [], dateRange))),
-  );
+  hasEnoughTransactions = computed(() => (this.stateRef.portfolioTransactions()?.length ?? 0) > this.transactionLimit);
 
   ColorScheme = ColorScheme;
-
-  USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
-
-  /**
-   * patching date values into the portfolio growth slider
-   */
-  patchSliderEffect = effect(
-    () => {
-      const data = this.portfolioUserFacadeService.getPortfolioGrowth() ?? [];
-
-      // patch values only if empty
-      this.portfolioGrowthRangeControl.patchValue({
-        dates: data.map((point) => point.date),
-        currentMinDateIndex: 0,
-        currentMaxDateIndex: data.length - 1,
-      });
-    },
-    {
-      allowSignalWrites: true,
-    },
-  );
 
   onPortfolioChangeChart(): void {
     this.dialogServiceUtil.showGenericDialog({

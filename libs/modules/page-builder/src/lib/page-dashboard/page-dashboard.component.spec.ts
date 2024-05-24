@@ -1,20 +1,444 @@
-import { ComponentFixture } from '@angular/core/testing';
-import { MockBuilder, MockRender } from 'ng-mocks';
+import { Component, input, signal } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import {
+  PortfolioStateHoldings,
+  PortfolioTransaction,
+  PortfolioTransactionMore,
+  UserAccountEnum,
+  mockCreateUser,
+  quoteAAPLMock,
+} from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { PortfolioChange, PortfolioGrowth, PortfolioUserFacadeService } from '@mm/portfolio/data-access';
+import {
+  PortfolioAssetChartComponent,
+  PortfolioChangeChartComponent,
+  PortfolioGrowthChartComponent,
+  PortfolioHoldingsTableCardComponent,
+  PortfolioPeriodChangeComponent,
+  PortfolioStateComponent,
+  PortfolioStateRiskComponent,
+  PortfolioStateTransactionsComponent,
+  PortfolioTransactionsTableComponent,
+} from '@mm/portfolio/ui';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { PieChartComponent } from '@mm/shared/ui';
+import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PageDashboardComponent } from './page-dashboard.component';
 
+@Component({
+  selector: 'app-portfolio-holdings-table-card',
+  standalone: true,
+  template: ``,
+})
+class PortfolioHoldingsTableCardComponentStub {
+  portfolioStateHolding = input<PortfolioStateHoldings>();
+}
+
+@Component({
+  selector: 'app-portfolio-transactions-table',
+  standalone: true,
+  template: ``,
+})
+class PortfolioTransactionsTableComponentStub {
+  showTransactionFees = input<boolean>();
+  data = input<PortfolioTransactionMore[] | null | undefined>();
+  showSymbolFilter = input<boolean>();
+}
+
 describe('PageDashboardComponent', () => {
-  let component: PageDashboardComponent;
-  let fixture: ComponentFixture<PageDashboardComponent>;
+  const portfolioChangeButtonS = '[data-testid="page-dashboard-portfolio-change-button"]';
+  const assetGrowthButtonS = '[data-testid="page-dashboard-asset-growth-button"]';
+  const periodChangeCompS = '[data-testid="page-dashboard-period-change"]';
 
-  beforeEach(async () => {
-    MockBuilder(PageDashboardComponent);
+  const portfolioStateS = '[data-testid="page-dashboard-portfolio-state"]';
+  const portfolioRiskS = '[data-testid="page-dashboard-portfolio-risk"]';
+  const portfolioTransactionsS = '[data-testid="page-dashboard-portfolio-transactions"]';
 
-    fixture = MockRender(PageDashboardComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  const growthChartBalanceS = '[data-testid="page-dashboard-portfolio-growth-chart"]';
+  const growthChartMarketS = '[data-testid="page-dashboard-investment-growth-chart"]';
+  const holdingTableS = '[data-testid="page-dashboard-portfolio-holdings-table"]';
+
+  const assetAllocationPieChart = '[data-testid="page-dashboard-portfolio-asset-allocation"]';
+  const sectorAllocationPriChart = '[data-testid="page-dashboard-portfolio-sector-allocation"]';
+
+  const transactionTableS = '[data-testid="page-dashboard-portfolio-transactions-table"]';
+  const bestTransactionS = '[data-testid="page-dashboard-best-transactions"]';
+  const worstTransactionS = '[data-testid="page-dashboard-worst-transactions"]';
+
+  const mockPortfolioState = {
+    balance: 1000,
+    cashOnHand: 500,
+    invested: 300,
+    holdingsBalance: 500,
+    startingCash: 10_000,
+    holdings: [
+      {
+        symbol: 'AAPL',
+        units: 10,
+        invested: 1000,
+        symbolQuote: quoteAAPLMock,
+      },
+    ] as PortfolioStateHoldings['holdings'],
+  } as PortfolioStateHoldings;
+
+  const mockUser = mockCreateUser({
+    id: 'User_123',
+    userAccountType: UserAccountEnum.DEMO_TRADING,
+    portfolioRisk: {
+      alpha: 0.5,
+      beta: 0.5,
+      sharpe: 0.5,
+      volatility: 12,
+      date: '2021-01-01',
+    },
+  });
+
+  // random data with no meaning to it
+  const mockPortfolioGrowth = [
+    {
+      date: '2021-01-01',
+      breakEvenValue: 1000,
+      marketTotalValue: 1200,
+      totalBalanceValue: 1200,
+    },
+    {
+      date: '2021-01-02',
+      breakEvenValue: 1200,
+      marketTotalValue: 1300,
+      totalBalanceValue: 1300,
+    },
+  ] as PortfolioGrowth[];
+
+  const mockAllocationChartData = {
+    name: 'Portfolio Allocation',
+    type: 'pie',
+    innerSize: '35%',
+    data: [],
+  };
+
+  const mockSectorChartData = {
+    name: 'Sector Allocation',
+    type: 'pie',
+    innerSize: '35%',
+    data: [],
+  };
+
+  const mockTransactions = [
+    { date: '2021-01-01', symbol: 'AAPL', units: 10, unitPrice: 100 },
+    { date: '2021-01-02', symbol: 'AAPL', units: 11, unitPrice: 100 },
+    { date: '2021-01-03', symbol: 'AAPL', units: 12, unitPrice: 100 },
+  ] as PortfolioTransaction[];
+
+  beforeEach(() => {
+    return MockBuilder(PageDashboardComponent)
+      .keep(MatButtonModule)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .keep(NoopAnimationsModule)
+      .replace(PortfolioHoldingsTableCardComponent, PortfolioHoldingsTableCardComponentStub)
+      .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentStub)
+      .provide({
+        provide: DialogServiceUtil,
+        useValue: {
+          showNotificationBar: jest.fn(),
+          showGenericDialog: jest.fn(),
+        },
+      })
+      .provide({
+        provide: AuthenticationUserStoreService,
+        useValue: {
+          state: {
+            portfolioTransactions: () => mockTransactions,
+            isAccountDemoTrading: () => true,
+            userHaveTransactions: () => true,
+            getUserDataNormal: () => mockUser,
+            getUserPortfolioTransactionsBest: () => [] as PortfolioTransaction[],
+            getUserPortfolioTransactionsWorst: () => [] as PortfolioTransaction[],
+          } as AuthenticationUserStoreService['state'],
+        },
+      })
+      .provide({
+        provide: PortfolioUserFacadeService,
+        useValue: {
+          getPortfolioSectorAllocationPieChart: () => mockSectorChartData,
+          getPortfolioAssetAllocationPieChart: () => mockAllocationChartData,
+          getPortfolioGrowth: () => mockPortfolioGrowth,
+          getPortfolioState: () => mockPortfolioState,
+          getPortfolioChange: () =>
+            ({
+              '1_day': {
+                value: 0.5,
+                valuePrct: 0.5,
+              },
+            }) as PortfolioChange,
+        },
+      });
+  });
+
+  afterEach(() => {
+    ngMocks.reset();
+    ngMocks.autoSpy('reset');
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = MockRender(PageDashboardComponent);
+    expect(fixture.point.componentInstance).toBeTruthy();
+  });
+
+  it('should display PortfolioStateComponent component', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const comp = ngMocks.find<PortfolioStateComponent>(portfolioStateS);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.portfolioState).toEqual(mockPortfolioState);
+    expect(comp.componentInstance.showCashSegment).toBe(true);
+  });
+
+  it('should display PortfolioStateRiskComponent component', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const comp = ngMocks.find<PortfolioStateRiskComponent>(portfolioRiskS);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.portfolioRisk).toEqual(mockUser.portfolioRisk);
+  });
+
+  it('should display PortfolioStateTransactionsComponent component', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const comp = ngMocks.find<PortfolioStateTransactionsComponent>(portfolioTransactionsS);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.showFees).toBe(true);
+    expect(comp.componentInstance.portfolioState).toEqual(mockPortfolioState);
+    expect(comp.componentInstance.portfolioState).toBe(mockPortfolioState);
+  });
+
+  it('should display PortfolioPeriodChangeComponent component', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const comp = ngMocks.find<PortfolioPeriodChangeComponent>(periodChangeCompS);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.portfolioChange).toEqual({
+      '1_day': {
+        value: 0.5,
+        valuePrct: 0.5,
+      },
+    });
+  });
+
+  it('should call PortfolioChangeChartComponent on button click', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const component = fixture.point.componentInstance;
+    const dialog = ngMocks.get(DialogServiceUtil);
+    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
+
+    const portfolioChangeButton = ngMocks.find(portfolioChangeButtonS);
+
+    const onPortfolioChangeChartSpy = jest.spyOn(component, 'onPortfolioChangeChart');
+
+    // click on the button
+    ngMocks.click(portfolioChangeButton);
+
+    expect(onPortfolioChangeChartSpy).toHaveBeenCalled();
+    expect(dialog.showGenericDialog).toHaveBeenCalledWith({
+      component: PortfolioChangeChartComponent,
+      componentData: {
+        data: portfolioUserFacadeService.getPortfolioGrowth,
+      },
+    });
+  });
+
+  it('should call PortfolioAssetChartComponent on button click', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const component = fixture.point.componentInstance;
+    const dialog = ngMocks.get(DialogServiceUtil);
+    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
+
+    const portfolioChangeButton = ngMocks.find(assetGrowthButtonS);
+
+    const onAssetGrowthChartSpy = jest.spyOn(component, 'onAssetGrowthChart');
+
+    // click on the button
+    ngMocks.click(portfolioChangeButton);
+
+    expect(onAssetGrowthChartSpy).toHaveBeenCalled();
+    expect(dialog.showGenericDialog).toHaveBeenCalledWith({
+      title: 'Portfolio Asset Growth Chart',
+      component: PortfolioAssetChartComponent,
+      componentData: {
+        data: portfolioUserFacadeService.getPortfolioGrowthAssets,
+      },
+    });
+  });
+
+  it('should display PortfolioGrowthChartComponent component type balance', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const comp = ngMocks.find<PortfolioGrowthChartComponent>(growthChartBalanceS);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.data).toEqual({
+      values: mockPortfolioGrowth,
+      startingCashValue: mockPortfolioState.startingCash,
+    });
+    expect(comp.componentInstance.chartType).toBe('balance');
+  });
+
+  it('should display PortfolioGrowthChartComponent component type marketValue', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const comp = ngMocks.find<PortfolioGrowthChartComponent>(growthChartMarketS);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.data).toEqual({
+      values: mockPortfolioGrowth,
+      startingCashValue: mockPortfolioState.startingCash,
+    });
+    expect(comp.componentInstance.chartType).toBe('marketValue');
+  });
+
+  it('should display PortfolioHoldingsTableCardComponent component', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
+
+    const comp = ngMocks.find<PortfolioHoldingsTableCardComponentStub>(holdingTableS);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.portfolioStateHolding()).toEqual(portfolioUserFacadeService.getPortfolioState());
+  });
+
+  it('should display Asset Allocation Pie Chart', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const portfolioUserFacade = ngMocks.get(PortfolioUserFacadeService);
+
+    const comp = ngMocks.find<PieChartComponent>(assetAllocationPieChart);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.chartTitle).toEqual('Asset Allocation');
+    expect(comp.componentInstance.series).toEqual(portfolioUserFacade.getPortfolioAssetAllocationPieChart());
+  });
+
+  it('should display Sector Allocation Pie Chart', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const portfolioUserFacade = ngMocks.get(PortfolioUserFacadeService);
+
+    const comp = ngMocks.find<PieChartComponent>(sectorAllocationPriChart);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.chartTitle).toEqual('Sector Allocation');
+    expect(comp.componentInstance.series).toEqual(portfolioUserFacade.getPortfolioSectorAllocationPieChart());
+  });
+
+  it('should NOT display sector allocation nor asset allocation pie chart when holdings is 0', () => {
+    const portfolioUserFacade = ngMocks.get(PortfolioUserFacadeService);
+    const newMockPortfolioState = {
+      ...mockPortfolioState,
+      holdings: [],
+    } as PortfolioStateHoldings;
+
+    // mock the new portfolio state
+    ngMocks.stub(portfolioUserFacade, {
+      getPortfolioState: signal(newMockPortfolioState),
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageDashboardComponent);
+
+    fixture.detectChanges();
+
+    const assetChart = fixture.debugElement.query(By.css(assetAllocationPieChart));
+    const sectorChart = fixture.debugElement.query(By.css(sectorAllocationPriChart));
+
+    expect(assetChart).toBeFalsy();
+    expect(sectorChart).toBeFalsy();
+  });
+
+  it('should NOT display transaction table if user has no transactions', () => {
+    const userStore = ngMocks.get(AuthenticationUserStoreService);
+    ngMocks.stub(userStore, {
+      state: {
+        ...userStore.state,
+        userHaveTransactions: () => false,
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const transactionTable = fixture.debugElement.query(By.css(transactionTableS));
+    expect(transactionTable).toBeFalsy();
+  });
+
+  it('should display and add transactions into transaction table', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const authenticationUserService = ngMocks.get(AuthenticationUserStoreService);
+
+    const transactionTable = ngMocks.find<PortfolioTransactionsTableComponentStub>(transactionTableS);
+
+    expect(transactionTable).toBeTruthy();
+    expect(transactionTable.componentInstance.data()).toEqual(authenticationUserService.state.portfolioTransactions());
+    expect(transactionTable.componentInstance.showSymbolFilter()).toBe(true);
+    expect(transactionTable.componentInstance.showTransactionFees()).toBe(true);
+  });
+
+  it('should NOT display best and worst transactions if user do not have enough transactions', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const bestTransactions = fixture.debugElement.queryAll(By.css(bestTransactionS));
+    const worstTransactions = fixture.debugElement.queryAll(By.css(worstTransactionS));
+
+    expect(bestTransactions).toHaveLength(0);
+    expect(worstTransactions).toHaveLength(0);
+  });
+
+  it('should show best and worst transactions', () => {
+    const userStore = ngMocks.get(AuthenticationUserStoreService);
+    const bestTransactions = [
+      { date: '2021-01-05', symbol: 'MSFT', units: 11, unitPrice: 120 },
+      { date: '2021-01-05', symbol: 'MSFT', units: 11, unitPrice: 120 },
+      { date: '2021-01-05', symbol: 'MSFT', units: 11, unitPrice: 120 },
+    ] as PortfolioTransaction[];
+
+    const worstTransactions = [
+      { date: '2021-01-01', symbol: 'AAPL', units: 10, unitPrice: 100 },
+    ] as PortfolioTransaction[];
+
+    ngMocks.stub(userStore, {
+      state: {
+        ...userStore.state,
+        getUserPortfolioTransactionsBest: () => bestTransactions,
+        getUserPortfolioTransactionsWorst: () => worstTransactions,
+        portfolioTransactions: () => Array.from({ length: 16 }, (_, i) => ({})),
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const bestTransactionsComp = fixture.debugElement.queryAll(By.css(bestTransactionS));
+    const worstTransactionsComp = fixture.debugElement.queryAll(By.css(worstTransactionS));
+
+    expect(bestTransactionsComp).toHaveLength(3);
+    expect(worstTransactionsComp).toHaveLength(1);
   });
 });
