@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatOptionSelectionChange } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { DefaultImageType, InputSource, InputSourceWrapper } from '@mm/shared/data-access';
 import { derivedFrom } from 'ngxtension/derived-from';
-import { filterNil } from 'ngxtension/filter-nil';
 import { distinctUntilChanged, filter, map, pipe, startWith } from 'rxjs';
 import { DefaultImgDirective } from '../../../directives';
 
@@ -32,7 +32,7 @@ import { DefaultImgDirective } from '../../../directives';
 
       @switch (inputType()) {
         @case ('SELECT_SOURCE_WRAPPER') {
-          <mat-select [disableRipple]="disabled()" [disabled]="disabled()" [formControl]="selectedValuesControl">
+          <mat-select [disableRipple]="disabled()" [disabled]="disabled()" [value]="internalSelectValue()?.value">
             <mat-select-trigger class="flex items-center gap-2">
               <img
                 appDefaultImg
@@ -48,7 +48,7 @@ import { DefaultImgDirective } from '../../../directives';
               <!-- clear option -->
               <mat-option *ngIf="internalSelectValue() && showClearButton()" (click)="onClear()"> clear </mat-option>
               @for (optionData of source.items; track optionData.caption) {
-                <mat-option [value]="optionData.value">
+                <mat-option [value]="optionData.value" (onSelectionChange)="onOptionChange($event)">
                   <div class="flex items-center gap-2">
                     <img
                       appDefaultImg
@@ -71,7 +71,7 @@ import { DefaultImgDirective } from '../../../directives';
             <!-- clear option -->
             <mat-option *ngIf="internalSelectValue()" (click)="onClear()"> clear </mat-option>
             @for (optionData of autoCompleteInputSource(); track optionData.caption) {
-              <mat-option [value]="optionData.value" (onSelectionChange)="selectedValuesControl.patchValue(optionData)">
+              <mat-option [value]="optionData.value" (onSelectionChange)="onOptionChange($event)">
                 <div class="flex items-center gap-2 min-w-max">
                   <img
                     appDefaultImg
@@ -88,12 +88,12 @@ import { DefaultImgDirective } from '../../../directives';
           </mat-autocomplete>
         }
         @case ('MULTISELECT') {
-          <mat-select [disableRipple]="disabled()" [formControl]="selectedValuesControl" multiple="true">
+          <mat-select [disableRipple]="disabled()" multiple="true">
             <input class="select-input" placeholder="Search" tabindex="0" />
             <!-- clear option -->
             <mat-option *ngIf="internalSelectValue" (click)="onClear()"> clear </mat-option>
             @for (optionData of inputSource(); track optionData.caption) {
-              <mat-option [value]="optionData.value">
+              <mat-option [value]="optionData.value" (onSelectionChange)="onOptionChange($event)">
                 <div class="flex items-center gap-2 min-w-max">
                   <img
                     *ngIf="optionData?.image"
@@ -110,7 +110,7 @@ import { DefaultImgDirective } from '../../../directives';
           </mat-select>
         }
         @default {
-          <mat-select [disableRipple]="disabled()" [formControl]="selectedValuesControl">
+          <mat-select [disableRipple]="disabled()" [value]="internalSelectValue()?.value">
             <mat-select-trigger *ngIf="internalSelectValue() as internalSelectValue" class="flex items-center gap-2">
               <img
                 appDefaultImg
@@ -125,7 +125,7 @@ import { DefaultImgDirective } from '../../../directives';
             <!-- clear option -->
             <mat-option *ngIf="internalSelectValue() && showClearButton()" (click)="onClear()"> clear </mat-option>
             @for (optionData of inputSource(); track optionData.caption) {
-              <mat-option [value]="optionData">
+              <mat-option [value]="optionData.value" (onSelectionChange)="onOptionChange($event)">
                 <div class="flex items-center gap-2 min-w-max">
                   <img
                     *ngIf="optionData?.image"
@@ -188,11 +188,6 @@ export class DropdownControlComponent<T> implements ControlValueAccessor {
   inputSourceWrapper = input<InputSourceWrapper<T>[] | null | undefined>([]);
 
   /**
-   * keep track of all selected values
-   */
-  selectedValuesControl = new FormControl<InputSource<T>[] | InputSource<T> | null>(null);
-
-  /**
    * control for autocomplete for user to type input to filter values
    */
   autoCompleteControl = new FormControl<string | null>('');
@@ -201,11 +196,7 @@ export class DropdownControlComponent<T> implements ControlValueAccessor {
    * keep the last selected value by user to display custom caption and image in UI
    * inside mat-select-trigger
    */
-  internalSelectValue = toSignal(
-    this.selectedValuesControl.valueChanges.pipe(
-      map((value) => (Array.isArray(value) ? value[value.length - 1] : value)),
-    ),
-  );
+  internalSelectValue = signal<InputSource<T> | undefined | null>(undefined);
 
   /**
    * data which are displayed in MatOption for autocomplete
@@ -223,18 +214,6 @@ export class DropdownControlComponent<T> implements ControlValueAccessor {
   disabled = signal(false);
 
   constructor() {
-    this.selectedValuesControl.valueChanges.pipe(filterNil(), takeUntilDestroyed()).subscribe((values) => {
-      const workingVal = this.selectedValuesControl.value;
-      const emitVal = !workingVal
-        ? null
-        : Array.isArray(workingVal)
-          ? workingVal.map((v) => v.value)
-          : workingVal.value;
-      console.log('DropdownControlComponent emit', emitVal);
-
-      this.onChange(emitVal);
-    });
-
     // listen to autocomplete value changes - when empty emit
     this.autoCompleteControl.valueChanges
       .pipe(
@@ -247,7 +226,7 @@ export class DropdownControlComponent<T> implements ControlValueAccessor {
       });
   }
 
-  onChange: (value: T[] | T | null) => void = () => {};
+  onChange: (value: T[] | T | undefined) => void = () => {};
   onTouched = () => {};
 
   writeValue(obj: T | T[] | undefined): void {
@@ -256,9 +235,10 @@ export class DropdownControlComponent<T> implements ControlValueAccessor {
       ...(this.inputSourceWrapper()?.flatMap((wrapper) => wrapper.items) ?? []),
     ];
 
+    // user cleared the value
     if (!obj) {
-      this.selectedValuesControl.setValue(null);
       this.autoCompleteControl.setValue(null);
+      this.internalSelectValue.set(undefined);
       return;
     }
 
@@ -267,21 +247,41 @@ export class DropdownControlComponent<T> implements ControlValueAccessor {
       const sources = obj
         .map((value) => inputSource.find((source) => source.value === value))
         .filter((d): d is InputSource<T> => !!d);
-      this.selectedValuesControl.patchValue(sources, { emitEvent: false });
+      this.internalSelectValue.set(sources[0]);
     }
 
     // single data
     if (!Array.isArray(obj) && this.inputType() !== 'MULTISELECT') {
       const source = inputSource.find((source) => source.value === obj) ?? null;
-      this.selectedValuesControl.patchValue(source, { emitEvent: false });
+      this.internalSelectValue.set(source);
     }
 
-    console.log('selectedValuesControl', obj, this.selectedValuesControl.value);
+    console.log('selectedValuesControl', obj);
   }
 
   onClear() {
-    this.selectedValuesControl.setValue(null);
-    this.onChange(null);
+    this.onChange(undefined);
+    this.internalSelectValue.set(undefined);
+  }
+
+  onOptionChange(event: MatOptionSelectionChange<T>) {
+    //console.log('onOptionChange', event);
+    if (!event.isUserInput) {
+      return;
+    }
+    const inputSource = [
+      ...(this.inputSource() ?? []),
+      ...(this.inputSourceWrapper()?.flatMap((wrapper) => wrapper.items) ?? []),
+    ];
+    const source = inputSource.find((source) => source.value === event.source.value);
+
+    // display value on UI
+    this.internalSelectValue.set(source);
+
+    // emit to parent
+    this.onChange(source?.value);
+
+    console.log('DropdownControlComponent emit', source?.value);
   }
 
   /**
