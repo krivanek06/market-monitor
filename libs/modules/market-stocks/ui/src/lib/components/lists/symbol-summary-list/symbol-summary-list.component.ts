@@ -11,7 +11,7 @@ import {
 import { RecommendationDirective } from '../../../directives';
 
 @Component({
-  selector: 'app-stock-summary-list',
+  selector: 'app-symbol-summary-list',
   standalone: true,
   imports: [
     CommonModule,
@@ -134,6 +134,6 @@ import { RecommendationDirective } from '../../../directives';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StockSummaryListComponent {
+export class SymbolSummaryListComponent {
   symbolSummary = input.required<SymbolSummary>();
 }

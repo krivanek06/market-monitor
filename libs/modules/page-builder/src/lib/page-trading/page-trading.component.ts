@@ -11,7 +11,7 @@ import { PortfolioTransaction, PortfolioTransactionType, SymbolQuote, USER_HOLDI
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
-import { StockSummaryListComponent } from '@mm/market-stocks/ui';
+import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
 import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
@@ -38,7 +38,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     MatIconModule,
     MatDialogModule,
     AssetPriceChartInteractiveComponent,
-    StockSummaryListComponent,
+    SymbolSummaryListComponent,
     PortfolioTransactionsTableComponent,
     PortfolioTradeDialogComponent,
     MatTooltipModule,
@@ -55,6 +55,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-6 xl:mb-2 gap-8">
       <!-- account state -->
       <app-portfolio-state
+        data-testid="page-trading-portfolio-state"
         class="sm:pl-10"
         [titleColor]="ColorScheme.PRIMARY_VAR"
         [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
@@ -65,18 +66,20 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
       <div class="flex flex-col xl:flex-row gap-x-6 gap-y-6 xl:col-span-2 max-md:-ml-4">
         <!-- holdings -->
         <app-dropdown-control
-          inputCaption="Select a holding"
-          [inputSource]="holdingsInputSource()"
-          displayImageType="symbol"
-          [formControl]="selectedSymbolControl"
+          data-testid="page-trading-holding-dropdown"
           class="scale-90 w-full h-12"
+          inputCaption="Select a holding"
+          displayImageType="symbol"
+          [inputSource]="holdingsInputSource()"
+          [formControl]="selectedSymbolControl"
         />
 
         <!-- search -->
         <app-symbol-search-basic
+          data-testid="page-trading-symbol-search-basic"
+          class="scale-90 w-full h-12"
           (clickedQuote)="onSymbolQuoteClick($event)"
           [openModalOnClick]="false"
-          class="scale-90 w-full h-12"
         />
       </div>
     </div>
@@ -84,9 +87,10 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     <!-- action buttons -->
     <div class="flex flex-col sm:flex-row xl:justify-end gap-4 mb-6">
       <button
+        data-testid="page-trading-buy-button"
         (click)="onOperationClick('BUY')"
         class="w-full xl:w-[280px]"
-        [disabled]="!allowBuyOperationSignal()"
+        [disabled]="!allowBuyOperationSignal() || !allowActionButtons()"
         mat-stroked-button
         color="accent"
         type="button"
@@ -94,8 +98,10 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
         BUY
       </button>
       <button
+        data-testid="page-trading-sell-button"
         (click)="onOperationClick('SELL')"
         class="w-full xl:w-[280px]"
+        [disabled]="!allowActionButtons()"
         mat-stroked-button
         color="warn"
         type="button"
@@ -108,13 +114,14 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     @if (symbolSummarySignal(); as symbolSummary) {
       <div class="flex flex-col gap-4 mb-6 xl:flex-row">
         <app-asset-price-chart-interactive
+          data-testid="page-trading-asset-price-chart-interactive"
           class="lg:basis-3/5"
           [imageName]="symbolSummary.id"
           [symbol]="symbolSummary.id"
           [title]="'Historical Price: ' + symbolSummary.id"
         />
         <div class="lg:basis-2/5">
-          <app-stock-summary-list [symbolSummary]="symbolSummary" />
+          <app-symbol-summary-list data-testid="page-trading-symbol-summary-list" [symbolSummary]="symbolSummary" />
         </div>
       </div>
     } @else {
@@ -131,6 +138,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
       <div class="grid grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-2 p-4">
         @for (item of topPerformanceSignal(); track item.symbol) {
           <div
+            data-testid="page-trading-top-active-symbols-wrapper"
             (click)="onSymbolQuoteClick(item)"
             [ngClass]="{
               'border-wt-primary': item.symbol === selectedSymbolControl.value,
@@ -138,7 +146,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
             }"
             class="g-clickable-hover py-2 px-4 border-r border-l border-solid hover:border rounded-lg border-wt-border"
           >
-            <app-quote-item [symbolQuote]="item" displayValue="symbol" />
+            <app-quote-item data-testid="page-trading-top-active-symbols" [symbolQuote]="item" />
           </div>
         } @empty {
           <div *ngRange="20" class="g-skeleton h-9"></div>
@@ -149,6 +157,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     <!-- transaction history -->
     <div>
       <app-portfolio-transactions-table
+        data-testid="page-trading-portfolio-transactions-table"
         (deleteEmitter)="onTransactionDelete($event)"
         [showTransactionFees]="authenticationUserService.state.isAccountDemoTrading()"
         [showActionButton]="authenticationUserService.state.isAccountNormalBasic()"
@@ -218,6 +227,13 @@ export class PageTradingComponent {
 
     return userContainSymbol || userHoldingsLimit;
   });
+
+  /**
+   * wait until data is loaded
+   */
+  allowActionButtons = computed(
+    () => !!this.portfolioUserFacadeService.getPortfolioState() && !!this.symbolSummarySignal(),
+  );
 
   holdingsInputSource = computed(() => {
     return (

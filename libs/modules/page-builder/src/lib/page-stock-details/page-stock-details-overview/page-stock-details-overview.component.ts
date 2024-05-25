@@ -16,7 +16,7 @@ import {
   StockPriceTargetTableComponent,
   StockRatingTableComponent,
   StockRecommendationChartComponent,
-  StockSummaryListComponent,
+  SymbolSummaryListComponent,
   StockUpgradesDowngradesTableComponent,
 } from '@mm/market-stocks/ui';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
@@ -48,7 +48,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     PriceChangeItemsComponent,
     AssetPriceChartInteractiveComponent,
     NameValueListComponent,
-    StockSummaryListComponent,
+    SymbolSummaryListComponent,
     StockEnterpriseChartComponent,
     StockPeersListComponent,
     SortByKeyPipe,
@@ -68,7 +68,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
 
         <!-- summary -->
         <app-general-card class="xl:-mt-6" title="Summary">
-          <app-stock-summary-list [symbolSummary]="stockDetailsSignal" />
+          <app-symbol-summary-list [symbolSummary]="stockDetailsSignal" />
         </app-general-card>
 
         <!-- financial strength -->
