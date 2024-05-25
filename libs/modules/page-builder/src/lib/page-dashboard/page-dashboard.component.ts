@@ -236,6 +236,7 @@ import {
         <!-- best / worst -->
         @if (hasEnoughTransactions()) {
           <div class="hidden sm:flex lg:max-xl:flex-row flex-col gap-4 lg:pt-6">
+            <!-- best transactions -->
             <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
               @for (item of stateRef.getUserPortfolioTransactionsBest(); track item.transactionId; let last = $last) {
                 <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
@@ -247,6 +248,7 @@ import {
               }
             </app-general-card>
 
+            <!-- worst transactions -->
             <app-general-card title="Worst Returns" matIcon="trending_down" class="flex-1">
               @for (item of stateRef.getUserPortfolioTransactionsWorst(); track item.transactionId; let last = $last) {
                 <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">

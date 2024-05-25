@@ -6,6 +6,18 @@ import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import highcharts3d from 'highcharts/highcharts-3d';
 
+const chartColors = [
+  '#2caffe',
+  '#544fc5',
+  '#00e272',
+  '#fe6a35',
+  '#6b8abc',
+  '#d568fb',
+  '#2ee0ca',
+  '#fa4b42',
+  '#feb56a',
+  '#91e8e1',
+];
 @Component({
   selector: 'app-pie-chart',
   standalone: true,
@@ -36,19 +48,6 @@ export class PieChartComponent extends ChartConstructor {
   series = input.required<GenericChartSeries<'pie'>>();
 
   chartOptionsComputed = computed(() => this.innitChart(this.series()));
-
-  chartColors = [
-    '#2caffe',
-    '#544fc5',
-    '#00e272',
-    '#fe6a35',
-    '#6b8abc',
-    '#d568fb',
-    '#2ee0ca',
-    '#fa4b42',
-    '#feb56a',
-    '#91e8e1',
-  ];
 
   constructor() {
     super();
@@ -115,7 +114,7 @@ export class PieChartComponent extends ChartConstructor {
               const that = this as any;
               // rounded value
               const rounded = roundNDigits(that.percentage);
-              const color = Highcharts.getOptions()?.colors?.[this.colorIndex ?? 0] ?? ColorScheme.PRIMARY_VAR;
+              const color = chartColors[(this.colorIndex ?? 0) % chartColors.length] ?? ColorScheme.PRIMARY_VAR;
 
               // const color =
               //   typeof that.color === 'object' && 'radialGradient' in that.color ? ColorScheme.PRIMARY_VAR : this.color;
@@ -140,7 +139,7 @@ export class PieChartComponent extends ChartConstructor {
             formatter: function () {
               const that = this as any;
               const rounded = roundNDigits(that.percentage);
-              const color = Highcharts.getOptions()?.colors?.[this.colorIndex ?? 0] ?? ColorScheme.PRIMARY_VAR;
+              const color = chartColors[(this.colorIndex ?? 0) % chartColors.length] ?? ColorScheme.PRIMARY_VAR;
 
               const result = `
                   <div style="color: ${color}">${that.key}</div>
@@ -154,7 +153,7 @@ export class PieChartComponent extends ChartConstructor {
               value: 4,
             },
           },
-          colors: (this.chartColors as any[]).map((color) => {
+          colors: (chartColors as any[]).map((color) => {
             return {
               radialGradient: {
                 cx: 0.5,
