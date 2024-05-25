@@ -10,6 +10,8 @@ import {
   TRANSACTION_FEE_PRCT,
   TRANSACTION_INPUT_UNITS_INTEGER,
   TRANSACTION_INPUT_UNITS_POSITIVE,
+  USER_HOLDINGS_SYMBOL_LIMIT,
+  USER_HOLDING_LIMIT_ERROR,
   USER_NOT_ENOUGH_CASH_ERROR,
   USER_NOT_UNITS_ON_HAND_ERROR,
   UserAccountEnum,
@@ -44,6 +46,8 @@ export class PortfolioCreateOperationService {
     if (!symbolPrice) {
       throw new Error(SYMBOL_NOT_FOUND_ERROR);
     }
+
+    // TODO: check if symbols is not over with USER_HOLDINGS_SYMBOL_LIMIT - and write test
 
     // check data validity
     this.transactionOperationDataValidity(userData, data, symbolPrice);
@@ -145,17 +149,24 @@ export class PortfolioCreateOperationService {
     // calculate total value
     const totalValue = roundNDigits(input.units * historicalPrice.close, 2);
 
-    // check if user has enough cash on hand if BUY and cashAccountActive
-    if (
-      input.transactionType === 'BUY' &&
-      userData.userAccountType === UserAccountEnum.DEMO_TRADING &&
-      userData.portfolioState.cashOnHand < totalValue
-    ) {
-      throw new Error(USER_NOT_ENOUGH_CASH_ERROR);
+    if (input.transactionType === 'BUY') {
+      // check if user has enough cash on hand if BUY and cashAccountActive
+      if (
+        userData.userAccountType === UserAccountEnum.DEMO_TRADING &&
+        userData.portfolioState.cashOnHand < totalValue
+      ) {
+        throw new Error(USER_NOT_ENOUGH_CASH_ERROR);
+      }
+
+      // check if user can buy this symbol - will not go over limit
+      const hasInHolding = userData.holdingSnapshot.data.find((d) => d.symbol === input.symbol);
+      if (!hasInHolding && userData.holdingSnapshot.data.length >= USER_HOLDINGS_SYMBOL_LIMIT) {
+        throw new Error(USER_HOLDING_LIMIT_ERROR);
+      }
     }
 
     // check if user has enough units on hand if SELL
-    if (input.transactionType === 'SELL') {
+    else if (input.transactionType === 'SELL') {
       // check if user has any holdings of that symbol
       const symbolHoldings = userData.holdingSnapshot.data.find((d) => d.symbol === input.symbol);
 

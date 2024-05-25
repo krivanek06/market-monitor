@@ -10,6 +10,8 @@ import {
   TRANSACTION_FEE_PRCT,
   TRANSACTION_INPUT_UNITS_INTEGER,
   TRANSACTION_INPUT_UNITS_POSITIVE,
+  USER_HOLDINGS_SYMBOL_LIMIT,
+  USER_HOLDING_LIMIT_ERROR,
   USER_NOT_ENOUGH_CASH_ERROR,
   USER_NOT_UNITS_ON_HAND_ERROR,
   UserAccountEnum,
@@ -257,6 +259,45 @@ describe('PortfolioCreateOperationService', () => {
       });
     });
 
+    it('should allow buy symbol over holding limit if user already has the symbol in holdings', async () => {
+      const t1 = {
+        date: randomDate,
+        units: 10,
+        symbol: `AAPL0`,
+        symbolType: 'STOCK',
+        transactionType: 'BUY',
+      } as PortfolioTransactionCreate;
+
+      const userData = {
+        ...testUserData,
+        holdingSnapshot: {
+          ...testUserData.holdingSnapshot,
+          data: Array.from({ length: USER_HOLDINGS_SYMBOL_LIMIT }, (_, i) => ({
+            invested: 100,
+            symbol: `AAPL${i}`,
+            symbolType: 'STOCK',
+            units: 10,
+            sector: 'Technology',
+            breakEvenPrice: 10,
+          })),
+        },
+      } satisfies UserData;
+
+      await expect(service.createPortfolioCreateOperation(userData, t1)).resolves.toMatchObject({
+        date: expect.any(String),
+        returnChange: expect.any(Number),
+        returnValue: expect.any(Number),
+        symbol: t1.symbol,
+        symbolType: expect.any(String),
+        transactionFees: expect.any(Number),
+        transactionId: expect.any(String),
+        transactionType: expect.any(String),
+        unitPrice: expect.any(Number),
+        units: expect.any(Number),
+        userId: userData.id,
+      });
+    });
+
     describe('Error states', () => {
       it('should throw error if symbol not found', async () => {
         const stocksApiService = TestBed.inject(MarketApiService);
@@ -301,6 +342,33 @@ describe('PortfolioCreateOperationService', () => {
         await expect(service.createPortfolioCreateOperation(testUserData, t1)).rejects.toThrow(
           TRANSACTION_INPUT_UNITS_INTEGER,
         );
+      });
+
+      it('should throw error if user wants to buy symbol over holding limit', async () => {
+        const t1 = {
+          date: randomDate,
+          units: 10,
+          symbol: 'AAPL_1234',
+          symbolType: 'STOCK',
+          transactionType: 'BUY',
+        } as PortfolioTransactionCreate;
+
+        const userData = {
+          ...testUserData,
+          holdingSnapshot: {
+            ...testUserData.holdingSnapshot,
+            data: Array.from({ length: USER_HOLDINGS_SYMBOL_LIMIT }, (_, i) => ({
+              invested: 100,
+              symbol: `AAPL${i}`,
+              symbolType: 'STOCK',
+              units: 10,
+              sector: 'Technology',
+              breakEvenPrice: 10,
+            })),
+          },
+        } satisfies UserData;
+
+        await expect(service.createPortfolioCreateOperation(userData, t1)).rejects.toThrow(USER_HOLDING_LIMIT_ERROR);
       });
 
       it('should throw error if loading data older than (HISTORICAL_PRICE_RESTRICTION_YEARS)', async () => {
