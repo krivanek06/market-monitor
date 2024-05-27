@@ -13,8 +13,7 @@ import {
 } from '@mm/authentication/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { HelpDialogComponent } from '@mm/shared/help-dialog';
-import { DefaultImgDirective } from '@mm/shared/ui';
+import { DefaultImgDirective, HelpDialogComponent } from '@mm/shared/ui';
 import { UserSettingsDialogComponent } from '@mm/user/features';
 
 @Component({

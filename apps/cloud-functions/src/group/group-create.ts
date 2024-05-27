@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import {
   GROUP_MEMBERS_LIMIT_ERROR,
   GROUP_MEMBER_LIMIT,
@@ -141,7 +142,7 @@ const createGroup = (data: GroupCreateInput, owner: UserBase, isOwnerMember = fa
     id: groupsId,
     name: data.groupName,
     nameLowerCase: data.groupName.toLowerCase(),
-    imageUrl: data.imageUrl,
+    imageUrl: data.imageUrl || faker.image.urlPicsumPhotos(),
     isPublic: data.isPublic,
     memberInvitedUserIds: data.memberInvitedUserIds,
     ownerUserId: owner.id,

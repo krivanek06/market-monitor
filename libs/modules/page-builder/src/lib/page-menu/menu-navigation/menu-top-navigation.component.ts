@@ -18,8 +18,7 @@ import { UserAccountTypeDirective } from '@mm/authentication/feature-access-dire
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { GenericDialogComponent, GenericDialogComponentData, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { HelpDialogComponent } from '@mm/shared/help-dialog';
-import { DefaultImgDirective } from '@mm/shared/ui';
+import { DefaultImgDirective, HelpDialogComponent } from '@mm/shared/ui';
 import { UserSettingsDialogComponent } from '@mm/user/features';
 
 @Component({
@@ -150,10 +149,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
           </div>
 
           <!-- search -->
-          <app-symbol-search-basic
-            displayValue="symbol"
-            class="hidden sm:block w-[520px] scale-[0.8] -mr-10 -mb-5"
-          />
+          <app-symbol-search-basic displayValue="symbol" class="hidden sm:block w-[520px] scale-[0.8] -mr-10 -mb-5" />
 
           <div class="gap-1 items-center hidden xl:flex">
             <!-- display logged in person -->

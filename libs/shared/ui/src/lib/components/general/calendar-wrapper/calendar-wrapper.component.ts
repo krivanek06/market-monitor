@@ -4,7 +4,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { dateIsNotWeekend, generateDatesArrayForMonth } from '@mm/shared/general-util';
-import { RangeDirective } from '../../directives';
+import { RangeDirective } from '../../../directives';
 
 export type CalendarRange = { year: number; month: number };
 export const CalendarRageToday = {
