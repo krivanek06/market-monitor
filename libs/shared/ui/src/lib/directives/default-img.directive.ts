@@ -13,17 +13,18 @@ export class DefaultImgDirective {
   private platformService = inject(PlatformService);
   private renderer = inject(Renderer2);
 
-  src = input<ImageSrc | null | undefined>(null);
+  src = input<ImageSrc>(null);
   imageType = input<DefaultImageType>('default');
 
   srcChangeEffect = effect(() => {
-    this.initImage();
+    this.initImage(this.src());
   });
 
-  private symbolURL = 'https://get-asset-url.krivanek1234.workers.dev';
-  private defaultLocalImage = 'assets/image-placeholder.jpg';
+  // private symbolURL = 'https://get-asset-url.krivanek1234.workers.dev';
+  private readonly symbolURL = 'https://financialmodelingprep.com/image-stock';
+  private readonly defaultLocalImage = 'assets/image-placeholder.jpg';
 
-  private initImage() {
+  private initImage(imageSrc: ImageSrc) {
     if (this.platformService.isServer) {
       return;
     }
@@ -33,7 +34,7 @@ export class DefaultImgDirective {
 
     const img = new Image();
 
-    if (!this.src()) {
+    if (!imageSrc) {
       this.setImage(this.defaultLocalImage);
       this.renderer.removeClass(this.imageRef.nativeElement, 'g-skeleton');
       return;
@@ -41,7 +42,7 @@ export class DefaultImgDirective {
 
     // if possible to load image, set it to img
     img.onload = () => {
-      this.setImage(this.resolveImage(this.src()));
+      this.setImage(this.resolveImage(imageSrc));
       this.renderer.removeClass(this.imageRef.nativeElement, 'g-skeleton');
     };
 
@@ -52,7 +53,7 @@ export class DefaultImgDirective {
     };
 
     // triggers http request to load image
-    img.src = this.resolveImage(this.src());
+    img.src = this.resolveImage(imageSrc);
   }
 
   private setImage(src: ImageSrc) {
@@ -69,7 +70,7 @@ export class DefaultImgDirective {
     }
 
     if (this.imageType() === 'symbol') {
-      return `${this.symbolURL}/${src}`;
+      return `${this.symbolURL}/${src}.png`;
     }
     return this.defaultLocalImage;
   }
