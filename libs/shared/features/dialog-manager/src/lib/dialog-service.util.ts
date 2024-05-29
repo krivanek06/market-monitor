@@ -25,8 +25,13 @@ export class DialogServiceUtil {
 
   handleError(error: any): void {
     console.log('error', error);
-    const message = error?.message ?? '';
+    const message = (error?.message ?? '') as string;
     const code = error?.code satisfies FirebaseError['code'];
+
+    if (message.startsWith('Http failure response for')) {
+      this.showNotificationBar('Server is not responding', 'error');
+      return;
+    }
 
     if (code === 'auth/email-already-in-use') {
       this.showNotificationBar('Email already in use', 'error');

@@ -48,12 +48,12 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           <!-- user image -->
           <div class="max-md:mx-auto">
             <app-upload-image-single-control
-              filePath="users"
+              folder="users"
               [isDisabled]="isDemoAccount()"
               [fileName]="userDataSignal().id"
               [heightPx]="225"
               [formControl]="userImageControl"
-            ></app-upload-image-single-control>
+            />
           </div>
 
           <!-- user data -->

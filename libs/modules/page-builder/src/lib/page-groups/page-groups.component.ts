@@ -12,7 +12,6 @@ import { GroupCreateDialogComponent, GroupDisplayCardComponent, GroupSearchContr
 import { GroupDisplayItemComponent } from '@mm/group/ui';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationShowItemLeft } from '@mm/shared/ui';
-import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
 
 @Component({
   selector: 'app-page-groups',
@@ -23,7 +22,6 @@ import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-singl
     MatButtonModule,
     GroupCreateDialogComponent,
     MatDialogModule,
-    UploadImageSingleControlComponent,
     MatTooltipModule,
     GroupDisplayCardComponent,
     GroupDisplayItemComponent,

@@ -1,3 +1,4 @@
+import { RESPONSE_HEADER } from '@mm/api-types';
 /**
  * Welcome to Cloudflare Workers! This is your first worker.
  *
@@ -14,11 +15,13 @@
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		try {
-			const { uploadingFile, folder, fileName } = await parseIncomingData(request);
+			const { folder, fileName } = getBasicData(request);
+
+			// todo: add some sort of authentication here
 
 			// save file to bucket
 			if (request.method === 'POST') {
-				return handleSaveFile(env, uploadingFile, folder, fileName);
+				return handleSaveFile(env, request, folder, fileName);
 			}
 
 			// get file from bucket
@@ -33,6 +36,20 @@ export default {
 	},
 };
 
+const getBasicData = (request: Request) => {
+	const { searchParams } = new URL(request.url);
+
+	const folder = searchParams.get('folder') as string;
+	const fileName = searchParams.get('name') as string;
+
+	// check for missing folder or id
+	if (!folder || !fileName) {
+		throw new Error('Missing required data');
+	}
+
+	return { folder, fileName };
+};
+
 /**
  *
  * @param request
@@ -40,29 +57,18 @@ export default {
  */
 const parseIncomingData = async (request: Request) => {
 	let uploadingFile: File | null = null;
-	let fileName: string = '';
-	let folder: string = '';
 	try {
 		// get the body of the request
 		const formData = await request.formData();
 		uploadingFile = formData.get('file') as File | null;
-		fileName = formData.get('name') as string;
-		folder = formData.get('folder') as string;
 
-		// log data
-		const userId = formData.get('userId') as string;
-		console.log(`User: ${userId}, uploading to folder: ${folder}, fileName: ${fileName}`);
+		// console.log(`User: ${userId}, uploading to folder: ${folder}, fileName: ${fileName}`);
 	} catch (error) {
 		console.log(error);
 		throw new Error('Error parsing request body');
 	}
 
-	// check for missing folder or id
-	if (!folder || !fileName) {
-		throw new Error('Missing required data');
-	}
-
-	return { uploadingFile, folder, fileName };
+	return { uploadingFile };
 };
 
 const handleGettingFile = async (env: Env, folder: string, fileName: string): Promise<Response> => {
@@ -90,7 +96,9 @@ const handleGettingFile = async (env: Env, folder: string, fileName: string): Pr
 	}
 };
 
-const handleSaveFile = async (env: Env, uploadingFile: File | null, folder: string, fileName: string): Promise<Response> => {
+const handleSaveFile = async (env: Env, request: Request, folder: string, fileName: string): Promise<Response> => {
+	const { uploadingFile } = await parseIncomingData(request);
+
 	// check for file
 	if (!uploadingFile) {
 		throw new Error('No file provided');
@@ -114,13 +122,10 @@ const handleSaveFile = async (env: Env, uploadingFile: File | null, folder: stri
 			httpMetadata: { contentType: uploadingFile.type },
 		});
 
-		const fileUrl = `https://upload-files.krivanek1234.workers.dev/${path}`;
+		const fileUrl = `https://upload-files.krivanek1234.workers.dev?folder=${folder}&name=${fileName}`;
 		const message = object ? 'File replaced successfully' : 'File uploaded successfully';
 
-		return new Response(JSON.stringify({ message: message, url: fileUrl }), {
-			status: 200,
-			headers: { 'Content-Type': 'application/json' },
-		});
+		return new Response(JSON.stringify({ message: message, url: fileUrl }), RESPONSE_HEADER);
 	} catch (error) {
 		console.log(error);
 		return new Response('Error saving file', { status: 500 });

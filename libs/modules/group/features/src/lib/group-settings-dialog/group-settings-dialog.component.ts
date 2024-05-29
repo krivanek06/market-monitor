@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -54,7 +54,12 @@ export type GroupSettingsDialogComponentData = {
         <div class="flex gap-4">
           <!-- upload image -->
           <div class="w-[270px] h-[270px]">
-            <app-upload-image-single-control filePath="groups" formControlName="uploadedImage" />
+            <app-upload-image-single-control
+              folder="groups"
+              formControlName="uploadedImage"
+              (uploadedFilesEmitter)="onNewImageUpload($event)"
+              [fileName]="groupDataSignal()?.id"
+            />
           </div>
 
           <!-- additional forms -->
@@ -129,6 +134,11 @@ export type GroupSettingsDialogComponentData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupSettingsDialogComponent {
+  private dialogRef = inject(MatDialogRef<GroupSettingsDialogComponent>);
+  private dialogServiceUtil = inject(DialogServiceUtil);
+  private groupApiService = inject(GroupApiService);
+  data = inject<GroupSettingsDialogComponentData>(MAT_DIALOG_DATA);
+
   form = new FormGroup({
     groupName: new FormControl('', {
       validators: [requiredValidator, minLengthValidator(4), maxLengthValidator(28)],
@@ -146,14 +156,12 @@ export class GroupSettingsDialogComponent {
     },
   );
 
+  /**
+   * save users that will be removed from the group
+   */
   removingGroupMembers = signal<GroupMember[]>([]);
 
-  constructor(
-    private dialogRef: MatDialogRef<GroupSettingsDialogComponent>,
-    private dialogServiceUtil: DialogServiceUtil,
-    private groupApiService: GroupApiService,
-    @Inject(MAT_DIALOG_DATA) public data: GroupSettingsDialogComponentData,
-  ) {
+  constructor() {
     this.initForm();
   }
 
@@ -163,6 +171,23 @@ export class GroupSettingsDialogComponent {
 
   onAddUserBack(groupMember: GroupMember) {
     this.removingGroupMembers.update((prev) => prev.filter((member) => member.id !== groupMember.id));
+  }
+
+  async onNewImageUpload(imageUrl: string) {
+    const group = this.groupDataSignal();
+
+    if (!group) {
+      return;
+    }
+
+    // send new image url to the server
+    this.groupApiService.changeGroupSettings({
+      groupId: group.id,
+      groupName: group.name,
+      isPublic: group.isPublic,
+      imageUrl: imageUrl,
+      removingUserIds: [],
+    });
   }
 
   async onFormSubmit() {
@@ -176,11 +201,8 @@ export class GroupSettingsDialogComponent {
 
     // notify that people will be removed from the group
     if (this.removingGroupMembers().length > 0) {
-      if (
-        !(await this.dialogServiceUtil.showConfirmDialog(
-          `You will remove ${this.removingGroupMembers().length} users, please confirm`,
-        ))
-      ) {
+      const message = `Confirm to remove ${this.removingGroupMembers().length} users`;
+      if (!(await this.dialogServiceUtil.showConfirmDialog(message))) {
         return;
       }
     }
