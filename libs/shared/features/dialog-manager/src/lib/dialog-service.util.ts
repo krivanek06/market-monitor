@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FirebaseError } from 'firebase/app';
@@ -16,12 +16,16 @@ import { NotificationProgressComponent } from './notification-bar/notification-b
 /**
  * Module has to be included in to page level (in apps folder) to be used in libraries
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class DialogServiceUtil {
-  constructor(
-    @Optional() private matDialog: MatDialog,
-    @Optional() private snackBar: MatSnackBar,
-  ) {}
+  private matDialog = inject(MatDialog, {
+    optional: true,
+  });
+  private snackBar = inject(MatSnackBar, {
+    optional: true,
+  });
 
   handleError(error: any): void {
     console.log('error', error);

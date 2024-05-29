@@ -58,13 +58,14 @@ export type UserSearchDialogData = {
             </div>
 
             <div class="grid gap-4 lg:grid-cols-2">
-              <div
-                *ngFor="let user of selectedUsersSignal"
-                class="p-2 border cursor-pointer border-wt-gray-medium hover:scale-105"
-                (click)="onUserRemove(user)"
-              >
-                <app-user-display-item [userData]="user"></app-user-display-item>
-              </div>
+              @for (user of selectedUsersSignal; track user.id) {
+                <div
+                  class="p-2 border cursor-pointer border-wt-gray-medium g-clickable-hover"
+                  (click)="onUserRemove(user)"
+                >
+                  <app-user-display-item [userData]="user"></app-user-display-item>
+                </div>
+              }
             </div>
 
             <!-- divider -->

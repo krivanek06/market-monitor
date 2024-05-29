@@ -27,15 +27,16 @@
 @include mat.core();
 
 // light theme
-$mat-theming-light: mat.define-light-theme(
+$mat-theming-light: mat.m2-define-light-theme(
   (
     color: (
-      primary: mat.define-palette($custom-primary),
-      accent: mat.define-palette($custom-success),
-      warn: mat.define-palette($custom-warn),
+      theme-type: light,
+      primary: mat.m2-define-palette($custom-primary),
+      accent: mat.m2-define-palette($custom-success),
+      warn: mat.m2-define-palette($custom-warn),
     ),
     typography:
-      mat.define-typography-config(
+      mat.m2-define-typography-config(
         $font-family: 'Poppins, sans-serif',
       ),
     density: -1,
@@ -43,15 +44,15 @@ $mat-theming-light: mat.define-light-theme(
 );
 
 // dark theme
-$mat-theming-dark: mat.define-dark-theme(
+$mat-theming-dark: mat.m2-define-dark-theme(
   (
     color: (
-      primary: mat.define-palette($custom-primary-dark),
-      accent: mat.define-palette($custom-success),
-      warn: mat.define-palette($custom-warn),
+      primary: mat.m2-define-palette($custom-primary-dark),
+      accent: mat.m2-define-palette($custom-success),
+      warn: mat.m2-define-palette($custom-warn),
     ),
     typography:
-      mat.define-typography-config(
+      mat.m2-define-typography-config(
         $font-family: 'Poppins, sans-serif',
       ),
     density: -1,
