@@ -27,7 +27,7 @@ export type InlineInputDialogComponentData = {
       <form [formGroup]="inputValueForm">
         <mat-form-field class="w-full">
           <mat-label>Enter Value</mat-label>
-          <input matInput formControlName="value" />
+          <input matInput formControlName="value" (keydown.space)="$event.preventDefault()" />
         </mat-form-field>
 
         <!-- error messages -->
@@ -101,6 +101,8 @@ export class InlineInputDialogComponent {
       return;
     }
 
-    this.dialogRef.close(this.inputValueForm.controls.value.value);
+    // remove white spaces
+    const result = this.inputValueForm.controls.value.value?.trim();
+    this.dialogRef.close(result);
   }
 }

@@ -13,7 +13,6 @@ import { AuthenticationAccountService, AuthenticationUserStoreService } from '@m
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
 import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { createNameInitials } from '@mm/shared/general-util';
 import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
@@ -106,23 +105,21 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
       </div>
 
       <!-- action buttons -->
-      <div class="flex flex-col gap-y-2 min-w-[180px] lg:pl-6">
-        <!--  Reset Transactions -->
+      <div class="flex flex-col gap-y-3 min-w-[180px] lg:pl-6">
+        <!--  Change Account type -->
         <button
-          [disabled]="!isDevActive"
-          (click)="onResetTransactions()"
-          [matTooltip]="actionButtonTooltips.resetTransactions"
+          [disabled]="isDemoAccount() && !isDevActive"
+          (click)="onChangeInitials()"
           type="button"
-          mat-flat-button
+          mat-stroked-button
           color="primary"
         >
-          Reset Transactions
+          Change Initials
         </button>
         <!--  Change Display Name -->
         <button
           [disabled]="!isDevActive"
           (click)="onChangeDisplayName()"
-          [matTooltip]="actionButtonTooltips.changeDisplayName"
           type="button"
           mat-stroked-button
           color="accent"
@@ -133,7 +130,6 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         <button
           [disabled]="isDemoAccount() && !isDevActive"
           (click)="onChangeAccountType()"
-          [matTooltip]="actionButtonTooltips.changeAccountType"
           type="button"
           mat-stroked-button
           color="primary"
@@ -145,12 +141,27 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           *ngIf="userDataSignal().personal.providerId === 'password'"
           [disabled]="!isDevActive"
           (click)="onChangePassword()"
-          [matTooltip]="actionButtonTooltips.changePassword"
           type="button"
           mat-stroked-button
           color="warn"
         >
           Change Password
+        </button>
+
+        <div class="hidden lg:block mt-10 mb-4">
+          <mat-divider></mat-divider>
+        </div>
+
+        <!--  Reset Transactions -->
+        <button
+          [disabled]="!isDevActive"
+          (click)="onResetTransactions()"
+          [matTooltip]="actionButtonTooltips.resetTransactions"
+          type="button"
+          mat-flat-button
+          color="primary"
+        >
+          Reset Transactions
         </button>
         <!--  Delete Account -->
         <button
@@ -215,10 +226,7 @@ export class UserSettingsDialogComponent implements OnInit {
 
   actionButtonTooltips = {
     deleteAccount: `Account will be deleted permanently and you will be logged out from the application. This action cannot be undone.`,
-    changePassword: `A form will be displayed to you to change your password`,
     resetTransactions: `Use this action to delete your trading history. You will start as a new user with a clean portfolio.`,
-    changeDisplayName: `Use this action to change your display name, this name will be visible to other users. Affect takes place in 24h.`,
-    changeAccountType: `You will be presented with options to change your current account type between Basic and Trading`,
   };
 
   accountDescriptionSignal = computed(() => {
@@ -282,11 +290,36 @@ export class UserSettingsDialogComponent implements OnInit {
         map((val) =>
           this.authenticationUserStoreService.changeUserPersonal({
             displayName: val,
-            displayNameInitials: createNameInitials(val),
             displayNameLowercase: val.toLowerCase(),
           }),
         ),
         tap(() => this.dialogServiceUtil.showNotificationBar('Your display name has been changed', 'success')),
+      )
+      .subscribe((res) => console.log(res));
+  }
+
+  onChangeInitials(): void {
+    this.dialogServiceUtil
+      .showInlineInputDialog({
+        title: 'Change Initials',
+        description: 'Enter a new initials (custom identification - max 8 characters)',
+        validatorMaxLength: 8,
+        initialValue: this.userDataSignal().personal.displayNameInitials,
+      })
+      .pipe(
+        take(1),
+        filterNil(),
+        map((val) =>
+          this.authenticationUserStoreService.changeUserPersonal({
+            displayNameInitials: val,
+          }),
+        ),
+        tap(() =>
+          this.dialogServiceUtil.showNotificationBar(
+            'Your initials has been updated, may take some time to update everywhere',
+            'success',
+          ),
+        ),
       )
       .subscribe((res) => console.log(res));
   }
