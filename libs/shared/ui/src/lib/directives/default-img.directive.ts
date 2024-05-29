@@ -20,8 +20,9 @@ export class DefaultImgDirective {
     this.initImage(this.src());
   });
 
-  private symbolURL = 'https://get-asset-url.krivanek1234.workers.dev';
-  private defaultLocalImage = 'assets/image-placeholder.jpg';
+  // private symbolURL = 'https://get-asset-url.krivanek1234.workers.dev';
+  private readonly symbolURL = 'https://financialmodelingprep.com/image-stock';
+  private readonly defaultLocalImage = 'assets/image-placeholder.jpg';
 
   private initImage(imageSrc: ImageSrc) {
     if (this.platformService.isServer) {
@@ -69,7 +70,7 @@ export class DefaultImgDirective {
     }
 
     if (this.imageType() === 'symbol') {
-      return `${this.symbolURL}/${src}`;
+      return `${this.symbolURL}/${src}.png`;
     }
     return this.defaultLocalImage;
   }
