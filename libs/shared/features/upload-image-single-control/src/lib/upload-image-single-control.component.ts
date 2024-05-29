@@ -34,6 +34,7 @@ import { EMPTY, catchError, take, tap } from 'rxjs';
         accept=".jpg, .jpeg, .png .webp"
       />
 
+      <!-- if no image is present only display text -->
       @if (!lastFileUploadSignal()) {
         <div>Click To Upload</div>
       }
@@ -41,9 +42,15 @@ import { EMPTY, catchError, take, tap } from 'rxjs';
       <!-- uploaded image -->
       @if (lastFileUploadSignal(); as downloadURL) {
         <div class="p-3">
-          <img appDefaultImg [src]="downloadURL" class="w-full h-full object-cover" alt="image upload" />
+          <img
+            appDefaultImg
+            [src]="downloadURL"
+            class="w-full object-cover"
+            alt="image upload"
+            [style.height.px]="heightPx()"
+          />
           <div
-            class="absolute hidden w-full py-4 text-xl transition-all duration-300 ease-in-out transform -translate-y-1/2 bg-gray-700 top-2/4 opacity-80 group-hover:block"
+            class="absolute hidden w-full py-4 text-xl transition-all duration-300 ease-in-out transform -translate-y-1/2 bg-gray-700 top-2/4 opacity-80 group-hover:block left-0"
           >
             Click To Upload
           </div>

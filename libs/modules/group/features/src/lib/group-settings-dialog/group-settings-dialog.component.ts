@@ -53,7 +53,7 @@ export type GroupSettingsDialogComponentData = {
       <mat-dialog-content>
         <div class="flex gap-4">
           <!-- upload image -->
-          <div class="w-[270px] h-[270px]">
+          <div>
             <app-upload-image-single-control
               folder="groups"
               formControlName="uploadedImage"
