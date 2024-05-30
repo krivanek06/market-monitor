@@ -177,7 +177,11 @@ export class MarketApiService {
       .getData<
         News[]
       >(`${this.cloudflareBasicAPI}/?type=news&news_types=${newsType}&symbol=${symbol}`, ApiCacheService.validity30Min)
-      .pipe(catchError(() => of([])));
+      .pipe(
+        // remove news which has the same title
+        map((news) => news.filter((v, i, a) => a.findIndex((t) => t.title === v.title) === i)),
+        catchError(() => of([])),
+      );
   }
 
   getQuotesByType(quoteType: AvailableQuotes): Observable<SymbolQuote[]> {

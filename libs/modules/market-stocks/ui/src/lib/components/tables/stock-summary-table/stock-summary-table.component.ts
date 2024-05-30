@@ -16,6 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { SymbolQuote } from '@mm/api-types';
 import { compare } from '@mm/shared/general-util';
 import {
@@ -45,6 +46,7 @@ import {
     TruncatePipe,
     MatChipsModule,
     MatSortModule,
+    MatTooltipModule,
   ],
   template: `
     <div class="flex sm:hidden justify-end mb-2">
@@ -166,7 +168,15 @@ import {
 
       <!-- volume -->
       <ng-container matColumnDef="volumeChange">
-        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">Volume %</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">
+          <span>Volume %</span>
+          <mat-icon
+            class="-mb-1 ml-2 text-xl"
+            matTooltip="Percentage difference from average volume since stock market is open"
+          >
+            help
+          </mat-icon>
+        </th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div
             appPercentageIncrease

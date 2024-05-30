@@ -13,12 +13,12 @@ import {
   getScreenerInputIndexByKey,
   getScreenerInputValueByKey,
 } from '@mm/market-stocks/data-access';
-import { SymbolSearchBasicComponent, StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { StockSummaryDialogComponent, SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { StockScreenerFormControlComponent, StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { RouterManagement } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { RangeDirective, ScrollNearEndDirective, SectionTitleComponent } from '@mm/shared/ui';
-import { catchError, switchMap, tap } from 'rxjs';
+import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-page-market-stock-screener',
@@ -56,30 +56,28 @@ import { catchError, switchMap, tap } from 'rxjs';
       </div>
 
       <div class="flex items-center justify-between mt-8">
-        <h3>Total found: {{ loadingSignal() ? 'Loading...' : screenerResults()?.length }}</h3>
+        <h3>Total found: {{ screenerResults().isLoading ? 'Loading...' : screenerResults().data.length }}</h3>
 
         <button (click)="onFormReset()" mat-stroked-button color="warn" class="g-border-apply">Reset Form</button>
       </div>
     </section>
 
     <!-- table of results -->
-    <ng-container *ngIf="!loadingSignal()">
-      <ng-container *ngIf="screenerResults() as screenerResults">
-        <section class="mt-6">
-          <app-stock-summary-table
-            appScrollNearEnd
-            (nearEnd)="onNearEndScroll()"
-            (itemClickedEmitter)="onQuoteClick($event)"
-            [symbolQuotes]="screenerResults | slice: 0 : maxScreenerResults()"
-          />
-        </section>
-      </ng-container>
-    </ng-container>
-
-    <!-- loading screen -->
-    <div *ngIf="loadingSignal()" class="mt-12">
-      <div *ngRange="20" class="mb-1 h-14 g-skeleton"></div>
-    </div>
+    @if (!screenerResults().isLoading) {
+      <section class="mt-6">
+        <app-stock-summary-table
+          appScrollNearEnd
+          [(nearEnd)]="maxScreenerResults"
+          (itemClickedEmitter)="onQuoteClick($event)"
+          [symbolQuotes]="screenerResults().data | slice: 0 : maxScreenerResults() * screenerDefault"
+        />
+      </section>
+    } @else {
+      <!-- loading screen -->
+      <div class="mt-12">
+        <div *ngRange="20" class="mb-1 h-14 g-skeleton"></div>
+      </div>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -89,50 +87,46 @@ import { catchError, switchMap, tap } from 'rxjs';
   `,
 })
 export class PageMarketStockScreenerComponent implements OnInit, RouterManagement {
-  private screenerDefault = 30;
-  marketApiService = inject(MarketApiService);
-  dialogServiceUtil = inject(DialogServiceUtil);
-  dialog = inject(MatDialog);
-  router = inject(Router);
-  route = inject(ActivatedRoute);
+  readonly screenerDefault = 30;
+  private marketApiService = inject(MarketApiService);
+  private dialogServiceUtil = inject(DialogServiceUtil);
+  private dialog = inject(MatDialog);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   screenerFormControl = new FormControl<StockScreenerValues>(STOCK_SCREENER_DEFAULT_VALUES, { nonNullable: true });
-  loadingSignal = signal(false);
-  maxScreenerResults = signal(this.screenerDefault);
+
+  /**
+   * will emit incremented number every time user scrolls near end
+   */
+  maxScreenerResults = signal(1);
   screenerResults = toSignal(
     this.screenerFormControl.valueChanges.pipe(
       tap((formValue) => {
-        // set loading to true
-        this.loadingSignal.set(true);
-        // reset maxScreenerResults to default
-        this.maxScreenerResults.set(this.screenerDefault);
-        // update query params
+        // set max results to 1
+        this.maxScreenerResults.set(1);
+        // update url
         this.updateQueryParams(formValue);
       }),
       switchMap((values) =>
         this.marketApiService.getStockScreening(values).pipe(
-          // set loading to false
-          tap(() => this.loadingSignal.set(false)),
+          map((data) => ({
+            data: data,
+            isLoading: false,
+          })),
+          startWith({ data: [], isLoading: true }),
         ),
       ),
       catchError(() => {
         this.dialogServiceUtil.showNotificationBar('Error loading screener results', 'error');
-        this.loadingSignal.set(false);
-        return [];
+        return of({ data: [], isLoading: false });
       }),
     ),
+    { initialValue: { data: [], isLoading: true } },
   );
 
   ngOnInit(): void {
     this.loadQueryParams();
-  }
-
-  onNearEndScroll(): void {
-    // increase only if maxScreenerResults is less than screenerResults length
-    if (this.maxScreenerResults() > (this.screenerResults()?.length ?? 0)) {
-      return;
-    }
-    this.maxScreenerResults.update((prev) => prev + this.screenerDefault);
   }
 
   onFormReset(): void {

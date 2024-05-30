@@ -1,92 +1,64 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@mm/api-client';
-import { News, NewsAcceptableTypes, NewsTypes } from '@mm/api-types';
-import { InputSource } from '@mm/shared/data-access';
+import { NewsTypes } from '@mm/api-types';
 import {
   DateAgoPipe,
   DefaultImgDirective,
-  DropdownControlComponent,
-  FormMatInputWrapperComponent,
   RangeDirective,
   ScrollNearEndDirective,
   TruncateWordsPipe,
 } from '@mm/shared/ui';
-import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
+import { derivedFrom } from 'ngxtension/derived-from';
+import { map, pipe, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-news-search',
   standalone: true,
   imports: [
     CommonModule,
-    FormMatInputWrapperComponent,
     MatButtonModule,
-    ReactiveFormsModule,
     RangeDirective,
     ScrollNearEndDirective,
     DateAgoPipe,
     TruncateWordsPipe,
     DefaultImgDirective,
-    DropdownControlComponent,
   ],
-  template: `<form *ngIf="showForm()" class="flex items-center gap-3 mb-2" [formGroup]="newSearchFormGroup">
-      <!-- news type -->
-      <app-dropdown-control
-        inputCaption="Select News Type"
-        formControlName="newsType"
-        [inputSource]="newsTypesInputSource"
-      ></app-dropdown-control>
-
-      <!-- symbol -->
-      <app-form-mat-input-wrapper
-        *ngIf="!isNewsTypeGeneral"
-        formControlName="symbol"
-        inputCaption="Enter Symbol"
-      ></app-form-mat-input-wrapper>
-    </form>
-
+  template: `
     <!-- loaded news -->
-    <div
-      *ngIf="!loadingSignal(); else showSkeleton"
-      appScrollNearEnd
-      (nearEnd)="onNearEndScroll()"
-      class="grid grid-cols-1 md:grid-cols-2"
-    >
-      <article
-        *ngFor="let news of marketStockNewsSignal()?.slice(0, maximumNewsDisplayed())"
-        class="inline-block m-2 transition-all duration-300 group hover:scale-95"
-      >
-        <a
-          class="relative flex flex-col items-start gap-3 pt-2 pb-4 pl-2 pr-4 overflow-hidden transition-all duration-500 rounded-lg max-lg:p-0 lg:flex-row hover:bg-wt-gray-light"
-          target="_blank"
-          [href]="news.url"
-        >
-          <img
-            appDefaultImg
-            [src]="news.image"
-            [alt]="news.title"
-            class="h-[255px] sm:h-[275px] object-cover lg:h-28 lg:w-36 min-w-[9rem] max-lg:m-auto w-full lg:pt-1"
-          />
-          <div class="flex flex-col max-lg:absolute p-2 xs:p-4 sm:p-6 lg:p-0 max-lg:bottom-0 max-lg:bg-[#ffffffbf]">
-            <div class="text-base text-wt-gray-dark group-hover:text-wt-primary">
-              {{ news.title }}
-            </div>
-            <div class="hidden space-x-1 text-xs text-wt-gray-medium lg:block">
-              <span>{{ news.site }}</span>
-              <span>●</span>
-              <span>{{ news.publishedDate | dateAgo }}</span>
-            </div>
-            <div class="hidden text-sm lg:block text-wt-gray-medium">{{ news.text | truncateWords: 25 }}</div>
-          </div>
-        </a>
-      </article>
-    </div>
-
-    <!-- loading screen -->
-    <ng-template #showSkeleton>
+    @if (!marketStockNewsSignal().isLoading) {
+      <div appScrollNearEnd [(nearEnd)]="displayMoreNotification" class="grid grid-cols-1 md:grid-cols-2">
+        @for (news of marketStockNewsSignal().data; track news.title) {
+          <article class="inline-block m-2 transition-all duration-300 group hover:scale-95">
+            <a
+              class="relative flex flex-col items-start gap-3 pt-2 pb-4 pl-2 pr-4 overflow-hidden transition-all duration-500 rounded-lg max-lg:p-0 lg:flex-row hover:bg-wt-gray-light"
+              target="_blank"
+              [href]="news.url"
+            >
+              <img
+                appDefaultImg
+                [src]="news.image"
+                [alt]="news.title"
+                class="h-[255px] sm:h-[275px] object-cover lg:h-28 lg:w-36 min-w-[9rem] max-lg:m-auto w-full lg:pt-1"
+              />
+              <div class="flex flex-col max-lg:absolute p-2 xs:p-4 sm:p-6 lg:p-0 max-lg:bottom-0 max-lg:bg-[#ffffffbf]">
+                <div class="text-base text-wt-gray-dark group-hover:text-wt-primary">
+                  {{ news.title }}
+                </div>
+                <div class="hidden space-x-1 text-xs text-wt-gray-medium lg:block">
+                  <span>{{ news.site }}</span>
+                  <span>●</span>
+                  <span>{{ news.publishedDate | dateAgo }}</span>
+                </div>
+                <div class="hidden text-sm lg:block text-wt-gray-medium">{{ news.text | truncateWords: 25 }}</div>
+              </div>
+            </a>
+          </article>
+        }
+      </div>
+    } @else {
+      <!-- loading screen -->
       <div class="columns-1 md:columns-2">
         <div
           *ngRange="initialNewsToDisplay()"
@@ -105,7 +77,8 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
           </div>
         </div>
       </div>
-    </ng-template> `,
+    }
+  `,
   styles: `
     :host {
       display: block;
@@ -114,72 +87,31 @@ import { map, pairwise, startWith, switchMap, tap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewsSearchComponent {
-  showForm = input(false);
+  private marketApiService = inject(MarketApiService);
+
   initialNewsToDisplay = input(16);
 
-  searchData = input.required<{ newsType: NewsTypes; symbol?: string }>();
-
-  searchDataEffect = effect(() => {
-    const value = this.searchData();
-    this.newSearchFormGroup.patchValue({
-      newsType: value.newsType,
-      symbol: value.symbol ?? '',
-    });
-  });
-
-  marketApiService = inject(MarketApiService);
-
-  newSearchFormGroup = new FormGroup({
-    newsType: new FormControl<NewsTypes>('stocks', { nonNullable: true }),
-    symbol: new FormControl('', { nonNullable: true }),
-  });
-
-  get isNewsTypeGeneral(): boolean {
-    return this.newSearchFormGroup.controls.newsType.value === 'general';
-  }
-
-  private newDisplay = 16;
-
-  maximumNewsDisplayed = signal(this.initialNewsToDisplay());
-  loadingSignal = signal(false);
-  marketStockNewsSignal = toSignal<News[]>(
-    this.newSearchFormGroup.valueChanges.pipe(
-      startWith(this.newSearchFormGroup.getRawValue()),
-      tap(() => {
-        this.loadingSignal.set(true);
-        this.maximumNewsDisplayed.set(this.initialNewsToDisplay());
-      }),
-      pairwise(),
-      map(([prev, curr]) => {
-        // console.log('prev', prev, 'curr', curr);
-        // reset symbol if newsType changed
-        // example previously it was 'stocks', now it is 'forex', we want to reset the symbol then
-        const symbol = (
-          prev.newsType === curr.newsType ? (curr.newsType === 'crypto' ? `${curr.symbol}USD` : curr.symbol) : ''
-        )?.toUpperCase();
-        const newsType = curr.newsType ?? 'stocks';
-        return [symbol, newsType] as [string, NewsTypes];
-      }),
-      // save maybe modified symbol if newsType changed
-      tap(([symbol, _]) => this.newSearchFormGroup.controls.symbol.setValue(symbol, { emitEvent: false })),
-      // load news
-      switchMap(([symbol, newsType]) => this.marketApiService.getNews(newsType, symbol)),
-      tap(() => this.loadingSignal.set(false)),
-    ),
-  );
+  searchData = input<{ newsType: NewsTypes; symbol?: string }>({ newsType: 'stocks', symbol: 'AAPL' });
 
   /**
-   * input source to display in select
+   * will emit incremented number every time user scrolls near end
    */
-  newsTypesInputSource = NewsAcceptableTypes.map((d) => {
-    const inputSource: InputSource<NewsTypes> = {
-      caption: d.toUpperCase(),
-      value: d,
-    };
-    return inputSource;
-  });
+  displayMoreNotification = signal(0);
 
-  onNearEndScroll(): void {
-    this.maximumNewsDisplayed.set(this.maximumNewsDisplayed() + this.newDisplay);
-  }
+  private readonly newDisplay = 16;
+
+  marketStockNewsSignal = derivedFrom(
+    [this.searchData, this.displayMoreNotification],
+    pipe(
+      switchMap(([searchData, increment]) =>
+        this.marketApiService.getNews(searchData.newsType, searchData.symbol).pipe(
+          map((news) => ({
+            data: news.slice(0, this.initialNewsToDisplay() + increment * this.newDisplay),
+            isLoading: false,
+          })),
+          startWith({ data: [], isLoading: true }),
+        ),
+      ),
+    ),
+  );
 }
