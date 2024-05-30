@@ -13,7 +13,7 @@
         "outputPath": "dist/apps/market-monitor",
         "index": "apps/market-monitor/src/index.html",
         "main": "apps/market-monitor/src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": [],
         "tsConfig": "apps/market-monitor/tsconfig.app.json",
         "assets": ["apps/market-monitor/src/favicon.ico", "apps/market-monitor/src/assets"],
         "styles": ["@angular/material/prebuilt-themes/indigo-pink.css", "apps/market-monitor/src/styles.scss"],

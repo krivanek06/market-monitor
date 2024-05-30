@@ -50,8 +50,8 @@ export const appConfig: ApplicationConfig = {
     // used to avoid error: No provider found for DateAdapter
     importProvidersFrom(MatNativeDateModule),
     provideAnimations(),
-    // remove zone.js
-    // ɵprovideZonelessChangeDetection(),
+    // apply zoneless change detection
+    // provideExperimentalZonelessChangeDetection(),
     {
       provide: AUTHENTICATION_ACCOUNT_TOKEN,
       useExisting: AuthenticationUserStoreService,
