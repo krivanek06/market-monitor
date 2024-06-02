@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -9,6 +10,8 @@ import { UserData } from '@mm/api-types';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { UserDisplayItemComponent } from '@mm/user/ui';
+import { filterNil } from 'ngxtension/filter-nil';
+import { Subject, map, merge, scan } from 'rxjs';
 import { UserSearchControlComponent } from '../user-search-control/user-search-control.component';
 
 export type UserSearchDialogData = {
@@ -37,47 +40,51 @@ export type UserSearchDialogData = {
   ],
   template: `
     <mat-dialog-content>
-      <div class="text-xl text-center text-wt-primary">{{ data.title }}</div>
+      <div class="text-xl text-center text-wt-primary">{{ dialogData().title }}</div>
 
       <!-- search user -->
       <div class="p-4">
-        <app-user-search-control [formControl]="searchUserControl"></app-user-search-control>
+        <app-user-search-control [formControl]="searchUserControl" />
       </div>
 
       <!-- display selected users -->
-      <ng-container *ngIf="data.multiple">
-        <ng-container *ngIf="selectedUsersSignal() as selectedUsersSignal">
-          <ng-container *ngIf="selectedUsersSignal.length > 0">
-            <div class="flex items-center justify-between pt-2">
-              <div class="my-4 space-x-1 text-lg">
-                <span>Selected Users: {{ selectedUsersSignal.length }}</span>
-                <span *ngIf="data.selectUsersCap">/ {{ data.selectUsersCap }}</span>
-              </div>
+      @if (dialogData().multiple && selectedUsersSignal().length > 0) {
+        <div class="flex items-center justify-between pt-2">
+          <div class="my-4 space-x-1 text-lg">
+            <span data-testid="user-search-dialog-selected-users-text">
+              Selected Users: {{ selectedUsersSignal().length }}
+            </span>
 
-              <div>Remove User By Clicking</div>
-            </div>
+            @if (dialogData().selectUsersCap) {
+              <span data-testid="user-search-dialog-selected-users-cap"> / {{ dialogData().selectUsersCap }} </span>
+            }
+          </div>
 
-            <div class="grid gap-4 lg:grid-cols-2">
-              @for (user of selectedUsersSignal; track user.id) {
-                <div
-                  class="p-2 border cursor-pointer border-wt-gray-medium g-clickable-hover"
-                  (click)="onUserRemove(user)"
-                >
-                  <app-user-display-item [userData]="user"></app-user-display-item>
-                </div>
-              }
-            </div>
+          <div>Remove User By Clicking</div>
+        </div>
+      }
 
-            <!-- divider -->
-            <div class="pt-6">
-              <mat-divider></mat-divider>
-            </div>
-          </ng-container>
-        </ng-container>
-      </ng-container>
+      <!-- selected users -->
+      <div class="grid gap-4 grid-cols-1" [ngClass]="{ 'lg:grid-cols-2': dialogData().multiple }">
+        @for (user of selectedUsersSignal(); track user.id) {
+          <div
+            data-testid="user-search-dialog-item"
+            class="p-2 border border-wt-gray-medium g-clickable-hover"
+            (click)="onUserRemove(user)"
+          >
+            <app-user-display-item [userData]="user" />
+          </div>
+        }
+      </div>
+
+      <!-- divider -->
+      <div class="pt-6">
+        <mat-divider />
+      </div>
     </mat-dialog-content>
 
-    <mat-dialog-actions *ngIf="data.multiple">
+    <!-- actions -->
+    <mat-dialog-actions>
       <div class="mt-2 g-mat-dialog-actions-full">
         <button mat-flat-button mat-dialog-close type="button">Cancel</button>
         <button type="button" (click)="onCloseDialog()" mat-flat-button color="primary">Save</button>
@@ -92,50 +99,69 @@ export type UserSearchDialogData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserSearchDialogComponent {
-  searchUserControl = new FormControl<UserData | null>(null, { nonNullable: true });
-  selectedUsersSignal = signal<UserData[]>([]);
+  private dialogServiceUtil = inject(DialogServiceUtil);
+  private dialogRef = inject(MatDialogRef<UserSearchDialogComponent, UserData[] | undefined>);
+  dialogData = signal(inject<UserSearchDialogData>(MAT_DIALOG_DATA));
+  searchUserControl = new FormControl<UserData | null>(null);
 
-  dialogServiceUtil = inject(DialogServiceUtil);
+  private removeUser$ = new Subject<UserData>();
 
-  constructor(
-    private dialogRef: MatDialogRef<UserSearchDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: UserSearchDialogData,
-  ) {
-    this.listenOnSearchControl();
-  }
+  /**
+   * subject about selected users
+   */
+  selectedUsersSignal = toSignal(
+    merge(
+      // emits the user who should be added
+      this.searchUserControl.valueChanges.pipe(
+        filterNil(),
+        map((user) => ({
+          action: 'add' as const,
+          user,
+        })),
+      ),
+      // emits the user who should be removed
+      this.removeUser$.pipe(
+        map((user) => ({
+          action: 'remove' as const,
+          user,
+        })),
+      ),
+    ).pipe(
+      scan((acc, curr) => {
+        // remove user
+        if (curr.action === 'remove') {
+          return acc.filter((u) => u.id !== curr.user.id);
+        }
+
+        // check if multiple is enabled
+        if (!this.dialogData().multiple) {
+          return [curr.user];
+        }
+
+        // check if user already selected
+        if (acc.find((u) => u.id === curr.user.id)) {
+          this.dialogServiceUtil.showNotificationBar('User already selected', 'error');
+          return acc;
+        }
+
+        // check if not overflowing with selected users number
+        const selectUsersCap = this.dialogData().selectUsersCap;
+        if (selectUsersCap && acc.length >= selectUsersCap) {
+          this.dialogServiceUtil.showNotificationBar(`You can select up to ${selectUsersCap} users`, 'error');
+          return acc;
+        }
+
+        return [...acc, curr.user];
+      }, [] as UserData[]),
+    ),
+    { initialValue: [] },
+  );
 
   onUserRemove(user: UserData) {
-    this.selectedUsersSignal.update((users) => users.filter((u) => u.id !== user.id));
+    this.removeUser$.next(user);
   }
 
   onCloseDialog() {
     this.dialogRef.close(this.selectedUsersSignal());
-  }
-
-  private listenOnSearchControl() {
-    this.searchUserControl.valueChanges.subscribe((value) => {
-      if (value) {
-        if (this.data.multiple) {
-          // check if not overflowing with selected users number
-          if (this.data.selectUsersCap && this.selectedUsersSignal().length >= this.data.selectUsersCap) {
-            this.dialogServiceUtil.showNotificationBar(
-              `You can select up to ${this.data.selectUsersCap} users`,
-              'error',
-            );
-          } else {
-            // check if user is already selected
-            if (this.selectedUsersSignal().find((u) => u.id === value.id)) {
-              this.dialogServiceUtil.showNotificationBar('User already selected', 'error');
-              return;
-            }
-            this.selectedUsersSignal.update((users) => [...users, value]);
-          }
-        } else {
-          // single selection, close dialog
-          this.selectedUsersSignal.set([value]);
-          this.onCloseDialog();
-        }
-      }
-    });
   }
 }

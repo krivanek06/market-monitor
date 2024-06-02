@@ -55,7 +55,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, 
           <mat-option [value]="user" class="py-2 rounded-md">
             <app-user-display-item [userData]="user" />
             <div *ngIf="!last" class="mt-2">
-              <mat-divider></mat-divider>
+              <mat-divider />
             </div>
           </mat-option>
         }
@@ -127,6 +127,7 @@ export class UserSearchControlComponent implements ControlValueAccessor {
     }
     this.onChange(userData);
     this.selectedUserEmitter.emit(userData);
+    this.searchControl.patchValue('');
   }
 
   /*
