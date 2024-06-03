@@ -15,7 +15,7 @@ import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
-import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
+import { UploadFileControlComponent } from 'libs/shared/features/upload-file-control/src';
 import { filterNil } from 'ngxtension/filter-nil';
 import { EMPTY, catchError, from, map, take, tap } from 'rxjs';
 import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';
@@ -30,7 +30,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     MatDialogModule,
     DialogCloseHeaderComponent,
     MatDividerModule,
-    UploadImageSingleControlComponent,
+    UploadFileControlComponent,
     ReactiveFormsModule,
     MatTooltipModule,
     UserAccountTypeSelectDialogComponent,
@@ -46,7 +46,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         <div class="flex flex-col gap-6 sm:flex-row">
           <!-- user image -->
           <div class="max-md:mx-auto">
-            <app-upload-image-single-control
+            <app-upload-file-control
               folder="users"
               [isDisabled]="isDemoAccount()"
               [fileName]="userDataSignal().id"

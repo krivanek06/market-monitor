@@ -12,7 +12,7 @@ import { DefaultImgDirective } from '@mm/shared/ui';
 import { EMPTY, catchError, take, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-upload-image-single-control',
+  selector: 'app-upload-file-control',
   standalone: true,
   imports: [CommonModule, MatRippleModule, DefaultImgDirective, ReactiveFormsModule, MatButtonModule, MatIconModule],
   template: `
@@ -73,7 +73,7 @@ import { EMPTY, catchError, take, tap } from 'rxjs';
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => UploadImageSingleControlComponent),
+      useExisting: forwardRef(() => UploadFileControlComponent),
       multi: true,
     },
   ],
@@ -83,7 +83,7 @@ import { EMPTY, catchError, take, tap } from 'rxjs';
     }
   `,
 })
-export class UploadImageSingleControlComponent implements ControlValueAccessor {
+export class UploadFileControlComponent implements ControlValueAccessor {
   // url where to upload the file
   private readonly UPLOAD_URL = 'https://upload-file.krivanek1234.workers.dev';
 
@@ -164,14 +164,14 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
   /**
    * Register Component's ControlValueAccessor onChange callback
    */
-  registerOnChange(fn: UploadImageSingleControlComponent['onChange']): void {
+  registerOnChange(fn: UploadFileControlComponent['onChange']): void {
     this.onChange = fn;
   }
 
   /**
    * Register Component's ControlValueAccessor onTouched callback
    */
-  registerOnTouched(fn: UploadImageSingleControlComponent['onTouched']): void {
+  registerOnTouched(fn: UploadFileControlComponent['onTouched']): void {
     this.onTouched = fn;
   }
 
@@ -199,6 +199,7 @@ export class UploadImageSingleControlComponent implements ControlValueAccessor {
         tap(() => {
           // show notification
           this.dialogServiceUtil.showNotificationBar('File uploaded', 'success');
+
           // save url
           this.lastFileUploadSignal.set(usedUrl);
 

@@ -18,8 +18,8 @@ import {
   DialogCloseHeaderComponent,
   FormMatInputWrapperComponent,
 } from '@mm/shared/ui';
-import { UploadImageSingleControlComponent } from '@mm/shared/upload-image-single-control';
 import { UserDisplayItemComponent } from '@mm/user/ui';
+import { UploadFileControlComponent } from 'libs/shared/features/upload-file-control/src';
 import { filterNil } from 'ngxtension/filter-nil';
 import { map, take } from 'rxjs';
 
@@ -43,7 +43,7 @@ export type GroupSettingsDialogComponentData = {
     DefaultImgDirective,
     DialogCloseHeaderComponent,
     UserDisplayItemComponent,
-    UploadImageSingleControlComponent,
+    UploadFileControlComponent,
     ArrayExcludePipe,
   ],
   template: `
@@ -54,7 +54,7 @@ export type GroupSettingsDialogComponentData = {
         <div class="flex gap-4">
           <!-- upload image -->
           <div>
-            <app-upload-image-single-control
+            <app-upload-file-control
               folder="groups"
               formControlName="uploadedImage"
               (uploadedFilesEmitter)="onNewImageUpload($event)"

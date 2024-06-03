@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'upload-image-single-control',
+  displayName: 'upload-file-control',
   preset: '../../../../jest.preset.js',
   setupFilesAfterEnv: ['../../../../jest.setup.js'],
-  coverageDirectory: '../../../../coverage/libs/shared/features/upload-image-single-control',
+  coverageDirectory: '../../../../coverage/libs/shared/features/upload-file-control',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',
