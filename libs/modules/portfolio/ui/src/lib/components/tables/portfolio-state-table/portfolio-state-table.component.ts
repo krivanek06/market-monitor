@@ -20,8 +20,8 @@ export type PortfolioStateTableData = {
         <ng-container matColumnDef="user">
           <th mat-header-cell *matHeaderCellDef>User</th>
           <td mat-cell *matCellDef="let row">
-            <div class="flex items-center gap-2 text-wt-gray-dark">
-              <img appDefaultImg [src]="row.userBase.personal.photoURL" alt="user" class="w-8 h-8 rounded-full" />
+            <div class="text-wt-gray-dark flex items-center gap-2">
+              <img appDefaultImg [src]="row.userBase.personal.photoURL" alt="user" class="h-8 w-8 rounded-full" />
               <span>{{ row.userBase.personal.displayNameInitials }}</span>
             </div>
           </td>
@@ -29,33 +29,33 @@ export type PortfolioStateTableData = {
 
         <!-- balance -->
         <ng-container matColumnDef="balance">
-          <th mat-header-cell *matHeaderCellDef class="hidden @lg:table-cell">Balance</th>
-          <td mat-cell *matCellDef="let row" class="hidden @lg:table-cell">
+          <th mat-header-cell *matHeaderCellDef class="@lg:table-cell hidden">Balance</th>
+          <td mat-cell *matCellDef="let row" class="@lg:table-cell hidden">
             {{ row.portfolioState.balance | currency }}
           </td>
         </ng-container>
 
         <!-- invested -->
         <ng-container matColumnDef="invested">
-          <th mat-header-cell *matHeaderCellDef class="hidden @lg:table-cell">Invested</th>
-          <td mat-cell *matCellDef="let row" class="hidden @lg:table-cell">
+          <th mat-header-cell *matHeaderCellDef class="@lg:table-cell hidden">Invested</th>
+          <td mat-cell *matCellDef="let row" class="@lg:table-cell hidden">
             {{ row.portfolioState.invested | currency }}
           </td>
         </ng-container>
 
         <!-- cashOnHand -->
         <ng-container matColumnDef="cashOnHand">
-          <th mat-header-cell *matHeaderCellDef class="hidden @xl:table-cell">Cash</th>
-          <td mat-cell *matCellDef="let row" class="hidden @xl:table-cell">
+          <th mat-header-cell *matHeaderCellDef class="@xl:table-cell hidden">Cash</th>
+          <td mat-cell *matCellDef="let row" class="@xl:table-cell hidden">
             {{ row.portfolioState.cashOnHand | currency }}
           </td>
         </ng-container>
 
         <!-- totalReturn -->
         <ng-container matColumnDef="totalReturn">
-          <th mat-header-cell *matHeaderCellDef class="text-end @lg:text-start">Total Return</th>
+          <th mat-header-cell *matHeaderCellDef class="@lg:text-start text-end">Total Return</th>
           <td mat-cell *matCellDef="let row">
-            <div class="flex flex-col items-end @lg:items-start">
+            <div class="@lg:items-start flex flex-col items-end">
               <span class="@lg:hidden">
                 {{ row.portfolioState.balance | currency }}
               </span>
@@ -64,7 +64,7 @@ export type PortfolioStateTableData = {
                 [useCurrencySign]="true"
                 [changeValues]="{
                   change: row.portfolioState.totalGainsValue,
-                  changePercentage: row.portfolioState.totalGainsPercentage
+                  changePercentage: row.portfolioState.totalGainsPercentage,
                 }"
               ></div>
             </div>

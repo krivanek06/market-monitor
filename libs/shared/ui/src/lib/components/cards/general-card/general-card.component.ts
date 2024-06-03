@@ -15,7 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         <mat-card-title class="flex items-center gap-2">
           <img *ngIf="titleImgUrl()" appDefaultImg [src]="titleImgUrl()" />
           <mat-icon *ngIf="matIcon()" color="primary">{{ matIcon() }}</mat-icon>
-          <h2 class="mb-0 text-wt-primary text-lg">
+          <h2 class="text-wt-primary mb-0 text-lg">
             {{ title() }}
           </h2>
         </mat-card-title>
@@ -35,7 +35,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
           <!-- default content -->
           <div class="default">
-            <div class="text-wt-gray-medium min-h-[150px] h-[80%] grid place-content-center">
+            <div class="text-wt-gray-medium grid h-[80%] min-h-[150px] place-content-center">
               No data has been found
             </div>
           </div>

@@ -16,36 +16,36 @@ import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- first line -->
-    <div class="flex items-center justify-between @container">
+    <div class="@container flex items-center justify-between">
       <!-- image and symbol -->
-      <div class="flex items-center gap-3 max-w-[60%]">
-        <img appDefaultImg imageType="symbol" [src]="symbolQuote().symbol" alt="stock image" class="w-7 h-7" />
-        <span class="block sm:hidden text-wt-gray-dark">{{ symbolQuote().symbol }}</span>
-        <span class="hidden sm:block text-start text-wt-gray-dark">
-          <span class="hidden @xl:block">{{ symbolQuote().name | truncate: 25 }}</span>
-          <span class="block @xl:hidden">{{ symbolQuote().symbol }}</span>
+      <div class="flex max-w-[60%] items-center gap-3">
+        <img appDefaultImg imageType="symbol" [src]="symbolQuote().symbol" alt="stock image" class="h-7 w-7" />
+        <span class="text-wt-gray-dark block sm:hidden">{{ symbolQuote().symbol }}</span>
+        <span class="text-wt-gray-dark hidden text-start sm:block">
+          <span class="@xl:block hidden">{{ symbolQuote().name | truncate: 25 }}</span>
+          <span class="@xl:hidden block">{{ symbolQuote().symbol }}</span>
         </span>
       </div>
       <!-- price & price change -->
-      <div class="flex flex-col items-end xs:items-center gap-x-3 xs:flex-row min-w-max">
-        <span class="text-base text-wt-gray-medium">{{ symbolQuote().price | currency }}</span>
+      <div class="xs:items-center xs:flex-row flex min-w-max flex-col items-end gap-x-3">
+        <span class="text-wt-gray-medium text-base">{{ symbolQuote().price | currency }}</span>
         <!-- show value change -->
         <span
-          class="hidden @xs:flex"
+          class="@xs:flex hidden"
           appPercentageIncrease
           [useCurrencySign]="true"
           [changeValues]="{
             change: symbolQuote().change,
-            changePercentage: symbolQuote().changesPercentage
+            changePercentage: symbolQuote().changesPercentage,
           }"
         ></span>
         <!-- hide value change -->
         <span
-          class="flex @xs:hidden"
+          class="@xs:hidden flex"
           appPercentageIncrease
           [useCurrencySign]="true"
           [changeValues]="{
-            change: symbolQuote().change
+            change: symbolQuote().change,
           }"
         ></span>
       </div>

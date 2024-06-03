@@ -12,7 +12,7 @@ import { AddColorDirective } from '@mm/shared/ui';
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- Alpha -->
-        <div class="flex justify-between @md:flex-col">
+        <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Alpha</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{ (portfolioRisk()?.alpha | number: '1.2-2') + '%' }}
@@ -20,7 +20,7 @@ import { AddColorDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Volatility -->
-        <div class="flex justify-between @md:flex-col">
+        <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Volatility</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{ portfolioRisk()?.volatility | percent: '1.2-2' }}
@@ -28,7 +28,7 @@ import { AddColorDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Beta -->
-        <div class="flex justify-between @md:flex-col">
+        <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Beta</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{ portfolioRisk()?.beta | number: '1.2-2' }}
@@ -36,7 +36,7 @@ import { AddColorDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Sharp Ratio -->
-        <div class="flex justify-between @md:flex-col">
+        <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Sharp Ratio</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{ portfolioRisk()?.sharpe | number: '1.2-2' }}

@@ -12,11 +12,11 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
   imports: [CommonModule, GeneralCardComponent, UserDisplayItemComponent, MatRippleModule],
   template: `
     <app-general-card *ngIf="memberRequestUsers().length > 0 || memberInvitedUsers().length > 0" title="Invitations">
-      <div class="w-full min-h-[150px] p-2 grid gap-8">
+      <div class="grid min-h-[150px] w-full gap-8 p-2">
         <!-- received invitations -->
         <div *ngIf="memberRequestUsers().length > 0">
           <div class="mb-4 text-lg">Received Invitations</div>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             <div
               *ngFor="let user of memberRequestUsers()"
               (click)="onReceivedInvitationClick(user)"
@@ -25,7 +25,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
               [matRippleDisabled]="false"
               [matRippleUnbounded]="false"
               appearance="outlined"
-              class="p-2 border rounded-lg cursor-pointer border-wt-gray-light-strong g-clickable-hover"
+              class="border-wt-gray-light-strong g-clickable-hover cursor-pointer rounded-lg border p-2"
             >
               <app-user-display-item [userData]="user" />
             </div>
@@ -35,7 +35,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         <!-- sent invitations -->
         <div *ngIf="memberInvitedUsers().length > 0">
           <div class="mb-4 text-lg">Sent Invitations</div>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             <div
               *ngFor="let user of memberInvitedUsers()"
               (click)="onSentInvitationClick(user)"
@@ -44,7 +44,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
               [matRippleDisabled]="false"
               [matRippleUnbounded]="false"
               appearance="outlined"
-              class="p-2 border border-wt-gray-light-strong g-clickable-hover-color"
+              class="border-wt-gray-light-strong g-clickable-hover-color border p-2"
             >
               <app-user-display-item [userData]="user" />
             </div>

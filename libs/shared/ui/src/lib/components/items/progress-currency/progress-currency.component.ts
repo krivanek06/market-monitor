@@ -15,8 +15,8 @@ import { ChangeDetectionStrategy, Component, OnInit, input } from '@angular/core
       />
     </div>
     <div class="flex items-center justify-between">
-      <span class="text-xs text-wt-gray-medium">{{ min() | currency }} </span>
-      <span class="text-xs text-wt-gray-medium">{{ max() | currency }} </span>
+      <span class="text-wt-gray-medium text-xs">{{ min() | currency }} </span>
+      <span class="text-wt-gray-medium text-xs">{{ max() | currency }} </span>
     </div>
   `,
   styles: [

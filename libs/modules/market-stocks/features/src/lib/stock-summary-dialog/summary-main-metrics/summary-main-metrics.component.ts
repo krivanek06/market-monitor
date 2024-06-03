@@ -14,7 +14,7 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         [titleCenter]="true"
         title="Price"
         additionalClasses="h-full"
-        class="max-sm:w-full min-w-[275px]"
+        class="min-w-[275px] max-sm:w-full"
       >
         <div class="flex items-center justify-center gap-3">
           <span>{{ stockSummary().quote.price | currency }}</span>
@@ -23,7 +23,7 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
             [useCurrencySign]="true"
             [changeValues]="{
               change: stockSummary().quote.change,
-              changePercentage: stockSummary().quote.changesPercentage
+              changePercentage: stockSummary().quote.changesPercentage,
             }"
           ></span>
         </div>
@@ -34,7 +34,7 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         [titleCenter]="true"
         title="Market Cap."
         additionalClasses="h-full"
-        class="hidden sm:block min-w-[150px]"
+        class="hidden min-w-[150px] sm:block"
       >
         <div class="text-center">{{ stockSummary().profile?.mktCap | largeNumberFormatter }}</div>
       </app-general-card>
@@ -59,7 +59,7 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         [titleCenter]="true"
         additionalClasses="h-full"
         title="PE"
-        class="hidden md:block min-w-[100px]"
+        class="hidden min-w-[100px] md:block"
       >
         <div class="text-center">
           {{ stockSummary().quote.pe ? (stockSummary().quote.pe | number: '1.2-2') : 'N/A' }}
@@ -71,7 +71,7 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
         [titleCenter]="true"
         additionalClasses="h-full"
         title="EPS"
-        class="hidden lg:block min-w-[100px]"
+        class="hidden min-w-[100px] lg:block"
       >
         <div class="text-center">
           {{ stockSummary().quote.eps ? (stockSummary().quote.eps | number: '1.2-2') : 'N/A' }}

@@ -44,7 +44,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
   ],
   template: `
     <div
-      class="xl:absolute xl:top-[-100px] xl:left-0 flex flex-col md:flex-row justify-between md:items-center gap-6 mb-10"
+      class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-center xl:absolute xl:left-0 xl:top-[-100px]"
     >
       <!-- display user rank -->
       <app-section-title
@@ -53,14 +53,14 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       />
       <!-- search users -->
       <app-user-search-control
-        class="md:scale-90 w-full md:w-[500px] xl:mt-3"
+        class="w-full md:w-[500px] md:scale-90 xl:mt-3"
         (selectedUserEmitter)="onUserClick($event)"
       />
     </div>
 
-    <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4 overflow-y-clip">
+    <div class="flex flex-col gap-x-10 gap-y-4 overflow-y-clip lg:flex-row">
       <div class="lg:basis-4/6 xl:basis-3/6">
-        <div class="flex items-center justify-between lg:px-2 mb-4">
+        <div class="mb-4 flex items-center justify-between lg:px-2">
           <!-- title -->
           <app-section-title title="Top Users" class="mt-2" />
 
@@ -97,11 +97,11 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
           </div>
         </app-general-card>
       </div>
-      <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
+      <div class="grid gap-y-6 p-4 lg:basis-2/6 xl:basis-3/6">
         <!-- daily best -->
         <div class="@container">
           <app-section-title title="Daily Gainers" class="mb-6" />
-          <div class="grid @xl:grid-cols-2 gap-3">
+          <div class="@xl:grid-cols-2 grid gap-3">
             @if (hallOfFameUsersSignal(); as hallOfFameUses) {
               @for (user of hallOfFameUses.bestDailyGains; track user.id) {
                 <app-user-display-item
@@ -123,7 +123,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         <!-- daily worst -->
         <div class="@container">
           <app-section-title title="Daily Losers" class="mb-6" />
-          <div class="grid @xl:grid-cols-2 gap-3">
+          <div class="@xl:grid-cols-2 grid gap-3">
             @if (hallOfFameUsersSignal(); as hallOfFameUses) {
               @for (user of hallOfFameUses.worstDailyGains; track user.id) {
                 <app-user-display-item
@@ -148,13 +148,13 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     <ng-template #userTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
         <mat-icon [color]="data.item.isAccountActive ? 'accent' : 'warn'"> radio_button_checked </mat-icon>
-        <img appDefaultImg [src]="data.item.personal.photoURL" alt="user image" class="w-10 h-10 rounded-lg" />
+        <img appDefaultImg [src]="data.item.personal.photoURL" alt="user image" class="h-10 w-10 rounded-lg" />
         <div class="flex items-center gap-2">
           <div appPositionColoring [position]="position">{{ data.item.personal.displayNameInitials }}</div>
           <!-- display position change if any -->
           @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
             @if (rankChange !== 0) {
-              <div class="flex items-center gap-1 ml-4">
+              <div class="ml-4 flex items-center gap-1">
                 <span [ngClass]="{ 'text-wt-success': rankChange > 0, 'text-wt-danger': rankChange < 0 }">
                   {{ rankChange }}
                 </span>

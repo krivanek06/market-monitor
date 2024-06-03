@@ -30,7 +30,7 @@ import { BubblePaginationDirective, LargeNumberFormatterPipe } from '@mm/shared/
           <div class="grid">
             <span class="text-wt-gray-dark">{{ row.reportingName }}</span>
             <div class="flex flex-row gap-2">
-              <span class="hidden xs:block">{{ row.typeOfOwner }}</span>
+              <span class="xs:block hidden">{{ row.typeOfOwner }}</span>
               <span class="xs:max-sm:block">|</span>
               <span class="block sm:hidden">{{ row.transactionDate | date: 'MMMM d, y' }}</span>
             </div>

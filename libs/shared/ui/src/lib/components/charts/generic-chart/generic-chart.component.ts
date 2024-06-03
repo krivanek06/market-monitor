@@ -23,11 +23,11 @@ type ChartInputType = Highcharts.SeriesOptionsType[];
     }
   `,
   template: `
-    <div class="block relative">
+    <div class="relative block">
       <button
         mat-icon-button
         *ngIf="showExpandableButton()"
-        class="text-wt-gray-medium hover:text-wt-gray-medium z-10 absolute right-0 top-0"
+        class="text-wt-gray-medium hover:text-wt-gray-medium absolute right-0 top-0 z-10"
         (click)="expand()"
         matTooltip="Expand chart"
       >

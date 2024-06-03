@@ -82,7 +82,7 @@ import { DefaultImgDirective } from '../../../directives';
           />
 
           <!-- hint -->
-          <mat-hint *ngIf="hintText()" class="hidden sm:block text-wt-gray-medium" matSuffix>
+          <mat-hint *ngIf="hintText()" class="text-wt-gray-medium hidden sm:block" matSuffix>
             {{ hintText() }}
           </mat-hint>
 

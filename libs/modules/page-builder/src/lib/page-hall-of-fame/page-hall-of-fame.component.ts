@@ -21,7 +21,7 @@ type SubPages = 'users' | 'groups' | 'compare-users';
     CompareUsersComponent,
   ],
   template: `
-    <div class="flex justify-end mb-6 lg:mb-10">
+    <div class="mb-6 flex justify-end lg:mb-10">
       <app-tab-select-control
         class="max-md:w-full"
         [formControl]="currentPageControl"

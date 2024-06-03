@@ -23,10 +23,10 @@ export class MarkerDirective {}
   standalone: true,
   imports: [CommonModule, RangeDirective, MatButtonModule, MatIconModule, MarkerDirective],
   template: `
-    <div class="flex flex-col justify-between px-6 mb-10 md:flex-row gap-y-3">
+    <div class="mb-10 flex flex-col justify-between gap-y-3 px-6 md:flex-row">
       <div class="flex items-center gap-10">
         <!-- current date range -->
-        <div class="justify-between space-x-4 text-wt-gray-medium max-md:flex max-md:flex-1">
+        <div class="text-wt-gray-medium justify-between space-x-4 max-md:flex max-md:flex-1">
           <span>{{ dateRangeSignal()[0] | date: 'MMMM d, y' }}</span>
           <span>-</span>
           <span>{{ dateRangeSignal()[dateRangeSignal().length - 1] | date: 'MMMM d, y' }}</span>
@@ -52,14 +52,14 @@ export class MarkerDirective {}
 
     <div class="grid grid-cols-5">
       <!-- display day name -->
-      <div *ngRange="5; let i = index" class="mb-4 text-base text-center text-wt-gray-medium">
+      <div *ngRange="5; let i = index" class="text-wt-gray-medium mb-4 text-center text-base">
         {{ dateRangeSignal()[i] | date: 'EEEE' }}
       </div>
 
       <!-- showing border if not last line on the bottom -->
       <div
         *ngFor="let date of dateRangeSignal(); let i = index"
-        class="p-2 g-border-bottom"
+        class="g-border-bottom p-2"
         [ngClass]="{
           'border-r': i % 5 !== 4,
           'border-b':
@@ -68,8 +68,8 @@ export class MarkerDirective {}
         }"
       >
         <!-- display day -->
-        <div class="flex justify-end mb-2">
-          <span class="p-2 text-center rounded-full text-wt-gray-medium w-9 h-9 bg-wt-gray-light">
+        <div class="mb-2 flex justify-end">
+          <span class="text-wt-gray-medium bg-wt-gray-light h-9 w-9 rounded-full p-2 text-center">
             {{ dateRangeSignal()[i] | date: 'd' }}
           </span>
         </div>

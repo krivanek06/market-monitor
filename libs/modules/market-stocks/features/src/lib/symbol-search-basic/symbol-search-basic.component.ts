@@ -73,8 +73,8 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
           originX: 'center',
           originY: 'bottom',
           overlayX: 'center',
-          overlayY: 'top'
-        }
+          overlayY: 'top',
+        },
       ]"
       [cdkConnectedOverlayOpen]="isInputFocused()"
     >
@@ -85,12 +85,12 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
         data-testid="search-basic-overlay"
         [style.max-width.px]="overlayWidth()"
         [style.min-width.px]="overlayWidth()"
-        class="min-h-[200px] max-h-[400px] bg-wt-gray-light w-full rounded-md mx-auto overflow-y-scroll p-3 shadow-md"
+        class="bg-wt-gray-light mx-auto max-h-[400px] min-h-[200px] w-full overflow-y-scroll rounded-md p-3 shadow-md"
       >
         <!-- checkbox changing displayed favorites -->
         @if (!isUserAuthenticatedSignal() && searchValue().length === 0) {
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-base text-wt-gray-medium">
+          <div class="mb-1 flex items-center justify-between">
+            <span class="text-wt-gray-medium text-base">
               {{ showFavoriteStocks() ? 'Watch List' : 'Last Searched' }}
             </span>
             <mat-checkbox
@@ -106,7 +106,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
 
         @if (displayQuotes().isLoading) {
           <!-- loading skeleton -->
-          <div *ngRange="6" class="h-10 mb-1 g-skeleton"></div>
+          <div *ngRange="6" class="g-skeleton mb-1 h-10"></div>
         } @else {
           <!-- display summaries as buttons -->
           @for (quote of displayQuotes().data; track quote.symbol; let last = $last) {
@@ -114,7 +114,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
               test-id="search-basic-quotes"
               mat-button
               type="button"
-              class="w-full h-12 max-sm:mb-2"
+              class="h-12 w-full max-sm:mb-2"
               (click)="onSummaryClick(quote)"
             >
               <app-quote-item [symbolQuote]="quote" />
@@ -126,7 +126,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
 
           <!-- no data -->
           @if (displayQuotes().noData) {
-            <div data-testid="search-basic-no-data" class="text-base grid place-content-center h-24">No data found</div>
+            <div data-testid="search-basic-no-data" class="grid h-24 place-content-center text-base">No data found</div>
           }
         }
       </div>

@@ -66,24 +66,24 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
   ],
   template: `
     <div
-      class="xl:absolute xl:top-[-100px] xl:left-0 flex flex-col md:flex-row justify-between md:items-center gap-6 mb-10"
+      class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-center xl:absolute xl:left-0 xl:top-[-100px]"
     >
       <!-- title -->
       <app-section-title matIcon="diversity_3" title="Compare Users" />
 
       <!-- search users -->
       <app-user-search-control
-        class="md:scale-90 w-full md:w-[500px] xl:mt-3"
+        class="w-full md:w-[500px] md:scale-90 xl:mt-3"
         (selectedUserEmitter)="onUserClick($event)"
         [isDisabled]="loadingState()"
       />
     </div>
 
     <!-- selected users -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-3 mb-10">
+    <div class="mb-10 grid grid-cols-1 gap-x-6 gap-y-3 md:grid-cols-2 xl:grid-cols-3">
       @for (user of selectedUsers(); track user.id) {
         <app-general-card>
-          <div class="flex gap-4 justify-between">
+          <div class="flex justify-between gap-4">
             <app-user-display-item [userData]="user" />
             <!-- remove button -->
             <button mat-icon-button color="warn" (click)="onRemoveUser(user)">
@@ -105,7 +105,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     </div>
 
     <!-- display compare tables -->
-    <div class="grid lg:grid-cols-2 xl:grid-cols-10 gap-x-4 gap-y-4 mb-10">
+    <div class="mb-10 grid gap-x-4 gap-y-4 lg:grid-cols-2 xl:grid-cols-10">
       <app-general-card title="State" class="lg:col-span-2 xl:col-span-4">
         <!-- table -->
         <app-portfolio-state-table [data]="selectedUsersData()" />
@@ -142,7 +142,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       <!-- allocation charts -->
       <div class="hidden md:block">
         <app-section-title title="Asset Allocation" />
-        <div class="grid grid-cols-2 xl:grid-cols-3 mb-10">
+        <div class="mb-10 grid grid-cols-2 xl:grid-cols-3">
           @for (userData of selectedUsersData(); track userData.userBase.id) {
             <app-pie-chart
               [chartTitle]="'Allocation: ' + userData.userBase.personal.displayNameInitials"
@@ -157,8 +157,8 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       </div>
 
       <!-- holding title -->
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl space-x-2">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="space-x-2 text-xl">
           <span class="text-wt-primary">Selected User: </span>
           <span class="text-wt-gray-dark">{{ selectedUser()?.userData?.personal?.displayName }}</span>
         </h2>

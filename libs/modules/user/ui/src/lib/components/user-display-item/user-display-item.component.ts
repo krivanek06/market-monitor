@@ -22,7 +22,7 @@ import {
   ],
   template: `
     <div class="flex gap-4">
-      <img appDefaultImg [src]="userData().personal.photoURL" alt="User Image" class="w-14 h-14 rounded-md" />
+      <img appDefaultImg [src]="userData().personal.photoURL" alt="User Image" class="h-14 w-14 rounded-md" />
 
       <!-- info -->
       <div class="flex flex-col text-sm">
@@ -45,7 +45,7 @@ import {
               *ngIf="!showDailyPortfolioChange()"
               appPercentageIncrease
               [changeValues]="{
-                changePercentage: userData().portfolioState.totalGainsPercentage
+                changePercentage: userData().portfolioState.totalGainsPercentage,
               }"
             ></div>
 
@@ -54,7 +54,7 @@ import {
               *ngIf="showDailyPortfolioChange()"
               appPercentageIncrease
               [changeValues]="{
-                changePercentage: userData().portfolioState.previousBalanceChangePercentage
+                changePercentage: userData().portfolioState.previousBalanceChangePercentage,
               }"
             ></div>
           </div>

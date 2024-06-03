@@ -50,9 +50,9 @@ import { RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
       </div>
     } @else {
       <!-- loading screen -->
-      <div class="grid pt-8 gap-y-14">
+      <div class="grid gap-y-14 pt-8">
         <div *ngRange="3">
-          <div *ngRange="15" class="h-12 mb-1 g-skeleton"></div>
+          <div *ngRange="15" class="g-skeleton mb-1 h-12"></div>
         </div>
       </div>
     }

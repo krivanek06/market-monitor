@@ -34,14 +34,14 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
       <!-- heading -->
       <div class="flex items-center justify-between p-4">
         <div class="flex items-center gap-3">
-          <img appDefaultImg imageType="symbol" [src]="stockSummary.id" alt="Stock Image" class="w-11 h-11" />
+          <img appDefaultImg imageType="symbol" [src]="stockSummary.id" alt="Stock Image" class="h-11 w-11" />
           <div class="grid">
-            <div class="flex gap-4 text-base text-wt-gray-medium">
+            <div class="text-wt-gray-medium flex gap-4 text-base">
               <span>{{ stockSummary.id }}</span>
               <span>|</span>
               <span>{{ symbolType() }}</span>
             </div>
-            <span class="text-lg text-wt-gray-medium">{{ stockSummary.quote.name }}</span>
+            <span class="text-wt-gray-medium text-lg">{{ stockSummary.quote.name }}</span>
           </div>
         </div>
 

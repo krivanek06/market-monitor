@@ -35,7 +35,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
         <td mat-cell *matCellDef="let row; let i = index">
           <div class="flex items-center gap-3">
             <!-- position -->
-            <span appPositionColoring [position]="i + 1" class="w-7 h-7 border border-solid text-center rounded-full">
+            <span appPositionColoring [position]="i + 1" class="h-7 w-7 rounded-full border border-solid text-center">
               {{ i + 1 }}
             </span>
             <!-- template from parent -->
@@ -57,7 +57,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Profit</th>
         <td mat-cell *matCellDef="let row; let i = index">
           <div class="flex flex-col">
-            <div appPositionColoring [position]="i + 1" class="block md:hidden text-end">
+            <div appPositionColoring [position]="i + 1" class="block text-end md:hidden">
               {{ row.item.portfolioState.balance | currency }}
             </div>
             <div
@@ -66,7 +66,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
               [useCurrencySign]="true"
               [changeValues]="{
                 change: row.item.portfolioState.totalGainsValue,
-                changePercentage: row.item.portfolioState.totalGainsPercentage
+                changePercentage: row.item.portfolioState.totalGainsPercentage,
               }"
             ></div>
           </div>
@@ -91,7 +91,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
 
     <!-- skeleton -->
     <div *ngIf="showLoadingSkeletonSignal()">
-      <div *ngRange="20" class="h-12 mb-1 g-skeleton"></div>
+      <div *ngRange="20" class="g-skeleton mb-1 h-12"></div>
     </div>
   `,
   styles: `

@@ -20,7 +20,7 @@ import { map } from 'rxjs';
   standalone: true,
   imports: [CommonModule, HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule, SectionTitleComponent],
   template: `
-    <div class="flex flex-col lg:flex-row gap-3 items-center justify-between">
+    <div class="flex flex-col items-center justify-between gap-3 lg:flex-row">
       <!-- select chart title -->
       <app-section-title [title]="headerTitle()" />
 

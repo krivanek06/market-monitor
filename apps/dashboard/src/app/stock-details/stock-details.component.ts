@@ -15,7 +15,7 @@ import { TabSelectControlComponent } from '@mm/shared/ui';
   imports: [CommonModule, RouterModule, TabSelectControlComponent, ReactiveFormsModule, MatButtonModule, MatIconModule],
   template: `
     <section>
-      <div class="flex justify-end mb-6">
+      <div class="mb-6 flex justify-end">
         <!-- main navigation -->
         <app-tab-select-control
           class="w-full md:w-[450px] xl:w-auto"

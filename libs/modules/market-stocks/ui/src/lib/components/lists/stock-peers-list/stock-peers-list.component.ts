@@ -11,10 +11,10 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
   imports: [CommonModule, DefaultImgDirective, PercentageIncreaseDirective, MatButtonModule, MatDividerModule],
   template: `
     <div *ngFor="let data of peers(); let last = last">
-      <button (click)="onItemClick(data)" class="w-full h-[50px]" mat-button type="button">
+      <button (click)="onItemClick(data)" class="h-[50px] w-full" mat-button type="button">
         <div class="g-item-wrapper">
           <div class="flex items-center gap-2">
-            <img appDefaultImg imageType="symbol" [src]="data.id" class="w-8 h-8" />
+            <img appDefaultImg imageType="symbol" [src]="data.id" class="h-8 w-8" />
             <span>{{ data.id }}</span>
           </div>
           <div class="flex items-center gap-2">
@@ -22,7 +22,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
             <div
               appPercentageIncrease
               [changeValues]="{
-                changePercentage: data.quote.changesPercentage
+                changePercentage: data.quote.changesPercentage,
               }"
             ></div>
           </div>

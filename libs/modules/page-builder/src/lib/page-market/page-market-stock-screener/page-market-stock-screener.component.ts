@@ -38,9 +38,9 @@ import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
     SectionTitleComponent,
   ],
   template: `
-    <section class="md:pt-4 mx-auto mb-10 md:w-11/12 lg:w-10/12 xl:w-9/12">
+    <section class="mx-auto mb-10 md:w-11/12 md:pt-4 lg:w-10/12 xl:w-9/12">
       <!-- specific search -->
-      <div class="sm:hidden mb-4">
+      <div class="mb-4 sm:hidden">
         <app-section-title title="Basic Search" matIcon="search" class="mb-3" />
         <app-symbol-search-basic />
 
@@ -55,7 +55,7 @@ import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
         <app-stock-screener-form-control [formControl]="screenerFormControl" />
       </div>
 
-      <div class="flex items-center justify-between mt-8">
+      <div class="mt-8 flex items-center justify-between">
         <h3>Total found: {{ screenerResults().isLoading ? 'Loading...' : screenerResults().data.length }}</h3>
 
         <button (click)="onFormReset()" mat-stroked-button color="warn" class="g-border-apply">Reset Form</button>
@@ -75,7 +75,7 @@ import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
     } @else {
       <!-- loading screen -->
       <div class="mt-12">
-        <div *ngRange="20" class="mb-1 h-14 g-skeleton"></div>
+        <div *ngRange="20" class="g-skeleton mb-1 h-14"></div>
       </div>
     }
   `,

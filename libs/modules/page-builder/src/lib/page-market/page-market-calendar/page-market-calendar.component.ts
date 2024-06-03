@@ -53,7 +53,7 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
     DropdownControlComponent,
   ],
   template: `
-    <div class="flex flex-col items-center justify-between gap-3 mb-10 md:flex-row sm:pl-4">
+    <div class="mb-10 flex flex-col items-center justify-between gap-3 sm:pl-4 md:flex-row">
       <h2>Calendar type: {{ calendarTypeFormControl.value | titlecase }}</h2>
 
       <!-- calendar change select -->
@@ -117,7 +117,7 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
       <!-- loading skeletons -->
       <ng-container *ngIf="loadingSignal()">
         <ng-template marker *ngRange="datesInMonthSignal() ?? 0">
-          <div *ngRange="displayElements" class="w-full h-10 mb-1 g-skeleton"></div>
+          <div *ngRange="displayElements" class="g-skeleton mb-1 h-10 w-full"></div>
         </ng-template>
       </ng-container>
     </app-calendar-wrapper>

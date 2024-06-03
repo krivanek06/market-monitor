@@ -9,7 +9,7 @@ import { PercentageIncreaseDirective } from '@mm/shared/ui';
   imports: [CommonModule, PercentageIncreaseDirective],
   template: `
     <div class="@container">
-      <div class="grid @md:grid-cols-2 @xl:grid-cols-6 gap-x-6 gap-y-2">
+      <div class="@md:grid-cols-2 @xl:grid-cols-6 grid gap-x-6 gap-y-2">
         <ng-container
           *ngTemplateOutlet="dataTemplate; context: { change: portfolioChange()['1_day'], name: 'Daily' }"
         ></ng-container>
@@ -34,13 +34,13 @@ import { PercentageIncreaseDirective } from '@mm/shared/ui';
     <!-- template -->
     <ng-template #dataTemplate let-change="change" let-name="name">
       <div class="@container/item">
-        <div class="flex sm:flex-col justify-between gap-1 flex-row">
+        <div class="flex flex-row justify-between gap-1 sm:flex-col">
           <!-- name: weekly -->
-          <div class="text-base text-center text-wt-gray-dark @sm/item:text-lg whitespace-nowrap">{{ name }}</div>
+          <div class="text-wt-gray-dark @sm/item:text-lg whitespace-nowrap text-center text-base">{{ name }}</div>
           <!-- change: weekly -->
           <ng-container *ngIf="change; else noData">
             <div
-              class="justify-center text-base text-center @sm/item:text-lg"
+              class="@sm/item:text-lg justify-center text-center text-base"
               appPercentageIncrease
               [useCurrencySign]="true"
               [changeValues]="{ changePercentage: change.valuePrct, change: change.value }"
@@ -48,7 +48,7 @@ import { PercentageIncreaseDirective } from '@mm/shared/ui';
           </ng-container>
           <!-- no data -->
           <ng-template #noData>
-            <div class="text-base text-center text-wt-gray-medium @sm/item:text-lg">N/A</div>
+            <div class="text-wt-gray-medium @sm/item:text-lg text-center text-base">N/A</div>
           </ng-template>
         </div>
       </div>

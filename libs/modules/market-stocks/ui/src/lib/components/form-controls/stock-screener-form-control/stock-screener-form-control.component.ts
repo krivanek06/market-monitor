@@ -25,7 +25,7 @@ import { DropdownControlComponent } from '@mm/shared/ui';
   standalone: true,
   imports: [CommonModule, DropdownControlComponent, ReactiveFormsModule],
   template: `
-    <form [formGroup]="screenerFormGroup" class="grid xs:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4">
+    <form [formGroup]="screenerFormGroup" class="xs:grid-cols-2 grid gap-x-6 gap-y-4 lg:grid-cols-4">
       <!-- market cap. -->
       <app-dropdown-control
         formControlName="marketCap"

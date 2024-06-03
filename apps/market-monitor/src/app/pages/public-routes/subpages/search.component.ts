@@ -12,7 +12,7 @@ import { PageSearchComponent } from '@mm/page-builder';
     }
 
     /** make the search dropdown overlay a bit higher (remove space) */
-    ::ng-deep div[id="search-basic-overlay"] {
+    ::ng-deep div[id='search-basic-overlay'] {
       margin-top: -20px !important;
     }
   `,

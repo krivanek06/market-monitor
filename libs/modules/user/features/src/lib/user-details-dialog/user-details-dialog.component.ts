@@ -49,7 +49,7 @@ export type UserDetailsDialogComponentData = {
       <div class="flex items-center gap-6">
         <!-- display user -->
         <div *ngIf="userDataSignal() as user" class="flex items-center gap-2">
-          <img appDefaultImg [src]="user.personal.photoURL" alt="User Image" class="rounded-full w-14 h-14" />
+          <img appDefaultImg [src]="user.personal.photoURL" alt="User Image" class="h-14 w-14 rounded-full" />
           <div class="flex flex-col">
             <span class="text-xl">{{ user.personal.displayName }}</span>
             <span class="text-sm">{{ user.accountCreatedDate | date: 'MMMM d, y' }}</span>
@@ -78,7 +78,7 @@ export type UserDetailsDialogComponentData = {
           <mat-divider></mat-divider>
         </div>
         <!-- display portfolio -->
-        <div class="flex p-2 divide-x-2 flex-row divide-wt-border">
+        <div class="divide-wt-border flex flex-row divide-x-2 p-2">
           <!-- portfolio state -->
           <div class="p-2 max-lg:flex-1 lg:basis-[40%]">
             @if (portfolioStateHoldingSignal(); as portfolioStateHoldingSignal) {
@@ -93,7 +93,7 @@ export type UserDetailsDialogComponentData = {
             }
           </div>
           <!-- risk -->
-          <div class="p-2 flex-1 hidden md:block">
+          <div class="hidden flex-1 p-2 md:block">
             @if (portfolioStateHoldingSignal()) {
               <app-portfolio-state-risk
                 [titleColor]="ColorScheme.GRAY_DARK_VAR"
@@ -105,7 +105,7 @@ export type UserDetailsDialogComponentData = {
             }
           </div>
           <!-- transactions -->
-          <div class="p-2 flex-1 hidden lg:block">
+          <div class="hidden flex-1 p-2 lg:block">
             @if (portfolioStateHoldingSignal(); as portfolioStateHoldingSignal) {
               <app-portfolio-state-transactions
                 [portfolioState]="portfolioStateHoldingSignal"
@@ -140,7 +140,7 @@ export type UserDetailsDialogComponentData = {
           }
         </div>
       } @else {
-        <div class="grid place-content-center h-[400px]">
+        <div class="grid h-[400px] place-content-center">
           <mat-spinner></mat-spinner>
         </div>
       }

@@ -43,7 +43,7 @@ import {
             <div
               appPercentageIncrease
               [changeValues]="{
-                changePercentage: row.changeInWeightPercentage
+                changePercentage: row.changeInWeightPercentage,
               }"
             ></div>
           </div>
@@ -63,7 +63,7 @@ import {
               appPercentageIncrease
               [changeValues]="{
                 change: row.changeInPerformance,
-                changePercentage: row.performancePercentage
+                changePercentage: row.performancePercentage,
               }"
             ></div>
           </div>
@@ -79,7 +79,7 @@ import {
             <div
               appPercentageIncrease
               [changeValues]="{
-                changePercentage: row.changeInMarketValuePercentage
+                changePercentage: row.changeInMarketValuePercentage,
               }"
             ></div>
           </div>
@@ -95,7 +95,7 @@ import {
             <div
               appPercentageIncrease
               [changeValues]="{
-                changePercentage: row.changeInSharesNumberPercentage
+                changePercentage: row.changeInSharesNumberPercentage,
               }"
             ></div>
           </div>

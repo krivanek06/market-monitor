@@ -13,49 +13,49 @@ import { RangeDirective } from '@mm/shared/ui';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="flex gap-3 p-2 mb-6 xl:justify-around md:grid-cols-2 max-md:overflow-x-scroll md:grid xl:flex">
-      <div *ngRange="4" class="w-full lg:min-w-[320px] px-6 py-3 h-[115px] g-skeleton"></div>
+    <div class="mb-6 flex gap-3 p-2 max-md:overflow-x-scroll md:grid md:grid-cols-2 xl:flex xl:justify-around">
+      <div *ngRange="4" class="g-skeleton h-[115px] w-full px-6 py-3 lg:min-w-[320px]"></div>
     </div>
 
     <!-- index select -->
-    <div class="flex max-sm:w-full mb-3">
-      <div class="min-w-[500px] max-sm:w-full g-skeleton h-12"></div>
+    <div class="mb-3 flex max-sm:w-full">
+      <div class="g-skeleton h-12 min-w-[500px] max-sm:w-full"></div>
     </div>
 
     <!-- chart -->
     <div class="mb-10">
-      <div class="h-[400px] w-full g-skeleton"></div>
+      <div class="g-skeleton h-[400px] w-full"></div>
     </div>
 
-    <div class="w-full mx-auto max-sm:pr-3 lg:w-11/12">
+    <div class="mx-auto w-full max-sm:pr-3 lg:w-11/12">
       <!-- SP 500 -->
-      <div class="w-[200px] h-8 g-skeleton mb-4"></div>
-      <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
-        <div *ngRange="6" class="h-[275px] w-full g-skeleton"></div>
+      <div class="g-skeleton mb-4 h-8 w-[200px]"></div>
+      <div class="mb-10 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div *ngRange="6" class="g-skeleton h-[275px] w-full"></div>
       </div>
 
       <!-- Inflation rate -->
-      <div class="w-[200px] h-8 g-skeleton mb-4"></div>
-      <div class="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2 lg:grid-cols-4">
-        <div *ngRange="4" class="h-[250px] w-full g-skeleton"></div>
+      <div class="g-skeleton mb-4 h-8 w-[200px]"></div>
+      <div class="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div *ngRange="4" class="g-skeleton h-[250px] w-full"></div>
       </div>
 
       <!-- Treasury -->
-      <div class="w-[200px] h-8 g-skeleton mb-4"></div>
-      <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
-        <div *ngRange="4" class="h-[250px] w-full g-skeleton"></div>
+      <div class="g-skeleton mb-4 h-8 w-[200px]"></div>
+      <div class="mb-10 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div *ngRange="4" class="g-skeleton h-[250px] w-full"></div>
       </div>
 
       <!-- Bonds -->
-      <div class="w-[200px] h-8 g-skeleton mb-4"></div>
-      <div class="grid grid-cols-1 gap-4 mb-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div *ngRange="4" class="h-[250px] w-full g-skeleton"></div>
+      <div class="g-skeleton mb-4 h-8 w-[200px]"></div>
+      <div class="mb-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div *ngRange="4" class="g-skeleton h-[250px] w-full"></div>
       </div>
 
       <!-- Consumer Price Index -->
-      <div class="w-[200px] h-8 g-skeleton mb-4"></div>
-      <div class="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2 lg:grid-cols-4">
-        <div *ngRange="4" class="h-[250px] w-full g-skeleton"></div>
+      <div class="g-skeleton mb-4 h-8 w-[200px]"></div>
+      <div class="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div *ngRange="4" class="g-skeleton h-[250px] w-full"></div>
       </div>
     </div>
   `,

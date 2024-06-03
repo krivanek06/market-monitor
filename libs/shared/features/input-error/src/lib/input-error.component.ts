@@ -16,15 +16,15 @@ import { input } from '@angular/core';
 
   template: `
     @for (error of errors() | keyvalue; track error.key) {
-      <mat-error class="pl-3 mb-2">
+      <mat-error class="mb-2 pl-3">
         {{ error.key | errorMessage: error.value }}
       </mat-error>
     }
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
 })
 export class InputErrorComponent {

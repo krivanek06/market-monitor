@@ -37,7 +37,7 @@ import { DefaultImgDirective, LargeNumberFormatterPipe, PercentageIncreaseDirect
           <div *ngIf="showRevenue()">/</div>
 
           <!-- revenue -->
-          <div *ngIf="showRevenue()" class="items-center gap-1 hiddem sm:flex">
+          <div *ngIf="showRevenue()" class="hidden items-center gap-1 sm:flex">
             <span>{{ earning().revenue ? (earning().revenue | largeNumberFormatter) : 'N/A' }}</span>
             <div *ngIf="earning().revenue && earning().revenueEstimated" class="flex items-center">
               <span>(</span>

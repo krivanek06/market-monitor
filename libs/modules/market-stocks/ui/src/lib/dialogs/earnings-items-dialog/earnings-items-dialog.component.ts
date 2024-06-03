@@ -13,7 +13,7 @@ import { EarningsItemComponent } from '../../components';
     <app-dialog-close-header [title]="dialogTitle"></app-dialog-close-header>
 
     <mat-dialog-content>
-      <div class="flex items-center justify-between mb-2">
+      <div class="mb-2 flex items-center justify-between">
         <div></div>
         <div class="space-x-4">
           <span>Earnings</span>

@@ -20,7 +20,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().totalInvested,
                 valueToCompare: ownershipInstitutional().lastTotalInvested,
-                hideValue: true
+                hideValue: true,
               }"
             ></span>
             <span *ngIf="enterpriseValue()">/</span>
@@ -39,7 +39,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().numberOf13Fshares,
                 valueToCompare: ownershipInstitutional().lastNumberOf13Fshares,
-                hideValue: true
+                hideValue: true,
               }"
             ></span>
             <span *ngIf="enterpriseValue()">/</span>
@@ -59,7 +59,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().ownershipPercent,
                 valueToCompare: ownershipInstitutional().lastOwnershipPercent,
-                hideValue: true
+                hideValue: true,
               }"
             ></span>
           </div>
@@ -77,7 +77,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().investorsHolding,
                 valueToCompare: ownershipInstitutional().lastInvestorsHolding,
-                hideValue: true
+                hideValue: true,
               }"
             ></span>
           </div>
@@ -101,7 +101,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().increasedPositions,
                 valueToCompare: ownershipInstitutional().lastIncreasedPositions,
-                hideValue: true
+                hideValue: true,
               }"
             ></span>
           </div>
@@ -120,7 +120,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().reducedPositions,
                 valueToCompare: ownershipInstitutional().lastReducedPositions,
-                hideValue: true
+                hideValue: true,
               }"
             ></span>
           </div>
@@ -138,7 +138,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().newPositions,
                 valueToCompare: ownershipInstitutional().lastNewPositions,
-                hideValue: true
+                hideValue: true,
               }"
             ></span>
           </div>
@@ -156,7 +156,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().closedPositions,
                 valueToCompare: ownershipInstitutional().lastClosedPositions,
-                hideValue: true
+                hideValue: true,
               }"
             ></span>
           </div>
@@ -179,7 +179,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().totalCalls,
                 valueToCompare: ownershipInstitutional().lastTotalCalls,
-                hideValue: false
+                hideValue: false,
               }"
             ></span>
           </div>
@@ -196,7 +196,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().totalPuts,
                 valueToCompare: ownershipInstitutional().lastTotalPuts,
-                hideValue: false
+                hideValue: false,
               }"
             ></span>
           </div>
@@ -213,7 +213,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
               [currentValues]="{
                 value: ownershipInstitutional().putCallRatio,
                 valueToCompare: ownershipInstitutional().lastPutCallRatio,
-                hideValue: true
+                hideValue: true,
               }"
             ></span>
           </div>

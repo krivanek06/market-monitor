@@ -40,7 +40,7 @@ export type UserSearchDialogData = {
   ],
   template: `
     <mat-dialog-content>
-      <div class="text-xl text-center text-wt-primary">{{ dialogData().title }}</div>
+      <div class="text-wt-primary text-center text-xl">{{ dialogData().title }}</div>
 
       <!-- search user -->
       <div class="p-4">
@@ -65,11 +65,11 @@ export type UserSearchDialogData = {
       }
 
       <!-- selected users -->
-      <div class="grid gap-4 grid-cols-1" [ngClass]="{ 'lg:grid-cols-2': dialogData().multiple }">
+      <div class="grid grid-cols-1 gap-4" [ngClass]="{ 'lg:grid-cols-2': dialogData().multiple }">
         @for (user of selectedUsersSignal(); track user.id) {
           <div
             data-testid="user-search-dialog-item"
-            class="p-2 border border-wt-gray-medium g-clickable-hover"
+            class="border-wt-gray-medium g-clickable-hover border p-2"
             (click)="onUserRemove(user)"
           >
             <app-user-display-item [userData]="user" />
@@ -85,7 +85,7 @@ export type UserSearchDialogData = {
 
     <!-- actions -->
     <mat-dialog-actions>
-      <div class="mt-2 g-mat-dialog-actions-full">
+      <div class="g-mat-dialog-actions-full mt-2">
         <button mat-flat-button mat-dialog-close type="button">Cancel</button>
         <button type="button" (click)="onCloseDialog()" mat-flat-button color="primary">Save</button>
       </div>

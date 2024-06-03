@@ -42,7 +42,7 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
               [currentValues]="{
                 hideValue: true,
                 value: currentPrice(),
-                valueToCompare: row.priceTarget
+                valueToCompare: row.priceTarget,
               }"
             ></div>
           </div>

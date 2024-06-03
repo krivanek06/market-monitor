@@ -13,7 +13,7 @@ import { DialogCloseHeaderComponent } from '../../headers';
     <app-dialog-close-header title="Help Section" />
 
     <mat-dialog-content>
-      <section class="grid lg:grid-cols-2 gap-x-10 gap-y-4">
+      <section class="grid gap-x-10 gap-y-4 lg:grid-cols-2">
         <!-- thank you section -->
         <article>
           <h2>Thank You</h2>

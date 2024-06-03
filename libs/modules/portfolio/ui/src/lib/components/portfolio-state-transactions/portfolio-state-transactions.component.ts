@@ -12,7 +12,7 @@ import { AddColorDirective } from '@mm/shared/ui';
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- Total -->
-        <div class="flex justify-between @md:flex-col">
+        <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Total</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{
@@ -23,7 +23,7 @@ import { AddColorDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Buy -->
-        <div class="flex justify-between @md:flex-col">
+        <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Buy</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{ portfolioState()?.numberOfExecutedBuyTransactions ?? 'N/A' }}
@@ -31,7 +31,7 @@ import { AddColorDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Sell -->
-        <div class="flex justify-between @md:flex-col">
+        <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Sell</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{ portfolioState()?.numberOfExecutedSellTransactions ?? 'N/A' }}
@@ -39,7 +39,7 @@ import { AddColorDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Fees -->
-        <div *ngIf="showFees()" class="flex justify-between @md:flex-col">
+        <div *ngIf="showFees()" class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Fees</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{ (portfolioState()?.transactionFees | currency) ?? 'N/A' }}

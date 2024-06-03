@@ -6,18 +6,18 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 @Component({
   selector: 'app-notification-bar-confirm-dialog',
   template: `
-    <div class="p-4 max-w-xl min-w-[300px]">
-      <p class="text-base text-center">{{ data.dialogTitle }}</p>
-      <div class="flex flex-col-reverse gap-4 mt-6 md:flex-row">
+    <div class="min-w-[300px] max-w-xl p-4">
+      <p class="text-center text-base">{{ data.dialogTitle }}</p>
+      <div class="mt-6 flex flex-col-reverse gap-4 md:flex-row">
         <button mat-stroked-button *ngIf="data.showCancelButton" class="w-full" (click)="cancel()">Cancel</button>
         <button mat-flat-button class="w-full" color="primary" (click)="confirm()">{{ data.confirmButton }}</button>
       </div>
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,

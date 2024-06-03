@@ -24,7 +24,7 @@ import { DialogCloseHeaderComponent, FormMatInputWrapperComponent } from '@mm/sh
   template: `
     <app-dialog-close-header title="Change Password" />
     <form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
-      <mat-dialog-content class="flex flex-col gap-4 p-4 md:p-10 md:mb-6">
+      <mat-dialog-content class="flex flex-col gap-4 p-4 md:mb-6 md:p-10">
         <!-- old password -->
         <app-form-mat-input-wrapper
           formControlName="oldPassword"

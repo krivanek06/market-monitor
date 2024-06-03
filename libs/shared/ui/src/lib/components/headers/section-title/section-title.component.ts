@@ -7,15 +7,15 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [CommonModule, MatIconModule],
   template: `
-    <h2 [class]="'flex items-center gap-4 text-xl text-wt-primary ' + additionalClasses()">
+    <h2 [class]="'text-wt-primary flex items-center gap-4 text-xl ' + additionalClasses()">
       <mat-icon *ngIf="matIcon()" color="primary">{{ matIcon() }}</mat-icon>
       {{ title() }}
     </h2>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -24,9 +24,9 @@ import { TabSelectControlComponent } from '@mm/shared/ui';
   ],
   template: `
     <section class="g-screen-size-default">
-      <div class="flex justify-between mb-6">
+      <div class="mb-6 flex justify-between">
         <div>
-          <button type="button" mat-stroked-button class="min-w-[120px] mt-2" (click)="onHomeClick()">
+          <button type="button" mat-stroked-button class="mt-2 min-w-[120px]" (click)="onHomeClick()">
             <mat-icon>home</mat-icon>
             Home
           </button>

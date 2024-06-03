@@ -52,7 +52,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
   ],
   template: `
     <!-- account state -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mb-6 xl:mb-2 gap-8">
+    <div class="mb-6 grid grid-cols-1 gap-8 md:grid-cols-2 xl:mb-2 xl:grid-cols-3">
       <!-- account state -->
       <app-portfolio-state
         data-testid="page-trading-portfolio-state"
@@ -63,11 +63,11 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
         [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
       />
 
-      <div class="flex flex-col xl:flex-row gap-x-6 gap-y-6 xl:col-span-2 max-md:-ml-4">
+      <div class="flex flex-col gap-x-6 gap-y-6 max-md:-ml-4 xl:col-span-2 xl:flex-row">
         <!-- holdings -->
         <app-dropdown-control
           data-testid="page-trading-holding-dropdown"
-          class="scale-90 w-full h-12"
+          class="h-12 w-full scale-90"
           inputCaption="Select a holding"
           displayImageType="symbol"
           [inputSource]="holdingsInputSource()"
@@ -77,7 +77,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
         <!-- search -->
         <app-symbol-search-basic
           data-testid="page-trading-symbol-search-basic"
-          class="scale-90 w-full h-12"
+          class="h-12 w-full scale-90"
           (clickedQuote)="onSymbolQuoteClick($event)"
           [openModalOnClick]="false"
         />
@@ -85,7 +85,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     </div>
 
     <!-- action buttons -->
-    <div class="flex flex-col sm:flex-row xl:justify-end gap-4 mb-6">
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row xl:justify-end">
       <button
         data-testid="page-trading-buy-button"
         (click)="onOperationClick('BUY')"
@@ -112,7 +112,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
 
     <!-- historical chart & summary -->
     @if (symbolSummarySignal(); as symbolSummary) {
-      <div class="flex flex-col gap-4 mb-6 xl:flex-row">
+      <div class="mb-6 flex flex-col gap-4 xl:flex-row">
         <app-asset-price-chart-interactive
           data-testid="page-trading-asset-price-chart-interactive"
           class="lg:basis-3/5"
@@ -125,9 +125,9 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
         </div>
       </div>
     } @else {
-      <div class="flex flex-col gap-4 mb-6 xl:flex-row h-[480px]">
-        <div class="lg:basis-3/5 g-skeleton"></div>
-        <div class="lg:basis-2/5 g-skeleton"></div>
+      <div class="mb-6 flex h-[480px] flex-col gap-4 xl:flex-row">
+        <div class="g-skeleton lg:basis-3/5"></div>
+        <div class="g-skeleton lg:basis-2/5"></div>
       </div>
     }
 
@@ -135,7 +135,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     <div class="mb-10 hidden lg:block">
       <app-section-title title="Top Active" />
 
-      <div class="grid grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-2 p-4">
+      <div class="grid grid-cols-3 gap-x-6 gap-y-2 p-4 xl:grid-cols-4 2xl:grid-cols-5">
         @for (item of topPerformanceSignal(); track item.symbol) {
           <div
             data-testid="page-trading-top-active-symbols-wrapper"
@@ -144,7 +144,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
               'border-wt-primary': item.symbol === selectedSymbolControl.value,
               border: item.symbol === selectedSymbolControl.value
             }"
-            class="g-clickable-hover py-2 px-4 border-r border-l border-solid hover:border rounded-lg border-wt-border"
+            class="g-clickable-hover border-wt-border rounded-lg border-l border-r border-solid px-4 py-2 hover:border"
           >
             <app-quote-item data-testid="page-trading-top-active-symbols" [symbolQuote]="item" />
           </div>

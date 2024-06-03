@@ -23,11 +23,11 @@ import { InArrayPipe } from '../../../pipes';
         <div class="flex flex-col">
           <div class="flex flex-row gap-2">
             <img *ngIf="item.imageSrc as imageSrc" appDefaultImg [src]="imageSrc" height="24px" />
-            <div class="mr-2 text-lg text-wt-gray-light">{{ item.name }}</div>
+            <div class="text-wt-gray-light mr-2 text-lg">{{ item.name }}</div>
           </div>
           <div class="flex flex-row gap-2">
-            <div class="text-base text-wt-gray-medium">{{ item.value | currency }}</div>
-            <div *ngIf="item.valuePrct" class="text-base text-wt-gray-dark">
+            <div class="text-wt-gray-medium text-base">{{ item.value | currency }}</div>
+            <div *ngIf="item.valuePrct" class="text-wt-gray-dark text-base">
               ({{ item.valuePrct | percent: '1.2-2' }})
             </div>
           </div>
@@ -41,7 +41,7 @@ import { InArrayPipe } from '../../../pipes';
         display: block;
 
         button {
-          @apply px-4 p-1 rounded-lg m-1;
+          @apply m-1 rounded-lg p-1 px-4;
 
           border: 1px solid var(--valueItemColor);
           border-left: 4px solid var(--valueItemColor);

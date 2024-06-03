@@ -80,12 +80,12 @@ export type GroupSettingsDialogComponentData = {
 
         @if (removingGroupMembers().length > 0) {
           <!-- removing member -->
-          <div class="mt-8 mb-4 space-x-2 text-lg">
+          <div class="mb-4 mt-8 space-x-2 text-lg">
             <span>Remove Members</span>
           </div>
 
           <!-- display selected users -->
-          <div class="grid md:grid-cols-2 gap-x-6 gap-y-2">
+          <div class="grid gap-x-6 gap-y-2 md:grid-cols-2">
             <div *ngFor="let user of removingGroupMembers()" class="flex gap-4 p-4 shadow-md">
               <app-user-display-item [userData]="user" />
               <button mat-icon-button type="button" matTooltip="Remove User" (click)="onAddUserBack(user)">
@@ -96,12 +96,12 @@ export type GroupSettingsDialogComponentData = {
         }
 
         <!-- current members -->
-        <div class="mt-8 mb-4 space-x-2 text-lg">
+        <div class="mb-4 mt-8 space-x-2 text-lg">
           <span>Current Members</span>
         </div>
 
         <!-- display selected users -->
-        <div class="grid md:grid-cols-2 gap-x-6 gap-y-2">
+        <div class="grid gap-x-6 gap-y-2 md:grid-cols-2">
           <div
             *ngFor="let user of groupMembersSignal() | arrayExclude: removingGroupMembers() : 'id'"
             class="flex gap-4 p-4 shadow-md"

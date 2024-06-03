@@ -20,7 +20,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     <!-- skeleton -->
     <ng-template #showSkeleton>
       <div>
-        <div *ngRange="25" class="h-[50px] mb-1 g-skeleton"></div>
+        <div *ngRange="25" class="g-skeleton mb-1 h-[50px]"></div>
       </div>
     </ng-template>
   `,

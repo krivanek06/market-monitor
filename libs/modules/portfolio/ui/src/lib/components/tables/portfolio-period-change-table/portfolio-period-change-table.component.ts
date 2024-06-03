@@ -20,8 +20,8 @@ export type PortfolioPeriodChangeTableComponentData = {
       <ng-container matColumnDef="user">
         <th mat-header-cell *matHeaderCellDef>User</th>
         <td mat-cell *matCellDef="let row">
-          <div class="flex items-center gap-2 text-wt-gray-dark">
-            <img appDefaultImg [src]="row.userBase.personal.photoURL" alt="user" class="w-8 h-8 rounded-full" />
+          <div class="text-wt-gray-dark flex items-center gap-2">
+            <img appDefaultImg [src]="row.userBase.personal.photoURL" alt="user" class="h-8 w-8 rounded-full" />
             <span>{{ row.userBase.personal.displayNameInitials }}</span>
           </div>
         </td>
@@ -36,7 +36,7 @@ export type PortfolioPeriodChangeTableComponentData = {
             [useCurrencySign]="true"
             [changeValues]="{
               change: row.portfolioChange['1_day']?.valuePrct,
-              changePercentage: row.portfolioChange['1_day']?.value
+              changePercentage: row.portfolioChange['1_day']?.value,
             }"
           ></div>
         </td>
@@ -51,7 +51,7 @@ export type PortfolioPeriodChangeTableComponentData = {
             [useCurrencySign]="true"
             [changeValues]="{
               change: row.portfolioChange['1_week']?.valuePrct,
-              changePercentage: row.portfolioChange['1_week']?.value
+              changePercentage: row.portfolioChange['1_week']?.value,
             }"
           ></div>
         </td>
@@ -66,7 +66,7 @@ export type PortfolioPeriodChangeTableComponentData = {
             [useCurrencySign]="true"
             [changeValues]="{
               change: row.portfolioChange['2_week']?.valuePrct,
-              changePercentage: row.portfolioChange['2_week']?.value
+              changePercentage: row.portfolioChange['2_week']?.value,
             }"
           ></div>
         </td>
@@ -81,7 +81,7 @@ export type PortfolioPeriodChangeTableComponentData = {
             [useCurrencySign]="true"
             [changeValues]="{
               change: row.portfolioChange['1_month']?.valuePrct,
-              changePercentage: row.portfolioChange['1_month']?.value
+              changePercentage: row.portfolioChange['1_month']?.value,
             }"
           ></div>
         </td>
@@ -96,7 +96,7 @@ export type PortfolioPeriodChangeTableComponentData = {
             [useCurrencySign]="true"
             [changeValues]="{
               change: row.portfolioChange['3_month']?.valuePrct,
-              changePercentage: row.portfolioChange['3_month']?.value
+              changePercentage: row.portfolioChange['3_month']?.value,
             }"
           ></div>
         </td>
@@ -111,7 +111,7 @@ export type PortfolioPeriodChangeTableComponentData = {
             [useCurrencySign]="true"
             [changeValues]="{
               change: row.portfolioChange['total']?.valuePrct,
-              changePercentage: row.portfolioChange['total']?.value
+              changePercentage: row.portfolioChange['total']?.value,
             }"
           ></div>
         </td>

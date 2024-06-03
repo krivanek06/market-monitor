@@ -14,17 +14,17 @@ import { forkJoin, take } from 'rxjs';
   standalone: true,
   imports: [CommonModule, MatButtonModule, NewsSearchComponent, SymbolSearchBasicComponent],
   template: `
-    <div class="pt-[180px] pb-[260px] sm:pt-[200px] sm:pb-[300px]">
-      <div class="max-w-[620px] mx-auto">
-        <h1 class="text-2xl text-center">Search Stock</h1>
+    <div class="pb-[260px] pt-[180px] sm:pb-[300px] sm:pt-[200px]">
+      <div class="mx-auto max-w-[620px]">
+        <h1 class="text-center text-2xl">Search Stock</h1>
         <app-symbol-search-basic />
-        <div class="text-xs text-wt-gray-medium -mt-3 pl-3">Ex: 'AAPL, MSFT, UBER, NFLX'</div>
+        <div class="text-wt-gray-medium -mt-3 pl-3 text-xs">Ex: 'AAPL, MSFT, UBER, NFLX'</div>
       </div>
     </div>
 
     <!-- news -->
     @defer {
-      <div class="max-w-[1280px] mx-auto">
+      <div class="mx-auto max-w-[1280px]">
         <app-news-search [initialNewsToDisplay]="4" [searchData]="{ newsType: 'general' }" />
       </div>
     }

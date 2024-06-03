@@ -126,7 +126,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         ></app-revenue-estimation-chart>
       </app-general-card>
 
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+      <div class="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
         <!-- rating table -->
         <app-general-card class="sm:max-lg:col-span-2" title="Rating">
           <app-stock-rating-table [data]="companyRatingSignal()"></app-stock-rating-table>
@@ -144,7 +144,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
                 colorByPoint: true,
                 additionalData: {
                   colorTooltipDefault: true,
-                  showPercentageSign: true
+                  showPercentageSign: true,
                 },
                 data: stockDetailsSignal.ratio
                   ? [
@@ -152,10 +152,10 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
                       { name: 'Gross Profit', y: stockDetailsSignal.ratio.grossProfitMarginTTM },
                       { name: 'Pretax Profit', y: stockDetailsSignal.ratio.pretaxProfitMarginTTM },
                       { name: 'Net Profit', y: stockDetailsSignal.ratio.netProfitMarginTTM },
-                      { name: 'Effective Tax Rate', y: stockDetailsSignal.ratio.effectiveTaxRateTTM }
+                      { name: 'Effective Tax Rate', y: stockDetailsSignal.ratio.effectiveTaxRateTTM },
                     ]
-                  : []
-              }
+                  : [],
+              },
             ]"
             [showDataLabel]="true"
           >
@@ -174,16 +174,16 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
                 colorByPoint: true,
                 additionalData: {
                   colorTooltipDefault: true,
-                  showPercentageSign: true
+                  showPercentageSign: true,
                 },
                 data: [
                   { name: 'Equity', y: stockDetailsSignal.ratio?.returnOnEquityTTM ?? 0 },
                   { name: 'Assets', y: stockDetailsSignal.ratio?.returnOnAssetsTTM ?? 0 },
                   { name: 'Tangible Assets', y: stockDetailsSignal.companyKeyMetricsTTM.returnOnTangibleAssetsTTM },
                   { name: 'Capital Employed', y: stockDetailsSignal.ratio?.returnOnCapitalEmployedTTM ?? 0 },
-                  { name: 'Invested Capital', y: stockDetailsSignal.companyKeyMetricsTTM.roicTTM }
-                ]
-              }
+                  { name: 'Invested Capital', y: stockDetailsSignal.companyKeyMetricsTTM.roicTTM },
+                ],
+              },
             ]"
             [showDataLabel]="true"
           >

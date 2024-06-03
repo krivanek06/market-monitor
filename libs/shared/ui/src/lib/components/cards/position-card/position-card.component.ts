@@ -17,7 +17,7 @@ import { ClickableDirective, PositionColoringDirective } from '../../../directiv
       [matRippleCentered]="true"
       [matRippleDisabled]="!clickableDirective.clickable()"
       [matRippleUnbounded]="false"
-      class="shadow-md pt-8 pb-3 px-6"
+      class="px-6 pb-3 pt-8 shadow-md"
       appPositionColoring
       [position]="currentPositions()"
       [defaultPositionColor]="ColorScheme.GRAY_LIGHT_VAR"
@@ -26,12 +26,12 @@ import { ClickableDirective, PositionColoringDirective } from '../../../directiv
       <div class="relative">
         <!-- position -->
         <div
-          class="absolute -top-6 -left-4 h-10 z-10 rounded-full bg-wt-gray-light-strong flex items-center gap-4 opacity-90 border border-wt-gray-light-strong"
+          class="bg-wt-gray-light-strong border-wt-gray-light-strong absolute -left-4 -top-6 z-10 flex h-10 items-center gap-4 rounded-full border opacity-90"
           [ngClass]="{
             'w-10': !showPreviousPosition()
           }"
         >
-          <div class="text-lg ml-2" appPositionColoring [position]="currentPositions()">#{{ currentPositions() }}</div>
+          <div class="ml-2 text-lg" appPositionColoring [position]="currentPositions()">#{{ currentPositions() }}</div>
           <div
             *ngIf="showPreviousPosition()"
             class="flex items-center"

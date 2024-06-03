@@ -29,7 +29,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     DropdownControlComponent,
   ],
   template: `
-    <div class="grid gap-8 mb-6 md:grid-cols-2 xl:grid-cols-4">
+    <div class="mb-6 grid gap-8 md:grid-cols-2 xl:grid-cols-4">
       <!-- Institution -->
       <app-general-card title="Institution" additionalClasses="max-xl:w-full xl:min-w-[350px]">
         @if (enterpriseValueToQuarterSignal(); as enterpriseValueToQuarterSignal) {
@@ -81,12 +81,12 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         />
 
         <!-- additional data -->
-        <div class="grid gap-2 p-4 mt-2">
-          <div class="text-base g-item-wrapper">
+        <div class="mt-2 grid gap-2 p-4">
+          <div class="g-item-wrapper text-base">
             <span> Date: </span>
             <span>{{ quarterFormControl.value | date: 'MMMM d, y' }}</span>
           </div>
-          <div class="text-base g-item-wrapper">
+          <div class="g-item-wrapper text-base">
             <span> Close Price: </span>
             <span>{{ historicalPriceOnDateSignal() ? (historicalPriceOnDateSignal()?.close | currency) : 'N/A' }}</span>
           </div>

@@ -16,25 +16,25 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
   template: `
     <app-dialog-close-header title="Available Account Types"></app-dialog-close-header>
 
-    <p *ngIf="!showLoaderSignal()" class="text-center mb-6 md:w-9/12 mx-auto text-xl">
+    <p *ngIf="!showLoaderSignal()" class="mx-auto mb-6 text-center text-xl md:w-9/12">
       Change you account type from the below options. Note that changing account type will reset your trading history
     </p>
 
     <mat-dialog-content class="p-4">
-      <div class="grid md:grid-cols-2 gap-x-10 gap-y-4 mb-10">
+      <div class="mb-10 grid gap-x-10 gap-y-4 md:grid-cols-2">
         @if (!showLoaderSignal()) {
           <!-- basic account -->
           <div
-            class="p-3 rounded-lg border "
+            class="rounded-lg border p-3"
             (click)="changeAccount(UserAccountTypes.NORMAL_BASIC)"
             [ngClass]="{
-              'border-wt-primary border-2 pointer-events-none':
+              'border-wt-primary pointer-events-none border-2':
                 userData().userAccountType === UserAccountTypes.NORMAL_BASIC,
-              'g-clickable-hover opacity-85 hover:opacity-100 bg-wt-gray-light-strong hover:bg-transparent':
-                userData().userAccountType !== UserAccountTypes.NORMAL_BASIC
+              'g-clickable-hover bg-wt-gray-light-strong opacity-85 hover:bg-transparent hover:opacity-100':
+                userData().userAccountType !== UserAccountTypes.NORMAL_BASIC,
             }"
           >
-            <div class="mb-2 text-lg text-wt-primary text-center">Basic Account</div>
+            <div class="text-wt-primary mb-2 text-center text-lg">Basic Account</div>
             <div *ngFor="let text of accountDescription.NORMAL_BASIC" class="mb-3 text-center">
               {{ text }}
             </div>
@@ -43,21 +43,21 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
           <!-- trading account -->
           <div
             (click)="changeAccount(UserAccountTypes.DEMO_TRADING)"
-            class="p-3 rounded-lg border"
+            class="rounded-lg border p-3"
             [ngClass]="{
-              'border-wt-primary border-2 pointer-events-none':
+              'border-wt-primary pointer-events-none border-2':
                 userData().userAccountType === UserAccountTypes.DEMO_TRADING,
-              'g-clickable-hover opacity-85 hover:opacity-100  bg-wt-gray-light-strong hover:bg-transparent':
-                userData().userAccountType !== UserAccountTypes.DEMO_TRADING
+              'g-clickable-hover bg-wt-gray-light-strong opacity-85 hover:bg-transparent hover:opacity-100':
+                userData().userAccountType !== UserAccountTypes.DEMO_TRADING,
             }"
           >
-            <div class="mb-2 text-lg text-wt-primary text-center">Demo Trading</div>
+            <div class="text-wt-primary mb-2 text-center text-lg">Demo Trading</div>
             <div *ngFor="let text of accountDescription.DEMO_TRADING" class="mb-3 text-center">
               {{ text }}
             </div>
           </div>
         } @else {
-          <div class="col-span-2 p-4 grid place-content-center">
+          <div class="col-span-2 grid place-content-center p-4">
             <mat-spinner></mat-spinner>
           </div>
         }

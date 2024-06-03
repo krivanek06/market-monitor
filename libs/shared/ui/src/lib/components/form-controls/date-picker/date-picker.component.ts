@@ -50,7 +50,7 @@ export interface InputTypeDateTimePickerConfig {
         (click)="datePicker.open()"
         type="button"
         mat-stroked-button
-        class="w-full min-h-[50px]"
+        class="min-h-[50px] w-full"
       >
         {{ selectedDate.value ? 'Date: ' + (selectedDate.value | date: 'dd.MM.YYYY') : 'Please select a date' }}
       </button>

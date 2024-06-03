@@ -34,7 +34,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
   ],
   template: `
     @if (!groupDetails().groupData.isClosed) {
-      <div class="flex flex-col gap-y-2 lg:flex-row gap-x-4 w-full">
+      <div class="flex w-full flex-col gap-x-4 gap-y-2 lg:flex-row">
         <!-- owner -->
         <button
           *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"

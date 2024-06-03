@@ -58,7 +58,7 @@ import {
 
     <!-- filter -->
     @if (showActionBarComp()) {
-      <div class="hidden lg:flex justify-end gap-3 mb-5">
+      <div class="mb-5 hidden justify-end gap-3 lg:flex">
         <app-dropdown-control
           class="min-w-[400px]"
           inputCaption="Symbol Filer"
@@ -85,7 +85,7 @@ import {
         <td mat-cell *matCellDef="let row">
           <!-- logo + symbol -->
           <div class="flex items-center gap-2">
-            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="w-10 h-10" />
+            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-10 w-10" />
             <div class="flex flex-col">
               <div class="flex items-center gap-2">
                 <div class="text-wt-primary">{{ row.symbol }}</div>
@@ -100,10 +100,10 @@ import {
                   {{ row.transactionType }}
                 </div>
                 <!-- units -->
-                <div class="block sm:hidden text-wt-gray-dark">[{{ row.units }}]</div>
+                <div class="text-wt-gray-dark block sm:hidden">[{{ row.units }}]</div>
                 <!-- user -->
-                <div *ngIf="showUser()" class="lg:hidden block">
-                  <img class="rounded-full h-6 w-6" appDefaultImg [src]="row.userPhotoURL" />
+                <div *ngIf="showUser()" class="block lg:hidden">
+                  <img class="h-6 w-6 rounded-full" appDefaultImg [src]="row.userPhotoURL" />
                 </div>
               </div>
               <span class="block md:hidden"> {{ row.date | date: 'MMMM d, y' }}</span>
@@ -132,7 +132,7 @@ import {
         <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">User</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div class="flex items-center gap-2">
-            <img class="rounded-lg h-7 w-7" appDefaultImg [src]="row.userPhotoURL" />
+            <img class="h-7 w-7 rounded-lg" appDefaultImg [src]="row.userPhotoURL" />
             <span class="hidden 2xl:block">{{ row.userDisplayName ?? 'Unknown' }}</span>
             <span class="block 2xl:hidden">{{ row.userDisplayNameInitials ?? 'Unknown' }}</span>
           </div>
@@ -143,7 +143,7 @@ import {
       <ng-container matColumnDef="totalValue">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Total Value</th>
         <td mat-cell *matCellDef="let row">
-          <div class="text-wt-gray-dark max-sm:text-end max-sm:mr-3">
+          <div class="text-wt-gray-dark max-sm:mr-3 max-sm:text-end">
             {{ row.unitPrice * row.units | currency }}
           </div>
         </td>

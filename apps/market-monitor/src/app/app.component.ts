@@ -12,7 +12,7 @@ import { LoaderMainService } from '@mm/shared/general-features';
   template: `
     <main class="min-h-screen min-w-full">
       @defer {
-        <div *ngIf="loadingSignal()" class="grid place-content-center pb-[15%] min-h-screen min-w-full">
+        <div *ngIf="loadingSignal()" class="grid min-h-screen min-w-full place-content-center pb-[15%]">
           <mat-spinner></mat-spinner>
         </div>
       }

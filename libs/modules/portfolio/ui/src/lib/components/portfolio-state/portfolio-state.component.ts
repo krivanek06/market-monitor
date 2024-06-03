@@ -12,7 +12,7 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- balance -->
-        <div class="flex justify-between @md:flex-col">
+        <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Balance</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{ (portfolioState()?.balance | currency) ?? 'N/A' }}
@@ -20,7 +20,7 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Invested -->
-        <div class="flex justify-between @md:flex-col">
+        <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Invested</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{ (portfolioState()?.holdingsBalance | currency) ?? 'N/A' }}
@@ -28,7 +28,7 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Cash -->
-        <div *ngIf="showCashSegment()" class="flex justify-between @md:flex-col">
+        <div *ngIf="showCashSegment()" class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Cash</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
             {{ (portfolioState()?.cashOnHand | currency) ?? 'N/A' }}
@@ -36,20 +36,20 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Total Gains -->
-        <div *ngIf="!showCashSegment()" class="flex justify-between @md:flex-col">
+        <div *ngIf="!showCashSegment()" class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Total Gains</div>
           <div
             class="sm:text-lg"
             [appAddColor]="valueColor()"
             appPercentageIncrease
             [changeValues]="{
-              changePercentage: portfolioState()?.totalGainsPercentage
+              changePercentage: portfolioState()?.totalGainsPercentage,
             }"
           ></div>
         </div>
 
         <!-- Total Return -->
-        <div class="flex justify-between @md:flex-col">
+        <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Total Return</div>
           <div
             class="sm:text-lg"
@@ -58,7 +58,7 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
             [useCurrencySign]="true"
             [changeValues]="{
               change: portfolioState()?.totalGainsValue,
-              changePercentage: showCashSegment() ? portfolioState()?.totalGainsPercentage : undefined
+              changePercentage: showCashSegment() ? portfolioState()?.totalGainsPercentage : undefined,
             }"
           ></div>
         </div>

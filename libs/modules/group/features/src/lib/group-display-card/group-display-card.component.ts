@@ -29,7 +29,7 @@ import { ClickableDirective } from '@mm/shared/ui';
       appearance="outlined"
       class="shadow-md"
       [ngClass]="{
-        'g-overlay': groupData().isClosed
+        'g-overlay': groupData().isClosed,
       }"
     >
       <mat-card-content>
@@ -40,13 +40,13 @@ import { ClickableDirective } from '@mm/shared/ui';
           <!-- closed message -->
           <div
             *ngIf="groupData().isClosed"
-            class="absolute text-xl transform -translate-x-1/2 -translate-y-1/2 text-wt-danger top-1/2 left-1/2"
+            class="text-wt-danger absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-xl"
           >
             Group is closed
           </div>
 
           <!-- portfolio chart -->
-          <div class="hidden lg:block -mt-2 w-[400px]">
+          <div class="-mt-2 hidden w-[400px] lg:block">
             <app-portfolio-balance-pie-chart
               *ngIf="groupData().portfolioState.balance > 0"
               [heightPx]="200"

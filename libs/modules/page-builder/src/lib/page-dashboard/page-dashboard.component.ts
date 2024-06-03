@@ -61,13 +61,13 @@ import {
     PortfolioHoldingsTableCardComponent,
   ],
   template: `
-    <div class="grid xl:grid-cols-3 mb-6 sm:mb-8 gap-8">
+    <div class="mb-6 grid gap-8 sm:mb-8 xl:grid-cols-3">
       <div
-        class="flex flex-row max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:col-span-2"
+        class="flex flex-row gap-4 max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 md:gap-6 lg:grid-cols-4 xl:col-span-2"
       >
         <!-- portfolio state -->
         <app-general-card
-          class="sm:col-span-2 max-sm:min-w-[360px] min-h-[210px]"
+          class="min-h-[210px] max-sm:min-w-[360px] sm:col-span-2"
           title="Account"
           [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
         >
@@ -82,7 +82,7 @@ import {
 
         <!-- portfolio risk -->
         <app-general-card
-          class="max-sm:min-w-[275px] min-h-[210px]"
+          class="min-h-[210px] max-sm:min-w-[275px]"
           title="Risk"
           [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
         >
@@ -96,7 +96,7 @@ import {
 
         <!-- portfolio transactions -->
         <app-general-card
-          class="max-sm:min-w-[275px] min-h-[210px]"
+          class="min-h-[210px] max-sm:min-w-[275px]"
           title="Transactions"
           [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
         >
@@ -120,7 +120,7 @@ import {
       </div>
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-4 mb-3">
+    <div class="mb-3 flex flex-col gap-4 sm:flex-row">
       <!-- do not show buttons if not enough data -->
       @if (portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0) {
         <button
@@ -194,7 +194,7 @@ import {
     </div>
 
     <!-- holdings pie charts -->
-    <div class="flex justify-center lg:justify-between gap-10 sm:mb-8 overflow-x-clip max-sm:-ml-6">
+    <div class="flex justify-center gap-10 overflow-x-clip max-sm:-ml-6 sm:mb-8 lg:justify-between">
       @if (portfolioUserFacadeService.getPortfolioState()?.holdings; as holdings) {
         @if (holdings.length > 0) {
           <app-pie-chart
@@ -220,7 +220,7 @@ import {
 
     @if (stateRef.userHaveTransactions()) {
       <!-- transaction history -->
-      <div class="grid xl:grid-cols-3 gap-x-8 gap-y-4" [ngClass]="{ 'xl:h-[980px]': hasEnoughTransactions() }">
+      <div class="grid gap-x-8 gap-y-4 xl:grid-cols-3" [ngClass]="{ 'xl:h-[980px]': hasEnoughTransactions() }">
         <!-- all transactions -->
         <app-portfolio-transactions-table
           data-testid="page-dashboard-portfolio-transactions-table"
@@ -235,7 +235,7 @@ import {
 
         <!-- best / worst -->
         @if (hasEnoughTransactions()) {
-          <div class="hidden sm:flex lg:max-xl:flex-row flex-col gap-4 lg:pt-6">
+          <div class="hidden flex-col gap-4 sm:flex lg:pt-6 lg:max-xl:flex-row">
             <!-- best transactions -->
             <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
               @for (item of stateRef.getUserPortfolioTransactionsBest(); track item.transactionId; let last = $last) {

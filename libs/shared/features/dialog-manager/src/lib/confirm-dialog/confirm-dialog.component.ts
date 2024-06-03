@@ -17,16 +17,16 @@ export type ConfirmDialogComponentData = {
   selector: 'app-confirm-dialog',
   template: `
     <div class="max-w-xl p-4 text-center sm:min-w-[400px]">
-      <p class="text-xl whitespace-pre-line">{{ data.dialogTitle }}</p>
+      <p class="whitespace-pre-line text-xl">{{ data.dialogTitle }}</p>
 
       <!-- input text if exists -->
-      <mat-form-field *ngIf="data.showTextWord" class="w-full mt-5">
+      <mat-form-field *ngIf="data.showTextWord" class="mt-5 w-full">
         <mat-label>Place required text: {{ data.showTextWord }}</mat-label>
         <input matInput [placeholder]="data.showTextWord" [formControl]="userInputControl" />
       </mat-form-field>
 
       <!-- action button -->
-      <div class="flex flex-col-reverse gap-4 mt-6 md:flex-row">
+      <div class="mt-6 flex flex-col-reverse gap-4 md:flex-row">
         <button mat-button *ngIf="data.showCancelButton" class="w-full" (click)="cancel()" color="primary">
           Cancel
         </button>

@@ -18,7 +18,8 @@
     "website:serve": "nx run website:serve",
     "website:build": "nx run website:build",
     "website:preview": "nx run website:preview",
-    "website:deploy": "nx run website:deploy"
+    "website:deploy": "nx run website:deploy",
+    "prettier:format": "npx prettier --write '**/*.ts'"
   },
   "private": true,
   "dependencies": {
@@ -127,7 +128,8 @@
     "postcss-nesting": "^12.1.5",
     "postcss-preset-env": "~9.5.14",
     "postcss-url": "~10.1.3",
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.0",
+    "prettier-plugin-tailwindcss": "^0.6.1",
     "qwik-nx": "^2.3.0",
     "sass": "~1.77.2",
     "tailwindcss": "^3.4.3",

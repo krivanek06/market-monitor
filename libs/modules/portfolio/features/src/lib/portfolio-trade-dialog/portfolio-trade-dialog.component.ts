@@ -68,12 +68,12 @@ export type PortfolioTradeDialogComponentData = {
       <mat-dialog-content>
         <div class="flex items-start justify-between pt-5">
           <!-- symbol & image -->
-          <div class="flex items-center gap-3 max-w-[70%]">
-            <img appDefaultImg imageType="symbol" [src]="data().quote.symbol" class="w-12 h-12" />
+          <div class="flex max-w-[70%] items-center gap-3">
+            <img appDefaultImg imageType="symbol" [src]="data().quote.symbol" class="h-12 w-12" />
             <div class="flex flex-col">
               <div class="flex items-center gap-4">
                 <!-- name -->
-                <div class="text-lg text-wt-gray-dark">{{ data().quote.symbol }}</div>
+                <div class="text-wt-gray-dark text-lg">{{ data().quote.symbol }}</div>
                 <span>-</span>
                 <!-- operation -->
                 <div
@@ -121,7 +121,7 @@ export type PortfolioTradeDialogComponentData = {
           />
 
           <!-- custom -->
-          <div class="flex justify-between pt-3 pb-2">
+          <div class="flex justify-between pb-2 pt-3">
             <div class="flex items-center gap-3">
               <ng-container *ngIf="isCustomTotal">
                 <button
@@ -155,7 +155,7 @@ export type PortfolioTradeDialogComponentData = {
           </div>
 
           <!-- info -->
-          <div class="flex flex-col p-3 mb-1">
+          <div class="mb-1 flex flex-col p-3">
             <div class="g-item-wrapper">
               <span>Date</span>
               <span>{{ form.controls.date.value | date: 'MMMM d, y (EEEE)' }}</span>
@@ -218,7 +218,7 @@ export type PortfolioTradeDialogComponentData = {
           </div>
 
           <!-- errors -->
-          <div class="flex flex-col gap-4 mb-7">
+          <div class="mb-7 flex flex-col gap-4">
             @if (insufficientUnitsErrorSignal() || isSellDisabledZeroUnits()) {
               <div data-testid="trade-dialog-insufficient-units-error" class="g-banner-error">
                 Insufficient units to sell
@@ -247,7 +247,7 @@ export type PortfolioTradeDialogComponentData = {
           </div>
         } @else {
           <!-- loader -->
-          <div class="grid py-16 place-content-center">
+          <div class="grid place-content-center py-16">
             <mat-spinner [diameter]="100" />
           </div>
         }

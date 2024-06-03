@@ -28,7 +28,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.marketCap
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -41,7 +41,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.enterpriseValue
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -54,7 +54,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.peRatio
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -67,7 +67,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.currentRatio
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -80,7 +80,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.quickRatio
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -93,7 +93,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.cashRatio
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -106,7 +106,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.priceToSalesRatio
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -119,7 +119,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.pocfratio
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -132,7 +132,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.pfcfRatio
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -145,7 +145,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.pbRatio
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -158,7 +158,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.debtRatio
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -171,7 +171,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.debtToEquity
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -184,7 +184,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.debtToAssets
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -197,7 +197,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.dividendYield
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -210,7 +210,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.ratios.stockBasedCompensationToRevenue
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -226,7 +226,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             }
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -242,7 +242,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             }
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -255,7 +255,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.perShare.revenuePerShare
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -268,7 +268,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.perShare.netIncomePerShare
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -281,7 +281,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.perShare.cashPerShare
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -294,7 +294,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.perShare.bookValuePerShare
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -307,7 +307,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             data: data.perShare.freeCashFlowPerShare
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -323,7 +323,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             }
           }
         ]"
-      ></app-generic-chart>
+      />
 
       <app-generic-chart
         [categories]="data.dates"
@@ -339,7 +339,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             }
           }
         ]"
-      ></app-generic-chart>
+      />
     </div>
 
     <ng-template #showSkeleton>

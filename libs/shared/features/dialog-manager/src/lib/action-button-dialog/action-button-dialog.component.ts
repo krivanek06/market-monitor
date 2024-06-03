@@ -20,14 +20,14 @@ export type ActionButtonDialog = {
   imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule],
   template: `
     <div class="max-w-xl p-2 text-center sm:min-w-[400px]">
-      <div class="flex justify-end mb-2">
+      <div class="mb-2 flex justify-end">
         <button mat-icon-button (click)="close()">
           <mat-icon>close</mat-icon>
         </button>
       </div>
       <div class="p-2">
         <p class="text-xl">{{ data.dialogTitle }}</p>
-        <div class="flex flex-col-reverse gap-4 mt-6 md:flex-row">
+        <div class="mt-6 flex flex-col-reverse gap-4 md:flex-row">
           <!-- secondary -->
           <button
             *ngIf="data.secondaryButtonText"
@@ -55,9 +55,9 @@ export type ActionButtonDialog = {
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

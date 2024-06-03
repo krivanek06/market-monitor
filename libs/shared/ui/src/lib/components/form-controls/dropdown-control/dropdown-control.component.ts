@@ -40,7 +40,7 @@ import { DefaultImgDirective } from '../../../directives';
                 [imageType]="displayImageType()"
                 [src]="selectedOptionImage"
                 alt="Option image"
-                class="w-8 h-8"
+                class="h-8 w-8"
               />
               {{ internalSelectValue()?.caption }}
             </mat-select-trigger>
@@ -55,7 +55,7 @@ import { DefaultImgDirective } from '../../../directives';
                       [imageType]="displayImageType()"
                       *ngIf="optionData?.image"
                       [src]="optionData.image"
-                      class="w-8 h-8"
+                      class="h-8 w-8"
                       alt=""
                     />
                     {{ optionData.caption }}
@@ -72,14 +72,14 @@ import { DefaultImgDirective } from '../../../directives';
             <mat-option *ngIf="internalSelectValue()" (click)="onClear()"> clear </mat-option>
             @for (optionData of autoCompleteInputSource(); track optionData.caption) {
               <mat-option [value]="optionData.value" (onSelectionChange)="onOptionChange($event)">
-                <div class="flex items-center gap-2 min-w-max">
+                <div class="flex min-w-max items-center gap-2">
                   <img
                     appDefaultImg
                     *ngIf="optionData.image as selectedOptionImage"
                     [imageType]="displayImageType()"
                     [src]="selectedOptionImage"
                     alt="Option image"
-                    class="w-8 h-8"
+                    class="h-8 w-8"
                   />
                   <span>{{ optionData.caption }}</span>
                 </div>
@@ -94,13 +94,13 @@ import { DefaultImgDirective } from '../../../directives';
             <mat-option *ngIf="internalSelectValue" (click)="onClear()"> clear </mat-option>
             @for (optionData of inputSource(); track optionData.caption) {
               <mat-option [value]="optionData.value" (onSelectionChange)="onOptionChange($event)">
-                <div class="flex items-center gap-2 min-w-max">
+                <div class="flex min-w-max items-center gap-2">
                   <img
                     *ngIf="optionData?.image"
                     appDefaultImg
                     [imageType]="displayImageType()"
                     [src]="optionData.image"
-                    class="w-8 h-8"
+                    class="h-8 w-8"
                     alt=""
                   />
                   {{ optionData.caption }}
@@ -118,7 +118,7 @@ import { DefaultImgDirective } from '../../../directives';
                 [imageType]="displayImageType()"
                 [src]="selectedOptionImage"
                 alt="Option image"
-                class="w-8 h-8"
+                class="h-8 w-8"
               />
               {{ internalSelectValue?.caption }}
             </mat-select-trigger>
@@ -126,13 +126,13 @@ import { DefaultImgDirective } from '../../../directives';
             <mat-option *ngIf="internalSelectValue() && showClearButton()" (click)="onClear()"> clear </mat-option>
             @for (optionData of inputSource(); track optionData.caption) {
               <mat-option [value]="optionData.value" (onSelectionChange)="onOptionChange($event)">
-                <div class="flex items-center gap-2 min-w-max">
+                <div class="flex min-w-max items-center gap-2">
                   <img
                     *ngIf="optionData?.image"
                     appDefaultImg
                     [imageType]="displayImageType()"
                     [src]="optionData.image"
-                    class="w-8 h-8"
+                    class="h-8 w-8"
                     alt=""
                   />
                   {{ optionData.caption }}

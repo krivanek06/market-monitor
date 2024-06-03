@@ -71,7 +71,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
   ],
   template: `
     @if (groupDetailsSignal(); as groupDetailsSignal) {
-      <div class="flex flex-col justify-between mb-6 lg:flex-row gap-x-10 gap-y-6">
+      <div class="mb-6 flex flex-col justify-between gap-x-10 gap-y-6 lg:flex-row">
         <!-- group info -->
         <app-group-display-info
           class="flex-1"
@@ -91,13 +91,13 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         />
 
         <!-- portfolio chart -->
-        <div class="-mt-10 w-[420px] hidden xl:block">
+        <div class="-mt-10 hidden w-[420px] xl:block">
           <app-portfolio-balance-pie-chart [heightPx]="260" [data]="groupDetailsSignal.groupData.portfolioState" />
         </div>
       </div>
 
       <!-- divider -->
-      <div class="pt-4 mb-8">
+      <div class="mb-8 pt-4">
         <mat-divider></mat-divider>
       </div>
 
@@ -137,7 +137,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       />
 
       <!-- member -->
-      <div *ngIf="groupDetailsSignal.groupMembersData.length > 0" class="grid gap-4 mb-12">
+      <div *ngIf="groupDetailsSignal.groupMembersData.length > 0" class="mb-12 grid gap-4">
         <div class="flex items-center justify-between">
           <app-section-title
             title="Members [{{ groupDetailsSignal.groupMembersData.length }} / {{ GROUP_MEMBER_LIMIT }}]"
@@ -152,7 +152,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
           />
         </div>
         <!-- member list -->
-        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           @for (user of displayedMembers(); track user.id; let i = $index) {
             <app-position-card
               (itemClicked)="onMemberClick(user)"
@@ -176,19 +176,19 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       </div>
 
       @if (groupDetailsSignal.groupTransactionsData.length > 0) {
-        <div #groupBubble class="sm:grid mb-12 xl:grid-cols-2 gap-x-4 hidden">
+        <div #groupBubble class="mb-12 hidden gap-x-4 sm:grid xl:grid-cols-2">
           @if (portfolioHoldingBubbleChartSignal().length > 1) {
             <!-- bubble chart -->
             <div>
               @defer (on viewport(groupBubble)) {
                 <app-generic-chart
-                  class="hidden sm:block w-full"
+                  class="hidden w-full sm:block"
                   chartType="packedbubble"
                   [heightPx]="380"
                   [series]="portfolioHoldingBubbleChartSignal()"
                 />
               } @loading (minimum 1s) {
-                <div class="g-skeleton h-[350px] hidden sm:block"></div>
+                <div class="g-skeleton hidden h-[350px] sm:block"></div>
               }
             </div>
 
@@ -203,7 +203,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
                   [series]="portfolioSectorAllocation"
                 />
               } @loading (minimum 1s) {
-                <div class="g-skeleton h-[350px] block max-xl:hidden"></div>
+                <div class="g-skeleton block h-[350px] max-xl:hidden"></div>
               }
             </div>
           } @else {
@@ -279,7 +279,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
               [data]="groupDetailsSignal.groupTransactionsData"
             />
           } @loading (minimum 1s) {
-            <div class="flex justify-between mb-4">
+            <div class="mb-4 flex justify-between">
               <div class="g-skeleton h-10 w-[220px]"></div>
 
               <div class="flex gap-2">

@@ -31,15 +31,15 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
       <ng-container *ngIf="stockHistoricalPriceSignal() as historicalPrice">
         <ng-container *ngIf="!errorLoadSignal(); else errorLoading">
           <!-- time data about chart -->
-          <div class="flex justify-end md:justify-between text-wt-gray-medium">
-            <div class="items-center hidden gap-2 md:flex">
+          <div class="text-wt-gray-medium flex justify-end md:justify-between">
+            <div class="hidden items-center gap-2 md:flex">
               <img
                 *ngIf="imageName()"
                 appDefaultImg
                 imageType="symbol"
                 [src]="imageName()"
                 alt="Asset Image"
-                class="w-6 h-6"
+                class="h-6 w-6"
               />
               <span>{{ title() }}</span>
             </div>
@@ -65,9 +65,9 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
     <!-- skeleton chart -->
     <ng-template #chartSkeleton>
       <!-- chart title() and date range -->
-      <div class="flex justify-end mb-3 md:justify-between max-sm:pl-4">
-        <div class="g-skeleton sm:w-[125px] h-6"></div>
-        <div class="g-skeleton w-[350px] h-6"></div>
+      <div class="mb-3 flex justify-end max-sm:pl-4 md:justify-between">
+        <div class="g-skeleton h-6 sm:w-[125px]"></div>
+        <div class="g-skeleton h-6 w-[350px]"></div>
       </div>
 
       <div [style.height.px]="chartHeightPx() - 25" class="g-skeleton"></div>
@@ -75,7 +75,7 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
 
     <!-- error loading -->
     <ng-template #errorLoading>
-      <div class="grid place-content-center bg-wt-gray-light-strong  gap-y-4" [style.height.px]="chartHeightPx()">
+      <div class="bg-wt-gray-light-strong grid place-content-center gap-y-4" [style.height.px]="chartHeightPx()">
         <div class="text-lg">Failed to load content</div>
         <button (click)="onRefresh()" type="button" mat-stroked-button color="warn">
           <mat-icon>refresh</mat-icon>

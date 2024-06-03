@@ -53,22 +53,22 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
   imports: [CommonModule, ReactiveFormsModule, MatSliderModule, GetDataByIndexPipe],
 
   template: `
-    <div *ngIf="dateRangeSignal() as values" class="flex flex-col w-full">
+    <div *ngIf="dateRangeSignal() as values" class="flex w-full flex-col">
       <!-- display current value from form -->
-      <div *ngIf="displayUpperDate()" class="hidden sm:flex items-center justify-center gap-3">
-        <span class="text-sm text-wt-gray-medium">
+      <div *ngIf="displayUpperDate()" class="hidden items-center justify-center gap-3 sm:flex">
+        <span class="text-wt-gray-medium text-sm">
           {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
         </span>
         <span>-</span>
-        <span class="text-sm text-wt-gray-medium">
+        <span class="text-wt-gray-medium text-sm">
           {{ values.dates | getDataByIndex: values.currentMaxDateIndex | date: 'MMM d, y' }}
         </span>
       </div>
 
       <!-- display slider and min/max values -->
-      <div class="flex items-center w-full gap-4">
+      <div class="flex w-full items-center gap-4">
         <!-- min value -->
-        <span class="max-sm:hidden text-sm text-wt-gray-medium">
+        <span class="text-wt-gray-medium text-sm max-sm:hidden">
           <!-- min date -->
           <ng-container *ngIf="displayUpperDate()">
             {{ values.dates | getDataByIndex: 0 | date: 'MMM d, y' }}
@@ -94,7 +94,7 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
         </mat-slider>
 
         <!-- max value -->
-        <span class="max-sm:hidden text-sm text-wt-gray-medium">
+        <span class="text-wt-gray-medium text-sm max-sm:hidden">
           <!-- max date -->
           <ng-container *ngIf="displayUpperDate()">
             {{ values.dates | getDataByIndex: values.dates.length - 1 | date: 'MMM d, y' }}
@@ -108,9 +108,9 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
     </div>
   `,
   styles: `
-      :host {
-        display: block;
-      }
+    :host {
+      display: block;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [

@@ -65,7 +65,7 @@ import { tap } from 'rxjs';
             <mat-option
               *cdkVirtualFor="let quote of displayedOptions(); let last = last"
               [value]="quote"
-              class="py-2 rounded-md"
+              class="rounded-md py-2"
             >
               <app-quote-item [symbolQuote]="quote"></app-quote-item>
               <mat-divider *ngIf="!last"></mat-divider>

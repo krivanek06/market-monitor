@@ -23,12 +23,12 @@ export const timePeriodDefaultButtons = [
   imports: [CommonModule, MatSelectModule, MatButtonModule, ReactiveFormsModule],
   template: `
     <!-- large screen buttons -->
-    <div class="flex-wrap items-center hidden gap-3 md:flex">
+    <div class="hidden flex-wrap items-center gap-3 md:flex">
       <button
         *ngFor="let period of displayTimePeriods()"
         mat-stroked-button
         type="button"
-        class="flex-1 min-h-[36px]"
+        class="min-h-[36px] flex-1"
         [color]="period.value === activeTimePeriod.value ? 'primary' : ''"
         (click)="onTimePeriodSelect(period.value)"
       >

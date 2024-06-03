@@ -30,11 +30,11 @@ import { PageGroupsBaseComponent } from './page-groups-base.component';
       @if (groupDetailsSignal(); as groupDetailsSignal) {
         <div class="flex justify-between md:mb-8 xl:mb-12">
           <!-- group action buttons -->
-          <div class="lg:-mb-2 flex-1">
+          <div class="flex-1 lg:-mb-2">
             <app-group-interaction-buttons class="hidden lg:block" [groupDetails]="groupDetailsSignal" />
             <button
               mat-stroked-button
-              class="max-md:absolute max-md:right-0 max-md:top-6 block lg:hidden"
+              class="block max-md:absolute max-md:right-0 max-md:top-6 lg:hidden"
               (click)="onGroupOptions()"
             >
               <mat-icon>settings</mat-icon>
@@ -46,7 +46,7 @@ import { PageGroupsBaseComponent } from './page-groups-base.component';
         <!-- group overview -->
         <app-group-details-overview />
       } @else {
-        <div class="grid place-content-center h-[600px]">
+        <div class="grid h-[600px] place-content-center">
           <mat-spinner diameter="100" />
         </div>
       }

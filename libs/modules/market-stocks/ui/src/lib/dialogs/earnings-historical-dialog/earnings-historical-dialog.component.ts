@@ -25,7 +25,7 @@ import { EarningsEstimationChartComponent, RevenueEstimationChartComponent } fro
   template: `
     <app-dialog-close-header [title]="'Earnings: ' + data.symbol"></app-dialog-close-header>
 
-    <div class="flex items-center justify-between sm:pr-3 sm:pl-6">
+    <div class="flex items-center justify-between sm:pl-6 sm:pr-3">
       <h2>Beat: {{ beatings ?? 0 }} / {{ displayDataNumberSignal() }}</h2>
       <mat-radio-group
         [formControl]="selectedChartTypeControl"
@@ -64,7 +64,7 @@ import { EarningsEstimationChartComponent, RevenueEstimationChartComponent } fro
       </ng-container>
 
       <ng-container *ngIf="isDataLoading()">
-        <div class="g-skeleton h-[500px] w-full mt-2"></div>
+        <div class="g-skeleton mt-2 h-[500px] w-full"></div>
       </ng-container>
     </mat-dialog-content>
   `,

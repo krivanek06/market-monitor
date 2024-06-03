@@ -35,7 +35,7 @@ import { RecommendationDirective } from '../../../directives';
     <div class="g-item-wrapper">
       <div>Company Name</div>
       <div class="flex items-center gap-2">
-        <img appDefaultImg imageType="symbol" [src]="symbolSummary().id" alt="Asset Image" class="w-6 h-6" />
+        <img appDefaultImg imageType="symbol" [src]="symbolSummary().id" alt="Asset Image" class="h-6 w-6" />
         <span>{{ symbolSummary().profile?.companyName }}</span>
       </div>
     </div>
@@ -68,7 +68,7 @@ import { RecommendationDirective } from '../../../directives';
           [currentValues]="{
             hideValue: false,
             value: symbolSummary().quote.price,
-            valueToCompare: symbolSummary().quote.previousClose
+            valueToCompare: symbolSummary().quote.previousClose,
           }"
         ></span>
       </div>
@@ -85,7 +85,7 @@ import { RecommendationDirective } from '../../../directives';
           [currentValues]="{
             hideValue: false,
             value: symbolSummary().quote.volume,
-            valueToCompare: symbolSummary().quote.avgVolume
+            valueToCompare: symbolSummary().quote.avgVolume,
           }"
         ></span>
       </div>
@@ -121,7 +121,7 @@ import { RecommendationDirective } from '../../../directives';
           appPercentageIncrease
           [useCurrencySign]="false"
           [changeValues]="{
-            changePercentage: symbolSummary().priceChange | priceChangeItemSelector: key
+            changePercentage: symbolSummary().priceChange | priceChangeItemSelector: key,
           }"
         ></span>
       </div>

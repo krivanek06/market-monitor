@@ -15,7 +15,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule],
   template: `
-    <mat-dialog-actions class="flex flex-col px-4 sm:flex-row gap-y-2 gap-x-6">
+    <mat-dialog-actions class="flex flex-col gap-x-6 gap-y-2 px-4 sm:flex-row">
       <!-- favorites button -->
       @if (isSymbolInWatchList()) {
         <button
@@ -24,7 +24,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
           color="warn"
           (click)="onRemoveWatchList()"
           type="button"
-          class="g-border-apply max-sm:w-full h-10"
+          class="g-border-apply h-10 max-sm:w-full"
         >
           <mat-icon>do_not_disturb_on</mat-icon>
           watchlist - remove
@@ -36,7 +36,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
           color="accent"
           (click)="onAddWatchList()"
           type="button"
-          class="g-border-apply max-sm:w-full h-10"
+          class="g-border-apply h-10 max-sm:w-full"
         >
           <mat-icon>star</mat-icon>
           watchlist - add
@@ -46,7 +46,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
       @if (showRedirectButton()) {
         <button
           data-testid="summary-action-buttons-redirect"
-          class="max-sm:w-full h-10"
+          class="h-10 max-sm:w-full"
           type="button"
           mat-stroked-button
           color="primary"

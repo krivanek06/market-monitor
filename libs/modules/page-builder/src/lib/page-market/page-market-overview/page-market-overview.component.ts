@@ -41,7 +41,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     RangeDirective,
   ],
   template: `
-    <div class="flex gap-3 p-2 mb-6 xl:justify-around md:grid-cols-2 max-md:overflow-x-scroll md:grid xl:flex">
+    <div class="mb-6 flex gap-3 p-2 max-md:overflow-x-scroll md:grid md:grid-cols-2 xl:flex xl:justify-around">
       <ng-container *ngIf="marketTopIndexQuotesSignal() as marketTopIndexQuotesSignal; else topIndexSkeleton">
         <app-general-card
           *ngFor="let index of marketTopIndexQuotesSignal"
@@ -57,7 +57,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
               [useCurrencySign]="false"
               [changeValues]="{
                 change: index.summary.quote.change,
-                changePercentage: index.summary.quote.changesPercentage
+                changePercentage: index.summary.quote.changesPercentage,
               }"
             ></span>
           </div>
@@ -66,8 +66,8 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
 
       <!-- skeleton -->
       <ng-template #topIndexSkeleton>
-        <div class="flex gap-3 p-2 mb-6 xl:justify-around md:grid-cols-2 max-md:overflow-x-scroll md:grid xl:flex">
-          <div *ngRange="4" class="w-full lg:min-w-[320px] px-6 py-3 h-[115px] g-skeleton"></div>
+        <div class="mb-6 flex gap-3 p-2 max-md:overflow-x-scroll md:grid md:grid-cols-2 xl:flex xl:justify-around">
+          <div *ngRange="4" class="g-skeleton h-[115px] w-full px-6 py-3 lg:min-w-[320px]"></div>
         </div>
       </ng-template>
     </div>
@@ -92,9 +92,9 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     </div>
 
     <!-- treasury rates -->
-    <div class="w-full mx-auto max-sm:pr-3 lg:w-11/12">
+    <div class="mx-auto w-full max-sm:pr-3 lg:w-11/12">
       <app-section-title title="Treasury Rates" class="mb-3" />
-      <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+      <div class="mb-10 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
         @if (marketTreasuryData(); as marketTreasuryData) {
           @for (item of treasuryData; track item.key) {
             <app-generic-chart
@@ -113,9 +113,9 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     </div>
 
     <!-- other economic data -->
-    <div class="w-full mx-auto max-sm:pr-3 lg:w-11/12">
+    <div class="mx-auto w-full max-sm:pr-3 lg:w-11/12">
       <app-section-title title="Economic Data" class="mb-3" />
-      <div class="grid grid-cols-1 mb-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+      <div class="mb-10 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
         @if (marketEconomicData(); as marketEconomicData) {
           @for (item of economicData; track item.key) {
             <app-generic-chart

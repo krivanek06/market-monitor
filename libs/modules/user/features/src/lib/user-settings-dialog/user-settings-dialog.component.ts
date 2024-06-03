@@ -41,9 +41,9 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
   template: `
     <app-dialog-close-header title="Settings"></app-dialog-close-header>
 
-    <mat-dialog-content class="min-h-[350px] flex flex-col lg:flex-row gap-y-6 px-1 xs:px-6">
-      <div class="flex-1 md:border-r border-wt-border">
-        <div class="flex flex-col sm:flex-row gap-6">
+    <mat-dialog-content class="xs:px-6 flex min-h-[350px] flex-col gap-y-6 px-1 lg:flex-row">
+      <div class="border-wt-border flex-1 md:border-r">
+        <div class="flex flex-col gap-6 sm:flex-row">
           <!-- user image -->
           <div class="max-md:mx-auto">
             <app-upload-image-single-control
@@ -96,8 +96,8 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </div>
 
         <!-- explain account type -->
-        <div class="p-4 hidden lg:block">
-          <div class="mb-2 text-lg text-wt-primary">{{ userDataSignal().userAccountType }} - Account</div>
+        <div class="hidden p-4 lg:block">
+          <div class="text-wt-primary mb-2 text-lg">{{ userDataSignal().userAccountType }} - Account</div>
           <div *ngFor="let text of accountDescriptionSignal()" class="mb-3">
             {{ text }}
           </div>
@@ -105,7 +105,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
       </div>
 
       <!-- action buttons -->
-      <div class="flex flex-col gap-y-3 min-w-[180px] lg:pl-6">
+      <div class="flex min-w-[180px] flex-col gap-y-3 lg:pl-6">
         <!--  Change Account type -->
         <button
           [disabled]="isDemoAccount() && !isDevActive"
@@ -148,7 +148,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           Change Password
         </button>
 
-        <div class="hidden lg:block mt-10 mb-4">
+        <div class="mb-4 mt-10 hidden lg:block">
           <mat-divider></mat-divider>
         </div>
 
@@ -182,7 +182,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     </div>
 
     <mat-dialog-actions>
-      <div class="g-mat-dialog-actions-end px-1 xs:px-6">
+      <div class="g-mat-dialog-actions-end xs:px-6 px-1">
         <button mat-flat-button mat-dialog-close type="button">Cancel</button>
       </div>
     </mat-dialog-actions>

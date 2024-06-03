@@ -31,7 +31,7 @@ import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/share
                 [currentValues]="{
                   hideValue: true,
                   value: value,
-                  valueToCompare: block.values[i + 1]
+                  valueToCompare: block.values[i + 1],
                 }"
               ></span>
             </div>

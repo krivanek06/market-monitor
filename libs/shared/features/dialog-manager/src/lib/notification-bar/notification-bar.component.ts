@@ -14,19 +14,19 @@ import { NotificationProgressService } from './notification-bar.service';
       </div>
 
       <!-- notification message -->
-      <div *ngIf="data.type === 'notification'" class="flex items-center flex-1 gap-4">
+      <div *ngIf="data.type === 'notification'" class="flex flex-1 items-center gap-4">
         <mat-icon color="primary">notifications</mat-icon>
         <span *ngIf="data.message"> {{ data.message }} </span>
       </div>
 
       <!-- success message -->
-      <div *ngIf="data.type === 'success'" class="flex items-center flex-1 gap-4">
+      <div *ngIf="data.type === 'success'" class="flex flex-1 items-center gap-4">
         <mat-icon color="accent">check_circle</mat-icon>
         <span *ngIf="data.message"> {{ data.message }} </span>
       </div>
 
       <!-- error message -->
-      <div *ngIf="data.type === 'error'" class="flex items-center flex-1 gap-4">
+      <div *ngIf="data.type === 'error'" class="flex flex-1 items-center gap-4">
         <mat-icon color="warn">report</mat-icon>
         <span *ngIf="data.message"> {{ data.message }} </span>
       </div>
@@ -38,10 +38,10 @@ import { NotificationProgressService } from './notification-bar.service';
     </div>
   `,
   styles: `
-      mat-icon {
-        min-width: 30px;
-      }
-    `,
+    mat-icon {
+      min-width: 30px;
+    }
+  `,
   //changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationProgressComponent implements OnInit {

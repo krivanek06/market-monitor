@@ -12,7 +12,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
   template: `
     <!-- name -->
     <div
-      class="block sm:hidden text-lg text-start mb-3"
+      class="mb-3 block text-start text-lg sm:hidden"
       [ngClass]="{
         'text-wt-primary': !groupData().isClosed,
         'text-wt-danger': groupData().isClosed
@@ -20,22 +20,22 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
     >
       {{ groupData().name | titlecase }}
     </div>
-    <div class="flex flex-col xs:flex-row xs:items-center flex-1 gap-3">
+    <div class="xs:flex-row xs:items-center flex flex-1 flex-col gap-3">
       <!-- image -->
       <img
         appDefaultImg
         [src]="groupData().imageUrl"
         alt="Group Image"
-        class="object-cover -mt-2 hidden xs:block"
+        class="xs:block -mt-2 hidden object-cover"
         [style.height.px]="imageHeightPx()"
         [style.width.px]="imageHeightPx()"
       />
       <!-- data -->
-      <div class="flex flex-col flex-1 @container">
-        <div class="flex gap-4 items-center">
+      <div class="@container flex flex-1 flex-col">
+        <div class="flex items-center gap-4">
           <!-- name -->
           <div
-            class="hidden sm:block text-lg"
+            class="hidden text-lg sm:block"
             [ngClass]="{
               'text-wt-primary': !groupData().isClosed,
               'text-wt-danger': groupData().isClosed
@@ -52,7 +52,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
               change: groupData().portfolioState.totalGainsValue,
               changePercentage: groupData().portfolioState.totalGainsPercentage
             }"
-            class="hidden @md:flex"
+            class="@md:flex hidden"
           ></div>
           <!-- closed group display message -->
           <div *ngIf="groupData().isClosed" class="text-wt-danger">(Closed)</div>
@@ -60,7 +60,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
         <!-- owner -->
         <div
           (click)="onOwnerClick()"
-          class="flex items-center gap-2 px-1 py-2 rounded-lg"
+          class="flex items-center gap-2 rounded-lg px-1 py-2"
           [ngClass]="{
             'g-clickable-hover-color': clickableOwner(),
             'hover:shadow-lg': clickableOwner()
@@ -70,13 +70,13 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
             appDefaultImg
             [src]="groupData().ownerUser.personal.photoURL"
             alt="Owner Image"
-            class="w-8 h-8 rounded-full"
+            class="h-8 w-8 rounded-full"
           />
           <span>{{ groupData().ownerUser.personal.displayName | titlecase }}</span>
         </div>
         <!-- status -->
         <div class="flex gap-2">
-          <div class="w-20 text-wt-gray-dark">Status</div>
+          <div class="text-wt-gray-dark w-20">Status</div>
           <div
             class="flex items-center gap-2"
             [ngClass]="{
@@ -91,12 +91,12 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
         </div>
         <!-- members -->
         <div class="flex gap-2">
-          <div class="w-20 text-wt-gray-dark">Members</div>
+          <div class="text-wt-gray-dark w-20">Members</div>
           <div>{{ groupData().memberUserIds.length }} / {{ GROUP_MEMBER_LIMIT }}</div>
         </div>
         <!-- created date -->
         <div class="flex gap-2">
-          <div class="w-20 text-wt-gray-dark">Created</div>
+          <div class="text-wt-gray-dark w-20">Created</div>
           <div>{{ groupData().createdDate | date: 'MMMM d, y' }}</div>
         </div>
       </div>

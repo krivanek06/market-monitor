@@ -20,8 +20,8 @@ export type InlineInputDialogComponentData = {
   imports: [CommonModule, MatDialogModule, MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatButtonModule],
   template: `
     <div class="p-4">
-      <div class="text-center text-wt-primary text-lg mb-3">{{ data.title }}</div>
-      <div *ngIf="data.description" class="mb-3 text-wt-gray-medium text-sm text-center">{{ data.description }}</div>
+      <div class="text-wt-primary mb-3 text-center text-lg">{{ data.title }}</div>
+      <div *ngIf="data.description" class="text-wt-gray-medium mb-3 text-center text-sm">{{ data.description }}</div>
 
       <!-- input -->
       <form [formGroup]="inputValueForm">
@@ -47,7 +47,7 @@ export type InlineInputDialogComponentData = {
       </form>
 
       <!-- action buttons -->
-      <div class="flex flex-col-reverse gap-4 mt-6 md:flex-row">
+      <div class="mt-6 flex flex-col-reverse gap-4 md:flex-row">
         <button mat-flat-button class="w-full" (click)="cancel()">Cancel</button>
         <button mat-flat-button class="w-full" color="primary" (click)="confirm()" [disabled]="inputValueForm.invalid">
           Confirm

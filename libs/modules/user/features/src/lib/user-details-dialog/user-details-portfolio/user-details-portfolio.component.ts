@@ -30,18 +30,18 @@ import { SectionTitleComponent } from '@mm/shared/ui';
         [displayLegend]="true"
         [data]="{
           values: portfolioGrowth,
-          startingCashValue: userData().portfolioState.startingCash
+          startingCashValue: userData().portfolioState.startingCash,
         }"
         [heightPx]="375"
         class="mb-6"
       ></app-portfolio-growth-chart>
     } @else {
-      <div class="h-[400px] grid place-content-center">
+      <div class="grid h-[400px] place-content-center">
         <mat-spinner></mat-spinner>
       </div>
     }
 
-    <div class="max-sm:pl-2 mb-6">
+    <div class="mb-6 max-sm:pl-2">
       <app-portfolio-holdings-table-card
         [displayedColumns]="displayedColumns"
         [portfolioStateHolding]="portfolioStateHolding()"

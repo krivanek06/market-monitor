@@ -30,9 +30,9 @@ import { map, pipe, startWith, switchMap } from 'rxjs';
     @if (!marketStockNewsSignal().isLoading) {
       <div appScrollNearEnd [(nearEnd)]="displayMoreNotification" class="grid grid-cols-1 md:grid-cols-2">
         @for (news of marketStockNewsSignal().data; track news.title) {
-          <article class="inline-block m-2 transition-all duration-300 group hover:scale-95">
+          <article class="group m-2 inline-block transition-all duration-300 hover:scale-95">
             <a
-              class="relative flex flex-col items-start gap-3 pt-2 pb-4 pl-2 pr-4 overflow-hidden transition-all duration-500 rounded-lg max-lg:p-0 lg:flex-row hover:bg-wt-gray-light"
+              class="hover:bg-wt-gray-light relative flex flex-col items-start gap-3 overflow-hidden rounded-lg pb-4 pl-2 pr-4 pt-2 transition-all duration-500 max-lg:p-0 lg:flex-row"
               target="_blank"
               [href]="news.url"
             >
@@ -40,18 +40,18 @@ import { map, pipe, startWith, switchMap } from 'rxjs';
                 appDefaultImg
                 [src]="news.image"
                 [alt]="news.title"
-                class="h-[255px] sm:h-[275px] object-cover lg:h-28 lg:w-36 min-w-[9rem] max-lg:m-auto w-full lg:pt-1"
+                class="h-[255px] w-full min-w-[9rem] object-cover max-lg:m-auto sm:h-[275px] lg:h-28 lg:w-36 lg:pt-1"
               />
-              <div class="flex flex-col max-lg:absolute p-2 xs:p-4 sm:p-6 lg:p-0 max-lg:bottom-0 max-lg:bg-[#ffffffbf]">
-                <div class="text-base text-wt-gray-dark group-hover:text-wt-primary">
+              <div class="xs:p-4 flex flex-col p-2 max-lg:absolute max-lg:bottom-0 max-lg:bg-[#ffffffbf] sm:p-6 lg:p-0">
+                <div class="text-wt-gray-dark group-hover:text-wt-primary text-base">
                   {{ news.title }}
                 </div>
-                <div class="hidden space-x-1 text-xs text-wt-gray-medium lg:block">
+                <div class="text-wt-gray-medium hidden space-x-1 text-xs lg:block">
                   <span>{{ news.site }}</span>
                   <span>●</span>
                   <span>{{ news.publishedDate | dateAgo }}</span>
                 </div>
-                <div class="hidden text-sm lg:block text-wt-gray-medium">{{ news.text | truncateWords: 25 }}</div>
+                <div class="text-wt-gray-medium hidden text-sm lg:block">{{ news.text | truncateWords: 25 }}</div>
               </div>
             </a>
           </article>
@@ -62,18 +62,18 @@ import { map, pipe, startWith, switchMap } from 'rxjs';
       <div class="columns-1 md:columns-2">
         <div
           *ngRange="initialNewsToDisplay()"
-          class="flex flex-col items-start gap-3 pt-2 pb-4 pl-2 pr-4 rounded-md max-lg:p-0 lg:flex-row"
+          class="flex flex-col items-start gap-3 rounded-md pb-4 pl-2 pr-4 pt-2 max-lg:p-0 lg:flex-row"
         >
           <!-- image -->
           <div
-            class="h-[255px] sm:h-[275px] object-cover lg:h-28 lg:w-36 min-w-[9rem] max-lg:m-auto w-full lg:pt-1 g-skeleton"
+            class="g-skeleton h-[255px] w-full min-w-[9rem] object-cover max-lg:m-auto sm:h-[275px] lg:h-28 lg:w-36 lg:pt-1"
           ></div>
-          <div class="flex flex-col w-full gap-1 lg:block">
+          <div class="flex w-full flex-col gap-1 lg:block">
             <!-- title -->
-            <div class="hidden w-full h-6 g-skeleton lg:block mb-1"></div>
+            <div class="g-skeleton mb-1 hidden h-6 w-full lg:block"></div>
             <!-- creator -->
-            <div class="hidden w-full h-6 g-skeleton lg:block mb-1"></div>
-            <div class="hidden w-full h-20 lg:block g-skeleton"></div>
+            <div class="g-skeleton mb-1 hidden h-6 w-full lg:block"></div>
+            <div class="g-skeleton hidden h-20 w-full lg:block"></div>
           </div>
         </div>
       </div>

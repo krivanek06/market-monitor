@@ -12,34 +12,34 @@ import { UserAccountBasicTypes, UserAccountEnum, accountDescription } from '@mm/
     <mat-dialog-content>
       <div class="max-w-[750px]">
         <!-- description -->
-        <div class="text-center mb-4 p-3">
+        <div class="mb-4 p-3 text-center">
           When creating an account you can choose either a demo trading account or a basic account. You can also change
           it in the settings.
         </div>
 
         <!-- selected account -->
-        <div class="text-center mb-4 p-3 space-x-2 text-lg">
+        <div class="mb-4 space-x-2 p-3 text-center text-lg">
           Selected:
           <span class="text-wt-primary">
             {{ selectedAccountTypeNewUser() === UserAccountEnum.DEMO_TRADING ? 'Demo Trading' : 'Basic Account' }}
           </span>
         </div>
 
-        <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="mb-6 grid grid-cols-2 gap-6">
           <!-- trading account -->
           <div
-            class="p-3 rounded-lg border "
+            class="rounded-lg border p-3"
             tabindex="0"
             [ngClass]="{
-              'border-wt-primary border-2 pointer-events-none':
+              'border-wt-primary pointer-events-none border-2':
                 selectedAccountTypeNewUser() === UserAccountEnum.DEMO_TRADING,
-              'g-clickable-hover opacity-85 hover:opacity-100 bg-wt-gray-light-strong hover:bg-transparent':
+              'g-clickable-hover bg-wt-gray-light-strong opacity-85 hover:bg-transparent hover:opacity-100':
                 selectedAccountTypeNewUser() !== UserAccountEnum.DEMO_TRADING
             }"
             (keydown.enter)="changeAccount(UserAccountEnum.DEMO_TRADING)"
             (click)="changeAccount(UserAccountEnum.DEMO_TRADING)"
           >
-            <div class="mb-2 text-lg text-wt-primary text-center">Demo Trading</div>
+            <div class="text-wt-primary mb-2 text-center text-lg">Demo Trading</div>
             <div class="mb-3 text-center font-bold">(Schools or practising trading)</div>
             <div *ngFor="let text of accountDescription.DEMO_TRADING" class="mb-3 text-center">
               {{ text }}
@@ -48,18 +48,18 @@ import { UserAccountBasicTypes, UserAccountEnum, accountDescription } from '@mm/
 
           <!-- basic account -->
           <div
-            class="p-3 rounded-lg border"
+            class="rounded-lg border p-3"
             tabindex="0"
             [ngClass]="{
-              'border-wt-primary border-2 pointer-events-none':
+              'border-wt-primary pointer-events-none border-2':
                 selectedAccountTypeNewUser() === UserAccountEnum.NORMAL_BASIC,
-              'g-clickable-hover opacity-85 hover:opacity-100 bg-wt-gray-light-strong hover:bg-transparent':
+              'g-clickable-hover bg-wt-gray-light-strong opacity-85 hover:bg-transparent hover:opacity-100':
                 selectedAccountTypeNewUser() !== UserAccountEnum.NORMAL_BASIC
             }"
             (keydown.enter)="changeAccount(UserAccountEnum.NORMAL_BASIC)"
             (click)="changeAccount(UserAccountEnum.NORMAL_BASIC)"
           >
-            <div class="mb-2 text-lg text-wt-primary text-center">Basic Account</div>
+            <div class="text-wt-primary mb-2 text-center text-lg">Basic Account</div>
             <div class="mb-3 text-center font-bold">(Personal use)</div>
             <div *ngFor="let text of accountDescription.NORMAL_BASIC" class="mb-3 text-center">
               {{ text }}

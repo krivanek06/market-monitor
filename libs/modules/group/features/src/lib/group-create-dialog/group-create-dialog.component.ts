@@ -75,7 +75,7 @@ import { map, startWith } from 'rxjs';
               </mat-checkbox>
 
               <!-- owner -->
-              <div *ngIf="form.controls.isOwnerMember.value" class="flex gap-4 p-4 mt-2 shadow-md rounded-md">
+              <div *ngIf="form.controls.isOwnerMember.value" class="mt-2 flex gap-4 rounded-md p-4 shadow-md">
                 <app-user-display-item *ngIf="authenticatedUserDataSignal() as user" [userData]="user" />
               </div>
             </div>
@@ -85,14 +85,14 @@ import { map, startWith } from 'rxjs';
           @if (allowCreateGroup()) {
             <div
               *hideAfter="5000; let counter = counter"
-              class="p-4 mx-auto my-4 text-center rounded-md bg-wt-gray-light-strong lg:w-11/12"
+              class="bg-wt-gray-light-strong mx-auto my-4 rounded-md p-4 text-center lg:w-11/12"
             >
               You are limited to create only {{ createGroupLimitSignal() }} groups. If you want to create more groups
               please contact support. Hidden after {{ counter() }} seconds.
             </div>
           } @else {
             <!-- error message if can not create more groups -->
-            <div class="p-4 mx-auto my-4 text-center rounded-md bg-wt-danger text-wt-gray-light lg:w-11/12">
+            <div class="bg-wt-danger text-wt-gray-light mx-auto my-4 rounded-md p-4 text-center lg:w-11/12">
               You can not longer create any additional groups. If you want to create more groups please contact support.
             </div>
           }
@@ -105,14 +105,14 @@ import { map, startWith } from 'rxjs';
             </div>
 
             <!-- search user control -->
-            <div class="max-w-[450px] mb-8">
+            <div class="mb-8 max-w-[450px]">
               <app-user-search-control [formControl]="searchUserControl"></app-user-search-control>
             </div>
 
             <!-- display selected users -->
-            <div class="grid lg:grid-cols-2 gap-4">
+            <div class="grid gap-4 lg:grid-cols-2">
               @for (user of selectedUsersSignal(); track user.id) {
-                <div class="flex gap-4 p-4 shadow-md rounded-md justify-between">
+                <div class="flex justify-between gap-4 rounded-md p-4 shadow-md">
                   <app-user-display-item [userData]="user" />
                   <button mat-icon-button type="button" matTooltip="Remove User" (click)="onUserRemove(user)">
                     <mat-icon color="warn">delete</mat-icon>
@@ -123,9 +123,9 @@ import { map, startWith } from 'rxjs';
           }
         } @else {
           <!-- loader -->
-          <div class="grid gap-5 py-16 place-content-center">
+          <div class="grid place-content-center gap-5 py-16">
             <mat-spinner [diameter]="100" class="m-auto"></mat-spinner>
-            <div class="text-center text-wt-gray-medium">This may time a while. Please wait...</div>
+            <div class="text-wt-gray-medium text-center">This may time a while. Please wait...</div>
           </div>
         }
       </mat-dialog-content>

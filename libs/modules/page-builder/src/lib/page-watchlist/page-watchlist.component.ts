@@ -26,7 +26,7 @@ import { switchMap } from 'rxjs';
     MatButtonModule,
   ],
   template: `
-    <div class="flex items-center justify-between mb-10">
+    <div class="mb-10 flex items-center justify-between">
       <app-section-title [title]="pageTitle()" matIcon="monitoring" />
 
       <button mat-button color="warn" (click)="onClearWatchList()">

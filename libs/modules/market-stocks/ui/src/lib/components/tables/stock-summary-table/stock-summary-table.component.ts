@@ -49,7 +49,7 @@ import {
     MatTooltipModule,
   ],
   template: `
-    <div class="flex sm:hidden justify-end mb-2">
+    <div class="mb-2 flex justify-end sm:hidden">
       <div>
         <button mat-stroked-button class="w-[150px] text-sm" (click)="toggleDisplayedValues()">
           {{ displayInfoMobile() ? 'Info' : 'Price +/-' }}
@@ -71,7 +71,7 @@ import {
         <td mat-cell *matCellDef="let row">
           <!-- logo + symbol -->
           <div class="flex items-center gap-2">
-            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="w-10 h-10" />
+            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-10 w-10" />
             <div class="flex flex-col">
               <!-- asset symbol + sector -->
               <div class="text-wt-primary">{{ row.symbol }}</div>
@@ -84,7 +84,7 @@ import {
       <ng-container matColumnDef="price">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Price +/-</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          <div class="text-base text-wt-gray-medium">
+          <div class="text-wt-gray-medium text-base">
             {{ row.price | currency }}
           </div>
         </td>
@@ -98,7 +98,7 @@ import {
             appPercentageIncrease
             [useCurrencySign]="false"
             [changeValues]="{
-              changePercentage: row.changesPercentage
+              changePercentage: row.changesPercentage,
             }"
           ></div>
         </td>
@@ -109,7 +109,7 @@ import {
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
         <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
           <ng-container *ngIf="!displayInfoMobile()">
-            <div class="flex justify-end text-base text-wt-gray-medium">
+            <div class="text-wt-gray-medium flex justify-end text-base">
               {{ row.price | currency }}
             </div>
             <div
@@ -118,7 +118,7 @@ import {
               [useCurrencySign]="true"
               [changeValues]="{
                 change: row.change,
-                changePercentage: row.changesPercentage
+                changePercentage: row.changesPercentage,
               }"
             ></div>
           </ng-container>
@@ -130,14 +130,14 @@ import {
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
         <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
           <ng-container *ngIf="displayInfoMobile()">
-            <div class="grid grid-cols-1 pl-5 xs:grid-cols-2 gap-x-4 xs:text-center">
+            <div class="xs:grid-cols-2 xs:text-center grid grid-cols-1 gap-x-4 pl-5">
               <!-- market cap -->
               <div>
                 <span class="text-wt-gray-dark">Market Cap.:</span>
                 <span> {{ row.marketCap | largeNumberFormatter }}</span>
               </div>
               <!-- PE -->
-              <div class="hidden xs:block">
+              <div class="xs:block hidden">
                 <span class="text-wt-gray-dark">PE:</span>
                 <span> {{ row.pe ? (row.pe | number: '1.2-2') : 'N/A' }}</span>
               </div>
@@ -147,7 +147,7 @@ import {
                 <span> {{ row.sharesOutstanding | largeNumberFormatter }}</span>
               </div>
               <!-- EPS -->
-              <div class="hidden xs:block">
+              <div class="xs:block hidden">
                 <span class="text-wt-gray-dark">EPS:</span>
                 <span> {{ row.eps ? (row.eps | number: '1.2-2') : 'N/A' }}</span>
               </div>
@@ -160,7 +160,7 @@ import {
       <ng-container matColumnDef="volume">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Volume +/-</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
-          <div class="text-base text-wt-gray-medium">
+          <div class="text-wt-gray-medium text-base">
             {{ row.volume | largeNumberFormatter }}
           </div>
         </td>
@@ -184,7 +184,7 @@ import {
             [currentValues]="{
               hideValue: true,
               value: row.volume,
-              valueToCompare: row.avgVolume
+              valueToCompare: row.avgVolume,
             }"
           ></div>
         </td>
@@ -248,7 +248,7 @@ import {
 
     <!-- skeleton -->
     <div *ngIf="showLoadingSkeletonSignal()">
-      <div *ngRange="symbolSkeletonLoaders() || 10" class="h-12 mb-1 g-skeleton"></div>
+      <div *ngRange="symbolSkeletonLoaders() || 10" class="g-skeleton mb-1 h-12"></div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

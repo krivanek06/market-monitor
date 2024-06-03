@@ -38,8 +38,8 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
     GenericDialogComponent,
   ],
   template: `
-    <div class="w-full shadow-md p-2 bg-wt-background-present">
-      <nav class="w-full pl-3 sm:pl-8 sm:pr-4 flex items-center gap-4 max-w-[1620px] mx-auto pb-1">
+    <div class="bg-wt-background-present w-full p-2 shadow-md">
+      <nav class="mx-auto flex w-full max-w-[1620px] items-center gap-4 pb-1 pl-3 sm:pl-8 sm:pr-4">
         <!-- hide menu button -->
         <div class="block xl:hidden">
           <button type="button" mat-icon-button (click)="onMenuClick()">
@@ -53,7 +53,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.DASHBOARD }"
         >
-          <div class="gap-2 flex items-center">
+          <div class="flex items-center gap-2">
             <mat-icon>dashboard</mat-icon>
             <span>Dashboard</span>
           </div>
@@ -65,7 +65,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.WATCHLIST }"
         >
-          <div class="gap-2 flex items-center">
+          <div class="flex items-center gap-2">
             <mat-icon>monitoring</mat-icon>
             <span>Watchlist</span>
           </div>
@@ -77,7 +77,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.TRADING }"
         >
-          <div class="gap-2 flex items-center">
+          <div class="flex items-center gap-2">
             <mat-icon>attach_money</mat-icon>
             <span>Trading</span>
           </div>
@@ -90,7 +90,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.GROUPS }"
         >
-          <div class="gap-2 flex items-center">
+          <div class="flex items-center gap-2">
             <mat-icon>group</mat-icon>
             <span>Groups</span>
           </div>
@@ -103,7 +103,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.HALL_OF_FAME }"
         >
-          <div class="gap-2 flex items-center">
+          <div class="flex items-center gap-2">
             <mat-icon>military_tech</mat-icon>
             <span>Hall Of Fame</span>
           </div>
@@ -116,7 +116,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.STOCK_SCREENER }"
         >
-          <div class="gap-2 flex items-center">
+          <div class="flex items-center gap-2">
             <mat-icon>search</mat-icon>
             <span>Screener</span>
           </div>
@@ -128,37 +128,37 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.MARKET }"
         >
-          <div class="gap-2 flex items-center">
+          <div class="flex items-center gap-2">
             <mat-icon>travel_explore</mat-icon>
             <span>Market</span>
           </div>
         </a>
 
-        <div class="flex-1 flex justify-end">
+        <div class="flex flex-1 justify-end">
           <!-- user on small screen -->
-          <div class="flex sm:hidden items-center gap-2 pr-6">
+          <div class="flex items-center gap-2 pr-6 sm:hidden">
             <!-- avatar -->
             <img
               appDefaultImg
               [src]="userDataSignal()?.personal?.photoURL"
               alt="User Image"
-              class="rounded-full w-8 h-8"
+              class="h-8 w-8 rounded-full"
             />
             <!-- name -->
             <div>{{ userDataSignal()?.personal?.displayName }}</div>
           </div>
 
           <!-- search -->
-          <app-symbol-search-basic displayValue="symbol" class="hidden sm:block w-[520px] scale-[0.8] -mr-10 -mb-5" />
+          <app-symbol-search-basic displayValue="symbol" class="-mb-5 -mr-10 hidden w-[520px] scale-[0.8] sm:block" />
 
-          <div class="gap-1 items-center hidden xl:flex">
+          <div class="hidden items-center gap-1 xl:flex">
             <!-- display logged in person -->
             <div *ngIf="userDataSignal() as userDataSignal" class="relative mt-2">
               <button mat-button class="h-11" (click)="onMoreOptionsClick()">
                 <div class="flex items-center gap-3">
                   <img
                     appDefaultImg
-                    class="w-8 h-8 rounded-full"
+                    class="h-8 w-8 rounded-full"
                     [src]="userDataSignal.personal.photoURL"
                     [alt]="userDataSignal.personal.displayName"
                   />
@@ -173,10 +173,10 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
 
     <!-- menu -->
     <ng-template #menuOptions>
-      <div class="min-w-[320px] flex flex-col">
+      <div class="flex min-w-[320px] flex-col">
         <button
           mat-button
-          class="mb-2 hover:bg-wt-gray-light-strong g-clickable-hover w-full h-12"
+          class="hover:bg-wt-gray-light-strong g-clickable-hover mb-2 h-12 w-full"
           (click)="onSettingClick()"
         >
           <mat-icon>settings</mat-icon>
@@ -184,7 +184,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
         </button>
         <button
           mat-button
-          class="mb-2 hover:bg-wt-gray-light-strong g-clickable-hover w-full h-12"
+          class="hover:bg-wt-gray-light-strong g-clickable-hover mb-2 h-12 w-full"
           (click)="onHelpClick()"
         >
           <mat-icon>help</mat-icon>
@@ -192,7 +192,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
         </button>
         <button
           mat-button
-          class="hover:bg-wt-gray-light-strong g-clickable-hover w-full h-12"
+          class="hover:bg-wt-gray-light-strong g-clickable-hover h-12 w-full"
           (click)="onLogOutClick()"
         >
           <mat-icon>logout</mat-icon>
@@ -207,7 +207,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
         display: block;
 
         a {
-          @apply hidden xl:block p-4 hover:bg-wt-gray-light-strong rounded-md px-4;
+          @apply hover:bg-wt-gray-light-strong hidden rounded-md p-4 px-4 xl:block;
 
           &.c-active {
             border-bottom: 2px solid var(--primary) !important;

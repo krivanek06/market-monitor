@@ -9,8 +9,8 @@ import { PriceChangeItemSelectorPipe } from './price-change-item-selector.pipe';
   standalone: true,
   imports: [CommonModule, PercentageIncreaseDirective, PriceChangeItemSelectorPipe],
   template: `
-    <div class="grid justify-around grid-cols-2 gap-4 md:flex md:flex-row md:flex-wrap">
-      <div *ngFor="let keys of priceChangeKeys" class="flex flex-row gap-x-4 sm:flex-col gap-y-1">
+    <div class="grid grid-cols-2 justify-around gap-4 md:flex md:flex-row md:flex-wrap">
+      <div *ngFor="let keys of priceChangeKeys" class="flex flex-row gap-x-4 gap-y-1 sm:flex-col">
         <!-- name => 1 day -->
         <span class="text-center">{{ keys.label }}</span>
         <!-- value -->

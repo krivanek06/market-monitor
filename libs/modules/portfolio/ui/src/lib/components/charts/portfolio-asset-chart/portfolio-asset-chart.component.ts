@@ -50,7 +50,7 @@ import { combineLatest, map, startWith } from 'rxjs';
       >
         <mat-chip-option
           *ngFor="let inputSource of symbolInputSourceSignal()"
-          class="h-10 mb-3 mr-1 g-mat-chip"
+          class="g-mat-chip mb-3 mr-1 h-10"
           color="primary"
         >
           <div class="flex flex-wrap items-center gap-4 px-2">
@@ -62,7 +62,7 @@ import { combineLatest, map, startWith } from 'rxjs';
 
       <!-- time slider -->
       <div class="flex justify-end" [ngClass]="{ hidden: symbolsControl.value.length === 0 }">
-        <app-date-range-slider class="hidden md:block w-[550px]" [formControl]="dateRangeControl" />
+        <app-date-range-slider class="hidden w-[550px] md:block" [formControl]="dateRangeControl" />
       </div>
 
       <!-- chart -->

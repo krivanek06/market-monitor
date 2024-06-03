@@ -24,15 +24,15 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
       [matRippleCentered]="true"
       [matRippleDisabled]="!clickableDirective.clickable()"
       [matRippleUnbounded]="false"
-      class="flex flex-col gap-1 p-2 @container"
+      class="@container flex flex-col gap-1 p-2"
     >
       <div class="flex gap-4">
         <!-- image -->
-        <img appDefaultImg [src]="groupData().imageUrl" alt="Group image" class="w-16 h-16" />
+        <img appDefaultImg [src]="groupData().imageUrl" alt="Group image" class="h-16 w-16" />
 
         <!-- info -->
         <div class="grid gap-1">
-          <div class="flex flex-col @md:flex-row @md:items-center gap-x-4">
+          <div class="@md:flex-row @md:items-center flex flex-col gap-x-4">
             <div class="flex flex-wrap gap-x-2">
               <!-- name -->
               <span
@@ -46,7 +46,7 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
               </span>
 
               <!-- members -->
-              <span class="block @md:hidden">[{{ groupData().numberOfMembers }} / {{ memberLimit }}]</span>
+              <span class="@md:hidden block">[{{ groupData().numberOfMembers }} / {{ memberLimit }}]</span>
             </div>
 
             <!-- portfolio -->
@@ -76,14 +76,14 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
             <!-- closed group display message -->
             <div *ngIf="groupData().isClosed" class="text-wt-danger">(Closed)</div>
           </div>
-          <div class="hidden @md:flex items-center gap-4">
+          <div class="@md:flex hidden items-center gap-4">
             <!-- owner -->
             <div class="flex items-center gap-4">
               <img
                 appDefaultImg
                 [src]="groupData().ownerUser.personal.photoURL"
                 alt="Owner image"
-                class="w-8 h-8 rounded-full"
+                class="h-8 w-8 rounded-full"
               />
               <span>{{ groupData().ownerUser.personal.displayName | titlecase }}</span>
             </div>

@@ -31,9 +31,9 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
     MatDividerModule,
   ],
   template: `
-    <div class="flex items-center gap-2 p-6 mb-2">
+    <div class="mb-2 flex items-center gap-2 p-6">
       <!-- avatar -->
-      <img appDefaultImg [src]="userData()?.personal?.photoURL" alt="User Image" class="rounded-full w-8 h-8" />
+      <img appDefaultImg [src]="userData()?.personal?.photoURL" alt="User Image" class="h-8 w-8 rounded-full" />
       <!-- name -->
       <div>{{ userData()?.personal?.displayName }}</div>
     </div>
@@ -63,7 +63,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
     </div>
 
     <!-- other navigation -->
-    <div class="flex flex-col mb-8">
+    <div class="mb-8 flex flex-col">
       <div class="mb-2 ml-4">Other</div>
 
       <!-- settings -->
@@ -100,12 +100,12 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
             [routerLink]="main.path"
             routerLinkActive="bg-wt-gray-light-strong text-wt-primary"
             (click)="onNavigationClick(main.path)"
-            class="flex items-center h-12 gap-3 rounded-e-xl hover:bg-wt-gray-light-strong max-w-[90%]"
+            class="hover:bg-wt-gray-light-strong flex h-12 max-w-[90%] items-center gap-3 rounded-e-xl"
             [ngClass]="{
-              'pl-5': selectedNavigationPath() !== main.path
+              'pl-5': selectedNavigationPath() !== main.path,
             }"
           >
-            <div *ngIf="selectedNavigationPath() === main.path" class="w-3 h-full bg-wt-primary"></div>
+            <div *ngIf="selectedNavigationPath() === main.path" class="bg-wt-primary h-full w-3"></div>
             <mat-icon>{{ main.icon }}</mat-icon>
             <div class="text-base">{{ main.title | titlecase }}</div>
           </a>
@@ -119,7 +119,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
     }
 
     .c-link {
-      @apply flex items-center h-12 gap-3 rounded-e-xl hover:bg-wt-gray-light-strong max-w-[90%] pl-5 cursor-pointer;
+      @apply hover:bg-wt-gray-light-strong flex h-12 max-w-[90%] cursor-pointer items-center gap-3 rounded-e-xl pl-5;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

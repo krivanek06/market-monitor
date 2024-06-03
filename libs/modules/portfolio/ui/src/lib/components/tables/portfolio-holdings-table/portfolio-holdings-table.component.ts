@@ -54,7 +54,7 @@ import {
         <td mat-cell *matCellDef="let row">
           <!-- logo + symbol -->
           <div class="flex items-center gap-2">
-            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="w-10 h-10" />
+            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-10 w-10" />
             <div class="flex flex-col">
               <div class="space-x-1">
                 <span class="text-wt-primary">{{ row.symbol }}</span>
@@ -80,7 +80,7 @@ import {
               [currentValues]="{
                 value: row.symbolQuote.price * row.units,
                 valueToCompare: row.symbolQuote.previousClose * row.units,
-                hideValue: true
+                hideValue: true,
               }"
             ></div>
           </div>
@@ -97,7 +97,7 @@ import {
             [currentValues]="{
               value: row.symbolQuote.price * row.units,
               valueToCompare: row.symbolQuote.previousClose * row.units,
-              hidePercentage: true
+              hidePercentage: true,
             }"
           ></div>
         </td>
@@ -106,7 +106,7 @@ import {
       <!-- BEP. -->
       <ng-container matColumnDef="bep">
         <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">BEP +/-</th>
-        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell text-wt-gray-dark">
+        <td mat-cell *matCellDef="let row" class="text-wt-gray-dark hidden lg:table-cell">
           {{ row.breakEvenPrice | currency }}
         </td>
       </ng-container>
@@ -120,13 +120,13 @@ import {
               {{ row.symbolQuote.price * row.units | currency }}
             </div>
             <div
-              class="block sm:hidden justify-end text-end"
+              class="block justify-end text-end sm:hidden"
               appPercentageIncrease
               [hideValueOnXsScreen]="true"
               [useCurrencySign]="true"
               [currentValues]="{
                 value: row.symbolQuote.price * row.units,
-                valueToCompare: row.breakEvenPrice * row.units
+                valueToCompare: row.breakEvenPrice * row.units,
               }"
             ></div>
           </div>
@@ -142,7 +142,7 @@ import {
             [useCurrencySign]="true"
             [currentValues]="{
               value: row.symbolQuote.price * row.units,
-              valueToCompare: row.breakEvenPrice * row.units
+              valueToCompare: row.breakEvenPrice * row.units,
             }"
           ></div>
         </td>
@@ -223,11 +223,11 @@ import {
 
       <!-- Row shown when there is no matching data. -->
       <tr class="mat-row" *matNoDataRow>
-        <td class="text-center mat-cell" colspan="10">
+        <td class="mat-cell text-center" colspan="10">
           @if (!portfolioState()) {
-            <div *ngRange="12" class="h-10 mb-1 g-skeleton"></div>
+            <div *ngRange="12" class="g-skeleton mb-1 h-10"></div>
           } @else {
-            <div class="grid place-content-center p-10 min-h-[250px]">No data to be found</div>
+            <div class="grid min-h-[250px] place-content-center p-10">No data to be found</div>
           }
         </td>
       </tr>

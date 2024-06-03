@@ -36,9 +36,9 @@ import {
     RangeDirective,
   ],
   template: `
-    <div class="flex flex-col lg:flex-row gap-x-10 gap-y-4">
+    <div class="flex flex-col gap-x-10 gap-y-4 lg:flex-row">
       <div class="lg:basis-4/6 xl:basis-3/6">
-        <div class="flex items-center justify-between lg:px-2 mb-4">
+        <div class="mb-4 flex items-center justify-between lg:px-2">
           <!-- title -->
           <app-section-title title="Top Groups" class="mt-2" />
 
@@ -75,11 +75,11 @@ import {
           </div>
         </app-general-card>
       </div>
-      <div class="p-4 lg:basis-2/6 xl:basis-3/6 gap-y-6 grid">
+      <div class="grid gap-y-6 p-4 lg:basis-2/6 xl:basis-3/6">
         <!-- daily best -->
         <div class="@container">
           <app-section-title title="Daily Gainers" class="mb-6" />
-          <div class="grid @xl:grid-cols-2 gap-3">
+          <div class="@xl:grid-cols-2 grid gap-3">
             @if (hallOfFameGroupsSignal(); as hallOfFameGroups) {
               @for (group of hallOfFameGroups.bestDailyGains; track group.id) {
                 <app-group-display-item
@@ -101,7 +101,7 @@ import {
         <!-- daily worst -->
         <div class="@container">
           <app-section-title title="Daily Losers" class="mb-6" />
-          <div class="grid @xl:grid-cols-2 gap-3">
+          <div class="@xl:grid-cols-2 grid gap-3">
             @if (hallOfFameGroupsSignal(); as hallOfFameGroups) {
               @for (group of hallOfFameGroups.worstDailyGains; track group.id) {
                 <app-group-display-item
@@ -125,15 +125,15 @@ import {
     <!-- template for user data in table -->
     <ng-template #groupTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
-        <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="w-10 h-10 rounded-lg" />
+        <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="h-10 w-10 rounded-lg" />
         <div class="flex items-center gap-2">
-          <div appPositionColoring [position]="position" class="truncate text-ellipsis w-[200px]">
+          <div appPositionColoring [position]="position" class="w-[200px] truncate text-ellipsis">
             {{ data.item.name }}
           </div>
           <!-- display position change if any -->
           @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
             @if (rankChange !== 0) {
-              <div class="flex items-center gap-1 ml-4">
+              <div class="ml-4 flex items-center gap-1">
                 <span [ngClass]="{ 'text-wt-success': rankChange > 0, 'text-wt-danger': rankChange < 0 }">
                   {{ rankChange }}
                 </span>

@@ -31,8 +31,8 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
     RangeDirective,
   ],
   template: `
-    <div class="grid m-auto xl:w-11/12 gap-y-4">
-      <div class="flex flex-col lg:flex-row w-full lg:mb-6 items-center gap-x-8 gap-y-4">
+    <div class="m-auto grid gap-y-4 xl:w-11/12">
+      <div class="flex w-full flex-col items-center gap-x-8 gap-y-4 lg:mb-6 lg:flex-row">
         <div class="flex justify-between gap-x-10 max-lg:w-full">
           <!-- title -->
           <app-section-title matIcon="group" title="Groups" class="mt-1" />
@@ -55,7 +55,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
         </div>
 
         <!-- search groups -->
-        <div class="flex flex-col justify-end gap-2 lg:flex-row flex-1 w-full">
+        <div class="flex w-full flex-1 flex-col justify-end gap-2 lg:flex-row">
           <app-group-search-control (selectedEmitter)="onGroupClick($event)" class="w-full lg:w-[500px] xl:w-[600px]" />
         </div>
       </div>
@@ -63,7 +63,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
       @if (groupsSignal(); as groups) {
         <!-- invitations - sent / received -->
         @if (groups.groupInvitations.length > 0 || groups.groupRequested.length > 0) {
-          <div class="grid lg:grid-cols-2 gap-x-6 gap-y-4 min-h-[100px] mb-6">
+          <div class="mb-6 grid min-h-[100px] gap-x-6 gap-y-4 lg:grid-cols-2">
             <!-- received invitations -->
             <app-general-card title="Received Invitations">
               @for (group of groups.groupInvitations; track group.id) {
@@ -77,7 +77,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
                   />
                   <button
                     mat-icon-button
-                    class="border-2 border-solid border-wt-gray-light-strong"
+                    class="border-wt-gray-light-strong border-2 border-solid"
                     (click)="onGroupClick(group)"
                   >
                     <mat-icon>navigate_next</mat-icon>
@@ -98,7 +98,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
                   />
                   <button
                     mat-icon-button
-                    class="border-2 border-solid border-wt-gray-light-strong"
+                    class="border-wt-gray-light-strong border-2 border-solid"
                     (click)="onGroupClick(group)"
                   >
                     <mat-icon>navigate_next</mat-icon>
@@ -111,7 +111,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
 
         <!-- no group message -->
         @if (groups.groupOwner.length === 0 && groups.groupMember.length === 0) {
-          <div class="text-2xl text-center text-wt-gray-medium mt-[250px]">
+          <div class="text-wt-gray-medium mt-[250px] text-center text-2xl">
             You are not a member of any group. You can create a new group or search for existing groups.
           </div>
         }
@@ -147,8 +147,8 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
         }
       } @else {
         <!-- skeleton -->
-        <div class="grid m-auto xl:w-11/12 gap-y-4">
-          <div *ngRange="5" class="g-skeleton h-[200px] w-full mb-2"></div>
+        <div class="m-auto grid gap-y-4 xl:w-11/12">
+          <div *ngRange="5" class="g-skeleton mb-2 h-[200px] w-full"></div>
         </div>
       }
     </div>

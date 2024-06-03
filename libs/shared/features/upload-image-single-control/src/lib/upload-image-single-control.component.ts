@@ -17,7 +17,7 @@ import { EMPTY, catchError, take, tap } from 'rxjs';
   imports: [CommonModule, MatRippleModule, DefaultImgDirective, ReactiveFormsModule, MatButtonModule, MatIconModule],
   template: `
     <div
-      class="relative grid text-center border rounded-md group border-wt-gray-medium hover:border-wt-gray-dark hover:shadow-lg bg-wt-gray-light place-content-center hover:bg-wt-gray-medium hover:text-wt-gray-light g-clickable-hover"
+      class="border-wt-gray-medium hover:border-wt-gray-dark bg-wt-gray-light hover:bg-wt-gray-medium hover:text-wt-gray-light g-clickable-hover group relative grid place-content-center rounded-md border text-center hover:shadow-lg"
       [ngClass]="{ 'g-disabled': isDisabled() }"
       matRipple
       [matRippleCentered]="true"
@@ -50,7 +50,7 @@ import { EMPTY, catchError, take, tap } from 'rxjs';
             [style.height.px]="heightPx()"
           />
           <div
-            class="absolute hidden w-full py-4 text-xl transition-all duration-300 ease-in-out transform -translate-y-1/2 bg-gray-700 top-2/4 opacity-80 group-hover:block left-0"
+            class="absolute left-0 top-2/4 hidden w-full -translate-y-1/2 transform bg-gray-700 py-4 text-xl opacity-80 transition-all duration-300 ease-in-out group-hover:block"
           >
             Click To Upload
           </div>

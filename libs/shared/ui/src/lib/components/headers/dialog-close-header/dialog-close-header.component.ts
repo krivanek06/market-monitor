@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex items-center justify-between p-4">
-      <h2 class="text-xl text-wt-primary mb-0">{{ title() }}</h2>
+      <h2 class="text-wt-primary mb-0 text-xl">{{ title() }}</h2>
 
       <div *ngIf="showCloseButton()">
         <button mat-icon-button color="warn" type="button" (click)="onDialogClose()">

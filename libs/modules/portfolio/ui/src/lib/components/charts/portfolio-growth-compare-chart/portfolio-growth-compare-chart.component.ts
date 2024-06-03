@@ -24,7 +24,7 @@ export type PortfolioGrowthCompareChartData = {
     <div class="flex justify-end">
       <app-date-range-slider
         *ngIf="dateRangeControl.value.dates.length > 0"
-        class="hidden md:block w-[550px]"
+        class="hidden w-[550px] md:block"
         [formControl]="dateRangeControl"
       />
     </div>

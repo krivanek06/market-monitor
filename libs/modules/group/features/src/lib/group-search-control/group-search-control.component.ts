@@ -52,7 +52,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, 
       >
         <!-- loaded data -->
         @for (group of optionsSignal(); let last = $last; track group.id) {
-          <mat-option [value]="group" class="py-2 rounded-md">
+          <mat-option [value]="group" class="rounded-md py-2">
             <app-group-display-item [groupData]="group" />
             <div *ngIf="!last" class="mt-2">
               <mat-divider></mat-divider>

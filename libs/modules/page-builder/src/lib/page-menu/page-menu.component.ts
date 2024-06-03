@@ -34,7 +34,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
       <mat-drawer
         mode="over"
         [opened]="isOpen()"
-        class="w-5/12 md:w-3/12 min-w-[275px] sm:min-w-[375px] block xl:hidden"
+        class="block w-5/12 min-w-[275px] sm:min-w-[375px] md:w-3/12 xl:hidden"
         role="navigation"
         (closed)="toggleMatDrawerExpandedView()"
       >
@@ -49,7 +49,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
 
         <div class="c-content-wrapper">
           <!-- content -->
-          <div *ngIf="loadingSignal()" class="grid place-content-center pb-[15%] min-h-screen min-w-full">
+          <div *ngIf="loadingSignal()" class="grid min-h-screen min-w-full place-content-center pb-[15%]">
             <mat-spinner></mat-spinner>
           </div>
 
@@ -57,7 +57,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
             <router-outlet></router-outlet>
           </main>
           <!-- footer for additional space on bottom -->
-          <footer class="w-full h-12"></footer>
+          <footer class="h-12 w-full"></footer>
         </div>
       </mat-drawer-content>
     </mat-drawer-container>
