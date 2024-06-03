@@ -31,7 +31,7 @@ import { EMPTY, catchError, take, tap } from 'rxjs';
         type="file"
         (change)="onFileSelected($event)"
         #fileUpload
-        accept=".jpg, .jpeg, .png .webp"
+        [accept]="acceptFileTypes()"
       />
 
       <!-- if no image is present only display text -->
@@ -98,6 +98,8 @@ export class UploadFileControlComponent implements ControlValueAccessor {
    * overwrites existing file name the user uploads
    */
   fileName = input<string | undefined>();
+
+  acceptFileTypes = input<string>('.jpg, .jpeg, .png .webp');
 
   /**
    * path where to save the file

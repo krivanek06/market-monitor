@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -50,36 +50,50 @@ import { map, startWith } from 'rxjs';
     <form [formGroup]="form" (ngSubmit)="onFormSubmit()">
       <mat-dialog-content>
         @if (!loaderSignal()) {
-          <div *ngIf="allowCreateGroup()" class="grid gap-4">
-            <!-- additional forms -->
-            <div class="w-full lg:w-9/12">
-              <!-- group name -->
-              <app-form-mat-input-wrapper formControlName="groupName" inputCaption="Group Name" inputType="TEXT" />
+          @if (allowCreateGroup()) {
+            <div class="grid gap-4">
+              <!-- additional forms -->
+              <div class="w-full lg:w-9/12">
+                <!-- group name -->
+                <app-form-mat-input-wrapper
+                  data-testid="group-create-group-name-control"
+                  formControlName="groupName"
+                  inputCaption="Group Name"
+                  inputType="TEXT"
+                />
 
-              <!-- is public -->
-              <mat-checkbox
-                color="primary"
-                formControlName="isPublic"
-                matTooltip="If selected people can request be member of a group"
-              >
-                Is Group Public
-              </mat-checkbox>
+                <!-- is public -->
+                <mat-checkbox
+                  data-testid="group-create-is-public-checkbox"
+                  color="primary"
+                  formControlName="isPublic"
+                  matTooltip="If selected people can request be member of a group"
+                >
+                  Is Group Public
+                </mat-checkbox>
 
-              <!-- add owner as member -->
-              <mat-checkbox
-                color="primary"
-                formControlName="isOwnerMember"
-                matTooltip="If selected the owner will be added as a member of the group"
-              >
-                Add owner as member
-              </mat-checkbox>
+                <!-- add owner as member -->
+                <mat-checkbox
+                  data-testid="group-create-add-owner-checkbox"
+                  color="primary"
+                  formControlName="isOwnerMember"
+                  matTooltip="If selected the owner will be added as a member of the group"
+                >
+                  Add owner as member
+                </mat-checkbox>
 
-              <!-- owner -->
-              <div *ngIf="form.controls.isOwnerMember.value" class="mt-2 flex gap-4 rounded-md p-4 shadow-md">
-                <app-user-display-item *ngIf="authenticatedUserDataSignal() as user" [userData]="user" />
+                <!-- owner -->
+                @if (form.controls.isOwnerMember.value) {
+                  <div class="mt-2 flex gap-4 rounded-md p-4 shadow-md">
+                    <app-user-display-item
+                      data-testid="group-create-owner-as-member"
+                      [userData]="authenticatedUserDataSignal()"
+                    />
+                  </div>
+                }
               </div>
             </div>
-          </div>
+          }
 
           <!-- display how many groups can be created -->
           @if (allowCreateGroup()) {
@@ -92,7 +106,10 @@ import { map, startWith } from 'rxjs';
             </div>
           } @else {
             <!-- error message if can not create more groups -->
-            <div class="bg-wt-danger text-wt-gray-light mx-auto my-4 rounded-md p-4 text-center lg:w-11/12">
+            <div
+              data-testid="group-create-not-allowed-message"
+              class="bg-wt-danger mx-auto my-4 rounded-md p-4 text-center text-white lg:w-11/12"
+            >
               You can not longer create any additional groups. If you want to create more groups please contact support.
             </div>
           }
@@ -106,15 +123,22 @@ import { map, startWith } from 'rxjs';
 
             <!-- search user control -->
             <div class="mb-8 max-w-[450px]">
-              <app-user-search-control [formControl]="searchUserControl"></app-user-search-control>
+              <app-user-search-control (selectedUserEmitter)="onUserSelect($event)" />
             </div>
 
             <!-- display selected users -->
             <div class="grid gap-4 lg:grid-cols-2">
               @for (user of selectedUsersSignal(); track user.id) {
                 <div class="flex justify-between gap-4 rounded-md p-4 shadow-md">
-                  <app-user-display-item [userData]="user" />
-                  <button mat-icon-button type="button" matTooltip="Remove User" (click)="onUserRemove(user)">
+                  <app-user-display-item data-testid="group-create-selected-users" [userData]="user" />
+                  <!-- remove user -->
+                  <button
+                    data-testid="group-create-selected-users-remove"
+                    mat-icon-button
+                    type="button"
+                    matTooltip="Remove User"
+                    (click)="onUserRemove(user)"
+                  >
                     <mat-icon color="warn">delete</mat-icon>
                   </button>
                 </div>
@@ -124,7 +148,7 @@ import { map, startWith } from 'rxjs';
         } @else {
           <!-- loader -->
           <div class="grid place-content-center gap-5 py-16">
-            <mat-spinner [diameter]="100" class="m-auto"></mat-spinner>
+            <mat-spinner [diameter]="100" class="m-auto" />
             <div class="text-wt-gray-medium text-center">This may time a while. Please wait...</div>
           </div>
         }
@@ -132,13 +156,21 @@ import { map, startWith } from 'rxjs';
 
       @if (!loaderSignal()) {
         <div class="my-4">
-          <mat-divider></mat-divider>
+          <mat-divider />
         </div>
 
         <mat-dialog-actions>
           <div class="g-mat-dialog-actions-end">
             <button mat-flat-button mat-dialog-close type="button">Cancel</button>
-            <button type="submit" mat-flat-button color="primary" [disabled]="!allowCreateGroup()">Save</button>
+            <button
+              data-testid="group-create-submit-button"
+              type="submit"
+              mat-flat-button
+              color="primary"
+              [disabled]="!allowCreateGroup()"
+            >
+              Save
+            </button>
           </div>
         </mat-dialog-actions>
       }
@@ -151,12 +183,11 @@ import { map, startWith } from 'rxjs';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GroupCreateDialogComponent implements OnInit {
+export class GroupCreateDialogComponent {
   private dialogRef = inject(MatDialogRef<GroupCreateDialogComponent>);
   private authenticationUserService = inject(AuthenticationUserStoreService);
   private dialogServiceUtil = inject(DialogServiceUtil);
   private groupApiService = inject(GroupApiService);
-  public data = inject<unknown>(MAT_DIALOG_DATA);
 
   form = new FormGroup({
     groupName: new FormControl('', {
@@ -166,8 +197,6 @@ export class GroupCreateDialogComponent implements OnInit {
     isPublic: new FormControl(true, { nonNullable: true }),
     isOwnerMember: new FormControl(true, { nonNullable: true }),
   });
-
-  searchUserControl = new FormControl<UserData | null>(null, { nonNullable: true });
 
   selectedUsersSignal = signal<UserData[]>([]);
   loaderSignal = signal<boolean>(false);
@@ -191,17 +220,9 @@ export class GroupCreateDialogComponent implements OnInit {
 
   allowCreateGroup = computed(() => this.createGroupLimitSignal() > 0);
 
-  authenticatedUserDataSignal = this.authenticationUserService.state.userData;
+  authenticatedUserDataSignal = this.authenticationUserService.state.getUserData;
 
-  ngOnInit(): void {
-    this.listenOnAddingUsers();
-  }
-
-  onUserRemove(userData: UserData): void {
-    this.selectedUsersSignal.update((previous) => previous.filter((d) => d.id !== userData.id));
-  }
-
-  onFormSubmit(): void {
+  async onFormSubmit() {
     if (!this.allowCreateGroup()) {
       this.dialogServiceUtil.showNotificationBar(`You can only create ${GROUP_OWNER_LIMIT} groups`, 'error');
       return;
@@ -231,47 +252,43 @@ export class GroupCreateDialogComponent implements OnInit {
     this.loaderSignal.set(true);
 
     // send data to API
-    this.groupApiService
-      .createGroup(value)
-      .then((d) => {
-        console.log(d);
-        this.dialogRef.close();
-        this.dialogServiceUtil.showNotificationBar('Group has been created', 'success');
-      })
-      .catch((e) => {
-        this.loaderSignal.set(false);
-        this.dialogServiceUtil.handleError(e);
-      });
+    try {
+      await this.groupApiService.createGroup(value);
+
+      this.dialogRef.close();
+      this.dialogServiceUtil.showNotificationBar('Group has been created', 'success');
+    } catch (e) {
+      this.loaderSignal.set(false);
+      this.dialogServiceUtil.handleError(e);
+    }
   }
 
-  private listenOnAddingUsers(): void {
-    this.searchUserControl.valueChanges.subscribe((userData) => {
-      if (!userData) {
-        return;
-      }
+  onUserSelect(selectedUser: UserData): void {
+    // prevent adding myself as a member
+    if (selectedUser.id === this.authenticationUserService.state.getUserData().id) {
+      this.dialogServiceUtil.showNotificationBar(
+        'You cannot add invite yourself. Check the above checkbox for it',
+        'error',
+      );
+      return;
+    }
 
-      // prevent adding myself as a member
-      if (userData.id === this.authenticationUserService.state().userData!.id) {
-        this.dialogServiceUtil.showNotificationBar(
-          'You cannot add invite yourself. Check the above checkbox for it',
-          'error',
-        );
-        return;
-      }
+    // check limit
+    if (this.selectedUsersSignal().length >= this.memberLimitSignal()) {
+      this.dialogServiceUtil.showNotificationBar(`You can only add up to ${this.memberLimitSignal()} users`, 'error');
+      return;
+    }
 
-      // check limit
-      if (this.selectedUsersSignal().length >= this.memberLimitSignal()) {
-        this.dialogServiceUtil.showNotificationBar(`You can only add up to ${this.memberLimitSignal()} users`, 'error');
-        return;
-      }
+    // check if user is already added
+    const userIds = this.selectedUsersSignal().map((d) => d.id);
 
-      // check if user is already added
-      const userIds = this.selectedUsersSignal().map((d) => d.id);
+    // add user if not already added
+    if (!userIds.includes(selectedUser.id)) {
+      this.selectedUsersSignal.update((previous) => [...previous, selectedUser]);
+    }
+  }
 
-      // add user if not already added
-      if (!userIds.includes(userData.id)) {
-        this.selectedUsersSignal.update((previous) => [...previous, userData]);
-      }
-    });
+  onUserRemove(userData: UserData): void {
+    this.selectedUsersSignal.update((previous) => previous.filter((d) => d.id !== userData.id));
   }
 }

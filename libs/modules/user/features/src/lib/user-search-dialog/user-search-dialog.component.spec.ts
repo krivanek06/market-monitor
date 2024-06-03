@@ -1,39 +1,13 @@
-import { Component } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UserData } from '@mm/api-types';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { UserDisplayItemComponent } from '@mm/user/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
+import { UserSearchControlComponentMock } from '../user-search-control/user-search-control-mock.component';
 import { UserSearchControlComponent } from '../user-search-control/user-search-control.component';
 import { UserSearchDialogComponent } from './user-search-dialog.component';
-import exp = require('constants');
-
-@Component({
-  selector: 'app-user-search-control',
-  standalone: true,
-  imports: [ReactiveFormsModule],
-  template: ``,
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: UserSearchControlComponentMock,
-      multi: true,
-    },
-  ],
-})
-class UserSearchControlComponentMock implements ControlValueAccessor {
-  onChange: (value: UserData) => void = () => {};
-  onTouched = () => {};
-  writeValue(obj: any): void {}
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
-  }
-}
 
 describe('UserSearchDialogComponent', () => {
   const selectedUsersTextS = '[data-testid="user-search-dialog-selected-users-text"]';
