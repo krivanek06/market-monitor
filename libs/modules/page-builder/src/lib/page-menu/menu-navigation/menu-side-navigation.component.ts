@@ -212,9 +212,9 @@ export class MenuSideNavigationComponent implements OnInit {
     this.selectedNavigationPath.set(path);
   }
 
-  onLogout(): void {
+  async onLogout() {
+    await this.router.navigate([ROUTES_MAIN.LOGIN]);
     this.authenticationService.signOut();
-    this.router.navigate([ROUTES_MAIN.LOGIN]);
   }
 
   onSettings() {

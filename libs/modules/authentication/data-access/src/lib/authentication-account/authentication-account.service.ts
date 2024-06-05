@@ -102,8 +102,12 @@ export class AuthenticationAccountService {
     return result.data;
   }
 
-  signOut() {
-    this.auth.signOut();
+  async signOut() {
+    try {
+      await this.auth.signOut();
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async changePassword(oldPassword: string, newPassword: string): Promise<void> {

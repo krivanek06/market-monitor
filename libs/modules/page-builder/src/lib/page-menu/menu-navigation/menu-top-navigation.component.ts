@@ -265,8 +265,8 @@ export class MenuTopNavigationComponent implements OnInit {
   }
 
   async onLogOutClick() {
+    await this.router.navigate([ROUTES_MAIN.LOGIN]);
     this.dialog.closeAll();
-    this.router.navigate([ROUTES_MAIN.LOGIN]);
     this.authenticationService.signOut();
   }
 
