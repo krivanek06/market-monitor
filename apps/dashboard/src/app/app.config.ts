@@ -4,7 +4,6 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
 import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { Functions, connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
-import { Storage, connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
 import { MatNativeDateModule } from '@angular/material/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
@@ -27,7 +26,6 @@ export const appConfig: ApplicationConfig = {
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
-    provideStorage(() => getStorage()),
     provideFunctions(() => getFunctions()),
     provideHttpClient(),
     provideRouter(
@@ -63,12 +61,11 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       multi: true,
-      deps: [Functions, Firestore, Storage, Auth],
+      deps: [Functions, Firestore, Auth],
       useFactory: () => {
         const localhost = '127.0.0.1';
         const functions = inject(Functions);
         const firestore = inject(Firestore);
-        const storage = inject(Storage);
         const auth = inject(Auth);
 
         return () => {
@@ -76,7 +73,6 @@ export const appConfig: ApplicationConfig = {
             console.log('%c[Firebase]: Connect to emulator', 'color: #bada55; font-size: 16px;');
             connectFunctionsEmulator(functions, localhost, 5001);
             connectFirestoreEmulator(firestore, localhost, 8080);
-            connectStorageEmulator(storage, localhost, 9199);
             connectAuthEmulator(auth, `http://${localhost}:9099`);
           }
         };
