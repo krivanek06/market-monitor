@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, computed, effect, input, signal } f
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { PortfolioGrowthAssets } from '@mm/api-types';
 import {
   ChartConstructor,
@@ -21,52 +20,55 @@ import {
   DateRangeSliderComponent,
   DateRangeSliderValues,
   DefaultImgDirective,
+  DropdownControlComponent,
   filterDataByTimestamp,
 } from '@mm/shared/ui';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { combineLatest, map, startWith } from 'rxjs';
+import { derivedFrom } from 'ngxtension/derived-from';
+import { Subject, map, merge, pipe, scan, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-asset-chart',
   standalone: true,
   imports: [
     CommonModule,
-    MatChipsModule,
     ReactiveFormsModule,
     DefaultImgDirective,
     MatButtonModule,
     HighchartsChartModule,
     DateRangeSliderComponent,
+    DropdownControlComponent,
   ],
   template: `
     <section class="relative">
-      <!-- list of symbols -->
-      <mat-chip-listbox
-        aria-label="Asset Selection"
-        [multiple]="true"
+      <app-dropdown-control
+        inputCaption="Select Symbol"
+        displayImageType="symbol"
+        class="w-6/12"
         [formControl]="symbolsControl"
-        class="mt-3 max-h-[200px] overflow-y-scroll p-3"
-      >
-        <mat-chip-option
-          *ngFor="let inputSource of symbolInputSourceSignal()"
-          class="g-mat-chip mb-3 mr-1 h-10"
-          color="primary"
-        >
-          <div class="flex flex-wrap items-center gap-4 px-2">
-            <img appDefaultImg imageType="symbol" [src]="inputSource.value" [alt]="inputSource.caption" class="h-7" />
-            <span class="text-base">{{ inputSource.caption }}</span>
-          </div>
-        </mat-chip-option>
-      </mat-chip-listbox>
+        [inputSource]="symbolInputSource()"
+      />
+
+      <!-- list of symbols -->
+      <div class="mb-2 mt-6 flex flex-wrap gap-x-3 gap-y-2">
+        @for (symbol of selectedSymbol(); track symbol) {
+          <button type="button" mat-stroked-button color="primary" class="h-11 px-6" (click)="onDeselectSymbol(symbol)">
+            <div class="flex flex-wrap items-center gap-4 px-2">
+              <img appDefaultImg imageType="symbol" [src]="symbol" [alt]="symbol" class="h-7" />
+              <span class="text-base">{{ symbol }}</span>
+            </div>
+          </button>
+        }
+      </div>
 
       <!-- time slider -->
-      <div class="flex justify-end" [ngClass]="{ hidden: symbolsControl.value.length === 0 }">
+      <div class="flex justify-end" [ngClass]="{ hidden: selectedSymbol().length === 0 }">
         <app-date-range-slider class="hidden w-[550px] md:block" [formControl]="dateRangeControl" />
       </div>
 
       <!-- chart -->
-      @if (symbolsControl.value.length > 0) {
+      @if (selectedSymbol().length > 0) {
         @if (displayChart()) {
           <highcharts-chart
             *ngIf="chartOptionsSignal() as chartOptionsSignal"
@@ -97,7 +99,7 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   /**
    * selected symbols by the user
    */
-  symbolsControl = new FormControl<string[]>([], { nonNullable: true });
+  symbolsControl = new FormControl<string>('', { nonNullable: true });
 
   /**
    * data range control for chart zoom
@@ -111,6 +113,8 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
     { nonNullable: true },
   );
 
+  private removeSymbol$ = new Subject<string>();
+
   /**
    * used to destroy and recreate the chart
    */
@@ -119,13 +123,37 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   /**
    * displayed symbols on the ui
    */
-  symbolInputSourceSignal = computed(() =>
-    (this.data() ?? []).map((asset) => ({ caption: asset.symbol, value: asset.symbol }) satisfies InputSource<string>),
+  symbolInputSource = computed(() =>
+    (this.data() ?? []).map(
+      (asset) => ({ caption: asset.symbol, value: asset.symbol, image: asset.symbol }) satisfies InputSource<string>,
+    ),
   );
 
-  symbolsControlSignal = toSignal(this.symbolsControl.valueChanges, {
-    initialValue: this.symbolsControl.value,
-  });
+  /**
+   * symbols which user selected to make comparison
+   */
+  selectedSymbol = toSignal(
+    merge(
+      this.symbolsControl.valueChanges.pipe(map((symbols) => ({ action: 'add' as const, symbols }))),
+      this.removeSymbol$.pipe(map((symbol) => ({ action: 'remove' as const, symbol }))),
+    ).pipe(
+      scan((acc, curr) => {
+        // remove symbol
+        if (curr.action === 'remove') {
+          return acc.filter((s) => s !== curr.symbol);
+        }
+
+        // check if symbol already exists
+        if (acc.includes(curr.symbols)) {
+          return acc;
+        }
+
+        // add symbol
+        return [...acc, curr.symbols];
+      }, [] as string[]),
+    ),
+    { initialValue: [] },
+  );
 
   /**
    * effect to patch value to the slider based on the selected symbols
@@ -133,7 +161,7 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   dateRangeEffect = effect(
     () => {
       const allAssetsData = this.data() ?? [];
-      const selectedSymbols = this.symbolsControlSignal();
+      const selectedSymbols = this.selectedSymbol();
 
       // nothing is selected or empty data
       if (selectedSymbols.length === 0 || allAssetsData.length === 0) {
@@ -166,11 +194,9 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   /**
    * save provided data into the component
    */
-  chartOptionsSignal = toSignal(
-    combineLatest([
-      this.dateRangeControl.valueChanges.pipe(startWith(this.dateRangeControl.value)),
-      this.symbolsControl.valueChanges.pipe(startWith(this.symbolsControl.value)),
-    ]).pipe(
+  chartOptionsSignal = derivedFrom(
+    [this.dateRangeControl.valueChanges.pipe(startWith(this.dateRangeControl.value)), this.selectedSymbol],
+    pipe(
       map(([dateRange, selectedSymbols]) => {
         const series = this.formatData(this.data() ?? [], selectedSymbols);
         const newData = series.map((d) => ({
@@ -190,7 +216,7 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
    */
   chartOptionsSignalEffect = effect(
     () => {
-      this.symbolsControlSignal();
+      this.selectedSymbol();
 
       this.displayChart.set(false);
 
@@ -200,6 +226,10 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
     },
     { allowSignalWrites: true },
   );
+
+  onDeselectSymbol(symbol: string) {
+    this.removeSymbol$.next(symbol);
+  }
 
   private initChart(series: Highcharts.SeriesOptionsType[]): Highcharts.Options {
     return {
