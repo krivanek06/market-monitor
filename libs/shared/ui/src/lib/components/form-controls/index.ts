@@ -7,4 +7,3 @@ export * from './form-mat-input-wrapper/form-mat-input-wrapper.component';
 export * from './number-keyboard-control/number-keyboard-control.component';
 export * from './tab-select-control/tab-select-control.component';
 export * from './time-period-buttons/time-period-buttons.component';
-export * from './value-presentation-button-control/value-presentation-button-control.component';

@@ -11,8 +11,11 @@ import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
   DefaultImgDirective,
   GeneralCardComponent,
+  PercentageIncreaseDirective,
   PositionColoringDirective,
   RangeDirective,
+  RankCardComponent,
+  ScrollWrapperComponent,
   SectionTitleComponent,
   ShowMoreButtonComponent,
 } from '@mm/shared/ui';
@@ -41,6 +44,9 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     ShowMoreButtonComponent,
     GeneralCardComponent,
     RangeDirective,
+    RankCardComponent,
+    ScrollWrapperComponent,
+    PercentageIncreaseDirective,
   ],
   template: `
     <div
@@ -57,6 +63,34 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         (selectedUserEmitter)="onUserClick($event)"
       />
     </div>
+
+    <!-- best users -->
+    <app-scroll-wrapper [heightPx]="220">
+      @for (user of hallOfFameUsersSignal()?.bestPortfolio ?? []; track user.item.id; let i = $index) {
+        <app-rank-card
+          [clickable]="true"
+          [currentPositions]="i + 1"
+          [image]="user.item.personal.photoURL"
+          [positionChange]="-12"
+          [cardWidthPx]="240"
+          [cardHeightPx]="180"
+        >
+          <div class="bg-wt-gray-light absolute bottom-0 flex w-full flex-col px-4 py-2">
+            <!-- user's name -->
+            <div>{{ user.item.personal.displayName }}</div>
+            <!-- user's portfolio -->
+            <div
+              appPercentageIncrease
+              [useCurrencySign]="true"
+              [changeValues]="{
+                change: user.item.portfolioState.totalGainsValue,
+                changePercentage: user.item.portfolioState.totalGainsPercentage,
+              }"
+            ></div>
+          </div>
+        </app-rank-card>
+      }
+    </app-scroll-wrapper>
 
     <div class="flex flex-col gap-x-10 gap-y-4 overflow-y-clip lg:flex-row">
       <div class="lg:basis-4/6 xl:basis-3/6">
