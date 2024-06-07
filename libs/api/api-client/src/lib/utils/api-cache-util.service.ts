@@ -1,12 +1,17 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { StorageLocalStoreService } from '@mm/shared/general-features';
 import { isBefore } from 'date-fns';
 import { Observable, of, retry, tap } from 'rxjs';
+
+type SavedData<T = unknown> = { data: T; validity: number };
 
 @Injectable({
   providedIn: 'root',
 })
-export class ApiCacheService {
+export class ApiCacheService extends StorageLocalStoreService<{
+  [K in string]: SavedData;
+}> {
   private validityOneMinute = 1000 * 60;
   private cache = new Map<string, { data: any; validity: number }>();
 
@@ -22,6 +27,7 @@ export class ApiCacheService {
   httpClient = inject(HttpClient);
 
   constructor() {
+    super('API_CACHE', {}, 1);
     if (!this.httpClient) {
       throw new Error('HttpClient is required');
     }
@@ -38,22 +44,15 @@ export class ApiCacheService {
 
   getData<T>(url: string, validityDefault = ApiCacheService.validity1Min): Observable<T> {
     // data cached
-    if (this.checkDataAndValidity(url)) {
-      const data = this.cache.get(url) as { data: any; validity: number };
-      return of(data.data);
+    const cachedData = this.getDataFromCache<T>(url);
+    if (cachedData) {
+      return of(cachedData.data);
     }
 
     // no data cached
-    const validity = validityDefault * this.validityOneMinute;
     return this.get<T>(url).pipe(
       retry(1),
-      tap((data) => {
-        console.log('save to cache');
-        this.cache.set(url, {
-          data,
-          validity: Date.now() + validity,
-        });
-      }),
+      tap((data) => this.saveDataIntoCache(url, data, validityDefault)),
     );
   }
 
@@ -72,22 +71,14 @@ export class ApiCacheService {
     const key = `${url}${JSON.stringify(data)}`;
 
     // data cached
-    if (this.checkDataAndValidity(key)) {
-      const data = this.cache.get(key) as { data: any; validity: number };
-      return of(data.data);
+    const dataInCache = this.getDataFromCache<T>(key);
+    if (dataInCache) {
+      return of(dataInCache.data);
     }
-
-    // calculate validity
-    const validity = validityDefault * this.validityOneMinute;
 
     return this.httpClient.post<T>(url, JSON.stringify(data), { headers: this.headers }).pipe(
       retry(1),
-      tap((data) => {
-        this.cache.set(key, {
-          data,
-          validity: Date.now() + validity,
-        });
-      }),
+      tap((data) => this.saveDataIntoCache(key, data, validityDefault)),
     );
   }
 
@@ -105,13 +96,60 @@ export class ApiCacheService {
 
   clearCache(): void {
     this.cache.clear();
+    this.removeDataStorage();
   }
 
-  private checkDataAndValidity(url: string): boolean {
-    const data = this.cache.get(url);
-    if (!data) {
-      return false;
+  /**
+   * saves data into cache and local storage
+   *
+   * @param url - url user tries to access
+   * @param data
+   * @param validityDefault
+   */
+  private saveDataIntoCache<T>(url: string, data: T, validityDefault: number): void {
+    // validity in milliseconds
+    const validity = validityDefault * this.validityOneMinute;
+
+    const savingData = {
+      data,
+      validity: Date.now() + validity,
+    } satisfies SavedData<T>;
+
+    // save data into cache
+    this.cache.set(url, savingData);
+
+    // save data into local storage
+    const prevData = this.getDataStorage();
+    this.updateDataStorage({
+      ...prevData,
+      [url]: savingData,
+    });
+
+    // log
+    console.log('ApiCacheService: save', { [url]: savingData });
+  }
+
+  /**
+   * checks if data is in cache or local storage
+   *
+   * @param url
+   * @returns saved data in cache or local storage if exists
+   */
+  private getDataFromCache<T>(url: string): SavedData<T> | undefined {
+    // check if data is in cache
+    if (this.cache.has(url)) {
+      return this.cache.get(url) as { data: T; validity: number };
     }
-    return isBefore(Date.now(), data.validity);
+
+    // data not in cache but may be in local storage
+    const data = this.getDataStorage();
+
+    // check data validity
+    if (data[url] && isBefore(Date.now(), data[url].validity)) {
+      return data[url] as SavedData<T>;
+    }
+
+    // data not in cache or local storage
+    return undefined;
   }
 }

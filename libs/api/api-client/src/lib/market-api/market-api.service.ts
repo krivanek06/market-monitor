@@ -100,9 +100,10 @@ export class MarketApiService {
     if (isBefore(endDate, dateStart)) {
       return of([]);
     }
+
     return this.apiCache.getData<HistoricalPrice[]>(
       `${this.cloudflareHistoricalPriceAPI}?symbol=${symbol}&dateStart=${dateStart}&dateEnd=${endDate}&type=dateRange`,
-      ApiCacheService.validity2Min,
+      ApiCacheService.validity1Hour,
     );
   }
 

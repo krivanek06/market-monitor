@@ -29,12 +29,12 @@ export abstract class StorageLocalStoreService<T> {
     this.checkSavedDataVersion();
   }
 
-  saveData(data: T): void {
+  updateDataStorage(data: T): void {
     if (this.platform.isServer) {
       return;
     }
 
-    // all local storage data saved for this app
+    // all local storage data saved for this app - different keys
     const savedData = this.getDataFromLocalStorage();
 
     // updated data for this specific key
@@ -51,12 +51,12 @@ export abstract class StorageLocalStoreService<T> {
     localStorage.setItem(this.STORAGE_MAIN_KEY, mergedData);
   }
 
-  getData(): T {
+  getDataStorage(): T {
     const data = this.getDataFromLocalStorage();
     return data[this.storageKey].data ?? this.defaultValues;
   }
 
-  removeData(): void {
+  removeDataStorage(): void {
     if (this.platform.isServer) {
       return;
     }
@@ -104,7 +104,7 @@ export abstract class StorageLocalStoreService<T> {
 
     if (!savedData || !savedData.version || savedData.version !== this.currentVersion) {
       console.log('checkSavedDataVersion remove');
-      this.removeData();
+      this.removeDataStorage();
     }
   }
 }

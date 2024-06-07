@@ -45,7 +45,7 @@ export class SymbolSearchService extends StorageLocalStoreService<string[]> {
     const symbolQuotesSlice = quotes.slice(0, 20);
 
     // save into storage
-    this.saveData(searchSymbolsSlice);
+    this.updateDataStorage(searchSymbolsSlice);
 
     // save into subject
     this.searchedSymbols.set(symbolQuotesSlice);
@@ -55,7 +55,7 @@ export class SymbolSearchService extends StorageLocalStoreService<string[]> {
    * load necessary data from api
    */
   private initService(): void {
-    const data = this.getData();
+    const data = this.getDataStorage();
 
     // load favorite stocks from api and last searched stocks from api
     this.marketApiService.getSymbolQuotes(data).subscribe((loadedQuotes) => {

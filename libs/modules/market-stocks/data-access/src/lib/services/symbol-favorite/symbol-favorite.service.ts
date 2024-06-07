@@ -28,7 +28,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<string[]> {
   }
 
   addFavoriteSymbol(searchSymbol: SymbolQuote): void {
-    const savedData = this.getData();
+    const savedData = this.getDataStorage();
 
     if (savedData.includes(searchSymbol.symbol)) {
       return;
@@ -51,7 +51,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<string[]> {
     const symbolSummariesSlice = symbolQuotes.slice(0, 12);
 
     // save into storage
-    this.saveData(symbolFavoriteSlice);
+    this.updateDataStorage(symbolFavoriteSlice);
 
     // save into subject
     this.favoriteSymbols.set(symbolSummariesSlice);
@@ -61,7 +61,7 @@ export class SymbolFavoriteService extends StorageLocalStoreService<string[]> {
    * load necessary data from api
    */
   private initService(): void {
-    const data = this.getData();
+    const data = this.getDataStorage();
 
     // load favorite stocks from api and last searched stocks from api
     this.marketApiService.getSymbolQuotes(data).subscribe((favoriteStocks) => {
