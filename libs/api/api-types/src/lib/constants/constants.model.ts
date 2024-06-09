@@ -26,7 +26,7 @@ export const USER_DEFAULT_STARTING_CASH = 30_000;
 /**
  * number how many entities to save for hall of fame portfolio best
  */
-export const HALL_OF_FAME_PORTFOLIO_TOP_LIMIT = 50;
+export const HALL_OF_FAME_PORTFOLIO_TOP_LIMIT = 75;
 /**
  * number how many entities to save for hall of fame portfolio daily change
  */
