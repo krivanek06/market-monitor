@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { HallOfFameTopRankData, PortfolioState } from '@mm/api-types';
+import { ColorScheme } from '@mm/shared/data-access';
 import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective } from '@mm/shared/ui';
 
 @Component({
@@ -48,7 +49,9 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
       <ng-container matColumnDef="balance">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Balance</th>
         <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
-          <span appPositionColoring [position]="i + 1">{{ row.item.portfolioState.balance | currency }}</span>
+          <span appPositionColoring [defaultPositionColor]="ColorScheme.GRAY_DARK_VAR" [position]="i + 1">
+            {{ row.item.portfolioState.balance | currency }}
+          </span>
         </td>
       </ng-container>
 
@@ -56,7 +59,15 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
       <ng-container matColumnDef="invested">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Invested</th>
         <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
-          {{ row.item.portfolioState.invested | currency }}
+          <span class="text-wt-gray-dark">{{ row.item.portfolioState.invested | currency }}</span>
+        </td>
+      </ng-container>
+
+      <!-- cash-->
+      <ng-container matColumnDef="cash">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Cash</th>
+        <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
+          {{ row.item.portfolioState.cashOnHand | currency }}
         </td>
       </ng-container>
 
@@ -168,6 +179,7 @@ export class PortfolioRankTableComponent<
   displayedColumns: string[] = [
     'itemTemplate',
     'balance',
+    'cash',
     'invested',
     'profit',
     'transaction_buy',
@@ -175,6 +187,8 @@ export class PortfolioRankTableComponent<
     'transaction_fees',
   ];
   dataSource = new MatTableDataSource<T>([]);
+
+  ColorScheme = ColorScheme;
 
   identity: TrackByFunction<T> = (index: number, item: T) => item.item.id;
 

@@ -37,7 +37,7 @@ import { filterNil } from 'ngxtension/filter-nil';
 import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } from 'rxjs';
 
 @Component({
-  selector: 'app-compare-users',
+  selector: 'app-page-compare-users',
   standalone: true,
   imports: [
     CommonModule,
@@ -65,11 +65,9 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     DropdownControlComponent,
   ],
   template: `
-    <div
-      class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-center xl:absolute xl:left-0 xl:top-[-100px]"
-    >
+    <div class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-center">
       <!-- title -->
-      <app-section-title matIcon="diversity_3" title="Compare Users" />
+      <app-section-title matIcon="diversity_3" title="Compare Users" [largeTitle]="true" />
 
       <!-- search users -->
       <app-user-search-control
@@ -193,7 +191,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CompareUsersComponent {
+export class PageCompareUsersComponent {
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private portfolioCalculationService = inject(PortfolioCalculationService);
   private userApiService = inject(UserApiService);

@@ -35,7 +35,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
       <div class="flex w-full flex-col items-center gap-x-8 gap-y-4 lg:mb-6 lg:flex-row">
         <div class="flex justify-between gap-x-10 max-lg:w-full">
           <!-- title -->
-          <app-section-title matIcon="group" title="Groups" class="mt-1" />
+          <app-section-title matIcon="group" title="Groups" class="mt-1" [largeTitle]="true" />
 
           <!-- create new group -->
           <div>

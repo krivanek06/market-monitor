@@ -65,6 +65,11 @@ export const appRoutes: Route[] = [
             canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
           },
           {
+            path: ROUTES_MAIN.COMPARE_USERS,
+            loadComponent: () => import('./compare-users/compare-users.component').then((m) => m.CompareUsersComponent),
+            canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
+          },
+          {
             path: ROUTES_MAIN.GROUPS,
             canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
             children: [
