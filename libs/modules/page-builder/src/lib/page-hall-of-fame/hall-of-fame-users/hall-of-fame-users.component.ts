@@ -111,8 +111,9 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
           <!-- show more button -->
           <div class="flex justify-end">
             <app-show-more-button
-              [itemsTotal]="displayPortfolioSignal().length"
-              [itemsLimit]="displayUsersLimit"
+              *ngIf="hallOfFameUsersSignal()?.bestPortfolio?.length ?? 0 as total"
+              [itemsTotal]="total"
+              [itemsLimit]="total - displayUsersLimit"
               [(showMoreToggle)]="showMoreSignal"
             />
           </div>
