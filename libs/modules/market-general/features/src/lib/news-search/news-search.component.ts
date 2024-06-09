@@ -42,7 +42,9 @@ import { map, pipe, startWith, switchMap } from 'rxjs';
                 [alt]="news.title"
                 class="h-[255px] w-full min-w-[9rem] object-cover max-lg:m-auto sm:h-[275px] lg:h-28 lg:w-36 lg:pt-1"
               />
-              <div class="xs:p-4 flex flex-col p-2 max-lg:absolute max-lg:bottom-0 max-lg:bg-[#ffffffbf] sm:p-6 lg:p-0">
+              <div
+                class="xs:p-4 max-lg:bg-wt-gray-light flex flex-col p-2 max-lg:absolute max-lg:bottom-0 sm:p-6 lg:p-0"
+              >
                 <div class="text-wt-gray-dark group-hover:text-wt-primary text-base">
                   {{ news.title }}
                 </div>

@@ -47,7 +47,7 @@ export class ShowMoreButtonComponent {
    * number of items that is limited can be displayed on the UI initially
    */
   itemsLimit = input<number>(25);
-  showButton = computed(() => this.itemsTotal() > this.itemsLimit());
+  showButton = computed(() => this.itemsLimit() > 0 && this.itemsTotal() > this.itemsLimit());
 
   buttonState = signal(true);
 

@@ -163,6 +163,12 @@ export class MenuSideNavigationComponent implements OnInit {
           icon: 'military_tech',
           hidden: !hasUserAccess(userData, UserAccountEnum.DEMO_TRADING),
         },
+        {
+          path: ROUTES_MAIN.COMPARE_USERS,
+          title: 'Compare Users',
+          icon: 'diversity_3',
+          hidden: !hasUserAccess(userData, UserAccountEnum.DEMO_TRADING),
+        },
       ],
       marketNavigation: [
         // {

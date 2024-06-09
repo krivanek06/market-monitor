@@ -13,7 +13,7 @@ import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
 import { calculateGroupMembersPortfolioState, groupCreate, groupMemberAccept } from '../group';
 import { groupDocumentPortfolioStateSnapshotsRef } from '../models';
-import { createRandomUserAccounts } from '../user';
+import { CreateDemoAccountService } from '../user';
 import { isFirebaseEmulator } from '../utils';
 /**
  * Reload the database with new testing data
@@ -31,13 +31,21 @@ export const reloadDatabase = async (): Promise<void> => {
   // create users
   console.log('CREATE NEW USERS - NORMAL - START');
   const limitUsersNormal = 10;
+  const demoService = new CreateDemoAccountService();
+  await demoService.initService();
 
   for (let i = 0; i < limitUsersNormal; i++) {
-    await createRandomUserAccounts({
+    // create new user
+    const newUser = await demoService.createRandomUserAccounts({
       isDemo: false,
       userAccountType: UserAccountEnum.NORMAL_BASIC,
       password: 'qwer1234',
     });
+    // create watchList
+    await demoService.createWatchListWithRandomSymbols(newUser);
+
+    // generate transactions
+    await demoService.generateTransactionsForRandomSymbols(newUser);
     // wait 0.2s sec
     await waitSeconds(0.2);
     // log
@@ -46,15 +54,21 @@ export const reloadDatabase = async (): Promise<void> => {
   console.log(`CREATE NEW USERS NORMAL DONE - ${limitUsersNormal} USERS`);
 
   console.log('CREATE NEW USERS - TRADING - START');
-  const limitUsers = 40;
+  const limitUsers = 150;
   const newUsers: UserData[] = [];
 
   for (let i = 0; i < limitUsers; i++) {
-    const newUser = await createRandomUserAccounts({
+    // create new user
+    const newUser = await demoService.createRandomUserAccounts({
       isDemo: false,
       userAccountType: UserAccountEnum.DEMO_TRADING,
       password: 'qwer1234',
     });
+    // create watchList
+    await demoService.createWatchListWithRandomSymbols(newUser);
+
+    // generate transactions
+    await demoService.generateTransactionsForRandomSymbols(newUser);
     // save new user
     newUsers.push(newUser);
     // wait 0.2s sec

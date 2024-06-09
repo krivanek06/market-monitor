@@ -1,3 +1,4 @@
+export * from './page-compare-users/page-compare-users.component';
 export * from './page-crypto/page-crypto.component';
 export * from './page-dashboard/page-dashboard.component';
 export * from './page-group-details/page-group-details.component';

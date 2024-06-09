@@ -124,6 +124,19 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
 
         <!-- market -->
         <a
+          *appUserAccountType="'DEMO_TRADING'"
+          (click)="onNavClick(ROUTES_MAIN.COMPARE_USERS)"
+          class="g-clickable-hover"
+          [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.COMPARE_USERS }"
+        >
+          <div class="flex items-center gap-2">
+            <mat-icon>diversity_3</mat-icon>
+            <span>Compare Users</span>
+          </div>
+        </a>
+
+        <!-- market -->
+        <a
           (click)="onNavClick(ROUTES_MAIN.MARKET)"
           class="g-clickable-hover"
           [ngClass]="{ 'c-active': activeLinkSignal() == ROUTES_MAIN.MARKET }"
@@ -135,26 +148,13 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
         </a>
 
         <div class="flex flex-1 justify-end">
-          <!-- user on small screen -->
-          <div class="flex items-center gap-2 pr-6 sm:hidden">
-            <!-- avatar -->
-            <img
-              appDefaultImg
-              [src]="userDataSignal()?.personal?.photoURL"
-              alt="User Image"
-              class="h-8 w-8 rounded-full"
-            />
-            <!-- name -->
-            <div>{{ userDataSignal()?.personal?.displayName }}</div>
-          </div>
-
           <!-- search -->
-          <app-symbol-search-basic displayValue="symbol" class="-mb-5 -mr-10 hidden w-[520px] scale-[0.8] sm:block" />
+          <app-symbol-search-basic displayValue="symbol" class="-mb-5 -mr-10 hidden w-[400px] scale-[0.8] sm:block" />
 
           <div class="hidden items-center gap-1 xl:flex">
             <!-- display logged in person -->
-            <div *ngIf="userDataSignal() as userDataSignal" class="relative mt-2">
-              <button mat-button class="h-11" (click)="onMoreOptionsClick()">
+            <div *ngIf="userDataSignal() as userDataSignal" class="relative mx-2 mt-2">
+              <button mat-button class="h-11 px-4" (click)="onMoreOptionsClick()">
                 <div class="flex items-center gap-3">
                   <img
                     appDefaultImg
@@ -162,7 +162,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
                     [src]="userDataSignal.personal.photoURL"
                     [alt]="userDataSignal.personal.displayName"
                   />
-                  <span>{{ userDataSignal.personal.displayName }}</span>
+                  <span>{{ userDataSignal.personal.displayNameInitials }}</span>
                 </div>
               </button>
             </div>

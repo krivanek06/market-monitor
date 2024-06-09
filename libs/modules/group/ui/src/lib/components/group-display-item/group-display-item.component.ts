@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -39,44 +39,30 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
                 class="text-lg"
                 [ngClass]="{
                   'text-wt-primary': !groupData().isClosed,
-                  'text-wt-danger': groupData().isClosed
+                  'text-wt-danger': groupData().isClosed,
                 }"
               >
                 {{ groupData().name | titlecase }}
               </span>
-
-              <!-- members -->
-              <span class="@md:hidden block">[{{ groupData().numberOfMembers }} / {{ memberLimit }}]</span>
             </div>
 
             <!-- portfolio -->
             @if (!groupData().isClosed) {
               <!-- total portfolio change -->
               <div
-                *ngIf="!showDailyPortfolioChange()"
+                class="@md:flex hidden"
                 appPercentageIncrease
                 [useCurrencySign]="true"
                 [changeValues]="{
-                  change: groupData().portfolioState.totalGainsValue,
-                  changePercentage: groupData().portfolioState.totalGainsPercentage
-                }"
-              ></div>
-
-              <!-- daily portfolio change -->
-              <div
-                *ngIf="showDailyPortfolioChange()"
-                appPercentageIncrease
-                [useCurrencySign]="true"
-                [changeValues]="{
-                  change: groupData().portfolioState.previousBalanceChange,
-                  changePercentage: groupData().portfolioState.previousBalanceChangePercentage
+                  changePercentage: changePercentage(),
                 }"
               ></div>
             }
+
             <!-- closed group display message -->
             <div *ngIf="groupData().isClosed" class="text-wt-danger">(Closed)</div>
           </div>
-          <div class="@md:flex hidden items-center gap-4">
+          <div class="flex items-center gap-4">
             <!-- owner -->
             <div class="flex items-center gap-4">
               <img
@@ -85,7 +71,8 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
                 alt="Owner image"
                 class="h-8 w-8 rounded-full"
               />
-              <span>{{ groupData().ownerUser.personal.displayName | titlecase }}</span>
+              <span class="@md:block hidden">{{ groupData().ownerUser.personal.displayName | titlecase }}</span>
+              <span class="@md:hidden block">{{ groupData().ownerUser.personal.displayNameInitials }}</span>
             </div>
             <!-- members -->
             <div>[{{ groupData().numberOfMembers }} / {{ memberLimit }}]</div>
@@ -116,6 +103,12 @@ export class GroupDisplayItemComponent {
    * whether to show daily portfolio change or total portfolio change
    */
   showDailyPortfolioChange = input(false);
+
+  changePercentage = computed(() =>
+    this.showDailyPortfolioChange()
+      ? this.groupData().portfolioState.previousBalanceChangePercentage
+      : this.groupData().portfolioState.totalGainsPercentage,
+  );
 
   memberLimit = GROUP_MEMBER_LIMIT;
 }

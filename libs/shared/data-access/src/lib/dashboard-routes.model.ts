@@ -13,6 +13,7 @@ export enum ROUTES_MAIN {
   NEWS = 'news',
   ECONOMICS = 'economics',
   HALL_OF_FAME = 'hall-of-fame',
+  COMPARE_USERS = 'compare-users',
   NOT_FOUND = 'not-found',
 }
 

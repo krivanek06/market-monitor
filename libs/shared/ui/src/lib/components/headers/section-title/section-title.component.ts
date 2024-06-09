@@ -7,7 +7,10 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [CommonModule, MatIconModule],
   template: `
-    <h2 [class]="'text-wt-primary flex items-center gap-4 text-xl ' + additionalClasses()">
+    <h2
+      [class]="'text-wt-primary flex items-center gap-4 ' + additionalClasses()"
+      [ngClass]="{ 'text-xl': !largeTitle(), 'text-2xl': largeTitle() }"
+    >
       <mat-icon *ngIf="matIcon()" color="primary">{{ matIcon() }}</mat-icon>
       {{ title() }}
     </h2>
@@ -23,4 +26,5 @@ export class SectionTitleComponent {
   matIcon = input<string | undefined>();
   title = input.required<string>();
   additionalClasses = input<string | undefined>();
+  largeTitle = input<boolean>(false);
 }
