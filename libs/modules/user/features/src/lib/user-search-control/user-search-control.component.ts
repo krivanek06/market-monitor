@@ -103,7 +103,7 @@ export class UserSearchControlComponent implements ControlValueAccessor {
           : of(
               this.aggregationApiService
                 .hallOfFameUsers()
-                ?.bestPortfolio.map((d) => d.item)
+                .bestPortfolio.map((d) => d.item)
                 .slice(0, 10) ?? [],
             ),
       ),

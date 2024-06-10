@@ -105,8 +105,8 @@ export class GroupSearchControlComponent implements ControlValueAccessor {
           : of(
               this.aggregationApiService
                 .hallOfFameGroups()
-                ?.bestPortfolio.map((d) => d.item)
-                .slice(0, 10) ?? [],
+                .bestPortfolio.map((d) => d.item)
+                .slice(0, 10),
             ),
       ),
     ),

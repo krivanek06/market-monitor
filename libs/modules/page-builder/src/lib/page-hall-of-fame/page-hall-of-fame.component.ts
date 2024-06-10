@@ -67,7 +67,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     <!-- best users -->
     <app-scroll-wrapper [heightPx]="220" class="mb-6">
       @for (
-        user of hallOfFameUsersSignal()?.bestPortfolio ?? [] | slice: 0 : topUsersLimit;
+        user of hallOfFameUsersSignal().bestPortfolio | slice: 0 : topUsersLimit;
         track user.item.id;
         let i = $index
       ) {
@@ -171,7 +171,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         <app-general-card>
           <app-portfolio-rank-table
             (clickedItem)="onGroupClick($event)"
-            [data]="hallOfFameGroupsSignal()?.bestPortfolio ?? []"
+            [data]="hallOfFameGroupsSignal().bestPortfolio"
             [template]="groupTemplate"
             [showLoadingSkeletonSignal]="!hallOfFameGroupsSignal()"
           />
@@ -262,15 +262,15 @@ export class PageHallOfFameComponent {
 
   displayPortfolioDataSignal = computed(() => {
     // remove first 10 users from best users
-    const bestUsers = (this.hallOfFameUsersSignal()?.bestPortfolio ?? []).slice(this.topUsersLimit);
+    const bestUsers = this.hallOfFameUsersSignal().bestPortfolio.slice(this.topUsersLimit);
     // check if display all or not
     return this.showMoreSignal() ? bestUsers : bestUsers.slice(0, this.displayUsersLimit);
   });
 
   bestWorstDailyUsers = computed(() =>
     (this.showBestSignal()
-      ? this.hallOfFameUsersSignal()?.bestDailyGains ?? []
-      : this.hallOfFameUsersSignal()?.worstDailyGains ?? []
+      ? this.hallOfFameUsersSignal().bestDailyGains
+      : this.hallOfFameUsersSignal().worstDailyGains
     ).slice(0, 4),
   );
 

@@ -22,7 +22,7 @@ import {
   getRandomNumber,
   roundNDigits,
 } from '@mm/shared/general-util';
-import { format, isBefore, isSameDay, subDays } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
@@ -71,6 +71,10 @@ export class CreateDemoAccountService {
   private symbolToTransact: SymbolSummary[] = [];
   private watchListSymbols: SymbolSummary[] = [];
   private symbolHistoricalPrices = new Map<string, HistoricalPrice>();
+
+  constructor() {
+    console.log('init CreateDemoAccountService');
+  }
 
   initService = async (transactionLimit = 25, watchListLimit = 30): Promise<void> => {
     this.symbolToTransact = await this.getRandomSymbolSummaries(transactionLimit);
@@ -178,22 +182,6 @@ export class CreateDemoAccountService {
     userTransactions: PortfolioTransaction[],
   ): Promise<PortfolioTransaction> => {
     const symbolPrice = await this.getHistoricalPrice(data.symbol, data.date);
-
-    // check if user has enough cash to buy
-    if (data.transactionType === 'BUY' && userData.userAccountType === UserAccountEnum.DEMO_TRADING) {
-      const symbolTotalValue = data.units * symbolPrice.close;
-      const transactionSpent = userTransactions
-        .filter((d) => isBefore(d.date, symbolPrice.date) || isSameDay(d.date, symbolPrice.date))
-        .reduce(
-          (acc, curr) =>
-            acc + (curr.transactionType === 'BUY' ? curr.unitPrice * curr.units : -curr.unitPrice * curr.units),
-          0,
-        );
-      const cashOnHand = userData.portfolioState.startingCash - transactionSpent;
-      if (symbolTotalValue > cashOnHand) {
-        throw new HttpsError('aborted', 'Not enough cash to buy');
-      }
-    }
 
     // from previous transaction calculate invested and units - currently if I own that symbol
     const symbolHolding = this.getCurrentInvestedFromTransactions(data.symbol, userTransactions);
