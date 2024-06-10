@@ -1,14 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  TemplateRef,
-  TrackByFunction,
-  effect,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, TrackByFunction, effect, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -165,13 +156,12 @@ export class PortfolioRankTableComponent<
    */
   initialPosition = input<number>(1);
 
-  showLoadingSkeletonSignal = signal(true);
+  showLoadingSkeletonSignal = input(false);
 
   tableEffect = effect(
     () => {
       this.dataSource.data = this.data();
       this.dataSource._updateChangeSubscription();
-      this.showLoadingSkeletonSignal.set(this.data().length === 0);
     },
     { allowSignalWrites: true },
   );

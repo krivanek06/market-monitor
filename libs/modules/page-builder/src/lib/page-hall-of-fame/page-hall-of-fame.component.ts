@@ -100,7 +100,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       }
     </app-scroll-wrapper>
 
-    <div class="flex items-center justify-between">
+    <div class="mb-4 flex items-center justify-between">
       <!-- search users -->
       <app-user-search-control
         class="w-full md:-ml-6 md:w-[500px] md:scale-90"
@@ -129,7 +129,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       </button>
     </div>
 
-    <div class="flex items-center justify-between overflow-x-hidden">
+    <div class="mb-6 flex items-center justify-between overflow-x-hidden">
       @for (user of bestWorstDailyUsers(); track user.id) {
         <app-user-display-item
           (itemClicked)="onUserClick(user)"
@@ -143,7 +143,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       }
     </div>
 
-    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="end" class="relative">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="end">
       <!-- user ranking -->
       <mat-tab label="User Ranking">
         <app-general-card>
@@ -152,6 +152,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
             [data]="displayPortfolioDataSignal()"
             [template]="userTemplate"
             [initialPosition]="11"
+            [showLoadingSkeletonSignal]="!hallOfFameUsersSignal()"
           />
 
           <!-- show more button -->
@@ -172,6 +173,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
             (clickedItem)="onGroupClick($event)"
             [data]="hallOfFameGroupsSignal()?.bestPortfolio ?? []"
             [template]="groupTemplate"
+            [showLoadingSkeletonSignal]="!hallOfFameGroupsSignal()"
           />
 
           <!-- show more button -->
