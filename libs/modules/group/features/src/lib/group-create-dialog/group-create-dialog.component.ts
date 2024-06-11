@@ -123,7 +123,7 @@ import { map, startWith } from 'rxjs';
 
             <!-- search user control -->
             <div class="mb-8 max-w-[450px]">
-              <app-user-search-control (selectedUserEmitter)="onUserSelect($event)" />
+              <app-user-search-control (selectedEmitter)="onUserSelect($event)" />
             </div>
 
             <!-- display selected users -->

@@ -80,7 +80,7 @@ export class UserSearchControlComponent implements ControlValueAccessor {
   private userApiService = inject(UserApiService);
   private aggregationApiService = inject(AggregationApiService);
 
-  selectedUserEmitter = output<UserData>();
+  selectedEmitter = output<UserData>();
   isDisabled = model<boolean>(false);
 
   searchControl = new FormControl<string>('', { nonNullable: true });
@@ -126,7 +126,7 @@ export class UserSearchControlComponent implements ControlValueAccessor {
       return;
     }
     this.onChange(userData);
-    this.selectedUserEmitter.emit(userData);
+    this.selectedEmitter.emit(userData);
     this.searchControl.patchValue('');
   }
 

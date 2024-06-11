@@ -16,7 +16,7 @@ import { UserData } from '@mm/api-types';
   ],
 })
 export class UserSearchControlComponentMock implements ControlValueAccessor {
-  selectedUserEmitter = output<UserData>();
+  selectedEmitter = output<UserData>();
   onChange: (value: UserData) => void = () => {};
   onTouched = () => {};
   writeValue(obj: any): void {}

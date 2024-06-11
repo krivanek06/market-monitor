@@ -228,7 +228,7 @@ describe('GroupCreateDialogComponent', () => {
     const dialogService = ngMocks.get(DialogServiceUtil);
 
     // emit myself
-    userSearchControl.selectedUserEmitter.emit(mockUser);
+    userSearchControl.selectedEmitter.emit(mockUser);
 
     // rerender UI
     fixture.detectChanges();
@@ -251,8 +251,8 @@ describe('GroupCreateDialogComponent', () => {
     const testUser2 = mockCreateUser({ id: 'User_2' });
 
     const userSearchControl = ngMocks.findInstance(UserSearchControlComponentMock);
-    userSearchControl.selectedUserEmitter.emit(testUser1);
-    userSearchControl.selectedUserEmitter.emit(testUser2);
+    userSearchControl.selectedEmitter.emit(testUser1);
+    userSearchControl.selectedEmitter.emit(testUser2);
 
     // rerender UI
     fixture.detectChanges();

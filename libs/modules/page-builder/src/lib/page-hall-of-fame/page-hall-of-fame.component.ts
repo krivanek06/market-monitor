@@ -104,7 +104,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       <!-- search users -->
       <app-user-search-control
         class="w-full md:-ml-6 md:w-[500px] md:scale-90"
-        (selectedUserEmitter)="onUserClick($event)"
+        (selectedEmitter)="onUserClick($event)"
       />
       <!-- search groups -->
       <app-group-search-control

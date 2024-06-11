@@ -72,7 +72,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       <!-- search users -->
       <app-user-search-control
         class="w-full md:w-[500px] md:scale-90 xl:mt-3"
-        (selectedUserEmitter)="onUserClick($event)"
+        (selectedEmitter)="onUserClick($event)"
         [isDisabled]="loadingState()"
       />
     </div>
