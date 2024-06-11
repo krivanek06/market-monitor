@@ -126,7 +126,7 @@ export class CreateDemoAccountService {
         symbol: symbol.id,
         sector: symbol.profile?.sector ?? 'Unknown',
         symbolType: 'STOCK',
-        units: getRandomNumber(12, 15),
+        units: getRandomNumber(6, 10),
         transactionType: 'BUY',
       };
 
@@ -135,7 +135,7 @@ export class CreateDemoAccountService {
         symbol: symbol.id,
         sector: symbol.profile?.sector ?? 'Unknown',
         symbolType: 'STOCK',
-        units: getRandomNumber(5, 8),
+        units: getRandomNumber(3, 5),
         transactionType: 'SELL',
       };
 

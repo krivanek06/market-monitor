@@ -72,6 +72,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         let i = $index
       ) {
         <app-rank-card
+          data-testid="hall-of-fame-user-rank-card"
           [clickable]="true"
           [currentPositions]="i + 1"
           [image]="user.item.personal.photoURL"
@@ -103,11 +104,13 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     <div class="mb-4 flex items-center justify-between">
       <!-- search users -->
       <app-user-search-control
+        data-testid="hall-of-fame-user-search-control"
         class="w-full md:-ml-6 md:w-[500px] md:scale-90"
         (selectedEmitter)="onUserClick($event)"
       />
       <!-- search groups -->
       <app-group-search-control
+        data-testid="hall-of-fame-group-search-control"
         class="w-full md:-mr-6 md:w-[500px] md:scale-90"
         (selectedEmitter)="onGroupClick($event)"
       />
@@ -118,7 +121,8 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       <app-section-title [title]="showBestSignal() ? 'Daily Gainers' : 'Daily Losers'" />
       <!-- best/worst button -->
       <button
-        (click)="showBestToggle()"
+        data-testid="hall-of-fame-best-worst-button"
+        (click)="onShowBestToggle()"
         [color]="showBestSignal() ? 'accent' : 'warn'"
         mat-stroked-button
         type="button"
@@ -132,6 +136,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     <div class="mb-6 flex items-center justify-between overflow-x-hidden">
       @for (user of bestWorstDailyUsers(); track user.id) {
         <app-user-display-item
+          data-testid="hall-of-fame-user-display-item-daily-top"
           (itemClicked)="onUserClick(user)"
           [clickable]="true"
           [showDailyPortfolioChange]="true"
@@ -148,39 +153,40 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       <mat-tab label="User Ranking">
         <app-general-card>
           <app-portfolio-rank-table
-            (clickedItem)="onUserClick($event)"
-            [data]="displayPortfolioDataSignal()"
+            data-testid="hall-of-fame-user-ranking-table"
+            (itemClicked)="onUserClick($event)"
+            [data]="displayUserTable()"
             [template]="userTemplate"
-            [initialPosition]="11"
-            [showLoadingSkeletonSignal]="!hallOfFameUsersSignal()"
+            [initialPosition]="topUsersLimit + 1"
           />
 
           <!-- show more button -->
           <div class="flex justify-end">
             <app-show-more-button
-              *ngIf="hallOfFameUsersSignal()?.bestPortfolio?.length ?? 0 as total"
-              [itemsTotal]="total - topUsersLimit"
+              data-testid="hall-of-fame-user-ranking-table-show-more"
+              [itemsTotal]="hallOfFameUsersSignal().bestPortfolio.length - topUsersLimit"
               [itemsLimit]="displayUsersLimit"
               [(showMoreToggle)]="showMoreSignal"
             />
           </div>
         </app-general-card>
       </mat-tab>
+
       <!-- group's ranking -->
       <mat-tab label="Group Ranking">
         <app-general-card>
           <app-portfolio-rank-table
-            (clickedItem)="onGroupClick($event)"
-            [data]="hallOfFameGroupsSignal().bestPortfolio"
+            data-testid="hall-of-fame-group-ranking-table"
+            (itemClicked)="onGroupClick($event)"
+            [data]="displayGroupsTable()"
             [template]="groupTemplate"
-            [showLoadingSkeletonSignal]="!hallOfFameGroupsSignal()"
           />
 
           <!-- show more button -->
           <div class="flex justify-end">
             <app-show-more-button
-              *ngIf="hallOfFameGroupsSignal()?.bestPortfolio?.length ?? 0 as total"
-              [itemsTotal]="total"
+              data-testid="hall-of-fame-group-ranking-table-show-more"
+              [itemsTotal]="hallOfFameGroupsSignal().bestPortfolio.length"
               [itemsLimit]="displayUsersLimit"
               [(showMoreToggle)]="showMoreSignal"
             />
@@ -260,12 +266,18 @@ export class PageHallOfFameComponent {
   hallOfFameUsersSignal = this.aggregationApiService.hallOfFameUsers;
   hallOfFameGroupsSignal = this.aggregationApiService.hallOfFameGroups;
 
-  displayPortfolioDataSignal = computed(() => {
+  displayUserTable = computed(() => {
     // remove first 10 users from best users
     const bestUsers = this.hallOfFameUsersSignal().bestPortfolio.slice(this.topUsersLimit);
     // check if display all or not
     return this.showMoreSignal() ? bestUsers : bestUsers.slice(0, this.displayUsersLimit);
   });
+
+  displayGroupsTable = computed(() =>
+    this.showMoreSignal()
+      ? this.hallOfFameGroupsSignal().bestPortfolio
+      : this.hallOfFameGroupsSignal().bestPortfolio.slice(0, this.displayUsersLimit),
+  );
 
   bestWorstDailyUsers = computed(() =>
     (this.showBestSignal()
@@ -297,7 +309,7 @@ export class PageHallOfFameComponent {
     this.router.navigateByUrl(`/${ROUTES_MAIN.GROUPS}/${group.id}`);
   }
 
-  showBestToggle() {
+  onShowBestToggle() {
     this.showBestSignal.set(!this.showBestSignal());
   }
 }

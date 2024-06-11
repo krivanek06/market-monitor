@@ -141,7 +141,7 @@ export class PortfolioRankTableComponent<
     portfolioState: PortfolioState;
   }>,
 > {
-  clickedItem = output<T['item']>();
+  itemClicked = output<T['item']>();
   /**
    * template that is rendered in the 'name' section
    */
@@ -183,6 +183,6 @@ export class PortfolioRankTableComponent<
   identity: TrackByFunction<T> = (index: number, item: T) => item.item.id;
 
   onItemClick(item: T): void {
-    this.clickedItem.emit(item.item);
+    this.itemClicked.emit(item.item);
   }
 }
