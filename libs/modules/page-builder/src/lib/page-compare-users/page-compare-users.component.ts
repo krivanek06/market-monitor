@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { UserApiService } from '@mm/api-client';
-import { UserBase } from '@mm/api-types';
+import { PortfolioRisk, PortfolioStateHoldings, PortfolioTransaction, UserBase, UserData } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
-import { PortfolioCalculationService } from '@mm/portfolio/data-access';
+import { PortfolioCalculationService, PortfolioChange, PortfolioGrowth } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthCompareChartComponent,
   PortfolioHoldingsTableCardComponent,
@@ -19,7 +19,7 @@ import {
   PortfolioStateTransactionsTableComponent,
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
-import { InputSource } from '@mm/shared/data-access';
+import { GenericChartSeries, InputSource } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
   DropdownControlComponent,
@@ -34,7 +34,7 @@ import { UserSearchControlComponent } from '@mm/user/features';
 import { UserDisplayItemComponent } from '@mm/user/ui';
 import { derivedFrom } from 'ngxtension/derived-from';
 import { filterNil } from 'ngxtension/filter-nil';
-import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } from 'rxjs';
+import { Subject, forkJoin, from, map, merge, of, pipe, scan, startWith, switchMap, take } from 'rxjs';
 
 @Component({
   selector: 'app-page-compare-users',
@@ -72,19 +72,24 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       <app-user-search-control
         data-testid="page-compare-users-search"
         class="w-full md:w-[500px] md:scale-90 xl:mt-3"
-        (selectedEmitter)="onUserClick($event)"
-        [isDisabled]="loadingState()"
+        [formControl]="searchUserControl"
+        [isDisabled]="selectedUsersData().isLoading"
       />
     </div>
 
     <!-- selected users -->
     <div class="mb-10 grid grid-cols-1 gap-x-6 gap-y-3 md:grid-cols-2 xl:grid-cols-3">
-      @for (user of selectedUsers(); track user.id) {
+      @for (item of selectedUsersData().data; track item.userData.id) {
         <app-general-card>
           <div class="flex justify-between gap-4">
-            <app-user-display-item data-testid="page-compare-user-display-item" [userData]="user" />
+            <app-user-display-item data-testid="page-compare-user-display-item" [userData]="item.userData" />
             <!-- remove button -->
-            <button data-testid="page-compare-user-remove" mat-icon-button color="warn" (click)="onRemoveUser(user)">
+            <button
+              data-testid="page-compare-user-remove"
+              mat-icon-button
+              color="warn"
+              (click)="onRemoveUser(item.userData)"
+            >
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -95,14 +100,14 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     <!-- compare portfolio chart -->
     <div class="mb-10">
       <app-section-title title="Portfolio Compare" />
-      @if (!loadingState()) {
+      @if (!selectedUsersData().isLoading) {
         <app-portfolio-growth-compare-chart
           data-testid="page-compare-portfolio-growth-compare-chart"
           [heightPx]="400"
-          [data]="selectedUsersData()"
+          [data]="selectedUsersData().data"
         />
       } @else {
-        <div class="g-skeleton mt-6 h-[385px]"></div>
+        <div data-testid="page-compare-loading" class="g-skeleton mt-6 h-[385px]"></div>
       }
     </div>
 
@@ -110,26 +115,29 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     <div class="mb-10 grid gap-x-4 gap-y-4 lg:grid-cols-2 xl:grid-cols-10">
       <app-general-card title="State" class="lg:col-span-2 xl:col-span-4">
         <!-- table -->
-        <app-portfolio-state-table data-testid="page-compare-portfolio-state-table" [data]="selectedUsersData()" />
+        <app-portfolio-state-table data-testid="page-compare-portfolio-state-table" [data]="selectedUsersData().data" />
         <!-- loading skeleton -->
-        <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
+        <div *ngIf="selectedUsersData().isLoading" data-testid="page-compare-loading" class="g-skeleton h-12"></div>
       </app-general-card>
 
       <app-general-card title="Risk" class="xl:col-span-3">
         <!-- table -->
-        <app-portfolio-state-risk-table data-testid="page-compare-portfolio-risk-table" [data]="selectedUsersData()" />
+        <app-portfolio-state-risk-table
+          data-testid="page-compare-portfolio-risk-table"
+          [data]="selectedUsersData().data"
+        />
         <!-- loading skeleton -->
-        <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
+        <div *ngIf="selectedUsersData().isLoading" data-testid="page-compare-loading" class="g-skeleton h-12"></div>
       </app-general-card>
 
       <app-general-card title="Transactions" class="xl:col-span-3">
         <!-- table -->
         <app-portfolio-state-transactions-table
           data-testid="page-compare-portfolio-transaction-table"
-          [data]="selectedUsersData()"
+          [data]="selectedUsersData().data"
         />
         <!-- loading skeleton -->
-        <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
+        <div *ngIf="selectedUsersData().isLoading" data-testid="page-compare-loading" class="g-skeleton h-12"></div>
       </app-general-card>
     </div>
 
@@ -139,19 +147,19 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
         <!-- table -->
         <app-portfolio-period-change-table
           data-testid="page-compare-period-change-table"
-          [data]="selectedUsersData()"
+          [data]="selectedUsersData().data"
         />
         <!-- loading skeleton -->
-        <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
+        <div *ngIf="selectedUsersData().isLoading" data-testid="page-compare-loading" class="g-skeleton h-12"></div>
       </app-general-card>
     </div>
 
-    @if (selectedUsersData().length > 0) {
+    @if (selectedUsersData().data.length > 0) {
       <!-- allocation charts -->
       <div class="hidden md:block">
         <app-section-title title="Asset Allocation" />
         <div class="mb-10 grid grid-cols-2 xl:grid-cols-3">
-          @for (userData of selectedUsersData(); track userData.userBase.id) {
+          @for (userData of selectedUsersData().data; track userData.userBase.id) {
             <app-pie-chart
               data-testid="page-compare-allocation-chart"
               [chartTitle]="'Allocation: ' + userData.userBase.personal.displayNameInitials"
@@ -161,7 +169,11 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
           }
 
           <!-- loading skeleton -->
-          <div *ngIf="loadingState()" class="g-skeleton h-[350px]"></div>
+          <div
+            *ngIf="selectedUsersData().isLoading"
+            data-testid="page-compare-loading"
+            class="g-skeleton h-[350px]"
+          ></div>
         </div>
       </div>
 
@@ -183,12 +195,16 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
 
       <!-- table -->
       <div class="mb-10">
-        <app-portfolio-holdings-table-card [portfolioStateHolding]="selectedUser()?.portfolioState" />
+        <app-portfolio-holdings-table-card
+          data-testid="page-compare-holding-table-card"
+          [portfolioStateHolding]="selectedUser()?.portfolioState"
+        />
       </div>
 
       <!-- transaction history -->
       <div class="mb-4">
         <app-portfolio-transactions-table
+          data-testid="page-compare-transaction-table"
           [showSymbolFilter]="true"
           [showTransactionFees]="true"
           [data]="selectedUser()?.userTransactions"
@@ -210,64 +226,149 @@ export class PageCompareUsersComponent {
   private dialogServiceUtil = inject(DialogServiceUtil);
 
   /**
-   * toggled when selecting a new user and data is not yet loaded
+   * emit when user is selected
    */
-  loadingState = computed(() => this.selectedUsers().length !== this.selectedUsersData().length);
+  searchUserControl = new FormControl<UserData>(this.authenticationUserStoreService.state.getUserData(), {
+    nonNullable: true,
+  });
 
-  selectedUsers = signal<UserBase[]>([this.authenticationUserStoreService.state.getUserData()]);
-  selectedUserHoldingsControl = new FormControl<UserBase | null>(
-    this.authenticationUserStoreService.state.getUserData(),
+  /**
+   * change when checking other user's holdings
+   */
+  selectedUserHoldingsControl = new FormControl<UserBase>(this.authenticationUserStoreService.state.getUserData());
+
+  private removeUser$ = new Subject<UserBase>();
+  private loadedUserData$ = this.searchUserControl.valueChanges.pipe(
+    startWith(this.searchUserControl.value),
+    switchMap((userBase) =>
+      forkJoin({
+        userData: this.userApiService.getUserById(userBase.id).pipe(filterNil(), take(1)),
+        userTransactions: this.userApiService.getUserPortfolioTransactions(userBase.id).pipe(take(1)),
+      }).pipe(
+        switchMap(({ userData, userTransactions }) =>
+          forkJoin({
+            userBase: of(userBase),
+            userData: of(userData),
+            userTransactions: of(userTransactions.transactions),
+            portfolioState: this.portfolioCalculationService
+              .getPortfolioStateHoldings(userData.portfolioState.startingCash, userTransactions.transactions)
+              .pipe(take(1)),
+            portfolioGrowth: from(
+              this.portfolioCalculationService.getPortfolioGrowthAssets(userTransactions.transactions),
+            ).pipe(
+              map((portfolioGrowthAsset) =>
+                this.portfolioCalculationService.getPortfolioGrowth(
+                  portfolioGrowthAsset,
+                  userData.portfolioState.startingCash,
+                ),
+              ),
+            ),
+          }).pipe(
+            map((data) => ({
+              ...data,
+              portfolioChange: this.portfolioCalculationService.getPortfolioChange(data.portfolioGrowth),
+              portfolioAssetAllocation: this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(
+                data.portfolioState.holdings,
+              ),
+              portfolioRisk: data.userData.portfolioRisk,
+            })),
+            map((d) => ({
+              data: d,
+              action: 'add' as const,
+            })),
+          ),
+        ),
+        startWith({
+          data: null,
+          action: 'loading' as const,
+        }),
+      ),
+    ),
   );
 
   /**
    * load user data when selected users change
    */
   selectedUsersData = toSignal(
-    toObservable(this.selectedUsers).pipe(
-      mergeMap((users) =>
-        users.length === 0
-          ? of([])
-          : forkJoin(
-              users.map((userBase) =>
-                forkJoin({
-                  userData: this.userApiService.getUserById(userBase.id).pipe(filterNil(), take(1)),
-                  userTransactions: this.userApiService.getUserPortfolioTransactions(userBase.id).pipe(take(1)),
-                }).pipe(
-                  switchMap(({ userData, userTransactions }) =>
-                    forkJoin({
-                      userBase: of(userBase),
-                      userData: of(userData),
-                      userTransactions: of(userTransactions.transactions),
-                      portfolioState: this.portfolioCalculationService
-                        .getPortfolioStateHoldings(userData.portfolioState.startingCash, userTransactions.transactions)
-                        .pipe(take(1)),
-                      portfolioGrowth: from(
-                        this.portfolioCalculationService.getPortfolioGrowthAssets(userTransactions.transactions),
-                      ).pipe(
-                        map((portfolioGrowthAsset) =>
-                          this.portfolioCalculationService.getPortfolioGrowth(
-                            portfolioGrowthAsset,
-                            userData.portfolioState.startingCash,
-                          ),
-                        ),
-                      ),
-                    }).pipe(
-                      map((data) => ({
-                        ...data,
-                        portfolioChange: this.portfolioCalculationService.getPortfolioChange(data.portfolioGrowth),
-                        portfolioAssetAllocation: this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(
-                          data.portfolioState.holdings,
-                        ),
-                        portfolioRisk: data.userData.portfolioRisk,
-                      })),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+    merge(
+      this.loadedUserData$,
+      this.removeUser$.pipe(
+        map((d) => ({
+          data: d,
+          action: 'remove' as const,
+        })),
+      ),
+    ).pipe(
+      scan(
+        (acc, curr) => {
+          // loading state
+          if (curr.action === 'loading') {
+            return {
+              data: acc.data,
+              isLoading: true,
+            };
+          }
+
+          // prevent adding more than 6 people
+          if (curr.action === 'add' && acc.data.length >= 6) {
+            this.dialogServiceUtil.showNotificationBar('You can only compare up to 6 users at a time', 'error');
+            return {
+              data: acc.data,
+              isLoading: false,
+            };
+          }
+
+          // prevent adding same user
+          if (curr.action === 'add' && acc.data.find((d) => d.userBase.id === curr.data.userBase.id)) {
+            this.dialogServiceUtil.showNotificationBar('User already selected', 'error');
+            return {
+              data: acc.data,
+              isLoading: false,
+            };
+          }
+
+          // add state
+          if (curr.action === 'add') {
+            return {
+              data: [...acc.data, curr.data],
+              isLoading: false,
+            };
+          }
+
+          // remove state
+          if (curr.action === 'remove') {
+            return {
+              data: acc.data.filter((d) => d.userBase.id !== curr.data.id),
+              isLoading: false,
+            };
+          }
+
+          return acc;
+        },
+        {
+          data: [],
+          isLoading: false,
+        } as {
+          data: {
+            userBase: UserBase;
+            userData: UserData;
+            userTransactions: PortfolioTransaction[];
+            portfolioState: PortfolioStateHoldings;
+            portfolioGrowth: PortfolioGrowth[];
+            portfolioChange: PortfolioChange;
+            portfolioAssetAllocation: GenericChartSeries<'pie'>;
+            portfolioRisk?: PortfolioRisk | null;
+          }[];
+          isLoading: boolean;
+        },
       ),
     ),
-    { initialValue: [] },
+    {
+      initialValue: {
+        data: [],
+        isLoading: false,
+      },
+    },
   );
 
   selectedUsersDataEffect = effect(() => console.log('selectedUsersData', this.selectedUsersData()));
@@ -276,15 +377,17 @@ export class PageCompareUsersComponent {
    * selected user from a dropdown
    */
   selectedUsersInputSource = computed(() =>
-    this.selectedUsers().map(
-      (user) =>
-        ({
-          value: user,
-          caption: user.personal.displayName,
-          image: user.personal.photoURL,
-          imageType: 'default',
-        }) satisfies InputSource<UserBase>,
-    ),
+    this.selectedUsersData()
+      .data.map((d) => d.userBase)
+      .map(
+        (user) =>
+          ({
+            value: user,
+            caption: user.personal.displayName,
+            image: user.personal.photoURL,
+            imageType: 'default',
+          }) satisfies InputSource<UserBase>,
+      ),
   );
 
   selectedUser = derivedFrom(
@@ -294,26 +397,12 @@ export class PageCompareUsersComponent {
     ],
     pipe(
       switchMap(([selectedUser, selectedUsersData]) =>
-        of(selectedUsersData.find((data) => data.userBase.id === selectedUser?.id)),
+        of(selectedUsersData.data.find((data) => data.userBase.id === selectedUser?.id)),
       ),
     ),
   );
 
-  onUserClick(user: UserBase) {
-    // prevent selecting same user twice
-    if (this.selectedUsers().find((u) => u.id === user.id)) {
-      return;
-    }
-
-    // select user
-    if (this.selectedUsers().length < 6) {
-      this.selectedUsers.set([...this.selectedUsers(), user]);
-    } else {
-      this.dialogServiceUtil.showNotificationBar('You can compare up to 6 users', 'error');
-    }
-  }
-
   onRemoveUser(user: UserBase) {
-    this.selectedUsers.set(this.selectedUsers().filter((u) => u.id !== user.id));
+    this.removeUser$.next(user);
   }
 }
