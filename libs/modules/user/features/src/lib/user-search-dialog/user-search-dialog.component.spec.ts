@@ -5,8 +5,8 @@ import { UserData } from '@mm/api-types';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { UserDisplayItemComponent } from '@mm/user/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
-import { UserSearchControlComponentMock } from '../user-search-control/user-search-control-mock.component';
 import { UserSearchControlComponent } from '../user-search-control/user-search-control.component';
+import { UserSearchControlComponentMock } from '../user-search-control/user-search-control.mock.component';
 import { UserSearchDialogComponent } from './user-search-dialog.component';
 
 describe('UserSearchDialogComponent', () => {
