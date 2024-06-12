@@ -1,11 +1,10 @@
-import { Component, input, signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {
   PortfolioStateHoldings,
   PortfolioTransaction,
-  PortfolioTransactionMore,
   UserAccountEnum,
   mockCreateUser,
   quoteAAPLMock,
@@ -17,36 +16,18 @@ import {
   PortfolioChangeChartComponent,
   PortfolioGrowthChartComponent,
   PortfolioHoldingsTableCardComponent,
+  PortfolioHoldingsTableCardComponentMock,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
   PortfolioTransactionsTableComponent,
+  PortfolioTransactionsTableComponentMock,
 } from '@mm/portfolio/ui';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { PieChartComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PageDashboardComponent } from './page-dashboard.component';
-
-@Component({
-  selector: 'app-portfolio-holdings-table-card',
-  standalone: true,
-  template: ``,
-})
-class PortfolioHoldingsTableCardComponentStub {
-  portfolioStateHolding = input<PortfolioStateHoldings>();
-}
-
-@Component({
-  selector: 'app-portfolio-transactions-table',
-  standalone: true,
-  template: ``,
-})
-class PortfolioTransactionsTableComponentStub {
-  showTransactionFees = input<boolean>();
-  data = input<PortfolioTransactionMore[] | null | undefined>();
-  showSymbolFilter = input<boolean>();
-}
 
 describe('PageDashboardComponent', () => {
   const portfolioChangeButtonS = '[data-testid="page-dashboard-portfolio-change-button"]';
@@ -137,8 +118,8 @@ describe('PageDashboardComponent', () => {
       .keep(MatButtonModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(NoopAnimationsModule)
-      .replace(PortfolioHoldingsTableCardComponent, PortfolioHoldingsTableCardComponentStub)
-      .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentStub)
+      .replace(PortfolioHoldingsTableCardComponent, PortfolioHoldingsTableCardComponentMock)
+      .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
       .provide({
         provide: DialogServiceUtil,
         useValue: {
@@ -312,7 +293,7 @@ describe('PageDashboardComponent', () => {
 
     const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
 
-    const comp = ngMocks.find<PortfolioHoldingsTableCardComponentStub>(holdingTableS);
+    const comp = ngMocks.find<PortfolioHoldingsTableCardComponentMock>(holdingTableS);
     expect(comp).toBeTruthy();
     expect(comp.componentInstance.portfolioStateHolding()).toEqual(portfolioUserFacadeService.getPortfolioState());
   });
@@ -390,7 +371,7 @@ describe('PageDashboardComponent', () => {
 
     const authenticationUserService = ngMocks.get(AuthenticationUserStoreService);
 
-    const transactionTable = ngMocks.find<PortfolioTransactionsTableComponentStub>(transactionTableS);
+    const transactionTable = ngMocks.find<PortfolioTransactionsTableComponentMock>(transactionTableS);
 
     expect(transactionTable).toBeTruthy();
     expect(transactionTable.componentInstance.data()).toEqual(authenticationUserService.state.portfolioTransactions());

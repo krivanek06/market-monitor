@@ -31,16 +31,15 @@ export type PortfolioGrowthCompareChartData = {
 
     <!-- chart -->
     @if (chartOptionsSignal() && dateRangeControl.value.dates.length > 0) {
-      @if (chartOptionsSignal(); as chartOptionsSignal) {
-        <highcharts-chart
-          *ngIf="isHighcharts()"
-          [Highcharts]="Highcharts"
-          [options]="chartOptionsSignal"
-          [callbackFunction]="chartCallback"
-          [style.height.px]="heightPx()"
-          style="display: block; width: 100%"
-        />
-      }
+      <highcharts-chart
+        *ngIf="isHighcharts()"
+        [Highcharts]="Highcharts"
+        [options]="chartOptionsSignal()"
+        [callbackFunction]="chartCallback"
+        [style.height.px]="heightPx()"
+        [oneToOne]="true"
+        style="display: block; width: 100%"
+      />
     } @else {
       <div class="grid place-content-center text-base" [style.height.px]="heightPx()">No data available</div>
     }
@@ -139,6 +138,7 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
         return this.initChart(filteredData);
       }),
     ),
+    { initialValue: this.initChart([]) },
   );
 
   private initChart(data: PortfolioGrowthCompareChartData[]): Highcharts.Options {
