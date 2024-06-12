@@ -53,7 +53,6 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     GeneralCardComponent,
     PieChartComponent,
     FormMatInputWrapperComponent,
-    ReactiveFormsModule,
     PortfolioHoldingsTableCardComponent,
     MatDialogModule,
     StockSummaryDialogComponent,
@@ -71,6 +70,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
 
       <!-- search users -->
       <app-user-search-control
+        data-testid="page-compare-users-search"
         class="w-full md:w-[500px] md:scale-90 xl:mt-3"
         (selectedEmitter)="onUserClick($event)"
         [isDisabled]="loadingState()"
@@ -82,9 +82,9 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
       @for (user of selectedUsers(); track user.id) {
         <app-general-card>
           <div class="flex justify-between gap-4">
-            <app-user-display-item [userData]="user" />
+            <app-user-display-item data-testid="page-compare-user-display-item" [userData]="user" />
             <!-- remove button -->
-            <button mat-icon-button color="warn" (click)="onRemoveUser(user)">
+            <button data-testid="page-compare-user-remove" mat-icon-button color="warn" (click)="onRemoveUser(user)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -96,9 +96,13 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     <div class="mb-10">
       <app-section-title title="Portfolio Compare" />
       @if (!loadingState()) {
-        <app-portfolio-growth-compare-chart [heightPx]="400" [data]="selectedUsersData()" />
+        <app-portfolio-growth-compare-chart
+          data-testid="page-compare-portfolio-growth-compare-chart"
+          [heightPx]="400"
+          [data]="selectedUsersData()"
+        />
       } @else {
-        <div class="g-skeleton h-[375px]"></div>
+        <div class="g-skeleton mt-6 h-[385px]"></div>
       }
     </div>
 
@@ -106,21 +110,24 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     <div class="mb-10 grid gap-x-4 gap-y-4 lg:grid-cols-2 xl:grid-cols-10">
       <app-general-card title="State" class="lg:col-span-2 xl:col-span-4">
         <!-- table -->
-        <app-portfolio-state-table [data]="selectedUsersData()" />
+        <app-portfolio-state-table data-testid="page-compare-portfolio-state-table" [data]="selectedUsersData()" />
         <!-- loading skeleton -->
         <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
 
       <app-general-card title="Risk" class="xl:col-span-3">
         <!-- table -->
-        <app-portfolio-state-risk-table [data]="selectedUsersData()" />
+        <app-portfolio-state-risk-table data-testid="page-compare-portfolio-risk-table" [data]="selectedUsersData()" />
         <!-- loading skeleton -->
         <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
 
       <app-general-card title="Transactions" class="xl:col-span-3">
         <!-- table -->
-        <app-portfolio-state-transactions-table [data]="selectedUsersData()" />
+        <app-portfolio-state-transactions-table
+          data-testid="page-compare-portfolio-transaction-table"
+          [data]="selectedUsersData()"
+        />
         <!-- loading skeleton -->
         <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
@@ -130,7 +137,10 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
     <div class="mb-10 hidden md:block">
       <app-general-card title="Period Change">
         <!-- table -->
-        <app-portfolio-period-change-table [data]="selectedUsersData()" />
+        <app-portfolio-period-change-table
+          data-testid="page-compare-period-change-table"
+          [data]="selectedUsersData()"
+        />
         <!-- loading skeleton -->
         <div *ngIf="loadingState()" class="g-skeleton h-12"></div>
       </app-general-card>
@@ -143,6 +153,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
         <div class="mb-10 grid grid-cols-2 xl:grid-cols-3">
           @for (userData of selectedUsersData(); track userData.userBase.id) {
             <app-pie-chart
+              data-testid="page-compare-allocation-chart"
               [chartTitle]="'Allocation: ' + userData.userBase.personal.displayNameInitials"
               [heightPx]="365"
               [series]="userData.portfolioAssetAllocation"
@@ -162,6 +173,7 @@ import { forkJoin, from, map, mergeMap, of, pipe, startWith, switchMap, take } f
         </h2>
 
         <app-dropdown-control
+          data-testid="page-compare-select-user-holding-dropdown"
           class="w-[360px]"
           inputCaption="Select User's Holdings"
           [formControl]="selectedUserHoldingsControl"
@@ -232,9 +244,9 @@ export class PageCompareUsersComponent {
                       portfolioGrowth: from(
                         this.portfolioCalculationService.getPortfolioGrowthAssets(userTransactions.transactions),
                       ).pipe(
-                        map((portfolioGrowth) =>
+                        map((portfolioGrowthAsset) =>
                           this.portfolioCalculationService.getPortfolioGrowth(
-                            portfolioGrowth,
+                            portfolioGrowthAsset,
                             userData.portfolioState.startingCash,
                           ),
                         ),

@@ -47,7 +47,7 @@ export const userCreateAccountDemoCall = onCall(
     const randomPassword = faker.internet.password();
 
     const demoService = new CreateDemoAccountService();
-    await demoService.initService(12, 20);
+    await demoService.initService(18, 20);
 
     // create new demo user
     const newUser = await demoService.createRandomUserAccounts({
@@ -76,7 +76,7 @@ export class CreateDemoAccountService {
     console.log('init CreateDemoAccountService');
   }
 
-  initService = async (transactionLimit = 25, watchListLimit = 30): Promise<void> => {
+  initService = async (transactionLimit = 20, watchListLimit = 30): Promise<void> => {
     this.symbolToTransact = await this.getRandomSymbolSummaries(transactionLimit);
     this.watchListSymbols = await this.getRandomSymbolSummaries(watchListLimit);
   };
@@ -126,7 +126,7 @@ export class CreateDemoAccountService {
         symbol: symbol.id,
         sector: symbol.profile?.sector ?? 'Unknown',
         symbolType: 'STOCK',
-        units: getRandomNumber(6, 10),
+        units: getRandomNumber(6, 9),
         transactionType: 'BUY',
       };
 

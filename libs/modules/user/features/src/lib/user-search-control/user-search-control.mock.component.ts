@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, model, output } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { UserData } from '@mm/api-types';
 
@@ -17,6 +17,7 @@ import { UserData } from '@mm/api-types';
 })
 export class UserSearchControlComponentMock implements ControlValueAccessor {
   selectedEmitter = output<UserData>();
+  isDisabled = model<boolean>(false);
   onChange: (value: UserData) => void = () => {};
   onTouched = () => {};
   writeValue(obj: any): void {}
