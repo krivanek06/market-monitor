@@ -29,21 +29,9 @@ import {
   UserSearchControlComponent,
   UserSearchControlComponentMock,
 } from '@mm/user/features';
-import { UserDisplayItemComponent } from '@mm/user/ui';
+import { UserDisplayItemComponent, UserDisplayItemComponentMock } from '@mm/user/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PageHallOfFameComponent } from './page-hall-of-fame.component';
-
-@Component({
-  selector: 'app-user-display-item',
-  standalone: true,
-  template: ``,
-})
-class UserDisplayItemComponentMock {
-  itemClicked = output<void>();
-  clickable = input(false);
-  showDailyPortfolioChange = input(true);
-  userData = input<UserBase>();
-}
 
 @Component({
   selector: 'app-scroll-wrapper',

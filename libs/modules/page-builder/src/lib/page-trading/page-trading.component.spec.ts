@@ -27,7 +27,7 @@ import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from
 import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
 import { InputSource } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { DropdownControlComponent, QuoteItemComponent } from '@mm/shared/ui';
+import { DropdownControlComponent, DropdownControlComponentMock, QuoteItemComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
 import { PageTradingComponent } from './page-trading.component';
@@ -112,6 +112,7 @@ describe('PageTradingComponent', () => {
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .replace(SymbolSearchBasicComponent, SymbolSearchBasicComponentMock)
       .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
+      .replace(DropdownControlComponent, DropdownControlComponentMock)
       .provide({
         provide: MatDialog,
         useValue: {
@@ -148,6 +149,7 @@ describe('PageTradingComponent', () => {
         useValue: {
           showNotificationBar: jest.fn(),
           handleError: jest.fn(),
+          showConfirmDialog: jest.fn(),
         },
       })
       .provide({
@@ -239,11 +241,18 @@ describe('PageTradingComponent', () => {
 
     const comp = ngMocks.find<DropdownControlComponent<string>>(holdingDropdownS);
 
+    // check if the dropdown is displayed correctly
     expect(comp).toBeTruthy();
-    expect(comp.componentInstance.displayImageType).toBe('symbol');
+    expect(comp.componentInstance.displayImageType()).toBe('symbol');
     expect(component.holdingsInputSource().length).toBe(expectInputSource.length);
-    expect(comp.componentInstance.inputSource).toEqual(expectInputSource);
-    expect(comp.componentInstance.inputSource).toBe(component.holdingsInputSource());
+    expect(comp.componentInstance.inputSource()).toEqual(expectInputSource);
+    expect(comp.componentInstance.inputSource()).toBe(component.holdingsInputSource());
+
+    // change value inside the dropdown
+    comp.componentInstance.onChange('MSFT');
+
+    expect(component.selectedSymbolControl.value).toBe('MSFT');
+    expect(component.symbolSummarySignal()?.id).toBe('MSFT');
   });
 
   it('should display symbol search component', () => {
@@ -428,12 +437,15 @@ describe('PageTradingComponent', () => {
     expect(comp.componentInstance.symbolSummary).toBe(component.symbolSummarySignal());
   });
 
-  it('should display transaction table', () => {
+  it('should display transaction table', async () => {
+    const dialogServiceUtil = ngMocks.get(DialogServiceUtil);
+    jest.spyOn(dialogServiceUtil, 'showConfirmDialog').mockResolvedValue(true);
+
+    // render
     const fixture = MockRender(PageTradingComponent);
     const component = fixture.point.componentInstance;
     const authenticationUserService = ngMocks.get(AuthenticationUserStoreService);
     const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
-    const dialogServiceUtil = ngMocks.get(DialogServiceUtil);
 
     fixture.detectChanges();
 
@@ -449,11 +461,14 @@ describe('PageTradingComponent', () => {
     // test emitter
     comp.componentInstance.deleteEmitter.emit(transactionsMock[0]);
 
+    // Wait for the confirmation dialog to resolve
+    await fixture.whenStable();
+
     expect(onTransactionDeleteSpy).toHaveBeenCalledWith(transactionsMock[0]);
 
-    // todo - unable to mock @Confirmable decorator
-    // expect(portfolioUserFacadeService.deletePortfolioOperation).toHaveBeenCalledWith(transactionsMock[0]);
-    // expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
+    // check if the transaction was deleted
+    expect(portfolioUserFacadeService.deletePortfolioOperation).toHaveBeenCalledWith(transactionsMock[0]);
+    expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
   });
 
   it('should check components if user is normal basic account', () => {

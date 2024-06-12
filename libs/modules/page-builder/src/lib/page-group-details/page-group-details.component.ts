@@ -65,7 +65,7 @@ export class PageGroupDetailsComponent extends PageGroupsBaseComponent {
       {
         component: GroupInteractionButtonsComponent,
         title: 'Settings',
-        componentData: { groupDetails: this.groupDetailsSignal() },
+        componentData: { groupDetails: this.groupDetailsSignal },
       },
       SCREEN_DIALOGS.DIALOG_SMALL,
     );
