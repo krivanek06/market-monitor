@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { StorageLocalStoreService } from '@mm/shared/general-features';
-import { isBefore } from 'date-fns';
 import { Observable, of, retry, tap } from 'rxjs';
 
 type SavedData<T = unknown> = { data: T; validity: number };
@@ -27,7 +26,7 @@ export class ApiCacheService extends StorageLocalStoreService<{
   httpClient = inject(HttpClient);
 
   constructor() {
-    super('API_CACHE', {}, 1);
+    super('API_CACHE', {}, 1.1);
     if (!this.httpClient) {
       throw new Error('HttpClient is required');
     }
@@ -118,13 +117,6 @@ export class ApiCacheService extends StorageLocalStoreService<{
     // save data into cache
     this.cache.set(url, savingData);
 
-    // save data into local storage
-    const prevData = this.getDataStorage();
-    this.updateDataStorage({
-      ...prevData,
-      [url]: savingData,
-    });
-
     // log
     console.log('ApiCacheService: save', { [url]: savingData });
   }
@@ -139,14 +131,6 @@ export class ApiCacheService extends StorageLocalStoreService<{
     // check if data is in cache
     if (this.cache.has(url)) {
       return this.cache.get(url) as { data: T; validity: number };
-    }
-
-    // data not in cache but may be in local storage
-    const data = this.getDataStorage();
-
-    // check data validity
-    if (data[url] && isBefore(Date.now(), data[url].validity)) {
-      return data[url] as SavedData<T>;
     }
 
     // data not in cache or local storage

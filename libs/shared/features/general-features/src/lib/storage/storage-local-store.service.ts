@@ -48,7 +48,12 @@ export abstract class StorageLocalStoreService<T> {
     // combine all data and save
     const mergedData = JSON.stringify({ ...savedData, ...newData });
 
-    localStorage.setItem(this.STORAGE_MAIN_KEY, mergedData);
+    try {
+      // can happen that too many data is saved
+      localStorage.setItem(this.STORAGE_MAIN_KEY, mergedData);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   getDataStorage(): T {
