@@ -1,8 +1,9 @@
-import { getHistoricalPricesOnDateRange } from '@mm/api-external';
 import { RESPONSE_HEADER } from '@mm/api-types';
-import { format, isBefore, isSameDay, isValid } from 'date-fns';
+import { isBefore, isSameDay, isValid } from 'date-fns';
+import { getHistoricalPriceHelper } from './historical-price-helper';
+import { Env } from './model';
 
-export const getPriceOnDateRange = async (symbolStrings: string, searchParams: URLSearchParams): Promise<Response> => {
+export const getPriceOnDateRange = async (env: Env, symbolStrings: string, searchParams: URLSearchParams): Promise<Response> => {
 	const dateStartParam = searchParams.get('dateStart') as string | undefined;
 	const dateEndParam = searchParams.get('dateEnd') as string | undefined;
 
@@ -21,14 +22,12 @@ export const getPriceOnDateRange = async (symbolStrings: string, searchParams: U
 		return new Response('dateEnd is before startDate', { status: 400 });
 	}
 
-	// format dates to YYYY-MM-DD
-	const startDate = format(new Date(dateStartParam), 'yyyy-MM-dd');
-	const endDate = format(new Date(dateEndParam), 'yyyy-MM-dd');
+	try {
+		const loadedData = await getHistoricalPriceHelper(env, symbolStrings, dateStartParam, dateEndParam);
 
-	// load data from API
-	const data = await getHistoricalPricesOnDateRange(symbolStrings, startDate, endDate);
-	const reversedData = data.reverse();
-
-	// return data
-	return new Response(JSON.stringify(reversedData), RESPONSE_HEADER);
+		// return data
+		return new Response(JSON.stringify(loadedData), RESPONSE_HEADER);
+	} catch (error: any) {
+		return new Response(error.message, { status: 400 });
+	}
 };

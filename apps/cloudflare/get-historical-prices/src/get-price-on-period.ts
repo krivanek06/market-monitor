@@ -1,5 +1,11 @@
 import { getHistoricalPricesByPeriod } from '@mm/api-external';
-import { HistoricalLoadingPeriodsDates, HistoricalPrice, HistoricalPricePeriods, RESPONSE_HEADER } from '@mm/api-types';
+import {
+	EXPIRATION_TWELVE_HOURS,
+	HistoricalLoadingPeriodsDates,
+	HistoricalPrice,
+	HistoricalPricePeriods,
+	RESPONSE_HEADER,
+} from '@mm/api-types';
 import { format, isWeekend, subDays } from 'date-fns';
 import { Env } from './model';
 
@@ -38,16 +44,13 @@ export const getPriceOnPeriod = async (env: Env, symbol: string, searchParams: U
 
 	console.log(`Price on period key = ${savedKey} loaded from API`);
 
-	// 12 hours
-	const expiration12Hours = 12 * 60 * 60;
-
 	// load data
 	const historicalPrices = await loadHistoricalPrices(symbol, period);
 
 	// save to cache if not 1d
 	if (period !== '1d') {
 		console.log(`Price on period key = ${savedKey} saved to cache`);
-		env.historical_prices.put(savedKey, JSON.stringify(historicalPrices), { expirationTtl: expiration12Hours });
+		env.historical_prices.put(savedKey, JSON.stringify(historicalPrices), { expirationTtl: EXPIRATION_TWELVE_HOURS });
 	}
 
 	// return historicalPrices

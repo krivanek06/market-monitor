@@ -36,7 +36,7 @@ export default {
 		}
 
 		if (type === 'dateRange') {
-			return getPriceOnDateRange(symbol, searchParams);
+			return getPriceOnDateRange(env, symbol, searchParams);
 		}
 
 		// invalid request
