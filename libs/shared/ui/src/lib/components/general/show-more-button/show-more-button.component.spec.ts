@@ -1,20 +1,20 @@
-import { ComponentFixture } from '@angular/core/testing';
-import { MockBuilder, MockRender } from 'ng-mocks';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS } from 'ng-mocks';
 import { ShowMoreButtonComponent } from './show-more-button.component';
 
 describe('ShowMoreButtonComponent', () => {
-  let component: ShowMoreButtonComponent;
-  let fixture: ComponentFixture<ShowMoreButtonComponent>;
-
-  beforeEach(async () => {
-    MockBuilder(ShowMoreButtonComponent);
-
-    fixture = MockRender(ShowMoreButtonComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  beforeEach(() => {
+    return MockBuilder(ShowMoreButtonComponent)
+      .keep(MatButtonModule)
+      .keep(ReactiveFormsModule)
+      .keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = MockRender(ShowMoreButtonComponent, {
+      itemsTotal: 0,
+    });
+    expect(fixture.point.componentInstance).toBeTruthy();
   });
 });

@@ -16,7 +16,7 @@ import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
 import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
 import { ColorScheme, InputSource } from '@mm/shared/data-access';
-import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
   DropdownControlComponent,
   FormMatInputWrapperComponent,
@@ -142,7 +142,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
             (click)="onSymbolQuoteClick(item)"
             [ngClass]="{
               'border-wt-primary': item.symbol === selectedSymbolControl.value,
-              border: item.symbol === selectedSymbolControl.value
+              border: item.symbol === selectedSymbolControl.value,
             }"
             class="g-clickable-hover border-wt-border rounded-lg border-l border-r border-solid px-4 py-2 hover:border"
           >
@@ -254,10 +254,11 @@ export class PageTradingComponent {
     this.selectedSymbolControl.patchValue(quote.symbol);
   }
 
-  @Confirmable('Please confirm removing transaction')
-  onTransactionDelete(transaction: PortfolioTransaction) {
-    this.portfolioUserFacadeService.deletePortfolioOperation(transaction);
-    this.dialogServiceUtil.showNotificationBar('Transaction removed', 'notification');
+  async onTransactionDelete(transaction: PortfolioTransaction) {
+    if (await this.dialogServiceUtil.showConfirmDialog('Please confirm removing transaction')) {
+      this.portfolioUserFacadeService.deletePortfolioOperation(transaction);
+      this.dialogServiceUtil.showNotificationBar('Transaction removed', 'success');
+    }
   }
 
   onOperationClick(transactionType: PortfolioTransactionType): void {

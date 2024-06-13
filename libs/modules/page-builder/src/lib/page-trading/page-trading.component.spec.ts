@@ -6,7 +6,6 @@ import { MarketApiService } from '@mm/api-client';
 import {
   PortfolioStateHoldings,
   PortfolioTransaction,
-  PortfolioTransactionMore,
   SymbolQuote,
   USER_HOLDINGS_SYMBOL_LIMIT,
   UserAccountEnum,
@@ -24,7 +23,11 @@ import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
-import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
+import {
+  PortfolioStateComponent,
+  PortfolioTransactionsTableComponent,
+  PortfolioTransactionsTableComponentMock,
+} from '@mm/portfolio/ui';
 import { InputSource } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { DropdownControlComponent, DropdownControlComponentMock, QuoteItemComponent } from '@mm/shared/ui';
@@ -40,20 +43,6 @@ import { PageTradingComponent } from './page-trading.component';
 export class SymbolSearchBasicComponentMock {
   clickedQuote = output<SymbolQuote>();
   openModalOnClick = input(true);
-}
-
-@Component({
-  selector: 'app-portfolio-transactions-table',
-  standalone: true,
-  template: ``,
-})
-export class PortfolioTransactionsTableComponentMock {
-  deleteEmitter = output<PortfolioTransactionMore>();
-
-  data = input<PortfolioTransactionMore[] | null>();
-  showSymbolFilter = input(false);
-  showTransactionFees = input(false);
-  showActionButton = input(false);
 }
 
 describe('PageTradingComponent', () => {

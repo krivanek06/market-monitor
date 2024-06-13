@@ -1,13 +1,10 @@
-import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { signal } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatButtonHarness } from '@angular/material/button/testing';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
+import { MatButton, MatButtonModule } from '@angular/material/button';
+import { MatCheckbox, MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MarketApiService } from '@mm/api-client';
@@ -26,7 +23,7 @@ import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { dateFormatDate, getCurrentDateDetailsFormat, roundNDigits } from '@mm/shared/general-util';
 import { DatePickerComponent } from '@mm/shared/ui';
-import { MockBuilder, MockProvider, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
+import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { of, throwError } from 'rxjs';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from './portfolio-trade-dialog.component';
 
@@ -57,10 +54,6 @@ const mockClosedPrice = {
 } as HistoricalPrice;
 
 describe('PortfolioTradeDialogComponent', () => {
-  let component: PortfolioTradeDialogComponent;
-  let fixture: ComponentFixture<PortfolioTradeDialogComponent>;
-  let loader: HarnessLoader;
-
   const testUserData = mockCreateUser({
     userAccountType: UserAccountEnum.DEMO_TRADING,
   });
@@ -83,50 +76,59 @@ describe('PortfolioTradeDialogComponent', () => {
     ] as PortfolioStateHoldings['holdings'],
   } as PortfolioStateHoldings;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [
-        PortfolioTradeDialogComponent,
-        ReactiveFormsModule,
-        MatCheckboxModule,
-        NoopAnimationsModule,
-        MatButtonModule,
-        UserAccountTypeDirective,
-      ],
-      providers: [
-        MockProvider(MarketApiService, {
+  beforeEach(() => {
+    return MockBuilder(PortfolioTradeDialogComponent)
+      .keep(ReactiveFormsModule)
+      .keep(MatCheckboxModule)
+      .keep(NoopAnimationsModule)
+      .keep(MatButtonModule)
+      .keep(MatIconModule)
+      .keep(UserAccountTypeDirective)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .provide({
+        provide: MarketApiService,
+        useValue: {
           getHistoricalPricesOnDate: jest.fn().mockReturnValue(of(mockClosedPrice)),
           getIsMarketOpenSignal: signal({
             currentHoliday: [] as string[],
             allHolidays: [] as string[],
           } as IsStockMarketOpenExtend),
-        }),
-        MockProvider(MatDialogRef, {
+        },
+      })
+      .provide({
+        provide: MatDialogRef,
+        useValue: {
           close: jest.fn(),
-        }),
-        MockProvider(PortfolioUserFacadeService, {
+        },
+      })
+      .provide({
+        provide: PortfolioUserFacadeService,
+        useValue: {
           getPortfolioStateHolding: jest.fn().mockReturnValue(signal(mockPortfolioState.holdings[0])),
           getPortfolioState: signal(mockPortfolioState),
           createPortfolioOperation: jest.fn().mockReturnValue(Promise.resolve({} as PortfolioTransactionCreate)),
-        }),
-        MockProvider(DialogServiceUtil, {
+        },
+      })
+      .provide({
+        provide: DialogServiceUtil,
+        useValue: {
           handleError: jest.fn(),
           showNotificationBar: jest.fn(),
-        }),
-        MockProvider(AuthenticationUserStoreService, {
+        },
+      })
+      .provide({
+        provide: AuthenticationUserStoreService,
+        useValue: {
           state: {
             getUserData: () => testUserData,
             isAccountDemoTrading: () => true,
           } as AuthenticationUserStoreService['state'],
-        }),
-        MockProvider(MAT_DIALOG_DATA, mockData),
-      ],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(PortfolioTradeDialogComponent);
-    component = fixture.componentInstance;
-    loader = TestbedHarnessEnvironment.loader(fixture);
-    fixture.detectChanges();
+        },
+      })
+      .provide({
+        provide: MAT_DIALOG_DATA,
+        useValue: mockData,
+      });
   });
 
   afterEach(() => {
@@ -144,15 +146,20 @@ describe('PortfolioTradeDialogComponent', () => {
   });
 
   it('should create', () => {
-    expect(fixture).toBeDefined();
+    const fixture = MockRender(PortfolioTradeDialogComponent);
+    expect(fixture.point.componentInstance).toBeDefined();
   });
 
   it('should init symbolPriceOnDate with the provided quote price', () => {
+    const fixture = MockRender(PortfolioTradeDialogComponent);
+    const component = fixture.point.componentInstance;
     expect(component.symbolPriceOnDate()).toBe(mockData.quote.price);
   });
 
   describe('test form interaction', () => {
     it('should init form', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
       const form = {
         date: new Date(mockData.quote.timestamp * 1000),
         units: '',
@@ -164,6 +171,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should load historical price if date changes', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       const marketApi = ngMocks.get(MarketApiService);
       const dialogUtil = ngMocks.get(DialogServiceUtil);
 
@@ -190,6 +200,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should calculate fees on unit change', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       const newUnits = 10;
       const expectedFees = roundNDigits(((newUnits * mockData.quote.price) / 100) * TRANSACTION_FEE_PRCT);
 
@@ -204,6 +217,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should reset units and total value on useCustomTotalValueControl change', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       const newUnits = 10;
       const newTotalValue = 1000;
 
@@ -225,15 +241,18 @@ describe('PortfolioTradeDialogComponent', () => {
       expect(component.form.controls.customTotalValue.value).toBe('');
     });
 
-    it('should increment units by 1 when + button is clicked', async () => {
+    it('should increment units by 1 when + button is clicked', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       // grab sell all checkbox
-      const incrementEl = await loader.getHarness(MatButtonHarness.with({ selector: incrementUnitsButtonS }));
+      const incrementEl = ngMocks.find<MatButton>(incrementUnitsButtonS);
 
       // check if exists
       expect(incrementEl).toBeTruthy();
 
       // click element
-      await incrementEl.click();
+      incrementEl.nativeElement.click();
 
       // trigger CD
       fixture.detectChanges();
@@ -242,7 +261,7 @@ describe('PortfolioTradeDialogComponent', () => {
       expect(component.form.controls.units.value).toBe('1');
 
       // click element
-      await incrementEl.click();
+      incrementEl.nativeElement.click();
 
       // trigger CD
       fixture.detectChanges();
@@ -252,6 +271,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should decrement units by 1 when - button is clicked', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       // grab sell all checkbox
       const decrementEl = fixture.debugElement.query(By.css(decrementUnitsButtonS));
 
@@ -281,6 +303,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should NOT decrement units by 1 when - button is clicked and units are 0', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       // grab sell all checkbox
       const decrementEl = fixture.debugElement.query(By.css(decrementUnitsButtonS));
 
@@ -297,6 +322,9 @@ describe('PortfolioTradeDialogComponent', () => {
 
   describe('test error validations', () => {
     it('should have initial state false errors and disabled submit', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       // trigger CD
       fixture.detectChanges();
 
@@ -315,6 +343,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should disable submit and show error on insufficient cash', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       const portfolioService = ngMocks.get(PortfolioUserFacadeService);
 
       // ser user cash to 0
@@ -340,6 +371,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should NOT display error on sufficient cash for SELL operation', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       const portfolioService = ngMocks.get(PortfolioUserFacadeService);
 
       // ser user cash to 0
@@ -366,6 +400,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should NOT display error on sufficient cash is user is not in DEMO_TRADING mode', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       const authUser = ngMocks.get(AuthenticationUserStoreService);
       const portfolioService = ngMocks.get(PortfolioUserFacadeService);
 
@@ -409,6 +446,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should disable submit and show error on not enough units for SELL operation', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       // test state
       expect(component.insufficientUnitsErrorSignal()).toBe(false);
 
@@ -433,6 +473,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should disable save button when units reach to 0', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       // check if error dix is present
       const saveButtonEl = fixture.debugElement.query(By.css(saveButtonS));
 
@@ -460,18 +503,18 @@ describe('PortfolioTradeDialogComponent', () => {
   });
 
   describe('test BUY operations', () => {
-    beforeEach(() => {
+    it('should not display sell all checkbox on BUY operation', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+      const loader = TestbedHarnessEnvironment.loader(fixture);
+
       // change transaction type to SELL
       component.data.update((d) => ({
         ...d,
         transactionType: 'BUY',
       }));
-
-      // trigger CD
       fixture.detectChanges();
-    });
 
-    it('should not display sell all checkbox on BUY operation', () => {
       // grab sell all checkbox
       const sellAllCheckboxEl = fixture.debugElement.query(By.css(sellAllCheckboxS));
 
@@ -481,57 +524,74 @@ describe('PortfolioTradeDialogComponent', () => {
   });
 
   describe('test SELL operations', () => {
-    beforeEach(() => {
+    it('should pull all units when sell all is checked', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       // change transaction type to SELL
       component.data.update((d) => ({
         ...d,
         transactionType: 'SELL',
       }));
-
-      // trigger CD
       fixture.detectChanges();
-    });
 
-    it('should pull all units when sell all is checked', async () => {
       // grab sell all checkbox
-      const sellAllCheckboxEl = await loader.getHarness(MatCheckboxHarness.with({ selector: sellAllCheckboxS }));
+      const sellAllCheckboxEl = ngMocks.find<MatCheckbox>(sellAllCheckboxS);
 
       // check if exists
       expect(sellAllCheckboxEl).toBeTruthy();
 
       // by default disabled
-      expect(await sellAllCheckboxEl.isChecked()).toBe(false);
+      expect(sellAllCheckboxEl.componentInstance.checked).toBe(false);
+      expect(component.form.controls.units.value).toBe('');
+
+      const onSellAllClickSpy = jest.spyOn(component, 'onSellAllClick');
 
       // check checkbox
-      await sellAllCheckboxEl.toggle();
+      sellAllCheckboxEl.componentInstance.toggle();
+      // todo: maybe not the best, but I want to trigger the 'change' event from checkbox
+      const change = new MatCheckboxChange();
+      change.source = sellAllCheckboxEl.componentInstance;
+      change.checked = sellAllCheckboxEl.componentInstance.checked;
+      sellAllCheckboxEl.componentInstance.change.emit(change);
 
       // trigger CD
       fixture.detectChanges();
 
       // check if changed
-      expect(await sellAllCheckboxEl.isChecked()).toBe(true);
+      expect(onSellAllClickSpy).toHaveBeenCalled();
+      expect(sellAllCheckboxEl.componentInstance.checked).toBe(true);
       expect(component.form.controls.units.value).toBe(String(mockPortfolioState.holdings[0].units));
 
       // uncheck checkbox
-      await sellAllCheckboxEl.toggle();
+      sellAllCheckboxEl.componentInstance.toggle();
+      change.checked = sellAllCheckboxEl.componentInstance.checked;
+      sellAllCheckboxEl.componentInstance.change.emit(change);
 
       // trigger CD
       fixture.detectChanges();
 
       // check if changed
-      expect(await sellAllCheckboxEl.isChecked()).toBe(false);
+      expect(onSellAllClickSpy).toHaveBeenCalledTimes(2);
+      expect(sellAllCheckboxEl.componentInstance.checked).toBe(false);
       expect(component.form.controls.units.value).toBe('');
     });
   });
 
   describe('test: onFormSubmit()', () => {
     it('should notify user on invalid form', async () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       await component.onFormSubmit();
 
       expect(ngMocks.get(DialogServiceUtil).showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'error');
     });
 
     it('should notify user if custom total value is missing', async () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       component.form.controls.useCustomTotalValueControl.setValue(true);
 
       await component.onFormSubmit();
@@ -548,6 +608,11 @@ describe('PortfolioTradeDialogComponent', () => {
         createPortfolioOperation: jest.fn().mockRejectedValue('error happened'),
       });
 
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       // set units
       component.form.controls.units.setValue('10');
 
@@ -563,6 +628,9 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should create transaction based on form value', async () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       const dialogUtil = ngMocks.get(DialogServiceUtil);
       const portfolioService = ngMocks.get(PortfolioUserFacadeService);
 
@@ -592,16 +660,19 @@ describe('PortfolioTradeDialogComponent', () => {
     });
 
     it('should create transaction by clicking on the UI', async () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
       const dialogUtil = ngMocks.get(DialogServiceUtil);
       const portfolioService = ngMocks.get(PortfolioUserFacadeService);
       const dialogRef = ngMocks.get(MatDialogRef);
 
-      const incrementEl = await loader.getHarness(MatButtonHarness.with({ selector: incrementUnitsButtonS }));
+      const incrementEl = ngMocks.find<MatButton>(incrementUnitsButtonS);
       const saveButtonEl = fixture.debugElement.query(By.css(saveButtonS));
 
       // set 2 units
-      await incrementEl.click();
-      await incrementEl.click();
+      await incrementEl.nativeElement.click();
+      await incrementEl.nativeElement.click();
 
       // trigger CD
       fixture.detectChanges();
@@ -628,6 +699,7 @@ describe('PortfolioTradeDialogComponent', () => {
   });
 
   it('should NOT display a calendar', () => {
+    const fixture = MockRender(PortfolioTradeDialogComponent);
     const datePickerEl = fixture.debugElement.query(By.css(datePickerS));
 
     // check if exists

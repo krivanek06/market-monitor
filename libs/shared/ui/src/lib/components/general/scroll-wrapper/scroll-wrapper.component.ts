@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
       <button
         mat-stroked-button
         [disabled]="isLeftScrollDisabled()"
-        (click)="onScollChange('decement')"
+        (click)="onScrollChange('decement')"
         [style.height.px]="heightPx() - 20"
         class="w-[55px] min-w-0"
       >
@@ -29,7 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
       <button
         [disabled]="isRightScrollDisabled()"
         mat-stroked-button
-        (click)="onScollChange('increment')"
+        (click)="onScrollChange('increment')"
         [style.height.px]="heightPx() - 20"
         class="w-[55px] min-w-0"
       >
@@ -73,7 +73,7 @@ export class ScrollWrapperComponent {
   isLeftScrollDisabled = signal(true);
   isRightScrollDisabled = signal(false);
 
-  onScollChange(change: 'increment' | 'decement'): void {
+  onScrollChange(change: 'increment' | 'decement'): void {
     const addValue = change === 'increment' ? 200 : -200;
 
     const element = this.element();

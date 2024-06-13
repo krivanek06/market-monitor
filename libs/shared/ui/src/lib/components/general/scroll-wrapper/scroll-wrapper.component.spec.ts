@@ -1,23 +1,18 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { MatButtonModule } from '@angular/material/button';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS } from 'ng-mocks';
 import { ScrollWrapperComponent } from './scroll-wrapper.component';
 
 describe('ScrollWrapperComponent', () => {
-  let component: ScrollWrapperComponent;
-  let fixture: ComponentFixture<ScrollWrapperComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ ScrollWrapperComponent ]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(ScrollWrapperComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  beforeEach(() => {
+    return MockBuilder(ScrollWrapperComponent)
+      .keep(MatButtonModule)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .keep(NoopAnimationsModule);
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = MockRender(ScrollWrapperComponent);
+    expect(fixture.point.componentInstance).toBeTruthy();
   });
 });

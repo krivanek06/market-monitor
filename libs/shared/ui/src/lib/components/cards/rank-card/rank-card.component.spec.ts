@@ -1,21 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatButton } from '@angular/material/button';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS } from 'ng-mocks';
+import { ClickableDirective } from '../../../directives';
 import { RankCardComponent } from './rank-card.component';
 
 describe('RankCardComponent', () => {
-  let component: RankCardComponent;
-  let fixture: ComponentFixture<RankCardComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [RankCardComponent],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(RankCardComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  beforeEach(() => {
+    return MockBuilder(RankCardComponent)
+      .keep(ClickableDirective)
+      .keep(MatButton)
+      .keep(NG_MOCKS_ROOT_PROVIDERS)
+      .keep(NoopAnimationsModule);
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = MockRender(RankCardComponent, {
+      image: '',
+      currentPositions: 0,
+    });
+    expect(fixture.point.componentInstance).toBeTruthy();
   });
 });

@@ -1,20 +1,14 @@
-import { ComponentFixture } from '@angular/core/testing';
-import { MockBuilder, MockRender } from 'ng-mocks';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS } from 'ng-mocks';
 import { CalendarWrapperComponent } from './calendar-wrapper.component';
 
 describe('CalendarWrapperComponent', () => {
-  let component: CalendarWrapperComponent;
-  let fixture: ComponentFixture<CalendarWrapperComponent>;
-
-  beforeEach(async () => {
-    MockBuilder(CalendarWrapperComponent);
-
-    fixture = MockRender(CalendarWrapperComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  beforeEach(() => {
+    return MockBuilder(CalendarWrapperComponent).keep(NG_MOCKS_ROOT_PROVIDERS).keep(ReactiveFormsModule);
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = MockRender(CalendarWrapperComponent);
+    expect(fixture.point.componentInstance).toBeTruthy();
   });
 });

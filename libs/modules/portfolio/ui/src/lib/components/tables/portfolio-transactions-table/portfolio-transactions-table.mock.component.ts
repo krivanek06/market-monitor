@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { PortfolioTransactionMore } from '@mm/api-types';
 
 @Component({
@@ -7,7 +7,10 @@ import { PortfolioTransactionMore } from '@mm/api-types';
   template: ``,
 })
 export class PortfolioTransactionsTableComponentMock {
+  deleteEmitter = output<PortfolioTransactionMore>();
   showTransactionFees = input<boolean>();
   data = input<PortfolioTransactionMore[] | null | undefined>();
   showSymbolFilter = input<boolean>();
+  showActionButton = input(false);
+  showUser = input(false);
 }
