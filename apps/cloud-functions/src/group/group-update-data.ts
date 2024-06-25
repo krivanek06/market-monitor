@@ -2,10 +2,10 @@ import {
   GroupData,
   GroupHoldingSnapshotsData,
   GroupMembersData,
+  GroupPortfolioStateHoldingBase,
   GroupPortfolioStateSnapshotsData,
   GroupTransactionsData,
   PortfolioState,
-  PortfolioStateHoldingBase,
   PortfolioTransaction,
   UserData,
 } from '@mm/api-types';
@@ -93,8 +93,11 @@ const groupCopyMembersAndTransactions = async (group: GroupData): Promise<void> 
   // get last, best and worst transactions by all users
   const lastTransactions = getTransactionData(memberTransactionHistoryData);
 
-  // calculate holdings from all members
-  const memberHoldingSnapshots = calculateGroupMembersHoldings(membersCurrentData);
+  // calculate holdings from all members - top 100 by invested
+  const memberHoldingSnapshots = calculateGroupMembersHoldings(membersCurrentData)
+    .sort((a, b) => b.invested - a.invested)
+    .slice(0, 100);
+
   // remove last portfolio state if it is from today - because we will recalculate it again
   const portfolioSnapshotsNewData =
     portfolioSnapshotsData.data.at(-1)?.date === getCurrentDateDefaultFormat()
@@ -192,48 +195,33 @@ const getTransactionData = (
   };
 };
 
-const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioStateHoldingBase[] => {
-  const memberHoldingSnapshots = groupMembers
-    // calculate holdings from all members
-    .map((d) =>
-      d.holdingSnapshot.data.reduce(
-        (acc, curr) => {
-          const newInvested = roundNDigits((acc[curr.symbol]?.invested ?? 0) + curr.invested);
-          const newUnits = (acc[curr.symbol]?.units ?? 0) + curr.units;
-          return {
-            ...acc,
-            [curr.symbol]: {
-              invested: newInvested,
-              units: newUnits,
-              symbol: curr.symbol,
-              symbolType: curr.symbolType,
-              sector: curr.sector,
-              breakEvenPrice: roundNDigits(newInvested / newUnits),
-            } satisfies PortfolioStateHoldingBase,
-          };
-        },
-        {} as { [key: string]: PortfolioStateHoldingBase },
+/**
+ *
+ * @param groupMembers - all members of the group
+ * @returns - merged holdings from all members
+ */
+const calculateGroupMembersHoldings = (groupMembers: UserData[]): GroupPortfolioStateHoldingBase[] => {
+  const memberHoldingSnapshots = groupMembers.reduce(
+    (acc, curr) => ({
+      ...acc,
+      ...curr.holdingSnapshot.data.reduce(
+        (accHolding, currHolding) => ({
+          ...accHolding,
+          [currHolding.symbol]: {
+            invested: currHolding.invested + (acc[currHolding.symbol]?.invested ?? 0),
+            units: currHolding.units + (acc[currHolding.symbol]?.units ?? 0),
+            symbol: currHolding.symbol,
+            symbolType: currHolding.symbolType,
+            sector: currHolding.sector,
+            breakEvenPrice: currHolding.breakEvenPrice,
+            memberIds: [...(acc[currHolding.symbol]?.memberIds ?? []), curr.id], // member id
+          } satisfies GroupPortfolioStateHoldingBase,
+        }),
+        {} as { [key: string]: GroupPortfolioStateHoldingBase },
       ),
-    )
-    // flatten array - merge all users data into one
-    .reduce(
-      (acc, curr) => {
-        // merge all holdings
-        getObjectEntries(curr).forEach(([key, value]) => {
-          acc[key] = {
-            invested: roundNDigits((acc[key]?.invested ?? 0) + value.invested),
-            units: (acc[key]?.units ?? 0) + value.units,
-            symbol: value.symbol,
-            symbolType: value.symbolType,
-            sector: value.sector,
-            breakEvenPrice: value.breakEvenPrice,
-          } satisfies PortfolioStateHoldingBase;
-        });
-
-        return acc;
-      },
-      {} as { [key: string]: PortfolioStateHoldingBase },
-    );
+    }),
+    {} as { [key: string]: GroupPortfolioStateHoldingBase },
+  );
 
   return getObjectEntries(memberHoldingSnapshots).map((d) => d[1]);
 };
