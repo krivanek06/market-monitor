@@ -130,20 +130,13 @@ export type SystemRankGroup = {
   portfolioTotalGainsPercentage?: RankingItem;
 };
 
-export type GroupPortfolioStateHoldingBase = PortfolioStateHoldingBase & {
-  /**
-   * Id of group members who own this holding
-   */
-  memberIds: string[];
-};
-
 export type GroupTransactionsData = DataDocsWrapper<PortfolioTransaction> & {
   transactionBestReturn: PortfolioTransaction[];
   transactionsWorstReturn: PortfolioTransaction[];
 };
 export type GroupMembersData = DataDocsWrapper<GroupMember>;
 export type GroupPortfolioStateSnapshotsData = DataDocsWrapper<PortfolioState>;
-export type GroupHoldingSnapshotsData = DataDocsWrapper<GroupPortfolioStateHoldingBase>;
+export type GroupHoldingSnapshotsData = DataDocsWrapper<PortfolioStateHoldingBase>;
 
 export type GroupDetails = {
   groupData: GroupData;

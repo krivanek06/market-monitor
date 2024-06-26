@@ -83,6 +83,12 @@ export type PortfolioStateHoldingBase = SymbolStoreBase & {
    */
   invested: number;
   breakEvenPrice: number;
+
+  /**
+   * list of user ids that have this holding,
+   * optional, if not set then it is assumed that only owner has this holding
+   */
+  userIds?: string[];
 };
 
 export type PortfolioStateHolding = PortfolioStateHoldingBase & {

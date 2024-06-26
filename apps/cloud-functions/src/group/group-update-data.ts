@@ -1,11 +1,12 @@
 import {
+  GROUP_HOLDING_LIMIT,
   GroupData,
   GroupHoldingSnapshotsData,
   GroupMembersData,
-  GroupPortfolioStateHoldingBase,
   GroupPortfolioStateSnapshotsData,
   GroupTransactionsData,
   PortfolioState,
+  PortfolioStateHoldingBase,
   PortfolioTransaction,
   UserData,
 } from '@mm/api-types';
@@ -96,7 +97,7 @@ const groupCopyMembersAndTransactions = async (group: GroupData): Promise<void> 
   // calculate holdings from all members - top 100 by invested
   const memberHoldingSnapshots = calculateGroupMembersHoldings(membersCurrentData)
     .sort((a, b) => b.invested - a.invested)
-    .slice(0, 100);
+    .slice(0, GROUP_HOLDING_LIMIT);
 
   // remove last portfolio state if it is from today - because we will recalculate it again
   const portfolioSnapshotsNewData =
@@ -200,7 +201,7 @@ const getTransactionData = (
  * @param groupMembers - all members of the group
  * @returns - merged holdings from all members
  */
-const calculateGroupMembersHoldings = (groupMembers: UserData[]): GroupPortfolioStateHoldingBase[] => {
+const calculateGroupMembersHoldings = (groupMembers: UserData[]): PortfolioStateHoldingBase[] => {
   const memberHoldingSnapshots = groupMembers.reduce(
     (acc, curr) => ({
       ...acc,
@@ -214,13 +215,13 @@ const calculateGroupMembersHoldings = (groupMembers: UserData[]): GroupPortfolio
             symbolType: currHolding.symbolType,
             sector: currHolding.sector,
             breakEvenPrice: currHolding.breakEvenPrice,
-            memberIds: [...(acc[currHolding.symbol]?.memberIds ?? []), curr.id], // member id
-          } satisfies GroupPortfolioStateHoldingBase,
+            userIds: [...(acc[currHolding.symbol]?.userIds ?? []), curr.id], // member id
+          } satisfies PortfolioStateHoldingBase,
         }),
-        {} as { [key: string]: GroupPortfolioStateHoldingBase },
+        {} as { [key: string]: PortfolioStateHoldingBase },
       ),
     }),
-    {} as { [key: string]: GroupPortfolioStateHoldingBase },
+    {} as { [key: string]: PortfolioStateHoldingBase },
   );
 
   return getObjectEntries(memberHoldingSnapshots).map((d) => d[1]);
