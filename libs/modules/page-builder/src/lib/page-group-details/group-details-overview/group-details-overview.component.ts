@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -317,9 +317,10 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent implements OnInit {
+export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
   readonly GROUP_MEMBER_LIMIT = GROUP_MEMBER_LIMIT;
   readonly GROUP_HOLDING_LIMIT = GROUP_HOLDING_LIMIT;
+  readonly ColorScheme = ColorScheme;
   readonly displayLimitInitial = 12;
 
   portfolioCalculationService = inject(PortfolioCalculationService);
@@ -375,10 +376,6 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
       ? this.groupDetailsSignal()?.groupMembersData
       : this.groupDetailsSignal()?.groupMembersData?.slice(0, this.displayLimitInitial),
   );
-
-  ColorScheme = ColorScheme;
-
-  ngOnInit(): void {}
 
   onMemberClick(member: UserBase): void {
     this.dialog.open(UserDetailsDialogComponent, {
