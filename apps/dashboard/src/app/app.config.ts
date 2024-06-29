@@ -1,11 +1,11 @@
 import { provideHttpClient } from '@angular/common/http';
-import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom, inject } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, inject } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
 import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { Functions, connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
-import { MatNativeDateModule } from '@angular/material/core';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   PreloadAllModules,
   provideRouter,
@@ -19,7 +19,6 @@ import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@m
 import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
-// import { provideAnimationsAsync } from '@angular/platform-browser/animations-async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -42,12 +41,11 @@ export const appConfig: ApplicationConfig = {
       withViewTransitions(),
       // enable component input binding
       withComponentInputBinding(),
-      // lazy load animation modules
-      // provideAnimationsAsync()
     ),
     // used to avoid error: No provider found for DateAdapter
-    importProvidersFrom(MatNativeDateModule),
-    provideAnimations(),
+    provideNativeDateAdapter(),
+    // lazy load animation modules
+    provideAnimationsAsync(),
     // apply zoneless change detection
     // provideExperimentalZonelessChangeDetection(),
     {
