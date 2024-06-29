@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
@@ -156,7 +157,7 @@ import {
           chartType="balance"
           [data]="{
             values: getPortfolioGrowth,
-            startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0
+            startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0,
           }"
           [heightPx]="400"
         />
@@ -174,7 +175,7 @@ import {
           chartType="marketValue"
           [data]="{
             values: portfolioGrowth,
-            startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0
+            startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0,
           }"
           [heightPx]="400"
         />
@@ -190,6 +191,7 @@ import {
       <app-portfolio-holdings-table-card
         data-testid="page-dashboard-portfolio-holdings-table"
         [portfolioStateHolding]="portfolioUserFacadeService.getPortfolioState()"
+        [maximumHoldingLimit]="USER_HOLDINGS_SYMBOL_LIMIT"
       />
     </div>
 
@@ -226,7 +228,7 @@ import {
           data-testid="page-dashboard-portfolio-transactions-table"
           [ngClass]="{
             'xl:col-span-2': hasEnoughTransactions(),
-            'xl:col-span-3': !hasEnoughTransactions()
+            'xl:col-span-3': !hasEnoughTransactions(),
           }"
           [showTransactionFees]="!!stateRef.isAccountDemoTrading()"
           [data]="stateRef.portfolioTransactions()"
@@ -280,6 +282,7 @@ export class PageDashboardComponent {
    * Transaction limit to show best and worst transactions
    */
   readonly transactionLimit = 15;
+  USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
 
   stateRef = this.authenticationUserService.state;
 

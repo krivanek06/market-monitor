@@ -28,7 +28,7 @@ import { PortfolioHoldingsTableComponent } from '../tables';
     ShowMoreButtonComponent,
   ],
   template: `
-    <app-general-card title="Holdings {{ (portfolioStateHolding()?.holdings ?? []).length }}" matIcon="show_chart">
+    <app-general-card [title]="cardTitle()" matIcon="show_chart">
       <!-- invisible el - use if to prevent immediate camera scroll -->
       @if (selectedHoldingsToggle()) {
         <div data-testid="portfolio-holding-table-card-start" #startSection></div>
@@ -73,6 +73,11 @@ export class PortfolioHoldingsTableCardComponent {
    */
   initialItemsLimit = input(15);
 
+  /**
+   * maximum number of holdings that can be in the table
+   */
+  maximumHoldingLimit = input(0);
+
   displayedColumns = input<string[]>([
     'symbol',
     'price',
@@ -95,6 +100,13 @@ export class PortfolioHoldingsTableCardComponent {
       ? this.portfolioStateHolding()?.holdings ?? []
       : (this.portfolioStateHolding()?.holdings ?? []).slice(0, this.initialItemsLimit()),
   );
+
+  cardTitle = computed(() => {
+    if (this.maximumHoldingLimit() > 0) {
+      return `Holdings [${(this.portfolioStateHolding()?.holdings ?? []).length} / ${this.maximumHoldingLimit()}]`;
+    }
+    return `Holdings ${(this.portfolioStateHolding()?.holdings ?? []).length}`;
+  });
 
   selectionHoldingEffect = effect(() => {
     const sectionRef = this.startSectionRef();

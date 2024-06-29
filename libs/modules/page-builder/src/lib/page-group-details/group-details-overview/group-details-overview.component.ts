@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { UserApiService } from '@mm/api-client';
-import { GROUP_MEMBER_LIMIT, UserBase } from '@mm/api-types';
+import { GROUP_HOLDING_LIMIT, GROUP_MEMBER_LIMIT, UserBase } from '@mm/api-types';
 import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@mm/group/features';
-import { GroupDisplayInfoComponent } from '@mm/group/ui';
+import { GroupDisplayInfoComponent, GroupMemberPortfolioHoldingChartComponent } from '@mm/group/ui';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioCalculationService, PortfolioGrowth } from '@mm/portfolio/data-access';
 import {
@@ -68,6 +68,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     ShowMoreButtonComponent,
     MatTabsModule,
     PortfolioTransactionsItemComponent,
+    GroupMemberPortfolioHoldingChartComponent,
   ],
   template: `
     @if (groupDetailsSignal(); as groupDetailsSignal) {
@@ -118,7 +119,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         *ngIf="portfolioGrowthSignal() as portfolioGrowthChartSignal"
         [data]="{
           values: portfolioGrowthChartSignal,
-          startingCashValue: groupDetailsSignal.groupData.portfolioState.startingCash
+          startingCashValue: groupDetailsSignal.groupData.portfolioState.startingCash,
         }"
         [heightPx]="425"
         class="mb-6"
@@ -213,9 +214,25 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         </div>
       }
 
+      @defer (on viewport) {
+        <!-- holding chart -->
+        <app-section-title title="Group Symbol Holdings - top 25" matIcon="filter_list" class="mb-2" />
+        <app-group-member-portfolio-holding-chart
+          [heightPx]="500"
+          [data]="groupPortfolioStateHolding()?.holdings ?? [] | slice: 0 : 25"
+        />
+      } @placeholder {
+        <div class="g-skeleton block h-[500px] max-xl:hidden"></div>
+      } @loading (minimum 1s) {
+        <div class="g-skeleton block h-[500px] max-xl:hidden"></div>
+      }
+
       <!-- holding table -->
       <div class="mb-10">
-        <app-portfolio-holdings-table-card [portfolioStateHolding]="groupPortfolioStateHolding()" />
+        <app-portfolio-holdings-table-card
+          [maximumHoldingLimit]="GROUP_HOLDING_LIMIT"
+          [portfolioStateHolding]="groupPortfolioStateHolding()"
+        />
       </div>
 
       <!-- transaction chart -->
@@ -300,8 +317,10 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent implements OnInit {
+export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
   readonly GROUP_MEMBER_LIMIT = GROUP_MEMBER_LIMIT;
+  readonly GROUP_HOLDING_LIMIT = GROUP_HOLDING_LIMIT;
+  readonly ColorScheme = ColorScheme;
   readonly displayLimitInitial = 12;
 
   portfolioCalculationService = inject(PortfolioCalculationService);
@@ -357,10 +376,6 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent imple
       ? this.groupDetailsSignal()?.groupMembersData
       : this.groupDetailsSignal()?.groupMembersData?.slice(0, this.displayLimitInitial),
   );
-
-  ColorScheme = ColorScheme;
-
-  ngOnInit(): void {}
 
   onMemberClick(member: UserBase): void {
     this.dialog.open(UserDetailsDialogComponent, {
