@@ -11,14 +11,5 @@ export const measureFunctionExecutionTime = async (fn: () => Promise<unknown>) =
   console.log(`Function took: ~${secondsDiff} seconds`);
 };
 
-export const runFunctionInEmulator = async (fn: () => Promise<unknown>) => {
-  if (!isFirebaseEmulator()) {
-    console.warn('Function can be executed only in development mode');
-    return;
-  }
-
-  await measureFunctionExecutionTime(fn);
-};
-
 export const isFirebaseEmulator = () =>
   process.env.FUNCTIONS_EMULATOR === 'true' && process.env.FIRESTORE_EMULATOR_HOST === '127.0.0.1:8080';
