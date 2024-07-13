@@ -14,25 +14,13 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
   template: `
     <form [formGroup]="formGroup" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
       <!-- email -->
-      <app-form-mat-input-wrapper
-        formControlName="email"
-        inputCaption="Email"
-        inputType="EMAIL"
-      ></app-form-mat-input-wrapper>
+      <app-form-mat-input-wrapper formControlName="email" inputCaption="Email" inputType="EMAIL" />
 
       <!-- password1 -->
-      <app-form-mat-input-wrapper
-        formControlName="password1"
-        inputCaption="Password"
-        inputType="PASSWORD"
-      ></app-form-mat-input-wrapper>
+      <app-form-mat-input-wrapper formControlName="password1" inputCaption="Password" inputType="PASSWORD" />
 
       <!-- password2 -->
-      <app-form-mat-input-wrapper
-        formControlName="password2"
-        inputCaption="Password"
-        inputType="PASSWORD"
-      ></app-form-mat-input-wrapper>
+      <app-form-mat-input-wrapper formControlName="password2" inputCaption="Password" inputType="PASSWORD" />
 
       <!-- submit -->
       <button mat-stroked-button class="w-full" color="primary" type="submit">Register</button>

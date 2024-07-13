@@ -8,9 +8,9 @@ import { PortfolioTransactionMore } from '@mm/api-types';
 })
 export class PortfolioTransactionsTableComponentMock {
   deleteEmitter = output<PortfolioTransactionMore>();
-  showTransactionFees = input<boolean>();
+  showTransactionFees = input<boolean>(false);
   data = input<PortfolioTransactionMore[] | null | undefined>();
-  showSymbolFilter = input<boolean>();
+  showSymbolFilter = input<boolean>(false);
   showActionButton = input(false);
   showUser = input(false);
 }

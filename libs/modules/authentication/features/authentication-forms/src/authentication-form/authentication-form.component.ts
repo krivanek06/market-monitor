@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -58,10 +58,10 @@ import { FormRegisterComponent } from './form-register/form-register.component';
     AuthenticationNewAccountTypeChooseDialogComponent,
   ],
   template: `
-    @if (userAuthenticationState().action !== 'loading') {
+    @if (showContent()) {
       <mat-tab-group>
         <mat-tab label="Login">
-          <app-form-login [formControl]="loginUserInputControl" />
+          <app-form-login data-testid="auth-form-login-form" [formControl]="loginUserInputControl" />
 
           <div class="my-4">
             <mat-divider />
@@ -71,7 +71,15 @@ import { FormRegisterComponent } from './form-register/form-register.component';
           <h2 class="text-wt-primary-dark text-center text-lg">Social Media Login</h2>
 
           <div class="mt-4 px-4">
-            <button mat-stroked-button (click)="onGoogleAuth()" color="warn" class="w-full">Google</button>
+            <button
+              data-testid="auth-form-google-auth-button"
+              mat-stroked-button
+              (click)="onGoogleAuth()"
+              color="warn"
+              class="w-full"
+            >
+              Google
+            </button>
           </div>
 
           <div class="my-4">
@@ -82,6 +90,7 @@ import { FormRegisterComponent } from './form-register/form-register.component';
           <h2 class="text-wt-primary-dark text-center text-lg">Demo Account Login</h2>
           <div class="mt-4 px-4">
             <button
+              data-testid="auth-form-demo-login-button"
               matTooltip="Account will be valid for 7 days and then removed"
               mat-stroked-button
               color="accent"
@@ -94,13 +103,13 @@ import { FormRegisterComponent } from './form-register/form-register.component';
           </div>
         </mat-tab>
         <mat-tab label="Register">
-          <app-form-register [formControl]="registerUserInputControl" />
+          <app-form-register data-testid="auth-form-registration-form" [formControl]="registerUserInputControl" />
         </mat-tab>
       </mat-tab-group>
     } @else {
       <!-- loader -->
       <div class="grid h-full w-full place-content-center place-items-center gap-4">
-        <mat-spinner diameter="120" />
+        <mat-spinner data-testid="auth-form-spinner" diameter="120" />
         <div class="text-wt-gray-medium text-lg">Checking Authentication</div>
       </div>
     }
@@ -121,11 +130,11 @@ export class AuthenticationFormComponent {
   private dialogServiceUtil = inject(DialogServiceUtil);
   private router = inject(Router);
 
+  /** emit a value whether to use google or demo login */
   private loginType$ = new Subject<'google' | 'demo'>();
 
-  private googleAuthSubject$ = this.loginType$.pipe(
+  private googleAuth$ = this.loginType$.pipe(
     filter((type) => type === 'google'),
-    tap(() => console.log('google login')),
     switchMap(() =>
       from(this.authenticationAccountService.signInGoogle()).pipe(
         switchMap(() =>
@@ -146,11 +155,18 @@ export class AuthenticationFormComponent {
             ),
           ),
         ),
+        catchError((err) =>
+          of({
+            action: 'error' as const,
+            error: err,
+            data: null,
+          }),
+        ),
       ),
     ),
   );
 
-  private demoLoginSubject$ = this.loginType$.pipe(
+  private demoLogin$ = this.loginType$.pipe(
     filter((type) => type === 'demo'),
     switchMap(() =>
       this.openSelectAccountType().pipe(
@@ -176,7 +192,14 @@ export class AuthenticationFormComponent {
                       email: result.userData.personal.email,
                       password: result.password,
                     }),
-                  ).pipe(map((userData) => ({ data: userData, action: 'success' as const }))),
+                  ).pipe(
+                    switchMap(() =>
+                      this.authenticationAccountService.getUserData().pipe(
+                        filterNil(), // wait until there is a user initialized
+                        map((userData) => ({ data: userData, action: 'success' as const })),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -197,7 +220,7 @@ export class AuthenticationFormComponent {
     ),
   );
 
-  private registerUserSubject$ = this.registerUserInputControl.valueChanges.pipe(
+  private registerUser$ = this.registerUserInputControl.valueChanges.pipe(
     filterNil(),
     switchMap((res) =>
       from(this.authenticationAccountService.register(res)).pipe(
@@ -232,7 +255,7 @@ export class AuthenticationFormComponent {
     ),
   );
 
-  private loginUserSubject$ = this.loginUserInputControl.valueChanges.pipe(
+  private loginUser$ = this.loginUserInputControl.valueChanges.pipe(
     filterNil(),
     switchMap((res) =>
       from(this.authenticationAccountService.signIn(res)).pipe(
@@ -260,12 +283,17 @@ export class AuthenticationFormComponent {
   userAuthenticationState = toSignal(
     concat(
       of({ action: 'idle' as const, data: null, error: null }),
-      merge(this.googleAuthSubject$, this.demoLoginSubject$, this.registerUserSubject$, this.loginUserSubject$),
+      merge(this.googleAuth$, this.demoLogin$, this.registerUser$, this.loginUser$),
     ),
     {
       initialValue: { action: 'idle', data: null, error: null },
     },
   );
+
+  showContent = computed(() => {
+    const state = this.userAuthenticationState();
+    return state.action !== 'loading' && state.action !== 'success';
+  });
 
   userAuthenticationStateEffect = effect(() => {
     const state = this.userAuthenticationState();
@@ -288,7 +316,7 @@ export class AuthenticationFormComponent {
     this.loginType$.next('demo');
   }
 
-  private openSelectAccountType(): Observable<UserAccountBasicTypes | undefined> {
+  openSelectAccountType(): Observable<UserAccountBasicTypes | undefined> {
     // return this.dialog
     //   .open(AuthenticationNewAccountTypeChooseDialogComponent)
     //   .afterClosed()
