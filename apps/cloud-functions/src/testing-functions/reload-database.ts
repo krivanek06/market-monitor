@@ -4,6 +4,8 @@ import {
   GroupData,
   GroupPortfolioStateSnapshotsData,
   PortfolioState,
+  TEST_CUSTOM_USER_1,
+  TEST_PASSWORD,
   UserAccountEnum,
   UserData,
 } from '@mm/api-types';
@@ -13,16 +15,16 @@ import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
 import { calculateGroupMembersPortfolioState, groupCreate, groupMemberAccept } from '../group';
 import { groupDocumentPortfolioStateSnapshotsRef } from '../models';
-import { CreateDemoAccountService } from '../user';
+import { CreateDemoAccountService, userCreate } from '../user';
 import { isFirebaseEmulator } from '../utils';
 /**
  * Reload the database with new testing data
  * ONLY USE FOR TESTING / LOCAL DEVELOPMENT
  */
-export const reloadDatabase = async (): Promise<void> => {
+export const testReloadDatabase = async (normalUsers = 10, demoUsers = 150): Promise<UserData[]> => {
   if (!isFirebaseEmulator()) {
     console.warn('reloadDatabase() should only be used for testing / local development');
-    return;
+    return [];
   }
 
   // delete previous data
@@ -30,68 +32,103 @@ export const reloadDatabase = async (): Promise<void> => {
 
   // create users
   console.log('CREATE NEW USERS - NORMAL - START');
-  const limitUsersNormal = 10;
   const demoService = new CreateDemoAccountService();
+
+  const newUsersDemo: UserData[] = [];
+  const newUsersNormal: UserData[] = [];
+
   await demoService.initService();
 
-  for (let i = 0; i < limitUsersNormal; i++) {
-    // create new user
-    const newUser = await demoService.createRandomUserAccounts({
+  // create normal users
+  for (let i = 0; i < normalUsers; i++) {
+    // create demo accounts
+    const newDemoUser = await demoService.createRandomUser(false, TEST_PASSWORD);
+
+    // create user document
+    const newUser = await userCreate(newDemoUser, {
       isDemo: false,
       userAccountType: UserAccountEnum.NORMAL_BASIC,
-      password: 'qwer1234',
     });
-    // create watchList
-    await demoService.createWatchListWithRandomSymbols(newUser);
 
-    // generate transactions
-    await demoService.generateTransactionsForRandomSymbols(newUser);
-    // wait 0.2s sec
-    await waitSeconds(0.2);
-    // log
-    console.log(`User normal created: [${i + 1}/${limitUsersNormal}]`);
-  }
-  console.log(`CREATE NEW USERS NORMAL DONE - ${limitUsersNormal} USERS`);
-
-  console.log('CREATE NEW USERS - TRADING - START');
-  const limitUsers = 150;
-  const newUsers: UserData[] = [];
-
-  for (let i = 0; i < limitUsers; i++) {
-    // create new user
-    const newUser = await demoService.createRandomUserAccounts({
-      isDemo: false,
-      userAccountType: UserAccountEnum.DEMO_TRADING,
-      password: 'qwer1234',
-    });
     // create watchList
     await demoService.createWatchListWithRandomSymbols(newUser);
 
     // generate transactions
     await demoService.generateTransactionsForRandomSymbols(newUser);
     // save new user
-    newUsers.push(newUser);
+    newUsersNormal.push(newUser);
     // wait 0.2s sec
     await waitSeconds(0.2);
     // log
-    console.log(`User trading created: [${i + 1}/${limitUsers}]: ${newUser.personal.displayName}`);
+    console.log(`User normal created: [${i + 1}/${normalUsers}]`);
+  }
+  console.log(`CREATE NEW USERS NORMAL DONE - ${normalUsers} USERS`);
+
+  console.log('CREATE NEW USERS - TRADING - START');
+
+  // create trading users
+  for (let i = 0; i < demoUsers; i++) {
+    // create demo accounts
+    const newDemoUser = await demoService.createRandomUser(false, TEST_PASSWORD);
+
+    // create user document
+    const newUser = await userCreate(newDemoUser, {
+      isDemo: false,
+      userAccountType: UserAccountEnum.DEMO_TRADING,
+    });
+
+    // create watchList
+    await demoService.createWatchListWithRandomSymbols(newUser);
+
+    // generate transactions
+    await demoService.generateTransactionsForRandomSymbols(newUser);
+    // save new user
+    newUsersDemo.push(newUser);
+    // wait 0.2s sec
+    await waitSeconds(0.2);
+    // log
+    console.log(`User trading created: [${i + 1}/${demoUsers}]: ${newUser.personal.displayName}`);
   }
 
-  console.log(`CREATE NEW USERS TRADING DONE - ${newUsers.length} USERS`);
+  console.log(`CREATE NEW USERS TRADING DONE - ${newUsersDemo.length} USERS`);
+
+  // create custom users
+  const customDemo1 = await demoService.createUserCustom(
+    TEST_CUSTOM_USER_1.email,
+    TEST_CUSTOM_USER_1.name,
+    TEST_PASSWORD,
+  );
+  // create user document
+  const newCustomDemo1 = await userCreate(customDemo1, {
+    isDemo: false,
+    userAccountType: UserAccountEnum.DEMO_TRADING,
+  });
+
+  // create watchList
+  await demoService.createWatchListWithRandomSymbols(newCustomDemo1);
+
+  // generate transactions
+  await demoService.generateTransactionsForRandomSymbols(newCustomDemo1);
 
   // create group data
   console.log('CREATE NEW GROUPS - START');
+
   // get 10 random users
-  const owners = newUsers.filter((d) => d.userAccountType === UserAccountEnum.DEMO_TRADING).slice(0, 10);
+  const owners = [
+    newCustomDemo1,
+    ...newUsersDemo.filter((d) => d.userAccountType === UserAccountEnum.DEMO_TRADING).slice(0, 10),
+  ];
 
   // generate groups
   for (const owner of owners) {
     console.log('Group created');
-    const { createdGroup, groupMembers } = await createRandomGroup(owner, newUsers);
+    const { createdGroup, groupMembers } = await createRandomGroup(owner, newUsersDemo);
     console.log('Updating group data');
     await createGroupRandomPortfolioSnapshots(createdGroup, groupMembers);
   }
   console.log('CREATE NEW GROUPS - DONE');
+
+  return [...newUsersNormal, ...newUsersDemo, newCustomDemo1];
 };
 
 /**

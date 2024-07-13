@@ -8,7 +8,6 @@ import {
   SymbolSummary,
   TRANSACTION_FEE_PRCT,
   USER_ALLOWED_DEMO_ACCOUNTS_PER_IP,
-  UserAccountBasicTypes,
   UserAccountEnum,
   UserCreateDemoAccountInput,
   UserData,
@@ -49,11 +48,13 @@ export const userCreateAccountDemoCall = onCall(
     const demoService = new CreateDemoAccountService();
     await demoService.initService(18, 20);
 
-    // create new demo user
-    const newUser = await demoService.createRandomUserAccounts({
+    // create demo accounts
+    const newDemoUser = await demoService.createRandomUser(true, randomPassword);
+
+    // create user document
+    const newUser = await userCreate(newDemoUser, {
       isDemo: true,
       userAccountType: request.data.accountType,
-      password: randomPassword,
       publicIP: request.data.publicIP,
     });
 
@@ -79,32 +80,6 @@ export class CreateDemoAccountService {
   initService = async (transactionLimit = 20, watchListLimit = 30): Promise<void> => {
     this.symbolToTransact = await this.getRandomSymbolSummaries(transactionLimit);
     this.watchListSymbols = await this.getRandomSymbolSummaries(watchListLimit);
-  };
-
-  /**
-   *
-   * @param data
-   * @param transactionSymbols - list of symbols to use for user's transactions
-   * @param watchListSymbols  - list of symbols to use for user's watchlist
-   * @returns
-   */
-  createRandomUserAccounts = async (data: {
-    userAccountType: UserAccountBasicTypes;
-    isDemo: boolean;
-    password: string;
-    publicIP?: string;
-  }): Promise<UserData> => {
-    // create demo accounts
-    const newDemoUser = await this.createRandomUser(data.isDemo, data.password);
-
-    // create user document
-    const userData = await userCreate(newDemoUser, {
-      isDemo: !!data.isDemo,
-      userAccountType: data.userAccountType,
-      publicIP: data.publicIP,
-    });
-
-    return userData;
   };
 
   /**
@@ -262,6 +237,18 @@ export class CreateDemoAccountService {
       emailVerified: true,
       password: password,
       displayName: `${namePrefix}${faker.person.fullName()}`,
+      photoURL: faker.image.avatar(),
+      disabled: false,
+    });
+  };
+
+  createUserCustom = async (email: string, name: string, password: string): Promise<UserRecord> => {
+    return getAuth().createUser({
+      uid: `CUSTOM_${faker.string.uuid()}`,
+      email: email,
+      emailVerified: true,
+      password: password,
+      displayName: name,
       photoURL: faker.image.avatar(),
       disabled: false,
     });

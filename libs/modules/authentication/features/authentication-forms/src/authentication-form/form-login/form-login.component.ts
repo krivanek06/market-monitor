@@ -13,18 +13,10 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
   template: `
     <form [formGroup]="formGroup" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
       <!-- email -->
-      <app-form-mat-input-wrapper
-        formControlName="email"
-        inputCaption="Email"
-        inputType="EMAIL"
-      ></app-form-mat-input-wrapper>
+      <app-form-mat-input-wrapper formControlName="email" inputCaption="Email" inputType="EMAIL" />
 
       <!-- password -->
-      <app-form-mat-input-wrapper
-        formControlName="password"
-        inputCaption="Password"
-        inputType="PASSWORD"
-      ></app-form-mat-input-wrapper>
+      <app-form-mat-input-wrapper formControlName="password" inputCaption="Password" inputType="PASSWORD" />
 
       <!-- submit -->
       <button mat-stroked-button color="primary" class="w-full" type="submit">Login</button>
@@ -58,8 +50,6 @@ export class FormLoginComponent implements ControlValueAccessor {
 
   onChange: (value: LoginUserInput) => void = () => {};
   onTouched = () => {};
-
-  constructor() {}
 
   onSubmit(): void {
     this.formGroup.markAllAsTouched();

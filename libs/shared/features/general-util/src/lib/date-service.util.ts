@@ -73,7 +73,7 @@ export const dateFormatDate = (
  * @returns today in format yyyy-MM-dd
  */
 export const getCurrentDateDefaultFormat = (): string => {
-  return dateFormatDate(new Date());
+  return dateFormatDate(new Date(), 'yyyy-MM-dd');
 };
 
 export const getCurrentDateDetailsFormat = (): string => {

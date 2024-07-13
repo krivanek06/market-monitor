@@ -5,7 +5,11 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { UserBase } from '@mm/api-types';
 import { PortfolioGrowth } from '@mm/portfolio/data-access';
 import { ChartConstructor, ColorScheme, GenericChartSeries } from '@mm/shared/data-access';
-import { fillOutMissingDatesForDate, formatValueIntoCurrency } from '@mm/shared/general-util';
+import {
+  fillOutMissingDatesForDate,
+  formatValueIntoCurrency,
+  getCurrentDateDefaultFormat,
+} from '@mm/shared/general-util';
 import { DateRangeSliderComponent, DateRangeSliderValues } from '@mm/shared/ui';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { map } from 'rxjs';
@@ -22,11 +26,9 @@ export type PortfolioGrowthCompareChartData = {
   template: `
     <!-- time slider -->
     <div class="flex justify-end">
-      <app-date-range-slider
-        *ngIf="dateRangeControl.value.dates.length > 0"
-        class="hidden w-[550px] md:block"
-        [formControl]="dateRangeControl"
-      />
+      @if (dateRangeControl.value.dates.length > 0) {
+        <app-date-range-slider class="hidden w-[550px] md:block" [formControl]="dateRangeControl" />
+      }
     </div>
 
     <!-- chart -->
@@ -68,42 +70,25 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
 
   dateRangeControlEffect = effect(
     () => {
-      // no data provided
-      if (this.data().length === 0) {
-        this.dateRangeControl.patchValue({
-          currentMaxDateIndex: 0,
-          currentMinDateIndex: 0,
-          dates: [],
-        });
-        return;
-      }
+      // get the default date - today
+      const defaultDate = getCurrentDateDefaultFormat();
 
       // find the data with minimum date
       const dataMinimalDate = this.data()
         .filter((d) => d.portfolioGrowth.length > 1)
-        .reduce((acc, curr) => (acc.portfolioGrowth[0].date < curr.portfolioGrowth[0].date ? acc : curr));
+        .map((d) => d.portfolioGrowth.map((e) => e.date))
+        .reduce((acc, curr) => (acc < curr[0] ? acc : curr[0]), defaultDate);
 
       // find the data with maximum date
       const dataMaximalDate = this.data()
         .filter((d) => d.portfolioGrowth.length > 1)
-        .reduce((acc, curr) =>
-          acc.portfolioGrowth[acc.portfolioGrowth.length - 1].date >
-          curr.portfolioGrowth[curr.portfolioGrowth.length - 1].date
-            ? acc
-            : curr,
-        );
+        .map((d) => d.portfolioGrowth.map((e) => e.date))
+        .reduce((acc, curr) => (acc > (curr.at(-1) ?? defaultDate) ? acc : curr.at(-1) ?? defaultDate), defaultDate);
 
-      // empty portfolio growth
-      if (dataMinimalDate.portfolioGrowth.length === 0 || dataMaximalDate.portfolioGrowth.length === 0) {
-        return;
-      }
+      // each user can have different starting and ending date (if inactive) and date gap may exists - may be empty
+      const dateInterval = fillOutMissingDatesForDate(dataMinimalDate, dataMaximalDate);
 
-      // get starting and ending date and fill out missing dates
-      // each user can have different starting and ending date and date gap may exists
-      const startingDate = new Date(dataMinimalDate.portfolioGrowth[0].date);
-      const endingDate = new Date(dataMaximalDate.portfolioGrowth[dataMaximalDate.portfolioGrowth.length - 1].date);
-      const dateInterval = fillOutMissingDatesForDate(startingDate, endingDate);
-
+      // set the date range
       this.dateRangeControl.patchValue({
         currentMaxDateIndex: dateInterval.length - 1,
         currentMinDateIndex: 0,
