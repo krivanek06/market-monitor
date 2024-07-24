@@ -5,7 +5,7 @@ import { PageDashboardComponent } from '@mm/page-builder';
   selector: 'app-dashboard',
   standalone: true,
   imports: [PageDashboardComponent],
-  template: `<app-page-dashboard></app-page-dashboard>`,
+  template: `<app-page-dashboard />`,
   styles: `
     :host {
       display: block;

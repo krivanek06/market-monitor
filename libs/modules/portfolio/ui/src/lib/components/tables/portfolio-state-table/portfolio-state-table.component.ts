@@ -81,7 +81,7 @@ export type PortfolioStateTableData = {
     </div>
   `,
   styles: `
-    :host: {
+    :host {
       display: block;
     }
   `,

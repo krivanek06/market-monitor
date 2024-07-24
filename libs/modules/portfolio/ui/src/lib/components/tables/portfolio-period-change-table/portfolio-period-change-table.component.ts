@@ -126,7 +126,7 @@ export type PortfolioPeriodChangeTableComponentData = {
     </table>
   `,
   styles: `
-    :host: {
+    :host {
       display: block;
     }
   `,
