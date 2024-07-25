@@ -122,29 +122,29 @@ import {
     </div>
 
     <div class="mb-3 flex flex-col gap-4 sm:flex-row">
-      <!-- do not show buttons if not enough data -->
-      @if (portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0 > 0) {
-        <button
-          data-testid="page-dashboard-portfolio-change-button"
-          matTooltip="Display daily portfolio change - profit/loss"
-          type="button"
-          class="hidden sm:block"
-          (click)="onPortfolioChangeChart()"
-          mat-stroked-button
-        >
-          Portfolio Change
-        </button>
-        <button
-          data-testid="page-dashboard-asset-growth-button"
-          matTooltip="Display invested amount per asset in your portfolio"
-          type="button"
-          class="hidden sm:block"
-          (click)="onAssetGrowthChart()"
-          mat-stroked-button
-        >
-          Asset Growth
-        </button>
-      }
+      <button
+        data-testid="page-dashboard-portfolio-change-button"
+        matTooltip="Display daily portfolio change - profit/loss"
+        type="button"
+        class="hidden sm:block"
+        (click)="onPortfolioChangeChart()"
+        [disabled]="(portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0) === 0"
+        mat-stroked-button
+      >
+        Portfolio Change
+      </button>
+
+      <button
+        data-testid="page-dashboard-asset-growth-button"
+        matTooltip="Display invested amount per asset in your portfolio"
+        type="button"
+        class="hidden sm:block"
+        (click)="onAssetGrowthChart()"
+        [disabled]="(portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0) === 0"
+        mat-stroked-button
+      >
+        Asset Growth
+      </button>
     </div>
 
     <!-- dashboard charts -->
@@ -162,9 +162,7 @@ import {
           [heightPx]="400"
         />
       } @else {
-        <div class="grid place-content-center" [style.height.px]="400">
-          <mat-spinner />
-        </div>
+        <div class="g-skeleton mt-6 h-[400px]"></div>
       }
 
       <!-- investment growth -->
@@ -180,9 +178,7 @@ import {
           [heightPx]="400"
         />
       } @else {
-        <div class="grid place-content-center" [style.height.px]="400">
-          <mat-spinner />
-        </div>
+        <div class="g-skeleton mt-8 h-[400px]"></div>
       }
     </div>
 

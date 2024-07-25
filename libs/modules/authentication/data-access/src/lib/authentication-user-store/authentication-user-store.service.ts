@@ -12,7 +12,7 @@ import {
 import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { User } from 'firebase/auth';
 import { signalSlice } from 'ngxtension/signal-slice';
-import { combineLatest, distinctUntilChanged, map, of, switchMap } from 'rxjs';
+import { combineLatest, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
 import { hasUserAccess } from '../model';
 
@@ -23,8 +23,11 @@ export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationUse
 type AuthenticationState = {
   /**
    * flag to indicate if authentication is loaded
+   * FAIL - user is not authenticated
+   * SUCCESS - user is authenticated
+   * LOADING - user authentication is loading (no data from firebase)
    */
-  authenticationLoaded: boolean;
+  authenticationState: 'SUCCESS' | 'FAIL' | 'LOADING';
 
   /**
    * data of authenticated user
@@ -45,7 +48,7 @@ export class AuthenticationUserStoreService {
   private userApiService = inject(UserApiService);
 
   private initialState: AuthenticationState = {
-    authenticationLoaded: false,
+    authenticationState: 'LOADING',
     user: null,
     userData: null,
     userGroupData: null,
@@ -59,8 +62,9 @@ export class AuthenticationUserStoreService {
   private loadedAuthenticationSource$ = this.authenticationAccountService.getLoadedAuthentication().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev === curr),
+    tap((loaded) => console.log('AuthenticationUserStoreService loaded', loaded)),
     map((loaded) => ({
-      authenticationLoaded: !!loaded,
+      authenticationState: !!loaded ? ('SUCCESS' as const) : ('FAIL' as const),
     })),
   );
 

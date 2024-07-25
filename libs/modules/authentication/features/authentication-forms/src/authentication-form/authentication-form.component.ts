@@ -302,6 +302,7 @@ export class AuthenticationFormComponent {
       // display success message
       this.dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
       // navigate to dashboard
+      console.log('redirect aaa', ROUTES_MAIN.DASHBOARD);
       this.router.navigate([ROUTES_MAIN.DASHBOARD]);
     } else if (state.action === 'error') {
       this.dialogServiceUtil.handleError(state.error);
