@@ -84,6 +84,7 @@ export const test_function = async () => {
   console.log('[Users]: update portfolio');
 };
 
+/** do not use in prod, probably not working correctly */
 export const test_delete_user_accounts = async () => {
   console.log('[Users]: deactivate necessary accounts');
   await userDeactivateInactiveAccounts();

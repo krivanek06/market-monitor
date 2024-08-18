@@ -41,6 +41,7 @@ export const getPortfolioStateHoldingsUtil = (
       }
       return {
         ...holding,
+        invested: roundNDigits(holding.invested),
         breakEvenPrice: roundNDigits(holding.invested / holding.units),
         weight: roundNDigits(holding.invested / investedTotal, 6),
         symbolQuote: quote,
@@ -111,9 +112,9 @@ export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransact
       // update existing holding
       if (existingHolding) {
         existingHolding.units += isSell ? -curr.units : curr.units;
-        existingHolding.invested += isSell
-          ? -(existingHolding.breakEvenPrice * curr.units)
-          : curr.unitPrice * curr.units;
+        existingHolding.invested += roundNDigits(
+          isSell ? -(existingHolding.breakEvenPrice * curr.units) : curr.unitPrice * curr.units,
+        );
         existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units);
         return acc;
       }

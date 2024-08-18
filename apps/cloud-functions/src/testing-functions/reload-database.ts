@@ -42,7 +42,10 @@ export const testReloadDatabase = async (normalUsers = 10, demoUsers = 150): Pro
   // create normal users
   for (let i = 0; i < normalUsers; i++) {
     // create demo accounts
-    const newDemoUser = await demoService.createRandomUser(false, TEST_PASSWORD);
+    const newDemoUser = await demoService.createRandomUser({
+      isDemo: false,
+      password: TEST_PASSWORD,
+    });
 
     // create user document
     const newUser = await userCreate(newDemoUser, {
@@ -69,7 +72,10 @@ export const testReloadDatabase = async (normalUsers = 10, demoUsers = 150): Pro
   // create trading users
   for (let i = 0; i < demoUsers; i++) {
     // create demo accounts
-    const newDemoUser = await demoService.createRandomUser(false, TEST_PASSWORD);
+    const newDemoUser = await demoService.createRandomUser({
+      isDemo: false,
+      password: TEST_PASSWORD,
+    });
 
     // create user document
     const newUser = await userCreate(newDemoUser, {
@@ -93,11 +99,11 @@ export const testReloadDatabase = async (normalUsers = 10, demoUsers = 150): Pro
   console.log(`CREATE NEW USERS TRADING DONE - ${newUsersDemo.length} USERS`);
 
   // create custom users
-  const customDemo1 = await demoService.createUserCustom(
-    TEST_CUSTOM_USER_1.email,
-    TEST_CUSTOM_USER_1.name,
-    TEST_PASSWORD,
-  );
+  const customDemo1 = await demoService.createRandomUser({
+    email: TEST_CUSTOM_USER_1.email,
+    name: TEST_CUSTOM_USER_1.name,
+    password: TEST_PASSWORD,
+  });
   // create user document
   const newCustomDemo1 = await userCreate(customDemo1, {
     isDemo: false,

@@ -19,15 +19,23 @@ export type UserBase = {
   portfolioState: PortfolioState;
 
   accountCreatedDate: string;
+
   /**
    * at each login is set to true, set to false
    * only if lastLoginDate is more than USER_LOGIN_ACCOUNT_ACTIVE_DAYS ago
    */
   isAccountActive: boolean;
+
   /**
    * if true, account was created by the system for demo purposes
    */
   isDemo: boolean;
+
+  /**
+   * if true, account was created by the system for testing purposes
+   */
+  isTest?: boolean;
+
   /**
    * features that user has access to
    */

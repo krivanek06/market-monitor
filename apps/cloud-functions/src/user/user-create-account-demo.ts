@@ -56,7 +56,10 @@ export const userCreateAccountDemoCall = onCall(
     await demoService.initService(18, 20);
 
     // create demo accounts
-    const newDemoUser = await demoService.createRandomUser(true, randomPassword);
+    const newDemoUser = await demoService.createRandomUser({
+      isDemo: true,
+      password: randomPassword,
+    });
 
     // create user document
     const newUser = await userCreate(newDemoUser, {
@@ -85,8 +88,8 @@ export class CreateDemoAccountService {
   }
 
   initService = async (transactionLimit = 20, watchListLimit = 30): Promise<void> => {
-    this.symbolToTransact = await this.getRandomSymbolSummaries(transactionLimit);
-    this.watchListSymbols = await this.getRandomSymbolSummaries(watchListLimit);
+    this.symbolToTransact = await this.#getRandomSymbolSummaries(transactionLimit);
+    this.watchListSymbols = await this.#getRandomSymbolSummaries(watchListLimit);
   };
 
   /**
@@ -95,48 +98,78 @@ export class CreateDemoAccountService {
    * @param userData
    */
   generateTransactionsForRandomSymbols = async (userData: UserData): Promise<void> => {
-    const userDocTransactionsRef = userDocumentTransactionHistoryRef(userData.id);
-
+    // save all created transactions
     const transactionsToSave: PortfolioTransaction[] = [];
 
-    const pastDateBuy = format(subDays(new Date(), 200), 'yyyy-MM-dd');
-    const pastDateSell = format(subDays(new Date(), 140), 'yyyy-MM-dd');
+    const pastDateBuy = format(subDays(new Date(), 30), 'yyyy-MM-dd');
+    const pastDateSell = format(subDays(new Date(), 4), 'yyyy-MM-dd');
 
-    for await (const symbol of this.symbolToTransact) {
+    // create BUY transactions for each symbol
+    for (const symbol of this.symbolToTransact) {
       const buyOperation: PortfolioTransactionCreate = {
         date: pastDateBuy,
         symbol: symbol.id,
         sector: symbol.profile?.sector ?? 'Unknown',
         symbolType: 'STOCK',
-        units: getRandomNumber(6, 9),
+        units: getRandomNumber(10, 40),
         transactionType: 'BUY',
       };
 
-      const sellOperation: PortfolioTransactionCreate = {
-        date: pastDateSell,
-        symbol: symbol.id,
-        sector: symbol.profile?.sector ?? 'Unknown',
-        symbolType: 'STOCK',
-        units: getRandomNumber(3, 5),
-        transactionType: 'SELL',
-      };
-
       try {
-        const t1 = await this.createPortfolioCreateOperation(buyOperation, userData, transactionsToSave);
-        transactionsToSave.push(t1);
+        const buyTransaction = await this.createPortfolioCreateOperation(buyOperation, userData, transactionsToSave);
 
-        const t2 = await this.createPortfolioCreateOperation(sellOperation, userData, transactionsToSave);
-        transactionsToSave.push(t2);
+        // how much was already spent on all transactions
+        const alreadySpent = transactionsToSave.reduce((acc, curr) => acc + curr.unitPrice * curr.units, 0);
+
+        // check if user has enough cash to buy
+        const hasCash =
+          userData.portfolioState.cashOnHand - alreadySpent - buyTransaction.unitPrice * buyTransaction.units > 0;
+
+        // only save if cash will not be negative for demo trading accounts
+        if (hasCash || userData.userAccountType !== UserAccountEnum.DEMO_TRADING) {
+          transactionsToSave.push(buyTransaction);
+        }
       } catch (err) {
         console.log(`Symbol: ${symbol.id} - skip transactions for user: ${userData.personal.displayName}`);
       }
     }
 
+    // map data into new object to avoid circular reference
+    const buyTransactionData = transactionsToSave.map((d) => ({ symbol: d.symbol, sector: d.sector, units: d.units }));
+
+    // create SELL transactions for each symbol
+    for (const transaction of buyTransactionData) {
+      const sellOperation: PortfolioTransactionCreate = {
+        date: pastDateSell,
+        symbol: transaction.symbol,
+        sector: transaction.sector ?? 'Unknown',
+        symbolType: 'STOCK',
+        // sell half of the units
+        units: getRandomNumber(8, Math.round(transaction.units / 2)),
+        transactionType: 'SELL',
+      };
+
+      // check if not selling more than user has
+      if (sellOperation.units > transaction.units) {
+        console.log(`Symbol: ${sellOperation.symbol} - skip transactions for user: ${userData.personal.displayName}`);
+        continue;
+      }
+
+      try {
+        const sellTransaction = await this.createPortfolioCreateOperation(sellOperation, userData, transactionsToSave);
+        transactionsToSave.push(sellTransaction);
+      } catch (err) {
+        console.log(`Symbol: ${sellOperation.symbol} - skip transactions for user: ${userData.personal.displayName}`);
+      }
+    }
+
     // save transaction into user document at once
-    userDocTransactionsRef.update({ transactions: transactionsToSave } satisfies UserPortfolioTransaction);
+    await userDocumentTransactionHistoryRef(userData.id).update({
+      transactions: transactionsToSave,
+    } satisfies UserPortfolioTransaction);
   };
 
-  getHistoricalPrice = async (symbol: string, date: string): Promise<HistoricalPrice> => {
+  #getHistoricalPrice = async (symbol: string, date: string): Promise<HistoricalPrice> => {
     const cacheKey = `${symbol}_${date}`;
 
     // check if data already loaded
@@ -163,20 +196,20 @@ export class CreateDemoAccountService {
     userData: UserData,
     userTransactions: PortfolioTransaction[],
   ): Promise<PortfolioTransaction> => {
-    const symbolPrice = await this.getHistoricalPrice(data.symbol, data.date);
+    const symbolPrice = await this.#getHistoricalPrice(data.symbol, data.date);
 
     // from previous transaction calculate invested and units - currently if I own that symbol
-    const symbolHolding = this.getCurrentInvestedFromTransactions(data.symbol, userTransactions);
+    const symbolHolding = this.#getCurrentInvestedFromTransactions(data.symbol, userTransactions);
     const symbolHoldingBreakEvenPrice = roundNDigits(symbolHolding.invested / symbolHolding.units, 2);
 
     // create transaction
-    const transaction = this.createTransaction(userData, data, symbolPrice, symbolHoldingBreakEvenPrice);
+    const transaction = this.#createTransaction(userData, data, symbolPrice, symbolHoldingBreakEvenPrice);
 
     // return data
     return transaction;
   };
 
-  getCurrentInvestedFromTransactions = (
+  #getCurrentInvestedFromTransactions = (
     symbol: string,
     userTransactions: PortfolioTransaction[],
   ): { units: number; invested: number } => {
@@ -185,16 +218,17 @@ export class CreateDemoAccountService {
       .reduce(
         (acc, curr) => ({
           ...acc,
-          invested:
+          invested: roundNDigits(
             acc.invested +
-            (curr.transactionType === 'BUY' ? curr.unitPrice * curr.units : -curr.unitPrice * curr.units),
+              (curr.transactionType === 'BUY' ? curr.unitPrice * curr.units : -curr.unitPrice * curr.units),
+          ),
           units: acc.units + (curr.transactionType === 'BUY' ? curr.units : -curr.units),
         }),
         { invested: 0, units: 0 } as { units: number; invested: number },
       );
   };
 
-  createTransaction = (
+  #createTransaction = (
     userDocData: UserData,
     input: PortfolioTransactionCreate,
     historicalPrice: HistoricalPrice,
@@ -235,27 +269,22 @@ export class CreateDemoAccountService {
     return result;
   };
 
-  createRandomUser = (isDemo: boolean, password: string): Promise<UserRecord> => {
-    const namePrefix = isDemo ? 'demo_' : 'user_';
+  createRandomUser = (data: {
+    isDemo?: boolean;
+    password: string;
+    isTest?: boolean;
+    email?: string;
+    name?: string;
+  }): Promise<UserRecord> => {
+    const idPrefix = data.isDemo ? 'demo_' : data.isTest ? 'test_' : 'user_';
+    const namePrefix = data.isDemo ? 'demo_' : '';
 
     return getAuth().createUser({
-      uid: `${namePrefix}${faker.string.uuid()}`,
-      email: `${namePrefix}${faker.internet.email()}`,
+      uid: `${idPrefix}${faker.string.uuid()}`,
+      email: data.email ?? `${idPrefix}${faker.internet.email()}`,
       emailVerified: true,
-      password: password,
-      displayName: `${namePrefix}${faker.person.fullName()}`,
-      photoURL: faker.image.avatar(),
-      disabled: false,
-    });
-  };
-
-  createUserCustom = async (email: string, name: string, password: string): Promise<UserRecord> => {
-    return getAuth().createUser({
-      uid: `CUSTOM_${faker.string.uuid()}`,
-      email: email,
-      emailVerified: true,
-      password: password,
-      displayName: name,
+      password: data.password,
+      displayName: data.name ?? `${namePrefix}${faker.internet.userName()}`,
       photoURL: faker.image.avatar(),
       disabled: false,
     });
@@ -273,9 +302,8 @@ export class CreateDemoAccountService {
     });
   };
 
-  getRandomSymbolSummaries = async (limit: number): Promise<SymbolSummary[]> => {
-    const symbols = this.getSymbols();
-    const randomSymbols = symbols.sort(() => 0.5 - Math.random()).slice(0, limit);
+  #getRandomSymbolSummaries = async (limit: number): Promise<SymbolSummary[]> => {
+    const randomSymbols = this.#getSymbols().slice(0, limit);
     const summaries = await getSymbolSummaries(randomSymbols);
 
     console.log('Random symbols:', randomSymbols, 'Summaries:', summaries.length);
@@ -283,16 +311,16 @@ export class CreateDemoAccountService {
     return summaries;
   };
 
-  getSymbols = () => {
+  #getSymbols = () => {
     // list of symbols
     const symbols = [
       'AAPL',
-      'AMZN',
+      'AAL',
       'GOOGL',
       'MSFT',
       'TSLA',
       'META',
-      'NVDA',
+      'LYFT',
       'BABA',
       'JPM',
       'V',

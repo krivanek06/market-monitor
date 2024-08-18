@@ -13,6 +13,7 @@ import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchLi
 
 export type CreateUserAdditionalData = {
   isDemo?: boolean;
+  isTest?: boolean;
   userAccountType?: UserAccountBasicTypes;
   publicIP?: string;
 };
@@ -98,6 +99,7 @@ const createNewUser = (id: string, personal: UserPersonalInfo, additional: Creat
     },
     isAccountActive: true,
     isDemo: !!additional.isDemo,
+    isTest: !!additional.isTest,
     accountCreatedDate: getCurrentDateDefaultFormat(),
     userAccountType: additional?.userAccountType ?? UserAccountEnum.DEMO_TRADING,
     systemRank: {},
