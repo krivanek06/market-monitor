@@ -63,6 +63,11 @@ export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DELETE = 180;
 export const USER_ALLOWED_DEMO_ACCOUNTS_PER_IP = 20;
 
 /**
+ * how many demo accounts can be inside the application at once
+ */
+export const USER_ALLOWED_DEMO_ACCOUNTS_TOTAL = 300;
+
+/**
  * limit how many symbols can be in a group holding (which are copied from users holdings)
  */
 export const GROUP_HOLDING_LIMIT = 100;

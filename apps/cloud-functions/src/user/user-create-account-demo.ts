@@ -8,6 +8,7 @@ import {
   SymbolSummary,
   TRANSACTION_FEE_PRCT,
   USER_ALLOWED_DEMO_ACCOUNTS_PER_IP,
+  USER_ALLOWED_DEMO_ACCOUNTS_TOTAL,
   UserAccountEnum,
   UserCreateDemoAccountInput,
   UserData,
@@ -31,15 +32,21 @@ import { userCreate } from './user-create-account';
 export const userCreateAccountDemoCall = onCall(
   async (request: CallableRequest<UserCreateDemoAccountInput>): Promise<UserDataDemoData> => {
     // check how many demo accounts are created per IP
-    const demoAccounts = await userCollectionDemoAccountRef()
-      .where('userPrivateInfo.publicIP', '==', request.data.publicIP)
-      .get();
+    const demoAccountsTotal = await userCollectionDemoAccountRef().get();
+    const demoAccountsPerIp = demoAccountsTotal.docs.filter(
+      (d) => d.data().userPrivateInfo.publicIP === request.data.publicIP,
+    );
 
-    console.log('demoAccounts', demoAccounts.docs.length, 'from IP', request.data.publicIP);
+    console.log('demoAccounts', demoAccountsPerIp.length, 'from IP', request.data.publicIP);
 
     // throw error if too many demo accounts are created
-    if (demoAccounts.docs.length > USER_ALLOWED_DEMO_ACCOUNTS_PER_IP) {
+    if (demoAccountsPerIp.length > USER_ALLOWED_DEMO_ACCOUNTS_PER_IP) {
       throw new HttpsError('aborted', 'Too many demo accounts created from this IP');
+    }
+
+    // throw error if too many accounts
+    if (demoAccountsTotal.docs.length >= USER_ALLOWED_DEMO_ACCOUNTS_TOTAL) {
+      throw new HttpsError('aborted', 'Too many demo accounts created for not, try later');
     }
 
     // create random password
