@@ -1,12 +1,10 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AuthenticationFormComponent } from '@mm/authentication/authentication-forms';
-import { DialogServiceModule } from '@mm/shared/dialog-manager';
 
 @Component({
   selector: 'app-page-login',
   standalone: true,
-  imports: [CommonModule, AuthenticationFormComponent, DialogServiceModule],
+  imports: [AuthenticationFormComponent],
   template: `
     <section>
       <div class="mx-auto h-lvh w-full max-w-[800px] pt-[200px]">

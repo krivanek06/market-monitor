@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,7 +11,7 @@ import { forkJoin, take } from 'rxjs';
 @Component({
   selector: 'app-page-search',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, NewsSearchComponent, SymbolSearchBasicComponent],
+  imports: [MatButtonModule, NewsSearchComponent, SymbolSearchBasicComponent],
   template: `
     <div class="pb-[260px] pt-[180px] sm:pb-[300px] sm:pt-[200px]">
       <div class="mx-auto max-w-[620px]">
