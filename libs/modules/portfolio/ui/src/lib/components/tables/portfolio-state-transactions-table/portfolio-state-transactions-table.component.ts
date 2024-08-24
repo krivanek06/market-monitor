@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input, untracked } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioState, UserBase } from '@mm/api-types';
 import { DefaultImgDirective } from '@mm/shared/ui';
@@ -76,13 +76,14 @@ export type PortfolioStateTransactionsTableData = {
 export class PortfolioStateTransactionsTableComponent {
   data = input.required<PortfolioStateTransactionsTableData[]>();
 
-  tableEffect = effect(
-    () => {
-      this.dataSource.data = this.data();
+  tableEffect = effect(() => {
+    const data = this.data();
+
+    untracked(() => {
+      this.dataSource.data = data;
       this.dataSource._updateChangeSubscription();
-    },
-    { allowSignalWrites: true },
-  );
+    });
+  });
 
   displayedColumns: string[] = ['user', 'total', 'buy', 'sell', 'fees'];
 

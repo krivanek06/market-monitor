@@ -1,4 +1,4 @@
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CalendarStockEarning, StockEarning } from '@mm/api-types';
@@ -8,9 +8,9 @@ import { EarningsItemComponent } from '../../components';
 @Component({
   selector: 'app-earnings-items-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, DialogCloseHeaderComponent, EarningsItemComponent],
+  imports: [MatDialogModule, DialogCloseHeaderComponent, EarningsItemComponent],
   template: `
-    <app-dialog-close-header [title]="dialogTitle"></app-dialog-close-header>
+    <app-dialog-close-header [title]="dialogTitle" />
 
     <mat-dialog-content>
       <div class="mb-2 flex items-center justify-between">
@@ -21,13 +21,14 @@ import { EarningsItemComponent } from '../../components';
           <span>Revenue</span>
         </div>
       </div>
-      <app-earnings-item
-        *ngFor="let earning of data.earnings; let last = last"
-        (itemClickedEmitter)="onEarningsClicked(earning)"
-        [earning]="earning"
-        [showBorder]="!last"
-        [showRevenue]="true"
-      ></app-earnings-item>
+      @for (earning of data.earnings; track earning.date; let last = $last) {
+        <app-earnings-item
+          (itemClickedEmitter)="onEarningsClicked(earning)"
+          [earning]="earning"
+          [showBorder]="!last"
+          [showRevenue]="true"
+        />
+      }
     </mat-dialog-content>
   `,
   styles: `

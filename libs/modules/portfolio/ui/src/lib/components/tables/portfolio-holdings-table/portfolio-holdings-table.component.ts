@@ -8,6 +8,7 @@ import {
   input,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
@@ -278,17 +279,17 @@ export class PortfolioHoldingsTableComponent {
 
   showDailyChangeSignal = signal(false);
 
-  tableEffect = effect(
-    () => {
-      const sorted = this.holdings()
-        .slice()
-        .sort((a, b) => compare(b.symbolQuote.price * b.units, a.symbolQuote.price * a.units));
+  tableEffect = effect(() => {
+    const sorted = this.holdings()
+      .slice()
+      .sort((a, b) => compare(b.symbolQuote.price * b.units, a.symbolQuote.price * a.units));
+
+    untracked(() => {
       this.dataSource.data = sorted;
       this.dataSource.paginator = this.paginator() ?? null;
       this.dataSource.sort = this.sort() ?? null;
-    },
-    { allowSignalWrites: true },
-  );
+    });
+  });
 
   identity: TrackByFunction<PortfolioStateHolding> = (index: number, item: PortfolioStateHolding) => item.symbol;
 

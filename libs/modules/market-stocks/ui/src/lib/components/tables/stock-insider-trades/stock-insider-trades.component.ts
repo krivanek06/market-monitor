@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  TrackByFunction,
+  effect,
+  input,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -136,7 +144,7 @@ import { BubblePaginationDirective, LargeNumberFormatterPipe } from '@mm/shared/
         [ngClass]="{
           'text-wt-success': transactionType === 'G-Gift',
           'text-wt-danger': transactionType === 'S-Sale',
-          'text-wt-gray-dark': transactionType !== 'G-Gift' && transactionType !== 'S-Sale'
+          'text-wt-gray-dark': transactionType !== 'G-Gift' && transactionType !== 'S-Sale',
         }"
       >
         {{ transactionType }}
@@ -155,15 +163,15 @@ export class StockInsiderTradesComponent {
   sort = viewChild(MatSort);
   data = input.required<CompanyInsideTrade[]>();
 
-  tableEffect = effect(
-    () => {
-      this.dataSource.data = this.data();
+  tableEffect = effect(() => {
+    const data = this.data();
+    untracked(() => {
+      this.dataSource.data = data;
       this.dataSource.paginator = this.paginator() ?? null;
       this.dataSource.sort = this.sort() ?? null;
       this.dataSource._updateChangeSubscription();
-    },
-    { allowSignalWrites: true },
-  );
+    });
+  });
   dataSource = new MatTableDataSource<CompanyInsideTrade>([]);
 
   displayedColumns: string[] = [

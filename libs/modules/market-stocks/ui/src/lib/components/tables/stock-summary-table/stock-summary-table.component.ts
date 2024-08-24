@@ -7,6 +7,7 @@ import {
   input,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -272,14 +273,15 @@ export class StockSummaryTableComponent {
   symbolQuotes = input.required<SymbolQuote[] | null | undefined>();
   symbolSkeletonLoaders = input<number>(10);
 
-  tableEffect = effect(
-    () => {
-      const summaries = this.symbolQuotes();
+  tableEffect = effect(() => {
+    const summaries = this.symbolQuotes();
 
-      // keep loading state
-      if (!summaries) {
-        return;
-      }
+    // keep loading state
+    if (!summaries) {
+      return;
+    }
+
+    untracked(() => {
       // sort data by market cap
       const newData = summaries.slice().sort((a, b) => compare(a.marketCap, b.marketCap, false));
       this.dataSource.data = newData;
@@ -288,9 +290,8 @@ export class StockSummaryTableComponent {
       this.dataSource.sort = this.sort() ?? null;
       this.dataSource._updateChangeSubscription();
       this.showLoadingSkeletonSignal.set(false);
-    },
-    { allowSignalWrites: true },
-  );
+    });
+  });
 
   showLoadingSkeletonSignal = signal(true);
 

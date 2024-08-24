@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -158,38 +158,39 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   /**
    * effect to patch value to the slider based on the selected symbols
    */
-  dateRangeEffect = effect(
-    () => {
-      const allAssetsData = this.data() ?? [];
-      const selectedSymbols = this.selectedSymbol();
+  dateRangeEffect = effect(() => {
+    const allAssetsData = this.data() ?? [];
+    const selectedSymbols = this.selectedSymbol();
 
-      // nothing is selected or empty data
-      if (selectedSymbols.length === 0 || allAssetsData.length === 0) {
+    // nothing is selected or empty data
+    if (selectedSymbols.length === 0 || allAssetsData.length === 0) {
+      untracked(() => {
         this.dateRangeControl.patchValue({
           currentMaxDateIndex: 0,
           currentMinDateIndex: 0,
           dates: [],
         });
-        return;
-      }
+      });
+      return;
+    }
 
-      // create range of dates from the minimal date to the current date up to today
-      const minDate = allAssetsData
-        .filter((d) => selectedSymbols.includes(d.symbol))
-        .reduce((acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc), getCurrentDateDefaultFormat());
+    // create range of dates from the minimal date to the current date up to today
+    const minDate = allAssetsData
+      .filter((d) => selectedSymbols.includes(d.symbol))
+      .reduce((acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc), getCurrentDateDefaultFormat());
 
-      // generate missing dates between minDate and today
-      const missingDates = fillOutMissingDatesForDate(minDate, new Date());
+    // generate missing dates between minDate and today
+    const missingDates = fillOutMissingDatesForDate(minDate, new Date());
 
+    untracked(() => {
       // set value to the form
       this.dateRangeControl.patchValue({
         currentMaxDateIndex: missingDates.length - 1,
         currentMinDateIndex: 0,
         dates: missingDates,
       });
-    },
-    { allowSignalWrites: true },
-  );
+    });
+  });
 
   /**
    * save provided data into the component
@@ -214,18 +215,17 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
    * otherwise new data inside the series is not showed
    * TODO: remove this - it is a hack
    */
-  chartOptionsSignalEffect = effect(
-    () => {
-      this.selectedSymbol();
+  chartOptionsSignalEffect = effect(() => {
+    this.selectedSymbol();
 
+    untracked(() => {
       this.displayChart.set(false);
 
       setTimeout(() => {
         this.displayChart.set(true);
       }, 300);
-    },
-    { allowSignalWrites: true },
-  );
+    });
+  });
 
   onDeselectSymbol(symbol: string) {
     this.removeSymbol$.next(symbol);

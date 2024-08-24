@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input, untracked } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { UserBase } from '@mm/api-types';
 import { PortfolioChange } from '@mm/portfolio/data-access';
@@ -135,13 +135,14 @@ export type PortfolioPeriodChangeTableComponentData = {
 export class PortfolioPeriodChangeTableComponent {
   data = input.required<PortfolioPeriodChangeTableComponentData[]>();
 
-  tableEffect = effect(
-    () => {
-      this.dataSource.data = this.data();
+  tableEffect = effect(() => {
+    const data = this.data();
+
+    untracked(() => {
+      this.dataSource.data = data;
       this.dataSource._updateChangeSubscription();
-    },
-    { allowSignalWrites: true },
-  );
+    });
+  });
 
   displayedColumns: string[] = ['user', '1_day', '1_week', '2_week', '1_month', '3_month'];
 

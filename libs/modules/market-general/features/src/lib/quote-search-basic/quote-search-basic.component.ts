@@ -1,6 +1,7 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatDividerModule } from '@angular/material/divider';
@@ -12,13 +13,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MarketApiService } from '@mm/api-client';
 import { AvailableQuotes, SymbolQuote } from '@mm/api-types';
 import { DefaultImgDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
-import { tap } from 'rxjs';
+import { combineLatest, map, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-quote-search-basic',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
     MatAutocompleteModule,
     ReactiveFormsModule,
     MatInputModule,
@@ -54,24 +55,19 @@ import { tap } from 'rxjs';
         [autofocus]="false"
         [autoActiveFirstOption]="false"
       >
-        <!-- loading skeleton -->
-        <div *ngIf="showLoadingIndicator()" class="h-[220px]">
-          <mat-spinner [diameter]="80"></mat-spinner>
-        </div>
-
         <!-- loaded data -->
-        <ng-container *ngIf="!showLoadingIndicator()">
-          <cdk-virtual-scroll-viewport [itemSize]="50" class="h-[400px]" minBufferPx="380" maxBufferPx="400">
-            <mat-option
-              *cdkVirtualFor="let quote of displayedOptions(); let last = last"
-              [value]="quote"
-              class="rounded-md py-2"
-            >
-              <app-quote-item [symbolQuote]="quote"></app-quote-item>
-              <mat-divider *ngIf="!last"></mat-divider>
-            </mat-option>
-          </cdk-virtual-scroll-viewport>
-        </ng-container>
+        <cdk-virtual-scroll-viewport [itemSize]="50" class="h-[400px]" minBufferPx="380" maxBufferPx="400">
+          <mat-option
+            *cdkVirtualFor="let quote of displayedOptions(); let last = last"
+            [value]="quote"
+            class="rounded-md py-2"
+          >
+            <app-quote-item [symbolQuote]="quote" />
+            @if (!last) {
+              <mat-divider />
+            }
+          </mat-option>
+        </cdk-virtual-scroll-viewport>
       </mat-autocomplete>
     </mat-form-field>
   `,
@@ -111,34 +107,22 @@ export class QuoteSearchBasicComponent implements ControlValueAccessor {
   size = input<'small'>('small');
 
   searchControlSignal = signal<string>('');
-  showLoadingIndicator = signal<boolean>(false);
-  displayedOptions = computed(() =>
-    this.options().filter((quote) => quote.name.toLowerCase().includes(this.searchControlSignal().toLowerCase())),
+
+  displayedOptions = toSignal(
+    combineLatest([
+      toObservable(this.type).pipe(switchMap((type) => this.marketApiService.getQuotesByType(type))),
+      toObservable(this.searchControlSignal),
+    ]).pipe(
+      map(([quotesData, searchQuotePrefix]) =>
+        quotesData.filter((quote) => quote.name.toLowerCase().includes(searchQuotePrefix.toLowerCase())),
+      ),
+    ),
+
+    { initialValue: [] },
   );
-  private options = signal<SymbolQuote[]>([]);
 
   onChange: (value: SymbolQuote) => void = () => {};
   onTouched = () => {};
-
-  loadQuotesEffect = effect(
-    () => {
-      this.loadQuotesByType(this.type());
-    },
-    { allowSignalWrites: true },
-  );
-
-  private loadQuotesByType(type: AvailableQuotes) {
-    this.showLoadingIndicator.set(true);
-    this.marketApiService
-      .getQuotesByType(type)
-      .pipe(
-        tap((quotes) => {
-          this.options.set(quotes);
-          this.showLoadingIndicator.set(false);
-        }),
-      )
-      .subscribe();
-  }
 
   onStockSelect(event: MatAutocompleteSelectedEvent): void {
     const quote = event.option.value as SymbolQuote;
@@ -146,7 +130,7 @@ export class QuoteSearchBasicComponent implements ControlValueAccessor {
     this.searchControlSignal.set(quote.name);
   }
 
-  displayProperty = (quote?: SymbolQuote | string) => (typeof quote === 'string' ? quote : quote?.name ?? '');
+  displayProperty = (quote?: SymbolQuote | string) => (typeof quote === 'string' ? quote : (quote?.name ?? ''));
 
   /*
       parent component adds value to child

@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, TrackByFunction, effect, input, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  TrackByFunction,
+  effect,
+  input,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -160,14 +168,15 @@ export class StockOwnershipHoldersTableComponent {
   sort = viewChild(MatSort);
   data = input.required<SymbolOwnershipHolders[]>();
 
-  tableEffect = effect(
-    () => {
-      this.dataSource.data = this.data();
+  tableEffect = effect(() => {
+    const data = this.data();
+
+    untracked(() => {
+      this.dataSource.data = data;
       this.dataSource.paginator = this.paginator() ?? null;
       this.dataSource.sort = this.sort() ?? null;
-    },
-    { allowSignalWrites: true },
-  );
+    });
+  });
 
   dataSource = new MatTableDataSource<SymbolOwnershipHolders>([]);
 

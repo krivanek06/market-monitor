@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { UserBase } from '@mm/api-types';
@@ -68,35 +68,34 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
 
   data = input.required<PortfolioGrowthCompareChartData[]>();
 
-  dateRangeControlEffect = effect(
-    () => {
-      // get the default date - today
-      const defaultDate = getCurrentDateDefaultFormat();
+  dateRangeControlEffect = effect(() => {
+    // get the default date - today
+    const defaultDate = getCurrentDateDefaultFormat();
 
-      // find the data with minimum date
-      const dataMinimalDate = this.data()
-        .filter((d) => d.portfolioGrowth.length > 1)
-        .map((d) => d.portfolioGrowth.map((e) => e.date))
-        .reduce((acc, curr) => (acc < curr[0] ? acc : curr[0]), defaultDate);
+    // find the data with minimum date
+    const dataMinimalDate = this.data()
+      .filter((d) => d.portfolioGrowth.length > 1)
+      .map((d) => d.portfolioGrowth.map((e) => e.date))
+      .reduce((acc, curr) => (acc < curr[0] ? acc : curr[0]), defaultDate);
 
-      // find the data with maximum date
-      const dataMaximalDate = this.data()
-        .filter((d) => d.portfolioGrowth.length > 1)
-        .map((d) => d.portfolioGrowth.map((e) => e.date))
-        .reduce((acc, curr) => (acc > (curr.at(-1) ?? defaultDate) ? acc : curr.at(-1) ?? defaultDate), defaultDate);
+    // find the data with maximum date
+    const dataMaximalDate = this.data()
+      .filter((d) => d.portfolioGrowth.length > 1)
+      .map((d) => d.portfolioGrowth.map((e) => e.date))
+      .reduce((acc, curr) => (acc > (curr.at(-1) ?? defaultDate) ? acc : (curr.at(-1) ?? defaultDate)), defaultDate);
 
-      // each user can have different starting and ending date (if inactive) and date gap may exists - may be empty
-      const dateInterval = fillOutMissingDatesForDate(dataMinimalDate, dataMaximalDate);
+    // each user can have different starting and ending date (if inactive) and date gap may exists - may be empty
+    const dateInterval = fillOutMissingDatesForDate(dataMinimalDate, dataMaximalDate);
 
+    untracked(() => {
       // set the date range
       this.dateRangeControl.patchValue({
         currentMaxDateIndex: dateInterval.length - 1,
         currentMinDateIndex: 0,
         dates: dateInterval,
       });
-    },
-    { allowSignalWrites: true },
-  );
+    });
+  });
 
   /**
    * create chart options only when date range triggers, otherwise chart is not created

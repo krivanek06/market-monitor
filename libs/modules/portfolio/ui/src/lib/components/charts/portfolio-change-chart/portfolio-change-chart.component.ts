@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowth } from '@mm/portfolio/data-access';
@@ -75,18 +75,16 @@ export class PortfolioChangeChartComponent extends ChartConstructor {
     },
   );
 
-  initSliderEffect = effect(
-    () => {
-      const inputValues = this.data() ?? [];
-      const sliderValues: DateRangeSliderValues = {
-        dates: inputValues.map((point) => point.date),
-        currentMinDateIndex: 0,
-        currentMaxDateIndex: inputValues.length - 1,
-      };
-      this.sliderControl.patchValue(sliderValues);
-    },
-    { allowSignalWrites: true },
-  );
+  initSliderEffect = effect(() => {
+    const inputValues = this.data() ?? [];
+    const sliderValues: DateRangeSliderValues = {
+      dates: inputValues.map((point) => point.date),
+      currentMinDateIndex: 0,
+      currentMaxDateIndex: inputValues.length - 1,
+    };
+
+    untracked(() => this.sliderControl.patchValue(sliderValues));
+  });
 
   private initChart(data: number[][]): Highcharts.Options {
     return {

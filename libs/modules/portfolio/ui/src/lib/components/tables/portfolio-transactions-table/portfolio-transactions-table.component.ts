@@ -7,6 +7,7 @@ import {
   effect,
   input,
   output,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -52,7 +53,7 @@ import {
       matIcon="history"
       class="mb-5"
       [ngClass]="{
-        'lg:-mb-10': showActionBarComp()
+        'lg:-mb-10': showActionBarComp(),
       }"
     />
 
@@ -94,7 +95,7 @@ import {
                   class="block sm:hidden"
                   [ngClass]="{
                     'text-wt-danger': row.transactionType === 'SELL',
-                    'text-wt-success': row.transactionType === 'BUY'
+                    'text-wt-success': row.transactionType === 'BUY',
                   }"
                 >
                   {{ row.transactionType }}
@@ -119,7 +120,7 @@ import {
           <div
             [ngClass]="{
               'text-wt-danger': row.transactionType === 'SELL',
-              'text-wt-success': row.transactionType === 'BUY'
+              'text-wt-success': row.transactionType === 'BUY',
             }"
           >
             {{ row.transactionType }}
@@ -300,17 +301,16 @@ export class PortfolioTransactionsTableComponent {
     });
   }
 
-  tableEffect = effect(
-    () => {
-      const usedData = this.data() ?? [];
-      // reverse transactions to show the latest first
-      const sortedDataByDate = usedData.reduce((acc, curr) => [curr, ...acc], [] as PortfolioTransactionMore[]);
+  tableEffect = effect(() => {
+    const usedData = this.data() ?? [];
+    // reverse transactions to show the latest first
+    const sortedDataByDate = usedData.reduce((acc, curr) => [curr, ...acc], [] as PortfolioTransactionMore[]);
 
+    untracked(() => {
       this.dataSource.data = sortedDataByDate;
       this.dataSource._updateChangeSubscription();
-    },
-    { allowSignalWrites: true },
-  );
+    });
+  });
 
   tableInitEffect = effect(() => {
     this.dataSource.paginator = this.paginator() ?? null;

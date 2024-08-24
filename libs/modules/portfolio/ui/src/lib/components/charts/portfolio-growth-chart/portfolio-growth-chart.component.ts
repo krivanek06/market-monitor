@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowth } from '@mm/portfolio/data-access';
@@ -71,20 +71,18 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
     { nonNullable: true },
   );
 
-  initSliderEffect = effect(
-    () => {
-      const dataValues = this.data();
+  initSliderEffect = effect(() => {
+    const dataValues = this.data();
 
-      // create slider values
-      const sliderValuesInput: DateRangeSliderValues = {
-        dates: dataValues.values.map((point) => point.date),
-        currentMinDateIndex: 0,
-        currentMaxDateIndex: dataValues.values.length - 1,
-      };
-      this.sliderControl.patchValue(sliderValuesInput);
-    },
-    { allowSignalWrites: true },
-  );
+    // create slider values
+    const sliderValuesInput: DateRangeSliderValues = {
+      dates: dataValues.values.map((point) => point.date),
+      currentMinDateIndex: 0,
+      currentMaxDateIndex: dataValues.values.length - 1,
+    };
+
+    untracked(() => this.sliderControl.patchValue(sliderValuesInput));
+  });
 
   chartOptionsSignal = toSignal(
     this.sliderControl.valueChanges.pipe(
