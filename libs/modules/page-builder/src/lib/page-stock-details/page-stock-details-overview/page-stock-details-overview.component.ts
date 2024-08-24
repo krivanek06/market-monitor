@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgClass, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,16 +16,16 @@ import {
   StockPriceTargetTableComponent,
   StockRatingTableComponent,
   StockRecommendationChartComponent,
-  SymbolSummaryListComponent,
   StockUpgradesDowngradesTableComponent,
+  SymbolSummaryListComponent,
 } from '@mm/market-stocks/ui';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
   GeneralCardComponent,
   GenericChartComponent,
-  NameValueListComponent,
   PriceChangeItemsComponent,
   SortByKeyPipe,
+  WordsUpPipe,
 } from '@mm/shared/ui';
 import { of, switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
@@ -34,7 +34,6 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   selector: 'app-page-details-overview',
   standalone: true,
   imports: [
-    CommonModule,
     GenericChartComponent,
     GeneralCardComponent,
     StockRatingTableComponent,
@@ -47,83 +46,112 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     StockPriceTargetTableComponent,
     PriceChangeItemsComponent,
     AssetPriceChartInteractiveComponent,
-    NameValueListComponent,
     SymbolSummaryListComponent,
     StockEnterpriseChartComponent,
     StockPeersListComponent,
     SortByKeyPipe,
+    WordsUpPipe,
+    NgClass,
+    SlicePipe,
   ],
   template: `
-    <div class="grid gap-6" *ngIf="stockDetailsSignal() as stockDetailsSignal">
+    <div class="grid gap-6">
       <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         <div class="md:col-span-2">
           <!-- price & volume -->
           <app-asset-price-chart-interactive
-            [imageName]="stockDetailsSignal.quote.symbol"
-            [title]="stockDetailsSignal.quote.name"
-            [symbol]="stockDetailsSignal.quote.symbol"
+            [imageName]="stockDetailsSignal().quote.symbol"
+            [title]="stockDetailsSignal().quote.name"
+            [symbol]="stockDetailsSignal().quote.symbol"
             [chartHeightPx]="480"
           />
         </div>
 
         <!-- summary -->
         <app-general-card class="xl:-mt-6" title="Summary">
-          <app-symbol-summary-list [symbolSummary]="stockDetailsSignal" />
+          <app-symbol-summary-list [symbolSummary]="stockDetailsSignal()" />
         </app-general-card>
 
         <!-- financial strength -->
         <app-general-card additionalClasses="h-full" title="Financial Strength">
-          <app-name-value-list [items]="financialStrengthSignal()" />
+          @for (item of financialStrengthSignal(); track item.name) {
+            <div class="g-item-wrapper">
+              <span>{{ item.name | wordsUp }}</span>
+              <span>{{ item.value === null ? 'N/A' : item.value }}</span>
+            </div>
+          }
         </app-general-card>
 
         <!-- financial ratio 1 -->
         <app-general-card additionalClasses="h-full" title="Financial Ratio">
-          <app-name-value-list [items]="financialRatio1Signal()" />
+          @for (item of financialRatio1Signal(); track item.name) {
+            <div class="g-item-wrapper">
+              <span>{{ item.name | wordsUp }}</span>
+              <span>{{ item.value === null ? 'N/A' : item.value }}</span>
+            </div>
+          }
         </app-general-card>
 
         <!-- financial ratio 2 -->
         <app-general-card additionalClasses="h-full" title="Financial Ratio">
-          <app-name-value-list [items]="financialRatio2Signal()" />
+          @for (item of financialRatio2Signal(); track item.name) {
+            <div class="g-item-wrapper">
+              <span>{{ item.name | wordsUp }}</span>
+              <span>{{ item.value === null ? 'N/A' : item.value }}</span>
+            </div>
+          }
         </app-general-card>
 
         <!-- earnings -->
         <app-general-card class="md:col-span-2" title="Earnings Chart">
-          <app-earnings-estimation-chart
-            *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
-            [data]="estimationChartDataSignal.earnings"
-            [heightPx]="400"
-          />
+          @if (estimationChartDataSignal(); as estimationChartDataSignal) {
+            <app-earnings-estimation-chart [data]="estimationChartDataSignal.earnings" [heightPx]="400" />
+          }
         </app-general-card>
 
         <!-- recommendation -->
         <app-general-card title="Recommendation Chart">
-          <app-stock-recommendation-chart [heightPx]="400" [data]="stockDetailsSignal.recommendationTrends" />
+          <app-stock-recommendation-chart [heightPx]="400" [data]="stockDetailsSignal().recommendationTrends" />
         </app-general-card>
 
         <!-- financial per share -->
         <app-general-card additionalClasses="h-full" title="Financial Per Share">
-          <app-name-value-list [items]="financialPerShareSignal()" />
+          @for (item of financialPerShareSignal(); track item.name) {
+            <div class="g-item-wrapper">
+              <span>{{ item.name | wordsUp }}</span>
+              <span>{{ item.value === null ? 'N/A' : item.value }}</span>
+            </div>
+          }
         </app-general-card>
 
         <!-- financial operating -->
         <app-general-card additionalClasses="h-full" title="Financial Operating">
-          <app-name-value-list [items]="financialOperatingSignal()" />
+          @for (item of financialOperatingSignal(); track item.name) {
+            <div class="g-item-wrapper">
+              <span>{{ item.name | wordsUp }}</span>
+              <span>{{ item.value === null ? 'N/A' : item.value }}</span>
+            </div>
+          }
         </app-general-card>
 
         <!-- dividends -->
         <app-general-card additionalClasses="h-full" title="Dividends">
-          <app-name-value-list *ngIf="financialDividendsSignal().length > 0" [items]="financialDividendsSignal()" />
+          @if (financialDividendsSignal().length > 0) {
+            @for (item of financialDividendsSignal(); track item.name) {
+              <div class="g-item-wrapper">
+                <span>{{ item.name | wordsUp }}</span>
+                <span>{{ item.value === null ? 'N/A' : item.value }}</span>
+              </div>
+            }
+          }
         </app-general-card>
       </div>
 
       <!-- revenue est. -->
       <app-general-card title="Revenue Chart">
-        <app-revenue-estimation-chart
-          *ngIf="estimationChartDataSignal() as estimationChartDataSignal"
-          class
-          [data]="estimationChartDataSignal.revenue"
-          [heightPx]="450"
-        ></app-revenue-estimation-chart>
+        @if (estimationChartDataSignal(); as estimationChartDataSignal) {
+          <app-revenue-estimation-chart [data]="estimationChartDataSignal.revenue" [heightPx]="450" />
+        }
       </app-general-card>
 
       <div class="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -146,13 +174,13 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
                   colorTooltipDefault: true,
                   showPercentageSign: true,
                 },
-                data: stockDetailsSignal.ratio
+                data: stockDetailsSignal().ratio
                   ? [
-                      { name: 'Operating Profit', y: stockDetailsSignal.ratio.operatingProfitMarginTTM },
-                      { name: 'Gross Profit', y: stockDetailsSignal.ratio.grossProfitMarginTTM },
-                      { name: 'Pretax Profit', y: stockDetailsSignal.ratio.pretaxProfitMarginTTM },
-                      { name: 'Net Profit', y: stockDetailsSignal.ratio.netProfitMarginTTM },
-                      { name: 'Effective Tax Rate', y: stockDetailsSignal.ratio.effectiveTaxRateTTM },
+                      { name: 'Operating Profit', y: stockDetailsSignal().ratio?.operatingProfitMarginTTM },
+                      { name: 'Gross Profit', y: stockDetailsSignal().ratio?.grossProfitMarginTTM },
+                      { name: 'Pretax Profit', y: stockDetailsSignal().ratio?.pretaxProfitMarginTTM },
+                      { name: 'Net Profit', y: stockDetailsSignal().ratio?.netProfitMarginTTM },
+                      { name: 'Effective Tax Rate', y: stockDetailsSignal().ratio?.effectiveTaxRateTTM },
                     ]
                   : [],
               },
@@ -177,11 +205,11 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
                   showPercentageSign: true,
                 },
                 data: [
-                  { name: 'Equity', y: stockDetailsSignal.ratio?.returnOnEquityTTM ?? 0 },
-                  { name: 'Assets', y: stockDetailsSignal.ratio?.returnOnAssetsTTM ?? 0 },
-                  { name: 'Tangible Assets', y: stockDetailsSignal.companyKeyMetricsTTM.returnOnTangibleAssetsTTM },
-                  { name: 'Capital Employed', y: stockDetailsSignal.ratio?.returnOnCapitalEmployedTTM ?? 0 },
-                  { name: 'Invested Capital', y: stockDetailsSignal.companyKeyMetricsTTM.roicTTM },
+                  { name: 'Equity', y: stockDetailsSignal().ratio?.returnOnEquityTTM ?? 0 },
+                  { name: 'Assets', y: stockDetailsSignal().ratio?.returnOnAssetsTTM ?? 0 },
+                  { name: 'Tangible Assets', y: stockDetailsSignal().companyKeyMetricsTTM.returnOnTangibleAssetsTTM },
+                  { name: 'Capital Employed', y: stockDetailsSignal().ratio?.returnOnCapitalEmployedTTM ?? 0 },
+                  { name: 'Invested Capital', y: stockDetailsSignal().companyKeyMetricsTTM.roicTTM },
                 ],
               },
             ]"
@@ -194,43 +222,41 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
       <div class="grid gap-6 lg:grid-cols-3">
         <!-- upgrades & downgrades -->
         <app-general-card title="Upgrades & Downgrades" class="lg:col-span-2">
-          <app-stock-upgrades-downgrades-table
-            *ngIf="stockDetailsSignal.upgradesDowngrades.length > 0"
-            [data]="stockDetailsSignal.upgradesDowngrades | slice: 0 : 12"
-            [currentPrice]="stockDetailsSignal.quote.price"
-          ></app-stock-upgrades-downgrades-table>
+          @if (stockDetailsSignal().upgradesDowngrades.length > 0) {
+            <app-stock-upgrades-downgrades-table
+              [data]="stockDetailsSignal().upgradesDowngrades | slice: 0 : 12"
+              [currentPrice]="stockDetailsSignal().quote.price"
+            />
+          }
         </app-general-card>
 
         <!-- peers -->
         <app-general-card title="Peers" class="hidden lg:block">
-          @if (stockPeersSignal(); as stockPeersSignal) {
+          @if (stockPeersSignal()?.length ?? 0 > 0) {
             <app-stock-peers-list
-              *ngIf="stockPeersSignal.length > 0"
               (clickedEmitter)="onShowSummary($event)"
-              [peers]="stockPeersSignal | slice: 0 : 12"
-            ></app-stock-peers-list>
+              [peers]="stockPeersSignal() ?? [] | slice: 0 : 12"
+            />
           }
         </app-general-card>
       </div>
 
-      <div class="grid gap-6 2xl:grid-cols-2">
+      <div class="grid gap-6" [ngClass]="{ '2xl:grid-cols-2': stockDetailsSignal().priceTarget.length > 0 }">
         <!-- price target -->
-        <app-general-card *ngIf="stockDetailsSignal.priceTarget.length > 0" title="Price Target">
-          <app-stock-price-target-table
-            [data]="stockDetailsSignal.priceTarget | slice: 0 : 10"
-            [currentPrice]="stockDetailsSignal.quote.price"
-          />
-        </app-general-card>
+        @if (stockDetailsSignal().priceTarget.length > 0) {
+          <app-general-card title="Price Target">
+            <app-stock-price-target-table
+              [data]="stockDetailsSignal().priceTarget | slice: 0 : 10"
+              [currentPrice]="stockDetailsSignal().quote.price"
+            />
+          </app-general-card>
+        }
 
         <!-- enterprise chart -->
-        <app-general-card
-          title="Enterprise Chart"
-          additionalClasses="h-full"
-          [ngClass]="{ '2xl:col-span-2': stockDetailsSignal.priceTarget.length === 0 }"
-        >
+        <app-general-card title="Enterprise Chart" additionalClasses="h-full">
           <app-stock-enterprise-chart
             [heightPx]="520"
-            [data]="stockDetailsSignal.enterpriseValue | sortByKey: 'date' : 'asc'"
+            [data]="stockDetailsSignal().enterpriseValue | sortByKey: 'date' : 'asc'"
           />
         </app-general-card>
       </div>

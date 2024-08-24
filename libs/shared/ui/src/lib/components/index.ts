@@ -5,4 +5,3 @@ export * from './form-controls';
 export * from './general';
 export * from './headers';
 export * from './items';
-export * from './lists';
