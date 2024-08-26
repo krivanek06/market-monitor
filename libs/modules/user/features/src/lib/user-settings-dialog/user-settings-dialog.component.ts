@@ -110,9 +110,16 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
       <!-- action buttons -->
       <div class="flex min-w-[180px] flex-col gap-y-3 lg:pl-6">
         <!--  Change Account type -->
-        <button [disabled]="!isDevActive" (click)="onChangeInitials()" type="button" mat-stroked-button color="primary">
+        <button
+          [disabled]="userDataSignal().isTest"
+          (click)="onChangeInitials()"
+          type="button"
+          mat-stroked-button
+          color="primary"
+        >
           Change Initials
         </button>
+
         <!--  Change Display Name -->
         <button
           [disabled]="userDataSignal().isTest"
@@ -123,12 +130,14 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         >
           Change Display Name
         </button>
+
         <!--  Change Account type -->
         @if (isDevActive) {
           <button (click)="onChangeAccountType()" type="button" mat-stroked-button color="primary">
             Change Account type
           </button>
         }
+
         <!--  Change Password -->
         @if (userDataSignal().personal.providerId === 'password') {
           <button
@@ -142,7 +151,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           </button>
         }
 
-        <div class="mb-4 mt-10 hidden lg:block">
+        <div class="mb-4 mt-8 hidden lg:block">
           <mat-divider />
         </div>
 
