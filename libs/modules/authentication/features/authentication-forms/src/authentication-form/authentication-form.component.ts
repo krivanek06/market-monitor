@@ -146,11 +146,19 @@ export class AuthenticationFormComponent {
                     switchMap((accountType) =>
                       from(this.authenticationUserStoreService.resetTransactions(accountType)).pipe(
                         map(() => ({ data: userData, action: 'success' as const })),
+                        startWith({
+                          action: 'loading' as const,
+                          data: null,
+                        }),
                       ),
                     ),
                   )
                 : of({ data: userData, action: 'success' as const }),
             ),
+            startWith({
+              action: 'loading' as const,
+              data: null,
+            }),
           ),
         ),
         catchError((err) =>
@@ -300,7 +308,6 @@ export class AuthenticationFormComponent {
       // display success message
       this.dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
       // navigate to dashboard
-      console.log('redirect aaa', ROUTES_MAIN.DASHBOARD);
       this.router.navigate([ROUTES_MAIN.DASHBOARD]);
     } else if (state.action === 'error') {
       this.dialogServiceUtil.handleError(state.error);
@@ -311,8 +318,14 @@ export class AuthenticationFormComponent {
     this.loginType$.next('google');
   }
 
-  onDemoLogin() {
-    this.loginType$.next('demo');
+  async onDemoLogin() {
+    const confirm = await this.dialogServiceUtil.showConfirmDialog(
+      'Demo account will be created and removed after 7 days, please confirm',
+    );
+
+    if (confirm) {
+      this.loginType$.next('demo');
+    }
   }
 
   openSelectAccountType(): Observable<UserAccountBasicTypes | undefined> {

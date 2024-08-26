@@ -37,6 +37,11 @@ export class DialogServiceUtil {
       return;
     }
 
+    if (code === 'auth/unauthorized-domain') {
+      this.showNotificationBar('Server error [unauthorized-domain], please contact support', 'error');
+      return;
+    }
+
     if (code === 'auth/email-already-in-use') {
       this.showNotificationBar('Email already in use', 'error');
       return;

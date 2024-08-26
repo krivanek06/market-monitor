@@ -403,7 +403,7 @@ describe('AuthenticationFormComponent', () => {
     expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'notification', 5000);
     expect(authenticationAccountService.registerDemoAccount).toHaveBeenCalledTimes(1);
     expect(authenticationAccountService.registerDemoAccount).toHaveBeenCalledWith(UserAccountEnum.DEMO_TRADING);
-    expect(dialogUtil.showConfirmDialog).not.toHaveBeenCalledWith(expect.any(String));
+    expect(dialogUtil.showConfirmDialog).toHaveBeenCalledWith(expect.any(String));
     expect(authenticationAccountService.signIn).not.toHaveBeenCalled();
     expect(component.userAuthenticationState()).toEqual({
       action: 'error',
