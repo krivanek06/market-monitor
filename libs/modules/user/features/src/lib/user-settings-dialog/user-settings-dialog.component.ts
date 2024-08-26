@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -24,7 +24,6 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
   selector: 'app-user-settings-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
@@ -37,9 +36,11 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     ChangePasswordDialogComponent,
     UserAccountTypeDirective,
     ThemeSwitcherComponent,
+    DatePipe,
+    CurrencyPipe,
   ],
   template: `
-    <app-dialog-close-header title="Settings"></app-dialog-close-header>
+    <app-dialog-close-header title="Settings" />
 
     <mat-dialog-content class="xs:px-6 flex min-h-[350px] flex-col gap-y-6 px-1 lg:flex-row">
       <div class="border-wt-border flex-1 md:border-r">
@@ -48,7 +49,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           <div class="max-md:mx-auto">
             <app-upload-file-control
               folder="users"
-              [isDisabled]="isDemoAccount()"
+              [isDisabled]="userDataSignal().isTest"
               [fileName]="userDataSignal().id"
               [heightPx]="225"
               [formControl]="userImageControl"
@@ -98,27 +99,23 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         <!-- explain account type -->
         <div class="hidden p-4 lg:block">
           <div class="text-wt-primary mb-2 text-lg">{{ userDataSignal().userAccountType }} - Account</div>
-          <div *ngFor="let text of accountDescriptionSignal()" class="mb-3">
-            {{ text }}
-          </div>
+          @for (text of accountDescriptionSignal(); track $index) {
+            <div class="mb-3">
+              {{ text }}
+            </div>
+          }
         </div>
       </div>
 
       <!-- action buttons -->
       <div class="flex min-w-[180px] flex-col gap-y-3 lg:pl-6">
         <!--  Change Account type -->
-        <button
-          [disabled]="isDemoAccount() && !isDevActive"
-          (click)="onChangeInitials()"
-          type="button"
-          mat-stroked-button
-          color="primary"
-        >
+        <button [disabled]="!isDevActive" (click)="onChangeInitials()" type="button" mat-stroked-button color="primary">
           Change Initials
         </button>
         <!--  Change Display Name -->
         <button
-          [disabled]="!isDevActive"
+          [disabled]="userDataSignal().isTest"
           (click)="onChangeDisplayName()"
           type="button"
           mat-stroked-button
@@ -127,34 +124,31 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           Change Display Name
         </button>
         <!--  Change Account type -->
-        <button
-          [disabled]="isDemoAccount() && !isDevActive"
-          (click)="onChangeAccountType()"
-          type="button"
-          mat-stroked-button
-          color="primary"
-        >
-          Change Account type
-        </button>
+        @if (isDevActive) {
+          <button (click)="onChangeAccountType()" type="button" mat-stroked-button color="primary">
+            Change Account type
+          </button>
+        }
         <!--  Change Password -->
-        <button
-          *ngIf="userDataSignal().personal.providerId === 'password'"
-          [disabled]="!isDevActive"
-          (click)="onChangePassword()"
-          type="button"
-          mat-stroked-button
-          color="warn"
-        >
-          Change Password
-        </button>
+        @if (userDataSignal().personal.providerId === 'password') {
+          <button
+            [disabled]="userDataSignal().isTest"
+            (click)="onChangePassword()"
+            type="button"
+            mat-stroked-button
+            color="warn"
+          >
+            Change Password
+          </button>
+        }
 
         <div class="mb-4 mt-10 hidden lg:block">
-          <mat-divider></mat-divider>
+          <mat-divider />
         </div>
 
         <!--  Reset Transactions -->
         <button
-          [disabled]="!isDevActive"
+          [disabled]="userDataSignal().isTest"
           (click)="onResetTransactions()"
           [matTooltip]="actionButtonTooltips.resetTransactions"
           type="button"
@@ -165,7 +159,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </button>
         <!--  Delete Account -->
         <button
-          [disabled]="!isDevActive"
+          [disabled]="userDataSignal().isTest"
           (click)="onDeleteAccount()"
           [matTooltip]="actionButtonTooltips.deleteAccount"
           type="button"
@@ -178,7 +172,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     </mat-dialog-content>
 
     <div class="my-4">
-      <mat-divider></mat-divider>
+      <mat-divider />
     </div>
 
     <mat-dialog-actions>
@@ -216,8 +210,6 @@ export class UserSettingsDialogComponent implements OnInit {
   isDevActive = inject(IS_DEV_TOKEN, {
     optional: true,
   });
-
-  isDemoAccount = signal(true); // this.authenticationUserStoreService.state.isDemoAccount;
   userDataSignal = this.authenticationUserStoreService.state.getUserData;
   userSignal = this.authenticationUserStoreService.state.getUser;
   userImageControl = new FormControl<string | null>(null);

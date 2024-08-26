@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserAccountBasicTypes, UserAccountEnum, accountDescription } from '@mm/api-types';
-import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { Confirmable, DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
@@ -14,11 +14,13 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatProgressSpinnerModule, DialogCloseHeaderComponent],
   template: `
-    <app-dialog-close-header title="Available Account Types"></app-dialog-close-header>
+    <app-dialog-close-header title="Available Account Types" />
 
-    <p *ngIf="!showLoaderSignal()" class="mx-auto mb-6 text-center text-xl md:w-9/12">
-      Change you account type from the below options. Note that changing account type will reset your trading history
-    </p>
+    @if (!showLoaderSignal()) {
+      <p class="mx-auto mb-6 text-center text-xl md:w-9/12">
+        Change you account type from the below options. Note that changing account type will reset your trading history
+      </p>
+    }
 
     <mat-dialog-content class="p-4">
       <div class="mb-10 grid gap-x-10 gap-y-4 md:grid-cols-2">
@@ -58,7 +60,7 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
           </div>
         } @else {
           <div class="col-span-2 grid place-content-center p-4">
-            <mat-spinner></mat-spinner>
+            <mat-spinner />
           </div>
         }
       </div>
@@ -73,9 +75,7 @@ import { EMPTY, catchError, finalize, from, tap } from 'rxjs';
 })
 export class UserAccountTypeSelectDialogComponent {
   private dialogServiceUtil = inject(DialogServiceUtil);
-  private dialogRef = inject(MatDialogRef<UserAccountTypeSelectDialogComponent>);
   private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private authenticationAccountService = inject(AuthenticationAccountService);
 
   userData = this.authenticationUserStoreService.state.getUserData;
 

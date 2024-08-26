@@ -107,7 +107,7 @@ export class UploadFileControlComponent implements ControlValueAccessor {
   folder = input('images');
   fileMaxSizeMb = input(2); // 2Mb
   heightPx = input(200);
-  isDisabled = input(false);
+  isDisabled = input<boolean | undefined>(false);
 
   onChange: (value: string) => void = () => {};
   onTouched = () => {};

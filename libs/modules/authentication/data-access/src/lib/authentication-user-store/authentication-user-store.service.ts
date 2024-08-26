@@ -102,8 +102,8 @@ export class AuthenticationUserStoreService {
    * Source used to get user portfolio transactions
    */
   private portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
-    // prevent duplicate calls only when user id changes
-    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
+    // prevent duplicate calls only when user id changes or changes account type
+    distinctUntilChanged((prev, curr) => prev?.id === curr?.id && prev?.userAccountType === curr?.userAccountType),
     switchMap((userData) => (userData ? this.userApiService.getUserPortfolioTransactions(userData.id) : of(null))),
     map((transactions) => ({
       portfolioTransactions: transactions?.transactions ?? null,
