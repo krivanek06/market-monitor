@@ -37,7 +37,7 @@ $mat-theming-light: mat.m2-define-light-theme(
     ),
     typography:
       mat.m2-define-typography-config(
-        $font-family: 'Poppins, sans-serif',
+        $font-family: 'system-ui',
       ),
     density: -1,
   )
@@ -53,7 +53,7 @@ $mat-theming-dark: mat.m2-define-dark-theme(
     ),
     typography:
       mat.m2-define-typography-config(
-        $font-family: 'Poppins, sans-serif',
+        $font-family: 'system-ui',
       ),
     density: -1,
   )

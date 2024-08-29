@@ -61,13 +61,11 @@ import { FormRegisterComponent } from './form-register/form-register.component';
         <mat-tab label="Login">
           <app-form-login data-testid="auth-form-login-form" [formControl]="loginUserInputControl" />
 
-          <div class="my-4">
+          <div class="my-8">
             <mat-divider />
           </div>
 
           <!-- social media login -->
-          <h2 class="text-wt-primary-dark text-center text-lg">Social Media Login</h2>
-
           <div class="mt-4 px-4">
             <button
               data-testid="auth-form-google-auth-button"
@@ -80,12 +78,11 @@ import { FormRegisterComponent } from './form-register/form-register.component';
             </button>
           </div>
 
-          <div class="my-4">
+          <div class="my-8">
             <mat-divider />
           </div>
 
           <!-- development -->
-          <h2 class="text-wt-primary-dark text-center text-lg">Demo Account Login</h2>
           <div class="mt-4 px-4">
             <button
               data-testid="auth-form-demo-login-button"

@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { LoginUserInput } from '@mm/authentication/data-access';
-import { emailValidator, maxLengthValidator, minLengthValidator, requiredValidator } from '@mm/shared/data-access';
 import { FormMatInputWrapperComponent } from '@mm/shared/ui';
 
 @Component({
@@ -39,11 +38,9 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
 export class FormLoginComponent implements ControlValueAccessor {
   formGroup = new FormGroup({
     email: new FormControl('', {
-      validators: [emailValidator, requiredValidator, maxLengthValidator(40)],
       nonNullable: true,
     }),
     password: new FormControl('', {
-      validators: [requiredValidator, maxLengthValidator(25), minLengthValidator(6)],
       nonNullable: true,
     }),
   });
@@ -58,12 +55,18 @@ export class FormLoginComponent implements ControlValueAccessor {
       return;
     }
 
-    const result: LoginUserInput = {
-      email: this.formGroup.controls.email.value,
-      password: this.formGroup.controls.password.value,
-    };
+    const email = this.formGroup.controls.email.value;
+    const password = this.formGroup.controls.password.value;
 
-    this.onChange(result);
+    // check if empty
+    if (!email || !password) {
+      return;
+    }
+
+    this.onChange({
+      email,
+      password,
+    });
   }
 
   writeValue(obj: LoginUserInput): void {}

@@ -26,25 +26,17 @@ import { DialogCloseHeaderComponent, FormMatInputWrapperComponent } from '@mm/sh
     <form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
       <mat-dialog-content class="flex flex-col gap-4 p-4 md:mb-6 md:p-10">
         <!-- old password -->
-        <app-form-mat-input-wrapper
-          formControlName="oldPassword"
-          inputCaption="Old Password"
-          inputType="PASSWORD"
-        ></app-form-mat-input-wrapper>
+        <app-form-mat-input-wrapper formControlName="oldPassword" inputCaption="Old Password" inputType="PASSWORD" />
 
         <!-- password1 -->
-        <app-form-mat-input-wrapper
-          formControlName="newPassword1"
-          inputCaption="New Password"
-          inputType="PASSWORD"
-        ></app-form-mat-input-wrapper>
+        <app-form-mat-input-wrapper formControlName="newPassword1" inputCaption="New Password" inputType="PASSWORD" />
 
         <!-- password2 -->
         <app-form-mat-input-wrapper
           formControlName="newPassword2"
           inputCaption="New Password Confirm"
           inputType="PASSWORD"
-        ></app-form-mat-input-wrapper>
+        />
       </mat-dialog-content>
 
       <mat-dialog-actions>

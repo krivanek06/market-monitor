@@ -48,8 +48,15 @@ export type InlineInputDialogComponentData = {
 
       <!-- action buttons -->
       <div class="mt-6 flex flex-col-reverse gap-4 md:flex-row">
-        <button mat-flat-button class="w-full" (click)="cancel()">Cancel</button>
-        <button mat-flat-button class="w-full" color="primary" (click)="confirm()" [disabled]="inputValueForm.invalid">
+        <button mat-flat-button class="w-full" (click)="cancel()" type="button">Cancel</button>
+        <button
+          mat-flat-button
+          class="w-full"
+          color="primary"
+          type="button"
+          (click)="confirm()"
+          [disabled]="inputValueForm.invalid"
+        >
           Confirm
         </button>
       </div>
