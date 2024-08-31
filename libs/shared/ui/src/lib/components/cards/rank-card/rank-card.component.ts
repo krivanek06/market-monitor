@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { ColorScheme } from '@mm/shared/data-access';
 import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } from '../../../directives';
 
 @Component({
@@ -23,7 +24,10 @@ import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } fr
       [matRippleUnbounded]="false"
       [style.width.px]="cardWidthPx()"
       [style.height.px]="cardHeightPx()"
-      class="group relative rounded-lg shadow-md"
+      class="group relative rounded-lg border-2 shadow-md"
+      appPositionColoring
+      [position]="currentPositions()"
+      cssSelector="border-color"
     >
       <!-- background image -->
       <img
@@ -61,7 +65,7 @@ import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } fr
       </div>
 
       <!-- content -->
-      <ng-content></ng-content>
+      <ng-content />
     </div>
   `,
   styles: `
@@ -80,6 +84,7 @@ import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } fr
 })
 export class RankCardComponent {
   protected clickableDirective = inject(ClickableDirective);
+  readonly ColorScheme = ColorScheme;
 
   cardWidthPx = input<number | null>();
   cardHeightPx = input<number | null>();

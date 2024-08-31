@@ -19,7 +19,6 @@ import {
   PositionColoringDirective,
   RangeDirective,
   RankCardComponent,
-  ScrollWrapperComponent,
   SectionTitleComponent,
   ShowMoreButtonComponent,
 } from '@mm/shared/ui';
@@ -49,13 +48,12 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     GeneralCardComponent,
     RangeDirective,
     RankCardComponent,
-    ScrollWrapperComponent,
     PercentageIncreaseDirective,
     MatTabsModule,
     GroupSearchControlComponent,
   ],
   template: `
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-6 flex items-center justify-between">
       <app-section-title matIcon="military_tech" title="Hall Of Fame" [largeTitle]="true" />
       <app-section-title
         matIcon="military_tech"
@@ -65,7 +63,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     </div>
 
     <!-- best users -->
-    <app-scroll-wrapper [heightPx]="220" class="mb-6">
+    <div class="mb-10 flex justify-around gap-4">
       @for (
         user of hallOfFameUsersSignal().bestPortfolio | slice: 0 : topUsersLimit;
         track user.item.id;
@@ -77,8 +75,8 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
           [currentPositions]="i + 1"
           [image]="user.item.personal.photoURL"
           [positionChange]="user.portfolioTotalGainsPercentage?.rankChange"
-          [cardWidthPx]="240"
-          [cardHeightPx]="180"
+          [cardWidthPx]="260"
+          [cardHeightPx]="200"
           (itemClicked)="onUserClick(user.item)"
         >
           <div class="bg-wt-gray-light absolute bottom-0 flex w-full flex-col px-4 py-2">
@@ -99,7 +97,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
           </div>
         </app-rank-card>
       }
-    </app-scroll-wrapper>
+    </div>
 
     <div class="mb-4 flex items-center justify-between">
       <!-- search users -->
@@ -158,6 +156,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
             [data]="displayUserTable()"
             [template]="userTemplate"
             [initialPosition]="topUsersLimit + 1"
+            [highlightPosition]="userDataSignal().systemRank?.portfolioTotalGainsPercentage?.rank"
           />
 
           <!-- show more button -->
@@ -201,7 +200,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         <mat-icon [color]="data.item.isAccountActive ? 'accent' : 'warn'"> radio_button_checked </mat-icon>
         <img appDefaultImg [src]="data.item.personal.photoURL" alt="user image" class="h-10 w-10 rounded-lg" />
         <div class="flex items-center gap-2">
-          <div appPositionColoring [position]="position">{{ data.item.personal.displayName }}</div>
+          <div>{{ data.item.personal.displayName }}</div>
           <!-- display position change if any -->
           @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
             @if (rankChange !== 0) {
@@ -223,7 +222,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       <div class="flex items-center gap-3">
         <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="h-10 w-10 rounded-lg" />
         <div class="flex items-center gap-2">
-          <div appPositionColoring [position]="position" class="w-[200px] truncate text-ellipsis">
+          <div class="w-[200px] truncate text-ellipsis">
             {{ data.item.name }}
           </div>
           <!-- display position change if any -->
@@ -259,7 +258,7 @@ export class PageHallOfFameComponent {
    * limit number of users to display, display rest on "show more"
    */
   readonly displayUsersLimit = 20;
-  readonly topUsersLimit = 10;
+  readonly topUsersLimit = 5;
 
   userDataSignal = this.authenticationUserStoreService.state.getUserData;
 

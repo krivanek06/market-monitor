@@ -8,7 +8,7 @@ import { AuthenticationFormComponent } from '@mm/authentication/authentication-f
   template: `
     <section class="c-wrapper">
       <div class="mx-auto h-lvh w-full max-w-[640px] pt-[160px]">
-        <div class="text-wt-primary mb-10 text-center text-5xl tracking-widest opacity-60">GGFinance</div>
+        <div class="text-wt-primary mb-10 text-center text-5xl tracking-widest opacity-80">GGFinance</div>
         <app-authentication-form />
       </div>
     </section>
@@ -19,7 +19,7 @@ import { AuthenticationFormComponent } from '@mm/authentication/authentication-f
     }
 
     .c-wrapper {
-      background: linear-gradient(315deg, #121212 10%, #051421 38%, #050505 98%);
+      background: linear-gradient(315deg, #000000 10%, #040d1c 38%, #001435 98%);
     }
 
     ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) {

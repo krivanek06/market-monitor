@@ -4,6 +4,7 @@ import {
   Component,
   TemplateRef,
   TrackByFunction,
+  computed,
   effect,
   input,
   output,
@@ -13,8 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { HallOfFameTopRankData, PortfolioState } from '@mm/api-types';
-import { ColorScheme } from '@mm/shared/data-access';
-import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective } from '@mm/shared/ui';
+import { InArrayPipe, PercentageIncreaseDirective, RangeDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-portfolio-rank-table',
@@ -25,8 +25,8 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
     MatIconModule,
     MatPaginatorModule,
     PercentageIncreaseDirective,
-    PositionColoringDirective,
     RangeDirective,
+    InArrayPipe,
   ],
   template: `
     <table mat-table class="table-hover" [dataSource]="dataSource" [trackBy]="identity">
@@ -36,7 +36,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
         <td mat-cell *matCellDef="let row; let i = index">
           <div class="flex items-center gap-3">
             <!-- position -->
-            <span appPositionColoring [position]="i + 1" class="h-7 w-7 rounded-full border border-solid text-center">
+            <span class="h-7 w-7 rounded-full border border-solid text-center">
               {{ i + initialPosition() }}
             </span>
             <!-- template from parent -->
@@ -49,9 +49,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
       <ng-container matColumnDef="balance">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Balance</th>
         <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
-          <span appPositionColoring [defaultPositionColor]="ColorScheme.GRAY_DARK_VAR" [position]="i + 1">
-            {{ row.item.portfolioState.balance | currency }}
-          </span>
+          <span class="text-wt-gray-dark"> {{ row.item.portfolioState.balance | currency }}</span>
         </td>
       </ng-container>
 
@@ -59,7 +57,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
       <ng-container matColumnDef="invested">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Invested</th>
         <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
-          <span class="text-wt-gray-dark">{{ row.item.portfolioState.invested | currency }}</span>
+          {{ row.item.portfolioState.invested | currency }}
         </td>
       </ng-container>
 
@@ -76,7 +74,7 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Profit</th>
         <td mat-cell *matCellDef="let row; let i = index">
           <div class="flex flex-col">
-            <div appPositionColoring [position]="i + 1" class="block text-end md:hidden">
+            <div class="block text-end md:hidden">
               {{ row.item.portfolioState.balance | currency }}
             </div>
             <div
@@ -119,8 +117,11 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
       <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden md:contents"></tr>
       <tr
         mat-row
-        *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"
-        [ngClass]="{ 'bg-wt-gray-light': even }"
+        *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd; let i = index"
+        [ngClass]="{
+          'bg-wt-gray-light': even,
+          highlight: highlightPositionUsed() | inArray: i + initialPosition(),
+        }"
         (click)="onItemClick(row)"
       ></tr>
 
@@ -140,6 +141,10 @@ import { PercentageIncreaseDirective, PositionColoringDirective, RangeDirective 
   styles: `
     :host {
       display: block;
+    }
+
+    .highlight {
+      background-color: var(--accent-highlight) !important;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -165,6 +170,11 @@ export class PortfolioRankTableComponent<
    */
   initialPosition = input<number>(1);
 
+  /**
+   * highlight the position of the item
+   */
+  highlightPosition = input<number | number[] | undefined | null>(null);
+
   showLoadingSkeletonSignal = input(false);
 
   tableEffect = effect(() => {
@@ -174,6 +184,11 @@ export class PortfolioRankTableComponent<
       this.dataSource.data = data;
       this.dataSource._updateChangeSubscription();
     });
+  });
+
+  highlightPositionUsed = computed(() => {
+    const highlightPosition = this.highlightPosition() ?? [];
+    return Array.isArray(highlightPosition) ? highlightPosition : [highlightPosition];
   });
 
   displayedColumns: string[] = [
@@ -187,8 +202,6 @@ export class PortfolioRankTableComponent<
     'transaction_fees',
   ];
   dataSource = new MatTableDataSource<T>([]);
-
-  ColorScheme = ColorScheme;
 
   identity: TrackByFunction<T> = (index: number, item: T) => item.item.id;
 

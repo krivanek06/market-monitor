@@ -1,5 +1,5 @@
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { Component, input, output } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -23,7 +23,12 @@ import { GroupSearchControlComponent, GroupSearchControlComponentMock } from '@m
 import { PortfolioRankTableComponent } from '@mm/portfolio/ui';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { RankCardComponent, ScrollWrapperComponent, ShowMoreButtonComponent } from '@mm/shared/ui';
+import {
+  RankCardComponent,
+  RankCardComponentMock,
+  ScrollWrapperComponent,
+  ShowMoreButtonComponent,
+} from '@mm/shared/ui';
 import {
   UserDetailsDialogComponent,
   UserSearchControlComponent,
@@ -40,21 +45,6 @@ import { PageHallOfFameComponent } from './page-hall-of-fame.component';
 })
 class ScrollWrapperComponentMock {
   heightPx = input<number>(300);
-}
-
-@Component({
-  selector: 'app-rank-card',
-  standalone: true,
-  template: `<ng-content />`,
-})
-class RankCardComponentMock {
-  itemClicked = output<void>();
-  clickable = input(false);
-  image = input<string | null>();
-  currentPositions = input<number>();
-  positionChange = input<number | undefined | null>();
-  cardWidthPx = input<number | null>();
-  cardHeightPx = input<number | null>();
 }
 
 describe('PageHallOfFameComponent', () => {

@@ -21,14 +21,14 @@ import { ClickableDirective, PositionColoringDirective } from '../../../directiv
       appPositionColoring
       [position]="currentPositions()"
       [defaultPositionColor]="ColorScheme.GRAY_LIGHT_VAR"
-      positionType="background-color"
+      cssSelector="background-color"
     >
       <div class="relative">
         <!-- position -->
         <div
           class="bg-wt-gray-light-strong border-wt-gray-light-strong absolute -left-4 -top-6 z-10 flex h-10 items-center gap-4 rounded-full border opacity-90"
           [ngClass]="{
-            'w-10': !showPreviousPosition()
+            'w-10': !showPreviousPosition(),
           }"
         >
           <div class="ml-2 text-lg" appPositionColoring [position]="currentPositions()">#{{ currentPositions() }}</div>
@@ -37,7 +37,7 @@ import { ClickableDirective, PositionColoringDirective } from '../../../directiv
             class="flex items-center"
             [ngClass]="{
               'text-wt-success': isPositionIncreased(),
-              'text-wt-danger': !isPositionIncreased()
+              'text-wt-danger': !isPositionIncreased(),
             }"
           >
             <span *ngIf="previousPosition() as previousPosition">{{ previousPosition - currentPositions() }}</span>
