@@ -36,14 +36,16 @@ import { RecommendationDirective } from '../../../directives';
       <div>Company Name</div>
       <div class="flex items-center gap-2">
         <img appDefaultImg imageType="symbol" [src]="symbolSummary().id" alt="Asset Image" class="h-6 w-6" />
-        <span>{{ symbolSummary().profile?.companyName }}</span>
+        <span>{{ symbolSummary().profile?.companyName ?? symbolSummary().quote.name }}</span>
       </div>
     </div>
 
     <div class="g-item-wrapper">
       <span>Sector</span>
       <mat-chip-listbox>
-        <mat-chip class="m-0" color="primary">{{ symbolSummary().profile?.sector }}</mat-chip>
+        <mat-chip class="m-0" color="primary">{{
+          symbolSummary().profile?.sector ?? symbolSummary().quote.exchange
+        }}</mat-chip>
       </mat-chip-listbox>
     </div>
 
@@ -93,7 +95,10 @@ import { RecommendationDirective } from '../../../directives';
 
     <div class="g-item-wrapper">
       <span>PE / EPS</span>
-      <span>{{ symbolSummary().quote.pe | number: '1.2-2' }} / {{ symbolSummary().quote.eps | number: '1.2-2' }}</span>
+      <span>
+        {{ symbolSummary().quote.pe ? (symbolSummary().quote.pe | number: '1.2-2') : 'N/A' }} /
+        {{ symbolSummary().quote.eps ? (symbolSummary().quote.eps | number: '1.2-2') : 'N/A' }}
+      </span>
     </div>
 
     <!-- <div class="g-item-wrapper">

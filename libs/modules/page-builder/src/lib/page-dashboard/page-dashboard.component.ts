@@ -278,13 +278,12 @@ export class PageDashboardComponent {
    * Transaction limit to show best and worst transactions
    */
   readonly transactionLimit = 15;
-  USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
-
-  stateRef = this.authenticationUserService.state;
-
-  hasEnoughTransactions = computed(() => (this.stateRef.portfolioTransactions()?.length ?? 0) > this.transactionLimit);
-
-  ColorScheme = ColorScheme;
+  readonly ColorScheme = ColorScheme;
+  readonly USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
+  readonly stateRef = this.authenticationUserService.state;
+  readonly hasEnoughTransactions = computed(
+    () => (this.stateRef.portfolioTransactions()?.length ?? 0) > this.transactionLimit,
+  );
 
   onPortfolioChangeChart(): void {
     this.dialogServiceUtil.showGenericDialog({

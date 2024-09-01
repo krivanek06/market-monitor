@@ -24,7 +24,6 @@ import { minValueValidator, positiveNumberValidator, requiredValidator } from '@
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { dateFormatDate, dateIsNotWeekend, roundNDigits } from '@mm/shared/general-util';
 import {
-  CastToNumberPipe,
   DatePickerComponent,
   DefaultImgDirective,
   DialogCloseHeaderComponent,
@@ -35,6 +34,7 @@ import {
 import { isSameDay } from 'date-fns';
 import { derivedFrom } from 'ngxtension/derived-from';
 import { catchError, map, of, pipe, startWith, switchMap } from 'rxjs';
+
 export type PortfolioTradeDialogComponentData = {
   quote: SymbolQuote;
   transactionType: PortfolioTransactionType;
@@ -58,7 +58,6 @@ export type PortfolioTradeDialogComponentData = {
     MatCheckboxModule,
     MatTooltipModule,
     NumberKeyboardComponent,
-    CastToNumberPipe,
     MatProgressSpinnerModule,
     UserAccountTypeDirective,
   ],
@@ -79,7 +78,7 @@ export type PortfolioTradeDialogComponentData = {
                 <div
                   [ngClass]="{
                     'text-wt-danger': data().transactionType === 'SELL',
-                    'text-wt-success': data().transactionType === 'BUY'
+                    'text-wt-success': data().transactionType === 'BUY',
                   }"
                 >
                   {{ data().transactionType | uppercase }} Operation
@@ -94,20 +93,20 @@ export type PortfolioTradeDialogComponentData = {
             <!-- market open state -->
             <div
               [ngClass]="{
-                'text-wt-danger': !getIsMarketOpenSignal()?.isTheStockMarketOpen,
-                'text-wt-success': !!getIsMarketOpenSignal()?.isTheStockMarketOpen
+                'text-wt-danger': !isMarketOpen(),
+                'text-wt-success': isMarketOpen(),
               }"
               class="mb-1 text-base"
             >
-              {{ !getIsMarketOpenSignal()?.isTheStockMarketOpen ? 'Market Closed' : 'Market Open' }}
+              {{ !isMarketOpen() ? 'Market Closed' : 'Market Open' }}
             </div>
 
             <!-- if sell, checkbox to sell all -->
-            <div *ngIf="data().transactionType === 'SELL'">
+            @if (data().transactionType === 'SELL') {
               <mat-checkbox data-testid="trade-dialog-sell-all-checkbox" (change)="onSellAllClick($event)" color="warn">
                 Sell All
               </mat-checkbox>
-            </div>
+            }
           </div>
         </div>
 
@@ -156,24 +155,31 @@ export type PortfolioTradeDialogComponentData = {
 
           <!-- info -->
           <div class="mb-1 flex flex-col p-3">
+            <!-- execution date -->
             <div class="g-item-wrapper">
               <span>Date</span>
               <span>{{ form.controls.date.value | date: 'MMMM d, y (EEEE)' }}</span>
             </div>
+            <!-- units owned -->
             <div class="g-item-wrapper">
               <span>Owned Units</span>
               <span>{{ holdingSignal()?.units ?? 0 }}</span>
             </div>
+            <!-- cash on hand -->
             <div *appUserAccountType="'DEMO_TRADING'" class="g-item-wrapper">
               <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">Cash on Hand</span>
               <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">
                 {{ portfolioState()?.cashOnHand | currency }}
               </span>
             </div>
-            <div *ngIf="!isCustomTotal" class="g-item-wrapper">
-              <span>Price</span>
-              <span>{{ symbolPriceOnDate() | currency }}</span>
-            </div>
+            <!-- price -->
+            @if (!isCustomTotal) {
+              <div class="g-item-wrapper">
+                <span>Price</span>
+                <span>{{ symbolPriceOnDate() | currency }}</span>
+              </div>
+            }
+            <!-- units -->
             <div class="g-item-wrapper">
               <div [ngClass]="{ 'text-wt-danger': insufficientUnitsErrorSignal() }">Units</div>
               <div [ngClass]="{ 'text-wt-danger': insufficientUnitsErrorSignal() }" class="flex items-center gap-4">
@@ -202,14 +208,18 @@ export type PortfolioTradeDialogComponentData = {
             <div class="g-item-wrapper">
               <div class="space-x-2">
                 <span>Total Value</span>
-                <span *ngIf="isDemoTradingAccount()">/</span>
-                <span *ngIf="isDemoTradingAccount()">Fees</span>
+                @if (isDemoTradingAccount()) {
+                  <span>/</span>
+                  <span>Fees</span>
+                }
               </div>
               <div class="space-x-2">
                 @if (!isCustomTotal) {
-                  <span>{{ symbolPriceOnDate() * (form.controls.units.value | castToNumber) | currency }}</span>
-                  <span *ngIf="isDemoTradingAccount()">/</span>
-                  <span *ngIf="isDemoTradingAccount()"> ~{{ calculatedFees() | currency }} </span>
+                  <span>{{ symbolPriceOnDate() * form.controls.units.value | currency }}</span>
+                  @if (isDemoTradingAccount()) {
+                    <span>/</span>
+                    <span> ~{{ calculatedFees() | currency }} </span>
+                  }
                 } @else {
                   <span> {{ form.controls.customTotalValue.value || 0 | currency }} </span>
                 }
@@ -234,16 +244,18 @@ export type PortfolioTradeDialogComponentData = {
           <!-- units / keyboard -->
           <div class="md:px-3">
             <!-- units keyboard -->
-            <app-number-keyboard-control
-              *ngIf="activeTotalValueButtonSignal() === 'UNITS'"
-              [formControl]="form.controls.units"
-            />
+            @if (activeTotalValueButtonSignal() === 'UNITS') {
+              <app-number-keyboard-control
+                [formControl]="form.controls.units"
+                [enableDecimal]="isSymbolCrypto()"
+                [decimalLimit]="isSymbolCrypto() ? 4 : 0"
+              />
+            }
 
             <!-- custom total keyboard -->
-            <app-number-keyboard-control
-              *ngIf="activeTotalValueButtonSignal() === 'TOTAL_VALUE'"
-              [formControl]="form.controls.customTotalValue"
-            />
+            @if (activeTotalValueButtonSignal() === 'TOTAL_VALUE') {
+              <app-number-keyboard-control [formControl]="form.controls.customTotalValue" />
+            }
           </div>
         } @else {
           <!-- loader -->
@@ -268,7 +280,7 @@ export type PortfolioTradeDialogComponentData = {
               insufficientCashErrorSignal() ||
               isSellDisabledZeroUnits() ||
               !form.controls.units.value ||
-              form.controls.units.value === '0'
+              form.controls.units.value === 0
             "
             type="submit"
             mat-flat-button
@@ -293,21 +305,21 @@ export class PortfolioTradeDialogComponent {
   private marketApiService = inject(MarketApiService);
   private dialogServiceUtil = inject(DialogServiceUtil);
   authenticationUserService = inject(AuthenticationUserStoreService);
-  data = signal(inject<PortfolioTradeDialogComponentData>(MAT_DIALOG_DATA));
+  readonly data = signal(inject<PortfolioTradeDialogComponentData>(MAT_DIALOG_DATA));
 
-  form = new FormGroup({
+  readonly form = new FormGroup({
     date: new FormControl(this.lastDateMarketOpen, { validators: [requiredValidator], nonNullable: true }),
-    units: new FormControl('', {
+    units: new FormControl(0, {
       validators: [requiredValidator, minValueValidator(0), positiveNumberValidator],
       nonNullable: true,
     }),
-    customTotalValue: new FormControl('', { nonNullable: true }),
+    customTotalValue: new FormControl(0, { nonNullable: true }),
     // whether user wants to use custom total value and custom units
     useCustomTotalValueControl: new FormControl(false, { nonNullable: true }),
   });
 
   // config for date picker
-  datePickerConfig: InputTypeDateTimePickerConfig = {
+  readonly datePickerConfig: InputTypeDateTimePickerConfig = {
     maxDate: this.lastDateMarketOpen,
     minDate: new Date(2015, 0, 1),
     dateFilter: dateIsNotWeekend,
@@ -316,8 +328,23 @@ export class PortfolioTradeDialogComponent {
   // get holding information for symbol if there is any
   holdingSignal = this.portfolioUserFacadeService.getPortfolioStateHolding(this.data().quote.symbol);
   portfolioState = this.portfolioUserFacadeService.getPortfolioState;
-  getIsMarketOpenSignal = this.marketApiService.getIsMarketOpenSignal;
   userDataSignal = this.authenticationUserService.state.getUserData;
+
+  /**
+   * check if stock market is open, crypto is open all the time
+   */
+  isMarketOpen = computed(() => {
+    const marketOpen = this.marketApiService.getIsMarketOpenSignal();
+    const data = this.data();
+
+    if (data.quote.exchange === 'CRYPTO') {
+      return marketOpen?.isTheCryptoMarketOpen ?? false;
+    }
+
+    return marketOpen?.isTheStockMarketOpen ?? false;
+  });
+
+  isSymbolCrypto = computed(() => this.data().quote.exchange === 'CRYPTO');
 
   /**
    * load current price or use from summary
@@ -343,7 +370,7 @@ export class PortfolioTradeDialogComponent {
    */
   insufficientUnitsErrorSignal = toSignal(
     this.form.controls.units.valueChanges.pipe(
-      map((units) => Number(units) > (this.holdingSignal()?.units ?? 0) && this.data().transactionType === 'SELL'),
+      map((units) => units > (this.holdingSignal()?.units ?? 0) && this.data().transactionType === 'SELL'),
     ),
     { initialValue: false },
   );
@@ -361,13 +388,13 @@ export class PortfolioTradeDialogComponent {
 
         // custom total value is set
         if (this.isCustomTotal) {
-          const value = Number(this.form.controls.customTotalValue.value) > (this.portfolioState()?.cashOnHand ?? 0);
+          const value = this.form.controls.customTotalValue.value > (this.portfolioState()?.cashOnHand ?? 0);
           return value;
         }
 
         // check if user has enough cash to buy
         const value =
-          Number(this.form.controls.units.value) * this.symbolPriceOnDate() > (this.portfolioState()?.cashOnHand ?? 0);
+          this.form.controls.units.value * this.symbolPriceOnDate() > (this.portfolioState()?.cashOnHand ?? 0);
         return value;
       }),
     ),
@@ -381,13 +408,7 @@ export class PortfolioTradeDialogComponent {
 
   isDemoTradingAccount = computed(() => this.authenticationUserService.state.isAccountDemoTrading());
   calculatedFees = derivedFrom(
-    [
-      this.form.controls.units.valueChanges.pipe(
-        startWith(this.form.controls.units.value),
-        map((d) => Number(d)),
-      ),
-      this.symbolPriceOnDate,
-    ],
+    [this.form.controls.units.valueChanges.pipe(startWith(this.form.controls.units.value)), this.symbolPriceOnDate],
     pipe(map(([units, price]) => roundNDigits(((units * price) / 100) * TRANSACTION_FEE_PRCT))),
     { initialValue: 0 },
   );
@@ -399,7 +420,7 @@ export class PortfolioTradeDialogComponent {
 
   isLoadingSignal = signal<boolean>(false);
 
-  USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
+  readonly USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
 
   get lastDateMarketOpen(): Date {
     return !isSameDay(new Date(this.data().quote.timestamp * 1000), new Date())
@@ -419,26 +440,28 @@ export class PortfolioTradeDialogComponent {
   }
 
   async onFormSubmit(): Promise<void> {
+    // form is probably never invalid
     if (this.form.invalid) {
       this.dialogServiceUtil.showNotificationBar('Please fill in all required fields', 'error');
       return;
     }
 
     // inform user to add custom total value
-    if (this.isCustomTotal && this.form.controls.customTotalValue.value === '') {
+    if (this.isCustomTotal && this.form.controls.customTotalValue.value === 0) {
       this.dialogServiceUtil.showNotificationBar('Please fill total value', 'error');
       return;
     }
 
     // create object
+    const data = this.data();
     const transactionCreate: PortfolioTransactionCreate = {
       date: dateFormatDate(this.form.controls.date.value, 'yyyy-MM-dd HH:mm:ss'),
-      symbol: this.data().quote.symbol,
-      units: Number(this.form.controls.units.value),
-      customTotalValue: this.isCustomTotal ? Number(this.form.controls.customTotalValue.value) : undefined,
-      transactionType: this.data().transactionType,
-      symbolType: 'STOCK',
-      sector: this.data()?.sector ?? 'Unknown',
+      symbol: data.quote.symbol,
+      units: this.form.controls.units.value,
+      customTotalValue: this.isCustomTotal ? this.form.controls.customTotalValue.value : undefined,
+      transactionType: data.transactionType,
+      symbolType: data.quote.exchange === 'CRYPTO' ? 'CRYPTO' : 'STOCK',
+      sector: data?.sector ?? 'Unknown',
     };
 
     // set loading
@@ -460,22 +483,19 @@ export class PortfolioTradeDialogComponent {
   }
 
   onSellAllClick(event: MatCheckboxChange): void {
-    if (event.checked) {
-      this.form.controls.units.patchValue(String(this.holdingSignal()?.units ?? 0));
-    } else {
-      this.form.controls.units.patchValue('');
-    }
+    const val = event.checked ? (this.holdingSignal()?.units ?? 0) : 0;
+    this.form.controls.units.patchValue(val);
   }
 
   onIncreaseUnits(value: number): void {
-    const currentVal = Number(this.form.controls.units.value);
+    const currentVal = this.form.controls.units.value;
     // prevent negative values
     if (currentVal + value < 0) {
-      this.form.controls.units.patchValue('0');
+      this.form.controls.units.patchValue(0);
       return;
     }
     // increase or decrease units
-    this.form.controls.units.patchValue(String(Number(this.form.controls.units.value) + value));
+    this.form.controls.units.patchValue(this.form.controls.units.value + value);
   }
 
   /**
@@ -483,8 +503,8 @@ export class PortfolioTradeDialogComponent {
    */
   private listenCustomTotalValueChange(): void {
     this.form.controls.useCustomTotalValueControl.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.form.controls.units.patchValue('', { emitEvent: false });
-      this.form.controls.customTotalValue.patchValue('', { emitEvent: false });
+      this.form.controls.units.patchValue(0, { emitEvent: false });
+      this.form.controls.customTotalValue.patchValue(0, { emitEvent: false });
     });
   }
 }

@@ -89,7 +89,7 @@ import {
             <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-10 w-10" />
             <div class="flex flex-col">
               <div class="flex items-center gap-2">
-                <div class="text-wt-primary">{{ row.symbol }}</div>
+                <div class="text-wt-primary">{{ row.displaySymbol ?? row.symbol }}</div>
                 <!-- transaction -->
                 <div
                   class="block sm:hidden"
@@ -237,7 +237,7 @@ import {
         [length]="dataSource.filteredData.length"
         [appCustomLength]="dataSource.filteredData.length"
         [pageSize]="18"
-      ></mat-paginator>
+      />
     </div>
   `,
   styles: `

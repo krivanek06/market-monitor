@@ -118,7 +118,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
           class="lg:basis-3/5"
           [imageName]="symbolSummary.id"
           [symbol]="symbolSummary.id"
-          [title]="'Historical Price: ' + symbolSummary.id"
+          [title]="'Historical Price: ' + symbolSummary.quote.displaySymbol"
         />
         <div class="lg:basis-2/5">
           <app-symbol-summary-list data-testid="page-trading-symbol-summary-list" [symbolSummary]="symbolSummary" />
@@ -248,7 +248,7 @@ export class PageTradingComponent {
     ).sort((a, b) => a.caption.localeCompare(b.caption));
   });
 
-  ColorScheme = ColorScheme;
+  readonly ColorScheme = ColorScheme;
 
   onSymbolQuoteClick(quote: SymbolQuote) {
     this.selectedSymbolControl.patchValue(quote.symbol);
@@ -272,7 +272,7 @@ export class PageTradingComponent {
       data: <PortfolioTradeDialogComponentData>{
         transactionType: transactionType,
         quote: summary.quote,
-        sector: summary.profile?.sector ?? '',
+        sector: summary.profile?.sector ?? summary.quote.exchange,
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });

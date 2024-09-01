@@ -48,14 +48,14 @@ export class MarketApiService {
       .pipe(catchError(() => []));
   }
 
-  searchQuotesByPrefix(ticker: string): Observable<SymbolQuote[]> {
+  searchQuotesByPrefix(ticker: string, isCrypto = false): Observable<SymbolQuote[]> {
     if (!ticker) {
       return of([]);
     }
     return this.apiCache
       .getData<
         SymbolQuote[]
-      >(`https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${ticker}&isSearch=true&onlyQuote=true`, ApiCacheService.validity5Min)
+      >(`${this.cloudflareSymbolSummaryAPI}/?symbol=${ticker}&isCrypto=${isCrypto}&isSearch=true&onlyQuote=true`, ApiCacheService.validity5Min)
       .pipe(catchError(() => []));
   }
 

@@ -37,7 +37,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
           <img appDefaultImg imageType="symbol" [src]="stockSummary.id" alt="Stock Image" class="h-11 w-11" />
           <div class="grid">
             <div class="text-wt-gray-medium flex gap-4 text-base">
-              <span>{{ stockSummary.id }}</span>
+              <span>{{ stockSummary.quote.displaySymbol }}</span>
               <span>|</span>
               <span>{{ symbolType() }}</span>
             </div>
@@ -82,18 +82,31 @@ export class StockSummaryDialogComponent {
 
   symbolType = computed(() => {
     const summary = this.stockSummarySignal();
-    if (!summary || !summary.profile) {
+
+    if (!summary) {
       return null;
     }
+
+    if (summary.quote.exchange === 'CRYPTO') {
+      return 'Crypto';
+    }
+
+    if (!summary.profile) {
+      return null;
+    }
+
     if (summary.profile?.isEtf) {
       return 'ETF';
     }
+
     if (summary.profile?.isAdr) {
       return 'ADR';
     }
+
     if (summary.profile?.isFund) {
       return 'FUND';
     }
+
     return 'Stock';
   });
   isSymbolTypeStock = computed(() => this.symbolType() === 'Stock' || this.symbolType() === 'ADR');

@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@mm/api-types';
 import { AUTHENTICATION_ACCOUNT_TOKEN } from '@mm/authentication/data-access';
-import { SymbolFavoriteService } from '@mm/market-stocks/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 
@@ -16,31 +15,33 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
   imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule],
   template: `
     <mat-dialog-actions class="flex flex-col gap-x-6 gap-y-2 px-4 sm:flex-row">
-      <!-- favorites button -->
-      @if (isSymbolInWatchList()) {
-        <button
-          data-testid="summary-action-buttons-remove-watchlist"
-          mat-stroked-button
-          color="warn"
-          (click)="onRemoveWatchList()"
-          type="button"
-          class="g-border-apply h-10 max-sm:w-full"
-        >
-          <mat-icon>do_not_disturb_on</mat-icon>
-          watchlist - remove
-        </button>
-      } @else {
-        <button
-          data-testid="summary-action-buttons-add-watchlist"
-          mat-stroked-button
-          color="accent"
-          (click)="onAddWatchList()"
-          type="button"
-          class="g-border-apply h-10 max-sm:w-full"
-        >
-          <mat-icon>star</mat-icon>
-          watchlist - add
-        </button>
+      <!-- favorites button (only for auth users) -->
+      @if (authenticationUserService) {
+        @if (isSymbolInWatchList()) {
+          <button
+            data-testid="summary-action-buttons-remove-watchlist"
+            mat-stroked-button
+            color="warn"
+            (click)="onRemoveWatchList()"
+            type="button"
+            class="g-border-apply h-10 max-sm:w-full"
+          >
+            <mat-icon>do_not_disturb_on</mat-icon>
+            watchlist - remove
+          </button>
+        } @else {
+          <button
+            data-testid="summary-action-buttons-add-watchlist"
+            mat-stroked-button
+            color="accent"
+            (click)="onAddWatchList()"
+            type="button"
+            class="g-border-apply h-10 max-sm:w-full"
+          >
+            <mat-icon>star</mat-icon>
+            watchlist - add
+          </button>
+        }
       }
 
       @if (showRedirectButton()) {
@@ -66,10 +67,9 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SummaryActionButtonsComponent {
-  private authenticationUserService = inject(AUTHENTICATION_ACCOUNT_TOKEN, {
+  readonly authenticationUserService = inject(AUTHENTICATION_ACCOUNT_TOKEN, {
     optional: true,
   });
-  private symbolFavoriteService = inject(SymbolFavoriteService);
   private dialogServiceUtil = inject(DialogServiceUtil);
   private route = inject(Router);
   private viewPortScroller = inject(ViewportScroller);
@@ -89,35 +89,20 @@ export class SummaryActionButtonsComponent {
     if (this.authenticationUserService) {
       return this.authenticationUserService.state.isSymbolInWatchList()(this.symbolSummary().id);
     }
-    return this.symbolFavoriteService.isSymbolInFavorite(this.symbolSummary().id);
+
+    return false;
   });
 
   onRemoveWatchList(): void {
     if (this.authenticationUserService) {
       this.removeWatchList();
-    } else {
-      this.removeToFavorite();
     }
   }
 
   onAddWatchList(): void {
     if (this.authenticationUserService) {
       this.addWatchList();
-    } else {
-      this.addToFavorite();
     }
-  }
-
-  private addToFavorite(): void {
-    this.symbolFavoriteService.addFavoriteSymbol(this.symbolSummary().quote);
-
-    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been added into favorites`);
-  }
-
-  private removeToFavorite(): void {
-    this.symbolFavoriteService.removeFavoriteSymbol(this.symbolSummary().quote);
-
-    this.dialogServiceUtil.showNotificationBar(`Symbol: ${this.symbolSummary().id} has been removed from favorites`);
   }
 
   private addWatchList() {

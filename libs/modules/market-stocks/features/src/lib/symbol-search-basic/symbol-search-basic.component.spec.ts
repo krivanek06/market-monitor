@@ -5,12 +5,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatRadioGroup, MatRadioModule } from '@angular/material/radio';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MarketApiService } from '@mm/api-client';
 import { SymbolQuote, quoteAAPLMock, quoteMSFTMock, quoteNFLXMock } from '@mm/api-types';
-import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { SymbolFavoriteService, SymbolSearchService } from '@mm/market-stocks/data-access';
+import { SymbolSearchService } from '@mm/market-stocks/data-access';
 import { ElementFocusDirective } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
@@ -18,15 +18,12 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
 import { SymbolSearchBasicComponent } from './symbol-search-basic.component';
 
 describe('SymbolSearchBasicComponent', () => {
-  const watchlistS = '[data-testid="search-basic-watchlist-checkbox"]';
   const overlayContentS = '[data-testid="search-basic-overlay"]';
   const overlayS = '.cdk-overlay-pane';
   const formFieldInputS = '[data-testid="search-basic-input"]';
   const formSearchedResultsS = '[test-id="search-basic-quotes"]';
   const noDataS = '[data-testid="search-basic-no-data"]';
-
-  // used to change injection token from undefined to some value before rendering component
-  let authServiceMockValue: AuthenticationUserStoreService | undefined = {} as AuthenticationUserStoreService;
+  const searchRadioGroupS = '[data-testid="search-change-radio-group"]';
 
   const quoteDef1Mock = {
     name: 'Default 1',
@@ -36,10 +33,10 @@ describe('SymbolSearchBasicComponent', () => {
     name: 'Default 2',
     symbol: 'Def2',
   } as SymbolQuote;
-
-  beforeAll(() => {
-    authServiceMockValue = {} as AuthenticationUserStoreService;
-  });
+  const quoteCryptoMock = {
+    name: 'C 1',
+    symbol: 'C1',
+  } as SymbolQuote;
 
   beforeEach(() => {
     return (
@@ -47,6 +44,7 @@ describe('SymbolSearchBasicComponent', () => {
         .keep(MatCheckboxModule)
         .keep(MatFormFieldModule)
         .keep(MatInputModule)
+        .keep(MatRadioModule)
         //.keep(MatInput)
         .keep(MatAutocompleteModule)
         .keep(ElementFocusDirective)
@@ -56,12 +54,6 @@ describe('SymbolSearchBasicComponent', () => {
         //.keep(FormsModule)
         //.keep(ReactiveFormsModule)
         .keep(NG_MOCKS_ROOT_PROVIDERS)
-        .provide({
-          provide: SymbolFavoriteService,
-          useValue: {
-            getFavoriteSymbols: jest.fn().mockReturnValue([]),
-          },
-        })
         .provide({
           provide: MarketApiService,
           useValue: {
@@ -74,6 +66,7 @@ describe('SymbolSearchBasicComponent', () => {
             addSearchedSymbol: jest.fn(),
             getSearchedSymbols: () => [],
             getDefaultSymbols: () => [quoteDef1Mock, quoteDef2Mock],
+            getDefaultCrypto: () => [quoteCryptoMock],
           },
         })
         .provide({
@@ -81,10 +74,6 @@ describe('SymbolSearchBasicComponent', () => {
           useValue: {
             open: jest.fn(),
           },
-        })
-        .provide({
-          provide: AUTHENTICATION_ACCOUNT_TOKEN,
-          useValue: authServiceMockValue,
         })
     );
   });
@@ -114,8 +103,83 @@ describe('SymbolSearchBasicComponent', () => {
     expect(overlayPane).toBeNull();
     expect(component.displayQuotes().data.length).toBe(2);
     expect(component.displayQuotes().isLoading).toBeFalsy();
-    expect(component.displayQuotes().type).toBe('lastSearched');
     expect(noData).toBeFalsy();
+  });
+
+  it('should change search type to crypto and back', () => {
+    const fixture = MockRender(SymbolSearchBasicComponent);
+    const marketApi = ngMocks.get(MarketApiService);
+
+    // Update the view
+    fixture.detectChanges();
+
+    const component = fixture.point.componentInstance;
+
+    // get input field
+    const inputField = ngMocks.find(fixture.debugElement, formFieldInputS);
+
+    // focus on form field - opens overlay
+    ngMocks.trigger(inputField, 'focus');
+
+    // Update the view
+    fixture.detectChanges();
+
+    // check if initially we load symbols
+    expect(component.searchCrypto()).toBeFalsy();
+
+    // find radio buttons
+    const radioGroup = ngMocks.find<MatRadioGroup>(fixture.debugElement, searchRadioGroupS);
+
+    // check if we have radio group
+    expect(radioGroup).toBeTruthy();
+    expect(radioGroup.childNodes.length).toBe(2);
+
+    const buttonTicker = radioGroup.childNodes[0];
+    const buttonCrypto = radioGroup.childNodes[1];
+
+    const onSearchTypeChangeSpy = jest.spyOn(fixture.point.componentInstance, 'onSearchTypeChange');
+
+    // click on radio
+    ngMocks.click(buttonCrypto);
+    radioGroup.triggerEventHandler('change', { value: true });
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if we change search type
+    expect(onSearchTypeChangeSpy).toHaveBeenCalledWith(expect.any(Object));
+    expect(component.searchCrypto()).toBeTruthy();
+
+    // check if default crypto symbols are loaded
+    expect(component.displayQuotes().data.length).toBe(1);
+    expect(component.displayQuotes().data[0]).toBe(quoteCryptoMock);
+
+    // type some value into search input
+    inputField.nativeElement.value = 'BTC';
+
+    // trigger input event
+    inputField.nativeElement.dispatchEvent(new Event('input'));
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if we searched for crypto
+    expect(component.searchValue()).toBe('BTC');
+    expect(marketApi.searchQuotesByPrefix).toHaveBeenCalledWith('BTC', true);
+
+    // click on radio (ticker symbol)
+    ngMocks.click(buttonTicker);
+    radioGroup.triggerEventHandler('change', { value: false });
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if we change search type
+    expect(onSearchTypeChangeSpy).toHaveBeenCalledWith(expect.any(Object));
+    expect(component.searchCrypto()).toBeFalsy();
+    expect(component.searchValue()).toBe('');
+    expect(component.displayQuotes().data.length).toBe(2);
+    expect(component.displayQuotes().data[0]).toBe(quoteDef1Mock);
   });
 
   it('should display overlay when search input field is focused', () => {
@@ -151,7 +215,6 @@ describe('SymbolSearchBasicComponent', () => {
     expect(options.length).toBe(2);
     expect(component.displayQuotes().data.length).toBe(2);
     expect(component.displayQuotes().isLoading).toBeFalsy();
-    expect(component.displayQuotes().type).toBe('lastSearched');
     expect(noData).toBeFalsy();
   });
 
@@ -232,10 +295,9 @@ describe('SymbolSearchBasicComponent', () => {
 
     // check if quotes are loaded
     expect(component.searchValue()).toBe('AAPL');
-    expect(marketApi.searchQuotesByPrefix).toHaveBeenCalledWith('AAPL');
+    expect(marketApi.searchQuotesByPrefix).toHaveBeenCalledWith('AAPL', false);
     expect(component.displayQuotes().data.length).toBe(3);
     expect(component.displayQuotes().isLoading).toBeFalsy();
-    expect(component.displayQuotes().type).toBe('searched');
     expect(overlayPane).toBeTruthy();
     expect(options.length).toBe(3);
   });
@@ -271,7 +333,6 @@ describe('SymbolSearchBasicComponent', () => {
     // check if quotes are loaded
     expect(component.searchValue()).toBe('');
     expect(component.displayQuotes().isLoading).toBeFalsy();
-    expect(component.displayQuotes().type).toBe('lastSearched');
     expect(component.displayQuotes().data.length).toBe(4);
     expect(overlayPane).toBeTruthy();
     expect(options.length).toBe(4);
@@ -314,27 +375,6 @@ describe('SymbolSearchBasicComponent', () => {
     expect(marketApi.searchQuotesByPrefix).not.toHaveBeenCalled();
   });
 
-  it('should NOT display favorite checkbox when user is authenticated', () => {
-    const fixture = MockRender(SymbolSearchBasicComponent);
-    const component = fixture.point.componentInstance;
-    fixture.detectChanges();
-
-    // get input field
-    const inputField = ngMocks.find(fixture.debugElement, formFieldInputS);
-
-    // focus on form field - opens overlay
-    ngMocks.trigger(inputField, 'focus');
-
-    fixture.detectChanges();
-
-    const overlayContainer = ngMocks.get(OverlayContainer);
-    const overlayContainerElement = overlayContainer.getContainerElement();
-    const favoriteCheckbox = overlayContainerElement.querySelector(watchlistS);
-
-    expect(component.isUserAuthenticatedSignal()).toBeTruthy();
-    expect(favoriteCheckbox).toBeFalsy();
-  });
-
   it('should display perform actions on symbol click', () => {
     const marketApi = ngMocks.get(MarketApiService);
     ngMocks.stub(marketApi, {
@@ -373,12 +413,10 @@ describe('SymbolSearchBasicComponent', () => {
     const clickedQuoteSpy = jest.spyOn(fixture.point.componentInstance.clickedQuote, 'emit');
 
     expect(options.length).toBe(3);
-    expect(component.displayQuotes().type).toBe('searched');
 
     // click on first option
     ngMocks.click(options[0]);
 
-    expect(component.displayQuotes().type).toBe('lastSearched');
     expect(component.openModalOnClick()).toBeTruthy();
     expect(onSummaryClickSpy).toHaveBeenCalledWith(quoteAAPLMock);
     expect(symbolSearchService.addSearchedSymbol).toHaveBeenCalledWith(quoteAAPLMock);
@@ -408,7 +446,6 @@ describe('SymbolSearchBasicComponent', () => {
     const options = ngMocks.findAll(formSearchedResultsS);
 
     expect(options.length).toBe(2);
-    expect(component.displayQuotes().type).toBe('lastSearched');
 
     const onSummaryClickSpy = jest.spyOn(fixture.point.componentInstance, 'onSummaryClick');
     const clickedQuoteSpy = jest.spyOn(fixture.point.componentInstance.clickedQuote, 'emit');
@@ -416,68 +453,10 @@ describe('SymbolSearchBasicComponent', () => {
     // click on first option
     ngMocks.click(options[0]);
 
-    expect(component.displayQuotes().type).toBe('lastSearched');
     expect(component.openModalOnClick()).toBeFalsy();
     expect(onSummaryClickSpy).toHaveBeenCalledWith(quoteDef1Mock);
     expect(component.searchValue()).toBe('');
     expect(dialogService.open).not.toHaveBeenCalled();
     expect(clickedQuoteSpy).toHaveBeenCalledWith(quoteDef1Mock);
-  });
-
-  describe('User in NOT Authenticated', () => {
-    beforeAll(() => {
-      authServiceMockValue = undefined;
-    });
-
-    it('should display favorite checkbox when user is NOT authenticated', () => {
-      const fixture = MockRender(SymbolSearchBasicComponent);
-      const component = fixture.point.componentInstance;
-      fixture.detectChanges();
-
-      // get input field
-      const inputField = ngMocks.find(fixture.debugElement, formFieldInputS);
-
-      // focus on form field - opens overlay
-      ngMocks.trigger(inputField, 'focus');
-
-      fixture.detectChanges();
-
-      const overlayContainer = ngMocks.get(OverlayContainer);
-      const overlayContainerElement = overlayContainer.getContainerElement();
-      const overlayPane = overlayContainerElement.querySelector(overlayS);
-      const favoriteCheckbox = overlayContainerElement.querySelector(watchlistS);
-
-      expect(component.isUserAuthenticatedSignal()).toBeFalsy();
-      expect(overlayPane).toBeTruthy();
-      expect(favoriteCheckbox).toBeTruthy();
-    });
-
-    it('should NOT display favorite checkbox when user is NOT authenticated and search has value', () => {
-      const fixture = MockRender(SymbolSearchBasicComponent);
-      const component = fixture.point.componentInstance;
-      fixture.detectChanges();
-
-      // get input field
-      const inputField = ngMocks.find(fixture.debugElement, formFieldInputS);
-
-      // put some value into the input field
-      inputField.nativeElement.value = 'AAPL';
-      inputField.nativeElement.dispatchEvent(new Event('input'));
-
-      // focus on form field - opens overlay
-      ngMocks.trigger(inputField, 'focus');
-
-      fixture.detectChanges();
-
-      const overlayContainer = ngMocks.get(OverlayContainer);
-      const overlayContainerElement = overlayContainer.getContainerElement();
-      const overlayPane = overlayContainerElement.querySelector(overlayS);
-      const favoriteCheckbox = overlayContainerElement.querySelector(watchlistS);
-
-      expect(component.isUserAuthenticatedSignal()).toBeFalsy();
-      expect(overlayPane).toBeTruthy();
-      expect(favoriteCheckbox).toBeFalsy();
-      expect(component.searchValue()).toBe('AAPL');
-    });
   });
 });

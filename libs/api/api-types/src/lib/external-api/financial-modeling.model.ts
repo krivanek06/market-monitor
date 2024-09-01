@@ -13,7 +13,7 @@ export type SymbolQuote = {
   yearLow: number;
   priceAvg50: number;
   priceAvg200: number;
-  exchange: 'CRYPTO' | 'INDEX' | string;
+  exchange: 'CRYPTO' | 'INDEX' | 'NASDAQ' | 'NYSE' | string;
   volume: number;
   avgVolume: number;
   open: number;
@@ -26,6 +26,12 @@ export type SymbolQuote = {
   // value can be null if it is ETF or index
   marketCap: number;
   sharesOutstanding: number;
+
+  /**
+   * if exchange is CRYPTO, it removes the 'USD' part so BTCUSD becomes BTC
+   * this field is only available on the client side, it's computed in cloudflare
+   */
+  displaySymbol: string;
 };
 
 export type CompanyOutlook = {

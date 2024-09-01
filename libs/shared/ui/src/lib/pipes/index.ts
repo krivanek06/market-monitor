@@ -1,5 +1,4 @@
 export * from './array.pipe';
-export * from './cast-to-number.pipe';
 export * from './date-ago.pipe';
 export * from './get-data-by-index.pipe';
 export * from './large-number-formatter.pipe';

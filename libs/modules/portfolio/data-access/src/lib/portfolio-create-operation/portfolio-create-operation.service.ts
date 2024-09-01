@@ -103,6 +103,7 @@ export class PortfolioCreateOperationService {
       returnChange,
       returnValue,
       dateExecuted: getCurrentDateDetailsFormat(),
+      displaySymbol: input.symbol.replace(input.symbolType === 'CRYPTO' ? 'USD' : '', ''),
     };
 
     return result;

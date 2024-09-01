@@ -1,5 +1,4 @@
 import { OverlayModule } from '@angular/cdk/overlay';
-import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -13,16 +12,15 @@ import {
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatRadioChange, MatRadioModule } from '@angular/material/radio';
 import { MarketApiService } from '@mm/api-client';
 import { SymbolQuote } from '@mm/api-types';
-import { AUTHENTICATION_ACCOUNT_TOKEN } from '@mm/authentication/data-access';
-import { SymbolFavoriteService, SymbolSearchService } from '@mm/market-stocks/data-access';
+import { SymbolSearchService } from '@mm/market-stocks/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, ElementFocusDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
 import { filter, map, of, startWith, switchMap } from 'rxjs';
@@ -32,18 +30,17 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
   selector: 'app-symbol-search-basic',
   standalone: true,
   imports: [
-    CommonModule,
     OverlayModule,
     QuoteItemComponent,
     MatButtonModule,
     MatIconModule,
-    MatCheckboxModule,
     ElementFocusDirective,
     RangeDirective,
     MatFormFieldModule,
     MatInputModule,
     DefaultImgDirective,
     MatDividerModule,
+    MatRadioModule,
   ],
   template: `
     <mat-form-field class="w-full" cdkOverlayOrigin #trigger #origin="cdkOverlayOrigin">
@@ -87,22 +84,18 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
         [style.min-width.px]="overlayWidth()"
         class="bg-wt-gray-light mx-auto max-h-[400px] min-h-[200px] w-full overflow-y-scroll rounded-md p-3 shadow-md"
       >
-        <!-- checkbox changing displayed favorites -->
-        @if (!isUserAuthenticatedSignal() && searchValue().length === 0) {
-          <div class="mb-1 flex items-center justify-between">
-            <span class="text-wt-gray-medium text-base">
-              {{ showFavoriteStocks() ? 'Watch List' : 'Last Searched' }}
-            </span>
-            <mat-checkbox
-              data-testid="search-basic-watchlist-checkbox"
-              color="primary"
-              [checked]="showFavoriteStocks()"
-              (change)="onShowFavoriteChange()"
-            >
-              Show Watch List
-            </mat-checkbox>
-          </div>
-        }
+        <!-- check if load ticker or crypto -->
+        <mat-radio-group
+          class="mb-4 flex justify-between"
+          color="primary"
+          aria-label="Select symbol type"
+          [value]="searchCrypto()"
+          (change)="onSearchTypeChange($event)"
+          data-testid="search-change-radio-group"
+        >
+          <mat-radio-button [value]="false">Ticker</mat-radio-button>
+          <mat-radio-button [value]="true">Crypto</mat-radio-button>
+        </mat-radio-group>
 
         @if (displayQuotes().isLoading) {
           <!-- loading skeleton -->
@@ -121,7 +114,9 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
             </button>
 
             <!-- divider -->
-            <mat-divider *ngIf="!last" />
+            @if (!last) {
+              <mat-divider />
+            }
           }
 
           <!-- no data -->
@@ -149,7 +144,6 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SymbolSearchBasicComponent {
-  private symbolFavoriteService = inject(SymbolFavoriteService);
   private symbolSearchService = inject(SymbolSearchService);
   private marketApiService = inject(MarketApiService);
   private dialog = inject(MatDialog);
@@ -171,8 +165,6 @@ export class SymbolSearchBasicComponent {
 
   triggerRef = viewChild('trigger', { read: ElementRef });
 
-  showFavoriteStocks = signal(false);
-
   overlayWidth = signal(0);
 
   /**
@@ -181,13 +173,9 @@ export class SymbolSearchBasicComponent {
   isInputFocused = signal(false);
 
   /**
-   * check if user is authenticated
+   * if true, load crypto symbols
    */
-  isUserAuthenticatedSignal = signal(
-    !!inject(AUTHENTICATION_ACCOUNT_TOKEN, {
-      optional: true,
-    }),
-  );
+  searchCrypto = signal<boolean>(false);
 
   /**
    * loaded symbol data by user's input typing
@@ -197,7 +185,7 @@ export class SymbolSearchBasicComponent {
       filter((value) => value.length > 0),
       switchMap((value) =>
         value.length <= 5 // prevent too many requests
-          ? this.marketApiService.searchQuotesByPrefix(value).pipe(
+          ? this.marketApiService.searchQuotesByPrefix(value, this.searchCrypto()).pipe(
               map((data) => ({
                 data: data,
                 isLoading: false,
@@ -214,22 +202,31 @@ export class SymbolSearchBasicComponent {
   displayQuotes = computed(() => {
     // return searched symbols by input
     if (this.searchValue().length > 0) {
-      return { ...this.loadedQuotesByInput(), type: 'searched' as const };
+      return { ...this.loadedQuotesByInput() };
     }
 
-    // return favorite symbols
-    if (this.showFavoriteStocks()) {
-      const favorites = this.symbolFavoriteService.getFavoriteSymbols();
-      return { data: favorites, isLoading: false, noData: false, type: 'favorites' as const };
+    if (this.searchCrypto()) {
+      return { data: this.symbolSearchService.getDefaultCrypto(), isLoading: false, noData: false };
     }
 
     // combine last searched and default symbols
     const lastSearch = [
       ...this.symbolSearchService.getSearchedSymbols(),
       ...this.symbolSearchService.getDefaultSymbols(),
-    ].slice(0, 10);
+    ]
+      // remove duplicates
+      .reduce((acc, curr) => {
+        const exist = acc.find((d) => d.symbol === curr.symbol);
+        if (exist) {
+          return acc;
+        }
 
-    return { data: lastSearch, isLoading: false, noData: false, type: 'lastSearched' as const };
+        // add to accumulator
+        return [...acc, curr];
+      }, [] as SymbolQuote[])
+      .slice(0, 10);
+
+    return { data: lastSearch, isLoading: false, noData: false };
   });
 
   onInputFocus(isFocused: boolean) {
@@ -238,6 +235,11 @@ export class SymbolSearchBasicComponent {
     // calculate overlay width based on screen size
     const overlayWidth = this.triggerRef()?.nativeElement.getBoundingClientRect().width ?? 620;
     this.overlayWidth.set(overlayWidth);
+
+    if (!isFocused) {
+      // clear input
+      this.searchValue.set('');
+    }
   }
 
   onSummaryClick(quote: SymbolQuote) {
@@ -265,8 +267,13 @@ export class SymbolSearchBasicComponent {
     });
   }
 
-  onShowFavoriteChange() {
-    this.showFavoriteStocks.set(!this.showFavoriteStocks());
+  onSearchTypeChange(event: MatRadioChange) {
+    // reset last searched symbols
+    this.searchValue.set('');
+
+    // set search type
+    const value = event.value as boolean;
+    this.searchCrypto.set(value);
   }
 
   onInputChange(event: Event) {

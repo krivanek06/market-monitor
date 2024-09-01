@@ -368,6 +368,7 @@ describe('PortfolioCalculationService', () => {
 
       const expectedResult = {
         symbol: t1.symbol,
+        displaySymbol: t1.symbol,
         data: testHistoricalPriceSymbol_AAPL.data.map((d) => ({
           date: d.date,
           breakEvenValue: t1.units * t1.unitPrice,
@@ -409,6 +410,7 @@ describe('PortfolioCalculationService', () => {
 
       const expectedResult = {
         symbol: t1.symbol,
+        displaySymbol: t1.symbol,
         data: testHistoricalPriceSymbol_AAPL.data.map((d) => ({
           date: d.date,
           breakEvenValue: t1.units * t1.unitPrice,
@@ -585,7 +587,8 @@ describe('PortfolioCalculationService', () => {
               ),
             },
           ],
-          symbol: 'AAPL',
+          displaySymbol: testHistoricalPriceSymbol_AAPL.symbol,
+          symbol: testHistoricalPriceSymbol_AAPL.symbol,
         },
         {
           data: [
@@ -634,7 +637,8 @@ describe('PortfolioCalculationService', () => {
                 t_BUY_MSFT_1.transactionFees,
             },
           ],
-          symbol: 'MSFT',
+          symbol: testHistoricalPriceSymbol_MSFT.symbol,
+          displaySymbol: testHistoricalPriceSymbol_MSFT.symbol,
         },
       ] satisfies PortfolioGrowthAssets[];
 
@@ -685,6 +689,7 @@ describe('PortfolioCalculationService', () => {
         .then((data) => {
           expect(data[0]).toEqual({
             symbol: 'AAPL',
+            displaySymbol: 'AAPL',
             data: [
               {
                 date: TestTransactionDates['2023-09-05'],
@@ -695,7 +700,7 @@ describe('PortfolioCalculationService', () => {
                 profit: 0,
               },
             ],
-          });
+          } satisfies PortfolioGrowthAssets);
           done();
         })
         .catch((e) => {
@@ -761,6 +766,7 @@ describe('PortfolioCalculationService', () => {
           },
         ],
         symbol: 'AAPL',
+        displaySymbol: 'AAPL',
       } satisfies PortfolioGrowthAssets;
 
       // service
