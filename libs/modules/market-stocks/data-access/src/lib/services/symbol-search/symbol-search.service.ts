@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MarketApiService } from '@mm/api-client';
 import { SymbolQuote } from '@mm/api-types';
 import { StorageLocalStoreService } from '@mm/shared/general-features';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +12,18 @@ export class SymbolSearchService extends StorageLocalStoreService<string[]> {
   private searchedSymbols = signal<SymbolQuote[]>([]);
 
   readonly defaultSymbolsArr = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA'];
-  readonly defaultCrypto = ['BTCUSD', 'ETHUSD', 'LTCUSD', 'XRPUSD', 'ADAUSD', 'DOGEUSD', 'SOLUSD', 'ATOMUSD'];
+  readonly defaultCrypto = [
+    'BTCUSD',
+    'ETHUSD',
+    'LTCUSD',
+    'XRPUSD',
+    'ADAUSD',
+    'DOGEUSD',
+    'SOLUSD',
+    'ATOMUSD',
+    'AVAXUSD',
+    'DOTUSD',
+  ];
 
   constructor(private marketApiService: MarketApiService) {
     super('SYMBOL_SEARCH', [], 1);
@@ -20,7 +32,12 @@ export class SymbolSearchService extends StorageLocalStoreService<string[]> {
 
   getSearchedSymbols = computed(() => this.searchedSymbols());
   getDefaultSymbols = toSignal(this.marketApiService.getSymbolQuotes(this.defaultSymbolsArr), { initialValue: [] });
-  getDefaultCrypto = toSignal(this.marketApiService.getSymbolQuotes(this.defaultCrypto), { initialValue: [] });
+  getDefaultCrypto = toSignal(
+    this.marketApiService
+      .getSymbolQuotes(this.defaultCrypto)
+      .pipe(map((data) => data.sort((a, b) => b.marketCap - a.marketCap))),
+    { initialValue: [] },
+  );
 
   addSearchedSymbol(quote: SymbolQuote): void {
     // remove from searchedSymbols$

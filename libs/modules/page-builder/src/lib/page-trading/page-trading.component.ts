@@ -118,7 +118,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
           class="lg:basis-3/5"
           [imageName]="symbolSummary.id"
           [symbol]="symbolSummary.id"
-          [title]="'Historical Price: ' + symbolSummary.id"
+          [title]="'Historical Price: ' + symbolSummary.quote.displaySymbol"
         />
         <div class="lg:basis-2/5">
           <app-symbol-summary-list data-testid="page-trading-symbol-summary-list" [symbolSummary]="symbolSummary" />
