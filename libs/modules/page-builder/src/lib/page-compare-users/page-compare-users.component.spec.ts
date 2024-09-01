@@ -136,7 +136,7 @@ describe('PageCompareUsersComponent', () => {
     const mockTransactions = {
       transactions: [{ transactionId: '1' }, { transactionId: '2' }],
     } as UserPortfolioTransaction;
-    const portfolioGrowthAssetMock = [{ symbol: 'AA', data: [] }] as PortfolioGrowthAssets[];
+    const portfolioGrowthAssetMock = [{ symbol: 'AA', data: [], displaySymbol: 'AA' }] as PortfolioGrowthAssets[];
     const portfolioGrowthMock = [
       { totalBalanceValue: 1, breakEvenValue: 1, date: '', marketTotalValue: 1 },
     ] as PortfolioGrowth[];
