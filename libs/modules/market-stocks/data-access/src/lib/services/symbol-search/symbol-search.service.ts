@@ -11,6 +11,7 @@ export class SymbolSearchService extends StorageLocalStoreService<string[]> {
   private searchedSymbols = signal<SymbolQuote[]>([]);
 
   readonly defaultSymbolsArr = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA'];
+  readonly defaultCrypto = ['BTCUSD', 'ETHUSD', 'LTCUSD', 'XRPUSD', 'ADAUSD', 'DOGEUSD', 'SOLUSD', 'ATOMUSD'];
 
   constructor(private marketApiService: MarketApiService) {
     super('SYMBOL_SEARCH', [], 1);
@@ -19,6 +20,7 @@ export class SymbolSearchService extends StorageLocalStoreService<string[]> {
 
   getSearchedSymbols = computed(() => this.searchedSymbols());
   getDefaultSymbols = toSignal(this.marketApiService.getSymbolQuotes(this.defaultSymbolsArr), { initialValue: [] });
+  getDefaultCrypto = toSignal(this.marketApiService.getSymbolQuotes(this.defaultCrypto), { initialValue: [] });
 
   addSearchedSymbol(quote: SymbolQuote): void {
     // remove from searchedSymbols$

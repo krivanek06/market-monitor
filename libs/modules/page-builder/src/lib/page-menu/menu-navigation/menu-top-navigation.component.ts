@@ -149,7 +149,10 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
 
         <div class="flex flex-1 justify-end">
           <!-- search -->
-          <app-symbol-search-basic displayValue="symbol" class="-mb-5 -mr-10 hidden w-[400px] scale-[0.8] sm:block" />
+          <app-symbol-search-basic
+            displayValue="symbol"
+            class="-mb-5 -mr-10 hidden w-full max-w-[640px] scale-[0.8] sm:block"
+          />
 
           <div class="hidden items-center gap-1 xl:flex">
             <!-- display logged in person -->

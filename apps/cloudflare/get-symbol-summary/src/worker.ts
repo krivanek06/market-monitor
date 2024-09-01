@@ -95,9 +95,17 @@ export default {
 
 		// order data by id asc
 		const orderedSummaries = [...validStoredData, ...summaries].sort((a, b) => (a.id < b.id ? 1 : -1));
+		const modifiedSummaries = orderedSummaries.map((d) => ({
+			...d,
+			quote: {
+				...d.quote,
+				// remove USD from symbol
+				displaySymbol: d.quote.symbol.replace(d.quote.exchange === 'CRYPTO' ? 'USD' : '', ''),
+			},
+		}));
 
 		// check if to return only quote or all data
-		const result = isOnlyQuote ? orderedSummaries.map((d) => d.quote) : orderedSummaries;
+		const result = isOnlyQuote ? modifiedSummaries.map((d) => d.quote) : modifiedSummaries;
 
 		// return data
 		return new Response(JSON.stringify(result), RESPONSE_HEADER);
@@ -215,8 +223,8 @@ const getParams = (requestUrl: string): { symbol: string | undefined; isSearch: 
 	const isSearch = isSearchString === 'true';
 
 	// stock, crypto, etf, fund
-	const symbolType = searchParams.get('symbolType') as string | undefined;
-	const isCrypto = symbolType === 'crypto';
+	const symbolType = searchParams.get('isCrypto') as string | undefined;
+	const isCrypto = symbolType === 'true';
 
 	// check if to get only quote
 	const isOnlyQuoteString = searchParams.get('onlyQuote') as string | undefined;

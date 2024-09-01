@@ -248,7 +248,7 @@ export class PageTradingComponent {
     ).sort((a, b) => a.caption.localeCompare(b.caption));
   });
 
-  ColorScheme = ColorScheme;
+  readonly ColorScheme = ColorScheme;
 
   onSymbolQuoteClick(quote: SymbolQuote) {
     this.selectedSymbolControl.patchValue(quote.symbol);
@@ -272,7 +272,7 @@ export class PageTradingComponent {
       data: <PortfolioTradeDialogComponentData>{
         transactionType: transactionType,
         quote: summary.quote,
-        sector: summary.profile?.sector ?? '',
+        sector: summary.profile?.sector ?? summary.quote.exchange,
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });

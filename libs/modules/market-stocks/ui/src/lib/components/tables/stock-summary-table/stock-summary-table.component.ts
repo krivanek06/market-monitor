@@ -75,7 +75,7 @@ import {
             <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-10 w-10" />
             <div class="flex flex-col">
               <!-- asset symbol + sector -->
-              <div class="text-wt-primary">{{ row.symbol }}</div>
+              <div class="text-wt-primary">{{ row.displaySymbol }}</div>
             </div>
           </div>
         </td>

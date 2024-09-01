@@ -157,6 +157,12 @@ export type PortfolioTransaction = SymbolStoreBase & {
    * during weekend and market is closed during weekend, so this will be last open market date
    */
   priceFromDate?: string;
+
+  /**
+   * if exchange is CRYPTO, it removes the 'USD' part so BTCUSD becomes BTC
+   * this field is only available on the client side, it's computed in cloudflare
+   */
+  displaySymbol: string;
 };
 
 export type PortfolioTransactionMore = PortfolioTransaction & {

@@ -303,9 +303,9 @@ export class PortfolioCalculationService {
       (acc, curr) => {
         const existingData = acc[curr.symbol];
         if (existingData) {
-          acc[curr.symbol] += curr.symbolQuote.price * curr.units;
+          acc[curr.symbolQuote.displaySymbol] += curr.symbolQuote.price * curr.units;
         } else {
-          acc[curr.symbol] = curr.symbolQuote.price * curr.units;
+          acc[curr.symbolQuote.displaySymbol] = curr.symbolQuote.price * curr.units;
         }
         return acc;
       },

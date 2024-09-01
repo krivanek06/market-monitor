@@ -79,7 +79,7 @@ export type PortfolioTradeDialogComponentData = {
                 <div
                   [ngClass]="{
                     'text-wt-danger': data().transactionType === 'SELL',
-                    'text-wt-success': data().transactionType === 'BUY'
+                    'text-wt-success': data().transactionType === 'BUY',
                   }"
                 >
                   {{ data().transactionType | uppercase }} Operation
@@ -95,7 +95,7 @@ export type PortfolioTradeDialogComponentData = {
             <div
               [ngClass]="{
                 'text-wt-danger': !getIsMarketOpenSignal()?.isTheStockMarketOpen,
-                'text-wt-success': !!getIsMarketOpenSignal()?.isTheStockMarketOpen
+                'text-wt-success': !!getIsMarketOpenSignal()?.isTheStockMarketOpen,
               }"
               class="mb-1 text-base"
             >
@@ -399,7 +399,7 @@ export class PortfolioTradeDialogComponent {
 
   isLoadingSignal = signal<boolean>(false);
 
-  USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
+  readonly USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
 
   get lastDateMarketOpen(): Date {
     return !isSameDay(new Date(this.data().quote.timestamp * 1000), new Date())
@@ -431,14 +431,15 @@ export class PortfolioTradeDialogComponent {
     }
 
     // create object
+    const data = this.data();
     const transactionCreate: PortfolioTransactionCreate = {
       date: dateFormatDate(this.form.controls.date.value, 'yyyy-MM-dd HH:mm:ss'),
-      symbol: this.data().quote.symbol,
+      symbol: data.quote.symbol,
       units: Number(this.form.controls.units.value),
       customTotalValue: this.isCustomTotal ? Number(this.form.controls.customTotalValue.value) : undefined,
-      transactionType: this.data().transactionType,
-      symbolType: 'STOCK',
-      sector: this.data()?.sector ?? 'Unknown',
+      transactionType: data.transactionType,
+      symbolType: data.quote.exchange === 'CRYPTO' ? 'CRYPTO' : 'STOCK',
+      sector: data?.sector ?? 'Unknown',
     };
 
     // set loading

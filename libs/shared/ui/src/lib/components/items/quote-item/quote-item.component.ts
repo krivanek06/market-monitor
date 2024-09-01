@@ -23,7 +23,7 @@ import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
         <span class="text-wt-gray-dark block sm:hidden">{{ symbolQuote().symbol }}</span>
         <span class="text-wt-gray-dark hidden text-start sm:block">
           <span class="@xl:block hidden">{{ symbolQuote().name | truncate: 25 }}</span>
-          <span class="@xl:hidden block">{{ symbolQuote().symbol }}</span>
+          <span class="@xl:hidden block">{{ symbolQuote().displaySymbol }}</span>
         </span>
       </div>
       <!-- price & price change -->

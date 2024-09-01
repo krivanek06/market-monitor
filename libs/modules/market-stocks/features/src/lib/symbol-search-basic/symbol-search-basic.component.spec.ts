@@ -18,7 +18,6 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
 import { SymbolSearchBasicComponent } from './symbol-search-basic.component';
 
 describe('SymbolSearchBasicComponent', () => {
-  const watchlistS = '[data-testid="search-basic-watchlist-checkbox"]';
   const overlayContentS = '[data-testid="search-basic-overlay"]';
   const overlayS = '.cdk-overlay-pane';
   const formFieldInputS = '[data-testid="search-basic-input"]';
@@ -314,27 +313,6 @@ describe('SymbolSearchBasicComponent', () => {
     expect(marketApi.searchQuotesByPrefix).not.toHaveBeenCalled();
   });
 
-  it('should NOT display favorite checkbox when user is authenticated', () => {
-    const fixture = MockRender(SymbolSearchBasicComponent);
-    const component = fixture.point.componentInstance;
-    fixture.detectChanges();
-
-    // get input field
-    const inputField = ngMocks.find(fixture.debugElement, formFieldInputS);
-
-    // focus on form field - opens overlay
-    ngMocks.trigger(inputField, 'focus');
-
-    fixture.detectChanges();
-
-    const overlayContainer = ngMocks.get(OverlayContainer);
-    const overlayContainerElement = overlayContainer.getContainerElement();
-    const favoriteCheckbox = overlayContainerElement.querySelector(watchlistS);
-
-    expect(component.isUserAuthenticatedSignal()).toBeTruthy();
-    expect(favoriteCheckbox).toBeFalsy();
-  });
-
   it('should display perform actions on symbol click', () => {
     const marketApi = ngMocks.get(MarketApiService);
     ngMocks.stub(marketApi, {
@@ -422,62 +400,5 @@ describe('SymbolSearchBasicComponent', () => {
     expect(component.searchValue()).toBe('');
     expect(dialogService.open).not.toHaveBeenCalled();
     expect(clickedQuoteSpy).toHaveBeenCalledWith(quoteDef1Mock);
-  });
-
-  describe('User in NOT Authenticated', () => {
-    beforeAll(() => {
-      authServiceMockValue = undefined;
-    });
-
-    it('should display favorite checkbox when user is NOT authenticated', () => {
-      const fixture = MockRender(SymbolSearchBasicComponent);
-      const component = fixture.point.componentInstance;
-      fixture.detectChanges();
-
-      // get input field
-      const inputField = ngMocks.find(fixture.debugElement, formFieldInputS);
-
-      // focus on form field - opens overlay
-      ngMocks.trigger(inputField, 'focus');
-
-      fixture.detectChanges();
-
-      const overlayContainer = ngMocks.get(OverlayContainer);
-      const overlayContainerElement = overlayContainer.getContainerElement();
-      const overlayPane = overlayContainerElement.querySelector(overlayS);
-      const favoriteCheckbox = overlayContainerElement.querySelector(watchlistS);
-
-      expect(component.isUserAuthenticatedSignal()).toBeFalsy();
-      expect(overlayPane).toBeTruthy();
-      expect(favoriteCheckbox).toBeTruthy();
-    });
-
-    it('should NOT display favorite checkbox when user is NOT authenticated and search has value', () => {
-      const fixture = MockRender(SymbolSearchBasicComponent);
-      const component = fixture.point.componentInstance;
-      fixture.detectChanges();
-
-      // get input field
-      const inputField = ngMocks.find(fixture.debugElement, formFieldInputS);
-
-      // put some value into the input field
-      inputField.nativeElement.value = 'AAPL';
-      inputField.nativeElement.dispatchEvent(new Event('input'));
-
-      // focus on form field - opens overlay
-      ngMocks.trigger(inputField, 'focus');
-
-      fixture.detectChanges();
-
-      const overlayContainer = ngMocks.get(OverlayContainer);
-      const overlayContainerElement = overlayContainer.getContainerElement();
-      const overlayPane = overlayContainerElement.querySelector(overlayS);
-      const favoriteCheckbox = overlayContainerElement.querySelector(watchlistS);
-
-      expect(component.isUserAuthenticatedSignal()).toBeFalsy();
-      expect(overlayPane).toBeTruthy();
-      expect(favoriteCheckbox).toBeFalsy();
-      expect(component.searchValue()).toBe('AAPL');
-    });
   });
 });

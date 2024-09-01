@@ -58,7 +58,7 @@ import {
             <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-10 w-10" />
             <div class="flex flex-col">
               <div class="space-x-1">
-                <span class="text-wt-primary">{{ row.symbol }}</span>
+                <span class="text-wt-primary">{{ row?.symbolQuote?.displaySymbol ?? row.symbol }}</span>
                 <span class="text-wt-gray-medium">({{ row.units }})</span>
               </div>
               <!-- <div>{{ row.symbolSummary.profile?.sector || 'N/A' }}</div> -->
