@@ -106,6 +106,10 @@ export type PortfolioStateHoldings = PortfolioState & {
 
 export type PortfolioGrowthAssets = {
   symbol: string;
+  /**
+   * modifies symbol string a bit, example for crypto it removes USD from BTCUSD -> BTC
+   */
+  displaySymbol: string;
   data: PortfolioGrowthAssetsDataItem[];
 };
 

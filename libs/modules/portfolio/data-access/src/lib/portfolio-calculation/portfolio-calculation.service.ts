@@ -418,8 +418,10 @@ export class PortfolioCalculationService {
           } satisfies PortfolioGrowthAssetsDataItem;
         });
 
+        const displaySymbol = symbolTransactions.at(0)?.displaySymbol ?? symbol;
         return {
           symbol,
+          displaySymbol,
           // remove data with 0 market value, however always keep last one (it has a different profit since it was SOLD)
           data: growthAssetItems.filter(
             (d, i) => !(d.marketTotalValue === 0 && growthAssetItems[i - 1]?.marketTotalValue === 0),

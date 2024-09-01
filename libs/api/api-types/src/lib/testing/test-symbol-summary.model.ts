@@ -4,6 +4,7 @@ import { SymbolSummary } from '../firebase';
 export const quoteAAPLMock = {
   name: 'Apple Inc.',
   symbol: 'AAPL',
+  displaySymbol: 'AAPL',
   price: 150.0,
 } as SymbolQuote;
 
@@ -18,6 +19,7 @@ export const summaryAAPLMock = {
 export const quoteMSFTMock = {
   name: 'Microsoft Corporation',
   symbol: 'MSFT',
+  displaySymbol: 'MSFT',
   price: 120.0,
 } as SymbolQuote;
 
@@ -32,6 +34,7 @@ export const summaryMSFTMock = {
 export const quoteNFLXMock = {
   name: 'Netflix Inc.',
   symbol: 'NFLX',
+  displaySymbol: 'NFLX',
   price: 100.0,
 } as SymbolQuote;
 

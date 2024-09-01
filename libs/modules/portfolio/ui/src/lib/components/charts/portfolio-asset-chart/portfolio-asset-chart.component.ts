@@ -125,7 +125,8 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
    */
   symbolInputSource = computed(() =>
     (this.data() ?? []).map(
-      (asset) => ({ caption: asset.symbol, value: asset.symbol, image: asset.symbol }) satisfies InputSource<string>,
+      (asset) =>
+        ({ caption: asset.displaySymbol, value: asset.symbol, image: asset.symbol }) satisfies InputSource<string>,
     ),
   );
 
