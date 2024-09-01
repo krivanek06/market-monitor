@@ -91,6 +91,7 @@ import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summa
           aria-label="Select symbol type"
           [value]="searchCrypto()"
           (change)="onSearchTypeChange($event)"
+          data-testid="search-change-radio-group"
         >
           <mat-radio-button [value]="false">Ticker</mat-radio-button>
           <mat-radio-button [value]="true">Crypto</mat-radio-button>
