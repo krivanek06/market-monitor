@@ -1,7 +1,7 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, forwardRef, input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { roundNDigits } from '@mm/shared/general-util';
 
 export const KeyboardComponentValues = [
   { label: 1, value: 1 },
@@ -23,25 +23,19 @@ export type KeyboardComponentType = (typeof KeyboardComponentValues)[number];
 @Component({
   selector: 'app-number-keyboard-control',
   standalone: true,
-  imports: [CommonModule, MatButtonModule],
+  imports: [MatButtonModule],
   template: `
     <div class="grid grid-cols-3 gap-2">
-      <ng-container *ngFor="let button of KeyboardComponent">
-        <button
-          *ngIf="enableDecimal() || button.label !== '.'; else placeholder"
-          type="button"
-          mat-stroked-button
-          (click)="onButtonClick(button)"
-          class="min-h-[52px]"
-        >
-          {{ button.label }}
-        </button>
-
-        <!-- placeholder -->
-        <ng-template #placeholder>
+      @for (button of KeyboardComponent; track button.value) {
+        @if (enableDecimal() || button.label !== '.') {
+          <button type="button" mat-stroked-button (click)="onButtonClick(button)" class="min-h-[52px]">
+            {{ button.label }}
+          </button>
+        } @else {
+          <!-- placeholder for space -->
           <div></div>
-        </ng-template>
-      </ng-container>
+        }
+      }
     </div>
   `,
   styles: [
@@ -64,23 +58,29 @@ export class NumberKeyboardComponent {
   enableDecimal = input(false);
 
   /**
-   * string value typed by user
+   * limit decimal to 2
+   */
+  decimalLimit = input(2);
+
+  /**
+   * string value typed by user, allows better manipulation like put '.' in the middle
    */
   private storedValue = '';
 
   // outputting number with maximum 2 decimal -> i.e: 122.33
-  onChange: (data: string) => void = () => {};
+  onChange: (data: number) => void = () => {};
   onTouched = () => {};
 
   KeyboardComponent = KeyboardComponentValues;
 
   onButtonClick(keyboard: KeyboardComponentType) {
     let value = this.storedValue;
+
     // remove last char
     if (keyboard.value === 'back') {
       value = value.slice(0, value.length - 1);
       this.storedValue = value;
-      this.onChange(value);
+      this.notifyParent();
       return;
     }
 
@@ -95,18 +95,23 @@ export class NumberKeyboardComponent {
     }
 
     // prevent more than 2 values after decimal
-    else if (value.includes('.') && value.length - 1 - value.indexOf('.') == 2) {
+    else if (value.includes('.') && value.length - 1 - value.indexOf('.') == this.decimalLimit()) {
       value = value.slice(0, value.length - 1);
     }
 
     // append chart
     value = value + keyboard.value;
     this.storedValue = value;
-    this.onChange(value);
+    this.notifyParent();
   }
 
-  writeValue(value?: string): void {
-    this.storedValue = value ?? '';
+  private notifyParent() {
+    const exportValue = roundNDigits(Number(this.storedValue), this.decimalLimit());
+    this.onChange(exportValue);
+  }
+
+  writeValue(value?: number): void {
+    this.storedValue = String(value) ?? '';
   }
 
   /**

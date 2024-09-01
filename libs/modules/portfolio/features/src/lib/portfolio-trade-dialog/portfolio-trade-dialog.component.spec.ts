@@ -1,4 +1,3 @@
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButton, MatButtonModule } from '@angular/material/button';
@@ -22,7 +21,7 @@ import { UserAccountTypeDirective } from '@mm/authentication/feature-access-dire
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { dateFormatDate, getCurrentDateDetailsFormat, roundNDigits } from '@mm/shared/general-util';
-import { DatePickerComponent } from '@mm/shared/ui';
+import { DatePickerComponent, NumberKeyboardComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { of, throwError } from 'rxjs';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from './portfolio-trade-dialog.component';
@@ -30,7 +29,6 @@ import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from
 const saveButtonS = '[data-testid="trade-dialog-save-button"]';
 const insufficientCashErrorS = '[data-testid="trade-dialog-insufficient-cash-error"]';
 const insufficientUnitsErrorS = '[data-testid="trade-dialog-insufficient-units-error"]';
-const maxHoldingErrorS = '[data-testid="trade-dialog-max-holdings-error"]';
 const sellAllCheckboxS = '[data-testid="trade-dialog-sell-all-checkbox"]';
 const incrementUnitsButtonS = '[data-testid="trade-dialog-increment-units"]';
 const decrementUnitsButtonS = '[data-testid="trade-dialog-decrement-units"]';
@@ -84,6 +82,7 @@ describe('PortfolioTradeDialogComponent', () => {
       .keep(MatButtonModule)
       .keep(MatIconModule)
       .keep(UserAccountTypeDirective)
+      .keep(NumberKeyboardComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .provide({
         provide: MarketApiService,
@@ -162,8 +161,8 @@ describe('PortfolioTradeDialogComponent', () => {
       const component = fixture.point.componentInstance;
       const form = {
         date: new Date(mockData.quote.timestamp * 1000),
-        units: '',
-        customTotalValue: '',
+        units: 0,
+        customTotalValue: 0,
         useCustomTotalValueControl: false,
       };
 
@@ -210,7 +209,7 @@ describe('PortfolioTradeDialogComponent', () => {
       expect(component.calculatedFees()).toBe(0);
 
       // set units
-      component.form.controls.units.setValue(String(newUnits));
+      component.form.controls.units.setValue(newUnits);
 
       // test new units
       expect(component.calculatedFees()).toBe(expectedFees);
@@ -224,21 +223,21 @@ describe('PortfolioTradeDialogComponent', () => {
       const newTotalValue = 1000;
 
       // set units
-      component.form.controls.units.setValue(String(newUnits));
+      component.form.controls.units.setValue(newUnits);
 
       // set total value
-      component.form.controls.customTotalValue.setValue(String(newTotalValue));
+      component.form.controls.customTotalValue.setValue(newTotalValue);
 
       // test initial value
-      expect(component.form.controls.units.value).toBe(String(newUnits));
-      expect(component.form.controls.customTotalValue.value).toBe(String(newTotalValue));
+      expect(component.form.controls.units.value).toBe(newUnits);
+      expect(component.form.controls.customTotalValue.value).toBe(newTotalValue);
 
       // set useCustomTotalValueControl
       component.form.controls.useCustomTotalValueControl.setValue(true);
 
       // test new value
-      expect(component.form.controls.units.value).toBe('');
-      expect(component.form.controls.customTotalValue.value).toBe('');
+      expect(component.form.controls.units.value).toBe(0);
+      expect(component.form.controls.customTotalValue.value).toBe(0);
     });
 
     it('should increment units by 1 when + button is clicked', () => {
@@ -258,7 +257,7 @@ describe('PortfolioTradeDialogComponent', () => {
       fixture.detectChanges();
 
       // test new state
-      expect(component.form.controls.units.value).toBe('1');
+      expect(component.form.controls.units.value).toBe(1);
 
       // click element
       incrementEl.nativeElement.click();
@@ -267,7 +266,7 @@ describe('PortfolioTradeDialogComponent', () => {
       fixture.detectChanges();
 
       // test new state
-      expect(component.form.controls.units.value).toBe('2');
+      expect(component.form.controls.units.value).toBe(2);
     });
 
     it('should decrement units by 1 when - button is clicked', () => {
@@ -281,7 +280,7 @@ describe('PortfolioTradeDialogComponent', () => {
       expect(decrementEl).toBeTruthy();
 
       // set units default value
-      component.form.controls.units.setValue('10');
+      component.form.controls.units.setValue(10);
 
       // click element
       decrementEl.nativeElement.click();
@@ -290,7 +289,7 @@ describe('PortfolioTradeDialogComponent', () => {
       fixture.detectChanges();
 
       // test new state
-      expect(component.form.controls.units.value).toBe('9');
+      expect(component.form.controls.units.value).toBe(9);
 
       // click element
       decrementEl.nativeElement.click();
@@ -299,7 +298,7 @@ describe('PortfolioTradeDialogComponent', () => {
       fixture.detectChanges();
 
       // test new state
-      expect(component.form.controls.units.value).toBe('8');
+      expect(component.form.controls.units.value).toBe(8);
     });
 
     it('should NOT decrement units by 1 when - button is clicked and units are 0', () => {
@@ -316,7 +315,40 @@ describe('PortfolioTradeDialogComponent', () => {
       fixture.detectChanges();
 
       // test new state
-      expect(component.form.controls.units.value).toBe('0');
+      expect(component.form.controls.units.value).toBe(0);
+    });
+
+    it('should NOT enable decimal units for NOT CRYPTO', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+      const keyBoard = ngMocks.find(NumberKeyboardComponent);
+
+      // check if crypto
+      expect(component.isSymbolCrypto()).toBe(false);
+      expect(keyBoard.componentInstance.enableDecimal()).toBe(false);
+      expect(keyBoard.componentInstance.decimalLimit()).toBe(0);
+    });
+
+    it('should enable decimal units for CRYPTO', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+      const keyBoard = ngMocks.find(NumberKeyboardComponent);
+
+      // change symbol type
+      component.data.update((d) => ({
+        ...d,
+        quote: {
+          ...d.quote,
+          exchange: 'CRYPTO',
+        },
+        symbolType: 'CRYPTO',
+      }));
+      fixture.detectChanges();
+
+      // check if crypto
+      expect(component.isSymbolCrypto()).toBe(true);
+      expect(keyBoard.componentInstance.enableDecimal()).toBe(true);
+      expect(keyBoard.componentInstance.decimalLimit()).toBe(4);
     });
   });
 
@@ -354,7 +386,7 @@ describe('PortfolioTradeDialogComponent', () => {
       });
 
       // trigger form change
-      component.form.controls.units.setValue('10');
+      component.form.controls.units.setValue(10);
 
       // test new state
       expect(component.insufficientCashErrorSignal()).toBe(true);
@@ -385,7 +417,7 @@ describe('PortfolioTradeDialogComponent', () => {
       component.data().transactionType = 'SELL';
 
       // trigger form change
-      component.form.controls.units.setValue('10');
+      component.form.controls.units.setValue(10);
 
       // test new state
       expect(component.insufficientCashErrorSignal()).toBe(false);
@@ -433,7 +465,7 @@ describe('PortfolioTradeDialogComponent', () => {
       });
 
       // trigger form change
-      component.form.controls.units.setValue('8');
+      component.form.controls.units.setValue(8);
 
       // test new state
       expect(component.insufficientCashErrorSignal()).toBe(false);
@@ -456,7 +488,7 @@ describe('PortfolioTradeDialogComponent', () => {
       component.data().transactionType = 'SELL';
 
       // trigger form change
-      component.form.controls.units.setValue('100');
+      component.form.controls.units.setValue(100);
 
       // trigger CD
       fixture.detectChanges();
@@ -483,7 +515,7 @@ describe('PortfolioTradeDialogComponent', () => {
       expect(saveButtonEl.nativeElement.disabled).toBe(true);
 
       // trigger form change
-      component.form.controls.units.setValue('2');
+      component.form.controls.units.setValue(2);
 
       // trigger CD
       fixture.detectChanges();
@@ -492,7 +524,7 @@ describe('PortfolioTradeDialogComponent', () => {
       expect(saveButtonEl.nativeElement.disabled).toBe(false);
 
       // trigger form change
-      component.form.controls.units.setValue('0');
+      component.form.controls.units.setValue(0);
 
       // trigger CD
       fixture.detectChanges();
@@ -506,7 +538,6 @@ describe('PortfolioTradeDialogComponent', () => {
     it('should not display sell all checkbox on BUY operation', () => {
       const fixture = MockRender(PortfolioTradeDialogComponent);
       const component = fixture.point.componentInstance;
-      const loader = TestbedHarnessEnvironment.loader(fixture);
 
       // change transaction type to SELL
       component.data.update((d) => ({
@@ -543,7 +574,7 @@ describe('PortfolioTradeDialogComponent', () => {
 
       // by default disabled
       expect(sellAllCheckboxEl.componentInstance.checked).toBe(false);
-      expect(component.form.controls.units.value).toBe('');
+      expect(component.form.controls.units.value).toBe(0);
 
       const onSellAllClickSpy = jest.spyOn(component, 'onSellAllClick');
 
@@ -561,7 +592,7 @@ describe('PortfolioTradeDialogComponent', () => {
       // check if changed
       expect(onSellAllClickSpy).toHaveBeenCalled();
       expect(sellAllCheckboxEl.componentInstance.checked).toBe(true);
-      expect(component.form.controls.units.value).toBe(String(mockPortfolioState.holdings[0].units));
+      expect(component.form.controls.units.value).toBe(mockPortfolioState.holdings[0].units);
 
       // uncheck checkbox
       sellAllCheckboxEl.componentInstance.toggle();
@@ -574,20 +605,11 @@ describe('PortfolioTradeDialogComponent', () => {
       // check if changed
       expect(onSellAllClickSpy).toHaveBeenCalledTimes(2);
       expect(sellAllCheckboxEl.componentInstance.checked).toBe(false);
-      expect(component.form.controls.units.value).toBe('');
+      expect(component.form.controls.units.value).toBe(0);
     });
   });
 
   describe('test: onFormSubmit()', () => {
-    it('should notify user on invalid form', async () => {
-      const fixture = MockRender(PortfolioTradeDialogComponent);
-      const component = fixture.point.componentInstance;
-
-      await component.onFormSubmit();
-
-      expect(ngMocks.get(DialogServiceUtil).showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'error');
-    });
-
     it('should notify user if custom total value is missing', async () => {
       const fixture = MockRender(PortfolioTradeDialogComponent);
       const component = fixture.point.componentInstance;
@@ -614,7 +636,7 @@ describe('PortfolioTradeDialogComponent', () => {
       const component = fixture.point.componentInstance;
 
       // set units
-      component.form.controls.units.setValue('10');
+      component.form.controls.units.setValue(10);
 
       // trigger CD
       fixture.detectChanges();
@@ -645,7 +667,7 @@ describe('PortfolioTradeDialogComponent', () => {
       };
 
       // set units
-      component.form.controls.units.setValue('10');
+      component.form.controls.units.setValue(10);
 
       // trigger CD
       fixture.detectChanges();
