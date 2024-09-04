@@ -7,7 +7,6 @@ export type HallOfFameTopRankData<T> = { item: T; portfolioTotalGainsPercentage?
 export type HallOfFameUsers = {
   date: string;
   bestPortfolio: HallOfFameTopRankData<UserBase>[];
-  worstPortfolio: HallOfFameTopRankData<UserBase>[];
   bestDailyGains: UserBase[];
   worstDailyGains: UserBase[];
 };
@@ -15,7 +14,6 @@ export type HallOfFameUsers = {
 export type HallOfFameGroups = {
   date: string;
   bestPortfolio: HallOfFameTopRankData<GroupBase>[];
-  worstPortfolio: HallOfFameTopRankData<GroupBase>[];
   bestDailyGains: GroupBase[];
   worstDailyGains: GroupBase[];
 };

@@ -171,13 +171,13 @@ export const transformPortfolioStateHoldingToPortfolioState = (holding: Portfoli
     numberOfExecutedSellTransactions: holding.numberOfExecutedSellTransactions,
     transactionFees: holding.transactionFees,
     holdingsBalance: holding.holdingsBalance,
-    totalGainsValue: roundNDigits(holding.totalGainsValue, 2),
-    totalGainsPercentage: roundNDigits(holding.totalGainsPercentage, 2),
+    totalGainsValue: roundNDigits(holding.totalGainsValue),
+    totalGainsPercentage: roundNDigits(holding.totalGainsPercentage),
     firstTransactionDate: holding.firstTransactionDate,
     lastTransactionDate: holding.lastTransactionDate,
     date: holding.date,
     startingCash: holding.startingCash,
-    previousBalanceChange: holding.previousBalanceChange,
+    previousBalanceChange: roundNDigits(holding.previousBalanceChange),
     previousBalanceChangePercentage: holding.previousBalanceChangePercentage,
   };
 };

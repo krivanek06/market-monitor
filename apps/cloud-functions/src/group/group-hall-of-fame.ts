@@ -16,10 +16,6 @@ export const groupHallOfFame = async (): Promise<void> => {
   const groupBestProfitRef = searchableRef
     .orderBy('systemRank.portfolioTotalGainsPercentage.rank', 'asc')
     .limit(HALL_OF_FAME_PORTFOLIO_TOP_LIMIT);
-  // get worst groups by total gains
-  const groupWorstProfitRef = searchableRef
-    .orderBy('systemRank.portfolioTotalGainsPercentage.rank', 'desc')
-    .limit(HALL_OF_FAME_PORTFOLIO_TOP_LIMIT);
   // get top daily profit groups
   const groupBestDailyProfitRef = searchableRef
     .where('portfolioState.previousBalanceChangePercentage', '>', 0)
@@ -32,27 +28,14 @@ export const groupHallOfFame = async (): Promise<void> => {
     .limit(HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT);
 
   // get documents
-  const [groupBestProfitDoc, groupWorstProfitDoc, groupBestDailyProfitDoc, groupWorstDailyProfitDoc] =
-    await Promise.all([
-      groupBestProfitRef.get(),
-      groupWorstProfitRef.get(),
-      groupBestDailyProfitRef.get(),
-      groupWorstDailyProfitRef.get(),
-    ]);
+  const [groupBestProfitDoc, groupBestDailyProfitDoc, groupWorstDailyProfitDoc] = await Promise.all([
+    groupBestProfitRef.get(),
+    groupBestDailyProfitRef.get(),
+    groupWorstDailyProfitRef.get(),
+  ]);
 
   // map docs to data - just in case remove undefined
   const groupBestProfitData = groupBestProfitDoc.docs
-    .map((d) => d.data())
-    .filter((d) => !!d)
-    .map(
-      (d) =>
-        ({
-          item: transformGroupToBase(d),
-          portfolioTotalGainsPercentage: d.systemRank.portfolioTotalGainsPercentage,
-        }) satisfies HallOfFameTopRankData<GroupBase>,
-    );
-
-  const groupWorstProfitData = groupWorstProfitDoc.docs
     .map((d) => d.data())
     .filter((d) => !!d)
     .map(
@@ -77,7 +60,6 @@ export const groupHallOfFame = async (): Promise<void> => {
   const docRef = aggregationHallOfFameGroupsRef();
   docRef.set({
     bestPortfolio: groupBestProfitData,
-    worstPortfolio: groupWorstProfitData,
     bestDailyGains: groupBestDailyProfitData,
     worstDailyGains: groupWorstDailyProfitData,
     date: getCurrentDateDetailsFormat(),

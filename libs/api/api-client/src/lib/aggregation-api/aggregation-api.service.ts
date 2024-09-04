@@ -15,10 +15,9 @@ export class AggregationApiService {
   private defaultValue = {
     date: '',
     bestPortfolio: [],
-    worstPortfolio: [],
     bestDailyGains: [],
     worstDailyGains: [],
-  };
+  } satisfies HallOfFameUsers;
 
   hallOfFameUsers = toSignal(this.getHallOfFameUsers(), {
     initialValue: this.defaultValue,

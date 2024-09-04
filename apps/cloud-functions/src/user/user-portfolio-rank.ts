@@ -11,9 +11,7 @@ export const userPortfolioRank = async (): Promise<void> => {
 
   // get user docs
   const userDocs = (await searchableRef.get()).docs;
-  const sortedUser = userDocs.sort(
-    (a, b) => b.data().portfolioState.totalGainsPercentage - a.data().portfolioState.totalGainsPercentage,
-  );
+  const sortedUser = userDocs.sort((a, b) => b.data().portfolioState.balance - a.data().portfolioState.balance);
 
   // update rank for each user
   for (let i = 0; i < sortedUser.length; i++) {

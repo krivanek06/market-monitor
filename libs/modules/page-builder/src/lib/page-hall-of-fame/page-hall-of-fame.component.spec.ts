@@ -114,7 +114,6 @@ describe('PageHallOfFameComponent', () => {
         item: mockCreateUser({ id: 'User_12' }),
       },
     ],
-    worstPortfolio: [],
   } satisfies HallOfFameUsers;
 
   const hallOfFameGroupsMock = {
@@ -135,7 +134,6 @@ describe('PageHallOfFameComponent', () => {
         item: mockCreateGroupData({ id: 'Group_2' }),
       },
     ],
-    worstPortfolio: [],
   } satisfies HallOfFameGroups;
 
   const mockUser = mockCreateUser({

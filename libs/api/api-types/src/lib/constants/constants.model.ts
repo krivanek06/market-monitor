@@ -30,7 +30,7 @@ export const HALL_OF_FAME_PORTFOLIO_TOP_LIMIT = 75;
 /**
  * number how many entities to save for hall of fame portfolio daily change
  */
-export const HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT = 15;
+export const HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT = 12;
 
 /**
  * limit how far can we load historical prices for a symbol
