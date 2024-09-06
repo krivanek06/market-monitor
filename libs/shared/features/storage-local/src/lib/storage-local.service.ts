@@ -12,12 +12,12 @@ import { LocalStorageData, LocalStorageKeysVersion, storageInitialData } from '.
 export class StorageLocalService {
   private readonly STORAGE_MAIN_KEY = 'MARKET_MONITOR';
 
-  private updateData$ = new Subject<LocalStorageData>();
+  private readonly updateData$ = new Subject<LocalStorageData>();
 
   /**
    * current version of the data saved - if changed, all data will be removed
    */
-  private currentVersion = 1.1;
+  private readonly currentVersion = 1.1;
 
   /** readonly value from local storage */
   readonly localData = toSignal(this.updateData$.pipe(startWith(this.getDataFromLocalStorage())), {
@@ -31,9 +31,7 @@ export class StorageLocalService {
     // updated data for this specific key
     const newData = {
       ...savedData,
-      [key]: {
-        ...data,
-      } as LocalStorageData[T],
+      [key]: data,
     };
 
     try {
@@ -47,32 +45,19 @@ export class StorageLocalService {
     }
   }
 
-  getData<T extends keyof LocalStorageData>(key: T): LocalStorageData[T] | undefined {
-    const data = this.getDataFromLocalStorage();
-    return data[key];
-  }
-
-  removeDataStorage<T extends keyof LocalStorageData>(key: T): void {
-    // all local storage data saved for this app
-    const data = this.getDataFromLocalStorage();
-
-    // cleared data
-    const newData = {
-      ...data,
-      [key]: null,
-    };
-
-    // merge old and new data
-    localStorage.setItem(this.STORAGE_MAIN_KEY, JSON.stringify(newData));
-  }
-
   private getDataFromLocalStorage(): LocalStorageData {
     const data = localStorage.getItem(this.STORAGE_MAIN_KEY) ?? JSON.stringify(storageInitialData);
     const dataParsed = JSON.parse(data) as LocalStorageKeysVersion;
 
     // if version is different, clear all data
     if (dataParsed.version !== this.currentVersion) {
-      localStorage.setItem(this.STORAGE_MAIN_KEY, JSON.stringify(storageInitialData));
+      localStorage.setItem(
+        this.STORAGE_MAIN_KEY,
+        JSON.stringify({
+          ...storageInitialData,
+          version: this.currentVersion,
+        }),
+      );
     }
 
     return dataParsed;

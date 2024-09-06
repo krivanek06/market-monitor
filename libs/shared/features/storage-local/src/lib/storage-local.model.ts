@@ -11,13 +11,13 @@ export type LocalStorageData = {
   };
 };
 
+export type LocalStorageKeysVersion = LocalStorageData & {
+  version: number;
+};
+
 export const storageInitialData: LocalStorageData = {
   demoAccount: undefined,
   loader: {
     enabled: false,
   },
-};
-
-export type LocalStorageKeysVersion = LocalStorageData & {
-  version: number;
 };

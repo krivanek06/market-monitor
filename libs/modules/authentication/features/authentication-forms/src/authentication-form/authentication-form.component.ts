@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
-import { UserAccountBasicTypes, UserAccountEnum } from '@mm/api-types';
+import { USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DEMO, UserAccountBasicTypes, UserAccountEnum } from '@mm/api-types';
 import {
   AuthenticationAccountService,
   AuthenticationUserStoreService,
@@ -18,6 +19,8 @@ import {
 } from '@mm/authentication/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil, GenericDialogComponent } from '@mm/shared/dialog-manager';
+import { StorageLocalService } from '@mm/shared/storage-local';
+import { addDays, isAfter } from 'date-fns';
 import { filterNil } from 'ngxtension/filter-nil';
 import {
   Observable,
@@ -54,6 +57,7 @@ import { FormRegisterComponent } from './form-register/form-register.component';
     MatTooltipModule,
     GenericDialogComponent,
     AuthenticationNewAccountTypeChooseDialogComponent,
+    DatePipe,
   ],
   template: `
     @if (showContent()) {
@@ -83,7 +87,12 @@ import { FormRegisterComponent } from './form-register/form-register.component';
           </div>
 
           <!-- development -->
-          <div class="mt-4 px-4">
+          <div class="px-4">
+            @if (demoAccountValid()) {
+              <div class="mb-2 text-center">
+                You have a demo account valid until: {{ demoAccountValidUntil() | date: 'HH:mm, MMMM d, y' }}
+              </div>
+            }
             <button
               data-testid="auth-form-demo-login-button"
               mat-stroked-button
@@ -92,7 +101,7 @@ import { FormRegisterComponent } from './form-register/form-register.component';
               type="button"
               (click)="onDemoLogin()"
             >
-              Create Demo Account
+              {{ demoAccountValid() ? 'Use Active Demo Account' : 'Create Demo Account' }}
             </button>
           </div>
         </mat-tab>
@@ -116,31 +125,32 @@ import { FormRegisterComponent } from './form-register/form-register.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthenticationFormComponent {
-  loginUserInputControl = new FormControl<LoginUserInput | null>(null);
-  registerUserInputControl = new FormControl<RegisterUserInput | null>(null);
+  readonly loginUserInputControl = new FormControl<LoginUserInput | null>(null);
+  readonly registerUserInputControl = new FormControl<RegisterUserInput | null>(null);
 
-  private authenticationAccountService = inject(AuthenticationAccountService);
-  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private dialogServiceUtil = inject(DialogServiceUtil);
-  private router = inject(Router);
+  readonly #authenticationAccountService = inject(AuthenticationAccountService);
+  readonly #authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  readonly #dialogServiceUtil = inject(DialogServiceUtil);
+  readonly #storageLocalService = inject(StorageLocalService);
+  readonly #router = inject(Router);
 
   /** emit a value whether to use google or demo login */
-  private loginType$ = new Subject<'google' | 'demo'>();
+  readonly #loginType$ = new Subject<'google' | 'demo' | 'demoAlreadyCreated'>();
 
-  private googleAuth$ = this.loginType$.pipe(
+  readonly #googleAuth$ = this.#loginType$.pipe(
     filter((type) => type === 'google'),
     switchMap(() =>
-      from(this.authenticationAccountService.signInGoogle()).pipe(
+      from(this.#authenticationAccountService.signInGoogle()).pipe(
         switchMap(() =>
-          this.authenticationAccountService.getUserData().pipe(
+          this.#authenticationAccountService.getUserData().pipe(
             filterNil(), // wait until there is a user initialized
             first(),
             switchMap((userData) =>
-              this.authenticationAccountService.isUserNewUser()
+              this.#authenticationAccountService.isUserNewUser()
                 ? from(this.openSelectAccountType()).pipe(
                     filterNil(),
                     switchMap((accountType) =>
-                      from(this.authenticationUserStoreService.resetTransactions(accountType)).pipe(
+                      from(this.#authenticationUserStoreService.resetTransactions(accountType)).pipe(
                         map(() => ({ data: userData, action: 'success' as const })),
                         startWith({
                           action: 'loading' as const,
@@ -168,39 +178,39 @@ export class AuthenticationFormComponent {
     ),
   );
 
-  private demoLogin$ = this.loginType$.pipe(
+  readonly #demoLogin$ = this.#loginType$.pipe(
     filter((type) => type === 'demo'),
     switchMap(() =>
       this.openSelectAccountType().pipe(
         filterNil(),
         tap(() =>
-          this.dialogServiceUtil.showNotificationBar(
+          this.#dialogServiceUtil.showNotificationBar(
             'Creating demo account, it may take few seconds',
             'notification',
             5000,
           ),
         ),
         switchMap((accountType) =>
-          from(this.authenticationAccountService.registerDemoAccount(accountType)).pipe(
+          from(this.#authenticationAccountService.registerDemoAccount(accountType)).pipe(
             switchMap((result) =>
               from(
-                this.dialogServiceUtil.showConfirmDialog(
-                  `Demo Account Created.\n\n Email: ${result.userData.personal.email}\nPassword: ${result.password}\n\n You can change you password in settings`,
-                ),
+                this.#authenticationAccountService.signIn({
+                  email: result.userData.personal.email,
+                  password: result.password,
+                }),
               ).pipe(
+                tap(() =>
+                  // save data into local storage
+                  this.#storageLocalService.saveData('demoAccount', {
+                    email: result.userData.personal.email,
+                    password: result.password,
+                    createdDate: new Date().toString(),
+                  }),
+                ),
                 switchMap(() =>
-                  from(
-                    this.authenticationAccountService.signIn({
-                      email: result.userData.personal.email,
-                      password: result.password,
-                    }),
-                  ).pipe(
-                    switchMap(() =>
-                      this.authenticationAccountService.getUserData().pipe(
-                        filterNil(), // wait until there is a user initialized
-                        map((userData) => ({ data: userData, action: 'success' as const })),
-                      ),
-                    ),
+                  this.#authenticationAccountService.getUserData().pipe(
+                    filterNil(), // wait until there is a user initialized
+                    map((userData) => ({ data: userData, action: 'success' as const })),
                   ),
                 ),
               ),
@@ -222,19 +232,49 @@ export class AuthenticationFormComponent {
     ),
   );
 
-  private registerUser$ = this.registerUserInputControl.valueChanges.pipe(
+  readonly #demoLoginAlreadyCreated$ = this.#loginType$.pipe(
+    filter((type) => type === 'demoAlreadyCreated'),
+    switchMap(() =>
+      from(
+        this.#authenticationAccountService.signIn({
+          email: this.demoAccount()?.email ?? '',
+          password: this.demoAccount()?.password ?? '',
+        }),
+      ).pipe(
+        switchMap(() =>
+          this.#authenticationAccountService.getUserData().pipe(
+            filterNil(), // wait until there is a user initialized
+            map((userData) => ({ data: userData, action: 'success' as const })),
+          ),
+        ),
+        startWith({
+          action: 'loading' as const,
+          data: null,
+        }),
+        catchError((err) =>
+          of({
+            action: 'error-demo-already-active' as const,
+            error: err,
+            data: null,
+          }),
+        ),
+      ),
+    ),
+  );
+
+  readonly #registerUser$ = this.registerUserInputControl.valueChanges.pipe(
     filterNil(),
     switchMap((res) =>
-      from(this.authenticationAccountService.register(res)).pipe(
+      from(this.#authenticationAccountService.register(res)).pipe(
         switchMap(() =>
-          this.authenticationAccountService.getUserData().pipe(
+          this.#authenticationAccountService.getUserData().pipe(
             filterNil(), // wait until there is a user initialized
             first(),
             switchMap((userData) =>
               from(this.openSelectAccountType()).pipe(
                 filterNil(),
                 switchMap((accountType) =>
-                  from(this.authenticationUserStoreService.resetTransactions(accountType)).pipe(
+                  from(this.#authenticationUserStoreService.resetTransactions(accountType)).pipe(
                     map(() => ({ data: userData, action: 'success' as const })),
                   ),
                 ),
@@ -257,12 +297,12 @@ export class AuthenticationFormComponent {
     ),
   );
 
-  private loginUser$ = this.loginUserInputControl.valueChanges.pipe(
+  readonly #loginUser$ = this.loginUserInputControl.valueChanges.pipe(
     filterNil(),
     switchMap((res) =>
-      from(this.authenticationAccountService.signIn(res)).pipe(
+      from(this.#authenticationAccountService.signIn(res)).pipe(
         switchMap(() =>
-          this.authenticationAccountService.getUserData().pipe(
+          this.#authenticationAccountService.getUserData().pipe(
             filterNil(), // wait until there is a user initialized
             map((userData) => ({ data: userData, action: 'success' as const })),
           ),
@@ -282,45 +322,64 @@ export class AuthenticationFormComponent {
     ),
   );
 
-  userAuthenticationState = toSignal(
+  readonly userAuthenticationState = toSignal(
     concat(
       of({ action: 'idle' as const, data: null, error: null }),
-      merge(this.googleAuth$, this.demoLogin$, this.registerUser$, this.loginUser$),
+      merge(this.#googleAuth$, this.#demoLogin$, this.#registerUser$, this.#loginUser$, this.#demoLoginAlreadyCreated$),
     ),
     {
       initialValue: { action: 'idle', data: null, error: null },
     },
   );
 
-  showContent = computed(() => {
+  readonly demoAccount = computed(() => this.#storageLocalService.localData().demoAccount);
+  readonly demoAccountValidUntil = computed(() =>
+    addDays(this.demoAccount()?.createdDate ?? '', USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DEMO),
+  );
+  readonly demoAccountValid = computed(() => isAfter(this.demoAccountValidUntil(), new Date()));
+
+  readonly showContent = computed(() => {
     const state = this.userAuthenticationState();
     return state.action !== 'loading' && state.action !== 'success';
   });
 
-  userAuthenticationStateEffect = effect(() => {
+  readonly userAuthenticationStateEffect = effect(() => {
     const state = this.userAuthenticationState();
 
-    if (state.action === 'success') {
-      // display success message
-      this.dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
-      // navigate to dashboard
-      this.router.navigate([ROUTES_MAIN.DASHBOARD]);
-    } else if (state.action === 'error') {
-      this.dialogServiceUtil.handleError(state.error);
-    }
+    untracked(() => {
+      if (state.action === 'success') {
+        // display success message
+        this.#dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
+        // navigate to dashboard
+        this.#router.navigate([ROUTES_MAIN.DASHBOARD]);
+      } else if (state.action === 'error') {
+        this.#dialogServiceUtil.handleError(state.error);
+      } else if (state.action === 'error-demo-already-active') {
+        this.#dialogServiceUtil.showNotificationBar('Demo account not longer works', 'error');
+        // remove demo account
+        this.#storageLocalService.saveData('demoAccount', undefined);
+      }
+    });
   });
 
-  onGoogleAuth(): void {
-    this.loginType$.next('google');
+  onGoogleAuth() {
+    this.#loginType$.next('google');
   }
 
   async onDemoLogin() {
-    const confirm = await this.dialogServiceUtil.showConfirmDialog(
-      'Demo account will be created and removed after 7 days, please confirm',
+    // if user already has demo account, use it
+    if (this.demoAccountValid()) {
+      this.#loginType$.next('demoAlreadyCreated');
+      return;
+    }
+
+    // create demo account
+    const confirm = await this.#dialogServiceUtil.showConfirmDialog(
+      `Demo account will be created and removed after ${USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DEMO} days, please confirm`,
     );
 
     if (confirm) {
-      this.loginType$.next('demo');
+      this.#loginType$.next('demo');
     }
   }
 

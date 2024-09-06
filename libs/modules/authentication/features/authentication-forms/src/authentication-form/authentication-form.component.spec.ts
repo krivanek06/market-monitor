@@ -17,6 +17,7 @@ import {
 } from '@mm/authentication/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { LocalStorageData, StorageLocalService } from '@mm/shared/storage-local';
 import { UserCredential } from 'firebase/auth';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
@@ -69,6 +70,15 @@ describe('AuthenticationFormComponent', () => {
           registerDemoAccount: jest.fn().mockResolvedValue(userDemoMock),
           signIn: jest.fn().mockResolvedValue(userMockCredentials),
           register: jest.fn().mockResolvedValue(userMockCredentials),
+        },
+      })
+      .provide({
+        provide: StorageLocalService,
+        useValue: {
+          localData: () => ({
+            demoAccount: undefined,
+          }),
+          saveData: jest.fn(),
         },
       })
       .provide({
@@ -342,6 +352,7 @@ describe('AuthenticationFormComponent', () => {
     const authenticationAccountService = ngMocks.get(AuthenticationAccountService);
     const router = ngMocks.get(Router);
     const dialogUtil = ngMocks.get(DialogServiceUtil);
+    const storageLocalService = ngMocks.get(StorageLocalService);
 
     const openSelectAccountTypeSpy = jest.spyOn(component, 'openSelectAccountType');
 
@@ -370,6 +381,126 @@ describe('AuthenticationFormComponent', () => {
     });
     expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
     expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
+
+    // check if demo account is saved in local storage
+    expect(storageLocalService.saveData).toHaveBeenCalledWith('demoAccount', {
+      email: userDemoMock.userData.personal.email,
+      password: userDemoMock.password,
+      createdDate: expect.any(String),
+    });
+
+    // check that demo account does not exist
+    expect(component.demoAccount()).toBeUndefined();
+    expect(component.demoAccountValid()).toBeFalsy();
+  });
+
+  it('should login by demo account if it is active', async () => {
+    // add demo account to local storage
+    const storageLocalService = ngMocks.get(StorageLocalService);
+    ngMocks.stub(storageLocalService, {
+      ...storageLocalService,
+      localData: signal({
+        demoAccount: {
+          email: userDemoMock.userData.personal.email,
+          password: userDemoMock.password,
+          createdDate: new Date().toISOString(),
+        },
+      } as LocalStorageData),
+    });
+
+    ngMocks.flushTestBed();
+
+    // create component
+    const fixture = MockRender(AuthenticationFormComponent);
+    const component = fixture.point.componentInstance;
+    const dialogServiceUtil = ngMocks.get(DialogServiceUtil);
+    const authenticationAccountService = ngMocks.get(AuthenticationAccountService);
+    const router = ngMocks.get(Router);
+
+    // click on demo login button
+    const demoLoginButton = ngMocks.find<MatButton>(demoLoginButtonS);
+    demoLoginButton.nativeElement.click();
+
+    // wait for the service to resolve
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    // check if correct services are called
+    expect(dialogServiceUtil.showConfirmDialog).not.toHaveBeenCalled();
+    expect(authenticationAccountService.signIn).toHaveBeenCalledWith({
+      email: userDemoMock.userData.personal.email,
+      password: userDemoMock.password,
+    });
+    expect(component.userAuthenticationState()).toEqual({
+      action: 'success',
+      data: userMockAuth,
+    });
+    expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
+    // check that demo account does exist
+    expect(component.demoAccount()).toEqual({
+      email: userDemoMock.userData.personal.email,
+      password: userDemoMock.password,
+      createdDate: expect.any(String),
+    });
+    expect(component.demoAccountValid()).toBeTruthy();
+  });
+
+  it('should remove demo account if receives error from server', async () => {
+    // add demo account to local storage
+    const storageLocalService = ngMocks.get(StorageLocalService);
+    const authenticationAccountService = ngMocks.get(AuthenticationAccountService);
+
+    // add demo account to local storage
+    ngMocks.stub(storageLocalService, {
+      ...storageLocalService,
+      localData: signal({
+        demoAccount: {
+          email: userDemoMock.userData.personal.email,
+          password: userDemoMock.password,
+          createdDate: new Date().toISOString(),
+        },
+      } as LocalStorageData),
+    });
+
+    // add error when signing in
+    ngMocks.stub(authenticationAccountService, {
+      ...authenticationAccountService,
+      signIn: jest.fn().mockRejectedValue(new Error('Invalid credentials')),
+    });
+
+    ngMocks.flushTestBed();
+
+    // create component
+    const fixture = MockRender(AuthenticationFormComponent);
+    const component = fixture.point.componentInstance;
+    const dialogServiceUtil = ngMocks.get(DialogServiceUtil);
+    const router = ngMocks.get(Router);
+
+    // wait for the service to resolve
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    // check that demo account does exist
+    expect(component.demoAccount()).toEqual({
+      email: userDemoMock.userData.personal.email,
+      password: userDemoMock.password,
+      createdDate: expect.any(String),
+    });
+    expect(component.demoAccountValid()).toBeTruthy();
+
+    // click on demo login button
+    const demoLoginButton = ngMocks.find<MatButton>(demoLoginButtonS);
+    demoLoginButton.nativeElement.click();
+
+    // wait for the service to resolve
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.userAuthenticationState().action).toBe('error-demo-already-active');
+    expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'error');
+    expect(storageLocalService.saveData).toHaveBeenCalledWith('demoAccount', undefined);
+    expect(router.navigate).not.toHaveBeenCalled();
   });
 
   it('should not create demo account if server error happens', async () => {
