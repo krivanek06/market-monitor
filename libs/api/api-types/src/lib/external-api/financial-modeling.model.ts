@@ -1,3 +1,5 @@
+import { OmitStrict } from '../utils';
+
 export const AvailableQuotesConst = ['index', 'crypto', 'etf', 'commodity', 'euronext'] as const;
 export type AvailableQuotes = (typeof AvailableQuotesConst)[number];
 
@@ -695,7 +697,7 @@ export type HistoricalPriceAPI = {
   volume: number;
 };
 
-export type HistoricalPrice = Omit<HistoricalPriceAPI, 'open' | 'low' | 'high'>;
+export type HistoricalPrice = OmitStrict<HistoricalPriceAPI, 'open' | 'low' | 'high'>;
 export type HistoricalPriceSymbol = {
   symbol: string;
   data: HistoricalPrice[];
