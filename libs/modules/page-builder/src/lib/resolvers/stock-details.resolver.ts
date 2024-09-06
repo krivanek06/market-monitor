@@ -2,8 +2,8 @@ import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveFn, Router, RouterStateSnapshot } from '@angular/router';
 import { MarketApiService, StocksApiService } from '@mm/api-client';
 import { StockDetails } from '@mm/api-types';
-import { LoaderMainService } from '@mm/shared/general-features';
-import { catchError, forkJoin, map, of, tap } from 'rxjs';
+import { StorageLocalService } from '@mm/shared/storage-local';
+import { catchError, finalize, forkJoin, map, of } from 'rxjs';
 
 export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
   route: ActivatedRouteSnapshot,
@@ -14,7 +14,7 @@ export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
   const router = inject(Router);
   const stocksApiService = inject(StocksApiService);
   const marketApiService = inject(MarketApiService);
-  const loaderMainService = inject(LoaderMainService);
+  const storageLocalService = inject(StorageLocalService);
   // const dialogServiceUtil = inject(DialogServiceUtil);
 
   if (!symbol) {
@@ -23,7 +23,9 @@ export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
   }
 
   // set loading to true
-  loaderMainService.setLoading(true);
+  storageLocalService.saveData('loader', {
+    enabled: true,
+  });
 
   // load multiple data at once
   return forkJoin([
@@ -40,12 +42,15 @@ export const stockDetailsResolver: ResolveFn<StockDetails | null> = (
   ]).pipe(
     // return only details, everything else is cached
     map(([details, ...rest]) => details),
-    tap(() => loaderMainService.setLoading(false)),
     catchError((err) => {
-      loaderMainService.setLoading(false);
       // dialogServiceUtil.showNotificationBar(`An error happened getting data for symbol: ${symbol}`, 'error');
       router.navigate(['/']);
       return of(null);
     }),
+    finalize(() =>
+      storageLocalService.saveData('loader', {
+        enabled: false,
+      }),
+    ),
   );
 };

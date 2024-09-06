@@ -86,14 +86,13 @@ import { FormRegisterComponent } from './form-register/form-register.component';
           <div class="mt-4 px-4">
             <button
               data-testid="auth-form-demo-login-button"
-              matTooltip="Account will be valid for 7 days and then removed"
               mat-stroked-button
               color="accent"
               class="w-full"
               type="button"
               (click)="onDemoLogin()"
             >
-              Demo Login
+              Create Demo Account
             </button>
           </div>
         </mat-tab>

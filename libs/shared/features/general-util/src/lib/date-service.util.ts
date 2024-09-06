@@ -1,3 +1,4 @@
+import { Spread } from '@mm/api-types';
 import {
   differenceInBusinessDays,
   differenceInDays,
@@ -16,7 +17,6 @@ import {
   subDays,
   subYears,
 } from 'date-fns';
-import { Spread } from './typescript.util';
 
 export type DateServiceUtilDateInformation = {
   year: number;

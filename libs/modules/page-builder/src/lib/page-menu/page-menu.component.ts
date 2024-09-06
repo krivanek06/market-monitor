@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,7 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
 import { DialogServiceModule } from '@mm/shared/dialog-manager';
-import { LoaderMainService } from '@mm/shared/general-features';
+import { StorageLocalService } from '@mm/shared/storage-local';
 import { ThemeService } from '@mm/shared/theme-switcher';
 import { MenuSideNavigationComponent } from './menu-navigation/menu-side-navigation.component';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
@@ -94,8 +93,8 @@ export class PageMenuComponent {
    * used to init the service to set theme eagerly
    */
   private themeService = inject(ThemeService);
-  loaderMainService = inject(LoaderMainService);
-  loadingSignal = toSignal(this.loaderMainService.getLoading());
+  private storageLocalService = inject(StorageLocalService);
+  loadingSignal = computed(() => this.storageLocalService.localData().loader.enabled);
 
   isOpen = signal<boolean>(false);
 

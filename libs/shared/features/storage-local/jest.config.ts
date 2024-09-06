@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'general-features',
+  displayName: 'storage-local',
   preset: '../../../../jest.preset.js',
   setupFilesAfterEnv: ['../../../../jest.setup.js'],
-  coverageDirectory: '../../../../coverage/libs/shared/features/general-features',
+  coverageDirectory: '../../../../coverage/libs/shared/features/storage-local',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

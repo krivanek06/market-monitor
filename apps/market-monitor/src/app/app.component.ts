@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
-import { LoaderMainService } from '@mm/shared/general-features';
+import { LoaderMainService } from '@mm/shared/storage-local';
 
 @Component({
   standalone: true,

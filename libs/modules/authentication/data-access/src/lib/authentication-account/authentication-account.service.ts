@@ -15,7 +15,6 @@ import {
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { UserApiService } from '@mm/api-client';
 import { UserAccountBasicTypes, UserCreateDemoAccountInput, UserData, UserDataDemoData } from '@mm/api-types';
-import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { filterNil } from 'ngxtension/filter-nil';
 import { BehaviorSubject, Observable, Subject, catchError, firstValueFrom, from, map, of, switchMap, take } from 'rxjs';
 import { LoginUserInput, RegisterUserInput } from '../model';
@@ -30,10 +29,6 @@ export class AuthenticationAccountService {
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
   private authenticatedUser$ = new BehaviorSubject<User | null>(null);
   private loadedAuthentication$ = new Subject<UserData['id'] | null>();
-
-  isDevActive = inject(IS_DEV_TOKEN, {
-    optional: true,
-  });
 
   constructor() {
     this.initAuthenticationUser();

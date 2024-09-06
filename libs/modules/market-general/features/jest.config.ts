@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'modules-market-general-features',
+  displayName: 'modules-market-storage-local',
   preset: '../../../../jest.preset.js',
   setupFilesAfterEnv: ['../../../../jest.setup.js'],
   coverageDirectory: '../../../../coverage/libs/modules/market-general/features',

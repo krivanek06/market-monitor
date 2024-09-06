@@ -1,14 +1,14 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MarketApiService } from '@mm/api-client';
 import { SymbolQuote } from '@mm/api-types';
-import { StorageLocalStoreService } from '@mm/shared/general-features';
 import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SymbolSearchService extends StorageLocalStoreService<string[]> {
+export class SymbolSearchService {
+  private marketApiService = inject(MarketApiService);
   private searchedSymbols = signal<SymbolQuote[]>([]);
 
   readonly defaultSymbolsArr = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA'];
@@ -24,11 +24,6 @@ export class SymbolSearchService extends StorageLocalStoreService<string[]> {
     'AVAXUSD',
     'DOTUSD',
   ];
-
-  constructor(private marketApiService: MarketApiService) {
-    super('SYMBOL_SEARCH', [], 1);
-    this.initService();
-  }
 
   getSearchedSymbols = computed(() => this.searchedSymbols());
   getDefaultSymbols = toSignal(this.marketApiService.getSymbolQuotes(this.defaultSymbolsArr), { initialValue: [] });
@@ -60,25 +55,9 @@ export class SymbolSearchService extends StorageLocalStoreService<string[]> {
    * @param quotes - array of symbol data to persist locally
    */
   private persistData(quotes: SymbolQuote[]): void {
-    const searchSymbolsSlice = quotes.map((d) => d.symbol).slice(0, 20);
     const symbolQuotesSlice = quotes.slice(0, 20);
-
-    // save into storage
-    this.updateDataStorage(searchSymbolsSlice);
 
     // save into subject
     this.searchedSymbols.set(symbolQuotesSlice);
-  }
-
-  /**
-   * load necessary data from api
-   */
-  private initService(): void {
-    const data = this.getDataStorage();
-
-    // load favorite stocks from api and last searched stocks from api
-    this.marketApiService.getSymbolQuotes(data).subscribe((loadedQuotes) => {
-      this.searchedSymbols.set(loadedQuotes);
-    });
   }
 }

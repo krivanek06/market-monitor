@@ -1,6 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { StorageLocalStoreService } from '@mm/shared/general-features';
 import { Observable, of, retry, tap } from 'rxjs';
 
 type SavedData<T = unknown> = { data: T; validity: number };
@@ -8,9 +7,7 @@ type SavedData<T = unknown> = { data: T; validity: number };
 @Injectable({
   providedIn: 'root',
 })
-export class ApiCacheService extends StorageLocalStoreService<{
-  [K in string]: SavedData;
-}> {
+export class ApiCacheService {
   private validityOneMinute = 1000 * 60;
   private cache = new Map<string, { data: any; validity: number }>();
 
@@ -26,7 +23,6 @@ export class ApiCacheService extends StorageLocalStoreService<{
   httpClient = inject(HttpClient);
 
   constructor() {
-    super('API_CACHE', {}, 1.1);
     if (!this.httpClient) {
       throw new Error('HttpClient is required');
     }
@@ -95,7 +91,6 @@ export class ApiCacheService extends StorageLocalStoreService<{
 
   clearCache(): void {
     this.cache.clear();
-    this.removeDataStorage();
   }
 
   /**

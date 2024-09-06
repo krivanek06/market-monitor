@@ -1,5 +1,5 @@
 {
-  "name": "modules-market-general-features",
+  "name": "modules-market-storage-local",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/modules/market-general/features/src",
   "prefix": "app",
