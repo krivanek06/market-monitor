@@ -1,7 +1,7 @@
 import { getCompanyQuote, getProfile, getSymbolsPriceChanges, searchTicker } from '@mm/api-external';
 import { CompanyProfile, PriceChange, RESPONSE_HEADER, SymbolQuote } from '@mm/api-types';
 import { chunk, getCurrentDateDetailsFormat } from '@mm/shared/general-util';
-import { isAfter, subMinutes } from 'date-fns';
+import { isAfter, isToday, subMinutes } from 'date-fns';
 /**
  * Welcome to Cloudflare Workers! This is your first worker.
  *
@@ -32,7 +32,7 @@ export interface Env {
 	// MY_QUEUE: Queue;
 }
 
-const SymbolSummaryTable = sqliteTable('symbol_summary', {
+const SymbolSummaryTable = sqliteTable('symbol-summary', {
 	id: text('id').primaryKey(),
 	quote: text('quote', { mode: 'json' }).notNull().$type<SymbolQuote>(),
 	profile: text('profile', { mode: 'json' }).$type<CompanyProfile | null>(),
@@ -46,7 +46,7 @@ type StockSummaryTable = typeof SymbolSummaryTable.$inferSelect;
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		const { symbol, isSearch, isOnlyQuote, isCrypto } = getParams(request.url);
+		const { symbol, isSearch, isOnlyQuote, isCrypto, isAfterHours } = getParams(request.url);
 
 		// throw error if no symbols
 		if (!symbol) {
@@ -76,7 +76,7 @@ export default {
 		const db = drizzle(env.DB);
 
 		// data from DB
-		const { validStoredData, reloadIds: symbolsToUpdate } = await getSummariesFromDB(symbolArray, isOnlyQuote, db);
+		const { validStoredData, reloadIds: symbolsToUpdate } = await getSummariesFromDB(symbolArray, isOnlyQuote, db, isAfterHours);
 
 		// load summaries
 		const summaries = !isOnlyQuote ? await loadSummaries(symbolsToUpdate) : await loadQuotes(symbolsToUpdate);
@@ -160,7 +160,12 @@ const loadQuotes = async (symbolsToUpdate: string[]): Promise<StockSummaryTable[
 	}));
 };
 
-const getSummariesFromDB = async (symbols: string[], onlyQuotes: boolean, db: DrizzleD1Database<Record<string, never>>) => {
+const getSummariesFromDB = async (
+	symbols: string[],
+	onlyQuotes: boolean,
+	db: DrizzleD1Database<Record<string, never>>,
+	isAfterHours: boolean = false,
+) => {
 	let storedSymbolSummaries: StockSummaryTable[] = [];
 	try {
 		// load data from db
@@ -170,8 +175,10 @@ const getSummariesFromDB = async (symbols: string[], onlyQuotes: boolean, db: Dr
 		storedSymbolSummaries = [];
 	}
 
-	// check symbol validity 3min and some additional data must be present
-	const validStoredData = storedSymbolSummaries.filter((d) => checkDataValidityMinutes(d, 3) && (onlyQuotes || !!d.priceChange));
+	// check symbol validity 3min and some additional data must be present or if after hours active then only check date if today
+	const validStoredData = storedSymbolSummaries.filter(
+		(d) => (isAfterHours || checkDataValidityMinutes(d, 3)) && isToday(d.lastUpdate) && (onlyQuotes || !!d.priceChange),
+	);
 	const validStoredDataIds = validStoredData.map((d) => d.id);
 
 	const reloadIds = symbols.filter((d) => !validStoredDataIds.includes(d));
@@ -214,23 +221,23 @@ const loadSummaries = async (symbolsToUpdate: string[]): Promise<StockSummaryTab
 	return summaries;
 };
 
-const getParams = (requestUrl: string): { symbol: string | undefined; isSearch: boolean; isOnlyQuote: boolean; isCrypto: boolean } => {
+const getParams = (requestUrl: string) => {
 	const { searchParams } = new URL(requestUrl);
 	const symbolsString = searchParams.get('symbol') as string | undefined;
 
 	// set isSearch to true if searching for symbols with same prefix
-	const isSearchString = searchParams.get('isSearch') as string | undefined;
-	const isSearch = isSearchString === 'true';
+	const isSearch = searchParams.get('isSearch') === 'true';
 
 	// stock, crypto, etf, fund
-	const symbolType = searchParams.get('isCrypto') as string | undefined;
-	const isCrypto = symbolType === 'true';
+	const isCrypto = searchParams.get('isCrypto') === 'true';
 
 	// check if to get only quote
-	const isOnlyQuoteString = searchParams.get('onlyQuote') as string | undefined;
-	const isOnlyQuote = isOnlyQuoteString === 'true';
+	const isOnlyQuote = searchParams.get('onlyQuote') === 'true';
 
-	return { symbol: symbolsString, isSearch, isOnlyQuote, isCrypto };
+	// check if user request only after hours data
+	const isAfterHours = searchParams.get('isAfterHours') === 'true';
+
+	return { symbol: symbolsString, isSearch, isOnlyQuote, isCrypto, isAfterHours };
 };
 
 const checkDataValidityMinutes = <T extends { lastUpdate: string | Date }>(data: T | undefined, minutes: number) =>

@@ -1,4 +1,5 @@
-import { waitSeconds } from '@mm/shared/general-util';
+import { getCurrentDateDetailsFormat, waitSeconds } from '@mm/shared/general-util';
+import { startOfDay } from 'date-fns';
 import { userCollectionActiveAccountRef } from '../models';
 import { updateUserPortfolioState } from '../portfolio';
 
@@ -12,8 +13,12 @@ import { updateUserPortfolioState } from '../portfolio';
  * At every 5th minute past every hour from 1 through 2am
  */
 export const userPortfolioUpdate = async (): Promise<number> => {
-  // load users to calculate balance
-  const userToUpdate = userCollectionActiveAccountRef().orderBy('portfolioState.date', 'desc').limit(100);
+  // load users to calculate balance if it was not calculated today
+  const currentDayStart = getCurrentDateDetailsFormat(startOfDay(new Date()));
+  const userToUpdate = userCollectionActiveAccountRef()
+    .where('portfolioState.date', '<', currentDayStart)
+    .orderBy('portfolioState.date', 'desc')
+    .limit(100);
 
   const users = await userToUpdate.get();
 
@@ -28,7 +33,7 @@ export const userPortfolioUpdate = async (): Promise<number> => {
 
     // update portfolio
     try {
-      await updateUserPortfolioState(user);
+      await updateUserPortfolioState(user, true);
     } catch (error) {
       console.error('Error updating user portfolio', user.id, error);
     }

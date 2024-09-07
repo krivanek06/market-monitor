@@ -30,7 +30,7 @@ export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_inform
  *
  * @param userData - user whom to update portfolio state
  */
-export const updateUserPortfolioState = async (userData: UserBase): Promise<void> => {
+export const updateUserPortfolioState = async (userData: UserBase, isAfterHours: boolean = false): Promise<void> => {
   const today = getCurrentDateDefaultFormat();
 
   // load transaction per user
@@ -43,7 +43,8 @@ export const updateUserPortfolioState = async (userData: UserBase): Promise<void
 
     // get symbol summaries from API
     const partialHoldingSymbols = holdingsBase.map((d) => d.symbol);
-    const symbolQuotes = partialHoldingSymbols.length > 0 ? await getSymbolQuotes(partialHoldingSymbols) : [];
+    const symbolQuotes =
+      partialHoldingSymbols.length > 0 ? await getSymbolQuotes(partialHoldingSymbols, isAfterHours) : [];
 
     // get portfolio state
     const portfolioStateHoldings = getPortfolioStateHoldingsUtil(

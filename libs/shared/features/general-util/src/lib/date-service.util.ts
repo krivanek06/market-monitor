@@ -72,12 +72,12 @@ export const dateFormatDate = (
  *
  * @returns today in format yyyy-MM-dd
  */
-export const getCurrentDateDefaultFormat = (): string => {
-  return dateFormatDate(new Date(), 'yyyy-MM-dd');
+export const getCurrentDateDefaultFormat = (date = new Date()): string => {
+  return dateFormatDate(date, 'yyyy-MM-dd');
 };
 
-export const getCurrentDateDetailsFormat = (): string => {
-  return dateFormatDate(new Date(), 'yyyy-MM-dd HH:mm:ss');
+export const getCurrentDateDetailsFormat = (date = new Date()): string => {
+  return dateFormatDate(date, 'yyyy-MM-dd HH:mm:ss');
 };
 
 export const getYesterdaysDate = (): string => {

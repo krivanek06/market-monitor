@@ -4,12 +4,12 @@ import { userDeleteDemoAccounts, userHallOfFame, userPortfolioRank, userPortfoli
 import { measureFunctionExecutionTime } from '../utils';
 
 /**
- * every 30 minutes from Monday to Friday
+ * every 5 minutes between 22:00 and 23:00
  */
 export const run_scheduler_update_users = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '*/30 * * * 1-5',
+    schedule: '*/5 22-23 * * *',
   },
   async () => {
     await measureFunctionExecutionTime(async () => {
@@ -19,6 +19,7 @@ export const run_scheduler_update_users = onSchedule(
   },
 );
 
+/** run at 1am */
 export const run_scheduler_once_a_day = onSchedule(
   {
     timeoutSeconds: 200,

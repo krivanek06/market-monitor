@@ -1,5 +1,6 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
+import { run_scheduler_update_users } from '../schedulers';
 import {
   userDeactivateInactiveAccounts,
   userDeleteDemoAccounts,
@@ -41,6 +42,7 @@ export const testing_function = onRequest({ timeoutSeconds: 1200 }, async (req, 
     // test function
     else if (functionType === 'test_function') {
       await test_function();
+      await run_scheduler_update_users(req, res);
     }
 
     // delete user accounts

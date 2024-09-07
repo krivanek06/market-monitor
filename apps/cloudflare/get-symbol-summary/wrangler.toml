@@ -4,8 +4,8 @@ compatibility_date = "2023-08-21"
 
 [[d1_databases]]
 binding = "DB" # i.e. available in your Worker on env.DB
-database_name = "market-monitor"
-database_id = "05a5e71a-c328-4ca0-afd0-84171706d16d"
+database_name = "ggfinance"
+database_id = "90f8bbd9-2aef-4019-bef6-43f976957920"
 preview_database_id = "local-test-db"
 
 # kv_namespaces = [
