@@ -63,7 +63,6 @@ export type PortfolioStateTableData = {
                 appPercentageIncrease
                 [useCurrencySign]="true"
                 [changeValues]="{
-                  change: row.portfolioState.totalGainsValue,
                   changePercentage: row.portfolioState.totalGainsPercentage,
                 }"
               ></div>
