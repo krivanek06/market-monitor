@@ -28,7 +28,7 @@ export type KeyboardComponentType = (typeof KeyboardComponentValues)[number];
     <div class="grid grid-cols-3 gap-2">
       @for (button of KeyboardComponent; track button.value) {
         @if (enableDecimal() || button.label !== '.') {
-          <button type="button" mat-stroked-button (click)="onButtonClick(button)" class="min-h-[52px]">
+          <button type="button" mat-stroked-button (click)="onButtonClick(button)" class="min-h-[48px]">
             {{ button.label }}
           </button>
         } @else {

@@ -18,7 +18,7 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
         <td mat-cell *matCellDef="let row">
           <div class="grid">
             <span class="text-wt-gray-dark">{{ row.analystName }}</span>
-            <span>{{ row.analystCompany }}</span>
+            <span class="text-sm">{{ row.analystCompany }}</span>
           </div>
         </td>
       </ng-container>

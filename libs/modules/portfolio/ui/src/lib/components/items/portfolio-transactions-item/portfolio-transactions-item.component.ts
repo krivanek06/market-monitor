@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { PortfolioTransactionMore } from '@mm/api-types';
 import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
@@ -6,12 +6,12 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
 @Component({
   selector: 'app-portfolio-transactions-item',
   standalone: true,
-  imports: [CommonModule, PercentageIncreaseDirective, DefaultImgDirective, DefaultImgDirective],
+  imports: [PercentageIncreaseDirective, DefaultImgDirective, DefaultImgDirective, NgClass, DatePipe, CurrencyPipe],
   template: `
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <!-- image  -->
-        <img appDefaultImg imageType="symbol" [src]="transaction().symbol" class="h-10 w-10" />
+        <img appDefaultImg imageType="symbol" [src]="transaction().symbol" class="h-8 w-8" />
         <!-- symbol &  date -->
         <div class="flex flex-col" [ngClass]="{ 'gap-y-2': displayUser() }">
           <div class="flex items-center gap-2">
@@ -42,17 +42,14 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
             </div>
           } @else {
             <!-- date -->
-            <div class="text-wt-gray-medium">{{ transaction().date | date: 'MMMM d, y' }}</div>
+            <div class="text-wt-gray-medium text-sm">{{ transaction().date | date: 'MMMM d, y' }}</div>
           }
         </div>
       </div>
 
       <!-- total & return -->
       <div class="flex flex-col items-end">
-        <div class="flex items-center gap-2">
-          <div class="text-wt-gray-dark">{{ transaction().units * transaction().unitPrice | currency }}</div>
-          <div class="text-wt-gray-medium">({{ transaction().units }})</div>
-        </div>
+        <!-- total return -->
         <div
           appPercentageIncrease
           [useCurrencySign]="true"
@@ -61,6 +58,12 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
             changePercentage: transaction().returnChange,
           }"
         ></div>
+
+        <!-- value transacted -->
+        <div class="flex items-center gap-2 text-sm">
+          <div class="text-wt-gray-dark">{{ transaction().units * transaction().unitPrice | currency }}</div>
+          <div class="text-wt-gray-medium">({{ transaction().units }})</div>
+        </div>
       </div>
     </div>
   `,
@@ -72,10 +75,10 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioTransactionsItemComponent {
-  transaction = input.required<PortfolioTransactionMore>();
+  readonly transaction = input.required<PortfolioTransactionMore>();
 
   /**
    * whether to display user who made the transaction
    */
-  displayUser = input<boolean>(false);
+  readonly displayUser = input<boolean>(false);
 }

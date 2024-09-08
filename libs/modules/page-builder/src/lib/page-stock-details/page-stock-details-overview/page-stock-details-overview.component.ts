@@ -63,7 +63,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             [imageName]="stockDetailsSignal().quote.symbol"
             [title]="stockDetailsSignal().quote.name"
             [symbol]="stockDetailsSignal().quote.symbol"
-            [chartHeightPx]="480"
+            [chartHeightPx]="430"
           />
         </div>
 
@@ -246,7 +246,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
         @if (stockDetailsSignal().priceTarget.length > 0) {
           <app-general-card title="Price Target">
             <app-stock-price-target-table
-              [data]="stockDetailsSignal().priceTarget | slice: 0 : 10"
+              [data]="stockDetailsSignal().priceTarget | slice: 0 : 9"
               [currentPrice]="stockDetailsSignal().quote.price"
             />
           </app-general-card>

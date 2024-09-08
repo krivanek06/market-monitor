@@ -28,7 +28,7 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
             [ngClass]="{
               'text-wt-danger': row.action === 'downgrade',
               'text-wt-gray-dark': row.action === 'hold',
-              'text-wt-success': row.action === 'upgrade'
+              'text-wt-success': row.action === 'upgrade',
             }"
           >
             {{ row.action | titlecase }}
@@ -41,9 +41,13 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Grade Change</th>
         <td mat-cell *matCellDef="let row">
           <div class="flex gap-2">
-            <span *ngIf="row.previousGrade" class="hidden sm:block">{{ row.previousGrade }}</span>
-            <span *ngIf="row.previousGrade" class="hidden sm:block">-></span>
-            <span>{{ row.newGrade }}</span>
+            <span class="hidden sm:block">{{ row?.previousGrade }}</span>
+            @if (row.previousGrade !== row.newGrade) {
+              @if (row.previousGrade) {
+                <span class="hidden sm:block">-></span>
+              }
+              <span>{{ row.newGrade }}</span>
+            }
           </div>
         </td>
       </ng-container>
@@ -59,7 +63,7 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
               [currentValues]="{
                 hideValue: true,
                 value: currentPrice(),
-                valueToCompare: row.priceWhenPosted
+                valueToCompare: row.priceWhenPosted,
               }"
             ></div>
           </div>

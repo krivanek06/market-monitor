@@ -76,7 +76,7 @@ export class PieChartComponent extends ChartConstructor {
         align: 'center',
         style: {
           color: ColorScheme.GRAY_MEDIUM_VAR,
-          fontSize: '15px',
+          fontSize: '14px',
           fontWeight: 'normal',
         },
         y: 10,
@@ -132,7 +132,7 @@ export class PieChartComponent extends ChartConstructor {
             overflow: 'allow',
             shadow: false,
             style: {
-              fontSize: '14px',
+              fontSize: '12px',
               width: 90,
               textOutline: 'transparent',
             },
