@@ -201,7 +201,7 @@ export class AuthenticationFormComponent {
               ).pipe(
                 tap(() =>
                   // save data into local storage
-                  this.#storageLocalService.saveData('demoAccount', {
+                  this.#storageLocalService.saveDataLocal('demoAccount', {
                     email: result.userData.personal.email,
                     password: result.password,
                     createdDate: new Date().toString(),
@@ -357,7 +357,7 @@ export class AuthenticationFormComponent {
       } else if (state.action === 'error-demo-already-active') {
         this.#dialogServiceUtil.showNotificationBar('Demo account not longer works', 'error');
         // remove demo account
-        this.#storageLocalService.saveData('demoAccount', undefined);
+        this.#storageLocalService.saveDataLocal('demoAccount', undefined);
       }
     });
   });

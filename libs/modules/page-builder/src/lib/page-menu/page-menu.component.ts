@@ -94,7 +94,7 @@ export class PageMenuComponent {
    */
   private themeService = inject(ThemeService);
   private storageLocalService = inject(StorageLocalService);
-  loadingSignal = computed(() => this.storageLocalService.localData().loader.enabled);
+  loadingSignal = computed(() => !!this.storageLocalService.localData()?.loader?.enabled);
 
   isOpen = signal<boolean>(false);
 

@@ -17,14 +17,20 @@ export class StorageLocalService {
   /**
    * current version of the data saved - if changed, all data will be removed
    */
-  private readonly currentVersion = 1.1;
+  private readonly currentVersion = 1.3;
 
   /** readonly value from local storage */
   readonly localData = toSignal(this.updateData$.pipe(startWith(this.getDataFromLocalStorage())), {
     initialValue: this.getDataFromLocalStorage(),
   });
 
-  saveData<T extends keyof LocalStorageData>(key: T, data: LocalStorageData[T]): void {
+  /**
+   * saves data also into local storage
+   *
+   * @param key - key to save data
+   * @param data - data to be saved
+   */
+  saveDataLocal<T extends keyof LocalStorageData>(key: T, data: LocalStorageData[T]): void {
     // all local storage data saved for this app - different keys
     const savedData = this.getDataFromLocalStorage();
 
@@ -45,21 +51,43 @@ export class StorageLocalService {
     }
   }
 
+  /**
+   * saves data into local internal variable
+   * @param key
+   * @param data
+   */
+  saveData<T extends keyof LocalStorageData>(key: T, data: LocalStorageData[T]): void {
+    // all local storage data saved for this app - different keys
+    const savedData = this.getDataFromLocalStorage();
+
+    // updated data for this specific key
+    const newData = {
+      ...savedData,
+      [key]: data,
+    };
+
+    // notify all subscribers
+    this.updateData$.next(newData);
+  }
+
   private getDataFromLocalStorage(): LocalStorageData {
     const data = localStorage.getItem(this.STORAGE_MAIN_KEY) ?? JSON.stringify(storageInitialData);
     const dataParsed = JSON.parse(data) as LocalStorageKeysVersion;
 
-    // if version is different, clear all data
-    if (dataParsed.version !== this.currentVersion) {
-      localStorage.setItem(
-        this.STORAGE_MAIN_KEY,
-        JSON.stringify({
-          ...storageInitialData,
-          version: this.currentVersion,
-        }),
-      );
+    // if version matches, return data
+    if (dataParsed.version === this.currentVersion) {
+      return dataParsed;
     }
 
-    return dataParsed;
+    // create new initial data since version is different
+    const updatedData = {
+      ...storageInitialData,
+      version: this.currentVersion,
+    };
+
+    // update local storage
+    localStorage.setItem(this.STORAGE_MAIN_KEY, JSON.stringify(updatedData));
+
+    return updatedData;
   }
 }

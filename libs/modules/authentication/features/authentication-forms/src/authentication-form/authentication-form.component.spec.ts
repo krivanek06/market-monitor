@@ -383,7 +383,7 @@ describe('AuthenticationFormComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
 
     // check if demo account is saved in local storage
-    expect(storageLocalService.saveData).toHaveBeenCalledWith('demoAccount', {
+    expect(storageLocalService.saveDataLocal).toHaveBeenCalledWith('demoAccount', {
       email: userDemoMock.userData.personal.email,
       password: userDemoMock.password,
       createdDate: expect.any(String),
@@ -499,7 +499,7 @@ describe('AuthenticationFormComponent', () => {
 
     expect(component.userAuthenticationState().action).toBe('error-demo-already-active');
     expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'error');
-    expect(storageLocalService.saveData).toHaveBeenCalledWith('demoAccount', undefined);
+    expect(storageLocalService.saveDataLocal).toHaveBeenCalledWith('demoAccount', undefined);
     expect(router.navigate).not.toHaveBeenCalled();
   });
 

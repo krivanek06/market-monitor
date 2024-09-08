@@ -6,7 +6,7 @@ export type LocalStorageData = {
     createdDate: string;
   };
   /** true if should show loader on the whole app */
-  loader: {
+  loader?: {
     enabled: boolean;
   };
 };
@@ -17,7 +17,4 @@ export type LocalStorageKeysVersion = LocalStorageData & {
 
 export const storageInitialData: LocalStorageData = {
   demoAccount: undefined,
-  loader: {
-    enabled: false,
-  },
 };
