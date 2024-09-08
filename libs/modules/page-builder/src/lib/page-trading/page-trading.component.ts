@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -31,7 +31,6 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
   selector: 'app-page-trading',
   standalone: true,
   imports: [
-    CommonModule,
     PortfolioStateComponent,
     SymbolSearchBasicComponent,
     MatButtonModule,
@@ -49,6 +48,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     FormMatInputWrapperComponent,
     ReactiveFormsModule,
     DropdownControlComponent,
+    NgClass,
   ],
   template: `
     <!-- account state -->
@@ -111,24 +111,29 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     </div>
 
     <!-- historical chart & summary -->
-    @if (symbolSummarySignal(); as symbolSummary) {
-      <div class="mb-6 flex flex-col gap-4 xl:flex-row">
-        <app-asset-price-chart-interactive
-          data-testid="page-trading-asset-price-chart-interactive"
-          class="lg:basis-3/5"
-          [imageName]="symbolSummary.id"
-          [symbol]="symbolSummary.id"
-          [title]="'Historical Price: ' + symbolSummary.quote.displaySymbol"
-        />
-        <div class="lg:basis-2/5">
-          <app-symbol-summary-list data-testid="page-trading-symbol-summary-list" [symbolSummary]="symbolSummary" />
+    @if (symbolSummarySignal().state === 'success') {
+      @if (symbolSummarySignal().data; as symbolSummary) {
+        <div class="mb-6 flex flex-col gap-4 xl:flex-row">
+          <app-asset-price-chart-interactive
+            data-testid="page-trading-asset-price-chart-interactive"
+            class="lg:basis-3/5"
+            [imageName]="symbolSummary.id"
+            [symbol]="symbolSummary.id"
+            [title]="'Historical Price: ' + symbolSummary.quote.displaySymbol"
+            [chartHeightPx]="380"
+          />
+          <div class="lg:basis-2/5">
+            <app-symbol-summary-list data-testid="page-trading-symbol-summary-list" [symbolSummary]="symbolSummary" />
+          </div>
         </div>
-      </div>
-    } @else {
-      <div class="mb-6 flex h-[480px] flex-col gap-4 xl:flex-row">
+      }
+    } @else if (symbolSummarySignal().state === 'loading') {
+      <div class="mb-6 flex h-[450px] flex-col gap-4 xl:flex-row">
         <div class="g-skeleton lg:basis-3/5"></div>
         <div class="g-skeleton lg:basis-2/5"></div>
       </div>
+    } @else {
+      <div class="grid h-[440px] place-content-center text-center text-lg">Failed to load symbol summary</div>
     }
 
     <!-- top active -->
@@ -174,44 +179,48 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingComponent {
-  private marketApiService = inject(MarketApiService);
-  private dialog = inject(MatDialog);
-  private dialogServiceUtil = inject(DialogServiceUtil);
+  readonly #marketApiService = inject(MarketApiService);
+  readonly #dialog = inject(MatDialog);
+  readonly #dialogServiceUtil = inject(DialogServiceUtil);
 
-  authenticationUserService = inject(AuthenticationUserStoreService);
-  portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  readonly authenticationUserService = inject(AuthenticationUserStoreService);
+  readonly portfolioUserFacadeService = inject(PortfolioUserFacadeService);
 
   /**
    * track the selected holding by user, null if else is selected
    */
-  selectedSymbolControl = new FormControl<string>('AAPL', { nonNullable: true });
+  readonly selectedSymbolControl = new FormControl<string>('AAPL', { nonNullable: true });
 
   /**
    * displayed symbol summary
    */
-  symbolSummarySignal = toSignal(
+  readonly symbolSummarySignal = toSignal(
     this.selectedSymbolControl.valueChanges.pipe(
       startWith(this.selectedSymbolControl.value),
       switchMap((symbol) =>
-        this.marketApiService.getSymbolSummary(symbol).pipe(
+        this.#marketApiService.getSymbolSummary(symbol).pipe(
+          map((d) => ({ data: d, state: 'success' as const })),
           catchError((e) => {
-            this.dialogServiceUtil.showNotificationBar('Error fetching symbol summary', 'error');
-            return of(null);
+            this.#dialogServiceUtil.showNotificationBar('Error fetching symbol summary', 'error');
+            return of({ data: null, state: 'error' as const });
           }),
           // to show loader every time the symbol changes
-          startWith(null),
+          startWith({ data: null, state: 'loading' as const }),
         ),
       ),
     ),
+    { initialValue: { data: null, state: 'loading' as const } },
   );
 
-  topPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance().pipe(map((d) => d.stockTopActive)));
+  readonly topPerformanceSignal = toSignal(
+    this.#marketApiService.getMarketTopPerformance().pipe(map((d) => d.stockTopActive)),
+  );
 
   /**
    * true if user has this symbol in his portfolio or he has not reached the limit of symbols
    */
-  allowBuyOperationSignal = computed(() => {
-    const summary = this.symbolSummarySignal();
+  readonly allowBuyOperationSignal = computed(() => {
+    const summary = this.symbolSummarySignal().data;
     const portfolioState = this.portfolioUserFacadeService.getPortfolioState();
 
     // disable buy operation until data is loaded
@@ -231,11 +240,11 @@ export class PageTradingComponent {
   /**
    * wait until data is loaded
    */
-  allowActionButtons = computed(
-    () => !!this.portfolioUserFacadeService.getPortfolioState() && !!this.symbolSummarySignal(),
+  readonly allowActionButtons = computed(
+    () => !!this.portfolioUserFacadeService.getPortfolioState() && this.symbolSummarySignal().state === 'success',
   );
 
-  holdingsInputSource = computed(() => {
+  readonly holdingsInputSource = computed(() => {
     return (
       this.portfolioUserFacadeService.getPortfolioState()?.holdings?.map(
         (holding) =>
@@ -255,20 +264,20 @@ export class PageTradingComponent {
   }
 
   async onTransactionDelete(transaction: PortfolioTransaction) {
-    if (await this.dialogServiceUtil.showConfirmDialog('Please confirm removing transaction')) {
+    if (await this.#dialogServiceUtil.showConfirmDialog('Please confirm removing transaction')) {
       this.portfolioUserFacadeService.deletePortfolioOperation(transaction);
-      this.dialogServiceUtil.showNotificationBar('Transaction removed', 'success');
+      this.#dialogServiceUtil.showNotificationBar('Transaction removed', 'success');
     }
   }
 
   onOperationClick(transactionType: PortfolioTransactionType): void {
-    const summary = this.symbolSummarySignal();
+    const summary = this.symbolSummarySignal().data;
     if (!summary) {
-      this.dialogServiceUtil.showNotificationBar('Please select a stock first', 'notification');
+      this.#dialogServiceUtil.showNotificationBar('Please select a stock first', 'notification');
       return;
     }
 
-    this.dialog.open(PortfolioTradeDialogComponent, {
+    this.#dialog.open(PortfolioTradeDialogComponent, {
       data: <PortfolioTradeDialogComponentData>{
         transactionType: transactionType,
         quote: summary.quote,

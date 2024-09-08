@@ -1,12 +1,11 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Component, input, output, signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MarketApiService } from '@mm/api-client';
 import {
   PortfolioStateHoldings,
   PortfolioTransaction,
-  SymbolQuote,
   USER_HOLDINGS_SYMBOL_LIMIT,
   UserAccountEnum,
   mockCreateUser,
@@ -19,7 +18,7 @@ import {
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
-import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
+import { SymbolSearchBasicComponent, SymbolSearchBasicComponentMock } from '@mm/market-stocks/features';
 import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
@@ -32,18 +31,8 @@ import { InputSource } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { DropdownControlComponent, DropdownControlComponentMock, QuoteItemComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
-import { of } from 'rxjs';
+import { delay, of, throwError } from 'rxjs';
 import { PageTradingComponent } from './page-trading.component';
-
-@Component({
-  selector: 'app-symbol-search-basic',
-  standalone: true,
-  template: ``,
-})
-export class SymbolSearchBasicComponentMock {
-  clickedQuote = output<SymbolQuote>();
-  openModalOnClick = input(true);
-}
 
 describe('PageTradingComponent', () => {
   const portfolioStateS = '[data-testid="page-trading-portfolio-state"]';
@@ -128,7 +117,7 @@ describe('PageTradingComponent', () => {
               case 'NFLX':
                 return of(summaryNFLXMock);
               default:
-                return of(null);
+                return throwError(() => new Error('Symbol not found'));
             }
           }),
         },
@@ -181,7 +170,8 @@ describe('PageTradingComponent', () => {
 
     // Check initial state of symbolSummarySignal (should start with null due to startWith in RxJS pipe)
     expect(marketApi.getSymbolSummary).toHaveBeenCalledWith('AAPL');
-    expect(component.symbolSummarySignal()).toBe(summaryAAPLMock);
+    expect(component.symbolSummarySignal().data).toBe(summaryAAPLMock);
+    expect(component.symbolSummarySignal().state).toBe('success');
   });
 
   it('should update selected symbol when a symbol quote is clicked', () => {
@@ -241,7 +231,7 @@ describe('PageTradingComponent', () => {
     comp.componentInstance.onChange('MSFT');
 
     expect(component.selectedSymbolControl.value).toBe('MSFT');
-    expect(component.symbolSummarySignal()?.id).toBe('MSFT');
+    expect(component.symbolSummarySignal()?.data?.id).toBe('MSFT');
   });
 
   it('should display symbol search component', () => {
@@ -274,7 +264,7 @@ describe('PageTradingComponent', () => {
     const comp = ngMocks.find<HTMLButtonElement>(buttonBuy);
     comp.nativeElement.click();
 
-    const summary = component.symbolSummarySignal();
+    const summary = component.symbolSummarySignal().data;
 
     expect(comp).toBeTruthy();
     expect(comp.componentInstance.disabled).toBeFalsy();
@@ -342,19 +332,21 @@ describe('PageTradingComponent', () => {
   });
 
   it('should disable BUY/SELL buttons while loading symbol summary', () => {
+    const marketApiService = ngMocks.get(MarketApiService);
+    ngMocks.stub(marketApiService, {
+      ...marketApiService,
+      getSymbolSummary: jest.fn().mockReturnValue(of(null).pipe(delay(1000))),
+    });
+
+    ngMocks.flushTestBed();
+
     const fixture = MockRender(PageTradingComponent);
     const component = fixture.point.componentInstance;
-
-    fixture.detectChanges();
-
-    // change symbol to non existing
-    component.selectedSymbolControl.setValue('NON_EXISTING_SYMBOL');
-
-    fixture.detectChanges();
 
     const compBuy = ngMocks.find<HTMLButtonElement>(buttonBuy);
     const compSell = ngMocks.find<HTMLButtonElement>(buttonSell);
 
+    expect(component.symbolSummarySignal().state).toBe('loading');
     expect(compBuy.componentInstance.disabled).toBeTruthy();
     expect(compSell.componentInstance.disabled).toBeTruthy();
   });
@@ -415,26 +407,27 @@ describe('PageTradingComponent', () => {
     const comp = ngMocks.find<SymbolSummaryListComponent>(summaryListS);
 
     expect(comp).toBeTruthy();
-    expect(comp.componentInstance.symbolSummary).toBe(component.symbolSummarySignal());
+    expect(comp.componentInstance.symbolSummary).toBe(component.symbolSummarySignal().data);
 
     // update symbol summary
     component.selectedSymbolControl.setValue('MSFT');
 
     fixture.detectChanges();
 
-    expect(component.symbolSummarySignal()?.id).toBe('MSFT');
-    expect(comp.componentInstance.symbolSummary).toBe(component.symbolSummarySignal());
+    expect(component.symbolSummarySignal()?.data?.id).toBe('MSFT');
+    expect(comp.componentInstance.symbolSummary).toBe(component.symbolSummarySignal().data);
+    expect(component.symbolSummarySignal().state).toBe('success');
   });
 
   it('should display transaction table', async () => {
-    const dialogServiceUtil = ngMocks.get(DialogServiceUtil);
-    jest.spyOn(dialogServiceUtil, 'showConfirmDialog').mockResolvedValue(true);
-
     // render
     const fixture = MockRender(PageTradingComponent);
     const component = fixture.point.componentInstance;
     const authenticationUserService = ngMocks.get(AuthenticationUserStoreService);
     const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
+    const dialogServiceUtil = ngMocks.get(DialogServiceUtil);
+
+    jest.spyOn(dialogServiceUtil, 'showConfirmDialog').mockResolvedValue(true);
 
     fixture.detectChanges();
 
@@ -483,5 +476,29 @@ describe('PageTradingComponent', () => {
     expect(portfolioStateComp.componentInstance.showCashSegment).toBeFalsy();
     expect(transactionTable.componentInstance.showActionButton()).toBeTruthy();
     expect(transactionTable.componentInstance.showTransactionFees()).toBeFalsy();
+  });
+
+  it('should display error message if symbol summary not found', () => {
+    const fixture = MockRender(PageTradingComponent);
+    const component = fixture.point.componentInstance;
+    const dialogServiceUtil = ngMocks.get(DialogServiceUtil);
+
+    const compBuy = ngMocks.find<HTMLButtonElement>(buttonBuy);
+    const compSell = ngMocks.find<HTMLButtonElement>(buttonSell);
+
+    // render UI
+    fixture.detectChanges();
+
+    // update symbol to invalid
+    component.selectedSymbolControl.setValue('INVALID');
+
+    // render UI
+    fixture.detectChanges();
+
+    expect(component.symbolSummarySignal().state).toBe('error');
+    expect(component.symbolSummarySignal().data).toBe(null);
+    expect(compBuy.componentInstance.disabled).toBeTruthy();
+    expect(compSell.componentInstance.disabled).toBeTruthy();
+    expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'error');
   });
 });

@@ -76,8 +76,15 @@ export class MarketApiService {
       .pipe(catchError(() => []));
   }
 
-  getSymbolSummary(symbol: string): Observable<SymbolSummary | null> {
-    return this.getSymbolSummaries([symbol]).pipe(map((d) => d[0] ?? null));
+  getSymbolSummary(symbol: string): Observable<SymbolSummary> {
+    return this.getSymbolSummaries([symbol]).pipe(
+      map((d) => {
+        if (d.length === 0) {
+          throw new Error('Symbol not found');
+        }
+        return d[0];
+      }),
+    );
   }
 
   getHistoricalPrices(symbol: string, period: SymbolHistoricalPeriods): Observable<HistoricalPrice[]> {
