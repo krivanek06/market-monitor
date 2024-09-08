@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { ViewportScroller } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import {
@@ -84,9 +84,9 @@ describe('SummaryActionButtonsComponent', () => {
           },
         })
         .provide({
-          provide: MatDialogRef,
+          provide: MatDialog,
           useValue: {
-            close: jest.fn(),
+            closeAll: jest.fn(),
           },
         })
     );
@@ -123,7 +123,7 @@ describe('SummaryActionButtonsComponent', () => {
     });
     const component = fixture.point.componentInstance;
     const router = ngMocks.get(Router);
-    const dialogRef = ngMocks.get(MatDialogRef);
+    const dialogRef = ngMocks.get(MatDialog);
     const viewPort = ngMocks.get(ViewportScroller);
 
     const onDetailsRedirectSpy = jest.spyOn(component, 'onDetailsRedirect');
@@ -138,7 +138,7 @@ describe('SummaryActionButtonsComponent', () => {
 
     expect(router.navigateByUrl).toHaveBeenCalledWith(`${ROUTES_MAIN.STOCK_DETAILS}/${mockSymbolSummary.id}`);
     expect(onDetailsRedirectSpy).toHaveBeenCalled();
-    expect(dialogRef.close).toHaveBeenCalled();
+    expect(dialogRef.closeAll).toHaveBeenCalled();
     expect(viewPort.scrollToPosition).toHaveBeenCalledWith([0, 0]);
   });
 

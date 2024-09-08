@@ -1,24 +1,23 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { NgClass } from '@angular/common';
+import { Component, computed, inject } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
-import { LoaderMainService } from '@mm/shared/storage-local';
+import { StorageLocalService } from '@mm/shared/storage-local';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterModule, MatProgressSpinnerModule],
+  imports: [RouterModule, MatProgressSpinnerModule, NgClass],
   selector: 'app-root',
   template: `
     <main class="min-h-screen min-w-full">
-      @defer {
-        <div *ngIf="loadingSignal()" class="grid min-h-screen min-w-full place-content-center pb-[15%]">
-          <mat-spinner></mat-spinner>
+      @if (isLoading()) {
+        <div class="grid min-h-screen min-w-full place-content-center pb-[15%]">
+          <mat-spinner />
         </div>
       }
 
-      <div [ngClass]="{ hidden: loadingSignal() }">
-        <router-outlet></router-outlet>
+      <div [ngClass]="{ hidden: isLoading() }">
+        <router-outlet />
       </div>
     </main>
   `,
@@ -29,5 +28,6 @@ import { LoaderMainService } from '@mm/shared/storage-local';
   `,
 })
 export class AppComponent {
-  loadingSignal = toSignal(inject(LoaderMainService).getLoading());
+  readonly #storageLocalService = inject(StorageLocalService);
+  isLoading = computed(() => this.#storageLocalService.localData().loader.enabled);
 }
