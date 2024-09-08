@@ -160,10 +160,6 @@ import { DefaultImgDirective } from '../../../directives';
       width: 100%;
     }
 
-    ::ng-deep .mat-mdc-form-field-infix {
-      height: 60px !important;
-    }
-
     ::ng-deep .mat-mdc-form-field-subscript-wrapper {
       height: 0px !important;
     }

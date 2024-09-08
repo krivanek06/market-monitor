@@ -75,8 +75,8 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
           [currentPositions]="i + 1"
           [image]="user.item.personal.photoURL"
           [positionChange]="user.portfolioTotalGainsPercentage?.rankChange"
-          [cardWidthPx]="260"
-          [cardHeightPx]="200"
+          [cardWidthPx]="240"
+          [cardHeightPx]="180"
           (itemClicked)="onUserClick(user.item)"
         >
           <div class="bg-wt-gray-light absolute bottom-0 flex w-full flex-col px-4 py-2">

@@ -105,7 +105,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
         >
           <div class="flex items-center gap-2">
             <mat-icon>military_tech</mat-icon>
-            <span>Hall Of Fame</span>
+            <span>Ranking</span>
           </div>
         </a>
 
@@ -131,7 +131,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
         >
           <div class="flex items-center gap-2">
             <mat-icon>diversity_3</mat-icon>
-            <span>Compare Users</span>
+            <span>Compare</span>
           </div>
         </a>
 
@@ -151,7 +151,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
           <!-- search -->
           <app-symbol-search-basic
             displayValue="symbol"
-            class="-mb-5 -mr-10 hidden w-full max-w-[640px] scale-[0.8] sm:block"
+            class="-mb-5 -mr-20 hidden w-[640px] scale-[0.7] sm:block xl:max-w-[580px] xl:scale-[0.7]"
           />
 
           <div class="hidden items-center gap-1 xl:flex">
@@ -204,24 +204,22 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
       </div>
     </ng-template>
   `,
-  styles: [
-    `
-      :host {
-        display: block;
+  styles: `
+    :host {
+      display: block;
 
-        a {
-          @apply hover:bg-wt-gray-light-strong hidden rounded-md p-4 px-4 xl:block;
+      a {
+        @apply hover:bg-wt-gray-light-strong hidden rounded-md px-4 py-3 text-sm xl:block;
 
-          &.c-active {
-            border-bottom: 2px solid var(--primary) !important;
-            > * {
-              color: var(--primary) !important;
-            }
+        &.c-active {
+          border-bottom: 2px solid var(--primary) !important;
+          > * {
+            color: var(--primary) !important;
           }
         }
       }
-    `,
-  ],
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuTopNavigationComponent implements OnInit {

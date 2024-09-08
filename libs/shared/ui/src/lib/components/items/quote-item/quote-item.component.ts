@@ -28,7 +28,7 @@ import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
       </div>
       <!-- price & price change -->
       <div class="xs:items-center xs:flex-row flex min-w-max flex-col items-end gap-x-3">
-        <span class="text-wt-gray-medium text-base">{{ symbolQuote().price | currency }}</span>
+        <span class="text-wt-gray-medium">{{ symbolQuote().price | currency }}</span>
         <!-- show value change -->
         <span
           class="@xs:flex hidden"

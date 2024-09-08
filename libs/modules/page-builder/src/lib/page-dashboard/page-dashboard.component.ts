@@ -192,27 +192,27 @@ import {
     </div>
 
     <!-- holdings pie charts -->
-    <div class="flex justify-center gap-10 overflow-x-clip max-sm:-ml-6 sm:mb-8 lg:justify-between">
+    <div class="flex justify-center gap-10 overflow-x-clip max-sm:-ml-6 sm:mb-10 lg:justify-between">
       @if (portfolioUserFacadeService.getPortfolioState()?.holdings; as holdings) {
         @if (holdings.length > 0) {
           <app-pie-chart
             data-testid="page-dashboard-portfolio-asset-allocation"
             class="max-sm:w-[385px]"
             chartTitle="Asset Allocation"
-            [heightPx]="400"
+            [heightPx]="365"
             [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
           />
           <app-pie-chart
             data-testid="page-dashboard-portfolio-sector-allocation"
             class="hidden lg:block"
             chartTitle="Sector Allocation"
-            [heightPx]="400"
+            [heightPx]="365"
             [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
           />
         }
       } @else {
-        <div class="g-skeleton h-[420px] w-full"></div>
-        <div class="g-skeleton h-[420px] w-full"></div>
+        <div class="g-skeleton h-[380px] w-full"></div>
+        <div class="g-skeleton h-[380px] w-full"></div>
       }
     </div>
 
