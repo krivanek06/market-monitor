@@ -1,7 +1,7 @@
 import { CommonModule, ViewportScroller } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { SymbolSummary, USER_WATCHLIST_SYMBOL_LIMIT } from '@mm/api-types';
@@ -73,7 +73,7 @@ export class SummaryActionButtonsComponent {
   private dialogServiceUtil = inject(DialogServiceUtil);
   private route = inject(Router);
   private viewPortScroller = inject(ViewportScroller);
-  private dialogRef = inject(MatDialogRef<any>);
+  private dialogRef = inject(MatDialog);
 
   /**
    * id of the symbol - AAPL, MSFT, BTC etc
@@ -154,8 +154,8 @@ export class SummaryActionButtonsComponent {
     // scroll to top
     this.viewPortScroller.scrollToPosition([0, 0]);
 
-    // close dialog
-    this.dialogRef.close();
+    // close all dialogs
+    this.dialogRef.closeAll();
 
     // routing kept here, because component is used in multiple places
     this.route.navigateByUrl(`${ROUTES_MAIN.STOCK_DETAILS}/${this.symbolSummary().id}`);
