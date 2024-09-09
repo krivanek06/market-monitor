@@ -31,21 +31,11 @@ export class StorageLocalService {
    * @param data - data to be saved
    */
   saveDataLocal<T extends keyof LocalStorageData>(key: T, data: LocalStorageData[T]): void {
-    // all local storage data saved for this app - different keys
-    const savedData = this.getDataFromLocalStorage();
-
-    // updated data for this specific key
-    const newData = {
-      ...savedData,
-      [key]: data,
-    };
-
     try {
+      const newData = this.saveAndReturnState(key, data);
+
       // can happen that too many data is saved
       localStorage.setItem(this.STORAGE_MAIN_KEY, JSON.stringify(newData));
-
-      // notify all subscribers
-      this.updateData$.next(newData);
     } catch (e) {
       console.log(e);
     }
@@ -57,6 +47,10 @@ export class StorageLocalService {
    * @param data
    */
   saveData<T extends keyof LocalStorageData>(key: T, data: LocalStorageData[T]): void {
+    this.saveAndReturnState(key, data);
+  }
+
+  private saveAndReturnState<T extends keyof LocalStorageData>(key: T, data: LocalStorageData[T]): LocalStorageData {
     // all local storage data saved for this app - different keys
     const savedData = this.getDataFromLocalStorage();
 
@@ -68,10 +62,12 @@ export class StorageLocalService {
 
     // notify all subscribers
     this.updateData$.next(newData);
+
+    return newData;
   }
 
   private getDataFromLocalStorage(): LocalStorageData {
-    const data = localStorage.getItem(this.STORAGE_MAIN_KEY) ?? JSON.stringify(storageInitialData);
+    const data = localStorage.getItem(this.STORAGE_MAIN_KEY) ?? '{}';
     const dataParsed = JSON.parse(data) as LocalStorageKeysVersion;
 
     // if version matches, return data

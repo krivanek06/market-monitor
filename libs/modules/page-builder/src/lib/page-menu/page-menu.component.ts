@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -15,7 +15,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
   selector: 'app-page-menu',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
     MatButtonModule,
     MatIconModule,
     RouterModule,
@@ -43,17 +43,19 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
       <mat-drawer-content class="overflow-x-clip">
         <!-- top navigation on big screen -->
         <header>
-          <app-menu-top-navigation (menuClickEmitter)="toggleMatDrawerExpandedView()"></app-menu-top-navigation>
+          <app-menu-top-navigation (menuClickEmitter)="toggleMatDrawerExpandedView()" />
         </header>
 
         <div class="c-content-wrapper">
           <!-- content -->
-          <div *ngIf="loadingSignal()" class="grid min-h-screen min-w-full place-content-center pb-[15%]">
-            <mat-spinner></mat-spinner>
-          </div>
+          @if (loadingSignal()) {
+            <div class="grid min-h-screen min-w-full place-content-center pb-[15%]">
+              <mat-spinner />
+            </div>
+          }
 
           <main [ngClass]="{ hidden: loadingSignal() }">
-            <router-outlet></router-outlet>
+            <router-outlet />
           </main>
           <!-- footer for additional space on bottom -->
           <footer class="h-12 w-full"></footer>
