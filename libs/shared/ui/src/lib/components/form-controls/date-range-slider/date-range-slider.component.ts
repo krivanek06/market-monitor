@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, forwardRef, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { addDays, isAfter, isBefore, subDays } from 'date-fns';
 import { GetDataByIndexPipe } from '../../../pipes';
-import { input } from '@angular/core';
 
 export type DateRangeSliderValues = {
   dates: (Date | string)[]; // YYYY-MM-DD
@@ -68,19 +67,18 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
       <!-- display slider and min/max values -->
       <div class="flex w-full items-center gap-4">
         <!-- min value -->
-        <span class="text-wt-gray-medium text-sm max-sm:hidden">
+        <span class="text-wt-gray-medium text-xs max-sm:hidden">
           <!-- min date -->
-          <ng-container *ngIf="displayUpperDate()">
+          @if (displayUpperDate()) {
             {{ values.dates | getDataByIndex: 0 | date: 'MMM d, y' }}
-          </ng-container>
-          <!-- current date -->
-          <ng-container *ngIf="!displayUpperDate()">
+          } @else {
+            <!-- current date -->
             {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
-          </ng-container>
+          }
         </span>
 
         <!-- slider -->
-        <mat-slider class="flex-1" [min]="0" [max]="values.dates.length - 1" showTickMarks>
+        <mat-slider class="g-custom-slider flex-1" [min]="0" [max]="values.dates.length - 1" showTickMarks>
           <input
             (valueChange)="onSliderValueChange($event, 'start')"
             [value]="values.currentMinDateIndex"
@@ -94,15 +92,14 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
         </mat-slider>
 
         <!-- max value -->
-        <span class="text-wt-gray-medium text-sm max-sm:hidden">
+        <span class="text-wt-gray-medium text-xs max-sm:hidden">
           <!-- max date -->
-          <ng-container *ngIf="displayUpperDate()">
+          @if (displayUpperDate()) {
             {{ values.dates | getDataByIndex: values.dates.length - 1 | date: 'MMM d, y' }}
-          </ng-container>
-          <!-- current date -->
-          <ng-container *ngIf="!displayUpperDate()">
+          } @else {
+            <!-- current date -->
             {{ values.dates | getDataByIndex: values.currentMaxDateIndex | date: 'MMM d, y' }}
-          </ng-container>
+          }
         </span>
       </div>
     </div>

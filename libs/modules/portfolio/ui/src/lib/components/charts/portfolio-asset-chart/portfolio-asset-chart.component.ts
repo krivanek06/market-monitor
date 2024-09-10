@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, input, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -26,14 +26,14 @@ import {
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { derivedFrom } from 'ngxtension/derived-from';
-import { Subject, map, merge, pipe, scan, startWith } from 'rxjs';
+import { map, pipe, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-asset-chart',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
+    NgClass,
     DefaultImgDirective,
     MatButtonModule,
     HighchartsChartModule,
@@ -41,50 +41,40 @@ import { Subject, map, merge, pipe, scan, startWith } from 'rxjs';
     DropdownControlComponent,
   ],
   template: `
-    <section class="relative">
+    <div class="mb-4 flex items-center justify-between gap-x-6">
       <app-dropdown-control
         inputCaption="Select Symbol"
         displayImageType="symbol"
-        class="w-6/12"
+        inputType="MULTISELECT"
+        class="w-full lg:w-[420px]"
         [formControl]="symbolsControl"
         [inputSource]="symbolInputSource()"
       />
 
-      <!-- list of symbols -->
-      <div class="mb-2 mt-6 flex flex-wrap gap-x-3 gap-y-2">
-        @for (symbol of selectedSymbol(); track symbol) {
-          <button type="button" mat-stroked-button color="primary" class="h-11 px-6" (click)="onDeselectSymbol(symbol)">
-            <div class="flex flex-wrap items-center gap-4 px-2">
-              <img appDefaultImg imageType="symbol" [src]="symbol" [alt]="symbol" class="h-7" />
-              <span class="text-base">{{ symbol }}</span>
-            </div>
-          </button>
-        }
-      </div>
-
       <!-- time slider -->
       <div class="flex justify-end" [ngClass]="{ hidden: selectedSymbol().length === 0 }">
-        <app-date-range-slider class="hidden w-[550px] md:block" [formControl]="dateRangeControl" />
+        <app-date-range-slider class="hidden w-[450px] md:block" [formControl]="dateRangeControl" />
       </div>
+    </div>
 
-      <!-- chart -->
-      @if (selectedSymbol().length > 0) {
-        @if (displayChart()) {
+    <!-- chart -->
+    @if (selectedSymbol().length > 0) {
+      @if (displayChart()) {
+        @if (chartOptionsSignal(); as chartOptionsSignal) {
           <highcharts-chart
-            *ngIf="chartOptionsSignal() as chartOptionsSignal"
             [Highcharts]="Highcharts"
             [options]="chartOptionsSignal"
             [callbackFunction]="chartCallback"
             [style.height.px]="heightPx()"
             style="width: 100%; display: block"
           />
-        } @else {
-          <div class="g-skeleton" [style.height.px]="heightPx()"></div>
         }
       } @else {
-        <div class="grid place-content-center text-base" [style.height.px]="heightPx() + 100">No data available</div>
+        <div class="g-skeleton" [style.height.px]="heightPx()"></div>
       }
-    </section>
+    } @else {
+      <div class="grid place-content-center text-base" [style.height.px]="heightPx() + 100">No data available</div>
+    }
   `,
   styles: `
     :host {
@@ -94,17 +84,17 @@ import { Subject, map, merge, pipe, scan, startWith } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioAssetChartComponent extends ChartConstructor {
-  data = input<PortfolioGrowthAssets[] | undefined>();
+  readonly data = input<PortfolioGrowthAssets[] | undefined>();
 
   /**
    * selected symbols by the user
    */
-  symbolsControl = new FormControl<string>('', { nonNullable: true });
+  readonly symbolsControl = new FormControl<string[]>([], { nonNullable: true });
 
   /**
    * data range control for chart zoom
    */
-  dateRangeControl = new FormControl<DateRangeSliderValues>(
+  readonly dateRangeControl = new FormControl<DateRangeSliderValues>(
     {
       currentMaxDateIndex: 0,
       currentMinDateIndex: 0,
@@ -113,17 +103,15 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
     { nonNullable: true },
   );
 
-  private removeSymbol$ = new Subject<string>();
-
   /**
    * used to destroy and recreate the chart
    */
-  displayChart = signal(false);
+  readonly displayChart = signal(false);
 
   /**
    * displayed symbols on the ui
    */
-  symbolInputSource = computed(() =>
+  readonly symbolInputSource = computed(() =>
     (this.data() ?? []).map(
       (asset) =>
         ({ caption: asset.displaySymbol, value: asset.symbol, image: asset.symbol }) satisfies InputSource<string>,
@@ -133,33 +121,30 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   /**
    * symbols which user selected to make comparison
    */
-  selectedSymbol = toSignal(
-    merge(
-      this.symbolsControl.valueChanges.pipe(map((symbols) => ({ action: 'add' as const, symbols }))),
-      this.removeSymbol$.pipe(map((symbol) => ({ action: 'remove' as const, symbol }))),
-    ).pipe(
-      scan((acc, curr) => {
-        // remove symbol
-        if (curr.action === 'remove') {
-          return acc.filter((s) => s !== curr.symbol);
-        }
+  readonly selectedSymbol = toSignal(this.symbolsControl.valueChanges, { initialValue: [] });
 
-        // check if symbol already exists
-        if (acc.includes(curr.symbols)) {
-          return acc;
-        }
+  /**
+   * save provided data into the component
+   */
+  readonly chartOptionsSignal = derivedFrom(
+    [this.dateRangeControl.valueChanges.pipe(startWith(this.dateRangeControl.value)), this.selectedSymbol],
+    pipe(
+      map(([dateRange, selectedSymbols]) => {
+        const series = this.formatData(this.data() ?? [], selectedSymbols);
+        const newData = series.map((d) => ({
+          ...d,
+          data: filterDataByTimestamp(d.data as [number, number][], dateRange),
+        })) satisfies Highcharts.SeriesOptionsType[];
 
-        // add symbol
-        return [...acc, curr.symbols];
-      }, [] as string[]),
+        return this.initChart(newData);
+      }),
     ),
-    { initialValue: [] },
   );
 
   /**
    * effect to patch value to the slider based on the selected symbols
    */
-  dateRangeEffect = effect(() => {
+  readonly dateRangeEffect = effect(() => {
     const allAssetsData = this.data() ?? [];
     const selectedSymbols = this.selectedSymbol();
 
@@ -194,29 +179,11 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   });
 
   /**
-   * save provided data into the component
-   */
-  chartOptionsSignal = derivedFrom(
-    [this.dateRangeControl.valueChanges.pipe(startWith(this.dateRangeControl.value)), this.selectedSymbol],
-    pipe(
-      map(([dateRange, selectedSymbols]) => {
-        const series = this.formatData(this.data() ?? [], selectedSymbols);
-        const newData = series.map((d) => ({
-          ...d,
-          data: filterDataByTimestamp(d.data as [number, number][], dateRange),
-        })) satisfies Highcharts.SeriesOptionsType[];
-
-        return this.initChart(newData);
-      }),
-    ),
-  );
-
-  /**
    * effect used to destroy the chart and recreate it with updated series,
    * otherwise new data inside the series is not showed
    * TODO: remove this - it is a hack
    */
-  chartOptionsSignalEffect = effect(() => {
+  readonly chartOptionsSignalEffect = effect(() => {
     this.selectedSymbol();
 
     untracked(() => {
@@ -228,9 +195,40 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
     });
   });
 
-  onDeselectSymbol(symbol: string) {
-    this.removeSymbol$.next(symbol);
-  }
+  /** chart is empty by default so select some symbol as default ones */
+  readonly displayInitialDataEffect = effect(() => {
+    const data = this.data() ?? [];
+    // limit initial symbols that are displayed
+    const symbolLimit = 5;
+
+    untracked(() => {
+      // display top N symbol which have the most data
+      const displaySymbols = data
+        .reduce(
+          (acc, curr) => {
+            // save first N symbols
+            if (acc.length < symbolLimit) {
+              return [...acc, { symbol: curr.symbol, count: curr.data.length }];
+            }
+            // find which one has the lowest count
+            const lowestCount = acc.reduce((prev, curr) => (prev.count < curr.count ? prev : curr));
+
+            // if current symbol has more data than the lowest one, replace it
+            if (curr.data.length > lowestCount.count) {
+              const lowestCountIndex = acc.findIndex((d) => d.symbol === lowestCount.symbol);
+              acc[lowestCountIndex] = { symbol: curr.symbol, count: curr.data.length };
+            }
+
+            return acc;
+          },
+          [] as { symbol: string; count: number }[],
+        )
+        .map((d) => d.symbol);
+
+      // save symbols into the form
+      this.symbolsControl.patchValue(displaySymbols);
+    });
+  });
 
   private initChart(series: Highcharts.SeriesOptionsType[]): Highcharts.Options {
     return {

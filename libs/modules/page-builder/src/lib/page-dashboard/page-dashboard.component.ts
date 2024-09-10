@@ -1,9 +1,8 @@
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
@@ -22,21 +21,19 @@ import {
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
-import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
   FormMatInputWrapperComponent,
   GeneralCardComponent,
   GenericChartComponent,
   PieChartComponent,
   SectionTitleComponent,
-  SortByKeyPipe,
 } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-page-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
     PortfolioStateComponent,
     GeneralCardComponent,
     PortfolioPeriodChangeComponent,
@@ -50,9 +47,7 @@ import {
     PortfolioTransactionChartComponent,
     SectionTitleComponent,
     PortfolioTransactionsTableComponent,
-    SortByKeyPipe,
     PieChartComponent,
-    MatTooltipModule,
     PortfolioGrowthChartComponent,
     PortfolioChangeChartComponent,
     PortfolioAssetChartComponent,
@@ -112,44 +107,17 @@ import {
       </div>
 
       <!-- portfolio change -->
-      <div class="lg:pt-2">
+      @if (portfolioUserFacadeService.getPortfolioChange(); as portfolioChange) {
         <app-portfolio-period-change
-          *ngIf="portfolioUserFacadeService.getPortfolioChange() as portfolioChange"
           data-testid="page-dashboard-period-change"
           [portfolioChange]="portfolioChange"
+          class="lg:pt-2"
         />
-      </div>
+      }
     </div>
 
-    <div class="mb-3 flex flex-col gap-4 sm:flex-row">
-      <button
-        data-testid="page-dashboard-portfolio-change-button"
-        matTooltip="Display daily portfolio change - profit/loss"
-        type="button"
-        class="hidden sm:block"
-        (click)="onPortfolioChangeChart()"
-        [disabled]="(portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0) === 0"
-        mat-stroked-button
-      >
-        Portfolio Change
-      </button>
-
-      <button
-        data-testid="page-dashboard-asset-growth-button"
-        matTooltip="Display invested amount per asset in your portfolio"
-        type="button"
-        class="hidden sm:block"
-        (click)="onAssetGrowthChart()"
-        [disabled]="(portfolioUserFacadeService.getPortfolioGrowth()?.length ?? 0) === 0"
-        mat-stroked-button
-      >
-        Asset Growth
-      </button>
-    </div>
-
-    <!-- dashboard charts -->
-    <div class="mb-8">
-      <!-- portfolio growth chart -->
+    <!-- portfolio growth chart -->
+    <div class="mb-12">
       @if (portfolioUserFacadeService.getPortfolioGrowth(); as getPortfolioGrowth) {
         <app-portfolio-growth-chart
           data-testid="page-dashboard-portfolio-growth-chart"
@@ -159,40 +127,43 @@ import {
             values: getPortfolioGrowth,
             startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0,
           }"
-          [heightPx]="400"
+          [heightPx]="350"
         />
       } @else {
-        <div class="g-skeleton mt-6 h-[400px]"></div>
+        <div class="g-skeleton mt-6 h-[350px]"></div>
       }
+    </div>
 
-      <!-- investment growth -->
+    <div class="mb-8 grid grid-cols-2 gap-x-10">
+      <!-- portfolio growth chart -->
       @if (portfolioUserFacadeService.getPortfolioGrowth(); as portfolioGrowth) {
         <app-portfolio-growth-chart
           data-testid="page-dashboard-investment-growth-chart"
-          headerTitle="Invested Value to Market"
+          headerTitle="Invested / Market"
           chartType="marketValue"
           [data]="{
             values: portfolioGrowth,
             startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0,
           }"
-          [heightPx]="400"
+          [heightPx]="360"
+          [dateRangeWidth]="400"
+        />
+
+        <!-- portfolio change chart -->
+        <app-portfolio-change-chart
+          data-testid="page-portfolio-change-chart"
+          [data]="portfolioGrowth"
+          [heightPx]="360"
+          [dateRangeWidth]="400"
         />
       } @else {
-        <div class="g-skeleton mt-8 h-[400px]"></div>
+        <div class="g-skeleton mt-8 h-[360px]"></div>
+        <div class="g-skeleton mt-8 h-[360px]"></div>
       }
     </div>
 
-    <!-- holding -->
-    <div class="mb-8">
-      <app-portfolio-holdings-table-card
-        data-testid="page-dashboard-portfolio-holdings-table"
-        [portfolioStateHolding]="portfolioUserFacadeService.getPortfolioState()"
-        [maximumHoldingLimit]="USER_HOLDINGS_SYMBOL_LIMIT"
-      />
-    </div>
-
     <!-- holdings pie charts -->
-    <div class="flex justify-center gap-10 overflow-x-clip max-sm:-ml-6 sm:mb-10 lg:justify-between">
+    <div class="flex justify-center gap-10 overflow-x-clip max-sm:-ml-6 sm:mb-14 lg:justify-around">
       @if (portfolioUserFacadeService.getPortfolioState()?.holdings; as holdings) {
         @if (holdings.length > 0) {
           <app-pie-chart
@@ -215,6 +186,29 @@ import {
         <div class="g-skeleton h-[380px] w-full"></div>
       }
     </div>
+
+    <!-- portfolio assets chart -->
+    @if (portfolioUserFacadeService.getPortfolioGrowth(); as growth) {
+      @if (growth.length > 8) {
+        <app-general-card title="Asset Growth" class="mb-8">
+          <app-portfolio-asset-chart
+            data-testid="portfolio-asset-chart-chart"
+            [data]="portfolioUserFacadeService.getPortfolioGrowthAssets()"
+            [heightPx]="350"
+          />
+        </app-general-card>
+      }
+    } @else {
+      <div class="g-skeleton h-[380px]"></div>
+    }
+
+    <!-- holding -->
+    <app-portfolio-holdings-table-card
+      class="mb-12"
+      data-testid="page-dashboard-portfolio-holdings-table"
+      [portfolioStateHolding]="portfolioUserFacadeService.getPortfolioState()"
+      [maximumHoldingLimit]="USER_HOLDINGS_SYMBOL_LIMIT"
+    />
 
     @if (stateRef.userHaveTransactions()) {
       <!-- transaction history -->
@@ -270,9 +264,8 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageDashboardComponent {
-  private dialogServiceUtil = inject(DialogServiceUtil);
-  private authenticationUserService = inject(AuthenticationUserStoreService);
-  portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  readonly #authenticationUserService = inject(AuthenticationUserStoreService);
+  readonly portfolioUserFacadeService = inject(PortfolioUserFacadeService);
 
   /**
    * Transaction limit to show best and worst transactions
@@ -280,27 +273,8 @@ export class PageDashboardComponent {
   readonly transactionLimit = 15;
   readonly ColorScheme = ColorScheme;
   readonly USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
-  readonly stateRef = this.authenticationUserService.state;
+  readonly stateRef = this.#authenticationUserService.state;
   readonly hasEnoughTransactions = computed(
     () => (this.stateRef.portfolioTransactions()?.length ?? 0) > this.transactionLimit,
   );
-
-  onPortfolioChangeChart(): void {
-    this.dialogServiceUtil.showGenericDialog({
-      component: PortfolioChangeChartComponent,
-      componentData: <PortfolioChangeChartComponent>{
-        data: this.portfolioUserFacadeService.getPortfolioGrowth,
-      },
-    });
-  }
-
-  onAssetGrowthChart(): void {
-    this.dialogServiceUtil.showGenericDialog({
-      title: 'Portfolio Asset Growth Chart',
-      component: PortfolioAssetChartComponent,
-      componentData: <PortfolioAssetChartComponent>{
-        data: this.portfolioUserFacadeService.getPortfolioGrowthAssets,
-      },
-    });
-  }
 }

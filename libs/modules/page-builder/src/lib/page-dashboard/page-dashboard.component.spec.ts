@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {
+  PortfolioGrowthAssets,
   PortfolioStateHoldings,
   PortfolioTransaction,
   UserAccountEnum,
@@ -24,14 +25,11 @@ import {
   PortfolioTransactionsTableComponent,
   PortfolioTransactionsTableComponentMock,
 } from '@mm/portfolio/ui';
-import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { PieChartComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PageDashboardComponent } from './page-dashboard.component';
 
 describe('PageDashboardComponent', () => {
-  const portfolioChangeButtonS = '[data-testid="page-dashboard-portfolio-change-button"]';
-  const assetGrowthButtonS = '[data-testid="page-dashboard-asset-growth-button"]';
   const periodChangeCompS = '[data-testid="page-dashboard-period-change"]';
 
   const portfolioStateS = '[data-testid="page-dashboard-portfolio-state"]';
@@ -40,6 +38,8 @@ describe('PageDashboardComponent', () => {
 
   const growthChartBalanceS = '[data-testid="page-dashboard-portfolio-growth-chart"]';
   const growthChartMarketS = '[data-testid="page-dashboard-investment-growth-chart"]';
+  const portfolioChangeChartS = '[data-testid="page-portfolio-change-chart"]';
+  const portfolioAssetChartS = '[data-testid="portfolio-asset-chart-chart"]';
   const holdingTableS = '[data-testid="page-dashboard-portfolio-holdings-table"]';
 
   const assetAllocationPieChart = '[data-testid="page-dashboard-portfolio-asset-allocation"]';
@@ -64,6 +64,11 @@ describe('PageDashboardComponent', () => {
       },
     ] as PortfolioStateHoldings['holdings'],
   } as PortfolioStateHoldings;
+
+  const mockGrowthAsset = [
+    { symbol: 'AAPL', data: [{ date: '2021-01-01', units: 10, profit: 2 }] },
+    { symbol: 'MSFT', data: [{ date: '2021-01-01', units: 10, profit: 2 }] },
+  ] as PortfolioGrowthAssets[];
 
   const mockUser = mockCreateUser({
     id: 'User_123',
@@ -121,13 +126,6 @@ describe('PageDashboardComponent', () => {
       .replace(PortfolioHoldingsTableCardComponent, PortfolioHoldingsTableCardComponentMock)
       .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
       .provide({
-        provide: DialogServiceUtil,
-        useValue: {
-          showNotificationBar: jest.fn(),
-          showGenericDialog: jest.fn(),
-        },
-      })
-      .provide({
         provide: AuthenticationUserStoreService,
         useValue: {
           state: {
@@ -147,6 +145,7 @@ describe('PageDashboardComponent', () => {
           getPortfolioAssetAllocationPieChart: () => mockAllocationChartData,
           getPortfolioGrowth: () => mockPortfolioGrowth,
           getPortfolioState: () => mockPortfolioState,
+          getPortfolioGrowthAssets: () => mockGrowthAsset,
           getPortfolioChange: () =>
             ({
               '1_day': {
@@ -212,55 +211,6 @@ describe('PageDashboardComponent', () => {
     });
   });
 
-  it('should call PortfolioChangeChartComponent on button click', () => {
-    const fixture = MockRender(PageDashboardComponent);
-    fixture.detectChanges();
-
-    const component = fixture.point.componentInstance;
-    const dialog = ngMocks.get(DialogServiceUtil);
-    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
-
-    const portfolioChangeButton = ngMocks.find(portfolioChangeButtonS);
-
-    const onPortfolioChangeChartSpy = jest.spyOn(component, 'onPortfolioChangeChart');
-
-    // click on the button
-    ngMocks.click(portfolioChangeButton);
-
-    expect(onPortfolioChangeChartSpy).toHaveBeenCalled();
-    expect(dialog.showGenericDialog).toHaveBeenCalledWith({
-      component: PortfolioChangeChartComponent,
-      componentData: {
-        data: portfolioUserFacadeService.getPortfolioGrowth,
-      },
-    });
-  });
-
-  it('should call PortfolioAssetChartComponent on button click', () => {
-    const fixture = MockRender(PageDashboardComponent);
-    fixture.detectChanges();
-
-    const component = fixture.point.componentInstance;
-    const dialog = ngMocks.get(DialogServiceUtil);
-    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
-
-    const portfolioChangeButton = ngMocks.find(assetGrowthButtonS);
-
-    const onAssetGrowthChartSpy = jest.spyOn(component, 'onAssetGrowthChart');
-
-    // click on the button
-    ngMocks.click(portfolioChangeButton);
-
-    expect(onAssetGrowthChartSpy).toHaveBeenCalled();
-    expect(dialog.showGenericDialog).toHaveBeenCalledWith({
-      title: 'Portfolio Asset Growth Chart',
-      component: PortfolioAssetChartComponent,
-      componentData: {
-        data: portfolioUserFacadeService.getPortfolioGrowthAssets,
-      },
-    });
-  });
-
   it('should display PortfolioGrowthChartComponent component type balance', () => {
     const fixture = MockRender(PageDashboardComponent);
     fixture.detectChanges();
@@ -272,6 +222,46 @@ describe('PageDashboardComponent', () => {
       startingCashValue: mockPortfolioState.startingCash,
     });
     expect(comp.componentInstance.chartType).toBe('balance');
+  });
+
+  it('should display PortfolioAssetChart', () => {
+    const portfolioUserFacade = ngMocks.get(PortfolioUserFacadeService);
+    // many dummy data
+    const newData = Array.from({ length: 16 }, (_, i) => ({
+      date: 'XXXX-XX-XX',
+      breakEvenValue: 1,
+      marketTotalValue: 1,
+      totalBalanceValue: 1,
+    }));
+    ngMocks.stub(portfolioUserFacade, {
+      ...portfolioUserFacade,
+      getPortfolioGrowth: signal(newData),
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const comp = ngMocks.find<PortfolioAssetChartComponent>(portfolioAssetChartS);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.data).toEqual(mockGrowthAsset);
+  });
+
+  it('should NOT display PortfolioAssetChart if not enough data', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    expect(fixture.debugElement.query(By.css(portfolioAssetChartS))).toBeFalsy();
+  });
+
+  it('should display PortfolioChangeChart', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const comp = ngMocks.find<PortfolioChangeChartComponent>(portfolioChangeChartS);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.data).toEqual(mockPortfolioGrowth);
   });
 
   it('should display PortfolioGrowthChartComponent component type marketValue', () => {

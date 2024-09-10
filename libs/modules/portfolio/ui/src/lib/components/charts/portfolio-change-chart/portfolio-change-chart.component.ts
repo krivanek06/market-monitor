@@ -1,40 +1,35 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowth } from '@mm/portfolio/data-access';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
-import {
-  DateRangeSliderComponent,
-  DateRangeSliderValues,
-  SectionTitleComponent,
-  filterDataByDateRange,
-} from '@mm/shared/ui';
+import { DateRangeSliderComponent, DateRangeSliderValues, filterDataByDateRange } from '@mm/shared/ui';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { map } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-change-chart',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule, SectionTitleComponent],
+  imports: [HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule],
   template: `
     <!-- investment growth -->
     <div class="flex items-center justify-between">
       <!-- select chart title -->
-      <app-section-title title="Portfolio Change Chart" />
+      <div class="text-wt-primary text-lg">Portfolio Change</div>
 
       <!-- date range -->
-      <app-date-range-slider class="w-[550px]" [formControl]="sliderControl"></app-date-range-slider>
+      <app-date-range-slider [style.width.px]="dateRangeWidth()" [formControl]="sliderControl" />
     </div>
 
-    <highcharts-chart
-      *ngIf="isHighcharts()"
-      [Highcharts]="Highcharts"
-      [options]="chartOptionSignal()"
-      [style.height.px]="heightPx()"
-      style="display: block; width: 100%"
-    />
+    @if (isHighcharts()) {
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartOptionSignal()"
+        [style.height.px]="heightPx()"
+        style="display: block; width: 100%"
+      />
+    }
   `,
   styles: `
     :host {
@@ -45,6 +40,8 @@ import { map } from 'rxjs';
 })
 export class PortfolioChangeChartComponent extends ChartConstructor {
   data = input.required<PortfolioGrowth[] | null>();
+  dateRangeWidth = input(550);
+
   sliderControl = new FormControl<DateRangeSliderValues>(
     {
       currentMaxDateIndex: 0,

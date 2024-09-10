@@ -350,6 +350,18 @@ export class PortfolioCalculationService {
     const historicalPrices = await this.getHistoricalPricesForTransactionsSymbols(transactions);
     const symbols = Object.keys(historicalPrices);
 
+    // format historical prices into dates as keys
+    const newFormat = Object.keys(historicalPrices).map((d) => ({
+      symbol: d,
+      data: historicalPrices[d].reduce(
+        (acc, curr) => ({
+          ...acc,
+          [curr.date]: curr.close,
+        }),
+        {} as { [key: string]: number },
+      ),
+    }));
+
     // create portfolio growth assets
     const result: PortfolioGrowthAssets[] = symbols
       .map((symbol) => {
@@ -365,27 +377,24 @@ export class PortfolioCalculationService {
         // get all transactions for this symbol in ASC order by date
         const symbolTransactions = transactions.filter((d) => d.symbol === symbol);
 
-        // check if historical prices first date is not after first transaction date
-        // transaction was weekend/holiday but prices are from next working date
-        const firstDate = symbolHistoricalPrice[0].date;
+        // generates all dates from first transaction date until yesterday
+        const transactionDate = fillOutMissingDatesForDate(symbolTransactions[0].date, getYesterdaysDate(), false);
+
+        // get historical price for the selected symbol
+        const pricePerDate = newFormat.find((d) => d.symbol === symbol)?.data ?? {};
 
         // internal helper
-        const isFirstTransactionBeforeFirstDate = isBefore(symbolTransactions[0].date, firstDate);
         const aggregator = {
-          units: isFirstTransactionBeforeFirstDate ? symbolTransactions[0].units : 0,
-          index: isFirstTransactionBeforeFirstDate ? 1 : 0,
-          breakEvenPrice: isFirstTransactionBeforeFirstDate ? symbolTransactions[0].unitPrice : 0,
+          units: 0,
+          index: 0,
+          breakEvenPrice: 0,
           accumulatedReturn: 0,
         };
 
-        // loop though prices of specific symbol and calculate invested value and market total value
-        const growthAssetItems = symbolHistoricalPrice.map((historicalPrice) => {
+        const growthAssetItems = transactionDate.reduce((acc, date) => {
           // modify the aggregator for every transaction that happened on that date
           // can be multiple transactions on the same day for the same symbol
-          while (
-            !!symbolTransactions[aggregator.index] &&
-            isSameDay(symbolTransactions[aggregator.index].date, historicalPrice.date)
-          ) {
+          while (!!symbolTransactions[aggregator.index] && isSameDay(symbolTransactions[aggregator.index].date, date)) {
             const transaction = symbolTransactions[aggregator.index];
             const isBuy = transaction.transactionType === 'BUY';
 
@@ -405,18 +414,28 @@ export class PortfolioCalculationService {
             aggregator.accumulatedReturn += roundNDigits(transaction.returnValue - transaction.transactionFees);
           }
 
-          const breakEvenValue = roundNDigits(aggregator.units * aggregator.breakEvenPrice);
-          const marketTotalValue = roundNDigits(aggregator.units * historicalPrice.close);
+          // get prince for the date - stocks on weekend do not have any data
+          const historicalPrice = pricePerDate[date];
 
-          return {
+          // skip weekends - no historical data
+          if (!historicalPrice) {
+            return acc;
+          }
+
+          const breakEvenValue = roundNDigits(aggregator.units * aggregator.breakEvenPrice);
+          const marketTotalValue = roundNDigits(aggregator.units * historicalPrice);
+
+          const portfolioAsset = {
             breakEvenValue: breakEvenValue,
-            date: historicalPrice.date,
+            date: date,
             units: aggregator.units,
             marketTotalValue: marketTotalValue,
             profit: roundNDigits(marketTotalValue - breakEvenValue + aggregator.accumulatedReturn),
-            accumulatedReturn: aggregator.accumulatedReturn,
+            accumulatedReturn: roundNDigits(aggregator.accumulatedReturn),
           } satisfies PortfolioGrowthAssetsDataItem;
-        });
+
+          return [...acc, portfolioAsset];
+        }, [] as PortfolioGrowthAssetsDataItem[]);
 
         const displaySymbol = symbolTransactions.at(0)?.displaySymbol ?? symbol;
         return {

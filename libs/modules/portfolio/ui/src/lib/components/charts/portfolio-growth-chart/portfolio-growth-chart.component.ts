@@ -1,16 +1,10 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowth } from '@mm/portfolio/data-access';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
-import {
-  DateRangeSliderComponent,
-  DateRangeSliderValues,
-  SectionTitleComponent,
-  filterDataByDateRange,
-} from '@mm/shared/ui';
+import { DateRangeSliderComponent, DateRangeSliderValues, filterDataByDateRange } from '@mm/shared/ui';
 import { SeriesOptionsType } from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { map } from 'rxjs';
@@ -18,30 +12,29 @@ import { map } from 'rxjs';
 @Component({
   selector: 'app-portfolio-growth-chart',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule, SectionTitleComponent],
+  imports: [HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule],
   template: `
     <div class="flex flex-col items-center justify-between gap-3 lg:flex-row">
       <!-- select chart title -->
-      <app-section-title [title]="headerTitle()" />
+      <div class="text-wt-primary text-lg">{{ headerTitle() }}</div>
 
       <!-- date range -->
-      <app-date-range-slider
-        *ngIf="data().values.length > 0"
-        class="w-full lg:w-[550px]"
-        [formControl]="sliderControl"
-      />
+      @if (data().values.length > 0) {
+        <app-date-range-slider [style.width.px]="dateRangeWidth()" [formControl]="sliderControl" />
+      }
     </div>
 
     <!-- chart -->
     @if ((chartOptionsSignal().series?.length ?? 0) > 0) {
-      <highcharts-chart
-        *ngIf="isHighcharts()"
-        [Highcharts]="Highcharts"
-        [options]="chartOptionsSignal()"
-        [callbackFunction]="chartCallback"
-        [style.height.px]="heightPx()"
-        style="display: block; width: 100%"
-      />
+      @if (isHighcharts()) {
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [options]="chartOptionsSignal()"
+          [callbackFunction]="chartCallback"
+          [style.height.px]="heightPx()"
+          style="display: block; width: 100%"
+        />
+      }
     } @else {
       <div class="grid place-content-center text-base" [style.height.px]="heightPx()">No data available</div>
     }
@@ -61,6 +54,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
   }>();
   displayLegend = input(false);
   chartType = input<'all' | 'marketValue' | 'balance'>('all');
+  dateRangeWidth = input(550);
 
   sliderControl = new FormControl<DateRangeSliderValues>(
     {
