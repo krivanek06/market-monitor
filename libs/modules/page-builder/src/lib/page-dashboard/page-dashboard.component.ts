@@ -117,7 +117,7 @@ import {
     </div>
 
     <!-- portfolio growth chart -->
-    <div class="mb-12">
+    <div class="mb-10">
       @if (portfolioUserFacadeService.getPortfolioGrowth(); as getPortfolioGrowth) {
         <app-portfolio-growth-chart
           data-testid="page-dashboard-portfolio-growth-chart"
@@ -130,7 +130,7 @@ import {
           [heightPx]="350"
         />
       } @else {
-        <div class="g-skeleton mt-6 h-[350px]"></div>
+        <div class="g-skeleton mt-6 h-[380px]"></div>
       }
     </div>
 
