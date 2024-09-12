@@ -118,14 +118,6 @@ export const compare = (a?: number | string | null, b?: number | string | null, 
   return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
 };
 
-export const ensureFind = <T>(argument: T | undefined | null, message = 'This value was promised to be there.'): T => {
-  if (argument === undefined || argument === null) {
-    throw new TypeError(message);
-  }
-
-  return argument;
-};
-
 export const insertIntoArray = <T>(arr: T[], index: number, newItem: T): T[] => [
   // part of the array before the specified index
   ...arr.slice(0, index),
@@ -148,26 +140,6 @@ export const getRandomNumber = (min: number, max: number): number => {
 };
 
 export const getObjectEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
-
-/**
- *
- * function that executes a function and returns a default value in case of an error
- */
-export const executeFnSafe = async <T>(...args: any[]): Promise<T | null> => {
-  try {
-    // Assuming the first argument is the function and the rest are its parameters
-    const fn = args[0];
-    if (typeof fn !== 'function') {
-      throw new Error('First argument must be a function');
-    }
-
-    // Call the function with the remaining arguments
-    return await fn(...args.slice(1));
-  } catch (e) {
-    console.error(e); // Optionally log the error for debugging
-    return null; // Return a default value in case of an error
-  }
-};
 
 export const createNameInitials = (name: string) => {
   const words = name.split(' ').reduce((acc, word) => acc + (word.at(0) ?? '').toUpperCase(), '');

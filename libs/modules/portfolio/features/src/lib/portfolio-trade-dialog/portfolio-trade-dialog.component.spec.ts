@@ -2,13 +2,12 @@ import { signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { MatCheckbox, MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MarketApiService } from '@mm/api-client';
 import {
-  HistoricalPrice,
   IsStockMarketOpenExtend,
   PortfolioStateHoldings,
   PortfolioTransactionCreate,
@@ -21,37 +20,31 @@ import { UserAccountTypeDirective } from '@mm/authentication/feature-access-dire
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { dateFormatDate, getCurrentDateDetailsFormat, roundNDigits } from '@mm/shared/general-util';
-import { DatePickerComponent, NumberKeyboardComponent } from '@mm/shared/ui';
+import { NumberKeyboardComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
-import { of, throwError } from 'rxjs';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from './portfolio-trade-dialog.component';
 
-const saveButtonS = '[data-testid="trade-dialog-save-button"]';
-const insufficientCashErrorS = '[data-testid="trade-dialog-insufficient-cash-error"]';
-const insufficientUnitsErrorS = '[data-testid="trade-dialog-insufficient-units-error"]';
-const sellAllCheckboxS = '[data-testid="trade-dialog-sell-all-checkbox"]';
-const incrementUnitsButtonS = '[data-testid="trade-dialog-increment-units"]';
-const decrementUnitsButtonS = '[data-testid="trade-dialog-decrement-units"]';
-const datePickerS = '[data-testid="trade-dialog-date-picker"]';
-
-const mockData = {
-  transactionType: 'BUY',
-  quote: {
-    symbol: 'AAPL',
-    name: 'Apple Inc.',
-    price: 150.0,
-    timestamp: 1630000000,
-  },
-  sector: 'Technology',
-} as PortfolioTradeDialogComponentData;
-
-const mockClosedPrice = {
-  close: 120,
-  date: '2021-01-01',
-  volume: 10_000,
-} as HistoricalPrice;
-
 describe('PortfolioTradeDialogComponent', () => {
+  const saveButtonS = '[data-testid="trade-dialog-save-button"]';
+  const insufficientCashErrorS = '[data-testid="trade-dialog-insufficient-cash-error"]';
+  const insufficientUnitsErrorS = '[data-testid="trade-dialog-insufficient-units-error"]';
+  const sellAllCheckboxS = '[data-testid="trade-dialog-sell-all-checkbox"]';
+  const unitsKeyboardCheckboxS = '[data-testid="trade-dialog-units-keyboard-checkbox"]';
+  const valueKeyboardCheckboxS = '[data-testid="trade-dialog-value-keyboard-checkbox"]';
+  const incrementUnitsButtonS = '[data-testid="trade-dialog-increment-units"]';
+  const decrementUnitsButtonS = '[data-testid="trade-dialog-decrement-units"]';
+
+  const mockData = {
+    transactionType: 'BUY',
+    quote: {
+      symbol: 'AAPL',
+      name: 'Apple Inc.',
+      price: 120.0,
+      timestamp: 1630000000,
+    },
+    sector: 'Technology',
+  } as PortfolioTradeDialogComponentData;
+
   const testUserData = mockCreateUser({
     userAccountType: UserAccountEnum.DEMO_TRADING,
   });
@@ -87,7 +80,6 @@ describe('PortfolioTradeDialogComponent', () => {
       .provide({
         provide: MarketApiService,
         useValue: {
-          getHistoricalPricesOnDate: jest.fn().mockReturnValue(of(mockClosedPrice)),
           getIsMarketOpenSignal: signal({
             currentHoliday: [] as string[],
             allHolidays: [] as string[],
@@ -136,7 +128,7 @@ describe('PortfolioTradeDialogComponent', () => {
   });
 
   beforeAll(() => {
-    // freezing time
+    // freezing time - no longer necessary, just keeping as example
     jest.useFakeTimers().setSystemTime(new Date(getCurrentDateDetailsFormat()));
   });
 
@@ -152,7 +144,249 @@ describe('PortfolioTradeDialogComponent', () => {
   it('should init symbolPriceOnDate with the provided quote price', () => {
     const fixture = MockRender(PortfolioTradeDialogComponent);
     const component = fixture.point.componentInstance;
-    expect(component.symbolPriceOnDate()).toBe(mockData.quote.price);
+    expect(component.data()).toBe(mockData);
+  });
+
+  it('should have default UNITS keyboard', () => {
+    const fixture = MockRender(PortfolioTradeDialogComponent);
+    const component = fixture.point.componentInstance;
+
+    const keyBoard = ngMocks.find(NumberKeyboardComponent);
+    const unitsKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(unitsKeyboardCheckboxS);
+
+    // check if exists
+    expect(keyBoard).toBeTruthy();
+    expect(unitsKeyboardCheckboxEl).toBeTruthy();
+    expect(unitsKeyboardCheckboxEl.componentInstance.checked).toBe(true);
+  });
+
+  it('should switch to Custom Value keyboard and back to units', () => {
+    const fixture = MockRender(PortfolioTradeDialogComponent);
+    const component = fixture.point.componentInstance;
+
+    const keyBoard = ngMocks.findInstance(NumberKeyboardComponent);
+    const valueKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(valueKeyboardCheckboxS);
+    const unitsKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(unitsKeyboardCheckboxS);
+
+    // check if exists
+    expect(keyBoard).toBeTruthy();
+    expect(valueKeyboardCheckboxEl).toBeTruthy();
+    expect(unitsKeyboardCheckboxEl).toBeTruthy();
+    const onActiveTotalValueButtonChangeSpy = jest.spyOn(component, 'onActiveTotalValueButtonChange');
+
+    // click element
+    valueKeyboardCheckboxEl.nativeElement.click();
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if switched
+    expect(onActiveTotalValueButtonChangeSpy).toHaveBeenCalledWith('TOTAL_VALUE');
+    expect(keyBoard).toBeTruthy();
+    expect(valueKeyboardCheckboxEl.componentInstance.checked).toBe(true);
+    expect(unitsKeyboardCheckboxEl.componentInstance.checked).toBe(false);
+
+    // todo - check when keyboard emit value it is set to custom value
+
+    // switch back to units
+    unitsKeyboardCheckboxEl.nativeElement.click();
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if switched
+    expect(onActiveTotalValueButtonChangeSpy).toHaveBeenCalledWith('UNITS');
+    expect(keyBoard).toBeTruthy();
+    expect(valueKeyboardCheckboxEl.componentInstance.checked).toBe(false);
+    expect(unitsKeyboardCheckboxEl.componentInstance.checked).toBe(true);
+
+    // todo - check when keyboard emit value it is set to units
+  });
+
+  it('should remain on Custom Value keyboard if clicking multiple times', async () => {
+    const fixture = MockRender(PortfolioTradeDialogComponent);
+    const component = fixture.point.componentInstance;
+
+    const keyBoard = ngMocks.findInstance(NumberKeyboardComponent);
+    const valueKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(valueKeyboardCheckboxS);
+    const unitsKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(unitsKeyboardCheckboxS);
+
+    const onActiveTotalValueButtonChangeSpy = jest.spyOn(component, 'onActiveTotalValueButtonChange');
+
+    // check initial state
+    expect(valueKeyboardCheckboxEl.componentInstance.checked).toBeFalsy();
+
+    // click element
+    valueKeyboardCheckboxEl.nativeElement.click();
+    expect(component.form.controls.useCustomTotalValueControl.value).toBeTruthy();
+    valueKeyboardCheckboxEl.nativeElement.click();
+    expect(component.form.controls.useCustomTotalValueControl.value).toBeTruthy();
+    valueKeyboardCheckboxEl.nativeElement.click();
+    expect(component.form.controls.useCustomTotalValueControl.value).toBeTruthy();
+    valueKeyboardCheckboxEl.nativeElement.click();
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if not switched
+    expect(valueKeyboardCheckboxEl.componentInstance.checked).toBeTruthy();
+    expect(unitsKeyboardCheckboxEl.componentInstance.checked).toBeFalsy();
+    expect(valueKeyboardCheckboxEl.componentInstance.disabled).toBeTruthy();
+    expect(unitsKeyboardCheckboxEl.componentInstance.disabled).toBeFalsy();
+    expect(component.form.controls.useCustomTotalValueControl.value).toBeTruthy();
+    expect(onActiveTotalValueButtonChangeSpy).toHaveBeenCalledWith('TOTAL_VALUE');
+  });
+
+  it('should remove increment units when setting custom value', () => {
+    const fixture = MockRender(PortfolioTradeDialogComponent);
+    const component = fixture.point.componentInstance;
+
+    // all checkbox
+    const valueKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(valueKeyboardCheckboxS);
+    const unitsKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(unitsKeyboardCheckboxS);
+
+    // check if exists
+    expect(fixture.debugElement.query(By.css(decrementUnitsButtonS))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css(incrementUnitsButtonS))).toBeTruthy();
+
+    // switch to custom value
+    valueKeyboardCheckboxEl.nativeElement.click();
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if removed
+    expect(fixture.debugElement.query(By.css(decrementUnitsButtonS))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css(incrementUnitsButtonS))).toBeFalsy();
+
+    // switch back to units
+    unitsKeyboardCheckboxEl.nativeElement.click();
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if exists
+    expect(fixture.debugElement.query(By.css(decrementUnitsButtonS))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css(incrementUnitsButtonS))).toBeTruthy();
+  });
+
+  it('should calculate possible units to buy when setting custom value for stocks', () => {
+    const fixture = MockRender(PortfolioTradeDialogComponent);
+    const component = fixture.point.componentInstance;
+
+    // use custom value
+    const saveButtonEl = ngMocks.find<MatButton>(saveButtonS);
+    const valueKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(valueKeyboardCheckboxS);
+    valueKeyboardCheckboxEl.nativeElement.click();
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // how many possible units can be bought
+    const possibleUnits = Math.floor(mockPortfolioState.cashOnHand / mockData.quote.price);
+
+    // set custom value
+    component.form.controls.customTotalValue.setValue(1000);
+    const calculatedUnits = Math.floor(1000 / mockData.quote.price);
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if not crypto
+    expect(component.isSymbolCrypto()).not.toBe(true);
+
+    // check if calculated
+    expect(component.form.controls.units.value).toBe(calculatedUnits);
+
+    // should be error because user does not have enough cash
+    expect(component.insufficientCashErrorSignal()).toBe(true);
+
+    // should have saved button disabled
+    expect(saveButtonEl.nativeElement.disabled).toBe(true);
+
+    // check how many units can be bought
+    expect(component.maximumUnitsToBuy()).toBe(possibleUnits);
+  });
+
+  it('should calculate possible units to buy when setting custom value for crypto', () => {
+    const fixture = MockRender(PortfolioTradeDialogComponent);
+    const component = fixture.point.componentInstance;
+
+    // set data to crypto
+    component.data.set({
+      ...component.data(),
+      quote: {
+        ...component.data().quote,
+        exchange: 'CRYPTO',
+      },
+    });
+
+    expect(component.isSymbolCrypto()).toBe(true);
+
+    // use custom value
+    const saveButtonEl = ngMocks.find<MatButton>(saveButtonS);
+    const valueKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(valueKeyboardCheckboxS);
+    valueKeyboardCheckboxEl.nativeElement.click();
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // how many possible units can be bought
+    const possibleUnits = roundNDigits(mockPortfolioState.cashOnHand / mockData.quote.price, 4);
+
+    // set custom value
+    component.form.controls.customTotalValue.setValue(1000);
+    const calculatedUnits = roundNDigits(1000 / mockData.quote.price, 4);
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if calculated
+    expect(component.form.controls.units.value).toBe(calculatedUnits);
+
+    // should be error because user does not have enough cash
+    expect(component.insufficientCashErrorSignal()).toBe(true);
+
+    // should have saved button disabled
+    expect(saveButtonEl.nativeElement.disabled).toBe(true);
+
+    // check how many units can be bought
+    expect(component.maximumUnitsToBuy()).toBe(possibleUnits);
+  });
+
+  it('should nullify units and custom value when switching between them', () => {
+    const fixture = MockRender(PortfolioTradeDialogComponent);
+    const component = fixture.point.componentInstance;
+
+    // all checkbox
+    const valueKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(valueKeyboardCheckboxS);
+    const unitsKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(unitsKeyboardCheckboxS);
+
+    // set units
+    component.form.controls.units.setValue(10);
+
+    // switch to custom value
+    valueKeyboardCheckboxEl.nativeElement.click();
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if nullified
+    expect(component.form.controls.units.value).toBe(0);
+    expect(component.form.controls.customTotalValue.value).toBe(0);
+
+    // change custom value
+    component.form.controls.customTotalValue.setValue(1000);
+
+    // switch back to units
+    unitsKeyboardCheckboxEl.nativeElement.click();
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if nullified
+    expect(component.form.controls.customTotalValue.value).toBe(0);
+    expect(component.form.controls.units.value).toBe(0);
   });
 
   describe('test form interaction', () => {
@@ -160,42 +394,12 @@ describe('PortfolioTradeDialogComponent', () => {
       const fixture = MockRender(PortfolioTradeDialogComponent);
       const component = fixture.point.componentInstance;
       const form = {
-        date: new Date(mockData.quote.timestamp * 1000),
         units: 0,
         customTotalValue: 0,
         useCustomTotalValueControl: false,
       };
 
       expect(component.form.value).toEqual(form);
-    });
-
-    it('should load historical price if date changes', () => {
-      const fixture = MockRender(PortfolioTradeDialogComponent);
-      const component = fixture.point.componentInstance;
-
-      const marketApi = ngMocks.get(MarketApiService);
-      const dialogUtil = ngMocks.get(DialogServiceUtil);
-
-      // by default is not called
-      expect(marketApi.getHistoricalPricesOnDate).not.toHaveBeenCalled();
-
-      // trigger date
-      component.form.controls.date.setValue(new Date());
-
-      expect(marketApi.getHistoricalPricesOnDate).toHaveBeenCalled();
-      expect(component.symbolPriceOnDate()).toBe(mockClosedPrice.close);
-
-      // mock response to get error
-      ngMocks.stub(marketApi, {
-        getHistoricalPricesOnDate: jest.fn().mockReturnValue(throwError(() => new Error('error'))),
-      });
-
-      // trigger date
-      component.form.controls.date.setValue(new Date());
-
-      expect(marketApi.getHistoricalPricesOnDate).toHaveBeenCalled();
-      expect(component.symbolPriceOnDate()).toBe(0);
-      expect(dialogUtil.handleError).toHaveBeenCalled();
     });
 
     it('should calculate fees on unit change', () => {
@@ -225,18 +429,17 @@ describe('PortfolioTradeDialogComponent', () => {
       // set units
       component.form.controls.units.setValue(newUnits);
 
+      // test units
+      expect(component.form.controls.units.value).toBe(newUnits);
+      component.form.controls.useCustomTotalValueControl.setValue(true);
+      expect(component.form.controls.units.value).toBe(0);
+
       // set total value
       component.form.controls.customTotalValue.setValue(newTotalValue);
 
-      // test initial value
-      expect(component.form.controls.units.value).toBe(newUnits);
+      // test total value
       expect(component.form.controls.customTotalValue.value).toBe(newTotalValue);
-
-      // set useCustomTotalValueControl
       component.form.controls.useCustomTotalValueControl.setValue(true);
-
-      // test new value
-      expect(component.form.controls.units.value).toBe(0);
       expect(component.form.controls.customTotalValue.value).toBe(0);
     });
 
@@ -555,6 +758,44 @@ describe('PortfolioTradeDialogComponent', () => {
   });
 
   describe('test SELL operations', () => {
+    it('should display sell all checkbox on SELL operation', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
+      // change transaction type to SELL
+      component.data.update((d) => ({
+        ...d,
+        transactionType: 'SELL',
+      }));
+      fixture.detectChanges();
+
+      // grab sell all checkbox
+      const sellAllCheckboxEl = ngMocks.find<MatCheckbox>(sellAllCheckboxS);
+
+      // check if exists
+      expect(sellAllCheckboxEl).toBeTruthy();
+    });
+
+    it('should NOT display units and custom value checkboxes', () => {
+      const fixture = MockRender(PortfolioTradeDialogComponent);
+      const component = fixture.point.componentInstance;
+
+      // change transaction type to SELL
+      component.data.update((d) => ({
+        ...d,
+        transactionType: 'SELL',
+      }));
+      fixture.detectChanges();
+
+      // grab sell all checkbox
+      const unitsKeyboardCheckboxEl = fixture.debugElement.query(By.css(unitsKeyboardCheckboxS));
+      const valueKeyboardCheckboxEl = fixture.debugElement.query(By.css(valueKeyboardCheckboxS));
+
+      // not present
+      expect(unitsKeyboardCheckboxEl).toBeFalsy();
+      expect(valueKeyboardCheckboxEl).toBeFalsy();
+    });
+
     it('should pull all units when sell all is checked', () => {
       const fixture = MockRender(PortfolioTradeDialogComponent);
       const component = fixture.point.componentInstance;
@@ -610,7 +851,7 @@ describe('PortfolioTradeDialogComponent', () => {
   });
 
   describe('test: onFormSubmit()', () => {
-    it('should notify user if custom total value is missing', async () => {
+    it('should not allow submit if custom value not set', async () => {
       const fixture = MockRender(PortfolioTradeDialogComponent);
       const component = fixture.point.componentInstance;
 
@@ -618,7 +859,8 @@ describe('PortfolioTradeDialogComponent', () => {
 
       await component.onFormSubmit();
 
-      expect(ngMocks.get(DialogServiceUtil).showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'error');
+      const saveButtonEl = ngMocks.find<MatButton>(saveButtonS);
+      expect(saveButtonEl.nativeElement.disabled).toBe(true);
     });
 
     it('should show error message if creating transaction fails', async () => {
@@ -693,14 +935,14 @@ describe('PortfolioTradeDialogComponent', () => {
       const saveButtonEl = fixture.debugElement.query(By.css(saveButtonS));
 
       // set 2 units
-      await incrementEl.nativeElement.click();
-      await incrementEl.nativeElement.click();
+      incrementEl.nativeElement.click();
+      incrementEl.nativeElement.click();
 
       // trigger CD
       fixture.detectChanges();
 
       // submit form
-      await saveButtonEl.nativeElement.click();
+      saveButtonEl.nativeElement.click();
 
       const expectedResult: PortfolioTransactionCreate = {
         date: dateFormatDate(mockData.quote.timestamp * 1000, 'yyyy-MM-dd HH:mm:ss'),
@@ -718,124 +960,5 @@ describe('PortfolioTradeDialogComponent', () => {
       expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
       expect(component.isLoadingSignal()).toBe(false);
     });
-  });
-
-  it('should NOT display a calendar', () => {
-    const fixture = MockRender(PortfolioTradeDialogComponent);
-    const datePickerEl = fixture.debugElement.query(By.css(datePickerS));
-
-    // check if exists
-    expect(datePickerEl).toBeFalsy();
-  });
-});
-
-// ------------------------------------------------------------------------------------------------------------------------
-
-describe('PortfolioTradeDialogComponent: Normal User Type', () => {
-  const testUserData = mockCreateUser({
-    userAccountType: UserAccountEnum.NORMAL_BASIC,
-  });
-
-  const mockPortfolioState = {
-    balance: 1000,
-    cashOnHand: 500,
-    invested: 300,
-    holdingsBalance: 500,
-    holdings: [
-      {
-        symbol: 'AAPL',
-        units: 10,
-        breakEvenPrice: 100,
-        invested: 1000,
-        sector: 'Technology',
-        weight: 1,
-        symbolType: 'STOCK',
-      },
-    ] as PortfolioStateHoldings['holdings'],
-  } as PortfolioStateHoldings;
-
-  beforeEach(() => {
-    return MockBuilder(PortfolioTradeDialogComponent)
-      .keep(ReactiveFormsModule)
-      .keep(NoopAnimationsModule)
-      .keep(UserAccountTypeDirective)
-      .keep(MatCheckboxModule)
-      .keep(MatButtonModule)
-      .keep(NG_MOCKS_ROOT_PROVIDERS) // used this because keeping mat modules
-      .mock(MatDialogModule)
-      .mock(DatePickerComponent)
-      .mock(DialogServiceUtil)
-      .mock(MatDialogRef, {
-        close: jest.fn(),
-      })
-      .provide({
-        provide: MarketApiService,
-        useValue: {
-          getHistoricalPricesOnDate: jest.fn().mockReturnValue(of(mockClosedPrice)),
-          getIsMarketOpenSignal: signal({
-            currentHoliday: [] as string[],
-            allHolidays: [] as string[],
-          } as IsStockMarketOpenExtend),
-        },
-      })
-      .provide({
-        provide: PortfolioUserFacadeService,
-        useValue: {
-          getPortfolioStateHolding: jest.fn().mockReturnValue(signal(mockPortfolioState.holdings[0])),
-          getPortfolioState: signal(mockPortfolioState),
-          createPortfolioOperation: jest.fn().mockReturnValue(Promise.resolve({} as PortfolioTransactionCreate)),
-        },
-      })
-      .provide({
-        provide: AuthenticationUserStoreService,
-        useValue: {
-          state: {
-            getUserData: () => testUserData,
-            isAccountDemoTrading: () => false,
-            isAccountNormalBasic: () => true,
-          } as AuthenticationUserStoreService['state'],
-        },
-      })
-      .provide({ provide: MAT_DIALOG_DATA, useValue: mockData });
-  });
-
-  afterEach(() => {
-    ngMocks.flushTestBed();
-    ngMocks.reset();
-    ngMocks.autoSpy('reset');
-  });
-
-  beforeAll(() => {
-    // freezing time
-    jest.useFakeTimers().setSystemTime(new Date(getCurrentDateDetailsFormat()));
-  });
-
-  afterAll(() => {
-    jest.useRealTimers();
-  });
-
-  it('should create', () => {
-    const fixture = MockRender(PortfolioTradeDialogComponent);
-    expect(fixture).toBeDefined();
-  });
-
-  it('should display any element on UI', () => {
-    const fixture = MockRender(PortfolioTradeDialogComponent);
-    const randomEl = ngMocks.find(incrementUnitsButtonS, { fixture: fixture });
-    const randomEl2 = fixture.debugElement.query(By.css(incrementUnitsButtonS));
-    const randomEl3 = ngMocks.find(fixture.debugElement, incrementUnitsButtonS);
-
-    expect(randomEl).toBeTruthy();
-    expect(randomEl2).toBeTruthy();
-    expect(randomEl3).toBeTruthy();
-  });
-
-  it('should have calendar date picker on the screen', () => {
-    const fixture = MockRender(PortfolioTradeDialogComponent);
-
-    const datePickerEl = ngMocks.find(fixture.debugElement, datePickerS);
-
-    // check if exists
-    expect(datePickerEl).toBeTruthy();
   });
 });

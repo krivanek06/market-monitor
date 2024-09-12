@@ -179,6 +179,7 @@ export class PageGroupsComponent {
     this.dialog.open(GroupCreateDialogComponent, {
       data: {},
       panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+      disableClose: true,
     });
   }
 

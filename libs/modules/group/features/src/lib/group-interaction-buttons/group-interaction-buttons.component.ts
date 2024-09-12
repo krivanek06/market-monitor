@@ -317,7 +317,8 @@ export class GroupInteractionButtonsComponent {
           multiple: true,
           selectUsersCap: allowedMembersToInvite,
         },
-        panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+        disableClose: true,
+        panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
       })
       .afterClosed()
       .pipe(

@@ -47,8 +47,6 @@ export class PortfolioCreateOperationService {
       throw new Error(SYMBOL_NOT_FOUND_ERROR);
     }
 
-    // TODO: check if symbols is not over with USER_HOLDINGS_SYMBOL_LIMIT - and write test
-
     // check data validity
     this.transactionOperationDataValidity(userData, data, symbolPrice);
 

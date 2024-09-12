@@ -197,7 +197,7 @@ const loadSummaries = async (symbolsToUpdate: string[]): Promise<StockSummaryTab
 	// map to correct data structure
 	const summaries = symbolsToUpdate
 		.map((symbol) => {
-			// find data from loaded API - ensureFind throws error if not found
+			// find data from loaded API
 			const quote = updatedQuotes.find((q) => q.symbol === symbol);
 			const priceChange = stockPriceChanges.find((p) => p.symbol === symbol);
 			const profile = profiles.find((p) => p.symbol === symbol);

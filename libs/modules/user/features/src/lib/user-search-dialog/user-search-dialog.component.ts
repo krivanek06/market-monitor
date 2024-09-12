@@ -65,7 +65,7 @@ export type UserSearchDialogData = {
       }
 
       <!-- selected users -->
-      <div class="grid grid-cols-1 gap-4" [ngClass]="{ 'lg:grid-cols-2': dialogData().multiple }">
+      <div class="grid grid-cols-1 gap-4">
         @for (user of selectedUsersSignal(); track user.id) {
           <div
             data-testid="user-search-dialog-item"
