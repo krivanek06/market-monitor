@@ -111,7 +111,8 @@ export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransact
       const isSell = curr.transactionType === 'SELL';
       // update existing holding
       if (existingHolding) {
-        existingHolding.units += isSell ? -curr.units : curr.units;
+        const newUnits = existingHolding.units + (isSell ? -curr.units : curr.units);
+        existingHolding.units = curr.sector === 'CRYPTO' ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
         existingHolding.invested += roundNDigits(
           isSell ? -(existingHolding.breakEvenPrice * curr.units) : curr.unitPrice * curr.units,
         );
