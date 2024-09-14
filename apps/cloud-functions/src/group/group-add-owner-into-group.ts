@@ -6,10 +6,10 @@ import {
   GroupMember,
   USER_NOT_FOUND_ERROR,
 } from '@mm/api-types';
+import { transformUserToGroupMember } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
-import { transformUserToGroupMember } from './../utils/transform.util';
 
 export const groupAddOwnerIntoGroupCall = onCall(async (request) => {
   const userAuthId = request.auth?.uid as string;

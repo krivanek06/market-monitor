@@ -9,10 +9,10 @@ import {
   USER_NOT_FOUND_ERROR,
   UserAccountEnum,
 } from '@mm/api-types';
+import { transformUserToGroupMember } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
-import { transformUserToGroupMember } from './../utils/transform.util';
 
 /**
  * Group accepts the user request to join

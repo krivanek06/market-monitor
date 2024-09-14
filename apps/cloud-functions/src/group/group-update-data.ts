@@ -16,6 +16,8 @@ import {
   getCurrentDateDefaultFormat,
   getObjectEntries,
   roundNDigits,
+  transformUserToBase,
+  transformUserToGroupMember,
 } from '@mm/shared/general-util';
 import {
   groupDocumentHoldingSnapshotsRef,
@@ -27,7 +29,6 @@ import {
   userDocumentRef,
   userDocumentTransactionHistoryRef,
 } from '../models';
-import { transformUserToBase, transformUserToGroupMember } from '../utils';
 
 /**
  * for each group update:

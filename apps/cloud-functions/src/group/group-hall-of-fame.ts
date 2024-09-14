@@ -4,10 +4,9 @@ import {
   HALL_OF_FAME_PORTFOLIO_TOP_LIMIT,
   HallOfFameTopRankData,
 } from '@mm/api-types';
-import { getCurrentDateDetailsFormat } from '@mm/shared/general-util';
+import { getCurrentDateDetailsFormat, transformGroupToBase } from '@mm/shared/general-util';
 import { groupsCollectionRef } from '../models';
 import { aggregationHallOfFameGroupsRef } from '../models/aggregation';
-import { transformGroupToBase } from '../utils';
 
 export const groupHallOfFame = async (): Promise<void> => {
   const searchableRef = groupsCollectionRef().where('isClosed', '==', false);

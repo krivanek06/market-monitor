@@ -12,7 +12,13 @@ import {
   USER_NOT_FOUND_ERROR,
   UserBase,
 } from '@mm/api-types';
-import { createEmptyPortfolioState, getCurrentDateDefaultFormat, getYesterdaysDate } from '@mm/shared/general-util';
+import {
+  createEmptyPortfolioState,
+  getCurrentDateDefaultFormat,
+  getYesterdaysDate,
+  transformUserToBase,
+  transformUserToGroupMember,
+} from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
@@ -25,7 +31,6 @@ import {
   groupsCollectionRef,
   userDocumentRef,
 } from '../models';
-import { transformUserToBase, transformUserToGroupMember } from '../utils';
 
 /**
  * Create a new group

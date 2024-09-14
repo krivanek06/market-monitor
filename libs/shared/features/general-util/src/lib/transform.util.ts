@@ -1,5 +1,5 @@
 import { GroupBase, GroupData, GroupMember, UserBase, UserData } from '@mm/api-types';
-import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
+import { getCurrentDateDefaultFormat } from './date-service.util';
 
 export const transformUserToBase = (user: UserData): UserBase => {
   return {

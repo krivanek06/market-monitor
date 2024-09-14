@@ -4,9 +4,8 @@ import {
   HallOfFameTopRankData,
   UserBase,
 } from '@mm/api-types';
-import { getCurrentDateDetailsFormat } from '@mm/shared/general-util';
+import { getCurrentDateDetailsFormat, transformUserToBase } from '@mm/shared/general-util';
 import { aggregationHallOfFameUsersRef, usersCollectionDemoTradingRef } from '../models';
-import { transformUserToBase } from '../utils';
 
 export const userHallOfFame = async (): Promise<void> => {
   const searchableRef = usersCollectionDemoTradingRef();
