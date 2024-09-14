@@ -227,13 +227,12 @@ export const getPreviousQuarter = (date: DateInput): string => {
   return `${year}-09-30`;
 };
 
-export const DATA_VALIDITY = 7;
 /**
  *
  * @param data
  * @returns whether data is is not older than N days
  */
-export const checkDataValidityDays = <T extends { lastUpdate: string | Date }>(data?: T, days = DATA_VALIDITY) =>
+export const checkDataValidityDays = <T extends { lastUpdate: string | Date }>(data?: T, days = 7) =>
   !!data && !isBefore(new Date(data.lastUpdate), subDays(new Date(), days));
 
 export const getPreviousDate = (date: DateInput): string => {
