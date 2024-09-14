@@ -262,10 +262,7 @@ export class GroupInteractionButtonsComponent {
   @Confirmable('Are you sure you want to close this group?', 'Confirm', true, 'CLOSE')
   async onGroupCloseClick() {
     try {
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('Closing group', 'notification');
-
-      await this.groupApiService.closeGroup(this.groupDetails().groupData.id);
+      this.groupApiService.closeGroup(this.groupDetails().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You closed the group', 'success');

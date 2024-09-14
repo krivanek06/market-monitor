@@ -241,10 +241,11 @@ export class GroupApiService {
     return newGroup;
   }
 
-  async closeGroup(input: string): Promise<GroupData> {
-    const callable = httpsCallable<string, GroupData>(this.functions, 'groupCloseCall');
-    const result = await callable(input);
-    return result.data;
+  closeGroup(groupId: string): Promise<void> {
+    return updateDoc(this.getGroupDocRef(groupId), {
+      isClosed: true,
+      endDate: getCurrentDateDefaultFormat(),
+    } satisfies Partial<GroupData>);
   }
 
   reopenGroup(groupId: string): Promise<void> {
