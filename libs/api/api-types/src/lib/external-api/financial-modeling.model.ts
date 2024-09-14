@@ -1,4 +1,4 @@
-import { OmitStrict } from '../utils';
+import { OmitStrict } from '../ts-utils';
 
 export const AvailableQuotesConst = ['index', 'crypto', 'etf', 'commodity', 'euronext'] as const;
 export type AvailableQuotes = (typeof AvailableQuotesConst)[number];

@@ -1,4 +1,3 @@
-import { Spread } from '@mm/api-types';
 import {
   differenceInBusinessDays,
   differenceInDays,
@@ -127,10 +126,7 @@ export const generateDatesArrayForMonth = (data: { year: number; month: number }
  * the current month
  * @param dates
  */
-export const fillOutMissingDatesForMonth = <T extends { date: string }>(
-  input: T[],
-  ignoreWeekend = true,
-): (T | Spread<[{ [key in keyof T]: null }, { date: string }]>)[] => {
+export const fillOutMissingDatesForMonth = <T extends { date: string }>(input: T[], ignoreWeekend = true) => {
   if (input.length === 0) {
     return input;
   }

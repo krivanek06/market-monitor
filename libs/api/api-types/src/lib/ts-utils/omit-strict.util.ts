@@ -13,11 +13,5 @@ type SpreadTwo<L, R> = Id<
 
 export type Spread<A extends readonly [...any]> = A extends [infer L, ...infer R] ? SpreadTwo<L, Spread<R>> : unknown;
 
-export function merge<A extends object[]>(...a: [...A]) {
-  return Object.assign({}, ...a) as Spread<A>;
-}
-
-export type ChangeFields<T, R> = Omit<T, keyof R> & R;
-
 /* ------------ OMIT --------------------- */
 export type OmitStrict<T, K extends keyof T> = Omit<T, K> & Partial<Record<K, never>>;
