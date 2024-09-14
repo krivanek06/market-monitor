@@ -7,6 +7,7 @@ import {
   doc,
   query,
   setDoc,
+  updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
@@ -246,10 +247,11 @@ export class GroupApiService {
     return result.data;
   }
 
-  async reopenGroup(input: string): Promise<GroupData> {
-    const callable = httpsCallable<string, GroupData>(this.functions, 'groupReopenCall');
-    const result = await callable(input);
-    return result.data;
+  reopenGroup(groupId: string): Promise<void> {
+    return updateDoc(this.getGroupDocRef(groupId), {
+      isClosed: false,
+      endDate: null,
+    } satisfies Partial<GroupData>);
   }
 
   async deleteGroup(input: string): Promise<GroupData> {
