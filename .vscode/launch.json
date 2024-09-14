@@ -12,11 +12,10 @@
         }
       },
       {
-        "command": "yarn mm:serve",
         "name": "Debug Market Monitor",
         "cwd": "${workspaceFolder}",
         "request": "launch",
-        "type": "node-terminal",
+        "type": "chrome",
         "serverReadyAction": {
           "action": "startDebugging",
           "name": "Launch Chrome Debugger",
@@ -24,11 +23,11 @@
         }
       },
       {
-        "command": "yarn mmd:serve",
         "name": "Debug Dashboard",
         "cwd": "${workspaceFolder}",
         "request": "launch",
-        "type": "node-terminal",
+        "type": "chrome",
+        "url": "http://localhost:4200",
         "serverReadyAction": {
           "action": "startDebugging",
           "name": "Launch Chrome Debugger",

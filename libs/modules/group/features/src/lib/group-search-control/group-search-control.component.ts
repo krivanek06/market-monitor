@@ -95,7 +95,7 @@ export class GroupSearchControlComponent implements ControlValueAccessor {
       distinctUntilChanged(),
       switchMap((value) =>
         value.length > 0
-          ? this.groupApiService.getGroupByName(value).pipe(
+          ? this.groupApiService.searchGroupsByName(value).pipe(
               //tap(console.log),
               catchError((e) => {
                 console.log(e);

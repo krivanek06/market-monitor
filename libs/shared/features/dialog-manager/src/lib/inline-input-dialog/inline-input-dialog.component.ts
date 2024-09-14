@@ -12,6 +12,7 @@ export type InlineInputDialogComponentData = {
   initialValue?: string;
 
   validatorMaxLength?: number;
+  validatorMinLength?: number;
 };
 
 @Component({
@@ -90,13 +91,13 @@ export class InlineInputDialogComponent {
     }
 
     // keep original validators and add maxLength validator
-    if (this.data.validatorMaxLength) {
-      this.inputValueForm.controls.value.setValidators([
-        Validators.required,
-        Validators.minLength(4),
-        Validators.maxLength(this.data.validatorMaxLength),
-      ]);
-    }
+    const minLength = this.data.validatorMinLength ?? 0;
+    const maxLength = this.data.validatorMaxLength ?? 100;
+    this.inputValueForm.controls.value.setValidators([
+      Validators.required,
+      Validators.minLength(minLength),
+      Validators.maxLength(maxLength),
+    ]);
   }
 
   cancel(): void {

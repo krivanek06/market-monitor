@@ -1,5 +1,4 @@
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { GroupApiService } from '@mm/api-client';
@@ -14,7 +13,7 @@ import {
   mockCreateUser,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { GroupCreateDialogComponent, GroupDisplayCardComponent, GroupSearchControlComponent } from '@mm/group/features';
+import { GroupDisplayCardComponent, GroupSearchControlComponent } from '@mm/group/features';
 import { GroupDisplayItemComponent } from '@mm/group/ui';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { waitSeconds } from '@mm/shared/general-util';
@@ -88,6 +87,7 @@ describe('PageGroupsComponent', () => {
           userAcceptsGroupInvitation: jest.fn(),
           userDeclinesGroupInvitation: jest.fn(),
           removeRequestToJoinGroup: jest.fn(),
+          createGroup: jest.fn(),
         },
       })
       .provide({
@@ -96,12 +96,7 @@ describe('PageGroupsComponent', () => {
           showActionButtonDialog: jest.fn(),
           showNotificationBar: jest.fn(),
           handleError: jest.fn(),
-        },
-      })
-      .provide({
-        provide: MatDialog,
-        useValue: {
-          open: jest.fn(),
+          showInlineInputDialog: jest.fn(),
         },
       })
       .provide({
@@ -140,7 +135,7 @@ describe('PageGroupsComponent', () => {
   it('should open create group dialog', () => {
     const fixture = MockRender(PageGroupsComponent);
     const component = fixture.point.componentInstance;
-    const dialog = ngMocks.findInstance(MatDialog);
+    const dialogServiceUtil = ngMocks.findInstance(DialogServiceUtil);
 
     fixture.detectChanges();
 
@@ -151,11 +146,72 @@ describe('PageGroupsComponent', () => {
 
     // check if the function is called
     expect(onCreateGroupClickSpy).toHaveBeenCalled();
-    expect(dialog.open).toHaveBeenCalledWith(GroupCreateDialogComponent, expect.any(Object));
+    expect(dialogServiceUtil.showInlineInputDialog).toHaveBeenCalledWith(expect.any(Object));
+  });
+
+  it('should create group if user fills group name into dialog', () => {
+    const dialogServiceUtil = ngMocks.findInstance(DialogServiceUtil);
+    ngMocks.stub(dialogServiceUtil, {
+      ...dialogServiceUtil,
+      showInlineInputDialog: jest.fn().mockResolvedValue('Group Name'),
+    });
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+    const component = fixture.point.componentInstance;
+    const groupApiService = ngMocks.findInstance(GroupApiService);
+
+    fixture.detectChanges();
+
+    const onCreateGroupClickSpy = jest.spyOn(component, 'onCreateGroupClick');
+
+    // Click on create group button
+    ngMocks.click(createGroupS);
+
+    // check if the function is called
+    expect(onCreateGroupClickSpy).toHaveBeenCalled();
+    expect(dialogServiceUtil.showInlineInputDialog).toHaveBeenCalled();
+
+    expect(groupApiService.createGroup).toHaveBeenCalledWith(groupDataOwnerMock, {
+      groupName: 'Group Name',
+    });
+
+    expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith('Group has been created', 'success');
+  });
+
+  it('should not create group if user does not fills group name into dialog', () => {
+    const dialogServiceUtil = ngMocks.findInstance(DialogServiceUtil);
+    ngMocks.stub(dialogServiceUtil, {
+      ...dialogServiceUtil,
+      showInlineInputDialog: jest.fn().mockResolvedValue(undefined),
+    });
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+    const component = fixture.point.componentInstance;
+    const groupApiService = ngMocks.findInstance(GroupApiService);
+
+    fixture.detectChanges();
+
+    const onCreateGroupClickSpy = jest.spyOn(component, 'onCreateGroupClick');
+
+    // Click on create group button
+    ngMocks.click(createGroupS);
+
+    // check if the function is called
+    expect(onCreateGroupClickSpy).toHaveBeenCalled();
+    expect(dialogServiceUtil.showInlineInputDialog).toHaveBeenCalled();
+
+    expect(groupApiService.createGroup).not.toHaveBeenCalled();
+    expect(dialogServiceUtil.showNotificationBar).not.toHaveBeenCalled();
   });
 
   it('should not open create group dialog if user is owner of many groups', () => {
-    const dialog = ngMocks.findInstance(MatDialog);
+    const dialogServiceUtil = ngMocks.findInstance(DialogServiceUtil);
     const authService = ngMocks.findInstance(AuthenticationUserStoreService);
 
     // Set user with many groups
@@ -199,11 +255,11 @@ describe('PageGroupsComponent', () => {
     expect(component.isCreateGroupDisabledSignal()).toBe(true);
     expect(createGroupEl.nativeElement.disabled).toBeTruthy();
     expect(onCreateGroupClickSpy).not.toHaveBeenCalled();
-    expect(dialog.open).not.toHaveBeenCalled();
+    expect(dialogServiceUtil.showInlineInputDialog).not.toHaveBeenCalled();
   });
 
   it('should not open create group dialog if user is demo account', () => {
-    const dialog = ngMocks.findInstance(MatDialog);
+    const dialogServiceUtil = ngMocks.findInstance(DialogServiceUtil);
     const authService = ngMocks.findInstance(AuthenticationUserStoreService);
 
     // Set user as demo account
@@ -240,7 +296,7 @@ describe('PageGroupsComponent', () => {
     expect(component.isCreateGroupDisabledSignal()).toBe(true);
     expect(createGroupEl.nativeElement.disabled).toBeTruthy();
     expect(onCreateGroupClickSpy).not.toHaveBeenCalled();
-    expect(dialog.open).not.toHaveBeenCalled();
+    expect(dialogServiceUtil.showInlineInputDialog).not.toHaveBeenCalled();
   });
 
   it('should redirect to group page on group click', () => {

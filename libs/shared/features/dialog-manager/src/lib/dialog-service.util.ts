@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FirebaseError } from 'firebase/app';
-import { Observable, firstValueFrom, of } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { ActionButtonDialog, ActionButtonDialogComponent } from './action-button-dialog/action-button-dialog.component';
 import { ConfirmDialogComponent, ConfirmDialogComponentData } from './confirm-dialog/confirm-dialog.component';
 import { SCREEN_DIALOGS } from './dialog.model';
@@ -156,10 +156,10 @@ export class DialogServiceUtil {
     return result;
   }
 
-  showInlineInputDialog(data: InlineInputDialogComponentData): Observable<string | undefined> {
+  async showInlineInputDialog(data: InlineInputDialogComponentData): Promise<string | undefined> {
     if (!this.matDialog) {
       console.warn('DialogService.matDialog not initialized');
-      return of(undefined);
+      return undefined;
     }
 
     const dialogRef = this.matDialog.open<InlineInputDialogComponent, InlineInputDialogComponentData>(
@@ -170,7 +170,7 @@ export class DialogServiceUtil {
       },
     );
 
-    const result = dialogRef.afterClosed();
+    const result = await firstValueFrom(dialogRef.afterClosed());
     return result;
   }
 }

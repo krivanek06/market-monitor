@@ -10,10 +10,7 @@ import { UserBase, UserData } from './user.model';
 
 export type GroupCreateInput = {
   groupName: string;
-  isPublic: boolean;
-  isOwnerMember: boolean;
-  memberInvitedUserIds: string[];
-  imageUrl: string | null;
+  memberInvitedUserIds?: string[];
 };
 
 export type GroupBaseInput = {

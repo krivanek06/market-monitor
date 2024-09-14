@@ -6,10 +6,15 @@ import {
   collection,
   doc,
   query,
+  setDoc,
   where,
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
+import { faker } from '@faker-js/faker';
 import {
+  GROUP_OWNER_LIMIT,
+  GROUP_OWNER_LIMIT_ERROR,
+  GROUP_SAME_NAME_ERROR,
   GroupBaseInput,
   GroupBaseInputInviteMembers,
   GroupCreateInput,
@@ -23,14 +28,26 @@ import {
   PortfolioStateHolding,
   PortfolioTransaction,
   PortfolioTransactionMore,
+  USER_HAS_DEMO_ACCOUNT_ERROR,
+  UserBase,
+  UserData,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { roundNDigits } from '@mm/shared/general-util';
+import {
+  createEmptyPortfolioState,
+  getCurrentDateDefaultFormat,
+  getYesterdaysDate,
+  roundNDigits,
+  transformUserToBase,
+  transformUserToGroupMember,
+} from '@mm/shared/general-util';
 import { limit } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
-import { Observable, catchError, combineLatest, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, combineLatest, lastValueFrom, map, of, switchMap, take } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 import { MarketApiService } from '../market-api/market-api.service';
+import { UserApiService } from '../user-api/user-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +56,7 @@ export class GroupApiService {
   private functions = inject(Functions);
   private firestore = inject(Firestore);
   private marketApiService = inject(MarketApiService);
+  private userApiService = inject(UserApiService);
 
   getGroupDataById(groupId: string): Observable<GroupData | undefined> {
     return rxDocData(this.getGroupDocRef(groupId), { idField: 'id' });
@@ -74,7 +92,7 @@ export class GroupApiService {
     return rxCollectionData(query(this.getGroupCollectionRef(), where('id', 'in', groupIds)));
   }
 
-  getGroupByName(name: string, limitResult = 5): Observable<GroupData[]> {
+  searchGroupsByName(name: string, limitResult = 5): Observable<GroupData[]> {
     return rxCollectionData(
       query(
         this.getGroupCollectionRef(),
@@ -82,6 +100,12 @@ export class GroupApiService {
         where('nameLowerCase', '<=', name.toLowerCase() + '\uf8ff'),
         limit(limitResult),
       ),
+    );
+  }
+
+  getGroupByName(name: string): Observable<GroupData | undefined> {
+    return rxCollectionData(query(this.getGroupCollectionRef(), where('nameLowerCase', '==', name.toUpperCase()))).pipe(
+      map((data) => data[0]),
     );
   }
 
@@ -152,10 +176,68 @@ export class GroupApiService {
     );
   }
 
-  async createGroup(input: GroupCreateInput): Promise<GroupData> {
-    const callable = httpsCallable<GroupCreateInput, GroupData>(this.functions, 'groupCreateCall');
-    const result = await callable(input);
-    return result.data;
+  async createGroup(userData: UserData, input: GroupCreateInput): Promise<GroupData> {
+    const userBase = transformUserToBase(userData);
+    const groupMembers = transformUserToGroupMember(userData, 1);
+    const group = await lastValueFrom(this.getGroupByName(input.groupName).pipe(take(1)));
+
+    // check if group already exists
+    if (group) {
+      throw new Error(GROUP_SAME_NAME_ERROR);
+    }
+
+    // demo account can not be added to the group
+    if (userData.isDemo) {
+      throw new Error(USER_HAS_DEMO_ACCOUNT_ERROR);
+    }
+
+    // check limit
+    if (userData.groups.groupOwner.length >= GROUP_OWNER_LIMIT) {
+      throw new Error(GROUP_OWNER_LIMIT_ERROR);
+    }
+
+    // create group
+    const newGroup = this.createGroupData(input, userBase);
+
+    // save new group
+    setDoc(this.getGroupDocRef(newGroup.id), newGroup);
+
+    // create additional documents for group
+    setDoc(this.getGroupPortfolioTransactionDocRef(newGroup.id), {
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      data: [],
+      transactionBestReturn: [],
+      transactionsWorstReturn: [],
+    });
+
+    // create members collection
+    setDoc(this.getGroupMembersDocRef(newGroup.id), {
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      data: [groupMembers],
+    });
+
+    // create portfolio snapshots collection
+    setDoc(this.getGroupPortfolioSnapshotsDocRef(newGroup.id), {
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      data: [],
+    });
+
+    // create holding snapshots collection
+    setDoc(this.getGroupHoldingSnapshotsDocRef(newGroup.id), {
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      data: [],
+    });
+
+    // update owner's data
+    this.userApiService.updateUser(userData.id, {
+      groups: {
+        ...userData.groups,
+        groupOwner: [...userData.groups.groupOwner, newGroup.id],
+        groupMember: [...userData.groups.groupMember, newGroup.id],
+      },
+    });
+
+    return newGroup;
   }
 
   async closeGroup(input: string): Promise<GroupData> {
@@ -302,5 +384,37 @@ export class GroupApiService {
     return doc(this.getGroupCollectionMoreInformationRef(userId), 'members').withConverter(
       assignTypesClient<GroupMembersData>(),
     );
+  }
+
+  /**
+   *
+   * @param data - basic information about the group
+   * @param owner - who the group belongs to
+   * @param isOwnerMember - is the owner a member of the group or not
+   * @param isDemo - if true, group is for demo purposes
+   * @returns created group
+   */
+  private createGroupData(data: GroupCreateInput, owner: UserBase, isOwnerMember = false): GroupData {
+    return {
+      id: uuidv4(),
+      name: data.groupName,
+      nameLowerCase: data.groupName.toLowerCase(),
+      imageUrl: faker.image.urlPicsumPhotos(),
+      isPublic: true,
+      memberInvitedUserIds: [],
+      ownerUserId: owner.id,
+      ownerUser: owner,
+      createdDate: getCurrentDateDefaultFormat(),
+      isClosed: false,
+      memberRequestUserIds: [],
+      memberUserIds: isOwnerMember ? [owner.id] : [],
+      endDate: null,
+      modifiedSubCollectionDate: getYesterdaysDate(),
+      portfolioState: {
+        ...createEmptyPortfolioState(),
+      },
+      systemRank: {},
+      numberOfMembers: 1,
+    };
   }
 }

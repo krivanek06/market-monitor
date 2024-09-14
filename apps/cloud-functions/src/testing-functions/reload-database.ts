@@ -7,16 +7,35 @@ import {
   TEST_CUSTOM_USER_1,
   TEST_PASSWORD,
   UserAccountEnum,
+  UserBase,
   UserData,
 } from '@mm/api-types';
-import { getRandomNumber, waitSeconds } from '@mm/shared/general-util';
+import {
+  createEmptyPortfolioState,
+  getCurrentDateDefaultFormat,
+  getRandomNumber,
+  getYesterdaysDate,
+  transformUserToBase,
+  transformUserToGroupMember,
+  waitSeconds,
+} from '@mm/shared/general-util';
 import { format, subDays } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
-import { calculateGroupMembersPortfolioState, groupCreate, groupMemberAccept } from '../group';
-import { groupDocumentPortfolioStateSnapshotsRef } from '../models';
+import { FieldValue } from 'firebase-admin/firestore';
+import { v4 as uuidv4 } from 'uuid';
+import { calculateGroupMembersPortfolioState, groupMemberAccept } from '../group';
+import {
+  groupDocumentHoldingSnapshotsRef,
+  groupDocumentMembersRef,
+  groupDocumentPortfolioStateSnapshotsRef,
+  groupDocumentRef,
+  groupDocumentTransactionsRef,
+  userDocumentRef,
+} from '../models';
 import { CreateDemoAccountService, userCreate } from '../user';
 import { isFirebaseEmulator } from '../utils';
+
 /**
  * Reload the database with new testing data
  * ONLY USE FOR TESTING / LOCAL DEVELOPMENT
@@ -198,7 +217,7 @@ const createRandomGroup = async (
   };
 
   // create groups
-  const groupData = await groupCreate(groupInput, owner.id, true);
+  const groupData = await groupCreate(groupInput, owner, true);
 
   // log
   console.log(`Group created: ${groupData.id} - ${groupData.name}`);
@@ -240,4 +259,99 @@ const createRandomPortfolioSnapshotsFromCurrentOne = (portfolioState: PortfolioS
   }
 
   return portfolioInPast;
+};
+
+/**
+ * Create a new group
+ * - create group
+ * - create additional documents for group: transactions, members
+ * - add group into users.groupOwner
+ * - add group into users.groupInvitations
+ */
+const groupCreate = async (data: GroupCreateInput, userData: UserData, isDemo = false): Promise<GroupData> => {
+  // load user data from firebase
+  const userDataDoc = await userDocumentRef(userData.id).get();
+  const isOwnerMember = data.isOwnerMember;
+
+  const userBase = transformUserToBase(userData);
+  const groupMembers = transformUserToGroupMember(userData, 1);
+
+  // create group
+  const newGroup = createGroup(data, userBase);
+
+  // save new group
+  await groupDocumentRef(newGroup.id).set(newGroup);
+
+  // create additional documents for group
+  await groupDocumentTransactionsRef(newGroup.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: [],
+    transactionBestReturn: [],
+    transactionsWorstReturn: [],
+  });
+
+  // create members collection
+  await groupDocumentMembersRef(newGroup.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: isOwnerMember ? [groupMembers] : [],
+  });
+
+  // create portfolio snapshots collection
+  await groupDocumentPortfolioStateSnapshotsRef(newGroup.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: [],
+  });
+
+  // create holding snapshots collection
+  await groupDocumentHoldingSnapshotsRef(newGroup.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
+    data: [],
+  });
+
+  // update member list
+  for await (const memberId of data?.memberInvitedUserIds ?? []) {
+    await userDocumentRef(memberId).update({
+      'groups.groupInvitations': FieldValue.arrayUnion(newGroup.id),
+    });
+  }
+
+  // update the owner's data in users collection
+  userDataDoc.ref.update({
+    'groups.groupMember': FieldValue.arrayUnion(newGroup.id),
+    'groups.groupOwner': FieldValue.arrayUnion(newGroup.id),
+  });
+
+  return newGroup;
+};
+
+/**
+ *
+ * @param data - basic information about the group
+ * @param owner - who the group belongs to
+ * @param isOwnerMember - is the owner a member of the group or not
+ * @param isDemo - if true, group is for demo purposes
+ * @returns created group
+ */
+const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
+  return {
+    id: `demo_${uuidv4()}`,
+    name: data.groupName,
+    nameLowerCase: data.groupName.toLowerCase(),
+    imageUrl: data.imageUrl || faker.image.urlPicsumPhotos(),
+    isPublic: true,
+    memberInvitedUserIds: [],
+    ownerUserId: owner.id,
+    ownerUser: owner,
+    createdDate: getCurrentDateDefaultFormat(),
+    isClosed: false,
+    memberRequestUserIds: [],
+    memberUserIds: [owner.id],
+    endDate: null,
+    modifiedSubCollectionDate: getYesterdaysDate(),
+    portfolioState: {
+      ...createEmptyPortfolioState(),
+    },
+    systemRank: {},
+    numberOfMembers: data.isOwnerMember ? 1 : 0,
+  };
 };
