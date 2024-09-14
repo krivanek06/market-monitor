@@ -42,7 +42,7 @@ import {
   transformUserToBase,
   transformUserToGroupMember,
 } from '@mm/shared/general-util';
-import { limit } from 'firebase/firestore';
+import { arrayUnion, limit } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
 import { Observable, catchError, combineLatest, lastValueFrom, map, of, switchMap, take } from 'rxjs';
@@ -241,15 +241,15 @@ export class GroupApiService {
     return newGroup;
   }
 
-  closeGroup(groupId: string): Promise<void> {
-    return updateDoc(this.getGroupDocRef(groupId), {
+  closeGroup(groupId: string) {
+    updateDoc(this.getGroupDocRef(groupId), {
       isClosed: true,
       endDate: getCurrentDateDefaultFormat(),
     } satisfies Partial<GroupData>);
   }
 
-  reopenGroup(groupId: string): Promise<void> {
-    return updateDoc(this.getGroupDocRef(groupId), {
+  reopenGroup(groupId: string) {
+    updateDoc(this.getGroupDocRef(groupId), {
       isClosed: false,
       endDate: null,
     } satisfies Partial<GroupData>);
@@ -290,9 +290,24 @@ export class GroupApiService {
     return result.data;
   }
 
-  async addOwnerOfGroupIntoGroup(groupId: string): Promise<void> {
-    const callable = httpsCallable<string, void>(this.functions, 'groupAddOwnerIntoGroupCall');
-    await callable(groupId);
+  addOwnerOfGroupIntoGroup(userData: UserData, groupData: GroupData) {
+    // update group
+    updateDoc(this.getGroupDocRef(groupData.id), {
+      memberUserIds: [...groupData.memberUserIds, userData.id],
+    } satisfies Partial<GroupData>);
+
+    // update group member data
+    updateDoc(this.getGroupMembersDocRef(groupData.id), {
+      data: arrayUnion(transformUserToGroupMember(userData, groupData.memberUserIds.length + 1)),
+    });
+
+    // update user
+    this.userApiService.updateUser(userData.id, {
+      groups: {
+        ...userData.groups,
+        groupMember: [...userData.groups.groupMember, groupData.id],
+      },
+    });
   }
 
   async inviteUserToGroup(input: GroupBaseInput): Promise<void> {

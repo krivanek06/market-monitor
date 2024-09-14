@@ -211,7 +211,8 @@ export class GroupInteractionButtonsComponent {
   groupApiService = inject(GroupApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
 
-  isDemoAccount = this.authenticationUserService.state.isDemoAccount;
+  readonly isDemoAccount = this.authenticationUserService.state.isDemoAccount;
+  readonly userData = this.authenticationUserService.state.getUserData;
   private dialog = inject(MatDialog);
   private router = inject(Router);
 
@@ -285,11 +286,8 @@ export class GroupInteractionButtonsComponent {
 
   async onAddOwnerToGroupClick() {
     try {
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('Saving data and adding you to the group', 'notification');
-
       // add myself as owner
-      await this.groupApiService.addOwnerOfGroupIntoGroup(this.groupDetails().groupData.id);
+      this.groupApiService.addOwnerOfGroupIntoGroup(this.userData(), this.groupDetails().groupData);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You added yourself to the group', 'success');

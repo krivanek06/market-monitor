@@ -1,4 +1,3 @@
-export * from './group-add-owner-into-group';
 export * from './group-delete';
 export * from './group-hall-of-fame';
 export * from './group-member-accept';
