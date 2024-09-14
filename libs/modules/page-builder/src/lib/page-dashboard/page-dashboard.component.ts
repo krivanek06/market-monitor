@@ -134,7 +134,7 @@ import {
       }
     </div>
 
-    <div class="mb-8 grid grid-cols-2 gap-x-10">
+    <div class="mb-8 grid grid-cols-1 gap-x-10 lg:grid-cols-2">
       <!-- portfolio growth chart -->
       @if (portfolioUserFacadeService.getPortfolioGrowth(); as portfolioGrowth) {
         <app-portfolio-growth-chart

@@ -14,7 +14,7 @@ import { map } from 'rxjs';
   standalone: true,
   imports: [HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule],
   template: `
-    <div class="flex flex-col items-center justify-between gap-3 lg:flex-row">
+    <div class="flex items-center justify-between gap-3">
       <!-- select chart title -->
       <div class="text-wt-primary text-lg">{{ headerTitle() }}</div>
 
