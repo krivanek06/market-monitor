@@ -1,4 +1,8 @@
-import { GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR, GROUP_NOT_FOUND_ERROR, GroupBaseInput } from '@mm/api-types';
+import {
+  GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR,
+  GROUP_NOT_FOUND_ERROR,
+  GroupRemoveMembersInput,
+} from '@mm/api-types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../models';
@@ -14,7 +18,7 @@ import { groupDocumentMembersRef, groupDocumentRef, userDocumentRef } from '../m
  */
 export const groupMemberRemoveCall = onCall(async (request) => {
   const userAuthId = request.auth?.uid as string;
-  const data = request.data as GroupBaseInput;
+  const data = request.data as GroupRemoveMembersInput;
 
   const groupData = (await groupDocumentRef(data.groupId).get()).data();
   const groupMemberData = (await groupDocumentMembersRef(data.groupId).get()).data();
@@ -30,24 +34,25 @@ export const groupMemberRemoveCall = onCall(async (request) => {
   }
 
   // check if authenticated user is owner or the user who leaves
-  const canBeUserRemove = groupData.ownerUserId === userAuthId || data.userId === userAuthId;
-  if (!canBeUserRemove) {
+  if (groupData.ownerUserId !== userAuthId) {
     throw new HttpsError('aborted', GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR);
   }
 
   // remove user from group
   await groupDocumentRef(data.groupId).update({
-    memberUserIds: FieldValue.arrayRemove(data.userId),
+    memberUserIds: FieldValue.arrayRemove(...data.userIds),
     numberOfMembers: FieldValue.increment(-1), // increment number of members
   });
 
   // remove user from group member
   await groupDocumentMembersRef(data.groupId).update({
-    data: groupMemberData.data.filter((user) => user.id !== data.userId),
+    data: groupMemberData.data.filter((user) => !data.userIds.includes(user.id)),
   });
 
   // update user info
-  await userDocumentRef(data.userId).update({
-    'groups.groupMember': FieldValue.arrayRemove(data.groupId),
-  });
+  for (const userId of data.userIds) {
+    await userDocumentRef(userId).update({
+      'groups.groupMember': FieldValue.arrayRemove(data.groupId),
+    });
+  }
 });

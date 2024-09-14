@@ -210,10 +210,6 @@ const createRandomGroup = async (
 
   const groupInput: GroupCreateInput = {
     groupName: `Demo_${faker.company.name()}`,
-    imageUrl: faker.image.url(),
-    isOwnerMember: true,
-    isPublic: true,
-    memberInvitedUserIds: randomUsersNotOwnerToInvite,
   };
 
   // create groups
@@ -271,7 +267,6 @@ const createRandomPortfolioSnapshotsFromCurrentOne = (portfolioState: PortfolioS
 const groupCreate = async (data: GroupCreateInput, userData: UserData, isDemo = false): Promise<GroupData> => {
   // load user data from firebase
   const userDataDoc = await userDocumentRef(userData.id).get();
-  const isOwnerMember = data.isOwnerMember;
 
   const userBase = transformUserToBase(userData);
   const groupMembers = transformUserToGroupMember(userData, 1);
@@ -293,7 +288,7 @@ const groupCreate = async (data: GroupCreateInput, userData: UserData, isDemo = 
   // create members collection
   await groupDocumentMembersRef(newGroup.id).set({
     lastModifiedDate: getCurrentDateDefaultFormat(),
-    data: isOwnerMember ? [groupMembers] : [],
+    data: [groupMembers],
   });
 
   // create portfolio snapshots collection
@@ -337,7 +332,7 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
     id: `demo_${uuidv4()}`,
     name: data.groupName,
     nameLowerCase: data.groupName.toLowerCase(),
-    imageUrl: data.imageUrl || faker.image.urlPicsumPhotos(),
+    imageUrl: faker.image.urlPicsumPhotos(),
     isPublic: true,
     memberInvitedUserIds: [],
     ownerUserId: owner.id,
@@ -352,6 +347,6 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
       ...createEmptyPortfolioState(),
     },
     systemRank: {},
-    numberOfMembers: data.isOwnerMember ? 1 : 0,
+    numberOfMembers: 1,
   };
 };

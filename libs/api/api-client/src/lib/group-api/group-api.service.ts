@@ -331,9 +331,33 @@ export class GroupApiService {
    *
    * @param input
    */
-  async removeGroupMember(input: GroupBaseInput): Promise<void> {
-    const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupMemberRemoveCall');
-    await callable(input);
+  async leaveGroup(userData: UserData, groupData: GroupData): Promise<void> {
+    // check if user is user is member
+    if (!groupData.memberUserIds.includes(userData.id)) {
+      return;
+    }
+
+    // update group
+    updateDoc(this.getGroupDocRef(groupData.id), {
+      memberUserIds: groupData.memberUserIds.filter((id) => id !== userData.id),
+      numberOfMembers: groupData.numberOfMembers - 1,
+    } satisfies Partial<GroupData>);
+
+    // load group members data
+    const groupMembersData = await lastValueFrom(this.getGroupMembersDataById(groupData.id).pipe(take(1)));
+
+    // update group member data
+    updateDoc(this.getGroupMembersDocRef(groupData.id), {
+      data: groupMembersData?.data.filter((user) => user.id !== userData.id),
+    });
+
+    // update user
+    this.userApiService.updateUser(userData.id, {
+      groups: {
+        ...userData.groups,
+        groupMember: userData.groups.groupMember.filter((id) => id !== groupData.id),
+      },
+    });
   }
 
   /**

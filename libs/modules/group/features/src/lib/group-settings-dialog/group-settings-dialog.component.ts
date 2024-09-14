@@ -137,9 +137,9 @@ export class GroupSettingsDialogComponent {
   private dialogRef = inject(MatDialogRef<GroupSettingsDialogComponent>);
   private dialogServiceUtil = inject(DialogServiceUtil);
   private groupApiService = inject(GroupApiService);
-  data = inject<GroupSettingsDialogComponentData>(MAT_DIALOG_DATA);
+  readonly data = inject<GroupSettingsDialogComponentData>(MAT_DIALOG_DATA);
 
-  form = new FormGroup({
+  readonly form = new FormGroup({
     groupName: new FormControl('', {
       validators: [requiredValidator, minLengthValidator(4), maxLengthValidator(28)],
       nonNullable: true,
@@ -148,8 +148,8 @@ export class GroupSettingsDialogComponent {
     uploadedImage: new FormControl<string | null>(null),
   });
 
-  groupDataSignal = toSignal(this.groupApiService.getGroupDataById(this.data.groupId));
-  groupMembersSignal = toSignal(
+  readonly groupDataSignal = toSignal(this.groupApiService.getGroupDataById(this.data.groupId));
+  readonly groupMembersSignal = toSignal(
     this.groupApiService.getGroupMembersDataById(this.data.groupId).pipe(map((d) => d?.data ?? [])),
     {
       initialValue: [],
@@ -159,7 +159,7 @@ export class GroupSettingsDialogComponent {
   /**
    * save users that will be removed from the group
    */
-  removingGroupMembers = signal<GroupMember[]>([]);
+  readonly removingGroupMembers = signal<GroupMember[]>([]);
 
   constructor() {
     this.initForm();

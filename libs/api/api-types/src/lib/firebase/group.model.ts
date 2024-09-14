@@ -134,6 +134,10 @@ export type GroupTransactionsData = DataDocsWrapper<PortfolioTransaction> & {
 export type GroupMembersData = DataDocsWrapper<GroupMember>;
 export type GroupPortfolioStateSnapshotsData = DataDocsWrapper<PortfolioState>;
 export type GroupHoldingSnapshotsData = DataDocsWrapper<PortfolioStateHoldingBase>;
+export type GroupRemoveMembersInput = {
+  groupId: string;
+  userIds: string[];
+};
 
 export type GroupDetails = {
   groupData: GroupData;
