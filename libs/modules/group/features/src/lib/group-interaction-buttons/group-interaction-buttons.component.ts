@@ -130,21 +130,24 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           Decline Request
         </button>
 
-        <button
-          *appGroupUserHasRole="
-            groupDetails().groupData.id;
-            exclude: ['groupRequested', 'groupMember', 'groupInvitations', 'groupOwner']
-          "
-          [disabled]="isDemoAccount()"
-          (click)="onRequestToJoinClick()"
-          type="button"
-          mat-stroked-button
-          color="accent"
-          [matTooltip]="tooltips.tooltipRequestToJoin"
-        >
-          <mat-icon>person</mat-icon>
-          Send Request To Join
-        </button>
+        <!-- can join only public group -->
+        @if (groupDetails().groupData.isPublic) {
+          <button
+            *appGroupUserHasRole="
+              groupDetails().groupData.id;
+              exclude: ['groupRequested', 'groupMember', 'groupInvitations', 'groupOwner']
+            "
+            [disabled]="isDemoAccount()"
+            (click)="onRequestToJoinClick()"
+            type="button"
+            mat-stroked-button
+            color="accent"
+            [matTooltip]="tooltips.tooltipRequestToJoin"
+          >
+            <mat-icon>person</mat-icon>
+            Send Request To Join
+          </button>
+        }
 
         <!-- owner - invite people -->
         <button
