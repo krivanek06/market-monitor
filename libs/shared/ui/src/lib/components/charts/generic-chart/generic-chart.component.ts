@@ -298,7 +298,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           minSize: '30px',
           maxSize: '120px',
           tooltip: {
-            headerFormat: `<p style="color:${ColorScheme.GRAY_LIGHT_STRONG_VAR}; font-size: 12px">{series.name}</p>`,
+            headerFormat: `<p style="color:${ColorScheme.GRAY_MEDIUM_VAR}; font-size: 12px">{series.name}</p>`,
           },
           layoutAlgorithm: {
             splitSeries: false,

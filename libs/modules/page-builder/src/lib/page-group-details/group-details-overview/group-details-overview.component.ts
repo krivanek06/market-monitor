@@ -99,7 +99,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <!-- divider -->
       <div class="mb-8 pt-4">
-        <mat-divider></mat-divider>
+        <mat-divider />
       </div>
 
       <!-- portfolio change -->
@@ -112,7 +112,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <!-- divider -->
       <div class="pb-4">
-        <mat-divider></mat-divider>
+        <mat-divider />
       </div>
 
       <app-portfolio-growth-chart
@@ -138,43 +138,45 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       />
 
       <!-- member -->
-      <div *ngIf="groupDetailsSignal.groupMembersData.length > 0" class="mb-12 grid gap-4">
-        <div class="flex items-center justify-between">
-          <app-section-title
-            title="Members [{{ groupDetailsSignal.groupMembersData.length }} / {{ GROUP_MEMBER_LIMIT }}]"
-            matIcon="group"
-          />
+      @if (groupDetailsSignal.groupMembersData.length > 0) {
+        <div class="mb-12 grid gap-4">
+          <div class="flex items-center justify-between">
+            <app-section-title
+              title="Members [{{ groupDetailsSignal.groupMembersData.length }} / {{ GROUP_MEMBER_LIMIT }}]"
+              matIcon="group"
+            />
+            <!-- show more members button -->
+            <app-show-more-button
+              class="hidden sm:block"
+              [(showMoreToggle)]="displayEveryMember"
+              [itemsLimit]="displayLimitInitial"
+              [itemsTotal]="groupDetailsSignal.groupMembersData.length"
+            />
+          </div>
+          <!-- member list -->
+          <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            @for (user of displayedMembers(); track user.id; let i = $index) {
+              <app-position-card
+                (itemClicked)="onMemberClick(user)"
+                [clickable]="true"
+                [currentPositions]="i + 1"
+                [previousPosition]="user.position.previousGroupMemberPosition"
+              >
+                <app-user-display-item [userData]="user" />
+              </app-position-card>
+            }
+          </div>
           <!-- show more members button -->
-          <app-show-more-button
-            class="hidden sm:block"
-            [(showMoreToggle)]="displayEveryMember"
-            [itemsLimit]="displayLimitInitial"
-            [itemsTotal]="groupDetailsSignal.groupMembersData.length"
-          />
+          <div class="flex justify-end">
+            <app-show-more-button
+              class="block sm:hidden"
+              [(showMoreToggle)]="displayEveryMember"
+              [itemsLimit]="displayLimitInitial"
+              [itemsTotal]="groupDetailsSignal.groupMembersData.length"
+            />
+          </div>
         </div>
-        <!-- member list -->
-        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          @for (user of displayedMembers(); track user.id; let i = $index) {
-            <app-position-card
-              (itemClicked)="onMemberClick(user)"
-              [clickable]="true"
-              [currentPositions]="i + 1"
-              [previousPosition]="user.position.previousGroupMemberPosition"
-            >
-              <app-user-display-item [userData]="user" />
-            </app-position-card>
-          }
-        </div>
-        <!-- show more members button -->
-        <div class="flex justify-end">
-          <app-show-more-button
-            class="block sm:hidden"
-            [(showMoreToggle)]="displayEveryMember"
-            [itemsLimit]="displayLimitInitial"
-            [itemsTotal]="groupDetailsSignal.groupMembersData.length"
-          />
-        </div>
-      </div>
+      }
 
       @if (groupDetailsSignal.groupTransactionsData.length > 0) {
         <div #groupBubble class="mb-12 hidden gap-x-4 sm:grid xl:grid-cols-2">
