@@ -7,6 +7,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
+import { GroupApiService } from '@mm/api-client';
 import { accountDescription } from '@mm/api-types';
 import { ChangePasswordDialogComponent } from '@mm/authentication/authentication-forms';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
@@ -216,6 +217,8 @@ export class UserSettingsDialogComponent implements OnInit {
   private dialog = inject(MatDialog);
   private router = inject(Router);
   private dialogRef = inject(MatDialogRef<UserSettingsDialogComponent>);
+  private groupApiService = inject(GroupApiService);
+
   isDevActive = inject(IS_DEV_TOKEN, {
     optional: true,
   });
@@ -249,6 +252,15 @@ export class UserSettingsDialogComponent implements OnInit {
 
   @Confirmable('Are you sure you want to delete your account?', 'Confirm', true, 'DELETE')
   onDeleteAccount(): void {
+    // delete groups that user is owner
+    const owner = this.authenticationUserStoreService.state.getUserData().groups.groupOwner;
+    for (const group of owner) {
+      this.groupApiService.deleteGroup(group);
+    }
+
+    // perform delete account
+    this.authenticationAccountService.deleteAccount();
+
     // notify user
     this.dialogServiceUtil.showNotificationBar('Your account has been deleted', 'success');
 
@@ -260,9 +272,6 @@ export class UserSettingsDialogComponent implements OnInit {
 
     // redirect to home
     this.router.navigate([ROUTES_MAIN.LOGIN]);
-
-    // perform delete account
-    this.authenticationAccountService.deleteAccount();
   }
 
   onChangePassword(): void {
