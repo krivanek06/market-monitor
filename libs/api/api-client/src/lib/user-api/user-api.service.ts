@@ -98,7 +98,7 @@ export class UserApiService {
     return rxCollectionData(
       query(
         this.userCollection(),
-        where('personal.displayNameLowercase', '>=', name.toUpperCase()),
+        where('personal.displayNameLowercase', '>=', name.toLowerCase()),
         where('personal.displayNameLowercase', '<=', name.toLowerCase() + '\uf8ff'),
         where('isDemo', '==', false),
         limit(10),
