@@ -19,7 +19,9 @@ import { map } from 'rxjs';
       <div class="text-wt-primary text-lg">Portfolio Change</div>
 
       <!-- date range -->
-      <app-date-range-slider [style.width.px]="dateRangeWidth()" [formControl]="sliderControl" />
+      @if ((data()?.length ?? 0) > 0) {
+        <app-date-range-slider [style.width.px]="dateRangeWidth()" [formControl]="sliderControl" />
+      }
     </div>
 
     @if (isHighcharts()) {
