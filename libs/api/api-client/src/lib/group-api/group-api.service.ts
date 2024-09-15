@@ -24,6 +24,7 @@ import {
   GroupHoldingSnapshotsData,
   GroupMembersData,
   GroupPortfolioStateSnapshotsData,
+  GroupRemoveMembersInput,
   GroupSettingsChangeInput,
   GroupTransactionsData,
   PortfolioStateHolding,
@@ -271,8 +272,17 @@ export class GroupApiService {
     await callable(input);
   }
 
-  async changeGroupSettings(input: GroupSettingsChangeInput): Promise<void> {
-    const callable = httpsCallable<GroupSettingsChangeInput, GroupData>(this.functions, 'groupSettingsChangeCall');
+  changeGroupSettings(input: GroupSettingsChangeInput): void {
+    updateDoc(this.getGroupDocRef(input.groupId), {
+      name: input.groupName,
+      nameLowerCase: input.groupName.toLowerCase(),
+      isPublic: input.isPublic,
+      imageUrl: input.imageUrl,
+    } satisfies Partial<GroupData>);
+  }
+
+  async removeGroupMembers(input: GroupRemoveMembersInput): Promise<void> {
+    const callable = httpsCallable<GroupRemoveMembersInput, void>(this.functions, 'groupMemberRemoveCall');
     await callable(input);
   }
 

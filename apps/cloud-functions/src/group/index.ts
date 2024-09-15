@@ -9,5 +9,4 @@ export * from './group-portfolio.rank';
 export * from './group-request-membership';
 export * from './group-request-membership-accept';
 export * from './group-request-membership-remove';
-export * from './group-settings-change';
 export * from './group-update-data';

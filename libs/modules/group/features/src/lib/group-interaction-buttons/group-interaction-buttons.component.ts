@@ -257,6 +257,7 @@ export class GroupInteractionButtonsComponent {
       data: <GroupSettingsDialogComponentData>{
         groupId: this.groupDetails().groupData.id,
       },
+      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
     });
   }
 

@@ -28,10 +28,6 @@ export type GroupSettingsChangeInput = {
   isPublic: boolean;
   groupName: string;
   imageUrl: string | null;
-  /**
-   * user ids that are removed from the group
-   */
-  removingUserIds: string[];
 };
 
 export type GroupMember = UserBase & {

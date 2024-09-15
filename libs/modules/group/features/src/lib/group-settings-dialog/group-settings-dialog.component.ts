@@ -186,7 +186,6 @@ export class GroupSettingsDialogComponent {
       groupName: group.name,
       isPublic: group.isPublic,
       imageUrl: imageUrl,
-      removingUserIds: [],
     });
   }
 
@@ -208,14 +207,23 @@ export class GroupSettingsDialogComponent {
     }
 
     try {
-      this.dialogServiceUtil.showNotificationBar('Updating group settings...', 'notification');
-      await this.groupApiService.changeGroupSettings({
+      // update group settings
+      this.groupApiService.changeGroupSettings({
         groupId: this.data.groupId,
         groupName: this.form.controls.groupName.value,
         isPublic: this.form.controls.isPublic.value,
         imageUrl: this.form.controls.uploadedImage.value,
-        removingUserIds: this.removingGroupMembers().map((d) => d.id),
       });
+
+      // remove members if any
+      const removingUserIds = this.removingGroupMembers().map((user) => user.id);
+      if (removingUserIds.length > 0) {
+        this.groupApiService.removeGroupMembers({
+          groupId: this.data.groupId,
+          userIds: removingUserIds,
+        });
+      }
+
       this.dialogServiceUtil.showNotificationBar('Group settings updated', 'success');
       this.dialogRef.close();
     } catch (e) {
