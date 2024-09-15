@@ -240,6 +240,39 @@ export class GroupApiService {
     return newGroup;
   }
 
+  /**
+   * resets historical transactions, portfolio snapshots, holding snapshots, and other group data
+   * such that group can start fresh with members it has
+   */
+  resetGroupData(groupId: string): void {
+    // reset portfolio snapshots
+    setDoc(this.getGroupPortfolioSnapshotsDocRef(groupId), {
+      data: [],
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+    });
+
+    // reset transactions
+    setDoc(this.getGroupPortfolioTransactionDocRef(groupId), {
+      data: [],
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      transactionBestReturn: [],
+      transactionsWorstReturn: [],
+    });
+
+    // reset holding snapshots
+    setDoc(this.getGroupHoldingSnapshotsDocRef(groupId), {
+      data: [],
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+    });
+
+    // reset portfolio state
+    updateDoc(this.getGroupDocRef(groupId), {
+      portfolioState: {
+        ...createEmptyPortfolioState(),
+      },
+    } satisfies Partial<GroupData>);
+  }
+
   closeGroup(groupId: string) {
     updateDoc(this.getGroupDocRef(groupId), {
       isClosed: true,

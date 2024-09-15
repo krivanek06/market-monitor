@@ -42,10 +42,24 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           type="button"
           mat-stroked-button
           color="warn"
-          [matTooltip]="tooltipClose"
+          [matTooltip]="tooltips.tooltipClose"
         >
           <mat-icon>close</mat-icon>
           Close Group
+        </button>
+
+        <!-- owner - reset data -->
+        <button
+          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          [disabled]="isDemoAccount()"
+          (click)="onGroupResetData()"
+          type="button"
+          color="warn"
+          mat-stroked-button
+          [matTooltip]="tooltips.resetData"
+        >
+          <mat-icon>settings</mat-icon>
+          Reset Data
         </button>
 
         <button
@@ -55,7 +69,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           type="button"
           mat-stroked-button
           color="accent"
-          [matTooltip]="tooltipAddMyselfOwner"
+          [matTooltip]="tooltips.tooltipAddMyselfOwner"
         >
           <mat-icon>person</mat-icon>
           Add Myself To Group
@@ -69,7 +83,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           type="button"
           mat-stroked-button
           color="warn"
-          [matTooltip]="tooltipLeave"
+          [matTooltip]="tooltips.tooltipLeave"
         >
           <mat-icon>logout</mat-icon>
           Leave Group
@@ -83,7 +97,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           type="button"
           mat-stroked-button
           color="warn"
-          [matTooltip]="tooltipInvitedCancel"
+          [matTooltip]="tooltips.tooltipInvitedCancel"
         >
           <mat-icon>logout</mat-icon>
           Decline Invitation
@@ -96,7 +110,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           type="button"
           mat-stroked-button
           color="accent"
-          [matTooltip]="tooltipInvitedAccept"
+          [matTooltip]="tooltips.tooltipInvitedAccept"
         >
           <mat-icon>done</mat-icon>
           Accept Invitation
@@ -110,7 +124,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           type="button"
           mat-stroked-button
           color="warn"
-          [matTooltip]="tooltipDeclineRequest"
+          [matTooltip]="tooltips.tooltipDeclineRequest"
         >
           <mat-icon>logout</mat-icon>
           Decline Request
@@ -126,7 +140,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           type="button"
           mat-stroked-button
           color="accent"
-          [matTooltip]="tooltipRequestToJoin"
+          [matTooltip]="tooltips.tooltipRequestToJoin"
         >
           <mat-icon>person</mat-icon>
           Send Request To Join
@@ -140,7 +154,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           type="button"
           mat-stroked-button
           color="primary"
-          [matTooltip]="tooltipInviteMembers"
+          [matTooltip]="tooltips.tooltipInviteMembers"
         >
           <mat-icon>add</mat-icon>
           Invite Members
@@ -169,7 +183,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           type="button"
           mat-flat-button
           color="warn"
-          [matTooltip]="tooltipDelete"
+          [matTooltip]="tooltips.tooltipDelete"
         >
           <mat-icon>delete</mat-icon>
           Delete Group
@@ -183,7 +197,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           type="button"
           mat-stroked-button
           color="accent"
-          [matTooltip]="tooltipClose"
+          [matTooltip]="tooltips.tooltipClose"
         >
           <mat-icon>cached</mat-icon>
           Reopen Group
@@ -215,41 +229,18 @@ export class GroupInteractionButtonsComponent {
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
 
-  get tooltipClose(): string {
-    return `By closing a group, you will save its current state as a historical data and will not be able to make any changes to it.`;
-  }
-
-  get tooltipDelete(): string {
-    return `By deleting a group, you will remove it from the system and will not be able to recover it.`;
-  }
-
-  get tooltipAddMyselfOwner(): string {
-    return `As owner of the group, you can add yourself as member of the group if you are not part of it`;
-  }
-
-  get tooltipInviteMembers(): string {
-    return `As owner of the group, you can invite members to join the group`;
-  }
-
-  get tooltipLeave(): string {
-    return `By leaving a group, you will no longer be part of it`;
-  }
-
-  get tooltipInvitedCancel(): string {
-    return `By cancelling an invitation, you will no longer be able to join the group`;
-  }
-
-  get tooltipInvitedAccept(): string {
-    return `By accepting an invitation, you will be part of the group`;
-  }
-
-  get tooltipDeclineRequest(): string {
-    return `By declining a request, you will remove your request to join the group`;
-  }
-
-  get tooltipRequestToJoin(): string {
-    return `By requesting to join a group, you will be part of the group if the owner accepts your request`;
-  }
+  readonly tooltips = {
+    tooltipClose: `By closing a group, you will save its current state as a historical data and will not be able to make any changes to it.`,
+    tooltipDelete: `By deleting a group, you will remove it from the system and will not be able to recover it.`,
+    tooltipAddMyselfOwner: `As owner of the group, you can add yourself as member of the group if you are not part of it`,
+    tooltipInviteMembers: `As owner of the group, you can invite members to join the group`,
+    tooltipLeave: `By leaving a group, you will no longer be part of it`,
+    tooltipInvitedCancel: `By cancelling an invitation, you will no longer be able to join the group`,
+    tooltipInvitedAccept: `By accepting an invitation, you will be part of the group`,
+    tooltipDeclineRequest: `By declining a request, you will remove your request to join the group`,
+    tooltipRequestToJoin: `By requesting to join a group, you will be part of the group if the owner accepts your request`,
+    resetData: `This action will reset portfolio growth and other historical data. Groups starts as fresh`,
+  };
 
   onGroupSettingsClick() {
     this.dialog.open(GroupSettingsDialogComponent, {
@@ -419,5 +410,13 @@ export class GroupInteractionButtonsComponent {
     } catch (error) {
       this.dialogServiceUtil.handleError(error);
     }
+  }
+
+  @Confirmable('This action will reset portfolio growth and other historical data. Groups starts as fresh')
+  onGroupResetData() {
+    this.groupApiService.resetGroupData(this.groupDetails().groupData.id);
+
+    // show notification
+    this.dialogServiceUtil.showNotificationBar('Group data has been reset', 'success');
   }
 }
