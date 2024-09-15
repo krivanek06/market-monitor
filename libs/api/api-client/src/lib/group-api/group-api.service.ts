@@ -6,15 +6,20 @@ import {
   collection,
   doc,
   query,
+  setDoc,
+  updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
+import { faker } from '@faker-js/faker';
 import {
-  GroupBaseInput,
-  GroupBaseInputInviteMembers,
+  GROUP_OWNER_LIMIT,
+  GROUP_OWNER_LIMIT_ERROR,
+  GROUP_SAME_NAME_ERROR,
   GroupCreateInput,
   GroupData,
   GroupDetails,
+  GroupGeneralActions,
   GroupHoldingSnapshotsData,
   GroupMembersData,
   GroupPortfolioStateSnapshotsData,
@@ -23,14 +28,26 @@ import {
   PortfolioStateHolding,
   PortfolioTransaction,
   PortfolioTransactionMore,
+  USER_HAS_DEMO_ACCOUNT_ERROR,
+  UserBase,
+  UserData,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { roundNDigits } from '@mm/shared/general-util';
-import { limit } from 'firebase/firestore';
+import {
+  createEmptyPortfolioState,
+  getCurrentDateDefaultFormat,
+  getYesterdaysDate,
+  roundNDigits,
+  transformUserToBase,
+  transformUserToGroupMember,
+} from '@mm/shared/general-util';
+import { arrayUnion, limit } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
-import { Observable, catchError, combineLatest, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, combineLatest, lastValueFrom, map, of, switchMap, take } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 import { MarketApiService } from '../market-api/market-api.service';
+import { UserApiService } from '../user-api/user-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +56,7 @@ export class GroupApiService {
   private functions = inject(Functions);
   private firestore = inject(Firestore);
   private marketApiService = inject(MarketApiService);
+  private userApiService = inject(UserApiService);
 
   getGroupDataById(groupId: string): Observable<GroupData | undefined> {
     return rxDocData(this.getGroupDocRef(groupId), { idField: 'id' });
@@ -74,7 +92,7 @@ export class GroupApiService {
     return rxCollectionData(query(this.getGroupCollectionRef(), where('id', 'in', groupIds)));
   }
 
-  getGroupByName(name: string, limitResult = 5): Observable<GroupData[]> {
+  searchGroupsByName(name: string, limitResult = 5): Observable<GroupData[]> {
     return rxCollectionData(
       query(
         this.getGroupCollectionRef(),
@@ -82,6 +100,12 @@ export class GroupApiService {
         where('nameLowerCase', '<=', name.toLowerCase() + '\uf8ff'),
         limit(limitResult),
       ),
+    );
+  }
+
+  getGroupByName(name: string): Observable<GroupData | undefined> {
+    return rxCollectionData(query(this.getGroupCollectionRef(), where('nameLowerCase', '==', name.toUpperCase()))).pipe(
+      map((data) => data[0]),
     );
   }
 
@@ -152,43 +176,130 @@ export class GroupApiService {
     );
   }
 
-  async createGroup(input: GroupCreateInput): Promise<GroupData> {
-    const callable = httpsCallable<GroupCreateInput, GroupData>(this.functions, 'groupCreateCall');
-    const result = await callable(input);
-    return result.data;
+  async createGroup(userData: UserData, input: GroupCreateInput): Promise<GroupData> {
+    const userBase = transformUserToBase(userData);
+    const groupMembers = transformUserToGroupMember(userData, 1);
+    const group = await lastValueFrom(this.getGroupByName(input.groupName).pipe(take(1)));
+
+    // check if group already exists
+    if (group) {
+      throw new Error(GROUP_SAME_NAME_ERROR);
+    }
+
+    // demo account can not be added to the group
+    if (userData.isDemo) {
+      throw new Error(USER_HAS_DEMO_ACCOUNT_ERROR);
+    }
+
+    // check limit
+    if (userData.groups.groupOwner.length >= GROUP_OWNER_LIMIT) {
+      throw new Error(GROUP_OWNER_LIMIT_ERROR);
+    }
+
+    // create group
+    const newGroup = this.createGroupData(input, userBase);
+
+    // save new group
+    setDoc(this.getGroupDocRef(newGroup.id), newGroup);
+
+    // create additional documents for group
+    setDoc(this.getGroupPortfolioTransactionDocRef(newGroup.id), {
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      data: [],
+      transactionBestReturn: [],
+      transactionsWorstReturn: [],
+    });
+
+    // create members collection
+    setDoc(this.getGroupMembersDocRef(newGroup.id), {
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      data: [groupMembers],
+    });
+
+    // create portfolio snapshots collection
+    setDoc(this.getGroupPortfolioSnapshotsDocRef(newGroup.id), {
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      data: [],
+    });
+
+    // create holding snapshots collection
+    setDoc(this.getGroupHoldingSnapshotsDocRef(newGroup.id), {
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      data: [],
+    });
+
+    // update owner's data
+    this.userApiService.updateUser(userData.id, {
+      groups: {
+        ...userData.groups,
+        groupOwner: [...userData.groups.groupOwner, newGroup.id],
+        groupMember: [...userData.groups.groupMember, newGroup.id],
+      },
+    });
+
+    return newGroup;
   }
 
-  async closeGroup(input: string): Promise<GroupData> {
-    const callable = httpsCallable<string, GroupData>(this.functions, 'groupCloseCall');
-    const result = await callable(input);
-    return result.data;
+  closeGroup(groupId: string) {
+    updateDoc(this.getGroupDocRef(groupId), {
+      isClosed: true,
+    } satisfies Partial<GroupData>);
+
+    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'closeGroup',
+      groupId: groupId,
+    });
   }
 
-  async reopenGroup(input: string): Promise<GroupData> {
-    const callable = httpsCallable<string, GroupData>(this.functions, 'groupReopenCall');
-    const result = await callable(input);
-    return result.data;
+  reopenGroup(groupId: string): void {
+    updateDoc(this.getGroupDocRef(groupId), {
+      isClosed: false,
+      endDate: null,
+    } satisfies Partial<GroupData>);
   }
 
-  async deleteGroup(input: string): Promise<GroupData> {
-    const callable = httpsCallable<string, GroupData>(this.functions, 'groupDeleteCall');
-    const result = await callable(input);
-    return result.data;
+  deleteGroup(groupId: string) {
+    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'deleteGroup',
+      groupId: groupId,
+    });
   }
 
-  async userAcceptsGroupInvitation(input: string): Promise<void> {
-    const callable = httpsCallable<string, GroupData>(this.functions, 'groupMemberAcceptCall');
-    await callable(input);
+  userAcceptsGroupInvitation(groupId: string) {
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'inviteUsersAccept',
+      groupId,
+    });
   }
 
-  async userDeclinesGroupInvitation(input: GroupBaseInput): Promise<void> {
-    const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupMemberInviteRemoveCall');
-    await callable(input);
+  userDeclinesGroupInvitation(input: { groupId: string; userId: string }) {
+    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'inviteUserRemoveInvitation',
+      userId: input.userId,
+      groupId: input.groupId,
+    });
   }
 
-  async changeGroupSettings(input: GroupSettingsChangeInput): Promise<void> {
-    const callable = httpsCallable<GroupSettingsChangeInput, GroupData>(this.functions, 'groupSettingsChangeCall');
-    await callable(input);
+  changeGroupSettings(input: GroupSettingsChangeInput): void {
+    updateDoc(this.getGroupDocRef(input.groupId), {
+      name: input.groupName,
+      nameLowerCase: input.groupName.toLowerCase(),
+      isPublic: input.isPublic,
+      imageUrl: input.imageUrl,
+    } satisfies Partial<GroupData>);
+  }
+
+  removeGroupMembers(input: { groupId: string; userIds: string[] }) {
+    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'membersRemove',
+      userIds: input.userIds,
+      groupId: input.groupId,
+    });
   }
 
   /**
@@ -196,23 +307,42 @@ export class GroupApiService {
    * @param input
    * @returns - how many users were invited to the group who are not yet members or invited or requested
    */
-  async inviteUsersToGroup(input: GroupBaseInputInviteMembers): Promise<number> {
-    const callable = httpsCallable<GroupBaseInputInviteMembers, number>(
-      this.functions,
-      'groupMemberInviteMultipleCall',
-    );
-    const result = await callable(input);
-    return result.data;
+  inviteUsersToGroup(input: { groupId: string; userIds: string[] }) {
+    const callable = httpsCallable<GroupGeneralActions, number>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'inviteUsers',
+      userIds: input.userIds,
+      groupId: input.groupId,
+    });
   }
 
-  async addOwnerOfGroupIntoGroup(groupId: string): Promise<void> {
-    const callable = httpsCallable<string, void>(this.functions, 'groupAddOwnerIntoGroupCall');
-    await callable(groupId);
+  addOwnerOfGroupIntoGroup(userData: UserData, groupData: GroupData): void {
+    // update group
+    updateDoc(this.getGroupDocRef(groupData.id), {
+      memberUserIds: [...groupData.memberUserIds, userData.id],
+    } satisfies Partial<GroupData>);
+
+    // update group member data
+    updateDoc(this.getGroupMembersDocRef(groupData.id), {
+      data: arrayUnion(transformUserToGroupMember(userData, groupData.memberUserIds.length + 1)),
+    });
+
+    // update user
+    this.userApiService.updateUser(userData.id, {
+      groups: {
+        ...userData.groups,
+        groupMember: [...userData.groups.groupMember, groupData.id],
+      },
+    });
   }
 
-  async inviteUserToGroup(input: GroupBaseInput): Promise<void> {
-    const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupMemberInviteCall');
-    await callable(input);
+  inviteUserToGroup(input: { groupId: string; userId: string }) {
+    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'inviteUsers',
+      userIds: [input.userId],
+      groupId: input.groupId,
+    });
   }
 
   /**
@@ -221,9 +351,13 @@ export class GroupApiService {
    * @param input
    * @returns
    */
-  async removeUserInvitationToGroup(input: GroupBaseInput): Promise<void> {
-    const callable = httpsCallable<GroupBaseInput, void>(this.functions, 'groupMemberInviteRemoveCall');
-    await callable(input);
+  removeUserInvitationToGroup(input: { groupId: string; userId: string }) {
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'inviteUserRemoveInvitation',
+      groupId: input.groupId,
+      userId: input.userId,
+    });
   }
 
   /**
@@ -231,9 +365,12 @@ export class GroupApiService {
    *
    * @param input
    */
-  async removeGroupMember(input: GroupBaseInput): Promise<void> {
-    const callable = httpsCallable<GroupBaseInput, GroupData>(this.functions, 'groupMemberRemoveCall');
-    await callable(input);
+  leaveGroup(groupData: GroupData) {
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'leaveGroup',
+      groupId: groupData.id,
+    });
   }
 
   /**
@@ -242,9 +379,13 @@ export class GroupApiService {
    * @param input
    * @returns
    */
-  async acceptUserRequestToGroup(input: GroupBaseInput): Promise<void> {
-    const callable = httpsCallable<GroupBaseInput, void>(this.functions, 'groupRequestMembershipAcceptCall');
-    await callable(input);
+  acceptUserRequestToGroup(input: { groupId: string; userId: string }) {
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'requestMembershipAccept',
+      groupId: input.groupId,
+      userId: input.userId,
+    });
   }
 
   /**
@@ -253,19 +394,30 @@ export class GroupApiService {
    * @param input
    * @returns
    */
-  async declineUserRequestToGroup(input: GroupBaseInput): Promise<void> {
-    const callable = httpsCallable<GroupBaseInput, void>(this.functions, 'groupRequestMembershipRemoveCall');
-    await callable(input);
+  declineUserRequestToGroup(input: { groupId: string; userId: string }) {
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'requestMembershipDecline',
+      groupId: input.groupId,
+      userId: input.userId,
+    });
   }
 
-  async sendRequestToJoinGroup(groupId: string): Promise<void> {
-    const callable = httpsCallable<string, void>(this.functions, 'groupRequestMembershipCall');
-    await callable(groupId);
+  sendRequestToJoinGroup(groupId: string) {
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'requestMembership',
+      groupId: groupId,
+    });
   }
 
-  async removeRequestToJoinGroup(input: GroupBaseInput): Promise<void> {
-    const callable = httpsCallable<GroupBaseInput, void>(this.functions, 'groupRequestMembershipRemoveCall');
-    await callable(input);
+  removeRequestToJoinGroup(input: { groupId: string; userId: string }) {
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    return callable({
+      type: 'requestMembershipDecline',
+      groupId: input.groupId,
+      userId: input.userId,
+    });
   }
 
   private getGroupDocRef(groupId: string): DocumentReference<GroupData> {
@@ -302,5 +454,37 @@ export class GroupApiService {
     return doc(this.getGroupCollectionMoreInformationRef(userId), 'members').withConverter(
       assignTypesClient<GroupMembersData>(),
     );
+  }
+
+  /**
+   *
+   * @param data - basic information about the group
+   * @param owner - who the group belongs to
+   * @param isOwnerMember - is the owner a member of the group or not
+   * @param isDemo - if true, group is for demo purposes
+   * @returns created group
+   */
+  private createGroupData(data: GroupCreateInput, owner: UserBase, isOwnerMember = false): GroupData {
+    return {
+      id: uuidv4(),
+      name: data.groupName,
+      nameLowerCase: data.groupName.toLowerCase(),
+      imageUrl: faker.image.urlPicsumPhotos(),
+      isPublic: true,
+      memberInvitedUserIds: [],
+      ownerUserId: owner.id,
+      ownerUser: owner,
+      createdDate: getCurrentDateDefaultFormat(),
+      isClosed: false,
+      memberRequestUserIds: [],
+      memberUserIds: isOwnerMember ? [owner.id] : [],
+      endDate: null,
+      modifiedSubCollectionDate: getYesterdaysDate(),
+      portfolioState: {
+        ...createEmptyPortfolioState(),
+      },
+      systemRank: {},
+      numberOfMembers: 1,
+    };
   }
 }

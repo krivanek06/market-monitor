@@ -35,7 +35,7 @@ import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@mm/
 import { UserDisplayItemComponent } from '@mm/user/ui';
 import { derivedFrom } from 'ngxtension/derived-from';
 import { filterNil } from 'ngxtension/filter-nil';
-import { map, pipe, switchMap } from 'rxjs';
+import { map, pipe, switchMap, take } from 'rxjs';
 import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
 @Component({
@@ -339,7 +339,12 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
     pipe(
       map(([group]) => group),
       filterNil(),
-      switchMap((group) => this.userApiService.getUsersByIds(group.groupData.memberRequestUserIds)),
+      switchMap((group) =>
+        this.userApiService.getUsersByIds(group.groupData.memberRequestUserIds).pipe(
+          // prevent listening on user document changes
+          take(1),
+        ),
+      ),
     ),
     { initialValue: [] },
   );
@@ -349,7 +354,12 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
     pipe(
       map(([group]) => group),
       filterNil(),
-      switchMap((group) => this.userApiService.getUsersByIds(group.groupData.memberInvitedUserIds)),
+      switchMap((group) =>
+        this.userApiService.getUsersByIds(group.groupData.memberInvitedUserIds).pipe(
+          // prevent listening on user document changes
+          take(1),
+        ),
+      ),
     ),
     { initialValue: [] },
   );

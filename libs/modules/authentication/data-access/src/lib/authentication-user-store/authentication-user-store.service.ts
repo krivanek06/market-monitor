@@ -222,4 +222,8 @@ export class AuthenticationUserStoreService {
   clearUserWatchList(): void {
     this.userApiService.clearUserWatchList(this.state.getUserData().id);
   }
+
+  updateUserData(data: Partial<UserData>): void {
+    this.userApiService.updateUser(this.state.getUserData().id, data);
+  }
 }

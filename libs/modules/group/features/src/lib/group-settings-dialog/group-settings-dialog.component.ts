@@ -53,7 +53,7 @@ export type GroupSettingsDialogComponentData = {
       <mat-dialog-content>
         <div class="flex gap-4">
           <!-- upload image -->
-          <div>
+          <div class="min-w-[200px]">
             <app-upload-file-control
               folder="groups"
               formControlName="uploadedImage"
@@ -64,6 +64,12 @@ export type GroupSettingsDialogComponentData = {
 
           <!-- additional forms -->
           <div class="flex-1">
+            <!-- group ID -->
+            <div class="g-item-wrapper mb-3">
+              <span>GroupID</span>
+              <span>{{ groupDataSignal()?.id }}</span>
+            </div>
+
             <!-- group name -->
             <app-form-mat-input-wrapper formControlName="groupName" inputCaption="Group Name" inputType="TEXT" />
 
@@ -137,9 +143,9 @@ export class GroupSettingsDialogComponent {
   private dialogRef = inject(MatDialogRef<GroupSettingsDialogComponent>);
   private dialogServiceUtil = inject(DialogServiceUtil);
   private groupApiService = inject(GroupApiService);
-  data = inject<GroupSettingsDialogComponentData>(MAT_DIALOG_DATA);
+  readonly data = inject<GroupSettingsDialogComponentData>(MAT_DIALOG_DATA);
 
-  form = new FormGroup({
+  readonly form = new FormGroup({
     groupName: new FormControl('', {
       validators: [requiredValidator, minLengthValidator(4), maxLengthValidator(28)],
       nonNullable: true,
@@ -148,8 +154,8 @@ export class GroupSettingsDialogComponent {
     uploadedImage: new FormControl<string | null>(null),
   });
 
-  groupDataSignal = toSignal(this.groupApiService.getGroupDataById(this.data.groupId));
-  groupMembersSignal = toSignal(
+  readonly groupDataSignal = toSignal(this.groupApiService.getGroupDataById(this.data.groupId));
+  readonly groupMembersSignal = toSignal(
     this.groupApiService.getGroupMembersDataById(this.data.groupId).pipe(map((d) => d?.data ?? [])),
     {
       initialValue: [],
@@ -159,7 +165,7 @@ export class GroupSettingsDialogComponent {
   /**
    * save users that will be removed from the group
    */
-  removingGroupMembers = signal<GroupMember[]>([]);
+  readonly removingGroupMembers = signal<GroupMember[]>([]);
 
   constructor() {
     this.initForm();
@@ -186,7 +192,6 @@ export class GroupSettingsDialogComponent {
       groupName: group.name,
       isPublic: group.isPublic,
       imageUrl: imageUrl,
-      removingUserIds: [],
     });
   }
 
@@ -208,14 +213,23 @@ export class GroupSettingsDialogComponent {
     }
 
     try {
-      this.dialogServiceUtil.showNotificationBar('Updating group settings...', 'notification');
-      await this.groupApiService.changeGroupSettings({
+      // update group settings
+      this.groupApiService.changeGroupSettings({
         groupId: this.data.groupId,
         groupName: this.form.controls.groupName.value,
         isPublic: this.form.controls.isPublic.value,
         imageUrl: this.form.controls.uploadedImage.value,
-        removingUserIds: this.removingGroupMembers().map((d) => d.id),
       });
+
+      // remove members if any
+      const removingUserIds = this.removingGroupMembers().map((user) => user.id);
+      if (removingUserIds.length > 0) {
+        this.groupApiService.removeGroupMembers({
+          groupId: this.data.groupId,
+          userIds: removingUserIds,
+        });
+      }
+
       this.dialogServiceUtil.showNotificationBar('Group settings updated', 'success');
       this.dialogRef.close();
     } catch (e) {

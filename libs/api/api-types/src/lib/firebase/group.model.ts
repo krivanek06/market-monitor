@@ -10,10 +10,7 @@ import { UserBase, UserData } from './user.model';
 
 export type GroupCreateInput = {
   groupName: string;
-  isPublic: boolean;
-  isOwnerMember: boolean;
-  memberInvitedUserIds: string[];
-  imageUrl: string | null;
+  memberInvitedUserIds?: string[];
 };
 
 export type GroupBaseInput = {
@@ -21,20 +18,77 @@ export type GroupBaseInput = {
   userId: string;
 };
 
-export type GroupBaseInputInviteMembers = {
-  groupId: string;
-  userIds: string[];
-};
+export type GroupGeneralActions = { groupId: string } & (
+  | {
+      /**
+       * invite multiple users to the group
+       */
+      type: 'inviteUsers';
+      userIds: string[];
+    }
+  | {
+      /**
+       * Remove a group invitation sent to the user by the owner or the user itself
+       */
+      type: 'inviteUserRemoveInvitation';
+      userId: string;
+    }
+  | {
+      /**
+       *  User accepts a group invitation
+       */
+      type: 'inviteUsersAccept';
+    }
+  | {
+      /**
+       * Remove a user from a group or user leaves the group
+       */
+      type: 'membersRemove';
+      userIds: string[];
+    }
+  | {
+      /**
+       * user can request to join the group
+       */
+      type: 'requestMembership';
+    }
+  | {
+      /**
+       * Group accepts the user request to join
+       */
+      type: 'requestMembershipAccept';
+      userId: string;
+    }
+  | {
+      /**
+       * Group declines the user request to join
+       * or user cancels the request
+       */
+      type: 'requestMembershipDecline';
+      userId: string;
+    }
+  | {
+      /**
+       * deleting the group
+       */
+      type: 'deleteGroup';
+    }
+  | {
+      /**
+       * user leaves the group
+       */
+      type: 'leaveGroup';
+    }
+  | {
+      type: 'closeGroup';
+    }
+);
 
 export type GroupSettingsChangeInput = {
   groupId: string;
   isPublic: boolean;
   groupName: string;
   imageUrl: string | null;
-  /**
-   * user ids that are removed from the group
-   */
-  removingUserIds: string[];
 };
 
 export type GroupMember = UserBase & {
@@ -137,7 +191,6 @@ export type GroupTransactionsData = DataDocsWrapper<PortfolioTransaction> & {
 export type GroupMembersData = DataDocsWrapper<GroupMember>;
 export type GroupPortfolioStateSnapshotsData = DataDocsWrapper<PortfolioState>;
 export type GroupHoldingSnapshotsData = DataDocsWrapper<PortfolioStateHoldingBase>;
-
 export type GroupDetails = {
   groupData: GroupData;
   groupTransactionsData: PortfolioTransactionMore[];

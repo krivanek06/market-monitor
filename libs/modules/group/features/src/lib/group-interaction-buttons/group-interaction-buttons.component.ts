@@ -11,8 +11,7 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { UserSearchDialogComponent, UserSearchDialogData } from '@mm/user/features';
-import { filterNil } from 'ngxtension/filter-nil';
-import { EMPTY, catchError, filter, from, of, switchMap, take, tap } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import {
   GroupSettingsDialogComponent,
   GroupSettingsDialogComponentData,
@@ -205,15 +204,16 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupInteractionButtonsComponent {
-  groupDetails = input.required<GroupDetails>();
+  readonly groupDetails = input.required<GroupDetails>();
 
-  authenticationUserService = inject(AuthenticationUserStoreService);
-  groupApiService = inject(GroupApiService);
-  dialogServiceUtil = inject(DialogServiceUtil);
+  readonly authenticationUserService = inject(AuthenticationUserStoreService);
+  readonly groupApiService = inject(GroupApiService);
+  readonly dialogServiceUtil = inject(DialogServiceUtil);
 
-  isDemoAccount = this.authenticationUserService.state.isDemoAccount;
-  private dialog = inject(MatDialog);
-  private router = inject(Router);
+  readonly isDemoAccount = this.authenticationUserService.state.isDemoAccount;
+  readonly userData = this.authenticationUserService.state.getUserData;
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
 
   get tooltipClose(): string {
     return `By closing a group, you will save its current state as a historical data and will not be able to make any changes to it.`;
@@ -256,16 +256,14 @@ export class GroupInteractionButtonsComponent {
       data: <GroupSettingsDialogComponentData>{
         groupId: this.groupDetails().groupData.id,
       },
+      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
     });
   }
 
   @Confirmable('Are you sure you want to close this group?', 'Confirm', true, 'CLOSE')
-  async onGroupCloseClick() {
+  onGroupCloseClick() {
     try {
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('Closing group', 'notification');
-
-      await this.groupApiService.closeGroup(this.groupDetails().groupData.id);
+      this.groupApiService.closeGroup(this.groupDetails().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You closed the group', 'success');
@@ -275,12 +273,9 @@ export class GroupInteractionButtonsComponent {
   }
 
   @Confirmable('Are you sure you want to reopen this group?')
-  async onGroupReopenClick() {
+  onGroupReopenClick() {
     try {
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('Reopening group', 'notification');
-
-      await this.groupApiService.reopenGroup(this.groupDetails().groupData.id);
+      this.groupApiService.reopenGroup(this.groupDetails().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('The group has been reopened', 'success');
@@ -289,13 +284,10 @@ export class GroupInteractionButtonsComponent {
     }
   }
 
-  async onAddOwnerToGroupClick() {
+  onAddOwnerToGroupClick() {
     try {
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('Saving data and adding you to the group', 'notification');
-
       // add myself as owner
-      await this.groupApiService.addOwnerOfGroupIntoGroup(this.groupDetails().groupData.id);
+      this.groupApiService.addOwnerOfGroupIntoGroup(this.userData(), this.groupDetails().groupData);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You added yourself to the group', 'success');
@@ -304,63 +296,47 @@ export class GroupInteractionButtonsComponent {
     }
   }
 
-  onInviteMembersClick() {
+  async onInviteMembersClick() {
     const allowedMembersToInvite =
       GROUP_MEMBER_LIMIT -
       this.groupDetails().groupData.memberUserIds.length -
       this.groupDetails().groupData.memberInvitedUserIds.length;
 
-    this.dialog
-      .open(UserSearchDialogComponent, {
-        data: <UserSearchDialogData>{
+    const dialogRef = this.dialog.open<UserSearchDialogComponent, UserSearchDialogData, UserData[] | undefined>(
+      UserSearchDialogComponent,
+      {
+        data: {
           title: 'Invite Members',
           multiple: true,
           selectUsersCap: allowedMembersToInvite,
         },
         disableClose: true,
         panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
-      })
-      .afterClosed()
-      .pipe(
-        filterNil(),
-        filter((d: UserData[]) => d.length > 0),
-        tap(() => this.dialogServiceUtil.showNotificationBar('Inviting members', 'notification')),
-        switchMap((res) =>
-          from(
-            this.groupApiService.inviteUsersToGroup({
-              groupId: this.groupDetails().groupData.id,
-              userIds: res.map((u) => u.id),
-            }),
-          ),
-        ),
-        tap((res) => {
-          if (res > 0) {
-            this.dialogServiceUtil.showNotificationBar('Invitation sent', 'success');
-          } else {
-            this.dialogServiceUtil.showNotificationBar('No users were invited', 'notification');
-          }
-        }),
-        take(1),
-        catchError((error) => {
-          this.dialogServiceUtil.handleError(error);
-          return of(EMPTY);
-        }),
-      )
-      .subscribe((res) => {
-        console.log('closed with', res);
-      });
+      },
+    );
+
+    // wait for dialog to close
+    const result = await firstValueFrom(dialogRef.afterClosed());
+
+    // dismissed modal
+    if (!result || result.length === 0) {
+      return;
+    }
+
+    // invite users
+    this.groupApiService.inviteUsersToGroup({
+      groupId: this.groupDetails().groupData.id,
+      userIds: result.map((u) => u.id),
+    });
+
+    // show notification
+    this.dialogServiceUtil.showNotificationBar('Invitation sent', 'success');
   }
 
   @Confirmable('Are you sure you want to leave this group?')
-  async onLeaveGroupClick() {
+  onLeaveGroupClick() {
     try {
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('Leaving group', 'notification');
-
-      await this.groupApiService.removeGroupMember({
-        groupId: this.groupDetails().groupData.id,
-        userId: this.authenticationUserService.state.getUserData().id,
-      });
+      this.groupApiService.leaveGroup(this.groupDetails().groupData);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You left the group', 'success');
@@ -370,12 +346,9 @@ export class GroupInteractionButtonsComponent {
   }
 
   @Confirmable('Are you sure you want to cancel this invitation?')
-  async onDeclineInvitationClick() {
+  onDeclineInvitationClick() {
     try {
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('Cancelling invitation', 'notification');
-
-      await this.groupApiService.userDeclinesGroupInvitation({
+      this.groupApiService.userDeclinesGroupInvitation({
         groupId: this.groupDetails().groupData.id,
         userId: this.authenticationUserService.state.getUserData().id,
       });
@@ -392,6 +365,7 @@ export class GroupInteractionButtonsComponent {
       // show notification
       this.dialogServiceUtil.showNotificationBar('Accepting invitation', 'notification');
 
+      // accept invitation
       await this.groupApiService.userAcceptsGroupInvitation(this.groupDetails().groupData.id);
 
       // show notification
@@ -402,12 +376,9 @@ export class GroupInteractionButtonsComponent {
   }
 
   @Confirmable('Are you sure you want to remove your request?')
-  async onCancelRequestClick() {
+  onCancelRequestClick() {
     try {
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('Removing request', 'notification');
-
-      await this.groupApiService.declineUserRequestToGroup({
+      this.groupApiService.declineUserRequestToGroup({
         groupId: this.groupDetails().groupData.id,
         userId: this.authenticationUserService.state.getUserData().id,
       });
@@ -421,9 +392,10 @@ export class GroupInteractionButtonsComponent {
 
   async onRequestToJoinClick() {
     try {
-      // show notification
+      // notify user
       this.dialogServiceUtil.showNotificationBar('Sending request to join group', 'notification');
 
+      // send request to join group
       await this.groupApiService.sendRequestToJoinGroup(this.groupDetails().groupData.id);
 
       // show notification
@@ -434,12 +406,10 @@ export class GroupInteractionButtonsComponent {
   }
 
   @Confirmable('Are you sure you want to delete this group?')
-  async onGroupDeleteClick() {
+  onGroupDeleteClick() {
     try {
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('Deleting Group', 'notification');
-
-      await this.groupApiService.deleteGroup(this.groupDetails().groupData.id);
+      // send API call
+      this.groupApiService.deleteGroup(this.groupDetails().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('Group has been deleted', 'success');

@@ -48,6 +48,7 @@ import { EMPTY, catchError, take, tap } from 'rxjs';
             class="w-full object-cover"
             alt="image upload"
             [style.height.px]="heightPx()"
+            [style.min-width.px]="heightPx()"
           />
           <div
             class="absolute left-0 top-2/4 hidden w-full -translate-y-1/2 transform bg-gray-700 py-4 text-xl opacity-80 transition-all duration-300 ease-in-out group-hover:block"

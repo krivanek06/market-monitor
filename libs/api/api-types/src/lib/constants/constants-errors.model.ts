@@ -39,3 +39,4 @@ export const GROUP_USER_ALREADY_REQUESTED_ERROR = 'User already requested to joi
 export const GROUPS_USER_ALREADY_INVITED_ERROR = 'User already invited';
 export const GROUP_IS_FULL_ERROR = 'Group is full';
 export const GROUP_USER_IS_OWNER_ERROR = 'User is owner';
+export const GROUP_CLOSED = 'Group is closed';

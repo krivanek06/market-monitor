@@ -7,6 +7,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
+import { GroupApiService } from '@mm/api-client';
 import { accountDescription } from '@mm/api-types';
 import { ChangePasswordDialogComponent } from '@mm/authentication/authentication-forms';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
@@ -17,7 +18,7 @@ import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { UploadFileControlComponent } from 'libs/shared/features/upload-file-control/src';
 import { filterNil } from 'ngxtension/filter-nil';
-import { EMPTY, catchError, from, map, take, tap } from 'rxjs';
+import { EMPTY, catchError, from, take, tap } from 'rxjs';
 import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';
 
 @Component({
@@ -216,6 +217,8 @@ export class UserSettingsDialogComponent implements OnInit {
   private dialog = inject(MatDialog);
   private router = inject(Router);
   private dialogRef = inject(MatDialogRef<UserSettingsDialogComponent>);
+  private groupApiService = inject(GroupApiService);
+
   isDevActive = inject(IS_DEV_TOKEN, {
     optional: true,
   });
@@ -249,6 +252,15 @@ export class UserSettingsDialogComponent implements OnInit {
 
   @Confirmable('Are you sure you want to delete your account?', 'Confirm', true, 'DELETE')
   onDeleteAccount(): void {
+    // delete groups that user is owner
+    const owner = this.authenticationUserStoreService.state.getUserData().groups.groupOwner;
+    for (const group of owner) {
+      this.groupApiService.deleteGroup(group);
+    }
+
+    // perform delete account
+    this.authenticationAccountService.deleteAccount();
+
     // notify user
     this.dialogServiceUtil.showNotificationBar('Your account has been deleted', 'success');
 
@@ -260,9 +272,6 @@ export class UserSettingsDialogComponent implements OnInit {
 
     // redirect to home
     this.router.navigate([ROUTES_MAIN.LOGIN]);
-
-    // perform delete account
-    this.authenticationAccountService.deleteAccount();
   }
 
   onChangePassword(): void {
@@ -277,52 +286,50 @@ export class UserSettingsDialogComponent implements OnInit {
     });
   }
 
-  onChangeDisplayName(): void {
-    this.dialogServiceUtil
-      .showInlineInputDialog({
-        title: 'Change Display Name',
-        description: 'Enter a new display name',
-        validatorMaxLength: 15,
-        initialValue: this.userDataSignal().personal.displayName,
-      })
-      .pipe(
-        take(1),
-        filterNil(),
-        map((val) =>
-          this.authenticationUserStoreService.changeUserPersonal({
-            displayName: val,
-            displayNameLowercase: val.toLowerCase(),
-          }),
-        ),
-        tap(() => this.dialogServiceUtil.showNotificationBar('Your display name has been changed', 'success')),
-      )
-      .subscribe((res) => console.log(res));
+  async onChangeDisplayName() {
+    const displayName = await this.dialogServiceUtil.showInlineInputDialog({
+      title: 'Change Display Name',
+      description: 'Enter a new display name',
+      validatorMaxLength: 15,
+      initialValue: this.userDataSignal().personal.displayName,
+    });
+
+    if (!displayName) {
+      return;
+    }
+
+    // update display name
+    this.authenticationUserStoreService.changeUserPersonal({
+      displayName: displayName,
+      displayNameLowercase: displayName.toLowerCase(),
+    });
+
+    // notify user
+    this.dialogServiceUtil.showNotificationBar('Your display name has been changed', 'success');
   }
 
-  onChangeInitials(): void {
-    this.dialogServiceUtil
-      .showInlineInputDialog({
-        title: 'Change Initials',
-        description: 'Enter a new initials (custom identification - max 8 characters)',
-        validatorMaxLength: 8,
-        initialValue: this.userDataSignal().personal.displayNameInitials,
-      })
-      .pipe(
-        take(1),
-        filterNil(),
-        map((val) =>
-          this.authenticationUserStoreService.changeUserPersonal({
-            displayNameInitials: val,
-          }),
-        ),
-        tap(() =>
-          this.dialogServiceUtil.showNotificationBar(
-            'Your initials has been updated, may take some time to update everywhere',
-            'success',
-          ),
-        ),
-      )
-      .subscribe((res) => console.log(res));
+  async onChangeInitials() {
+    const initials = await this.dialogServiceUtil.showInlineInputDialog({
+      title: 'Change Initials',
+      description: 'Enter a new initials (custom identification - max 8 characters)',
+      validatorMaxLength: 8,
+      initialValue: this.userDataSignal().personal.displayNameInitials,
+    });
+
+    if (!initials) {
+      return;
+    }
+
+    // update initials
+    this.authenticationUserStoreService.changeUserPersonal({
+      displayNameInitials: initials,
+    });
+
+    // notify user
+    this.dialogServiceUtil.showNotificationBar(
+      'Your initials has been updated, may take some time to update everywhere',
+      'success',
+    );
   }
 
   @Confirmable('Are you sure you want to reset your account? Your trading history & groups will be removed')

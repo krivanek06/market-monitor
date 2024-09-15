@@ -1,16 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { GroupApiService } from '@mm/api-client';
 import { GROUP_OWNER_LIMIT, GroupData } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { GroupCreateDialogComponent, GroupDisplayCardComponent, GroupSearchControlComponent } from '@mm/group/features';
+import { GroupDisplayCardComponent, GroupSearchControlComponent } from '@mm/group/features';
 import { GroupDisplayItemComponent } from '@mm/group/ui';
-import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationShowItemLeft } from '@mm/shared/ui';
 
 @Component({
@@ -20,7 +20,6 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
     CommonModule,
     MatIconModule,
     MatButtonModule,
-    GroupCreateDialogComponent,
     MatDialogModule,
     MatTooltipModule,
     GroupDisplayCardComponent,
@@ -165,7 +164,6 @@ export class PageGroupsComponent {
   authenticationUserService = inject(AuthenticationUserStoreService);
   groupApiService = inject(GroupApiService);
   dialogServiceUtil = inject(DialogServiceUtil);
-  dialog = inject(MatDialog);
   router = inject(Router);
   groupsSignal = this.authenticationUserService.state.userGroupData;
 
@@ -175,12 +173,27 @@ export class PageGroupsComponent {
       this.authenticationUserService.state.isDemoAccount(),
   );
 
-  onCreateGroupClick(): void {
-    this.dialog.open(GroupCreateDialogComponent, {
-      data: {},
-      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
-      disableClose: true,
+  async onCreateGroupClick() {
+    const user = this.authenticationUserService.state.getUserData();
+    const groupName = await this.dialogServiceUtil.showInlineInputDialog({
+      title: 'Create Group',
+      description: 'Please enter a name for the group',
+      validatorMaxLength: 30,
+      validatorMinLength: 4,
     });
+
+    // dismissed modal
+    if (!groupName) {
+      return;
+    }
+
+    // create group
+    await this.groupApiService.createGroup(user, {
+      groupName,
+    });
+
+    // notify user
+    this.dialogServiceUtil.showNotificationBar('Group has been created', 'success');
   }
 
   /**
@@ -198,16 +211,21 @@ export class PageGroupsComponent {
     try {
       // accept user
       if (response === 'primary') {
-        this.dialogServiceUtil.showNotificationBar(`Accepted ${groupData.name} invitation`, 'success');
+        // show notification
+        this.dialogServiceUtil.showNotificationBar(`Accepting ${groupData.name}'s invitation`, 'notification');
 
+        // accept invitation
         await this.groupApiService.userAcceptsGroupInvitation(groupData.id);
+
+        // show notification
+        this.dialogServiceUtil.showNotificationBar(`Accepted ${groupData.name} invitation`, 'success');
       }
 
       // decline user
       else if (response === 'secondary') {
         this.dialogServiceUtil.showNotificationBar(`Declined ${groupData.name} invitation`, 'success');
 
-        await this.groupApiService.userDeclinesGroupInvitation({
+        this.groupApiService.userDeclinesGroupInvitation({
           userId: user.id,
           groupId: groupData.id,
         });
@@ -234,7 +252,7 @@ export class PageGroupsComponent {
         this.dialogServiceUtil.showNotificationBar(`Removed request from group ${groupData.name}`, 'success');
 
         // remove request
-        await this.groupApiService.removeRequestToJoinGroup({
+        this.groupApiService.removeRequestToJoinGroup({
           groupId: groupData.id,
           userId: this.authenticationUserService.state.getUserData().id,
         });

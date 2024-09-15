@@ -3,9 +3,12 @@ import 'zone.js';
 import 'zone.js/testing';
 
 // Error:  ReferenceError: TextDecoder is not defined for angular/fire
-const { TextEncoder, TextDecoder } = require('util');
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
+const { TextEncoder, TextDecoder, ReadableStream } = require('node:util');
+Object.defineProperties(globalThis, {
+  TextDecoder: { value: TextDecoder },
+  TextEncoder: { value: TextEncoder },
+  ReadableStream: { value: ReadableStream },
+});
 
 console.log('Jest setup file is loaded!');
 

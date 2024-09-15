@@ -1,7 +1,6 @@
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { groupDeleteData } from '../group/group-delete';
 import { userDocumentRef } from '../models';
 
 /**
@@ -32,11 +31,6 @@ export const userDeleteAccountById = async (userId: string): Promise<void> => {
   // check if user exists
   if (!userData) {
     throw new HttpsError('failed-precondition', 'User does not exist');
-  }
-
-  // delete groups where user is the owner
-  for (const groupId of userData.groups.groupOwner) {
-    await groupDeleteData(userId, groupId);
   }
 
   // delete user's sub collections
