@@ -94,7 +94,7 @@ export type GroupSettingsDialogComponentData = {
           <div class="grid gap-x-6 gap-y-2 md:grid-cols-2">
             <div *ngFor="let user of removingGroupMembers()" class="flex gap-4 p-4 shadow-md">
               <app-user-display-item [userData]="user" />
-              <button mat-icon-button type="button" matTooltip="Remove User" (click)="onAddUserBack(user)">
+              <button mat-icon-button type="button" matTooltip="Add user back" (click)="onAddUserBack(user)">
                 <mat-icon color="primary">add</mat-icon>
               </button>
             </div>

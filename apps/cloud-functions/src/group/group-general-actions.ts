@@ -333,7 +333,7 @@ const requestMembershipAccept = async (authUserData: UserData, groupData: GroupD
   }
 
   // only allow DEMO_TRADING users to join
-  if (userData.userAccountType !== UserAccountEnum.DEMO_TRADING || userData.isDemo || userData.isTest) {
+  if (userData.userAccountType !== UserAccountEnum.DEMO_TRADING || userData.isDemo) {
     throw new HttpsError('aborted', 'User account type is not allowed to join group');
   }
 
