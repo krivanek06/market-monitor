@@ -211,16 +211,21 @@ export class PageGroupsComponent {
     try {
       // accept user
       if (response === 'primary') {
-        this.dialogServiceUtil.showNotificationBar(`Accepted ${groupData.name} invitation`, 'success');
+        // show notification
+        this.dialogServiceUtil.showNotificationBar(`Accepting ${groupData.name}'s invitation`, 'notification');
 
+        // accept invitation
         await this.groupApiService.userAcceptsGroupInvitation(groupData.id);
+
+        // show notification
+        this.dialogServiceUtil.showNotificationBar(`Accepted ${groupData.name} invitation`, 'success');
       }
 
       // decline user
       else if (response === 'secondary') {
         this.dialogServiceUtil.showNotificationBar(`Declined ${groupData.name} invitation`, 'success');
 
-        await this.groupApiService.userDeclinesGroupInvitation({
+        this.groupApiService.userDeclinesGroupInvitation({
           userId: user.id,
           groupId: groupData.id,
         });
@@ -247,7 +252,7 @@ export class PageGroupsComponent {
         this.dialogServiceUtil.showNotificationBar(`Removed request from group ${groupData.name}`, 'success');
 
         // remove request
-        await this.groupApiService.removeRequestToJoinGroup({
+        this.groupApiService.removeRequestToJoinGroup({
           groupId: groupData.id,
           userId: this.authenticationUserService.state.getUserData().id,
         });

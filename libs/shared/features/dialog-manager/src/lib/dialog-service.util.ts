@@ -20,10 +20,10 @@ import { NotificationProgressComponent } from './notification-bar/notification-b
   providedIn: 'root',
 })
 export class DialogServiceUtil {
-  private matDialog = inject(MatDialog, {
+  private readonly matDialog = inject(MatDialog, {
     optional: true,
   });
-  private snackBar = inject(MatSnackBar, {
+  private readonly snackBar = inject(MatSnackBar, {
     optional: true,
   });
 

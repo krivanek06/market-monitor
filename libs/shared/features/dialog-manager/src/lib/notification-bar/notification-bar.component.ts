@@ -1,4 +1,8 @@
+import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { NotificationProgressService } from './notification-bar.service';
@@ -37,6 +41,8 @@ import { NotificationProgressService } from './notification-bar.service';
       </button>
     </div>
   `,
+  standalone: true,
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressBarModule],
   styles: `
     mat-icon {
       min-width: 30px;

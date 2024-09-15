@@ -53,7 +53,7 @@ export type GroupSettingsDialogComponentData = {
       <mat-dialog-content>
         <div class="flex gap-4">
           <!-- upload image -->
-          <div>
+          <div class="min-w-[200px]">
             <app-upload-file-control
               folder="groups"
               formControlName="uploadedImage"
@@ -64,6 +64,12 @@ export type GroupSettingsDialogComponentData = {
 
           <!-- additional forms -->
           <div class="flex-1">
+            <!-- group ID -->
+            <div class="g-item-wrapper mb-3">
+              <span>GroupID</span>
+              <span>{{ groupDataSignal()?.id }}</span>
+            </div>
+
             <!-- group name -->
             <app-form-mat-input-wrapper formControlName="groupName" inputCaption="Group Name" inputType="TEXT" />
 

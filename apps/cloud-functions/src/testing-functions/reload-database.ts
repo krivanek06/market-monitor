@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   GroupCreateInput,
   GroupData,
+  GroupMember,
   GroupPortfolioStateSnapshotsData,
   PortfolioState,
   TEST_CUSTOM_USER_1,
@@ -24,7 +25,7 @@ import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
 import { FieldValue } from 'firebase-admin/firestore';
 import { v4 as uuidv4 } from 'uuid';
-import { calculateGroupMembersPortfolioState, groupMemberAccept } from '../group';
+import { calculateGroupMembersPortfolioState } from '../group';
 import {
   groupDocumentHoldingSnapshotsRef,
   groupDocumentMembersRef,
@@ -349,4 +350,38 @@ const createGroup = (data: GroupCreateInput, owner: UserBase): GroupData => {
     systemRank: {},
     numberOfMembers: 1,
   };
+};
+
+/**
+ *
+ * @param userAuthId - user id to which to add to the group
+ * @param requestGroupId - group id to which to add the user
+ */
+const groupMemberAccept = async (userAuthId: string, requestGroupId: string): Promise<void> => {
+  const userData = (await userDocumentRef(userAuthId).get()).data();
+  const groupData = (await groupDocumentRef(requestGroupId).get()).data();
+
+  // check if group exists
+  if (!groupData || !userData) {
+    return;
+  }
+  // update user to join group
+  await userDocumentRef(userAuthId).update({
+    'groups.groupInvitations': FieldValue.arrayRemove(requestGroupId),
+    'groups.groupMember': FieldValue.arrayUnion(requestGroupId),
+  });
+
+  // update group
+  await groupDocumentRef(groupData.id).update({
+    memberUserIds: FieldValue.arrayUnion(userAuthId), // add user to members
+    memberInvitedUserIds: FieldValue.arrayRemove(userAuthId), // remove invitation
+    numberOfMembers: FieldValue.increment(1), // increment number of members
+  });
+
+  // update group members
+  await groupDocumentMembersRef(groupData.id).update({
+    data: FieldValue.arrayUnion(<GroupMember>{
+      ...transformUserToGroupMember(userData, groupData.memberUserIds.length + 1),
+    }),
+  });
 };

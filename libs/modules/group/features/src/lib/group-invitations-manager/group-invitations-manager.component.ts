@@ -69,7 +69,6 @@ export class GroupInvitationsManagerComponent {
   dialogServiceUtil = inject(DialogServiceUtil);
 
   async onReceivedInvitationClick(user: UserData): Promise<void> {
-    console.log('onReceivedInvitationClick');
     const response = await this.dialogServiceUtil.showActionButtonDialog({
       dialogTitle: `Please decide if you want to accept or not the user ${user.personal.displayName}`,
       primaryButtonText: 'Accept',
@@ -81,21 +80,28 @@ export class GroupInvitationsManagerComponent {
     // accept user
     try {
       if (response === 'primary') {
-        this.dialogServiceUtil.showNotificationBar(`Accepting ${user.personal.displayName} to join the group`);
+        // notify user
+        this.dialogServiceUtil.showNotificationBar(`Accepting ${user.personal.displayName} to join`, 'notification');
+
+        // accept user
         await this.groupApiService.acceptUserRequestToGroup({
           userId: user.id,
           groupId: this.groupData().groupData.id,
         });
+
+        // notify user
         this.dialogServiceUtil.showNotificationBar(`Accepted ${user.personal.displayName} to join`, 'success');
       }
 
       // decline user
       else if (response === 'secondary') {
-        this.dialogServiceUtil.showNotificationBar(`Declining ${user.personal.displayName} to join the group`);
-        await this.groupApiService.declineUserRequestToGroup({
+        // decline
+        this.groupApiService.declineUserRequestToGroup({
           userId: user.id,
           groupId: this.groupData().groupData.id,
         });
+
+        // notify user
         this.dialogServiceUtil.showNotificationBar(`Declined ${user.personal.displayName} to join`, 'success');
       }
     } catch (error) {
@@ -106,11 +112,8 @@ export class GroupInvitationsManagerComponent {
   @Confirmable('Do you want to remove this invitation? User will not be able to join the group anymore.')
   async onSentInvitationClick(user: UserData): Promise<void> {
     try {
-      // notify user
-      this.dialogServiceUtil.showNotificationBar(`Removing ${user.personal.displayName} invitation to join the group`);
-
       // remove invitation
-      await this.groupApiService.removeUserInvitationToGroup({
+      this.groupApiService.removeUserInvitationToGroup({
         groupId: this.groupData().groupData.id,
         userId: user.id,
       });

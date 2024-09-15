@@ -6,23 +6,14 @@ import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.componen
 import { DialogServiceUtil } from './dialog-service.util';
 import { GenericDialogComponent } from './generic-dialog/generic-dialog.component';
 import { InlineInputDialogComponent } from './inline-input-dialog/inline-input-dialog.component';
-import { NotificationBarModule } from './notification-bar/notification-bar.module';
+import { NotificationProgressComponent } from './notification-bar';
 
 @NgModule({
   declarations: [],
   imports: [
     MatSnackBarModule,
     MatDialogModule,
-    NotificationBarModule,
-    ConfirmDialogComponent,
-    ActionButtonDialogComponent,
-    InlineInputDialogComponent,
-    GenericDialogComponent,
-  ],
-  exports: [
-    MatSnackBarModule,
-    MatDialogModule,
-    NotificationBarModule,
+    NotificationProgressComponent,
     ConfirmDialogComponent,
     ActionButtonDialogComponent,
     InlineInputDialogComponent,
