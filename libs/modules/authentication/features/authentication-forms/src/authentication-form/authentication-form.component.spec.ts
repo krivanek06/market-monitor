@@ -78,6 +78,7 @@ describe('AuthenticationFormComponent', () => {
           localData: () => ({
             demoAccount: undefined,
           }),
+          saveDataLocal: jest.fn(),
           saveData: jest.fn(),
         },
       })
