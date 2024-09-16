@@ -1,6 +1,6 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
-import { run_scheduler_update_users } from '../schedulers';
+import { run_scheduler_once_a_day, run_scheduler_update_users } from '../schedulers';
 import {
   userDeactivateInactiveAccounts,
   userDeleteDemoAccounts,
@@ -12,7 +12,12 @@ import { isFirebaseEmulator, measureFunctionExecutionTime } from './../utils';
 import { testReloadDatabase } from './reload-database';
 import { testingModifyHallOfFame } from './testing-modify-hall-of-fame';
 
-type FType = 'test_reload_database' | 'test_function' | 'test_delete_user_accounts';
+type FType =
+  | 'test_reload_database'
+  | 'test_function'
+  | 'test_delete_user_accounts'
+  | 'run_scheduler_once_a_day'
+  | 'run_scheduler_update_users';
 
 export const testing_function = onRequest({ timeoutSeconds: 1200 }, async (req, res) => {
   // prevent running in production
@@ -42,12 +47,12 @@ export const testing_function = onRequest({ timeoutSeconds: 1200 }, async (req, 
     // test function
     else if (functionType === 'test_function') {
       await test_function();
-      await run_scheduler_update_users(req, res);
-    }
-
-    // delete user accounts
-    else if (functionType === 'test_delete_user_accounts') {
+    } else if (functionType === 'test_delete_user_accounts') {
       await test_delete_user_accounts();
+    } else if (functionType === 'run_scheduler_once_a_day') {
+      await run_scheduler_once_a_day(req, res);
+    } else if (functionType === 'run_scheduler_update_users') {
+      await run_scheduler_update_users(req, res);
     }
 
     res.status(200).send('DONE');

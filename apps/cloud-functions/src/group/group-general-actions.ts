@@ -35,6 +35,9 @@ export const groupGeneralActions = onCall(async (request) => {
   const authUserData = (await userDocumentRef(userAuthId).get()).data();
   const groupData = (await groupDocumentRef(data.groupId).get()).data();
 
+  // log what's going on
+  console.log(`GroupId: ${data.groupId}, userId: ${userAuthId}, type: ${data.type}`);
+
   // check if group exists
   if (!groupData) {
     throw new HttpsError('not-found', GROUP_NOT_FOUND_ERROR);

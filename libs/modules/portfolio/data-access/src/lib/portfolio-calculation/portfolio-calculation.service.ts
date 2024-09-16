@@ -78,6 +78,7 @@ export class PortfolioCalculationService {
         breakEvenValue: 0,
         marketTotalValue: 0,
         totalBalanceValue: startingCashValue,
+        startingCash: startingCashValue,
       };
 
       // loop though all portfolio assets per date

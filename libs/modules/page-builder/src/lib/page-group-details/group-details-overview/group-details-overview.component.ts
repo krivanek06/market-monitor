@@ -115,11 +115,10 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         <mat-divider />
       </div>
 
+      <!-- growth chart -->
       <app-portfolio-growth-chart
-        *ngIf="portfolioGrowthSignal() as portfolioGrowthChartSignal"
         [data]="{
-          values: portfolioGrowthChartSignal,
-          startingCashValue: groupDetailsSignal.groupData.portfolioState.startingCash,
+          values: portfolioGrowthSignal(),
         }"
         [heightPx]="425"
         class="mb-6"
@@ -374,6 +373,7 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
           breakEvenValue: portfolioStatePerDay.invested,
           marketTotalValue: portfolioStatePerDay.holdingsBalance,
           totalBalanceValue: portfolioStatePerDay.balance,
+          startingCash: portfolioStatePerDay.startingCash,
         }) satisfies PortfolioGrowth,
     ),
   );

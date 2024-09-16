@@ -268,20 +268,21 @@ export const calculateGroupMembersPortfolioState = (
       createEmptyPortfolioState(),
     );
 
-  // calculate additional fields
-  memberPortfolioState.totalGainsValue = roundNDigits(
-    memberPortfolioState.holdingsBalance - memberPortfolioState.invested,
-  );
-  memberPortfolioState.totalGainsPercentage = roundNDigits(
-    memberPortfolioState.totalGainsValue / memberPortfolioState.holdingsBalance,
-  );
-  memberPortfolioState.previousBalanceChange = roundNDigits(
-    memberPortfolioState.balance - groupPreviousPortfolioState.balance,
-  );
-  memberPortfolioState.previousBalanceChangePercentage = calculateGrowth(
-    memberPortfolioState.balance,
-    groupPreviousPortfolioState.balance,
-  );
+  const memberPortfolioStateUpdate = {
+    ...memberPortfolioState,
 
-  return memberPortfolioState;
+    // round all values
+    balance: roundNDigits(memberPortfolioState.balance),
+    invested: roundNDigits(memberPortfolioState.invested),
+    holdingsBalance: roundNDigits(memberPortfolioState.holdingsBalance),
+    transactionFees: roundNDigits(memberPortfolioState.transactionFees),
+
+    // additional calculations
+    totalGainsValue: roundNDigits(memberPortfolioState.holdingsBalance - memberPortfolioState.invested),
+    totalGainsPercentage: roundNDigits(memberPortfolioState.totalGainsValue / memberPortfolioState.holdingsBalance),
+    previousBalanceChange: roundNDigits(memberPortfolioState.balance - groupPreviousPortfolioState.balance),
+    previousBalanceChangePercentage: calculateGrowth(memberPortfolioState.balance, groupPreviousPortfolioState.balance),
+  } satisfies PortfolioState;
+
+  return memberPortfolioStateUpdate;
 };

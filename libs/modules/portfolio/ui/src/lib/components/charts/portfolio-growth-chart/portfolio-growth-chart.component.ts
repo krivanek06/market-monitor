@@ -50,7 +50,6 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
   headerTitle = input<string>('');
   data = input.required<{
     values: PortfolioGrowth[];
-    startingCashValue: number;
   }>();
   displayLegend = input(false);
   chartType = input<'all' | 'marketValue' | 'balance'>('all');
@@ -85,7 +84,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
 
         // filter out by valid dates
         const inputValues = filterDataByDateRange(dataValues.values, sliderValues);
-        const seriesDataUpdate = this.createChartSeries(inputValues, dataValues.startingCashValue);
+        const seriesDataUpdate = this.createChartSeries(inputValues);
 
         // create chart
         return this.initChart(seriesDataUpdate);
@@ -232,13 +231,13 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
     };
   }
 
-  private createChartSeries(data: PortfolioGrowth[], startingCashValue: number = 0): SeriesOptionsType[] {
+  private createChartSeries(data: PortfolioGrowth[]): SeriesOptionsType[] {
     const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotalValue]);
     const breakEvenValue = data.map((point) => [new Date(point.date).getTime(), point.breakEvenValue]);
 
     //  const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
     const totalBalanceValues = data.map((point) => [new Date(point.date).getTime(), point.totalBalanceValue]);
-    const threshold = data.map((point) => [new Date(point.date).getTime(), startingCashValue ?? 0]);
+    const threshold = data.map((point) => [new Date(point.date).getTime(), point.startingCash]);
 
     // get points when investment value change from previous day
     const investmentChangePoints: [number, number][] = [];
@@ -335,7 +334,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         zIndex: 10,
         yAxis: 0,
         opacity: 0.45,
-        visible: (this.chartType() === 'all' || this.chartType() === 'balance') && startingCashValue > 0,
+        visible: this.chartType() === 'all' || this.chartType() === 'balance',
         showInLegend: true,
         fillColor: {
           linearGradient: {

@@ -125,7 +125,6 @@ import {
           chartType="balance"
           [data]="{
             values: getPortfolioGrowth,
-            startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0,
           }"
           [heightPx]="350"
         />
@@ -143,7 +142,6 @@ import {
           chartType="marketValue"
           [data]="{
             values: portfolioGrowth,
-            startingCashValue: portfolioUserFacadeService.getPortfolioState()?.startingCash ?? 0,
           }"
           [heightPx]="360"
           [dateRangeWidth]="400"

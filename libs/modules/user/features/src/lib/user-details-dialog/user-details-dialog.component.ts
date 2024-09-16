@@ -139,7 +139,6 @@ export type UserDetailsDialogComponentData = {
                 [displayLegend]="true"
                 [data]="{
                   values: portfolioGrowthSignal().data,
-                  startingCashValue: userData.portfolioState.startingCash,
                 }"
                 [heightPx]="375"
                 class="mb-6"
