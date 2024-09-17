@@ -28,6 +28,6 @@ import { StorageLocalService } from '@mm/shared/storage-local';
   `,
 })
 export class AppComponent {
-  readonly #storageLocalService = inject(StorageLocalService);
-  isLoading = computed(() => !!this.#storageLocalService.localData()?.loader?.enabled);
+  private readonly storageLocalService = inject(StorageLocalService);
+  readonly isLoading = computed(() => !!this.storageLocalService.localData()?.loader?.enabled);
 }

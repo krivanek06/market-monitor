@@ -178,41 +178,41 @@ export type UserDetailsDialogComponentData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserDetailsDialogComponent {
-  readonly #dialogRef = inject(MatDialogRef);
-  readonly #userApiService = inject(UserApiService);
-  readonly #dialogServiceUtil = inject(DialogServiceUtil);
-  readonly #portfolioCalculationService = inject(PortfolioCalculationService);
-  readonly data = inject<UserDetailsDialogComponentData>(MAT_DIALOG_DATA);
+  private readonly dialogRef = inject(MatDialogRef);
+  private readonly userApiService = inject(UserApiService);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly portfolioCalculationService = inject(PortfolioCalculationService);
+  private readonly data = inject<UserDetailsDialogComponentData>(MAT_DIALOG_DATA);
 
-  readonly #userData = this.#userApiService.getUserById(this.data.userId).pipe(
+  private readonly userData$ = this.userApiService.getUserById(this.data.userId).pipe(
     tap((userData) => {
       if (!userData) {
-        this.#dialogServiceUtil.showNotificationBar(`User not found`, 'error');
+        this.dialogServiceUtil.showNotificationBar(`User not found`, 'error');
         this.onDialogClose();
       }
     }),
     filterNil(),
     share(),
   );
-  readonly #portfolioTransactions = this.#userData.pipe(
+  private readonly portfolioTransactions$ = this.userData$.pipe(
     map((userData) => userData),
     filterNil(),
     switchMap((userData) =>
-      this.#userApiService
+      this.userApiService
         .getUserPortfolioTransactions(userData.id)
         .pipe(map((transactions) => transactions.transactions)),
     ),
     share(),
   );
 
-  readonly userDataSignal = toSignal(this.#userData);
+  readonly userDataSignal = toSignal(this.userData$);
 
-  readonly portfolioTransactions = toSignal(this.#portfolioTransactions);
+  readonly portfolioTransactions = toSignal(this.portfolioTransactions$);
 
   readonly portfolioStateHoldingSignal = toSignal(
-    combineLatest([this.#userData, this.#portfolioTransactions]).pipe(
+    combineLatest([this.userData$, this.portfolioTransactions$]).pipe(
       switchMap(([userData, transactions]) =>
-        this.#portfolioCalculationService.getPortfolioStateHoldings(
+        this.portfolioCalculationService.getPortfolioStateHoldings(
           userData?.portfolioState?.startingCash ?? 0,
           transactions,
         ),
@@ -221,11 +221,11 @@ export class UserDetailsDialogComponent {
   );
 
   readonly portfolioGrowthSignal = toSignal(
-    combineLatest([this.#userData, this.#portfolioTransactions]).pipe(
+    combineLatest([this.userData$, this.portfolioTransactions$]).pipe(
       switchMap(([userData, transactions]) =>
-        from(this.#portfolioCalculationService.getPortfolioGrowthAssets(transactions)).pipe(
+        from(this.portfolioCalculationService.getPortfolioGrowthAssets(transactions)).pipe(
           map((growth) =>
-            this.#portfolioCalculationService.getPortfolioGrowth(growth, userData?.portfolioState?.startingCash ?? 0),
+            this.portfolioCalculationService.getPortfolioGrowth(growth, userData?.portfolioState?.startingCash ?? 0),
           ),
           map((data) => ({ data, state: 'loaded' as const })),
         ),
@@ -253,6 +253,6 @@ export class UserDetailsDialogComponent {
   readonly selectedValueSignal = signal<'portfolio' | 'transactions'>('portfolio');
 
   onDialogClose() {
-    this.#dialogRef.close();
+    this.dialogRef.close();
   }
 }

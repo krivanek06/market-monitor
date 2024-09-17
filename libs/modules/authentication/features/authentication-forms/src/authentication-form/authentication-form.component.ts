@@ -125,32 +125,32 @@ import { FormRegisterComponent } from './form-register/form-register.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthenticationFormComponent {
+  private readonly authenticationAccountService = inject(AuthenticationAccountService);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly storageLocalService = inject(StorageLocalService);
+  private readonly router = inject(Router);
+
   readonly loginUserInputControl = new FormControl<LoginUserInput | null>(null);
   readonly registerUserInputControl = new FormControl<RegisterUserInput | null>(null);
 
-  readonly #authenticationAccountService = inject(AuthenticationAccountService);
-  readonly #authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  readonly #dialogServiceUtil = inject(DialogServiceUtil);
-  readonly #storageLocalService = inject(StorageLocalService);
-  readonly #router = inject(Router);
-
   /** emit a value whether to use google or demo login */
-  readonly #loginType$ = new Subject<'google' | 'demo' | 'demoAlreadyCreated'>();
+  private readonly loginType$ = new Subject<'google' | 'demo' | 'demoAlreadyCreated'>();
 
-  readonly #googleAuth$ = this.#loginType$.pipe(
+  private readonly googleAuth$ = this.loginType$.pipe(
     filter((type) => type === 'google'),
     switchMap(() =>
-      from(this.#authenticationAccountService.signInGoogle()).pipe(
+      from(this.authenticationAccountService.signInGoogle()).pipe(
         switchMap(() =>
-          this.#authenticationAccountService.getUserData().pipe(
+          this.authenticationAccountService.getUserData().pipe(
             filterNil(), // wait until there is a user initialized
             first(),
             switchMap((userData) =>
-              this.#authenticationAccountService.isUserNewUser()
+              this.authenticationAccountService.isUserNewUser()
                 ? from(this.openSelectAccountType()).pipe(
                     filterNil(),
                     switchMap((accountType) =>
-                      from(this.#authenticationUserStoreService.resetTransactions(accountType)).pipe(
+                      from(this.authenticationUserStoreService.resetTransactions(accountType)).pipe(
                         map(() => ({ data: userData, action: 'success' as const })),
                         startWith({
                           action: 'loading' as const,
@@ -178,37 +178,37 @@ export class AuthenticationFormComponent {
     ),
   );
 
-  readonly #demoLogin$ = this.#loginType$.pipe(
+  private readonly demoLogin$ = this.loginType$.pipe(
     filter((type) => type === 'demo'),
     switchMap(() =>
       this.openSelectAccountType().pipe(
         filterNil(),
         tap(() =>
-          this.#dialogServiceUtil.showNotificationBar(
+          this.dialogServiceUtil.showNotificationBar(
             'Creating demo account, it may take few seconds',
             'notification',
             5000,
           ),
         ),
         switchMap((accountType) =>
-          from(this.#authenticationAccountService.registerDemoAccount(accountType)).pipe(
+          from(this.authenticationAccountService.registerDemoAccount(accountType)).pipe(
             switchMap((result) =>
               from(
-                this.#authenticationAccountService.signIn({
+                this.authenticationAccountService.signIn({
                   email: result.userData.personal.email,
                   password: result.password,
                 }),
               ).pipe(
                 tap(() =>
                   // save data into local storage
-                  this.#storageLocalService.saveDataLocal('demoAccount', {
+                  this.storageLocalService.saveDataLocal('demoAccount', {
                     email: result.userData.personal.email,
                     password: result.password,
                     createdDate: new Date().toString(),
                   }),
                 ),
                 switchMap(() =>
-                  this.#authenticationAccountService.getUserData().pipe(
+                  this.authenticationAccountService.getUserData().pipe(
                     filterNil(), // wait until there is a user initialized
                     map((userData) => ({ data: userData, action: 'success' as const })),
                   ),
@@ -232,17 +232,17 @@ export class AuthenticationFormComponent {
     ),
   );
 
-  readonly #demoLoginAlreadyCreated$ = this.#loginType$.pipe(
+  private readonly demoLoginAlreadyCreated$ = this.loginType$.pipe(
     filter((type) => type === 'demoAlreadyCreated'),
     switchMap(() =>
       from(
-        this.#authenticationAccountService.signIn({
+        this.authenticationAccountService.signIn({
           email: this.demoAccount()?.email ?? '',
           password: this.demoAccount()?.password ?? '',
         }),
       ).pipe(
         switchMap(() =>
-          this.#authenticationAccountService.getUserData().pipe(
+          this.authenticationAccountService.getUserData().pipe(
             filterNil(), // wait until there is a user initialized
             map((userData) => ({ data: userData, action: 'success' as const })),
           ),
@@ -262,19 +262,19 @@ export class AuthenticationFormComponent {
     ),
   );
 
-  readonly #registerUser$ = this.registerUserInputControl.valueChanges.pipe(
+  private readonly registerUser$ = this.registerUserInputControl.valueChanges.pipe(
     filterNil(),
     switchMap((res) =>
-      from(this.#authenticationAccountService.register(res)).pipe(
+      from(this.authenticationAccountService.register(res)).pipe(
         switchMap(() =>
-          this.#authenticationAccountService.getUserData().pipe(
+          this.authenticationAccountService.getUserData().pipe(
             filterNil(), // wait until there is a user initialized
             first(),
             switchMap((userData) =>
               from(this.openSelectAccountType()).pipe(
                 filterNil(),
                 switchMap((accountType) =>
-                  from(this.#authenticationUserStoreService.resetTransactions(accountType)).pipe(
+                  from(this.authenticationUserStoreService.resetTransactions(accountType)).pipe(
                     map(() => ({ data: userData, action: 'success' as const })),
                   ),
                 ),
@@ -297,12 +297,12 @@ export class AuthenticationFormComponent {
     ),
   );
 
-  readonly #loginUser$ = this.loginUserInputControl.valueChanges.pipe(
+  private readonly loginUser$ = this.loginUserInputControl.valueChanges.pipe(
     filterNil(),
     switchMap((res) =>
-      from(this.#authenticationAccountService.signIn(res)).pipe(
+      from(this.authenticationAccountService.signIn(res)).pipe(
         switchMap(() =>
-          this.#authenticationAccountService.getUserData().pipe(
+          this.authenticationAccountService.getUserData().pipe(
             filterNil(), // wait until there is a user initialized
             map((userData) => ({ data: userData, action: 'success' as const })),
           ),
@@ -325,14 +325,14 @@ export class AuthenticationFormComponent {
   readonly userAuthenticationState = toSignal(
     concat(
       of({ action: 'idle' as const, data: null, error: null }),
-      merge(this.#googleAuth$, this.#demoLogin$, this.#registerUser$, this.#loginUser$, this.#demoLoginAlreadyCreated$),
+      merge(this.googleAuth$, this.demoLogin$, this.registerUser$, this.loginUser$, this.demoLoginAlreadyCreated$),
     ),
     {
       initialValue: { action: 'idle', data: null, error: null },
     },
   );
 
-  readonly demoAccount = computed(() => this.#storageLocalService.localData().demoAccount);
+  readonly demoAccount = computed(() => this.storageLocalService.localData().demoAccount);
   readonly demoAccountValidUntil = computed(() =>
     addDays(this.demoAccount()?.createdDate ?? '', USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DEMO),
   );
@@ -349,37 +349,37 @@ export class AuthenticationFormComponent {
     untracked(() => {
       if (state.action === 'success') {
         // display success message
-        this.#dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
+        this.dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
         // navigate to dashboard
-        this.#router.navigate([ROUTES_MAIN.DASHBOARD]);
+        this.router.navigate([ROUTES_MAIN.DASHBOARD]);
       } else if (state.action === 'error') {
-        this.#dialogServiceUtil.handleError(state.error);
+        this.dialogServiceUtil.handleError(state.error);
       } else if (state.action === 'error-demo-already-active') {
-        this.#dialogServiceUtil.showNotificationBar('Demo account not longer works', 'error');
+        this.dialogServiceUtil.showNotificationBar('Demo account not longer works', 'error');
         // remove demo account
-        this.#storageLocalService.saveDataLocal('demoAccount', undefined);
+        this.storageLocalService.saveDataLocal('demoAccount', undefined);
       }
     });
   });
 
   onGoogleAuth() {
-    this.#loginType$.next('google');
+    this.loginType$.next('google');
   }
 
   async onDemoLogin() {
     // if user already has demo account, use it
     if (this.demoAccountValid()) {
-      this.#loginType$.next('demoAlreadyCreated');
+      this.loginType$.next('demoAlreadyCreated');
       return;
     }
 
     // create demo account
-    const confirm = await this.#dialogServiceUtil.showConfirmDialog(
+    const confirm = await this.dialogServiceUtil.showConfirmDialog(
       `Demo account will be created and removed after ${USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DEMO} days, please confirm`,
     );
 
     if (confirm) {
-      this.#loginType$.next('demo');
+      this.loginType$.next('demo');
     }
   }
 

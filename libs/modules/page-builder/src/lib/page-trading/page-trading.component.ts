@@ -179,9 +179,9 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingComponent {
-  readonly #marketApiService = inject(MarketApiService);
-  readonly #dialog = inject(MatDialog);
-  readonly #dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly marketApiService = inject(MarketApiService);
+  private readonly dialog = inject(MatDialog);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
 
   readonly authenticationUserService = inject(AuthenticationUserStoreService);
   readonly portfolioUserFacadeService = inject(PortfolioUserFacadeService);
@@ -198,10 +198,10 @@ export class PageTradingComponent {
     this.selectedSymbolControl.valueChanges.pipe(
       startWith(this.selectedSymbolControl.value),
       switchMap((symbol) =>
-        this.#marketApiService.getSymbolSummary(symbol).pipe(
+        this.marketApiService.getSymbolSummary(symbol).pipe(
           map((d) => ({ data: d, state: 'success' as const })),
           catchError((e) => {
-            this.#dialogServiceUtil.showNotificationBar('Error fetching symbol summary', 'error');
+            this.dialogServiceUtil.showNotificationBar('Error fetching symbol summary', 'error');
             return of({ data: null, state: 'error' as const });
           }),
           // to show loader every time the symbol changes
@@ -213,7 +213,7 @@ export class PageTradingComponent {
   );
 
   readonly topPerformanceSignal = toSignal(
-    this.#marketApiService.getMarketTopPerformance().pipe(map((d) => d.stockTopActive)),
+    this.marketApiService.getMarketTopPerformance().pipe(map((d) => d.stockTopActive)),
   );
 
   /**
@@ -264,20 +264,20 @@ export class PageTradingComponent {
   }
 
   async onTransactionDelete(transaction: PortfolioTransaction) {
-    if (await this.#dialogServiceUtil.showConfirmDialog('Please confirm removing transaction')) {
+    if (await this.dialogServiceUtil.showConfirmDialog('Please confirm removing transaction')) {
       this.portfolioUserFacadeService.deletePortfolioOperation(transaction);
-      this.#dialogServiceUtil.showNotificationBar('Transaction removed', 'success');
+      this.dialogServiceUtil.showNotificationBar('Transaction removed', 'success');
     }
   }
 
   onOperationClick(transactionType: PortfolioTransactionType): void {
     const summary = this.symbolSummarySignal().data;
     if (!summary) {
-      this.#dialogServiceUtil.showNotificationBar('Please select a stock first', 'notification');
+      this.dialogServiceUtil.showNotificationBar('Please select a stock first', 'notification');
       return;
     }
 
-    this.#dialog.open(PortfolioTradeDialogComponent, {
+    this.dialog.open(PortfolioTradeDialogComponent, {
       data: <PortfolioTradeDialogComponentData>{
         transactionType: transactionType,
         quote: summary.quote,

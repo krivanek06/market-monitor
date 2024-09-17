@@ -14,17 +14,17 @@ import { PortfolioCreateOperationService } from '../portfolio-create-operation/p
   providedIn: 'root',
 })
 export class PortfolioUserFacadeService {
-  readonly #authenticationUserService = inject(AuthenticationUserStoreService);
-  readonly #portfolioCalculationService = inject(PortfolioCalculationService);
-  readonly #portfolioCreateOperationService = inject(PortfolioCreateOperationService);
-  readonly #userApiService = inject(UserApiService);
+  private readonly authenticationUserService = inject(AuthenticationUserStoreService);
+  private readonly portfolioCalculationService = inject(PortfolioCalculationService);
+  private readonly portfolioCreateOperationService = inject(PortfolioCreateOperationService);
+  private readonly userApiService = inject(UserApiService);
 
   readonly getPortfolioState = toSignal(
-    toObservable(this.#authenticationUserService.state.getUserPortfolioTransactions).pipe(
+    toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
       switchMap((transactions) =>
         transactions
-          ? this.#portfolioCalculationService.getPortfolioStateHoldings(
-              this.#authenticationUserService.state.getUserData().portfolioState.startingCash,
+          ? this.portfolioCalculationService.getPortfolioStateHoldings(
+              this.authenticationUserService.state.getUserData().portfolioState.startingCash,
               transactions,
             )
           : of(undefined),
@@ -39,9 +39,9 @@ export class PortfolioUserFacadeService {
    * method used to return growth for each asset based on the dates owned.
    */
   readonly getPortfolioGrowthAssets = toSignal(
-    toObservable(this.#authenticationUserService.state.getUserPortfolioTransactions).pipe(
+    toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
       switchMap((transactions) =>
-        transactions ? from(this.#portfolioCalculationService.getPortfolioGrowthAssets(transactions)) : of(undefined),
+        transactions ? from(this.portfolioCalculationService.getPortfolioGrowthAssets(transactions)) : of(undefined),
       ),
     ),
   );
@@ -52,7 +52,7 @@ export class PortfolioUserFacadeService {
   readonly getPortfolioGrowth = computed(() => {
     const growth = this.getPortfolioGrowthAssets();
     const startingCash = this.getPortfolioState()?.startingCash;
-    const result = growth ? this.#portfolioCalculationService.getPortfolioGrowth(growth, startingCash) : null;
+    const result = growth ? this.portfolioCalculationService.getPortfolioGrowth(growth, startingCash) : null;
 
     return result;
   });
@@ -61,24 +61,24 @@ export class PortfolioUserFacadeService {
    * method used to return change for the entire portfolio
    */
   readonly getPortfolioChange = computed(() =>
-    this.#portfolioCalculationService.getPortfolioChange(this.getPortfolioGrowth() ?? []),
+    this.portfolioCalculationService.getPortfolioChange(this.getPortfolioGrowth() ?? []),
   );
 
   readonly getPortfolioSectorAllocationPieChart = computed(() =>
-    this.#portfolioCalculationService.getPortfolioSectorAllocationPieChart(this.getPortfolioState()?.holdings ?? []),
+    this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(this.getPortfolioState()?.holdings ?? []),
   );
 
   readonly getPortfolioAssetAllocationPieChart = computed(() =>
-    this.#portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.getPortfolioState()?.holdings ?? []),
+    this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.getPortfolioState()?.holdings ?? []),
   );
 
   createPortfolioOperation(data: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
-    const userData = this.#authenticationUserService.state.getUserData();
-    return this.#portfolioCreateOperationService.createPortfolioCreateOperation(userData, data);
+    const userData = this.authenticationUserService.state.getUserData();
+    return this.portfolioCreateOperationService.createPortfolioCreateOperation(userData, data);
   }
 
   deletePortfolioOperation(transaction: PortfolioTransaction): void {
-    const userData = this.#authenticationUserService.state.getUserData();
-    this.#userApiService.deletePortfolioTransactionForUser(userData.id, transaction);
+    const userData = this.authenticationUserService.state.getUserData();
+    this.userApiService.deletePortfolioTransactionForUser(userData.id, transaction);
   }
 }
