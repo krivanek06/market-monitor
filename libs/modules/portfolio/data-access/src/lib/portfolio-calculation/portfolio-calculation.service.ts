@@ -353,6 +353,7 @@ export class PortfolioCalculationService {
    * @returns - an array of {symbol: string, data: PortfolioGrowthAssetsDataItem[]}
    */
   async getPortfolioGrowthAssets(transactions: PortfolioTransaction[]): Promise<PortfolioGrowthAssets[]> {
+    // load historical data for all distinct symbols in transactions
     const historicalPrices = await this.getHistoricalPricesForTransactionsSymbols(transactions);
     const symbols = Object.keys(historicalPrices);
 
@@ -412,6 +413,8 @@ export class PortfolioCalculationService {
 
             // add or subtract units depending on transaction type
             aggregator.units += isBuy ? transaction.units : -transaction.units;
+            aggregator.units =
+              transaction.symbolType === 'CRYPTO' ? roundNDigits(aggregator.units, 4) : aggregator.units;
 
             // increment next transaction index
             aggregator.index += 1;
