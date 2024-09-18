@@ -1,6 +1,6 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
-import { run_scheduler_once_a_day, run_scheduler_update_users } from '../schedulers';
+import { run_scheduler_once_a_day, run_scheduler_update_users } from '../production';
 import {
   userDeactivateInactiveAccounts,
   userDeleteDemoAccounts,

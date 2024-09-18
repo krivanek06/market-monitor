@@ -5,4 +5,3 @@ export * from './user-delete-account';
 export * from './user-hall-of-fame';
 export * from './user-portfolio-rank';
 export * from './user-portfolio-update';
-export * from './user-reset-transactions';

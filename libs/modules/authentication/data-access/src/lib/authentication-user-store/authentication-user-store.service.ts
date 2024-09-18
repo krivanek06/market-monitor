@@ -203,8 +203,34 @@ export class AuthenticationUserStoreService {
     this.userApiService.changeUserPersonal(this.state.getUserData(), data);
   }
 
-  resetTransactions(data: UserAccountBasicTypes): Promise<void> {
-    return this.userApiService.resetTransactions(this.state.getUserData().id, data);
+  resetTransactions(): void {
+    this.userApiService.resetTransactions(this.state.getUserData());
+  }
+
+  changeAccountType(data: UserAccountBasicTypes): void {
+    const userData = this.state.getUserData();
+
+    // update user account type
+    this.userApiService.changeAccountType(userData, data);
+
+    // remove user from groups
+    userData.groups.groupMember.forEach((groupId) => this.groupApiService.leaveGroup(groupId));
+
+    // clear all sent invitations to groups
+    userData.groups.groupInvitations.forEach((groupId) =>
+      this.groupApiService.userDeclinesGroupInvitation({
+        groupId,
+        userId: userData.id,
+      }),
+    );
+
+    // clear all requests to join groups
+    userData.groups.groupRequested.forEach((groupId) =>
+      this.groupApiService.removeRequestToJoinGroup({
+        groupId,
+        userId: userData.id,
+      }),
+    );
   }
 
   changeUserSettings(data: Partial<UserData['settings']>): void {

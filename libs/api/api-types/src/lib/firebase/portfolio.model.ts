@@ -119,13 +119,14 @@ export type PortfolioGrowthAssetsDataItem = {
    * units * invested values - how much user invested in this asset
    */
   breakEvenValue: number;
-  // breakEvenPrice - investedValue / units
+  /**
+   * units of the asset user has in this specific date
+   */
   units: number;
   /**
    * units * price of the asset on day
    */
   marketTotalValue: number;
-  // price - marketTotalValue / units
   /**
    * units * price of the asset on day - invested values
    */

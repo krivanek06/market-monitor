@@ -149,15 +149,12 @@ export class AuthenticationFormComponent {
               this.authenticationAccountService.isUserNewUser()
                 ? from(this.openSelectAccountType()).pipe(
                     filterNil(),
-                    switchMap((accountType) =>
-                      from(this.authenticationUserStoreService.resetTransactions(accountType)).pipe(
-                        map(() => ({ data: userData, action: 'success' as const })),
-                        startWith({
-                          action: 'loading' as const,
-                          data: null,
-                        }),
-                      ),
-                    ),
+                    tap((accountType) => this.authenticationUserStoreService.changeAccountType(accountType)),
+                    map(() => ({ data: userData, action: 'success' as const })),
+                    startWith({
+                      action: 'loading' as const,
+                      data: null,
+                    }),
                   )
                 : of({ data: userData, action: 'success' as const }),
             ),
@@ -273,11 +270,8 @@ export class AuthenticationFormComponent {
             switchMap((userData) =>
               from(this.openSelectAccountType()).pipe(
                 filterNil(),
-                switchMap((accountType) =>
-                  from(this.authenticationUserStoreService.resetTransactions(accountType)).pipe(
-                    map(() => ({ data: userData, action: 'success' as const })),
-                  ),
-                ),
+                tap((accountType) => this.authenticationUserStoreService.changeAccountType(accountType)),
+                map(() => ({ data: userData, action: 'success' as const })),
               ),
             ),
           ),

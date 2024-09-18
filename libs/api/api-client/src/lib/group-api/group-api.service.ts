@@ -278,7 +278,7 @@ export class GroupApiService {
       isClosed: true,
     } satisfies Partial<GroupData>);
 
-    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'closeGroup',
       groupId: groupId,
@@ -293,7 +293,7 @@ export class GroupApiService {
   }
 
   deleteGroup(groupId: string) {
-    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'deleteGroup',
       groupId: groupId,
@@ -301,7 +301,7 @@ export class GroupApiService {
   }
 
   userAcceptsGroupInvitation(groupId: string) {
-    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'inviteUsersAccept',
       groupId,
@@ -309,7 +309,7 @@ export class GroupApiService {
   }
 
   userDeclinesGroupInvitation(input: { groupId: string; userId: string }) {
-    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'inviteUserRemoveInvitation',
       userId: input.userId,
@@ -327,7 +327,7 @@ export class GroupApiService {
   }
 
   removeGroupMembers(input: { groupId: string; userIds: string[] }) {
-    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'membersRemove',
       userIds: input.userIds,
@@ -341,7 +341,7 @@ export class GroupApiService {
    * @returns - how many users were invited to the group who are not yet members or invited or requested
    */
   inviteUsersToGroup(input: { groupId: string; userIds: string[] }) {
-    const callable = httpsCallable<GroupGeneralActions, number>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, number>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'inviteUsers',
       userIds: input.userIds,
@@ -370,7 +370,7 @@ export class GroupApiService {
   }
 
   inviteUserToGroup(input: { groupId: string; userId: string }) {
-    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, GroupData>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'inviteUsers',
       userIds: [input.userId],
@@ -385,7 +385,7 @@ export class GroupApiService {
    * @returns
    */
   removeUserInvitationToGroup(input: { groupId: string; userId: string }) {
-    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'inviteUserRemoveInvitation',
       groupId: input.groupId,
@@ -398,11 +398,11 @@ export class GroupApiService {
    *
    * @param input
    */
-  leaveGroup(groupData: GroupData) {
-    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+  leaveGroup(groupId: string) {
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'leaveGroup',
-      groupId: groupData.id,
+      groupId,
     });
   }
 
@@ -413,7 +413,7 @@ export class GroupApiService {
    * @returns
    */
   acceptUserRequestToGroup(input: { groupId: string; userId: string }) {
-    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'requestMembershipAccept',
       groupId: input.groupId,
@@ -428,7 +428,7 @@ export class GroupApiService {
    * @returns
    */
   declineUserRequestToGroup(input: { groupId: string; userId: string }) {
-    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'requestMembershipDecline',
       groupId: input.groupId,
@@ -437,7 +437,7 @@ export class GroupApiService {
   }
 
   sendRequestToJoinGroup(groupId: string) {
-    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'requestMembership',
       groupId: groupId,
@@ -445,7 +445,7 @@ export class GroupApiService {
   }
 
   removeRequestToJoinGroup(input: { groupId: string; userId: string }) {
-    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActions');
+    const callable = httpsCallable<GroupGeneralActions, void>(this.functions, 'groupGeneralActionsCall');
     return callable({
       type: 'requestMembershipDecline',
       groupId: input.groupId,

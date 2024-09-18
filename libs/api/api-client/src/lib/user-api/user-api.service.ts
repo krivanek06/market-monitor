@@ -12,17 +12,19 @@ import {
   setDoc,
   where,
 } from '@angular/fire/firestore';
-import { Functions, httpsCallable } from '@angular/fire/functions';
+import { Functions } from '@angular/fire/functions';
 import {
   PortfolioTransaction,
   SymbolStoreBase,
-  UserAccountBasicTypes,
+  USER_DEFAULT_STARTING_CASH,
+  UserAccountEnum,
+  UserBase,
   UserData,
   UserPortfolioTransaction,
-  UserResetTransactionsInput,
   UserWatchList,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
+import { createEmptyPortfolioState } from '@mm/shared/general-util';
 import { arrayUnion, updateDoc } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { DocumentData } from 'rxfire/firestore/interfaces';
@@ -71,11 +73,43 @@ export class UserApiService {
     });
   }
 
-  async resetTransactions(userId: string, accountTypeSelected: UserAccountBasicTypes): Promise<void> {
-    const callable = httpsCallable<UserResetTransactionsInput, void>(this.functions, 'userResetTransactionsCall');
-    await callable({
-      userId: userId,
-      accountTypeSelected,
+  resetTransactions(userBase: UserBase): void {
+    const startingCash = userBase.userAccountType === UserAccountEnum.DEMO_TRADING ? USER_DEFAULT_STARTING_CASH : 0;
+
+    // reset transactions
+    updateDoc(this.getUserPortfolioTransactionDocRef(userBase.id), {
+      transactions: [],
+    });
+
+    // reset user portfolio state
+    this.updateUser(userBase.id, {
+      portfolioState: {
+        ...createEmptyPortfolioState(startingCash),
+      },
+    });
+  }
+
+  changeAccountType(userBase: UserBase, accountTypeSelected: UserAccountEnum): void {
+    const startingCash = accountTypeSelected === UserAccountEnum.DEMO_TRADING ? USER_DEFAULT_STARTING_CASH : 0;
+
+    // reset transactions
+    updateDoc(this.getUserPortfolioTransactionDocRef(userBase.id), {
+      transactions: [],
+    });
+
+    // reset user portfolio state
+    this.updateUser(userBase.id, {
+      portfolioState: {
+        ...createEmptyPortfolioState(startingCash),
+      },
+      groups: {
+        groupInvitations: [],
+        groupMember: [],
+        groupOwner: [],
+        groupRequested: [],
+        groupWatched: [],
+      },
+      userAccountType: accountTypeSelected,
     });
   }
 

@@ -330,7 +330,7 @@ export class GroupInteractionButtonsComponent {
   @Confirmable('Are you sure you want to leave this group?')
   onLeaveGroupClick() {
     try {
-      this.groupApiService.leaveGroup(this.groupDetails().groupData);
+      this.groupApiService.leaveGroup(this.groupDetails().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You left the group', 'success');

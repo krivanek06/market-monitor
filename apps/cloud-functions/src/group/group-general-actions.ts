@@ -20,7 +20,7 @@ import {
 } from '@mm/api-types';
 import { getCurrentDateDefaultFormat, transformUserToGroupMember } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { HttpsError } from 'firebase-functions/v2/https';
 import {
   groupCollectionMoreInformationRef,
   groupDocumentMembersRef,
@@ -28,9 +28,10 @@ import {
   userDocumentRef,
 } from '../models';
 
-export const groupGeneralActions = onCall(async (request) => {
-  const userAuthId = request.auth?.uid as string;
-  const data = request.data as GroupGeneralActions;
+export const groupGeneralActions = async (userAuthId: string | undefined, data: GroupGeneralActions) => {
+  if (!userAuthId) {
+    return;
+  }
 
   const authUserData = (await userDocumentRef(userAuthId).get()).data();
   const groupData = (await groupDocumentRef(data.groupId).get()).data();
@@ -99,7 +100,7 @@ export const groupGeneralActions = onCall(async (request) => {
   }
 
   throw new HttpsError('invalid-argument', 'Invalid action type');
-});
+};
 
 /** Invite a user to a group */
 const inviteUsers = async (authUserData: UserData, groupData: GroupData, userIds: string[]) => {

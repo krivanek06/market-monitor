@@ -1,7 +1,43 @@
+import { GroupGeneralActions, UserCreateDemoAccountInput } from '@mm/api-types';
+import { CallableRequest, onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
-import { userDeleteDemoAccounts, userHallOfFame, userPortfolioRank, userPortfolioUpdate } from '../user';
-import { measureFunctionExecutionTime } from '../utils';
+import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from './group';
+import { groupGeneralActions } from './group/group-general-actions';
+import {
+  userCreateAccount,
+  userCreateAccountDemo,
+  userDeleteAccount,
+  userDeleteDemoAccounts,
+  userHallOfFame,
+  userPortfolioRank,
+  userPortfolioUpdate,
+} from './user';
+import { measureFunctionExecutionTime } from './utils';
+
+/**
+ * USERS
+ */
+
+export const userCreateAccountCall = onCall((request: CallableRequest<void>) => userCreateAccount(request.auth?.uid));
+
+export const userCreateAccountDemoCall = onCall((request: CallableRequest<UserCreateDemoAccountInput>) =>
+  userCreateAccountDemo(request.data),
+);
+
+export const userDeleteAccountCall = onCall(async (request: CallableRequest<void>) =>
+  userDeleteAccount(request.auth?.uid),
+);
+
+/** ------------------------------------------ */
+
+/**
+ * GROUPS
+ */
+export const groupGeneralActionsCall = onCall((request: CallableRequest<GroupGeneralActions>) =>
+  groupGeneralActions(request.auth?.uid, request.data),
+);
+
+/** ------------------------------------------ */
 
 /**
  * every 5 minutes between 22:00 and 23:00

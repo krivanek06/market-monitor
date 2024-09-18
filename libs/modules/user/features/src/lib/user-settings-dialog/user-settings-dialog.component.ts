@@ -18,7 +18,6 @@ import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { UploadFileControlComponent } from 'libs/shared/features/upload-file-control/src';
 import { filterNil } from 'ngxtension/filter-nil';
-import { EMPTY, catchError, from, take, tap } from 'rxjs';
 import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';
 
 @Component({
@@ -211,29 +210,29 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserSettingsDialogComponent implements OnInit {
-  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private authenticationAccountService = inject(AuthenticationAccountService);
-  private dialogServiceUtil = inject(DialogServiceUtil);
-  private dialog = inject(MatDialog);
-  private router = inject(Router);
-  private dialogRef = inject(MatDialogRef<UserSettingsDialogComponent>);
-  private groupApiService = inject(GroupApiService);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly authenticationAccountService = inject(AuthenticationAccountService);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly dialogRef = inject(MatDialogRef<UserSettingsDialogComponent>);
+  private readonly groupApiService = inject(GroupApiService);
 
-  isDevActive = inject(IS_DEV_TOKEN, {
+  readonly isDevActive = inject(IS_DEV_TOKEN, {
     optional: true,
   });
-  userDataSignal = this.authenticationUserStoreService.state.getUserData;
-  userSignal = this.authenticationUserStoreService.state.getUser;
-  userImageControl = new FormControl<string | null>(null);
+  readonly userDataSignal = this.authenticationUserStoreService.state.getUserData;
+  readonly userSignal = this.authenticationUserStoreService.state.getUser;
+  readonly userImageControl = new FormControl<string | null>(null);
 
-  accountDescription = accountDescription;
+  readonly accountDescription = accountDescription;
 
-  actionButtonTooltips = {
+  readonly actionButtonTooltips = {
     deleteAccount: `Account will be deleted permanently and you will be logged out from the application. This action cannot be undone.`,
     resetTransactions: `Use this action to delete your trading history. You will start as a new user with a clean portfolio.`,
   };
 
-  accountDescriptionSignal = computed(() => {
+  readonly accountDescriptionSignal = computed(() => {
     return accountDescription[this.userDataSignal().userAccountType];
   });
 
@@ -345,15 +344,9 @@ export class UserSettingsDialogComponent implements OnInit {
     }
 
     // perform operation
-    from(this.authenticationUserStoreService.resetTransactions(currentAccountType))
-      .pipe(
-        take(1),
-        tap(() => this.dialogServiceUtil.showNotificationBar('Your account has been reset', 'success')),
-        catchError((err) => {
-          this.dialogServiceUtil.handleError(err);
-          return EMPTY;
-        }),
-      )
-      .subscribe();
+    this.authenticationUserStoreService.resetTransactions();
+
+    // notify user
+    this.dialogServiceUtil.showNotificationBar('Your account has been reset', 'success');
   }
 }

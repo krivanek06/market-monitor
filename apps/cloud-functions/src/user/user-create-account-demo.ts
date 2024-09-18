@@ -24,59 +24,55 @@ import {
 } from '@mm/shared/general-util';
 import { format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
-import { CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https';
+import { HttpsError } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
 import { userCollectionDemoAccountRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
 import { userCreate } from './user-create-account';
 
-export const userCreateAccountDemoCall = onCall(
-  async (request: CallableRequest<UserCreateDemoAccountInput>): Promise<UserDataDemoData> => {
-    // check how many demo accounts are created per IP
-    const demoAccountsTotal = await userCollectionDemoAccountRef().get();
-    const demoAccountsPerIp = demoAccountsTotal.docs.filter(
-      (d) => d.data().userPrivateInfo.publicIP === request.data.publicIP,
-    );
+export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): Promise<UserDataDemoData> => {
+  // check how many demo accounts are created per IP
+  const demoAccountsTotal = await userCollectionDemoAccountRef().get();
+  const demoAccountsPerIp = demoAccountsTotal.docs.filter((d) => d.data().userPrivateInfo.publicIP === data.publicIP);
 
-    console.log('demoAccounts', demoAccountsPerIp.length, 'from IP', request.data.publicIP);
+  console.log('demoAccounts', demoAccountsPerIp.length, 'from IP', data.publicIP);
 
-    // throw error if too many demo accounts are created
-    if (demoAccountsPerIp.length > USER_ALLOWED_DEMO_ACCOUNTS_PER_IP) {
-      throw new HttpsError('aborted', 'Too many demo accounts created from this IP');
-    }
+  // throw error if too many demo accounts are created
+  if (demoAccountsPerIp.length > USER_ALLOWED_DEMO_ACCOUNTS_PER_IP) {
+    throw new HttpsError('aborted', 'Too many demo accounts created from this IP');
+  }
 
-    // throw error if too many accounts
-    if (demoAccountsTotal.docs.length >= USER_ALLOWED_DEMO_ACCOUNTS_TOTAL) {
-      throw new HttpsError('aborted', 'Too many demo accounts created for not, try later');
-    }
+  // throw error if too many accounts
+  if (demoAccountsTotal.docs.length >= USER_ALLOWED_DEMO_ACCOUNTS_TOTAL) {
+    throw new HttpsError('aborted', 'Too many demo accounts created for not, try later');
+  }
 
-    // create random password
-    const randomPassword = faker.internet.password();
+  // create random password
+  const randomPassword = faker.internet.password();
 
-    const demoService = new CreateDemoAccountService();
-    await demoService.initService(18, 20);
+  const demoService = new CreateDemoAccountService();
+  await demoService.initService(18, 20);
 
-    // create demo accounts
-    const newDemoUser = await demoService.createRandomUser({
-      isDemo: true,
-      password: randomPassword,
-    });
+  // create demo accounts
+  const newDemoUser = await demoService.createRandomUser({
+    isDemo: true,
+    password: randomPassword,
+  });
 
-    // create user document
-    const newUser = await userCreate(newDemoUser, {
-      isDemo: true,
-      userAccountType: request.data.accountType,
-      publicIP: request.data.publicIP,
-    });
+  // create user document
+  const newUser = await userCreate(newDemoUser, {
+    isDemo: true,
+    userAccountType: data.accountType,
+    publicIP: data.publicIP,
+  });
 
-    // create watchList
-    await demoService.createWatchListWithRandomSymbols(newUser);
+  // create watchList
+  await demoService.createWatchListWithRandomSymbols(newUser);
 
-    // generate transactions
-    await demoService.generateTransactionsForRandomSymbols(newUser);
+  // generate transactions
+  await demoService.generateTransactionsForRandomSymbols(newUser);
 
-    return { userData: newUser, password: randomPassword };
-  },
-);
+  return { userData: newUser, password: randomPassword };
+};
 
 export class CreateDemoAccountService {
   private symbolToTransact: SymbolSummary[] = [];

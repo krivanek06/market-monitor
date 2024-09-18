@@ -8,7 +8,7 @@ import {
 } from '@mm/api-types';
 import { createEmptyPortfolioState, createNameInitials, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { HttpsError } from 'firebase-functions/v2/https';
 import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
 
 export type CreateUserAdditionalData = {
@@ -18,9 +18,7 @@ export type CreateUserAdditionalData = {
   publicIP?: string;
 };
 
-export const userCreateAccountCall = onCall(async (request) => {
-  const userAuthId = request.auth?.uid;
-
+export const userCreateAccount = async (userAuthId?: string) => {
   if (!userAuthId) {
     throw new HttpsError('aborted', 'User is not authenticated');
   }
@@ -34,7 +32,7 @@ export const userCreateAccountCall = onCall(async (request) => {
   // create new user
   const user = await getAuth().getUser(userAuthId);
   return userCreate(user);
-});
+};
 
 export const userCreate = async (user: UserRecord, additional: CreateUserAdditionalData = {}): Promise<UserData> => {
   // create new user data

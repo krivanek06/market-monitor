@@ -262,7 +262,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageDashboardComponent {
-  readonly #authenticationUserService = inject(AuthenticationUserStoreService);
+  readonly authenticationUserService = inject(AuthenticationUserStoreService);
   readonly portfolioUserFacadeService = inject(PortfolioUserFacadeService);
 
   /**
@@ -271,7 +271,7 @@ export class PageDashboardComponent {
   readonly transactionLimit = 15;
   readonly ColorScheme = ColorScheme;
   readonly USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
-  readonly stateRef = this.#authenticationUserService.state;
+  readonly stateRef = this.authenticationUserService.state;
   readonly hasEnoughTransactions = computed(
     () => (this.stateRef.portfolioTransactions()?.length ?? 0) > this.transactionLimit,
   );

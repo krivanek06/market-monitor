@@ -7,7 +7,7 @@ import {
 import { format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { userCollectionDemoAccountRef, userDocumentRef } from '../models';
-import { userDeleteAccountById } from './user-delete-account';
+import { userDeleteAccount } from './user-delete-account';
 
 /**
  * accounts where user did not log in more than USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT days will be inactive
@@ -44,7 +44,7 @@ export const userDeleteDemoAccounts = async () => {
 
   // delete demo accounts
   for (const doc of userDemoAccountsToDelete.docs) {
-    await userDeleteAccountById(doc.id);
+    await userDeleteAccount(doc.id);
     console.log(`[Users demo]: deleted ${doc.id}`);
   }
 };
