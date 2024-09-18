@@ -6,13 +6,10 @@ import {
   getPortfolioStateHoldingsUtil,
   transformPortfolioStateHoldingToPortfolioState,
 } from '@mm/shared/general-util';
-import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { userDocumentRef, userDocumentTransactionHistoryRef } from '../models';
 import { userPortfolioRisk } from './portfolio-risk-evaluation';
 
-export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_information/transactions', async (event) => {
-  const userId = event.params.userId;
-
+export const onTransactionUpdateForUserId = async (userId: string): Promise<void> => {
   // load user
   const userRef = userDocumentRef(userId);
   const user = (await userRef.get()).data();
@@ -23,7 +20,7 @@ export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_inform
   }
 
   await updateUserPortfolioState(user);
-});
+};
 
 /**
  * loads transactions for the provided user and calculates portfolio state (balance, cash on hand, invested, risk, etc.)

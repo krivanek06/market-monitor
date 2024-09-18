@@ -47,6 +47,11 @@ export class PortfolioCalculationService {
   }
 
   getPortfolioGrowth(portfolioAssets: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
+    // user has no transactions yet
+    if (!portfolioAssets || portfolioAssets.length === 0) {
+      return [];
+    }
+
     // get holidays
     const allHolidays = this.marketApiService.getIsMarketOpenSignal()?.allHolidays ?? [];
 

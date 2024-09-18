@@ -1,8 +1,10 @@
 import { GroupGeneralActions, UserCreateDemoAccountInput } from '@mm/api-types';
+import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { CallableRequest, onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from './group';
 import { groupGeneralActions } from './group/group-general-actions';
+import { onTransactionUpdateForUserId } from './portfolio';
 import {
   userCreateAccount,
   userCreateAccountDemo,
@@ -35,6 +37,15 @@ export const userDeleteAccountCall = onCall(async (request: CallableRequest<void
  */
 export const groupGeneralActionsCall = onCall((request: CallableRequest<GroupGeneralActions>) =>
   groupGeneralActions(request.auth?.uid, request.data),
+);
+
+/** ------------------------------------------ */
+
+/**
+ * TRANSACTIONS
+ */
+export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_information/transactions', async (event) =>
+  onTransactionUpdateForUserId(event.params.userId),
 );
 
 /** ------------------------------------------ */
