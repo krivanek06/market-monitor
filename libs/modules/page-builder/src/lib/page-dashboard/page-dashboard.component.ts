@@ -5,7 +5,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import {
   PortfolioAssetChartComponent,
@@ -41,7 +41,7 @@ import {
     PortfolioStateTransactionsComponent,
     PortfolioStateRiskComponent,
     GeneralCardComponent,
-    StockSummaryDialogComponent,
+    SymbolSummaryDialogComponent,
     MatDialogModule,
     FormMatInputWrapperComponent,
     PortfolioTransactionChartComponent,

@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MarketApiService } from '@mm/api-client';
 import { SymbolQuote } from '@mm/api-types';
-import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
@@ -70,7 +70,7 @@ export class PageMarketTopPerformersComponent {
   marketTopPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance());
 
   onQuoteClick(summary: SymbolQuote) {
-    this.dialog.open(StockSummaryDialogComponent, {
+    this.dialog.open(SymbolSummaryDialogComponent, {
       data: {
         symbol: summary.symbol,
       },

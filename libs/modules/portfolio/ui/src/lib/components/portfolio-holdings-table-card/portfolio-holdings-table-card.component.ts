@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PortfolioStateHoldings } from '@mm/api-types';
-import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { GeneralCardComponent, ShowMoreButtonComponent } from '@mm/shared/ui';
 import { PortfolioHoldingsTableComponent } from '../tables';
@@ -24,7 +24,7 @@ import { PortfolioHoldingsTableComponent } from '../tables';
     CommonModule,
     GeneralCardComponent,
     PortfolioHoldingsTableComponent,
-    StockSummaryDialogComponent,
+    SymbolSummaryDialogComponent,
     ShowMoreButtonComponent,
   ],
   template: `
@@ -97,7 +97,7 @@ export class PortfolioHoldingsTableCardComponent {
   selectedHoldingsToggle = signal(false);
   selectedHoldings = computed(() =>
     this.selectedHoldingsToggle()
-      ? this.portfolioStateHolding()?.holdings ?? []
+      ? (this.portfolioStateHolding()?.holdings ?? [])
       : (this.portfolioStateHolding()?.holdings ?? []).slice(0, this.initialItemsLimit()),
   );
 
@@ -117,7 +117,7 @@ export class PortfolioHoldingsTableCardComponent {
   });
 
   onSummaryClick(symbol: string) {
-    this.dialog.open(StockSummaryDialogComponent, {
+    this.dialog.open(SymbolSummaryDialogComponent, {
       data: {
         symbol: symbol,
       },

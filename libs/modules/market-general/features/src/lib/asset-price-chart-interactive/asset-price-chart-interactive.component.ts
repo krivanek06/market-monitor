@@ -1,88 +1,91 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, effect, inject, input, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MarketApiService } from '@mm/api-client';
 import { HistoricalPrice, SymbolHistoricalPeriods, SymbolHistoricalPeriodsArrayPreload } from '@mm/api-types';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { AssetPriceChartComponent, DefaultImgDirective, TimePeriodButtonsComponent } from '@mm/shared/ui';
+import {
+  AssetPriceChartComponent,
+  DefaultImgDirective,
+  RangeDirective,
+  TimePeriodButtonsComponent,
+} from '@mm/shared/ui';
 import { catchError, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-asset-price-chart-interactive',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     AssetPriceChartComponent,
     TimePeriodButtonsComponent,
     DefaultImgDirective,
     MatButtonModule,
     MatIconModule,
+    RangeDirective,
   ],
+  providers: [DatePipe],
   template: `
-    <!-- time period form control -->
-    <div *ngIf="!errorLoadSignal()" class="mb-4">
-      <app-time-period-buttons [formControl]="timePeriodFormControl"></app-time-period-buttons>
-    </div>
+    @if (!errorLoadSignal() && !errorFromParent()) {
+      @if (!loadingSignal()) {
+        <!-- time period form control -->
+        <div class="mb-4">
+          <app-time-period-buttons [formControl]="timePeriodFormControl"></app-time-period-buttons>
+        </div>
 
-    <ng-container *ngIf="!loadingSignal(); else chartSkeleton">
-      <ng-container *ngIf="stockHistoricalPriceSignal() as historicalPrice">
-        <ng-container *ngIf="!errorLoadSignal(); else errorLoading">
-          <!-- time data about chart -->
-          <div class="text-wt-gray-medium flex justify-end md:justify-between">
-            <div class="hidden items-center gap-2 md:flex">
-              <img
-                *ngIf="imageName()"
-                appDefaultImg
-                imageType="symbol"
-                [src]="imageName()"
-                alt="Asset Image"
-                class="h-6 w-6"
-              />
-              <span>{{ title() }}</span>
-            </div>
-            <span *ngIf="historicalPrice.length > 0" class="block">
-              {{ historicalPrice[0].date | date: 'MMMM d, y' }} -
-              {{ historicalPrice[historicalPrice.length - 1].date | date: 'MMMM d, y' }}
-            </span>
+        <!-- time data about chart -->
+        <div class="text-wt-gray-medium flex justify-end md:justify-between">
+          <div class="hidden items-center gap-2 md:flex">
+            @if (imageName()) {
+              <img appDefaultImg imageType="symbol" [src]="imageName()" alt="Asset Image" class="h-6 w-6" />
+            }
+            <span>{{ title() }}</span>
           </div>
+          <span class="block">
+            {{ dateDisplay() }}
+          </span>
+        </div>
 
-          <!-- price & volume chart -->
-          <app-asset-price-chart
-            [period]="timePeriodFormControl.value"
-            [priceShowSign]="priceShowSign()"
-            [priceName]="priceName()"
-            [displayVolume]="displayVolume()"
-            [historicalPrice]="historicalPrice"
-            [heightPx]="chartHeightPx()"
-          ></app-asset-price-chart>
-        </ng-container>
-      </ng-container>
-    </ng-container>
+        <!-- price & volume chart -->
+        <app-asset-price-chart
+          [period]="timePeriodFormControl.value"
+          [priceShowSign]="priceShowSign()"
+          [priceName]="priceName()"
+          [displayVolume]="displayVolume()"
+          [historicalPrice]="stockHistoricalPriceSignal()"
+          [heightPx]="chartHeightPx()"
+        />
+      } @else {
+        <!-- time period button skeletons -->
+        <div class="mb-4 flex gap-3">
+          <div *ngRange="8" class="g-skeleton h-9 flex-1"></div>
+        </div>
 
-    <!-- skeleton chart -->
-    <ng-template #chartSkeleton>
-      <!-- chart title() and date range -->
-      <div class="mb-3 flex justify-end max-sm:pl-4 md:justify-between">
-        <div class="g-skeleton h-6 sm:w-[125px]"></div>
-        <div class="g-skeleton h-6 w-[350px]"></div>
-      </div>
+        <!-- chart title and date range -->
+        <div class="mb-3 flex justify-end max-sm:pl-4 md:justify-between">
+          <div class="g-skeleton h-6 sm:w-[125px]"></div>
+          <div class="g-skeleton h-6 w-[350px]"></div>
+        </div>
 
-      <div [style.height.px]="chartHeightPx() - 25" class="g-skeleton"></div>
-    </ng-template>
-
-    <!-- error loading -->
-    <ng-template #errorLoading>
-      <div class="bg-wt-gray-light-strong grid place-content-center gap-y-4" [style.height.px]="chartHeightPx()">
+        <!-- chart skeleton -->
+        <div [style.height.px]="chartHeightPx() - 25" class="g-skeleton"></div>
+      }
+    } @else {
+      <!-- error loading -->
+      <div class="bg-wt-gray-light-strong grid place-content-center gap-y-4" [style.height.px]="chartHeightPx() + 30">
         <div class="text-lg">Failed to load content</div>
-        <button (click)="onRefresh()" type="button" mat-stroked-button color="warn">
-          <mat-icon>refresh</mat-icon>
-          try again
-        </button>
+
+        <!-- display reloading only if no error from parent -->
+        @if (!errorFromParent()) {
+          <button (click)="onRefresh()" type="button" mat-stroked-button color="warn">
+            <mat-icon>refresh</mat-icon>
+            try again
+          </button>
+        }
       </div>
-    </ng-template>
+    }
   `,
   styles: `
     :host {
@@ -92,6 +95,7 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetPriceChartInteractiveComponent implements OnInit {
+  private datePipe = inject(DatePipe);
   symbol = input.required<string>();
   chartHeightPx = input(420);
   priceName = input('price');
@@ -99,6 +103,9 @@ export class AssetPriceChartInteractiveComponent implements OnInit {
   title = input('Historical Prices');
   imageName = input('');
   displayVolume = input(true);
+
+  /** parent can set that some error happened and no data will be loaded */
+  readonly errorFromParent = input(false);
 
   loadingSignal = signal<boolean>(true);
   errorLoadSignal = signal<boolean>(false);
@@ -109,6 +116,17 @@ export class AssetPriceChartInteractiveComponent implements OnInit {
   dialogServiceUtil = inject(DialogServiceUtil);
   timePeriodFormControl = new FormControl<SymbolHistoricalPeriods>(SymbolHistoricalPeriods.week, {
     nonNullable: true,
+  });
+
+  readonly dateDisplay = computed(() => {
+    const stockHistorical = this.stockHistoricalPriceSignal();
+    if (stockHistorical.length === 0) {
+      return '';
+    }
+    const start = this.datePipe.transform(stockHistorical[0].date, 'MMMM d, y');
+    const end = this.datePipe.transform(stockHistorical[stockHistorical.length - 1].date, 'MMMM d, y');
+
+    return `${start} - ${end}`;
   });
 
   ngOnInit(): void {

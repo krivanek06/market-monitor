@@ -8,7 +8,7 @@ import { UserApiService } from '@mm/api-client';
 import { GROUP_HOLDING_LIMIT, GROUP_MEMBER_LIMIT, UserBase } from '@mm/api-types';
 import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@mm/group/features';
 import { GroupDisplayInfoComponent, GroupMemberPortfolioHoldingChartComponent } from '@mm/group/ui';
-import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioCalculationService, PortfolioGrowth } from '@mm/portfolio/data-access';
 import {
   PortfolioBalancePieChartComponent,
@@ -59,7 +59,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     GroupUserHasRoleDirective,
     UserDetailsDialogComponent,
     GeneralCardComponent,
-    StockSummaryDialogComponent,
+    SymbolSummaryDialogComponent,
     PieChartComponent,
     GenericChartComponent,
     PortfolioTransactionsTableComponent,

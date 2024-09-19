@@ -59,10 +59,7 @@ export const dateGetDayDifference = (first: DateInput, second: DateInput): numbe
  * @param formatOptions
  * @returns - months: [1,2...12]
  */
-export const dateFormatDate = (
-  inputDate: DateInput,
-  formateStr: 'yyyy-MM-dd' | 'MMMM d, y' | 'yyyy-MM-dd HH:mm:ss' | 'MMMM d, yyyy' | 'HH:mm, MMMM d, y' = 'yyyy-MM-dd',
-): string => {
+export const dateFormatDate = (inputDate: DateInput, formateStr: string = 'yyyy-MM-dd'): string => {
   const date = new Date(inputDate);
   return format(date, formateStr);
 };

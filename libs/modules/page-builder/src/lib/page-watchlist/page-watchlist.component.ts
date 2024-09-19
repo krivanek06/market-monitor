@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MarketApiService } from '@mm/api-client';
 import { SymbolQuote, USER_WATCHLIST_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { SectionTitleComponent } from '@mm/shared/ui';
@@ -19,7 +19,7 @@ import { switchMap } from 'rxjs';
   imports: [
     CommonModule,
     StockSummaryTableComponent,
-    StockSummaryDialogComponent,
+    SymbolSummaryDialogComponent,
     MatDialogModule,
     MatIconModule,
     SectionTitleComponent,
@@ -77,7 +77,7 @@ export class PageWatchlistComponent {
   });
 
   onQuoteClick(summary: SymbolQuote): void {
-    this.dialog.open(StockSummaryDialogComponent, {
+    this.dialog.open(SymbolSummaryDialogComponent, {
       data: {
         symbol: summary.symbol,
       },

@@ -14,7 +14,7 @@ import { SymbolSearchService } from '@mm/market-stocks/data-access';
 import { ElementFocusDirective } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
-import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summary-dialog.component';
+import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-summary-dialog.component';
 import { SymbolSearchBasicComponent } from './symbol-search-basic.component';
 
 describe('SymbolSearchBasicComponent', () => {
@@ -421,7 +421,7 @@ describe('SymbolSearchBasicComponent', () => {
     expect(onSummaryClickSpy).toHaveBeenCalledWith(quoteAAPLMock);
     expect(symbolSearchService.addSearchedSymbol).toHaveBeenCalledWith(quoteAAPLMock);
     expect(component.searchValue()).toBe('');
-    expect(dialogService.open).toHaveBeenCalledWith(StockSummaryDialogComponent, expect.any(Object));
+    expect(dialogService.open).toHaveBeenCalledWith(SymbolSummaryDialogComponent, expect.any(Object));
     expect(clickedQuoteSpy).toHaveBeenCalledWith(quoteAAPLMock);
   });
 

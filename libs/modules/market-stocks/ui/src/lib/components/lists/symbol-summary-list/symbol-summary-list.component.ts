@@ -37,15 +37,16 @@ import { RecommendationDirective } from '../../../directives';
       <div class="flex items-center gap-2">
         <img appDefaultImg imageType="symbol" [src]="symbolSummary().id" alt="Asset Image" class="h-6 w-6" />
         <span>{{ symbolSummary().profile?.companyName ?? symbolSummary().quote.name }}</span>
+        <span> ({{ symbolSummary().quote.timestamp * 1000 | date: 'MMM d, y' }}) </span>
       </div>
     </div>
 
     <div class="g-item-wrapper">
       <span>Sector</span>
       <mat-chip-listbox>
-        <mat-chip class="m-0" color="primary">{{
-          symbolSummary().profile?.sector ?? symbolSummary().quote.exchange
-        }}</mat-chip>
+        <mat-chip class="m-0" color="primary">
+          {{ symbolSummary().profile?.sector ?? symbolSummary().quote.exchange }}
+        </mat-chip>
       </mat-chip-listbox>
     </div>
 
@@ -140,5 +141,5 @@ import { RecommendationDirective } from '../../../directives';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SymbolSummaryListComponent {
-  symbolSummary = input.required<SymbolSummary>();
+  readonly symbolSummary = input.required<SymbolSummary>();
 }

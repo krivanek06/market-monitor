@@ -24,7 +24,7 @@ import { SymbolSearchService } from '@mm/market-stocks/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, ElementFocusDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
 import { filter, map, of, startWith, switchMap } from 'rxjs';
-import { StockSummaryDialogComponent } from '../stock-summary-dialog/stock-summary-dialog.component';
+import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-summary-dialog.component';
 
 @Component({
   selector: 'app-symbol-search-basic',
@@ -250,7 +250,7 @@ export class SymbolSearchBasicComponent {
     this.searchValue.set('');
 
     if (this.openModalOnClick()) {
-      this.dialog.open(StockSummaryDialogComponent, {
+      this.dialog.open(SymbolSummaryDialogComponent, {
         data: {
           symbol: quote.symbol,
         },

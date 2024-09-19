@@ -13,7 +13,7 @@ import {
   getScreenerInputIndexByKey,
   getScreenerInputValueByKey,
 } from '@mm/market-stocks/data-access';
-import { StockSummaryDialogComponent, SymbolSearchBasicComponent } from '@mm/market-stocks/features';
+import { SymbolSearchBasicComponent, SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { StockScreenerFormControlComponent, StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { RouterManagement } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
@@ -134,7 +134,7 @@ export class PageMarketStockScreenerComponent implements OnInit, RouterManagemen
   }
 
   onQuoteClick(summary: SymbolQuote): void {
-    this.dialog.open(StockSummaryDialogComponent, {
+    this.dialog.open(SymbolSummaryDialogComponent, {
       data: {
         symbol: summary.symbol,
       },

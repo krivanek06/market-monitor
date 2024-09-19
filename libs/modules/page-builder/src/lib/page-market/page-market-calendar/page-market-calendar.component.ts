@@ -9,7 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@mm/api-client';
 import { CalendarAssetDataTypes, CalendarDividend, CalendarStockEarning } from '@mm/api-types';
-import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import {
   DividendItemComponent,
   DividendItemsDialogComponent,
@@ -48,7 +48,7 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
     MatDialogModule,
     EarningsItemsDialogComponent,
     EarningsHistoricalDialogComponent,
-    StockSummaryDialogComponent,
+    SymbolSummaryDialogComponent,
     MatDialogModule,
     DropdownControlComponent,
   ],
@@ -266,7 +266,7 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
   }
 
   private showStockSummary(symbol: string): void {
-    this.dialog.open(StockSummaryDialogComponent, {
+    this.dialog.open(SymbolSummaryDialogComponent, {
       data: {
         symbol: symbol,
       },

@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { UserApiService } from '@mm/api-client';
 import { PortfolioRisk, PortfolioStateHoldings, PortfolioTransaction, UserBase, UserData } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioCalculationService, PortfolioChange, PortfolioGrowth } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthCompareChartComponent,
@@ -55,7 +55,7 @@ import { Subject, forkJoin, from, map, merge, of, pipe, scan, startWith, switchM
     FormMatInputWrapperComponent,
     PortfolioHoldingsTableCardComponent,
     MatDialogModule,
-    StockSummaryDialogComponent,
+    SymbolSummaryDialogComponent,
     PortfolioTransactionsTableComponent,
     SortByKeyPipe,
     ShowMoreButtonComponent,

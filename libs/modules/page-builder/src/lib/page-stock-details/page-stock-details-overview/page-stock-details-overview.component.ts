@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SymbolSummary } from '@mm/api-types';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
 import { StockTransformService } from '@mm/market-stocks/data-access';
-import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import {
   EarningsEstimationChartComponent,
   RevenueEstimationChartComponent,
@@ -324,7 +324,7 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   );
 
   onShowSummary(summary: SymbolSummary) {
-    this.dialog.open(StockSummaryDialogComponent, {
+    this.dialog.open(SymbolSummaryDialogComponent, {
       data: {
         symbol: summary.id,
       },

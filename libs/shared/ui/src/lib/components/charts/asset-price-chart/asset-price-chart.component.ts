@@ -86,11 +86,9 @@ export class AssetPriceChartComponent extends ChartConstructor {
         crosshair: true,
         type: 'category',
         categories: dates.map((date) => {
-          if ([SymbolHistoricalPeriods.day, SymbolHistoricalPeriods.week].includes(this.period())) {
-            return dateFormatDate(date, 'HH:mm, MMMM d, y');
-          }
-          if (this.period() === SymbolHistoricalPeriods.month) {
-            return dateFormatDate(date, 'HH:mm, MMMM d, y');
+          const basic = [SymbolHistoricalPeriods.day, SymbolHistoricalPeriods.week, SymbolHistoricalPeriods.month];
+          if (basic.includes(this.period())) {
+            return dateFormatDate(date, 'HH:mm, MMM d');
           }
 
           return dateFormatDate(date, 'MMMM d, y');

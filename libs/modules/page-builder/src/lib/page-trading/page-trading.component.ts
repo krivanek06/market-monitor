@@ -120,15 +120,21 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
             [imageName]="symbolSummary.id"
             [symbol]="symbolSummary.id"
             [title]="'Historical Price: ' + symbolSummary.quote.displaySymbol"
-            [chartHeightPx]="380"
+            [chartHeightPx]="400"
+            [errorFromParent]="!symbolSummary.priceChange['5D']"
           />
-          <div class="lg:basis-2/5">
+          <div
+            class="lg:basis-2/5"
+            [ngClass]="{
+              'opacity-65': !symbolSummary.priceChange['5D'],
+            }"
+          >
             <app-symbol-summary-list data-testid="page-trading-symbol-summary-list" [symbolSummary]="symbolSummary" />
           </div>
         </div>
       }
     } @else if (symbolSummarySignal().state === 'loading') {
-      <div class="mb-6 flex h-[450px] flex-col gap-4 xl:flex-row">
+      <div class="mb-6 flex h-[470px] flex-col gap-4 xl:flex-row">
         <div class="g-skeleton lg:basis-3/5"></div>
         <div class="g-skeleton lg:basis-2/5"></div>
       </div>
@@ -240,9 +246,14 @@ export class PageTradingComponent {
   /**
    * wait until data is loaded
    */
-  readonly allowActionButtons = computed(
-    () => !!this.portfolioUserFacadeService.getPortfolioState() && this.symbolSummarySignal().state === 'success',
-  );
+  readonly allowActionButtons = computed(() => {
+    const portfolioState = this.portfolioUserFacadeService.getPortfolioState();
+    const symbolSummary = this.symbolSummarySignal();
+
+    // check if exists 5D price change, may happen that we get symbols which are deprecated
+    // example: AAU, Maverix Metals Inc (MMX)
+    return portfolioState && symbolSummary.state === 'success' && !!symbolSummary.data.priceChange['5D'];
+  });
 
   readonly holdingsInputSource = computed(() => {
     return (
