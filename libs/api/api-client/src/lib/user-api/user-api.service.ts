@@ -12,7 +12,6 @@ import {
   setDoc,
   where,
 } from '@angular/fire/firestore';
-import { Functions } from '@angular/fire/functions';
 import {
   PortfolioTransaction,
   SymbolStoreBase,
@@ -35,7 +34,6 @@ import { Observable, filter, map, of } from 'rxjs';
 })
 export class UserApiService {
   private firestore = inject(Firestore);
-  private functions = inject(Functions);
   private http = inject(HttpClient);
 
   getUserPublicIp(): Observable<string> {

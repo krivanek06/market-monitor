@@ -23,7 +23,7 @@ import { LoginUserInput, RegisterUserInput } from '../model';
   providedIn: 'root',
 })
 export class AuthenticationAccountService {
-  private functions = inject(Functions);
+  private readonly functions = inject(Functions);
   private auth = inject(Auth);
   private userApiService = inject(UserApiService);
   private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);

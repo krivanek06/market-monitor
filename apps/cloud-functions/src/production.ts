@@ -16,18 +16,35 @@ import {
 } from './user';
 import { measureFunctionExecutionTime } from './utils';
 
+const region = 'europe-central2';
+const allowedUrl = ['https://dashboard.ggfinance.io', 'http://localhost:4200/']; // in the future maybe configure this -> ['https://dashboard.ggfinance.io', 'http://localhost:4200/'];
+
 /**
  * USERS
  */
 
-export const userCreateAccountCall = onCall((request: CallableRequest<void>) => userCreateAccount(request.auth?.uid));
-
-export const userCreateAccountDemoCall = onCall((request: CallableRequest<UserCreateDemoAccountInput>) =>
-  userCreateAccountDemo(request.data),
+export const userCreateAccountCall = onCall(
+  {
+    region: region,
+    cors: allowedUrl,
+  },
+  (request: CallableRequest<void>) => userCreateAccount(request.auth?.uid),
 );
 
-export const userDeleteAccountCall = onCall(async (request: CallableRequest<void>) =>
-  userDeleteAccount(request.auth?.uid),
+export const userCreateAccountDemoCall = onCall(
+  {
+    region: region,
+    cors: allowedUrl,
+  },
+  (request: CallableRequest<UserCreateDemoAccountInput>) => userCreateAccountDemo(request.data),
+);
+
+export const userDeleteAccountCall = onCall(
+  {
+    region: region,
+    cors: allowedUrl,
+  },
+  (request: CallableRequest<void>) => userDeleteAccount(request.auth?.uid),
 );
 
 /** ------------------------------------------ */
@@ -35,8 +52,12 @@ export const userDeleteAccountCall = onCall(async (request: CallableRequest<void
 /**
  * GROUPS
  */
-export const groupGeneralActionsCall = onCall((request: CallableRequest<GroupGeneralActions>) =>
-  groupGeneralActions(request.auth?.uid, request.data),
+export const groupGeneralActionsCall = onCall(
+  {
+    region: region,
+    cors: allowedUrl,
+  },
+  (request: CallableRequest<GroupGeneralActions>) => groupGeneralActions(request.auth?.uid, request.data),
 );
 
 /** ------------------------------------------ */
@@ -57,6 +78,7 @@ export const run_scheduler_update_users = onSchedule(
   {
     timeoutSeconds: 200,
     schedule: '*/5 22-23 * * *',
+    region: region,
   },
   async () => {
     await measureFunctionExecutionTime(async () => {
@@ -71,6 +93,7 @@ export const run_scheduler_once_a_day = onSchedule(
   {
     timeoutSeconds: 200,
     schedule: '0 1 * * *',
+    region: region,
   },
   async () => {
     await measureFunctionExecutionTime(async () => {

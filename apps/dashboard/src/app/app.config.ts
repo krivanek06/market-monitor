@@ -61,10 +61,13 @@ export const appConfig: ApplicationConfig = {
       multi: true,
       deps: [Functions, Firestore, Auth],
       useFactory: () => {
+        const region = 'europe-central2';
         const localhost = '127.0.0.1';
         const functions = inject(Functions);
         const firestore = inject(Firestore);
         const auth = inject(Auth);
+
+        functions.region = region;
 
         return () => {
           if (!environment.production) {

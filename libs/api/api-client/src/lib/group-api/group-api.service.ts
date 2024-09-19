@@ -53,10 +53,10 @@ import { UserApiService } from '../user-api/user-api.service';
   providedIn: 'root',
 })
 export class GroupApiService {
-  private functions = inject(Functions);
-  private firestore = inject(Firestore);
-  private marketApiService = inject(MarketApiService);
-  private userApiService = inject(UserApiService);
+  private readonly functions = inject(Functions);
+  private readonly firestore = inject(Firestore);
+  private readonly marketApiService = inject(MarketApiService);
+  private readonly userApiService = inject(UserApiService);
 
   getGroupDataById(groupId: string): Observable<GroupData | undefined> {
     return rxDocData(this.getGroupDocRef(groupId), { idField: 'id' });
