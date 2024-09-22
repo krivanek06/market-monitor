@@ -6,7 +6,12 @@ import {
   UserData,
   UserPersonalInfo,
 } from '@mm/api-types';
-import { createEmptyPortfolioState, createNameInitials, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
+import {
+  createEmptyPortfolioState,
+  createNameInitials,
+  getCurrentDateDefaultFormat,
+  getYesterdaysDate,
+} from '@mm/shared/general-util';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
@@ -77,6 +82,9 @@ const createNewUser = (id: string, personal: UserPersonalInfo, additional: Creat
 
   const newUser: UserData = {
     id,
+    dates: {
+      portfolioGrowthDate: getYesterdaysDate(),
+    },
     groups: {
       groupInvitations: [],
       groupMember: [],

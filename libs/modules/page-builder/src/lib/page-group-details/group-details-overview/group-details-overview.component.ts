@@ -119,6 +119,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       <app-portfolio-growth-chart
         [data]="{
           values: portfolioGrowthSignal(),
+          currentCash: portfolioGrowthCurrentCash(),
         }"
         [heightPx]="425"
         class="mb-6"
@@ -324,18 +325,18 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
   readonly ColorScheme = ColorScheme;
   readonly displayLimitInitial = 12;
 
-  portfolioCalculationService = inject(PortfolioCalculationService);
-  userApiService = inject(UserApiService);
+  readonly portfolioCalculationService = inject(PortfolioCalculationService);
+  readonly userApiService = inject(UserApiService);
 
-  portfolioSectorAllocationSignal = computed(() =>
+  readonly portfolioSectorAllocationSignal = computed(() =>
     this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(this.getGroupHoldingsSignal()),
   );
 
-  portfolioHoldingBubbleChartSignal = computed(() =>
+  readonly portfolioHoldingBubbleChartSignal = computed(() =>
     this.portfolioCalculationService.getPortfolioHoldingBubbleChart(this.getGroupHoldingsSignal()),
   );
 
-  memberRequestedUsersSignal = derivedFrom(
+  readonly memberRequestedUsersSignal = derivedFrom(
     [this.groupDetailsSignal],
     pipe(
       map(([group]) => group),
@@ -365,7 +366,7 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
     { initialValue: [] },
   );
 
-  portfolioGrowthSignal = computed(() =>
+  readonly portfolioGrowthSignal = computed(() =>
     (this.groupDetailsSignal()?.groupPortfolioSnapshotsData ?? []).map(
       (portfolioStatePerDay) =>
         ({
@@ -373,17 +374,22 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
           investedTotal: portfolioStatePerDay.invested,
           marketTotal: portfolioStatePerDay.holdingsBalance,
           balanceTotal: portfolioStatePerDay.balance,
-          currentCash: portfolioStatePerDay.startingCash,
         }) satisfies PortfolioGrowth,
     ),
   );
 
-  portfolioChangeSignal = computed(() =>
+  readonly portfolioGrowthCurrentCash = computed(() =>
+    (this.groupDetailsSignal()?.groupPortfolioSnapshotsData ?? []).map(
+      (portfolioStatePerDay) => portfolioStatePerDay.startingCash,
+    ),
+  );
+
+  readonly portfolioChangeSignal = computed(() =>
     this.portfolioCalculationService.getPortfolioChange(this.portfolioGrowthSignal()),
   );
 
-  displayEveryMember = signal(false);
-  displayedMembers = computed(() =>
+  readonly displayEveryMember = signal(false);
+  readonly displayedMembers = computed(() =>
     this.displayEveryMember()
       ? this.groupDetailsSignal()?.groupMembersData
       : this.groupDetailsSignal()?.groupMembersData?.slice(0, this.displayLimitInitial),

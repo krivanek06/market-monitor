@@ -143,11 +143,6 @@ export type PortfolioGrowth = Pick<PortfolioGrowthAssetsDataItem, 'investedTotal
    * if user has activated cash account it will be investedValue + cashOnHand else investedValue
    */
   balanceTotal: number;
-
-  /**
-   * starting cash of the user, mainly used for groups to calculate threshold as users can join and leave
-   */
-  currentCash: number;
 };
 
 export type PortfolioTransactionType = 'BUY' | 'SELL';

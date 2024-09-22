@@ -8,6 +8,9 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
   const defaultUser: UserData = {
     id: USER_TEST_1_ID,
     systemRank: {},
+    dates: {
+      portfolioGrowthDate: format(new Date(), 'yyyy-MM-dd'),
+    },
     groups: {
       groupInvitations: [],
       groupMember: [],

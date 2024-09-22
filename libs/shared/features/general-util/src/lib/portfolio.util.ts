@@ -360,7 +360,6 @@ export const getPortfolioGrowth = (
       investedTotal: 0,
       marketTotal: 0,
       balanceTotal: startingCashValue,
-      currentCash: startingCashValue,
     };
 
     // loop though all portfolio assets per date

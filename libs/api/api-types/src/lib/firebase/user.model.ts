@@ -44,6 +44,12 @@ export type UserBase = {
 };
 
 export type UserData = UserBase & {
+  dates: {
+    /**
+     * when was portfolio growth data last updated
+     */
+    portfolioGrowthDate: string;
+  };
   groups: {
     /**
      * group member

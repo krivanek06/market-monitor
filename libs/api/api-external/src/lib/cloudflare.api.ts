@@ -36,8 +36,8 @@ export const getSymbolSummaries = async (symbols: string[]): Promise<SymbolSumma
  * @param isAfterHours - will cache the symbol on the BE until the next trading day
  * @returns
  */
-export const getSymbolQuotes = async (symbols: string[], isAfterHours: boolean = false): Promise<SymbolQuote[]> => {
-  const url = `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}&onlyQuote=true&isAfterHours=${isAfterHours}`;
+export const getSymbolQuotes = async (symbols: string[]): Promise<SymbolQuote[]> => {
+  const url = `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}&onlyQuote=true`;
   try {
     const response = await fetch(url, {
       method: 'GET',

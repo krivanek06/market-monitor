@@ -50,7 +50,7 @@ export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT = 60;
 /**
  * number in days when a demo user account will be deleted
  */
-export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DEMO = 7;
+export const USER_ACTIVE_ACCOUNT_TIME_DAYS_LIMIT_DEMO = 2;
 
 /**
  * number in days when a normal user account will be deleted after not logging in
