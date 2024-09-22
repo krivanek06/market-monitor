@@ -54,8 +54,6 @@ export const testing_function = onRequest({ timeoutSeconds: 1200 }, async (req, 
     } else if (functionType === 'run_scheduler_update_users') {
       await run_scheduler_update_users(req, res);
     }
-
-    res.status(200).send('DONE');
   });
 });
 

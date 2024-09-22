@@ -19,6 +19,7 @@ import {
   UserAccountEnum,
   UserBase,
   UserData,
+  UserPortfolioGrowthData,
   UserPortfolioTransaction,
   UserWatchList,
 } from '@mm/api-types';
@@ -91,7 +92,7 @@ export class UserApiService {
     const startingCash = accountTypeSelected === UserAccountEnum.DEMO_TRADING ? USER_DEFAULT_STARTING_CASH : 0;
 
     // reset transactions
-    updateDoc(this.getUserPortfolioTransactionDocRef(userBase.id), {
+    setDoc(this.getUserPortfolioTransactionDocRef(userBase.id), {
       transactions: [],
     });
 
@@ -108,6 +109,12 @@ export class UserApiService {
         groupWatched: [],
       },
       userAccountType: accountTypeSelected,
+    });
+
+    // reset user portfolio growth
+    setDoc(this.getUserPortfolioGrowthDocRef(userBase.id), {
+      lastModifiedDate: '',
+      data: [],
     });
   }
 
@@ -188,6 +195,12 @@ export class UserApiService {
     });
   }
 
+  getUserPortfolioGrowth(userId: string): Observable<UserPortfolioGrowthData['data']> {
+    return rxDocData(this.getUserPortfolioGrowthDocRef(userId))
+      .pipe(filter((d): d is UserPortfolioGrowthData => !!d))
+      .pipe(map((d) => d.data));
+  }
+
   /* private */
 
   private getUserDocRef(userId: string): DocumentReference<UserData> {
@@ -202,6 +215,12 @@ export class UserApiService {
   private getUserPortfolioTransactionDocRef(userId: string): DocumentReference<UserPortfolioTransaction> {
     return doc(this.userCollectionMoreInformationRef(userId), 'transactions').withConverter(
       assignTypesClient<UserPortfolioTransaction>(),
+    );
+  }
+
+  private getUserPortfolioGrowthDocRef(userId: string): DocumentReference<UserPortfolioGrowthData> {
+    return doc(this.userCollectionMoreInformationRef(userId), 'portfolio_growth').withConverter(
+      assignTypesClient<UserPortfolioGrowthData>(),
     );
   }
 

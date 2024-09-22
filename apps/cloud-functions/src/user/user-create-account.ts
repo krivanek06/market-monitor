@@ -14,7 +14,12 @@ import {
 } from '@mm/shared/general-util';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { HttpsError } from 'firebase-functions/v2/https';
-import { userDocumentRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
+import {
+  userDocumentPortfolioGrowthRef,
+  userDocumentRef,
+  userDocumentTransactionHistoryRef,
+  userDocumentWatchListRef,
+} from '../models';
 
 export type CreateUserAdditionalData = {
   isDemo?: boolean;
@@ -66,6 +71,12 @@ export const userCreate = async (user: UserRecord, additional: CreateUserAdditio
   // update watchList
   await userDocumentWatchListRef(newUserData.id).set({
     createdDate: getCurrentDateDefaultFormat(),
+    data: [],
+  });
+
+  // create portfolio growth
+  await userDocumentPortfolioGrowthRef(newUserData.id).set({
+    lastModifiedDate: getCurrentDateDefaultFormat(),
     data: [],
   });
 

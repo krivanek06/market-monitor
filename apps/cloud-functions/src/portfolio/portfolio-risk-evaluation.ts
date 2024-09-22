@@ -1,4 +1,4 @@
-import { getHistoricalPricesCloudflare, getTreasuryRates } from '@mm/api-external';
+import { getHistoricalPricesCF, getTreasuryRates } from '@mm/api-external';
 import {
   HistoricalPrice,
   PortfolioRisk,
@@ -134,7 +134,7 @@ const getSymbolPricesAndReturn = async (symbol: string): Promise<SymbolReturns> 
   }
 
   try {
-    const prices = await getHistoricalPricesCloudflare(symbol, SymbolHistoricalPeriods.year);
+    const prices = await getHistoricalPricesCF(symbol, SymbolHistoricalPeriods.year);
     const yearlyReturn = (prices[prices.length - 1].close - prices[0].close) / prices[0].close;
     const dailyReturns = prices
       .map((price, index, arr) => (index > 0 ? (price.close - arr[index - 1].close) / arr[index - 1].close : 0))

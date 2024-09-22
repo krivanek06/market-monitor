@@ -1,7 +1,13 @@
 import { faker } from '@faker-js/faker';
-import { getStockHistoricalPricesOnDate, getSymbolSummaries } from '@mm/api-external';
+import {
+  getHistoricalPricesOnDateCF,
+  getIsMarketOpenCF,
+  getStockHistoricalPricesOnDateCF,
+  getSymbolSummariesCF,
+} from '@mm/api-external';
 import {
   HistoricalPrice,
+  HistoricalPriceSymbol,
   PortfolioTransaction,
   PortfolioTransactionCreate,
   SYMBOL_NOT_FOUND_ERROR,
@@ -19,14 +25,23 @@ import {
   dateFormatDate,
   getCurrentDateDefaultFormat,
   getCurrentDateDetailsFormat,
+  getPortfolioGrowth,
+  getPortfolioGrowthAssets,
   getRandomNumber,
+  getTransactionsStartDate,
+  getYesterdaysDate,
   roundNDigits,
 } from '@mm/shared/general-util';
 import { format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { v4 as uuidv4 } from 'uuid';
-import { userCollectionDemoAccountRef, userDocumentTransactionHistoryRef, userDocumentWatchListRef } from '../models';
+import {
+  userCollectionDemoAccountRef,
+  userDocumentPortfolioGrowthRef,
+  userDocumentTransactionHistoryRef,
+  userDocumentWatchListRef,
+} from '../models';
 import { userCreate } from './user-create-account';
 
 export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): Promise<UserDataDemoData> => {
@@ -69,7 +84,10 @@ export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): P
   await demoService.createWatchListWithRandomSymbols(newUser);
 
   // generate transactions
-  await demoService.generateTransactionsForRandomSymbols(newUser);
+  const transactions = await demoService.generateTransactionsForRandomSymbols(newUser);
+
+  // create portfolio growth data
+  await demoService.generatePortfolioGrowthData(newUser, transactions);
 
   return { userData: newUser, password: randomPassword };
 };
@@ -88,12 +106,47 @@ export class CreateDemoAccountService {
     this.watchListSymbols = await this.#getRandomSymbolSummaries(watchListLimit);
   };
 
+  generatePortfolioGrowthData = async (userData: UserData, transactions: PortfolioTransaction[]): Promise<void> => {
+    const yesterDay = getYesterdaysDate();
+    const transactionStart = getTransactionsStartDate(transactions);
+
+    // load historical data for each symbol
+    const historicalPricesPromise = await Promise.allSettled(
+      transactionStart.map((d) => getHistoricalPricesOnDateCF(d.symbol, format(d.startDate, 'yyyy-MM-dd'), yesterDay)),
+    );
+
+    // filter fulfilled promises
+    const historicalPrices = historicalPricesPromise
+      .filter((d): d is PromiseFulfilledResult<HistoricalPriceSymbol> => d.status === 'fulfilled')
+      .map((d) => d.value)
+      .reduce((acc, curr) => ({ ...acc, [curr.symbol]: curr.data }), {} as { [key: string]: HistoricalPrice[] });
+
+    // get portfolio growth assets
+    const portfolioGrowthAssets = getPortfolioGrowthAssets(transactions, historicalPrices);
+
+    // get holidays
+    const allHolidays = (await getIsMarketOpenCF())?.allHolidays ?? [];
+
+    // get portfolio growth data
+    const portfolioGrowth = getPortfolioGrowth(
+      portfolioGrowthAssets,
+      userData.portfolioState.startingCash,
+      allHolidays,
+    );
+
+    // save data into user document
+    await userDocumentPortfolioGrowthRef(userData.id).set({
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+      data: portfolioGrowth,
+    });
+  };
+
   /**
    *
    * creates one buy and one sell transaction for each symbol
    * @param userData
    */
-  generateTransactionsForRandomSymbols = async (userData: UserData): Promise<void> => {
+  generateTransactionsForRandomSymbols = async (userData: UserData): Promise<PortfolioTransaction[]> => {
     // save all created transactions
     const transactionsToSave: PortfolioTransaction[] = [];
 
@@ -163,6 +216,8 @@ export class CreateDemoAccountService {
     await userDocumentTransactionHistoryRef(userData.id).update({
       transactions: transactionsToSave,
     } satisfies UserPortfolioTransaction);
+
+    return transactionsToSave;
   };
 
   #getHistoricalPrice = async (symbol: string, date: string): Promise<HistoricalPrice> => {
@@ -175,7 +230,7 @@ export class CreateDemoAccountService {
     }
 
     // load historical price for symbol on date
-    const symbolPrice = await getStockHistoricalPricesOnDate(symbol, dateFormatDate(date));
+    const symbolPrice = await getStockHistoricalPricesOnDateCF(symbol, dateFormatDate(date));
 
     // check if symbol exists
     if (!symbolPrice) {
@@ -301,7 +356,7 @@ export class CreateDemoAccountService {
 
   #getRandomSymbolSummaries = async (limit: number): Promise<SymbolSummary[]> => {
     const randomSymbols = this.#getSymbols().slice(0, limit);
-    const summaries = await getSymbolSummaries(randomSymbols);
+    const summaries = await getSymbolSummariesCF(randomSymbols);
 
     console.log('Random symbols:', randomSymbols, 'Summaries:', summaries.length);
 

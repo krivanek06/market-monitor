@@ -151,17 +151,6 @@ export type UserAccountTypes = keyof typeof UserAccountEnum;
  */
 export type UserAccountBasicTypes = UserAccountEnum.NORMAL_BASIC | UserAccountEnum.DEMO_TRADING;
 
-export type UserResetTransactionsInput = {
-  /**
-   * user's id whom to to reset transactions
-   */
-  userId: string;
-  /**
-   * selected account type by the user
-   */
-  accountTypeSelected: UserAccountBasicTypes;
-};
-
 export const accountDescription: { [K in UserAccountEnum]: string[] } = {
   [UserAccountEnum.DEMO_TRADING]: [
     `Account type intended for users who wants to learn how to trade and practice trading.`,

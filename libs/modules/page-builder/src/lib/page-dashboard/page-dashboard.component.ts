@@ -191,7 +191,7 @@ import {
         <app-general-card title="Asset Growth" class="mb-8">
           <app-portfolio-asset-chart
             data-testid="portfolio-asset-chart-chart"
-            [data]="portfolioUserFacadeService.getPortfolioGrowthAssets()"
+            [data]="stateRef.getUserPortfolioTransactions()"
             [heightPx]="350"
           />
         </app-general-card>
