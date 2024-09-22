@@ -31,7 +31,7 @@ import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
         <span class="text-wt-gray-medium">{{ symbolQuote().price | currency }}</span>
         <!-- show value change -->
         <span
-          class="@xs:flex hidden"
+          class="@sm:flex hidden"
           appPercentageIncrease
           [useCurrencySign]="true"
           [changeValues]="{
@@ -41,11 +41,11 @@ import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
         ></span>
         <!-- hide value change -->
         <span
-          class="@xs:hidden flex"
+          class="@sm:hidden flex"
           appPercentageIncrease
           [useCurrencySign]="true"
           [changeValues]="{
-            change: symbolQuote().change,
+            changePercentage: symbolQuote().changesPercentage,
           }"
         ></span>
       </div>

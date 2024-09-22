@@ -45,7 +45,7 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
   template: `
     <mat-form-field class="w-full" cdkOverlayOrigin #trigger #origin="cdkOverlayOrigin">
       <!-- search input -->
-      <mat-label>Search stock by ticker</mat-label>
+      <mat-label>Search symbol by ticker</mat-label>
       <input
         data-testid="search-basic-input"
         type="text"
