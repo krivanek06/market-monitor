@@ -77,8 +77,9 @@ export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_inform
 export const run_scheduler_update_users = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '*/5 22-23 * * *',
+    schedule: '*/5 21-22 * * *',
     region: region,
+    timeZone: 'Europe/Berlin',
   },
   async () => {
     await measureFunctionExecutionTime(async () => {
@@ -94,6 +95,7 @@ export const run_scheduler_once_a_day = onSchedule(
     timeoutSeconds: 200,
     schedule: '0 1 * * *',
     region: region,
+    timeZone: 'Europe/Berlin',
   },
   async () => {
     await measureFunctionExecutionTime(async () => {
