@@ -86,6 +86,12 @@ export class UserApiService {
         ...createEmptyPortfolioState(startingCash),
       },
     });
+
+    // reset user portfolio growth
+    setDoc(this.getUserPortfolioGrowthDocRef(userBase.id), {
+      lastModifiedDate: '',
+      data: [],
+    });
   }
 
   changeAccountType(userBase: UserBase, accountTypeSelected: UserAccountEnum): void {
