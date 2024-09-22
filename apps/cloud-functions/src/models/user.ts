@@ -1,4 +1,10 @@
-import { UserAccountEnum, UserData, UserPortfolioTransaction, UserWatchList } from '@mm/api-types';
+import {
+  UserAccountEnum,
+  UserData,
+  UserPortfolioGrowthData,
+  UserPortfolioTransaction,
+  UserWatchList,
+} from '@mm/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './assign-type';
 
@@ -24,3 +30,8 @@ export const userDocumentTransactionHistoryRef = (userId: string) =>
 
 export const userDocumentWatchListRef = (userId: string) =>
   userCollectionMoreInformationRef(userId).doc('watchlist').withConverter(assignTypes<UserWatchList>());
+
+export const userDocumentPortfolioGrowthRef = (userId: string) =>
+  userCollectionMoreInformationRef(userId)
+    .doc('portfolio_growth')
+    .withConverter(assignTypes<UserPortfolioGrowthData>());

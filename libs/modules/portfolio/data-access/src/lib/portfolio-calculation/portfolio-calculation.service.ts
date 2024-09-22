@@ -3,8 +3,8 @@ import { MarketApiService } from '@mm/api-client';
 import {
   HistoricalPrice,
   HistoricalPriceSymbol,
+  PortfolioGrowth,
   PortfolioGrowthAssets,
-  PortfolioGrowthAssetsDataItem,
   PortfolioStateHolding,
   PortfolioStateHoldings,
   PortfolioTransaction,
@@ -13,22 +13,24 @@ import { ColorScheme, GenericChartSeries, ValueItem } from '@mm/shared/data-acce
 import {
   calculateGrowth,
   dateFormatDate,
-  fillOutMissingDatesForDate,
   getObjectEntries,
+  getPortfolioGrowth,
+  getPortfolioGrowthAssets,
   getPortfolioStateHoldingBaseUtil,
   getPortfolioStateHoldingsUtil,
+  getTransactionsStartDate,
   getYesterdaysDate,
   roundNDigits,
 } from '@mm/shared/general-util';
-import { format, isBefore, isSameDay, subMonths, subWeeks, subYears } from 'date-fns';
+import { format, subMonths, subWeeks, subYears } from 'date-fns';
 import { Observable, catchError, firstValueFrom, map, of } from 'rxjs';
-import { PortfolioChange, PortfolioGrowth } from '../models';
+import { PortfolioChange } from '../models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PortfolioCalculationService {
-  private marketApiService = inject(MarketApiService);
+  private readonly marketApiService = inject(MarketApiService);
 
   getPortfolioStateHoldings(
     startingCash: number,
@@ -47,76 +49,8 @@ export class PortfolioCalculationService {
   }
 
   getPortfolioGrowth(portfolioAssets: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
-    // user has no transactions yet
-    if (!portfolioAssets || portfolioAssets.length === 0) {
-      return [];
-    }
-
-    // get holidays
     const allHolidays = this.marketApiService.getIsMarketOpenSignal()?.allHolidays ?? [];
-
-    // get soonest date
-    const soonestDate = portfolioAssets.reduce(
-      (acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc),
-      getYesterdaysDate(),
-    );
-
-    // generate dates from soonest until today
-    const generatedDates = fillOutMissingDatesForDate(soonestDate, getYesterdaysDate());
-
-    // result of portfolio growth
-    const result: PortfolioGrowth[] = [];
-
-    // accumulate return values, because it is increasing per symbol - {symbol: accumulatedReturn}
-    const accumulatedReturn = new Map<string, number>();
-
-    // loop though all generated dates
-    for (const gDate of generatedDates) {
-      // check if holiday
-      if (allHolidays.includes(gDate)) {
-        continue;
-      }
-
-      // initial object
-      const portfolioItem: PortfolioGrowth = {
-        date: gDate,
-        breakEvenValue: 0,
-        marketTotalValue: 0,
-        totalBalanceValue: startingCashValue,
-        startingCash: startingCashValue,
-      };
-
-      // loop though all portfolio assets per date
-      for (const portfolioAsset of portfolioAssets) {
-        // find current portfolio asset on this date
-        const currentPortfolioAsset = portfolioAsset.data.find((d) => d.date === gDate);
-
-        // not found
-        if (!currentPortfolioAsset) {
-          continue;
-        }
-
-        // save accumulated return
-        accumulatedReturn.set(portfolioAsset.symbol, currentPortfolioAsset.accumulatedReturn);
-
-        // add values to initial object
-        portfolioItem.marketTotalValue += currentPortfolioAsset.marketTotalValue;
-        portfolioItem.breakEvenValue += currentPortfolioAsset.breakEvenValue;
-        portfolioItem.totalBalanceValue +=
-          currentPortfolioAsset.marketTotalValue - currentPortfolioAsset.breakEvenValue;
-      }
-
-      // add accumulated return to total balance
-      portfolioItem.totalBalanceValue += Array.from(accumulatedReturn.entries()).reduce(
-        (acc, curr) => acc + curr[1],
-        0,
-      );
-
-      // save result
-      result.push(portfolioItem);
-    }
-
-    return result;
+    return getPortfolioGrowth(portfolioAssets, startingCashValue, allHolidays);
   }
 
   /**
@@ -149,7 +83,7 @@ export class PortfolioCalculationService {
       };
     }
 
-    const todayChange = reversedData[0].totalBalanceValue;
+    const todayChange = reversedData[0].balanceTotal;
 
     // construct dates
     const week1ChangeDate = dateFormatDate(subWeeks(today, 1));
@@ -174,8 +108,8 @@ export class PortfolioCalculationService {
       !growth
         ? null
         : ({
-            value: roundNDigits(todayChange - growth.totalBalanceValue, 2),
-            valuePrct: roundNDigits(calculateGrowth(todayChange, growth.totalBalanceValue), 4),
+            value: roundNDigits(todayChange - growth.balanceTotal, 2),
+            valuePrct: roundNDigits(calculateGrowth(todayChange, growth.balanceTotal), 4),
           } satisfies ValueItem);
 
     // calculate change for each time period
@@ -229,6 +163,33 @@ export class PortfolioCalculationService {
       innerSize: '35%',
       data: chartData,
     };
+  }
+
+  /**
+   *
+   * @param transactions - executed transactions by user
+   * @returns - array of distinct symbols user ever transacted
+   */
+  getTransactionSymbols(transactions: PortfolioTransaction[]): {
+    symbol: string;
+    displaySymbol: string;
+  }[] {
+    const symbolMap = transactions.reduce(
+      (acc, curr) =>
+        curr.symbol in acc
+          ? acc
+          : { ...acc, [curr.symbol]: { symbol: curr.symbol, displaySymbol: curr.displaySymbol ?? curr.symbol } },
+
+      {} as {
+        [key: string]: {
+          symbol: string;
+          displaySymbol: string;
+        };
+      },
+    );
+
+    // get only the values
+    return Object.entries(symbolMap).map(([_, value]) => value);
   }
 
   getPortfolioHoldingBubbleChart(holdings: PortfolioStateHolding[]): GenericChartSeries<'packedbubble'>[] {
@@ -353,143 +314,8 @@ export class PortfolioCalculationService {
    * @returns - an array of {symbol: string, data: PortfolioGrowthAssetsDataItem[]}
    */
   async getPortfolioGrowthAssets(transactions: PortfolioTransaction[]): Promise<PortfolioGrowthAssets[]> {
-    // load historical data for all distinct symbols in transactions
-    const historicalPrices = await this.getHistoricalPricesForTransactionsSymbols(transactions);
-    const symbols = Object.keys(historicalPrices);
-
-    // format historical prices into dates as keys
-    const newFormat = Object.keys(historicalPrices).map((d) => ({
-      symbol: d,
-      data: historicalPrices[d].reduce(
-        (acc, curr) => ({
-          ...acc,
-          [curr.date]: curr.close,
-        }),
-        {} as { [key: string]: number },
-      ),
-    }));
-
-    // create portfolio growth assets
-    const result: PortfolioGrowthAssets[] = symbols
-      .map((symbol) => {
-        // historical data per symbol
-        const symbolHistoricalPrice = historicalPrices[symbol];
-
-        // check if historical prices are missing (symbol bought today)
-        if (!symbolHistoricalPrice || symbolHistoricalPrice.length === 0) {
-          console.log(`Missing historical prices for ${symbol}`);
-          return null;
-        }
-
-        // get all transactions for this symbol in ASC order by date
-        const symbolTransactions = transactions.filter((d) => d.symbol === symbol);
-
-        // generates all dates from first transaction date until yesterday
-        const transactionDate = fillOutMissingDatesForDate(symbolTransactions[0].date, getYesterdaysDate(), false);
-
-        // get historical price for the selected symbol
-        const pricePerDate = newFormat.find((d) => d.symbol === symbol)?.data ?? {};
-
-        // internal helper
-        const aggregator = {
-          units: 0,
-          index: 0,
-          breakEvenPrice: 0,
-          accumulatedReturn: 0,
-        };
-
-        const growthAssetItems = transactionDate.reduce((acc, date) => {
-          // modify the aggregator for every transaction that happened on that date
-          // can be multiple transactions on the same day for the same symbol
-          while (!!symbolTransactions[aggregator.index] && isSameDay(symbolTransactions[aggregator.index].date, date)) {
-            const transaction = symbolTransactions[aggregator.index];
-            const isBuy = transaction.transactionType === 'BUY';
-
-            // change break even price
-            aggregator.breakEvenPrice = isBuy
-              ? (aggregator.units * aggregator.breakEvenPrice + transaction.units * transaction.unitPrice) /
-                (aggregator.units + transaction.units)
-              : aggregator.breakEvenPrice;
-
-            // add or subtract units depending on transaction type
-            aggregator.units += isBuy ? transaction.units : -transaction.units;
-            aggregator.units =
-              transaction.symbolType === 'CRYPTO' ? roundNDigits(aggregator.units, 4) : aggregator.units;
-
-            // increment next transaction index
-            aggregator.index += 1;
-
-            // calculate accumulated return
-            aggregator.accumulatedReturn += roundNDigits(transaction.returnValue - transaction.transactionFees);
-          }
-
-          // get prince for the date - stocks on weekend do not have any data
-          const historicalPrice = pricePerDate[date];
-
-          // skip weekends - no historical data
-          if (!historicalPrice) {
-            return acc;
-          }
-
-          const breakEvenValue = roundNDigits(aggregator.units * aggregator.breakEvenPrice);
-          const marketTotalValue = roundNDigits(aggregator.units * historicalPrice);
-
-          const portfolioAsset = {
-            breakEvenValue: breakEvenValue,
-            date: date,
-            units: aggregator.units,
-            marketTotalValue: marketTotalValue,
-            profit: roundNDigits(marketTotalValue - breakEvenValue + aggregator.accumulatedReturn),
-            accumulatedReturn: roundNDigits(aggregator.accumulatedReturn),
-          } satisfies PortfolioGrowthAssetsDataItem;
-
-          return [...acc, portfolioAsset];
-        }, [] as PortfolioGrowthAssetsDataItem[]);
-
-        const displaySymbol = symbolTransactions.at(0)?.displaySymbol ?? symbol;
-        return {
-          symbol,
-          displaySymbol,
-          // remove data with 0 market value, however always keep last one (it has a different profit since it was SOLD)
-          data: growthAssetItems.filter(
-            (d, i) => !(d.marketTotalValue === 0 && growthAssetItems[i - 1]?.marketTotalValue === 0),
-          ),
-        } satisfies PortfolioGrowthAssets;
-      })
-      // remove undefined or symbols which were bought and sold on the same day
-      .filter((d): d is PortfolioGrowthAssets => !!d && d.data.length > 0);
-
-    console.log('PortfolioGrowthService: getPortfolioGrowthAssets', result);
-
-    return result;
-  }
-
-  /**
-   *
-   * @param transactions
-   * @returns distinct symbols with historical prices
-   */
-  private async getHistoricalPricesForTransactionsSymbols(
-    transactions: PortfolioTransaction[],
-  ): Promise<{ [key: string]: HistoricalPrice[] }> {
     // from transactions get all distinct symbols with soonest date of transaction
-    const transactionStart = transactions.reduce(
-      (acc, curr) => {
-        // check if symbol already exists
-        const entry = acc.find((d) => d.symbol === curr.symbol);
-        // add new entry if not exists
-        if (!entry) {
-          return [...acc, { symbol: curr.symbol, startDate: curr.date }];
-        }
-        // compare dates and update if sooner
-        if (isBefore(curr.date, entry.startDate)) {
-          return [...acc.filter((d) => d.symbol !== curr.symbol), { symbol: curr.symbol, startDate: curr.date }];
-        }
-        // else return original
-        return acc;
-      },
-      [] as { symbol: string; startDate: string }[],
-    );
+    const transactionStart = getTransactionsStartDate(transactions);
 
     // load historical prices for all holdings
     const yesterDay = getYesterdaysDate();
@@ -510,9 +336,7 @@ export class PortfolioCalculationService {
     );
 
     // get fulfilled promises or fulfilled promises with null
-    const incorrectData = historicalPricesPromise
-      .filter((d): d is PromiseRejectedResult => d.status === 'rejected' || d.value === null)
-      .map((d) => d.reason);
+    const incorrectData = historicalPricesPromise.filter((d) => d.status === 'rejected').map((d) => d.reason);
 
     // TODO: maybe use some logging service
     console.log('incorrectData', incorrectData);
@@ -523,6 +347,6 @@ export class PortfolioCalculationService {
       .map((d) => d.value)
       .reduce((acc, curr) => ({ ...acc, [curr.symbol]: curr.data }), {} as { [key: string]: HistoricalPrice[] });
 
-    return historicalPrices;
+    return getPortfolioGrowthAssets(transactions, historicalPrices);
   }
 }

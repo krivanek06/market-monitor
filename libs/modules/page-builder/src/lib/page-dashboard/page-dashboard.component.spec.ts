@@ -88,13 +88,13 @@ describe('PageDashboardComponent', () => {
       date: '2021-01-01',
       breakEvenValue: 1000,
       marketTotalValue: 1200,
-      totalBalanceValue: 1200,
+      balanceTotal: 1200,
     },
     {
       date: '2021-01-02',
       breakEvenValue: 1200,
       marketTotalValue: 1300,
-      totalBalanceValue: 1300,
+      balanceTotal: 1300,
     },
   ] as PortfolioGrowth[];
 
@@ -231,7 +231,7 @@ describe('PageDashboardComponent', () => {
       date: 'XXXX-XX-XX',
       breakEvenValue: 1,
       marketTotalValue: 1,
-      totalBalanceValue: 1,
+      balanceTotal: 1,
     }));
     ngMocks.stub(portfolioUserFacade, {
       ...portfolioUserFacade,

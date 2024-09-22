@@ -140,6 +140,7 @@ export const getRandomNumber = (min: number, max: number): number => {
 };
 
 export const getObjectEntries = <T extends object>(obj: T) => Object.entries(obj) as Entries<T>;
+export const getObjectKeys = <T extends object>(obj: T) => Object.keys(obj) as (keyof T)[];
 
 export const createNameInitials = (name: string) => {
   const words = name.split(' ').reduce((acc, word) => acc + (word.at(0) ?? '').toUpperCase(), '');

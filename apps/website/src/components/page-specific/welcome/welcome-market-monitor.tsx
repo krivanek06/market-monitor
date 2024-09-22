@@ -1,5 +1,5 @@
 import { $, Resource, component$, useResource$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
-import { getHistoricalPricesCloudflare, getSymbolSummaries } from '@mm/api-external';
+import { getHistoricalPricesCF, getSymbolSummariesCF } from '@mm/api-external';
 import { SymbolHistoricalPeriods, SymbolSummary } from '@mm/api-types';
 import { getRandomElement } from '@mm/shared/general-util';
 import { Button, CardBasic } from '../../shared';
@@ -11,7 +11,7 @@ export const WelcomeMarketMonitor = component$(() => {
     <section class="grid place-content-center">
       <h2 class="g-section-title">Market Monitoring</h2>
 
-      <div class="grid md:grid-cols-2 gap-x-10 gap-y-4 text-gray-300 text-center mx-auto w-full lg:w-[80%] mb-6 md:mb-16">
+      <div class="mx-auto mb-6 grid w-full gap-x-10 gap-y-4 text-center text-gray-300 md:mb-16 md:grid-cols-2 lg:w-[80%]">
         <p id="mm-p1" class="p-4 text-lg">
           Whether you're tracking blue-chip stocks or uncovering hidden gems in small-cap companies, we bring the entire
           marketplace to your screen
@@ -46,9 +46,7 @@ const MarketSymbolsSection = component$(() => {
   const loadedHistoricalPrice = useResource$(({ track }) => {
     track(() => selectedSummary.value);
 
-    return selectedSummary.value
-      ? getHistoricalPricesCloudflare(selectedSummary.value.id, SymbolHistoricalPeriods.year)
-      : [];
+    return selectedSummary.value ? getHistoricalPricesCF(selectedSummary.value.id, SymbolHistoricalPeriods.year) : [];
   });
 
   const loadedSummaries = useResource$(async ({ track }) => {
@@ -56,7 +54,7 @@ const MarketSymbolsSection = component$(() => {
     track(reloadSummaries);
     // load more symbols if some of them are undefined, and display 8
     const randomSymbols = getRandomElement(stockSymbols, 10);
-    const data = await getSymbolSummaries(randomSymbols);
+    const data = await getSymbolSummariesCF(randomSymbols);
 
     // console.log('loaded', data.length, 'symbols');
 
@@ -73,19 +71,19 @@ const MarketSymbolsSection = component$(() => {
   return (
     <>
       {/* loaded summaries about stocks */}
-      <div class="flex items-center gap-4 mb-6 md:mb-10">
+      <div class="mb-6 flex items-center gap-4 md:mb-10">
         {/* left button */}
         <div>
-          <Button class="h-20 hidden md:block" onClick$={() => reloadSummaries.value++}>
+          <Button class="hidden h-20 md:block" onClick$={() => reloadSummaries.value++}>
             <span class="material-symbols-outlined">arrow_back_ios</span>
           </Button>
         </div>
         {/* data */}
-        <div class="lg:px-2 flex-1">
+        <div class="flex-1 lg:px-2">
           <Resource
             value={loadedSummaries}
             onPending={() => (
-              <div class="hidden md:grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-8 gap-y-4 ">
+              <div class="hidden grid-cols-2 gap-x-8 gap-y-4 md:grid lg:grid-cols-3 2xl:grid-cols-4">
                 {Array.from({ length: 8 }, (_, index) => (
                   <div key={index} class="g-skeleton h-12"></div>
                 ))}
@@ -94,7 +92,7 @@ const MarketSymbolsSection = component$(() => {
             onResolved={(data) => (
               <>
                 {/* items */}
-                <div class="hidden md:grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-8 gap-y-4 ">
+                <div class="hidden grid-cols-2 gap-x-8 gap-y-4 md:grid lg:grid-cols-3 2xl:grid-cols-4">
                   {data.map((summary) => (
                     <SymbolChange
                       isSelect={selectedSummary.value?.id === summary.id}
@@ -109,7 +107,7 @@ const MarketSymbolsSection = component$(() => {
                   <select
                     name="stocks"
                     onChange$={(e) => onItemLetterClick$((e.target! as any)['value'])}
-                    class="w-full bg-transparent p-4 border border-cyan-800 border-solid rounded-lg"
+                    class="w-full rounded-lg border border-solid border-cyan-800 bg-transparent p-4"
                   >
                     {data.map((summary) => (
                       <option value={summary.id} key={summary.id}>
@@ -124,13 +122,13 @@ const MarketSymbolsSection = component$(() => {
         </div>
         {/* right button */}
         <div>
-          <Button class="h-20 hidden md:block" onClick$={() => reloadSummaries.value++}>
+          <Button class="hidden h-20 md:block" onClick$={() => reloadSummaries.value++}>
             <span class="material-symbols-outlined">arrow_forward_ios</span>
           </Button>
         </div>
       </div>
       {/* historical price */}
-      <div class="grid xl:grid-cols-3 gap-4">
+      <div class="grid gap-4 xl:grid-cols-3">
         <div class="xl:col-span-2">
           <Resource
             value={loadedHistoricalPrice}

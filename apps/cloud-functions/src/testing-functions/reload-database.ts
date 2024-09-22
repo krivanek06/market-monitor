@@ -77,11 +77,17 @@ export const testReloadDatabase = async (normalUsers = 10, demoUsers = 150): Pro
     await demoService.createWatchListWithRandomSymbols(newUser);
 
     // generate transactions
-    await demoService.generateTransactionsForRandomSymbols(newUser);
+    const transactions = await demoService.generateTransactionsForRandomSymbols(newUser);
+
+    // create portfolio growth data
+    await demoService.generatePortfolioGrowthData(newUser, transactions);
+
     // save new user
     newUsersNormal.push(newUser);
+
     // wait 0.2s sec
     await waitSeconds(0.2);
+
     // log
     console.log(`User normal created: [${i + 1}/${normalUsers}]`);
   }
@@ -107,7 +113,11 @@ export const testReloadDatabase = async (normalUsers = 10, demoUsers = 150): Pro
     await demoService.createWatchListWithRandomSymbols(newUser);
 
     // generate transactions
-    await demoService.generateTransactionsForRandomSymbols(newUser);
+    const transactions = await demoService.generateTransactionsForRandomSymbols(newUser);
+
+    // create portfolio growth data
+    await demoService.generatePortfolioGrowthData(newUser, transactions);
+
     // save new user
     newUsersDemo.push(newUser);
     // wait 0.2s sec
@@ -134,7 +144,10 @@ export const testReloadDatabase = async (normalUsers = 10, demoUsers = 150): Pro
   await demoService.createWatchListWithRandomSymbols(newCustomDemo1);
 
   // generate transactions
-  await demoService.generateTransactionsForRandomSymbols(newCustomDemo1);
+  const transactions = await demoService.generateTransactionsForRandomSymbols(newCustomDemo1);
+
+  // create portfolio growth data
+  await demoService.generatePortfolioGrowthData(newCustomDemo1, transactions);
 
   // create group data
   console.log('CREATE NEW GROUPS - START');

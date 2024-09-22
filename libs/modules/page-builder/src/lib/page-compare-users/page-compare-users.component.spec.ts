@@ -138,7 +138,7 @@ describe('PageCompareUsersComponent', () => {
     } as UserPortfolioTransaction;
     const portfolioGrowthAssetMock = [{ symbol: 'AA', data: [], displaySymbol: 'AA' }] as PortfolioGrowthAssets[];
     const portfolioGrowthMock = [
-      { totalBalanceValue: 1, breakEvenValue: 1, date: '', marketTotalValue: 1 },
+      { balanceTotal: 1, breakEvenValue: 1, date: '', marketTotalValue: 1 },
     ] as PortfolioGrowth[];
     const portfolioStateHoldingsMock = {
       balance: 1000,

@@ -5,11 +5,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { UserApiService } from '@mm/api-client';
-import { GROUP_HOLDING_LIMIT, GROUP_MEMBER_LIMIT, UserBase } from '@mm/api-types';
+import { GROUP_HOLDING_LIMIT, GROUP_MEMBER_LIMIT, PortfolioGrowth, UserBase } from '@mm/api-types';
 import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@mm/group/features';
 import { GroupDisplayInfoComponent, GroupMemberPortfolioHoldingChartComponent } from '@mm/group/ui';
 import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
-import { PortfolioCalculationService, PortfolioGrowth } from '@mm/portfolio/data-access';
+import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
   PortfolioBalancePieChartComponent,
   PortfolioGrowthChartComponent,
@@ -119,6 +119,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       <app-portfolio-growth-chart
         [data]="{
           values: portfolioGrowthSignal(),
+          currentCash: portfolioGrowthCurrentCash(),
         }"
         [heightPx]="425"
         class="mb-6"
@@ -324,18 +325,18 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
   readonly ColorScheme = ColorScheme;
   readonly displayLimitInitial = 12;
 
-  portfolioCalculationService = inject(PortfolioCalculationService);
-  userApiService = inject(UserApiService);
+  readonly portfolioCalculationService = inject(PortfolioCalculationService);
+  readonly userApiService = inject(UserApiService);
 
-  portfolioSectorAllocationSignal = computed(() =>
+  readonly portfolioSectorAllocationSignal = computed(() =>
     this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(this.getGroupHoldingsSignal()),
   );
 
-  portfolioHoldingBubbleChartSignal = computed(() =>
+  readonly portfolioHoldingBubbleChartSignal = computed(() =>
     this.portfolioCalculationService.getPortfolioHoldingBubbleChart(this.getGroupHoldingsSignal()),
   );
 
-  memberRequestedUsersSignal = derivedFrom(
+  readonly memberRequestedUsersSignal = derivedFrom(
     [this.groupDetailsSignal],
     pipe(
       map(([group]) => group),
@@ -365,25 +366,30 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
     { initialValue: [] },
   );
 
-  portfolioGrowthSignal = computed(() =>
+  readonly portfolioGrowthSignal = computed(() =>
     (this.groupDetailsSignal()?.groupPortfolioSnapshotsData ?? []).map(
       (portfolioStatePerDay) =>
         ({
           date: portfolioStatePerDay.date,
-          breakEvenValue: portfolioStatePerDay.invested,
-          marketTotalValue: portfolioStatePerDay.holdingsBalance,
-          totalBalanceValue: portfolioStatePerDay.balance,
-          startingCash: portfolioStatePerDay.startingCash,
+          investedTotal: portfolioStatePerDay.invested,
+          marketTotal: portfolioStatePerDay.holdingsBalance,
+          balanceTotal: portfolioStatePerDay.balance,
         }) satisfies PortfolioGrowth,
     ),
   );
 
-  portfolioChangeSignal = computed(() =>
+  readonly portfolioGrowthCurrentCash = computed(() =>
+    (this.groupDetailsSignal()?.groupPortfolioSnapshotsData ?? []).map(
+      (portfolioStatePerDay) => portfolioStatePerDay.startingCash,
+    ),
+  );
+
+  readonly portfolioChangeSignal = computed(() =>
     this.portfolioCalculationService.getPortfolioChange(this.portfolioGrowthSignal()),
   );
 
-  displayEveryMember = signal(false);
-  displayedMembers = computed(() =>
+  readonly displayEveryMember = signal(false);
+  readonly displayedMembers = computed(() =>
     this.displayEveryMember()
       ? this.groupDetailsSignal()?.groupMembersData
       : this.groupDetailsSignal()?.groupMembersData?.slice(0, this.displayLimitInitial),

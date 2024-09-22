@@ -1,24 +1,19 @@
-import { getCurrentDateDetailsFormat, waitSeconds } from '@mm/shared/general-util';
-import { startOfDay } from 'date-fns';
-import { userCollectionActiveAccountRef } from '../models';
-import { updateUserPortfolioState } from '../portfolio';
+import { PortfolioGrowth, UserData } from '@mm/api-types';
+import { getCurrentDateDefaultFormat, waitSeconds } from '@mm/shared/general-util';
+import { FieldValue } from 'firebase-admin/firestore';
+import { userCollectionActiveAccountRef, userDocumentPortfolioGrowthRef, userDocumentRef } from '../models';
+import { calculateUserPortfolioStateByTransactions } from '../portfolio';
 
 /**
  * for each user who is active
  * calculate portfolio state at the end of the day.
- *
- * functions runs multiple time to make sure all users are processed.
- * Select only N users at a time to prevent timeout.
- *
- * At every 5th minute past every hour from 1 through 2am
  */
 export const userPortfolioUpdate = async (): Promise<number> => {
+  // create threshold of today
+  const today = getCurrentDateDefaultFormat();
+
   // load users to calculate balance if it was not calculated today
-  const currentDayStart = getCurrentDateDetailsFormat(startOfDay(new Date()));
-  const userToUpdate = userCollectionActiveAccountRef()
-    .where('portfolioState.date', '<', currentDayStart)
-    .orderBy('portfolioState.date', 'desc')
-    .limit(100);
+  const userToUpdate = userCollectionActiveAccountRef().where('dates.portfolioGrowthDate', '!=', today).limit(100);
 
   const users = await userToUpdate.get();
 
@@ -31,9 +26,45 @@ export const userPortfolioUpdate = async (): Promise<number> => {
 
     const user = userDoc.data();
 
-    // update portfolio
     try {
-      await updateUserPortfolioState(user, true);
+      // calculate portfolio state
+      const data = await calculateUserPortfolioStateByTransactions(user);
+
+      if (!data) {
+        console.error(`Error calculating user portfolio state: ${user.id}`);
+        continue;
+      }
+
+      const { portfolioState, portfolioRisk, holdingsBase } = data;
+
+      // update user
+      userDocumentRef(user.id).update({
+        portfolioState: portfolioState,
+        holdingSnapshot: {
+          data: holdingsBase,
+          lastModifiedDate: getCurrentDateDefaultFormat(),
+        },
+        dates: {
+          ...user.dates,
+          portfolioGrowthDate: today,
+        },
+      } satisfies Partial<UserData>);
+
+      // update portfolio risk
+      userDocumentRef(user.id).update({
+        portfolioRisk: portfolioRisk,
+      } satisfies Partial<UserData>);
+
+      // update portfolio growth
+      userDocumentPortfolioGrowthRef(user.id).update({
+        lastModifiedDate: getCurrentDateDefaultFormat(),
+        data: FieldValue.arrayUnion({
+          date: getCurrentDateDefaultFormat(),
+          balanceTotal: portfolioState.balance,
+          investedTotal: portfolioState.invested,
+          marketTotal: portfolioState.holdingsBalance,
+        } satisfies PortfolioGrowth),
+      });
     } catch (error) {
       console.error('Error updating user portfolio', user.id, error);
     }

@@ -1,4 +1,4 @@
-import { getSymbolQuotes } from '@mm/api-external';
+import { getSymbolQuotesCF } from '@mm/api-external';
 import { UserBase, UserData } from '@mm/api-types';
 import {
   getCurrentDateDefaultFormat,
@@ -19,7 +19,29 @@ export const onTransactionUpdateForUserId = async (userId: string): Promise<void
     return;
   }
 
-  await updateUserPortfolioState(user);
+  // calculate portfolio state
+  const data = await calculateUserPortfolioStateByTransactions(user);
+
+  if (!data) {
+    console.error(`Error calculating user portfolio state: ${userId}`);
+    return;
+  }
+
+  const { portfolioState, portfolioRisk, holdingsBase } = data;
+
+  // update user
+  userDocumentRef(user.id).update({
+    portfolioState: portfolioState,
+    holdingSnapshot: {
+      data: holdingsBase,
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+    },
+  } satisfies Partial<UserData>);
+
+  // update portfolio risk
+  userDocumentRef(user.id).update({
+    portfolioRisk: portfolioRisk,
+  } satisfies Partial<UserData>);
 };
 
 /**
@@ -27,12 +49,9 @@ export const onTransactionUpdateForUserId = async (userId: string): Promise<void
  *
  * @param userData - user whom to update portfolio state
  */
-export const updateUserPortfolioState = async (userData: UserBase, isAfterHours: boolean = false): Promise<void> => {
-  const today = getCurrentDateDefaultFormat();
-
-  // load transaction per user
-  const transactionRef = userDocumentTransactionHistoryRef(userData.id);
-  const transactionData = (await transactionRef.get()).data()?.transactions ?? [];
+export const calculateUserPortfolioStateByTransactions = async (userData: UserBase) => {
+  // load user data
+  const transactionData = (await userDocumentTransactionHistoryRef(userData.id).get()).data()?.transactions ?? [];
 
   try {
     // get partial holdings calculations
@@ -40,8 +59,7 @@ export const updateUserPortfolioState = async (userData: UserBase, isAfterHours:
 
     // get symbol summaries from API
     const partialHoldingSymbols = holdingsBase.map((d) => d.symbol);
-    const symbolQuotes =
-      partialHoldingSymbols.length > 0 ? await getSymbolQuotes(partialHoldingSymbols, isAfterHours) : [];
+    const symbolQuotes = partialHoldingSymbols.length > 0 ? await getSymbolQuotesCF(partialHoldingSymbols) : [];
 
     // get portfolio state
     const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
@@ -54,27 +72,21 @@ export const updateUserPortfolioState = async (userData: UserBase, isAfterHours:
     // remove holdings
     const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
 
-    // update user
-    userDocumentRef(userData.id).update({
-      portfolioState: portfolioState,
-      holdingSnapshot: {
-        data: holdingsBase,
-        lastModifiedDate: today,
-      },
-    } satisfies Partial<UserData>);
-
     // calculation risk of investment
     const portfolioRisk = await userPortfolioRisk(portfolioStateHoldings);
-
-    // update user
-    userDocumentRef(userData.id).update({
-      portfolioRisk: portfolioRisk,
-    } satisfies Partial<UserData>);
 
     // log
     console.log(
       `Updated user: ${userData.personal.displayName}, ${userData.id}, holdings: ${portfolioStateHoldings.holdings.length}`,
     );
+
+    // return some data to use it later if needed
+    return {
+      portfolioState,
+      portfolioRisk,
+      symbolQuotes,
+      holdingsBase,
+    };
   } catch (e) {
     console.warn(`Error for user: ${userData.personal.displayName}, ${userData.id}: ${e}`);
   }

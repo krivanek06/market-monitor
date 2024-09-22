@@ -1,13 +1,14 @@
 import {
   HistoricalPrice,
   HistoricalPriceSymbol,
+  IsStockMarketOpenExtend,
   SymbolHistoricalPeriods,
   SymbolQuote,
   SymbolSummary,
 } from '@mm/api-types';
 import axios from 'axios';
 
-export const getSymbolSummaries = async (symbols: string[]): Promise<SymbolSummary[]> => {
+export const getSymbolSummariesCF = async (symbols: string[]): Promise<SymbolSummary[]> => {
   const url = `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}`;
   try {
     const response = await fetch(url, {
@@ -32,12 +33,11 @@ export const getSymbolSummaries = async (symbols: string[]): Promise<SymbolSumma
 
 /**
  *
- * @param symbols
- * @param isAfterHours - will cache the symbol on the BE until the next trading day
- * @returns
+ * @param symbols - array of symbols
+ * @returns - array of SymbolQuote
  */
-export const getSymbolQuotes = async (symbols: string[], isAfterHours: boolean = false): Promise<SymbolQuote[]> => {
-  const url = `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}&onlyQuote=true&isAfterHours=${isAfterHours}`;
+export const getSymbolQuotesCF = async (symbols: string[]): Promise<SymbolQuote[]> => {
+  const url = `https://get-symbol-summary.krivanek1234.workers.dev/?symbol=${symbols.join(',')}&onlyQuote=true`;
   try {
     const response = await fetch(url, {
       method: 'GET',
@@ -59,7 +59,7 @@ export const getSymbolQuotes = async (symbols: string[], isAfterHours: boolean =
   }
 };
 
-export const getPriceOnDateRange = async (
+export const getHistoricalPricesOnDateCF = async (
   symbol: string,
   dateStart: string,
   endDate: string,
@@ -86,7 +86,30 @@ export const getPriceOnDateRange = async (
   }
 };
 
-export const getHistoricalPricesCloudflare = async (
+export const getIsMarketOpenCF = async (): Promise<IsStockMarketOpenExtend | undefined> => {
+  const url = `https://get-basic-data.krivanek1234.workers.dev/?type=market-is-open`;
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.log(`Not ok ${response.statusText}, URL: ${response.url}`);
+      return undefined;
+    }
+    const data = (await response.json()) as IsStockMarketOpenExtend;
+    return data;
+  } catch (error) {
+    console.log(`Failed to get is market open`);
+    console.log(error);
+    return undefined;
+  }
+};
+
+export const getHistoricalPricesCF = async (
   symbol: string,
   period: SymbolHistoricalPeriods,
 ): Promise<HistoricalPrice[]> => {
@@ -113,7 +136,7 @@ export const getHistoricalPricesCloudflare = async (
   }
 };
 
-export const getStockHistoricalPricesOnDate = (symbol: string, date: string): Promise<HistoricalPrice | null> => {
+export const getStockHistoricalPricesOnDateCF = (symbol: string, date: string): Promise<HistoricalPrice | null> => {
   return axios
     .get<HistoricalPrice | null>(
       `https://get-historical-prices.krivanek1234.workers.dev?symbol=${symbol}&date=${date}&type=specificDate`,

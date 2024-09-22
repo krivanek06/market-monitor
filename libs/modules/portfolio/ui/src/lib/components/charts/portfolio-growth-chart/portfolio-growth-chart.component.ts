@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { PortfolioGrowth } from '@mm/portfolio/data-access';
+import { PortfolioGrowth, USER_DEFAULT_STARTING_CASH } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
 import { DateRangeSliderComponent, DateRangeSliderValues, filterDataByDateRange } from '@mm/shared/ui';
@@ -47,15 +47,18 @@ import { map } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioGrowthChartComponent extends ChartConstructor {
-  headerTitle = input<string>('');
-  data = input.required<{
+  readonly headerTitle = input<string>('');
+  readonly data = input.required<{
     values: PortfolioGrowth[];
+    currentCash?: number[];
   }>();
-  displayLegend = input(false);
-  chartType = input<'all' | 'marketValue' | 'balance'>('all');
-  dateRangeWidth = input(550);
 
-  sliderControl = new FormControl<DateRangeSliderValues>(
+  readonly startCash = input(USER_DEFAULT_STARTING_CASH);
+  readonly displayLegend = input(false);
+  readonly chartType = input<'all' | 'marketValue' | 'balance'>('all');
+  readonly dateRangeWidth = input(550);
+
+  readonly sliderControl = new FormControl<DateRangeSliderValues>(
     {
       currentMaxDateIndex: 0,
       currentMinDateIndex: 0,
@@ -64,7 +67,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
     { nonNullable: true },
   );
 
-  initSliderEffect = effect(() => {
+  readonly initSliderEffect = effect(() => {
     const dataValues = this.data();
 
     // create slider values
@@ -77,14 +80,15 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
     untracked(() => this.sliderControl.patchValue(sliderValuesInput));
   });
 
-  chartOptionsSignal = toSignal(
+  readonly chartOptionsSignal = toSignal(
     this.sliderControl.valueChanges.pipe(
       map((sliderValues) => {
         const dataValues = this.data();
+        const startCash = this.startCash();
 
         // filter out by valid dates
         const inputValues = filterDataByDateRange(dataValues.values, sliderValues);
-        const seriesDataUpdate = this.createChartSeries(inputValues);
+        const seriesDataUpdate = this.createChartSeries(inputValues, dataValues.currentCash ?? [], startCash);
 
         // create chart
         return this.initChart(seriesDataUpdate);
@@ -231,21 +235,22 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
     };
   }
 
-  private createChartSeries(data: PortfolioGrowth[]): SeriesOptionsType[] {
-    const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotalValue]);
-    const breakEvenValue = data.map((point) => [new Date(point.date).getTime(), point.breakEvenValue]);
-
-    //  const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
-    const totalBalanceValues = data.map((point) => [new Date(point.date).getTime(), point.totalBalanceValue]);
-    const threshold = data.map((point) => [new Date(point.date).getTime(), point.startingCash]);
+  private createChartSeries(data: PortfolioGrowth[], currentCash: number[], startingCash: number): SeriesOptionsType[] {
+    const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotal]);
+    const breakEvenValue = data.map((point) => [new Date(point.date).getTime(), point.investedTotal]);
+    const balanceTotal = data.map((point) => [new Date(point.date).getTime(), point.balanceTotal]);
+    const threshold = data.map((point, index) => [
+      new Date(point.date).getTime(),
+      currentCash.at(index) ?? startingCash,
+    ]);
 
     // get points when investment value change from previous day
     const investmentChangePoints: [number, number][] = [];
     for (let i = 0; i < data.length; i++) {
       const curr = data[i];
       const prev = data[i - 1];
-      if (prev && prev.breakEvenValue !== curr.breakEvenValue) {
-        investmentChangePoints.push([new Date(curr.date).getTime(), curr.breakEvenValue]);
+      if (prev && prev.investedTotal !== curr.investedTotal) {
+        investmentChangePoints.push([new Date(curr.date).getTime(), curr.investedTotal]);
       }
     }
 
@@ -269,7 +274,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           ],
         },
         name: 'Total Balance',
-        data: totalBalanceValues,
+        data: balanceTotal,
       },
       {
         color: ColorScheme.PRIMARY_VAR,

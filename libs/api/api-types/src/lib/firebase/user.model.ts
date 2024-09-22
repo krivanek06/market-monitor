@@ -1,6 +1,7 @@
 import { User } from 'firebase/auth';
 import { DataDocsWrapper } from './../constants/generic.model';
 import {
+  PortfolioGrowth,
   PortfolioRisk,
   PortfolioState,
   PortfolioStateHoldingBase,
@@ -43,6 +44,12 @@ export type UserBase = {
 };
 
 export type UserData = UserBase & {
+  dates: {
+    /**
+     * when was portfolio growth data last updated
+     */
+    portfolioGrowthDate: string;
+  };
   groups: {
     /**
      * group member
@@ -144,17 +151,6 @@ export type UserAccountTypes = keyof typeof UserAccountEnum;
  */
 export type UserAccountBasicTypes = UserAccountEnum.NORMAL_BASIC | UserAccountEnum.DEMO_TRADING;
 
-export type UserResetTransactionsInput = {
-  /**
-   * user's id whom to to reset transactions
-   */
-  userId: string;
-  /**
-   * selected account type by the user
-   */
-  accountTypeSelected: UserAccountBasicTypes;
-};
-
 export const accountDescription: { [K in UserAccountEnum]: string[] } = {
   [UserAccountEnum.DEMO_TRADING]: [
     `Account type intended for users who wants to learn how to trade and practice trading.`,
@@ -166,3 +162,5 @@ export const accountDescription: { [K in UserAccountEnum]: string[] } = {
   ],
   [UserAccountEnum.NORMAL_PAID]: [`TODO`],
 };
+
+export type UserPortfolioGrowthData = DataDocsWrapper<PortfolioGrowth>;

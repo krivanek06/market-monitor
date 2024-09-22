@@ -1,5 +1,14 @@
-import { GroupBase, GroupData, GroupMember, UserBase, UserData } from '@mm/api-types';
+import {
+  GroupBase,
+  GroupData,
+  GroupMember,
+  PortfolioState,
+  PortfolioStateHoldings,
+  UserBase,
+  UserData,
+} from '@mm/api-types';
 import { getCurrentDateDefaultFormat } from './date-service.util';
+import { roundNDigits } from './general-function.util';
 
 export const transformUserToBase = (user: UserData): UserBase => {
   return {
@@ -42,5 +51,28 @@ export const transformUserToGroupMember = (
       currentGroupMemberPosition: newPosition,
       previousGroupMemberPosition: userPreviousGroupData?.position?.currentGroupMemberPosition ?? null,
     },
+  };
+};
+
+/**
+ * transform PortfolioStateHoldings to PortfolioState
+ */
+export const transformPortfolioStateHoldingToPortfolioState = (holding: PortfolioStateHoldings): PortfolioState => {
+  return {
+    balance: holding.balance,
+    cashOnHand: holding.cashOnHand,
+    invested: holding.invested,
+    numberOfExecutedBuyTransactions: holding.numberOfExecutedBuyTransactions,
+    numberOfExecutedSellTransactions: holding.numberOfExecutedSellTransactions,
+    transactionFees: holding.transactionFees,
+    holdingsBalance: holding.holdingsBalance,
+    totalGainsValue: roundNDigits(holding.totalGainsValue),
+    totalGainsPercentage: roundNDigits(holding.totalGainsPercentage),
+    firstTransactionDate: holding.firstTransactionDate,
+    lastTransactionDate: holding.lastTransactionDate,
+    date: holding.date,
+    startingCash: holding.startingCash,
+    previousBalanceChange: roundNDigits(holding.previousBalanceChange),
+    previousBalanceChangePercentage: holding.previousBalanceChangePercentage,
   };
 };

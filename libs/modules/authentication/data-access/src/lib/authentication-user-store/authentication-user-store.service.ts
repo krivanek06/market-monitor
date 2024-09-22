@@ -1,6 +1,7 @@
 import { Injectable, InjectionToken, effect, inject } from '@angular/core';
 import { GroupApiService, UserApiService } from '@mm/api-client';
 import {
+  PortfolioGrowth,
   PortfolioTransaction,
   SymbolStoreBase,
   UserAccountBasicTypes,
@@ -37,6 +38,7 @@ type AuthenticationState = {
   userGroupData: UserGroupData | null;
   portfolioTransactions: PortfolioTransaction[] | null;
   watchList: UserWatchList;
+  portfolioGrowth: PortfolioGrowth[] | null;
 };
 
 @Injectable({
@@ -53,6 +55,7 @@ export class AuthenticationUserStoreService {
     userData: null,
     userGroupData: null,
     portfolioTransactions: [],
+    portfolioGrowth: [],
     watchList: {
       createdDate: getCurrentDateDefaultFormat(),
       data: [],
@@ -110,6 +113,12 @@ export class AuthenticationUserStoreService {
     })),
   );
 
+  private userPortfolioGrowthSource$ = this.authenticationAccountService.getUserData().pipe(
+    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
+    switchMap((userData) => (userData ? this.userApiService.getUserPortfolioGrowth(userData.id) : of(null))),
+    map((data) => ({ portfolioGrowth: data })),
+  );
+
   /**
    * Source used to get user group data, owner, member, invitations, requested, watched
    */
@@ -164,6 +173,7 @@ export class AuthenticationUserStoreService {
       this.portfolioTransactionsSource$,
       this.userGroupDataSource$,
       this.loadedAuthenticationSource$,
+      this.userPortfolioGrowthSource$,
     ],
     selectors: (state) => ({
       getUser: () => state().user!,
@@ -171,7 +181,7 @@ export class AuthenticationUserStoreService {
       getUserDataNormal: () => state().userData,
       getUserGroupData: () => state().userGroupData!,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
-      getUserPortfolioTransactions: () => state().portfolioTransactions,
+      getUserPortfolioTransactions: () => state().portfolioTransactions!,
       getUserPortfolioTransactionsBest: () =>
         (state().portfolioTransactions ?? [])
           .filter((d) => d.transactionType === 'SELL')
