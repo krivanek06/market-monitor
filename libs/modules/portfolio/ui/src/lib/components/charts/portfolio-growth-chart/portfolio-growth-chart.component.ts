@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { PortfolioGrowth } from '@mm/portfolio/data-access';
+import { PortfolioGrowth } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
 import { DateRangeSliderComponent, DateRangeSliderValues, filterDataByDateRange } from '@mm/shared/ui';
@@ -232,20 +232,20 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
   }
 
   private createChartSeries(data: PortfolioGrowth[]): SeriesOptionsType[] {
-    const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotalValue]);
-    const breakEvenValue = data.map((point) => [new Date(point.date).getTime(), point.breakEvenValue]);
+    const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotal]);
+    const breakEvenValue = data.map((point) => [new Date(point.date).getTime(), point.investedTotal]);
 
     //  const dates = data.map((point) => dateFormatDate(point.date, 'MMMM d, y'));
-    const totalBalanceValues = data.map((point) => [new Date(point.date).getTime(), point.totalBalanceValue]);
-    const threshold = data.map((point) => [new Date(point.date).getTime(), point.startingCash]);
+    const balanceTotal = data.map((point) => [new Date(point.date).getTime(), point.balanceTotal]);
+    const threshold = data.map((point) => [new Date(point.date).getTime(), point.currentCash]);
 
     // get points when investment value change from previous day
     const investmentChangePoints: [number, number][] = [];
     for (let i = 0; i < data.length; i++) {
       const curr = data[i];
       const prev = data[i - 1];
-      if (prev && prev.breakEvenValue !== curr.breakEvenValue) {
-        investmentChangePoints.push([new Date(curr.date).getTime(), curr.breakEvenValue]);
+      if (prev && prev.investedTotal !== curr.investedTotal) {
+        investmentChangePoints.push([new Date(curr.date).getTime(), curr.investedTotal]);
       }
     }
 
@@ -269,7 +269,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           ],
         },
         name: 'Total Balance',
-        data: totalBalanceValues,
+        data: balanceTotal,
       },
       {
         color: ColorScheme.PRIMARY_VAR,

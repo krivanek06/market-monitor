@@ -27,13 +27,12 @@ export type PortfolioState = {
    */
   balance: number;
   /**
-   * holdingsBalance = closed price * units for each holdings
-   * calculated from holdings the value of user's appreciated investments
+   * closed price * units for each holdings - current value of holdings
    */
   holdingsBalance: number;
 
   /**
-   * total invested value into holdings
+   * user's total invested value into holdings
    */
   invested: number;
   cashOnHand: number;
@@ -116,9 +115,9 @@ export type PortfolioGrowthAssets = {
 export type PortfolioGrowthAssetsDataItem = {
   date: string;
   /**
-   * units * invested values - how much user invested in this asset
+   * units * invested values - in total how much user invested in this asset
    */
-  breakEvenValue: number;
+  investedTotal: number;
   /**
    * units of the asset user has in this specific date
    */
@@ -126,7 +125,7 @@ export type PortfolioGrowthAssetsDataItem = {
   /**
    * units * price of the asset on day
    */
-  marketTotalValue: number;
+  marketTotal: number;
   /**
    * units * price of the asset on day - invested values
    */
@@ -135,6 +134,20 @@ export type PortfolioGrowthAssetsDataItem = {
    * when transaction is SELL, this is the return from the transaction
    */
   accumulatedReturn: number;
+};
+
+export type PortfolioGrowth = Pick<PortfolioGrowthAssetsDataItem, 'investedTotal' | 'marketTotal'> & {
+  date: string;
+
+  /**
+   * if user has activated cash account it will be investedValue + cashOnHand else investedValue
+   */
+  balanceTotal: number;
+
+  /**
+   * starting cash of the user, mainly used for groups to calculate threshold as users can join and leave
+   */
+  currentCash: number;
 };
 
 export type PortfolioTransactionType = 'BUY' | 'SELL';

@@ -2,8 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { UserBase } from '@mm/api-types';
-import { PortfolioGrowth } from '@mm/portfolio/data-access';
+import { PortfolioGrowth, UserBase } from '@mm/api-types';
 import { ChartConstructor, ColorScheme, GenericChartSeries } from '@mm/shared/data-access';
 import {
   fillOutMissingDatesForDate,
@@ -253,7 +252,7 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
           ({
             type: 'line',
             name: `${d.userBase.personal.displayName}`,
-            data: d.portfolioGrowth.map((point) => [Date.parse(point.date), point.totalBalanceValue]),
+            data: d.portfolioGrowth.map((point) => [Date.parse(point.date), point.balanceTotal]),
           }) satisfies GenericChartSeries<'line'>,
       ),
     };

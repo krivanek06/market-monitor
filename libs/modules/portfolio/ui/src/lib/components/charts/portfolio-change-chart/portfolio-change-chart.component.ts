@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { PortfolioGrowth } from '@mm/portfolio/data-access';
+import { PortfolioGrowth } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
 import { DateRangeSliderComponent, DateRangeSliderValues, filterDataByDateRange } from '@mm/shared/ui';
@@ -60,8 +60,8 @@ export class PortfolioChangeChartComponent extends ChartConstructor {
         const inputValues = filterDataByDateRange(inputData, sliderValues);
         const data: number[][] = [];
         for (let i = 1; i < inputValues.length; i++) {
-          const current = inputValues[i].totalBalanceValue;
-          const before = inputValues[i - 1].totalBalanceValue;
+          const current = inputValues[i].balanceTotal;
+          const before = inputValues[i - 1].balanceTotal;
 
           data.push([Date.parse(inputValues[i].date), current - before, (current / 100) * before]);
         }

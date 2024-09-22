@@ -6,10 +6,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { UserApiService } from '@mm/api-client';
-import { PortfolioRisk, PortfolioStateHoldings, PortfolioTransaction, UserBase, UserData } from '@mm/api-types';
+import {
+  PortfolioGrowth,
+  PortfolioRisk,
+  PortfolioStateHoldings,
+  PortfolioTransaction,
+  UserBase,
+  UserData,
+} from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
-import { PortfolioCalculationService, PortfolioChange, PortfolioGrowth } from '@mm/portfolio/data-access';
+import { PortfolioCalculationService, PortfolioChange } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthCompareChartComponent,
   PortfolioHoldingsTableCardComponent,
@@ -34,7 +41,7 @@ import { UserSearchControlComponent } from '@mm/user/features';
 import { UserDisplayItemComponent } from '@mm/user/ui';
 import { derivedFrom } from 'ngxtension/derived-from';
 import { filterNil } from 'ngxtension/filter-nil';
-import { Subject, forkJoin, from, map, merge, of, pipe, scan, startWith, switchMap, take } from 'rxjs';
+import { Subject, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, take } from 'rxjs';
 
 @Component({
   selector: 'app-page-compare-users',
@@ -253,16 +260,7 @@ export class PageCompareUsersComponent {
             portfolioState: this.portfolioCalculationService
               .getPortfolioStateHoldings(userData.portfolioState.startingCash, userTransactions.transactions)
               .pipe(take(1)),
-            portfolioGrowth: from(
-              this.portfolioCalculationService.getPortfolioGrowthAssets(userTransactions.transactions),
-            ).pipe(
-              map((portfolioGrowthAsset) =>
-                this.portfolioCalculationService.getPortfolioGrowth(
-                  portfolioGrowthAsset,
-                  userData.portfolioState.startingCash,
-                ),
-              ),
-            ),
+            portfolioGrowth: this.userApiService.getUserPortfolioGrowth(userBase.id).pipe(take(1)),
           }).pipe(
             map((data) => ({
               ...data,

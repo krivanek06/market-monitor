@@ -1,9 +1,10 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, input, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { PortfolioGrowthAssets } from '@mm/api-types';
+import { PortfolioGrowthAssets, PortfolioTransaction } from '@mm/api-types';
+import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
   ChartConstructor,
   ColorScheme,
@@ -25,8 +26,7 @@ import {
 } from '@mm/shared/ui';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { derivedFrom } from 'ngxtension/derived-from';
-import { map, pipe, startWith } from 'rxjs';
+import { from, map, share, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-asset-chart',
@@ -59,18 +59,18 @@ import { map, pipe, startWith } from 'rxjs';
 
     <!-- chart -->
     @if (selectedSymbol().length > 0) {
-      @if (displayChart()) {
-        @if (chartOptionsSignal(); as chartOptionsSignal) {
+      @if (chartOptionsSignal(); as chartOptionsSignal) {
+        @if (chartOptionsSignal.loaded) {
           <highcharts-chart
             [Highcharts]="Highcharts"
-            [options]="chartOptionsSignal"
+            [options]="chartOptionsSignal.series"
             [callbackFunction]="chartCallback"
             [style.height.px]="heightPx()"
             style="width: 100%; display: block"
           />
+        } @else {
+          <div class="g-skeleton" [style.height.px]="heightPx()"></div>
         }
-      } @else {
-        <div class="g-skeleton" [style.height.px]="heightPx()"></div>
       }
     } @else {
       <div class="grid place-content-center text-base" [style.height.px]="heightPx() + 100">No data available</div>
@@ -84,7 +84,12 @@ import { map, pipe, startWith } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioAssetChartComponent extends ChartConstructor {
-  readonly data = input<PortfolioGrowthAssets[] | undefined>();
+  private readonly portfolioCalculationService = inject(PortfolioCalculationService);
+
+  /**
+   * user's all portfolio transactions
+   */
+  readonly data = input<PortfolioTransaction[]>([]);
 
   /**
    * selected symbols by the user
@@ -104,18 +109,26 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   );
 
   /**
-   * used to destroy and recreate the chart
+   * every symbol which has been transacted
    */
-  readonly displayChart = signal(false);
+  readonly transactedSymbols = computed(() => this.portfolioCalculationService.getTransactionSymbols(this.data()));
 
   /**
    * displayed symbols on the ui
    */
   readonly symbolInputSource = computed(() =>
-    (this.data() ?? []).map(
+    this.transactedSymbols().map(
       (asset) =>
         ({ caption: asset.displaySymbol, value: asset.symbol, image: asset.symbol }) satisfies InputSource<string>,
     ),
+  );
+
+  /**
+   * signal value of the selected date range
+   */
+  readonly dateRangeControlData = toSignal(
+    this.dateRangeControl.valueChanges.pipe(startWith(this.dateRangeControl.value)),
+    { initialValue: this.dateRangeControl.value },
   );
 
   /**
@@ -126,30 +139,51 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   /**
    * save provided data into the component
    */
-  readonly chartOptionsSignal = derivedFrom(
-    [this.dateRangeControl.valueChanges.pipe(startWith(this.dateRangeControl.value)), this.selectedSymbol],
-    pipe(
-      map(([dateRange, selectedSymbols]) => {
-        const series = this.formatData(this.data() ?? [], selectedSymbols);
-        const newData = series.map((d) => ({
-          ...d,
-          data: filterDataByTimestamp(d.data as [number, number][], dateRange),
-        })) satisfies Highcharts.SeriesOptionsType[];
+  readonly chartOptionsSignal = computed(() => {
+    const dateRange = this.dateRangeControlData();
+    const growthAssets = this.selectedSymbolsPortfolioGrowthAssets();
 
-        return this.initChart(newData);
-      }),
+    // data not yet loaded, display skeleton
+    if (!growthAssets.loaded) {
+      return { loaded: false, series: {} };
+    }
+
+    const series = this.formatData(growthAssets.data);
+    const newData = series.map((d) => ({
+      ...d,
+      data: filterDataByTimestamp(d.data as [number, number][], dateRange),
+    })) satisfies Highcharts.SeriesOptionsType[];
+
+    return { loaded: true, series: this.initChart(newData) };
+  });
+
+  /**
+   * loaded portfolio growth for selected symbols
+   */
+  private readonly selectedSymbolsPortfolioGrowthAssets = toSignal(
+    this.symbolsControl.valueChanges.pipe(startWith(this.symbolsControl.value)).pipe(
+      // filter out transactions which are related to this symbols
+      map((symbol) => this.data().filter((d) => symbol.includes(d.symbol))),
+      // load historical data, calculate assets growth
+      switchMap((transactions) =>
+        from(this.portfolioCalculationService.getPortfolioGrowthAssets(transactions)).pipe(
+          map((data) => ({ loaded: true, data })),
+          startWith({ loaded: false, data: [] }),
+        ),
+      ),
+      share(),
     ),
+    { initialValue: { loaded: false, data: [] } },
   );
 
   /**
    * effect to patch value to the slider based on the selected symbols
    */
   readonly dateRangeEffect = effect(() => {
-    const allAssetsData = this.data() ?? [];
-    const selectedSymbols = this.selectedSymbol();
+    const growthAssets = this.selectedSymbolsPortfolioGrowthAssets();
 
     // nothing is selected or empty data
-    if (selectedSymbols.length === 0 || allAssetsData.length === 0) {
+    if (growthAssets.data.length === 0) {
       untracked(() => {
         this.dateRangeControl.patchValue({
           currentMaxDateIndex: 0,
@@ -161,9 +195,10 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
     }
 
     // create range of dates from the minimal date to the current date up to today
-    const minDate = allAssetsData
-      .filter((d) => selectedSymbols.includes(d.symbol))
-      .reduce((acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc), getCurrentDateDefaultFormat());
+    const minDate = growthAssets.data.reduce(
+      (acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc),
+      getCurrentDateDefaultFormat(),
+    );
 
     // generate missing dates between minDate and today
     const missingDates = fillOutMissingDatesForDate(minDate, new Date());
@@ -178,52 +213,16 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
     });
   });
 
-  /**
-   * effect used to destroy the chart and recreate it with updated series,
-   * otherwise new data inside the series is not showed
-   * TODO: remove this - it is a hack
-   */
-  readonly chartOptionsSignalEffect = effect(() => {
-    this.selectedSymbol();
-
-    untracked(() => {
-      this.displayChart.set(false);
-
-      setTimeout(() => {
-        this.displayChart.set(true);
-      }, 300);
-    });
-  });
-
   /** chart is empty by default so select some symbol as default ones */
   readonly displayInitialDataEffect = effect(() => {
-    const data = this.data() ?? [];
+    //const data = this.data() ?? [];
+    const transactedSymbols = this.transactedSymbols();
     // limit initial symbols that are displayed
     const symbolLimit = 5;
 
     untracked(() => {
-      // display top N symbol which have the most data
-      const displaySymbols = data
-        .reduce(
-          (acc, curr) => {
-            // save first N symbols
-            if (acc.length < symbolLimit) {
-              return [...acc, { symbol: curr.symbol, count: curr.data.length }];
-            }
-            // find which one has the lowest count
-            const lowestCount = acc.reduce((prev, curr) => (prev.count < curr.count ? prev : curr));
-
-            // if current symbol has more data than the lowest one, replace it
-            if (curr.data.length > lowestCount.count) {
-              const lowestCountIndex = acc.findIndex((d) => d.symbol === lowestCount.symbol);
-              acc[lowestCountIndex] = { symbol: curr.symbol, count: curr.data.length };
-            }
-
-            return acc;
-          },
-          [] as { symbol: string; count: number }[],
-        )
-        .map((d) => d.symbol);
+      // display top N symbol
+      const displaySymbols = transactedSymbols.map((d) => d.symbol).slice(0, symbolLimit);
 
       // save symbols into the form
       this.symbolsControl.patchValue(displaySymbols);
@@ -390,20 +389,15 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   /**
    *
    * @param portfolioAssets - historical invested value into assets
-   * @param selectedSymbols - selected symbols by the user
    * @returns formatted PortfolioGrowthAssets with the selected symbols into the Highcharts.SeriesOptionsType
    */
-  private formatData(
-    portfolioAssets: PortfolioGrowthAssets[],
-    selectedSymbols: string[],
-  ): GenericChartSeries<'line' | 'column'>[] {
-    const portfolioFiltered = portfolioAssets.filter((asset) => selectedSymbols.includes(asset.symbol));
-    const seriesData = portfolioFiltered.map(
+  private formatData(portfolioAssets: PortfolioGrowthAssets[]): GenericChartSeries<'line' | 'column'>[] {
+    const seriesData = portfolioAssets.map(
       (d, index) =>
         ({
           type: 'line',
           name: d.symbol,
-          data: d.data.map((g) => [Date.parse(g.date), g.marketTotalValue]),
+          data: d.data.map((g) => [Date.parse(g.date), g.marketTotal]),
           yAxis: 1,
           color: getChartGenericColor(index),
           additionalData: {

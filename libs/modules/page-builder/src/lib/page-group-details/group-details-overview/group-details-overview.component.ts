@@ -5,11 +5,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { UserApiService } from '@mm/api-client';
-import { GROUP_HOLDING_LIMIT, GROUP_MEMBER_LIMIT, UserBase } from '@mm/api-types';
+import { GROUP_HOLDING_LIMIT, GROUP_MEMBER_LIMIT, PortfolioGrowth, UserBase } from '@mm/api-types';
 import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@mm/group/features';
 import { GroupDisplayInfoComponent, GroupMemberPortfolioHoldingChartComponent } from '@mm/group/ui';
 import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
-import { PortfolioCalculationService, PortfolioGrowth } from '@mm/portfolio/data-access';
+import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
   PortfolioBalancePieChartComponent,
   PortfolioGrowthChartComponent,
@@ -370,10 +370,10 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
       (portfolioStatePerDay) =>
         ({
           date: portfolioStatePerDay.date,
-          breakEvenValue: portfolioStatePerDay.invested,
-          marketTotalValue: portfolioStatePerDay.holdingsBalance,
-          totalBalanceValue: portfolioStatePerDay.balance,
-          startingCash: portfolioStatePerDay.startingCash,
+          investedTotal: portfolioStatePerDay.invested,
+          marketTotal: portfolioStatePerDay.holdingsBalance,
+          balanceTotal: portfolioStatePerDay.balance,
+          currentCash: portfolioStatePerDay.startingCash,
         }) satisfies PortfolioGrowth,
     ),
   );

@@ -21,7 +21,7 @@ import { ColorScheme, LabelValue } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, SectionTitleComponent, TabSelectControlComponent } from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
-import { combineLatest, from, map, share, startWith, switchMap, tap } from 'rxjs';
+import { combineLatest, map, share, startWith, switchMap, tap } from 'rxjs';
 
 export type UserDetailsDialogComponentData = {
   userId: string;
@@ -221,14 +221,11 @@ export class UserDetailsDialogComponent {
   );
 
   readonly portfolioGrowthSignal = toSignal(
-    combineLatest([this.userData$, this.portfolioTransactions$]).pipe(
-      switchMap(([userData, transactions]) =>
-        from(this.portfolioCalculationService.getPortfolioGrowthAssets(transactions)).pipe(
-          map((growth) =>
-            this.portfolioCalculationService.getPortfolioGrowth(growth, userData?.portfolioState?.startingCash ?? 0),
-          ),
-          map((data) => ({ data, state: 'loaded' as const })),
-        ),
+    this.userData$.pipe(
+      switchMap((userData) =>
+        this.userApiService
+          .getUserPortfolioGrowth(userData.id)
+          .pipe(map((data) => ({ data, state: 'loaded' as const }))),
       ),
       startWith({ data: [], state: 'loading' as const }),
     ),

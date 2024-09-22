@@ -1,6 +1,7 @@
 import { User } from 'firebase/auth';
 import { DataDocsWrapper } from './../constants/generic.model';
 import {
+  PortfolioGrowth,
   PortfolioRisk,
   PortfolioState,
   PortfolioStateHoldingBase,
@@ -166,3 +167,5 @@ export const accountDescription: { [K in UserAccountEnum]: string[] } = {
   ],
   [UserAccountEnum.NORMAL_PAID]: [`TODO`],
 };
+
+export type UserPortfolioGrowthData = DataDocsWrapper<PortfolioGrowth>;

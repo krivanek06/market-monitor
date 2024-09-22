@@ -291,7 +291,10 @@ export class PortfolioTradeDialogComponent {
   });
 
   // get holding information for symbol if there is any
-  readonly holdingSignal = this.portfolioUserFacadeService.getPortfolioStateHolding(this.data().quote.symbol);
+  readonly holdingSignal = computed(() => {
+    const symbol = this.data().quote.symbol;
+    return this.portfolioUserFacadeService.getPortfolioState()?.holdings.find((holding) => holding.symbol === symbol);
+  });
   readonly portfolioState = this.portfolioUserFacadeService.getPortfolioState;
   readonly userDataSignal = this.authenticationUserService.state.getUserData;
 
