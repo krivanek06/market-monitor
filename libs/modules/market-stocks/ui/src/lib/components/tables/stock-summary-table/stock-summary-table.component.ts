@@ -72,7 +72,7 @@ import {
         <td mat-cell *matCellDef="let row">
           <!-- logo + symbol -->
           <div class="flex items-center gap-2">
-            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-10 w-10" />
+            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-8 w-8" />
             <div class="flex flex-col">
               <!-- asset symbol + sector -->
               <div class="text-wt-primary">{{ row.displaySymbol }}</div>

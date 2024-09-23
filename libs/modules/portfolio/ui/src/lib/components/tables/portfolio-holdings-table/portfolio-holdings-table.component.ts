@@ -55,7 +55,7 @@ import {
         <td mat-cell *matCellDef="let row">
           <!-- logo + symbol -->
           <div class="flex items-center gap-2">
-            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-10 w-10" />
+            <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-8 w-8" />
             <div class="flex flex-col">
               <div class="space-x-1">
                 <span class="text-wt-primary">{{ row?.symbolQuote?.displaySymbol ?? row.symbol }}</span>
@@ -242,24 +242,24 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioHoldingsTableComponent {
-  symbolClicked = output<string>();
+  readonly symbolClicked = output<string>();
 
   /**
    * Invested amount - closed price * units for each holdings
    */
-  portfolioState = input.required<PortfolioState | undefined>();
-  holdings = input.required<PortfolioStateHolding[]>();
-  paginator = viewChild(MatPaginator);
-  sort = viewChild(MatSort);
+  readonly portfolioState = input.required<PortfolioState | undefined>();
+  readonly holdings = input.required<PortfolioStateHolding[]>();
+  readonly paginator = viewChild(MatPaginator);
+  readonly sort = viewChild(MatSort);
 
   /**
    * Total balance of all holdings - used to have wrong percentage calculation when fees wasn't accounted for
    */
-  holdingsBalance = computed(
+  readonly holdingsBalance = computed(
     () => (this.portfolioState()?.holdingsBalance ?? 0) + (this.portfolioState()?.transactionFees ?? 0),
   );
 
-  displayedColumns = input<string[]>([
+  readonly displayedColumns = input<string[]>([
     'symbol',
     'price',
     // 'units',
@@ -275,11 +275,11 @@ export class PortfolioHoldingsTableComponent {
     'yearlyRange',
     // 'sector',
   ]);
-  dataSource = new MatTableDataSource<PortfolioStateHolding>([]);
+  readonly dataSource = new MatTableDataSource<PortfolioStateHolding>([]);
 
-  showDailyChangeSignal = signal(false);
+  readonly showDailyChangeSignal = signal(false);
 
-  tableEffect = effect(() => {
+  readonly tableEffect = effect(() => {
     const sorted = this.holdings()
       .slice()
       .sort((a, b) => compare(b.symbolQuote.price * b.units, a.symbolQuote.price * a.units));

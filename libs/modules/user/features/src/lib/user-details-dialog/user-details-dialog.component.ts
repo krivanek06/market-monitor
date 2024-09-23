@@ -54,7 +54,7 @@ export type UserDetailsDialogComponentData = {
         <!-- display user -->
         @if (userDataSignal(); as user) {
           <div class="flex items-center gap-2">
-            <img appDefaultImg [src]="user.personal.photoURL" alt="User Image" class="h-14 w-14 rounded-full" />
+            <img appDefaultImg [src]="user.personal.photoURL" alt="User Image" class="h-12 w-12 rounded-full" />
             <div class="flex flex-col">
               <span class="text-xl">{{ user.personal.displayName }}</span>
               <span class="text-sm">{{ user.accountCreatedDate | date: 'MMMM d, y' }}</span>
@@ -64,18 +64,16 @@ export type UserDetailsDialogComponentData = {
 
         <!-- tabs -->
         <app-tab-select-control
-          class="hidden lg:block"
+          class="-mb-3 hidden lg:block"
           [displayOptions]="displayOptions"
           [(selectedValueSignal)]="selectedValueSignal"
         />
       </div>
 
       <!-- close -->
-      <div>
-        <button mat-icon-button color="warn" type="button" (click)="onDialogClose()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
+      <button mat-icon-button color="warn" type="button" (click)="onDialogClose()">
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
 
     <mat-dialog-content class="md:h-[75vh]">
@@ -86,42 +84,30 @@ export type UserDetailsDialogComponentData = {
         <!-- display portfolio -->
         <div class="divide-wt-border flex flex-row divide-x-2 p-2">
           <!-- portfolio state -->
-          <div class="p-2 max-lg:flex-1 lg:basis-[40%]">
-            @if (portfolioStateHoldingSignal(); as portfolioStateHoldingSignal) {
-              <app-portfolio-state
-                [titleColor]="ColorScheme.GRAY_DARK_VAR"
-                [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-                [portfolioState]="portfolioStateHoldingSignal"
-                [showCashSegment]="userData.userAccountType === 'DEMO_TRADING'"
-              />
-            } @else {
-              <div class="g-skeleton h-[120px]"></div>
-            }
+          <div class="px-4 py-2 max-lg:flex-1 lg:basis-[40%]">
+            <app-portfolio-state
+              [titleColor]="ColorScheme.GRAY_DARK_VAR"
+              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+              [portfolioState]="userData.portfolioState"
+              [showCashSegment]="userData.userAccountType === 'DEMO_TRADING'"
+            />
           </div>
           <!-- risk -->
-          <div class="hidden flex-1 p-2 md:block">
-            @if (portfolioStateHoldingSignal()) {
-              <app-portfolio-state-risk
-                [titleColor]="ColorScheme.GRAY_DARK_VAR"
-                [portfolioRisk]="userDataSignal()?.portfolioRisk"
-                [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-              />
-            } @else {
-              <div class="g-skeleton h-[120px]"></div>
-            }
+          <div class="hidden flex-1 px-4 py-2 md:block">
+            <app-portfolio-state-risk
+              [titleColor]="ColorScheme.GRAY_DARK_VAR"
+              [portfolioRisk]="userData.portfolioRisk"
+              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+            />
           </div>
           <!-- transactions -->
-          <div class="hidden flex-1 p-2 lg:block">
-            @if (portfolioStateHoldingSignal(); as portfolioStateHoldingSignal) {
-              <app-portfolio-state-transactions
-                [portfolioState]="portfolioStateHoldingSignal"
-                [titleColor]="ColorScheme.GRAY_DARK_VAR"
-                [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-                [showFees]="userData.userAccountType === 'DEMO_TRADING'"
-              />
-            } @else {
-              <div class="g-skeleton h-[120px]"></div>
-            }
+          <div class="hidden flex-1 px-4 py-2 lg:block">
+            <app-portfolio-state-transactions
+              [portfolioState]="userData.portfolioState"
+              [titleColor]="ColorScheme.GRAY_DARK_VAR"
+              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+              [showFees]="userData.userAccountType === 'DEMO_TRADING'"
+            />
           </div>
         </div>
 

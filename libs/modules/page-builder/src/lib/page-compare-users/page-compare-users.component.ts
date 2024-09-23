@@ -73,7 +73,7 @@ import { Subject, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, ta
   template: `
     <div class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-center">
       <!-- title -->
-      <app-section-title matIcon="diversity_3" title="Compare Users" [largeTitle]="true" />
+      <app-section-title matIcon="diversity_3" title="Compare Users" />
 
       <!-- search users -->
       <app-user-search-control

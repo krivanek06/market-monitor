@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { PortfolioState } from '@mm/api-types';
 import { ColorScheme } from '@mm/shared/data-access';
@@ -7,7 +7,7 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 @Component({
   selector: 'app-portfolio-state',
   standalone: true,
-  imports: [CommonModule, PercentageIncreaseDirective, AddColorDirective],
+  imports: [PercentageIncreaseDirective, AddColorDirective, CurrencyPipe],
   template: `
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
@@ -28,25 +28,27 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Cash -->
-        <div *ngIf="showCashSegment()" class="@md:flex-col flex justify-between">
-          <div [appAddColor]="titleColor()" class="sm:text-lg">Cash</div>
-          <div [appAddColor]="valueColor()" class="sm:text-lg">
-            {{ (portfolioState()?.cashOnHand | currency) ?? 'N/A' }}
+        @if (showCashSegment()) {
+          <div class="@md:flex-col flex justify-between">
+            <div [appAddColor]="titleColor()" class="sm:text-lg">Cash</div>
+            <div [appAddColor]="valueColor()" class="sm:text-lg">
+              {{ (portfolioState()?.cashOnHand | currency) ?? 'N/A' }}
+            </div>
           </div>
-        </div>
-
-        <!-- Total Gains -->
-        <div *ngIf="!showCashSegment()" class="@md:flex-col flex justify-between">
-          <div [appAddColor]="titleColor()" class="sm:text-lg">Total Gains</div>
-          <div
-            class="sm:text-lg"
-            [appAddColor]="valueColor()"
-            appPercentageIncrease
-            [changeValues]="{
-              changePercentage: portfolioState()?.totalGainsPercentage,
-            }"
-          ></div>
-        </div>
+        } @else {
+          <!-- Total Gains -->
+          <div class="@md:flex-col flex justify-between">
+            <div [appAddColor]="titleColor()" class="sm:text-lg">Total Gains</div>
+            <div
+              class="sm:text-lg"
+              [appAddColor]="valueColor()"
+              appPercentageIncrease
+              [changeValues]="{
+                changePercentage: portfolioState()?.totalGainsPercentage,
+              }"
+            ></div>
+          </div>
+        }
 
         <!-- Total Return -->
         <div class="@md:flex-col flex justify-between">
@@ -73,8 +75,8 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStateComponent {
-  portfolioState = input<PortfolioState | undefined>();
-  titleColor = input<ColorScheme | undefined>();
-  valueColor = input<ColorScheme | undefined>();
-  showCashSegment = input(false);
+  readonly portfolioState = input<PortfolioState | undefined>();
+  readonly titleColor = input<ColorScheme | undefined>();
+  readonly valueColor = input<ColorScheme | undefined>();
+  readonly showCashSegment = input(false);
 }

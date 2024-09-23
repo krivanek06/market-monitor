@@ -313,7 +313,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
 
             style: {
               color: ColorScheme.GRAY_DARK_VAR,
-              fontSize: '16px',
+              fontSize: '12px',
               textOutline: 'none',
               fontWeight: 'normal',
             },

@@ -13,10 +13,10 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
         <!-- image  -->
         <img appDefaultImg imageType="symbol" [src]="transaction().symbol" class="h-8 w-8" />
         <!-- symbol &  date -->
-        <div class="flex flex-col" [ngClass]="{ 'gap-y-2': displayUser() }">
+        <div class="flex flex-col">
           <div class="flex items-center gap-2">
             <!-- symbol -->
-            <div class="text-wt-primary">{{ transaction().symbol }}</div>
+            <div class="text-wt-primary">{{ transaction().userDisplayName ?? transaction().symbol }}</div>
             <div>|</div>
             <!-- transaction type -->
             <div
@@ -38,7 +38,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
           @if (displayUser()) {
             <div class="flex items-center gap-2">
               <img appDefaultImg imageType="default" [src]="transaction().userPhotoURL" class="h-6 w-6 rounded-lg" />
-              <div class="text-wt-gray-dark">{{ transaction().userDisplayName ?? 'Unknown' }}</div>
+              <div class="text-wt-gray-medium">{{ transaction().userDisplayName ?? 'Unknown' }}</div>
             </div>
           } @else {
             <!-- date -->

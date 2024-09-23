@@ -1,17 +1,15 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-section-title',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [MatIconModule],
   template: `
-    <h2
-      [class]="'text-wt-primary flex items-center gap-4 ' + additionalClasses()"
-      [ngClass]="{ 'text-xl': !largeTitle(), 'text-2xl': largeTitle() }"
-    >
-      <mat-icon *ngIf="matIcon()" color="primary">{{ matIcon() }}</mat-icon>
+    <h2 class="text-wt-primary flex items-center gap-4 text-xl">
+      @if (matIcon()) {
+        <mat-icon color="primary">{{ matIcon() }}</mat-icon>
+      }
       {{ title() }}
     </h2>
   `,
@@ -23,8 +21,6 @@ import { MatIconModule } from '@angular/material/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SectionTitleComponent {
-  matIcon = input<string | undefined>();
-  title = input.required<string>();
-  additionalClasses = input<string | undefined>();
-  largeTitle = input<boolean>(false);
+  readonly matIcon = input<string | undefined>();
+  readonly title = input.required<string>();
 }

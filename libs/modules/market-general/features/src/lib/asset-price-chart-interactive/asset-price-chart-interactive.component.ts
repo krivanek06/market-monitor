@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MarketApiService } from '@mm/api-client';
 import { HistoricalPrice, SymbolHistoricalPeriods, SymbolHistoricalPeriodsArrayPreload } from '@mm/api-types';
-import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
   AssetPriceChartComponent,
   DefaultImgDirective,
@@ -36,14 +35,14 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
         </div>
 
         <!-- time data about chart -->
-        <div class="text-wt-gray-medium flex justify-end md:justify-between">
+        <div class="text-wt-gray-medium flex justify-end text-center md:justify-between">
           <div class="hidden items-center gap-2 md:flex">
             @if (imageName()) {
               <img appDefaultImg imageType="symbol" [src]="imageName()" alt="Asset Image" class="h-6 w-6" />
             }
             <span>{{ title() }}</span>
           </div>
-          <span class="block">
+          <span class="block text-sm">
             {{ dateDisplay() }}
           </span>
         </div>
@@ -95,26 +94,26 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetPriceChartInteractiveComponent implements OnInit {
-  private datePipe = inject(DatePipe);
-  symbol = input.required<string>();
-  chartHeightPx = input(420);
-  priceName = input('price');
-  priceShowSign = input(true);
-  title = input('Historical Prices');
-  imageName = input('');
-  displayVolume = input(true);
+  private readonly marketApiService = inject(MarketApiService);
+  private readonly datePipe = inject(DatePipe);
+
+  readonly symbol = input.required<string>();
+  readonly chartHeightPx = input(420);
+  readonly priceName = input('price');
+  readonly priceShowSign = input(true);
+  readonly title = input('Historical Prices');
+  readonly imageName = input('');
+  readonly displayVolume = input(true);
 
   /** parent can set that some error happened and no data will be loaded */
   readonly errorFromParent = input(false);
 
-  loadingSignal = signal<boolean>(true);
-  errorLoadSignal = signal<boolean>(false);
+  readonly loadingSignal = signal<boolean>(true);
+  readonly errorLoadSignal = signal<boolean>(false);
 
-  stockHistoricalPriceSignal = signal<HistoricalPrice[]>([]);
+  readonly stockHistoricalPriceSignal = signal<HistoricalPrice[]>([]);
 
-  marketApiService = inject(MarketApiService);
-  dialogServiceUtil = inject(DialogServiceUtil);
-  timePeriodFormControl = new FormControl<SymbolHistoricalPeriods>(SymbolHistoricalPeriods.week, {
+  readonly timePeriodFormControl = new FormControl<SymbolHistoricalPeriods>(SymbolHistoricalPeriods.week, {
     nonNullable: true,
   });
 
@@ -123,8 +122,8 @@ export class AssetPriceChartInteractiveComponent implements OnInit {
     if (stockHistorical.length === 0) {
       return '';
     }
-    const start = this.datePipe.transform(stockHistorical[0].date, 'MMMM d, y');
-    const end = this.datePipe.transform(stockHistorical[stockHistorical.length - 1].date, 'MMMM d, y');
+    const start = this.datePipe.transform(stockHistorical[0].date, 'MMM d, y');
+    const end = this.datePipe.transform(stockHistorical[stockHistorical.length - 1].date, 'MMM d, y');
 
     return `${start} - ${end}`;
   });

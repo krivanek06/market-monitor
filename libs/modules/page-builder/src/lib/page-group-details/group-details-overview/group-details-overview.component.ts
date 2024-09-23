@@ -179,15 +179,15 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       }
 
       @if (groupDetailsSignal.groupTransactionsData.length > 0) {
-        <div #groupBubble class="mb-12 hidden gap-x-4 sm:grid xl:grid-cols-2">
+        <div #groupBubble class="mb-14 hidden gap-x-8 sm:flex">
           @if (portfolioHoldingBubbleChartSignal().length > 1) {
             <!-- bubble chart -->
-            <div>
+            <div class="xl:basis-3/5">
               @defer (on viewport(groupBubble)) {
                 <app-generic-chart
                   class="hidden w-full sm:block"
                   chartType="packedbubble"
-                  [heightPx]="380"
+                  [heightPx]="350"
                   [series]="portfolioHoldingBubbleChartSignal()"
                 />
               } @loading (minimum 1s) {
@@ -196,22 +196,23 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
             </div>
 
             <!-- sector allocation -->
-            <div>
+            <div class="xl:basis-2/5">
               @defer (on viewport(groupBubble)) {
-                <app-pie-chart
-                  class="block max-xl:hidden"
-                  *ngIf="portfolioSectorAllocationSignal() as portfolioSectorAllocation"
-                  [heightPx]="380"
-                  chartTitle="Sector Allocation"
-                  [series]="portfolioSectorAllocation"
-                />
+                @if (portfolioSectorAllocationSignal(); as portfolioSectorAllocation) {
+                  <app-pie-chart
+                    class="block max-xl:hidden"
+                    [heightPx]="300"
+                    chartTitle="Sector Allocation"
+                    [series]="portfolioSectorAllocation"
+                  />
+                }
               } @loading (minimum 1s) {
                 <div class="g-skeleton block h-[350px] max-xl:hidden"></div>
               }
             </div>
           } @else {
-            <div class="g-skeleton h-[350px]"></div>
-            <div class="g-skeleton h-[350px]"></div>
+            <div class="g-skeleton h-[350px] xl:basis-3/5"></div>
+            <div class="g-skeleton h-[350px] xl:basis-2/5"></div>
           }
         </div>
       }
@@ -220,7 +221,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         <!-- holding chart -->
         <app-section-title title="Group Symbol Holdings - top 25" matIcon="filter_list" class="mb-2" />
         <app-group-member-portfolio-holding-chart
-          [heightPx]="500"
+          [heightPx]="400"
           [data]="groupPortfolioStateHolding()?.holdings ?? [] | slice: 0 : 25"
         />
       } @placeholder {

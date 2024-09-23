@@ -310,8 +310,6 @@ export const getPortfolioGrowthAssets = (
     // remove undefined or symbols which were bought and sold on the same day
     .filter((d): d is PortfolioGrowthAssets => !!d && d.data.length > 0);
 
-  console.log('PortfolioGrowthService: getPortfolioGrowthAssets', result);
-
   return result;
 };
 

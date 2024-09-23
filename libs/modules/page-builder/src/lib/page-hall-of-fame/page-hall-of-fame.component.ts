@@ -54,11 +54,10 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
   ],
   template: `
     <div class="mb-6 flex items-center justify-between">
-      <app-section-title matIcon="military_tech" title="Hall Of Fame" [largeTitle]="true" />
+      <app-section-title matIcon="military_tech" title="Hall Of Fame" />
       <app-section-title
         matIcon="military_tech"
         title="My rank: {{ userDataSignal().systemRank?.portfolioTotalGainsPercentage?.rank ?? 'N/A' }}"
-        [largeTitle]="true"
       />
     </div>
 
@@ -198,7 +197,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     <ng-template #userTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
         <mat-icon [color]="data.item.isAccountActive ? 'accent' : 'warn'"> radio_button_checked </mat-icon>
-        <img appDefaultImg [src]="data.item.personal.photoURL" alt="user image" class="h-10 w-10 rounded-lg" />
+        <img appDefaultImg [src]="data.item.personal.photoURL" alt="user image" class="h-8 w-8 rounded-lg" />
         <div class="flex items-center gap-2">
           <div>{{ data.item.personal.displayName }}</div>
           <!-- display position change if any -->
@@ -220,7 +219,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     <!-- template for user data in table -->
     <ng-template #groupTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
-        <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="h-10 w-10 rounded-lg" />
+        <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="h-8 w-8 rounded-lg" />
         <div class="flex items-center gap-2">
           <div class="w-[200px] truncate text-ellipsis">
             {{ data.item.name }}
