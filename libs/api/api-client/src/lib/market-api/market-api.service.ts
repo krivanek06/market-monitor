@@ -65,7 +65,7 @@ export class MarketApiService {
     }
 
     // if more than 100 symbols, split into chunks
-    if (symbols.length > 120) {
+    if (symbols.length > 50) {
       return this.getSymbolSummariesLong(symbols);
     }
 
@@ -261,7 +261,7 @@ export class MarketApiService {
   }
 
   private getSymbolSummariesLong(symbols: string[]): Observable<SymbolSummary[]> {
-    const chunkLimit = 100;
+    const chunkLimit = 50;
     const checkedSymbols = chunk(symbols, chunkLimit);
     return forkJoin(checkedSymbols.map((chunk) => this.getSymbolSummaries(chunk))).pipe(
       map((data) => data.reduce((acc, curr) => [...acc, ...curr], [])),

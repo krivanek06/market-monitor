@@ -123,12 +123,20 @@ export class ApiCacheService {
    * @returns saved data in cache or local storage if exists
    */
   private getDataFromCache<T>(url: string): SavedData<T> | undefined {
-    // check if data is in cache
-    if (this.cache.has(url)) {
-      return this.cache.get(url) as { data: T; validity: number };
+    const data = this.cache.get(url) as { data: T; validity: number } | undefined;
+    // check if no data in cache
+    if (!data) {
+      return undefined;
     }
 
-    // data not in cache or local storage
-    return undefined;
+    // check if data is valid
+    if (data.validity < Date.now()) {
+      console.log('ApiCacheService: get', { [url]: 'expired' });
+      this.cache.delete(url);
+      return undefined;
+    }
+
+    // data is valid
+    return data;
   }
 }
