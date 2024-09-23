@@ -11,7 +11,7 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
   standalone: true,
   imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, PercentageIncreaseDirective, SplitStringPipe],
   template: `
-    <table mat-table [dataSource]="dataSource">
+    <table mat-table [dataSource]="dataSource" class="g-table-smaller-font">
       <!-- gradingCompany -->
       <ng-container matColumnDef="gradingCompany">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Company</th>
@@ -40,15 +40,7 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
       <ng-container matColumnDef="grade">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Grade Change</th>
         <td mat-cell *matCellDef="let row">
-          <div class="flex gap-2">
-            <span class="hidden sm:block">{{ row?.previousGrade }}</span>
-            @if (row.previousGrade !== row.newGrade) {
-              @if (row.previousGrade) {
-                <span class="hidden sm:block">-></span>
-              }
-              <span>{{ row.newGrade }}</span>
-            }
-          </div>
+          {{ row.newGrade ?? row.previousGrade }}
         </td>
       </ng-container>
 
@@ -74,7 +66,7 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
       <ng-container matColumnDef="publishedDate">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Date</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
-          {{ row.publishedDate | splitString: ['T'] : 0 | date: 'MMMM d, y' }}
+          {{ row.publishedDate | splitString: ['T'] : 0 | date: 'MMM d, y' }}
         </td>
       </ng-container>
 

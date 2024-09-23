@@ -11,7 +11,7 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
   standalone: true,
   imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, PercentageIncreaseDirective, SplitStringPipe],
   template: `
-    <table mat-table [dataSource]="dataSource">
+    <table mat-table [dataSource]="dataSource" class="g-table-smaller-font">
       <!-- person -->
       <ng-container matColumnDef="person">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Person</th>
@@ -53,7 +53,7 @@ import { PercentageIncreaseDirective, SplitStringPipe } from '@mm/shared/ui';
       <ng-container matColumnDef="publishedDate">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">Date</th>
         <td mat-cell *matCellDef="let row" class="hidden xl:table-cell">
-          {{ row.publishedDate | splitString: ['T'] : 0 | date: 'MMMM d, y' }}
+          {{ row.publishedDate | splitString: ['T'] : 0 | date: 'MMM d, y' }}
         </td>
       </ng-container>
 

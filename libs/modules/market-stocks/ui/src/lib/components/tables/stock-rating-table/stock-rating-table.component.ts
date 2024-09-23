@@ -58,7 +58,7 @@ import { RecommendationDirective } from '../../../directives';
         </div>
       </div>
 
-      <div class="flex justify-between p-3">
+      <div class="g-item-wrapper">
         <div>Debt to Equity</div>
         <div class="flex items-center gap-2">
           <div>{{ data()?.ratingDetailsDEScoreValue | largeNumberFormatter: false : false }}</div>

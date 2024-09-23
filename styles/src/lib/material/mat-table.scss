@@ -4,7 +4,7 @@ table:not([mat-table]) {
   thead {
     tr {
       th {
-        @apply text-sm text-wt-gray-medium text-start;
+        @apply text-wt-gray-medium text-start text-sm;
       }
     }
   }
@@ -37,7 +37,7 @@ table[mat-table] {
   thead {
     tr {
       th {
-        @apply text-sm text-wt-gray-dark;
+        @apply text-wt-gray-dark text-sm;
       }
     }
   }
@@ -93,6 +93,16 @@ table[mat-table] tbody tr td {
 .g-table-disabled-row {
   opacity: 0.55 !important;
   pointer-events: none !important;
+}
+
+table.g-table-smaller-font {
+  tbody {
+    tr {
+      td {
+        font-size: 14px !important;
+      }
+    }
+  }
 }
 
 .mdc-data-table__cell,
