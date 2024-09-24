@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { PortfolioState, PortfolioStateHolding, PortfolioStateHoldings } from '@mm/api-types';
-import { StockSummaryDialogComponent } from '@mm/market-stocks/features';
+import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { GeneralCardComponent, ShowMoreButtonComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
@@ -179,7 +179,7 @@ describe('PortfolioHoldingsTableCardComponent', () => {
 
     // check if dialog is opened
     expect(summarySpy).toHaveBeenCalledWith('AAPL');
-    expect(dialog.open).toHaveBeenCalledWith(StockSummaryDialogComponent, {
+    expect(dialog.open).toHaveBeenCalledWith(SymbolSummaryDialogComponent, {
       data: {
         symbol: 'AAPL',
       },

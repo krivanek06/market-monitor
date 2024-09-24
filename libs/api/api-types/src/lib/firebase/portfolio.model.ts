@@ -175,7 +175,7 @@ export type PortfolioTransaction = SymbolStoreBase & {
    * if exchange is CRYPTO, it removes the 'USD' part so BTCUSD becomes BTC
    * this field is only available on the client side, it's computed in cloudflare
    */
-  displaySymbol: string;
+  displaySymbol?: string;
 };
 
 export type PortfolioTransactionMore = PortfolioTransaction & {

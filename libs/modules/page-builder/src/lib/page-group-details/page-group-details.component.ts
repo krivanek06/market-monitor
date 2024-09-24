@@ -1,6 +1,4 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,13 +13,11 @@ import { PageGroupsBaseComponent } from './page-groups-base.component';
   selector: 'app-page-group-details',
   standalone: true,
   imports: [
-    CommonModule,
     TabSelectControlComponent,
     MatButtonModule,
     MatIconModule,
     GroupInteractionButtonsComponent,
     GroupDetailsOverviewComponent,
-    ReactiveFormsModule,
     MatDialogModule,
     MatProgressSpinnerModule,
   ],

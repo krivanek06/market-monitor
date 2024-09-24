@@ -21,3 +21,13 @@ TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicT
 // auto spy - https://ng-mocks.sudo.eu/extra/auto-spy
 import { ngMocks } from 'ng-mocks';
 ngMocks.autoSpy('jest');
+
+global.console = {
+  ...console,
+  // uncomment to ignore a specific log level
+  log: jest.fn(),
+  debug: jest.fn(),
+  info: jest.fn(),
+  // warn: jest.fn(),
+  // error: jest.fn(),
+};

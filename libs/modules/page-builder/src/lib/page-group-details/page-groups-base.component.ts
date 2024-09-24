@@ -14,14 +14,14 @@ import { EMPTY, catchError, switchMap } from 'rxjs';
  * Helper class for all page group details components
  */
 export abstract class PageGroupsBaseComponent {
-  protected groupApiService = inject(GroupApiService);
-  protected dialog = inject(MatDialog);
-  protected router = inject(Router);
-  protected dialogServiceUtil = inject(DialogServiceUtil);
+  protected readonly groupApiService = inject(GroupApiService);
+  protected readonly dialog = inject(MatDialog);
+  protected readonly router = inject(Router);
+  protected readonly dialogServiceUtil = inject(DialogServiceUtil);
 
-  private groupIdParam = injectParams('id');
+  private readonly groupIdParam = injectParams('id');
 
-  groupDetailsSignal = toSignal(
+  readonly groupDetailsSignal = toSignal(
     toObservable(this.groupIdParam).pipe(
       filterNil(),
       switchMap((id) =>
@@ -36,7 +36,7 @@ export abstract class PageGroupsBaseComponent {
     ),
   );
 
-  groupPortfolioStateHolding = computed(() => {
+  readonly groupPortfolioStateHolding = computed(() => {
     const groupPortfolioState = this.groupDetailsSignal()?.groupData?.portfolioState;
     const holdings = this.getGroupHoldingsSignalNormal();
 
@@ -50,9 +50,9 @@ export abstract class PageGroupsBaseComponent {
     } satisfies PortfolioStateHoldings;
   });
 
-  getGroupHoldingsSignal = computed(() => this.getGroupHoldingsSignalNormal() ?? []);
+  readonly getGroupHoldingsSignal = computed(() => this.getGroupHoldingsSignalNormal() ?? []);
 
-  private getGroupHoldingsSignalNormal = toSignal(
+  private readonly getGroupHoldingsSignalNormal = toSignal(
     toObservable(this.groupIdParam).pipe(
       filterNil(),
       switchMap((id) =>

@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {
+  PortfolioGrowth,
   PortfolioGrowthAssets,
   PortfolioStateHoldings,
   PortfolioTransaction,
@@ -11,7 +12,7 @@ import {
   quoteAAPLMock,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { PortfolioChange, PortfolioGrowth, PortfolioUserFacadeService } from '@mm/portfolio/data-access';
+import { PortfolioChange, PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import {
   PortfolioAssetChartComponent,
   PortfolioChangeChartComponent,
@@ -80,20 +81,21 @@ describe('PageDashboardComponent', () => {
       volatility: 12,
       date: '2021-01-01',
     },
+    portfolioState: mockPortfolioState,
   });
 
   // random data with no meaning to it
   const mockPortfolioGrowth = [
     {
       date: '2021-01-01',
-      breakEvenValue: 1000,
-      marketTotalValue: 1200,
+      investedTotal: 1000,
+      marketTotal: 1200,
       balanceTotal: 1200,
     },
     {
       date: '2021-01-02',
-      breakEvenValue: 1200,
-      marketTotalValue: 1300,
+      investedTotal: 1200,
+      marketTotal: 1300,
       balanceTotal: 1300,
     },
   ] as PortfolioGrowth[];
@@ -132,9 +134,10 @@ describe('PageDashboardComponent', () => {
             portfolioTransactions: () => mockTransactions,
             isAccountDemoTrading: () => true,
             userHaveTransactions: () => true,
-            getUserDataNormal: () => mockUser,
+            getUserData: () => mockUser,
             getUserPortfolioTransactionsBest: () => [] as PortfolioTransaction[],
             getUserPortfolioTransactionsWorst: () => [] as PortfolioTransaction[],
+            getUserPortfolioTransactions: () => mockTransactions,
           } as AuthenticationUserStoreService['state'],
         },
       })
@@ -219,20 +222,16 @@ describe('PageDashboardComponent', () => {
     expect(comp).toBeTruthy();
     expect(comp.componentInstance.data).toEqual({
       values: mockPortfolioGrowth,
-      startingCashValue: mockPortfolioState.startingCash,
     });
+    expect(comp.componentInstance.startCash).toEqual(mockPortfolioState.startingCash);
     expect(comp.componentInstance.chartType).toBe('balance');
   });
 
   it('should display PortfolioAssetChart', () => {
     const portfolioUserFacade = ngMocks.get(PortfolioUserFacadeService);
     // many dummy data
-    const newData = Array.from({ length: 16 }, (_, i) => ({
-      date: 'XXXX-XX-XX',
-      breakEvenValue: 1,
-      marketTotalValue: 1,
-      balanceTotal: 1,
-    }));
+    const newData = Array.from({ length: 16 }, (_, i) => ({}) as PortfolioGrowth);
+
     ngMocks.stub(portfolioUserFacade, {
       ...portfolioUserFacade,
       getPortfolioGrowth: signal(newData),
@@ -245,7 +244,7 @@ describe('PageDashboardComponent', () => {
 
     const comp = ngMocks.find<PortfolioAssetChartComponent>(portfolioAssetChartS);
     expect(comp).toBeTruthy();
-    expect(comp.componentInstance.data).toEqual(mockGrowthAsset);
+    expect(comp.componentInstance.data).toEqual(mockTransactions);
   });
 
   it('should NOT display PortfolioAssetChart if not enough data', () => {
@@ -272,8 +271,8 @@ describe('PageDashboardComponent', () => {
     expect(comp).toBeTruthy();
     expect(comp.componentInstance.data).toEqual({
       values: mockPortfolioGrowth,
-      startingCashValue: mockPortfolioState.startingCash,
     });
+    expect(comp.componentInstance.startCash).toBeUndefined();
     expect(comp.componentInstance.chartType).toBe('marketValue');
   });
 

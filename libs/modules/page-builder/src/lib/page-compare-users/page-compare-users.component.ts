@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -41,13 +40,12 @@ import { UserSearchControlComponent } from '@mm/user/features';
 import { UserDisplayItemComponent } from '@mm/user/ui';
 import { derivedFrom } from 'ngxtension/derived-from';
 import { filterNil } from 'ngxtension/filter-nil';
-import { Subject, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, take } from 'rxjs';
+import { Subject, catchError, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, take } from 'rxjs';
 
 @Component({
   selector: 'app-page-compare-users',
   standalone: true,
   imports: [
-    CommonModule,
     SectionTitleComponent,
     UserSearchControlComponent,
     ReactiveFormsModule,
@@ -107,14 +105,16 @@ import { Subject, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, ta
     <!-- compare portfolio chart -->
     <div class="mb-10">
       <app-section-title title="Portfolio Compare" />
-      @if (!selectedUsersData().isLoading) {
+      @if (selectedUsersData().isLoading) {
+        <!-- loading skeleton -->
+        <div data-testid="page-compare-loading" class="g-skeleton mt-6 h-[385px]"></div>
+      } @else {
+        <!-- chart -->
         <app-portfolio-growth-compare-chart
           data-testid="page-compare-portfolio-growth-compare-chart"
           [heightPx]="400"
           [data]="selectedUsersData().data"
         />
-      } @else {
-        <div data-testid="page-compare-loading" class="g-skeleton mt-6 h-[385px]"></div>
       }
     </div>
 
@@ -124,7 +124,9 @@ import { Subject, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, ta
         <!-- table -->
         <app-portfolio-state-table data-testid="page-compare-portfolio-state-table" [data]="selectedUsersData().data" />
         <!-- loading skeleton -->
-        <div *ngIf="selectedUsersData().isLoading" data-testid="page-compare-loading" class="g-skeleton h-12"></div>
+        @if (selectedUsersData().isLoading) {
+          <div data-testid="page-compare-loading" class="g-skeleton h-12"></div>
+        }
       </app-general-card>
 
       <app-general-card title="Risk" class="xl:col-span-3">
@@ -134,7 +136,9 @@ import { Subject, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, ta
           [data]="selectedUsersData().data"
         />
         <!-- loading skeleton -->
-        <div *ngIf="selectedUsersData().isLoading" data-testid="page-compare-loading" class="g-skeleton h-12"></div>
+        @if (selectedUsersData().isLoading) {
+          <div data-testid="page-compare-loading" class="g-skeleton h-12"></div>
+        }
       </app-general-card>
 
       <app-general-card title="Transactions" class="xl:col-span-3">
@@ -144,7 +148,9 @@ import { Subject, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, ta
           [data]="selectedUsersData().data"
         />
         <!-- loading skeleton -->
-        <div *ngIf="selectedUsersData().isLoading" data-testid="page-compare-loading" class="g-skeleton h-12"></div>
+        @if (selectedUsersData().isLoading) {
+          <div data-testid="page-compare-loading" class="g-skeleton h-12"></div>
+        }
       </app-general-card>
     </div>
 
@@ -157,7 +163,9 @@ import { Subject, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, ta
           [data]="selectedUsersData().data"
         />
         <!-- loading skeleton -->
-        <div *ngIf="selectedUsersData().isLoading" data-testid="page-compare-loading" class="g-skeleton h-12"></div>
+        @if (selectedUsersData().isLoading) {
+          <div data-testid="page-compare-loading" class="g-skeleton h-12"></div>
+        }
       </app-general-card>
     </div>
 
@@ -176,11 +184,9 @@ import { Subject, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, ta
           }
 
           <!-- loading skeleton -->
-          <div
-            *ngIf="selectedUsersData().isLoading"
-            data-testid="page-compare-loading"
-            class="g-skeleton h-[350px]"
-          ></div>
+          @if (selectedUsersData().isLoading) {
+            <div data-testid="page-compare-loading" class="g-skeleton h-[350px]"></div>
+          }
         </div>
       </div>
 
@@ -227,25 +233,27 @@ import { Subject, forkJoin, map, merge, of, pipe, scan, startWith, switchMap, ta
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageCompareUsersComponent {
-  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private portfolioCalculationService = inject(PortfolioCalculationService);
-  private userApiService = inject(UserApiService);
-  private dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly portfolioCalculationService = inject(PortfolioCalculationService);
+  private readonly userApiService = inject(UserApiService);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
 
   /**
    * emit when user is selected
    */
-  searchUserControl = new FormControl<UserData>(this.authenticationUserStoreService.state.getUserData(), {
+  readonly searchUserControl = new FormControl<UserData>(this.authenticationUserStoreService.state.getUserData(), {
     nonNullable: true,
   });
 
   /**
    * change when checking other user's holdings
    */
-  selectedUserHoldingsControl = new FormControl<UserBase>(this.authenticationUserStoreService.state.getUserData());
+  readonly selectedUserHoldingsControl = new FormControl<UserBase>(
+    this.authenticationUserStoreService.state.getUserData(),
+  );
 
-  private removeUser$ = new Subject<UserBase>();
-  private loadedUserData$ = this.searchUserControl.valueChanges.pipe(
+  private readonly removeUser$ = new Subject<UserBase>();
+  private readonly loadedUserData$ = this.searchUserControl.valueChanges.pipe(
     startWith(this.searchUserControl.value),
     switchMap((userBase) =>
       forkJoin({
@@ -280,6 +288,7 @@ export class PageCompareUsersComponent {
           data: null,
           action: 'loading' as const,
         }),
+        catchError((err) => of({ data: null, action: 'error' as const, err })),
       ),
     ),
   );
@@ -287,7 +296,7 @@ export class PageCompareUsersComponent {
   /**
    * load user data when selected users change
    */
-  selectedUsersData = toSignal(
+  readonly selectedUsersData = toSignal(
     merge(
       this.loadedUserData$,
       this.removeUser$.pipe(
@@ -341,6 +350,15 @@ export class PageCompareUsersComponent {
             };
           }
 
+          // error happened
+          if (curr.action === 'error') {
+            this.dialogServiceUtil.showNotificationBar('Error loading user data', 'error');
+            return {
+              data: acc.data,
+              isLoading: false,
+            };
+          }
+
           return acc;
         },
         {
@@ -369,12 +387,10 @@ export class PageCompareUsersComponent {
     },
   );
 
-  selectedUsersDataEffect = effect(() => console.log('selectedUsersData', this.selectedUsersData()));
-
   /**
    * selected user from a dropdown
    */
-  selectedUsersInputSource = computed(() =>
+  readonly selectedUsersInputSource = computed(() =>
     this.selectedUsersData()
       .data.map((d) => d.userBase)
       .map(
@@ -388,7 +404,7 @@ export class PageCompareUsersComponent {
       ),
   );
 
-  selectedUser = derivedFrom(
+  readonly selectedUser = derivedFrom(
     [
       this.selectedUserHoldingsControl.valueChanges.pipe(startWith(this.selectedUserHoldingsControl.value)),
       this.selectedUsersData,
@@ -399,6 +415,11 @@ export class PageCompareUsersComponent {
       ),
     ),
   );
+
+  constructor() {
+    // used just for logging
+    effect(() => console.log('selectedUsersData', this.selectedUsersData()));
+  }
 
   onRemoveUser(user: UserBase) {
     this.removeUser$.next(user);

@@ -84,7 +84,7 @@ import {
         >
           <app-portfolio-state-risk
             data-testid="page-dashboard-portfolio-risk"
-            [portfolioRisk]="stateRef.getUserDataNormal()?.portfolioRisk"
+            [portfolioRisk]="stateRef.getUserData().portfolioRisk"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
           />
@@ -126,6 +126,7 @@ import {
           [data]="{
             values: getPortfolioGrowth,
           }"
+          [startCash]="stateRef.getUserData().portfolioState.startingCash"
           [heightPx]="350"
         />
       } @else {

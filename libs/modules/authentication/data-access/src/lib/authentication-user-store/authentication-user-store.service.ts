@@ -181,7 +181,7 @@ export class AuthenticationUserStoreService {
       getUserDataNormal: () => state().userData,
       getUserGroupData: () => state().userGroupData!,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
-      getUserPortfolioTransactions: () => state().portfolioTransactions!,
+      getUserPortfolioTransactions: () => state().portfolioTransactions ?? [],
       getUserPortfolioTransactionsBest: () =>
         (state().portfolioTransactions ?? [])
           .filter((d) => d.transactionType === 'SELL')

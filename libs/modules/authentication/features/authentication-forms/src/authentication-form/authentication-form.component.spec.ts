@@ -85,7 +85,7 @@ describe('AuthenticationFormComponent', () => {
       .provide({
         provide: AuthenticationUserStoreService,
         useValue: {
-          resetTransactions: jest.fn().mockResolvedValue(true),
+          changeAccountType: jest.fn(),
         },
       })
       .provide({
@@ -279,8 +279,8 @@ describe('AuthenticationFormComponent', () => {
 
     expect(authenticationAccountService.getUserData).toHaveBeenCalledTimes(1);
     expect(openSelectAccountTypeSpy).toHaveBeenCalledTimes(1);
-    expect(store.resetTransactions).toHaveBeenCalledTimes(1);
-    expect(store.resetTransactions).toHaveBeenCalledWith(UserAccountEnum.DEMO_TRADING);
+    expect(store.changeAccountType).toHaveBeenCalledTimes(1);
+    expect(store.changeAccountType).toHaveBeenCalledWith(UserAccountEnum.DEMO_TRADING);
     expect(component.userAuthenticationState()).toEqual({
       action: 'success',
       data: userMockAuth,
@@ -336,7 +336,7 @@ describe('AuthenticationFormComponent', () => {
 
     expect(authenticationAccountService.getUserData).not.toHaveBeenCalled();
     expect(openSelectAccountTypeSpy).not.toHaveBeenCalled();
-    expect(store.resetTransactions).not.toHaveBeenCalled();
+    expect(store.changeAccountType).not.toHaveBeenCalled();
     expect(component.userAuthenticationState()).toEqual({
       action: 'error',
       data: null,
@@ -566,8 +566,8 @@ describe('AuthenticationFormComponent', () => {
     // check if correct services are called
     expect(openSelectAccountTypeSpy).toHaveBeenCalledTimes(1);
     expect(authenticationAccountService.signInGoogle).toHaveBeenCalledTimes(1);
-    expect(store.resetTransactions).toHaveBeenCalledTimes(1);
-    expect(store.resetTransactions).toHaveBeenCalledWith(UserAccountEnum.DEMO_TRADING);
+    expect(store.changeAccountType).toHaveBeenCalledTimes(1);
+    expect(store.changeAccountType).toHaveBeenCalledWith(UserAccountEnum.DEMO_TRADING);
     expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
     expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
     expect(component.userAuthenticationState()).toEqual({
@@ -602,7 +602,7 @@ describe('AuthenticationFormComponent', () => {
     // check if correct services are called
     expect(openSelectAccountTypeSpy).not.toHaveBeenCalled();
     expect(authenticationAccountService.signInGoogle).toHaveBeenCalledTimes(1);
-    expect(store.resetTransactions).not.toHaveBeenCalled();
+    expect(store.changeAccountType).not.toHaveBeenCalled();
     expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
     expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
     expect(component.userAuthenticationState()).toEqual({

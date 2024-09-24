@@ -77,15 +77,15 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, 
   ],
 })
 export class UserSearchControlComponent implements ControlValueAccessor {
-  private userApiService = inject(UserApiService);
-  private aggregationApiService = inject(AggregationApiService);
+  private readonly userApiService = inject(UserApiService);
+  private readonly aggregationApiService = inject(AggregationApiService);
 
-  selectedEmitter = output<UserData>();
-  isDisabled = model<boolean>(false);
+  readonly selectedEmitter = output<UserData>();
+  readonly isDisabled = model<boolean>(false);
 
-  searchControl = new FormControl<string>('', { nonNullable: true });
+  readonly searchControl = new FormControl<string>('', { nonNullable: true });
 
-  optionsSignal = toSignal(
+  readonly optionsSignal = toSignal(
     this.searchControl.valueChanges.pipe(
       startWith(''),
       filter((d) => d.length < 10),

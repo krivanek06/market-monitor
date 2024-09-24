@@ -202,9 +202,7 @@ export class UserApiService {
   }
 
   getUserPortfolioGrowth(userId: string): Observable<UserPortfolioGrowthData['data']> {
-    return rxDocData(this.getUserPortfolioGrowthDocRef(userId))
-      .pipe(filter((d): d is UserPortfolioGrowthData => !!d))
-      .pipe(map((d) => d.data));
+    return rxDocData(this.getUserPortfolioGrowthDocRef(userId)).pipe(map((d) => d?.data ?? []));
   }
 
   /* private */

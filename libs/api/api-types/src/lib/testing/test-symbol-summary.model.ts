@@ -14,6 +14,9 @@ export const summaryAAPLMock = {
   profile: {
     sector: 'Technology',
   },
+  priceChange: {
+    ['5D']: 10,
+  },
 } as SymbolSummary;
 
 export const quoteMSFTMock = {
@@ -29,6 +32,9 @@ export const summaryMSFTMock = {
   profile: {
     sector: 'Technology',
   },
+  priceChange: {
+    ['5D']: 10,
+  },
 } as SymbolSummary;
 
 export const quoteNFLXMock = {
@@ -43,5 +49,8 @@ export const summaryNFLXMock = {
   quote: quoteNFLXMock,
   profile: {
     sector: 'Technology',
+  },
+  priceChange: {
+    ['5D']: 10,
   },
 } as SymbolSummary;

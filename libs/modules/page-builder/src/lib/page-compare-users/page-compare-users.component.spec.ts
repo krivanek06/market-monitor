@@ -5,16 +5,16 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { UserApiService } from '@mm/api-client';
 import {
-  PortfolioGrowthAssets,
+  mockCreateUser,
+  PortfolioGrowth,
   PortfolioStateHoldings,
   UserAccountEnum,
   UserBase,
   UserPortfolioTransaction,
-  mockCreateUser,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { PageCompareUsersComponent } from '@mm/page-builder';
-import { PortfolioCalculationService, PortfolioChange, PortfolioGrowth } from '@mm/portfolio/data-access';
+import { PortfolioCalculationService, PortfolioChange } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthCompareChartComponent,
   PortfolioHoldingsTableCardComponent,
@@ -28,11 +28,12 @@ import {
 } from '@mm/portfolio/ui';
 import { GenericChartSeries, InputSource } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { waitSeconds } from '@mm/shared/general-util';
 import { DropdownControlComponent, DropdownControlComponentMock, GeneralCardComponent } from '@mm/shared/ui';
 import { UserSearchControlComponent, UserSearchControlComponentMock } from '@mm/user/features';
 import { UserDisplayItemComponent, UserDisplayItemComponentMock } from '@mm/user/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
-import { of } from 'rxjs';
+import { delay, of } from 'rxjs';
 
 describe('PageCompareUsersComponent', () => {
   const searchUsersS = '[data-testid="page-compare-users-search"]';
@@ -64,6 +65,24 @@ describe('PageCompareUsersComponent', () => {
     userAccountType: UserAccountEnum.DEMO_TRADING,
   });
 
+  const mockTransactions = {
+    transactions: [{ transactionId: '1' }, { transactionId: '2' }],
+  } as UserPortfolioTransaction;
+  const portfolioGrowthMock = [{ balanceTotal: 1, investedTotal: 1, date: '', marketTotal: 1 }] as PortfolioGrowth[];
+  const portfolioStateHoldingsMock = {
+    balance: 1000,
+    holdings: [{ symbol: 'AAPL' }] as PortfolioStateHoldings['holdings'],
+  } as PortfolioStateHoldings;
+  const portfolioChangeMock = {
+    '1_day': {
+      value: 1,
+      valuePrct: 1,
+    },
+  } as PortfolioChange;
+  const portfolioAssetPie = {
+    type: 'pie',
+  } as GenericChartSeries<'pie'>;
+
   beforeEach(() => {
     return MockBuilder(PageCompareUsersComponent)
       .keep(NoopAnimationsModule)
@@ -87,11 +106,9 @@ describe('PageCompareUsersComponent', () => {
       .provide({
         provide: PortfolioCalculationService,
         useValue: {
-          getPortfolioGrowthAssets: jest.fn().mockResolvedValue([]),
-          getPortfolioGrowth: jest.fn().mockReturnValue([]),
-          getPortfolioChange: jest.fn().mockReturnValue({}),
-          getPortfolioAssetAllocationPieChart: jest.fn().mockReturnValue({}),
-          getPortfolioStateHoldings: jest.fn().mockReturnValue(of({})),
+          getPortfolioStateHoldings: jest.fn().mockReturnValue(of(portfolioStateHoldingsMock)),
+          getPortfolioChange: jest.fn().mockReturnValue(portfolioChangeMock),
+          getPortfolioAssetAllocationPieChart: jest.fn().mockReturnValue(portfolioAssetPie),
         },
       })
       .provide({
@@ -108,7 +125,8 @@ describe('PageCompareUsersComponent', () => {
 
             throw new Error('User not found');
           }),
-          getUserPortfolioTransactions: jest.fn().mockReturnValue(of([])),
+          getUserPortfolioTransactions: jest.fn().mockReturnValue(of(mockTransactions)),
+          getUserPortfolioGrowth: jest.fn().mockReturnValue(of(portfolioGrowthMock)),
         },
       })
       .provide({
@@ -124,59 +142,18 @@ describe('PageCompareUsersComponent', () => {
     ngMocks.autoSpy('reset');
   });
 
-  ngMocks.ignoreOnConsole('log');
-
   it('should create', () => {
     const fixture = MockRender(PageCompareUsersComponent);
     expect(fixture.point.componentInstance).toBeTruthy();
   });
 
-  it('should have some default values about the auth user in the component', async () => {
-    // create mock data
-    const mockTransactions = {
-      transactions: [{ transactionId: '1' }, { transactionId: '2' }],
-    } as UserPortfolioTransaction;
-    const portfolioGrowthAssetMock = [{ symbol: 'AA', data: [], displaySymbol: 'AA' }] as PortfolioGrowthAssets[];
-    const portfolioGrowthMock = [
-      { balanceTotal: 1, breakEvenValue: 1, date: '', marketTotalValue: 1 },
-    ] as PortfolioGrowth[];
-    const portfolioStateHoldingsMock = {
-      balance: 1000,
-      holdings: [{ symbol: 'AAPL' }] as PortfolioStateHoldings['holdings'],
-    } as PortfolioStateHoldings;
-    const portfolioChangeMock = {
-      '1_day': {
-        value: 1,
-        valuePrct: 1,
-      },
-    } as PortfolioChange;
-    const portfolioAssetPie = {
-      type: 'pie',
-    } as GenericChartSeries<'pie'>;
-
-    const userApi = ngMocks.get(UserApiService);
-    const calculationService = ngMocks.get(PortfolioCalculationService);
-
-    // mock api data
-    ngMocks.stub(userApi, {
-      ...userApi,
-      getUserPortfolioTransactions: jest.fn().mockReturnValue(of(mockTransactions)),
-    });
-    ngMocks.stub(calculationService, {
-      ...calculationService,
-      getPortfolioGrowthAssets: jest.fn().mockResolvedValue(portfolioGrowthAssetMock),
-      getPortfolioGrowth: jest.fn().mockReturnValue(portfolioGrowthMock),
-      getPortfolioStateHoldings: jest.fn().mockReturnValue(of(portfolioStateHoldingsMock)),
-      getPortfolioChange: jest.fn().mockReturnValue(portfolioChangeMock),
-      getPortfolioAssetAllocationPieChart: jest.fn().mockReturnValue(portfolioAssetPie),
-    });
-
-    ngMocks.flushTestBed();
-
+  it('should have some default values about the auth user in the component', () => {
     // create component
     const fixture = MockRender(PageCompareUsersComponent);
     const component = fixture.point.componentInstance;
 
+    const userApi = ngMocks.get(UserApiService);
+    const calculationService = ngMocks.get(PortfolioCalculationService);
     const authService = ngMocks.get(AuthenticationUserStoreService);
 
     const usedUser = authService.state.getUserData();
@@ -188,12 +165,8 @@ describe('PageCompareUsersComponent', () => {
     // check selected users
     expect(component.searchUserControl.value).toEqual(usedUser);
 
-    // check loading state
-    expect(component.selectedUsersData().isLoading).toBe(true);
-    expect(component.selectedUsersData().data).toEqual([]);
-
     // wait until all API calls resolve
-    await fixture.whenStable();
+    fixture.detectChanges();
 
     // check input source
     expect(component.selectedUsersInputSource()).toEqual([
@@ -212,11 +185,7 @@ describe('PageCompareUsersComponent', () => {
       usedUser.portfolioState.startingCash,
       mockTransactions.transactions,
     );
-    expect(calculationService.getPortfolioGrowthAssets).toHaveBeenCalledWith(mockTransactions.transactions);
-    expect(calculationService.getPortfolioGrowth).toHaveBeenCalledWith(
-      portfolioGrowthAssetMock,
-      usedUser.portfolioState.startingCash,
-    );
+    expect(userApi.getUserPortfolioGrowth).toHaveBeenCalledWith(usedUser.id);
     expect(calculationService.getPortfolioChange).toHaveBeenCalledWith(portfolioGrowthMock);
     expect(calculationService.getPortfolioAssetAllocationPieChart).toHaveBeenCalledWith(
       portfolioStateHoldingsMock.holdings,
@@ -238,50 +207,6 @@ describe('PageCompareUsersComponent', () => {
 
     // loading state should be false in the end
     expect(component.selectedUsersData().isLoading).toBe(false);
-  });
-
-  it('should display search user control and select user', async () => {
-    const fixture = MockRender(PageCompareUsersComponent);
-    const component = fixture.point.componentInstance;
-    fixture.checkNoChanges();
-
-    const searchComponent = ngMocks.find<UserSearchControlComponentMock>(searchUsersS);
-
-    // check if start as disabled and then enabled
-    expect(searchComponent.componentInstance.isDisabled()).toBe(true);
-
-    // wait for data load
-    await fixture.whenStable();
-    fixture.detectChanges();
-
-    // after everything is loaded it should be enabled
-    expect(searchComponent.componentInstance.isDisabled()).toBe(false);
-
-    // check selecting user
-    searchComponent.componentInstance.onChange(mockUser1);
-    expect(component.searchUserControl.value).toEqual(mockUser1);
-
-    fixture.detectChanges();
-    // check if start as disabled and then enabled
-    expect(searchComponent.componentInstance.isDisabled()).toBe(true);
-
-    // wait api call
-    await fixture.whenStable();
-    fixture.detectChanges();
-
-    // check if start as disabled and then enabled
-    expect(searchComponent.componentInstance.isDisabled()).toBe(false);
-
-    expect(component.selectedUsersData().data.map((d) => d.userData)).toEqual([userMockAuth, mockUser1]);
-
-    // try to select the same user
-    searchComponent.componentInstance.onChange(mockUser1);
-    expect(component.searchUserControl.value).toEqual(mockUser1);
-
-    // wait api call
-    await fixture.whenStable();
-
-    expect(component.selectedUsersData().data.map((d) => d.userData)).toEqual([userMockAuth, mockUser1]);
   });
 
   it('should load data for selected users', async () => {
@@ -306,9 +231,9 @@ describe('PageCompareUsersComponent', () => {
 
     expect(userApi.getUserById).toHaveBeenCalledWith(mockUser1.id);
     expect(userApi.getUserPortfolioTransactions).toHaveBeenCalledWith(mockUser1.id);
+    expect(userApi.getUserPortfolioGrowth).toHaveBeenCalledWith(mockUser1.id);
+    expect(userApi.getUserPortfolioGrowth).toHaveBeenCalledTimes(2);
     expect(calculationService.getPortfolioStateHoldings).toHaveBeenCalledTimes(2);
-    expect(calculationService.getPortfolioGrowthAssets).toHaveBeenCalledTimes(2);
-    expect(calculationService.getPortfolioGrowth).toHaveBeenCalledTimes(2);
     expect(calculationService.getPortfolioChange).toHaveBeenCalledTimes(2);
     expect(calculationService.getPortfolioAssetAllocationPieChart).toHaveBeenCalledTimes(2);
     expect(component.selectedUsersData().data.length).toBe(2);
@@ -321,9 +246,9 @@ describe('PageCompareUsersComponent', () => {
 
     expect(userApi.getUserById).toHaveBeenCalledWith(mockUser2.id);
     expect(userApi.getUserPortfolioTransactions).toHaveBeenCalledWith(mockUser2.id);
+    expect(userApi.getUserPortfolioGrowth).toHaveBeenCalledWith(mockUser1.id);
+    expect(userApi.getUserPortfolioGrowth).toHaveBeenCalledTimes(3);
     expect(calculationService.getPortfolioStateHoldings).toHaveBeenCalledTimes(3);
-    expect(calculationService.getPortfolioGrowthAssets).toHaveBeenCalledTimes(3);
-    expect(calculationService.getPortfolioGrowth).toHaveBeenCalledTimes(3);
     expect(calculationService.getPortfolioChange).toHaveBeenCalledTimes(3);
     expect(calculationService.getPortfolioAssetAllocationPieChart).toHaveBeenCalledTimes(3);
     expect(component.selectedUsersData().data.length).toBe(3);
@@ -383,30 +308,72 @@ describe('PageCompareUsersComponent', () => {
   });
 
   it('should display loading state while loading data', async () => {
+    // mock that some data is coming back
+    const portfolioStateHoldingsMock = {
+      balance: 1000,
+      holdings: [{ symbol: 'AAPL' }] as PortfolioStateHoldings['holdings'],
+    } as PortfolioStateHoldings;
+    const portfolioCalculation = ngMocks.get(PortfolioCalculationService);
+    ngMocks.stub(portfolioCalculation, {
+      ...portfolioCalculation,
+      // put some delay to simulate loading
+      getPortfolioStateHoldings: jest.fn().mockReturnValue(of(portfolioStateHoldingsMock).pipe(delay(1000))),
+    });
+
+    ngMocks.flushTestBed();
+
     const fixture = MockRender(PageCompareUsersComponent);
     const component = fixture.point.componentInstance;
-
-    // wait to load first user data
-    await fixture.whenStable();
-    fixture.detectChanges();
 
     // select users
     const searchComponent = ngMocks.find<UserSearchControlComponentMock>(searchUsersS);
     searchComponent.componentInstance.onChange(mockUser1);
 
-    // reread component
+    // check initial loading state
+    expect(component.selectedUsersData().isLoading).toBeTruthy();
+    // check if start as disabled and then enabled
+    expect(searchComponent.componentInstance.isDisabled()).toBeTruthy();
+
+    // wait to load first user data
+    await fixture.whenStable();
     fixture.detectChanges();
 
     // check if loading states are there
+    expect(component.selectedUsersData().isLoading).toBeTruthy();
     const loadingStates = ngMocks.findAll(loadingS);
-    expect(loadingStates.length).toBe(6);
+    expect(loadingStates.length).toBe(5);
+    expect(searchComponent.componentInstance.isDisabled()).toBeTruthy();
 
-    // finish data load
+    // finish data load - 1.1 second is arbitrary
+    await waitSeconds(1.1);
     await fixture.whenStable();
     fixture.detectChanges();
 
     // check if loading states are removed
     expect(ngMocks.findAll(loadingS).length).toBe(0);
+    expect(searchComponent.componentInstance.isDisabled()).toBeFalsy();
+
+    // display loading state again
+    searchComponent.componentInstance.onChange(mockUser2);
+
+    // rerender UI
+    fixture.detectChanges();
+
+    // check initial loading state
+    expect(component.selectedUsersData().isLoading).toBeTruthy();
+    // check if start as disabled and then enabled
+    expect(searchComponent.componentInstance.isDisabled()).toBeTruthy();
+    // check if loading states are there
+    expect(ngMocks.findAll(loadingS).length).toBe(6);
+
+    // finish data load - 1.1 second is arbitrary
+    await waitSeconds(1.1);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    // check if loading states are removed
+    expect(ngMocks.findAll(loadingS).length).toBe(0);
+    expect(searchComponent.componentInstance.isDisabled()).toBeFalsy();
   });
 
   it('should display portfolio growth compare chart', async () => {

@@ -1,4 +1,3 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -86,7 +85,6 @@ describe('PageTradingComponent', () => {
   beforeEach(() => {
     return MockBuilder(PageTradingComponent)
       .keep(ReactiveFormsModule)
-      .keep(HttpClientTestingModule)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .replace(SymbolSearchBasicComponent, SymbolSearchBasicComponentMock)
       .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
@@ -329,6 +327,43 @@ describe('PageTradingComponent', () => {
     expect(component.allowActionButtons()).toBeTruthy();
     expect(compBuy.componentInstance.disabled).toBeTruthy();
     expect(compSell.componentInstance.disabled).toBeFalsy();
+  });
+
+  /** symbols like (AAU, Maverix Metals Inc (MMX)) are missing some historical data */
+  it('should disable BUY/SELL buttons if symbol does not have historical data', () => {
+    const marketAPI = ngMocks.get(MarketApiService);
+
+    // mock historical data to be undefined
+    ngMocks.stub(marketAPI, {
+      ...marketAPI,
+      getSymbolSummary: jest.fn().mockReturnValue(
+        of({
+          ...summaryAAPLMock,
+          priceChange: {
+            ['5D']: undefined,
+          },
+        }),
+      ),
+    });
+
+    // flush
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageTradingComponent);
+    const component = fixture.point.componentInstance;
+
+    fixture.detectChanges();
+
+    const compBuy = ngMocks.find<HTMLButtonElement>(buttonBuy);
+    const compSell = ngMocks.find<HTMLButtonElement>(buttonSell);
+
+    expect(component.symbolSummarySignal().state).toBe('success');
+
+    // disabled buttons
+    expect(compBuy.componentInstance.disabled).toBeTruthy();
+    expect(compSell.componentInstance.disabled).toBeTruthy();
+
+    expect(component.allowActionButtons()).toBeFalsy();
   });
 
   it('should disable BUY/SELL buttons while loading symbol summary', () => {
