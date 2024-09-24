@@ -16,7 +16,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
         <div class="flex flex-col">
           <div class="flex items-center gap-2">
             <!-- symbol -->
-            <div class="text-wt-primary">{{ transaction().userDisplayName ?? transaction().symbol }}</div>
+            <div class="text-wt-primary">{{ transaction().displaySymbol ?? transaction().symbol }}</div>
             <div>|</div>
             <!-- transaction type -->
             <div
