@@ -41,7 +41,7 @@ import {
   userDocumentPortfolioGrowthRef,
   userDocumentTransactionHistoryRef,
   userDocumentWatchListRef,
-} from '../models';
+} from '../database';
 import { userCreate } from './user-create-account';
 
 export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): Promise<UserDataDemoData> => {
@@ -65,7 +65,7 @@ export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): P
   const randomPassword = faker.internet.password();
 
   const demoService = new CreateDemoAccountService();
-  await demoService.initService(18, 20);
+  await demoService.initService(10, 20);
 
   // create demo accounts
   const newDemoUser = await demoService.createRandomUser({
@@ -85,8 +85,10 @@ export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): P
 
   // generate transactions in async
   demoService.generateTransactionsForRandomSymbols(newUser).then((transactions) => {
+    console.log('Generated transactions, user:', newUser.personal.displayName);
     // create portfolio growth data
     demoService.generatePortfolioGrowthData(newUser, transactions);
+    console.log('Generated portfolio growth, user:', newUser.personal.displayName);
   });
 
   return { userData: newUser, password: randomPassword };
@@ -194,7 +196,7 @@ export class CreateDemoAccountService {
         sector: transaction.sector ?? 'Unknown',
         symbolType: 'STOCK',
         // sell half of the units
-        units: getRandomNumber(8, Math.round(transaction.units / 2)),
+        units: getRandomNumber(4, Math.round(transaction.units / 2)),
         transactionType: 'SELL',
       };
 

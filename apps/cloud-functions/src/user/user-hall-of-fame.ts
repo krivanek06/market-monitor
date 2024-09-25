@@ -5,7 +5,7 @@ import {
   UserBase,
 } from '@mm/api-types';
 import { getCurrentDateDetailsFormat, transformUserToBase } from '@mm/shared/general-util';
-import { aggregationHallOfFameUsersRef, usersCollectionDemoTradingRef } from '../models';
+import { aggregationHallOfFameUsersRef, usersCollectionDemoTradingRef } from '../database';
 
 export const userHallOfFame = async (): Promise<void> => {
   const searchableRef = usersCollectionDemoTradingRef();

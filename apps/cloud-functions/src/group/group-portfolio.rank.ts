@@ -1,4 +1,4 @@
-import { groupsCollectionRef } from '../models';
+import { groupsCollectionRef } from '../database';
 
 /**
  * for each group order (calculate) the portfolio rank based on totalGainsPercentage

@@ -28,7 +28,7 @@ import {
   groupsCollectionRef,
   userDocumentRef,
   userDocumentTransactionHistoryRef,
-} from '../models';
+} from '../database';
 
 /**
  * for each group update:

@@ -1,7 +1,7 @@
 import { PortfolioGrowth, UserData } from '@mm/api-types';
 import { getCurrentDateDefaultFormat, waitSeconds } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
-import { userCollectionActiveAccountRef, userDocumentPortfolioGrowthRef, userDocumentRef } from '../models';
+import { userCollectionActiveAccountRef, userDocumentPortfolioGrowthRef, userDocumentRef } from '../database';
 import { calculateUserPortfolioStateByTransactions } from '../portfolio';
 
 /**

@@ -25,7 +25,6 @@ import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
 import { FieldValue } from 'firebase-admin/firestore';
 import { v4 as uuidv4 } from 'uuid';
-import { calculateGroupMembersPortfolioState } from '../group';
 import {
   groupDocumentHoldingSnapshotsRef,
   groupDocumentMembersRef,
@@ -33,7 +32,8 @@ import {
   groupDocumentRef,
   groupDocumentTransactionsRef,
   userDocumentRef,
-} from '../models';
+} from '../database';
+import { calculateGroupMembersPortfolioState } from '../group';
 import { CreateDemoAccountService, userCreate } from '../user';
 import { isFirebaseEmulator } from '../utils';
 

@@ -1,6 +1,6 @@
 import { RankingItem } from '@mm/api-types';
 import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
-import { usersCollectionDemoTradingRef } from '../models';
+import { usersCollectionDemoTradingRef } from '../database';
 
 /**
  * Query all trading user accounts

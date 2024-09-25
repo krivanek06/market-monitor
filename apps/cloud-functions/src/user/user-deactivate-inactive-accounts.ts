@@ -6,7 +6,7 @@ import {
 } from '@mm/api-types';
 import { format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
-import { userCollectionDemoAccountRef, userDocumentRef } from '../models';
+import { userCollectionDemoAccountRef, userDocumentRef } from '../database';
 import { userDeleteAccount } from './user-delete-account';
 
 /**

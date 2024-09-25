@@ -6,7 +6,7 @@ import {
   getPortfolioStateHoldingsUtil,
   transformPortfolioStateHoldingToPortfolioState,
 } from '@mm/shared/general-util';
-import { userDocumentRef, userDocumentTransactionHistoryRef } from '../models';
+import { userDocumentRef, userDocumentTransactionHistoryRef } from '../database';
 import { userPortfolioRisk } from './portfolio-risk-evaluation';
 
 export const onTransactionUpdateForUserId = async (userId: string): Promise<void> => {

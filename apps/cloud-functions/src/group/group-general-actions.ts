@@ -26,7 +26,7 @@ import {
   groupDocumentMembersRef,
   groupDocumentRef,
   userDocumentRef,
-} from '../models';
+} from '../database';
 
 export const groupGeneralActions = async (userAuthId: string | undefined, data: GroupGeneralActions) => {
   if (!userAuthId) {

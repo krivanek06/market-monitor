@@ -1,6 +1,6 @@
 import { HallOfFameUsers } from '@mm/api-types';
 import { getCurrentDateDefaultFormat, getRandomNumber } from '@mm/shared/general-util';
-import { aggregationHallOfFameUsersRef } from '../models';
+import { aggregationHallOfFameUsersRef } from '../database';
 
 /**
  * modifies hall of fame data for testing to display rank movements

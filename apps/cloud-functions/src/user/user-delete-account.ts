@@ -1,7 +1,7 @@
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError } from 'firebase-functions/v2/https';
-import { userDocumentRef } from '../models';
+import { userDocumentRef } from '../database';
 
 /**
  * This function is called when a user deletes their account.

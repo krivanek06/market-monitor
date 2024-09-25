@@ -19,7 +19,7 @@ import {
   userDocumentRef,
   userDocumentTransactionHistoryRef,
   userDocumentWatchListRef,
-} from '../models';
+} from '../database';
 
 export type CreateUserAdditionalData = {
   isDemo?: boolean;
