@@ -42,7 +42,7 @@ export class PortfolioUserFacadeService {
    */
   readonly transactedSymbols = computed(() => {
     const transactions = this.authenticationUserService.state.getUserPortfolioTransactions();
-    return this.portfolioCalculationService.getTransactionSymbols(transactions);
+    return this.portfolioCalculationService.getTransactionSymbols(transactions ?? []);
   });
 
   /**
