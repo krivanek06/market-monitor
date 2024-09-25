@@ -13,6 +13,7 @@ import {
   where,
 } from '@angular/fire/firestore';
 import {
+  PortfolioGrowth,
   PortfolioTransaction,
   SymbolStoreBase,
   USER_DEFAULT_STARTING_CASH,
@@ -201,7 +202,7 @@ export class UserApiService {
     });
   }
 
-  getUserPortfolioGrowth(userId: string): Observable<UserPortfolioGrowthData['data']> {
+  getUserPortfolioGrowth(userId: string): Observable<PortfolioGrowth[]> {
     return rxDocData(this.getUserPortfolioGrowthDocRef(userId)).pipe(map((d) => d?.data ?? []));
   }
 

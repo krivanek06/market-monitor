@@ -9,4 +9,6 @@ import { PortfolioStateHoldings } from '@mm/api-types';
 export class PortfolioHoldingsTableCardComponentMock {
   portfolioStateHolding = input<PortfolioStateHoldings>();
   maximumHoldingLimit = input<number>();
+  initialItemsLimit = input<number>();
+  displayedColumns = input<string[]>([]);
 }

@@ -56,7 +56,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
     },
     isAccountActive: true,
     accountCreatedDate: format(new Date(), 'yyyy-MM-dd'),
-    userAccountType: UserAccountEnum.NORMAL_BASIC,
+    userAccountType: UserAccountEnum.DEMO_TRADING,
   };
 
   return { ...defaultUser, ...data };

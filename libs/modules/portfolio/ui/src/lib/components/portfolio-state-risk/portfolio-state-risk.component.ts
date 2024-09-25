@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { DecimalPipe, PercentPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { PortfolioRisk } from '@mm/api-types';
 import { ColorScheme } from '@mm/shared/data-access';
@@ -7,7 +7,7 @@ import { AddColorDirective } from '@mm/shared/ui';
 @Component({
   selector: 'app-portfolio-state-risk',
   standalone: true,
-  imports: [CommonModule, AddColorDirective],
+  imports: [AddColorDirective, DecimalPipe, PercentPipe],
   template: `
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
@@ -53,7 +53,7 @@ import { AddColorDirective } from '@mm/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStateRiskComponent {
-  portfolioRisk = input<PortfolioRisk | undefined | null>();
-  titleColor = input<ColorScheme | undefined>();
-  valueColor = input<ColorScheme | undefined>();
+  readonly portfolioRisk = input<PortfolioRisk | undefined | null>();
+  readonly titleColor = input<ColorScheme | undefined>();
+  readonly valueColor = input<ColorScheme | undefined>();
 }

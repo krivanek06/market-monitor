@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { PortfolioState } from '@mm/api-types';
 import { ColorScheme } from '@mm/shared/data-access';
@@ -7,7 +7,7 @@ import { AddColorDirective } from '@mm/shared/ui';
 @Component({
   selector: 'app-portfolio-state-transactions',
   standalone: true,
-  imports: [CommonModule, AddColorDirective],
+  imports: [AddColorDirective, CurrencyPipe],
   template: `
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
@@ -39,12 +39,14 @@ import { AddColorDirective } from '@mm/shared/ui';
         </div>
 
         <!-- Fees -->
-        <div *ngIf="showFees()" class="@md:flex-col flex justify-between">
-          <div [appAddColor]="titleColor()" class="sm:text-lg">Fees</div>
-          <div [appAddColor]="valueColor()" class="sm:text-lg">
-            {{ (portfolioState()?.transactionFees | currency) ?? 'N/A' }}
+        @if (showFees()) {
+          <div class="@md:flex-col flex justify-between">
+            <div [appAddColor]="titleColor()" class="sm:text-lg">Fees</div>
+            <div [appAddColor]="valueColor()" class="sm:text-lg">
+              {{ (portfolioState()?.transactionFees | currency) ?? 'N/A' }}
+            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   `,
@@ -56,8 +58,8 @@ import { AddColorDirective } from '@mm/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioStateTransactionsComponent {
-  portfolioState = input<PortfolioState | undefined>();
-  showFees = input(false);
-  titleColor = input<ColorScheme | undefined>();
-  valueColor = input<ColorScheme | undefined>();
+  readonly portfolioState = input<PortfolioState | undefined>();
+  readonly showFees = input(false);
+  readonly titleColor = input<ColorScheme | undefined>();
+  readonly valueColor = input<ColorScheme | undefined>();
 }

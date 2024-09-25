@@ -21,7 +21,7 @@ import { ColorScheme, LabelValue } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, SectionTitleComponent, TabSelectControlComponent } from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
-import { combineLatest, map, share, startWith, switchMap, tap } from 'rxjs';
+import { combineLatest, map, startWith, switchMap, tap } from 'rxjs';
 
 export type UserDetailsDialogComponentData = {
   userId: string;
@@ -66,12 +66,18 @@ export type UserDetailsDialogComponentData = {
         <app-tab-select-control
           class="-mb-3 hidden lg:block"
           [displayOptions]="displayOptions"
-          [(selectedValueSignal)]="selectedValueSignal"
+          [(selectedValueSignal)]="selectedValue"
         />
       </div>
 
       <!-- close -->
-      <button mat-icon-button color="warn" type="button" (click)="onDialogClose()">
+      <button
+        data-testid="user-details-dialog-close-button"
+        mat-icon-button
+        color="warn"
+        type="button"
+        (click)="onDialogClose()"
+      >
         <mat-icon>close</mat-icon>
       </button>
     </div>
@@ -86,6 +92,7 @@ export type UserDetailsDialogComponentData = {
           <!-- portfolio state -->
           <div class="px-4 py-2 max-lg:flex-1 lg:basis-[40%]">
             <app-portfolio-state
+              data-testid="user-details-portfolio-state"
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
               [portfolioState]="userData.portfolioState"
@@ -95,6 +102,7 @@ export type UserDetailsDialogComponentData = {
           <!-- risk -->
           <div class="hidden flex-1 px-4 py-2 md:block">
             <app-portfolio-state-risk
+              data-testid="user-details-portfolio-state-risk"
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [portfolioRisk]="userData.portfolioRisk"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
@@ -103,6 +111,7 @@ export type UserDetailsDialogComponentData = {
           <!-- transactions -->
           <div class="hidden flex-1 px-4 py-2 lg:block">
             <app-portfolio-state-transactions
+              data-testid="user-details-portfolio-state-transactions"
               [portfolioState]="userData.portfolioState"
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
@@ -116,15 +125,16 @@ export type UserDetailsDialogComponentData = {
         </div>
 
         <div class="p-4">
-          @if (selectedValueSignal() === 'portfolio') {
+          @if (selectedValue() === 'portfolio') {
             <!-- portfolio growth charts -->
-            @if (portfolioGrowthSignal().state === 'loaded') {
+            @if (portfolioGrowth().state === 'loaded') {
               <app-portfolio-growth-chart
+                data-testid="user-details-portfolio-growth-chart"
                 headerTitle="Portfolio Growth"
                 chartType="balance"
                 [displayLegend]="true"
                 [data]="{
-                  values: portfolioGrowthSignal().data,
+                  values: portfolioGrowth().data,
                 }"
                 [heightPx]="375"
                 class="mb-6"
@@ -138,20 +148,24 @@ export type UserDetailsDialogComponentData = {
             <!-- holding table -->
             <div class="mb-6 max-sm:pl-2">
               <app-portfolio-holdings-table-card
+                data-testid="user-details-portfolio-holdings-table-card"
                 [displayedColumns]="displayedColumns"
-                [portfolioStateHolding]="portfolioStateHoldingSignal()"
+                [portfolioStateHolding]="portfolioStateHolding()"
               />
             </div>
-          } @else if (selectedValueSignal() === 'transactions') {
+          } @else if (selectedValue() === 'transactions') {
             <!-- transaction -->
             <div class="pt-3">
-              <app-portfolio-transactions-table [data]="portfolioTransactions()" />
+              <app-portfolio-transactions-table
+                data-testid="user-details-portfolio-transactions-table"
+                [data]="portfolioTransactions()"
+              />
             </div>
           }
         </div>
       } @else {
         <div class="grid h-[400px] place-content-center">
-          <mat-spinner />
+          <mat-spinner data-testid="user-details-dialog-loading-spinner" />
         </div>
       }
     </mat-dialog-content>
@@ -178,7 +192,6 @@ export class UserDetailsDialogComponent {
       }
     }),
     filterNil(),
-    share(),
   );
   private readonly portfolioTransactions$ = this.userData$.pipe(
     map((userData) => userData),
@@ -188,14 +201,13 @@ export class UserDetailsDialogComponent {
         .getUserPortfolioTransactions(userData.id)
         .pipe(map((transactions) => transactions.transactions)),
     ),
-    share(),
   );
 
   readonly userDataSignal = toSignal(this.userData$);
 
   readonly portfolioTransactions = toSignal(this.portfolioTransactions$);
 
-  readonly portfolioStateHoldingSignal = toSignal(
+  readonly portfolioStateHolding = toSignal(
     combineLatest([this.userData$, this.portfolioTransactions$]).pipe(
       switchMap(([userData, transactions]) =>
         this.portfolioCalculationService.getPortfolioStateHoldings(
@@ -206,7 +218,7 @@ export class UserDetailsDialogComponent {
     ),
   );
 
-  readonly portfolioGrowthSignal = toSignal(
+  readonly portfolioGrowth = toSignal(
     this.userData$.pipe(
       switchMap((userData) =>
         this.userApiService
@@ -233,7 +245,7 @@ export class UserDetailsDialogComponent {
 
   readonly displayedColumns = ['symbol', 'price', 'balance', 'invested', 'totalChange', 'portfolio', 'marketCap'];
 
-  readonly selectedValueSignal = signal<'portfolio' | 'transactions'>('portfolio');
+  readonly selectedValue = signal<'portfolio' | 'transactions'>('portfolio');
 
   onDialogClose() {
     this.dialogRef.close();

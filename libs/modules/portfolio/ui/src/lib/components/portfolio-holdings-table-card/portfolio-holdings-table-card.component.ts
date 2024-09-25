@@ -43,7 +43,7 @@ import { PortfolioHoldingsTableComponent } from '../tables';
         [displayedColumns]="displayedColumns()"
       />
 
-      <!-- show more members button -->
+      <!-- show more holding button -->
       <div class="flex justify-end">
         <app-show-more-button
           data-testid="portfolio-holding-table-card-show-more"
