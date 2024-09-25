@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,30 +7,36 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 @Component({
   selector: 'app-general-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [NgClass, MatCardModule, MatIconModule, MatProgressSpinnerModule],
   template: `
     <mat-card appearance="outlined" [class]="additionalClasses() + ' ' + 'h-full shadow-md'">
       <!-- title -->
-      <mat-card-header *ngIf="title()" [ngClass]="{ 'justify-center': titleCenter() }">
-        <mat-card-title class="flex items-center gap-2">
-          <img *ngIf="titleImgUrl()" appDefaultImg [src]="titleImgUrl()" />
-          <mat-icon *ngIf="matIcon()" color="primary">{{ matIcon() }}</mat-icon>
-          <h2 class="text-wt-primary mb-0 text-lg">
-            {{ title() }}
-          </h2>
-        </mat-card-title>
-      </mat-card-header>
+      @if (title()) {
+        <mat-card-header [ngClass]="{ 'justify-center': titleCenter() }">
+          <mat-card-title class="flex items-center gap-2">
+            @if (titleImgUrl()) {
+              <img appDefaultImg [src]="titleImgUrl()" />
+            }
+            @if (matIcon()) {
+              <mat-icon color="primary">{{ matIcon() }}</mat-icon>
+            }
+            <h2 class="text-wt-primary mb-0 text-lg">
+              {{ title() }}
+            </h2>
+          </mat-card-title>
+        </mat-card-header>
+      }
 
       <!-- content -->
       <mat-card-content #matContent>
         @if (showLoadingState()) {
           <div class="grid place-content-center">
-            <mat-spinner></mat-spinner>
+            <mat-spinner />
           </div>
         } @else {
           <!-- custom content -->
           <div class="wrapper">
-            <ng-content></ng-content>
+            <ng-content />
           </div>
 
           <!-- default content -->
@@ -58,10 +64,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   `,
 })
 export class GeneralCardComponent {
-  title = input<string | null>(null);
-  titleImgUrl = input<string | undefined>();
-  matIcon = input<string | undefined>();
-  additionalClasses = input('');
-  titleCenter = input(false);
-  showLoadingState = input(false);
+  readonly title = input<string | null>(null);
+  readonly titleImgUrl = input<string | undefined>();
+  readonly matIcon = input<string | undefined>();
+  readonly additionalClasses = input('');
+  readonly titleCenter = input(false);
+  readonly showLoadingState = input(false);
 }

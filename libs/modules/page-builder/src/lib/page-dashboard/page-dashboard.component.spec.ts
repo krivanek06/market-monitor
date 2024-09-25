@@ -26,7 +26,7 @@ import {
   PortfolioTransactionsTableComponent,
   PortfolioTransactionsTableComponentMock,
 } from '@mm/portfolio/ui';
-import { PieChartComponent } from '@mm/shared/ui';
+import { GeneralCardComponent, PieChartComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PageDashboardComponent } from './page-dashboard.component';
 
@@ -44,7 +44,7 @@ describe('PageDashboardComponent', () => {
   const holdingTableS = '[data-testid="page-dashboard-portfolio-holdings-table"]';
 
   const assetAllocationPieChart = '[data-testid="page-dashboard-portfolio-asset-allocation"]';
-  const sectorAllocationPriChart = '[data-testid="page-dashboard-portfolio-sector-allocation"]';
+  const sectorAllocationPieChart = '[data-testid="page-dashboard-portfolio-sector-allocation"]';
 
   const transactionTableS = '[data-testid="page-dashboard-portfolio-transactions-table"]';
   const bestTransactionS = '[data-testid="page-dashboard-best-transactions"]';
@@ -127,6 +127,7 @@ describe('PageDashboardComponent', () => {
       .keep(NoopAnimationsModule)
       .replace(PortfolioHoldingsTableCardComponent, PortfolioHoldingsTableCardComponentMock)
       .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
+      .keep(GeneralCardComponent)
       .provide({
         provide: AuthenticationUserStoreService,
         useValue: {
@@ -305,7 +306,7 @@ describe('PageDashboardComponent', () => {
 
     const portfolioUserFacade = ngMocks.get(PortfolioUserFacadeService);
 
-    const comp = ngMocks.find<PieChartComponent>(sectorAllocationPriChart);
+    const comp = ngMocks.find<PieChartComponent>(sectorAllocationPieChart);
     expect(comp).toBeTruthy();
     expect(comp.componentInstance.chartTitle).toEqual('Sector Allocation');
     expect(comp.componentInstance.series).toEqual(portfolioUserFacade.getPortfolioSectorAllocationPieChart());
@@ -330,7 +331,7 @@ describe('PageDashboardComponent', () => {
     fixture.detectChanges();
 
     const assetChart = fixture.debugElement.query(By.css(assetAllocationPieChart));
-    const sectorChart = fixture.debugElement.query(By.css(sectorAllocationPriChart));
+    const sectorChart = fixture.debugElement.query(By.css(sectorAllocationPieChart));
 
     expect(assetChart).toBeFalsy();
     expect(sectorChart).toBeFalsy();
@@ -410,5 +411,47 @@ describe('PageDashboardComponent', () => {
 
     expect(bestTransactionsComp).toHaveLength(3);
     expect(worstTransactionsComp).toHaveLength(1);
+  });
+
+  it('should display loading state for a demo account until data is created on the server', async () => {
+    const userStore = ngMocks.get(AuthenticationUserStoreService);
+    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
+
+    // made demo account
+    ngMocks.stub(userStore, {
+      state: {
+        ...userStore.state,
+        getUserData: () => ({
+          ...mockUser,
+          isDemo: true,
+        }),
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    // make some delay to load portfolio growth
+    ngMocks.stub(portfolioUserFacadeService, {
+      ...portfolioUserFacadeService,
+      getPortfolioGrowth: signal([]),
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageDashboardComponent);
+    const component = fixture.point.componentInstance;
+    fixture.detectChanges();
+
+    // check if loading state is shown
+    expect(component.showLoadingState()).toBeTruthy();
+
+    // check if some components are hidden
+    expect(fixture.debugElement.query(By.css(portfolioStateS))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css(portfolioRiskS))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css(portfolioTransactionsS))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css(growthChartBalanceS))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css(growthChartMarketS))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css(portfolioChangeChartS))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css(portfolioAssetChartS))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css(assetAllocationPieChart))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css(sectorAllocationPieChart))).toBeFalsy();
   });
 });

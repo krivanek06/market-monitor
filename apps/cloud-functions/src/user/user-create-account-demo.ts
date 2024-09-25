@@ -81,13 +81,13 @@ export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): P
   });
 
   // create watchList
-  await demoService.createWatchListWithRandomSymbols(newUser);
+  demoService.createWatchListWithRandomSymbols(newUser);
 
-  // generate transactions
-  const transactions = await demoService.generateTransactionsForRandomSymbols(newUser);
-
-  // create portfolio growth data
-  await demoService.generatePortfolioGrowthData(newUser, transactions);
+  // generate transactions in async
+  demoService.generateTransactionsForRandomSymbols(newUser).then((transactions) => {
+    // create portfolio growth data
+    demoService.generatePortfolioGrowthData(newUser, transactions);
+  });
 
   return { userData: newUser, password: randomPassword };
 };

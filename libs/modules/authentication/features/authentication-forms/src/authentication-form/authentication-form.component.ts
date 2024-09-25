@@ -207,7 +207,7 @@ export class AuthenticationFormComponent {
                 switchMap(() =>
                   this.authenticationAccountService.getUserData().pipe(
                     filterNil(), // wait until there is a user initialized
-                    map((userData) => ({ data: userData, action: 'success' as const })),
+                    map((userData) => ({ data: userData, action: 'success-demo-account' as const })),
                   ),
                 ),
               ),
@@ -344,6 +344,15 @@ export class AuthenticationFormComponent {
       if (state.action === 'success') {
         // display success message
         this.dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
+        // navigate to dashboard
+        this.router.navigate([ROUTES_MAIN.DASHBOARD]);
+      } else if (state.action === 'success-demo-account') {
+        // display success message
+        this.dialogServiceUtil.showNotificationBar(
+          'Please wait a moment, we are creating data for you on the server',
+          'notification',
+          10_000,
+        );
         // navigate to dashboard
         this.router.navigate([ROUTES_MAIN.DASHBOARD]);
       } else if (state.action === 'error') {

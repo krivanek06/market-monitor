@@ -89,7 +89,7 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   /**
    * user's all portfolio transactions
    */
-  readonly data = input<PortfolioTransaction[]>([]);
+  readonly data = input<PortfolioTransaction[] | null>([]);
 
   /**
    * selected symbols by the user
@@ -111,7 +111,9 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   /**
    * every symbol which has been transacted
    */
-  readonly transactedSymbols = computed(() => this.portfolioCalculationService.getTransactionSymbols(this.data()));
+  readonly transactedSymbols = computed(() =>
+    this.portfolioCalculationService.getTransactionSymbols(this.data() ?? []),
+  );
 
   /**
    * displayed symbols on the ui
@@ -163,7 +165,7 @@ export class PortfolioAssetChartComponent extends ChartConstructor {
   private readonly selectedSymbolsPortfolioGrowthAssets = toSignal(
     this.symbolsControl.valueChanges.pipe(startWith(this.symbolsControl.value)).pipe(
       // filter out transactions which are related to this symbols
-      map((symbol) => this.data().filter((d) => symbol.includes(d.symbol))),
+      map((symbol) => (this.data() ?? []).filter((d) => symbol.includes(d.symbol))),
       // load historical data, calculate assets growth
       switchMap((transactions) =>
         from(this.portfolioCalculationService.getPortfolioGrowthAssets(transactions)).pipe(

@@ -65,7 +65,7 @@ import {
         <app-general-card
           class="min-h-[210px] max-sm:min-w-[360px] sm:col-span-2"
           title="Account"
-          [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
+          [showLoadingState]="showLoadingState()"
         >
           <app-portfolio-state
             data-testid="page-dashboard-portfolio-state"
@@ -80,7 +80,7 @@ import {
         <app-general-card
           class="min-h-[210px] max-sm:min-w-[275px]"
           title="Risk"
-          [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
+          [showLoadingState]="showLoadingState()"
         >
           <app-portfolio-state-risk
             data-testid="page-dashboard-portfolio-risk"
@@ -94,7 +94,7 @@ import {
         <app-general-card
           class="min-h-[210px] max-sm:min-w-[275px]"
           title="Transactions"
-          [showLoadingState]="!portfolioUserFacadeService.getPortfolioState()"
+          [showLoadingState]="showLoadingState()"
         >
           <app-portfolio-state-transactions
             data-testid="page-dashboard-portfolio-transactions"
@@ -118,31 +118,34 @@ import {
 
     <!-- portfolio growth chart -->
     <div class="mb-10">
-      @if (portfolioUserFacadeService.getPortfolioGrowth(); as getPortfolioGrowth) {
+      @if (showLoadingState()) {
+        <div class="g-skeleton mt-6 h-[380px]"></div>
+      } @else {
         <app-portfolio-growth-chart
           data-testid="page-dashboard-portfolio-growth-chart"
           headerTitle="Portfolio Growth"
           chartType="balance"
           [data]="{
-            values: getPortfolioGrowth,
+            values: portfolioUserFacadeService.getPortfolioGrowth(),
           }"
           [startCash]="stateRef.getUserData().portfolioState.startingCash"
           [heightPx]="350"
         />
-      } @else {
-        <div class="g-skeleton mt-6 h-[380px]"></div>
       }
     </div>
 
     <div class="mb-8 grid grid-cols-1 gap-x-10 lg:grid-cols-2">
       <!-- portfolio growth chart -->
-      @if (portfolioUserFacadeService.getPortfolioGrowth(); as portfolioGrowth) {
+      @if (showLoadingState()) {
+        <div class="g-skeleton mt-8 h-[360px]"></div>
+        <div class="g-skeleton mt-8 h-[360px]"></div>
+      } @else {
         <app-portfolio-growth-chart
           data-testid="page-dashboard-investment-growth-chart"
           headerTitle="Invested / Market"
           chartType="marketValue"
           [data]="{
-            values: portfolioGrowth,
+            values: portfolioUserFacadeService.getPortfolioGrowth(),
           }"
           [heightPx]="360"
           [dateRangeWidth]="400"
@@ -151,20 +154,20 @@ import {
         <!-- portfolio change chart -->
         <app-portfolio-change-chart
           data-testid="page-portfolio-change-chart"
-          [data]="portfolioGrowth"
+          [data]="portfolioUserFacadeService.getPortfolioGrowth()"
           [heightPx]="360"
           [dateRangeWidth]="400"
         />
-      } @else {
-        <div class="g-skeleton mt-8 h-[360px]"></div>
-        <div class="g-skeleton mt-8 h-[360px]"></div>
       }
     </div>
 
     <!-- holdings pie charts -->
     <div class="flex justify-center gap-10 overflow-x-clip max-sm:-ml-6 sm:mb-14 lg:justify-around">
-      @if (portfolioUserFacadeService.getPortfolioState()?.holdings; as holdings) {
-        @if (holdings.length > 0) {
+      @if (showLoadingState()) {
+        <div class="g-skeleton h-[380px] w-full"></div>
+        <div class="g-skeleton h-[380px] w-full"></div>
+      } @else {
+        @if ((portfolioUserFacadeService.getPortfolioState()?.holdings ?? []).length > 0) {
           <app-pie-chart
             data-testid="page-dashboard-portfolio-asset-allocation"
             class="max-sm:w-[385px]"
@@ -180,15 +183,14 @@ import {
             [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
           />
         }
-      } @else {
-        <div class="g-skeleton h-[380px] w-full"></div>
-        <div class="g-skeleton h-[380px] w-full"></div>
       }
     </div>
 
     <!-- portfolio assets chart -->
-    @if (portfolioUserFacadeService.getPortfolioGrowth(); as growth) {
-      @if (growth.length > 8) {
+    @if (showLoadingState()) {
+      <div class="g-skeleton mb-8 h-[380px]"></div>
+    } @else {
+      @if (portfolioUserFacadeService.getPortfolioGrowth().length > 8) {
         <app-general-card title="Asset Growth" class="mb-8">
           <app-portfolio-asset-chart
             data-testid="portfolio-asset-chart-chart"
@@ -197,8 +199,6 @@ import {
           />
         </app-general-card>
       }
-    } @else {
-      <div class="g-skeleton h-[380px]"></div>
     }
 
     <!-- holding -->
@@ -276,4 +276,13 @@ export class PageDashboardComponent {
   readonly hasEnoughTransactions = computed(
     () => (this.stateRef.portfolioTransactions()?.length ?? 0) > this.transactionLimit,
   );
+
+  readonly showLoadingState = computed(() => {
+    const getPortfolioState = this.portfolioUserFacadeService.getPortfolioState();
+    const userData = this.stateRef.getUserData();
+    const portfolioGrowth = this.portfolioUserFacadeService.getPortfolioGrowth();
+
+    // data not yet loaded or user has demo account but data is not yet created
+    return !getPortfolioState || (userData.isDemo && (portfolioGrowth ?? []).length === 0);
+  });
 }

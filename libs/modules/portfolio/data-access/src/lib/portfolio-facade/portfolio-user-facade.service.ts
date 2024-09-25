@@ -35,7 +35,7 @@ export class PortfolioUserFacadeService {
   /**
    * used to return growth for the entire portfolio
    */
-  readonly getPortfolioGrowth = this.authenticationUserService.state.portfolioGrowth;
+  readonly getPortfolioGrowth = computed(() => this.authenticationUserService.state.portfolioGrowth() ?? []);
 
   /**
    * get distinct symbols from the portfolio transactions
