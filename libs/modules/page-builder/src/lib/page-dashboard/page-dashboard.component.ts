@@ -65,7 +65,7 @@ import {
         <app-general-card class="min-h-[210px] max-sm:min-w-[360px] sm:col-span-2" title="Account">
           <app-portfolio-state
             data-testid="page-dashboard-portfolio-state"
-            [showSpinner]="!portfolioUserFacadeService.portfolioStateHolding()"
+            [showSpinner]="!portfolioUserFacadeService.portfolioStateHolding() || showLoadingState()"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showCashSegment]="stateRef.isAccountDemoTrading()"

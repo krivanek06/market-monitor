@@ -42,6 +42,7 @@ import {
   userDocumentTransactionHistoryRef,
   userDocumentWatchListRef,
 } from '../database';
+import { isFirebaseEmulator } from '../utils';
 import { userCreate } from './user-create-account';
 
 export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): Promise<UserDataDemoData> => {
@@ -52,12 +53,12 @@ export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): P
   console.log('demoAccounts', demoAccountsPerIp.length, 'from IP', data.publicIP);
 
   // throw error if too many demo accounts are created
-  if (demoAccountsPerIp.length > USER_ALLOWED_DEMO_ACCOUNTS_PER_IP) {
+  if (!isFirebaseEmulator() && demoAccountsPerIp.length > USER_ALLOWED_DEMO_ACCOUNTS_PER_IP) {
     throw new HttpsError('aborted', 'Too many demo accounts created from this IP');
   }
 
   // throw error if too many accounts
-  if (demoAccountsTotal.docs.length >= USER_ALLOWED_DEMO_ACCOUNTS_TOTAL) {
+  if (!isFirebaseEmulator() && demoAccountsTotal.docs.length >= USER_ALLOWED_DEMO_ACCOUNTS_TOTAL) {
     throw new HttpsError('aborted', 'Too many demo accounts created for not, try later');
   }
 
