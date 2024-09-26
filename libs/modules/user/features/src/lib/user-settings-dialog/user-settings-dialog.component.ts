@@ -2,7 +2,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -49,8 +49,8 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           <div class="max-md:mx-auto">
             <app-upload-file-control
               folder="users"
-              [isDisabled]="userDataSignal().isTest"
-              [fileName]="userDataSignal().id"
+              [isDisabled]="userDataNormal()?.isTest"
+              [fileName]="userDataNormal()?.id ?? 'Unknown'"
               [heightPx]="225"
               [formControl]="userImageControl"
             />
@@ -61,32 +61,32 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
             <!-- name -->
             <div class="c-text-item">
               <span>Display Name:</span>
-              <span>{{ userDataSignal().personal.displayName }}</span>
+              <span>{{ userDataNormal()?.personal?.displayName }}</span>
             </div>
             <!-- initials -->
             <div class="c-text-item">
               <span>Initials:</span>
-              <span>{{ userDataSignal().personal.displayNameInitials }}</span>
+              <span>{{ userDataNormal()?.personal?.displayNameInitials }}</span>
             </div>
             <!-- email -->
             <div class="c-text-item">
               <span>Email:</span>
-              <span>{{ userSignal().email }}</span>
+              <span>{{ userDataNormal()?.personal?.email }}</span>
             </div>
             <!-- created -->
             <div class="c-text-item">
               <span>Created:</span>
-              <span>{{ userDataSignal().accountCreatedDate | date: 'MMMM d, y' }}</span>
+              <span>{{ userDataNormal()?.accountCreatedDate | date: 'MMMM d, y' }}</span>
             </div>
             <!-- account type -->
             <div class="c-text-item">
               <span>Account Type:</span>
-              <span> {{ userDataSignal().userAccountType }}</span>
+              <span> {{ userDataNormal()?.userAccountType }}</span>
             </div>
             <!-- starting cash -->
             <div *appUserAccountType="'DEMO_TRADING'" class="c-text-item">
               <span>Starting Cash:</span>
-              <span> {{ userDataSignal().portfolioState.startingCash | currency }}</span>
+              <span> {{ userDataNormal()?.portfolioState?.startingCash | currency }}</span>
             </div>
             <!-- theme -->
             <div class="flex items-center gap-6">
@@ -98,7 +98,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
 
         <!-- explain account type -->
         <div class="hidden p-4 lg:block">
-          <div class="text-wt-primary mb-2 text-lg">{{ userDataSignal().userAccountType }} - Account</div>
+          <div class="text-wt-primary mb-2 text-lg">{{ userDataNormal()?.userAccountType }} - Account</div>
           @for (text of accountDescriptionSignal(); track $index) {
             <div class="mb-3">
               {{ text }}
@@ -111,7 +111,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
       <div class="flex min-w-[180px] flex-col gap-y-3 lg:pl-6">
         <!--  Change Account type -->
         <button
-          [disabled]="userDataSignal().isTest"
+          [disabled]="userDataNormal()?.isTest"
           (click)="onChangeInitials()"
           type="button"
           mat-stroked-button
@@ -122,7 +122,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
 
         <!--  Change Display Name -->
         <button
-          [disabled]="userDataSignal().isTest"
+          [disabled]="userDataNormal()?.isTest"
           (click)="onChangeDisplayName()"
           type="button"
           mat-stroked-button
@@ -139,9 +139,9 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         }
 
         <!--  Change Password -->
-        @if (userDataSignal().personal.providerId === 'password') {
+        @if (userDataNormal()?.personal?.providerId === 'password') {
           <button
-            [disabled]="userDataSignal().isTest"
+            [disabled]="userDataNormal()?.isTest"
             (click)="onChangePassword()"
             type="button"
             mat-stroked-button
@@ -157,7 +157,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
 
         <!--  Reset Transactions -->
         <button
-          [disabled]="userDataSignal().isTest"
+          [disabled]="userDataNormal()?.isTest"
           (click)="onResetTransactions()"
           [matTooltip]="actionButtonTooltips.resetTransactions"
           type="button"
@@ -168,7 +168,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         </button>
         <!--  Delete Account -->
         <button
-          [disabled]="userDataSignal().isTest"
+          [disabled]="userDataNormal()?.isTest"
           (click)="onDeleteAccount()"
           [matTooltip]="actionButtonTooltips.deleteAccount"
           type="button"
@@ -215,12 +215,15 @@ export class UserSettingsDialogComponent implements OnInit {
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
-  private readonly dialogRef = inject(MatDialogRef<UserSettingsDialogComponent>);
+  private readonly dialogRef = inject(MatDialog);
   private readonly groupApiService = inject(GroupApiService);
 
   readonly isDevActive = inject(IS_DEV_TOKEN, {
     optional: true,
   });
+
+  // use userDataNormal because this component get's destroyed as last one and before it is destroyed, use will be undefined - for deleting account
+  readonly userDataNormal = this.authenticationUserStoreService.state.getUserDataNormal;
   readonly userDataSignal = this.authenticationUserStoreService.state.getUserData;
   readonly userSignal = this.authenticationUserStoreService.state.getUser;
   readonly userImageControl = new FormControl<string | null>(null);
@@ -233,7 +236,11 @@ export class UserSettingsDialogComponent implements OnInit {
   };
 
   readonly accountDescriptionSignal = computed(() => {
-    return accountDescription[this.userDataSignal().userAccountType];
+    const accountType = this.userDataSignal()?.userAccountType;
+    if (!accountType) {
+      return [];
+    }
+    return accountDescription[accountType];
   });
 
   ngOnInit(): void {
@@ -250,12 +257,18 @@ export class UserSettingsDialogComponent implements OnInit {
   }
 
   @Confirmable('Are you sure you want to delete your account?', 'Confirm', true, 'DELETE')
-  onDeleteAccount(): void {
+  async onDeleteAccount() {
     // delete groups that user is owner
     const owner = this.authenticationUserStoreService.state.getUserData().groups.groupOwner;
     for (const group of owner) {
       this.groupApiService.deleteGroup(group);
     }
+
+    // close dialog
+    this.dialogRef.closeAll();
+
+    // redirect to home
+    await this.router.navigate([ROUTES_MAIN.LOGIN]);
 
     // perform delete account
     this.authenticationAccountService.deleteAccount();
@@ -265,12 +278,6 @@ export class UserSettingsDialogComponent implements OnInit {
 
     // sign out to avoid errors
     this.authenticationAccountService.signOut();
-
-    // close dialog
-    this.dialogRef.close();
-
-    // redirect to home
-    this.router.navigate([ROUTES_MAIN.LOGIN]);
   }
 
   onChangePassword(): void {
