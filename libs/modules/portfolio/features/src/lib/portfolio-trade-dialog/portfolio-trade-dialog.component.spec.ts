@@ -95,8 +95,7 @@ describe('PortfolioTradeDialogComponent', () => {
       .provide({
         provide: PortfolioUserFacadeService,
         useValue: {
-          getPortfolioStateHolding: jest.fn().mockReturnValue(signal(mockPortfolioState.holdings[0])),
-          getPortfolioState: signal(mockPortfolioState),
+          portfolioStateHolding: signal(mockPortfolioState),
           createPortfolioOperation: jest.fn().mockReturnValue(Promise.resolve({} as PortfolioTransactionCreate)),
         },
       })
@@ -585,7 +584,7 @@ describe('PortfolioTradeDialogComponent', () => {
 
       // ser user cash to 0
       ngMocks.stub(portfolioService, {
-        getPortfolioState: signal({ ...mockPortfolioState, cashOnHand: 0 }),
+        portfolioStateHolding: signal({ ...mockPortfolioState, cashOnHand: 0 }),
       });
 
       // trigger form change
@@ -613,7 +612,7 @@ describe('PortfolioTradeDialogComponent', () => {
 
       // ser user cash to 0
       ngMocks.stub(portfolioService, {
-        getPortfolioState: signal({ ...mockPortfolioState, cashOnHand: 0 }),
+        portfolioStateHolding: signal({ ...mockPortfolioState, cashOnHand: 0 }),
       });
 
       // change transaction type to SELL
@@ -664,7 +663,7 @@ describe('PortfolioTradeDialogComponent', () => {
 
       // ser user cash to 0
       ngMocks.stub(portfolioService, {
-        getPortfolioState: signal({ ...mockPortfolioState, cashOnHand: 0 }),
+        portfolioStateHolding: signal({ ...mockPortfolioState, cashOnHand: 0 }),
       });
 
       // trigger form change

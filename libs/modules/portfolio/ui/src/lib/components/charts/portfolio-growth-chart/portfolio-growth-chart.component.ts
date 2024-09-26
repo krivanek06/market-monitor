@@ -19,7 +19,7 @@ import { map } from 'rxjs';
       <div class="text-wt-primary text-lg">{{ headerTitle() }}</div>
 
       <!-- date range -->
-      @if (data().values.length > 0) {
+      @if ((data().values ?? []).length > 0) {
         <app-date-range-slider [style.width.px]="dateRangeWidth()" [formControl]="sliderControl" />
       }
     </div>
@@ -49,7 +49,7 @@ import { map } from 'rxjs';
 export class PortfolioGrowthChartComponent extends ChartConstructor {
   readonly headerTitle = input<string>('');
   readonly data = input.required<{
-    values: PortfolioGrowth[];
+    values: PortfolioGrowth[] | null;
     currentCash?: number[];
   }>();
 
@@ -69,12 +69,13 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
 
   readonly initSliderEffect = effect(() => {
     const dataValues = this.data();
+    const values = dataValues.values ?? [];
 
     // create slider values
     const sliderValuesInput: DateRangeSliderValues = {
-      dates: dataValues.values.map((point) => point.date),
+      dates: values.map((point) => point.date),
       currentMinDateIndex: 0,
-      currentMaxDateIndex: dataValues.values.length - 1,
+      currentMaxDateIndex: values.length - 1,
     };
 
     untracked(() => this.sliderControl.patchValue(sliderValuesInput));
@@ -87,7 +88,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         const startCash = this.startCash();
 
         // filter out by valid dates
-        const inputValues = filterDataByDateRange(dataValues.values, sliderValues);
+        const inputValues = filterDataByDateRange(dataValues.values ?? [], sliderValues);
         const seriesDataUpdate = this.createChartSeries(inputValues, dataValues.currentCash ?? [], startCash);
 
         // create chart

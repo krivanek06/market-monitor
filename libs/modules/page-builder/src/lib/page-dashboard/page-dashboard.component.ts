@@ -62,26 +62,18 @@ import {
         class="flex flex-row gap-4 max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 md:gap-6 lg:grid-cols-4 xl:col-span-2"
       >
         <!-- portfolio state -->
-        <app-general-card
-          class="min-h-[210px] max-sm:min-w-[360px] sm:col-span-2"
-          title="Account"
-          [showLoadingState]="showLoadingState()"
-        >
+        <app-general-card class="min-h-[210px] max-sm:min-w-[360px] sm:col-span-2" title="Account">
           <app-portfolio-state
             data-testid="page-dashboard-portfolio-state"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showCashSegment]="stateRef.isAccountDemoTrading()"
-            [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
+            [portfolioState]="portfolioUserFacadeService.portfolioState()"
           />
         </app-general-card>
 
         <!-- portfolio risk -->
-        <app-general-card
-          class="min-h-[210px] max-sm:min-w-[275px]"
-          title="Risk"
-          [showLoadingState]="showLoadingState()"
-        >
+        <app-general-card class="min-h-[210px] max-sm:min-w-[275px]" title="Risk">
           <app-portfolio-state-risk
             data-testid="page-dashboard-portfolio-risk"
             [portfolioRisk]="stateRef.getUserData().portfolioRisk"
@@ -91,23 +83,19 @@ import {
         </app-general-card>
 
         <!-- portfolio transactions -->
-        <app-general-card
-          class="min-h-[210px] max-sm:min-w-[275px]"
-          title="Transactions"
-          [showLoadingState]="showLoadingState()"
-        >
+        <app-general-card class="min-h-[210px] max-sm:min-w-[275px]" title="Transactions">
           <app-portfolio-state-transactions
             data-testid="page-dashboard-portfolio-transactions"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showFees]="!!stateRef.isAccountDemoTrading()"
-            [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
+            [portfolioState]="portfolioUserFacadeService.portfolioState()"
           />
         </app-general-card>
       </div>
 
       <!-- portfolio change -->
-      @if (portfolioUserFacadeService.getPortfolioChange(); as portfolioChange) {
+      @if (portfolioUserFacadeService.portfolioChange(); as portfolioChange) {
         <app-portfolio-period-change
           data-testid="page-dashboard-period-change"
           [portfolioChange]="portfolioChange"
@@ -126,7 +114,7 @@ import {
           headerTitle="Portfolio Growth"
           chartType="balance"
           [data]="{
-            values: portfolioUserFacadeService.getPortfolioGrowth(),
+            values: portfolioUserFacadeService.portfolioGrowth(),
           }"
           [startCash]="stateRef.getUserData().portfolioState.startingCash"
           [heightPx]="350"
@@ -145,7 +133,7 @@ import {
           headerTitle="Invested / Market"
           chartType="marketValue"
           [data]="{
-            values: portfolioUserFacadeService.getPortfolioGrowth(),
+            values: portfolioUserFacadeService.portfolioGrowth(),
           }"
           [heightPx]="360"
           [dateRangeWidth]="400"
@@ -154,7 +142,7 @@ import {
         <!-- portfolio change chart -->
         <app-portfolio-change-chart
           data-testid="page-portfolio-change-chart"
-          [data]="portfolioUserFacadeService.getPortfolioGrowth()"
+          [data]="portfolioUserFacadeService.portfolioGrowth()"
           [heightPx]="360"
           [dateRangeWidth]="400"
         />
@@ -163,24 +151,24 @@ import {
 
     <!-- holdings pie charts -->
     <div class="flex justify-center gap-10 overflow-x-clip max-sm:-ml-6 sm:mb-14 lg:justify-around">
-      @if (showLoadingState()) {
+      @if (!portfolioUserFacadeService.portfolioStateHolding()) {
         <div class="g-skeleton h-[380px] w-full"></div>
         <div class="g-skeleton h-[380px] w-full"></div>
       } @else {
-        @if ((portfolioUserFacadeService.getPortfolioState()?.holdings ?? []).length > 0) {
+        @if ((portfolioUserFacadeService.portfolioStateHolding()?.holdings ?? []).length > 0) {
           <app-pie-chart
             data-testid="page-dashboard-portfolio-asset-allocation"
             class="max-sm:w-[385px]"
             chartTitle="Asset Allocation"
             [heightPx]="365"
-            [series]="portfolioUserFacadeService.getPortfolioAssetAllocationPieChart()"
+            [series]="portfolioUserFacadeService.portfolioAssetAllocationPieChart()"
           />
           <app-pie-chart
             data-testid="page-dashboard-portfolio-sector-allocation"
             class="hidden lg:block"
             chartTitle="Sector Allocation"
             [heightPx]="365"
-            [series]="portfolioUserFacadeService.getPortfolioSectorAllocationPieChart()"
+            [series]="portfolioUserFacadeService.portfolioSectorAllocationPieChart()"
           />
         }
       }
@@ -190,7 +178,7 @@ import {
     @if (showLoadingState()) {
       <div class="g-skeleton mb-8 h-[380px]"></div>
     } @else {
-      @if (portfolioUserFacadeService.getPortfolioGrowth().length > 8) {
+      @if ((portfolioUserFacadeService.portfolioGrowth() ?? []).length > 8) {
         <app-general-card title="Asset Growth" class="mb-8">
           <app-portfolio-asset-chart
             data-testid="portfolio-asset-chart-chart"
@@ -205,7 +193,7 @@ import {
     <app-portfolio-holdings-table-card
       class="mb-12"
       data-testid="page-dashboard-portfolio-holdings-table"
-      [portfolioStateHolding]="portfolioUserFacadeService.getPortfolioState()"
+      [portfolioStateHolding]="portfolioUserFacadeService.portfolioStateHolding()"
       [maximumHoldingLimit]="USER_HOLDINGS_SYMBOL_LIMIT"
     />
 
@@ -278,11 +266,10 @@ export class PageDashboardComponent {
   );
 
   readonly showLoadingState = computed(() => {
-    const getPortfolioState = this.portfolioUserFacadeService.getPortfolioState();
     const userData = this.stateRef.getUserData();
-    const portfolioGrowth = this.portfolioUserFacadeService.getPortfolioGrowth();
+    const portfolioGrowth = this.portfolioUserFacadeService.portfolioGrowth();
 
     // data not yet loaded or user has demo account but data is not yet created
-    return !getPortfolioState || (userData.isDemo && (portfolioGrowth ?? []).length === 0);
+    return !portfolioGrowth || (userData.isDemo && (portfolioGrowth ?? []).length === 0);
   });
 }

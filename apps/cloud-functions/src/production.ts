@@ -35,6 +35,7 @@ export const userCreateAccountDemoCall = onCall(
   {
     region: region,
     cors: allowedUrl,
+    memory: '512MiB',
   },
   (request: CallableRequest<UserCreateDemoAccountInput>) => userCreateAccountDemo(request.data),
 );

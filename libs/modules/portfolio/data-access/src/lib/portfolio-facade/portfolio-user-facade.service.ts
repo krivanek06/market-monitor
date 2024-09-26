@@ -19,7 +19,7 @@ export class PortfolioUserFacadeService {
   private readonly portfolioCreateOperationService = inject(PortfolioCreateOperationService);
   private readonly userApiService = inject(UserApiService);
 
-  readonly getPortfolioState = toSignal(
+  readonly portfolioStateHolding = toSignal(
     toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
       switchMap((transactions) =>
         transactions
@@ -33,9 +33,16 @@ export class PortfolioUserFacadeService {
   );
 
   /**
+   * get portfolio state either saved from DB or recalculated from transactions
+   */
+  readonly portfolioState = computed(
+    () => this.portfolioStateHolding() ?? this.authenticationUserService.state.getUserData().portfolioState,
+  );
+
+  /**
    * used to return growth for the entire portfolio
    */
-  readonly getPortfolioGrowth = computed(() => this.authenticationUserService.state.portfolioGrowth() ?? []);
+  readonly portfolioGrowth = computed(() => this.authenticationUserService.state.portfolioGrowth());
 
   /**
    * get distinct symbols from the portfolio transactions
@@ -48,16 +55,16 @@ export class PortfolioUserFacadeService {
   /**
    * method used to return change for the entire portfolio
    */
-  readonly getPortfolioChange = computed(() =>
-    this.portfolioCalculationService.getPortfolioChange(this.getPortfolioGrowth() ?? []),
+  readonly portfolioChange = computed(() =>
+    this.portfolioCalculationService.getPortfolioChange(this.portfolioGrowth() ?? []),
   );
 
-  readonly getPortfolioSectorAllocationPieChart = computed(() =>
-    this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(this.getPortfolioState()?.holdings ?? []),
+  readonly portfolioSectorAllocationPieChart = computed(() =>
+    this.portfolioCalculationService.getPortfolioSectorAllocationPieChart(this.portfolioStateHolding()?.holdings ?? []),
   );
 
-  readonly getPortfolioAssetAllocationPieChart = computed(() =>
-    this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.getPortfolioState()?.holdings ?? []),
+  readonly portfolioAssetAllocationPieChart = computed(() =>
+    this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.portfolioStateHolding()?.holdings ?? []),
   );
 
   createPortfolioOperation(data: PortfolioTransactionCreate): Promise<PortfolioTransaction> {

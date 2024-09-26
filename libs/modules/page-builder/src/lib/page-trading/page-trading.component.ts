@@ -60,7 +60,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
         [titleColor]="ColorScheme.PRIMARY_VAR"
         [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
         [showCashSegment]="authenticationUserService.state.isAccountDemoTrading()"
-        [portfolioState]="portfolioUserFacadeService.getPortfolioState()"
+        [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
       />
 
       <div class="flex flex-col gap-x-6 gap-y-6 max-md:-ml-4 xl:col-span-2 xl:flex-row">
@@ -227,7 +227,7 @@ export class PageTradingComponent {
    */
   readonly allowBuyOperationSignal = computed(() => {
     const summary = this.symbolSummarySignal().data;
-    const portfolioState = this.portfolioUserFacadeService.getPortfolioState();
+    const portfolioState = this.portfolioUserFacadeService.portfolioStateHolding();
 
     // disable buy operation until data is loaded
     if (!summary || !portfolioState) {
@@ -247,7 +247,7 @@ export class PageTradingComponent {
    * wait until data is loaded
    */
   readonly allowActionButtons = computed(() => {
-    const portfolioState = this.portfolioUserFacadeService.getPortfolioState();
+    const portfolioState = this.portfolioUserFacadeService.portfolioStateHolding();
     const symbolSummary = this.symbolSummarySignal();
 
     // check if exists 5D price change, may happen that we get symbols which are deprecated
@@ -257,7 +257,7 @@ export class PageTradingComponent {
 
   readonly holdingsInputSource = computed(() => {
     return (
-      this.portfolioUserFacadeService.getPortfolioState()?.holdings?.map(
+      this.portfolioUserFacadeService.portfolioStateHolding()?.holdings?.map(
         (holding) =>
           ({
             value: holding.symbol,

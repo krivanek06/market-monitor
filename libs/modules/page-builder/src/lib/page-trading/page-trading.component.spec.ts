@@ -142,7 +142,7 @@ describe('PageTradingComponent', () => {
       .provide({
         provide: PortfolioUserFacadeService,
         useValue: {
-          getPortfolioState: () => mockPortfolioState,
+          portfolioStateHolding: () => mockPortfolioState,
           deletePortfolioOperation: jest.fn(),
         },
       });
@@ -193,7 +193,7 @@ describe('PageTradingComponent', () => {
     const comp = ngMocks.find<PortfolioStateComponent>(portfolioStateS);
 
     expect(comp).toBeTruthy();
-    expect(comp.componentInstance.portfolioState).toBe(portfolioUserFacadeService.getPortfolioState());
+    expect(comp.componentInstance.portfolioState).toBe(portfolioUserFacadeService.portfolioStateHolding());
     expect(comp.componentInstance.showCashSegment).toBeTruthy();
   });
 
@@ -206,7 +206,7 @@ describe('PageTradingComponent', () => {
 
     // Check that the dropdown is displayed
     const expectInputSource = (
-      userPortfolio.getPortfolioState()?.holdings.map(
+      userPortfolio.portfolioStateHolding()?.holdings.map(
         (d) =>
           ({
             value: d.symbol,
@@ -299,7 +299,7 @@ describe('PageTradingComponent', () => {
     // configure user holdings to reach the limit
     ngMocks.stubMember(
       portfolioUserFacadeService,
-      'getPortfolioState',
+      'portfolioStateHolding',
       signal({
         balance: 1000,
         holdings: Array.from({ length: USER_HOLDINGS_SYMBOL_LIMIT }, (_, i) => ({

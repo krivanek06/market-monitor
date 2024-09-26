@@ -377,10 +377,10 @@ describe('AuthenticationFormComponent', () => {
       password: userDemoMock.password,
     });
     expect(component.userAuthenticationState()).toEqual({
-      action: 'success',
+      action: 'success-demo-account',
       data: userMockAuth,
     });
-    expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
+    expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'notification', 10000);
     expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
 
     // check if demo account is saved in local storage

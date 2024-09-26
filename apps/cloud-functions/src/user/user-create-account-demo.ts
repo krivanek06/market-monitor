@@ -80,8 +80,12 @@ export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): P
     publicIP: data.publicIP,
   });
 
+  console.log('Created demo user:', newUser.personal.displayName);
+
   // create watchList
   demoService.createWatchListWithRandomSymbols(newUser);
+
+  console.log('Created watchList for user:', newUser.personal.displayName);
 
   // generate transactions in async
   demoService.generateTransactionsForRandomSymbols(newUser).then((transactions) => {
@@ -156,19 +160,26 @@ export class CreateDemoAccountService {
     const pastDateSell = format(subDays(new Date(), 4), 'yyyy-MM-dd');
 
     // create BUY transactions for each symbol
-    for (const symbol of this.symbolToTransact) {
-      const buyOperation: PortfolioTransactionCreate = {
-        date: pastDateBuy,
-        symbol: symbol.id,
-        sector: symbol.profile?.sector ?? 'Unknown',
-        symbolType: 'STOCK',
-        units: getRandomNumber(10, 40),
-        transactionType: 'BUY',
-      };
+    const buyOperations = this.symbolToTransact.map(
+      (symbol) =>
+        ({
+          date: pastDateBuy,
+          symbol: symbol.id,
+          sector: symbol.profile?.sector ?? 'Unknown',
+          symbolType: 'STOCK',
+          units: getRandomNumber(10, 32),
+          transactionType: 'BUY',
+        }) satisfies PortfolioTransactionCreate,
+    );
 
+    // load all transactions at once
+    const buyTransactions = await Promise.all(
+      buyOperations.map((operation) => this.createPortfolioCreateOperation(operation, userData, transactionsToSave)),
+    );
+
+    // determine if user has enough cash to buy
+    for (const buyTransaction of buyTransactions) {
       try {
-        const buyTransaction = await this.createPortfolioCreateOperation(buyOperation, userData, transactionsToSave);
-
         // how much was already spent on all transactions
         const alreadySpent = transactionsToSave.reduce((acc, curr) => acc + curr.unitPrice * curr.units, 0);
 
@@ -181,38 +192,36 @@ export class CreateDemoAccountService {
           transactionsToSave.push(buyTransaction);
         }
       } catch (err) {
-        console.log(`Symbol: ${symbol.id} - skip transactions for user: ${userData.personal.displayName}`);
+        console.log(`Symbol: ${buyTransaction.symbol} - skip transactions for user: ${userData.personal.displayName}`);
       }
     }
+
+    console.log('Created BUY transactions:', transactionsToSave.length);
 
     // map data into new object to avoid circular reference
-    const buyTransactionData = transactionsToSave.map((d) => ({ symbol: d.symbol, sector: d.sector, units: d.units }));
+    const sellOperations = transactionsToSave
+      .map((d) => ({ symbol: d.symbol, sector: d.sector, units: d.units }))
+      .map(
+        (operation) =>
+          ({
+            date: pastDateSell,
+            symbol: operation.symbol,
+            sector: operation.sector ?? 'Unknown',
+            symbolType: 'STOCK',
+            units: Math.round(operation.units / 2),
+            transactionType: 'SELL',
+          }) satisfies PortfolioTransactionCreate,
+      );
 
-    // create SELL transactions for each symbol
-    for (const transaction of buyTransactionData) {
-      const sellOperation: PortfolioTransactionCreate = {
-        date: pastDateSell,
-        symbol: transaction.symbol,
-        sector: transaction.sector ?? 'Unknown',
-        symbolType: 'STOCK',
-        // sell half of the units
-        units: getRandomNumber(4, Math.round(transaction.units / 2)),
-        transactionType: 'SELL',
-      };
+    // load all transactions at once
+    const sellTransactions = await Promise.all(
+      sellOperations.map((operation) => this.createPortfolioCreateOperation(operation, userData, transactionsToSave)),
+    );
 
-      // check if not selling more than user has
-      if (sellOperation.units > transaction.units) {
-        console.log(`Symbol: ${sellOperation.symbol} - skip transactions for user: ${userData.personal.displayName}`);
-        continue;
-      }
+    console.log('Created SELL transactions:', sellTransactions.length);
 
-      try {
-        const sellTransaction = await this.createPortfolioCreateOperation(sellOperation, userData, transactionsToSave);
-        transactionsToSave.push(sellTransaction);
-      } catch (err) {
-        console.log(`Symbol: ${sellOperation.symbol} - skip transactions for user: ${userData.personal.displayName}`);
-      }
-    }
+    // save them
+    transactionsToSave.push(...sellTransactions);
 
     // save transaction into user document at once
     await userDocumentTransactionHistoryRef(userData.id).update({
@@ -233,6 +242,7 @@ export class CreateDemoAccountService {
 
     // load historical price for symbol on date
     const symbolPrice = await getStockHistoricalPricesOnDateCF(symbol, dateFormatDate(date));
+    console.log('loaded historical price for symbol:', symbol, 'date:', date);
 
     // check if symbol exists
     if (!symbolPrice) {
@@ -360,7 +370,7 @@ export class CreateDemoAccountService {
     const randomSymbols = this.#getSymbols().slice(0, limit);
     const summaries = await getSymbolSummariesCF(randomSymbols);
 
-    console.log('Random symbols:', randomSymbols, 'Summaries:', summaries.length);
+    console.log('Random symbols:', randomSymbols.length, 'Summaries:', summaries.length);
 
     return summaries;
   };
