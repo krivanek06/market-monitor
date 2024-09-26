@@ -1,5 +1,6 @@
 import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PortfolioState } from '@mm/api-types';
 import { ColorScheme } from '@mm/shared/data-access';
 import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
@@ -7,15 +8,18 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 @Component({
   selector: 'app-portfolio-state',
   standalone: true,
-  imports: [PercentageIncreaseDirective, AddColorDirective, CurrencyPipe],
+  imports: [PercentageIncreaseDirective, AddColorDirective, MatProgressSpinnerModule, CurrencyPipe],
   template: `
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
         <!-- balance -->
         <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Balance</div>
-          <div [appAddColor]="valueColor()" class="sm:text-lg">
-            {{ (portfolioState()?.balance | currency) ?? 'N/A' }}
+          <div [appAddColor]="valueColor()" class="flex items-center gap-2 sm:text-lg">
+            <span>{{ (portfolioState()?.balance | currency) ?? 'N/A' }}</span>
+            @if (showSpinner()) {
+              <mat-spinner [diameter]="20" />
+            }
           </div>
         </div>
 
@@ -79,4 +83,5 @@ export class PortfolioStateComponent {
   readonly titleColor = input<ColorScheme | undefined>();
   readonly valueColor = input<ColorScheme | undefined>();
   readonly showCashSegment = input(false);
+  readonly showSpinner = input(false);
 }
