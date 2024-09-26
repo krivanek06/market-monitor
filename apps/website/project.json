@@ -20,14 +20,14 @@
       "executor": "@nx/vite:build",
       "options": {
         "outputPath": "dist/apps/website",
-        "configFile": "apps/website/vite.config.ts"
+        "configFile": "apps/website/vite.config.mts"
       }
     },
     "build.ssr": {
       "executor": "@nx/vite:build",
       "options": {
         "outputPath": "dist/apps/website",
-        "configFile": "apps/website/adapters/cloudflare-pages/vite.config.ts"
+        "configFile": "apps/website/adapters/cloudflare-pages/vite.config.mts"
       }
     },
     "test": {
