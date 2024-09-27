@@ -70,17 +70,15 @@ import { FormRegisterComponent } from './form-register/form-register.component';
           </div>
 
           <!-- social media login -->
-          <div class="mt-4 px-4">
-            <button
-              data-testid="auth-form-google-auth-button"
-              mat-stroked-button
-              (click)="onGoogleAuth()"
-              color="warn"
-              class="w-full"
-            >
-              Google
-            </button>
-          </div>
+          <button
+            data-testid="auth-form-google-auth-button"
+            mat-stroked-button
+            (click)="onGoogleAuth()"
+            color="warn"
+            class="w-full"
+          >
+            Google
+          </button>
 
           <div class="my-8">
             <mat-divider />
@@ -90,7 +88,7 @@ import { FormRegisterComponent } from './form-register/form-register.component';
           <div class="px-4">
             @if (demoAccountValid()) {
               <div class="mb-2 text-center">
-                You have a demo account valid until: {{ demoAccountValidUntil() | date: 'HH:mm, MMMM d, y' }}
+                Demo account valid until: {{ demoAccountValidUntil() | date: 'HH:mm, MMM d., y' }}
               </div>
             }
             <button
