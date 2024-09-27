@@ -170,11 +170,14 @@ const getTransactionData = (
   worstTransactions: PortfolioTransaction[];
 } => {
   // combine all transactions
-  const usersAllTransactionsCombined = usersAllTransactions.reduce((acc, val) => [...acc, ...val]);
+  const usersAllTransactionsCombined = usersAllTransactions.reduce(
+    (acc, val) => [...acc, ...val],
+    [] as PortfolioTransaction[],
+  );
 
   // get last N transactions for everybody - order by date desc
   const lastTransactions = usersAllTransactions
-    .reduce((acc, val) => [...acc, ...val.slice(0, 10)])
+    .reduce((acc, val) => [...acc, ...val.slice(0, 10)], [] as PortfolioTransaction[])
     .sort((a, b) => (a.date < b.date ? -1 : 1))
     .slice(0, 150);
 
