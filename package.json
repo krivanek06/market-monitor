@@ -20,6 +20,7 @@
     "website:build": "nx run website:build",
     "website:preview": "nx run website:preview",
     "website:deploy": "nx run website:deploy",
+    "website:deploy-prev": "nx run website:deploy-production-preview",
     "prettier:format": "npx prettier --write '**/*.ts'"
   },
   "private": true,

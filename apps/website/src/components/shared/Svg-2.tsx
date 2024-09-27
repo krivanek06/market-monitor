@@ -3,12 +3,14 @@ import { Signal, component$ } from '@builder.io/qwik';
 export type SVG2Props = {
   class?: string;
   forwardRef?: Signal<Element | undefined>;
+  id?: string;
 };
 
 export const SVG2 = component$<SVG2Props>((props) => {
   return (
     <svg
       ref={props.forwardRef}
+      id={props.id}
       width="1364"
       height="2336"
       viewBox="0 0 1364 2336"

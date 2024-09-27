@@ -46,7 +46,9 @@ const MarketSymbolsSection = component$(() => {
   const loadedHistoricalPrice = useResource$(({ track }) => {
     track(() => selectedSummary.value);
 
-    return selectedSummary.value ? getHistoricalPricesCF(selectedSummary.value.id, SymbolHistoricalPeriods.year) : [];
+    return selectedSummary.value
+      ? getHistoricalPricesCF(selectedSummary.value.id, SymbolHistoricalPeriods.sixMonths)
+      : [];
   });
 
   const loadedSummaries = useResource$(async ({ track }) => {
@@ -71,7 +73,7 @@ const MarketSymbolsSection = component$(() => {
   return (
     <>
       {/* loaded summaries about stocks */}
-      <div class="mb-6 flex items-center gap-4 md:mb-10">
+      <div class="mb-6 flex items-center gap-4 md:mb-14">
         {/* left button */}
         <div>
           <Button class="hidden h-20 md:block" onClick$={() => reloadSummaries.value++}>
@@ -92,7 +94,7 @@ const MarketSymbolsSection = component$(() => {
             onResolved={(data) => (
               <>
                 {/* items */}
-                <div class="hidden grid-cols-2 gap-x-8 gap-y-4 md:grid lg:grid-cols-3 2xl:grid-cols-4">
+                <div class="hidden grid-cols-2 gap-x-8 gap-y-2 md:grid lg:grid-cols-3 2xl:grid-cols-4">
                   {data.map((summary) => (
                     <SymbolChange
                       isSelect={selectedSummary.value?.id === summary.id}
@@ -132,8 +134,14 @@ const MarketSymbolsSection = component$(() => {
         <div class="xl:col-span-2">
           <Resource
             value={loadedHistoricalPrice}
-            onPending={() => <div class="g-skeleton h-[500px]"></div>}
-            onResolved={(data) => <HistoricalPriceChart historicalPrice={data} symbolId={selectedSummary.value?.id} />}
+            onPending={() => <div class="g-skeleton h-[390px]"></div>}
+            onResolved={(data) => (
+              <HistoricalPriceChart
+                historicalPrice={data}
+                symbolId={selectedSummary.value?.id}
+                styles={{ width: '100%', height: '420px', display: 'block' }}
+              />
+            )}
           ></Resource>
         </div>
         <div>

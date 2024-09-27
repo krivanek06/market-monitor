@@ -66,10 +66,16 @@
         "lintFilePatterns": ["apps/website/**/*.{ts,tsx,js,jsx}"]
       }
     },
+    "deploy-production-preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "CLOUDFLARE_API_TOKEN=sGcAnkvEVxuEG3UY4j5jsPZzg5AkW49NeUuNOtYN CLOUDFLARE_ACCOUNT_ID=f1df8b715072f0acab628276164c0494 wrangler pages deploy ./dist/apps/website --branch production --project-name=\"ggfinance-website\""
+      }
+    },
     "deploy": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "CLOUDFLARE_API_TOKEN=sGcAnkvEVxuEG3UY4j5jsPZzg5AkW49NeUuNOtYN CLOUDFLARE_ACCOUNT_ID=f1df8b715072f0acab628276164c0494 wrangler pages deploy ./dist/apps/website --env production --project-name=\"ggfinance-website\""
+        "command": "CLOUDFLARE_API_TOKEN=sGcAnkvEVxuEG3UY4j5jsPZzg5AkW49NeUuNOtYN CLOUDFLARE_ACCOUNT_ID=f1df8b715072f0acab628276164c0494 wrangler pages deploy ./dist/apps/website --branch main --project-name=\"ggfinance-website\""
       }
     },
     "preview": {
