@@ -52,10 +52,12 @@ export const WelcomeHero = component$(() => {
         <div
           ref={heroAppDescriptionRef}
           id="hero-app-description"
-          class="invisible mx-auto flex w-[320px] flex-col px-4 text-center text-lg text-gray-400 max-md:gap-y-4 sm:w-[550px] lg:mb-10"
+          class="invisible mx-auto flex w-[320px] flex-col px-4 text-center text-xl text-gray-500 max-md:gap-y-4 sm:w-[650px] lg:mb-10"
         >
-          <span>Trading simulator, designed to help learning financial literacy.</span>
-          <span>Application is free to use, mainly intended for schools to make lectures more interactive.</span>
+          <span>
+            Free to use trading simulator, designed to help learning financial literacy, mainly intended for schools to
+            make lectures more interactive.
+          </span>
         </div>
       </div>
 
@@ -64,12 +66,12 @@ export const WelcomeHero = component$(() => {
         id="hero-action-buttons"
         class="invisible z-10 mx-auto flex flex-col items-center gap-x-8 gap-y-8 sm:flex-row"
       >
-        <Button onClick$={() => (window.location.href = searchURL)} class="hidden w-[220px] text-lg lg:block">
+        <Button onClick$={() => (window.location.href = searchURL)} class="hidden h-14 w-[220px] text-lg lg:block">
           <span>Search</span>
         </Button>
         <Button
           onClick$={() => (window.location.href = dashboardURL)}
-          class="duration-2500 w-[220px] text-lg lg:animate-pulse"
+          class="duration-2500 h-14 w-[220px] text-lg lg:animate-pulse"
         >
           <span>Dashboard</span>
         </Button>

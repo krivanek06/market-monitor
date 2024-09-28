@@ -9,19 +9,19 @@ export const WelcomeSchools = component$(() => {
       <h2 class="g-section-title">Support Early Investing</h2>
 
       {/* some info */}
-      <div class="mx-auto mb-10 flex flex-col justify-center gap-x-10 gap-y-4 md:mb-[80px] md:flex-row md:justify-around lg:w-9/12">
-        <p class="text-center text-lg">
-          Most of us wish that we’ve already started investing from an early age, that’s why want to create a platform
-          which provides basic understanding of finances for young adults.
+      <div class="mx-auto grid justify-center gap-x-10 gap-y-4 text-gray-400 md:flex-row md:justify-around lg:w-9/12 lg:grid-cols-2">
+        <p class="text-center text-xl">
+          We create a platform to provide basic understanding of finances in an interactive way. Learn and make mistakes
+          while trading with a demo account.
         </p>
-        <p class="text-center text-lg">
-          Create a demo trading account for your school, and let your students learn about investing in a fun and
-          engaging way. Compete, learn, and have fun with your friends.
+        <p class="text-center text-xl">
+          Create a demo trading account, and learn about investing in a fun and engaging way. Compete, learn, and have
+          fun with your friends.
         </p>
       </div>
 
       {/* redirect dashboard button */}
-      <div class="mb-16 grid place-content-center md:mb-[140px]">
+      <div class="my-28 grid place-content-center md:mb-[140px] lg:my-20">
         <Button onClick$={() => (window.location.href = dashboardURL)} class="h-14">
           <div class="flex min-w-[200px] items-center justify-center gap-4 text-lg">
             <span>Dashboard</span>
@@ -31,17 +31,17 @@ export const WelcomeSchools = component$(() => {
       </div>
 
       {/* some info */}
-      <div class="mx-auto grid gap-10 p-4 md:p-10 lg:grid-cols-2 xl:w-10/12 xl:px-10">
-        <div class="grid gap-8 text-center sm:text-left lg:w-11/12 xl:w-9/12">
-          <p class="text-lg">
+      <div class="mx-auto grid gap-10 p-4 lg:grid-cols-2 xl:w-10/12 xl:p-10 xl:px-10">
+        <div class="grid gap-8 text-center text-gray-400 sm:text-left lg:w-11/12 xl:w-9/12">
+          <p class="text-xl">
             Create <span class="text-cyan-700">Groups</span> to gather all your friends in one place and compete with
             each other and other groups
           </p>
-          <p class="text-lg">
+          <p class="text-xl">
             In <span class="text-cyan-700">Hall of Fame</span> you compete with everybody with a demo account, you can
             compare your tradings to see who is the better strategy
           </p>
-          <p class="text-lg">
+          <p class="text-xl">
             You made some bad trades with your demo account? No worries, you can always{' '}
             <span class="text-cyan-700">reset your account</span> and have a fresh start
           </p>

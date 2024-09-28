@@ -2,7 +2,6 @@ import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 import anime from 'animejs';
 import {
-  WelcomeAboutUs,
   WelcomeHero,
   WelcomeInvestmentAccount,
   WelcomeMarketMonitor,
@@ -78,7 +77,7 @@ export default component$(() => {
   const heroImage = `${websiteImageUrls}/hero-6.webp`;
 
   return (
-    <div class="relative overflow-x-clip bg-black">
+    <div class="relative overflow-clip bg-black">
       {/* some svgs */}
       <SVG2 forwardRef={svg2Ref} id="hero-svg" class="absolute right-[-100px] top-[250px] hidden" />
       {/* blob that follows mouse */}
@@ -94,11 +93,11 @@ export default component$(() => {
         class="absolute top-0 hidden w-[100%] object-cover opacity-30"
       />
 
-      <div class="mx-auto max-w-[1440px]">
+      <div class="mx-auto w-11/12 xl:max-w-[1440px]">
         <div ref={heroPageRef} class="relative p-4 md:p-10">
           <WelcomeHero />
         </div>
-        <div class="relative mb-16 p-4 md:mb-[140px] md:p-10">
+        <div class="relative mb-16 p-4 sm:px-10 md:mb-[140px] md:p-10">
           <WelcomeMarketMonitor />
         </div>
         <div class="relative mb-16 p-4 md:mb-[160px] md:p-10">
@@ -107,15 +106,15 @@ export default component$(() => {
           <SVG1 class="absolute left-[120px] top-[120px] h-[175px] w-[175px] opacity-25" />
           <WelcomeInvestmentAccount />
         </div>
-        <div class="relative mb-16 p-4 md:mb-[160px] md:p-10">
+        <div class="relative mb-6 p-4 md:p-10">
           <SVG1 class="absolute right-0 top-[-40px] h-[175px] w-[175px] opacity-25" />
           <SVG1 class="absolute right-[160px] top-[225px] h-[175px] w-[175px] opacity-25" />
           <WelcomeSchools />
         </div>
-        <div class="relative p-4 md:p-10">
+        {/* <div class="relative p-4 md:p-10">
           <WelcomeAboutUs />
-        </div>
-        <footer class="min-h-[100px] lg:min-h-[180px]"></footer>
+        </div> */}
+        <footer class="h-12 bg-black"></footer>
       </div>
     </div>
   );
