@@ -29,7 +29,7 @@ import { switchMap } from 'rxjs';
     <div class="mb-10 flex items-center justify-between">
       <app-section-title [title]="pageTitle()" matIcon="monitoring" />
 
-      <button mat-button color="warn" (click)="onClearWatchList()">
+      <button mat-button color="warn" (click)="onClearWatchList()" class="hidden sm:block">
         <mat-icon>delete_history</mat-icon>
         Clear Watchlist
       </button>
