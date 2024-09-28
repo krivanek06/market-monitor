@@ -148,6 +148,21 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
         </a>
 
         <div class="flex flex-1 justify-end">
+          <!-- small screen -->
+          <div class="text-wt-gray-medium pr-4 sm:hidden">
+            @if (userDataSignal(); as userDataSignal) {
+              <div class="flex items-center gap-3">
+                <img
+                  appDefaultImg
+                  class="h-6 w-6 rounded-full"
+                  [src]="userDataSignal.personal.photoURL"
+                  [alt]="userDataSignal.personal.displayName"
+                />
+                <span>{{ userDataSignal.personal.displayName }}</span>
+              </div>
+            }
+          </div>
+
           <!-- search -->
           <app-symbol-search-basic
             displayValue="symbol"

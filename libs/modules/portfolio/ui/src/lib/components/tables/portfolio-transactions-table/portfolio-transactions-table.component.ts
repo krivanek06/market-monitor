@@ -92,7 +92,7 @@ import {
                 <div class="text-wt-primary">{{ row.displaySymbol ?? row.symbol }}</div>
                 <!-- transaction -->
                 <div
-                  class="block sm:hidden"
+                  class="block text-sm sm:hidden"
                   [ngClass]="{
                     'text-wt-danger': row.transactionType === 'SELL',
                     'text-wt-success': row.transactionType === 'BUY',
@@ -101,13 +101,15 @@ import {
                   {{ row.transactionType }}
                 </div>
                 <!-- units -->
-                <div class="text-wt-gray-dark block sm:hidden">[{{ row.units }}]</div>
+                <div class="text-wt-gray-medium block text-sm sm:hidden">[{{ row.units }}]</div>
                 <!-- user -->
-                <div *ngIf="showUser()" class="block lg:hidden">
-                  <img class="h-6 w-6 rounded-full" appDefaultImg [src]="row.userPhotoURL" />
-                </div>
+                @if (showUser()) {
+                  <div class="block lg:hidden">
+                    <img class="h-6 w-6 rounded-full" appDefaultImg [src]="row.userPhotoURL" />
+                  </div>
+                }
               </div>
-              <span class="block md:hidden"> {{ row.date | date: 'MMMM d, y' }}</span>
+              <span class="block text-sm md:hidden"> {{ row.date | date: 'MMM d, y' }}</span>
             </div>
           </div>
         </td>
@@ -248,25 +250,25 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioTransactionsTableComponent {
-  deleteEmitter = output<PortfolioTransactionMore>();
+  readonly deleteEmitter = output<PortfolioTransactionMore>();
 
-  data = input<PortfolioTransactionMore[] | null>();
-  showSymbolFilter = input(false);
-  showTransactionFees = input(false);
+  readonly data = input<PortfolioTransactionMore[] | null>();
+  readonly showSymbolFilter = input(false);
+  readonly showTransactionFees = input(false);
 
   /**
    * Whether to show the action button column - delete button
    */
-  showActionButton = input(false);
+  readonly showActionButton = input(false);
 
   /**
    * Whether to show the user column
    */
-  showUser = input(false);
+  readonly showUser = input(false);
 
-  showActionBarComp = computed(() => this.showSymbolFilter() && (this.data()?.length ?? 0) > 15);
+  readonly showActionBarComp = computed(() => this.showSymbolFilter() && (this.data()?.length ?? 0) > 15);
 
-  tableSymbolFilter = computed(
+  readonly tableSymbolFilter = computed(
     () =>
       this.data()
         ?.map(
@@ -287,7 +289,7 @@ export class PortfolioTransactionsTableComponent {
         // sort alphabetically
         .sort((a, b) => a.caption.localeCompare(b.caption)) ?? [],
   );
-  tableSymbolFilterControl = new FormControl<string | null>(null);
+  readonly tableSymbolFilterControl = new FormControl<string | null>(null);
 
   constructor() {
     this.tableSymbolFilterControl.valueChanges.subscribe((value) => {
@@ -301,7 +303,7 @@ export class PortfolioTransactionsTableComponent {
     });
   }
 
-  tableEffect = effect(() => {
+  readonly tableEffect = effect(() => {
     const usedData = this.data() ?? [];
     // reverse transactions to show the latest first
     const sortedDataByDate = usedData.reduce((acc, curr) => [curr, ...acc], [] as PortfolioTransactionMore[]);
@@ -312,7 +314,7 @@ export class PortfolioTransactionsTableComponent {
     });
   });
 
-  tableInitEffect = effect(() => {
+  readonly tableInitEffect = effect(() => {
     this.dataSource.paginator = this.paginator() ?? null;
   });
 
@@ -328,7 +330,7 @@ export class PortfolioTransactionsTableComponent {
     }
   });
 
-  dataSource = new MatTableDataSource<PortfolioTransactionMore>([]);
+  readonly dataSource = new MatTableDataSource<PortfolioTransactionMore>([]);
   displayedColumns: string[] = [
     'symbol',
     'transactionType',
@@ -340,7 +342,7 @@ export class PortfolioTransactionsTableComponent {
     'date',
   ];
 
-  paginator = viewChild(MatPaginator);
+  readonly paginator = viewChild(MatPaginator);
 
   identity: TrackByFunction<PortfolioTransactionMore> = (index: number, item: PortfolioTransactionMore) =>
     item.transactionId;

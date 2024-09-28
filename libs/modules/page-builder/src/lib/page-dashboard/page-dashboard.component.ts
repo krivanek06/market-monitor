@@ -62,7 +62,7 @@ import {
         class="flex flex-row gap-4 max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 md:gap-6 lg:grid-cols-4 xl:col-span-2"
       >
         <!-- portfolio state -->
-        <app-general-card class="min-h-[210px] max-sm:min-w-[360px] sm:col-span-2" title="Account">
+        <app-general-card class="min-h-[210px] max-sm:min-w-[315px] sm:col-span-2" title="Account">
           <app-portfolio-state
             data-testid="page-dashboard-portfolio-state"
             [showSpinner]="!portfolioUserFacadeService.portfolioStateHolding() || showLoadingState()"
@@ -96,13 +96,11 @@ import {
       </div>
 
       <!-- portfolio change -->
-      @if (portfolioUserFacadeService.portfolioChange(); as portfolioChange) {
-        <app-portfolio-period-change
-          data-testid="page-dashboard-period-change"
-          [portfolioChange]="portfolioChange"
-          class="lg:pt-2"
-        />
-      }
+      <app-portfolio-period-change
+        data-testid="page-dashboard-period-change"
+        [portfolioChange]="portfolioUserFacadeService.portfolioChange()"
+        class="lg:pt-2"
+      />
     </div>
 
     <!-- portfolio growth chart -->
@@ -123,7 +121,7 @@ import {
       }
     </div>
 
-    <div class="mb-8 grid grid-cols-1 gap-x-10 lg:grid-cols-2">
+    <div class="mb-8 grid grid-cols-1 gap-x-10 xl:grid-cols-2">
       <!-- portfolio growth chart -->
       @if (showLoadingState()) {
         <div class="g-skeleton mt-8 h-[360px]"></div>
@@ -137,7 +135,7 @@ import {
             values: portfolioUserFacadeService.portfolioGrowth(),
           }"
           [heightPx]="360"
-          [dateRangeWidth]="400"
+          class="hidden md:block"
         />
 
         <!-- portfolio change chart -->
@@ -145,7 +143,6 @@ import {
           data-testid="page-portfolio-change-chart"
           [data]="portfolioUserFacadeService.portfolioGrowth()"
           [heightPx]="360"
-          [dateRangeWidth]="400"
         />
       }
     </div>
@@ -180,7 +177,7 @@ import {
       <div class="g-skeleton mb-8 h-[380px]"></div>
     } @else {
       @if ((portfolioUserFacadeService.portfolioGrowth() ?? []).length > 8) {
-        <app-general-card title="Asset Growth" class="mb-8">
+        <app-general-card title="Asset Growth" class="mb-8 hidden md:block">
           <app-portfolio-asset-chart
             data-testid="portfolio-asset-chart-chart"
             [data]="stateRef.getUserPortfolioTransactions()"

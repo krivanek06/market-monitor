@@ -14,13 +14,13 @@ import { map } from 'rxjs';
   standalone: true,
   imports: [HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule],
   template: `
-    <div class="flex items-center justify-between gap-3">
+    <div class="flex flex-col items-center justify-between gap-x-3 sm:flex-row">
       <!-- select chart title -->
       <div class="text-wt-primary text-lg">{{ headerTitle() }}</div>
 
       <!-- date range -->
       @if ((data().values ?? []).length > 0) {
-        <app-date-range-slider [style.width.px]="dateRangeWidth()" [formControl]="sliderControl" />
+        <app-date-range-slider class="w-full max-sm:px-4 sm:w-[450px]" [formControl]="sliderControl" />
       }
     </div>
 
@@ -56,7 +56,6 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
   readonly startCash = input(USER_DEFAULT_STARTING_CASH);
   readonly displayLegend = input(false);
   readonly chartType = input<'all' | 'marketValue' | 'balance'>('all');
-  readonly dateRangeWidth = input(550);
 
   readonly sliderControl = new FormControl<DateRangeSliderValues>(
     {

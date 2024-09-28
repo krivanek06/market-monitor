@@ -62,23 +62,23 @@ import { PortfolioHoldingsTableComponent } from '../tables';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioHoldingsTableCardComponent {
-  private dialog = inject(MatDialog);
+  private readonly dialog = inject(MatDialog);
 
-  startSectionRef = viewChild('startSection', { read: ElementRef });
+  readonly startSectionRef = viewChild('startSection', { read: ElementRef });
 
-  portfolioStateHolding = input.required<PortfolioStateHoldings | undefined>();
+  readonly portfolioStateHolding = input.required<PortfolioStateHoldings | undefined>();
 
   /**
    * how many items to show initially
    */
-  initialItemsLimit = input(15);
+  readonly initialItemsLimit = input(15);
 
   /**
    * maximum number of holdings that can be in the table
    */
-  maximumHoldingLimit = input(0);
+  readonly maximumHoldingLimit = input(0);
 
-  displayedColumns = input<string[]>([
+  readonly displayedColumns = input<string[]>([
     'symbol',
     'price',
     'bep',
@@ -94,21 +94,21 @@ export class PortfolioHoldingsTableCardComponent {
   /**
    * toggle to display every holding for the selected user
    */
-  selectedHoldingsToggle = signal(false);
-  selectedHoldings = computed(() =>
+  readonly selectedHoldingsToggle = signal(false);
+  readonly selectedHoldings = computed(() =>
     this.selectedHoldingsToggle()
       ? (this.portfolioStateHolding()?.holdings ?? [])
       : (this.portfolioStateHolding()?.holdings ?? []).slice(0, this.initialItemsLimit()),
   );
 
-  cardTitle = computed(() => {
+  readonly cardTitle = computed(() => {
     if (this.maximumHoldingLimit() > 0) {
       return `Holdings [${(this.portfolioStateHolding()?.holdings ?? []).length} / ${this.maximumHoldingLimit()}]`;
     }
     return `Holdings ${(this.portfolioStateHolding()?.holdings ?? []).length}`;
   });
 
-  selectionHoldingEffect = effect(() => {
+  readonly selectionHoldingEffect = effect(() => {
     const sectionRef = this.startSectionRef();
     if (!this.selectedHoldingsToggle() && sectionRef) {
       // camera jump back to the title section when clicking show less

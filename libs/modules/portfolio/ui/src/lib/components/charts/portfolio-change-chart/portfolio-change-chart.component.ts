@@ -14,13 +14,13 @@ import { map } from 'rxjs';
   imports: [HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule],
   template: `
     <!-- investment growth -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col items-center justify-between gap-x-3 sm:flex-row">
       <!-- select chart title -->
       <div class="text-wt-primary text-lg">Portfolio Change</div>
 
       <!-- date range -->
       @if ((data()?.length ?? 0) > 0) {
-        <app-date-range-slider [style.width.px]="dateRangeWidth()" [formControl]="sliderControl" />
+        <app-date-range-slider class="w-full max-sm:px-4 sm:w-[450px]" [formControl]="sliderControl" />
       }
     </div>
 
@@ -41,10 +41,9 @@ import { map } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioChangeChartComponent extends ChartConstructor {
-  data = input.required<PortfolioGrowth[] | null>();
-  dateRangeWidth = input(550);
+  readonly data = input.required<PortfolioGrowth[] | null>();
 
-  sliderControl = new FormControl<DateRangeSliderValues>(
+  readonly sliderControl = new FormControl<DateRangeSliderValues>(
     {
       currentMaxDateIndex: 0,
       currentMinDateIndex: 0,
@@ -53,7 +52,7 @@ export class PortfolioChangeChartComponent extends ChartConstructor {
     { nonNullable: true },
   );
 
-  chartOptionSignal = toSignal(
+  readonly chartOptionSignal = toSignal(
     this.sliderControl.valueChanges.pipe(
       map((sliderValues) => {
         const inputData = this.data() ?? [];
@@ -74,7 +73,7 @@ export class PortfolioChangeChartComponent extends ChartConstructor {
     },
   );
 
-  initSliderEffect = effect(() => {
+  readonly initSliderEffect = effect(() => {
     const inputValues = this.data() ?? [];
     const sliderValues: DateRangeSliderValues = {
       dates: inputValues.map((point) => point.date),
