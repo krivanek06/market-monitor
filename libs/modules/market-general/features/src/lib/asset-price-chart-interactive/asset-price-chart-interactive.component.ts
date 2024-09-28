@@ -31,16 +31,17 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
       @if (!loadingSignal()) {
         <!-- time period form control -->
         <div class="mb-4">
-          <app-time-period-buttons [formControl]="timePeriodFormControl"></app-time-period-buttons>
+          <app-time-period-buttons [formControl]="timePeriodFormControl" />
         </div>
 
         <!-- time data about chart -->
-        <div class="text-wt-gray-medium flex justify-end text-center md:justify-between">
-          <div class="hidden items-center gap-2 md:flex">
+        <div class="text-wt-gray-medium flex justify-between text-center">
+          <div class="flex items-center gap-2">
             @if (imageName()) {
               <img appDefaultImg imageType="symbol" [src]="imageName()" alt="Asset Image" class="h-6 w-6" />
             }
-            <span>{{ title() }}</span>
+            <span class="hidden sm:block">{{ title() }}</span>
+            <span class="block sm:hidden">{{ symbol() }}</span>
           </div>
           <span class="block text-sm">
             {{ dateDisplay() }}
@@ -58,14 +59,17 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
         />
       } @else {
         <!-- time period button skeletons -->
-        <div class="mb-4 flex gap-3">
+        <div class="mb-4 hidden gap-3 md:flex">
           <div *ngRange="8" class="g-skeleton h-9 flex-1"></div>
         </div>
 
+        <!-- skeleton on mobile -->
+        <div class="g-skeleton mb-4 h-12 gap-3 rounded-lg md:hidden"></div>
+
         <!-- chart title and date range -->
-        <div class="mb-3 flex justify-end max-sm:pl-4 md:justify-between">
-          <div class="g-skeleton h-6 sm:w-[125px]"></div>
-          <div class="g-skeleton h-6 w-[350px]"></div>
+        <div class="mb-3 flex justify-between">
+          <div class="g-skeleton h-6 w-3/12 max-w-[150px]"></div>
+          <div class="g-skeleton h-6 w-7/12 max-w-[350px]"></div>
         </div>
 
         <!-- chart skeleton -->

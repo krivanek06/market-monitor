@@ -64,9 +64,9 @@ export const timePeriodDefaultButtons = [
   ],
 })
 export class TimePeriodButtonsComponent implements ControlValueAccessor {
-  displayTimePeriods = input(timePeriodDefaultButtons);
+  readonly displayTimePeriods = input(timePeriodDefaultButtons);
 
-  activeTimePeriod = new FormControl<SymbolHistoricalPeriods | null>(null);
+  readonly activeTimePeriod = new FormControl<SymbolHistoricalPeriods | null>(null);
 
   onChange: (data: SymbolHistoricalPeriods) => void = () => {};
   onTouched = () => {};

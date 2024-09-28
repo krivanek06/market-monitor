@@ -148,7 +148,9 @@ import {
     </div>
 
     <!-- holdings pie charts -->
-    <div class="flex justify-center gap-10 overflow-x-clip max-sm:-ml-6 sm:mb-14 lg:justify-around">
+    <div
+      class="flex justify-center overflow-x-clip max-sm:-ml-6 sm:mb-14 lg:justify-around lg:max-xl:ml-[-60px] xl:gap-10"
+    >
       @if (!portfolioUserFacadeService.portfolioStateHolding()) {
         <div class="g-skeleton h-[380px] w-full"></div>
         <div class="g-skeleton h-[380px] w-full"></div>

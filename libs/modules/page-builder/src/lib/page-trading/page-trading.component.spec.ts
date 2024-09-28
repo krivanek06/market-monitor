@@ -26,7 +26,6 @@ import {
   PortfolioTransactionsTableComponent,
   PortfolioTransactionsTableComponentMock,
 } from '@mm/portfolio/ui';
-import { InputSource } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { DropdownControlComponent, DropdownControlComponentMock, QuoteItemComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
@@ -35,7 +34,6 @@ import { PageTradingComponent } from './page-trading.component';
 
 describe('PageTradingComponent', () => {
   const portfolioStateS = '[data-testid="page-trading-portfolio-state"]';
-  const holdingDropdownS = '[data-testid="page-trading-holding-dropdown"]';
   const searchBasicS = '[data-testid="page-trading-symbol-search-basic"]';
 
   const buttonBuy = '[data-testid="page-trading-buy-button"]';
@@ -195,41 +193,6 @@ describe('PageTradingComponent', () => {
     expect(comp).toBeTruthy();
     expect(comp.componentInstance.portfolioState).toBe(portfolioUserFacadeService.portfolioStateHolding());
     expect(comp.componentInstance.showCashSegment).toBeTruthy();
-  });
-
-  it('should display dropdown of holdings', () => {
-    const fixture = MockRender(PageTradingComponent);
-    const component = fixture.point.componentInstance;
-    const userPortfolio = ngMocks.get(PortfolioUserFacadeService);
-
-    fixture.detectChanges();
-
-    // Check that the dropdown is displayed
-    const expectInputSource = (
-      userPortfolio.portfolioStateHolding()?.holdings.map(
-        (d) =>
-          ({
-            value: d.symbol,
-            caption: `${d.symbolQuote.name}`,
-            image: d.symbolQuote.symbol,
-          }) satisfies InputSource<string>,
-      ) ?? []
-    ).sort((a, b) => a.caption.localeCompare(b.caption));
-
-    const comp = ngMocks.find<DropdownControlComponent<string>>(holdingDropdownS);
-
-    // check if the dropdown is displayed correctly
-    expect(comp).toBeTruthy();
-    expect(comp.componentInstance.displayImageType()).toBe('symbol');
-    expect(component.holdingsInputSource().length).toBe(expectInputSource.length);
-    expect(comp.componentInstance.inputSource()).toEqual(expectInputSource);
-    expect(comp.componentInstance.inputSource()).toBe(component.holdingsInputSource());
-
-    // change value inside the dropdown
-    comp.componentInstance.onChange('MSFT');
-
-    expect(component.selectedSymbolControl.value).toBe('MSFT');
-    expect(component.symbolSummarySignal()?.data?.id).toBe('MSFT');
   });
 
   it('should display symbol search component', () => {

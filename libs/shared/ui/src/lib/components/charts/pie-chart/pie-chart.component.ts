@@ -1,6 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { ChartConstructor, ColorScheme, GenericChartSeries } from '@mm/shared/data-access';
+import { ChartConstructor, ColorScheme, GenericChartSeries, isScreenLarger } from '@mm/shared/data-access';
 import { roundNDigits } from '@mm/shared/general-util';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -21,15 +20,16 @@ const chartColors = [
 @Component({
   selector: 'app-pie-chart',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
+  imports: [HighchartsChartModule],
   template: `
-    <highcharts-chart
-      *ngIf="isHighcharts()"
-      [Highcharts]="Highcharts"
-      [options]="chartOptionsComputed()"
-      [callbackFunction]="chartCallback"
-      [style.height.px]="heightPx()"
-    />
+    @if (isHighcharts()) {
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartOptionsComputed()"
+        [callbackFunction]="chartCallback"
+        [style.height.px]="userHeight()"
+      />
+    }
   `,
   styles: `
     :host {
@@ -44,10 +44,19 @@ const chartColors = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PieChartComponent extends ChartConstructor {
-  chartTitle = input('');
-  series = input.required<GenericChartSeries<'pie'>>();
+  readonly chartTitle = input('');
+  readonly series = input.required<GenericChartSeries<'pie'>>();
 
-  chartOptionsComputed = computed(() => this.innitChart(this.series()));
+  readonly chartOptionsComputed = computed(() => this.innitChart(this.series()));
+
+  /**
+   * on smaller screens use smaller height for pie charts
+   */
+  readonly userHeight = computed(() => {
+    const isLgSmaller = isScreenLarger('LAYOUT_XL');
+    const height = this.heightPx();
+    return isLgSmaller ? height : height - 40;
+  });
 
   constructor() {
     super();

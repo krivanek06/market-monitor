@@ -89,12 +89,15 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
           class="mb-4 flex justify-between"
           color="primary"
           aria-label="Select symbol type"
-          [value]="searchCrypto()"
+          [value]="searchSymbolType()"
           (change)="onSearchTypeChange($event)"
           data-testid="search-change-radio-group"
         >
-          <mat-radio-button [value]="false">Ticker</mat-radio-button>
-          <mat-radio-button [value]="true">Crypto</mat-radio-button>
+          <mat-radio-button [value]="SelectorOptions.TICKER">Ticker</mat-radio-button>
+          <mat-radio-button [value]="SelectorOptions.CRYPTO">Crypto</mat-radio-button>
+          @if ((holdings()?.length ?? 0) > 0) {
+            <mat-radio-button [value]="SelectorOptions.HOLDINGS">Holdings</mat-radio-button>
+          }
         </mat-radio-group>
 
         @if (displayQuotes().isLoading) {
@@ -144,48 +147,59 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SymbolSearchBasicComponent {
-  private symbolSearchService = inject(SymbolSearchService);
-  private marketApiService = inject(MarketApiService);
-  private dialog = inject(MatDialog);
+  private readonly symbolSearchService = inject(SymbolSearchService);
+  private readonly marketApiService = inject(MarketApiService);
+  private readonly dialog = inject(MatDialog);
 
   /**
    * emit when user clicks on a symbol quote
    */
-  clickedQuote = output<SymbolQuote>();
+  readonly clickedQuote = output<SymbolQuote>();
 
   /**
    * open modal on summary click
    */
-  openModalOnClick = input(true);
+  readonly openModalOnClick = input(true);
+
+  /**
+   * user's holdings to display
+   */
+  readonly holdings = input<SymbolQuote[]>();
 
   /**
    * user's input value to load symbols
    */
-  searchValue = signal('');
+  readonly searchValue = signal('');
 
-  triggerRef = viewChild('trigger', { read: ElementRef });
+  readonly triggerRef = viewChild('trigger', { read: ElementRef });
 
-  overlayWidth = signal(0);
+  readonly overlayWidth = signal(0);
 
   /**
    * open overlay if input is focused and has no value
    */
-  isInputFocused = signal(false);
+  readonly isInputFocused = signal(false);
 
   /**
    * if true, load crypto symbols
    */
-  searchCrypto = signal<boolean>(false);
+  readonly searchSymbolType = signal<keyof typeof this.SelectorOptions>('TICKER');
+
+  readonly SelectorOptions = {
+    TICKER: 'TICKER',
+    CRYPTO: 'CRYPTO',
+    HOLDINGS: 'HOLDINGS',
+  } as const;
 
   /**
    * loaded symbol data by user's input typing
    */
-  private loadedQuotesByInput = toSignal(
+  private readonly loadedQuotesByInput = toSignal(
     toObservable(this.searchValue).pipe(
       filter((value) => value.length > 0),
       switchMap((value) =>
         value.length <= 5 // prevent too many requests
-          ? this.marketApiService.searchQuotesByPrefix(value, this.searchCrypto()).pipe(
+          ? this.marketApiService.searchQuotesByPrefix(value, this.searchSymbolType() === 'CRYPTO').pipe(
               map((data) => ({
                 data: data,
                 isLoading: false,
@@ -199,14 +213,21 @@ export class SymbolSearchBasicComponent {
     { initialValue: { isLoading: false, data: [], noData: false } },
   );
 
-  displayQuotes = computed(() => {
+  readonly displayQuotes = computed(() => {
+    const searchSymbolType = this.searchSymbolType();
     // return searched symbols by input
     if (this.searchValue().length > 0) {
       return { ...this.loadedQuotesByInput() };
     }
 
-    if (this.searchCrypto()) {
+    // return default crypto symbols
+    if (searchSymbolType === 'CRYPTO') {
       return { data: this.symbolSearchService.getDefaultCrypto(), isLoading: false, noData: false };
+    }
+
+    // return holdings user has
+    if (searchSymbolType === 'HOLDINGS') {
+      return { data: this.holdings() ?? [], isLoading: false, noData: false };
     }
 
     // combine last searched and default symbols
@@ -272,8 +293,8 @@ export class SymbolSearchBasicComponent {
     this.searchValue.set('');
 
     // set search type
-    const value = event.value as boolean;
-    this.searchCrypto.set(value);
+    const value = event.value as keyof typeof this.SelectorOptions;
+    this.searchSymbolType.set(value);
   }
 
   onInputChange(event: Event) {
