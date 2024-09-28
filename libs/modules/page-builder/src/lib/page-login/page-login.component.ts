@@ -7,22 +7,21 @@ import { AuthenticationFormComponent } from '@mm/authentication/authentication-f
   imports: [AuthenticationFormComponent],
   template: `
     <section class="c-wrapper">
-      <div class="flex min-h-lvh flex-col gap-y-10 lg:flex-row">
+      <div class="mx-auto flex min-h-lvh max-w-[1660px] flex-col gap-y-10 lg:flex-row">
         <!-- left side -->
-        <div class="lg:flex-1">
+        <div class="lg:basis-2/5">
           <!-- background circles -->
           <div class="c-circle-1 c-circle hidden lg:block"></div>
           <div class="c-circle-2 c-circle hidden lg:block"></div>
           <div class="c-circle-3 c-circle hidden lg:block"></div>
 
           <!-- page title and description -->
-          <div class="relative z-10 mx-auto w-10/12 pt-[40px] lg:pt-[100px] xl:w-9/12">
+          <div class="relative z-10 mx-auto w-10/12 pt-[40px] lg:pt-[100px] xl:w-10/12 xl:pl-10">
             <div class="text-wt-primary mb-4 text-5xl opacity-80 max-lg:text-center">GGFinance</div>
-            <div class="grid gap-10 text-3xl text-gray-400 max-lg:text-center">
-              <span
-                >Discover investing with our engaging, <span class="text-wt-primary">risk-free</span> trading
-                simulator.</span
-              >
+            <div class="grid gap-10 text-2xl text-gray-400 max-lg:text-center">
+              <span>
+                Discover investing with our engaging, <span class="text-wt-primary">risk-free</span> trading simulator.
+              </span>
               <span class="hidden lg:block">
                 Build financial skills, track your progress, and competing with friends.
               </span>
@@ -31,10 +30,10 @@ import { AuthenticationFormComponent } from '@mm/authentication/authentication-f
         </div>
 
         <!-- right side -->
-        <div class="px-5 lg:flex-1 lg:pt-[160px]">
+        <div class="px-5 lg:basis-3/5 lg:pt-[160px]">
           <!--<div class="text-wt-primary mb-10 text-center text-5xl tracking-widest opacity-80">GGFinance</div>-->
           <div
-            class="rounded-lg bg-[#02070f] p-4 shadow-lg max-lg:mx-auto sm:h-[600px] sm:w-10/12 sm:p-8 lg:ml-8 lg:w-[520px] xl:w-[620px] xl:p-12 2xl:ml-32"
+            class="mx-auto rounded-lg bg-[#02070f] p-4 shadow-lg sm:h-[600px] sm:w-10/12 sm:p-8 lg:w-[520px] xl:w-[620px]"
           >
             <app-authentication-form />
           </div>

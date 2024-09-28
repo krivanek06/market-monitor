@@ -21,7 +21,7 @@ export const WelcomeSchools = component$(() => {
       </div>
 
       {/* redirect dashboard button */}
-      <div class="my-28 grid place-content-center md:mb-[140px] lg:my-20">
+      <div class="my-20 grid place-content-center md:mb-[140px]">
         <Button onClick$={() => (window.location.href = dashboardURL)} class="h-14">
           <div class="flex min-w-[200px] items-center justify-center gap-4 text-lg">
             <span>Dashboard</span>
