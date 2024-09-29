@@ -54,15 +54,15 @@ export type PortfolioTradeDialogComponentData = {
     <!-- form -->
     <form [formGroup]="form" (ngSubmit)="onFormSubmit()">
       <mat-dialog-content>
-        <div class="flex items-start justify-between pt-5">
-          <!-- symbol & image -->
+        <div class="flex items-start justify-between gap-y-2 pt-5">
+          <!-- right side - symbol & image -->
           <div class="flex max-w-[70%] items-center gap-3">
-            <img appDefaultImg imageType="symbol" [src]="data().quote.symbol" class="h-12 w-12" />
+            <img appDefaultImg imageType="symbol" [src]="data().quote.symbol" class="h-8 w-8 md:h-12 md:w-12" />
             <div class="flex flex-col">
-              <div class="flex items-center gap-4">
+              <div class="flex flex-col gap-x-4 md:flex-row md:items-center">
                 <!-- name -->
                 <div class="text-wt-gray-dark text-lg">{{ data().quote.symbol }}</div>
-                <span>-</span>
+                <span class="hidden md:block">-</span>
                 <!-- operation -->
                 <div
                   [ngClass]="{
@@ -70,7 +70,7 @@ export type PortfolioTradeDialogComponentData = {
                     'text-wt-success': data().transactionType === 'BUY',
                   }"
                 >
-                  {{ data().transactionType | uppercase }} Operation
+                  {{ data().transactionType | uppercase }} <span class="max-lg:hidden">Operation</span>
                 </div>
               </div>
               <div class="hidden md:block">{{ data().quote.name }}</div>
@@ -97,7 +97,7 @@ export type PortfolioTradeDialogComponentData = {
               </mat-checkbox>
             } @else {
               <!-- custom -->
-              <div class="flex gap-4">
+              <div class="flex justify-around gap-4">
                 <mat-checkbox
                   data-testid="trade-dialog-units-keyboard-checkbox"
                   [color]="!useCustomTotalValue ? 'primary' : ''"
