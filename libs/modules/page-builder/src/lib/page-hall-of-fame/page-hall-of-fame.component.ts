@@ -57,17 +57,13 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       <app-section-title matIcon="military_tech" title="Hall Of Fame" />
       <app-section-title
         matIcon="military_tech"
-        title="My rank: {{ userDataSignal().systemRank?.portfolioTotalGainsPercentage?.rank ?? 'N/A' }}"
+        title="My rank: {{ userData().systemRank?.portfolioTotalGainsPercentage?.rank ?? 'N/A' }}"
       />
     </div>
 
     <!-- best users -->
-    <div class="mb-10 flex justify-around gap-4">
-      @for (
-        user of hallOfFameUsersSignal().bestPortfolio | slice: 0 : topUsersLimit;
-        track user.item.id;
-        let i = $index
-      ) {
+    <div class="mb-10 flex justify-around gap-4 max-xl:overflow-x-scroll">
+      @for (user of hallOfFameUsers().bestPortfolio | slice: 0 : topUsersLimit; track user.item.id; let i = $index) {
         <app-rank-card
           data-testid="hall-of-fame-user-rank-card"
           [clickable]="true"
@@ -108,7 +104,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       <!-- search groups -->
       <app-group-search-control
         data-testid="hall-of-fame-group-search-control"
-        class="w-full md:-mr-6 md:w-[500px] md:scale-90"
+        class="hidden w-full md:-mr-6 md:w-[500px] md:scale-90 lg:block"
         (selectedEmitter)="onGroupClick($event)"
       />
     </div>
@@ -124,22 +120,28 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         mat-stroked-button
         type="button"
       >
-        <mat-icon *ngIf="showBestSignal()">arrow_drop_up</mat-icon>
-        <mat-icon *ngIf="!showBestSignal()">arrow_drop_down</mat-icon>
+        @if (showBestSignal()) {
+          <mat-icon>arrow_drop_up</mat-icon>
+        } @else {
+          <mat-icon>arrow_drop_down</mat-icon>
+        }
         {{ showBestSignal() ? 'Top Gainers' : ' Top Losers' }}
       </button>
     </div>
 
-    <div class="mb-6 flex items-center justify-between overflow-x-hidden">
+    <!-- displayed best/worst daily users -->
+    <div class="mb-10 grid items-center gap-x-4 gap-y-2 overflow-x-hidden md:grid-cols-2 xl:grid-cols-4">
       @for (user of bestWorstDailyUsers(); track user.id) {
-        <app-user-display-item
-          data-testid="hall-of-fame-user-display-item-daily-top"
-          (itemClicked)="onUserClick(user)"
-          [clickable]="true"
-          [showDailyPortfolioChange]="true"
-          class="mb-1 rounded-lg p-2"
-          [userData]="user"
-        />
+        <app-general-card>
+          <app-user-display-item
+            data-testid="hall-of-fame-user-display-item-daily-top"
+            (itemClicked)="onUserClick(user)"
+            [clickable]="true"
+            [showDailyPortfolioChange]="true"
+            class="mb-1 rounded-lg p-2"
+            [userData]="user"
+          />
+        </app-general-card>
       } @empty {
         <div>No Data Found</div>
       }
@@ -155,14 +157,14 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
             [data]="displayUserTable()"
             [template]="userTemplate"
             [initialPosition]="topUsersLimit + 1"
-            [highlightPosition]="userDataSignal().systemRank?.portfolioTotalGainsPercentage?.rank"
+            [highlightPosition]="userData().systemRank?.portfolioTotalGainsPercentage?.rank"
           />
 
           <!-- show more button -->
           <div class="flex justify-end">
             <app-show-more-button
               data-testid="hall-of-fame-user-ranking-table-show-more"
-              [itemsTotal]="hallOfFameUsersSignal().bestPortfolio.length - topUsersLimit"
+              [itemsTotal]="hallOfFameUsers().bestPortfolio.length - topUsersLimit"
               [itemsLimit]="displayUsersLimit"
               [(showMoreToggle)]="showMoreSignal"
             />
@@ -184,7 +186,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
           <div class="flex justify-end">
             <app-show-more-button
               data-testid="hall-of-fame-group-ranking-table-show-more"
-              [itemsTotal]="hallOfFameGroupsSignal().bestPortfolio.length"
+              [itemsTotal]="hallOfFameGroups().bestPortfolio.length"
               [itemsLimit]="displayUsersLimit"
               [(showMoreToggle)]="showMoreSignal"
             />
@@ -196,10 +198,13 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     <!-- template for user data in table -->
     <ng-template #userTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
-        <mat-icon [color]="data.item.isAccountActive ? 'accent' : 'warn'"> radio_button_checked </mat-icon>
+        <mat-icon class="hidden md:block" [color]="data.item.isAccountActive ? 'accent' : 'warn'">
+          radio_button_checked
+        </mat-icon>
         <img appDefaultImg [src]="data.item.personal.photoURL" alt="user image" class="h-8 w-8 rounded-lg" />
         <div class="flex items-center gap-2">
-          <div>{{ data.item.personal.displayName }}</div>
+          <div class="hidden sm:block">{{ data.item.personal.displayName }}</div>
+          <div class="block sm:hidden">{{ data.item.personal.displayNameInitials }}</div>
           <!-- display position change if any -->
           @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
             @if (rankChange !== 0) {
@@ -207,8 +212,11 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
                 <span [ngClass]="{ 'text-wt-success': rankChange > 0, 'text-wt-danger': rankChange < 0 }">
                   {{ rankChange }}
                 </span>
-                <mat-icon *ngIf="rankChange > 0" color="accent" class="scale-150">arrow_drop_up</mat-icon>
-                <mat-icon *ngIf="rankChange < 0" color="warn" class="scale-150">arrow_drop_down</mat-icon>
+                @if (rankChange > 0) {
+                  <mat-icon color="accent" class="scale-150">arrow_drop_up</mat-icon>
+                } @else if (rankChange < 0) {
+                  <mat-icon color="warn" class="scale-150">arrow_drop_down</mat-icon>
+                }
               </div>
             }
           }
@@ -221,7 +229,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       <div class="flex items-center gap-3">
         <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="h-8 w-8 rounded-lg" />
         <div class="flex items-center gap-2">
-          <div class="w-[200px] truncate text-ellipsis">
+          <div class="w-[100px] truncate text-ellipsis sm:w-[200px]">
             {{ data.item.name }}
           </div>
           <!-- display position change if any -->
@@ -231,8 +239,11 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
                 <span [ngClass]="{ 'text-wt-success': rankChange > 0, 'text-wt-danger': rankChange < 0 }">
                   {{ rankChange }}
                 </span>
-                <mat-icon *ngIf="rankChange > 0" color="accent" class="scale-150">arrow_drop_up</mat-icon>
-                <mat-icon *ngIf="rankChange < 0" color="warn" class="scale-150">arrow_drop_down</mat-icon>
+                @if (rankChange > 0) {
+                  <mat-icon color="accent" class="scale-150">arrow_drop_up</mat-icon>
+                } @else if (rankChange < 0) {
+                  <mat-icon color="warn" class="scale-150">arrow_drop_down</mat-icon>
+                }
               </div>
             }
           }
@@ -248,10 +259,10 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageHallOfFameComponent {
-  private aggregationApiService = inject(AggregationApiService);
-  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private dialog = inject(MatDialog);
-  private router = inject(Router);
+  private readonly aggregationApiService = inject(AggregationApiService);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
 
   /**
    * limit number of users to display, display rest on "show more"
@@ -259,40 +270,39 @@ export class PageHallOfFameComponent {
   readonly displayUsersLimit = 20;
   readonly topUsersLimit = 5;
 
-  userDataSignal = this.authenticationUserStoreService.state.getUserData;
-
-  hallOfFameUsersSignal = this.aggregationApiService.hallOfFameUsers;
-  hallOfFameGroupsSignal = this.aggregationApiService.hallOfFameGroups;
-
-  displayUserTable = computed(() => {
-    // remove first 10 users from best users
-    const bestUsers = this.hallOfFameUsersSignal().bestPortfolio.slice(this.topUsersLimit);
-    // check if display all or not
-    return this.showMoreSignal() ? bestUsers : bestUsers.slice(0, this.displayUsersLimit);
-  });
-
-  displayGroupsTable = computed(() =>
-    this.showMoreSignal()
-      ? this.hallOfFameGroupsSignal().bestPortfolio
-      : this.hallOfFameGroupsSignal().bestPortfolio.slice(0, this.displayUsersLimit),
-  );
-
-  bestWorstDailyUsers = computed(() =>
-    (this.showBestSignal()
-      ? this.hallOfFameUsersSignal().bestDailyGains
-      : this.hallOfFameUsersSignal().worstDailyGains
-    ).slice(0, 4),
-  );
+  readonly userData = this.authenticationUserStoreService.state.getUserData;
+  readonly hallOfFameUsers = this.aggregationApiService.hallOfFameUsers;
+  readonly hallOfFameGroups = this.aggregationApiService.hallOfFameGroups;
 
   /**
    * if true shows more users, if false shows less users
    */
-  showMoreSignal = signal(false);
+  readonly showMoreSignal = signal(false);
 
   /**
    * if true shows best users, if false shows worst users
    */
-  showBestSignal = signal(true);
+  readonly showBestSignal = signal(true);
+
+  readonly displayUserTable = computed(() => {
+    // remove first 10 users from best users
+    const bestUsers = this.hallOfFameUsers().bestPortfolio.slice(this.topUsersLimit);
+    // check if display all or not
+    return this.showMoreSignal() ? bestUsers : bestUsers.slice(0, this.displayUsersLimit);
+  });
+
+  readonly displayGroupsTable = computed(() =>
+    this.showMoreSignal()
+      ? this.hallOfFameGroups().bestPortfolio
+      : this.hallOfFameGroups().bestPortfolio.slice(0, this.displayUsersLimit),
+  );
+
+  readonly bestWorstDailyUsers = computed(() =>
+    (this.showBestSignal() ? this.hallOfFameUsers().bestDailyGains : this.hallOfFameUsers().worstDailyGains).slice(
+      0,
+      4,
+    ),
+  );
 
   onUserClick(user: UserBase) {
     this.dialog.open(UserDetailsDialogComponent, {

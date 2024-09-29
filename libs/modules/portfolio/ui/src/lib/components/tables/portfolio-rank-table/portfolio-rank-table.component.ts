@@ -69,16 +69,17 @@ import { InArrayPipe, PercentageIncreaseDirective, RangeDirective } from '@mm/sh
         </td>
       </ng-container>
 
-      <!-- profit-->
+      <!-- profit -->
       <ng-container matColumnDef="profit">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Profit</th>
         <td mat-cell *matCellDef="let row; let i = index">
           <div class="flex flex-col">
-            <div class="block text-end md:hidden">
+            <!-- mobile display -->
+            <div class="text-wt-gray-dark block text-end md:hidden">
               {{ row.item.portfolioState.balance | currency }}
             </div>
             <div
-              class="max-md:justify-end"
+              class="max-md:justify-end max-md:text-sm"
               appPercentageIncrease
               [useCurrencySign]="true"
               [changeValues]="{
