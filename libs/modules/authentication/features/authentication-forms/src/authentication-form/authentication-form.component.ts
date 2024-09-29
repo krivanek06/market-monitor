@@ -18,7 +18,7 @@ import {
   RegisterUserInput,
 } from '@mm/authentication/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
-import { DialogServiceUtil, GenericDialogComponent } from '@mm/shared/dialog-manager';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { StorageLocalService } from '@mm/shared/storage-local';
 import { addDays, isAfter } from 'date-fns';
 import { filterNil } from 'ngxtension/filter-nil';
@@ -55,7 +55,6 @@ import { FormRegisterComponent } from './form-register/form-register.component';
     MatProgressSpinnerModule,
     MatDialogModule,
     MatTooltipModule,
-    GenericDialogComponent,
     AuthenticationNewAccountTypeChooseDialogComponent,
     DatePipe,
   ],

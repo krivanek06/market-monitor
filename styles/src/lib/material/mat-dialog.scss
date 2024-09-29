@@ -109,8 +109,8 @@ mat-dialog-content {
   }
 
   .mat-mdc-dialog-container {
-    height: 100vh !important;
-    width: 100vw !important;
+    //height: 100vh !important;
+    width: 90vw !important;
     max-width: 1440px !important;
 
     @screen sm {

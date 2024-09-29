@@ -17,7 +17,7 @@ import { AuthenticationAccountService, AuthenticationUserStoreService } from '@m
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
-import { GenericDialogComponent, GenericDialogComponentData, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, HelpDialogComponent } from '@mm/shared/ui';
 import { UserSettingsDialogComponent } from '@mm/user/features';
 
@@ -35,7 +35,6 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
     MatDialogModule,
     HelpDialogComponent,
     SymbolSearchBasicComponent,
-    GenericDialogComponent,
   ],
   template: `
     <div class="bg-wt-background-present w-full p-2 shadow-md">
@@ -238,18 +237,18 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuTopNavigationComponent implements OnInit {
-  menuClickEmitter = output<void>();
-  private router = inject(Router);
-  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private authenticationService = inject(AuthenticationAccountService);
-  private dialog = inject(MatDialog);
+  readonly menuClickEmitter = output<void>();
+  private readonly router = inject(Router);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly authenticationService = inject(AuthenticationAccountService);
+  private readonly dialog = inject(MatDialog);
 
-  menuOptions = viewChild('menuOptions', { read: TemplateRef });
+  readonly menuOptions = viewChild('menuOptions', { read: TemplateRef<HTMLElement> });
 
-  userDataSignal = this.authenticationUserStoreService.state.userData;
+  readonly userDataSignal = this.authenticationUserStoreService.state.userData;
 
-  ROUTES_MAIN = ROUTES_MAIN;
-  activeLinkSignal = signal<ROUTES_MAIN>(ROUTES_MAIN.DASHBOARD);
+  readonly ROUTES_MAIN = ROUTES_MAIN;
+  readonly activeLinkSignal = signal<ROUTES_MAIN>(ROUTES_MAIN.DASHBOARD);
 
   ngOnInit(): void {
     // check if url is different than activeLinkSignal
@@ -287,11 +286,6 @@ export class MenuTopNavigationComponent implements OnInit {
   }
 
   onMoreOptionsClick() {
-    this.dialog.open(GenericDialogComponent, {
-      data: <GenericDialogComponentData>{
-        title: 'Options',
-        templateRef: this.menuOptions(),
-      },
-    });
+    this.dialog.open(this.menuOptions()!, {});
   }
 }

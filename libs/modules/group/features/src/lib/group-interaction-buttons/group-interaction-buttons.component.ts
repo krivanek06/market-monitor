@@ -1,7 +1,7 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
@@ -22,7 +22,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
   selector: 'app-group-interaction-buttons',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
@@ -30,13 +30,55 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
     MatDialogModule,
     GroupUserHasRoleDirective,
     GroupSettingsDialogComponent,
+    MatDialogModule,
   ],
   template: `
-    @if (!groupDetails().groupData.isClosed) {
-      <div class="flex w-full flex-col gap-x-4 gap-y-2 lg:flex-row">
+    @if (groupDetailsUsed().groupData.isClosed) {
+      <!-- closed group -->
+      <div
+        class="flex flex-row gap-4 max-lg:items-center"
+        [ngClass]="{
+          'max-lg:hidden': !isModal(),
+        }"
+      >
         <!-- owner -->
         <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupOwner']"
+          [disabled]="isDemoAccount()"
+          (click)="onGroupDeleteClick()"
+          type="button"
+          mat-flat-button
+          color="warn"
+          [matTooltip]="tooltips.tooltipDelete"
+        >
+          <mat-icon>delete</mat-icon>
+          Delete Group
+        </button>
+
+        <!-- owner -->
+        <button
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupOwner']"
+          [disabled]="isDemoAccount()"
+          (click)="onGroupReopenClick()"
+          type="button"
+          mat-stroked-button
+          color="accent"
+          [matTooltip]="tooltips.tooltipClose"
+        >
+          <mat-icon>cached</mat-icon>
+          Reopen Group
+        </button>
+      </div>
+    } @else {
+      <div
+        class="flex w-full flex-col gap-x-4 gap-y-2 max-lg:items-center lg:flex-row"
+        [ngClass]="{
+          'max-lg:hidden': !isModal(),
+        }"
+      >
+        <!-- owner -->
+        <button
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupOwner']"
           [disabled]="isDemoAccount()"
           (click)="onGroupCloseClick()"
           type="button"
@@ -50,7 +92,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
 
         <!-- owner - reset data -->
         <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupOwner']"
           [disabled]="isDemoAccount()"
           (click)="onGroupResetData()"
           type="button"
@@ -63,7 +105,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         </button>
 
         <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']; exclude: ['groupMember']"
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupOwner']; exclude: ['groupMember']"
           [disabled]="isDemoAccount()"
           (click)="onAddOwnerToGroupClick()"
           type="button"
@@ -77,7 +119,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
 
         <!-- member -->
         <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupMember']"
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupMember']"
           [disabled]="isDemoAccount()"
           (click)="onLeaveGroupClick()"
           type="button"
@@ -91,7 +133,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
 
         <!-- invited person -->
         <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupInvitations']"
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupInvitations']"
           [disabled]="isDemoAccount()"
           (click)="onDeclineInvitationClick()"
           type="button"
@@ -104,7 +146,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         </button>
 
         <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupInvitations']"
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupInvitations']"
           [disabled]="isDemoAccount()"
           (click)="onAcceptInvitationClick()"
           type="button"
@@ -118,7 +160,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
 
         <!-- request invitation person -->
         <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupRequested']"
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupRequested']"
           [disabled]="isDemoAccount()"
           (click)="onCancelRequestClick()"
           type="button"
@@ -131,10 +173,10 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
         </button>
 
         <!-- can join only public group -->
-        @if (groupDetails().groupData.isPublic) {
+        @if (groupDetailsUsed().groupData.isPublic) {
           <button
             *appGroupUserHasRole="
-              groupDetails().groupData.id;
+              groupDetailsUsed().groupData.id;
               exclude: ['groupRequested', 'groupMember', 'groupInvitations', 'groupOwner']
             "
             [disabled]="isDemoAccount()"
@@ -151,7 +193,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
 
         <!-- owner - invite people -->
         <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupOwner']"
           [disabled]="isDemoAccount()"
           (click)="onInviteMembersClick()"
           type="button"
@@ -165,7 +207,7 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
 
         <!-- owner - settings -->
         <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
+          *appGroupUserHasRole="groupDetailsUsed().groupData.id; include: ['groupOwner']"
           [disabled]="isDemoAccount()"
           (click)="onGroupSettingsClick()"
           type="button"
@@ -175,35 +217,14 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
           Group Settings
         </button>
       </div>
-    } @else {
-      <!-- closed group -->
-      <div class="flex flex-row gap-4">
-        <!-- owner -->
-        <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
-          [disabled]="isDemoAccount()"
-          (click)="onGroupDeleteClick()"
-          type="button"
-          mat-flat-button
-          color="warn"
-          [matTooltip]="tooltips.tooltipDelete"
-        >
-          <mat-icon>delete</mat-icon>
-          Delete Group
-        </button>
+    }
 
-        <!-- owner -->
-        <button
-          *appGroupUserHasRole="groupDetails().groupData.id; include: ['groupOwner']"
-          [disabled]="isDemoAccount()"
-          (click)="onGroupReopenClick()"
-          type="button"
-          mat-stroked-button
-          color="accent"
-          [matTooltip]="tooltips.tooltipClose"
-        >
-          <mat-icon>cached</mat-icon>
-          Reopen Group
+    <!-- options - displayed on mobile -->
+    @if (!data || !data.hideOptions) {
+      <div class="flex w-full justify-end lg:hidden">
+        <button mat-stroked-button (click)="onGroupOptionSettings()">
+          <mat-icon>settings</mat-icon>
+          Options
         </button>
       </div>
     }
@@ -215,22 +236,33 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
     }
 
     button {
-      @apply h-10;
+      @apply h-10 max-lg:w-[220px];
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupInteractionButtonsComponent {
-  readonly groupDetails = input.required<GroupDetails>();
-
-  readonly authenticationUserService = inject(AuthenticationUserStoreService);
-  readonly groupApiService = inject(GroupApiService);
-  readonly dialogServiceUtil = inject(DialogServiceUtil);
-
-  readonly isDemoAccount = this.authenticationUserService.state.isDemoAccount;
-  readonly userData = this.authenticationUserService.state.getUserData;
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
+  private readonly authenticationUserService = inject(AuthenticationUserStoreService);
+  private readonly groupApiService = inject(GroupApiService);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+
+  /**
+   * once component is opened as dialog, hide option button
+   */
+  readonly data = inject<{
+    hideOptions: boolean;
+    groupDetails: GroupDetails;
+  }>(MAT_DIALOG_DATA, {
+    optional: true,
+  });
+
+  readonly groupDetails = input<GroupDetails | undefined>(undefined);
+  readonly groupDetailsUsed = computed(() => this.groupDetails() || this.data?.groupDetails!);
+  readonly isModal = computed(() => !!this.data);
+  readonly isDemoAccount = this.authenticationUserService.state.isDemoAccount;
+  readonly userData = this.authenticationUserService.state.getUserData;
 
   readonly tooltips = {
     tooltipClose: `By closing a group, you will save its current state as a historical data and will not be able to make any changes to it.`,
@@ -248,7 +280,7 @@ export class GroupInteractionButtonsComponent {
   onGroupSettingsClick() {
     this.dialog.open(GroupSettingsDialogComponent, {
       data: <GroupSettingsDialogComponentData>{
-        groupId: this.groupDetails().groupData.id,
+        groupId: this.groupDetailsUsed().groupData.id,
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
     });
@@ -257,7 +289,7 @@ export class GroupInteractionButtonsComponent {
   @Confirmable('Are you sure you want to close this group?', 'Confirm', true, 'CLOSE')
   onGroupCloseClick() {
     try {
-      this.groupApiService.closeGroup(this.groupDetails().groupData.id);
+      this.groupApiService.closeGroup(this.groupDetailsUsed().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You closed the group', 'success');
@@ -269,7 +301,7 @@ export class GroupInteractionButtonsComponent {
   @Confirmable('Are you sure you want to reopen this group?')
   onGroupReopenClick() {
     try {
-      this.groupApiService.reopenGroup(this.groupDetails().groupData.id);
+      this.groupApiService.reopenGroup(this.groupDetailsUsed().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('The group has been reopened', 'success');
@@ -281,7 +313,7 @@ export class GroupInteractionButtonsComponent {
   onAddOwnerToGroupClick() {
     try {
       // add myself as owner
-      this.groupApiService.addOwnerOfGroupIntoGroup(this.userData(), this.groupDetails().groupData);
+      this.groupApiService.addOwnerOfGroupIntoGroup(this.userData(), this.groupDetailsUsed().groupData);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You added yourself to the group', 'success');
@@ -293,8 +325,8 @@ export class GroupInteractionButtonsComponent {
   async onInviteMembersClick() {
     const allowedMembersToInvite =
       GROUP_MEMBER_LIMIT -
-      this.groupDetails().groupData.memberUserIds.length -
-      this.groupDetails().groupData.memberInvitedUserIds.length;
+      this.groupDetailsUsed().groupData.memberUserIds.length -
+      this.groupDetailsUsed().groupData.memberInvitedUserIds.length;
 
     const dialogRef = this.dialog.open<UserSearchDialogComponent, UserSearchDialogData, UserData[] | undefined>(
       UserSearchDialogComponent,
@@ -319,7 +351,7 @@ export class GroupInteractionButtonsComponent {
 
     // invite users
     this.groupApiService.inviteUsersToGroup({
-      groupId: this.groupDetails().groupData.id,
+      groupId: this.groupDetailsUsed().groupData.id,
       userIds: result.map((u) => u.id),
     });
 
@@ -330,7 +362,7 @@ export class GroupInteractionButtonsComponent {
   @Confirmable('Are you sure you want to leave this group?')
   onLeaveGroupClick() {
     try {
-      this.groupApiService.leaveGroup(this.groupDetails().groupData.id);
+      this.groupApiService.leaveGroup(this.groupDetailsUsed().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You left the group', 'success');
@@ -343,7 +375,7 @@ export class GroupInteractionButtonsComponent {
   onDeclineInvitationClick() {
     try {
       this.groupApiService.userDeclinesGroupInvitation({
-        groupId: this.groupDetails().groupData.id,
+        groupId: this.groupDetailsUsed().groupData.id,
         userId: this.authenticationUserService.state.getUserData().id,
       });
 
@@ -360,7 +392,7 @@ export class GroupInteractionButtonsComponent {
       this.dialogServiceUtil.showNotificationBar('Accepting invitation', 'notification');
 
       // accept invitation
-      await this.groupApiService.userAcceptsGroupInvitation(this.groupDetails().groupData.id);
+      await this.groupApiService.userAcceptsGroupInvitation(this.groupDetailsUsed().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You accepted the invitation', 'success');
@@ -373,7 +405,7 @@ export class GroupInteractionButtonsComponent {
   onCancelRequestClick() {
     try {
       this.groupApiService.declineUserRequestToGroup({
-        groupId: this.groupDetails().groupData.id,
+        groupId: this.groupDetailsUsed().groupData.id,
         userId: this.authenticationUserService.state.getUserData().id,
       });
 
@@ -390,7 +422,7 @@ export class GroupInteractionButtonsComponent {
       this.dialogServiceUtil.showNotificationBar('Sending request to join group', 'notification');
 
       // send request to join group
-      await this.groupApiService.sendRequestToJoinGroup(this.groupDetails().groupData.id);
+      await this.groupApiService.sendRequestToJoinGroup(this.groupDetailsUsed().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('You sent a request to join the group', 'success');
@@ -403,7 +435,7 @@ export class GroupInteractionButtonsComponent {
   onGroupDeleteClick() {
     try {
       // send API call
-      this.groupApiService.deleteGroup(this.groupDetails().groupData.id);
+      this.groupApiService.deleteGroup(this.groupDetailsUsed().groupData.id);
 
       // show notification
       this.dialogServiceUtil.showNotificationBar('Group has been deleted', 'success');
@@ -417,9 +449,16 @@ export class GroupInteractionButtonsComponent {
 
   @Confirmable('This action will reset portfolio growth and other historical data. Groups starts as fresh')
   onGroupResetData() {
-    this.groupApiService.resetGroupData(this.groupDetails().groupData.id);
+    this.groupApiService.resetGroupData(this.groupDetailsUsed().groupData.id);
 
     // show notification
     this.dialogServiceUtil.showNotificationBar('Group data has been reset', 'success');
+  }
+
+  onGroupOptionSettings() {
+    this.dialog.open(GroupInteractionButtonsComponent, {
+      data: { hideOptions: true, groupDetails: this.groupDetailsUsed() },
+      panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
+    });
   }
 }
