@@ -155,7 +155,7 @@ import { Subject, catchError, forkJoin, map, merge, of, pipe, scan, startWith, s
     </div>
 
     <!-- portfolio change table -->
-    <div class="mb-10 hidden md:block">
+    <div class="mb-10 hidden sm:block">
       <app-general-card title="Period Change">
         <!-- table -->
         <app-portfolio-period-change-table
@@ -191,15 +191,16 @@ import { Subject, catchError, forkJoin, map, merge, of, pipe, scan, startWith, s
       </div>
 
       <!-- holding title -->
-      <div class="mb-4 flex items-center justify-between">
+      <div class="mb-4 flex flex-col items-center justify-between gap-y-4 sm:flex-row">
         <h2 class="space-x-2 text-xl">
           <span class="text-wt-primary">Selected User: </span>
           <span class="text-wt-gray-dark">{{ selectedUser()?.userData?.personal?.displayName }}</span>
         </h2>
 
+        <!-- select different user's holdings -->
         <app-dropdown-control
           data-testid="page-compare-select-user-holding-dropdown"
-          class="w-[360px]"
+          class="w-full sm:w-[360px]"
           inputCaption="Select User's Holdings"
           [formControl]="selectedUserHoldingsControl"
           [inputSource]="selectedUsersInputSource()"
