@@ -33,10 +33,11 @@ import { RecommendationDirective } from '../../../directives';
     </div>
 
     <div class="g-item-wrapper">
-      <div>Company Name</div>
+      <div>Company</div>
       <div class="flex items-center gap-2">
         <img appDefaultImg imageType="symbol" [src]="symbolSummary().id" alt="Asset Image" class="h-6 w-6" />
-        <span>{{ symbolSummary().profile?.companyName ?? symbolSummary().quote.name }}</span>
+        <span class="hidden sm:block">{{ symbolSummary().profile?.companyName ?? symbolSummary().quote.name }}</span>
+        <span class="sm:hidden">{{ symbolSummary().quote.symbol }}</span>
         <span> ({{ symbolSummary().quote.timestamp * 1000 | date: 'MMM d, y' }}) </span>
       </div>
     </div>

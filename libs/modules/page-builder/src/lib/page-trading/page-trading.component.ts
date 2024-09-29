@@ -123,9 +123,10 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
         </div>
       }
     } @else if (symbolSummarySignal().state === 'loading') {
-      <div class="mb-6 flex h-[470px] flex-col gap-4 xl:flex-row">
-        <div class="g-skeleton lg:basis-3/5"></div>
-        <div class="g-skeleton lg:basis-2/5"></div>
+      <!-- skeleton -->
+      <div class="mb-6 flex flex-col gap-4 xl:flex-row">
+        <div class="g-skeleton min-h-[450px] lg:basis-3/5"></div>
+        <div class="g-skeleton min-h-[450px] lg:basis-2/5"></div>
       </div>
     } @else {
       <div class="grid h-[440px] place-content-center text-center text-lg">Failed to load symbol summary</div>
