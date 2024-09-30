@@ -14,7 +14,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
   standalone: true,
   imports: [MatButtonModule, MatIconModule, MatDialogModule],
   template: `
-    <mat-dialog-actions class="flex flex-col gap-x-6 gap-y-2 px-4 sm:flex-row">
+    <div class="flex flex-row justify-between gap-x-4 gap-y-2 px-4">
       <!-- favorites button (only for auth users) -->
       @if (authenticationUserService) {
         @if (isSymbolInWatchList()) {
@@ -27,7 +27,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
             class="g-border-apply h-10 max-sm:w-full"
           >
             <mat-icon>do_not_disturb_on</mat-icon>
-            watchlist - remove
+            watchlist <span class="max-sm:hidden">- remove</span>
           </button>
         } @else {
           <button
@@ -39,7 +39,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
             class="g-border-apply h-10 max-sm:w-full"
           >
             <mat-icon>star</mat-icon>
-            watchlist - add
+            watchlist <span class="max-sm:hidden">- add</span>
           </button>
         }
       }
@@ -53,11 +53,11 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
           color="primary"
           (click)="onDetailsRedirect()"
         >
-          Go to Details
+          <span class="max-sm:hidden">Go to</span> Details
           <mat-icon iconPositionEnd>navigate_next</mat-icon>
         </button>
       }
-    </mat-dialog-actions>
+    </div>
   `,
   styles: `
     :host {

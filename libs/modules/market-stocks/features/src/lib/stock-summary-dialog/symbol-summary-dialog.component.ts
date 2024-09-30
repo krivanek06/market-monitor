@@ -31,16 +31,27 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
   template: `
     @if (symbolSummary(); as symbolSummary) {
       <!-- heading -->
-      <div class="flex items-center justify-between p-4">
-        <div class="flex items-center gap-3">
-          <img appDefaultImg imageType="symbol" [src]="symbolSummary.id" alt="Stock Image" class="h-11 w-11" />
-          <div class="grid">
-            <div class="text-wt-gray-medium flex gap-4 text-base">
-              <span>{{ symbolSummary.quote.displaySymbol }}</span>
-              <span>|</span>
-              <span>{{ symbolType() }}</span>
+      <div class="flex flex-col gap-y-4 p-4 md:flex-row md:justify-between">
+        <div class="flex justify-between">
+          <!-- symbol info -->
+          <div class="flex gap-3 md:items-center">
+            <img appDefaultImg imageType="symbol" [src]="symbolSummary.id" alt="Stock Image" class="h-11 w-11" />
+            <div class="grid">
+              <div class="text-wt-gray-medium flex gap-4 text-base">
+                <span class="text-wt-primary">{{ symbolSummary.quote.displaySymbol }}</span>
+                <span>|</span>
+                <span>{{ symbolType() }}</span>
+              </div>
+              <span class="text-wt-gray-dark text-lg">{{ symbolSummary.quote.name }}</span>
             </div>
-            <span class="text-wt-gray-medium text-lg">{{ symbolSummary.quote.name }}</span>
+          </div>
+
+          <!-- close button -->
+          <div class="md:hidden">
+            <button mat-button mat-dialog-close color="warn">
+              <mat-icon>close</mat-icon>
+              close
+            </button>
           </div>
         </div>
 
@@ -48,14 +59,14 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
         <app-summary-action-buttons [symbolSummary]="symbolSummary" [showRedirectButton]="isSymbolTypeStock()" />
       </div>
 
-      <mat-dialog-content>
+      <mat-dialog-content class="grid gap-6">
         <!-- display main metrics -->
         <div>
           <app-summary-main-metrics [stockSummary]="symbolSummary" />
         </div>
 
         <!-- time period change -->
-        <div class="mb-8 mt-4">
+        <div class="max-sm:hidden">
           <app-price-change-items [mainSymbolPriceChange]="symbolSummary.priceChange" />
         </div>
 

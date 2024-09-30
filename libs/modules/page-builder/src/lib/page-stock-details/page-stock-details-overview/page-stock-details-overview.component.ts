@@ -63,7 +63,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             [imageName]="stockDetailsSignal().quote.symbol"
             [title]="stockDetailsSignal().quote.name"
             [symbol]="stockDetailsSignal().quote.symbol"
-            [chartHeightPx]="430"
+            [chartHeightPx]="450"
           />
         </div>
 

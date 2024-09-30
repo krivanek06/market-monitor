@@ -38,7 +38,6 @@ import { RecommendationDirective } from '../../../directives';
         <img appDefaultImg imageType="symbol" [src]="symbolSummary().id" alt="Asset Image" class="h-6 w-6" />
         <span class="hidden sm:block">{{ symbolSummary().profile?.companyName ?? symbolSummary().quote.name }}</span>
         <span class="sm:hidden">{{ symbolSummary().quote.symbol }}</span>
-        <span> ({{ symbolSummary().quote.timestamp * 1000 | date: 'MMM d, y' }}) </span>
       </div>
     </div>
 
@@ -58,7 +57,10 @@ import { RecommendationDirective } from '../../../directives';
 
     <div class="g-item-wrapper">
       <span>Market Cap.</span>
-      <span>{{ symbolSummary().quote.price * symbolSummary().quote.sharesOutstanding | largeNumberFormatter }}</span>
+      <div>
+        <span>{{ symbolSummary().quote.price * symbolSummary().quote.sharesOutstanding | largeNumberFormatter }}</span>
+        <span> ({{ symbolSummary().quote.timestamp * 1000 | date: 'MMM d, y' }}) </span>
+      </div>
     </div>
 
     <div class="g-item-wrapper">

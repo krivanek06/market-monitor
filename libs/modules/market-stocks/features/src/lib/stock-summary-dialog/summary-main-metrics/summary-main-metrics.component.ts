@@ -1,23 +1,19 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { SymbolSummary } from '@mm/api-types';
-import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
+import { LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-summary-main-metrics',
   standalone: true,
-  imports: [DecimalPipe, CurrencyPipe, GeneralCardComponent, PercentageIncreaseDirective, LargeNumberFormatterPipe],
+  imports: [DecimalPipe, CurrencyPipe, PercentageIncreaseDirective, LargeNumberFormatterPipe],
   template: `
-    <div class="flex justify-around">
+    <div class="flex flex-col justify-around sm:flex-row">
       <!-- price -->
-      <app-general-card
-        [titleCenter]="true"
-        title="Price"
-        additionalClasses="h-full"
-        class="min-w-[275px] max-sm:w-full"
-      >
+      <div class="border-wt-border min-w-[100px] rounded-lg border px-6 py-4 text-center">
+        <div class="text-wt-primary text-lg">Price</div>
         <div class="flex items-center justify-center gap-3">
-          <span>{{ stockSummary().quote.price | currency }}</span>
+          <span class="text-wt-gray-dark">{{ stockSummary().quote.price | currency }}</span>
           <span
             appPercentageIncrease
             [useCurrencySign]="true"
@@ -27,66 +23,35 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
             }"
           ></span>
         </div>
-      </app-general-card>
+      </div>
 
       <!-- market cap -->
-      <app-general-card
-        [titleCenter]="true"
-        title="Market Cap."
-        additionalClasses="h-full"
-        class="hidden min-w-[150px] sm:block"
-      >
-        <div class="text-center">{{ stockSummary().profile?.mktCap | largeNumberFormatter }}</div>
-      </app-general-card>
-
-      <!-- volume -->
-      <!-- <app-general-card [titleCenter]="true" title="Volume" additionalClasses="h-full"
-  class="hidden lg:block">
-    <div>
-      <span>{{ stockSummary().quote.volume | largeNumberFormatter }}</span>
-      <span
-        appPercentageIncrease
-        [currentValues]="{
-        value: stockSummary().quote.volume,
-        valueToCompare: stockSummary().quote.avgVolume,
-    }"
-      ></span>
-    </div>
-  </app-general-card> -->
+      <div class="border-wt-border min-w-[100px] rounded-lg border px-6 py-4 text-center max-sm:hidden">
+        <div class="text-wt-primary text-lg">Market Cap.</div>
+        <div class="text-wt-gray-dark">{{ stockSummary().profile?.mktCap | largeNumberFormatter }}</div>
+      </div>
 
       <!-- PE -->
-      <app-general-card
-        [titleCenter]="true"
-        additionalClasses="h-full"
-        title="PE"
-        class="hidden min-w-[100px] md:block"
-      >
-        <div class="text-center">
+      <div class="border-wt-border min-w-[100px] rounded-lg border px-6 py-4 text-center max-sm:hidden">
+        <div class="text-wt-primary text-lg">PE</div>
+        <div class="text-wt-gray-dark">
           {{ stockSummary().quote.pe ? (stockSummary().quote.pe | number: '1.2-2') : 'N/A' }}
         </div>
-      </app-general-card>
+      </div>
 
       <!-- EPS -->
-      <app-general-card
-        [titleCenter]="true"
-        additionalClasses="h-full"
-        title="EPS"
-        class="hidden min-w-[100px] lg:block"
-      >
-        <div class="text-center">
+      <div class="border-wt-border min-w-[100px] rounded-lg border px-6 py-4 text-center max-md:hidden">
+        <div class="text-wt-primary text-lg">EPS</div>
+        <div class="text-wt-gray-dark">
           {{ stockSummary().quote.eps ? (stockSummary().quote.eps | number: '1.2-2') : 'N/A' }}
         </div>
-      </app-general-card>
+      </div>
 
       <!-- Sector -->
-      <app-general-card
-        [titleCenter]="true"
-        title="Sector"
-        additionalClasses="h-full"
-        class="hidden text-center xl:block"
-      >
-        <div>{{ stockSummary().profile?.sector || 'N/A' }}</div>
-      </app-general-card>
+      <div class="border-wt-border min-w-[100px] rounded-lg border px-6 py-4 text-center max-lg:hidden">
+        <div class="text-wt-primary text-lg">Sector</div>
+        <div class="text-wt-gray-dark">{{ stockSummary().profile?.sector || 'N/A' }}</div>
+      </div>
     </div>
   `,
   styles: `
