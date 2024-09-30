@@ -12,7 +12,7 @@ export const PercentageIncrease = component$<PercentageIncreaseProps>(({ value, 
   const changesPercentage = calculateGrowth(value, valueToCompare);
 
   return (
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 text-base">
       <span>{isPrice ? formatValueIntoCurrency(value) : formatLargeNumber(value)}</span>
       {change ? (
         <div class={[change > 0 ? 'text-green-500' : change < 0 ? 'text-red-500' : '', 'flex items-center gap-1']}>
@@ -21,9 +21,6 @@ export const PercentageIncrease = component$<PercentageIncreaseProps>(({ value, 
             {change > 0 ? '+' : ''}
             {changesPercentage}%
           </span>
-
-          {/* change value */}
-          <span>({isPrice ? formatValueIntoCurrency(change) : formatLargeNumber(change)})</span>
 
           {/* icons */}
           {change > 0 ? (

@@ -55,8 +55,8 @@ export const WelcomeHero = component$(() => {
           class="invisible mx-auto flex w-[320px] flex-col px-4 text-center text-xl text-gray-500 max-md:gap-y-4 sm:w-[650px] lg:mb-10"
         >
           <span>
-            Free to use trading simulator, designed to help learning financial literacy, mainly intended for schools to
-            make lectures more interactive.
+            A free-to-use trading simulator designed to help teach financial literacy, primarily intended for schools to
+            make lessons more interactive
           </span>
         </div>
       </div>

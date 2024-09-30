@@ -40,7 +40,7 @@ import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
   template: `
     <section class="mx-auto mb-10 md:w-11/12 md:pt-4 lg:w-10/12 xl:w-9/12">
       <!-- specific search -->
-      <div class="mb-4 sm:hidden">
+      <div class="mb-4 md:hidden">
         <app-section-title title="Basic Search" matIcon="search" class="mb-3" />
         <app-symbol-search-basic />
 

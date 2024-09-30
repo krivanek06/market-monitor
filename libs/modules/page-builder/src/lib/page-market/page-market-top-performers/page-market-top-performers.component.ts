@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,49 +12,54 @@ import { RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
 @Component({
   selector: 'app-page-market-top-performers',
   standalone: true,
-  imports: [
-    CommonModule,
-    StockSummaryTableComponent,
-    MatButtonModule,
-    MatDialogModule,
-    RangeDirective,
-    SectionTitleComponent,
-  ],
+  imports: [StockSummaryTableComponent, MatButtonModule, MatDialogModule, RangeDirective, SectionTitleComponent],
   template: `
-    @if (marketTopPerformanceSignal(); as marketOverview) {
-      <div class="grid gap-y-14">
-        <div>
-          <app-section-title title="Top Active" class="mb-6" />
+    <div class="grid gap-y-14">
+      <div>
+        <app-section-title title="Top Active" class="-mb-6 sm:mb-6" />
+        @if (marketTopPerformance(); as marketOverview) {
           <app-stock-summary-table
             (itemClickedEmitter)="onQuoteClick($event)"
             [symbolQuotes]="marketOverview.stockTopActive"
           />
-        </div>
+        } @else {
+          <!-- skeleton -->
+          <div class="max-sm:mt-12">
+            <div *ngRange="15" class="g-skeleton mb-1 h-12"></div>
+          </div>
+        }
+      </div>
 
-        <div>
-          <app-section-title title="Top Gainer" class="mb-6" />
+      <div>
+        <app-section-title title="Top Gainer" class="-mb-6 sm:mb-6" />
+        @if (marketTopPerformance(); as marketOverview) {
           <app-stock-summary-table
             (itemClickedEmitter)="onQuoteClick($event)"
             [symbolQuotes]="marketOverview.stockTopGainers"
           />
-        </div>
+        } @else {
+          <!-- skeleton -->
+          <div class="max-sm:mt-12">
+            <div *ngRange="15" class="g-skeleton mb-1 h-12"></div>
+          </div>
+        }
+      </div>
 
-        <div>
-          <app-section-title title="Top Losers" class="mb-6" />
+      <div>
+        <app-section-title title="Top Losers" class="-mb-6 sm:mb-6" />
+        @if (marketTopPerformance(); as marketOverview) {
           <app-stock-summary-table
             (itemClickedEmitter)="onQuoteClick($event)"
             [symbolQuotes]="marketOverview.stockTopLosers"
           />
-        </div>
+        } @else {
+          <!-- skeleton -->
+          <div class="max-sm:mt-12">
+            <div *ngRange="15" class="g-skeleton mb-1 h-12"></div>
+          </div>
+        }
       </div>
-    } @else {
-      <!-- loading screen -->
-      <div class="grid gap-y-14 pt-8">
-        <div *ngRange="3">
-          <div *ngRange="15" class="g-skeleton mb-1 h-12"></div>
-        </div>
-      </div>
-    }
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -65,9 +69,9 @@ import { RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
   `,
 })
 export class PageMarketTopPerformersComponent {
-  marketApiService = inject(MarketApiService);
-  dialog = inject(MatDialog);
-  marketTopPerformanceSignal = toSignal(this.marketApiService.getMarketTopPerformance());
+  private readonly marketApiService = inject(MarketApiService);
+  private readonly dialog = inject(MatDialog);
+  readonly marketTopPerformance = toSignal(this.marketApiService.getMarketTopPerformance());
 
   onQuoteClick(summary: SymbolQuote) {
     this.dialog.open(SymbolSummaryDialogComponent, {

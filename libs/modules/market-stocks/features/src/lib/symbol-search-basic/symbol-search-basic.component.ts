@@ -1,4 +1,5 @@
 import { OverlayModule } from '@angular/cdk/overlay';
+import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -30,6 +31,7 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
   selector: 'app-symbol-search-basic',
   standalone: true,
   imports: [
+    NgClass,
     OverlayModule,
     QuoteItemComponent,
     MatButtonModule,
@@ -43,9 +45,22 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
     MatRadioModule,
   ],
   template: `
-    <mat-form-field class="w-full" cdkOverlayOrigin #trigger #origin="cdkOverlayOrigin">
+    <mat-form-field
+      class="w-full"
+      cdkOverlayOrigin
+      #trigger
+      #origin="cdkOverlayOrigin"
+      [style.height.px]="isSmallInput() ? 45 : undefined"
+    >
       <!-- search input -->
-      <mat-label>Search symbol by ticker</mat-label>
+      <mat-label
+        [ngClass]="{
+          'text-sm': isSmallInput(),
+          'text-base': !isSmallInput(),
+        }"
+      >
+        Search symbol by ticker
+      </mat-label>
       <input
         data-testid="search-basic-input"
         type="text"
@@ -82,7 +97,7 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
         data-testid="search-basic-overlay"
         [style.max-width.px]="overlayWidth()"
         [style.min-width.px]="overlayWidth()"
-        class="bg-wt-gray-light mx-auto max-h-[400px] min-h-[200px] w-full overflow-y-scroll rounded-md p-3 shadow-md"
+        class="bg-wt-gray-light @container mx-auto max-h-[400px] min-h-[200px] w-full overflow-y-scroll rounded-md p-3 shadow-md"
       >
         <!-- check if load ticker or crypto -->
         <mat-radio-group
@@ -96,7 +111,7 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
           <mat-radio-button [value]="SelectorOptions.TICKER">Ticker</mat-radio-button>
           <mat-radio-button [value]="SelectorOptions.CRYPTO">Crypto</mat-radio-button>
           @if ((holdings()?.length ?? 0) > 0) {
-            <mat-radio-button [value]="SelectorOptions.HOLDINGS">Holdings</mat-radio-button>
+            <mat-radio-button [value]="SelectorOptions.HOLDINGS" class="@sm:block hidden">Holdings</mat-radio-button>
           }
         </mat-radio-group>
 
@@ -133,15 +148,19 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
   styles: `
     :host {
       display: block;
-    }
 
-    ::ng-deep .mdc-menu-surface.mat-mdc-autocomplete-panel {
-      max-height: 452px !important;
-    }
+      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+      }
 
-    ::ng-deep .mdc-menu-surface.mat-mdc-autocomplete-panel {
-      width: 95% !important;
-      margin: auto !important;
+      ::ng-deep .mdc-menu-surface.mat-mdc-autocomplete-panel {
+        max-height: 452px !important;
+      }
+
+      ::ng-deep .mdc-menu-surface.mat-mdc-autocomplete-panel {
+        width: 95% !important;
+        margin: auto !important;
+      }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -165,6 +184,11 @@ export class SymbolSearchBasicComponent {
    * user's holdings to display
    */
   readonly holdings = input<SymbolQuote[]>();
+
+  /**
+   * size of the input
+   */
+  readonly isSmallInput = input<boolean>(false);
 
   /**
    * user's input value to load symbols
