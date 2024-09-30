@@ -98,13 +98,13 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       <!-- search users -->
       <app-user-search-control
         data-testid="hall-of-fame-user-search-control"
-        class="w-full md:-ml-6 md:w-[500px] md:scale-90"
+        class="w-full md:w-[500px]"
         (selectedEmitter)="onUserClick($event)"
       />
       <!-- search groups -->
       <app-group-search-control
         data-testid="hall-of-fame-group-search-control"
-        class="hidden w-full md:-mr-6 md:w-[500px] md:scale-90 lg:block"
+        class="hidden w-full md:w-[500px] lg:block"
         (selectedEmitter)="onGroupClick($event)"
       />
     </div>

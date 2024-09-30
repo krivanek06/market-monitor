@@ -125,7 +125,7 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
               test-id="search-basic-quotes"
               mat-button
               type="button"
-              class="h-12 w-full max-sm:mb-2"
+              class="h-12 w-full"
               (click)="onSummaryClick(quote)"
             >
               <app-quote-item [symbolQuote]="quote" />

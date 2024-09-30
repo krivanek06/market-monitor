@@ -71,10 +71,10 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     </div>
 
     <!-- search index quotes -->
-    <div class="flex max-sm:w-full">
+    <div class="mb-2 md:mb-6">
       <app-quote-search-basic
         [formControl]="selectedIndexSymbolQuoteControl"
-        class="min-w-[800px] max-sm:w-full xl:-ml-5 xl:scale-90"
+        class="w-full md:w-[520px]"
         type="index"
       />
     </div>

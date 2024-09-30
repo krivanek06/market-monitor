@@ -130,34 +130,36 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
   `,
 })
 export class PageMarketCalendarComponent implements OnInit, RouterManagement {
-  marketApiService = inject(MarketApiService);
-  router = inject(Router);
-  route = inject(ActivatedRoute);
-  dialog = inject(MatDialog);
+  private readonly marketApiService = inject(MarketApiService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
 
-  currentDateRangeControl = new FormControl<CalendarRange>(CalendarRageToday, { nonNullable: true });
+  readonly currentDateRangeControl = new FormControl<CalendarRange>(CalendarRageToday, { nonNullable: true });
 
-  displayElements = 5;
+  readonly displayElements = 5;
 
-  calendarTypeInputSource = [
+  readonly calendarTypeInputSource = [
     { value: 'dividends', caption: 'Dividends' },
     { value: 'earnings', caption: 'Earnings' },
   ] satisfies InputSource<string>[];
 
-  calendarTypeFormControl = new FormControl<string>(this.calendarTypeInputSource[0].value, { nonNullable: true });
+  readonly calendarTypeFormControl = new FormControl<string>(this.calendarTypeInputSource[0].value, {
+    nonNullable: true,
+  });
 
-  loadingSignal = signal<boolean>(true);
-  datesInMonthSignal = toSignal(
+  readonly loadingSignal = signal<boolean>(true);
+  readonly datesInMonthSignal = toSignal(
     this.currentDateRangeControl.valueChanges.pipe(
       startWith(this.currentDateRangeControl.value),
       map((d) => generateDatesArrayForMonth(d).length),
     ),
   );
 
-  calendarDataDividendSignal = computed(() =>
+  readonly calendarDataDividendSignal = computed(() =>
     this.resolveCalendarType<CalendarDividend>(this.calendarDataSignal(), 'dividend'),
   );
-  calendarDataEarningsSignal = computed(() =>
+  readonly calendarDataEarningsSignal = computed(() =>
     this.resolveCalendarType<CalendarStockEarning>(this.calendarDataSignal(), 'eps'),
   );
 

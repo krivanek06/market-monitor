@@ -61,18 +61,18 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
         [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
       />
 
-      <div class="flex flex-col gap-6 max-md:flex-1 md:basis-3/5 xl:basis-2/5 2xl:basis-1/3">
+      <div class="flex flex-col gap-6 max-md:flex-1 md:basis-3/5 lg:basis-2/5 2xl:basis-1/3">
         <!-- search -->
         <app-symbol-search-basic
           data-testid="page-trading-symbol-search-basic"
-          class="h-12 w-full scale-90"
+          class="h-12 w-full"
           (clickedQuote)="onSymbolQuoteClick($event)"
           [openModalOnClick]="false"
           [holdings]="holdingsInputSource()"
         />
 
         <!-- action buttons -->
-        <div class="mx-auto flex w-full gap-4 sm:w-11/12">
+        <div class="mx-auto flex w-full gap-4">
           <button
             data-testid="page-trading-buy-button"
             (click)="onOperationClick('BUY')"

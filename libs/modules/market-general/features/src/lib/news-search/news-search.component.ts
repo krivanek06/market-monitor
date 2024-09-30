@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MarketApiService } from '@mm/api-client';
@@ -17,7 +16,6 @@ import { map, pipe, startWith, switchMap } from 'rxjs';
   selector: 'app-news-search',
   standalone: true,
   imports: [
-    CommonModule,
     MatButtonModule,
     RangeDirective,
     ScrollNearEndDirective,
@@ -89,20 +87,20 @@ import { map, pipe, startWith, switchMap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewsSearchComponent {
-  private marketApiService = inject(MarketApiService);
+  private readonly marketApiService = inject(MarketApiService);
 
-  initialNewsToDisplay = input(16);
+  readonly initialNewsToDisplay = input(16);
 
-  searchData = input<{ newsType: NewsTypes; symbol?: string }>({ newsType: 'stocks', symbol: 'AAPL' });
+  readonly searchData = input<{ newsType: NewsTypes; symbol?: string }>({ newsType: 'stocks', symbol: 'AAPL' });
 
   /**
    * will emit incremented number every time user scrolls near end
    */
-  displayMoreNotification = signal(0);
+  readonly displayMoreNotification = signal(0);
 
   private readonly newDisplay = 16;
 
-  marketStockNewsSignal = derivedFrom(
+  readonly marketStockNewsSignal = derivedFrom(
     [this.searchData, this.displayMoreNotification],
     pipe(
       switchMap(([searchData, increment]) =>
