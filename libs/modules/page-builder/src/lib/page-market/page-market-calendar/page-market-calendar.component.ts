@@ -54,7 +54,10 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
   ],
   template: `
     <div class="mb-10 flex flex-col items-center justify-between gap-3 sm:pl-4 md:flex-row">
-      <h2>Calendar type: {{ calendarTypeFormControl.value | titlecase }}</h2>
+      <h2 class="text-lg">
+        Calendar type:
+        <span class="text-wt-primary">{{ calendarTypeFormControl.value | titlecase }}</span>
+      </h2>
 
       <!-- calendar change select -->
       <app-dropdown-control
@@ -66,66 +69,53 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
     </div>
 
     <app-calendar-wrapper [formControl]="currentDateRangeControl">
-      <ng-container *ngIf="!loadingSignal()">
+      @if (!loadingSignal()) {
         <!-- Dividends -->
-        <ng-template marker *ngFor="let dividendsData of calendarDataDividendSignal()">
-          <ng-container *ngFor="let data of dividendsData.data | slice: 0 : displayElements; let last = last">
-            <app-dividend-item
-              (itemClickedEmitter)="onDividendClick(data)"
-              [showBorder]="!last"
-              [dividend]="data"
-            ></app-dividend-item>
-          </ng-container>
-          <!-- more button -->
-          <div class="flex justify-end">
-            <button
-              *ngIf="dividendsData.data && dividendsData.data.length > displayElements"
-              (click)="onMoreDividends(dividendsData.data)"
-              mat-button
-              type="button"
-              color="primary"
-            >
-              {{ dividendsData.data.length - displayElements }} more
-            </button>
-          </div>
-        </ng-template>
+        @for (dividendsData of calendarDataDividendSignal(); track dividendsData.date) {
+          <ng-template marker>
+            @for (data of dividendsData.data | slice: 0 : displayElements; track $index; let last = $last) {
+              <app-dividend-item (itemClickedEmitter)="onDividendClick(data)" [showBorder]="!last" [dividend]="data" />
+            }
+
+            <!-- more button -->
+            <div class="flex justify-end">
+              @if (dividendsData.data && dividendsData.data.length > displayElements) {
+                <button (click)="onMoreDividends(dividendsData.data)" mat-button type="button" color="primary">
+                  {{ dividendsData.data.length - displayElements }} more
+                </button>
+              }
+            </div>
+          </ng-template>
+        }
 
         <!-- Earnings -->
-        <ng-template marker *ngFor="let earningsData of calendarDataEarningsSignal()">
-          <ng-container *ngFor="let data of earningsData.data | slice: 0 : displayElements; let last = last">
-            <app-earnings-item
-              (itemClickedEmitter)="onEarningsClicked(data)"
-              [showBorder]="!last"
-              [earning]="data"
-            ></app-earnings-item>
-          </ng-container>
-          <!-- more button -->
-          <div class="flex justify-end">
-            <button
-              *ngIf="earningsData.data && earningsData.data.length > displayElements"
-              (click)="onMoreEarnings(earningsData.data)"
-              mat-button
-              type="button"
-              color="primary"
-            >
-              {{ earningsData.data.length - displayElements }} more
-            </button>
-          </div>
-        </ng-template>
-      </ng-container>
-
-      <!-- loading skeletons -->
-      <ng-container *ngIf="loadingSignal()">
+        @for (earningsData of calendarDataEarningsSignal(); track earningsData.date) {
+          <ng-template marker>
+            @for (data of earningsData.data | slice: 0 : displayElements; track $index; let last = $last) {
+              <app-earnings-item (itemClickedEmitter)="onEarningsClicked(data)" [showBorder]="!last" [earning]="data" />
+            }
+            <!-- more button -->
+            <div class="flex justify-end">
+              @if (earningsData.data && earningsData.data.length > displayElements) {
+                <button (click)="onMoreEarnings(earningsData.data)" mat-button type="button" color="primary">
+                  {{ earningsData.data.length - displayElements }} more
+                </button>
+              }
+            </div>
+          </ng-template>
+        }
+      } @else {
+        <!-- loading skeletons -->
         <ng-template marker *ngRange="datesInMonthSignal() ?? 0">
           <div *ngRange="displayElements" class="g-skeleton mb-1 h-10 w-full"></div>
         </ng-template>
-      </ng-container>
+      }
     </app-calendar-wrapper>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
-      @apply mt-10 block;
+      display: block;
     }
   `,
 })
@@ -191,7 +181,7 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
           dividends: data,
           showDate: true,
         },
-        panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+        panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
       })
       .afterClosed()
       .pipe(
@@ -210,7 +200,7 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
           earnings: data,
           showDate: true,
         },
-        panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+        panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
       })
       .afterClosed()
       .pipe(

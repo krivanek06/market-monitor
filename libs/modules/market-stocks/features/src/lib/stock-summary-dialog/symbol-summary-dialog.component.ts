@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MarketApiService } from '@mm/api-client';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { DefaultImgDirective, PriceChangeItemsComponent } from '@mm/shared/ui';
+import { DefaultImgDirective, PriceChangeItemsComponent, TruncatePipe } from '@mm/shared/ui';
 import { catchError, of } from 'rxjs';
 import { SummaryActionButtonsComponent } from './summary-action-buttons/summary-action-buttons.component';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
@@ -27,6 +27,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
     SummaryModalSkeletonComponent,
     AssetPriceChartInteractiveComponent,
     SummaryActionButtonsComponent,
+    TruncatePipe,
   ],
   template: `
     @if (symbolSummary(); as symbolSummary) {
@@ -42,7 +43,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
                 <span>|</span>
                 <span>{{ symbolType() }}</span>
               </div>
-              <span class="text-wt-gray-dark text-lg">{{ symbolSummary.quote.name }}</span>
+              <span class="text-wt-gray-dark text-lg">{{ symbolSummary.quote.name | truncate: 40 }}</span>
             </div>
           </div>
 

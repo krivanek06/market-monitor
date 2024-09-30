@@ -1,7 +1,8 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CalendarStockEarning, StockEarning } from '@mm/api-types';
+import { isScreenLarger } from '@mm/shared/data-access';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { EarningsItemComponent } from '../../components';
 
@@ -21,7 +22,7 @@ import { EarningsItemComponent } from '../../components';
           <span>Revenue</span>
         </div>
       </div>
-      @for (earning of data.earnings; track earning.date; let last = $last) {
+      @for (earning of data.earnings; track $index; let last = $last) {
         <app-earnings-item
           (itemClickedEmitter)="onEarningsClicked(earning)"
           [earning]="earning"
@@ -40,15 +41,15 @@ import { EarningsItemComponent } from '../../components';
   providers: [DatePipe],
 })
 export class EarningsItemsDialogComponent {
-  constructor(
-    private dialogRef: MatDialogRef<EarningsItemsDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { earnings: (StockEarning | CalendarStockEarning)[]; showDate: boolean },
-    private datePipe: DatePipe,
-  ) {}
+  private readonly dialogRef = inject(MatDialogRef<EarningsItemsDialogComponent>);
+  private readonly datePipe = inject(DatePipe);
+  readonly data = inject<{ earnings: (StockEarning | CalendarStockEarning)[]; showDate: boolean }>(MAT_DIALOG_DATA);
 
   get dialogTitle(): string {
+    // different formatting on smaller screen
+    const format = isScreenLarger('LAYOUT_SM') ? 'd. MMMM, y (EEEE)' : 'd. MMM, y';
     return this.data.showDate && this.data.earnings.length > 0
-      ? `Earnings: ${this.datePipe.transform(this.data.earnings[0].date, 'd. MMMM, y (EEEE)')}`
+      ? `Earnings: ${this.datePipe.transform(this.data.earnings[0].date, format)}`
       : 'Earnings';
   }
 

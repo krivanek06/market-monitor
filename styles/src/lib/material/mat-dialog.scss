@@ -112,9 +112,11 @@ mat-dialog-content {
     //height: 100vh !important;
     width: 90vw !important;
     max-width: 1440px !important;
+    max-height: 95vh !important;
 
     @screen sm {
       height: auto !important;
+      max-height: 90vh !important;
     }
 
     @screen md {
