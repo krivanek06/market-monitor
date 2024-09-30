@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { SymbolSummary } from '@mm/api-types';
 import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirective } from '@mm/shared/ui';
@@ -6,7 +6,7 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
 @Component({
   selector: 'app-summary-main-metrics',
   standalone: true,
-  imports: [CommonModule, GeneralCardComponent, PercentageIncreaseDirective, LargeNumberFormatterPipe],
+  imports: [DecimalPipe, CurrencyPipe, GeneralCardComponent, PercentageIncreaseDirective, LargeNumberFormatterPipe],
   template: `
     <div class="flex justify-around">
       <!-- price -->
@@ -96,5 +96,5 @@ import { GeneralCardComponent, LargeNumberFormatterPipe, PercentageIncreaseDirec
   `,
 })
 export class SummaryMainMetricsComponent {
-  stockSummary = input.required<SymbolSummary>();
+  readonly stockSummary = input.required<SymbolSummary>();
 }

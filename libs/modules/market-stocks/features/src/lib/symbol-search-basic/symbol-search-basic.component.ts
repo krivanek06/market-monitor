@@ -149,6 +149,7 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
     :host {
       display: block;
 
+      /* hide the bottom element, it was causing some height issues */
       ::ng-deep .mat-mdc-form-field-subscript-wrapper {
         display: none;
       }

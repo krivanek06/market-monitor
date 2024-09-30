@@ -1,4 +1,4 @@
-import { CommonModule, ViewportScroller } from '@angular/common';
+import { ViewportScroller } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -12,7 +12,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 @Component({
   selector: 'app-summary-action-buttons',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [MatButtonModule, MatIconModule, MatDialogModule],
   template: `
     <mat-dialog-actions class="flex flex-col gap-x-6 gap-y-2 px-4 sm:flex-row">
       <!-- favorites button (only for auth users) -->
@@ -70,22 +70,22 @@ export class SummaryActionButtonsComponent {
   readonly authenticationUserService = inject(AUTHENTICATION_ACCOUNT_TOKEN, {
     optional: true,
   });
-  private dialogServiceUtil = inject(DialogServiceUtil);
-  private route = inject(Router);
-  private viewPortScroller = inject(ViewportScroller);
-  private dialogRef = inject(MatDialog);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly route = inject(Router);
+  private readonly viewPortScroller = inject(ViewportScroller);
+  private readonly dialogRef = inject(MatDialog);
 
   /**
    * id of the symbol - AAPL, MSFT, BTC etc
    */
-  symbolSummary = input.required<SymbolSummary>();
+  readonly symbolSummary = input.required<SymbolSummary>();
 
   /**
    * whether to show the redirect button or not - used only for STOCK and ADR
    */
-  showRedirectButton = input(false);
+  readonly showRedirectButton = input(false);
 
-  isSymbolInWatchList = computed(() => {
+  readonly isSymbolInWatchList = computed(() => {
     if (this.authenticationUserService) {
       return this.authenticationUserService.state.isSymbolInWatchList()(this.symbolSummary().id);
     }

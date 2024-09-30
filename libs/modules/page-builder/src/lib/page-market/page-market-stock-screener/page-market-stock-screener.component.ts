@@ -88,19 +88,21 @@ import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
 })
 export class PageMarketStockScreenerComponent implements OnInit, RouterManagement {
   readonly screenerDefault = 30;
-  private marketApiService = inject(MarketApiService);
-  private dialogServiceUtil = inject(DialogServiceUtil);
-  private dialog = inject(MatDialog);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private readonly marketApiService = inject(MarketApiService);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
-  screenerFormControl = new FormControl<StockScreenerValues>(STOCK_SCREENER_DEFAULT_VALUES, { nonNullable: true });
+  readonly screenerFormControl = new FormControl<StockScreenerValues>(STOCK_SCREENER_DEFAULT_VALUES, {
+    nonNullable: true,
+  });
 
   /**
    * will emit incremented number every time user scrolls near end
    */
-  maxScreenerResults = signal(1);
-  screenerResults = toSignal(
+  readonly maxScreenerResults = signal(1);
+  readonly screenerResults = toSignal(
     this.screenerFormControl.valueChanges.pipe(
       tap((formValue) => {
         // set max results to 1

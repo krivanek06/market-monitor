@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -23,9 +22,9 @@ import { DropdownControlComponent } from '@mm/shared/ui';
 @Component({
   selector: 'app-stock-screener-form-control',
   standalone: true,
-  imports: [CommonModule, DropdownControlComponent, ReactiveFormsModule],
+  imports: [DropdownControlComponent, ReactiveFormsModule],
   template: `
-    <form [formGroup]="screenerFormGroup" class="xs:grid-cols-2 grid gap-x-6 gap-y-4 lg:grid-cols-4">
+    <form [formGroup]="screenerFormGroup" class="xs:grid-cols-2 grid gap-x-6 gap-y-4 md:grid-cols-3 lg:grid-cols-4">
       <!-- market cap. -->
       <app-dropdown-control
         formControlName="marketCap"
@@ -90,17 +89,17 @@ import { DropdownControlComponent } from '@mm/shared/ui';
   `,
 })
 export class StockScreenerFormControlComponent implements OnInit, ControlValueAccessor {
-  STOCK_SCREENER_COUNTRIES = STOCK_SCREENER_COUNTRIES;
-  STOCK_SCREENER_INDUSTRIES = STOCK_SCREENER_INDUSTRIES;
-  STOCK_SCREENER_SECTORS = STOCK_SCREENER_SECTORS;
-  STOCK_SCREENER_EXCHANGE = STOCK_SCREENER_EXCHANGE;
+  readonly STOCK_SCREENER_COUNTRIES = STOCK_SCREENER_COUNTRIES;
+  readonly STOCK_SCREENER_INDUSTRIES = STOCK_SCREENER_INDUSTRIES;
+  readonly STOCK_SCREENER_SECTORS = STOCK_SCREENER_SECTORS;
+  readonly STOCK_SCREENER_EXCHANGE = STOCK_SCREENER_EXCHANGE;
 
-  STOCK_SCREENER_MARKET_CAP = STOCK_SCREENER_MARKET_CAP;
-  STOCK_SCREENER_PRICE = STOCK_SCREENER_PRICE;
-  STOCK_SCREENER_VOLUME = STOCK_SCREENER_VOLUME;
-  STOCK_SCREENER_DIVIDENDS = STOCK_SCREENER_DIVIDENDS;
+  readonly STOCK_SCREENER_MARKET_CAP = STOCK_SCREENER_MARKET_CAP;
+  readonly STOCK_SCREENER_PRICE = STOCK_SCREENER_PRICE;
+  readonly STOCK_SCREENER_VOLUME = STOCK_SCREENER_VOLUME;
+  readonly STOCK_SCREENER_DIVIDENDS = STOCK_SCREENER_DIVIDENDS;
 
-  screenerFormGroup = new FormGroup({
+  readonly screenerFormGroup = new FormGroup({
     country: new FormControl<string | null>(null),
     industry: new FormControl<StockIndustryTypes | null>(null),
     sector: new FormControl<StockSectorTypes | null>(null),
