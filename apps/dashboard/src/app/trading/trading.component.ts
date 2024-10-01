@@ -5,7 +5,7 @@ import { PageTradingComponent } from '@mm/page-builder';
   selector: 'app-trading',
   standalone: true,
   imports: [PageTradingComponent],
-  template: `<app-page-trading></app-page-trading>`,
+  template: `<app-page-trading />`,
   styles: `
     :host {
       display: block;

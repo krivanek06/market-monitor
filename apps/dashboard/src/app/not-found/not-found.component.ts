@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,7 +6,7 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-not-found',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, RouterModule, MatIconModule],
+  imports: [MatButtonModule, RouterModule, MatIconModule],
   template: `
     <section>
       <div class="mt-[250px] flex flex-col items-center gap-4 2xl:mt-[400px]">

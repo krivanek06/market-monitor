@@ -5,7 +5,7 @@ import { PageHallOfFameComponent } from '@mm/page-builder';
   selector: 'app-hall-of-fame',
   standalone: true,
   imports: [PageHallOfFameComponent],
-  template: `<app-page-hall-of-fame></app-page-hall-of-fame>`,
+  template: `<app-page-hall-of-fame />`,
   styles: `
     :host {
       display: block;
