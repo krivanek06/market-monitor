@@ -112,7 +112,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
         <!-- created date -->
         <div class="flex gap-2 max-sm:justify-between">
           <div class="text-wt-gray-dark w-20">Created</div>
-          <div>{{ groupData().createdDate | date: 'MMMM d, y' }}</div>
+          <div>{{ groupData().createdDate | date: 'MMM d, y' }}</div>
         </div>
       </div>
     </div>

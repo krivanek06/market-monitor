@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -20,17 +19,29 @@ export type ConfirmDialogComponentData = {
       <p class="whitespace-pre-line text-xl">{{ data.dialogTitle }}</p>
 
       <!-- input text if exists -->
-      <mat-form-field *ngIf="data.showTextWord" class="mt-5 w-full">
-        <mat-label>Place required text: {{ data.showTextWord }}</mat-label>
-        <input matInput [placeholder]="data.showTextWord" [formControl]="userInputControl" />
-      </mat-form-field>
+      @if (data.showTextWord) {
+        <mat-form-field class="mt-5 w-full">
+          <mat-label>Place required text: {{ data.showTextWord }}</mat-label>
+          <input matInput [placeholder]="data.showTextWord" [formControl]="userInputControl" />
+        </mat-form-field>
+      }
 
       <!-- action button -->
       <div class="mt-6 flex flex-col-reverse gap-4 md:flex-row">
-        <button mat-button *ngIf="data.showCancelButton" class="w-full" (click)="cancel()" color="primary">
-          Cancel
-        </button>
-        <button mat-flat-button class="w-full" color="primary" (click)="confirm()" [disabled]="!enableConfirmButton">
+        <!-- cancel -->
+        @if (data.showCancelButton) {
+          <button mat-button class="w-full" (click)="cancel()" type="button" color="primary">Cancel</button>
+        }
+
+        <!-- confirm -->
+        <button
+          mat-flat-button
+          class="w-full"
+          color="primary"
+          type="button"
+          (click)="confirm()"
+          [disabled]="!enableConfirmButton"
+        >
           {{ data.confirmButton }}
         </button>
       </div>
@@ -43,10 +54,12 @@ export type ConfirmDialogComponentData = {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatDialogModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule],
+  imports: [MatButtonModule, MatDialogModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule],
 })
 export class ConfirmDialogComponent {
-  userInputControl = new FormControl('');
+  private readonly dialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
+  readonly data = inject<ConfirmDialogComponentData>(MAT_DIALOG_DATA);
+  readonly userInputControl = new FormControl('');
 
   get enableConfirmButton(): boolean {
     if (!this.data.showTextWord) {
@@ -55,12 +68,11 @@ export class ConfirmDialogComponent {
     return this.userInputControl.value === this.data.showTextWord;
   }
 
-  constructor(
-    private dialogRef: MatDialogRef<ConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogComponentData,
-  ) {}
-
   confirm(): void {
+    if (!this.enableConfirmButton) {
+      return;
+    }
+
     this.dialogRef.close(true);
   }
 

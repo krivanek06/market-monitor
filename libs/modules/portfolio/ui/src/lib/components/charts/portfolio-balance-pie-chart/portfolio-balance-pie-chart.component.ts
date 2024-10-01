@@ -27,9 +27,9 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioBalancePieChartComponent extends ChartConstructor {
-  data = input.required<PortfolioState>();
+  readonly data = input.required<PortfolioState>();
 
-  chartOptionSignal = computed(() => this.initChart(this.data()));
+  readonly chartOptionSignal = computed(() => this.initChart(this.data()));
 
   private initChart(data: PortfolioState): Highcharts.Options {
     return {
@@ -55,10 +55,11 @@ export class PortfolioBalancePieChartComponent extends ChartConstructor {
         floating: true,
         verticalAlign: 'middle',
         y: 15,
-        text: `
-          <div style="font-size: 18px">${formatValueIntoCurrency(data.balance)}</div>
-
-        `,
+        style: {
+          color: ColorScheme.GRAY_DARK_VAR,
+          fontSize: '18px',
+        },
+        text: formatValueIntoCurrency(data.balance),
       },
       scrollbar: {
         enabled: false,
