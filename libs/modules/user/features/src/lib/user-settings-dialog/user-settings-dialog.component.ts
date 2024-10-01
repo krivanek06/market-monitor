@@ -43,7 +43,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     <app-dialog-close-header title="Settings" />
 
     <mat-dialog-content class="xs:px-6 flex min-h-[350px] flex-col gap-y-6 px-1 lg:flex-row">
-      <div class="border-wt-border flex-1 md:border-r">
+      <div class="border-wt-border flex-1 lg:border-r lg:pr-10">
         <div class="flex flex-col gap-6 sm:flex-row">
           <!-- user image -->
           <div class="max-md:mx-auto">
@@ -51,47 +51,47 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
               folder="users"
               [isDisabled]="userDataNormal()?.isTest"
               [fileName]="userDataNormal()?.id ?? 'Unknown'"
-              [heightPx]="225"
+              [heightPx]="170"
               [formControl]="userImageControl"
             />
           </div>
 
           <!-- user data -->
-          <div class="pt-2 text-lg">
+          <div class="grid flex-1 gap-x-4 overflow-x-clip pt-2 text-base lg:grid-cols-2 xl:text-lg">
             <!-- name -->
-            <div class="c-text-item">
+            <div class="g-item-wrapper">
               <span>Display Name:</span>
               <span>{{ userDataNormal()?.personal?.displayName }}</span>
             </div>
             <!-- initials -->
-            <div class="c-text-item">
+            <div class="g-item-wrapper">
               <span>Initials:</span>
               <span>{{ userDataNormal()?.personal?.displayNameInitials }}</span>
             </div>
             <!-- email -->
-            <div class="c-text-item">
+            <div class="g-item-wrapper">
               <span>Email:</span>
               <span>{{ userDataNormal()?.personal?.email }}</span>
             </div>
             <!-- created -->
-            <div class="c-text-item">
+            <div class="g-item-wrapper">
               <span>Created:</span>
               <span>{{ userDataNormal()?.accountCreatedDate | date: 'MMMM d, y' }}</span>
             </div>
             <!-- account type -->
-            <div class="c-text-item">
+            <div class="g-item-wrapper">
               <span>Account Type:</span>
               <span> {{ userDataNormal()?.userAccountType }}</span>
             </div>
             <!-- starting cash -->
-            <div *appUserAccountType="'DEMO_TRADING'" class="c-text-item">
+            <div *appUserAccountType="'DEMO_TRADING'" class="g-item-wrapper">
               <span>Starting Cash:</span>
               <span> {{ userDataNormal()?.portfolioState?.startingCash | currency }}</span>
             </div>
             <!-- theme -->
-            <div class="flex items-center gap-6">
-              <span class="text-wt-gray-dark">Dark Mode:</span>
-              <app-theme-switcher />
+            <div class="g-item-wrapper">
+              <span>Dark Mode:</span>
+              <app-theme-switcher class="lg:-mr-4" />
             </div>
           </div>
         </div>
@@ -108,7 +108,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
       </div>
 
       <!-- action buttons -->
-      <div class="flex min-w-[180px] flex-col gap-y-3 lg:pl-6">
+      <div class="xs:grid-cols-2 grid min-w-[180px] gap-x-10 gap-y-3 md:grid-cols-3 lg:grid-cols-1 lg:pl-6">
         <!--  Change Account type -->
         <button
           [disabled]="userDataNormal()?.isTest"
@@ -196,15 +196,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     }
 
     button {
-      @apply h-11;
-    }
-
-    .c-text-item {
-      display: flex;
-      :first-child {
-        min-width: 170px;
-        color: var(--gray-dark);
-      }
+      @apply h-10;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -222,7 +214,7 @@ export class UserSettingsDialogComponent implements OnInit {
     optional: true,
   });
 
-  // use userDataNormal because this component get's destroyed as last one and before it is destroyed, use will be undefined - for deleting account
+  /* use userDataNormal because this component get's destroyed as last one and before it is destroyed, use will be undefined - for deleting account */
   readonly userDataNormal = this.authenticationUserStoreService.state.getUserDataNormal;
   readonly userDataSignal = this.authenticationUserStoreService.state.getUserData;
   readonly userSignal = this.authenticationUserStoreService.state.getUser;
