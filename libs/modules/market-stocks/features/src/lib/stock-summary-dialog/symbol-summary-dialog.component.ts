@@ -32,7 +32,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
   template: `
     @if (symbolSummary(); as symbolSummary) {
       <!-- heading -->
-      <div class="flex flex-col gap-y-4 p-4 md:flex-row md:justify-between">
+      <div class="flex flex-col gap-y-6 p-4 md:flex-row md:justify-between">
         <div class="flex justify-between">
           <!-- symbol info -->
           <div class="flex gap-3 md:items-center">

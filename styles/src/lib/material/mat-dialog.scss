@@ -2,9 +2,9 @@
   background: var(--background-present) !important;
   color: var(--gray-medium) !important;
   padding-left: 16px !important;
-  padding-right: 4px !important;
+  padding-right: 16px !important;
   padding-bottom: 16px !important;
-  padding-left: 0 !important;
+  padding-top: 8px !important;
   max-width: 100% !important;
 
   @screen sm {
@@ -110,7 +110,7 @@ mat-dialog-content {
 
   .mat-mdc-dialog-container {
     //height: 100vh !important;
-    width: 90vw !important;
+    width: 98vw !important;
     max-width: 1440px !important;
     max-height: 95vh !important;
 
