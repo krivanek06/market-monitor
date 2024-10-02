@@ -30,12 +30,13 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
     TruncatePipe,
   ],
   template: `
+    <!-- data -->
     @if (symbolSummary(); as symbolSummary) {
       <!-- heading -->
-      <div class="flex flex-col gap-y-6 p-4 md:flex-row md:justify-between">
+      <div class="flex flex-col gap-y-6 p-4 lg:flex-row lg:justify-between">
         <div class="flex justify-between">
           <!-- symbol info -->
-          <div class="flex gap-3 md:items-center">
+          <div class="flex items-center gap-3">
             <img appDefaultImg imageType="symbol" [src]="symbolSummary.id" alt="Stock Image" class="h-11 w-11" />
             <div class="grid">
               <div class="text-wt-gray-medium flex gap-4 text-base">
@@ -48,7 +49,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
           </div>
 
           <!-- close button -->
-          <div class="md:hidden">
+          <div class="lg:hidden">
             <button mat-button mat-dialog-close color="warn">
               <mat-icon>close</mat-icon>
               close
@@ -78,6 +79,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
             [title]="data.symbol"
             [symbol]="data.symbol"
             [errorFromParent]="!symbolSummary.priceChange['5D']"
+            [chartHeightPx]="420"
           />
         </div>
       </mat-dialog-content>

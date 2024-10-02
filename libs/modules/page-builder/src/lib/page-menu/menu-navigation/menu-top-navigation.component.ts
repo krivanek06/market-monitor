@@ -169,7 +169,7 @@ import { filter, map, startWith } from 'rxjs';
           </div>
 
           <!-- search -->
-          <app-symbol-search-basic class="mt-2 hidden w-[385px] scale-90 md:block xl:-mr-6" />
+          <app-symbol-search-basic class="mt-2 hidden w-[475px] scale-90 md:block xl:-mr-6 xl:w-[400px]" />
 
           <div class="hidden items-center gap-1 xl:flex">
             <!-- display logged in person -->

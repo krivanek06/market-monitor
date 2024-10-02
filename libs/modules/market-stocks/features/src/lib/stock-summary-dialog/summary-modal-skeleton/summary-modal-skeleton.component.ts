@@ -6,12 +6,12 @@ import { Component } from '@angular/core';
   imports: [],
   template: `
     <!-- heading -->
-    <div class="mb-2 flex flex-col gap-y-6 p-4 md:flex-row md:justify-between">
+    <div class="mb-2 flex flex-col gap-y-6 p-4 lg:flex-row lg:justify-between">
       <!-- symbol info -->
       <div class="flex items-center gap-3">
         <div class="g-skeleton h-12 w-12"></div>
         <div class="grid gap-1">
-          <div class="text-md text-wt-gray-medium flex gap-3">
+          <div class="text-wt-gray-medium flex gap-3 text-lg">
             <span class="g-skeleton h-4 w-10"></span>
             <span class="g-skeleton h-4 w-6"></span>
             <span class="g-skeleton h-4 w-10"></span>
@@ -85,7 +85,7 @@ import { Component } from '@angular/core';
 
     <!-- price & volume chart -->
     <div class="pl-4 pr-4">
-      <div class="g-skeleton h-[420px]"></div>
+      <div class="g-skeleton h-[390px]"></div>
     </div>
   `,
   styles: `

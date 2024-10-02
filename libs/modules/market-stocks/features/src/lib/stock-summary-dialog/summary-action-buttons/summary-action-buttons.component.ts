@@ -46,6 +46,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 
       @if (showRedirectButton()) {
         <button
+          cdkFocusInitial
           data-testid="summary-action-buttons-redirect"
           class="h-10 max-sm:w-full"
           type="button"

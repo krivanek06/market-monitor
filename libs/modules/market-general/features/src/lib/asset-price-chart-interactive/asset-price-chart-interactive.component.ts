@@ -73,7 +73,7 @@ import { catchError, startWith, switchMap, tap } from 'rxjs';
         </div>
 
         <!-- chart skeleton -->
-        <div [style.height.px]="chartHeightPx() - 25" class="g-skeleton"></div>
+        <div [style.height.px]="chartHeightPx() - 20" class="g-skeleton"></div>
       }
     } @else {
       <!-- error loading -->
