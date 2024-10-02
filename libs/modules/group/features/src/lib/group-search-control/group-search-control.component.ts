@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
@@ -18,7 +17,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, 
   selector: 'app-group-search-control',
   standalone: true,
   imports: [
-    CommonModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
     MatInputModule,
@@ -54,9 +52,11 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, 
         @for (group of optionsSignal(); let last = $last; track group.id) {
           <mat-option [value]="group" class="rounded-md py-2">
             <app-group-display-item [groupData]="group" />
-            <div *ngIf="!last" class="mt-2">
-              <mat-divider></mat-divider>
-            </div>
+            @if (!last) {
+              <div class="mt-2">
+                <mat-divider />
+              </div>
+            }
           </mat-option>
         }
       </mat-autocomplete>
@@ -65,11 +65,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, 
   styles: `
     :host {
       display: block;
-    }
-
-    ::ng-deep .mat-mdc-form-field-infix {
-      height: 48px !important;
-      min-height: 48px !important;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -82,12 +77,12 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, 
   ],
 })
 export class GroupSearchControlComponent implements ControlValueAccessor {
-  private groupApiService = inject(GroupApiService);
-  private aggregationApiService = inject(AggregationApiService);
+  private readonly groupApiService = inject(GroupApiService);
+  private readonly aggregationApiService = inject(AggregationApiService);
 
-  selectedEmitter = output<GroupData>();
-  searchControl = new FormControl<string>('', { nonNullable: true });
-  optionsSignal = toSignal(
+  readonly selectedEmitter = output<GroupData>();
+  readonly searchControl = new FormControl<string>('', { nonNullable: true });
+  readonly optionsSignal = toSignal(
     this.searchControl.valueChanges.pipe(
       startWith(''),
       filter((d) => d.length < 10),

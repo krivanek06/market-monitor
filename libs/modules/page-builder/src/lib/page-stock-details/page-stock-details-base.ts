@@ -8,17 +8,19 @@ import { Observable, map } from 'rxjs';
 
 @Directive()
 export class PageStockDetailsBase {
-  route = inject(ActivatedRoute);
-  router = inject(Router);
-  dialogServiceUtil = inject(DialogServiceUtil);
-  stocksApiService = inject(StocksApiService);
-  marketApiService = inject(MarketApiService);
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly router = inject(Router);
+  protected readonly dialogServiceUtil = inject(DialogServiceUtil);
+  protected readonly stocksApiService = inject(StocksApiService);
+  protected readonly marketApiService = inject(MarketApiService);
 
   // get stock details from route data - can change from stock peers
-  stockDetails$ = this.route.parent?.data?.pipe(map((d) => d['stockDetails'])) as Observable<StockDetails>;
+  protected readonly stockDetails$ = this.route.parent?.data?.pipe(
+    map((d) => d['stockDetails']),
+  ) as Observable<StockDetails>;
 
-  stockDetailsSignal = toSignal(this.stockDetails$, {
+  protected readonly stockDetailsSignal = toSignal(this.stockDetails$, {
     initialValue: this.route.parent?.snapshot.data['stockDetails'] as StockDetails,
   });
-  stockSymbolSignal = computed(() => this.stockDetailsSignal().id);
+  protected readonly stockSymbolSignal = computed(() => this.stockDetailsSignal().id);
 }
