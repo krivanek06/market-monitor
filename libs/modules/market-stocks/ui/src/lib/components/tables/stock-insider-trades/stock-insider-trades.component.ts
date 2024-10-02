@@ -37,10 +37,11 @@ import { BubblePaginationDirective, LargeNumberFormatterPipe } from '@mm/shared/
         <td mat-cell *matCellDef="let row">
           <div class="grid">
             <span class="text-wt-gray-dark">{{ row.reportingName }}</span>
-            <div class="flex flex-row gap-2">
-              <span class="xs:block hidden">{{ row.typeOfOwner }}</span>
-              <span class="xs:max-sm:block">|</span>
-              <span class="block sm:hidden">{{ row.transactionDate | date: 'MMMM d, y' }}</span>
+
+            <!-- post & transaction date -->
+            <div class="flex flex-row gap-2 text-sm">
+              <span class="max-sm:hidden">{{ row.typeOfOwner }}</span>
+              <span class="sm:hidden">{{ row.transactionDate | date: 'MMM d, y' }}</span>
             </div>
           </div>
         </td>
@@ -77,8 +78,8 @@ import { BubblePaginationDirective, LargeNumberFormatterPipe } from '@mm/shared/
 
       <!-- securitiesTransacted -->
       <ng-container matColumnDef="securitiesTransacted">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Units</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Units</th>
+        <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           {{ row.securitiesTransacted | largeNumberFormatter: false : false }}
         </td>
       </ng-container>
@@ -103,14 +104,14 @@ import { BubblePaginationDirective, LargeNumberFormatterPipe } from '@mm/shared/
       <ng-container matColumnDef="date">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Date</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          {{ row.transactionDate | date: 'MMMM d, y' }}
+          {{ row.transactionDate | date: 'MMM d, y' }}
         </td>
       </ng-container>
 
       <!-- redirect -->
       <ng-container matColumnDef="redirect">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Redirect</th>
-        <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Redirect</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <a mat-icon-button [href]="row.link" target="_blank">
             <mat-icon>open_in_new</mat-icon>
           </a>
@@ -159,11 +160,11 @@ import { BubblePaginationDirective, LargeNumberFormatterPipe } from '@mm/shared/
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockInsiderTradesComponent {
-  paginator = viewChild(MatPaginator);
-  sort = viewChild(MatSort);
-  data = input.required<CompanyInsideTrade[]>();
+  readonly paginator = viewChild(MatPaginator);
+  readonly sort = viewChild(MatSort);
+  readonly data = input.required<CompanyInsideTrade[]>();
 
-  tableEffect = effect(() => {
+  readonly tableEffect = effect(() => {
     const data = this.data();
     untracked(() => {
       this.dataSource.data = data;
@@ -172,9 +173,9 @@ export class StockInsiderTradesComponent {
       this.dataSource._updateChangeSubscription();
     });
   });
-  dataSource = new MatTableDataSource<CompanyInsideTrade>([]);
+  readonly dataSource = new MatTableDataSource<CompanyInsideTrade>([]);
 
-  displayedColumns: string[] = [
+  readonly displayedColumns: string[] = [
     'person',
     'securityName',
     'transactionType',
