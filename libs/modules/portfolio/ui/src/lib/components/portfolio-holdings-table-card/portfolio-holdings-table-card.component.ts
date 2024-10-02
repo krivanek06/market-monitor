@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,7 +11,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { PortfolioStateHoldings } from '@mm/api-types';
+import { MatIconModule } from '@angular/material/icon';
+import { PortfolioStateHoldings, USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { GeneralCardComponent, ShowMoreButtonComponent } from '@mm/shared/ui';
@@ -21,14 +22,27 @@ import { PortfolioHoldingsTableComponent } from '../tables';
   selector: 'app-portfolio-holdings-table-card',
   standalone: true,
   imports: [
-    CommonModule,
+    NgTemplateOutlet,
     GeneralCardComponent,
     PortfolioHoldingsTableComponent,
     SymbolSummaryDialogComponent,
     ShowMoreButtonComponent,
+    MatIconModule,
   ],
   template: `
-    <app-general-card [title]="cardTitle()" matIcon="show_chart">
+    @if (showInCard()) {
+      <app-general-card [title]="cardTitle()" matIcon="show_chart">
+        <ng-container *ngTemplateOutlet="content" />
+      </app-general-card>
+    } @else {
+      <h2 class="text-wt-primary mb-2 flex items-center gap-2 text-base">
+        <mat-icon color="primary">show_chart</mat-icon>
+        {{ cardTitle() }}
+      </h2>
+      <ng-container *ngTemplateOutlet="content" />
+    }
+
+    <ng-template #content>
       <!-- invisible el - use if to prevent immediate camera scroll -->
       @if (selectedHoldingsToggle()) {
         <div data-testid="portfolio-holding-table-card-start" #startSection></div>
@@ -52,7 +66,7 @@ import { PortfolioHoldingsTableComponent } from '../tables';
           [itemsTotal]="(portfolioStateHolding()?.holdings ?? []).length"
         />
       </div>
-    </app-general-card>
+    </ng-template>
   `,
   styles: `
     :host {
@@ -76,7 +90,12 @@ export class PortfolioHoldingsTableCardComponent {
   /**
    * maximum number of holdings that can be in the table
    */
-  readonly maximumHoldingLimit = input(0);
+  readonly maximumHoldingLimit = input(USER_HOLDINGS_SYMBOL_LIMIT);
+
+  /**
+   * show the card the content
+   */
+  readonly showInCard = input(true);
 
   readonly displayedColumns = input<string[]>([
     'symbol',

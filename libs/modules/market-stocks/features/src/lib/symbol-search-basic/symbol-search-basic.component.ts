@@ -45,22 +45,9 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
     MatRadioModule,
   ],
   template: `
-    <mat-form-field
-      class="w-full"
-      cdkOverlayOrigin
-      #trigger
-      #origin="cdkOverlayOrigin"
-      [style.height.px]="isSmallInput() ? 45 : undefined"
-    >
+    <mat-form-field class="w-full" cdkOverlayOrigin #trigger #origin="cdkOverlayOrigin">
       <!-- search input -->
-      <mat-label
-        [ngClass]="{
-          'text-sm': isSmallInput(),
-          'text-base': !isSmallInput(),
-        }"
-      >
-        Search symbol by ticker
-      </mat-label>
+      <mat-label> Search symbol by ticker </mat-label>
       <input
         data-testid="search-basic-input"
         type="text"
@@ -185,11 +172,6 @@ export class SymbolSearchBasicComponent {
    * user's holdings to display
    */
   readonly holdings = input<SymbolQuote[]>();
-
-  /**
-   * size of the input
-   */
-  readonly isSmallInput = input<boolean>(false);
 
   /**
    * user's input value to load symbols

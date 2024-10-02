@@ -10,5 +10,4 @@ export class SymbolSearchBasicComponentMock {
   clickedQuote = output<SymbolQuote>();
   openModalOnClick = input(true);
   holdings = input<SymbolQuote[]>([]);
-  isSmallInput = input(false);
 }

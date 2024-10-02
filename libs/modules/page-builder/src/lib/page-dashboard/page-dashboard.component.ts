@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
@@ -194,7 +193,6 @@ import {
       class="mb-12"
       data-testid="page-dashboard-portfolio-holdings-table"
       [portfolioStateHolding]="portfolioUserFacadeService.portfolioStateHolding()"
-      [maximumHoldingLimit]="USER_HOLDINGS_SYMBOL_LIMIT"
     />
 
     @if (stateRef.userHaveTransactions()) {
@@ -259,7 +257,6 @@ export class PageDashboardComponent {
    */
   readonly transactionLimit = 15;
   readonly ColorScheme = ColorScheme;
-  readonly USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
   readonly stateRef = this.authenticationUserService.state;
   readonly hasEnoughTransactions = computed(
     () => (this.stateRef.portfolioTransactions()?.length ?? 0) > this.transactionLimit,
