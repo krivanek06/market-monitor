@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -44,6 +45,7 @@ describe('PortfolioHoldingsTableCardComponent', () => {
       .replace(PortfolioHoldingsTableComponent, PortfolioHoldingsTableComponentMock)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(NoopAnimationsModule)
+      .keep(NgTemplateOutlet)
       .mock(ShowMoreButtonComponent)
       .provide({
         provide: MatDialog,
