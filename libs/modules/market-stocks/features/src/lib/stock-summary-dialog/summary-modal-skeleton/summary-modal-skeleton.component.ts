@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   imports: [],
   template: `
     <!-- heading -->
-    <div class="mb-2 flex flex-col gap-y-6 p-4 lg:flex-row lg:justify-between">
+    <div class="mb-2 flex flex-col gap-y-6 p-4 md:-mt-1 lg:flex-row lg:justify-between">
       <!-- symbol info -->
       <div class="flex items-center gap-3">
         <div class="g-skeleton h-12 w-12"></div>
@@ -23,8 +23,8 @@ import { Component } from '@angular/core';
 
       <!-- action buttons -->
       <div class="flex flex-row justify-between gap-x-4 gap-y-2 px-4">
-        <div class="g-skeleton h-11 w-full sm:w-[220px]"></div>
-        <div class="g-skeleton h-11 w-full sm:w-[180px]"></div>
+        <div class="g-skeleton h-10 w-full sm:w-[205px]"></div>
+        <div class="g-skeleton h-10 w-full sm:w-[160px]"></div>
       </div>
     </div>
 
