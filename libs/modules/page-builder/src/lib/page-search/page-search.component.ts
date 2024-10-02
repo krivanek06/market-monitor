@@ -14,9 +14,9 @@ import { forkJoin, take } from 'rxjs';
   imports: [MatButtonModule, NewsSearchComponent, SymbolSearchBasicComponent],
   template: `
     <div class="pb-[260px] pt-[180px] sm:pb-[300px] sm:pt-[200px]">
-      <div class="mx-auto max-w-[620px]">
-        <h1 class="text-center text-2xl">Search Stock</h1>
-        <app-symbol-search-basic />
+      <div class="mx-auto max-w-[520px]">
+        <h1 class="text-center text-2xl">Search Symbol</h1>
+        <app-symbol-search-basic class="scale-125" />
         <div class="text-wt-gray-medium -mt-3 pl-3 text-xs">Ex: 'AAPL, MSFT, UBER, NFLX'</div>
       </div>
     </div>

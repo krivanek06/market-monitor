@@ -78,7 +78,6 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
       [cdkConnectedOverlayOpen]="isInputFocused()"
     >
       <div
-        id="search-basic-overlay"
         appElementFocus
         (outsideClick)="onInputFocus(false)"
         data-testid="search-basic-overlay"
