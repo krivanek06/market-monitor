@@ -163,7 +163,7 @@ import { filter, map, startWith } from 'rxjs';
                   [src]="userDataSignal.personal.photoURL"
                   [alt]="userDataSignal.personal.displayName"
                 />
-                <span>{{ userDataSignal.personal.displayName }}</span>
+                <span>{{ userDataSignal.personal.displayNameInitials }}</span>
               </div>
             }
           </div>
@@ -329,23 +329,23 @@ export class MenuTopNavigationComponent implements OnInit {
     }
 
     if (route.includes(ROUTES_MAIN.STOCK_SCREENER)) {
-      return 'Market - Screener';
+      return 'Screener';
     }
 
     if (route.includes(ROUTES_MAIN.MARKET_CALENDAR)) {
-      return 'Market - Calendar';
+      return 'Calendar';
     }
 
     if (route.includes(ROUTES_MAIN.ECONOMICS)) {
-      return 'Market - Economics';
+      return 'Economics';
     }
 
     if (route.includes(ROUTES_MAIN.NEWS)) {
-      return 'Market - News';
+      return 'News';
     }
 
     if (route.includes(ROUTES_MAIN.TOP_PERFORMERS)) {
-      return 'Market - Top Performers';
+      return 'Top Performers';
     }
 
     // default fallback
