@@ -15,10 +15,9 @@ import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
 import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
-import { ColorScheme, InputSource } from '@mm/shared/data-access';
+import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
-  DropdownControlComponent,
   FormMatInputWrapperComponent,
   QuoteItemComponent,
   RangeDirective,
@@ -47,67 +46,57 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     SectionTitleComponent,
     FormMatInputWrapperComponent,
     ReactiveFormsModule,
-    DropdownControlComponent,
     NgClass,
   ],
   template: `
     <!-- account state -->
-    <div class="mb-6 grid grid-cols-1 gap-8 md:grid-cols-2 xl:mb-2 xl:grid-cols-3">
+    <div class="mb-12 flex flex-col justify-between gap-8 md:flex-row">
       <!-- account state -->
       <app-portfolio-state
         data-testid="page-trading-portfolio-state"
-        class="sm:pl-10"
+        class="max-md:flex-1 md:basis-2/5 2xl:basis-1/3"
         [titleColor]="ColorScheme.PRIMARY_VAR"
         [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
         [showCashSegment]="authenticationUserService.state.isAccountDemoTrading()"
         [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
       />
 
-      <div class="flex flex-col gap-x-6 gap-y-6 max-md:-ml-4 xl:col-span-2 xl:flex-row">
-        <!-- holdings -->
-        <app-dropdown-control
-          data-testid="page-trading-holding-dropdown"
-          class="h-12 w-full scale-90"
-          inputCaption="Select a holding"
-          displayImageType="symbol"
-          [inputSource]="holdingsInputSource()"
-          [formControl]="selectedSymbolControl"
-        />
-
+      <div class="flex flex-col gap-6 max-md:flex-1 md:basis-3/5 lg:basis-2/5 2xl:basis-1/3">
         <!-- search -->
         <app-symbol-search-basic
           data-testid="page-trading-symbol-search-basic"
-          class="h-12 w-full scale-90"
+          class="h-12 w-full"
           (clickedQuote)="onSymbolQuoteClick($event)"
           [openModalOnClick]="false"
+          [holdings]="holdingsInputSource()"
         />
-      </div>
-    </div>
 
-    <!-- action buttons -->
-    <div class="mb-6 flex flex-col gap-4 sm:flex-row xl:justify-end">
-      <button
-        data-testid="page-trading-buy-button"
-        (click)="onOperationClick('BUY')"
-        class="w-full xl:w-[280px]"
-        [disabled]="!allowBuyOperationSignal() || !allowActionButtons()"
-        mat-stroked-button
-        color="accent"
-        type="button"
-      >
-        BUY
-      </button>
-      <button
-        data-testid="page-trading-sell-button"
-        (click)="onOperationClick('SELL')"
-        class="w-full xl:w-[280px]"
-        [disabled]="!allowActionButtons()"
-        mat-stroked-button
-        color="warn"
-        type="button"
-      >
-        SELL
-      </button>
+        <!-- action buttons -->
+        <div class="mx-auto flex w-full gap-4">
+          <button
+            data-testid="page-trading-buy-button"
+            (click)="onOperationClick('BUY')"
+            class="w-full"
+            [disabled]="!allowBuyOperationSignal() || !allowActionButtons()"
+            mat-stroked-button
+            color="accent"
+            type="button"
+          >
+            BUY
+          </button>
+          <button
+            data-testid="page-trading-sell-button"
+            (click)="onOperationClick('SELL')"
+            class="w-full"
+            [disabled]="!allowActionButtons()"
+            mat-stroked-button
+            color="warn"
+            type="button"
+          >
+            SELL
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- historical chart & summary -->
@@ -134,9 +123,10 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
         </div>
       }
     } @else if (symbolSummarySignal().state === 'loading') {
-      <div class="mb-6 flex h-[470px] flex-col gap-4 xl:flex-row">
-        <div class="g-skeleton lg:basis-3/5"></div>
-        <div class="g-skeleton lg:basis-2/5"></div>
+      <!-- skeleton -->
+      <div class="mb-6 flex flex-col gap-4 xl:flex-row">
+        <div class="g-skeleton min-h-[450px] lg:basis-3/5"></div>
+        <div class="g-skeleton min-h-[450px] lg:basis-2/5"></div>
       </div>
     } @else {
       <div class="grid h-[440px] place-content-center text-center text-lg">Failed to load symbol summary</div>
@@ -257,15 +247,11 @@ export class PageTradingComponent {
 
   readonly holdingsInputSource = computed(() => {
     return (
-      this.portfolioUserFacadeService.portfolioStateHolding()?.holdings?.map(
-        (holding) =>
-          ({
-            value: holding.symbol,
-            caption: `${holding.symbolQuote.name}`,
-            image: holding.symbolQuote.symbol,
-          }) satisfies InputSource<string>,
-      ) ?? []
-    ).sort((a, b) => a.caption.localeCompare(b.caption));
+      this.portfolioUserFacadeService
+        .portfolioStateHolding()
+        ?.holdings?.map((holding) => holding.symbolQuote)
+        .sort((a, b) => a.name.localeCompare(b.name)) ?? []
+    );
   });
 
   readonly ColorScheme = ColorScheme;

@@ -26,7 +26,7 @@ body {
 }
 
 .g-item-wrapper {
-  @apply flex justify-between items-center p-3 gap-4 w-full text-base;
+  @apply flex w-full items-center justify-between gap-4 px-3 py-2 text-sm;
 
   & > :first-child {
     @apply flex-1 text-gray-400;
@@ -53,11 +53,11 @@ body {
 }
 
 .g-section-title {
-  @apply text-3xl text-cyan-700 text-center mb-8 md:mb-16 capitalize;
+  @apply mb-10 text-center text-2xl capitalize text-cyan-800 md:mb-16;
 }
 
 .g-skeleton {
-  @apply rounded-lg bg-gray-800 animate-pulse;
+  @apply animate-pulse rounded-lg bg-gray-800;
 }
 
 @layer base {
@@ -84,7 +84,7 @@ body {
   left: 50%;
   top: 50%;
   translate: -50% -50%;
-  opacity: 0.2;
+  opacity: 0.3;
   animation:
     blobRadius 5s ease infinite,
     rotate 20s infinite;

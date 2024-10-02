@@ -2,21 +2,16 @@
 .mat-mdc-form-field {
   font-size: 12px !important;
 
-  input,
-  textarea,
-  .mat-mdc-select-placeholder,
-  mat-select {
-    font-size: 1rem;
-  }
-
   .mat-mdc-form-field-infix {
-    padding-top: 20px !important;
-    padding-bottom: 0px !important;
-
     label {
-      // font-size: 1rem !important;
       margin-top: -4px !important;
       color: var(--gray-medium) !important;
+      font-size: 14px !important;
+    }
+
+    /** put user's typing a bit higher */
+    input {
+      margin-top: -10px;
     }
   }
 
@@ -26,6 +21,11 @@
       color: var(--gray-medium) !important;
     }
   }
+}
+
+/* make the whole form field smaller */
+.mat-mdc-form-field-flex {
+  height: 45px !important;
 }
 
 /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
@@ -75,7 +75,6 @@ mat-divider {
 }
 
 .mat-mdc-text-field-wrapper {
-  // background: var(--gray-medium) !important;
   border-radius: 20px !important;
 }
 
@@ -84,7 +83,7 @@ mat-divider {
   margin-right: 8px !important;
 }
 
-// remove space for error message if not error is present
+/* remove space for error message if not error is present */
 .mat-mdc-form-field-bottom-align::before {
   height: 0px !important;
 }

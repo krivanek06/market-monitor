@@ -5,43 +5,37 @@ import { HallOfFameGroups, HallOfFameUsers } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
 import { doc } from 'firebase/firestore';
 import { docData as rxDocData } from 'rxfire/firestore';
-import { Observable, map, shareReplay } from 'rxjs';
+import { map, shareReplay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AggregationApiService {
-  private firestore = inject(Firestore);
-  private defaultValue = {
+  private readonly firestore = inject(Firestore);
+  private readonly defaultValue = {
     date: '',
     bestPortfolio: [],
     bestDailyGains: [],
     worstDailyGains: [],
   } satisfies HallOfFameUsers;
 
-  hallOfFameUsers = toSignal(this.getHallOfFameUsers(), {
+  readonly hallOfFameUsers$ = rxDocData(this.getHallOfFameUsersDocRef()).pipe(
+    map((data) => data ?? this.defaultValue),
+    shareReplay({ refCount: false, bufferSize: 1 }),
+  );
+
+  readonly hallOfFameGroups$ = rxDocData(this.getHallOfFameGroupsDocRef()).pipe(
+    map((data) => data ?? this.defaultValue),
+    shareReplay({ refCount: false, bufferSize: 1 }),
+  );
+
+  readonly hallOfFameUsers = toSignal(this.hallOfFameUsers$, {
     initialValue: this.defaultValue,
   });
 
-  hallOfFameGroups = toSignal(this.getHallOfFameGroups(), {
+  readonly hallOfFameGroups = toSignal(this.hallOfFameGroups$, {
     initialValue: this.defaultValue,
   });
-
-  private getHallOfFameUsers(): Observable<HallOfFameUsers> {
-    // cache the data
-    return rxDocData(this.getHallOfFameUsersDocRef()).pipe(
-      map((data) => data ?? this.defaultValue),
-      shareReplay({ refCount: false, bufferSize: 1 }),
-    );
-  }
-
-  private getHallOfFameGroups(): Observable<HallOfFameGroups> {
-    // cache the data
-    return rxDocData(this.getHallOfFameGroupsDocRef()).pipe(
-      map((data) => data ?? this.defaultValue),
-      shareReplay({ refCount: false, bufferSize: 1 }),
-    );
-  }
 
   private getHallOfFameGroupsDocRef(): DocumentReference<HallOfFameGroups> {
     return doc(this.getAggregationCollectionRef(), 'hall_of_fame_groups').withConverter(

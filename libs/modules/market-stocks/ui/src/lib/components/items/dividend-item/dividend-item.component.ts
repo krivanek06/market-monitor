@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { CalendarDividend, CompanyStockDividend } from '@mm/api-types';
@@ -7,7 +7,7 @@ import { DefaultImgDirective } from '@mm/shared/ui';
 @Component({
   selector: 'app-dividend-item',
   standalone: true,
-  imports: [CommonModule, DefaultImgDirective, MatButtonModule],
+  imports: [NgClass, CurrencyPipe, DefaultImgDirective, MatButtonModule],
   template: `
     <button (click)="onItemClick()" type="button" mat-button class="w-full">
       <div class="flex items-center justify-between py-1" [ngClass]="{ 'g-border-bottom': showBorder() }">
@@ -28,9 +28,9 @@ import { DefaultImgDirective } from '@mm/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DividendItemComponent {
-  itemClickedEmitter = output<void>();
-  dividend = input.required<CompanyStockDividend | CalendarDividend>();
-  showBorder = input(false);
+  readonly itemClickedEmitter = output<void>();
+  readonly dividend = input.required<CompanyStockDividend | CalendarDividend>();
+  readonly showBorder = input(false);
 
   onItemClick(): void {
     this.itemClickedEmitter.emit();

@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -12,7 +11,7 @@ import { TabSelectControlComponent } from '@mm/shared/ui';
 @Component({
   selector: 'app-stock-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, TabSelectControlComponent, ReactiveFormsModule, MatButtonModule, MatIconModule],
+  imports: [RouterModule, TabSelectControlComponent, ReactiveFormsModule, MatButtonModule, MatIconModule],
   template: `
     <section>
       <div class="mb-6 flex justify-end">
@@ -25,7 +24,7 @@ import { TabSelectControlComponent } from '@mm/shared/ui';
         ></app-tab-select-control>
       </div>
 
-      <router-outlet></router-outlet>
+      <router-outlet />
     </section>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,10 +35,10 @@ import { TabSelectControlComponent } from '@mm/shared/ui';
   `,
 })
 export class StockDetailsComponent {
-  router = inject(Router);
-  route = inject(ActivatedRoute);
-  routesStockDetailsControl = new FormControl<string>(ROUTES_STOCK_DETAILS.OVERVIEW);
-  routesStockDetails: LabelValue<string>[] = [
+  readonly router = inject(Router);
+  readonly route = inject(ActivatedRoute);
+  readonly routesStockDetailsControl = new FormControl<string>(ROUTES_STOCK_DETAILS.OVERVIEW);
+  readonly routesStockDetails: LabelValue<string>[] = [
     { label: 'Overview', value: ROUTES_STOCK_DETAILS.OVERVIEW },
     { label: 'Financials', value: ROUTES_STOCK_DETAILS.FINANCIALS },
     { label: 'Ratios', value: ROUTES_STOCK_DETAILS.RATIOS },

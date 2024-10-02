@@ -4,6 +4,7 @@ import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angu
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,6 +34,7 @@ import { combineLatest, map, switchMap } from 'rxjs';
     MatProgressSpinnerModule,
     FormsModule,
     ScrollingModule,
+    MatButtonModule,
   ],
   template: `
     <mat-form-field class="w-full" [ngClass]="size()">
@@ -62,32 +64,39 @@ import { combineLatest, map, switchMap } from 'rxjs';
             [value]="quote"
             class="rounded-md py-2"
           >
-            <app-quote-item [symbolQuote]="quote" />
+            <app-quote-item [displayImage]="false" [symbolQuote]="quote" />
             @if (!last) {
               <mat-divider />
             }
           </mat-option>
         </cdk-virtual-scroll-viewport>
+
+        <!-- cancel button -->
+        <button (click)="onSearchCancel()" mat-stroked-button type="button" class="w-full">Cancel</button>
       </mat-autocomplete>
     </mat-form-field>
   `,
   styles: `
     :host {
       display: block;
-    }
 
-    ::ng-deep {
-      .mat-mdc-autocomplete-panel {
-        max-height: 420px !important;
+      ::ng-deep {
+        .mat-mdc-autocomplete-panel {
+          max-height: 420px !important;
 
-        @screen md {
-          min-width: 600px;
+          @screen md {
+            min-width: 600px;
+          }
+        }
+
+        .small .mat-mdc-form-field-infix {
+          max-height: 45px !important;
+          min-height: 45px !important;
         }
       }
 
-      .small .mat-mdc-form-field-infix {
-        max-height: 45px !important;
-        min-height: 45px !important;
+      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+        display: none !important;
       }
     }
   `,
@@ -101,20 +110,30 @@ import { combineLatest, map, switchMap } from 'rxjs';
   ],
 })
 export class QuoteSearchBasicComponent implements ControlValueAccessor {
-  private marketApiService = inject(MarketApiService);
+  private readonly marketApiService = inject(MarketApiService);
 
-  type = input.required<AvailableQuotes>();
-  size = input<'small'>('small');
+  readonly type = input.required<AvailableQuotes>();
+  readonly size = input<'small'>('small');
 
-  searchControlSignal = signal<string>('');
+  readonly searchControlSignal = signal<string>('');
 
-  displayedOptions = toSignal(
+  readonly displayedOptions = toSignal(
     combineLatest([
       toObservable(this.type).pipe(switchMap((type) => this.marketApiService.getQuotesByType(type))),
       toObservable(this.searchControlSignal),
     ]).pipe(
       map(([quotesData, searchQuotePrefix]) =>
         quotesData.filter((quote) => quote.name.toLowerCase().includes(searchQuotePrefix.toLowerCase())),
+      ),
+      map((quotes) =>
+        // indexes do not have displaySymbol
+        quotes.map(
+          (d) =>
+            ({
+              ...d,
+              displaySymbol: d.name,
+            }) satisfies SymbolQuote,
+        ),
       ),
     ),
 
@@ -128,6 +147,10 @@ export class QuoteSearchBasicComponent implements ControlValueAccessor {
     const quote = event.option.value as SymbolQuote;
     this.onChange(quote);
     this.searchControlSignal.set(quote.name);
+  }
+
+  onSearchCancel(): void {
+    this.searchControlSignal.set('');
   }
 
   displayProperty = (quote?: SymbolQuote | string) => (typeof quote === 'string' ? quote : (quote?.name ?? ''));

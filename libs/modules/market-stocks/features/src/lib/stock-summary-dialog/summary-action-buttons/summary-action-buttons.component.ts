@@ -1,4 +1,4 @@
-import { CommonModule, ViewportScroller } from '@angular/common';
+import { ViewportScroller } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -12,9 +12,9 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 @Component({
   selector: 'app-summary-action-buttons',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [MatButtonModule, MatIconModule, MatDialogModule],
   template: `
-    <mat-dialog-actions class="flex flex-col gap-x-6 gap-y-2 px-4 sm:flex-row">
+    <div class="flex flex-row justify-between gap-x-4 gap-y-2 px-4">
       <!-- favorites button (only for auth users) -->
       @if (authenticationUserService) {
         @if (isSymbolInWatchList()) {
@@ -27,7 +27,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
             class="g-border-apply h-10 max-sm:w-full"
           >
             <mat-icon>do_not_disturb_on</mat-icon>
-            watchlist - remove
+            watchlist <span class="max-sm:hidden">- remove</span>
           </button>
         } @else {
           <button
@@ -39,13 +39,14 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
             class="g-border-apply h-10 max-sm:w-full"
           >
             <mat-icon>star</mat-icon>
-            watchlist - add
+            watchlist <span class="max-sm:hidden">- add</span>
           </button>
         }
       }
 
       @if (showRedirectButton()) {
         <button
+          cdkFocusInitial
           data-testid="summary-action-buttons-redirect"
           class="h-10 max-sm:w-full"
           type="button"
@@ -53,11 +54,11 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
           color="primary"
           (click)="onDetailsRedirect()"
         >
-          Go to Details
+          <span class="max-sm:hidden">Go to</span> Details
           <mat-icon iconPositionEnd>navigate_next</mat-icon>
         </button>
       }
-    </mat-dialog-actions>
+    </div>
   `,
   styles: `
     :host {
@@ -70,22 +71,22 @@ export class SummaryActionButtonsComponent {
   readonly authenticationUserService = inject(AUTHENTICATION_ACCOUNT_TOKEN, {
     optional: true,
   });
-  private dialogServiceUtil = inject(DialogServiceUtil);
-  private route = inject(Router);
-  private viewPortScroller = inject(ViewportScroller);
-  private dialogRef = inject(MatDialog);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly route = inject(Router);
+  private readonly viewPortScroller = inject(ViewportScroller);
+  private readonly dialogRef = inject(MatDialog);
 
   /**
    * id of the symbol - AAPL, MSFT, BTC etc
    */
-  symbolSummary = input.required<SymbolSummary>();
+  readonly symbolSummary = input.required<SymbolSummary>();
 
   /**
    * whether to show the redirect button or not - used only for STOCK and ADR
    */
-  showRedirectButton = input(false);
+  readonly showRedirectButton = input(false);
 
-  isSymbolInWatchList = computed(() => {
+  readonly isSymbolInWatchList = computed(() => {
     if (this.authenticationUserService) {
       return this.authenticationUserService.state.isSymbolInWatchList()(this.symbolSummary().id);
     }

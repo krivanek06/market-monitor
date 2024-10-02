@@ -11,12 +11,12 @@ export const WelcomeMarketMonitor = component$(() => {
     <section class="grid place-content-center">
       <h2 class="g-section-title">Market Monitoring</h2>
 
-      <div class="mx-auto mb-6 grid w-full gap-x-10 gap-y-4 text-center text-gray-300 md:mb-16 md:grid-cols-2 lg:w-[80%]">
-        <p id="mm-p1" class="p-4 text-lg">
+      <div class="mx-auto mb-6 grid gap-x-10 gap-y-4 text-center text-gray-400 md:mb-16 md:grid-cols-2 lg:w-[80%]">
+        <p id="mm-p1" class="p-4 text-xl">
           Whether you're tracking blue-chip stocks or uncovering hidden gems in small-cap companies, we bring the entire
           marketplace to your screen
         </p>
-        <p id="mm-p2" class="p-4 text-lg">
+        <p id="mm-p2" class="p-4 text-xl">
           Explore stocks across various sectors, geographies, market caps, and get detailed financial information on
           companies you are interested in
         </p>
@@ -46,7 +46,9 @@ const MarketSymbolsSection = component$(() => {
   const loadedHistoricalPrice = useResource$(({ track }) => {
     track(() => selectedSummary.value);
 
-    return selectedSummary.value ? getHistoricalPricesCF(selectedSummary.value.id, SymbolHistoricalPeriods.year) : [];
+    return selectedSummary.value
+      ? getHistoricalPricesCF(selectedSummary.value.id, SymbolHistoricalPeriods.sixMonths)
+      : [];
   });
 
   const loadedSummaries = useResource$(async ({ track }) => {
@@ -71,7 +73,7 @@ const MarketSymbolsSection = component$(() => {
   return (
     <>
       {/* loaded summaries about stocks */}
-      <div class="mb-6 flex items-center gap-4 md:mb-10">
+      <div class="mb-6 flex items-center gap-4 md:mb-14">
         {/* left button */}
         <div>
           <Button class="hidden h-20 md:block" onClick$={() => reloadSummaries.value++}>
@@ -92,7 +94,7 @@ const MarketSymbolsSection = component$(() => {
             onResolved={(data) => (
               <>
                 {/* items */}
-                <div class="hidden grid-cols-2 gap-x-8 gap-y-4 md:grid lg:grid-cols-3 2xl:grid-cols-4">
+                <div class="hidden grid-cols-2 gap-x-8 gap-y-2 md:grid lg:grid-cols-3 2xl:grid-cols-4">
                   {data.map((summary) => (
                     <SymbolChange
                       isSelect={selectedSummary.value?.id === summary.id}
@@ -132,8 +134,14 @@ const MarketSymbolsSection = component$(() => {
         <div class="xl:col-span-2">
           <Resource
             value={loadedHistoricalPrice}
-            onPending={() => <div class="g-skeleton h-[500px]"></div>}
-            onResolved={(data) => <HistoricalPriceChart historicalPrice={data} symbolId={selectedSummary.value?.id} />}
+            onPending={() => <div class="g-skeleton h-[390px]"></div>}
+            onResolved={(data) => (
+              <HistoricalPriceChart
+                historicalPrice={data}
+                symbolId={selectedSummary.value?.id}
+                styles={{ width: '100%', height: '420px', display: 'block' }}
+              />
+            )}
           ></Resource>
         </div>
         <div>

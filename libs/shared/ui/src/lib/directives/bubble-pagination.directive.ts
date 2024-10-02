@@ -1,5 +1,6 @@
 import { Directive, ElementRef, Host, Optional, Renderer2, Self, effect, input, output } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { isScreenLarger } from '@mm/shared/data-access';
 import { map, startWith } from 'rxjs';
 import { PlatformService } from '../utils';
 
@@ -14,29 +15,24 @@ export class BubblePaginationDirective {
   /**
    * custom emitter for parent component
    */
-  pageIndexChangeEmitter = output<number>();
+  readonly pageIndexChangeEmitter = output<number>();
 
   /**
    * whether we want to display first/last button and dots
    */
-  showFirstButton = input(true);
-  showLastButton = input(true);
+  readonly showFirstButton = input(true);
+  readonly showLastButton = input(true);
 
   /**
    * how many buttons to display before and after
    * the selected button
    */
-  renderButtonsNumber = input(2);
+  readonly renderButtonsNumber = input(2);
 
   /**
    * how many elements are in the table
    */
-  appCustomLength = input<number | null | undefined>(0);
-
-  /**
-   * set true to hide left and right arrows surrounding the bubbles
-   */
-  hideDefaultArrows = input(false);
+  readonly appCustomLength = input<number | null | undefined>(0);
 
   /**
    * references to DOM elements
@@ -55,7 +51,7 @@ export class BubblePaginationDirective {
     private platform: PlatformService,
   ) {}
 
-  buildButtonsEffect = effect(() => {
+  readonly buildButtonsEffect = effect(() => {
     if (this.platform.isServer) {
       return;
     }
@@ -75,7 +71,9 @@ export class BubblePaginationDirective {
     this.switchPage(0);
 
     // create all buttons
-    this.buildButtons(appCustomLength);
+    if (isScreenLarger('LAYOUT_MD')) {
+      this.buildButtons(appCustomLength);
+    }
 
     // listen on changing the buttons
     this.listenOnPageChange();
@@ -165,12 +163,13 @@ export class BubblePaginationDirective {
 
     // style text of how many elements are currently displayed
     this.ren.setStyle(howManyDisplayedEl, 'position', 'absolute');
-    this.ren.setStyle(howManyDisplayedEl, 'left', '20px');
     this.ren.setStyle(howManyDisplayedEl, 'color', '#919191');
     this.ren.setStyle(howManyDisplayedEl, 'font-size', '14px');
+    this.ren.setStyle(howManyDisplayedEl, 'left', '-20px');
 
-    // check whether the user wants to remove left & right default arrow
-    if (this.hideDefaultArrows()) {
+    // check whether to remove left & right default arrow
+    if (isScreenLarger('LAYOUT_MD')) {
+      console.log('hiding arrows');
       this.ren.setStyle(previousButton, 'display', 'none');
       this.ren.setStyle(nextButtonDefault, 'display', 'none');
     }

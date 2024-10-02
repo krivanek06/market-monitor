@@ -124,7 +124,7 @@ export type UserDetailsDialogComponentData = {
           <mat-divider />
         </div>
 
-        <div class="p-4">
+        <div class="md:p-4">
           @if (selectedValue() === 'portfolio') {
             <!-- portfolio growth charts -->
             @if (portfolioGrowth().state === 'loaded') {
@@ -151,6 +151,7 @@ export type UserDetailsDialogComponentData = {
                 data-testid="user-details-portfolio-holdings-table-card"
                 [displayedColumns]="displayedColumns"
                 [portfolioStateHolding]="portfolioStateHolding()"
+                [showInCard]="false"
               />
             </div>
           } @else if (selectedValue() === 'transactions') {

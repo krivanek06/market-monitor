@@ -6,9 +6,10 @@ import * as Highcharts from 'highcharts';
 export type HistoricalPriceChartProps = {
   historicalPrice: HistoricalPrice[];
   symbolId?: string;
+  styles?: any;
 };
 
-export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ historicalPrice, symbolId }) => {
+export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ historicalPrice, symbolId, styles }) => {
   const myChart = useSignal<HTMLElement>();
 
   // Hook to create the chart when the component is created
@@ -70,7 +71,7 @@ export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ his
         crosshair: true,
         type: 'category',
         categories: dates.map((date) => {
-          return dateFormatDate(date, 'MMMM d, y');
+          return dateFormatDate(date, 'MMM d, y');
         }),
         lineColor: colorGray,
         labels: {
@@ -184,7 +185,7 @@ export const HistoricalPriceChart = component$<HistoricalPriceChartProps>(({ his
 
   return (
     <>
-      <div id="myChart" ref={myChart} style={{ width: '100%', height: '520px', display: 'block' }}></div>
+      <div id="myChart" ref={myChart} style={styles}></div>
     </>
   );
 });

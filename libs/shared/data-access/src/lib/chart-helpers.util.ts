@@ -6,9 +6,9 @@ import { ColorScheme } from './color-scheme.model';
 
 @Directive()
 export abstract class ChartConstructor {
-  heightPx = input<number>(400);
+  readonly heightPx = input<number>(400);
 
-  Highcharts: typeof Highcharts = Highcharts;
+  readonly Highcharts: typeof Highcharts = Highcharts;
   chart!: Highcharts.Chart;
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
@@ -18,7 +18,7 @@ export abstract class ChartConstructor {
   // determine whether we use SSR or not
   // https://github.com/highcharts/highcharts-angular/issues/216
   // isHighcharts = typeof Highcharts === 'object';
-  isHighcharts = signal(false);
+  readonly isHighcharts = signal(false);
 
   constructor() {
     afterNextRender(() => {

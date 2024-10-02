@@ -5,7 +5,7 @@ import { PageWatchlistComponent } from '@mm/page-builder';
   selector: 'app-watchlist',
   standalone: true,
   imports: [PageWatchlistComponent],
-  template: `<app-page-watchlist></app-page-watchlist>`,
+  template: `<app-page-watchlist />`,
   styles: `
     :host {
       display: block;

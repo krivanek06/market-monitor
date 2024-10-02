@@ -72,10 +72,10 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
   ],
   template: `
     @if (groupDetailsSignal(); as groupDetailsSignal) {
-      <div class="mb-6 flex flex-col justify-between gap-x-10 gap-y-6 lg:flex-row">
+      <div class="mb-6 flex flex-col items-center justify-between gap-x-10 gap-y-6 md:flex-row xl:justify-evenly">
         <!-- group info -->
         <app-group-display-info
-          class="flex-1"
+          class="w-full md:max-xl:basis-3/5 xl:flex-1"
           (ownerClickEmitter)="onMemberClick($event)"
           [clickableOwner]="true"
           [imageHeightPx]="150"
@@ -84,7 +84,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
         <!-- portfolio info -->
         <app-portfolio-state
-          class="flex-1"
+          class="w-full md:max-xl:basis-2/5 md:max-xl:pt-12 xl:flex-1"
           [titleColor]="ColorScheme.GRAY_DARK_VAR"
           [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
           [showCashSegment]="true"
@@ -92,8 +92,8 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         />
 
         <!-- portfolio chart -->
-        <div class="-mt-10 hidden w-[420px] xl:block">
-          <app-portfolio-balance-pie-chart [heightPx]="260" [data]="groupDetailsSignal.groupData.portfolioState" />
+        <div class="hidden w-[440px] xl:block">
+          <app-portfolio-balance-pie-chart [heightPx]="245" [data]="groupDetailsSignal.groupData.portfolioState" />
         </div>
       </div>
 
@@ -104,10 +104,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <!-- portfolio change -->
       <div class="mb-12 lg:px-10">
-        <app-portfolio-period-change
-          *ngIf="portfolioChangeSignal() as portfolioChange"
-          [portfolioChange]="portfolioChange"
-        />
+        <app-portfolio-period-change [portfolioChange]="portfolioChangeSignal()" />
       </div>
 
       <!-- divider -->
@@ -178,11 +175,12 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         </div>
       }
 
+      <!-- charts -->
       @if (groupDetailsSignal.groupTransactionsData.length > 0) {
         <div #groupBubble class="mb-14 hidden gap-x-8 sm:flex">
           @if (portfolioHoldingBubbleChartSignal().length > 1) {
             <!-- bubble chart -->
-            <div class="xl:basis-3/5">
+            <div class="max-xl:flex-1 xl:basis-3/5">
               @defer (on viewport(groupBubble)) {
                 <app-generic-chart
                   class="hidden w-full sm:block"
@@ -352,7 +350,7 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
     { initialValue: [] },
   );
 
-  memberInvitedUsersSignal = derivedFrom(
+  readonly memberInvitedUsersSignal = derivedFrom(
     [this.groupDetailsSignal],
     pipe(
       map(([group]) => group),

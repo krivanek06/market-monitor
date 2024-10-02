@@ -7,7 +7,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   selector: 'app-page-stock-details-news',
   standalone: true,
   imports: [CommonModule, NewsSearchComponent],
-  template: `<app-news-search [searchData]="{ newsType: 'stocks', symbol: stockSymbolSignal() }"></app-news-search> `,
+  template: `<app-news-search [searchData]="{ newsType: 'stocks', symbol: stockSymbolSignal() }" />`,
   styles: `
     :host {
       display: block;

@@ -31,7 +31,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
   ],
   template: `
     <div class="m-auto grid gap-y-4 xl:w-11/12">
-      <div class="flex w-full flex-col items-center gap-x-8 gap-y-4 lg:mb-6 lg:flex-row">
+      <div class="flex w-full flex-col items-start justify-between gap-x-8 gap-y-6 lg:mb-6 lg:flex-row">
         <div class="flex justify-between gap-x-10 max-lg:w-full">
           <!-- title -->
           <app-section-title matIcon="group" title="Groups" class="mt-1" />
@@ -54,9 +54,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
         </div>
 
         <!-- search groups -->
-        <div class="flex w-full flex-1 flex-col justify-end gap-2 lg:flex-row">
-          <app-group-search-control (selectedEmitter)="onGroupClick($event)" class="w-full lg:w-[500px] xl:w-[600px]" />
-        </div>
+        <app-group-search-control (selectedEmitter)="onGroupClick($event)" class="w-full md:w-[500px]" />
       </div>
 
       @if (groupsSignal(); as groups) {

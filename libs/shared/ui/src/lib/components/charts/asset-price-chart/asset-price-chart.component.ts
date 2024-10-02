@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { HistoricalPrice, SymbolHistoricalPeriods } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
@@ -8,7 +7,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
 @Component({
   selector: 'app-asset-price-chart',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
+  imports: [HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
@@ -16,25 +15,26 @@ import { HighchartsChartModule } from 'highcharts-angular';
     }
   `,
   template: `
-    <highcharts-chart
-      *ngIf="isHighcharts()"
-      [Highcharts]="Highcharts"
-      [options]="chartOptionsSignal()"
-      [callbackFunction]="chartCallback"
-      [style.height.px]="heightPx()"
-      style="width: 100%; display: block"
-    />
+    @if (isHighcharts()) {
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartOptionsSignal()"
+        [callbackFunction]="chartCallback"
+        [style.height.px]="heightPx()"
+        style="width: 100%; display: block"
+      />
+    }
   `,
 })
 export class AssetPriceChartComponent extends ChartConstructor {
-  period = input.required<SymbolHistoricalPeriods>();
-  historicalPrice = input.required<HistoricalPrice[]>();
-  showTitle = input(false);
-  priceName = input('price');
-  displayVolume = input(true);
-  priceShowSign = input(true);
+  readonly period = input.required<SymbolHistoricalPeriods>();
+  readonly historicalPrice = input.required<HistoricalPrice[]>();
+  readonly showTitle = input(false);
+  readonly priceName = input('price');
+  readonly displayVolume = input(true);
+  readonly priceShowSign = input(true);
 
-  chartOptionsSignal = computed(() => this.initChart(this.historicalPrice()));
+  readonly chartOptionsSignal = computed(() => this.initChart(this.historicalPrice()));
 
   private initChart(data: HistoricalPrice[]): Highcharts.Options {
     const price = data.map((d) => d.close);

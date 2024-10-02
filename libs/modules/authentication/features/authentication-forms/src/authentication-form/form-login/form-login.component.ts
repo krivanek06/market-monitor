@@ -10,7 +10,7 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormMatInputWrapperComponent, MatButtonModule],
   template: `
-    <form [formGroup]="formGroup" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
+    <form [formGroup]="formGroup" class="flex flex-col gap-6" (ngSubmit)="onSubmit()">
       <!-- email -->
       <app-form-mat-input-wrapper formControlName="email" inputCaption="Email" inputType="EMAIL" />
 
@@ -36,7 +36,7 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
   ],
 })
 export class FormLoginComponent implements ControlValueAccessor {
-  formGroup = new FormGroup({
+  readonly formGroup = new FormGroup({
     email: new FormControl('', {
       nonNullable: true,
     }),

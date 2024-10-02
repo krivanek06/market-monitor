@@ -63,6 +63,10 @@ mat-select-trigger {
   background: var(--gray-light-strong) !important;
 }
 
+.mat-mdc-autocomplete-panel {
+  max-height: 450px !important;
+}
+
 /* distance between content and scroll bar */
 .cdk-overlay-pane:not(.mat-mdc-select-panel-above) .mdc-menu-surface.mat-mdc-select-panel {
   padding-right: 12px !important;

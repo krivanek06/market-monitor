@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -24,7 +24,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
   selector: 'app-page-market-overview',
   standalone: true,
   imports: [
-    CommonModule,
+    DecimalPipe,
     AssetPriceChartInteractiveComponent,
     GenericChartComponent,
     QuoteSearchBasicComponent,
@@ -42,44 +42,44 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
   ],
   template: `
     <div class="mb-6 flex gap-3 p-2 max-md:overflow-x-scroll md:grid md:grid-cols-2 xl:flex xl:justify-around">
-      <ng-container *ngIf="marketTopIndexQuotesSignal() as marketTopIndexQuotesSignal; else topIndexSkeleton">
-        <app-general-card
-          *ngFor="let index of marketTopIndexQuotesSignal"
-          [title]="index.name"
-          [titleCenter]="true"
-          additionalClasses="min-w-max px-6 py-3"
-          titleScale="large"
-        >
-          <div class="flex items-center justify-center gap-3 text-base">
-            <span>{{ index.summary.quote.price | number: '1.2-2' }}</span>
-            <span
-              appPercentageIncrease
-              [useCurrencySign]="false"
-              [changeValues]="{
-                change: index.summary.quote.change,
-                changePercentage: index.summary.quote.changesPercentage,
-              }"
-            ></span>
-          </div>
-        </app-general-card>
-      </ng-container>
-
-      <!-- skeleton -->
-      <ng-template #topIndexSkeleton>
-        <div class="mb-6 flex gap-3 p-2 max-md:overflow-x-scroll md:grid md:grid-cols-2 xl:flex xl:justify-around">
-          <div *ngRange="4" class="g-skeleton h-[115px] w-full px-6 py-3 lg:min-w-[320px]"></div>
-        </div>
-      </ng-template>
+      <!-- top index quotes -->
+      @if (marketTopIndexQuotes(); as marketTopIndexQuotes) {
+        @for (index of marketTopIndexQuotes; track index.name) {
+          <app-general-card
+            [title]="index.name"
+            [titleCenter]="true"
+            additionalClasses="min-w-max px-6 py-3"
+            titleScale="large"
+          >
+            <div class="flex items-center justify-center gap-3 text-base">
+              <span>{{ index.summary.quote.price | number: '1.2-2' }}</span>
+              <span
+                appPercentageIncrease
+                [useCurrencySign]="false"
+                [changeValues]="{
+                  change: index.summary.quote.change,
+                  changePercentage: index.summary.quote.changesPercentage,
+                }"
+              ></span>
+            </div>
+          </app-general-card>
+        }
+      } @else {
+        <!-- skeleton -->
+        <div *ngRange="4" class="g-skeleton h-[115px] w-full px-6 py-3 lg:min-w-[320px]"></div>
+      }
     </div>
 
-    <div class="flex max-sm:w-full">
+    <!-- search index quotes -->
+    <div class="mb-2 md:mb-6">
       <app-quote-search-basic
         [formControl]="selectedIndexSymbolQuoteControl"
-        class="min-w-[800px] max-sm:w-full xl:-ml-5 xl:scale-90"
+        class="w-full md:w-[520px]"
         type="index"
       />
     </div>
 
+    <!-- price chart -->
     <div class="mb-10">
       <app-asset-price-chart-interactive
         priceName="Value"
@@ -141,18 +141,18 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
   `,
 })
 export class PageMarketOverviewComponent {
-  marketApiService = inject(MarketApiService);
+  private readonly marketApiService = inject(MarketApiService);
 
-  selectedIndexSymbolQuoteControl = new FormControl<SymbolQuote | null>(null);
+  readonly selectedIndexSymbolQuoteControl = new FormControl<SymbolQuote | null>(null);
 
-  marketTreasuryData = toSignal(this.marketApiService.getMarketTreasuryData());
-  marketEconomicData = toSignal(this.marketApiService.getMarketEconomicDataAll());
+  readonly marketTreasuryData = toSignal(this.marketApiService.getMarketTreasuryData());
+  readonly marketEconomicData = toSignal(this.marketApiService.getMarketEconomicDataAll());
 
-  SYMBOL_SP500 = SYMBOL_SP500;
-  economicData = economicData;
-  treasuryData = treasuryData;
+  readonly SYMBOL_SP500 = SYMBOL_SP500;
+  readonly economicData = economicData;
+  readonly treasuryData = treasuryData;
 
-  marketTopIndexQuotesSignal = toSignal(
+  readonly marketTopIndexQuotes = toSignal(
     this.marketApiService.getSymbolSummaries(INDEXES_DEFAULT_SYMBOLS).pipe(
       map((quotes) =>
         quotes.map((summary, index) => ({

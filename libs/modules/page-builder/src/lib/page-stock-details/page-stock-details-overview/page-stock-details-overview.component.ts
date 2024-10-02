@@ -63,7 +63,7 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
             [imageName]="stockDetailsSignal().quote.symbol"
             [title]="stockDetailsSignal().quote.name"
             [symbol]="stockDetailsSignal().quote.symbol"
-            [chartHeightPx]="430"
+            [chartHeightPx]="450"
           />
         </div>
 
@@ -290,10 +290,10 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
-  private stockTransformService = inject(StockTransformService);
-  private dialog = inject(MatDialog);
+  private readonly stockTransformService = inject(StockTransformService);
+  private readonly dialog = inject(MatDialog);
 
-  stockPeersSignal = toSignal(
+  readonly stockPeersSignal = toSignal(
     this.stockDetails$.pipe(
       switchMap((details) => {
         if (!details.sectorPeers || details.sectorPeers.peersList.length === 0) {
@@ -304,22 +304,28 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
     ),
   );
 
-  companyRatingSignal = computed(() => this.stockTransformService.createCompanyRatingTable(this.stockDetailsSignal()));
-  estimationChartDataSignal = computed(
-    computed(() => this.stockTransformService.createEstimationData(this.stockDetailsSignal())),
+  readonly companyRatingSignal = computed(() =>
+    this.stockTransformService.createCompanyRatingTable(this.stockDetailsSignal()),
   );
-  financialStrengthSignal = computed(() =>
+  readonly estimationChartDataSignal = computed(() =>
+    this.stockTransformService.createEstimationData(this.stockDetailsSignal()),
+  );
+  readonly financialStrengthSignal = computed(() =>
     this.stockTransformService.createFinancialStrength(this.stockDetailsSignal()),
   );
-  financialRatio1Signal = computed(() => this.stockTransformService.createFinancialRatio1(this.stockDetailsSignal()));
-  financialRatio2Signal = computed(() => this.stockTransformService.createFinancialRatio2(this.stockDetailsSignal()));
-  financialPerShareSignal = computed(() =>
+  readonly financialRatio1Signal = computed(() =>
+    this.stockTransformService.createFinancialRatio1(this.stockDetailsSignal()),
+  );
+  readonly financialRatio2Signal = computed(() =>
+    this.stockTransformService.createFinancialRatio2(this.stockDetailsSignal()),
+  );
+  readonly financialPerShareSignal = computed(() =>
     this.stockTransformService.createFinancialPerShare(this.stockDetailsSignal()),
   );
-  financialOperatingSignal = computed(() =>
+  readonly financialOperatingSignal = computed(() =>
     this.stockTransformService.createFinancialOperatingData(this.stockDetailsSignal()),
   );
-  financialDividendsSignal = computed(() =>
+  readonly financialDividendsSignal = computed(() =>
     this.stockTransformService.createFinancialDividends(this.stockDetailsSignal()),
   );
 

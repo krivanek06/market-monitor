@@ -17,12 +17,12 @@ export const SymbolChange = component$<SymbolChangeItemProps>(({ symbolQuote, on
     <button type="button" onClick$={onItemClick$} class={classes}>
       <div
         class={[
-          'flex items-center justify-between gap-x-10 text-base px-4 py-2 hover:border-2  hover:border-cyan-800 border-solid rounded-lg hover:bg-gray-900 transition-all duration-300 hover:scale-105 cursor-pointer',
-          isSelect ? 'border-2 border-cyan-800 bg-gray-900' : '',
+          'flex cursor-pointer items-center justify-between gap-x-10 rounded-lg border-solid px-4 py-2 text-sm transition-all duration-300 hover:scale-105 hover:bg-gray-900 hover:outline-dashed hover:outline-2 hover:outline-cyan-800',
+          isSelect ? 'bg-gray-900 outline-dashed outline-2 outline-cyan-800' : '',
         ]}
       >
         {/* symbol image & name */}
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 text-base">
           <img srcset={symbolUrlMerged} alt="symbol image" width={32} height={32} />
           <span>{symbolQuote.symbol}</span>
         </div>

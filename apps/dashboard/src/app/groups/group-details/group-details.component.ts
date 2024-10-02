@@ -5,7 +5,7 @@ import { PageGroupDetailsComponent } from '@mm/page-builder';
   selector: 'app-group-details',
   standalone: true,
   imports: [PageGroupDetailsComponent],
-  template: `<app-page-group-details></app-page-group-details>`,
+  template: `<app-page-group-details />`,
   styles: `
     :host {
       display: block;

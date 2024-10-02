@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MarketApiService } from '@mm/api-client';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { DefaultImgDirective, PriceChangeItemsComponent } from '@mm/shared/ui';
+import { DefaultImgDirective, PriceChangeItemsComponent, TruncatePipe } from '@mm/shared/ui';
 import { catchError, of } from 'rxjs';
 import { SummaryActionButtonsComponent } from './summary-action-buttons/summary-action-buttons.component';
 import { SummaryMainMetricsComponent } from './summary-main-metrics/summary-main-metrics.component';
@@ -27,20 +27,33 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
     SummaryModalSkeletonComponent,
     AssetPriceChartInteractiveComponent,
     SummaryActionButtonsComponent,
+    TruncatePipe,
   ],
   template: `
+    <!-- data -->
     @if (symbolSummary(); as symbolSummary) {
       <!-- heading -->
-      <div class="flex items-center justify-between p-4">
-        <div class="flex items-center gap-3">
-          <img appDefaultImg imageType="symbol" [src]="symbolSummary.id" alt="Stock Image" class="h-11 w-11" />
-          <div class="grid">
-            <div class="text-wt-gray-medium flex gap-4 text-base">
-              <span>{{ symbolSummary.quote.displaySymbol }}</span>
-              <span>|</span>
-              <span>{{ symbolType() }}</span>
+      <div class="flex flex-col gap-y-6 p-4 lg:flex-row lg:justify-between">
+        <div class="flex justify-between">
+          <!-- symbol info -->
+          <div class="flex items-center gap-3">
+            <img appDefaultImg imageType="symbol" [src]="symbolSummary.id" alt="Stock Image" class="h-11 w-11" />
+            <div class="grid">
+              <div class="text-wt-gray-medium flex gap-4 text-base">
+                <span class="text-wt-primary">{{ symbolSummary.quote.displaySymbol }}</span>
+                <span>|</span>
+                <span>{{ symbolType() }}</span>
+              </div>
+              <span class="text-wt-gray-dark text-lg">{{ symbolSummary.quote.name | truncate: 40 }}</span>
             </div>
-            <span class="text-wt-gray-medium text-lg">{{ symbolSummary.quote.name }}</span>
+          </div>
+
+          <!-- close button -->
+          <div class="lg:hidden">
+            <button mat-button mat-dialog-close color="warn">
+              <mat-icon>close</mat-icon>
+              close
+            </button>
           </div>
         </div>
 
@@ -48,14 +61,14 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
         <app-summary-action-buttons [symbolSummary]="symbolSummary" [showRedirectButton]="isSymbolTypeStock()" />
       </div>
 
-      <mat-dialog-content>
+      <mat-dialog-content class="grid gap-6">
         <!-- display main metrics -->
         <div>
           <app-summary-main-metrics [stockSummary]="symbolSummary" />
         </div>
 
         <!-- time period change -->
-        <div class="mb-8 mt-4">
+        <div class="max-sm:hidden">
           <app-price-change-items [mainSymbolPriceChange]="symbolSummary.priceChange" />
         </div>
 
@@ -66,6 +79,7 @@ import { SummaryModalSkeletonComponent } from './summary-modal-skeleton/summary-
             [title]="data.symbol"
             [symbol]="data.symbol"
             [errorFromParent]="!symbolSummary.priceChange['5D']"
+            [chartHeightPx]="420"
           />
         </div>
       </mat-dialog-content>

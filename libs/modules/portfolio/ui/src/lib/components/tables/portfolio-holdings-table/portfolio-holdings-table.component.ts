@@ -120,8 +120,9 @@ import {
             <div class="text-wt-gray-dark max-sm:text-end">
               {{ row.symbolQuote.price * row.units | currency }}
             </div>
+            <!-- mobile -->
             <div
-              class="block justify-end text-end sm:hidden"
+              class="block justify-end text-end text-sm sm:hidden"
               appPercentageIncrease
               [hideValueOnXsScreen]="true"
               [useCurrencySign]="true"

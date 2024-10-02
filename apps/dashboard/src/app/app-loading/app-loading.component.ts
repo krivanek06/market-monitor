@@ -19,10 +19,10 @@ import { delay, filter, map } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppLoadingComponent {
-  private authStore = inject(AuthenticationUserStoreService);
-  private router = inject(Router);
+  private readonly authStore = inject(AuthenticationUserStoreService);
+  private readonly router = inject(Router);
 
-  authState$ = toObservable(this.authStore.state);
+  readonly authState$ = toObservable(this.authStore.state);
 
   constructor() {
     this.authState$

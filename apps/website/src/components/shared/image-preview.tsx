@@ -22,14 +22,14 @@ export const ImagePreview = component$<ImagePreviewProps>((props) => {
     <div>
       {/* preview selected image */}
       <div class="mb-10">
-        <h3 class="text-center mb-2 text-xl capitalize">{selectedImage.value.alt}</h3>
-        <CardBasic class="w-fit mx-auto">
-          <img srcset={selectedImage.value.src} alt="image preview" class="rounded-lg h-[400px]" />
+        <h3 class="mb-2 text-center text-xl capitalize text-gray-200">{selectedImage.value.alt}</h3>
+        <CardBasic class="mx-auto w-fit">
+          <img srcset={selectedImage.value.src} alt="image preview" class="h-[400px] rounded-lg" />
         </CardBasic>
       </div>
 
       {/* slider image */}
-      <div class="flex gap-6 h-20">
+      <div class="flex h-20 gap-6">
         {/* left arrow */}
         <div class="grid">
           <Button class="h-11/12 hidden md:block" onClick$={() => indexChangeClick(-1)}>
@@ -37,7 +37,7 @@ export const ImagePreview = component$<ImagePreviewProps>((props) => {
           </Button>
         </div>
         {/* images */}
-        <div class="flex overflow-x-scroll flex-1 gap-x-3 py-2 g-no-scrollbar">
+        <div class="g-no-scrollbar flex flex-1 gap-x-3 overflow-x-scroll py-2">
           {props.images.map((image, index) => (
             <button key={index} type="button" onClick$={() => (selectedImageIndex.value = index)}>
               <img
@@ -47,7 +47,7 @@ export const ImagePreview = component$<ImagePreviewProps>((props) => {
                 width={200}
                 height={200}
                 class={[
-                  'min-w-[200px] h-full object-cover rounded-lg hover:scale-105 transition-all duration-300 cursor-pointer hover:brightness-100',
+                  'h-full min-w-[200px] cursor-pointer rounded-lg object-cover transition-all duration-300 hover:scale-105 hover:brightness-100',
                   index === selectedImageIndex.value
                     ? 'outline outline-4 outline-cyan-700 brightness-100'
                     : 'brightness-50',

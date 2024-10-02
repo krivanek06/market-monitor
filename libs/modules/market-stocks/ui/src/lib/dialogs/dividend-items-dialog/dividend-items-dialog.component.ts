@@ -1,5 +1,5 @@
-import { CommonModule, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CalendarDividend, CompanyStockDividend } from '@mm/api-types';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
@@ -8,17 +8,18 @@ import { DividendItemComponent } from '../../components';
 @Component({
   selector: 'app-dividend-items-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, DialogCloseHeaderComponent, DividendItemComponent],
+  imports: [MatDialogModule, DialogCloseHeaderComponent, DividendItemComponent],
   template: `
-    <app-dialog-close-header [title]="dialogTitle"></app-dialog-close-header>
+    <app-dialog-close-header [title]="dialogTitle" />
 
     <mat-dialog-content>
-      <app-dividend-item
-        *ngFor="let dividend of data.dividends; let last = last"
-        (itemClickedEmitter)="onDividendClicked(dividend)"
-        [dividend]="dividend"
-        [showBorder]="!last"
-      ></app-dividend-item>
+      @for (dividend of data.dividends; track dividend.symbol; let last = $last) {
+        <app-dividend-item
+          (itemClickedEmitter)="onDividendClicked(dividend)"
+          [dividend]="dividend"
+          [showBorder]="!last"
+        />
+      }
     </mat-dialog-content>
   `,
   styles: `
@@ -30,11 +31,11 @@ import { DividendItemComponent } from '../../components';
   providers: [DatePipe],
 })
 export class DividendItemsDialogComponent {
-  constructor(
-    private dialogRef: MatDialogRef<DividendItemsDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { dividends: (CalendarDividend | CompanyStockDividend)[]; showDate: boolean },
-    private datePipe: DatePipe,
-  ) {}
+  private readonly dialogRef = inject(MatDialogRef<DividendItemsDialogComponent>);
+  private readonly datePipe = inject(DatePipe);
+  readonly data = inject<{ dividends: (CalendarDividend | CompanyStockDividend)[]; showDate: boolean }>(
+    MAT_DIALOG_DATA,
+  );
 
   get dialogTitle(): string {
     return this.data.showDate && this.data.dividends.length > 0

@@ -1,26 +1,14 @@
-import { Component, input, output } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { PortfolioState, PortfolioStateHolding, PortfolioStateHoldings } from '@mm/api-types';
+import { PortfolioStateHoldings } from '@mm/api-types';
 import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { GeneralCardComponent, ShowMoreButtonComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
-import { PortfolioHoldingsTableComponent } from '../tables';
+import { PortfolioHoldingsTableComponent, PortfolioHoldingsTableComponentMock } from '../tables';
 import { PortfolioHoldingsTableCardComponent } from './portfolio-holdings-table-card.component';
-
-@Component({
-  selector: 'app-portfolio-holdings-table',
-  standalone: true,
-  template: ``,
-})
-class PortfolioHoldingsTableComponentStub {
-  symbolClicked = output<string>();
-  holdings = input<PortfolioStateHolding[]>();
-  portfolioState = input<PortfolioState>();
-  displayedColumns = input<string[]>();
-}
 
 describe('PortfolioHoldingsTableCardComponent', () => {
   const holdingTableS = '[data-testid="portfolio-holding-table-card-table"]';
@@ -54,9 +42,10 @@ describe('PortfolioHoldingsTableCardComponent', () => {
   beforeEach(() => {
     return MockBuilder(PortfolioHoldingsTableCardComponent)
       .keep(GeneralCardComponent)
-      .replace(PortfolioHoldingsTableComponent, PortfolioHoldingsTableComponentStub)
+      .replace(PortfolioHoldingsTableComponent, PortfolioHoldingsTableComponentMock)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(NoopAnimationsModule)
+      .keep(NgTemplateOutlet)
       .mock(ShowMoreButtonComponent)
       .provide({
         provide: MatDialog,
@@ -170,7 +159,7 @@ describe('PortfolioHoldingsTableCardComponent', () => {
     fixture.detectChanges();
 
     // find holding table
-    const holdingTable = ngMocks.find(PortfolioHoldingsTableComponentStub);
+    const holdingTable = ngMocks.find(PortfolioHoldingsTableComponentMock);
 
     expect(holdingTable).toBeTruthy();
 

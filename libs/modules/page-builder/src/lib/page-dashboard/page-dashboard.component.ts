@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
@@ -62,7 +61,7 @@ import {
         class="flex flex-row gap-4 max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 md:gap-6 lg:grid-cols-4 xl:col-span-2"
       >
         <!-- portfolio state -->
-        <app-general-card class="min-h-[210px] max-sm:min-w-[360px] sm:col-span-2" title="Account">
+        <app-general-card class="min-h-[210px] max-sm:min-w-[315px] sm:col-span-2" title="Account">
           <app-portfolio-state
             data-testid="page-dashboard-portfolio-state"
             [showSpinner]="!portfolioUserFacadeService.portfolioStateHolding() || showLoadingState()"
@@ -96,13 +95,11 @@ import {
       </div>
 
       <!-- portfolio change -->
-      @if (portfolioUserFacadeService.portfolioChange(); as portfolioChange) {
-        <app-portfolio-period-change
-          data-testid="page-dashboard-period-change"
-          [portfolioChange]="portfolioChange"
-          class="lg:pt-2"
-        />
-      }
+      <app-portfolio-period-change
+        data-testid="page-dashboard-period-change"
+        [portfolioChange]="portfolioUserFacadeService.portfolioChange()"
+        class="lg:pt-2"
+      />
     </div>
 
     <!-- portfolio growth chart -->
@@ -123,7 +120,7 @@ import {
       }
     </div>
 
-    <div class="mb-8 grid grid-cols-1 gap-x-10 lg:grid-cols-2">
+    <div class="mb-8 grid grid-cols-1 gap-x-10 xl:grid-cols-2">
       <!-- portfolio growth chart -->
       @if (showLoadingState()) {
         <div class="g-skeleton mt-8 h-[360px]"></div>
@@ -137,7 +134,7 @@ import {
             values: portfolioUserFacadeService.portfolioGrowth(),
           }"
           [heightPx]="360"
-          [dateRangeWidth]="400"
+          class="hidden md:block"
         />
 
         <!-- portfolio change chart -->
@@ -145,13 +142,14 @@ import {
           data-testid="page-portfolio-change-chart"
           [data]="portfolioUserFacadeService.portfolioGrowth()"
           [heightPx]="360"
-          [dateRangeWidth]="400"
         />
       }
     </div>
 
     <!-- holdings pie charts -->
-    <div class="flex justify-center gap-10 overflow-x-clip max-sm:-ml-6 sm:mb-14 lg:justify-around">
+    <div
+      class="flex justify-center overflow-x-clip max-sm:-ml-6 sm:mb-14 lg:justify-around lg:max-xl:ml-[-60px] xl:gap-10"
+    >
       @if (!portfolioUserFacadeService.portfolioStateHolding()) {
         <div class="g-skeleton h-[380px] w-full"></div>
         <div class="g-skeleton h-[380px] w-full"></div>
@@ -180,7 +178,7 @@ import {
       <div class="g-skeleton mb-8 h-[380px]"></div>
     } @else {
       @if ((portfolioUserFacadeService.portfolioGrowth() ?? []).length > 8) {
-        <app-general-card title="Asset Growth" class="mb-8">
+        <app-general-card title="Asset Growth" class="mb-8 hidden md:block">
           <app-portfolio-asset-chart
             data-testid="portfolio-asset-chart-chart"
             [data]="stateRef.getUserPortfolioTransactions()"
@@ -195,7 +193,6 @@ import {
       class="mb-12"
       data-testid="page-dashboard-portfolio-holdings-table"
       [portfolioStateHolding]="portfolioUserFacadeService.portfolioStateHolding()"
-      [maximumHoldingLimit]="USER_HOLDINGS_SYMBOL_LIMIT"
     />
 
     @if (stateRef.userHaveTransactions()) {
@@ -260,7 +257,6 @@ export class PageDashboardComponent {
    */
   readonly transactionLimit = 15;
   readonly ColorScheme = ColorScheme;
-  readonly USER_HOLDINGS_SYMBOL_LIMIT = USER_HOLDINGS_SYMBOL_LIMIT;
   readonly stateRef = this.authenticationUserService.state;
   readonly hasEnoughTransactions = computed(
     () => (this.stateRef.portfolioTransactions()?.length ?? 0) > this.transactionLimit,

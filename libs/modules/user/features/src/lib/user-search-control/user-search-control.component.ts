@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, model, output } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
@@ -12,13 +11,12 @@ import { AggregationApiService, UserApiService } from '@mm/api-client';
 import { UserData } from '@mm/api-types';
 import { DefaultImgDirective, RangeDirective } from '@mm/shared/ui';
 import { UserDisplayItemComponent } from '@mm/user/ui';
-import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, of, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-user-search-control',
   standalone: true,
   imports: [
-    CommonModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
     MatInputModule,
@@ -54,9 +52,11 @@ import { catchError, debounceTime, distinctUntilChanged, filter, of, startWith, 
         @for (user of optionsSignal(); track user.id; let last = $last) {
           <mat-option [value]="user" class="rounded-md py-2">
             <app-user-display-item [userData]="user" />
-            <div *ngIf="!last" class="mt-2">
-              <mat-divider />
-            </div>
+            @if (!last) {
+              <div class="mt-2">
+                <mat-divider />
+              </div>
+            }
           </mat-option>
         }
       </mat-autocomplete>
@@ -100,17 +100,10 @@ export class UserSearchControlComponent implements ControlValueAccessor {
                 return of([]);
               }),
             )
-          : of(
-              this.aggregationApiService
-                .hallOfFameUsers()
-                .bestPortfolio.map((d) => d.item)
-                .slice(0, 10) ?? [],
+          : this.aggregationApiService.hallOfFameUsers$.pipe(
+              map((data) => data.bestPortfolio.map((d) => d.item).slice(0, 10) ?? []),
             ),
       ),
-      catchError((e) => {
-        console.log(e);
-        return of([]);
-      }),
     ),
     { initialValue: [] },
   );

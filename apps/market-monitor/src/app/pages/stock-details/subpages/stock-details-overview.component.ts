@@ -1,12 +1,11 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PageStockDetailsOverviewComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-details-overview',
   standalone: true,
-  imports: [CommonModule, PageStockDetailsOverviewComponent],
-  template: `<app-page-details-overview></app-page-details-overview> `,
+  imports: [PageStockDetailsOverviewComponent],
+  template: `<app-page-details-overview />`,
   styles: `
     :host {
       display: block;

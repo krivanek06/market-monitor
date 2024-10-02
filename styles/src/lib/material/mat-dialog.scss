@@ -2,9 +2,9 @@
   background: var(--background-present) !important;
   color: var(--gray-medium) !important;
   padding-left: 16px !important;
-  padding-right: 4px !important;
+  padding-right: 16px !important;
   padding-bottom: 16px !important;
-  padding-left: 0 !important;
+  padding-top: 8px !important;
   max-width: 100% !important;
 
   @screen sm {
@@ -109,20 +109,22 @@ mat-dialog-content {
   }
 
   .mat-mdc-dialog-container {
-    height: 100vh !important;
-    width: 100vw !important;
+    //height: 100vh !important;
+    width: 98vw !important;
     max-width: 1440px !important;
+    max-height: 95vh !important;
 
     @screen sm {
       height: auto !important;
+      max-height: 90vh !important;
     }
 
     @screen md {
-      width: 60vw !important;
+      width: 70vw !important;
     }
 
     @screen lg {
-      width: 50vw !important;
+      width: 55vw !important;
     }
 
     @screen xl {

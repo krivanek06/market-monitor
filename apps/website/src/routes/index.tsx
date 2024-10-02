@@ -1,18 +1,16 @@
-import { $, component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
 import anime from 'animejs';
 import {
-  WelcomeAboutUs,
   WelcomeHero,
   WelcomeInvestmentAccount,
   WelcomeMarketMonitor,
   WelcomeSchools,
 } from '../components/page-specific/welcome';
 import { SVG1, SVG2 } from '../components/shared';
-import { isScreenLarger, websiteImageUrls } from '../components/utils';
+import { websiteImageUrls } from '../components/utils';
 
 export default component$(() => {
-  const wholePageRef = useSignal<HTMLDivElement | undefined>(undefined);
   const heroPageRef = useSignal<HTMLDivElement | undefined>(undefined);
   const blobRef = useSignal<HTMLDivElement | undefined>(undefined);
   const heroBgImageRef = useSignal<HTMLImageElement | undefined>(undefined);
@@ -45,85 +43,43 @@ export default component$(() => {
     };
   });
 
-  const setDefaultValues = $(() => {
-    if (wholePageRef.value) {
-      wholePageRef.value.style.backgroundColor = 'black';
-    }
-    if (svg2Ref.value) {
-      svg2Ref.value.classList.add('md:block');
-    }
-    if (blobRef.value) {
-      blobRef.value.classList.add('md:block');
-    }
-    if (heroBgImageRef.value) {
-      heroBgImageRef.value.classList.remove('hidden');
-    }
-  });
-
   useVisibleTask$(() => {
-    // if mobile do not animate
-    if (!isScreenLarger('LAYOUT_SM')) {
-      setDefaultValues();
-      return;
-    }
+    setTimeout(() => {
+      // reveal hero image
+      anime({
+        targets: '#hero-bg',
+        opacity: [0, 0.4],
+        easing: 'easeInOutQuad',
+        duration: 2500,
+      });
 
-    const rowDivs = Math.ceil((wholePageRef.value?.clientWidth ?? 0) / 100);
-    const colDivs = Math.ceil((heroPageRef.value?.clientHeight ?? 0) / 100);
-    // console.log(rowDivs, colDivs);
+      // reveal a svg
+      anime({
+        targets: '#hero-svg',
+        opacity: [0, 1],
+        easing: 'easeInOutQuad',
+        duration: 2500,
+      });
 
-    // generate bunch of divs to UI to animate
-    for (let col = 0; col < colDivs; col++) {
-      for (let row = 0; row < rowDivs; row++) {
-        const newDiv = document.createElement('div');
-        newDiv.style.width = '100px';
-        newDiv.style.height = '100px';
-        newDiv.style.background = '#00181f';
-        newDiv.style.position = 'absolute';
-        newDiv.style.left = `${row * 100}px`;
-        newDiv.style.top = `${col * 100}px`;
-        //newDiv.style.border = '1px solid black';
-
-        // create random class
-        newDiv.classList.add('el');
-
-        // append div to section
-        wholePageRef.value?.appendChild(newDiv);
-
-        // destroy div after N seconds
-        setTimeout(() => {
-          newDiv.remove();
-        }, 6000);
+      // remove / add css classes which should be applied after the animation
+      if (svg2Ref.value) {
+        svg2Ref.value.classList.add('md:block');
       }
-    }
-
-    // animate each div
-    anime({
-      targets: '.el',
-      scale: [
-        { value: 1, easing: 'easeInOutQuad', duration: 0 },
-        { value: 0, easing: 'easeOutSine', duration: 1500, delay: 1500 },
-      ],
-      delay: anime.stagger(400, { grid: [rowDivs, colDivs], from: 'center' }),
-    });
-
-    // reveal hero image
-    anime({
-      targets: '#hero-bg',
-      opacity: [0, 0.4],
-      easing: 'easeInOutQuad',
-      duration: 2000,
-    });
-
-    // remove / add css classes which should be applied after the animation
-    setDefaultValues();
+      if (blobRef.value) {
+        blobRef.value.classList.add('lg:block');
+      }
+      if (heroBgImageRef.value) {
+        heroBgImageRef.value.classList.remove('hidden');
+      }
+    }, 500);
   });
 
   const heroImage = `${websiteImageUrls}/hero-6.webp`;
 
   return (
-    <div ref={wholePageRef} class="relative overflow-x-clip">
+    <div class="relative overflow-clip bg-black">
       {/* some svgs */}
-      <SVG2 forwardRef={svg2Ref} class="absolute top-[250px] right-[-100px] hidden" />
+      <SVG2 forwardRef={svg2Ref} id="hero-svg" class="absolute right-[-100px] top-[250px] hidden" />
       {/* blob that follows mouse */}
       <div id="blob" ref={blobRef} class="hidden"></div>
 
@@ -134,31 +90,31 @@ export default component$(() => {
         src={heroImage}
         width={1980}
         height={1080}
-        class="absolute top-0 w-[100%] object-cover opacity-30 hidden"
+        class="absolute top-0 hidden w-[100%] object-cover opacity-30"
       />
 
-      <div class="max-w-[1600px] mx-auto">
+      <div class="mx-auto w-11/12 xl:max-w-[1440px]">
         <div ref={heroPageRef} class="relative p-4 md:p-10">
           <WelcomeHero />
         </div>
-        <div class="relative mb-16 md:mb-[140px] p-4 md:p-10">
+        <div class="relative mb-16 p-4 sm:px-10 md:mb-[140px] md:p-10">
           <WelcomeMarketMonitor />
         </div>
-        <div class="relative mb-16 md:mb-[160px] p-4 md:p-10">
-          <SVG2 class="absolute top-[300px] left-[-500px] hidden md:block" />
-          <SVG1 class="absolute top-[-40px] left-0 opacity-25 w-[175px] h-[175px]" />
-          <SVG1 class="absolute top-[120px] left-[120px] opacity-25 w-[175px] h-[175px]" />
+        <div class="relative mb-16 p-4 md:mb-[160px] md:p-10">
+          <SVG2 class="absolute left-[-500px] top-[300px] hidden md:block" />
+          <SVG1 class="absolute left-0 top-[-40px] h-[175px] w-[175px] opacity-25" />
+          <SVG1 class="absolute left-[120px] top-[120px] h-[175px] w-[175px] opacity-25" />
           <WelcomeInvestmentAccount />
         </div>
-        <div class="relative mb-16 md:mb-[160px] p-4 md:p-10">
-          <SVG1 class="absolute top-[-40px] right-0 opacity-25 w-[175px] h-[175px]" />
-          <SVG1 class="absolute top-[225px] right-[160px] opacity-25 w-[175px] h-[175px]" />
+        <div class="relative mb-6 p-4 md:p-10">
+          <SVG1 class="absolute right-0 top-[-40px] h-[175px] w-[175px] opacity-25" />
+          <SVG1 class="absolute right-[160px] top-[225px] h-[175px] w-[175px] opacity-25" />
           <WelcomeSchools />
         </div>
-        <div class="relative p-4 md:p-10">
+        {/* <div class="relative p-4 md:p-10">
           <WelcomeAboutUs />
-        </div>
-        <footer class="min-h-[100px]"></footer>
+        </div> */}
+        <footer class="h-12 bg-black"></footer>
       </div>
     </div>
   );

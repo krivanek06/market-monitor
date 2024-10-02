@@ -50,7 +50,7 @@ import {
     MatTooltipModule,
   ],
   template: `
-    <div class="mb-2 flex justify-end sm:hidden">
+    <div class="mb-4 flex justify-end sm:hidden">
       <div>
         <button mat-stroked-button class="w-[150px] text-sm" (click)="toggleDisplayedValues()">
           {{ displayInfoMobile() ? 'Info' : 'Price +/-' }}

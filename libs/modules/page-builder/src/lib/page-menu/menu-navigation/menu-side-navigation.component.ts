@@ -67,7 +67,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
       <div class="mb-2 ml-4">Other</div>
 
       <!-- settings -->
-      <div class="grid gap-2">
+      <div class="text-wt-gray-dark grid gap-2">
         <a (click)="onSettings()" class="c-link">
           <mat-icon>settings</mat-icon>
           <div class="text-base">Settings</div>
@@ -75,7 +75,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
       </div>
 
       <!-- help -->
-      <div class="grid gap-2">
+      <div class="text-wt-gray-dark grid gap-2">
         <a (click)="onHelp()" class="c-link">
           <mat-icon>help</mat-icon>
           <div class="text-base">Help</div>
@@ -83,7 +83,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
       </div>
 
       <!-- logout -->
-      <div class="grid gap-2">
+      <div class="text-wt-gray-dark grid gap-2">
         <a (click)="onLogout()" class="c-link">
           <mat-icon>logout</mat-icon>
           <div class="text-base">Logout</div>
@@ -100,12 +100,14 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
             [routerLink]="main.path"
             routerLinkActive="bg-wt-gray-light-strong text-wt-primary"
             (click)="onNavigationClick(main.path)"
-            class="hover:bg-wt-gray-light-strong flex h-12 max-w-[90%] items-center gap-3 rounded-e-xl"
+            class="hover:bg-wt-gray-light-strong text-wt-gray-dark flex h-12 max-w-[90%] items-center gap-3 rounded-xl"
             [ngClass]="{
               'pl-5': selectedNavigationPath() !== main.path,
             }"
           >
-            <div *ngIf="selectedNavigationPath() === main.path" class="bg-wt-primary h-full w-3"></div>
+            @if (selectedNavigationPath() === main.path) {
+              <div class="bg-wt-primary h-full w-3"></div>
+            }
             <mat-icon>{{ main.icon }}</mat-icon>
             <div class="text-base">{{ main.title | titlecase }}</div>
           </a>

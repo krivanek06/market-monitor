@@ -1,11 +1,10 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PageCompareUsersComponent } from '@mm/page-builder';
 
 @Component({
   selector: 'app-compare-users',
   standalone: true,
-  imports: [CommonModule, PageCompareUsersComponent],
+  imports: [PageCompareUsersComponent],
   template: `<app-page-compare-users />`,
   styles: `
     :host {

@@ -10,11 +10,6 @@ import { PageSearchComponent } from '@mm/page-builder';
     :host {
       display: block;
     }
-
-    /** make the search dropdown overlay a bit higher (remove space) */
-    ::ng-deep div[id='search-basic-overlay'] {
-      margin-top: -20px !important;
-    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

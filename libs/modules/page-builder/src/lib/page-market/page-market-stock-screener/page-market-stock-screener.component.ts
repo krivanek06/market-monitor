@@ -40,7 +40,7 @@ import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
   template: `
     <section class="mx-auto mb-10 md:w-11/12 md:pt-4 lg:w-10/12 xl:w-9/12">
       <!-- specific search -->
-      <div class="mb-4 sm:hidden">
+      <div class="mb-4 md:hidden">
         <app-section-title title="Basic Search" matIcon="search" class="mb-3" />
         <app-symbol-search-basic />
 
@@ -88,19 +88,21 @@ import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
 })
 export class PageMarketStockScreenerComponent implements OnInit, RouterManagement {
   readonly screenerDefault = 30;
-  private marketApiService = inject(MarketApiService);
-  private dialogServiceUtil = inject(DialogServiceUtil);
-  private dialog = inject(MatDialog);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private readonly marketApiService = inject(MarketApiService);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
-  screenerFormControl = new FormControl<StockScreenerValues>(STOCK_SCREENER_DEFAULT_VALUES, { nonNullable: true });
+  readonly screenerFormControl = new FormControl<StockScreenerValues>(STOCK_SCREENER_DEFAULT_VALUES, {
+    nonNullable: true,
+  });
 
   /**
    * will emit incremented number every time user scrolls near end
    */
-  maxScreenerResults = signal(1);
-  screenerResults = toSignal(
+  readonly maxScreenerResults = signal(1);
+  readonly screenerResults = toSignal(
     this.screenerFormControl.valueChanges.pipe(
       tap((formValue) => {
         // set max results to 1

@@ -9,17 +9,19 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationStart, Router, RouterModule } from '@angular/router';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
-import { GenericDialogComponent, GenericDialogComponentData, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, HelpDialogComponent } from '@mm/shared/ui';
 import { UserSettingsDialogComponent } from '@mm/user/features';
+import { filter, map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-menu-top-navigation',
@@ -35,16 +37,19 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
     MatDialogModule,
     HelpDialogComponent,
     SymbolSearchBasicComponent,
-    GenericDialogComponent,
   ],
   template: `
     <div class="bg-wt-background-present w-full p-2 shadow-md">
       <nav class="mx-auto flex w-full max-w-[1620px] items-center gap-4 pb-1 pl-3 sm:pl-8 sm:pr-4">
-        <!-- hide menu button -->
-        <div class="block xl:hidden">
+        <!-- mobile screen -->
+        <div class="flex items-center gap-x-2 xl:hidden">
+          <!-- menu button -->
           <button type="button" mat-icon-button (click)="onMenuClick()">
             <mat-icon>menu</mat-icon>
           </button>
+
+          <!-- page title -->
+          <span class="text-wt-primary mt-1 text-lg">{{ pageName() }}</span>
         </div>
 
         <!-- dashboard -->
@@ -148,27 +153,41 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
         </a>
 
         <div class="flex flex-1 justify-end">
+          <!-- small screen -->
+          <div class="text-wt-gray-medium pr-4 md:hidden">
+            @if (userDataSignal(); as userDataSignal) {
+              <div class="flex items-center gap-3">
+                <img
+                  appDefaultImg
+                  class="h-6 w-6 rounded-full"
+                  [src]="userDataSignal.personal.photoURL"
+                  [alt]="userDataSignal.personal.displayName"
+                />
+                <span>{{ userDataSignal.personal.displayName }}</span>
+              </div>
+            }
+          </div>
+
           <!-- search -->
-          <app-symbol-search-basic
-            displayValue="symbol"
-            class="-mb-5 -mr-20 hidden w-[640px] scale-[0.7] sm:block xl:max-w-[580px] xl:scale-[0.7]"
-          />
+          <app-symbol-search-basic class="mt-2 hidden w-[475px] scale-90 md:block xl:-mr-6 xl:w-[400px]" />
 
           <div class="hidden items-center gap-1 xl:flex">
             <!-- display logged in person -->
-            <div *ngIf="userDataSignal() as userDataSignal" class="relative mx-2 mt-2">
-              <button mat-button class="h-11 px-4" (click)="onMoreOptionsClick()">
-                <div class="flex items-center gap-3">
-                  <img
-                    appDefaultImg
-                    class="h-8 w-8 rounded-full"
-                    [src]="userDataSignal.personal.photoURL"
-                    [alt]="userDataSignal.personal.displayName"
-                  />
-                  <span>{{ userDataSignal.personal.displayNameInitials }}</span>
-                </div>
-              </button>
-            </div>
+            @if (userDataSignal(); as userDataSignal) {
+              <div class="relative mx-2 mt-2">
+                <button mat-button class="h-11 px-4" (click)="onMoreOptionsClick()">
+                  <div class="flex items-center gap-3">
+                    <img
+                      appDefaultImg
+                      class="h-8 w-8 rounded-full"
+                      [src]="userDataSignal.personal.photoURL"
+                      [alt]="userDataSignal.personal.displayName"
+                    />
+                    <span>{{ userDataSignal.personal.displayNameInitials }}</span>
+                  </div>
+                </button>
+              </div>
+            }
           </div>
         </div>
       </nav>
@@ -223,18 +242,27 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuTopNavigationComponent implements OnInit {
-  menuClickEmitter = output<void>();
-  private router = inject(Router);
-  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private authenticationService = inject(AuthenticationAccountService);
-  private dialog = inject(MatDialog);
+  readonly menuClickEmitter = output<void>();
+  private readonly router = inject(Router);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly authenticationService = inject(AuthenticationAccountService);
+  private readonly dialog = inject(MatDialog);
 
-  menuOptions = viewChild('menuOptions', { read: TemplateRef });
+  readonly menuOptions = viewChild('menuOptions', { read: TemplateRef<HTMLElement> });
 
-  userDataSignal = this.authenticationUserStoreService.state.userData;
+  readonly userDataSignal = this.authenticationUserStoreService.state.userData;
 
-  ROUTES_MAIN = ROUTES_MAIN;
-  activeLinkSignal = signal<ROUTES_MAIN>(ROUTES_MAIN.DASHBOARD);
+  readonly ROUTES_MAIN = ROUTES_MAIN;
+  readonly activeLinkSignal = signal<ROUTES_MAIN>(ROUTES_MAIN.DASHBOARD);
+  readonly pageName = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationStart),
+      map((event) => event?.url || ''),
+      startWith(this.router.url),
+      map((url) => this.resolveActiveRouteName(url)),
+    ),
+    { initialValue: 'GGFinance' },
+  );
 
   ngOnInit(): void {
     // check if url is different than activeLinkSignal
@@ -272,11 +300,55 @@ export class MenuTopNavigationComponent implements OnInit {
   }
 
   onMoreOptionsClick() {
-    this.dialog.open(GenericDialogComponent, {
-      data: <GenericDialogComponentData>{
-        title: 'Options',
-        templateRef: this.menuOptions(),
-      },
-    });
+    this.dialog.open(this.menuOptions()!, {});
+  }
+
+  private resolveActiveRouteName(route: string): string {
+    if (route.includes(ROUTES_MAIN.DASHBOARD)) {
+      return 'Dashboard';
+    }
+
+    if (route.includes(ROUTES_MAIN.WATCHLIST)) {
+      return 'Watchlist';
+    }
+
+    if (route.includes(ROUTES_MAIN.TRADING)) {
+      return 'Trading';
+    }
+
+    if (route.includes(ROUTES_MAIN.GROUPS)) {
+      return 'Groups';
+    }
+
+    if (route.includes(ROUTES_MAIN.HALL_OF_FAME)) {
+      return 'Ranking';
+    }
+
+    if (route.includes(ROUTES_MAIN.COMPARE_USERS)) {
+      return 'Compare';
+    }
+
+    if (route.includes(ROUTES_MAIN.STOCK_SCREENER)) {
+      return 'Market - Screener';
+    }
+
+    if (route.includes(ROUTES_MAIN.MARKET_CALENDAR)) {
+      return 'Market - Calendar';
+    }
+
+    if (route.includes(ROUTES_MAIN.ECONOMICS)) {
+      return 'Market - Economics';
+    }
+
+    if (route.includes(ROUTES_MAIN.NEWS)) {
+      return 'Market - News';
+    }
+
+    if (route.includes(ROUTES_MAIN.TOP_PERFORMERS)) {
+      return 'Market - Top Performers';
+    }
+
+    // default fallback
+    return 'GGFinance';
   }
 }

@@ -23,53 +23,59 @@ export class MarkerDirective {}
   standalone: true,
   imports: [CommonModule, RangeDirective, MatButtonModule, MatIconModule, MarkerDirective],
   template: `
-    <div class="mb-10 flex flex-col justify-between gap-y-3 px-6 md:flex-row">
+    <div class="mb-10 flex flex-col justify-between gap-y-5 lg:flex-row lg:px-6">
       <div class="flex items-center gap-10">
         <!-- current date range -->
-        <div class="text-wt-gray-medium justify-between space-x-4 max-md:flex max-md:flex-1">
+        <div class="max-lg:text-wt-gray-dark space-x-4 text-lg max-lg:flex-1 max-lg:text-center">
           <span>{{ dateRangeSignal()[0] | date: 'MMMM d, y' }}</span>
           <span>-</span>
           <span>{{ dateRangeSignal()[dateRangeSignal().length - 1] | date: 'MMMM d, y' }}</span>
         </div>
         <!-- current month button -->
-        <button class="hidden md:block" (click)="onCurrentMonthClick()" type="button" mat-stroked-button>
+        <button class="hidden lg:block" (click)="onCurrentMonthClick()" type="button" mat-stroked-button>
           Current Date
         </button>
       </div>
 
       <!-- left / right button -->
-      <div class="flex items-center gap-10 max-md:flex-1">
-        <button (click)="onMonthChange('previous')" mat-button type="button" class="max-md:flex-1">
+      <div class="flex items-center gap-10 max-lg:flex-1">
+        <button (click)="onMonthChange('previous')" mat-button type="button" class="max-lg:flex-1">
           <mat-icon>navigate_before</mat-icon>
           Previous Month
         </button>
-        <button (click)="onMonthChange('next')" mat-button type="button" class="max-md:flex-1">
+        <button (click)="onMonthChange('next')" mat-button type="button" class="max-lg:flex-1">
           Next Month
           <mat-icon iconPositionEnd>navigate_next</mat-icon>
         </button>
       </div>
     </div>
 
-    <div class="grid grid-cols-5">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <!-- display day name -->
-      <div *ngRange="5; let i = index" class="text-wt-gray-medium mb-4 text-center text-base">
+      <div *ngRange="5; let i = index" class="text-wt-gray-dark mb-4 text-center text-base max-xl:hidden">
         {{ dateRangeSignal()[i] | date: 'EEEE' }}
       </div>
 
       <!-- showing border if not last line on the bottom -->
       <div
         *ngFor="let date of dateRangeSignal(); let i = index"
-        class="g-border-bottom p-2"
+        class="xl:g-border-bottom border-wt-border min-h-[120px] p-2 max-xl:border"
         [ngClass]="{
-          'border-r': i % 5 !== 4,
-          'border-b':
+          'xl:border-r': i % 5 !== 4,
+          'xl:border-b':
             dateRangeSignal().length % 5 < dateRangeSignal().length - i &&
-            (dateRangeSignal().length % 5 !== 0 || i < dateRangeSignal().length - 5)
+            (dateRangeSignal().length % 5 !== 0 || i < dateRangeSignal().length - 5),
         }"
       >
         <!-- display day -->
-        <div class="mb-2 flex justify-end">
-          <span class="text-wt-gray-medium bg-wt-gray-light h-9 w-9 rounded-full p-2 text-center">
+        <div class="mb-2 flex items-center justify-between xl:justify-end">
+          <!-- display day name on smaller screen-->
+          <span class="text-wt-gray-dark text-sm xl:hidden">
+            {{ dateRangeSignal()[i] | date: 'EEEE, (MMM d.)' }}
+          </span>
+
+          <!-- display day number on large screen -->
+          <span class="text-wt-gray-medium bg-wt-gray-light h-9 w-9 rounded-full p-2 text-center max-xl:hidden">
             {{ dateRangeSignal()[i] | date: 'd' }}
           </span>
         </div>
@@ -89,6 +95,7 @@ export class MarkerDirective {}
       display: block;
     }
   `,
+  // todo - if enabled - always skeleton is displayed
   //changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
@@ -101,8 +108,12 @@ export class MarkerDirective {}
 export class CalendarWrapperComponent implements OnInit, ControlValueAccessor {
   @ContentChildren(MarkerDirective, { read: TemplateRef }) templates!: TemplateRef<any>[];
 
-  selectedDate = CalendarRageToday;
-  dateRangeSignal = signal<string[]>([]);
+  private readonly selectedDate = signal<CalendarRange>(CalendarRageToday);
+
+  /**
+   * displayed dates in the calendar month
+   */
+  readonly dateRangeSignal = signal<string[]>([]);
 
   onChange: (value: CalendarRange) => void = () => {};
   onTouched = () => {};
@@ -112,7 +123,7 @@ export class CalendarWrapperComponent implements OnInit, ControlValueAccessor {
   }
 
   writeValue(values: CalendarRange): void {
-    this.selectedDate = values;
+    this.selectedDate.set(values);
     this.initDateRange();
   }
   /**
@@ -130,35 +141,36 @@ export class CalendarWrapperComponent implements OnInit, ControlValueAccessor {
   }
 
   onCurrentMonthClick(): void {
-    this.selectedDate = { year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
+    const selectedDate = { year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
+    this.selectedDate.set(selectedDate);
     this.initDateRange();
-    this.onChange(this.selectedDate);
+    this.onChange(this.selectedDate());
   }
 
   onMonthChange(value: 'next' | 'previous'): void {
-    const { year, month } = this.selectedDate;
+    const { year, month } = this.selectedDate();
     if (value === 'next') {
       const selectedDate = {
         year: month === 12 ? year + 1 : year,
         month: month === 12 ? 1 : month + 1,
       };
-      this.selectedDate = selectedDate;
+      this.selectedDate.set(selectedDate);
     } else {
       const selectedDate = {
         year: month === 1 ? year - 1 : year,
         month: month === 1 ? 12 : month - 1,
       };
-      this.selectedDate = selectedDate;
+      this.selectedDate.set(selectedDate);
     }
     this.initDateRange();
-    this.onChange(this.selectedDate);
+    this.onChange(this.selectedDate());
   }
 
   private initDateRange(): void {
     this.dateRangeSignal.set(
       generateDatesArrayForMonth({
-        year: this.selectedDate.year,
-        month: this.selectedDate.month,
+        year: this.selectedDate().year,
+        month: this.selectedDate().month,
       }).filter((d) => dateIsNotWeekend(d)),
     );
   }

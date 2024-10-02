@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -13,7 +12,7 @@ type MarketRoutes = ROUTES_MAIN.TOP_PERFORMERS | ROUTES_MAIN.ECONOMICS | ROUTES_
 @Component({
   selector: 'app-market',
   standalone: true,
-  imports: [CommonModule, RouterModule, TabSelectControlComponent, ReactiveFormsModule],
+  imports: [RouterModule, TabSelectControlComponent, ReactiveFormsModule],
   template: `
     <app-tab-select-control
       class="hidden xl:block"
@@ -23,7 +22,7 @@ type MarketRoutes = ROUTES_MAIN.TOP_PERFORMERS | ROUTES_MAIN.ECONOMICS | ROUTES_
     />
 
     <section>
-      <router-outlet></router-outlet>
+      <router-outlet />
     </section>
   `,
   styles: `
@@ -34,11 +33,11 @@ type MarketRoutes = ROUTES_MAIN.TOP_PERFORMERS | ROUTES_MAIN.ECONOMICS | ROUTES_
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarketComponent implements OnInit {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
 
-  private marketTabs: LabelValue<MarketRoutes>[] = [
+  private readonly marketTabs: LabelValue<MarketRoutes>[] = [
     {
       label: 'Top Performers',
       value: ROUTES_MAIN.TOP_PERFORMERS,
@@ -57,7 +56,7 @@ export class MarketComponent implements OnInit {
     },
   ];
 
-  marketTabsSignal = computed(() => {
+  readonly marketTabsSignal = computed(() => {
     const userData = this.authenticationUserStoreService.state.getUserDataNormal();
     if (userData?.userAccountType === UserAccountEnum.DEMO_TRADING) {
       return [
@@ -71,7 +70,7 @@ export class MarketComponent implements OnInit {
     return this.marketTabs;
   });
 
-  currentRouteControl = new FormControl<MarketRoutes>(ROUTES_MAIN.TOP_PERFORMERS, { nonNullable: true });
+  readonly currentRouteControl = new FormControl<MarketRoutes>(ROUTES_MAIN.TOP_PERFORMERS, { nonNullable: true });
 
   ngOnInit(): void {
     // check if custom route is selected and set checkbox accordingly

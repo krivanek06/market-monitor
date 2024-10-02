@@ -62,7 +62,7 @@ import {
 
         <div class="flex">
           <div class="text-wt-gray-dark w-[80px]">Created:</div>
-          <span>{{ userData().accountCreatedDate | date: 'MMMM d, y' }}</span>
+          <span>{{ userData().accountCreatedDate | date: 'MMM d, y' }}</span>
         </div>
       </div>
     </div>
@@ -82,9 +82,9 @@ import {
   ],
 })
 export class UserDisplayItemComponent {
-  userData = input.required<UserBase>();
+  readonly userData = input.required<UserBase>();
   /**
    * whether to show daily portfolio change or total portfolio change
    */
-  showDailyPortfolioChange = input(false);
+  readonly showDailyPortfolioChange = input(false);
 }
