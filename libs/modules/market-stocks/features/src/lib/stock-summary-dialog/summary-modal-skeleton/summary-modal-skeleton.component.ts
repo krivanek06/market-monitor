@@ -1,14 +1,12 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RangeDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-summary-modal-skeleton',
   standalone: true,
-  imports: [CommonModule, RangeDirective],
+  imports: [],
   template: `
     <!-- heading -->
-    <div class="mb-6 flex flex-col gap-y-6 p-4 md:flex-row md:justify-between">
+    <div class="mb-2 flex flex-col gap-y-6 p-4 md:flex-row md:justify-between">
       <!-- symbol info -->
       <div class="flex items-center gap-3">
         <div class="g-skeleton h-12 w-12"></div>
@@ -31,7 +29,7 @@ import { RangeDirective } from '@mm/shared/ui';
     </div>
 
     <!-- display main metrics -->
-    <div class="mb-6 pl-4">
+    <div class="mb-6 pl-4 pr-4">
       <div class="flex justify-around">
         <!-- price -->
         <div class="g-skeleton h-[90px] max-sm:w-full sm:min-w-[250px]"></div>
@@ -51,7 +49,9 @@ import { RangeDirective } from '@mm/shared/ui';
     </div>
 
     <!-- time period change -->
-    <div class="grid grid-cols-2 justify-around gap-4 max-sm:hidden sm:grid-cols-3 md:flex md:flex-row md:flex-wrap">
+    <div
+      class="grid grid-cols-2 justify-around gap-4 pl-4 max-sm:hidden sm:grid-cols-3 md:flex md:flex-row md:flex-wrap"
+    >
       <div class="g-skeleton mx-auto h-12 w-9/12 md:w-20"></div>
       <div class="g-skeleton mx-auto h-12 w-9/12 md:w-20"></div>
       <div class="g-skeleton mx-auto h-12 w-9/12 md:w-20"></div>
@@ -61,10 +61,16 @@ import { RangeDirective } from '@mm/shared/ui';
     </div>
 
     <!-- time period form control -->
-    <div class="my-6 pl-4">
+    <div class="my-6 pl-4 pr-4">
       <!-- large screen buttons -->
       <div class="hidden flex-wrap items-center gap-3 md:flex">
-        <div *ngRange="9" class="g-skeleton h-11 flex-1"></div>
+        <div class="g-skeleton h-11 flex-1"></div>
+        <div class="g-skeleton h-11 flex-1"></div>
+        <div class="g-skeleton h-11 flex-1"></div>
+        <div class="g-skeleton h-11 flex-1"></div>
+        <div class="g-skeleton h-11 flex-1"></div>
+        <div class="g-skeleton h-11 flex-1"></div>
+        <div class="g-skeleton h-11 flex-1"></div>
       </div>
 
       <!-- select on small screen -->
@@ -72,13 +78,13 @@ import { RangeDirective } from '@mm/shared/ui';
     </div>
 
     <!-- chart title and date range -->
-    <div class="mb-3 flex justify-between pl-4">
-      <div class="g-skeleton h-6 sm:w-[125px]"></div>
-      <div class="g-skeleton h-6 sm:w-[350px]"></div>
+    <div class="mb-2 flex justify-between pl-4 pr-4">
+      <div class="g-skeleton h-6 w-[100px] sm:w-[125px]"></div>
+      <div class="g-skeleton h-6 w-[150px] sm:w-[350px]"></div>
     </div>
 
     <!-- price & volume chart -->
-    <div class="pl-4">
+    <div class="pl-4 pr-4">
       <div class="g-skeleton h-[420px]"></div>
     </div>
   `,
