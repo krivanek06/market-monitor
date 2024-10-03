@@ -12,7 +12,7 @@ export const Button = component$<ButtonProps>((props) => {
       type="button"
       onClick$={props.onClick$}
       class={twMerge(
-        'p-2 rounded-lg bg-transparent border border-cyan-800 border-solid hover:bg-gray-900  transition-all duration-300 text-cyan-700 z-10',
+        'z-10 rounded-lg border border-solid border-cyan-700 bg-transparent p-2 text-cyan-700 transition-all duration-300 hover:bg-cyan-900',
         props.class,
       )}
     >

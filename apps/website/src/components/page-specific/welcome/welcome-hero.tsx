@@ -42,7 +42,7 @@ export const WelcomeHero = component$(() => {
     <section class="-mt-10 grid h-screen place-content-center gap-y-12">
       <h1
         class={
-          'animate-in fade-in zoom-in duration-2000 lg:font-outline-2 z-10 inline-block text-center text-6xl max-lg:text-cyan-800 md:bg-gradient-to-b md:from-cyan-700 md:to-black md:bg-clip-text md:text-transparent lg:-mt-20'
+          'animate-in fade-in zoom-in duration-2000 lg:font-outline-2 z-10 inline-block text-center text-6xl max-md:text-cyan-800 md:bg-gradient-to-b md:from-cyan-500 md:to-black md:bg-clip-text md:text-transparent lg:-mt-20'
         }
       >
         <TextModifactor name="GGFinance" />
@@ -52,7 +52,7 @@ export const WelcomeHero = component$(() => {
         <div
           ref={heroAppDescriptionRef}
           id="hero-app-description"
-          class="invisible mx-auto flex w-[320px] flex-col px-4 text-center text-xl text-gray-500 max-md:gap-y-4 sm:w-[650px] lg:mb-10"
+          class="invisible mx-auto flex w-[320px] flex-col px-4 text-center text-xl text-gray-400 max-md:gap-y-4 sm:w-[650px] lg:mb-10"
         >
           <span>
             A free-to-use trading simulator designed to help teach financial literacy, primarily intended for schools to
@@ -69,10 +69,7 @@ export const WelcomeHero = component$(() => {
         <Button onClick$={() => (window.location.href = searchURL)} class="hidden h-14 w-[220px] text-lg lg:block">
           <span>Search</span>
         </Button>
-        <Button
-          onClick$={() => (window.location.href = dashboardURL)}
-          class="duration-2500 h-14 w-[220px] text-lg lg:animate-pulse"
-        >
+        <Button onClick$={() => (window.location.href = dashboardURL)} class="h-14 w-[220px] text-lg">
           <span>Dashboard</span>
         </Button>
       </div>
