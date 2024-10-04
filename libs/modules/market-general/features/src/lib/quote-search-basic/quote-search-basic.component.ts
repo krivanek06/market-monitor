@@ -67,7 +67,7 @@ import { combineLatest, map, switchMap } from 'rxjs';
         </cdk-virtual-scroll-viewport>
 
         <!-- cancel button -->
-        <button (click)="onSearchCancel()" mat-stroked-button type="button" class="w-full">Cancel</button>
+        <button (click)="onSearchCancel()" mat-stroked-button type="button" class="mt-2 w-full">Cancel</button>
       </mat-autocomplete>
     </mat-form-field>
   `,

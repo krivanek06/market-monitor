@@ -81,7 +81,7 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
         data-testid="search-basic-overlay"
         [style.max-width.px]="overlayWidth()"
         [style.min-width.px]="overlayWidth()"
-        class="bg-wt-gray-light @container mx-auto max-h-[400px] min-h-[200px] w-full overflow-y-scroll rounded-md p-3 shadow-md"
+        class="bg-wt-gray-light @container mx-auto max-h-[450px] min-h-[200px] w-full overflow-y-scroll rounded-md p-3 shadow-md"
       >
         <!-- check if load ticker or crypto -->
         <mat-radio-group
