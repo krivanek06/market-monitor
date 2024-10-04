@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, inject, model, output } from '@angu
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -24,7 +23,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, map, of, startW
     MatSelectModule,
     RangeDirective,
     DefaultImgDirective,
-    MatDividerModule,
     MatIconModule,
     UserDisplayItemComponent,
   ],
@@ -49,16 +47,13 @@ import { catchError, debounceTime, distinctUntilChanged, filter, map, of, startW
         [autoActiveFirstOption]="false"
       >
         <!-- loaded data -->
-        @for (user of optionsSignal(); track user.id; let last = $last) {
-          <mat-option [value]="user" class="rounded-md py-2">
-            <app-user-display-item [userData]="user" />
-            @if (!last) {
-              <div class="mt-2">
-                <mat-divider />
-              </div>
-            }
-          </mat-option>
-        }
+        <div class="divide-wt-border divide-y-2 px-4">
+          @for (user of optionsSignal(); track user.id; let last = $last) {
+            <mat-option [value]="user" class="py-2">
+              <app-user-display-item [userData]="user" />
+            </mat-option>
+          }
+        </div>
       </mat-autocomplete>
     </mat-form-field>
   `,

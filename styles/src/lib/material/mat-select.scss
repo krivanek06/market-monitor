@@ -65,6 +65,8 @@ mat-select-trigger {
 
 .mat-mdc-autocomplete-panel {
   max-height: 450px !important;
+  max-width: 96%;
+  margin: auto;
 }
 
 /* distance between content and scroll bar */

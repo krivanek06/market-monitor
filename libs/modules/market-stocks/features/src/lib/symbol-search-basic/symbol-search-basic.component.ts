@@ -14,7 +14,6 @@ import {
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -41,7 +40,6 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
     MatFormFieldModule,
     MatInputModule,
     DefaultImgDirective,
-    MatDividerModule,
     MatRadioModule,
   ],
   template: `
@@ -111,16 +109,11 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
               test-id="search-basic-quotes"
               mat-button
               type="button"
-              class="h-12 w-full"
+              class="g-border-bottom h-12 w-full"
               (click)="onSummaryClick(quote)"
             >
               <app-quote-item [symbolQuote]="quote" />
             </button>
-
-            <!-- divider -->
-            @if (!last) {
-              <mat-divider />
-            }
           }
 
           <!-- no data -->

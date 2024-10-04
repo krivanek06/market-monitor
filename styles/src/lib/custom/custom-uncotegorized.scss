@@ -17,7 +17,14 @@
 }
 
 .g-border-bottom {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border) !important;
+  border-bottom-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+
+  /** remove border from last child */
+  &:last-child {
+    border-bottom: 0 !important;
+  }
 }
 
 .g-screen-size-default {

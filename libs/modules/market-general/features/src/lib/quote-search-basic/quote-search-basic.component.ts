@@ -59,16 +59,11 @@ import { combineLatest, map, switchMap } from 'rxjs';
       >
         <!-- loaded data -->
         <cdk-virtual-scroll-viewport [itemSize]="50" class="h-[400px]" minBufferPx="380" maxBufferPx="400">
-          <mat-option
-            *cdkVirtualFor="let quote of displayedOptions(); let last = last"
-            [value]="quote"
-            class="rounded-md py-2"
-          >
-            <app-quote-item [displayImage]="false" [symbolQuote]="quote" />
-            @if (!last) {
-              <mat-divider />
-            }
-          </mat-option>
+          <div class="divide-wt-border divide-y-2 px-4">
+            <mat-option *cdkVirtualFor="let quote of displayedOptions(); let last = last" [value]="quote" class="py-2">
+              <app-quote-item [displayImage]="false" [symbolQuote]="quote" />
+            </mat-option>
+          </div>
         </cdk-virtual-scroll-viewport>
 
         <!-- cancel button -->

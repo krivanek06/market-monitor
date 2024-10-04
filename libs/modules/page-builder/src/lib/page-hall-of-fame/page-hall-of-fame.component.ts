@@ -101,6 +101,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         class="w-full md:w-[500px]"
         (selectedEmitter)="onUserClick($event)"
       />
+
       <!-- search groups -->
       <app-group-search-control
         data-testid="hall-of-fame-group-search-control"
