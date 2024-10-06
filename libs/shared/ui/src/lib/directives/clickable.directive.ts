@@ -21,11 +21,11 @@ interface Clickable {
   standalone: true,
 })
 export class ClickableDirective implements OnDestroy, Clickable {
-  itemClicked = output<void>();
-  clickable = input(false);
+  readonly itemClicked = output<void>();
+  readonly clickable = input(false);
 
-  private elementRef = inject(ElementRef);
-  private renderer = inject(Renderer2);
+  private readonly elementRef = inject(ElementRef);
+  private readonly renderer = inject(Renderer2);
 
   /**
    * references for event listeners to destroy them when directive is destroyed
@@ -33,7 +33,7 @@ export class ClickableDirective implements OnDestroy, Clickable {
   private clickMouseRef: (() => void) | null = null;
   private clickKeyboardRef: (() => void) | null = null;
 
-  clickableChangeEffect = effect(() => {
+  readonly clickableChangeEffect = effect(() => {
     const isClickable = this.clickable();
     if (isClickable) {
       this.addClickableEffect();

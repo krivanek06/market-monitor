@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Host, Optional, Renderer2, Self, effect, input, output } from '@angular/core';
+import { Directive, ElementRef, Renderer2, effect, inject, input, output } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { isScreenLarger } from '@mm/shared/data-access';
 import { map, startWith } from 'rxjs';
@@ -12,6 +12,15 @@ import { PlatformService } from '../utils';
   standalone: true,
 })
 export class BubblePaginationDirective {
+  private readonly matPag = inject(MatPaginator, {
+    optional: true,
+    self: true,
+    host: true,
+  });
+  private readonly elementRef = inject(ElementRef);
+  private readonly ren = inject(Renderer2);
+  private readonly platform = inject(PlatformService);
+
   /**
    * custom emitter for parent component
    */
@@ -44,13 +53,6 @@ export class BubblePaginationDirective {
   // remember rendered buttons on UI that we can remove them when page index change
   private buttonsRef: HTMLElement[] = [];
 
-  constructor(
-    @Host() @Self() @Optional() private readonly matPag: MatPaginator,
-    private elementRef: ElementRef,
-    private ren: Renderer2,
-    private platform: PlatformService,
-  ) {}
-
   readonly buildButtonsEffect = effect(() => {
     if (this.platform.isServer) {
       return;
@@ -80,6 +82,10 @@ export class BubblePaginationDirective {
   });
 
   private listenOnPageChange(): void {
+    if (!this.matPag) {
+      return;
+    }
+
     // when pagination change -> change button styles
     this.matPag.page
       .pipe(
@@ -197,6 +203,10 @@ export class BubblePaginationDirective {
    * end result: (1) .... (4) (5) (6) ... (25)
    */
   private buildButtons(appCustomLength: number): void {
+    if (!this.matPag) {
+      return;
+    }
+
     const neededButtons = Math.ceil(appCustomLength / this.matPag.pageSize);
 
     // if there is only one page, do not render buttons
@@ -302,6 +312,10 @@ export class BubblePaginationDirective {
    * Helper function to switch page
    */
   private switchPage(i: number): void {
+    if (!this.matPag) {
+      return;
+    }
+
     const previousPageIndex = this.matPag.pageIndex;
     this.matPag.pageIndex = i;
     this.matPag['_emitPageEvent'](previousPageIndex);

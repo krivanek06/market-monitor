@@ -9,14 +9,14 @@ type ImageSrc = string | null | undefined;
   standalone: true,
 })
 export class DefaultImgDirective {
-  private imageRef = inject(ElementRef);
-  private platformService = inject(PlatformService);
-  private renderer = inject(Renderer2);
+  private readonly imageRef = inject(ElementRef);
+  private readonly platformService = inject(PlatformService);
+  private readonly renderer = inject(Renderer2);
 
-  src = input<ImageSrc>(null);
-  imageType = input<DefaultImageType>('default');
+  readonly src = input<ImageSrc>(null);
+  readonly imageType = input<DefaultImageType>('default');
 
-  srcChangeEffect = effect(() => {
+  readonly srcChangeEffect = effect(() => {
     this.initImage(this.src());
   });
 

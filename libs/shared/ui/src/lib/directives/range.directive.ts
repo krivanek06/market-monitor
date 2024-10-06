@@ -27,10 +27,10 @@ interface Context {
   standalone: true,
 })
 export class RangeDirective {
-  ngRange = input<number>(0);
-  ngRangeStep = input<number>(1);
+  readonly ngRange = input<number>(0);
+  readonly ngRangeStep = input<number>(1);
 
-  rangeEffect = effect(() => {
+  readonly rangeEffect = effect(() => {
     this.viewContainer.clear();
 
     const max = this.ngRange();
@@ -43,7 +43,7 @@ export class RangeDirective {
   // Inject template into parent view
   private readonly viewContainer = inject(ViewContainerRef);
 
-  private cd = inject(ChangeDetectorRef);
+  private readonly cd = inject(ChangeDetectorRef);
 
   applyViewChanges(max: number): void {
     for (let i = 0; i < max; i++) {

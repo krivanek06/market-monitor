@@ -8,12 +8,12 @@ import { Directive, ElementRef, OnDestroy, OnInit, Renderer2, inject, output } f
   standalone: true,
 })
 export class ElementFocusDirective implements OnInit, OnDestroy {
-  private renderer = inject(Renderer2);
-  private elementRef = inject(ElementRef);
+  private readonly renderer = inject(Renderer2);
+  private readonly elementRef = inject(ElementRef);
 
-  insideClick = output<void>();
-  insideFocus = output<void>();
-  outsideClick = output<void>();
+  readonly insideClick = output<void>();
+  readonly insideFocus = output<void>();
+  readonly outsideClick = output<void>();
 
   private focusRef: (() => void) | null = null;
   private mouseDown: (() => void) | null = null;

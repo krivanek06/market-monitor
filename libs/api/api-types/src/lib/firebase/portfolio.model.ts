@@ -158,8 +158,8 @@ export type PortfolioTransaction = SymbolStoreBase & {
 
   /**
    * what was the return % from the SELL transaction
-   * example: if user bought for 100 and sold for 110, returnChange is 0.1
-   * example: value 1.0105 is 101.05%
+   * example: if user bought for 100 and sold for 110, returnChange is 10
+   * example: value 11.05 is 11.05%
    */
   returnChange: number;
 

@@ -9,25 +9,25 @@ import { ColorScheme } from '@mm/shared/data-access';
   standalone: true,
 })
 export class PositionColoringDirective {
-  private renderer = inject(Renderer2);
-  private elementRef = inject(ElementRef);
+  private readonly renderer = inject(Renderer2);
+  private readonly elementRef = inject(ElementRef);
 
   /**
    * target html element position - border, background, etc.
    */
-  cssSelector = input<string>('color');
+  readonly cssSelector = input<string>('color');
 
   /**
    * element's position - determine what color to use
    */
-  position = input<number>(0);
+  readonly position = input<number>(0);
 
   /**
    * color used to color elements after the first 3 positions
    */
-  defaultPositionColor = input<ColorScheme>(ColorScheme.GRAY_MEDIUM_VAR);
+  readonly defaultPositionColor = input<ColorScheme>(ColorScheme.GRAY_MEDIUM_VAR);
 
-  positionChangeEffect = effect(() => {
+  readonly positionChangeEffect = effect(() => {
     const cssSelector = this.cssSelector();
     const position = this.position();
     const defaultColor = this.defaultPositionColor();

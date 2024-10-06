@@ -25,12 +25,12 @@ export class HideAfterDirective {
   /**
    * time in milliseconds after which the element will be hidden
    */
-  hideAfter = input.required<number>();
+  readonly hideAfter = input.required<number>();
 
-  private viewContainerRef = inject(ViewContainerRef);
-  private template = inject(TemplateRef<HideAfterContext>);
+  private readonly viewContainerRef = inject(ViewContainerRef);
+  private readonly template = inject(TemplateRef<HideAfterContext>);
 
-  contextChangeEffect = effect(
+  readonly contextChangeEffect = effect(
     () => {
       const delay = this.hideAfter();
       const internalCounter = signal(0);

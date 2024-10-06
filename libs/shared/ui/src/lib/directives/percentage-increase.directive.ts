@@ -27,20 +27,20 @@ export type CurrentValues = {
   standalone: true,
 })
 export class PercentageIncreaseDirective {
-  private renderer2 = inject(Renderer2);
-  private vr = inject(ViewContainerRef);
+  private readonly renderer2 = inject(Renderer2);
+  private readonly vr = inject(ViewContainerRef);
   /**
    * choose to populate data for changeValues or currentValues
    */
-  changeValues = input<ChangeValues>();
-  currentValues = input<CurrentValues>();
+  readonly changeValues = input<ChangeValues>();
+  readonly currentValues = input<CurrentValues>();
   /**
    * if true, it will display the currency sign inside ()
    */
-  useCurrencySign = input(false);
-  hideValueOnXsScreen = input(false);
+  readonly useCurrencySign = input(false);
+  readonly hideValueOnXsScreen = input(false);
 
-  changeValuesEffect = effect(() => {
+  readonly changeValuesEffect = effect(() => {
     const changeValues = this.changeValues();
     if (!changeValues) {
       return;
@@ -50,7 +50,7 @@ export class PercentageIncreaseDirective {
     this.createElement(change, changesPercentage);
   });
 
-  currentValuesEffect = effect(() => {
+  readonly currentValuesEffect = effect(() => {
     const currentValues = this.currentValues();
 
     if (!currentValues || !currentValues.valueToCompare) {
@@ -102,10 +102,6 @@ export class PercentageIncreaseDirective {
 
     this.renderer2.addClass(wrapper, 'items-center');
     this.renderer2.addClass(wrapper, 'flex-wrap');
-    //this.rederer2.addClass(wrapper, 'gap-x-1');
-
-    // this.rederer2.addClass(wrapper, 'flex-col');
-    // this.rederer2.addClass(wrapper, 'items-start');
 
     // display percentage
     if (changesPercentage && !hidePercentage) {

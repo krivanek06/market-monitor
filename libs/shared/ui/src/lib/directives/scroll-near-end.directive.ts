@@ -6,18 +6,18 @@ import { AfterViewInit, Directive, ElementRef, HostListener, OnInit, inject, inp
   standalone: true,
 })
 export class ScrollNearEndDirective implements OnInit, AfterViewInit {
-  private document = inject(DOCUMENT);
-  private el = inject(ElementRef);
+  private readonly document = inject(DOCUMENT);
+  private readonly el = inject(ElementRef);
 
   /**
    * will emit incremented number every time user scrolls near end
    */
-  nearEnd = model<number>(0);
+  readonly nearEnd = model<number>(0);
 
   /**
    * threshold in PX when to emit before page end scroll
    */
-  threshold = input(40);
+  readonly threshold = input(40);
 
   private window?: Window;
 
