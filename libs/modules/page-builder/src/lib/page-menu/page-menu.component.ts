@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,7 +7,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
 import { DialogServiceModule } from '@mm/shared/dialog-manager';
-import { StorageLocalService } from '@mm/shared/storage-local';
 import { ThemeService } from '@mm/shared/theme-switcher';
 import { MenuSideNavigationComponent } from './menu-navigation/menu-side-navigation.component';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
@@ -48,15 +47,8 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
 
         <div class="c-content-wrapper">
           <!-- content -->
-          @if (loadingSignal()) {
-            <div class="grid min-h-screen min-w-full place-content-center pb-[15%]">
-              <mat-spinner />
-            </div>
-          }
+          <router-outlet />
 
-          <main [ngClass]="{ hidden: loadingSignal() }">
-            <router-outlet />
-          </main>
           <!-- footer for additional space on bottom -->
           <footer class="h-12 w-full"></footer>
         </div>
@@ -99,8 +91,6 @@ export class PageMenuComponent {
    * used to init the service to set theme eagerly
    */
   private themeService = inject(ThemeService);
-  private storageLocalService = inject(StorageLocalService);
-  loadingSignal = computed(() => !!this.storageLocalService.localData()?.loader?.enabled);
 
   isOpen = signal<boolean>(false);
 

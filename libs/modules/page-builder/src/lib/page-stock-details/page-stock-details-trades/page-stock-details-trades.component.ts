@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { StockInsiderTradesComponent } from '@mm/market-stocks/ui';
 import { GeneralCardComponent, RangeDirective } from '@mm/shared/ui';
+import { switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
@@ -28,5 +29,9 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageStockDetailsTradesComponent extends PageStockDetailsBase {
-  readonly stockInsiderTradesSignal = toSignal(this.stocksApiService.getStockInsiderTrades(this.stockSymbolSignal()));
+  readonly stockInsiderTradesSignal = toSignal(
+    toObservable(this.stockSymbolSignal).pipe(
+      switchMap((symbol) => this.stocksApiService.getStockInsiderTrades(symbol)),
+    ),
+  );
 }

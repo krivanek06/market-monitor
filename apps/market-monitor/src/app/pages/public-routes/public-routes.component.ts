@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceModule } from '@mm/shared/dialog-manager';
 import { environment } from '../../../environments/environment';
@@ -22,7 +22,7 @@ import { environment } from '../../../environments/environment';
     </nav>
 
     <section class="g-screen-size-default">
-      <router-outlet></router-outlet>
+      <router-outlet />
     </section>
   `,
   styles: `
@@ -42,45 +42,6 @@ import { environment } from '../../../environments/environment';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicRoutesComponent {
-  ROUTES_MAIN = ROUTES_MAIN;
-  version = environment.version;
+  readonly ROUTES_MAIN = ROUTES_MAIN;
+  readonly version = environment.version;
 }
-
-export const route: Routes = [
-  {
-    path: '',
-    component: PublicRoutesComponent,
-    children: [
-      {
-        path: '',
-        title: 'Search',
-        loadComponent: () => import('./subpages/search.component').then((m) => m.SearchComponent),
-      },
-      {
-        path: ROUTES_MAIN.STOCK_SCREENER,
-        title: 'Stock Screener',
-        loadComponent: () => import('./subpages/stock-screener.component').then((m) => m.StockScreenerComponent),
-      },
-      {
-        path: ROUTES_MAIN.MARKET,
-        title: 'Market',
-        loadComponent: () => import('./subpages/market.component').then((m) => m.MarketComponent),
-      },
-      {
-        path: ROUTES_MAIN.MARKET_CALENDAR,
-        title: 'Market Calendar',
-        loadComponent: () => import('./subpages/calendar.component').then((m) => m.CalendarComponent),
-      },
-      {
-        path: ROUTES_MAIN.TOP_PERFORMERS,
-        title: 'Top Performers',
-        loadComponent: () => import('./subpages/top-performers.component').then((m) => m.TopPerformersComponent),
-      },
-      {
-        path: ROUTES_MAIN.CRYPTO,
-        title: 'Crypto',
-        loadComponent: () => import('./subpages/crypto.component').then((m) => m.CryptoComponent),
-      },
-    ],
-  },
-];

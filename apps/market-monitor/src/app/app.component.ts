@@ -1,8 +1,7 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
-import { StorageLocalService } from '@mm/shared/storage-local';
 
 @Component({
   standalone: true,
@@ -10,15 +9,7 @@ import { StorageLocalService } from '@mm/shared/storage-local';
   selector: 'app-root',
   template: `
     <main class="min-h-screen min-w-full">
-      @if (isLoading()) {
-        <div class="grid min-h-screen min-w-full place-content-center pb-[15%]">
-          <mat-spinner />
-        </div>
-      }
-
-      <div [ngClass]="{ hidden: isLoading() }">
-        <router-outlet />
-      </div>
+      <router-outlet />
     </main>
   `,
   styles: `
@@ -27,7 +18,4 @@ import { StorageLocalService } from '@mm/shared/storage-local';
     }
   `,
 })
-export class AppComponent {
-  private readonly storageLocalService = inject(StorageLocalService);
-  readonly isLoading = computed(() => !!this.storageLocalService.localData()?.loader?.enabled);
-}
+export class AppComponent {}

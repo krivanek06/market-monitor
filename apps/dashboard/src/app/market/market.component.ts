@@ -81,14 +81,5 @@ export class MarketComponent implements OnInit {
       console.log('currentRouteControl', value);
       this.router.navigate([value], { relativeTo: this.route });
     });
-
-    // this.isCustomCheckedControl.patchValue(lastSegment === ROUTES_MARKET.CUSTOM);
-    // this.isCustomCheckedControl.valueChanges.subscribe((value) => {
-    //   if (value) {
-    //     this.router.navigate([`${ROUTES_MAIN.MARKET}/${ROUTES_MARKET.CUSTOM}`]);
-    //   } else {
-    //     this.router.navigate([`${ROUTES_MAIN.MARKET}/${ROUTES_MARKET.OVERVIEW}`]);
-    //   }
-    // });
   }
 }

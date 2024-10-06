@@ -1,6 +1,6 @@
 import { NgClass, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { SymbolSummary } from '@mm/api-types';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
@@ -232,10 +232,10 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
 
         <!-- peers -->
         <app-general-card title="Peers" class="hidden lg:block">
-          @if (stockPeersSignal()?.length ?? 0 > 0) {
+          @if (stockPeersSignal().length > 0) {
             <app-stock-peers-list
               (clickedEmitter)="onShowSummary($event)"
-              [peers]="stockPeersSignal() ?? [] | slice: 0 : 12"
+              [peers]="stockPeersSignal() | slice: 0 : 12"
             />
           }
         </app-general-card>
@@ -294,7 +294,7 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
   private readonly dialog = inject(MatDialog);
 
   readonly stockPeersSignal = toSignal(
-    this.stockDetails$.pipe(
+    toObservable(this.stockDetailsSignal).pipe(
       switchMap((details) => {
         if (!details.sectorPeers || details.sectorPeers.peersList.length === 0) {
           return of([]);
@@ -302,6 +302,7 @@ export class PageStockDetailsOverviewComponent extends PageStockDetailsBase {
         return this.marketApiService.getSymbolSummaries(details.sectorPeers.peersList);
       }),
     ),
+    { initialValue: [] },
   );
 
   readonly companyRatingSignal = computed(() =>

@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { SheetDataTimePeriodForm, StockTransformService } from '@mm/market-stocks/data-access';
 import { StockSheetDataTableComponent, StockSheetDataTimePeriodComponent } from '@mm/market-stocks/ui';
 import { GeneralCardComponent } from '@mm/shared/ui';
-import { map, startWith } from 'rxjs';
+import { map, startWith, switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
@@ -42,22 +42,26 @@ export class PageStockDetailsFinancialsComponent extends PageStockDetailsBase {
 
   /** which financial sheet to display */
   readonly sheetDataSignal = toSignal(
-    this.timePeriodControl.valueChanges.pipe(
-      startWith(this.timePeriodControl.value),
-      map((timePeriod) => {
-        const time = timePeriod.timePeriod;
-        const key = timePeriod.sheetKey;
-        // cash flow
-        if (key === 'cash') {
-          return this.stockTransformService.createSheetDataFromCashFlow(time, this.stockDetailsSignal());
-        }
-        // income statement
-        if (key === 'income') {
-          return this.stockTransformService.createSheetDataFromIncomeStatement(time, this.stockDetailsSignal());
-        }
-        // balance sheet
-        return this.stockTransformService.createSheetDataFromBalanceSheet(time, this.stockDetailsSignal());
-      }),
+    toObservable(this.stockDetailsSignal).pipe(
+      switchMap((stockDetails) =>
+        this.timePeriodControl.valueChanges.pipe(
+          startWith(this.timePeriodControl.value),
+          map((timePeriod) => {
+            const time = timePeriod.timePeriod;
+            const key = timePeriod.sheetKey;
+            // cash flow
+            if (key === 'cash') {
+              return this.stockTransformService.createSheetDataFromCashFlow(time, stockDetails);
+            }
+            // income statement
+            if (key === 'income') {
+              return this.stockTransformService.createSheetDataFromIncomeStatement(time, stockDetails);
+            }
+            // balance sheet
+            return this.stockTransformService.createSheetDataFromBalanceSheet(time, stockDetails);
+          }),
+        ),
+      ),
     ),
   );
 }

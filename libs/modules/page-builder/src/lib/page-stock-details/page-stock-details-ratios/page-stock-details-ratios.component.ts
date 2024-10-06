@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { GenericChartComponent, RangeDirective } from '@mm/shared/ui';
+import { switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
 @Component({
@@ -353,6 +354,8 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
 })
 export class PageStockDetailsRatiosComponent extends PageStockDetailsBase {
   readonly stockHistoricalMetricsSignal = toSignal(
-    this.stocksApiService.getStockHistoricalMetrics(this.stockSymbolSignal()),
+    toObservable(this.stockSymbolSignal).pipe(
+      switchMap((symbol) => this.stocksApiService.getStockHistoricalMetrics(symbol)),
+    ),
   );
 }

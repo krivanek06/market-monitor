@@ -1,14 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, effect, inject, untracked } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
-import { stockDetailsResolver } from '@mm/page-builder';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MarketApiService, StocksApiService } from '@mm/api-client';
+import {
+  PageStockDetailsFinancialsComponent,
+  PageStockDetailsNewsComponent,
+  PageStockDetailsOverviewComponent,
+  PageStockDetailsRatiosComponent,
+  PageStockDetailsTradesComponent,
+} from '@mm/page-builder';
 import { LabelValue, ROUTES_STOCK_DETAILS } from '@mm/shared/data-access';
 import { DialogServiceModule } from '@mm/shared/dialog-manager';
 import { TabSelectControlComponent } from '@mm/shared/ui';
+import { catchError, filter, forkJoin, map, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-stock-details',
@@ -21,26 +30,59 @@ import { TabSelectControlComponent } from '@mm/shared/ui';
     MatButtonModule,
     MatIconModule,
     DialogServiceModule,
+    MatProgressSpinnerModule,
+    PageStockDetailsOverviewComponent,
+    PageStockDetailsNewsComponent,
+    PageStockDetailsTradesComponent,
+    PageStockDetailsFinancialsComponent,
+    PageStockDetailsRatiosComponent,
   ],
   template: `
     <section class="g-screen-size-default">
-      <div class="mb-6 flex justify-between">
-        <div>
-          <button type="button" mat-stroked-button class="mt-2 min-w-[120px]" (click)="onHomeClick()">
-            <mat-icon>home</mat-icon>
-            Home
-          </button>
-        </div>
+      @if (symbolDetails(); as symbolDetails) {
+        @if (symbolDetails.action === 'loading') {
+          <div class="grid min-h-screen min-w-full place-content-center pb-[15%]">
+            <mat-spinner />
+          </div>
+        } @else if (symbolDetails.action === 'loaded') {
+          <div class="mb-6 flex justify-between">
+            <div>
+              <button type="button" mat-stroked-button class="mt-2 min-w-[120px]" (click)="onHomeClick()">
+                <mat-icon>home</mat-icon>
+                Home
+              </button>
+            </div>
 
-        <!-- main navigation -->
-        <app-tab-select-control
-          [formControl]="routesStockDetailsControl"
-          [displayOptions]="routesStockDetails"
-          screenLayoutSplit="LAYOUT_XL"
-        ></app-tab-select-control>
-      </div>
+            <!-- main navigation -->
+            <app-tab-select-control
+              [formControl]="routesStockDetailsControl"
+              [displayOptions]="routesStockDetails"
+              screenLayoutSplit="LAYOUT_XL"
+            />
+          </div>
 
-      <router-outlet></router-outlet>
+          @switch (routesStockDetailsControl.value) {
+            @case (ROUTES_STOCK_DETAILS.OVERVIEW) {
+              <app-page-details-overview [stockDetailsSignal]="symbolDetails.data.stockDetails" />
+            }
+            @case (ROUTES_STOCK_DETAILS.FINANCIALS) {
+              <app-page-stock-details-financials [stockDetailsSignal]="symbolDetails.data.stockDetails" />
+            }
+
+            @case (ROUTES_STOCK_DETAILS.RATIOS) {
+              <app-page-stock-details-ratios [stockDetailsSignal]="symbolDetails.data.stockDetails" />
+            }
+
+            @case (ROUTES_STOCK_DETAILS.TRADES) {
+              <app-page-stock-details-trades [stockDetailsSignal]="symbolDetails.data.stockDetails" />
+            }
+
+            @case (ROUTES_STOCK_DETAILS.NEWS) {
+              <app-page-stock-details-news [stockDetailsSignal]="symbolDetails.data.stockDetails" />
+            }
+          }
+        }
+      }
     </section>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,10 +93,12 @@ import { TabSelectControlComponent } from '@mm/shared/ui';
   `,
 })
 export class StockDetailsComponent {
-  router = inject(Router);
-  route = inject(ActivatedRoute);
-  routesStockDetailsControl = new FormControl<string>(ROUTES_STOCK_DETAILS.OVERVIEW);
-  routesStockDetails: LabelValue<string>[] = [
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly stocksApiService = inject(StocksApiService);
+  private readonly marketApiService = inject(MarketApiService);
+  readonly routesStockDetailsControl = new FormControl<string>(ROUTES_STOCK_DETAILS.OVERVIEW);
+  readonly routesStockDetails: LabelValue<string>[] = [
     { label: 'Overview', value: ROUTES_STOCK_DETAILS.OVERVIEW },
     { label: 'Financials', value: ROUTES_STOCK_DETAILS.FINANCIALS },
     { label: 'Ratios', value: ROUTES_STOCK_DETAILS.RATIOS },
@@ -63,82 +107,50 @@ export class StockDetailsComponent {
     { label: 'Trades', value: ROUTES_STOCK_DETAILS.TRADES },
   ];
 
-  constructor() {
-    this.resolveUrl();
+  readonly ROUTES_STOCK_DETAILS = ROUTES_STOCK_DETAILS;
 
-    // navigate to selected tab
-    this.routesStockDetailsControl.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
-      this.router.navigate([value], { relativeTo: this.route });
+  readonly symbolDetails = toSignal(
+    this.route.params.pipe(
+      map((params) => params['symbol']),
+      filter((symbol) => !!symbol),
+      switchMap((symbol) =>
+        forkJoin([
+          this.stocksApiService.getStockDetails(symbol),
+          this.stocksApiService.getStockOwnershipInstitutional(symbol),
+          this.stocksApiService.getStockHistoricalMetrics(symbol),
+          this.stocksApiService.getStockInsiderTrades(symbol),
+          this.marketApiService.getNews('stocks', symbol),
+        ]).pipe(
+          map((details) => ({
+            action: 'loaded' as const,
+            data: {
+              stockDetails: details[0],
+              stockOwnershipInstitutional: details[1],
+              stockHistoricalMetrics: details[2],
+              stockInsiderTrades: details[3],
+              news: details[4],
+            },
+          })),
+          catchError(() => [{ action: 'error' as const }]),
+          startWith({ action: 'loading' as const }),
+        ),
+      ),
+    ),
+    { initialValue: { action: 'loading' as const } },
+  );
+
+  readonly symbolDetailsChange = effect(() => {
+    const symbolDetails = this.symbolDetails();
+    console.log('symbolDetails', symbolDetails);
+
+    untracked(() => {
+      if (symbolDetails.action === 'error') {
+        this.router.navigate(['/']);
+      }
     });
-  }
+  });
 
   onHomeClick(): void {
     this.router.navigate(['']);
   }
-
-  /**
-   * may happen that url is different than default value in routesStockDetailsControl
-   */
-  private resolveUrl(): void {
-    const slittedUrl = this.router.url.split('?');
-    if (!slittedUrl[0]) {
-      return;
-    }
-    const lastUrlSegment = slittedUrl[0].split('/').pop();
-    if (lastUrlSegment) {
-      this.routesStockDetailsControl.patchValue(lastUrlSegment);
-    }
-  }
 }
-
-export const route: Routes = [
-  {
-    path: '',
-    component: StockDetailsComponent,
-    resolve: {
-      stockDetails: stockDetailsResolver,
-    },
-    children: [
-      {
-        path: '',
-        redirectTo: ROUTES_STOCK_DETAILS.OVERVIEW,
-        pathMatch: 'full',
-      },
-      {
-        path: ROUTES_STOCK_DETAILS.OVERVIEW,
-        title: 'Overview',
-        loadComponent: () =>
-          import('./subpages/stock-details-overview.component').then((m) => m.StockDetailsOverviewComponent),
-      },
-      // {
-      //   path: ROUTES_STOCK_DETAILS.HOLDERS,
-      //   title: 'Holders',
-      //   loadComponent: () =>
-      //     import('./subpages/stock-details-holders.component').then((m) => m.StockDetailsHoldersComponent),
-      // },
-      {
-        path: ROUTES_STOCK_DETAILS.NEWS,
-        title: 'News',
-        loadComponent: () => import('./subpages/stock-details-news.component').then((m) => m.StockDetailsNewsComponent),
-      },
-      {
-        path: ROUTES_STOCK_DETAILS.TRADES,
-        title: 'Trades',
-        loadComponent: () =>
-          import('./subpages/stock-details-trades.component').then((m) => m.StockDetailsTradesComponent),
-      },
-      {
-        path: ROUTES_STOCK_DETAILS.FINANCIALS,
-        title: 'Financials',
-        loadComponent: () =>
-          import('./subpages/stock-details-financials.component').then((m) => m.StockDetailsFinancialsComponent),
-      },
-      {
-        path: ROUTES_STOCK_DETAILS.RATIOS,
-        title: 'Ratios',
-        loadComponent: () =>
-          import('./subpages/stock-details-ratios.component').then((m) => m.StockDetailsRatiosComponent),
-      },
-    ],
-  },
-];
