@@ -37,8 +37,13 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
           <!-- user -->
           @if (displayUser()) {
             <div class="flex items-center gap-2">
-              <img appDefaultImg imageType="default" [src]="transaction().userPhotoURL" class="h-6 w-6 rounded-lg" />
-              <div class="text-wt-gray-medium">{{ transaction().userDisplayName ?? 'Unknown' }}</div>
+              <img
+                appDefaultImg
+                imageType="default"
+                [src]="transaction().userPhotoURL"
+                class="h-5 w-5 rounded-lg opacity-85"
+              />
+              <div class="text-wt-gray-medium text-sm">{{ transaction().userDisplayName ?? 'Unknown' }}</div>
             </div>
           } @else {
             <!-- date -->
@@ -55,7 +60,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
           [useCurrencySign]="true"
           [changeValues]="{
             change: transaction().returnValue,
-            changePercentage: transaction().returnChange,
+            changePercentage: transaction().returnChange * 100,
           }"
         ></div>
 

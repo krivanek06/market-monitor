@@ -297,14 +297,11 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
               [data]="groupDetailsSignal.groupTransactionsData"
             />
           } @loading (minimum 1s) {
-            <div class="mb-4 flex justify-between">
+            <div class="mb-4 flex justify-end gap-2">
               <div class="g-skeleton h-10 w-[220px]"></div>
-
-              <div class="flex gap-2">
-                <div class="g-skeleton h-10 w-[220px]"></div>
-                <div class="g-skeleton h-10 w-[220px]"></div>
-              </div>
+              <div class="g-skeleton h-10 w-[220px]"></div>
             </div>
+            <div class="g-skeleton mb-2 h-10 w-[220px]"></div>
             <div class="g-skeleton h-[600px]"></div>
           }
         </div>

@@ -204,8 +204,8 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         </mat-icon>
         <img appDefaultImg [src]="data.item.personal.photoURL" alt="user image" class="h-8 w-8 rounded-lg" />
         <div class="flex items-center gap-2">
-          <div class="hidden sm:block">{{ data.item.personal.displayName }}</div>
-          <div class="block sm:hidden">{{ data.item.personal.displayNameInitials }}</div>
+          <div class="text-wt-gray-dark hidden lg:block">{{ data.item.personal.displayName }}</div>
+          <div class="block lg:hidden">{{ data.item.personal.displayNameInitials }}</div>
           <!-- display position change if any -->
           @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
             @if (rankChange !== 0) {
@@ -225,14 +225,18 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       </div>
     </ng-template>
 
-    <!-- template for user data in table -->
+    <!-- template for group data in table -->
     <ng-template #groupTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
         <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="h-8 w-8 rounded-lg" />
         <div class="flex items-center gap-2">
-          <div class="w-[100px] truncate text-ellipsis sm:w-[200px]">
+          <!-- group name -->
+          <div class="text-wt-gray-dark w-[100px] truncate text-ellipsis sm:w-[180px]">
             {{ data.item.name }}
           </div>
+          <!-- number of members -->
+          <div>[{{ data.item.numberOfMembers }}]</div>
+
           <!-- display position change if any -->
           @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
             @if (rankChange !== 0) {

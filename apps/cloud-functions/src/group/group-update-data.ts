@@ -281,8 +281,8 @@ export const calculateGroupMembersPortfolioState = (
     transactionFees: roundNDigits(memberPortfolioState.transactionFees),
 
     // additional calculations
-    totalGainsValue: roundNDigits(memberPortfolioState.holdingsBalance - memberPortfolioState.invested),
-    totalGainsPercentage: roundNDigits(memberPortfolioState.totalGainsValue / memberPortfolioState.holdingsBalance),
+    totalGainsValue: roundNDigits(memberPortfolioState.balance - memberPortfolioState.startingCash),
+    totalGainsPercentage: calculateGrowth(memberPortfolioState.balance, memberPortfolioState.startingCash),
     previousBalanceChange: roundNDigits(memberPortfolioState.balance - groupPreviousPortfolioState.balance),
     previousBalanceChangePercentage: calculateGrowth(memberPortfolioState.balance, groupPreviousPortfolioState.balance),
   } satisfies PortfolioState;

@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { HallOfFameTopRankData, PortfolioState } from '@mm/api-types';
-import { InArrayPipe, PercentageIncreaseDirective, RangeDirective } from '@mm/shared/ui';
+import { InArrayPipe, LargeNumberFormatterPipe, PercentageIncreaseDirective, RangeDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-portfolio-rank-table',
@@ -27,6 +27,7 @@ import { InArrayPipe, PercentageIncreaseDirective, RangeDirective } from '@mm/sh
     PercentageIncreaseDirective,
     RangeDirective,
     InArrayPipe,
+    LargeNumberFormatterPipe,
   ],
   template: `
     <table mat-table class="table-hover" [dataSource]="dataSource" [trackBy]="identity">
@@ -63,9 +64,17 @@ import { InArrayPipe, PercentageIncreaseDirective, RangeDirective } from '@mm/sh
 
       <!-- cash-->
       <ng-container matColumnDef="cash">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Cash</th>
-        <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Cash</th>
+        <td mat-cell *matCellDef="let row; let i = index" class="hidden lg:table-cell">
           {{ row.item.portfolioState.cashOnHand | currency }}
+        </td>
+      </ng-container>
+
+      <!-- started-->
+      <ng-container matColumnDef="started">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden xl:table-cell">Started</th>
+        <td mat-cell *matCellDef="let row; let i = index" class="hidden xl:table-cell">
+          {{ row.item.portfolioState.startingCash | largeNumberFormatter: false : true }}
         </td>
       </ng-container>
 
@@ -78,6 +87,7 @@ import { InArrayPipe, PercentageIncreaseDirective, RangeDirective } from '@mm/sh
             <div class="text-wt-gray-dark block text-end md:hidden">
               {{ row.item.portfolioState.balance | currency }}
             </div>
+            <!-- desktop display -->
             <div
               class="max-md:justify-end max-md:text-sm"
               appPercentageIncrease
@@ -93,24 +103,24 @@ import { InArrayPipe, PercentageIncreaseDirective, RangeDirective } from '@mm/sh
 
       <!-- transactions buy -->
       <ng-container matColumnDef="transaction_buy">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Buys</th>
-        <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Buys</th>
+        <td mat-cell *matCellDef="let row; let i = index" class="hidden lg:table-cell">
           {{ row.item.portfolioState.numberOfExecutedBuyTransactions }}
         </td>
       </ng-container>
 
       <!-- transactions sell -->
       <ng-container matColumnDef="transaction_sell">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Sells</th>
-        <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Sells</th>
+        <td mat-cell *matCellDef="let row; let i = index" class="hidden lg:table-cell">
           {{ row.item.portfolioState.numberOfExecutedSellTransactions }}
         </td>
       </ng-container>
 
       <!-- transactions fees -->
       <ng-container matColumnDef="transaction_fees">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Fees</th>
-        <td mat-cell *matCellDef="let row; let i = index" class="hidden md:table-cell">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden 2xl:table-cell">Fees</th>
+        <td mat-cell *matCellDef="let row; let i = index" class="hidden 2xl:table-cell">
           {{ row.item.portfolioState.transactionFees | currency }}
         </td>
       </ng-container>
@@ -156,29 +166,31 @@ export class PortfolioRankTableComponent<
     portfolioState: PortfolioState;
   }>,
 > {
-  itemClicked = output<T['item']>();
+  readonly itemClicked = output<T['item']>();
+
   /**
    * template that is rendered in the 'name' section
    */
-  template = input.required<TemplateRef<any>>();
+  readonly template = input.required<TemplateRef<any>>();
+
   /**
    * data to be displayed in the table
    */
-  data = input.required<T[]>();
+  readonly data = input.required<T[]>();
 
   /**
    * number from which the position should start
    */
-  initialPosition = input<number>(1);
+  readonly initialPosition = input<number>(1);
 
   /**
    * highlight the position of the item
    */
-  highlightPosition = input<number | number[] | undefined | null>(null);
+  readonly highlightPosition = input<number | number[] | undefined | null>(null);
 
-  showLoadingSkeletonSignal = input(false);
+  readonly showLoadingSkeletonSignal = input(false);
 
-  tableEffect = effect(() => {
+  readonly tableEffect = effect(() => {
     const data = this.data();
 
     untracked(() => {
@@ -187,22 +199,23 @@ export class PortfolioRankTableComponent<
     });
   });
 
-  highlightPositionUsed = computed(() => {
+  readonly highlightPositionUsed = computed(() => {
     const highlightPosition = this.highlightPosition() ?? [];
     return Array.isArray(highlightPosition) ? highlightPosition : [highlightPosition];
   });
 
-  displayedColumns: string[] = [
+  readonly displayedColumns: string[] = [
     'itemTemplate',
     'balance',
     'cash',
     'invested',
+    'started',
     'profit',
     'transaction_buy',
     'transaction_sell',
     'transaction_fees',
   ];
-  dataSource = new MatTableDataSource<T>([]);
+  readonly dataSource = new MatTableDataSource<T>([]);
 
   identity: TrackByFunction<T> = (index: number, item: T) => item.item.id;
 
