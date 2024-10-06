@@ -209,13 +209,14 @@ describe('PortfolioCreateOperationService', () => {
       });
     });
 
-    it('should create a SELL transaction', async () => {
+    it('should create a SELL transaction (1)', async () => {
       const t1 = {
         symbol: 'AAPL',
         date: randomDate,
         symbolType: 'STOCK',
         transactionType: 'SELL',
         units: 10,
+        sector: 'Technology',
       } as PortfolioTransactionCreate;
 
       const user = {
@@ -229,20 +230,20 @@ describe('PortfolioCreateOperationService', () => {
           data: [
             {
               invested: 200,
-              symbol: 'AAPL',
-              symbolType: 'STOCK',
+              symbol: t1.symbol,
+              symbolType: t1.symbolType,
               units: 10,
-              sector: 'Technology',
+              sector: t1.sector,
               breakEvenPrice: 20,
             },
           ],
         },
       } satisfies UserData;
 
-      const breakEvenPrice = roundNDigits(200 / 10);
+      const breakEvenPrice = user.holdingSnapshot.data[0].breakEvenPrice;
       const returnValue = roundNDigits((randomSymboLPrice.close - breakEvenPrice) * t1.units);
       const returnChange = calculateGrowth(randomSymboLPrice.close, breakEvenPrice);
-      const transactionFeesCalc = ((t1.units * randomSymboLPrice.close) / 100) * TRANSACTION_FEE_PRCT;
+      const transactionFeesCalc = roundNDigits(((t1.units * randomSymboLPrice.close) / 100) * TRANSACTION_FEE_PRCT);
 
       await expect(service.createPortfolioCreateOperation(user, t1)).resolves.toMatchObject({
         date: expect.any(String),
@@ -250,6 +251,56 @@ describe('PortfolioCreateOperationService', () => {
         returnValue: returnValue,
         symbol: 'AAPL',
         symbolType: 'STOCK',
+        transactionFees: transactionFeesCalc,
+        transactionId: expect.any(String),
+        transactionType: 'SELL',
+        unitPrice: randomSymboLPrice.close,
+        units: t1.units,
+        userId: testUserData.id,
+      });
+    });
+
+    it('should create a SELL transaction (2)', async () => {
+      const t1 = {
+        symbol: 'MSFT',
+        date: randomDate,
+        symbolType: 'STOCK',
+        transactionType: 'SELL',
+        units: 8,
+        sector: 'Technology',
+      } as PortfolioTransactionCreate;
+
+      const user = {
+        ...testUserData,
+        portfolioState: {
+          ...testUserData.portfolioState,
+        },
+        holdingSnapshot: {
+          lastModifiedDate: randomDate,
+          data: [
+            {
+              invested: 2500,
+              symbol: t1.symbol,
+              symbolType: t1.symbolType,
+              units: 12,
+              sector: t1.sector,
+              breakEvenPrice: 208.34, // 2500 / 12
+            },
+          ],
+        },
+      } satisfies UserData;
+
+      const breakEvenPrice = user.holdingSnapshot.data[0].breakEvenPrice;
+      const returnValue = roundNDigits((randomSymboLPrice.close - breakEvenPrice) * t1.units);
+      const returnChange = calculateGrowth(randomSymboLPrice.close, breakEvenPrice);
+      const transactionFeesCalc = roundNDigits(((t1.units * randomSymboLPrice.close) / 100) * TRANSACTION_FEE_PRCT);
+
+      await expect(service.createPortfolioCreateOperation(user, t1)).resolves.toMatchObject({
+        date: expect.any(String),
+        returnChange: returnChange,
+        returnValue: returnValue,
+        symbol: t1.symbol,
+        symbolType: t1.symbolType,
         transactionFees: transactionFeesCalc,
         transactionId: expect.any(String),
         transactionType: 'SELL',
