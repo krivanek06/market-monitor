@@ -231,14 +231,14 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     <!-- template for group data in table -->
     <ng-template #groupTemplate let-data="data" let-position="position">
       <div class="flex items-center gap-3">
-        <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="h-8 w-8 rounded-lg" />
+        <img appDefaultImg [src]="data.item.imageUrl" alt="user image" class="max-xs:hidden h-8 w-8 rounded-lg" />
         <div class="flex items-center gap-2">
           <!-- group name -->
-          <div class="text-wt-gray-dark w-[100px] truncate text-ellipsis sm:w-[180px]">
+          <div class="text-wt-gray-dark w-[100px] truncate text-ellipsis sm:w-[150px]">
             {{ data.item.name }}
           </div>
           <!-- number of members -->
-          <div>[{{ data.item.numberOfMembers }}]</div>
+          <div class="max-xs:hidden">[{{ data.item.numberOfMembers }}]</div>
 
           <!-- display position change if any -->
           @if (data.portfolioTotalGainsPercentage?.rankChange; as rankChange) {
