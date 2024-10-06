@@ -1,4 +1,5 @@
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { SlicePipe } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -148,6 +149,7 @@ describe('PageHallOfFameComponent', () => {
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(NoopAnimationsModule)
       .keep(ShowMoreButtonComponent)
+      .keep(SlicePipe)
       .replace(ScrollWrapperComponent, ScrollWrapperComponentMock)
       .replace(RankCardComponent, RankCardComponentMock)
       .replace(UserSearchControlComponent, UserSearchControlComponentMock)
@@ -201,6 +203,7 @@ describe('PageHallOfFameComponent', () => {
     const userRankCards = ngMocks.findAll<RankCardComponentMock>(userRankCardS);
     const bestPortfolio = hallOfFameUsersMock.bestPortfolio;
 
+    expect(component.hallOfFameUsers()).toEqual(hallOfFameUsersMock);
     // check if 10 users are displayed
     expect(userRankCards.length).toBe(component.topUsersLimit);
 
