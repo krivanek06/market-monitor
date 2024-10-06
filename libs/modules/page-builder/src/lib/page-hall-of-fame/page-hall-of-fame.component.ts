@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, NgClass, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -33,7 +33,9 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
   selector: 'app-page-hall-of-fame',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
+    SlicePipe,
+    CurrencyPipe,
     PortfolioRankTableComponent,
     DefaultImgDirective,
     SectionTitleComponent,
@@ -54,10 +56,9 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
   ],
   template: `
     <div class="mb-6 flex items-center justify-between">
-      <app-section-title matIcon="military_tech" title="Hall Of Fame" />
       <app-section-title
         matIcon="military_tech"
-        title="My rank: {{ userData().systemRank?.portfolioTotalGainsPercentage?.rank ?? 'N/A' }}"
+        [title]="'Hall Of Fame - My rank: ' + (userData().systemRank?.portfolioTotalGainsPercentage?.rank ?? 'N/A')"
       />
     </div>
 
@@ -76,10 +77,12 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
         >
           <div class="bg-wt-gray-light absolute bottom-0 flex w-full flex-col px-4 py-2">
             <!-- user's name -->
-            <div class="text-wt-gray-dark">{{ user.item.personal.displayName }}</div>
+            <div appPositionColoring [position]="i + 1" class="text-lg">
+              {{ user.item.personal.displayName }}
+            </div>
             <div class="flex items-center justify-between">
               <!-- user's balance -->
-              <div>{{ user.item.portfolioState.balance | currency }}</div>
+              <div class="text-wt-gray-dark">{{ user.item.portfolioState.balance | currency }}</div>
               <!-- user's portfolio -->
               <div
                 appPercentageIncrease

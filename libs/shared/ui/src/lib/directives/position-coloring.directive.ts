@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Renderer2, effect, inject, input } from '@angular/core';
+import { Directive, ElementRef, Renderer2, computed, effect, inject, input } from '@angular/core';
 import { ColorScheme } from '@mm/shared/data-access';
 
 /**
@@ -7,6 +7,7 @@ import { ColorScheme } from '@mm/shared/data-access';
 @Directive({
   selector: '[appPositionColoring]',
   standalone: true,
+  exportAs: 'coloring',
 })
 export class PositionColoringDirective {
   private readonly renderer = inject(Renderer2);
@@ -23,9 +24,14 @@ export class PositionColoringDirective {
   readonly position = input<number>(0);
 
   /**
-   * color used to color elements after the first 3 positions
+   * color used to color elements after the first 5 positions
    */
   readonly defaultPositionColor = input<ColorScheme>(ColorScheme.GRAY_MEDIUM_VAR);
+
+  /**
+   * color used to color elements
+   */
+  readonly usedColor = computed(() => this.resolveColor(this.position()));
 
   readonly positionChangeEffect = effect(() => {
     const cssSelector = this.cssSelector();
@@ -44,13 +50,19 @@ export class PositionColoringDirective {
 
   private resolveColor(position: number): string | undefined {
     if (position === 1) {
-      return ColorScheme.ACCENT_1_VAR;
+      return '#f7af10';
     }
     if (position === 2) {
-      return ColorScheme.ACCENT_2_VAR;
+      return '#20aea8';
     }
     if (position === 3) {
       return ColorScheme.ACCENT_3_VAR;
+    }
+    if (position === 4) {
+      return ColorScheme.ACCENT_2_VAR;
+    }
+    if (position === 5) {
+      return ColorScheme.ACCENT_1_VAR;
     }
 
     return undefined;

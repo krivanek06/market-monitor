@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,7 +9,7 @@ import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } fr
   selector: 'app-rank-card',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
     MatRippleModule,
     ClickableDirective,
     MatIconModule,
@@ -41,9 +41,11 @@ import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } fr
       <div class="absolute top-0 flex w-full justify-between px-1">
         <!-- current position -->
         <div
-          class="border-wt-gray-medium ml-2 mt-1 rounded-full border px-2 py-1 text-lg"
+          class="ml-2 mt-1 rounded-full border px-2 py-1 text-lg"
           appPositionColoring
+          #color="coloring"
           [position]="currentPositions()"
+          [style.borderColor]="color.usedColor()"
         >
           #{{ currentPositions() }}
         </div>
@@ -58,8 +60,11 @@ import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } fr
             }"
           >
             <span>{{ positionChange }}</span>
-            <mat-icon *ngIf="positionChange > 0" color="accent">expand_less</mat-icon>
-            <mat-icon *ngIf="positionChange < 0" color="warn">expand_more</mat-icon>
+            @if (positionChange > 0) {
+              <mat-icon color="accent">expand_less</mat-icon>
+            } @else if (positionChange < 0) {
+              <mat-icon color="warn">expand_more</mat-icon>
+            }
           </div>
         }
       </div>
@@ -83,24 +88,24 @@ import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } fr
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RankCardComponent {
-  protected clickableDirective = inject(ClickableDirective);
+  protected readonly clickableDirective = inject(ClickableDirective);
   readonly ColorScheme = ColorScheme;
 
-  cardWidthPx = input<number | null>();
-  cardHeightPx = input<number | null>();
+  readonly cardWidthPx = input<number | null>();
+  readonly cardHeightPx = input<number | null>();
 
   /**
    * Image of the card
    */
-  image = input.required<string | null>();
+  readonly image = input.required<string | null>();
 
   /**
    * Position of the card
    */
-  currentPositions = input.required<number>();
+  readonly currentPositions = input.required<number>();
 
   /**
    * Previous position of the card
    */
-  positionChange = input<number | undefined | null>();
+  readonly positionChange = input<number | undefined | null>();
 }
