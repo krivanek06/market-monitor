@@ -45,7 +45,7 @@ h2 {
 }
 
 .g-item-wrapper {
-  @apply flex items-center justify-between gap-4 p-3 text-sm;
+  @apply flex items-center justify-between gap-x-4 p-3 text-sm;
 
   & > :first-child {
     @apply text-wt-gray-dark flex-1;

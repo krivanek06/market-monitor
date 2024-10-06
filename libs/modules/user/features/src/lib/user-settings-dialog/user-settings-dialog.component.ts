@@ -56,40 +56,49 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
             />
           </div>
 
-          <!-- user data -->
-          <div class="grid flex-1 gap-x-4 overflow-x-clip pt-2 text-base lg:grid-cols-2 xl:text-lg">
-            <!-- name -->
-            <div class="g-item-wrapper">
-              <span>Display Name:</span>
-              <span>{{ userDataNormal()?.personal?.displayName }}</span>
+          <div class="flex-1">
+            <!-- user data -->
+            <div class="grid flex-1 gap-x-4 overflow-x-clip text-base lg:grid-cols-2 xl:text-lg">
+              <!-- name -->
+              <div class="g-item-wrapper">
+                <span>Display Name:</span>
+                <span>{{ userDataNormal()?.personal?.displayName }}</span>
+              </div>
+              <!-- initials -->
+              <div class="g-item-wrapper">
+                <span>Initials:</span>
+                <span>{{ userDataNormal()?.personal?.displayNameInitials }}</span>
+              </div>
+              <!-- email -->
+              <div class="g-item-wrapper">
+                <span>Email:</span>
+                <span>{{ userDataNormal()?.personal?.email }}</span>
+              </div>
+              <!-- created -->
+              <div class="g-item-wrapper">
+                <span>Created:</span>
+                <span>{{ userDataNormal()?.accountCreatedDate | date: 'MMMM d, y' }}</span>
+              </div>
+              <!-- account type -->
+              <div class="g-item-wrapper">
+                <span>Account Type:</span>
+                <span> {{ userDataNormal()?.userAccountType }}</span>
+              </div>
+              <!-- starting cash -->
+              <div *appUserAccountType="'DEMO_TRADING'" class="g-item-wrapper border-wt-border border-b">
+                <span>Starting Cash:</span>
+                <span> {{ userDataNormal()?.portfolioState?.startingCash | currency }}</span>
+              </div>
             </div>
-            <!-- initials -->
-            <div class="g-item-wrapper">
-              <span>Initials:</span>
-              <span>{{ userDataNormal()?.personal?.displayNameInitials }}</span>
+
+            <!-- ID -->
+            <div class="g-item-wrapper xs:flex-row flex-col overflow-x-clip max-sm:items-start">
+              <span>AccountId:</span>
+              <span> {{ userDataNormal()?.id }}</span>
             </div>
-            <!-- email -->
-            <div class="g-item-wrapper">
-              <span>Email:</span>
-              <span>{{ userDataNormal()?.personal?.email }}</span>
-            </div>
-            <!-- created -->
-            <div class="g-item-wrapper">
-              <span>Created:</span>
-              <span>{{ userDataNormal()?.accountCreatedDate | date: 'MMMM d, y' }}</span>
-            </div>
-            <!-- account type -->
-            <div class="g-item-wrapper">
-              <span>Account Type:</span>
-              <span> {{ userDataNormal()?.userAccountType }}</span>
-            </div>
-            <!-- starting cash -->
-            <div *appUserAccountType="'DEMO_TRADING'" class="g-item-wrapper">
-              <span>Starting Cash:</span>
-              <span> {{ userDataNormal()?.portfolioState?.startingCash | currency }}</span>
-            </div>
+
             <!-- theme -->
-            <div class="g-item-wrapper">
+            <div class="g-item-wrapper overflow-x-clip">
               <span>Dark Mode:</span>
               <app-theme-switcher class="lg:-mr-4" />
             </div>
@@ -108,7 +117,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
       </div>
 
       <!-- action buttons -->
-      <div class="xs:grid-cols-2 grid min-w-[180px] gap-x-10 gap-y-3 md:grid-cols-3 lg:grid-cols-1 lg:pl-6">
+      <div class="xs:grid-cols-2 grid min-w-[180px] gap-x-4 gap-y-3 md:grid-cols-3 md:gap-x-10 lg:grid-cols-1 lg:pl-6">
         <!--  Change Account type -->
         <button
           [disabled]="userDataNormal()?.isTest"

@@ -41,8 +41,6 @@ export const userPortfolioRisk = async (portfolioState: PortfolioStateHoldings):
     // calculate portfolio volatility
     const volatility = await calculatePortfolioVolatility(portfolioState);
 
-    console.log(`PortfolioVol: ${volatility}, Beta: ${beta}, Alpha: ${alpha}, Sharpe: ${sharpe}`);
-
     return {
       beta,
       alpha,
