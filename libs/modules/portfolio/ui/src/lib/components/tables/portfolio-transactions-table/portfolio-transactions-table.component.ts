@@ -183,7 +183,7 @@ import {
           <div
             appPercentageIncrease
             [useCurrencySign]="true"
-            [changeValues]="{ changePercentage: row.returnChange }"
+            [changeValues]="{ changePercentage: row.returnChange * 100 }"
           ></div>
         </td>
       </ng-container>

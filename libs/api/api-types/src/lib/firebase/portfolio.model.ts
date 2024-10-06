@@ -153,9 +153,15 @@ export type PortfolioTransaction = SymbolStoreBase & {
   units: number;
   unitPrice: number;
   returnValue: number;
-  returnChange: number;
   transactionType: PortfolioTransactionType;
   transactionFees: number;
+
+  /**
+   * what was the return % from the SELL transaction
+   * example: if user bought for 100 and sold for 110, returnChange is 0.1
+   * example: value 1.0105 is 101.05%
+   */
+  returnChange: number;
 
   /**
    * date to which to associate this transaction (if weekend then last trading date)
