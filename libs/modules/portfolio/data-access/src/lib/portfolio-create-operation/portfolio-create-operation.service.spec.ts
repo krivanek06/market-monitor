@@ -18,7 +18,7 @@ import {
   UserData,
   mockCreateUser,
 } from '@mm/api-types';
-import { roundNDigits } from '@mm/shared/general-util';
+import { calculateGrowth, roundNDigits } from '@mm/shared/general-util';
 import { format, subYears } from 'date-fns';
 import { MockProvider, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
@@ -241,7 +241,7 @@ describe('PortfolioCreateOperationService', () => {
 
       const breakEvenPrice = roundNDigits(200 / 10);
       const returnValue = roundNDigits((randomSymboLPrice.close - breakEvenPrice) * t1.units);
-      const returnChange = roundNDigits((randomSymboLPrice.close - breakEvenPrice) / breakEvenPrice, 4);
+      const returnChange = calculateGrowth(randomSymboLPrice.close, breakEvenPrice);
       const transactionFeesCalc = ((t1.units * randomSymboLPrice.close) / 100) * TRANSACTION_FEE_PRCT;
 
       await expect(service.createPortfolioCreateOperation(user, t1)).resolves.toMatchObject({

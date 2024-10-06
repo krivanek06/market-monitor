@@ -60,7 +60,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
           [useCurrencySign]="true"
           [changeValues]="{
             change: transaction().returnValue,
-            changePercentage: transaction().returnChange * 100,
+            changePercentage: transaction().returnChange,
           }"
         ></div>
 

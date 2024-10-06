@@ -22,6 +22,7 @@ import {
   UserPortfolioTransaction,
 } from '@mm/api-types';
 import {
+  calculateGrowth,
   dateFormatDate,
   getCurrentDateDefaultFormat,
   getCurrentDateDetailsFormat,
@@ -307,7 +308,7 @@ export class CreateDemoAccountService {
 
     const isSell = input.transactionType === 'SELL';
     const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
-    const returnChange = isSell ? roundNDigits((unitPrice - breakEvenPrice) / breakEvenPrice) : 0;
+    const returnChange = isSell ? calculateGrowth(unitPrice, breakEvenPrice) : 0;
 
     // transaction fees are 0.01% of the transaction value
     const transactionFeesCalc = isTransactionFeesActive ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;

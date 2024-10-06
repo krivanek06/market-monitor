@@ -18,6 +18,7 @@ import {
   UserData,
 } from '@mm/api-types';
 import {
+  calculateGrowth,
   dateFormatDate,
   dateGetDetailsInformationFromDate,
   getCurrentDateDetailsFormat,
@@ -81,7 +82,7 @@ export class PortfolioCreateOperationService {
     const breakEvenPrice = isSell ? roundNDigits(symbolHolding?.breakEvenPrice ?? 1, 2) : 0;
 
     const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
-    const returnChange = isSell ? roundNDigits((unitPrice - breakEvenPrice) / breakEvenPrice, 4) : 0;
+    const returnChange = isSell ? calculateGrowth(unitPrice, breakEvenPrice) : 0;
 
     // transaction fees are 0.01% of the transaction value
     const transactionFeesCalc = isDemoTradingAccount ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
