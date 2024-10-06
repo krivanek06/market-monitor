@@ -3,8 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
-import { stockDetailsResolver } from '@mm/page-builder';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LabelValue, ROUTES_STOCK_DETAILS } from '@mm/shared/data-access';
 import { TabSelectControlComponent } from '@mm/shared/ui';
 
@@ -21,7 +20,7 @@ import { TabSelectControlComponent } from '@mm/shared/ui';
           [formControl]="routesStockDetailsControl"
           [displayOptions]="routesStockDetails"
           screenLayoutSplit="LAYOUT_XL"
-        ></app-tab-select-control>
+        />
       </div>
 
       <router-outlet />
@@ -74,50 +73,3 @@ export class StockDetailsComponent {
     }
   }
 }
-
-export const route: Routes = [
-  {
-    path: '',
-    component: StockDetailsComponent,
-    resolve: {
-      stockDetails: stockDetailsResolver,
-    },
-    children: [
-      {
-        path: '',
-        redirectTo: ROUTES_STOCK_DETAILS.OVERVIEW,
-        pathMatch: 'full',
-      },
-      {
-        path: ROUTES_STOCK_DETAILS.OVERVIEW,
-        title: 'Overview',
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsOverviewComponent),
-      },
-      {
-        path: ROUTES_STOCK_DETAILS.HOLDERS,
-        title: 'Holders',
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsHoldersComponent),
-      },
-      {
-        path: ROUTES_STOCK_DETAILS.NEWS,
-        title: 'News',
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsNewsComponent),
-      },
-      {
-        path: ROUTES_STOCK_DETAILS.TRADES,
-        title: 'Trades',
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsTradesComponent),
-      },
-      {
-        path: ROUTES_STOCK_DETAILS.FINANCIALS,
-        title: 'Financials',
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsFinancialsComponent),
-      },
-      {
-        path: ROUTES_STOCK_DETAILS.RATIOS,
-        title: 'Ratios',
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsRatiosComponent),
-      },
-    ],
-  },
-];

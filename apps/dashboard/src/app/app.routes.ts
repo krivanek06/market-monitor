@@ -3,7 +3,8 @@ import { Route, Router } from '@angular/router';
 import { UserAccountEnum } from '@mm/api-types';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { featureFlagGuard } from '@mm/authentication/feature-access-directive';
-import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
+import { stockDetailsResolver } from '@mm/page-builder';
+import { IS_DEV_TOKEN, ROUTES_MAIN, ROUTES_STOCK_DETAILS } from '@mm/shared/data-access';
 import { map, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
@@ -71,28 +72,34 @@ export const appRoutes: Route[] = [
           },
           {
             path: ROUTES_MAIN.DASHBOARD,
+            title: 'GGFinance - Dashboard',
             loadComponent: () => import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
           },
           {
             path: ROUTES_MAIN.WATCHLIST,
+            title: 'GGFinance - Watchlist',
             loadComponent: () => import('./watchlist/watchlist.component').then((m) => m.WatchlistComponent),
           },
           {
             path: ROUTES_MAIN.TRADING,
+            title: 'GGFinance - Trading',
             loadComponent: () => import('./trading/trading.component').then((m) => m.TradingComponent),
           },
           {
             path: ROUTES_MAIN.HALL_OF_FAME,
+            title: 'GGFinance - Ranking',
             loadComponent: () => import('./hall-of-fame/hall-of-fame.component').then((m) => m.HallOfFameComponent),
             canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
           },
           {
             path: ROUTES_MAIN.COMPARE_USERS,
+            title: 'GGFinance - Compare Users',
             loadComponent: () => import('./compare-users/compare-users.component').then((m) => m.CompareUsersComponent),
             canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
           },
           {
             path: ROUTES_MAIN.GROUPS,
+            title: 'GGFinance - Groups',
             canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
             children: [
               {
@@ -101,7 +108,6 @@ export const appRoutes: Route[] = [
               },
               {
                 path: ':id',
-                title: 'Group Details',
                 loadComponent: () =>
                   import('./groups/group-details/group-details.component').then((m) => m.GroupDetailsComponent),
               },
@@ -109,17 +115,57 @@ export const appRoutes: Route[] = [
           },
           {
             path: `${ROUTES_MAIN.STOCK_DETAILS}/:symbol`,
-            title: 'Stock Details',
-            loadChildren: () => import('./stock-details/stock-details.component').then((m) => m.route),
+            title: 'GGFinance - Stock Details',
+            loadComponent: () => import('./stock-details/stock-details.component').then((m) => m.StockDetailsComponent),
+            resolve: {
+              stockDetails: stockDetailsResolver,
+            },
+            children: [
+              {
+                path: '',
+                redirectTo: ROUTES_STOCK_DETAILS.OVERVIEW,
+                pathMatch: 'full',
+              },
+              {
+                path: ROUTES_STOCK_DETAILS.OVERVIEW,
+                title: 'GGFinance - Stock Overview',
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsOverviewComponent),
+              },
+              {
+                path: ROUTES_STOCK_DETAILS.HOLDERS,
+                title: 'GGFinance - Stock Holders',
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsHoldersComponent),
+              },
+              {
+                path: ROUTES_STOCK_DETAILS.NEWS,
+                title: 'GGFinance - Stock News',
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsNewsComponent),
+              },
+              {
+                path: ROUTES_STOCK_DETAILS.TRADES,
+                title: 'GGFinance - Stock Trades',
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsTradesComponent),
+              },
+              {
+                path: ROUTES_STOCK_DETAILS.FINANCIALS,
+                title: 'GGFinance - Stock Financials',
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsFinancialsComponent),
+              },
+              {
+                path: ROUTES_STOCK_DETAILS.RATIOS,
+                title: 'GGFinance - Stock Ratios',
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsRatiosComponent),
+              },
+            ],
           },
           {
             path: ROUTES_MAIN.STOCK_SCREENER,
-            title: 'Stock Screener',
+            title: 'GGFinance - Stock Screener',
             loadComponent: () => import('./market/market-screener.component').then((m) => m.MarketCalendarComponent),
           },
           {
             path: ROUTES_MAIN.MARKET,
-            title: 'Market',
+            title: 'GGFinance - Market',
             loadComponent: () => import('./market/market.component').then((m) => m.MarketComponent),
             children: [
               {
@@ -129,36 +175,36 @@ export const appRoutes: Route[] = [
               },
               {
                 path: ROUTES_MAIN.STOCK_SCREENER,
-                title: 'Market Top Performers',
+                title: 'GGFinance - Stock Screener',
                 loadComponent: () =>
                   import('./market/market-screener.component').then((m) => m.MarketCalendarComponent),
               },
               {
                 path: ROUTES_MAIN.TOP_PERFORMERS,
-                title: 'Stock Screener',
+                title: 'GGFinance - Top Performers',
                 loadComponent: () =>
                   import('./market/market-top-performers.component').then((m) => m.MarketTopPerformersComponent),
               },
               {
                 path: ROUTES_MAIN.MARKET_CALENDAR,
-                title: 'Market Calendar',
+                title: 'GGFinance -  Calendar',
                 loadComponent: () =>
                   import('./market/market-calendar.component').then((m) => m.MarketCalendarComponent),
               },
               {
                 path: ROUTES_MAIN.ECONOMICS,
-                title: 'Market Economics',
+                title: 'GGFinance - Economics',
                 loadComponent: () =>
                   import('./market/market-economics.component').then((m) => m.MarketEconomicsComponent),
               },
               {
                 path: ROUTES_MAIN.NEWS,
-                title: 'Market News',
+                title: 'GGFinance - News',
                 loadComponent: () => import('./market/market-news.component').then((m) => m.MarketNewsComponent),
               },
               {
                 path: ROUTES_MAIN.CRYPTO,
-                title: 'Crypto',
+                title: 'GGFinance - Crypto',
                 loadComponent: () => import('@mm/page-builder').then((m) => m.PageCryptoComponent),
               },
             ],
