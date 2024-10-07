@@ -1,5 +1,5 @@
 import { provideHttpClient } from '@angular/common/http';
-import { APP_INITIALIZER, ApplicationConfig, inject } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, inject, provideZoneChangeDetection } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
 import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore';
@@ -48,6 +48,9 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     // apply zoneless change detection
     // provideExperimentalZonelessChangeDetection(),
+    provideZoneChangeDetection({
+      eventCoalescing: true,
+    }),
     {
       provide: AUTHENTICATION_ACCOUNT_TOKEN,
       useExisting: AuthenticationUserStoreService,
