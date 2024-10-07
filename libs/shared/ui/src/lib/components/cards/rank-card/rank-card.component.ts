@@ -26,6 +26,7 @@ import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } fr
       [style.height.px]="cardHeightPx()"
       class="group relative rounded-lg border-2 shadow-md"
       appPositionColoring
+      #color="coloring"
       [position]="currentPositions()"
       cssSelector="border-color"
     >
@@ -42,9 +43,7 @@ import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } fr
         <!-- current position -->
         <div
           class="ml-2 mt-1 rounded-full border px-2 py-1 text-lg"
-          appPositionColoring
-          #color="coloring"
-          [position]="currentPositions()"
+          [style.color]="color.usedColor()"
           [style.borderColor]="color.usedColor()"
         >
           #{{ currentPositions() }}

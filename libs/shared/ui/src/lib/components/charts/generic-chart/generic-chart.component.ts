@@ -45,34 +45,34 @@ type ChartInputType = Highcharts.SeriesOptionsType[];
   `,
 })
 export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type']> extends ChartConstructor {
-  expandEmitter = output<void>();
+  readonly expandEmitter = output<void>();
 
-  series = input.required<GenericChartSeries<T>[]>();
+  readonly series = input.required<GenericChartSeries<T>[]>();
 
-  chartType = input<Highcharts.SeriesOptionsType['type']>('line');
-  chartTitle = input('');
-  chartTitlePosition = input<Highcharts.AlignValue>('left');
-  enableZoom = input(false);
-  showTooltip = input(true);
-  showDataLabel = input(false);
-  categories = input<string[]>([]);
-  showYAxis = input(true);
-  showXAxis = input(true);
-  shareTooltip = input(true);
-  showTooltipHeader = input(true);
+  readonly chartType = input<Highcharts.SeriesOptionsType['type']>('line');
+  readonly chartTitle = input('');
+  readonly chartTitlePosition = input<Highcharts.AlignValue>('left');
+  readonly enableZoom = input(false);
+  readonly showTooltip = input(true);
+  readonly showDataLabel = input(false);
+  readonly categories = input<string[]>([]);
+  readonly showYAxis = input(true);
+  readonly showXAxis = input(true);
+  readonly shareTooltip = input(true);
+  readonly showTooltipHeader = input(true);
 
   // legend
-  showLegend = input(false);
-  enableLegendTogging = input(false);
-  showLegendLatestValue = input(false);
-  legendAlign = input<'left' | 'center' | 'right'>('left');
-  legentLayout = input<'vertical' | 'horizontal'>('horizontal');
-  legendVerticalAlign = input<'top' | 'middle' | 'bottom'>('top');
-  floatingLegend = input(false);
+  readonly showLegend = input(false);
+  readonly enableLegendTogging = input(false);
+  readonly showLegendLatestValue = input(false);
+  readonly legendAlign = input<'left' | 'center' | 'right'>('left');
+  readonly legentLayout = input<'vertical' | 'horizontal'>('horizontal');
+  readonly legendVerticalAlign = input<'top' | 'middle' | 'bottom'>('top');
+  readonly floatingLegend = input(false);
 
-  showExpandableButton = input(false);
-  applyFancyColor = input(0);
-  isCategoryDates = input(false);
+  readonly showExpandableButton = input(false);
+  readonly applyFancyColor = input(0);
+  readonly isCategoryDates = input(false);
 
   chartOptionsSignal = computed(() => {
     const series = this.applyFancyColor() > 0 ? this.fancyColoring(this.series()) : this.series();
@@ -295,8 +295,8 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
           },
         },
         packedbubble: {
-          minSize: '30px',
-          maxSize: '120px',
+          minSize: '40px',
+          maxSize: '85px',
           tooltip: {
             headerFormat: `<p style="color:${ColorScheme.GRAY_MEDIUM_VAR}; font-size: 12px">{series.name}</p>`,
           },

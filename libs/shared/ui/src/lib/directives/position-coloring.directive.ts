@@ -53,13 +53,13 @@ export class PositionColoringDirective {
       return '#f7af10';
     }
     if (position === 2) {
-      return '#20aea8';
+      return ColorScheme.ACCENT_2_VAR;
     }
     if (position === 3) {
       return ColorScheme.ACCENT_3_VAR;
     }
     if (position === 4) {
-      return ColorScheme.ACCENT_2_VAR;
+      return '#b91010';
     }
     if (position === 5) {
       return ColorScheme.ACCENT_1_VAR;

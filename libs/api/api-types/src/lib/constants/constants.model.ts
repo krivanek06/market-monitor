@@ -70,4 +70,4 @@ export const USER_ALLOWED_DEMO_ACCOUNTS_TOTAL = 300;
 /**
  * limit how many symbols can be in a group holding (which are copied from users holdings)
  */
-export const GROUP_HOLDING_LIMIT = 75;
+export const GROUP_HOLDING_LIMIT = 50;

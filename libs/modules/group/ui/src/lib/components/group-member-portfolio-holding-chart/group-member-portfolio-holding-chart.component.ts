@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { PortfolioStateHolding } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
@@ -8,17 +7,18 @@ import { HighchartsChartModule } from 'highcharts-angular';
 @Component({
   selector: 'app-group-member-portfolio-holding-chart',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
+  imports: [HighchartsChartModule],
   template: `
-    <highcharts-chart
-      *ngIf="isHighcharts()"
-      [Highcharts]="Highcharts"
-      [options]="chartOptionsSignal()"
-      [callbackFunction]="chartCallback"
-      [style.height.px]="heightPx()"
-      [oneToOne]="true"
-      style="display: block; width: 100%"
-    />
+    @if (isHighcharts()) {
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartOptionsSignal()"
+        [callbackFunction]="chartCallback"
+        [style.height.px]="heightPx()"
+        [oneToOne]="true"
+        style="display: block; width: 100%"
+      />
+    }
   `,
   styles: `
     :host {
@@ -28,12 +28,12 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupMemberPortfolioHoldingChartComponent extends ChartConstructor {
-  data = input.required<PortfolioStateHolding[]>();
+  readonly data = input.required<PortfolioStateHolding[]>();
 
-  chartOptionsSignal = computed(() => this.initChart(this.data()));
+  readonly chartOptionsSignal = computed(() => this.initChart(this.data()));
 
   private initChart(data: PortfolioStateHolding[]): Highcharts.Options {
-    const symbols = data.map((holding) => holding.symbol);
+    const symbols = data.map((holding) => holding.symbolQuote.displaySymbol ?? holding.symbol);
     const balance = data.map((holding) => holding.units * holding.symbolQuote.price);
     const invested = data.map((holding) => holding.invested);
     const profitPerSymbol = data.map((holding) => holding.units * holding.symbolQuote.price - holding.invested);
@@ -138,7 +138,7 @@ export class GroupMemberPortfolioHoldingChartComponent extends ChartConstructor 
           color: ColorScheme.GRAY_DARK_VAR,
         },
         shared: true,
-        headerFormat: `<span style="color:${ColorScheme.GRAY_DARK_VAR}; font-size: 12px">{point.key}</span><br/>`,
+        headerFormat: `<div style="font-size: 14px">Symbol: <span style="color: ${ColorScheme.PRIMARY_VAR}">{point.key}</span></div><br/>`,
         pointFormatter: function () {
           const name = this.series.name.toLowerCase();
           const value = name === 'holders' ? this.y : formatValueIntoCurrency(this.y);

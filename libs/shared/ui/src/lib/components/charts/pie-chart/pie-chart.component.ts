@@ -84,7 +84,7 @@ export class PieChartComponent extends ChartConstructor {
         text: this.chartTitle(),
         align: 'center',
         style: {
-          color: ColorScheme.GRAY_MEDIUM_VAR,
+          color: ColorScheme.GRAY_DARK_VAR,
           fontSize: '14px',
           fontWeight: 'normal',
         },

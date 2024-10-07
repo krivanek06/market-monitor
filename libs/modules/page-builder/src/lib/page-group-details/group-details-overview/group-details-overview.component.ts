@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgClass, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -42,7 +42,8 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
   selector: 'app-group-details-overview',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
+    SlicePipe,
     GroupDisplayInfoComponent,
     PortfolioBalancePieChartComponent,
     PortfolioStateComponent,
@@ -181,32 +182,21 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
           @if (portfolioHoldingBubbleChartSignal().length > 1) {
             <!-- bubble chart -->
             <div class="max-xl:flex-1 xl:basis-3/5">
-              @defer (on viewport(groupBubble)) {
-                <app-generic-chart
-                  class="hidden w-full sm:block"
-                  chartType="packedbubble"
-                  [heightPx]="350"
-                  [series]="portfolioHoldingBubbleChartSignal()"
-                />
-              } @loading (minimum 1s) {
-                <div class="g-skeleton hidden h-[350px] sm:block"></div>
-              }
+              <app-generic-chart
+                class="hidden w-full sm:block"
+                chartType="packedbubble"
+                [heightPx]="350"
+                [series]="portfolioHoldingBubbleChartSignal()"
+              />
             </div>
 
             <!-- sector allocation -->
             <div class="xl:basis-2/5">
-              @defer (on viewport(groupBubble)) {
-                @if (portfolioSectorAllocationSignal(); as portfolioSectorAllocation) {
-                  <app-pie-chart
-                    class="block max-xl:hidden"
-                    [heightPx]="300"
-                    chartTitle="Sector Allocation"
-                    [series]="portfolioSectorAllocation"
-                  />
-                }
-              } @loading (minimum 1s) {
-                <div class="g-skeleton block h-[350px] max-xl:hidden"></div>
-              }
+              <app-pie-chart
+                class="block max-xl:hidden"
+                [heightPx]="300"
+                [series]="portfolioSectorAllocationSignal()"
+              />
             </div>
           } @else {
             <div class="g-skeleton h-[350px] xl:basis-3/5"></div>
@@ -215,13 +205,17 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
         </div>
       }
 
+      <!-- holding chart -->
       @defer (on viewport) {
-        <!-- holding chart -->
-        <app-section-title title="Group Symbol Holdings - top 25" matIcon="filter_list" class="mb-2" />
-        <app-group-member-portfolio-holding-chart
-          [heightPx]="400"
-          [data]="groupPortfolioStateHolding()?.holdings ?? [] | slice: 0 : 25"
-        />
+        <app-section-title title="Group Symbol Holdings" matIcon="filter_list" class="mb-2" />
+        @if (groupPortfolioStateHolding()?.holdings; as holdings) {
+          <app-group-member-portfolio-holding-chart
+            [heightPx]="400"
+            [data]="holdings | slice: 0 : GROUP_HOLDING_LIMIT"
+          />
+        } @else {
+          <div class="g-skeleton block h-[480px] max-xl:hidden"></div>
+        }
       } @placeholder {
         <div class="g-skeleton block h-[500px] max-xl:hidden"></div>
       } @loading (minimum 1s) {

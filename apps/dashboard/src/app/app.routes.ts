@@ -31,7 +31,7 @@ export const appRoutes: Route[] = [
         return authState.authenticationState !== 'LOADING' || isDev;
       },
     ],
-    children: [
+    loadChildren: () => [
       {
         path: ROUTES_MAIN.LOGIN,
         loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
@@ -63,7 +63,7 @@ export const appRoutes: Route[] = [
             );
           },
         ],
-        children: [
+        loadChildren: () => [
           {
             path: '',
             pathMatch: 'full',
@@ -100,7 +100,7 @@ export const appRoutes: Route[] = [
             path: ROUTES_MAIN.GROUPS,
             title: 'GGFinance - Groups',
             canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
-            children: [
+            loadChildren: () => [
               {
                 path: '',
                 loadComponent: () => import('./groups/groups.component').then((m) => m.GroupsComponent),
@@ -126,7 +126,7 @@ export const appRoutes: Route[] = [
             path: ROUTES_MAIN.MARKET,
             title: 'GGFinance - Market',
             loadComponent: () => import('./market/market.component').then((m) => m.MarketComponent),
-            children: [
+            loadChildren: () => [
               {
                 path: '',
                 redirectTo: ROUTES_MAIN.TOP_PERFORMERS,
