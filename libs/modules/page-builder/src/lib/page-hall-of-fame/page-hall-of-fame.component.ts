@@ -58,7 +58,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     <div class="mb-6 flex items-center justify-between">
       <app-section-title
         matIcon="military_tech"
-        [title]="'Hall Of Fame - My rank: ' + (userData().systemRank?.portfolioTotalGainsPercentage?.rank ?? 'N/A')"
+        [title]="'Hall Of Fame - My Rank: ' + (userData().systemRank?.portfolioTotalGainsPercentage?.rank ?? 'N/A')"
       />
     </div>
 

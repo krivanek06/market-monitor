@@ -36,9 +36,9 @@ import { forkJoin, take } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageSearchComponent implements OnInit {
-  marketApiService = inject(MarketApiService);
+  readonly marketApiService = inject(MarketApiService);
 
-  marketStockNews = toSignal(this.marketApiService.getNews('stocks'));
+  readonly marketStockNews = toSignal(this.marketApiService.getNews('stocks'));
 
   ngOnInit(): void {
     // preload some data to other pages without blocking the page

@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { ApplicationConfig, provideExperimentalZonelessChangeDetection } from '@angular/core';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   PreloadAllModules,
   provideRouter,
@@ -30,8 +30,8 @@ export const appConfig: ApplicationConfig = {
     ),
     // apply zoneless change detection
     provideExperimentalZonelessChangeDetection(),
-    // allow animations
-    provideAnimations(),
+    // allow animations - load async
+    provideAnimationsAsync(),
     // provideClientHydration(),
     // withNoHttpTransferCache(),
   ],

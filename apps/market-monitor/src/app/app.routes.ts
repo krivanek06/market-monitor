@@ -5,7 +5,7 @@ import { PublicRoutesComponent } from './pages/public-routes/public-routes.compo
 export const appRoutes: Routes = [
   {
     path: '',
-    children: [
+    loadChildren: () => [
       {
         path: '',
         component: PublicRoutesComponent,

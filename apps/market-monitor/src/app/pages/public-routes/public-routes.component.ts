@@ -1,14 +1,12 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
-import { DialogServiceModule } from '@mm/shared/dialog-manager';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-public-routes',
   standalone: true,
-  imports: [CommonModule, RouterModule, DialogServiceModule],
+  imports: [RouterModule],
   template: `
     <nav
       class="text-wt-gray-medium relative flex gap-6 pb-6 pt-8 max-sm:overflow-scroll max-sm:px-6 sm:justify-center sm:gap-4"

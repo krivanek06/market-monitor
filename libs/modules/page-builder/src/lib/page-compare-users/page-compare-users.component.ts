@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -416,11 +416,6 @@ export class PageCompareUsersComponent {
       ),
     ),
   );
-
-  constructor() {
-    // used just for logging
-    effect(() => console.log('selectedUsersData', this.selectedUsersData()));
-  }
 
   onRemoveUser(user: UserBase) {
     this.removeUser$.next(user);

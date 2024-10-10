@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -23,7 +22,6 @@ import { catchError, filter, forkJoin, map, startWith, switchMap } from 'rxjs';
   selector: 'app-stock-details',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     TabSelectControlComponent,
     ReactiveFormsModule,
