@@ -14,7 +14,6 @@ import {
   PageStockDetailsTradesComponent,
 } from '@mm/page-builder';
 import { LabelValue, ROUTES_STOCK_DETAILS } from '@mm/shared/data-access';
-import { DialogServiceModule } from '@mm/shared/dialog-manager';
 import { TabSelectControlComponent } from '@mm/shared/ui';
 import { catchError, filter, forkJoin, map, startWith, switchMap } from 'rxjs';
 
@@ -27,7 +26,6 @@ import { catchError, filter, forkJoin, map, startWith, switchMap } from 'rxjs';
     ReactiveFormsModule,
     MatButtonModule,
     MatIconModule,
-    DialogServiceModule,
     MatProgressSpinnerModule,
     PageStockDetailsOverviewComponent,
     PageStockDetailsNewsComponent,

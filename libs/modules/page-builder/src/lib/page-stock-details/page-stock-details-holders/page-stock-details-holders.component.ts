@@ -114,18 +114,18 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
   host: { ngSkipHydration: 'true' },
 })
 export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
-  quarterFormControl = new FormControl<string | null>(null);
-  loadingSignal = signal(false);
+  readonly quarterFormControl = new FormControl<string | null>(null);
+  readonly loadingSignal = signal(false);
 
-  quarterFormControlSignal = toSignal(this.quarterFormControl.valueChanges);
-  ownershipInstitutionalSignal = toSignal(
+  readonly quarterFormControlSignal = toSignal(this.quarterFormControl.valueChanges);
+  readonly ownershipInstitutionalSignal = toSignal(
     this.stocksApiService.getStockOwnershipInstitutional(this.stockSymbolSignal()).pipe(
       tap((data) => {
         this.quarterFormControl.setValue(data[0]?.date ?? null);
       }),
     ),
   );
-  ownershipHoldersToDateSignal = toSignal(
+  readonly ownershipHoldersToDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
       startWith(this.quarterFormControl.value),
       filter((data): data is string => !!data),
@@ -138,7 +138,7 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
     ),
   );
 
-  institutionalPortfolioInputSourceSignal = computed(() =>
+  readonly institutionalPortfolioInputSourceSignal = computed(() =>
     this.ownershipInstitutionalSignal()?.map(
       (d) =>
         ({
@@ -148,7 +148,7 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
     ),
   );
 
-  historicalPriceOnDateSignal = toSignal(
+  readonly historicalPriceOnDateSignal = toSignal(
     this.quarterFormControl.valueChanges.pipe(
       startWith(this.quarterFormControl.value),
       filterNil(),
@@ -160,10 +160,10 @@ export class PageStockDetailsHoldersComponent extends PageStockDetailsBase {
     ),
   );
 
-  enterpriseValueToQuarterSignal = computed(() =>
+  readonly enterpriseValueToQuarterSignal = computed(() =>
     this.stockDetailsSignal().enterpriseValue.find((d) => d.date === this.quarterFormControlSignal()),
   );
-  ownershipInstitutionalToQuarterSignal = computed(() =>
+  readonly ownershipInstitutionalToQuarterSignal = computed(() =>
     this.ownershipInstitutionalSignal()?.find((d) => d.date === this.quarterFormControlSignal()),
   );
 }

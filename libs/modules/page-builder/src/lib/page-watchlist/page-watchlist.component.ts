@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +16,6 @@ import { switchMap } from 'rxjs';
   selector: 'app-page-watchlist',
   standalone: true,
   imports: [
-    CommonModule,
     StockSummaryTableComponent,
     SymbolSummaryDialogComponent,
     MatDialogModule,
@@ -55,23 +53,23 @@ export class PageWatchlistComponent {
    */
   readonly displayCheckValue = 25;
 
-  private authenticationUserService = inject(AuthenticationUserStoreService);
-  private dialog = inject(MatDialog);
-  private dialogServiceUtil = inject(DialogServiceUtil);
-  private marketApiService = inject(MarketApiService);
+  private readonly authenticationUserService = inject(AuthenticationUserStoreService);
+  private readonly dialog = inject(MatDialog);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly marketApiService = inject(MarketApiService);
 
-  watchList = this.authenticationUserService.state.watchList;
+  readonly watchList = this.authenticationUserService.state.watchList;
 
   /**
    * all symbols in the user's watchlist
    */
-  userWatchListSymbolsSignal = toSignal(
+  readonly userWatchListSymbolsSignal = toSignal(
     toObservable(this.watchList).pipe(
       switchMap((watchList) => this.marketApiService.getSymbolQuotes(watchList.data.map((d) => d.symbol))),
     ),
   );
 
-  pageTitle = computed(() => {
+  readonly pageTitle = computed(() => {
     const watchList = this.authenticationUserService.state.watchList();
     return `Watchlist: [${watchList.data.length} / ${USER_WATCHLIST_SYMBOL_LIMIT}]`;
   });

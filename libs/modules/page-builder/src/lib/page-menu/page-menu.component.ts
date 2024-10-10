@@ -10,6 +10,7 @@ import { DialogServiceModule } from '@mm/shared/dialog-manager';
 import { ThemeService } from '@mm/shared/theme-switcher';
 import { MenuSideNavigationComponent } from './menu-navigation/menu-side-navigation.component';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
+
 @Component({
   selector: 'app-page-menu',
   standalone: true,
@@ -90,9 +91,9 @@ export class PageMenuComponent {
   /**
    * used to init the service to set theme eagerly
    */
-  private themeService = inject(ThemeService);
+  private readonly themeService = inject(ThemeService);
 
-  isOpen = signal<boolean>(false);
+  readonly isOpen = signal<boolean>(false);
 
   toggleMatDrawerExpandedView(): void {
     this.isOpen.set(!this.isOpen());
