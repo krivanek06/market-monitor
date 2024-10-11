@@ -7,12 +7,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Allow users to read and write their own document
     match /users/{userId}/{document=**} {
-      allow read, write: if isOwner(userId);
+      allow write: if request.auth.uid == userId;
     }
 
     // allow group owners to modify their groups
     match /groups/{groupId}/{document=**} {
-    	allow read: if true;
       allow create: if true;
       allow update: if request.auth.uid == resource.data.ownerUser.id;
       allow delete: if request.auth.uid == resource.data.ownerUser.id;
@@ -23,15 +22,11 @@ service cloud.firestore {
       allow read: if true;
     }
 
-    // Deny write
+    // deny write for all document
     match /{document=**} {
-      allow write: if true;
+      allow write: if false;
     }
   }
-}
-
-function isOwner(userId) {
-  return request.auth != null && request.auth.uid == userId;
 }
 
 
