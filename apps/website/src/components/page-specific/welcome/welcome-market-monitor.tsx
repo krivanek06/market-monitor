@@ -11,7 +11,7 @@ export const WelcomeMarketMonitor = component$(() => {
     <section class="grid place-content-center">
       <h2 class="g-section-title">Market Monitoring</h2>
 
-      <div class="mx-auto mb-6 grid gap-x-10 gap-y-4 text-center text-gray-400 md:mb-16 md:grid-cols-2 lg:w-[80%]">
+      <div class="mx-auto mb-6 grid gap-x-10 gap-y-4 text-center text-gray-300 md:mb-16 md:grid-cols-2 lg:w-[80%]">
         <p id="mm-p1" class="p-4 text-xl">
           Whether you're tracking blue-chip stocks or uncovering hidden gems in small-cap companies, we bring the entire
           marketplace to your screen

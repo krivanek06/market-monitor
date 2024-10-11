@@ -37,7 +37,7 @@ export const ImagePreview = component$<ImagePreviewProps>((props) => {
           </Button>
         </div>
         {/* images */}
-        <div class="g-no-scrollbar flex flex-1 gap-x-3 overflow-x-scroll py-2">
+        <div class="g-no-scrollbar flex flex-1 gap-x-5 overflow-x-scroll py-2">
           {props.images.map((image, index) => (
             <button key={index} type="button" onClick$={() => (selectedImageIndex.value = index)}>
               <img
@@ -49,7 +49,7 @@ export const ImagePreview = component$<ImagePreviewProps>((props) => {
                 class={[
                   'h-full min-w-[200px] cursor-pointer rounded-lg object-cover transition-all duration-300 hover:scale-105 hover:brightness-100',
                   index === selectedImageIndex.value
-                    ? 'outline outline-4 outline-cyan-700 brightness-100'
+                    ? 'outline outline-2 outline-cyan-600 brightness-100'
                     : 'brightness-50',
                 ]}
               />

@@ -9,7 +9,7 @@ export const WelcomeSchools = component$(() => {
       <h2 class="g-section-title">Support Early Investing</h2>
 
       {/* some info */}
-      <div class="mx-auto grid justify-center gap-x-10 gap-y-4 text-gray-400 md:flex-row md:justify-around lg:w-9/12 lg:grid-cols-2">
+      <div class="mx-auto grid justify-center gap-x-10 gap-y-4 text-gray-300 md:flex-row md:justify-around lg:w-9/12 lg:grid-cols-2">
         <p class="text-center text-xl">
           We create a platform to provide basic understanding of finances in an interactive way. Learn and make mistakes
           while trading with a demo account.
@@ -32,18 +32,18 @@ export const WelcomeSchools = component$(() => {
 
       {/* some info */}
       <div class="mx-auto grid gap-10 p-4 lg:grid-cols-2 xl:w-10/12 xl:p-10 xl:px-10">
-        <div class="grid gap-8 text-center text-gray-400 sm:text-left lg:w-11/12 xl:w-9/12">
+        <div class="grid gap-8 text-center text-gray-300 sm:text-left lg:w-11/12 xl:w-9/12">
           <p class="text-xl">
-            Create <span class="text-cyan-700">Groups</span> to gather all your friends in one place and compete with
+            Create <span class="text-cyan-600">Groups</span> to gather all your friends in one place and compete with
             each other and other groups
           </p>
           <p class="text-xl">
-            In <span class="text-cyan-700">Hall of Fame</span> you compete with everybody with a demo account, you can
+            In <span class="text-cyan-600">Hall of Fame</span> you compete with everybody with a demo account, you can
             compare your tradings to see who is the better strategy
           </p>
           <p class="text-xl">
             You made some bad trades with your demo account? No worries, you can always{' '}
-            <span class="text-cyan-700">reset your account</span> and have a fresh start
+            <span class="text-cyan-600">reset your account</span> and have a fresh start
           </p>
         </div>
         <div class="hidden sm:block">
@@ -83,7 +83,7 @@ const UserPortfolioChange = component$(() => {
         >
           <div class="flex items-center gap-2">
             <img src={user.image} alt="user image" class="h-7 w-7 rounded-lg" loading="lazy" />
-            <span>{user.displayName}</span>
+            <span class="text-cyan-600">{user.displayName}</span>
           </div>
 
           <PercentageIncrease value={user.currentCash} valueToCompare={user.startingCash} isPrice={true} />

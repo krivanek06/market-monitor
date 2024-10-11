@@ -8,7 +8,6 @@ import {
   WelcomeSchools,
 } from '../components/page-specific/welcome';
 import { SVG1, SVG2 } from '../components/shared';
-import { websiteImageUrls } from '../components/utils';
 
 export default component$(() => {
   const heroPageRef = useSignal<HTMLDivElement | undefined>(undefined);
@@ -74,7 +73,7 @@ export default component$(() => {
     }, 500);
   });
 
-  const heroImage = `${websiteImageUrls}/hero-6.webp`;
+  const heroImage = `images/application/hero-6.webp`;
 
   return (
     <div class="relative overflow-clip bg-black">

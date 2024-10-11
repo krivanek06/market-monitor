@@ -62,7 +62,6 @@ export const stockSymbols = [
 ];
 
 export const symbolUrl = 'https://get-asset-url.krivanek1234.workers.dev';
-export const websiteImageUrls = 'https://pub-d26f02a60027491183556ab35227779d.r2.dev';
 
 export const dashboardURL = 'https://dashboard.ggfinance.io/';
 export const searchURL = 'https://search.ggfinance.io/';

@@ -1,52 +1,55 @@
 import { component$ } from '@builder.io/qwik';
 import { CardBasic, ImagePreview, ImagePreviewProps } from '../../shared';
-import { websiteImageUrls } from '../../utils';
 
 export const WelcomeInvestmentAccount = component$(() => {
   const images = [
     {
-      src: `${websiteImageUrls}/app-4.webp`,
+      src: `images/application/app-1.webp`,
       alt: 'Portfolio Growth',
     },
     {
-      src: `${websiteImageUrls}/app-5.webp`,
-      alt: 'Trading',
+      src: `images/application/app-10.webp`,
+      alt: 'Portfolio Daily Change',
     },
     {
-      src: `${websiteImageUrls}/app-1.webp`,
-      alt: 'Transactions',
+      src: `images/application/app-11.webp`,
+      alt: 'Portfolio Allocation',
     },
     {
-      src: `${websiteImageUrls}/app-2.webp`,
-      alt: 'Holdings',
+      src: `images/application/app-3.webp`,
+      alt: 'Asset Growth',
     },
     {
-      src: `${websiteImageUrls}/app-3.webp`,
-      alt: 'Allocation Chart',
+      src: `images/application/app-4.webp`,
+      alt: 'Symbol Summary',
     },
     {
-      src: `${websiteImageUrls}/app-6.webp`,
+      src: `images/application/app-5.webp`,
+      alt: 'Transaction History',
+    },
+    {
+      src: `images/application/app-6.webp`,
       alt: 'User Ranks',
     },
     {
-      src: `${websiteImageUrls}/app-7.webp`,
-      alt: 'SP500 stats',
+      src: `images/application/app-7.webp`,
+      alt: 'User Details',
     },
     {
-      src: `${websiteImageUrls}/app-8.webp`,
-      alt: 'Treasure Bonds',
+      src: `images/application/app-8.webp`,
+      alt: 'User Comparison',
     },
     {
-      src: `${websiteImageUrls}/app-9.webp`,
-      alt: 'Dividend Calendar',
+      src: `images/application/app-9.webp`,
+      alt: 'Trading',
     },
     {
-      src: `${websiteImageUrls}/app-10.webp`,
-      alt: 'Advance Stock Search',
+      src: `images/application/app-12.webp`,
+      alt: 'Asset Statistics',
     },
     {
-      src: `${websiteImageUrls}/app-11.webp`,
-      alt: 'Groups Info',
+      src: `images/application/app-13.webp`,
+      alt: 'Asset Statistics',
     },
   ] satisfies ImagePreviewProps['images'];
 
@@ -56,21 +59,21 @@ export const WelcomeInvestmentAccount = component$(() => {
 
       <div class="mb-8 grid gap-x-4 gap-y-8 pt-4 md:mb-16 md:grid-cols-3 lg:px-10">
         <CardBasic>
-          <h3 class="mb-2 w-full text-center text-xl text-cyan-700">Portfolio Growth</h3>
-          <p class="p-4 text-center text-lg text-gray-400">
+          <h3 class="mb-2 w-full text-center text-xl text-cyan-600">Portfolio Growth</h3>
+          <p class="p-4 text-center text-lg text-gray-300">
             Monitor your portfolio against indexes, see in-depth details of your holdings and view your last
             transactions
           </p>
         </CardBasic>
         <CardBasic>
-          <h3 class="mb-2 w-full text-center text-xl text-cyan-700">Investment Risk</h3>
-          <p class="p-4 text-center text-lg text-gray-400">
+          <h3 class="mb-2 w-full text-center text-xl text-cyan-600">Investment Risk</h3>
+          <p class="p-4 text-center text-lg text-gray-300">
             Have you ever wondered how risky your portfolio is? Use us to see your portfolio's risk and how it compares
           </p>
         </CardBasic>
         <CardBasic>
-          <h3 class="mb-2 w-full text-center text-xl text-cyan-700">Allocations & Transactions</h3>
-          <p class="p-4 text-center text-lg text-gray-400">
+          <h3 class="mb-2 w-full text-center text-xl text-cyan-600">Allocations & Transactions</h3>
+          <p class="p-4 text-center text-lg text-gray-300">
             See your portfolio's allocation, your transactions, and your performance over time.
           </p>
         </CardBasic>
