@@ -29,7 +29,7 @@ import { ClickableDirective } from '@mm/shared/ui';
       appearance="outlined"
       class="shadow-md"
       [ngClass]="{
-        'g-overlay': groupData().isClosed,
+        'c-overlay': groupData().isClosed,
       }"
     >
       <mat-card-content>
@@ -57,6 +57,11 @@ import { ClickableDirective } from '@mm/shared/ui';
   styles: `
     :host {
       display: block;
+    }
+
+    .c-overlay {
+      background-color: #3e3e3e7a !important;
+      opacity: 0.8;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

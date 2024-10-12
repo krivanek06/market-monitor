@@ -11,11 +11,6 @@
   background-color: var(--gray-medium) !important;
 }
 
-.g-absolute-center {
-  position: absolute !important;
-  @apply left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform;
-}
-
 .g-border-bottom {
   border-bottom: 1px solid var(--border) !important;
   border-bottom-right-radius: 0 !important;
@@ -82,11 +77,6 @@ h2 {
   &:focus {
     background: var(--hover-color) !important;
   }
-}
-
-.g-overlay {
-  background-color: #3e3e3e7a !important;
-  opacity: 0.8;
 }
 
 .g-disabled {
