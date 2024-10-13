@@ -11,7 +11,7 @@ export type SymbolChangeItemProps = {
 };
 
 export const SymbolChange = component$<SymbolChangeItemProps>(({ symbolQuote, onItemClick$, classes, isSelect }) => {
-  const symbolUrlMerged = `${symbolUrl}/${symbolQuote.symbol}`;
+  const symbolUrlMerged = `${symbolUrl}/${symbolQuote.symbol}.png`;
 
   return (
     <button type="button" onClick$={onItemClick$} class={classes}>

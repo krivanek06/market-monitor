@@ -16,6 +16,7 @@ export interface Env {
 }
 
 /**
+ * TODO - currently not used
  * worker to get asset (stock, crypto) image from financial modeling API and save it into cloudflare bucket
  *
  * @param request

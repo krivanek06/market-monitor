@@ -9,17 +9,17 @@ export type SymbolSummaryProps = {
 };
 
 export const SymbolSummaryList = component$<SymbolSummaryProps>(({ summary }) => {
-  const symbolUrlMerged = `${symbolUrl}/${summary?.id}`;
+  const symbolUrlMerged = `${symbolUrl}/${summary?.id}.png`;
 
   return (
-    <div class="flex flex-wrap justify-between @container">
+    <div class="@container flex flex-wrap justify-between">
       {/* company name */}
       <div class="g-item-wrapper">
         <div>Company Name</div>
         <div class="flex items-center gap-2">
-          <img src={symbolUrlMerged} alt="Asset Image" class="w-6 h-6" />
-          <span class="hidden @md:block">{summary?.profile?.companyName}</span>
-          <span class="block @md:hidden">{summary?.id}</span>
+          <img src={symbolUrlMerged} alt="Asset Image" class="h-6 w-6" />
+          <span class="@md:block hidden">{summary?.profile?.companyName}</span>
+          <span class="@md:hidden block">{summary?.id}</span>
         </div>
       </div>
 
