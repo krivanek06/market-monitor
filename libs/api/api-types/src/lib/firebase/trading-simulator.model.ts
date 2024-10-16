@@ -317,4 +317,4 @@ export type TradingSimulatorParticipatingUsers = DataDocsWrapper<UserBase>;
  *    -- documents: TradingSimulatorSymbol
  */
 
-// todo - if shorting is possible and I want to close my position, what to do if units are not available ???
+// todo - if shorting is possible and I want to close my position, what to do if units are not available ??
