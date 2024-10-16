@@ -156,7 +156,7 @@ describe('SummaryActionButtonsComponent', () => {
   });
 
   it('should add symbol into watchlist', () => {
-    let authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
+    const authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
 
     // prevent warning
     ngMocks.flushTestBed();
@@ -195,7 +195,7 @@ describe('SummaryActionButtonsComponent', () => {
   });
 
   it('should remove symbol into watchlist', () => {
-    let authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
+    const authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
     ngMocks.stub(authUserService, {
       ...authUserService,
       state: {
@@ -262,7 +262,7 @@ describe('SummaryActionButtonsComponent', () => {
         }) as SymbolStoreBase,
     );
 
-    let authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
+    const authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
     ngMocks.stub(authUserService, {
       ...authUserService,
       state: {
