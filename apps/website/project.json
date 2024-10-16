@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "apps/website/src",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "qwik-nx:build",
@@ -84,6 +85,5 @@
         "command": "wrangler pages dev dist/apps/website"
       }
     }
-  },
-  "tags": []
+  }
 }

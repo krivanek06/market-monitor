@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import {
   AnalystEstimates,
   AvailableQuotes,
@@ -435,7 +434,7 @@ export const getSymbolPrice = async (symbol: string): Promise<PriceChange> => {
     "url": "https://www.fool.com/investing/2023/06/09/a-bull-market-is-coming-2-reasons-to-buy-apple-sto/"
   }]
  */
-export const getNewsFromApi = async (newsType: NewsTypes, symbol: string = '') => {
+export const getNewsFromApi = async (newsType: NewsTypes, symbol = '') => {
   const resolveNewsUrl = (newsType: NewsTypes, symbol: string) => {
     const ticker = symbol ? `tickers=${symbol}&` : '';
     if (newsType === 'forex') {
@@ -591,7 +590,7 @@ export const getSymbolOwnershipHolders = async (
   return data;
 };
 
-export const getInstitutionalPortfolioDates = async (cik: string = '0000093751'): Promise<string[]> => {
+export const getInstitutionalPortfolioDates = async (cik = '0000093751'): Promise<string[]> => {
   const url = `${FINANCIAL_MODELING_URL}/v4/institutional-ownership/portfolio-date?cik=${cik}&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await fetch(url);
   const data = (await response.json()) as { date: string }[];
