@@ -57,7 +57,7 @@
     "tailwind-merge": "^2.5.4",
     "tslib": "^2.7.0",
     "uuid": "^10.0.0",
-    "zone.js": "0.15.0"
+    "zone.js": "~0.14.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "18.2.8",
@@ -72,6 +72,8 @@
     "@builder.io/qwik": "~1.9.1",
     "@builder.io/qwik-city": "~1.9.1",
     "@cloudflare/workers-types": "^4.20241011.0",
+    "@eslint/eslintrc": "^2.1.1",
+    "@eslint/js": "~8.57.0",
     "@faker-js/faker": "^9.0.3",
     "@golevelup/ts-jest": "^0.5.6",
     "@nrwl/cli": "^15.9.3",
@@ -139,6 +141,7 @@
     "ts-jest": "^29.2.5",
     "ts-node": "10.9.2",
     "typescript": "~5.5.4",
+    "typescript-eslint": "^8.0.0",
     "undici": "^6.20.1",
     "utf-8-validate": "^6.0.4",
     "util": "^0.12.5",
