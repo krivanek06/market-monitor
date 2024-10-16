@@ -71,3 +71,8 @@ export const USER_ALLOWED_DEMO_ACCOUNTS_TOTAL = 300;
  * limit how many symbols can be in a group holding (which are copied from users holdings)
  */
 export const GROUP_HOLDING_LIMIT = 50;
+
+/**
+ * limit the number of users who can play the trading simulator in multiplayer mode
+ */
+export const TRADING_SIMULATOR_MULTIPLAYER_USER_LIMIT = 50;
