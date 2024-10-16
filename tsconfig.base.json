@@ -49,7 +49,9 @@
       "@mm/shared/upload-file-control": ["libs/shared/features/upload-file-control/src/index.ts"],
       "@mm/user/data-access": ["libs/modules/user/data-access/src/index.ts"],
       "@mm/user/features": ["libs/modules/user/features/src/index.ts"],
-      "@mm/user/ui": ["libs/modules/user/ui/src/index.ts"]
+      "@mm/user/ui": ["libs/modules/user/ui/src/index.ts"],
+      "@mm/trading-simulator/data-access": ["libs/modules/trading-simulator/data-access/src/index.ts"],
+      "@mm/trading-simulator/ui": ["libs/modules/trading-simulator/ui/src/index.ts"],
     }
   },
   "exclude": ["node_modules", "tmp"]
