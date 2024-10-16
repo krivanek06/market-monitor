@@ -1,6 +1,6 @@
 import { DataDocsWrapper } from '../constants';
 import { PortfolioGrowth, PortfolioStateHoldingBase, PortfolioTransaction, SymbolStoreBase } from './portfolio.model';
-import { UserBase, UserPersonalInfo } from './user.model';
+import { UserBaseMin } from './user.model';
 
 /**
  * data about the trading simulator
@@ -28,6 +28,11 @@ export type TradingSimulator = {
    * if empty, then anybody can join it
    */
   invitationCode: string;
+
+  /**
+   * how many users participate in the trading simulator
+   */
+  currentParticipants: number;
 
   /**
    * state of the trading simulator
@@ -135,7 +140,7 @@ export type TradingSimulator = {
  * data about each participant in the trading simulator
  */
 export type TradingSimulatorParticipant = {
-  userBase: UserBase;
+  userData: UserBaseMin;
 
   /**
    * current user symbol holdings
@@ -187,8 +192,7 @@ export type TradingSimulatorOrder = SymbolStoreBase & {
   orderId: string;
 
   /** data of the user who created the order */
-  userId: string;
-  userInfo: UserPersonalInfo;
+  userData: UserBaseMin;
 
   /** modified symbol ID */
   displaySymbol?: string;
@@ -197,13 +201,13 @@ export type TradingSimulatorOrder = SymbolStoreBase & {
   units: number;
 
   /**
-   * timestamp when the order was created
+   * when the order was created
    * format: 'YYYY-MM-DDTHH:mm:ss' (new Date().toISOString())
    */
   createdAt: string;
 
   /**
-   * timestamp when the order was closed (fulfilled by the system)
+   * when the order was closed (fulfilled by the system)
    * format: 'YYYY-MM-DDTHH:mm:ss' (new Date().toISOString())
    */
   closedAt: string;
@@ -291,12 +295,12 @@ export type TradingSimulatorTransactions = {
 /**
  * user ranking in the trading simulator, updates on each next round
  */
-export type TradingSimulatorUserRanking = DataDocsWrapper<UserBase>;
+export type TradingSimulatorUserRanking = DataDocsWrapper<UserBaseMin>;
 
 /**
  * users who will be participating in the trading simulator
  */
-export type TradingSimulatorParticipatingUsers = DataDocsWrapper<UserBase>;
+export type TradingSimulatorParticipatingUsers = DataDocsWrapper<UserBaseMin>;
 
 /**
  *
