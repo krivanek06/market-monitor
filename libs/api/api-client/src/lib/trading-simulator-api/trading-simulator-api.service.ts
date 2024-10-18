@@ -14,13 +14,14 @@ import {
 } from '@angular/fire/firestore';
 import {
   DataDocsWrapper,
+  PortfolioTransaction,
   TradingSimulator,
   TradingSimulatorLatestData,
   TradingSimulatorOrder,
   TradingSimulatorParticipant,
   TradingSimulatorParticipatingUsers,
   TradingSimulatorSymbol,
-  TradingSimulatorTransactions,
+  TradingSimulatorTransactionAggregation,
   TradingSimulatorUserRanking,
   UserBase,
   UserBaseMin,
@@ -83,7 +84,7 @@ export class TradingSimulatorApiService {
     setDoc(this.getTradingSimulatorOrderDocRef(id, data.orderId), data, { merge: true });
   }
 
-  getTradingSimulatorByIdTransactions(id: string): Observable<TradingSimulatorTransactions> {
+  getTradingSimulatorByIdTransactions(id: string): Observable<TradingSimulatorTransactionAggregation> {
     return rxDocData(this.getTradingSimulatorTransactions(id)).pipe(
       map((data) => data ?? { bestTransaction: [], worstTransaction: [], lastTransactions: [] }),
     );
@@ -113,9 +114,9 @@ export class TradingSimulatorApiService {
     );
   }
 
-  private getTradingSimulatorTransactions(id: string): DocumentReference<TradingSimulatorTransactions> {
+  private getTradingSimulatorTransactions(id: string): DocumentReference<TradingSimulatorTransactionAggregation> {
     return doc(this.getTradingSimulatorMoreInformationCollection(id), 'transactions').withConverter(
-      assignTypesClient<TradingSimulatorTransactions>(),
+      assignTypesClient<TradingSimulatorTransactionAggregation>(),
     );
   }
 
@@ -151,6 +152,14 @@ export class TradingSimulatorApiService {
   private getTradingSimulatorSymbolsCollection(id: string): CollectionReference<TradingSimulatorSymbol, DocumentData> {
     return collection(this.getTradingSimulatorDocRef(id), 'symbols').withConverter(
       assignTypesClient<TradingSimulatorSymbol>(),
+    );
+  }
+
+  private getTradingSimulatorTransactionsCollection(
+    id: string,
+  ): CollectionReference<PortfolioTransaction, DocumentData> {
+    return collection(this.getTradingSimulatorDocRef(id), 'transactions').withConverter(
+      assignTypesClient<PortfolioTransaction>(),
     );
   }
 

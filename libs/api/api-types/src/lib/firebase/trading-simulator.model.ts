@@ -78,27 +78,6 @@ export type TradingSimulator = TradingSimulatorBase & {
   symbols: string[];
 
   /**
-   * additional data about selected symbols
-   */
-  symbolsData: {
-    // key is the original symbol saved in symbols array
-    [key: string]: {
-      /**
-       * changing the name of original symbol to prevent cheating from user's side
-       * default: {AAPL: 'Symbol1', GOOGL: 'Symbol2', ...}
-       */
-      displayName: string;
-
-      /**
-       * how many units of this symbol is available in the market start (defined by the admin)
-       * If -1, then it's unlimited
-       * - possible to later issue more shares
-       */
-      unitsAvailableOnStart: number;
-    };
-  };
-
-  /**
    * admin can setup modifications to the historical data of a symbol
    */
   modifications: (
@@ -136,8 +115,8 @@ export type TradingSimulator = TradingSimulatorBase & {
   marginTrading?: {
     /** number of days (periods) how often a $$ amount should be subtracted from an user */
     subtractPeriodDays: number;
-    /** amount to subtract from the user */
-    subtractAmount: number;
+    /** amount (in %) of the borrowing value to subtract from the user */
+    subtractInterestAmount: number;
     /** rate which user can take out margin, example: 3 -> 3:1 */
     marginConversionRate: number;
   };
@@ -151,7 +130,6 @@ export type TradingSimulatorParticipant = {
 
   /**
    * current user symbol holdings
-   * todo - maybe this is not important and can be calculated each time on the UI
    */
   holdings: PortfolioStateHoldingBase[];
 
@@ -161,7 +139,7 @@ export type TradingSimulatorParticipant = {
   portfolioGrowth: PortfolioGrowth[];
 
   /**
-   * user's executed portfolio transactions
+   * user's last N executed portfolio transactions
    */
   transactions: PortfolioTransaction[];
 };
@@ -174,6 +152,20 @@ export type TradingSimulatorSymbol = {
    * which symbol this historical data belongs to
    */
   symbol: string;
+
+  /**
+   * how many units of this symbol is available in the market start (defined by the admin)
+   * If -1, then it's unlimited
+   * - possible to later issue more shares
+   */
+  unitsAvailableOnStart: number;
+
+  /**
+   * every time a transaction happens, this value is updated
+   * default is the same as 'unitsAvailableOnStart'
+   * should never be negative
+   */
+  unitsCurrentlyAvailable: number;
 
   /**
    * historical data of a symbol
@@ -296,7 +288,7 @@ export type TradingSimulatorOrder = SymbolStoreBase & {
 /**
  * transaction container
  */
-export type TradingSimulatorTransactions = {
+export type TradingSimulatorTransactionAggregation = {
   /** best return transaction (only SELL transactions) */
   bestTransaction: PortfolioTransaction[];
 
@@ -332,19 +324,24 @@ export type TradingSimulatorParticipatingUsers = DataDocsWrapper<UserBaseMin>;
  * - which user had the best return
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export type TradingSimulatorAggregations = {};
+export type TradingSimulatorAggregations = {
+  // todo - implement it
+};
 
 /**
  *
  * collection: trading_simulator
- * - document: TradingSimulator - also save TradingSimulatorLatestData, to prevent reading all documents
+ * - document: TradingSimulator
  *   -- collection: more_information
- *     -- document: TradingSimulatorTransactions
+ *     -- document: TradingSimulatorTransactionAggregation
  *     -- document: TradingSimulatorUserRanking
  *     -- document: TradingSimulatorParticipatingUsers
  *
  *   -- collection: orders
  *     -- document: TradingSimulatorOrder
+ *
+ *   -- collection: transactions
+ *     -- document: PortfolioTransaction
  *
  *   -- collection: participants (each user one document)
  *    -- documents: TradingSimulatorParticipant
