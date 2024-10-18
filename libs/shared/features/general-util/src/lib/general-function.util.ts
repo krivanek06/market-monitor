@@ -13,7 +13,7 @@ export const calculateGrowth = (starting?: number, ending?: number) => {
   return roundNDigits(((starting - ending) / Math.abs(ending)) * 100);
 };
 
-export const roundNDigits = (value?: number | null, n: number = 2, isPercent = false): number => {
+export const roundNDigits = (value?: number | null, n = 2, isPercent = false): number => {
   if (value === undefined || value === null || isNaN(value)) {
     return 0;
   }
@@ -145,4 +145,14 @@ export const getObjectKeys = <T extends object>(obj: T) => Object.keys(obj) as (
 export const createNameInitials = (name: string) => {
   const words = name.split(' ').reduce((acc, word) => acc + (word.at(0) ?? '').toUpperCase(), '');
   return `${words}.`;
+};
+
+export const generateRandomString = (length = 10): string => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 };

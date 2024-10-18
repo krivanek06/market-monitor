@@ -80,6 +80,10 @@ export class TradingSimulatorApiService {
     addDoc(this.getTradingSimulatorOrdersCollection(id), data);
   }
 
+  addTradingSimulatorByIdTransaction(id: string, data: PortfolioTransaction): void {
+    addDoc(this.getTradingSimulatorTransactionsCollection(id), data);
+  }
+
   updateTradingSimulatorByIdOpenOrder(id: string, data: TradingSimulatorOrder): void {
     setDoc(this.getTradingSimulatorOrderDocRef(id, data.orderId), data, { merge: true });
   }

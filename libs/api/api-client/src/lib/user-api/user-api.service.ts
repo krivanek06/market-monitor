@@ -35,8 +35,8 @@ import { Observable, filter, map, of } from 'rxjs';
   providedIn: 'root',
 })
 export class UserApiService {
-  private firestore = inject(Firestore);
-  private http = inject(HttpClient);
+  private readonly firestore = inject(Firestore);
+  private readonly http = inject(HttpClient);
 
   getUserPublicIp(): Observable<string> {
     return this.http.get<{ ip: string }>('https://api.ipify.org?format=json').pipe(map((d) => d.ip));
@@ -211,6 +211,7 @@ export class UserApiService {
   private getUserDocRef(userId: string): DocumentReference<UserData> {
     return doc(this.userCollection(), userId);
   }
+
   private getUserWatchlistDocRef(userId: string): DocumentReference<UserWatchList> {
     return doc(this.userCollectionMoreInformationRef(userId), 'watchlist').withConverter(
       assignTypesClient<UserWatchList>(),

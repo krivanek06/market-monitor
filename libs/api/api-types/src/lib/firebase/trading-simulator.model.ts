@@ -168,14 +168,6 @@ export type TradingSimulatorSymbol = {
   unitsCurrentlyAvailable: number;
 
   /**
-   * historical data of a symbol
-   */
-  historicalDataOriginal: {
-    date: string;
-    price: number;
-  }[];
-
-  /**
    * modified historical data of a symbol (calculated when setting up the trading simulator)
    */
   historicalDataModified: {
