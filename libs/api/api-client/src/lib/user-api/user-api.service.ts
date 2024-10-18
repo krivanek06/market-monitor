@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
   CollectionReference,
+  DocumentData,
   DocumentReference,
   Firestore,
   arrayRemove,
@@ -28,7 +29,6 @@ import { assignTypesClient } from '@mm/shared/data-access';
 import { createEmptyPortfolioState } from '@mm/shared/general-util';
 import { arrayUnion, updateDoc } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
-import { DocumentData } from 'rxfire/firestore/interfaces';
 import { Observable, filter, map, of } from 'rxjs';
 
 @Injectable({

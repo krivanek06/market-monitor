@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CollectionReference, DocumentData, DocumentReference, Firestore, collection } from '@angular/fire/firestore';
-import { HallOfFameGroups, HallOfFameUsers } from '@mm/api-types';
+import { HallOfFameGroups, HallOfFameUsers, TradingSimulatorLatestData } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
 import { doc } from 'firebase/firestore';
 import { docData as rxDocData } from 'rxfire/firestore';
@@ -46,6 +46,12 @@ export class AggregationApiService {
   private getHallOfFameUsersDocRef(): DocumentReference<HallOfFameUsers> {
     return doc(this.getAggregationCollectionRef(), 'hall_of_fame_users').withConverter(
       assignTypesClient<HallOfFameUsers>(),
+    );
+  }
+
+  private getTradingSimulatorLatestDataDocRef(): DocumentReference<TradingSimulatorLatestData> {
+    return doc(this.getAggregationCollectionRef(), 'trading_simulator_latest_data').withConverter(
+      assignTypesClient<TradingSimulatorLatestData>(),
     );
   }
 

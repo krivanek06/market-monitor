@@ -1,11 +1,8 @@
 import { DataDocsWrapper } from '../constants';
 import { PortfolioGrowth, PortfolioStateHoldingBase, PortfolioTransaction, SymbolStoreBase } from './portfolio.model';
-import { UserBaseMin } from './user.model';
+import { UserBase, UserBaseMin } from './user.model';
 
-/**
- * data about the trading simulator
- */
-export type TradingSimulator = {
+export type TradingSimulatorBase = {
   id: string;
 
   /**
@@ -65,6 +62,16 @@ export type TradingSimulator = {
    */
   startingCashValue: number;
 
+  /**
+   * how many symbols are available in the trading simulator -> symbols.length()
+   */
+  availableSymbols: number;
+};
+
+/**
+ * data about the trading simulator
+ */
+export type TradingSimulator = TradingSimulatorBase & {
   /**
    * original symbols that are used in the trading simulator
    */
@@ -144,6 +151,7 @@ export type TradingSimulatorParticipant = {
 
   /**
    * current user symbol holdings
+   * todo - maybe this is not important and can be calculated each time on the UI
    */
   holdings: PortfolioStateHoldingBase[];
 
@@ -199,6 +207,13 @@ export type TradingSimulatorOrder = SymbolStoreBase & {
 
   /** units to transact */
   units: number;
+
+  /**
+   * status of the order
+   * open - order is active and waiting for the price to reach the desired value
+   * closed - order was fulfilled by the system
+   */
+  status: 'open' | 'closed';
 
   /**
    * when the order was created
@@ -293,9 +308,18 @@ export type TradingSimulatorTransactions = {
 };
 
 /**
+ * some aggregations of the trading simulator
+ */
+export type TradingSimulatorLatestData = {
+  live: TradingSimulatorBase[];
+  open: TradingSimulatorBase[];
+  historical: TradingSimulatorBase[];
+};
+
+/**
  * user ranking in the trading simulator, updates on each next round
  */
-export type TradingSimulatorUserRanking = DataDocsWrapper<UserBaseMin>;
+export type TradingSimulatorUserRanking = DataDocsWrapper<UserBase>;
 
 /**
  * users who will be participating in the trading simulator
@@ -303,9 +327,17 @@ export type TradingSimulatorUserRanking = DataDocsWrapper<UserBaseMin>;
 export type TradingSimulatorParticipatingUsers = DataDocsWrapper<UserBaseMin>;
 
 /**
+ * aggregations of the trading simulator example:
+ * - which symbol was how many times bought/sold
+ * - which user had the best return
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export type TradingSimulatorAggregations = {};
+
+/**
  *
  * collection: trading_simulator
- * - document: TradingSimulator
+ * - document: TradingSimulator - also save TradingSimulatorLatestData, to prevent reading all documents
  *   -- collection: more_information
  *     -- document: TradingSimulatorTransactions
  *     -- document: TradingSimulatorUserRanking
