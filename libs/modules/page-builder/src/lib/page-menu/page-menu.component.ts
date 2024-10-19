@@ -59,6 +59,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
   styles: `
     :host {
       display: block;
+      overflow-x: clip;
     }
 
     .mat-drawer:not(.mat-drawer-side) {

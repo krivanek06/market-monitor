@@ -85,8 +85,12 @@ export class DatePickerComponent implements OnInit {
 
   defaultDateFilter: DateFilterFn<any> = (d: Date) => true;
 
-  onChange: (data: Date) => void = () => {};
-  onTouched = () => {};
+  onChange: (data: Date) => void = () => {
+    /** */
+  };
+  onTouched = () => {
+    /** */
+  };
 
   selectedDate = new FormControl<Date | null>(null);
 

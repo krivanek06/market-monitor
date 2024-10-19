@@ -15,6 +15,7 @@ export enum ROUTES_MAIN {
   HALL_OF_FAME = 'hall-of-fame',
   COMPARE_USERS = 'compare-users',
   NOT_FOUND = 'not-found',
+  TRADING_SIMULATOR = 'trading-simulator',
 }
 
 export enum ROUTES_MARKET {
@@ -32,5 +33,11 @@ export enum ROUTES_STOCK_DETAILS {
 }
 
 export enum ROUTES_GROUP {
+  DETAILS = 'details',
+}
+
+export enum ROUTES_TRADING_SIMULATOR {
+  CREATE = 'create',
+  EDIT = 'edit',
   DETAILS = 'details',
 }

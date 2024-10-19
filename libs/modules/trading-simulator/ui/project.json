@@ -2,7 +2,7 @@
   "name": "trading-simulator-ui",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/modules/trading-simulator/ui/src",
-  "prefix": "lib",
+  "prefix": "app",
   "projectType": "library",
   "tags": [],
   "targets": {
