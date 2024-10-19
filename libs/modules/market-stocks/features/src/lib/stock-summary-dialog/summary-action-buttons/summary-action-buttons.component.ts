@@ -24,7 +24,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
             color="warn"
             (click)="onRemoveWatchList()"
             type="button"
-            class="g-border-apply h-10 max-sm:w-full"
+            class="h-10 max-sm:w-full"
           >
             <mat-icon>do_not_disturb_on</mat-icon>
             watchlist <span class="max-sm:hidden">- remove</span>
@@ -36,7 +36,7 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
             color="accent"
             (click)="onAddWatchList()"
             type="button"
-            class="g-border-apply h-10 max-sm:w-full"
+            class="h-10 max-sm:w-full"
           >
             <mat-icon>star</mat-icon>
             watchlist <span class="max-sm:hidden">- add</span>

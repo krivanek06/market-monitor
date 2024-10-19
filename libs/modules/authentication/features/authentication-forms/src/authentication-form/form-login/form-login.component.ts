@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,7 +7,7 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
 @Component({
   selector: 'app-form-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormMatInputWrapperComponent, MatButtonModule],
+  imports: [ReactiveFormsModule, FormMatInputWrapperComponent, MatButtonModule],
   template: `
     <form [formGroup]="formGroup" class="flex flex-col gap-6" (ngSubmit)="onSubmit()">
       <!-- email -->
@@ -45,8 +44,12 @@ export class FormLoginComponent implements ControlValueAccessor {
     }),
   });
 
-  onChange: (value: LoginUserInput) => void = () => {};
-  onTouched = () => {};
+  onChange: (value: LoginUserInput) => void = () => {
+    /** */
+  };
+  onTouched = () => {
+    /** */
+  };
 
   onSubmit(): void {
     this.formGroup.markAllAsTouched();
@@ -69,7 +72,9 @@ export class FormLoginComponent implements ControlValueAccessor {
     });
   }
 
-  writeValue(obj: LoginUserInput): void {}
+  writeValue(obj: LoginUserInput): void {
+    this.formGroup.setValue(obj);
+  }
 
   /**
    * Register Component's ControlValueAccessor onChange callback

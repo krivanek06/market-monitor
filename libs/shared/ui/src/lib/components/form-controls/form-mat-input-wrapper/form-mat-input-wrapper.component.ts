@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { KeyValuePipe, LowerCasePipe, NgClass } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -41,67 +41,50 @@ import { DefaultImgDirective } from '../../../directives';
   selector: 'app-form-mat-input-wrapper',
   template: `
     <fieldset [disabled]="disabled()">
-      <ng-container [ngSwitch]="inputType()">
-        <mat-form-field
-          appearance="fill"
-          [ngClass]="{ 'g-form-error': parentFormControl?.touched && parentFormControl?.invalid }"
-        >
-          <!-- label -->
-          <mat-label> {{ inputCaption() }}</mat-label>
+      <mat-form-field
+        appearance="fill"
+        [ngClass]="{ 'g-form-error': parentFormControl?.touched && parentFormControl?.invalid }"
+      >
+        <!-- label -->
+        <mat-label> {{ inputCaption() }}</mat-label>
 
-          <!-- textarea -->
-          <textarea
-            #textAreaElement
-            *ngSwitchCase="'TEXTAREA'"
-            [formControl]="internalFormControl"
-            cdkAutosizeMinRows="4"
-            cdkTextareaAutosize
-            matInput
-          >
-          </textarea>
+        <!-- text, number, time, email -->
+        <input
+          [formControl]="internalFormControl"
+          [readOnly]="disabled()"
+          [type]="inputType() | lowercase"
+          autocomplete="off"
+          matInput
+        />
 
-          <!-- number -->
-          <ng-container *ngSwitchCase="'NUMBER'">
-            <input
-              [formControl]="internalFormControl"
-              [readOnly]="disabled()"
-              type="number"
-              autocomplete="off"
-              matInput
-            />
-          </ng-container>
-
-          <!-- text, number, time, email -->
-          <input
-            *ngSwitchDefault
-            [formControl]="internalFormControl"
-            [readOnly]="disabled()"
-            [type]="inputType() | lowercase"
-            autocomplete="off"
-            matInput
-          />
-
-          <!-- hint -->
-          <mat-hint *ngIf="hintText()" class="text-wt-gray-medium hidden sm:block" matSuffix>
+        <!-- hint -->
+        @if (hintText()) {
+          <mat-hint class="text-wt-gray-medium hidden sm:block" matSuffix>
             {{ hintText() }}
           </mat-hint>
+        }
 
-          <!-- prefix icon -->
-          <mat-icon *ngIf="prefixIcon()" matPrefix class="icon-prefix">{{ prefixIcon() }}</mat-icon>
-        </mat-form-field>
-      </ng-container>
+        <!-- prefix icon -->
+        @if (prefixIcon()) {
+          <mat-icon matPrefix class="icon-prefix">{{ prefixIcon() }}</mat-icon>
+        }
+      </mat-form-field>
     </fieldset>
 
     <!-- errors -->
-    <ng-container *ngIf="showErrors">
-      <mat-error *ngFor="let inputError of parentFormControl?.errors | keyvalue" [id]="''">
-        {{ inputError.value.errorText }}
-      </mat-error>
-    </ng-container>
+    @if (showErrors) {
+      @for (inputError of parentFormControl?.errors | keyvalue; track $index) {
+        <mat-error [id]="''">
+          {{ inputError.value.errorText }}
+        </mat-error>
+      }
+    }
   `,
   standalone: true,
   imports: [
-    CommonModule,
+    KeyValuePipe,
+    LowerCasePipe,
+    NgClass,
     ReactiveFormsModule,
     MatCheckboxModule,
     MatSlideToggleModule,
@@ -127,7 +110,7 @@ import { DefaultImgDirective } from '../../../directives';
   styles: `
     mat-form-field.mat-mdc-form-field {
       width: 100%;
-      height: 60px;
+      height: 52px;
     }
 
     fieldset {
@@ -140,24 +123,28 @@ import { DefaultImgDirective } from '../../../directives';
   `,
 })
 export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, ControlValueAccessor {
-  inputCaption = input.required<string>();
-  prefixIcon = input<string | undefined>();
-  inputType = input<'TEXT' | 'NUMBER' | 'PASSWORD' | 'EMAIL' | 'TEXTAREA'>('TEXT');
-  displayImageType = input<DefaultImageType>('default');
+  readonly inputCaption = input.required<string>();
+  readonly prefixIcon = input<string | undefined>();
+  readonly inputType = input<'TEXT' | 'NUMBER' | 'PASSWORD' | 'EMAIL' | 'TEXTAREA'>('TEXT');
+  readonly displayImageType = input<DefaultImageType>('default');
 
   /*
 		disable input source
 	  */
-  disabled = signal(false);
+  readonly disabled = signal(false);
 
   /*
 		display hint text for input
 	  */
-  hintText = input<string | undefined>();
+  readonly hintText = input<string | undefined>();
 
-  onChange: (value: T | null) => void = () => {};
-  onTouched = () => {};
-  internalFormControl = new FormControl<T | null>(null);
+  onChange: (value: T | null) => void = () => {
+    /** */
+  };
+  onTouched = () => {
+    /** */
+  };
+  readonly internalFormControl = new FormControl<T | null>(null);
 
   // TODO: remove this if possible to get parent validators
   parentFormControl?: FormControl;

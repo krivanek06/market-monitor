@@ -21,10 +21,6 @@ button[mat-stroked-button] {
     }
   }
 
-  &.g-border-apply {
-    border: 1px solid !important;
-  }
-
   &.mat-primary {
     border: 1px solid var(--primary) !important;
   }
@@ -39,7 +35,7 @@ button[mat-stroked-button] {
 }
 
 button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
-  border: 1px solid var(--gray-medium) !important;
+  border: 1px solid var(--gray-medium);
   //background-color: #ffffff !important;
   opacity: 0.95 !important;
 
