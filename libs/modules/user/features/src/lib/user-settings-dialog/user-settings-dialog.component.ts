@@ -16,7 +16,7 @@ import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
-import { UploadFileControlComponent } from 'libs/shared/features/upload-file-control/src';
+import { UploadFileControlComponent } from '@mm/shared/upload-file-control';
 import { filterNil } from 'ngxtension/filter-nil';
 import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';
 
@@ -283,7 +283,7 @@ export class UserSettingsDialogComponent implements OnInit {
 
   onChangePassword(): void {
     this.dialog.open(ChangePasswordDialogComponent, {
-      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+      panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });
   }
 

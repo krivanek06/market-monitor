@@ -27,32 +27,44 @@ import { DropdownControlComponent } from '@mm/shared/ui';
     <form [formGroup]="screenerFormGroup" class="xs:grid-cols-2 grid gap-x-6 gap-y-4 md:grid-cols-3 lg:grid-cols-4">
       <!-- market cap. -->
       <app-dropdown-control
-        formControlName="marketCap"
+        [formControl]="screenerFormGroup.controls.marketCap"
         inputCaption="Market Cap."
         [inputSource]="STOCK_SCREENER_MARKET_CAP"
       />
 
       <!-- price -->
-      <app-dropdown-control formControlName="price" inputCaption="Price" [inputSource]="STOCK_SCREENER_PRICE" />
+      <app-dropdown-control
+        [formControl]="screenerFormGroup.controls.price"
+        inputCaption="Price"
+        [inputSource]="STOCK_SCREENER_PRICE"
+      />
 
       <!-- volume -->
-      <app-dropdown-control formControlName="volume" inputCaption="Volume" [inputSource]="STOCK_SCREENER_VOLUME" />
+      <app-dropdown-control
+        [formControl]="screenerFormGroup.controls.volume"
+        inputCaption="Volume"
+        [inputSource]="STOCK_SCREENER_VOLUME"
+      />
 
       <!-- dividends -->
       <app-dropdown-control
         class="hidden md:block"
-        formControlName="dividends"
+        [formControl]="screenerFormGroup.controls.dividends"
         inputCaption="Dividends"
         [inputSource]="STOCK_SCREENER_DIVIDENDS"
       />
 
       <!-- sector -->
-      <app-dropdown-control formControlName="sector" inputCaption="Sector" [inputSource]="STOCK_SCREENER_SECTORS" />
+      <app-dropdown-control
+        [formControl]="screenerFormGroup.controls.sector"
+        inputCaption="Sector"
+        [inputSource]="STOCK_SCREENER_SECTORS"
+      />
 
       <!-- industries -->
       <app-dropdown-control
         class="hidden md:block"
-        formControlName="industry"
+        [formControl]="screenerFormGroup.controls.industry"
         inputCaption="Industry"
         [inputSource]="STOCK_SCREENER_INDUSTRIES"
       />
@@ -60,7 +72,7 @@ import { DropdownControlComponent } from '@mm/shared/ui';
       <!-- exchange -->
       <app-dropdown-control
         class="hidden md:block"
-        formControlName="exchange"
+        [formControl]="screenerFormGroup.controls.exchange"
         inputCaption="Exchange"
         [inputSource]="STOCK_SCREENER_EXCHANGE"
       />
@@ -68,7 +80,7 @@ import { DropdownControlComponent } from '@mm/shared/ui';
       <!-- countries -->
       <app-dropdown-control
         class="hidden md:block"
-        formControlName="country"
+        [formControl]="screenerFormGroup.controls.country"
         inputCaption="Country"
         [inputSource]="STOCK_SCREENER_COUNTRIES"
       />

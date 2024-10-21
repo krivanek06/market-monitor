@@ -12,7 +12,7 @@ import { SheetDataPeriod, SheetDataTimePeriodForm } from '@mm/market-stocks/data
     <form [formGroup]="timePeriodGroup" class="flex flex-col gap-y-3 lg:flex-row lg:items-center lg:justify-between">
       <!-- time period -->
       <mat-radio-group
-        formControlName="timePeriod"
+        [formControl]="timePeriodGroup.controls.timePeriod"
         color="primary"
         aria-label="Select an option"
         class="flex gap-x-4 max-lg:justify-between max-lg:[&>*]:w-[200px] max-sm:[&>*]:flex-1"
@@ -23,7 +23,7 @@ import { SheetDataPeriod, SheetDataTimePeriodForm } from '@mm/market-stocks/data
 
       <!-- keys -->
       <mat-radio-group
-        formControlName="sheetKey"
+        [formControl]="timePeriodGroup.controls.sheetKey"
         color="primary"
         aria-label="Select an option"
         class="flex gap-x-2 sm:gap-x-6 max-lg:[&>*]:flex-1"

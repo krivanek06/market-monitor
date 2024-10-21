@@ -26,14 +26,22 @@ import { DialogCloseHeaderComponent, FormMatInputWrapperComponent } from '@mm/sh
     <form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
       <mat-dialog-content class="flex flex-col gap-4 p-4 md:mb-6 md:p-10">
         <!-- old password -->
-        <app-form-mat-input-wrapper formControlName="oldPassword" inputCaption="Old Password" inputType="PASSWORD" />
+        <app-form-mat-input-wrapper
+          [formControl]="passwordForm.controls.oldPassword"
+          inputCaption="Old Password"
+          inputType="PASSWORD"
+        />
 
         <!-- password1 -->
-        <app-form-mat-input-wrapper formControlName="newPassword1" inputCaption="New Password" inputType="PASSWORD" />
+        <app-form-mat-input-wrapper
+          [formControl]="passwordForm.controls.newPassword1"
+          inputCaption="New Password"
+          inputType="PASSWORD"
+        />
 
         <!-- password2 -->
         <app-form-mat-input-wrapper
-          formControlName="newPassword2"
+          [formControl]="passwordForm.controls.newPassword2"
           inputCaption="New Password Confirm"
           inputType="PASSWORD"
         />
@@ -55,11 +63,11 @@ import { DialogCloseHeaderComponent, FormMatInputWrapperComponent } from '@mm/sh
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChangePasswordDialogComponent {
-  private dialogServiceUtil = inject(DialogServiceUtil);
-  private authenticationAccountService = inject(AuthenticationAccountService);
-  private dialogRef = inject(MatDialogRef<ChangePasswordDialogComponent>);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly authenticationAccountService = inject(AuthenticationAccountService);
+  private readonly dialogRef = inject(MatDialogRef<ChangePasswordDialogComponent>);
 
-  passwordForm = new FormGroup({
+  readonly passwordForm = new FormGroup({
     oldPassword: new FormControl('', {
       validators: [requiredValidator, minLengthValidator(4), maxLengthValidator(20)],
       nonNullable: true,
