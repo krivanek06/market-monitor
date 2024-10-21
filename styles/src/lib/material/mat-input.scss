@@ -7,8 +7,18 @@
 fieldset:disabled {
   mat-form-field {
     .mat-mdc-text-field-wrapper {
+      opacity: 0.65 !important;
+      pointer-events: none !important;
       background-color: var(--disable-default) !important;
     }
+
+    :hover {
+      pointer-events: none !important;
+      background-color: var(--disable-default) !important;
+    }
+
+    opacity: 0.65 !important;
+    pointer-events: none !important;
   }
 }
 
@@ -34,6 +44,10 @@ mat-form-field {
   &.g-form-error {
     .mdc-text-field--filled:not(.mdc-text-field--disabled) {
       border: 1px solid var(--danger) !important;
+    }
+
+    mat-label {
+      color: var(--danger) !important;
     }
   }
 }

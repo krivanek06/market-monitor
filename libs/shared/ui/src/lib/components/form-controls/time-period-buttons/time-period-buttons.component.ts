@@ -50,10 +50,6 @@ export const timePeriodDefaultButtons = [
     :host {
       display: block;
     }
-
-    button[mat-stroked-button].mat-mdc-outlined-button.mat-unthemed {
-      background-color: var(--gray-light) !important;
-    }
   `,
   providers: [
     {

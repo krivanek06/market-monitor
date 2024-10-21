@@ -75,7 +75,7 @@ mat-divider {
 }
 
 .mat-mdc-text-field-wrapper {
-  border-radius: 20px !important;
+  border-radius: 12px !important;
 }
 
 .mat-mdc-option .mat-icon,
@@ -86,4 +86,8 @@ mat-divider {
 /* remove space for error message if not error is present */
 .mat-mdc-form-field-bottom-align::before {
   height: 0px !important;
+}
+
+mat-label {
+  color: var(--gray-dark);
 }
