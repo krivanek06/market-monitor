@@ -84,9 +84,9 @@ mat-divider {
 }
 
 /* remove space for error message if not error is present */
-.mat-mdc-form-field-bottom-align::before {
-  height: 0px !important;
-}
+// .mat-mdc-form-field-bottom-align::before {
+//   height: 0px !important;
+// }
 
 mat-label {
   color: var(--gray-dark);

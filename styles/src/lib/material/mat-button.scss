@@ -12,12 +12,13 @@ button[mat-stroked-button] {
   // border: 1px solid !important; // var(--background-medium)
 
   &.mat-mdc-outlined-button.mat-unthemed {
-    background-color: var(--gray-light);
+    background-color: var(--gray-light-strong);
     color: unset !important;
     opacity: 0.7;
+    color: var(--gray-dark) !important;
 
     &:hover {
-      background-color: var(--gray-light);
+      background-color: var(--gray-light-strong);
     }
   }
 
