@@ -58,7 +58,7 @@ import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
       <div class="mt-8 flex items-center justify-between">
         <h3>Total found: {{ screenerResults().isLoading ? 'Loading...' : screenerResults().data.length }}</h3>
 
-        <button (click)="onFormReset()" mat-stroked-button color="warn" class="g-border-apply">Reset Form</button>
+        <button (click)="onFormReset()" mat-stroked-button color="warn">Reset Form</button>
       </div>
     </section>
 

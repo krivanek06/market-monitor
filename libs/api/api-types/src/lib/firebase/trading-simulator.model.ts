@@ -52,20 +52,14 @@ export type TradingSimulatorBase = {
   maximumRounds: number;
 
   /**
-   * current round of the trading simulator
-   * calculated from the startDateTime + oneRoundDurationSeconds
-   */
-  currentRound: number;
-
-  /**
    * cash value user starts with
    */
-  startingCashValue: number;
+  cashStartingValue: number;
 
   /**
    * how many symbols are available in the trading simulator -> symbols.length()
    */
-  availableSymbols: number;
+  symbolAvailable: number;
 };
 
 /**
@@ -78,36 +72,22 @@ export type TradingSimulator = TradingSimulatorBase & {
   symbols: string[];
 
   /**
-   * admin can setup modifications to the historical data of a symbol
+   * possible to add more cash to the participating users
    */
-  modifications: (
-    | {
-        /** possible to modify the return of symbol historical data */
-        type: 'returnChange';
-        symbol: string;
-        from: string; // format 'YYYY-MM-DD'
-        to: string; // format 'YYYY-MM-DD'
+  cashAdditionalIssued: {
+    date: string; // format 'YYYY-MM-DD'
+    value: number;
+  }[];
 
-        /**
-         * how much the price of the symbol changes in percentage between 'from' and 'to' dates
-         */
-        returnChange: number; // example: 11.5 is 11.5%
-      }
-    | {
-        /** possible to issue more shares of a specific symbol */
-        type: 'sharesIssued';
-        symbol: string;
-        date: string; // format 'YYYY-MM-DD'
-        /** additional share units to issue to the market */
-        units: number;
-      }
-    | {
-        /** possible to add more cash to the participating users */
-        type: 'cashIssued';
-        date: string; // format 'YYYY-MM-DD'
-        value: number;
-      }
-  )[];
+  /**
+   * modify the return of symbols historical data
+   * imitate market crashes, bubbles, etc.
+   */
+  returnChange: {
+    from: string; // format 'YYYY-MM-DD'
+    to: string; // format 'YYYY-MM-DD'
+    returnChange: number; // example: 11.5 is 11.5%
+  }[];
 
   /**
    * possible to enable margin trading for users
@@ -116,7 +96,7 @@ export type TradingSimulator = TradingSimulatorBase & {
     /** number of days (periods) how often a $$ amount should be subtracted from an user */
     subtractPeriodDays: number;
     /** amount (in %) of the borrowing value to subtract from the user */
-    subtractInterestAmount: number;
+    subtractInterestRate: number;
     /** rate which user can take out margin, example: 3 -> 3:1 */
     marginConversionRate: number;
   };
@@ -166,6 +146,14 @@ export type TradingSimulatorSymbol = {
    * should never be negative
    */
   unitsCurrentlyAvailable: number;
+
+  /**
+   * possible to issue more shares of a specific symbol
+   */
+  unitsAdditionalIssued: {
+    date: string; // format 'YYYY-MM-DD'
+    units: number;
+  }[];
 
   /**
    * modified historical data of a symbol (calculated when setting up the trading simulator)

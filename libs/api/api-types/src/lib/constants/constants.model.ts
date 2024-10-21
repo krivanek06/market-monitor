@@ -80,4 +80,9 @@ export const TRADING_SIMULATOR_MULTIPLAYER_USER_LIMIT = 50;
 /**
  * maximum number of rounds in the trading simulator can handle
  */
-export const TRADING_SIMULATOR_MAX_ROUNDS = 250;
+export const TRADING_SIMULATOR_MAX_ROUNDS = 500;
+
+/**
+ * maximum number of instances of trading simulator a user can create
+ */
+export const TRADING_SIMULATOR_MAX_INSTANCES_PER_USER = 3;

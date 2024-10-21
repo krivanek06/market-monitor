@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { DataDocsWrapper } from './../constants/generic.model';
+import { DataDocsWrapper } from '../constants';
 import {
   PortfolioGrowth,
   PortfolioRisk,
