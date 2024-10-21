@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, forwardRef, inject, input, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, inject, input, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,34 +34,30 @@ export interface InputTypeDateTimePickerConfig {
   ],
   template: `
     <!-- hidden datepicker -->
-    <mat-form-field class="h-0 scale-0">
-      <div class="hidden">
-        <input
-          [min]="inputTypeDateTimePickerConfig()?.minDate"
-          [max]="inputTypeDateTimePickerConfig()?.maxDate"
-          matInput
-          [matDatepicker]="datePicker"
-          [matDatepickerFilter]="inputTypeDateTimePickerConfig()?.dateFilter ?? defaultDateFilter"
-          [formControl]="selectedDate"
-        />
-        <mat-datepicker-toggle matSuffix [for]="datePicker" />
-        <mat-datepicker #datePicker />
-      </div>
+    <mat-form-field class="invisible absolute">
+      <input
+        [min]="inputTypeDateTimePickerConfig()?.minDate"
+        [max]="inputTypeDateTimePickerConfig()?.maxDate"
+        matInput
+        [matDatepicker]="datePicker"
+        [matDatepickerFilter]="inputTypeDateTimePickerConfig()?.dateFilter ?? defaultDateFilter"
+        [formControl]="selectedDate"
+      />
+      <mat-datepicker-toggle matSuffix [for]="datePicker" />
+      <mat-datepicker #datePicker />
     </mat-form-field>
 
     <!-- hidden timepicker -->
-    <mat-form-field class="h-0 scale-0">
-      <div class="hidden">
-        <input
-          matInput
-          [format]="24"
-          [formControl]="selectedTime"
-          [ngxMatTimepicker]="timePicker"
-          placeholder="12:00"
-          readonly
-        />
-        <ngx-mat-timepicker #timePicker color="primary" />
-      </div>
+    <mat-form-field class="invisible absolute">
+      <input
+        matInput
+        [format]="24"
+        [formControl]="selectedTime"
+        [ngxMatTimepicker]="timePicker"
+        placeholder="12:00"
+        readonly
+      />
+      <ngx-mat-timepicker #timePicker color="primary" />
     </mat-form-field>
 
     <div class="flex gap-2">
@@ -70,8 +66,8 @@ export interface InputTypeDateTimePickerConfig {
         [disabled]="isDisabled()"
         (click)="onDateToggle()"
         type="button"
-        mat-stroked-button
-        class="-mt-5 min-h-[50px] w-full"
+        mat-flat-button
+        class="h-12 w-full"
         [ngClass]="{
           'border-wt-danger': hasError(),
         }"
@@ -82,7 +78,7 @@ export interface InputTypeDateTimePickerConfig {
 
       <!-- reset button -->
       @if (selectedDate.value || selectedTime.value) {
-        <button mat-icon-button type="button" (click)="clearDate()" class="-mt-4">
+        <button mat-icon-button type="button" (click)="clearDate()">
           <mat-icon>close</mat-icon>
         </button>
       }
@@ -92,10 +88,15 @@ export interface InputTypeDateTimePickerConfig {
     `
       :host {
         display: block;
+        position: relative;
       }
 
       ::ng-deep mat-datepicker-content {
         margin-top: 45px !important;
+      }
+
+      ::ng-deep mat-calendar {
+        margin-top: -32px;
       }
     `,
   ],
@@ -113,11 +114,12 @@ export class DatePickerComponent implements ControlValueAccessor {
   private readonly datePipe = inject(DatePipe);
 
   readonly inputTypeDateTimePickerConfig = input<InputTypeDateTimePickerConfig | undefined>();
-  readonly isDisabled = input(false);
 
   /** if true, set red borders */
   readonly hasError = input(false);
-  readonly type = input<'date' | 'time' | 'datetime'>('date');
+  readonly type = input<'date' | 'datetime'>('date');
+
+  readonly isDisabled = signal(false);
 
   readonly timePicker = viewChild('timePicker', { read: NgxMatTimepickerComponent });
   readonly datePicker = viewChild('datePicker', { read: MatDatepicker<any> });
@@ -143,10 +145,6 @@ export class DatePickerComponent implements ControlValueAccessor {
           return this.datePipe.transform(date, 'dd. MMMM, YYYY');
         }
 
-        if (type === 'time') {
-          return this.datePipe.transform(date, 'HH:mm');
-        }
-
         return `${time}, ${this.datePipe.transform(date, 'dd. MMMM, YYYY')}`;
       }),
     ),
@@ -165,6 +163,7 @@ export class DatePickerComponent implements ControlValueAccessor {
   constructor() {
     this.selectedDate.valueChanges
       .pipe(
+        tap(() => this.onTouched()),
         filterNil(),
         // if type is date, return date value
         switchMap((date) =>
@@ -177,8 +176,12 @@ export class DatePickerComponent implements ControlValueAccessor {
                 switchMap((date) =>
                   this.selectedTime.valueChanges.pipe(
                     startWith(this.selectedTime.value),
-                    filterNil(),
                     map((time) => {
+                      // no time selected
+                      if (!time) {
+                        return null;
+                      }
+
                       // Split the time string into hours and minutes
                       const [hours, minutes] = time.split(':').map(Number);
 
@@ -239,5 +242,9 @@ export class DatePickerComponent implements ControlValueAccessor {
    */
   registerOnTouched(fn: DatePickerComponent['onTouched']): void {
     this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled.set(isDisabled);
   }
 }

@@ -72,9 +72,9 @@ button[mat-stroked-button][disabled] {
 }
 
 .mat-mdc-unelevated-button.mat-unthemed {
-  background-color: var(--gray-light-strong) !important;
+  background-color: var(--gray-light) !important;
   color: var(--gray-medium) !important;
-  border: 1px solid var(--gray-light) !important;
+  border: 1px solid var(--gray-light);
 
   // &:hover {
   //   color: var(--gray-dark) !important;
