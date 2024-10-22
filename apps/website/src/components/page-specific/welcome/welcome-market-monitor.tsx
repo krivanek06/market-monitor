@@ -1,10 +1,9 @@
 import { $, Resource, component$, useResource$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import { getHistoricalPricesCF, getSymbolSummariesCF } from '@mm/api-external';
-import { SymbolHistoricalPeriods, SymbolSummary } from '@mm/api-types';
+import { STOCK_SYMBOLS, SymbolHistoricalPeriods, SymbolSummary } from '@mm/api-types';
 import { getRandomElement } from '@mm/shared/general-util';
 import { Button, CardBasic } from '../../shared';
 import { HistoricalPriceChart, SymbolChange, SymbolSummaryList } from '../../trading';
-import { stockSymbols } from '../../utils';
 
 export const WelcomeMarketMonitor = component$(() => {
   return (
@@ -55,7 +54,7 @@ const MarketSymbolsSection = component$(() => {
     // track random variable to reload data
     track(reloadSummaries);
     // load more symbols if some of them are undefined, and display 8
-    const randomSymbols = getRandomElement(stockSymbols, 10);
+    const randomSymbols = getRandomElement(STOCK_SYMBOLS, 10);
     const data = await getSymbolSummariesCF(randomSymbols);
 
     // console.log('loaded', data.length, 'symbols');

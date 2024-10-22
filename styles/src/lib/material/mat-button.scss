@@ -13,9 +13,8 @@ button[mat-stroked-button] {
 
   &.mat-mdc-outlined-button.mat-unthemed {
     background-color: var(--gray-light-strong);
-    color: unset !important;
-    opacity: 0.7;
-    color: var(--gray-dark) !important;
+    opacity: 0.9;
+    color: var(--gray-medium) !important;
 
     &:hover {
       background-color: var(--gray-light-strong);
@@ -43,13 +42,6 @@ button[mat-stroked-button][disabled] {
   border: 1px solid var(--gray-light) !important;
   background-color: var(--disable-default) !important;
   opacity: 0.8;
-}
-
-@layer utilities {
-  .g-button-size-lg {
-    min-width: 220px !important;
-    min-height: 50px !important;
-  }
 }
 
 .mat-mdc-button.mat-unthemed {

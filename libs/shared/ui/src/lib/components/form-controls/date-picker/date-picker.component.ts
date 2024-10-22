@@ -77,7 +77,7 @@ export interface InputTypeDateTimePickerConfig {
       </button>
 
       <!-- reset button -->
-      @if (selectedDate.value || selectedTime.value) {
+      @if (showCancelDate() && (selectedDate.value || selectedTime.value)) {
         <button mat-icon-button type="button" (click)="clearDate()">
           <mat-icon>close</mat-icon>
         </button>
@@ -118,6 +118,7 @@ export class DatePickerComponent implements ControlValueAccessor {
   /** if true, set red borders */
   readonly hasError = input(false);
   readonly type = input<'date' | 'datetime'>('date');
+  readonly showCancelDate = input(true);
 
   readonly isDisabled = signal(false);
 

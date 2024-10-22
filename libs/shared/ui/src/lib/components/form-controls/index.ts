@@ -6,5 +6,6 @@ export * from './dropdown-control/dropdown-control.mock.component';
 export * from './form-mat-input-wrapper/form-mat-input-wrapper-mock.component';
 export * from './form-mat-input-wrapper/form-mat-input-wrapper.component';
 export * from './number-keyboard-control/number-keyboard-control.component';
+export * from './slider-control/slider-control.component';
 export * from './tab-select-control/tab-select-control.component';
 export * from './time-period-buttons/time-period-buttons.component';

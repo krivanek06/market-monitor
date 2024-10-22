@@ -1,8 +1,6 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChartConstructor, ColorScheme, GenericChartSeries } from '@mm/shared/data-access';
 import { formatLargeNumber, formatValueIntoCurrency, roundNDigits } from '@mm/shared/general-util';
 import { format } from 'date-fns';
@@ -15,7 +13,7 @@ type ChartInputType = Highcharts.SeriesOptionsType[];
   selector: 'app-generic-chart',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  imports: [HighchartsChartModule, MatButtonModule, MatIconModule],
   host: { ngSkipHydration: 'true' },
   styles: `
     :host {
@@ -24,23 +22,24 @@ type ChartInputType = Highcharts.SeriesOptionsType[];
   `,
   template: `
     <div class="relative block">
-      <button
-        mat-icon-button
-        *ngIf="showExpandableButton()"
-        class="text-wt-gray-medium hover:text-wt-gray-medium absolute right-0 top-0 z-10"
-        (click)="expand()"
-        matTooltip="Expand chart"
-      >
-        <mat-icon>open_with</mat-icon>
-      </button>
+      @if (showExpandableButton()) {
+        <button
+          mat-icon-button
+          class="text-wt-gray-medium hover:text-wt-gray-medium absolute right-0 top-0 z-10"
+          (click)="expand()"
+        >
+          <mat-icon>open_with</mat-icon>
+        </button>
+      }
 
-      <highcharts-chart
-        *ngIf="isHighcharts()"
-        [Highcharts]="Highcharts"
-        [options]="chartOptionsSignal()"
-        [style.height.px]="heightPx()"
-        style="width: 100%; display: block"
-      />
+      @if (isHighcharts()) {
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [options]="chartOptionsSignal()"
+          [style.height.px]="heightPx()"
+          style="width: 100%; display: block"
+        />
+      }
     </div>
   `,
 })
@@ -74,7 +73,7 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
   readonly applyFancyColor = input(0);
   readonly isCategoryDates = input(false);
 
-  chartOptionsSignal = computed(() => {
+  readonly chartOptionsSignal = computed(() => {
     const series = this.applyFancyColor() > 0 ? this.fancyColoring(this.series()) : this.series();
 
     const chartOptions = this.initChart(series);
@@ -89,11 +88,6 @@ export class GenericChartComponent<T extends Highcharts.SeriesOptionsType['type'
     }
 
     if (this.chartType() === 'column' && chartOptions.xAxis) {
-      chartOptions.xAxis = {
-        ...chartOptions.xAxis,
-        type: 'category',
-      };
-    } else if (this.chartType() === 'column' && chartOptions.xAxis) {
       chartOptions.xAxis = {
         ...chartOptions.xAxis,
         type: 'category',

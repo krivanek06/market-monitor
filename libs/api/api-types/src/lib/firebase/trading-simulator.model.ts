@@ -75,7 +75,11 @@ export type TradingSimulator = TradingSimulatorBase & {
    * possible to add more cash to the participating users
    */
   cashAdditionalIssued: {
-    date: string; // format 'YYYY-MM-DD'
+    /**
+     * when the cash is added to users
+     * range: 1 - maximumRounds
+     */
+    issuedOnRound: number;
     value: number;
   }[];
 
@@ -84,8 +88,7 @@ export type TradingSimulator = TradingSimulatorBase & {
    * imitate market crashes, bubbles, etc.
    */
   returnChange: {
-    from: string; // format 'YYYY-MM-DD'
-    to: string; // format 'YYYY-MM-DD'
+    modifiedOnRound: number[];
     returnChange: number; // example: 11.5 is 11.5%
   }[];
 
@@ -151,7 +154,11 @@ export type TradingSimulatorSymbol = {
    * possible to issue more shares of a specific symbol
    */
   unitsAdditionalIssued: {
-    date: string; // format 'YYYY-MM-DD'
+    /**
+     * when the units are issued
+     * range: 1 - maximumRounds
+     */
+    issuedOnRound: number;
     units: number;
   }[];
 
@@ -159,9 +166,9 @@ export type TradingSimulatorSymbol = {
    * modified historical data of a symbol (calculated when setting up the trading simulator)
    */
   historicalDataModified: {
-    date: string;
+    day: number;
     price: number;
-  };
+  }[];
 };
 
 /**
@@ -198,6 +205,12 @@ export type TradingSimulatorOrder = SymbolStoreBase & {
    * format: 'YYYY-MM-DDTHH:mm:ss' (new Date().toISOString())
    */
   closedAt: string;
+
+  /**
+   * range between: 1 - maximumRounds
+   */
+  createdOnRound: number;
+  closedOnRound: number;
 
   /** type of order */
   orderType:
