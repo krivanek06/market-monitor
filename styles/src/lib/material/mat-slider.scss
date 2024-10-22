@@ -6,3 +6,7 @@
   --mdc-slider-handle-height: 14px;
   --mdc-slider-handle-width: 14px;
 }
+
+mat-slider[disabled] {
+  pointer-events: none;
+}

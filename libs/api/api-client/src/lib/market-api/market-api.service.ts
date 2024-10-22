@@ -180,7 +180,7 @@ export class MarketApiService {
       );
   }
 
-  getNews(newsType: NewsTypes, symbol: string = ''): Observable<News[]> {
+  getNews(newsType: NewsTypes, symbol = ''): Observable<News[]> {
     return this.apiCache
       .getData<
         News[]

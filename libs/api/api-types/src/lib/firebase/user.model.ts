@@ -94,6 +94,19 @@ export type UserData = UserBase & {
    * additional private info about the user
    */
   userPrivateInfo: UserPrivateInfo;
+  /**
+   * additional feature access for the user
+   */
+  featureAccess?: {
+    /**
+     * if true, user can create groups
+     */
+    createGroups?: boolean;
+    /**
+     * if true, user can create trading simulator
+     */
+    createTradingSimulator?: boolean;
+  };
 };
 
 export type UserDataDemoData = {

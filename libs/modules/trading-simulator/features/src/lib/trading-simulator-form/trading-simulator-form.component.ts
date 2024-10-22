@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDivider } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { MarketApiService, TradingSimulatorApiService } from '@mm/api-client';
-import { TradingSimulator } from '@mm/api-types';
+import { TradingSimulatorApiService } from '@mm/api-client';
+import { TRADING_SIMULATOR_MAX_ROUNDS, TradingSimulator } from '@mm/api-types';
 import {
   intervalValidator,
   maxLengthValidator,
@@ -21,7 +21,15 @@ import {
   FormMatInputWrapperComponent,
   InputTypeDateTimePickerConfig,
   SectionTitleComponent,
+  SliderControlComponent,
+  SliderControlConfig,
 } from '@mm/shared/ui';
+import { map, startWith } from 'rxjs';
+import { TradingSimulatorFormSummaryComponent } from './trading-simulator-form-summary/trading-simulator-form-summary.component';
+import {
+  TradingSimulatorFormData,
+  TradingSimulatorFormSymbolComponent,
+} from './trading-simulator-form-symbol/trading-simulator-form-symbol.component';
 
 @Component({
   selector: 'app-trading-simulator-form',
@@ -36,10 +44,18 @@ import {
     MatDivider,
     MatButtonModule,
     MatIconModule,
+    SliderControlComponent,
+    TradingSimulatorFormSymbolComponent,
+    TradingSimulatorFormSummaryComponent,
   ],
   template: `
     <section class="mx-auto max-w-[1180px]">
-      <div class="mb-10">title</div>
+      <div class="mb-10 flex items-center justify-between">
+        <div class="text-wt-primary text-xl">Trading Simulator Form</div>
+
+        <!-- info button -->
+        <button mat-stroked-button>TODO INFO</button>
+      </div>
 
       <div class="flex gap-x-10">
         <!-- left side - form -->
@@ -49,7 +65,7 @@ import {
             title="Basic Information"
             description="Basic information about the trading simulator"
             titleSize="base"
-            class="mb-2"
+            class="mb-4"
           />
 
           <div class="grid grid-cols-2 gap-x-6 gap-y-4">
@@ -96,23 +112,20 @@ import {
             title="Issued Cash"
             description="Setup additional cash issuing for participating users"
             titleSize="base"
-            class="mb-2"
+            class="mb-4"
           >
             <mat-checkbox [formControl]="form.controls.cashIssuedEnabled" color="primary">Issue Cash</mat-checkbox>
           </app-section-title>
 
           <!-- issued cash form -->
           <div class="mb-4 grid gap-y-2">
-            @for (control of form.controls.cashIssued.controls; track $index; let i = $index) {
-              <div class="flex gap-4" [formGroup]="control">
-                @let usedControl = form.controls.cashIssued.controls[i].controls;
+            @for (formGroup of form.controls.cashIssued.controls; track $index; let i = $index) {
+              <div class="flex gap-4" [formGroup]="formGroup">
                 <!-- date issue -->
-                <app-date-picker
+                <app-slider-control
                   class="flex-1"
-                  type="date"
-                  [inputTypeDateTimePickerConfig]="startTimeConfig"
-                  [formControl]="usedControl.date"
-                  [hasError]="usedControl.date.touched && usedControl.date.invalid"
+                  [config]="sliderControlConfig()"
+                  [formControl]="formGroup.controls.issuedOnRound"
                 />
 
                 <!-- cash issued -->
@@ -120,7 +133,7 @@ import {
                   class="flex-1"
                   inputCaption="Issue cash"
                   inputType="NUMBER"
-                  [formControl]="usedControl.value"
+                  [formControl]="formGroup.controls.value"
                 />
 
                 <!-- delete -->
@@ -159,7 +172,7 @@ import {
             title="Margin trading"
             description="Setup margin trading for this simulator"
             titleSize="base"
-            class="mb-2"
+            class="mb-4"
           >
             <mat-checkbox [formControl]="form.controls.marginTradingEnabled" color="primary">
               Margin Trading
@@ -193,8 +206,10 @@ import {
 
         <!-- right side - explanation -->
         <div class="basis-1/4">
-          TODO
+          <!-- summary -->
+          <app-trading-simulator-form-summary />
 
+          <!-- submit button -->
           <button type="button" mat-flat-button color="primary" (click)="onSubmit()">Submit</button>
         </div>
       </div>
@@ -204,15 +219,33 @@ import {
         <mat-divider />
       </div>
 
-      <!-- margin trading -->
+      <!-- symbol select -->
       <app-section-title
         title="Select Symbols"
         description="Select what symbols are available in the trading simulator"
         titleSize="base"
-        class="mb-2"
+        class="mb-4"
       />
 
-      TODO - have prepared 4-5 symbols with changed data
+      <!-- symbols form -->
+      <div class="mb-10 grid gap-6">
+        @for (control of form.controls.symbolsHistoricalData.controls; track $index; let i = $index) {
+          <app-trading-simulator-form-symbol
+            [formControl]="control"
+            [maximumRounds]="form.controls.maximumRounds.value"
+            (removeSymbol)="onRemoveSymbol(i)"
+          />
+          <mat-divider />
+        }
+      </div>
+
+      <!-- symbols form add button -->
+      <div class="flex justify-end">
+        <button mat-stroked-button color="primary" (click)="onAddSymbol()">
+          <mat-icon>add</mat-icon>
+          add symbol
+        </button>
+      </div>
     </section>
   `,
   styles: `
@@ -223,9 +256,11 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingSimulatorFormComponent {
-  private readonly marketApiService = inject(MarketApiService);
   private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
+
+  // todo - calculate end date and set max date for the end date in calendars
+  // todo - add market crash settings
 
   /**
    * provide an existing trading simulator to edit it
@@ -242,7 +277,7 @@ export class TradingSimulatorFormComponent {
     // how many rounds to play
     maximumRounds: new FormControl(100, {
       nonNullable: true,
-      validators: [requiredValidator, positiveNumberValidator],
+      validators: [requiredValidator, positiveNumberValidator, intervalValidator(1, TRADING_SIMULATOR_MAX_ROUNDS)],
     }),
     // how much time to (in seconds) to wait between rounds
     roundIntervalSeconds: new FormControl(30, {
@@ -264,7 +299,7 @@ export class TradingSimulatorFormComponent {
         /** how much cash to issue */
         value: FormControl<number>;
         /** on which date to issue cash value */
-        date: FormControl<string | null>;
+        issuedOnRound: FormControl<number>;
       }>
     >([]),
 
@@ -295,26 +330,7 @@ export class TradingSimulatorFormComponent {
     >([]),
 
     // symbols
-    symbols: new FormArray<
-      FormGroup<{
-        symbol: FormControl<string>;
-        /** original historical data pulled from the internet */
-        historicalData: FormControl<{ date: string; price: number }[]>;
-        /** modified historical displayed in charts */
-        historicalDataModified: FormControl<{ date: string; price: number }[]>;
-        unitsAvailableOnStart: FormControl<number>;
-        unitsInfinity: FormControl<boolean>;
-        /** possible to issue more shares of a specific symbol */
-        unitsAdditionalIssued: FormControl<
-          {
-            date: string;
-            value: number;
-          }[]
-        >;
-        /** possible to multiply every historical value by N times */
-        priceMultiplication: FormControl<number>;
-      }>
-    >([]),
+    symbolsHistoricalData: new FormArray<FormControl<TradingSimulatorFormData>>([]),
   });
 
   /** prevent selecting dates in the past */
@@ -322,14 +338,25 @@ export class TradingSimulatorFormComponent {
     minDate: getCurrentDateDefaultFormat(),
   };
 
+  readonly sliderControlConfig = toSignal(
+    this.form.controls.maximumRounds.valueChanges.pipe(
+      startWith(this.form.controls.maximumRounds.value),
+      map(
+        (maxRounds) =>
+          ({
+            min: 1,
+            max: maxRounds,
+            step: 1,
+          }) satisfies SliderControlConfig,
+      ),
+    ),
+    { requireSync: true },
+  );
+
   constructor() {
-    this.form.controls.name.statusChanges.subscribe(console.log);
     this.form.valueChanges.subscribe((res) => {
       console.log('create ', res);
     });
-
-    // this.form.controls.name.disable();
-    // this.form.controls.startTime.disable();
 
     // listen on margin trading enabled sate
     this.form.controls.marginTradingEnabled.valueChanges.pipe(takeUntilDestroyed()).subscribe((enabled) => {
@@ -360,44 +387,22 @@ export class TradingSimulatorFormComponent {
     // todo - create a new trading simulator
   }
 
-  async onAddSymbol(): Promise<void> {
-    // get historical prices for a symbol
-    const historicalPrices = await this.generateHistoricalPrices();
+  onAddSymbol(): void {
+    // create form group for symbol
+    const symbolForm: TradingSimulatorFormData = {
+      symbol: '',
+      historicalData: [],
+    };
 
-    // todo - get random symbol
-
-    // create form group for a symbol
-    const formSymbolGroup = new FormGroup({
-      symbol: new FormControl('', { validators: [requiredValidator, maxLengthValidator(10)], nonNullable: true }),
-      unitsAvailableOnStart: new FormControl(1_000, {
-        validators: [requiredValidator, positiveNumberValidator],
-        nonNullable: true,
-      }),
-      unitsInfinity: new FormControl(false, { validators: [requiredValidator], nonNullable: true }),
-      historicalData: new FormControl(historicalPrices, { validators: [requiredValidator], nonNullable: true }),
-      historicalDataModified: new FormControl(historicalPrices, { validators: [requiredValidator], nonNullable: true }),
-      priceMultiplication: new FormControl(1, {
-        validators: [requiredValidator, positiveNumberValidator],
-        nonNullable: true,
-      }),
-      unitsAdditionalIssued: new FormControl<
-        {
-          date: string;
-          value: number;
-        }[]
-      >([], { nonNullable: true }),
-    });
+    // create control
+    const control = new FormControl(symbolForm, { nonNullable: true });
 
     // add the form group to the form array
-    this.form.controls.symbols.push(formSymbolGroup);
-  }
-
-  onGenerateNewDataForSymbol(symbol: string, index: number): void {
-    // todo
+    this.form.controls.symbolsHistoricalData.push(control);
   }
 
   onRemoveSymbol(index: number): void {
-    this.form.controls.symbols.removeAt(index);
+    this.form.controls.symbolsHistoricalData.removeAt(index);
   }
 
   onAddIssuedCash(): void {
@@ -407,7 +412,10 @@ export class TradingSimulatorFormComponent {
         validators: [requiredValidator, positiveNumberValidator, intervalValidator(0, 100_000)],
         nonNullable: true,
       }),
-      date: new FormControl<string | null>(null, { validators: [requiredValidator], nonNullable: true }),
+      issuedOnRound: new FormControl<number>(1, {
+        validators: [requiredValidator, positiveNumberValidator],
+        nonNullable: true,
+      }),
     });
 
     // add the form group to the form array
@@ -415,26 +423,8 @@ export class TradingSimulatorFormComponent {
   }
 
   onRemoveIssuedCash(index: number): void {
-    // // remove validation for the form group
-    // this.form.controls.cashIssued.controls[index].controls.value.clearValidators();
-    // this.form.controls.cashIssued.controls[index].controls.date.clearValidators();
-
-    // // update the form group validation
-    // this.form.controls.cashIssued.controls[index].updateValueAndValidity();
-
     // remove the form group from the form array
     this.form.controls.cashIssued.removeAt(index);
-  }
-
-  /**
-   *
-   * @returns historical prices for a symbol
-   */
-  private async generateHistoricalPrices(): Promise<{ date: string; price: number }[]> {
-    // todo: implement this
-    // todo - probably I should pull some historical prices so that students can analyze the chart
-    // todo - and not just random data
-    return [];
   }
 
   private changeFormCashIssuedValidation(enabled: boolean): void {
@@ -442,13 +432,13 @@ export class TradingSimulatorFormComponent {
       this.form.controls.cashIssued.enable();
       this.form.controls.cashIssued.controls.forEach((control) => {
         control.controls.value.enable();
-        control.controls.date.enable();
+        control.controls.issuedOnRound.enable();
       });
     } else {
       this.form.controls.cashIssued.disable();
       this.form.controls.cashIssued.controls.forEach((control) => {
         control.controls.value.disable();
-        control.controls.date.disable();
+        control.controls.issuedOnRound.disable();
       });
     }
 

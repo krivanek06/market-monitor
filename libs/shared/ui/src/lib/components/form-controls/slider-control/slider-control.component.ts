@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, effect, forwardRef, input, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, forwardRef, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
+import { debounceTime } from 'rxjs';
 
 export type SliderControlConfig = {
   min: number;
@@ -25,8 +26,9 @@ export type SliderControlConfig = {
       [step]="config().step ?? 1"
       [displayWith]="config().displayWith ?? defaultFormatLabel"
       [formControl]="sliderControl"
+      [disabled]="isDisabled()"
     >
-      <input matSliderThumb />
+      <input matSliderThumb [readOnly]="isDisabled()" />
     </mat-slider>
   `,
   styles: `
@@ -51,6 +53,8 @@ export class SliderControlComponent implements ControlValueAccessor {
   readonly sliderControl = new FormControl<number>(1, { nonNullable: true });
   readonly config = input.required<SliderControlConfig>();
 
+  readonly isDisabled = signal(false);
+
   constructor() {
     effect(() => {
       const config = this.config();
@@ -62,7 +66,7 @@ export class SliderControlComponent implements ControlValueAccessor {
     });
 
     // listen on change
-    this.sliderControl.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
+    this.sliderControl.valueChanges.pipe(debounceTime(300), takeUntilDestroyed()).subscribe((value) => {
       this.onChange(Number(value));
       this.onTouched();
     });
@@ -98,5 +102,17 @@ export class SliderControlComponent implements ControlValueAccessor {
    */
   registerOnTouched(fn: SliderControlComponent['onTouched']): void {
     this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled.set(isDisabled);
+
+    if (isDisabled) {
+      this.sliderControl.disable();
+    } else {
+      this.sliderControl.enable();
+    }
+
+    this.sliderControl.updateValueAndValidity({ emitEvent: false });
   }
 }
