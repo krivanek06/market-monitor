@@ -87,7 +87,6 @@ export const STOCK_SYMBOLS = [
   'S',
   'NFLX',
   'EA',
-  'SNE',
   'AMD',
   'MU',
   'QCOM',

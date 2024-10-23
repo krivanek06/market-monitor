@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [MatIconModule, NgClass],
   template: `
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between gap-x-10">
       <!-- left side -->
       <div class="flex-1">
         <h2

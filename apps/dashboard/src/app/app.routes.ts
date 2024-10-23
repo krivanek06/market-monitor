@@ -103,7 +103,7 @@ export const appRoutes: Route[] = [
             loadChildren: () => [
               {
                 path: '',
-                loadComponent: () => import('@mm/page-builder').then((m) => m.PageGroupsComponent),
+                loadComponent: () => import('./groups/groups.component').then((m) => m.groupsComponent),
               },
               {
                 path: ':id',

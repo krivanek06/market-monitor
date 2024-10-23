@@ -410,7 +410,6 @@ export class CreateDemoAccountService {
       'TMUS',
       'NFLX',
       'EA',
-      'SNE',
       'AMD',
       'MU',
       'QCOM',

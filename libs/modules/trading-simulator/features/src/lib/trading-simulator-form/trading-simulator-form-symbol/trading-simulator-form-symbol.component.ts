@@ -72,10 +72,12 @@ export type TradingSimulatorFormData = { symbol: string; historicalData: { day: 
         </button>
 
         <!-- buttons to remove symbol -->
-        <button type="button" mat-stroked-button color="warn" (click)="onRemoveSymbol()">
-          <mat-icon>delete</mat-icon>
-          Remove
-        </button>
+        @if (!disabledRemove()) {
+          <button type="button" mat-stroked-button color="warn" (click)="onRemoveSymbol()">
+            <mat-icon>delete</mat-icon>
+            Remove
+          </button>
+        }
       </div>
     </div>
 
@@ -171,6 +173,17 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
 
   readonly maximumRounds = input<number>(100);
 
+  /** whether to display remove button */
+  readonly disabledRemove = input<boolean>(false);
+
+  readonly marketChange = input<
+    {
+      startingRound?: number;
+      endingRound?: number;
+      valueChange?: number;
+    }[]
+  >([]);
+
   /** generate array of round points: [1,2,3, ...] */
   readonly roundPoints = computed(() => Array.from({ length: this.maximumRounds() }, (_, i) => String(i + 1)));
   readonly sliderControlConfig = computed(
@@ -181,8 +194,6 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
         step: 1,
       }) satisfies SliderControlConfig,
   );
-
-  // todo - apply market crash from above
 
   readonly form = new FormGroup({
     symbol: new FormControl<string>('', { nonNullable: true }),
@@ -209,14 +220,33 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   readonly formDataChartSeries = computed(() => {
     const data = this.formData();
     const maxRounds = this.maximumRounds();
+    const marketChange = this.marketChange();
+
     const multiply = data.priceMultiplication ?? 1;
+
+    // multiply the historical data by the price multiplication
+    const multipliedData = Array.from(
+      { length: maxRounds },
+      (_, i) => (data.historicalData?.at(i)?.price ?? 0) * multiply,
+    );
+
+    // apply market change
+    const multipliedDataWithMarketChange = marketChange.reduce((acc, { startingRound, endingRound, valueChange }) => {
+      if (startingRound && endingRound && valueChange) {
+        for (let i = startingRound - 1; i < endingRound; i++) {
+          acc[i] *= (100 + valueChange) / 100;
+        }
+      }
+
+      return acc;
+    }, multipliedData);
 
     // price data
     const modifiedPriceData: GenericChartSeries<'line'> = {
       type: 'line',
       name: `${data.symbol} price`,
       yAxis: 0,
-      data: Array.from({ length: maxRounds }, (_, i) => (data.historicalData?.at(i)?.price ?? 0) * multiply),
+      data: multipliedDataWithMarketChange,
     };
 
     // issued units

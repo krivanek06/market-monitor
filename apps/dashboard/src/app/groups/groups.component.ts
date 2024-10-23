@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { PageGroupsComponent } from '@mm/page-builder';
 
 @Component({
-  selector: 'app-trading-simulator-form-summary',
+  selector: 'app-groups',
   standalone: true,
-  imports: [],
-  template: `<p>trading-simulator-form-summary works!</p>`,
+  imports: [PageGroupsComponent],
+  template: ` <app-page-groups /> `,
   styles: `
     :host {
       display: block;
@@ -12,6 +13,4 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TradingSimulatorFormSummaryComponent {
-  // todo - implement it
-}
+export class groupsComponent {}

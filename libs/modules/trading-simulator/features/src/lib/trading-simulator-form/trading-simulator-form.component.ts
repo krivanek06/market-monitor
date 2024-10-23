@@ -31,7 +31,6 @@ import {
 } from '@mm/shared/ui';
 import { addSeconds } from 'date-fns';
 import { map, startWith } from 'rxjs';
-import { TradingSimulatorFormSummaryComponent } from './trading-simulator-form-summary/trading-simulator-form-summary.component';
 import {
   TradingSimulatorFormData,
   TradingSimulatorFormSymbolComponent,
@@ -57,291 +56,354 @@ import {
     DateReadablePipe,
     TruncatePipe,
     TradingSimulatorFormSymbolComponent,
-    TradingSimulatorFormSummaryComponent,
   ],
   template: `
-    <section class="mx-auto max-w-[1180px]">
-      <div class="mb-10 flex items-center justify-between">
-        <div class="text-wt-primary text-xl">Trading Simulator Form</div>
+    <div class="grid grid-cols-3 gap-x-10">
+      <!-- left side - form -->
+      <form class="col-span-2 grid" [formGroup]="form">
+        <!-- basic information -->
+        <app-section-title
+          title="Basic Information"
+          description="Basic information about the trading simulator"
+          titleSize="base"
+          class="mb-4"
+        >
+          <button mat-stroked-button>TODO INFO</button>
+        </app-section-title>
 
-        <!-- info button -->
-        <button mat-stroked-button>TODO INFO</button>
-      </div>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-2">
+          <!-- name -->
+          <app-form-mat-input-wrapper inputCaption="name" [formControl]="form.controls.name" />
 
-      <div class="grid grid-cols-3 gap-x-10">
-        <!-- left side - form -->
-        <form class="col-span-2 grid gap-y-2" [formGroup]="form">
-          <!-- basic information -->
-          <app-section-title
-            title="Basic Information"
-            description="Basic information about the trading simulator"
-            titleSize="base"
-            class="mb-4"
-          >
-            <!-- submit button -->
-            <button type="button" mat-flat-button color="primary" (click)="onSubmit()">Submit</button>
-          </app-section-title>
-
-          <div class="grid grid-cols-2 gap-x-6 gap-y-4">
-            <!-- name -->
-            <app-form-mat-input-wrapper inputCaption="name" [formControl]="form.controls.name" />
-
-            <!-- start time -->
-            <app-date-picker
-              [inputTypeDateTimePickerConfig]="startTimeConfig"
-              [formControl]="form.controls.startTime"
-              type="datetime"
-              [hasError]="form.controls.startTime.touched && form.controls.startTime.invalid"
-            />
-
-            <!-- maximum round -->
-            <app-form-mat-input-wrapper
-              inputCaption="maximum rounds"
-              inputType="NUMBER"
-              [formControl]="form.controls.maximumRounds"
-            />
-
-            <!-- round interval -->
-            <app-form-mat-input-wrapper
-              inputCaption="round interval"
-              hintText="How long in seconds one round takes"
-              inputType="NUMBER"
-              [formControl]="form.controls.roundIntervalSeconds"
-            />
-
-            <!-- invitation code -->
-            <app-form-mat-input-wrapper inputCaption="invitation code" [formControl]="form.controls.invitationCode" />
-
-            <!-- starting cash -->
-            <app-form-mat-input-wrapper inputCaption="starting cash" [formControl]="form.controls.startingCash" />
-          </div>
-
-          <!-- divider -->
-          <div class="my-3">
-            <mat-divider />
-          </div>
-
-          <!-- issued cash -->
-          <app-section-title
-            title="Issued Cash"
-            description="Setup additional cash issuing for participating users"
-            titleSize="base"
-            class="mb-4"
-          >
-            <mat-checkbox [formControl]="form.controls.cashIssuedEnabled" color="primary">Issue Cash</mat-checkbox>
-          </app-section-title>
-
-          <!-- issued cash form -->
-          <div class="mb-4 grid gap-y-2">
-            @for (formGroup of form.controls.cashIssued.controls; track $index; let i = $index) {
-              <div class="flex gap-4" [formGroup]="formGroup">
-                <!-- date issue -->
-                <app-slider-control
-                  class="flex-1"
-                  [config]="sliderControlConfig()"
-                  [formControl]="formGroup.controls.issuedOnRound"
-                />
-
-                <!-- cash issued -->
-                <app-form-mat-input-wrapper
-                  class="flex-1"
-                  inputCaption="Issue cash"
-                  inputType="NUMBER"
-                  [formControl]="formGroup.controls.value"
-                />
-
-                <!-- delete -->
-                <button
-                  mat-icon-button
-                  (click)="onRemoveIssuedCash(i)"
-                  color="warn"
-                  [disabled]="!form.controls.cashIssuedEnabled.value"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            }
-          </div>
-
-          <!-- add issued cash -->
-          <div class="flex justify-end">
-            <button
-              mat-stroked-button
-              color="primary"
-              (click)="onAddIssuedCash()"
-              [disabled]="!form.controls.cashIssuedEnabled.value"
-            >
-              <mat-icon>add</mat-icon>
-              add cash
-            </button>
-          </div>
-
-          <!-- divider -->
-          <div class="my-3">
-            <mat-divider />
-          </div>
-
-          <!-- margin trading -->
-          <app-section-title
-            title="Margin trading"
-            description="Setup margin trading for this simulator"
-            titleSize="base"
-            class="mb-4"
-          >
-            <mat-checkbox [formControl]="form.controls.marginTradingEnabled" color="primary">
-              Margin Trading
-            </mat-checkbox>
-          </app-section-title>
-
-          <!-- margin trading form -->
-          <div class="flex gap-4 *:flex-1">
-            <!-- subtract period days -->
-            <app-form-mat-input-wrapper
-              inputCaption="Subtract period days"
-              inputType="NUMBER"
-              [formControl]="form.controls.marginTrading.controls.subtractPeriodDays"
-            />
-
-            <!-- subtract interest rate -->
-            <app-form-mat-input-wrapper
-              inputCaption="Subtract interest rate"
-              inputType="NUMBER"
-              [formControl]="form.controls.marginTrading.controls.subtractInterestRate"
-            />
-
-            <!-- margin conversion rate -->
-            <app-form-mat-input-wrapper
-              inputCaption="Margin conversion rate"
-              inputType="NUMBER"
-              [formControl]="form.controls.marginTrading.controls.marginConversionRate"
-            />
-          </div>
-        </form>
-
-        <!-- right side - explanation -->
-        <div class="flex min-h-[750px] flex-col gap-3 pt-4">
-          <!-- basic information -->
-          <app-general-card title="Basic Information">
-            <div class="g-item-wrapper">
-              <span>Name</span>
-              <span>{{ formData().name | truncate: 25 }}</span>
-            </div>
-
-            <div class="g-item-wrapper">
-              <span>Start Date</span>
-              <span>{{ formData().startTime | date: 'HH:mm, dd. MMMM' }}</span>
-            </div>
-
-            <div class="g-item-wrapper">
-              <span>End Date</span>
-              <span>{{ formData().endTime | date: 'HH:mm, dd. MMMM' }}</span>
-            </div>
-
-            <div class="g-item-wrapper">
-              <span>Total time</span>
-              <span>{{ formData().totalTimeSeconds | dateReadable: 'seconds' }}</span>
-            </div>
-
-            <div class="g-item-wrapper">
-              <span>Maximum rounds</span>
-              <span>{{ formData().maximumRounds }}</span>
-            </div>
-
-            <div class="g-item-wrapper">
-              <span>Round interval (sec)</span>
-              <span>{{ formData().roundIntervalSeconds }}</span>
-            </div>
-
-            <div class="g-item-wrapper">
-              <span>Invitation code</span>
-              <span>{{ formData().invitationCode }}</span>
-            </div>
-
-            <div class="g-item-wrapper">
-              <span>Starting cash</span>
-              <span>{{ formData().startingCash | largeNumberFormatter: false : true }}</span>
-            </div>
-          </app-general-card>
-
-          <!-- issued cash -->
-          <app-general-card title="Issued Cash">
-            <div class="grid grid-cols-2 gap-y-2">
-              <div class="text-wt-gray-dark">Selected day</div>
-              <div class="text-wt-gray-dark">Issued value</div>
-              @if (formData().cashIssuedEnabled) {
-                @for (item of formData().cashIssued; track $index) {
-                  <div>{{ item.issuedOnRound }}</div>
-                  <div>{{ item.value }}</div>
-                } @empty {
-                  <div class="col-span-2 p-2 text-center">No issued cash</div>
-                }
-              } @else {
-                <div class="col-span-2 p-2 text-center">Cash issuing disabled</div>
-              }
-            </div>
-          </app-general-card>
-
-          <!-- margin trading -->
-          <app-general-card title="Basic Information">
-            @if (formData().marginTradingEnabled) {
-              <div class="g-item-wrapper">
-                <span>Subtract period</span>
-                <span>{{ formData().marginTrading?.subtractPeriodDays }}</span>
-              </div>
-
-              <div class="g-item-wrapper">
-                <span>Interest rate</span>
-                <span>{{ formData().marginTrading?.subtractInterestRate }}</span>
-              </div>
-
-              <div class="g-item-wrapper">
-                <span>Margin Rate</span>
-                <span>{{ formData().marginTrading?.marginConversionRate }}:1</span>
-              </div>
-            } @else {
-              <div class="p-2 text-center">Margin trading disabled</div>
-            }
-          </app-general-card>
-        </div>
-      </div>
-
-      <!-- divider -->
-      <div class="my-6">
-        <mat-divider />
-      </div>
-
-      <!-- symbol select -->
-      <app-section-title
-        title="Select Symbols"
-        description="Select what symbols are available in the trading simulator"
-        titleSize="base"
-        class="mb-4"
-      />
-
-      <!-- symbols form -->
-      <div class="mb-10 grid gap-6">
-        @for (control of form.controls.symbolsHistoricalData.controls; track $index; let i = $index) {
-          <app-trading-simulator-form-symbol
-            [formControl]="control"
-            [maximumRounds]="form.controls.maximumRounds.value"
-            (removeSymbol)="onRemoveSymbol(i)"
+          <!-- start time -->
+          <app-date-picker
+            [inputTypeDateTimePickerConfig]="startTimeConfig"
+            [formControl]="form.controls.startTime"
+            type="datetime"
+            [hasError]="form.controls.startTime.touched && form.controls.startTime.invalid"
           />
-          <mat-divider />
-        }
-      </div>
 
-      <!-- symbols form add button -->
-      <div class="flex justify-end">
-        <button mat-stroked-button color="primary" (click)="onAddSymbol()">
-          <mat-icon>add</mat-icon>
-          add symbol
-        </button>
+          <!-- maximum round -->
+          <app-form-mat-input-wrapper
+            inputCaption="maximum rounds"
+            inputType="NUMBER"
+            [formControl]="form.controls.maximumRounds"
+          />
+
+          <!-- round interval -->
+          <app-form-mat-input-wrapper
+            inputCaption="round interval"
+            hintText="How long in seconds one round takes"
+            inputType="NUMBER"
+            [formControl]="form.controls.roundIntervalSeconds"
+          />
+
+          <!-- invitation code -->
+          <app-form-mat-input-wrapper inputCaption="invitation code" [formControl]="form.controls.invitationCode" />
+
+          <!-- starting cash -->
+          <app-form-mat-input-wrapper inputCaption="starting cash" [formControl]="form.controls.startingCash" />
+        </div>
+
+        <!-- divider -->
+        <div class="my-3">
+          <mat-divider />
+        </div>
+
+        <!-- margin trading -->
+        <app-section-title
+          title="Margin trading"
+          description="Setup margin trading for this simulator"
+          titleSize="base"
+          class="mb-4"
+        >
+          <mat-checkbox [formControl]="form.controls.marginTradingEnabled" color="primary">
+            Margin Trading
+          </mat-checkbox>
+        </app-section-title>
+
+        <!-- margin trading form -->
+        <div class="flex gap-4 *:flex-1">
+          <!-- subtract period days -->
+          <app-form-mat-input-wrapper
+            inputCaption="Subtract period days"
+            inputType="NUMBER"
+            [formControl]="form.controls.marginTrading.controls.subtractPeriodDays"
+          />
+
+          <!-- subtract interest rate -->
+          <app-form-mat-input-wrapper
+            inputCaption="Subtract interest rate"
+            inputType="NUMBER"
+            [formControl]="form.controls.marginTrading.controls.subtractInterestRate"
+          />
+
+          <!-- margin conversion rate -->
+          <app-form-mat-input-wrapper
+            inputCaption="Margin conversion rate"
+            inputType="NUMBER"
+            [formControl]="form.controls.marginTrading.controls.marginConversionRate"
+          />
+        </div>
+
+        <!-- divider -->
+        <div class="my-3">
+          <mat-divider />
+        </div>
+
+        <!-- issued cash -->
+        <app-section-title
+          title="Issued Cash"
+          description="Setup additional cash issuing for participating users"
+          titleSize="base"
+          class="mb-4"
+        >
+          <mat-checkbox [formControl]="form.controls.cashIssuedEnabled" color="primary">Issue Cash</mat-checkbox>
+        </app-section-title>
+
+        <!-- issued cash form -->
+        <div class="mb-4 grid">
+          @for (formGroup of form.controls.cashIssued.controls; track $index; let i = $index) {
+            <div class="flex gap-4" [formGroup]="formGroup">
+              <!-- date issue -->
+              <app-slider-control
+                class="flex-1"
+                [config]="sliderControlConfig()"
+                [formControl]="formGroup.controls.issuedOnRound"
+              />
+
+              <!-- cash issued -->
+              <app-form-mat-input-wrapper
+                class="flex-1"
+                inputCaption="Issue cash"
+                inputType="NUMBER"
+                [formControl]="formGroup.controls.value"
+              />
+
+              <!-- delete -->
+              <button
+                mat-icon-button
+                (click)="onRemoveIssuedCash(i)"
+                color="warn"
+                [disabled]="!form.controls.cashIssuedEnabled.value"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- add issued cash -->
+        <div class="flex justify-end">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="onAddIssuedCash()"
+            [disabled]="!form.controls.cashIssuedEnabled.value"
+          >
+            <mat-icon>add</mat-icon>
+            add cash
+          </button>
+        </div>
+
+        <!-- divider -->
+        <div class="my-5">
+          <mat-divider />
+        </div>
+
+        <!-- market change -->
+        <app-section-title
+          title="Market change"
+          description="Setup market change that will influence the price of each symbol"
+          titleSize="base"
+          class="mb-4"
+        >
+          <mat-checkbox [formControl]="form.controls.marketChangeEnabled" color="primary">Market Change</mat-checkbox>
+        </app-section-title>
+
+        <!-- issued cash form -->
+        <div class="mb-4 grid">
+          @for (formGroup of form.controls.marketChange.controls; track $index; let i = $index) {
+            <div class="flex gap-4" [formGroup]="formGroup">
+              <!-- starting round -->
+              <app-slider-control
+                class="flex-1"
+                [config]="sliderControlConfig()"
+                [formControl]="formGroup.controls.startingRound"
+              />
+
+              <!-- ending round -->
+              <app-slider-control
+                class="flex-1"
+                [config]="sliderControlConfig()"
+                [formControl]="formGroup.controls.endingRound"
+              />
+
+              <!-- value change -->
+              <app-form-mat-input-wrapper
+                class="flex-1"
+                inputCaption="Value change"
+                inputType="NUMBER"
+                [formControl]="formGroup.controls.valueChange"
+              />
+
+              <!-- delete -->
+              <button
+                mat-icon-button
+                (click)="onRemoveMarketChange(i)"
+                color="warn"
+                [disabled]="!form.controls.marketChangeEnabled.value"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- add market change -->
+        <div class="flex justify-end">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="onAddMarketChange()"
+            [disabled]="!form.controls.marketChangeEnabled.value"
+          >
+            <mat-icon>add</mat-icon>
+            add market change
+          </button>
+        </div>
+      </form>
+
+      <!-- right side - explanation -->
+      <div class="flex flex-col gap-3 pt-4">
+        <!-- basic information -->
+        <app-general-card title="Basic Information">
+          <div class="g-item-wrapper">
+            <span>Name</span>
+            <span>{{ formData().name | truncate: 25 }}</span>
+          </div>
+
+          <div class="g-item-wrapper">
+            <span>Start Date</span>
+            <span>{{ formData().startTime | date: 'HH:mm, dd. MMMM' }}</span>
+          </div>
+
+          <div class="g-item-wrapper">
+            <span>End Date</span>
+            <span>{{ formData().endTime | date: 'HH:mm, dd. MMMM' }}</span>
+          </div>
+
+          <div class="g-item-wrapper">
+            <span>Total time</span>
+            <span>{{ formData().totalTimeSeconds | dateReadable: 'seconds' }}</span>
+          </div>
+
+          <div class="g-item-wrapper">
+            <span>Maximum rounds</span>
+            <span>{{ formData().maximumRounds }}</span>
+          </div>
+
+          <div class="g-item-wrapper">
+            <span>Round interval (sec)</span>
+            <span>{{ formData().roundIntervalSeconds }}</span>
+          </div>
+
+          <div class="g-item-wrapper">
+            <span>Invitation code</span>
+            <span>{{ formData().invitationCode }}</span>
+          </div>
+
+          <div class="g-item-wrapper">
+            <span>Starting cash</span>
+            <span>{{ formData().startingCash | largeNumberFormatter: false : true }}</span>
+          </div>
+        </app-general-card>
+
+        <!-- margin trading -->
+        <app-general-card title="Basic Information">
+          @if (formData().marginTradingEnabled) {
+            <div class="g-item-wrapper">
+              <span>Subtract period</span>
+              <span>{{ formData().marginTrading?.subtractPeriodDays }}</span>
+            </div>
+
+            <div class="g-item-wrapper">
+              <span>Interest rate</span>
+              <span>{{ formData().marginTrading?.subtractInterestRate }}</span>
+            </div>
+
+            <div class="g-item-wrapper">
+              <span>Margin Rate</span>
+              <span>{{ formData().marginTrading?.marginConversionRate }}:1</span>
+            </div>
+          } @else {
+            <div class="p-2 text-center">Margin trading disabled</div>
+          }
+        </app-general-card>
+
+        <!-- issued cash -->
+        <app-general-card title="Issued Cash">
+          <div class="grid grid-cols-2 gap-y-2">
+            <div class="text-wt-gray-dark">Selected day</div>
+            <div class="text-wt-gray-dark">Issued value</div>
+            @if (formData().cashIssuedEnabled) {
+              @for (item of formData().cashIssued; track $index) {
+                <div>{{ item.issuedOnRound }}</div>
+                <div>{{ item.value }}</div>
+              } @empty {
+                <div class="col-span-2 p-2 text-center">No issued cash</div>
+              }
+            } @else {
+              <div class="col-span-2 p-2 text-center">Cash issuing disabled</div>
+            }
+          </div>
+        </app-general-card>
+
+        <!-- submit button -->
+        <button type="button" mat-flat-button color="primary" (click)="onSubmit()" class="w-full">Submit</button>
       </div>
-    </section>
+    </div>
+
+    <!-- divider -->
+    <div class="my-6">
+      <mat-divider />
+    </div>
+
+    <!-- symbol select -->
+    <app-section-title
+      title="Select Symbols"
+      description="Select what symbols are available in the trading simulator"
+      titleSize="base"
+      class="mb-4"
+    />
+
+    <!-- symbols form -->
+    <div class="mb-10 grid gap-6">
+      @for (control of form.controls.symbolsHistoricalData.controls; track control.value.symbol; let i = $index) {
+        <app-trading-simulator-form-symbol
+          [formControl]="control"
+          [maximumRounds]="form.controls.maximumRounds.value"
+          [marketChange]="form.controls.marketChange.value"
+          (removeSymbol)="onRemoveSymbol(i)"
+          [disabledRemove]="form.controls.symbolsHistoricalData.controls.length <= 5"
+        />
+        <mat-divider />
+      }
+    </div>
+
+    <!-- symbols form add button -->
+    <div class="flex justify-end">
+      <button mat-stroked-button color="primary" (click)="onAddSymbol()">
+        <mat-icon>add</mat-icon>
+        add symbol
+      </button>
+    </div>
   `,
   styles: `
     :host {
       display: block;
+      max-width: 1180px;
+      margin: 0 auto;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -350,7 +412,6 @@ export class TradingSimulatorFormComponent {
   private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
 
-  // todo - add market crash settings
   // todo - add more hints to fields
 
   /**
@@ -394,6 +455,19 @@ export class TradingSimulatorFormComponent {
       }>
     >([]),
 
+    // market change - crash or positive value
+    marketChangeEnabled: new FormControl<boolean>(true, { nonNullable: true }),
+    marketChange: new FormArray<
+      FormGroup<{
+        /** on which round to influence prices */
+        startingRound: FormControl<number>;
+        /** on which round to stop influencing prices */
+        endingRound: FormControl<number>;
+        /** how much in % to influence market */
+        valueChange: FormControl<number>;
+      }>
+    >([]),
+
     // margin trading
     marginTradingEnabled: new FormControl<boolean>(true, { nonNullable: true }),
     marginTrading: new FormGroup({
@@ -420,10 +494,17 @@ export class TradingSimulatorFormComponent {
       }>
     >([]),
 
-    // symbols
-    symbolsHistoricalData: new FormArray<FormControl<TradingSimulatorFormData>>([]),
+    // symbols - start with some default symbols
+    symbolsHistoricalData: new FormArray<FormControl<TradingSimulatorFormData>>([
+      new FormControl({ symbol: '', historicalData: [] }, { nonNullable: true }),
+      new FormControl({ symbol: '', historicalData: [] }, { nonNullable: true }),
+      new FormControl({ symbol: '', historicalData: [] }, { nonNullable: true }),
+      new FormControl({ symbol: '', historicalData: [] }, { nonNullable: true }),
+      new FormControl({ symbol: '', historicalData: [] }, { nonNullable: true }),
+    ]),
   });
 
+  /** put form into signal, better for change detection */
   readonly formData = toSignal(
     this.form.valueChanges.pipe(
       startWith(this.form.value),
@@ -443,6 +524,7 @@ export class TradingSimulatorFormComponent {
     minDate: getCurrentDateDefaultFormat(),
   };
 
+  /** config into each slider, maximum value is the max rounds */
   readonly sliderControlConfig = toSignal(
     this.form.controls.maximumRounds.valueChanges.pipe(
       startWith(this.form.controls.maximumRounds.value),
@@ -471,6 +553,11 @@ export class TradingSimulatorFormComponent {
     // listen on cash issued enabled state
     this.form.controls.cashIssuedEnabled.valueChanges.pipe(takeUntilDestroyed()).subscribe((enabled) => {
       this.changeFormCashIssuedValidation(enabled);
+    });
+
+    // listen on market change enabled state
+    this.form.controls.marketChangeEnabled.valueChanges.pipe(takeUntilDestroyed()).subscribe((enabled) => {
+      this.changeFormMarketChangeValidation(enabled);
     });
   }
 
@@ -507,7 +594,34 @@ export class TradingSimulatorFormComponent {
   }
 
   onRemoveSymbol(index: number): void {
+    console.log('remove symbol', index);
     this.form.controls.symbolsHistoricalData.removeAt(index);
+  }
+
+  onAddMarketChange(): void {
+    // create control
+    const control = new FormGroup({
+      startingRound: new FormControl<number>(1, {
+        validators: [requiredValidator, positiveNumberValidator],
+        nonNullable: true,
+      }),
+      endingRound: new FormControl<number>(1, {
+        validators: [requiredValidator, positiveNumberValidator],
+        nonNullable: true,
+      }),
+      valueChange: new FormControl<number>(10, {
+        validators: [requiredValidator, intervalValidator(-100, 100)],
+        nonNullable: true,
+      }),
+    });
+
+    // add the form group to the form array
+    this.form.controls.marketChange.push(control);
+  }
+
+  onRemoveMarketChange(index: number): void {
+    // remove the form group from the form array
+    this.form.controls.marketChange.removeAt(index);
   }
 
   onAddIssuedCash(): void {
@@ -530,6 +644,32 @@ export class TradingSimulatorFormComponent {
   onRemoveIssuedCash(index: number): void {
     // remove the form group from the form array
     this.form.controls.cashIssued.removeAt(index);
+  }
+
+  private changeFormMarketChangeValidation(enabled: boolean): void {
+    if (enabled) {
+      this.form.controls.marketChange.enable();
+      this.form.controls.marketChange.controls.forEach((control) => {
+        control.controls.startingRound.enable();
+        control.controls.endingRound.enable();
+        control.controls.valueChange.enable();
+      });
+    } else {
+      this.form.controls.marketChange.disable();
+      this.form.controls.marketChange.controls.forEach((control) => {
+        // reset to default values
+        control.controls.startingRound.patchValue(1);
+        control.controls.endingRound.patchValue(1);
+        control.controls.valueChange.patchValue(10);
+        // disable the form group
+        control.controls.startingRound.disable();
+        control.controls.endingRound.disable();
+        control.controls.valueChange.disable();
+      });
+    }
+
+    // update form validation
+    this.form.controls.marketChange.updateValueAndValidity();
   }
 
   private changeFormCashIssuedValidation(enabled: boolean): void {
