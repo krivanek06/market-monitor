@@ -12,4 +12,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TradingSimulatorFormSummaryComponent {}
+export class TradingSimulatorFormSummaryComponent {
+  // todo - implement it
+}

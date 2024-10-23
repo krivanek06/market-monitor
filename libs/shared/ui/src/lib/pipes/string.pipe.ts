@@ -15,8 +15,8 @@ import { Pipe, PipeTransform } from '@angular/core';
   standalone: true,
 })
 export class SplitStringPipe implements PipeTransform {
-  transform(value: string, keys: string[], displayStringPart: number = 0): string | null {
-    let regex = new RegExp(keys.join('|'), 'g');
+  transform(value: string, keys: string[], displayStringPart = 0): string | null {
+    const regex = new RegExp(keys.join('|'), 'g');
     return value.split(regex)[displayStringPart] ?? null;
   }
 }
@@ -26,7 +26,7 @@ export class SplitStringPipe implements PipeTransform {
   standalone: true,
 })
 export class TruncatePipe implements PipeTransform {
-  transform(value: string | null, limit = 25, ellipsis = '...') {
+  transform(value: string | null | undefined, limit = 25, ellipsis = '...') {
     if (!value) {
       return '';
     }

@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -18,12 +19,17 @@ import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { generateRandomString, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
 import {
   DatePickerComponent,
+  DateReadablePipe,
   FormMatInputWrapperComponent,
+  GeneralCardComponent,
   InputTypeDateTimePickerConfig,
+  LargeNumberFormatterPipe,
   SectionTitleComponent,
   SliderControlComponent,
   SliderControlConfig,
+  TruncatePipe,
 } from '@mm/shared/ui';
+import { addSeconds } from 'date-fns';
 import { map, startWith } from 'rxjs';
 import { TradingSimulatorFormSummaryComponent } from './trading-simulator-form-summary/trading-simulator-form-summary.component';
 import {
@@ -45,6 +51,11 @@ import {
     MatButtonModule,
     MatIconModule,
     SliderControlComponent,
+    DatePipe,
+    LargeNumberFormatterPipe,
+    GeneralCardComponent,
+    DateReadablePipe,
+    TruncatePipe,
     TradingSimulatorFormSymbolComponent,
     TradingSimulatorFormSummaryComponent,
   ],
@@ -57,16 +68,19 @@ import {
         <button mat-stroked-button>TODO INFO</button>
       </div>
 
-      <div class="flex gap-x-10">
+      <div class="grid grid-cols-3 gap-x-10">
         <!-- left side - form -->
-        <form class="grid basis-3/4 gap-y-2" [formGroup]="form">
+        <form class="col-span-2 grid gap-y-2" [formGroup]="form">
           <!-- basic information -->
           <app-section-title
             title="Basic Information"
             description="Basic information about the trading simulator"
             titleSize="base"
             class="mb-4"
-          />
+          >
+            <!-- submit button -->
+            <button type="button" mat-flat-button color="primary" (click)="onSubmit()">Submit</button>
+          </app-section-title>
 
           <div class="grid grid-cols-2 gap-x-6 gap-y-4">
             <!-- name -->
@@ -205,12 +219,89 @@ import {
         </form>
 
         <!-- right side - explanation -->
-        <div class="basis-1/4">
-          <!-- summary -->
-          <app-trading-simulator-form-summary />
+        <div class="flex min-h-[750px] flex-col gap-3 pt-4">
+          <!-- basic information -->
+          <app-general-card title="Basic Information">
+            <div class="g-item-wrapper">
+              <span>Name</span>
+              <span>{{ formData().name | truncate: 25 }}</span>
+            </div>
 
-          <!-- submit button -->
-          <button type="button" mat-flat-button color="primary" (click)="onSubmit()">Submit</button>
+            <div class="g-item-wrapper">
+              <span>Start Date</span>
+              <span>{{ formData().startTime | date: 'HH:mm, dd. MMMM' }}</span>
+            </div>
+
+            <div class="g-item-wrapper">
+              <span>End Date</span>
+              <span>{{ formData().endTime | date: 'HH:mm, dd. MMMM' }}</span>
+            </div>
+
+            <div class="g-item-wrapper">
+              <span>Total time</span>
+              <span>{{ formData().totalTimeSeconds | dateReadable: 'seconds' }}</span>
+            </div>
+
+            <div class="g-item-wrapper">
+              <span>Maximum rounds</span>
+              <span>{{ formData().maximumRounds }}</span>
+            </div>
+
+            <div class="g-item-wrapper">
+              <span>Round interval (sec)</span>
+              <span>{{ formData().roundIntervalSeconds }}</span>
+            </div>
+
+            <div class="g-item-wrapper">
+              <span>Invitation code</span>
+              <span>{{ formData().invitationCode }}</span>
+            </div>
+
+            <div class="g-item-wrapper">
+              <span>Starting cash</span>
+              <span>{{ formData().startingCash | largeNumberFormatter: false : true }}</span>
+            </div>
+          </app-general-card>
+
+          <!-- issued cash -->
+          <app-general-card title="Issued Cash">
+            <div class="grid grid-cols-2 gap-y-2">
+              <div class="text-wt-gray-dark">Selected day</div>
+              <div class="text-wt-gray-dark">Issued value</div>
+              @if (formData().cashIssuedEnabled) {
+                @for (item of formData().cashIssued; track $index) {
+                  <div>{{ item.issuedOnRound }}</div>
+                  <div>{{ item.value }}</div>
+                } @empty {
+                  <div class="col-span-2 p-2 text-center">No issued cash</div>
+                }
+              } @else {
+                <div class="col-span-2 p-2 text-center">Cash issuing disabled</div>
+              }
+            </div>
+          </app-general-card>
+
+          <!-- margin trading -->
+          <app-general-card title="Basic Information">
+            @if (formData().marginTradingEnabled) {
+              <div class="g-item-wrapper">
+                <span>Subtract period</span>
+                <span>{{ formData().marginTrading?.subtractPeriodDays }}</span>
+              </div>
+
+              <div class="g-item-wrapper">
+                <span>Interest rate</span>
+                <span>{{ formData().marginTrading?.subtractInterestRate }}</span>
+              </div>
+
+              <div class="g-item-wrapper">
+                <span>Margin Rate</span>
+                <span>{{ formData().marginTrading?.marginConversionRate }}:1</span>
+              </div>
+            } @else {
+              <div class="p-2 text-center">Margin trading disabled</div>
+            }
+          </app-general-card>
         </div>
       </div>
 
@@ -259,8 +350,8 @@ export class TradingSimulatorFormComponent {
   private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
 
-  // todo - calculate end date and set max date for the end date in calendars
   // todo - add market crash settings
+  // todo - add more hints to fields
 
   /**
    * provide an existing trading simulator to edit it
@@ -280,9 +371,9 @@ export class TradingSimulatorFormComponent {
       validators: [requiredValidator, positiveNumberValidator, intervalValidator(1, TRADING_SIMULATOR_MAX_ROUNDS)],
     }),
     // how much time to (in seconds) to wait between rounds
-    roundIntervalSeconds: new FormControl(30, {
+    roundIntervalSeconds: new FormControl(10, {
       nonNullable: true,
-      validators: [requiredValidator, positiveNumberValidator],
+      validators: [requiredValidator, positiveNumberValidator, intervalValidator(10, 3600)],
     }),
     // code to join the trading simulator
     invitationCode: new FormControl(generateRandomString(6), { nonNullable: true, validators: [requiredValidator] }),
@@ -332,6 +423,20 @@ export class TradingSimulatorFormComponent {
     // symbols
     symbolsHistoricalData: new FormArray<FormControl<TradingSimulatorFormData>>([]),
   });
+
+  readonly formData = toSignal(
+    this.form.valueChanges.pipe(
+      startWith(this.form.value),
+      map((data) => ({
+        ...data,
+        endTime: data.startTime
+          ? addSeconds(data.startTime, (data.maximumRounds ?? 1) * (data.roundIntervalSeconds ?? 10))
+          : null,
+        totalTimeSeconds: (data.maximumRounds ?? 1) * (data.roundIntervalSeconds ?? 10),
+      })),
+    ),
+    { requireSync: true },
+  );
 
   /** prevent selecting dates in the past */
   readonly startTimeConfig: InputTypeDateTimePickerConfig = {
@@ -437,6 +542,10 @@ export class TradingSimulatorFormComponent {
     } else {
       this.form.controls.cashIssued.disable();
       this.form.controls.cashIssued.controls.forEach((control) => {
+        // reset to default values
+        control.controls.value.patchValue(1000);
+        control.controls.issuedOnRound.patchValue(1);
+        // disable the form group
         control.controls.value.disable();
         control.controls.issuedOnRound.disable();
       });

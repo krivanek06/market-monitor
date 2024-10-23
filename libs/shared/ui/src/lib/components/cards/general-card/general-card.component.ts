@@ -20,7 +20,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
             @if (matIcon()) {
               <mat-icon color="primary">{{ matIcon() }}</mat-icon>
             }
-            <h2 class="text-wt-primary mb-0 text-lg">
+            <h2
+              class="text-wt-primary mb-0"
+              [ngClass]="{
+                'text-lg': titleSize() === 'lg',
+                'text-base': titleSize() === 'base',
+              }"
+            >
               {{ title() }}
             </h2>
           </mat-card-title>
@@ -35,7 +41,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
           </div>
         } @else {
           <!-- custom content -->
-          <div class="wrapper">
+          <div class="wrapper overflow-clip">
             <ng-content />
           </div>
 
@@ -66,6 +72,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 export class GeneralCardComponent {
   readonly title = input<string | null>(null);
   readonly titleImgUrl = input<string | undefined>();
+  readonly titleSize = input<'lg' | 'base'>('base');
   readonly matIcon = input<string | undefined>();
   readonly additionalClasses = input('');
   readonly titleCenter = input(false);

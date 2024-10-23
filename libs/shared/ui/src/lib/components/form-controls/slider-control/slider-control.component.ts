@@ -27,8 +27,9 @@ export type SliderControlConfig = {
       [displayWith]="config().displayWith ?? defaultFormatLabel"
       [formControl]="sliderControl"
       [disabled]="isDisabled()"
+      color="primary"
     >
-      <input matSliderThumb [readOnly]="isDisabled()" />
+      <input matSliderThumb [value]="sliderControl.value" />
     </mat-slider>
   `,
   styles: `
@@ -61,7 +62,7 @@ export class SliderControlComponent implements ControlValueAccessor {
 
       untracked(() => {
         // set the default value
-        this.sliderControl.patchValue(config.min, { emitEvent: false });
+        this.sliderControl.setValue(config.min, { emitEvent: false });
       });
     });
 
@@ -87,6 +88,7 @@ export class SliderControlComponent implements ControlValueAccessor {
     if (value === null) {
       return;
     }
+
     this.sliderControl.setValue(value, { emitEvent: false });
   }
 
