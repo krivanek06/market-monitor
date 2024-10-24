@@ -77,7 +77,6 @@
     "@faker-js/faker": "^9.0.3",
     "@golevelup/ts-jest": "^0.5.6",
     "@nrwl/cli": "^15.9.3",
-    "@nrwl/esbuild": "19.8.4",
     "@nx-toolkits/firebase": "^0.7.6",
     "@nx/angular": "20.0.0",
     "@nx/devkit": "20.0.0",
