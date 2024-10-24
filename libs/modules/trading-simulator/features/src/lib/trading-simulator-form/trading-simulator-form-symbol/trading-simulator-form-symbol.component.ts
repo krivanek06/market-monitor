@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   ControlValueAccessor,
@@ -30,7 +30,7 @@ import {
   SliderControlConfig,
 } from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
-import { filter, firstValueFrom } from 'rxjs';
+import { catchError, filter, firstValueFrom, of } from 'rxjs';
 
 export type TradingSimulatorFormData = { symbol: string; historicalData: { day: number; price: number }[] };
 
@@ -83,12 +83,18 @@ export type TradingSimulatorFormData = { symbol: string; historicalData: { day: 
 
     <div class="flex gap-6">
       <!-- chart -->
-      <app-generic-chart
-        class="basis-3/4"
-        [series]="formDataChartSeries()"
-        [categories]="roundPoints()"
-        [heightPx]="300"
-      />
+      @if (loadingSymbolData()) {
+        <div class="h-[300px] basis-3/4">
+          <div class="g-skeleton h-[280px]"></div>
+        </div>
+      } @else {
+        <app-generic-chart
+          class="basis-3/4"
+          [series]="formDataChartSeries()"
+          [categories]="roundPoints()"
+          [heightPx]="300"
+        />
+      }
 
       <!-- form -->
       <div class="flex basis-1/4 flex-col gap-5 pt-2">
@@ -184,6 +190,8 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
     }[]
   >([]);
 
+  readonly loadingSymbolData = signal(false);
+
   /** generate array of round points: [1,2,3, ...] */
   readonly roundPoints = computed(() => Array.from({ length: this.maximumRounds() }, (_, i) => String(i + 1)));
   readonly sliderControlConfig = computed(
@@ -263,8 +271,6 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
 
     return [modifiedPriceData, issuedUnits];
   });
-
-  formDataChartSerieseee = effect(() => console.log('formDataChartSeries', this.formDataChartSeries()));
 
   /** available symbols to choose from */
   readonly STOCK_SYMBOLS = STOCK_SYMBOLS;
@@ -350,13 +356,21 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   async onChangeHistoricalData() {
     const [s1] = getRandomElement(STOCK_SYMBOLS, 1);
 
+    // set loading state
+    this.loadingSymbolData.set(true);
+
     // get historical data for the symbol
     const historicalData = (
-      await firstValueFrom(this.marketApiService.getHistoricalPrices(s1, SymbolHistoricalPeriods.year))
+      await firstValueFrom(
+        this.marketApiService.getHistoricalPrices(s1, SymbolHistoricalPeriods.year).pipe(catchError(() => of([]))),
+      )
     ).map((d) => ({ date: d.date, price: d.close }));
 
     // set the form data
     this.form.patchValue({ historicalData });
+
+    // remove loading state
+    this.loadingSymbolData.set(false);
   }
 
   writeValue(obj: TradingSimulatorFormData): void {
@@ -379,18 +393,7 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
    * use 2 random symbols - one for the symbol and one for the historical data
    */
   private async fillFormData(): Promise<void> {
-    // get two random symbols
-    const [s1, s2] = getRandomElement(STOCK_SYMBOLS, 2);
-
-    // get historical data for the symbol
-    const historicalData = (
-      await firstValueFrom(this.marketApiService.getHistoricalPrices(s2, SymbolHistoricalPeriods.year))
-    ).map((d) => ({ date: d.date, price: d.close }));
-
-    // set the form data
-    this.form.patchValue({
-      symbol: s1,
-      historicalData,
-    });
+    this.onChangeSymbol();
+    this.onChangeHistoricalData();
   }
 }

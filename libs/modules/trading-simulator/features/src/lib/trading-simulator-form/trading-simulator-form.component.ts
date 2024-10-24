@@ -29,6 +29,7 @@ import {
   SliderControlConfig,
   TruncatePipe,
 } from '@mm/shared/ui';
+import { TradingSimulatorInfoButtonComponent } from '@mm/trading-simulator/ui';
 import { addSeconds } from 'date-fns';
 import { map, startWith } from 'rxjs';
 import {
@@ -55,6 +56,7 @@ import {
     GeneralCardComponent,
     DateReadablePipe,
     TruncatePipe,
+    TradingSimulatorInfoButtonComponent,
     TradingSimulatorFormSymbolComponent,
   ],
   template: `
@@ -68,7 +70,7 @@ import {
           titleSize="base"
           class="mb-4"
         >
-          <button mat-stroked-button>TODO INFO</button>
+          <app-trading-simulator-info-button class="w-[160px]" />
         </app-section-title>
 
         <div class="grid grid-cols-2 gap-x-6 gap-y-2">
@@ -86,6 +88,7 @@ import {
           <!-- maximum round -->
           <app-form-mat-input-wrapper
             inputCaption="maximum rounds"
+            hintText="Rounds to play the simulator from 1 to {{ constFields.maxRounds }}"
             inputType="NUMBER"
             [formControl]="form.controls.maximumRounds"
           />
@@ -93,16 +96,26 @@ import {
           <!-- round interval -->
           <app-form-mat-input-wrapper
             inputCaption="round interval"
-            hintText="How long in seconds one round takes"
+            hintText="On round interval in seconds, from {{ constFields.roundIntervalSecondsMin }} to {{
+              constFields.roundIntervalSecondsMax
+            }}"
             inputType="NUMBER"
             [formControl]="form.controls.roundIntervalSeconds"
           />
 
-          <!-- invitation code -->
-          <app-form-mat-input-wrapper inputCaption="invitation code" [formControl]="form.controls.invitationCode" />
-
           <!-- starting cash -->
-          <app-form-mat-input-wrapper inputCaption="starting cash" [formControl]="form.controls.startingCash" />
+          <app-form-mat-input-wrapper
+            inputCaption="starting cash"
+            hintText="Starting cash for each user in the simulator"
+            [formControl]="form.controls.startingCash"
+          />
+
+          <!-- invitation code -->
+          <app-form-mat-input-wrapper
+            inputCaption="invitation code"
+            hintText="Code to join the simulator"
+            [formControl]="form.controls.invitationCode"
+          />
         </div>
 
         <!-- divider -->
@@ -165,9 +178,10 @@ import {
         <div class="mb-4 grid">
           @for (formGroup of form.controls.cashIssued.controls; track $index; let i = $index) {
             <div class="flex gap-4" [formGroup]="formGroup">
-              <!-- date issue -->
+              <!-- period issue -->
               <app-slider-control
                 class="flex-1"
+                inputCaption="Issue on round"
                 [config]="sliderControlConfig()"
                 [formControl]="formGroup.controls.issuedOnRound"
               />
@@ -221,13 +235,14 @@ import {
           <mat-checkbox [formControl]="form.controls.marketChangeEnabled" color="primary">Market Change</mat-checkbox>
         </app-section-title>
 
-        <!-- issued cash form -->
+        <!-- market change form -->
         <div class="mb-4 grid">
           @for (formGroup of form.controls.marketChange.controls; track $index; let i = $index) {
             <div class="flex gap-4" [formGroup]="formGroup">
               <!-- starting round -->
               <app-slider-control
                 class="flex-1"
+                inputCaption="Start on round"
                 [config]="sliderControlConfig()"
                 [formControl]="formGroup.controls.startingRound"
               />
@@ -235,6 +250,7 @@ import {
               <!-- ending round -->
               <app-slider-control
                 class="flex-1"
+                inputCaption="End on round"
                 [config]="sliderControlConfig()"
                 [formControl]="formGroup.controls.endingRound"
               />
@@ -309,18 +325,18 @@ import {
           </div>
 
           <div class="g-item-wrapper">
-            <span>Invitation code</span>
-            <span>{{ formData().invitationCode }}</span>
+            <span>Starting cash</span>
+            <span>{{ formData().startingCash | largeNumberFormatter: false : true }}</span>
           </div>
 
           <div class="g-item-wrapper">
-            <span>Starting cash</span>
-            <span>{{ formData().startingCash | largeNumberFormatter: false : true }}</span>
+            <span>Invitation code</span>
+            <span>{{ formData().invitationCode }}</span>
           </div>
         </app-general-card>
 
         <!-- margin trading -->
-        <app-general-card title="Basic Information">
+        <app-general-card title="Margin Trading">
           @if (formData().marginTradingEnabled) {
             <div class="g-item-wrapper">
               <span>Subtract period</span>
@@ -412,7 +428,11 @@ export class TradingSimulatorFormComponent {
   private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
 
-  // todo - add more hints to fields
+  readonly constFields = {
+    maxRounds: TRADING_SIMULATOR_MAX_ROUNDS,
+    roundIntervalSecondsMin: 10,
+    roundIntervalSecondsMax: 3600,
+  } as const;
 
   /**
    * provide an existing trading simulator to edit it

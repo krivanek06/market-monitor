@@ -1,14 +1,13 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { DialogCloseHeaderComponent } from '../../headers';
 
 @Component({
   selector: 'app-help-dialog',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatDialogModule, DialogCloseHeaderComponent, MatButtonModule, MatIconModule],
+  imports: [MatIconModule, MatDialogModule, DialogCloseHeaderComponent, MatButtonModule, MatIconModule],
   template: `
     <app-dialog-close-header title="Help Section" />
 
@@ -68,6 +67,4 @@ import { DialogCloseHeaderComponent } from '../../headers';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HelpDialogComponent {
-  private dialogRef = inject(MatDialogRef<HelpDialogComponent>);
-}
+export class HelpDialogComponent {}

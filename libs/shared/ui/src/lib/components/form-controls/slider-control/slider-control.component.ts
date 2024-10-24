@@ -16,7 +16,9 @@ export type SliderControlConfig = {
   standalone: true,
   imports: [ReactiveFormsModule, MatSliderModule, FormsModule],
   template: `
-    <div class="text-wt-gray-medium -mb-3 text-center text-xs">selected: {{ sliderControl.value }}</div>
+    <div class="text-wt-gray-medium -mb-3 text-center text-xs">
+      {{ inputCaption() || 'selected' }} : {{ sliderControl.value }}
+    </div>
     <mat-slider
       showTickMarks
       discrete
@@ -52,6 +54,7 @@ export type SliderControlConfig = {
 })
 export class SliderControlComponent implements ControlValueAccessor {
   readonly sliderControl = new FormControl<number>(1, { nonNullable: true });
+  readonly inputCaption = input<string>('');
   readonly config = input.required<SliderControlConfig>();
 
   readonly isDisabled = signal(false);
