@@ -272,8 +272,6 @@ export type PortfolioTradeDialogComponentData = {
 })
 export class PortfolioTradeDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<PortfolioTradeDialogComponent, OutstandingOrder | undefined>);
-  //private readonly portfolioUserFacadeService = inject(PortfolioUserFacadeService);
-  //private readonly marketApiService = inject(MarketApiService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   readonly authenticationUserService = inject(AuthenticationUserStoreService);
   readonly data = signal(inject<PortfolioTradeDialogComponentData>(MAT_DIALOG_DATA));
@@ -294,7 +292,6 @@ export class PortfolioTradeDialogComponent {
     const symbol = this.data().quote.symbol;
     return this.data().userPortfolioStateHolding?.holdings.find((holding) => holding.symbol === symbol);
   });
-  //readonly portfolioState = this.portfolioUserFacadeService.portfolioStateHolding;
   readonly userDataSignal = this.authenticationUserService.state.getUserData;
 
   readonly isSymbolCrypto = computed(() => this.data().quote.exchange === 'CRYPTO');
@@ -390,30 +387,18 @@ export class PortfolioTradeDialogComponent {
     const order: OutstandingOrder = {
       orderId: createUUID(),
       createdAt: getCurrentDateDetailsFormat(),
-      status: 'open',
+      status: 'OPEN',
       symbol: data.quote.symbol,
       displaySymbol: data.quote.displaySymbol,
       sector: data.sector ?? 'Unknown',
       symbolType: data.quote.exchange === 'CRYPTO' ? 'CRYPTO' : 'STOCK',
       units: this.form.controls.units.value,
-      symbolPrice: data.quote.price,
+      potentialSymbolPrice: data.quote.price,
+      potentialTotalPrice: roundNDigits(data.quote.price * this.form.controls.units.value),
       userData: transformUserToBaseMin(this.userDataSignal()),
       orderType: this.getOrderType(),
       closedAt: null,
     };
-
-    // set loading
-    // this.isLoadingSignal.set(true);
-
-    // try {
-    //   await this.portfolioUserFacadeService.createPortfolioOperation(transactionCreate);
-    //   this.dialogServiceUtil.showNotificationBar('Transaction created', 'success');
-    //   this.dialogRef.close();
-    // } catch (error) {
-    //   this.dialogServiceUtil.handleError(error);
-    // } finally {
-    //   this.isLoadingSignal.set(false);
-    // }
 
     // close dialog
     this.dialogRef.close(order);

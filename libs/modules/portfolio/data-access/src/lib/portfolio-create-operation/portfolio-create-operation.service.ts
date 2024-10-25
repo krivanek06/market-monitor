@@ -41,6 +41,9 @@ export class PortfolioCreateOperationService {
       throw new Error('User does not have the order');
     }
 
+    // check if operation validity - throws error if invalid
+    checkTransactionOperationDataValidity(userData, order, order.potentialSymbolPrice);
+
     // check if market is open
     const marketType = order.sector === 'CRYPTO' ? 'crypto' : 'stock';
     const isMarketOpen = this.marketApiService.isMarketOpenForQuote(marketType);
@@ -54,11 +57,8 @@ export class PortfolioCreateOperationService {
       };
     }
 
-    // check data validity - throws error if invalid
-    checkTransactionOperationDataValidity(userData, order, order.symbolPrice);
-
     // create transaction
-    const transaction = createTransaction(userData, order, order.symbolPrice);
+    const transaction = createTransaction(userData, order, order.potentialSymbolPrice);
 
     // update user's transactions
     this.userApiService.addUserPortfolioTransactions(userData.id, transaction);

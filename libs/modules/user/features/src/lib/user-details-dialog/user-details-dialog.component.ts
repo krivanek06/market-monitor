@@ -211,10 +211,7 @@ export class UserDetailsDialogComponent {
   readonly portfolioStateHolding = toSignal(
     combineLatest([this.userData$, this.portfolioTransactions$]).pipe(
       switchMap(([userData, transactions]) =>
-        this.portfolioCalculationService.getPortfolioStateHoldings(
-          userData?.portfolioState?.startingCash ?? 0,
-          transactions,
-        ),
+        this.portfolioCalculationService.getPortfolioStateHoldings(userData.portfolioState, transactions),
       ),
     ),
   );

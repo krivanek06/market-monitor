@@ -1,4 +1,5 @@
 import { Injectable, InjectionToken, effect, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { GroupApiService, UserApiService } from '@mm/api-client';
 import {
   PortfolioGrowth,
@@ -45,11 +46,11 @@ type AuthenticationState = {
   providedIn: 'root',
 })
 export class AuthenticationUserStoreService {
-  private authenticationAccountService = inject(AuthenticationAccountService);
-  private groupApiService = inject(GroupApiService);
-  private userApiService = inject(UserApiService);
+  private readonly authenticationAccountService = inject(AuthenticationAccountService);
+  private readonly groupApiService = inject(GroupApiService);
+  private readonly userApiService = inject(UserApiService);
 
-  private initialState: AuthenticationState = {
+  private readonly initialState: AuthenticationState = {
     authenticationState: 'LOADING',
     user: null,
     userData: null,
@@ -62,7 +63,7 @@ export class AuthenticationUserStoreService {
     },
   };
 
-  private loadedAuthenticationSource$ = this.authenticationAccountService.getLoadedAuthentication().pipe(
+  private readonly loadedAuthenticationSource$ = this.authenticationAccountService.getLoadedAuthentication().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev === curr),
     tap((loaded) => console.log('AuthenticationUserStoreService loaded', loaded)),
@@ -74,7 +75,7 @@ export class AuthenticationUserStoreService {
   /**
    * Source used to get user data
    */
-  private userSource$ = this.authenticationAccountService.getUser().pipe(
+  private readonly userSource$ = this.authenticationAccountService.getUser().pipe(
     map((user) => ({
       user: user,
     })),
@@ -83,7 +84,7 @@ export class AuthenticationUserStoreService {
   /**
    * Source used to get user data
    */
-  private userDataSource$ = this.authenticationAccountService.getUserData().pipe(
+  private readonly userDataSource$ = this.authenticationAccountService.getUserData().pipe(
     map((userData) => ({
       userData: userData,
     })),
@@ -92,7 +93,7 @@ export class AuthenticationUserStoreService {
   /**
    * Source used to get user watchList
    */
-  private watchListSource$ = this.authenticationAccountService.getUserData().pipe(
+  private readonly watchListSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
     switchMap((userData) =>
@@ -104,7 +105,7 @@ export class AuthenticationUserStoreService {
   /**
    * Source used to get user portfolio transactions
    */
-  private portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
+  private readonly portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes or changes account type
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id && prev?.userAccountType === curr?.userAccountType),
     switchMap((userData) => (userData ? this.userApiService.getUserPortfolioTransactions(userData.id) : of(null))),
@@ -113,7 +114,7 @@ export class AuthenticationUserStoreService {
     })),
   );
 
-  private userPortfolioGrowthSource$ = this.authenticationAccountService.getUserData().pipe(
+  private readonly userPortfolioGrowthSource$ = this.authenticationAccountService.getUserData().pipe(
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
     switchMap((userData) => (userData ? this.userApiService.getUserPortfolioGrowth(userData.id) : of(null))),
     map((data) => ({ portfolioGrowth: data })),
@@ -122,7 +123,7 @@ export class AuthenticationUserStoreService {
   /**
    * Source used to get user group data, owner, member, invitations, requested, watched
    */
-  private userGroupDataSource$ = this.authenticationAccountService.getUserData().pipe(
+  private readonly userGroupDataSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes or groups changes
     distinctUntilChanged(
       (prev, curr) =>
@@ -164,7 +165,7 @@ export class AuthenticationUserStoreService {
     ),
   );
 
-  state = signalSlice({
+  readonly state = signalSlice({
     initialState: this.initialState,
     sources: [
       this.userSource$,
@@ -204,6 +205,8 @@ export class AuthenticationUserStoreService {
       isDemoAccount: () => !!state().userData?.isDemo,
     }),
   });
+
+  readonly stateUserData$ = toObservable(this.state.userData);
 
   userDataChange = effect(() => {
     console.log('AuthenticationUserStoreService update', this.state());

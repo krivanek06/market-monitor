@@ -1,6 +1,5 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { UserApiService } from '@mm/api-client';
 import { OutstandingOrder } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { of, switchMap } from 'rxjs';
@@ -17,17 +16,24 @@ export class PortfolioUserFacadeService {
   private readonly authenticationUserService = inject(AuthenticationUserStoreService);
   private readonly portfolioCalculationService = inject(PortfolioCalculationService);
   private readonly portfolioCreateOperationService = inject(PortfolioCreateOperationService);
-  private readonly userApiService = inject(UserApiService);
 
+  /**
+   * on every transaction change, recalculate the portfolio state
+   * however listen on the userState to get current data - like cashOnHand (for outstanding orders)
+   */
   readonly portfolioStateHolding = toSignal(
     toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
       switchMap((transactions) =>
-        transactions
-          ? this.portfolioCalculationService.getPortfolioStateHoldings(
-              this.authenticationUserService.state.getUserData().portfolioState.startingCash,
-              transactions,
-            )
-          : of(undefined),
+        this.authenticationUserService.stateUserData$.pipe(
+          switchMap((userData) =>
+            transactions && userData
+              ? this.portfolioCalculationService.getPortfolioStateHoldings(
+                  this.authenticationUserService.state.getUserData().portfolioState,
+                  transactions,
+                )
+              : of(undefined),
+          ),
+        ),
       ),
     ),
   );
@@ -67,7 +73,7 @@ export class PortfolioUserFacadeService {
     this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.portfolioStateHolding()?.holdings ?? []),
   );
 
-  async createOrder(data: OutstandingOrder) {
+  createOrder(data: OutstandingOrder) {
     const userData = this.authenticationUserService.state.getUserData();
     return this.portfolioCreateOperationService.createOrder(userData, data);
   }

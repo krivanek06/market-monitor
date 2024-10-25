@@ -21,7 +21,7 @@ export type OutstandingOrder = SymbolStoreBase & {
    * open - order is active and waiting for the price to reach the desired value
    * closed - order was fulfilled by the system
    */
-  status: 'open' | 'closed';
+  status: 'OPEN' | 'CLOSED';
 
   /**
    * when the order was created
@@ -37,8 +37,10 @@ export type OutstandingOrder = SymbolStoreBase & {
 
   /**
    * price of the symbol when the user created the order
+   * used to subtract the user's cash when the order is created
    */
-  symbolPrice: number;
+  potentialSymbolPrice: number;
+  potentialTotalPrice: number;
 
   /** type of order */
   orderType:

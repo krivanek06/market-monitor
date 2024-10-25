@@ -8,11 +8,10 @@ import {
 import {
   HistoricalPrice,
   HistoricalPriceSymbol,
+  OutstandingOrder,
   PortfolioTransaction,
-  PortfolioTransactionCreate,
   SYMBOL_NOT_FOUND_ERROR,
   SymbolSummary,
-  TRANSACTION_FEE_PRCT,
   USER_ALLOWED_DEMO_ACCOUNTS_PER_IP,
   USER_ALLOWED_DEMO_ACCOUNTS_TOTAL,
   UserAccountEnum,
@@ -22,7 +21,7 @@ import {
   UserPortfolioTransaction,
 } from '@mm/api-types';
 import {
-  calculateGrowth,
+  createTransaction,
   dateFormatDate,
   getCurrentDateDefaultFormat,
   getCurrentDateDetailsFormat,
@@ -158,20 +157,27 @@ export class CreateDemoAccountService {
     // save all created transactions
     const transactionsToSave: PortfolioTransaction[] = [];
 
-    const pastDateBuy = format(subDays(new Date(), 30), 'yyyy-MM-dd');
-    const pastDateSell = format(subDays(new Date(), 4), 'yyyy-MM-dd');
+    const pastDateBuy = getCurrentDateDetailsFormat(subDays(new Date(), 30));
+    const pastDateSell = getCurrentDateDetailsFormat(subDays(new Date(), 4));
 
     // create BUY transactions for each symbol
     const buyOperations = this.symbolToTransact.map(
       (symbol) =>
         ({
-          date: pastDateBuy,
           symbol: symbol.id,
           sector: symbol.profile?.sector ?? 'Unknown',
           symbolType: 'STOCK',
           units: getRandomNumber(10, 32),
-          transactionType: 'BUY',
-        }) satisfies PortfolioTransactionCreate,
+          createdAt: pastDateBuy,
+          displaySymbol: symbol.id,
+          orderId: uuidv4(),
+          orderType: { type: 'BUY' },
+          potentialSymbolPrice: 1, // todo - maybe wrong
+          potentialTotalPrice: 1, // todo - maybe wrong
+          closedAt: null,
+          status: 'OPEN',
+          userData: userData,
+        }) satisfies OutstandingOrder,
     );
 
     // load all transactions at once
@@ -206,13 +212,20 @@ export class CreateDemoAccountService {
       .map(
         (operation) =>
           ({
-            date: pastDateSell,
             symbol: operation.symbol,
             sector: operation.sector ?? 'Unknown',
             symbolType: 'STOCK',
             units: Math.round(operation.units / 2),
-            transactionType: 'SELL',
-          }) satisfies PortfolioTransactionCreate,
+            orderId: uuidv4(),
+            orderType: { type: 'SELL' },
+            potentialSymbolPrice: 1, // todo - maybe wrong
+            potentialTotalPrice: 1, // todo - maybe wrong
+            closedAt: null,
+            status: 'OPEN',
+            userData: userData,
+            createdAt: pastDateSell,
+            displaySymbol: operation.symbol,
+          }) satisfies OutstandingOrder,
       );
 
     // load all transactions at once
@@ -257,18 +270,18 @@ export class CreateDemoAccountService {
   };
 
   createPortfolioCreateOperation = async (
-    data: PortfolioTransactionCreate,
+    data: OutstandingOrder,
     userData: UserData,
     userTransactions: PortfolioTransaction[],
   ): Promise<PortfolioTransaction> => {
-    const symbolPrice = await this.#getHistoricalPrice(data.symbol, data.date);
+    const symbolPrice = await this.#getHistoricalPrice(data.symbol, data.createdAt);
 
     // from previous transaction calculate invested and units - currently if I own that symbol
     const symbolHolding = this.#getCurrentInvestedFromTransactions(data.symbol, userTransactions);
-    const symbolHoldingBreakEvenPrice = roundNDigits(symbolHolding.invested / symbolHolding.units, 2);
+    //const symbolHoldingBreakEvenPrice = roundNDigits(symbolHolding.invested / symbolHolding.units, 2);
 
     // create transaction
-    const transaction = this.#createTransaction(userData, data, symbolPrice, symbolHoldingBreakEvenPrice);
+    const transaction = createTransaction(userData, data, symbolPrice.close);
 
     // return data
     return transaction;
@@ -293,47 +306,45 @@ export class CreateDemoAccountService {
       );
   };
 
-  #createTransaction = (
-    userDocData: UserData,
-    input: PortfolioTransactionCreate,
-    historicalPrice: HistoricalPrice,
-    breakEvenPrice: number,
-  ): PortfolioTransaction => {
-    const isTransactionFeesActive = userDocData.userAccountType === UserAccountEnum.DEMO_TRADING;
+  // #createTransaction = (
+  //   userDocData: UserData,
+  //   input: OutstandingOrder,
+  //   historicalPrice: HistoricalPrice,
+  //   breakEvenPrice: number,
+  // ): PortfolioTransaction => {
+  //   const isTransactionFeesActive = userDocData.userAccountType === UserAccountEnum.DEMO_TRADING;
 
-    // if custom total value is provided calculate unit price, else use API price
-    const unitPrice = input.customTotalValue
-      ? roundNDigits(input.customTotalValue / input.units)
-      : historicalPrice.close;
+  //   // if custom total value is provided calculate unit price, else use API price
+  //   const unitPrice =  historicalPrice.close;
 
-    const isSell = input.transactionType === 'SELL';
-    const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
-    const returnChange = isSell ? calculateGrowth(unitPrice, breakEvenPrice) : 0;
+  //   const isSell = input.transactionType === 'SELL';
+  //   const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
+  //   const returnChange = isSell ? calculateGrowth(unitPrice, breakEvenPrice) : 0;
 
-    // transaction fees are 0.01% of the transaction value
-    const transactionFeesCalc = isTransactionFeesActive ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
-    const transactionFees = roundNDigits(transactionFeesCalc, 2);
+  //   // transaction fees are 0.01% of the transaction value
+  //   const transactionFeesCalc = isTransactionFeesActive ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
+  //   const transactionFees = roundNDigits(transactionFeesCalc, 2);
 
-    const result: PortfolioTransaction = {
-      transactionId: uuidv4(),
-      date: input.date,
-      symbol: input.symbol,
-      units: input.units,
-      transactionType: input.transactionType,
-      userId: userDocData.id,
-      symbolType: input.symbolType,
-      unitPrice,
-      transactionFees,
-      returnChange,
-      returnValue,
-      priceFromDate: historicalPrice.date,
-      sector: input.sector,
-      dateExecuted: getCurrentDateDetailsFormat(),
-      displaySymbol: input.symbol.replace(input.symbolType === 'CRYPTO' ? 'USD' : '', ''),
-    };
+  //   const result: PortfolioTransaction = {
+  //     transactionId: uuidv4(),
+  //     date: input.date,
+  //     symbol: input.symbol,
+  //     units: input.units,
+  //     transactionType: input.transactionType,
+  //     userId: userDocData.id,
+  //     symbolType: input.symbolType,
+  //     unitPrice,
+  //     transactionFees,
+  //     returnChange,
+  //     returnValue,
+  //     priceFromDate: historicalPrice.date,
+  //     sector: input.sector,
+  //     dateExecuted: getCurrentDateDetailsFormat(),
+  //     displaySymbol: input.symbol.replace(input.symbolType === 'CRYPTO' ? 'USD' : '', ''),
+  //   };
 
-    return result;
-  };
+  //   return result;
+  // };
 
   createRandomUser = (data: {
     isDemo?: boolean;

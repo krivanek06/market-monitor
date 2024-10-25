@@ -5,6 +5,7 @@ import {
   HistoricalPriceSymbol,
   PortfolioGrowth,
   PortfolioGrowthAssets,
+  PortfolioState,
   PortfolioStateHolding,
   PortfolioStateHoldings,
   PortfolioTransaction,
@@ -33,7 +34,7 @@ export class PortfolioCalculationService {
   private readonly marketApiService = inject(MarketApiService);
 
   getPortfolioStateHoldings(
-    startingCash: number,
+    portfolioState: PortfolioState,
     transactions: PortfolioTransaction[],
   ): Observable<PortfolioStateHoldings> {
     // get partial holdings calculations
@@ -43,9 +44,21 @@ export class PortfolioCalculationService {
     console.log(`PortfolioGrowthService: getPortfolioState`, holdingSymbols, holdingsBase, transactions);
 
     // get symbol summaries from API
-    return this.marketApiService
-      .getSymbolQuotes(holdingSymbols)
-      .pipe(map((summaries) => getPortfolioStateHoldingsUtil(transactions, holdingsBase, summaries, startingCash)));
+    return this.marketApiService.getSymbolQuotes(holdingSymbols).pipe(
+      map((summaries) => {
+        const holdings = getPortfolioStateHoldingsUtil(
+          transactions,
+          holdingsBase,
+          summaries,
+          portfolioState.startingCash,
+        );
+        return {
+          ...holdings,
+          // outstanding orders can update cash in DB
+          cashOnHand: portfolioState.cashOnHand,
+        };
+      }),
+    );
   }
 
   getPortfolioGrowth(portfolioAssets: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {

@@ -1,9 +1,10 @@
-import { GroupGeneralActions, UserCreateDemoAccountInput } from '@mm/api-types';
-import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
+import { GroupGeneralActions, OutstandingOrder, UserCreateDemoAccountInput } from '@mm/api-types';
+import { onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { CallableRequest, onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from './group';
 import { groupGeneralActions } from './group/group-general-actions';
+import { onOutstandingOrderCreate, onOutstandingOrderDelete } from './outstanding-order';
 import { onTransactionUpdateForUserId } from './portfolio';
 import {
   userCreateAccount,
@@ -69,6 +70,32 @@ export const groupGeneralActionsCall = onCall(
 export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_information/transactions', async (event) =>
   onTransactionUpdateForUserId(event.params.userId),
 );
+
+/** ------------------------------------------ */
+
+/**
+ * OUTSTANDING ORDERS
+ */
+
+export const on_outstanding_order_change = onDocumentWritten('outstanding_orders/{orderId}', async (event) => {
+  const newValue = event.data?.after.data() as OutstandingOrder | undefined;
+  const previousValue = event.data?.before.data() as OutstandingOrder | undefined;
+
+  // not new value - it was deleted
+  if (!newValue && previousValue) {
+    onOutstandingOrderDelete(previousValue);
+  }
+
+  // new value - it was created
+  else if (newValue && !previousValue) {
+    onOutstandingOrderCreate(newValue);
+  }
+
+  // new value - it was updated
+  else if (newValue && previousValue) {
+    onOutstandingOrderCreate(newValue);
+  }
+});
 
 /** ------------------------------------------ */
 

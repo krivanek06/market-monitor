@@ -267,7 +267,7 @@ export class PageCompareUsersComponent {
             userData: of(userData),
             userTransactions: of(userTransactions.transactions),
             portfolioState: this.portfolioCalculationService
-              .getPortfolioStateHoldings(userData.portfolioState.startingCash, userTransactions.transactions)
+              .getPortfolioStateHoldings(userData.portfolioState, userTransactions.transactions)
               .pipe(take(1)),
             portfolioGrowth: this.userApiService.getUserPortfolioGrowth(userBase.id).pipe(take(1)),
           }).pipe(
