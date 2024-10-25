@@ -28,7 +28,7 @@ import { DefaultImgDirective } from '../../../directives';
     MatButtonModule,
   ],
   template: `
-    <mat-form-field appearance="fill">
+    <mat-form-field>
       <!-- label -->
       <mat-label> {{ inputCaption() }}</mat-label>
 
@@ -150,9 +150,9 @@ import { DefaultImgDirective } from '../../../directives';
       width: 100%;
     }
 
-    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-      height: 0px !important;
-    }
+    // ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    //   height: 0px !important;
+    // }
   `,
   providers: [
     {
