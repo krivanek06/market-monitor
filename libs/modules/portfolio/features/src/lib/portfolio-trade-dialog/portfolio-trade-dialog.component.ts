@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgClass, UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -41,7 +41,10 @@ export type PortfolioTradeDialogComponentData = {
   selector: 'app-portfolio-trade-dialog',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
+    DatePipe,
+    CurrencyPipe,
+    UpperCasePipe,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
@@ -339,8 +342,6 @@ export class PortfolioTradeDialogComponent {
     { initialValue: 0 },
   );
 
-  //readonly isLoadingSignal = signal<boolean>(false);
-
   readonly disabledSubmit = computed(
     () => this.insufficientUnitsErrorSignal() || this.insufficientCashErrorSignal() || this.isSellDisabledZeroUnits(),
   );
@@ -384,6 +385,7 @@ export class PortfolioTradeDialogComponent {
     // create object
     const data = this.data();
 
+    // create order
     const order: OutstandingOrder = {
       orderId: createUUID(),
       createdAt: getCurrentDateDetailsFormat(),

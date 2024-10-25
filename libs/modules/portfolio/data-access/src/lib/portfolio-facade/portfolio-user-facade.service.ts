@@ -1,6 +1,6 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { OutstandingOrder } from '@mm/api-types';
+import { OUTSTANDING_ORDERS_MAX_ORDERS, OutstandingOrder } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { of, switchMap } from 'rxjs';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
@@ -75,6 +75,19 @@ export class PortfolioUserFacadeService {
 
   createOrder(data: OutstandingOrder) {
     const userData = this.authenticationUserService.state.getUserData();
+    const orders = this.authenticationUserService.state.outstandingOrders();
+
+    // prevent creating more orders than allowed
+    if (orders.open.length >= OUTSTANDING_ORDERS_MAX_ORDERS) {
+      throw new Error('User has reached the maximum number of open orders');
+    }
+
+    // create the order
     return this.portfolioCreateOperationService.createOrder(userData, data);
+  }
+
+  deleteOrder(order: OutstandingOrder) {
+    const userData = this.authenticationUserService.state.getUserData();
+    return this.portfolioCreateOperationService.deleteOrder(order, userData);
   }
 }

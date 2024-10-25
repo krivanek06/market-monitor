@@ -4,7 +4,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@mm/api-client';
 import { OutstandingOrder, PortfolioTransactionType, SymbolQuote, USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
@@ -14,7 +16,11 @@ import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
-import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
+import {
+  OutstandingOrderCardDataComponent,
+  PortfolioStateComponent,
+  PortfolioTransactionsTableComponent,
+} from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
@@ -47,6 +53,9 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
     FormMatInputWrapperComponent,
     ReactiveFormsModule,
     NgClass,
+    OutstandingOrderCardDataComponent,
+    MatTabsModule,
+    MatDividerModule,
   ],
   template: `
     <!-- account state -->
@@ -57,7 +66,7 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
         class="max-md:flex-1 md:basis-2/5 2xl:basis-1/3"
         [titleColor]="ColorScheme.PRIMARY_VAR"
         [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-        [showCashSegment]="authenticationUserService.state.isAccountDemoTrading()"
+        [showCashSegment]="state.isAccountDemoTrading()"
         [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
       />
 
@@ -132,6 +141,36 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
       <div class="grid h-[440px] place-content-center text-center text-lg">Failed to load symbol summary</div>
     }
 
+    <!-- divider -->
+    <div class="mb-3 py-2">
+      <mat-divider />
+    </div>
+
+    <!-- outstanding orders -->
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="end" class="mb-8">
+      <mat-tab label="Open Orders">
+        <div class="grid grid-cols-4 gap-x-4 gap-y-2">
+          @for (order of state.outstandingOrders().open; track order.orderId) {
+            <app-outstanding-order-card-data [order]="order" (deleteClicked)="onOpenOrderRemove(order)" />
+          } @empty {
+            <div class="col-span-4 p-4 text-center">No open orders</div>
+          }
+        </div>
+      </mat-tab>
+      <mat-tab label="Closed Orders">
+        @for (order of state.outstandingOrders().closed; track order.orderId) {
+          <app-outstanding-order-card-data [order]="order" (deleteClicked)="onOpenOrderRemove(order)" />
+        } @empty {
+          <div class="col-span-4 p-4 text-center">No closed orders</div>
+        }
+      </mat-tab>
+    </mat-tab-group>
+
+    <!-- divider -->
+    <div class="mb-3 py-2">
+      <mat-divider />
+    </div>
+
     <!-- top active -->
     <div class="mb-10 hidden lg:block">
       <app-section-title title="Top Active" />
@@ -159,9 +198,9 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
     <div>
       <app-portfolio-transactions-table
         data-testid="page-trading-portfolio-transactions-table"
-        [showTransactionFees]="authenticationUserService.state.isAccountDemoTrading()"
-        [showActionButton]="authenticationUserService.state.isAccountNormalBasic()"
-        [data]="authenticationUserService.state.portfolioTransactions()"
+        [showTransactionFees]="state.isAccountDemoTrading()"
+        [showActionButton]="state.isAccountNormalBasic()"
+        [data]="state.portfolioTransactions()"
         [showSymbolFilter]="true"
       />
     </div>
@@ -177,9 +216,9 @@ export class PageTradingComponent {
   private readonly marketApiService = inject(MarketApiService);
   private readonly dialog = inject(MatDialog);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
-
-  readonly authenticationUserService = inject(AuthenticationUserStoreService);
+  private readonly authenticationUserService = inject(AuthenticationUserStoreService);
   readonly portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  readonly state = this.authenticationUserService.state;
 
   /**
    * track the selected holding by user, null if else is selected
@@ -266,6 +305,12 @@ export class PageTradingComponent {
 
   onSymbolQuoteClick(quote: SymbolQuote) {
     this.selectedSymbolControl.patchValue(quote.symbol);
+  }
+
+  async onOpenOrderRemove(order: OutstandingOrder) {
+    if (await this.dialogServiceUtil.showConfirmDialog('Are you sure you want to delete this order?')) {
+      this.portfolioUserFacadeService.deleteOrder(order);
+    }
   }
 
   async onOperationClick(transactionType: PortfolioTransactionType): Promise<void> {

@@ -69,4 +69,29 @@ export class PortfolioCreateOperationService {
       data: transaction,
     };
   }
+
+  /**
+   * possible to delete an order if it's open and the user who created the order is the same as the user in the order
+   * @param order
+   * @param userData
+   */
+  deleteOrder(order: OutstandingOrder, userData: UserData) {
+    // check if the user who creates the order is the same as the user in the order
+    if (order.userData.id !== userData.id) {
+      throw new Error('User does not have the order');
+    }
+
+    // only allow demo trading users to create orders
+    if (userData.userAccountType !== UserAccountEnum.DEMO_TRADING) {
+      throw new Error('User does not have the order');
+    }
+
+    // check if the order is open
+    if (order.status !== 'OPEN') {
+      throw new Error('Order is not open');
+    }
+
+    // delete the order
+    this.outstandingOrdersApiService.deleteOutstandingOrder(order, userData);
+  }
 }
