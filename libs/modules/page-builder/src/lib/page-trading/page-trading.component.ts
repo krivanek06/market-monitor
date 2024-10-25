@@ -7,7 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@mm/api-client';
-import { PortfolioTransaction, PortfolioTransactionType, SymbolQuote, USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
+import { OutstandingOrder, PortfolioTransactionType, SymbolQuote, USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
@@ -24,7 +24,7 @@ import {
   SectionTitleComponent,
   SortByKeyPipe,
 } from '@mm/shared/ui';
-import { catchError, map, of, startWith, switchMap } from 'rxjs';
+import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-page-trading',
@@ -159,7 +159,6 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     <div>
       <app-portfolio-transactions-table
         data-testid="page-trading-portfolio-transactions-table"
-        (deleteEmitter)="onTransactionDelete($event)"
         [showTransactionFees]="authenticationUserService.state.isAccountDemoTrading()"
         [showActionButton]="authenticationUserService.state.isAccountNormalBasic()"
         [data]="authenticationUserService.state.portfolioTransactions()"
@@ -207,6 +206,15 @@ export class PageTradingComponent {
     ),
     { initialValue: { data: null, state: 'loading' as const } },
   );
+
+  /**
+   * check if stock market is open, crypto is open all the time
+   */
+  readonly isMarketOpen = computed(() => {
+    const summary = this.symbolSummarySignal();
+    const isCrypto = summary.data?.quote.exchange === 'CRYPTO' ? 'crypto' : 'stock';
+    return this.marketApiService.isMarketOpenForQuote(isCrypto);
+  });
 
   readonly topPerformanceSignal = toSignal(
     this.marketApiService.getMarketTopPerformance().pipe(map((d) => d.stockTopActive)),
@@ -260,27 +268,49 @@ export class PageTradingComponent {
     this.selectedSymbolControl.patchValue(quote.symbol);
   }
 
-  async onTransactionDelete(transaction: PortfolioTransaction) {
-    if (await this.dialogServiceUtil.showConfirmDialog('Please confirm removing transaction')) {
-      this.portfolioUserFacadeService.deletePortfolioOperation(transaction);
-      this.dialogServiceUtil.showNotificationBar('Transaction removed', 'success');
-    }
-  }
-
-  onOperationClick(transactionType: PortfolioTransactionType): void {
+  async onOperationClick(transactionType: PortfolioTransactionType): Promise<void> {
     const summary = this.symbolSummarySignal().data;
     if (!summary) {
       this.dialogServiceUtil.showNotificationBar('Please select a stock first', 'notification');
       return;
     }
 
-    this.dialog.open(PortfolioTradeDialogComponent, {
-      data: <PortfolioTradeDialogComponentData>{
+    // open dialog
+    const dialogRef = this.dialog.open<
+      PortfolioTradeDialogComponent,
+      PortfolioTradeDialogComponentData,
+      OutstandingOrder | undefined
+    >(PortfolioTradeDialogComponent, {
+      data: {
         transactionType: transactionType,
         quote: summary.quote,
         sector: summary.profile?.sector ?? summary.quote.exchange,
+        userPortfolioStateHolding: this.portfolioUserFacadeService.portfolioStateHolding(),
+        isMarketOpen: this.isMarketOpen(),
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });
+
+    // get data from dialog
+    const dialogData = await firstValueFrom(dialogRef.afterClosed());
+
+    // dialog was closed
+    if (!dialogData) {
+      return;
+    }
+
+    try {
+      // create order
+      const result = await this.portfolioUserFacadeService.createOrder(dialogData);
+
+      // show notification
+      if (result.type === 'order') {
+        this.dialogServiceUtil.showNotificationBar('Order created, it will be fulfilled once market opens', 'success');
+      } else {
+        this.dialogServiceUtil.showNotificationBar('Transaction created', 'success');
+      }
+    } catch (e) {
+      this.dialogServiceUtil.handleError(e);
+    }
   }
 }

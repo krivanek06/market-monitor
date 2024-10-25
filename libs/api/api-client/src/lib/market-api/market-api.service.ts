@@ -33,8 +33,8 @@ export class MarketApiService {
   private readonly cloudflareHistoricalPriceAPI = 'https://get-historical-prices.krivanek1234.workers.dev';
   private readonly cloudflareSymbolSummaryAPI = 'https://get-symbol-summary.krivanek1234.workers.dev';
 
-  private apiCache = inject(ApiCacheService);
-  getIsMarketOpenSignal = toSignal(this.getIsMarketOpen());
+  private readonly apiCache = inject(ApiCacheService);
+  readonly getIsMarketOpenSignal = toSignal(this.getIsMarketOpen());
 
   getSymbolQuotes(symbols: string[] | undefined): Observable<SymbolQuote[]> {
     if (!symbols || symbols.length === 0) {
@@ -180,7 +180,7 @@ export class MarketApiService {
       );
   }
 
-  getNews(newsType: NewsTypes, symbol: string = ''): Observable<News[]> {
+  getNews(newsType: NewsTypes, symbol = ''): Observable<News[]> {
     return this.apiCache
       .getData<
         News[]
@@ -258,6 +258,15 @@ export class MarketApiService {
         ApiCacheService.validity30Min,
       )
       .pipe(map((d) => d[economicType]));
+  }
+
+  isMarketOpenForQuote(type: 'stock' | 'crypto' = 'stock'): boolean {
+    const marketOpen = this.getIsMarketOpenSignal();
+    if (type === 'crypto') {
+      return marketOpen?.isTheCryptoMarketOpen ?? false;
+    }
+
+    return marketOpen?.isTheStockMarketOpen ?? false;
   }
 
   private getSymbolSummariesLong(symbols: string[]): Observable<SymbolSummary[]> {

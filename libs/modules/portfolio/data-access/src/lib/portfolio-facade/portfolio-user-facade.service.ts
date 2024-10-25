@@ -1,7 +1,7 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { UserApiService } from '@mm/api-client';
-import { PortfolioTransaction, PortfolioTransactionCreate } from '@mm/api-types';
+import { OutstandingOrder } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { of, switchMap } from 'rxjs';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
@@ -67,13 +67,8 @@ export class PortfolioUserFacadeService {
     this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.portfolioStateHolding()?.holdings ?? []),
   );
 
-  createPortfolioOperation(data: PortfolioTransactionCreate): Promise<PortfolioTransaction> {
+  async createOrder(data: OutstandingOrder) {
     const userData = this.authenticationUserService.state.getUserData();
-    return this.portfolioCreateOperationService.createPortfolioCreateOperation(userData, data);
-  }
-
-  deletePortfolioOperation(transaction: PortfolioTransaction): void {
-    const userData = this.authenticationUserService.state.getUserData();
-    this.userApiService.deletePortfolioTransactionForUser(userData.id, transaction);
+    return this.portfolioCreateOperationService.createOrder(userData, data);
   }
 }

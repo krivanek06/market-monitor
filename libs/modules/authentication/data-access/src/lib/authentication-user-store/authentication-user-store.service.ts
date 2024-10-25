@@ -67,7 +67,7 @@ export class AuthenticationUserStoreService {
     distinctUntilChanged((prev, curr) => prev === curr),
     tap((loaded) => console.log('AuthenticationUserStoreService loaded', loaded)),
     map((loaded) => ({
-      authenticationState: !!loaded ? ('SUCCESS' as const) : ('FAIL' as const),
+      authenticationState: loaded ? ('SUCCESS' as const) : ('FAIL' as const),
     })),
   );
 

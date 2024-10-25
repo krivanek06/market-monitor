@@ -10,7 +10,7 @@ import {
   PortfolioTransaction,
   SymbolQuote,
 } from '@mm/api-types';
-import { isBefore, isSameDay } from 'date-fns';
+import { isSameDay } from 'date-fns';
 import {
   fillOutMissingDatesForDate,
   getCurrentDateDefaultFormat,
@@ -169,34 +169,6 @@ export const createEmptyPortfolioState = (startingCash = 0) =>
     previousBalanceChange: 0,
     previousBalanceChangePercentage: 0,
   }) satisfies PortfolioState;
-
-/**
- * from user's every transaction, get distinct symbols with their first transaction date
- *
- * @param transactions - user's transactions
- * @returns - array of symbols with their first transaction date
- */
-export const getTransactionsStartDate = (
-  transactions: PortfolioTransaction[],
-): { symbol: string; startDate: string }[] => {
-  return transactions.reduce(
-    (acc, curr) => {
-      // check if symbol already exists
-      const entry = acc.find((d) => d.symbol === curr.symbol);
-      // add new entry if not exists
-      if (!entry) {
-        return [...acc, { symbol: curr.symbol, startDate: curr.date }];
-      }
-      // compare dates and update if sooner
-      if (isBefore(curr.date, entry.startDate)) {
-        return [...acc.filter((d) => d.symbol !== curr.symbol), { symbol: curr.symbol, startDate: curr.date }];
-      }
-      // else return original
-      return acc;
-    },
-    [] as { symbol: string; startDate: string }[],
-  );
-};
 
 /**
  * for provided transactions, calculate portfolio growth assets
