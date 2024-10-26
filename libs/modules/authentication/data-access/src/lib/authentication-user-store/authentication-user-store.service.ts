@@ -40,10 +40,7 @@ type AuthenticationState = {
   portfolioTransactions: PortfolioTransaction[] | null;
   watchList: UserWatchList;
   portfolioGrowth: PortfolioGrowth[] | null;
-  outstandingOrders: {
-    open: OutstandingOrder[];
-    closed: OutstandingOrder[];
-  };
+  outstandingOrders: OutstandingOrder[];
 };
 
 @Injectable({
@@ -66,10 +63,7 @@ export class AuthenticationUserStoreService {
       createdDate: getCurrentDateDefaultFormat(),
       data: [],
     },
-    outstandingOrders: {
-      open: [],
-      closed: [],
-    },
+    outstandingOrders: [],
   };
 
   private readonly loadedAuthenticationSource$ = this.authenticationAccountService.getLoadedAuthentication().pipe(
@@ -134,23 +128,11 @@ export class AuthenticationUserStoreService {
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
     switchMap((userData) =>
       userData
-        ? combineLatest([
-            this.outstandingOrderApiService.getOutstandingOrdersOpen(userData.id),
-            this.outstandingOrderApiService.getOutstandingOrdersClosed(userData.id),
-          ]).pipe(
-            map(([open, closed]) => ({
-              outstandingOrders: {
-                open: open.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-                closed: closed.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-              },
-            })),
+        ? this.outstandingOrderApiService.getOutstandingOrders(userData.id).pipe(
+            map((orders) => orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())),
+            map((orders) => ({ outstandingOrders: orders })),
           )
-        : of({
-            outstandingOrders: {
-              open: [],
-              closed: [],
-            },
-          }),
+        : of({ outstandingOrders: [] }),
     ),
   );
 

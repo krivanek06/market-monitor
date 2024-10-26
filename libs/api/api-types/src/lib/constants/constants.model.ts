@@ -75,4 +75,4 @@ export const GROUP_HOLDING_LIMIT = 50;
 /**
  * how many outstanding orders can a single user have at once in OPEN state
  */
-export const OUTSTANDING_ORDERS_MAX_ORDERS = 20;
+export const OUTSTANDING_ORDERS_MAX_ORDERS = 5;

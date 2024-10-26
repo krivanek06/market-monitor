@@ -86,11 +86,6 @@ export class PortfolioCreateOperationService {
       throw new Error('User does not have the order');
     }
 
-    // check if the order is open
-    if (order.status !== 'OPEN') {
-      throw new Error('Order is not open');
-    }
-
     // delete the order
     this.outstandingOrdersApiService.deleteOutstandingOrder(order, userData);
   }

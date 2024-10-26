@@ -389,7 +389,6 @@ export class PortfolioTradeDialogComponent {
     const order: OutstandingOrder = {
       orderId: createUUID(),
       createdAt: getCurrentDateDetailsFormat(),
-      status: 'OPEN',
       symbol: data.quote.symbol,
       displaySymbol: data.quote.displaySymbol,
       sector: data.sector ?? 'Unknown',

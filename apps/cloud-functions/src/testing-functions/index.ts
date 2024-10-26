@@ -1,5 +1,6 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
+import { outstandingOrderExecute } from '../outstanding-order';
 import { run_scheduler_once_a_day, run_scheduler_update_users } from '../production';
 import {
   userDeactivateInactiveAccounts,
@@ -17,7 +18,8 @@ type FType =
   | 'test_function'
   | 'test_delete_user_accounts'
   | 'run_scheduler_once_a_day'
-  | 'run_scheduler_update_users';
+  | 'run_scheduler_update_users'
+  | 'run_outstanding_order_execute';
 
 export const testing_function = onRequest({ timeoutSeconds: 1200 }, async (req, res) => {
   // prevent running in production
@@ -53,6 +55,8 @@ export const testing_function = onRequest({ timeoutSeconds: 1200 }, async (req, 
       await run_scheduler_once_a_day(req, res);
     } else if (functionType === 'run_scheduler_update_users') {
       await run_scheduler_update_users(req, res);
+    } else if (functionType === 'run_outstanding_order_execute') {
+      await outstandingOrderExecute();
     }
   });
 });

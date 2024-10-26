@@ -28,40 +28,17 @@ export class OutstandingOrderApiService {
   }
 
   /** get all open orders */
-  getOutstandingOrdersOpen(userId: string): Observable<OutstandingOrder[]> {
+  getOutstandingOrders(userId: string): Observable<OutstandingOrder[]> {
     return rxCollectionData(
       query(
         this.outstandingOrdersCollection(),
         where('userData.id', '==', userId),
-        where('status', '==', 'OPEN'),
         limit(OUTSTANDING_ORDERS_MAX_ORDERS),
       ),
     );
   }
 
-  /** get last N closed orders */
-  getOutstandingOrdersClosed(userId: string): Observable<OutstandingOrder[]> {
-    return rxCollectionData(
-      query(
-        this.outstandingOrdersCollection(),
-        where('userData.id', '==', userId),
-        where('status', '==', 'CLOSED'),
-        limit(10),
-      ),
-    );
-  }
-
   addOutstandingOrder(order: OutstandingOrder): void {
-    setDoc(this.getOutstandingOrderDocRef(order.orderId), order);
-  }
-
-  editOutstandingOrder(order: OutstandingOrder, userBase: UserBase): void {
-    // check if user has the order
-    if (order.userData.id !== userBase.id) {
-      throw new Error('User does not have the order');
-    }
-
-    // update the order
     setDoc(this.getOutstandingOrderDocRef(order.orderId), order);
   }
 

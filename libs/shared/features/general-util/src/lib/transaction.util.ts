@@ -49,8 +49,8 @@ export const getTransactionsStartDate = (
  * creates transaction from an outstanding order
  *
  * @param userDocData
- * @param input
- * @param historicalPrice
+ * @param input - outstanding order
+ * @param currentPrice - current price of the symbol
  * @returns
  */
 export const createTransaction = (
@@ -60,7 +60,7 @@ export const createTransaction = (
 ): PortfolioTransaction => {
   const isSell = input.orderType.type === 'SELL';
 
-  // if custom total value is provided calculate unit price, else use API price
+  // current price of the symbol
   const unitPrice = currentPrice;
 
   // from holdings get break even price

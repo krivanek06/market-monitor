@@ -20,12 +20,12 @@ import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
   ],
   template: `
     <app-general-card>
-      <!-- header -->
-      <div class="flex justify-between">
-        <!-- symbol + image -->
-        <div class="flex items-center gap-2">
-          <img appDefaultImg imageType="symbol" [src]="order().symbol" class="h-8 w-8" />
-          <div class="flex flex-col">
+      <!-- symbol + image -->
+      <div class="flex items-center gap-2">
+        <img appDefaultImg imageType="symbol" [src]="order().symbol" class="h-8 w-8" />
+        <div class="-mt-1 flex flex-1 flex-col">
+          <div class="flex items-center justify-between">
+            <!-- symbol + order type -->
             <div class="flex gap-2">
               <div class="text-wt-gray-dark">{{ order().symbol }}</div>
               <div
@@ -37,26 +37,16 @@ import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
                 {{ order().orderType.type }}
               </div>
             </div>
-            <div class="text-sm">{{ order().createdAt | date: 'HH:mm MMM d, y' }}</div>
-          </div>
-        </div>
 
-        <!-- status + delete button -->
-        <div class="flex items-center gap-2">
-          <div
-            [ngClass]="{
-              'text-wt-success': order().status === 'OPEN',
-              'text-wt-danger': order().status === 'CLOSED',
-            }"
-          >
-            {{ order().status }}
+            <!-- delete button -->
+            <div class="flex items-center gap-2">
+              <button mat-icon-button type="button" color="warn" (click)="onDelete()">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </div>
-          <!-- display delete button only if order status is OPEN -->
-          @if (order().status === 'OPEN') {
-            <button mat-icon-button type="button" color="warn" (click)="onDelete()">
-              <mat-icon>delete</mat-icon>
-            </button>
-          }
+
+          <div class="-mt-1 text-sm">{{ order().createdAt | date: 'HH:mm MMM d, y' }}</div>
         </div>
       </div>
 
@@ -75,13 +65,13 @@ import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
         </div>
 
         <div class="g-item-wrapper">
-          <span>Potential price</span>
-          <span>{{ order.potentialSymbolPrice | currency }}</span>
+          <span>Price</span>
+          <span>~{{ order.potentialSymbolPrice | currency }}</span>
         </div>
 
         <div class="g-item-wrapper">
-          <span>Potential total</span>
-          <span>{{ order.potentialTotalPrice | currency }}</span>
+          <span>Total</span>
+          <span>~{{ order.potentialTotalPrice | currency }}</span>
         </div>
       </div>
     </ng-template>

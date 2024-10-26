@@ -17,13 +17,6 @@ export type OutstandingOrder = SymbolStoreBase & {
   units: number;
 
   /**
-   * status of the order
-   * open - order is active and waiting for the price to reach the desired value
-   * closed - order was fulfilled by the system
-   */
-  status: 'OPEN' | 'CLOSED';
-
-  /**
    * when the order was created
    * format: 'yyyy-MM-dd HH:mm:ss' (new Date().toISOString())
    */

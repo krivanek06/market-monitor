@@ -148,11 +148,11 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
 
     <!-- outstanding orders -->
     <app-section-title title="Open Outstanding Orders" class="mb-4" matIcon="reorder" />
-    <div class="grid grid-cols-4 gap-x-4 gap-y-2">
-      @for (order of state.outstandingOrders().open; track order.orderId) {
-        <app-outstanding-order-card-data [order]="order" (deleteClicked)="onOpenOrderRemove(order)" />
+    <div class="grid grid-cols-5 gap-x-4 gap-y-2">
+      @for (order of state.outstandingOrders(); track order.orderId) {
+        <app-outstanding-order-card-data [order]="order" (deleteClicked)="onOrderRemove(order)" />
       } @empty {
-        <div class="col-span-4 p-4 text-center">No open orders</div>
+        <div class="col-span-5 p-4 text-center">No open orders</div>
       }
     </div>
 
@@ -300,7 +300,7 @@ export class PageTradingComponent {
     this.selectedSymbolControl.patchValue(quote.symbol);
   }
 
-  async onOpenOrderRemove(order: OutstandingOrder) {
+  async onOrderRemove(order: OutstandingOrder) {
     if (await this.dialogServiceUtil.showConfirmDialog('Are you sure you want to delete this order?')) {
       this.portfolioUserFacadeService.deleteOrder(order);
     }

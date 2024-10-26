@@ -16,7 +16,6 @@ import {
   calculateGrowth,
   dateFormatDate,
   getObjectEntries,
-  getPortfolioGrowth,
   getPortfolioGrowthAssets,
   getTransactionsStartDate,
   getYesterdaysDate,
@@ -73,11 +72,6 @@ export class PortfolioCalculationService {
         holdings,
       })),
     );
-  }
-
-  getPortfolioGrowth(portfolioAssets: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
-    const allHolidays = this.marketApiService.getIsMarketOpenSignal()?.allHolidays ?? [];
-    return getPortfolioGrowth(portfolioAssets, startingCashValue, allHolidays);
   }
 
   /**
