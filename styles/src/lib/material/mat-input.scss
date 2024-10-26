@@ -1,33 +1,17 @@
-.mat-mdc-input-element:disabled,
-.mat-mdc-form-field-type-mat-native-select.mat-mdc-form-field-disabled .mat-mdc-form-field-infix::after {
-  color: var(--disable-default) !important;
-  opacity: 0.55;
-}
-
-fieldset:disabled {
-  mat-form-field {
-    .mat-mdc-text-field-wrapper {
-      background-color: var(--disable-default) !important;
-    }
+.mat-form-field-disabled {
+  .mat-mdc-text-field-wrapper {
+    opacity: 0.65 !important;
+    pointer-events: none !important;
+    background-color: var(--disable-default) !important;
   }
-}
 
-.mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__input {
-  color: var(--gray-medium) !important;
-}
+  :hover {
+    pointer-events: none !important;
+    background-color: var(--disable-default) !important;
+  }
 
-input,
-textarea {
-  font-size: 16px !important;
-}
-
-.mdc-text-field--filled:not(.mdc-text-field--disabled) {
-  background-color: var(--gray-light) !important;
-  border: 1px solid var(--gray-light-strong) !important;
-}
-
-::-webkit-input-placeholder {
-  color: var(--gray-medium) !important;
+  opacity: 0.65 !important;
+  pointer-events: none !important;
 }
 
 mat-form-field {

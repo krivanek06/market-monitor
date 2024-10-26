@@ -1,14 +1,16 @@
-import { CommonModule } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { ThemeService } from './theme.service';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { filterNil } from 'ngxtension/filter-nil';
 
 @Component({
   selector: 'app-theme-switcher',
   standalone: true,
-  imports: [CommonModule, MatSlideToggleModule, MatIconModule, ReactiveFormsModule],
+  imports: [MatSlideToggleModule, MatIconModule, ReactiveFormsModule],
   template: `
     <div class="flex items-center gap-4">
       <mat-icon class="text-wt-gray-medium">light_mode</mat-icon>
@@ -28,18 +30,27 @@ import { ThemeService } from './theme.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeSwitcherComponent {
-  private themeService = inject(ThemeService);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly document = inject(DOCUMENT);
+  private readonly DARK_THEME = 'dark-theme';
 
-  sliderControl = new FormControl<boolean>(false);
+  readonly sliderControl = new FormControl<boolean>(false);
 
   constructor() {
-    this.sliderControl.patchValue(this.themeService.isDarkMode());
-  }
+    const val = !!this.authenticationUserStoreService.state.getUserDataNormal()?.settings?.isDarkMode;
+    this.sliderControl.patchValue(val, { emitEvent: false });
 
-  ngOnInit(): void {
-    this.sliderControl.valueChanges.subscribe(() => {
-      console.log('changing toggle theme');
-      this.themeService.toggleTheme();
+    this.sliderControl.valueChanges.pipe(filterNil(), takeUntilDestroyed()).subscribe((val) => {
+      if (val) {
+        this.document.body.classList.add(this.DARK_THEME);
+      } else {
+        this.document.body.classList.remove(this.DARK_THEME);
+      }
+
+      // save user settings
+      this.authenticationUserStoreService.changeUserSettings({
+        isDarkMode: val,
+      });
     });
   }
 }

@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,7 +7,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
 import { DialogServiceModule } from '@mm/shared/dialog-manager';
-import { ThemeService } from '@mm/shared/theme-switcher';
 import { MenuSideNavigationComponent } from './menu-navigation/menu-side-navigation.component';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
 
@@ -88,15 +87,9 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageMenuComponent {
-  /**
-   * used to init the service to set theme eagerly
-   */
-  private readonly themeService = inject(ThemeService);
-
   readonly isOpen = signal<boolean>(false);
 
   toggleMatDrawerExpandedView(): void {
     this.isOpen.set(!this.isOpen());
-    console.log('toggleMatDrawerExpandedView', this.isOpen());
   }
 }
