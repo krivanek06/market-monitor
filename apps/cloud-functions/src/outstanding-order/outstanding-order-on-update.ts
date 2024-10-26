@@ -10,52 +10,32 @@ export const onOutstandingOrderCreate = async (order: OutstandingOrder): Promise
     console.error(`User not found: ${order.userData.id}`);
     return;
   }
+
+  // what type of order is it
+  const isBuy = order.orderType.type === 'BUY';
+  const isSell = order.orderType.type === 'SELL';
+
+  // subtract the cash from the user if BUY order
+  const cashOnHand = isBuy
+    ? roundNDigits(user.portfolioState.cashOnHand - order.potentialTotalPrice)
+    : user.portfolioState.cashOnHand;
+
+  // update holdings
+  const holdings = user.holdingSnapshot.data.map((holding) => ({
+    ...holding,
+    // remove owned units if SELL order
+    units: holding.symbol === order.symbol && isSell ? holding.units - order.units : holding.units,
+  }));
+
   // update user
   userRef.update({
     portfolioState: {
       ...user.portfolioState,
-      cashOnHand: roundNDigits(user.portfolioState.cashOnHand - order.potentialTotalPrice),
+      cashOnHand,
     },
-  } satisfies Partial<UserData>);
-};
-
-/**
- * - check if units or price changed and update user's cash on hand
- * - check if it was closed and update user's cash on hand (add back the cash)
- */
-export const onOutstandingOrderEdit = async (oldOrder: OutstandingOrder, newOrder: OutstandingOrder): Promise<void> => {
-  const userRef = userDocumentRef(oldOrder.userData.id);
-  const user = (await userRef.get()).data();
-
-  if (!user) {
-    console.error(`User not found: ${oldOrder.userData.id}`);
-    return;
-  }
-
-  // don't do if the status remained the same
-  if (oldOrder.status === 'CLOSED' && newOrder.status === 'CLOSED') {
-    return;
-  }
-
-  // check if it was closed and update user's cash on hand (add back the cash)
-  if (oldOrder.status === 'OPEN' && newOrder.status === 'CLOSED') {
-    userRef.update({
-      portfolioState: {
-        ...user.portfolioState,
-        cashOnHand: roundNDigits(user.portfolioState.cashOnHand + oldOrder.potentialTotalPrice),
-      },
-    } satisfies Partial<UserData>);
-
-    return;
-  }
-
-  // update user's cash on hand - probably the units or price changed
-  userRef.update({
-    portfolioState: {
-      ...user.portfolioState,
-      cashOnHand: roundNDigits(
-        user.portfolioState.cashOnHand + oldOrder.potentialTotalPrice - newOrder.potentialTotalPrice,
-      ),
+    holdingSnapshot: {
+      lastModifiedDate: new Date().toISOString(),
+      data: holdings,
     },
   } satisfies Partial<UserData>);
 };
@@ -69,11 +49,30 @@ export const onOutstandingOrderDelete = async (order: OutstandingOrder): Promise
     return;
   }
 
-  // update user - add back the cash
+  // what type of order is it
+  const isBuy = order.orderType.type === 'BUY';
+  const isSell = order.orderType.type === 'SELL';
+
+  // add the cash back to the user if BUY order
+  const cashOnHand = isBuy
+    ? roundNDigits(user.portfolioState.cashOnHand + order.potentialTotalPrice)
+    : user.portfolioState.cashOnHand;
+
+  // update holdings - add back the units if SELL order
+  const holdings = user.holdingSnapshot.data.map((holding) => ({
+    ...holding,
+    units: holding.symbol === order.symbol && isSell ? holding.units + order.units : holding.units,
+  }));
+
+  // update user
   userRef.update({
     portfolioState: {
       ...user.portfolioState,
-      cashOnHand: roundNDigits(user.portfolioState.cashOnHand + order.potentialTotalPrice),
+      cashOnHand,
+    },
+    holdingSnapshot: {
+      lastModifiedDate: new Date().toISOString(),
+      data: holdings,
     },
   } satisfies Partial<UserData>);
 };
