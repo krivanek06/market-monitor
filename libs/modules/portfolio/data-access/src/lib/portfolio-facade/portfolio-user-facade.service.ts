@@ -22,18 +22,14 @@ export class PortfolioUserFacadeService {
    * however listen on the userState to get current data - like cashOnHand (for outstanding orders)
    */
   readonly portfolioStateHolding = toSignal(
-    toObservable(this.authenticationUserService.state.getUserPortfolioTransactions).pipe(
-      switchMap((transactions) =>
-        this.authenticationUserService.stateUserData$.pipe(
-          switchMap((userData) =>
-            transactions && userData
-              ? this.portfolioCalculationService.getPortfolioStateHoldings(
-                  this.authenticationUserService.state.getUserData().portfolioState,
-                  transactions,
-                )
-              : of(undefined),
-          ),
-        ),
+    toObservable(this.authenticationUserService.state.userData).pipe(
+      switchMap((userData) =>
+        userData
+          ? this.portfolioCalculationService.getPortfolioStateHoldings(
+              this.authenticationUserService.state.getUserData().portfolioState,
+              this.authenticationUserService.state.getUserData().holdingSnapshot.data,
+            )
+          : of(undefined),
       ),
     ),
   );

@@ -1,5 +1,4 @@
 import { Injectable, InjectionToken, effect, inject } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
 import {
   OutstandingOrder,
@@ -141,8 +140,8 @@ export class AuthenticationUserStoreService {
           ]).pipe(
             map(([open, closed]) => ({
               outstandingOrders: {
-                open,
-                closed,
+                open: open.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+                closed: closed.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
               },
             })),
           )
@@ -241,8 +240,6 @@ export class AuthenticationUserStoreService {
       isDemoAccount: () => !!state().userData?.isDemo,
     }),
   });
-
-  readonly stateUserData$ = toObservable(this.state.userData);
 
   userDataChange = effect(() => {
     console.log('AuthenticationUserStoreService update', this.state());

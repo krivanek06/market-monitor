@@ -147,33 +147,23 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
     </div>
 
     <!-- outstanding orders -->
-    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="end" class="mb-8">
-      <mat-tab label="Open Orders">
-        <div class="grid grid-cols-4 gap-x-4 gap-y-2">
-          @for (order of state.outstandingOrders().open; track order.orderId) {
-            <app-outstanding-order-card-data [order]="order" (deleteClicked)="onOpenOrderRemove(order)" />
-          } @empty {
-            <div class="col-span-4 p-4 text-center">No open orders</div>
-          }
-        </div>
-      </mat-tab>
-      <mat-tab label="Closed Orders">
-        @for (order of state.outstandingOrders().closed; track order.orderId) {
-          <app-outstanding-order-card-data [order]="order" (deleteClicked)="onOpenOrderRemove(order)" />
-        } @empty {
-          <div class="col-span-4 p-4 text-center">No closed orders</div>
-        }
-      </mat-tab>
-    </mat-tab-group>
+    <app-section-title title="Open Outstanding Orders" class="mb-4" matIcon="reorder" />
+    <div class="grid grid-cols-4 gap-x-4 gap-y-2">
+      @for (order of state.outstandingOrders().open; track order.orderId) {
+        <app-outstanding-order-card-data [order]="order" (deleteClicked)="onOpenOrderRemove(order)" />
+      } @empty {
+        <div class="col-span-4 p-4 text-center">No open orders</div>
+      }
+    </div>
 
     <!-- divider -->
-    <div class="mb-3 py-2">
+    <div class="my-5">
       <mat-divider />
     </div>
 
     <!-- top active -->
     <div class="mb-10 hidden lg:block">
-      <app-section-title title="Top Active" />
+      <app-section-title title="Top Active" matIcon="military_tech" />
 
       <div class="grid grid-cols-3 gap-x-6 gap-y-2 p-4 xl:grid-cols-4 2xl:grid-cols-5">
         @for (item of topPerformanceSignal(); track item.symbol) {
@@ -189,21 +179,24 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
             <app-quote-item data-testid="page-trading-top-active-symbols" [symbolQuote]="item" />
           </div>
         } @empty {
-          <div *ngRange="20" class="g-skeleton h-9"></div>
+          <div *ngRange="20" class="g-skeleton h-10"></div>
         }
       </div>
     </div>
 
-    <!-- transaction history -->
-    <div>
-      <app-portfolio-transactions-table
-        data-testid="page-trading-portfolio-transactions-table"
-        [showTransactionFees]="state.isAccountDemoTrading()"
-        [showActionButton]="state.isAccountNormalBasic()"
-        [data]="state.portfolioTransactions()"
-        [showSymbolFilter]="true"
-      />
+    <!-- divider -->
+    <div class="mb-6 py-2">
+      <mat-divider />
     </div>
+
+    <!-- transaction history -->
+    <app-portfolio-transactions-table
+      data-testid="page-trading-portfolio-transactions-table"
+      [showTransactionFees]="state.isAccountDemoTrading()"
+      [showActionButton]="state.isAccountNormalBasic()"
+      [data]="state.portfolioTransactions()"
+      [showSymbolFilter]="true"
+    />
   `,
   styles: `
     :host {
@@ -234,7 +227,7 @@ export class PageTradingComponent {
       switchMap((symbol) =>
         this.marketApiService.getSymbolSummary(symbol).pipe(
           map((d) => ({ data: d, state: 'success' as const })),
-          catchError((e) => {
+          catchError(() => {
             this.dialogServiceUtil.showNotificationBar('Error fetching symbol summary', 'error');
             return of({ data: null, state: 'error' as const });
           }),
