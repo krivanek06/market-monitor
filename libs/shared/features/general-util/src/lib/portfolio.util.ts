@@ -3,30 +3,30 @@ import {
   PortfolioGrowthAssets,
   PortfolioGrowthAssetsDataItem,
   PortfolioState,
+  PortfolioStateHoldingBase,
   PortfolioTransaction,
 } from '@mm/api-types';
 import { isSameDay } from 'date-fns';
 import { fillOutMissingDatesForDate, getCurrentDateDefaultFormat, getYesterdaysDate } from './date-service.util';
 import { roundNDigits } from './general-function.util';
 
-export const createEmptyPortfolioState = (startingCash = 0) =>
-  ({
-    balance: startingCash,
-    cashOnHand: startingCash,
-    holdingsBalance: 0,
-    invested: 0,
-    numberOfExecutedBuyTransactions: 0,
-    numberOfExecutedSellTransactions: 0,
-    startingCash: startingCash,
-    transactionFees: 0,
-    date: getCurrentDateDefaultFormat(),
-    totalGainsPercentage: 0,
-    totalGainsValue: 0,
-    firstTransactionDate: null,
-    lastTransactionDate: null,
-    previousBalanceChange: 0,
-    previousBalanceChangePercentage: 0,
-  }) satisfies PortfolioState;
+export const createEmptyPortfolioState = (startingCash = 0): PortfolioState => ({
+  balance: startingCash,
+  cashOnHand: startingCash,
+  holdingsBalance: 0,
+  invested: 0,
+  numberOfExecutedBuyTransactions: 0,
+  numberOfExecutedSellTransactions: 0,
+  startingCash: startingCash,
+  transactionFees: 0,
+  date: getCurrentDateDefaultFormat(),
+  totalGainsPercentage: 0,
+  totalGainsValue: 0,
+  firstTransactionDate: null,
+  lastTransactionDate: null,
+  previousBalanceChange: 0,
+  previousBalanceChangePercentage: 0,
+});
 
 /**
  * for provided transactions, calculate portfolio growth assets
@@ -141,4 +141,47 @@ export const getPortfolioGrowthAssets = (
     .filter((d): d is PortfolioGrowthAssets => !!d && d.data.length > 0);
 
   return result;
+};
+
+/**
+ * get partial data for user's current holdings from all previous transactions, where units are more than 0
+ *
+ * @param transactions - user's transactions
+ * @returns
+ */
+export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransaction[]): PortfolioStateHoldingBase[] => {
+  return transactions
+    .reduce((acc, curr) => {
+      const existingHolding = acc.find((d) => d.symbol === curr.symbol);
+      const isSell = curr.transactionType === 'SELL';
+      // update existing holding
+      if (existingHolding) {
+        const newUnits = existingHolding.units + (isSell ? -curr.units : curr.units);
+        existingHolding.units = curr.sector === 'CRYPTO' ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
+        existingHolding.invested += roundNDigits(
+          isSell ? -(existingHolding.breakEvenPrice * curr.units) : curr.unitPrice * curr.units,
+        );
+        existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units);
+        return acc;
+      }
+
+      // first value can not be sell
+      if (isSell) {
+        console.error('First transaction can not be sell');
+      }
+
+      // add new holding
+      return [
+        ...acc,
+        {
+          symbolType: curr.symbolType,
+          symbol: curr.symbol,
+          sector: curr.sector,
+          units: curr.units,
+          invested: roundNDigits(curr.unitPrice * curr.units),
+          breakEvenPrice: curr.unitPrice,
+        } satisfies PortfolioStateHoldingBase,
+      ];
+    }, [] as PortfolioStateHoldingBase[])
+    .filter((d) => d.units > 0);
 };

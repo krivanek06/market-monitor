@@ -12,6 +12,7 @@ import {
   calculateGrowth,
   getCurrentDateDefaultFormat,
   getCurrentDateDetailsFormat,
+  getPortfolioStateHoldingBaseUtil,
   roundNDigits,
   transformPortfolioStateHoldingToPortfolioState,
 } from '@mm/shared/general-util';
@@ -188,47 +189,4 @@ const getPortfolioStateHoldingsUtil = (
   };
 
   return result;
-};
-
-/**
- * get partial data for user's current holdings from all previous transactions, where units are more than 0
- *
- * @param transactions - user's transactions
- * @returns
- */
-export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransaction[]): PortfolioStateHoldingBase[] => {
-  return transactions
-    .reduce((acc, curr) => {
-      const existingHolding = acc.find((d) => d.symbol === curr.symbol);
-      const isSell = curr.transactionType === 'SELL';
-      // update existing holding
-      if (existingHolding) {
-        const newUnits = existingHolding.units + (isSell ? -curr.units : curr.units);
-        existingHolding.units = curr.sector === 'CRYPTO' ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
-        existingHolding.invested += roundNDigits(
-          isSell ? -(existingHolding.breakEvenPrice * curr.units) : curr.unitPrice * curr.units,
-        );
-        existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units);
-        return acc;
-      }
-
-      // first value can not be sell
-      if (isSell) {
-        console.error('First transaction can not be sell');
-      }
-
-      // add new holding
-      return [
-        ...acc,
-        {
-          symbolType: curr.symbolType,
-          symbol: curr.symbol,
-          sector: curr.sector,
-          units: curr.units,
-          invested: roundNDigits(curr.unitPrice * curr.units),
-          breakEvenPrice: curr.unitPrice,
-        } satisfies PortfolioStateHoldingBase,
-      ];
-    }, [] as PortfolioStateHoldingBase[])
-    .filter((d) => d.units > 0);
 };

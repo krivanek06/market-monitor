@@ -22,6 +22,7 @@ import {
   getCurrentDateDefaultFormat,
   getCurrentDateDetailsFormat,
   getPortfolioGrowthAssets,
+  getPortfolioStateHoldingBaseUtil,
   getRandomNumber,
   getTransactionsStartDate,
   getYesterdaysDate,
@@ -37,7 +38,6 @@ import {
   userDocumentTransactionHistoryRef,
   userDocumentWatchListRef,
 } from '../database';
-import { getPortfolioStateHoldingBaseUtil } from '../portfolio';
 import { isFirebaseEmulator } from '../utils';
 import { userCreate } from './user-create-account';
 
@@ -121,7 +121,7 @@ export class CreateDemoAccountService {
   };
 
   generatePortfolioGrowthData = async (userData: UserData, transactions: PortfolioTransaction[]): Promise<void> => {
-    //const yesterDay = getYesterdaysDate();
+    // get start date of each transaction - should be the same for all symbols
     const transactionStart = getTransactionsStartDate(transactions);
 
     // load historical data for each symbol
