@@ -196,7 +196,7 @@ const getPortfolioStateHoldingsUtil = (
  * @param transactions - user's transactions
  * @returns
  */
-const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransaction[]): PortfolioStateHoldingBase[] => {
+export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransaction[]): PortfolioStateHoldingBase[] => {
   return transactions
     .reduce((acc, curr) => {
       const existingHolding = acc.find((d) => d.symbol === curr.symbol);

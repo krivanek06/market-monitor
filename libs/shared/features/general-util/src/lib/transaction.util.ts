@@ -54,7 +54,7 @@ export const getTransactionsStartDate = (
  * @returns
  */
 export const createTransaction = (
-  userDocData: UserData,
+  { id: userId, holdingSnapshot }: UserData,
   input: OutstandingOrder,
   currentPrice: number,
 ): PortfolioTransaction => {
@@ -64,7 +64,12 @@ export const createTransaction = (
   const unitPrice = currentPrice;
 
   // from holdings get break even price
-  const symbolHolding = userDocData.holdingSnapshot.data.find((d) => d.symbol === input.symbol);
+  const symbolHolding = holdingSnapshot.data.find((d) => d.symbol === input.symbol);
+
+  // on sell order, holdings must exists
+  if (isSell && !symbolHolding) {
+    throw new Error('Symbol holding not found');
+  }
 
   // calculate break even price if SELL order
   const breakEvenPrice = isSell ? roundNDigits(symbolHolding?.breakEvenPrice ?? 1, 2) : 0;
@@ -84,7 +89,7 @@ export const createTransaction = (
     units: input.units,
     sector: input.sector,
     transactionType: input.orderType.type,
-    userId: userDocData.id,
+    userId: userId,
     symbolType: input.symbolType,
     unitPrice,
     transactionFees,
