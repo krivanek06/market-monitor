@@ -4,7 +4,7 @@ import { CallableRequest, onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from './group';
 import { groupGeneralActions } from './group/group-general-actions';
-import { onOutstandingOrderCreate, onOutstandingOrderDelete } from './outstanding-order';
+import { onOutstandingOrderCreate, onOutstandingOrderDelete, outstandingOrderExecute } from './outstanding-order';
 import { onTransactionUpdateForUserId } from './portfolio';
 import {
   userCreateAccount,
@@ -106,6 +106,20 @@ export const run_scheduler_update_users = onSchedule(
     await measureFunctionExecutionTime(async () => {
       console.log('[Users]: update portfolio');
       await userPortfolioUpdate();
+    });
+  },
+);
+
+export const run_scheduler_execute_outstanding_orders = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '2 16 * * 1-5', // 16:02 every weekday
+    region: region,
+    timeZone: 'Europe/Berlin',
+  },
+  async () => {
+    await measureFunctionExecutionTime(async () => {
+      await outstandingOrderExecute();
     });
   },
 );
