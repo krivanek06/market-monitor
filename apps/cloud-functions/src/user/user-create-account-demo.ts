@@ -185,7 +185,6 @@ export class CreateDemoAccountService {
         orderType: { type: 'BUY' },
         potentialSymbolPrice: price.close,
         potentialTotalPrice: price.close * units,
-        closedAt: null,
         userData: userData,
       } satisfies OutstandingOrder;
 
@@ -243,7 +242,6 @@ export class CreateDemoAccountService {
         orderType: { type: 'SELL' },
         potentialSymbolPrice: price.close,
         potentialTotalPrice: price.close * units,
-        closedAt: null,
         userData: userData,
         createdAt: this.pastDateSell,
         displaySymbol: transaction.symbol,

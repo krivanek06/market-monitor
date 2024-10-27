@@ -341,7 +341,7 @@ export class PageTradingComponent {
 
     try {
       // create order
-      const result = await this.portfolioUserFacadeService.createOrder(dialogData);
+      const result = this.portfolioUserFacadeService.createOrder(dialogData);
 
       // show notification
       if (result.type === 'order') {

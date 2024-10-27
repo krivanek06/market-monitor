@@ -12,7 +12,7 @@ import {
   setDoc,
   where,
 } from '@angular/fire/firestore';
-import { OUTSTANDING_ORDERS_MAX_ORDERS, OutstandingOrder, UserBase } from '@mm/api-types';
+import { OUTSTANDING_ORDERS_MAX_ORDERS, OutstandingOrder, UserBaseMin } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { Observable } from 'rxjs';
@@ -42,7 +42,7 @@ export class OutstandingOrderApiService {
     setDoc(this.getOutstandingOrderDocRef(order.orderId), order);
   }
 
-  deleteOutstandingOrder(order: OutstandingOrder, userBase: UserBase): void {
+  deleteOutstandingOrder(order: OutstandingOrder, userBase: UserBaseMin): void {
     // check if user has the order
     if (order.userData.id !== userBase.id) {
       throw new Error('User does not have the order');

@@ -12,6 +12,8 @@ import {
 
 /**
  * load all outstanding orders and try execute them
+ *
+ * todo - can happen that I have 2 BUY orders and both overflow with total price, so cash may be negative
  */
 export const outstandingOrderExecute = async () => {
   // check if market is open

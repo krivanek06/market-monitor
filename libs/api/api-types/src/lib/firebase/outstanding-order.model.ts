@@ -23,12 +23,6 @@ export type OutstandingOrder = SymbolStoreBase & {
   createdAt: string;
 
   /**
-   * when the order was closed (fulfilled by the system)
-   * format: 'yyyy-MM-dd HH:mm:ss' (new Date().toISOString())
-   */
-  closedAt: string | null;
-
-  /**
    * price of the symbol when the user created the order
    * used to subtract the user's cash when the order is created
    */
