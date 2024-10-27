@@ -1,10 +1,10 @@
 import { getIsMarketOpenCF, getSymbolQuotesCF } from '@mm/api-external';
 import { OutstandingOrder, SymbolQuote } from '@mm/api-types';
-import { createTransaction } from '@mm/shared/general-util';
+import { createTransaction, getCurrentDateDetailsFormat } from '@mm/shared/general-util';
 import { firestore } from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import {
-  outstandingOrderCollectionRef,
+  outstandingOrderCollectionStatusOpenRef,
   outstandingOrderDocRef,
   userDocumentRef,
   userDocumentTransactionHistoryRef,
@@ -26,7 +26,7 @@ export const outstandingOrderExecute = async () => {
   }
 
   // load all open orders
-  const openOrders = await outstandingOrderCollectionRef().get();
+  const openOrders = await outstandingOrderCollectionStatusOpenRef().get();
   const openOrdersData = openOrders.docs.map((doc) => doc.data());
 
   // group orders by user id
@@ -74,11 +74,13 @@ export const outstandingOrderExecute = async () => {
           const quote = symbolQuotesMap.get(order.symbol);
 
           if (quote) {
-            // calculate the current total of the order
+            // calculate the new current total of the order
             const currentTotal = order.units * quote.price;
+            // if potentialTotalPrice was 100 and now it's 110, priceDiff is 10
+            const priceDiff = currentTotal - order.potentialTotalPrice;
 
             // check if user has enough money
-            if (order.orderType.type === 'BUY' && userData.portfolioState.cashOnHand < currentTotal) {
+            if (order.orderType.type === 'BUY' && userData.portfolioState.cashOnHand < priceDiff) {
               console.error(`User ${userData.id} does not have enough money to execute order ${order.orderId}`);
               return;
             }
@@ -89,7 +91,12 @@ export const outstandingOrderExecute = async () => {
             });
 
             // delete the order
-            firebaseTransaction.delete(outstandingOrderDocRef(order.orderId));
+            firebaseTransaction.update(outstandingOrderDocRef(order.orderId), {
+              status: 'CLOSED',
+              closedAt: getCurrentDateDetailsFormat(),
+              finalSymbolPrice: quote.price,
+              finalTotalPrice: currentTotal,
+            } satisfies Partial<OutstandingOrder>);
           } else {
             console.error(`Failed to get quote for symbol ${order.symbol}`);
           }

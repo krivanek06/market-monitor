@@ -141,7 +141,7 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
       <div class="grid h-[440px] place-content-center text-center text-lg">Failed to load symbol summary</div>
     }
 
-    @if (state.outstandingOrders().length > 0) {
+    @if (state.outstandingOrders().openOrders.length > 0) {
       <!-- divider -->
       <div class="mb-3 py-2">
         <mat-divider />
@@ -150,7 +150,7 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
       <!-- outstanding orders -->
       <app-section-title title="Open Outstanding Orders" class="mb-4" matIcon="reorder" />
       <div class="grid grid-cols-5 gap-x-4 gap-y-2">
-        @for (order of state.outstandingOrders(); track order.orderId) {
+        @for (order of state.outstandingOrders().openOrders; track order.orderId) {
           <app-outstanding-order-card-data [order]="order" (deleteClicked)="onOrderRemove(order)" />
         } @empty {
           <div class="col-span-5 p-4 text-center">No open orders</div>

@@ -65,10 +65,6 @@ export class PortfolioCalculationService {
                 symbolQuote: quote,
               } satisfies PortfolioStateHolding;
             })
-            .map((d) => {
-              console.log('PortfolioStateHolding', d);
-              return d;
-            })
             .filter((d) => !!d) as PortfolioStateHolding[],
       ),
       map((holdings) => ({

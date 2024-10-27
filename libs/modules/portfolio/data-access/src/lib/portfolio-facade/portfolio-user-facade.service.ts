@@ -74,7 +74,7 @@ export class PortfolioUserFacadeService {
     const orders = this.authenticationUserService.state.outstandingOrders();
 
     // prevent creating more orders than allowed
-    if (orders.length >= OUTSTANDING_ORDERS_MAX_ORDERS) {
+    if (orders.openOrders.length >= OUTSTANDING_ORDERS_MAX_ORDERS) {
       throw new Error(`You can have maximum ${OUTSTANDING_ORDERS_MAX_ORDERS} outstanding orders`);
     }
 

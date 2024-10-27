@@ -149,10 +149,6 @@ import { DefaultImgDirective } from '../../../directives';
     mat-form-field.mat-mdc-form-field {
       width: 100%;
     }
-
-    // ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-    //   height: 0px !important;
-    // }
   `,
   providers: [
     {

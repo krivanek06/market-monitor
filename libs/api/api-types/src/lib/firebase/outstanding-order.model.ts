@@ -17,10 +17,21 @@ export type OutstandingOrder = SymbolStoreBase & {
   units: number;
 
   /**
+   * OPEN - order was created, but not executed
+   * CLOSED - order was executed
+   */
+  status: 'OPEN' | 'CLOSED';
+
+  /**
    * when the order was created
    * format: 'yyyy-MM-dd HH:mm:ss' (new Date().toISOString())
    */
   createdAt: string;
+
+  /**
+   * when the order was closed - yyyy-MM-dd HH:mm:ss
+   */
+  closedAt?: string;
 
   /**
    * price of the symbol when the user created the order
@@ -28,6 +39,12 @@ export type OutstandingOrder = SymbolStoreBase & {
    */
   potentialSymbolPrice: number;
   potentialTotalPrice: number;
+
+  /**
+   * price of the symbol when the order was CLOSED
+   */
+  finalSymbolPrice?: number;
+  finalTotalPrice?: number;
 
   /** type of order */
   orderType:

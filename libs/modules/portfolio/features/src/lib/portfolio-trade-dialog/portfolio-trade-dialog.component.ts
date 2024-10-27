@@ -398,6 +398,7 @@ export class PortfolioTradeDialogComponent {
       potentialTotalPrice: roundNDigits(data.quote.price * this.form.controls.units.value),
       userData: transformUserToBaseMin(this.userDataSignal()),
       orderType: this.getOrderType(),
+      status: 'OPEN',
     };
 
     // close dialog

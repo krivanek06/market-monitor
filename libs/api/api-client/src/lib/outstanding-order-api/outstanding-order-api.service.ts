@@ -12,7 +12,7 @@ import {
   setDoc,
   where,
 } from '@angular/fire/firestore';
-import { OUTSTANDING_ORDERS_MAX_ORDERS, OutstandingOrder, UserBaseMin } from '@mm/api-types';
+import { OutstandingOrder, UserBaseMin } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { Observable } from 'rxjs';
@@ -28,12 +28,19 @@ export class OutstandingOrderApiService {
   }
 
   /** get all open orders */
-  getOutstandingOrders(userId: string): Observable<OutstandingOrder[]> {
+  getOutstandingOrdersOpen(userId: string): Observable<OutstandingOrder[]> {
+    return rxCollectionData(
+      query(this.outstandingOrdersCollection(), where('userData.id', '==', userId), where('status', '==', 'OPEN')),
+    );
+  }
+
+  getOutstandingOrdersClosed(userId: string): Observable<OutstandingOrder[]> {
     return rxCollectionData(
       query(
         this.outstandingOrdersCollection(),
         where('userData.id', '==', userId),
-        limit(OUTSTANDING_ORDERS_MAX_ORDERS),
+        where('status', '==', 'CLOSED'),
+        limit(10),
       ),
     );
   }

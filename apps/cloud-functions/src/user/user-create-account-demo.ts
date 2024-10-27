@@ -186,6 +186,7 @@ export class CreateDemoAccountService {
         potentialSymbolPrice: price.close,
         potentialTotalPrice: price.close * units,
         userData: userData,
+        status: 'OPEN',
       } satisfies OutstandingOrder;
 
       // save data
@@ -245,6 +246,7 @@ export class CreateDemoAccountService {
         userData: userData,
         createdAt: this.pastDateSell,
         displaySymbol: transaction.symbol,
+        status: 'OPEN',
       } satisfies OutstandingOrder;
 
       // save data
