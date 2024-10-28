@@ -149,7 +149,7 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
 
       <!-- outstanding orders -->
       <app-section-title title="Open Outstanding Orders" class="mb-4" matIcon="reorder" />
-      <div class="grid grid-cols-5 gap-x-4 gap-y-2">
+      <div class="grid gap-x-4 gap-y-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
         @for (order of state.outstandingOrders().openOrders; track order.orderId) {
           <app-outstanding-order-card-data [order]="order" (deleteClicked)="onOrderRemove(order)" />
         } @empty {
