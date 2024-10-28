@@ -1,5 +1,6 @@
 import { getSymbolQuotesCF } from '@mm/api-external';
 import {
+  OutstandingOrder,
   PortfolioStateHolding,
   PortfolioStateHoldingBase,
   PortfolioStateHoldings,
@@ -16,7 +17,11 @@ import {
   roundNDigits,
   transformPortfolioStateHoldingToPortfolioState,
 } from '@mm/shared/general-util';
-import { userDocumentRef, userDocumentTransactionHistoryRef } from '../database';
+import {
+  outstandingOrderCollectionByUserStatusOpenRef,
+  userDocumentRef,
+  userDocumentTransactionHistoryRef,
+} from '../database';
 import { userPortfolioRisk } from './portfolio-risk-evaluation';
 
 export const onTransactionUpdateForUserId = async (userId: string): Promise<void> => {
@@ -60,8 +65,12 @@ export const onTransactionUpdateForUserId = async (userId: string): Promise<void
  * @param userData - user whom to update portfolio state
  */
 export const calculateUserPortfolioStateByTransactions = async (userData: UserBase) => {
-  // load user data
+  // load user transactions
   const transactionData = (await userDocumentTransactionHistoryRef(userData.id).get()).data()?.transactions ?? [];
+  // load user open orders
+  const openOrders = (await outstandingOrderCollectionByUserStatusOpenRef(userData.id).get()).docs.map((doc) =>
+    doc.data(),
+  );
 
   try {
     // get partial holdings calculations
@@ -77,6 +86,7 @@ export const calculateUserPortfolioStateByTransactions = async (userData: UserBa
       holdingsBase,
       symbolQuotes,
       userData.portfolioState.startingCash,
+      openOrders,
     );
 
     // remove holdings
@@ -116,6 +126,7 @@ const getPortfolioStateHoldingsUtil = (
   partialHoldings: PortfolioStateHoldingBase[],
   symbolQuotes: SymbolQuote[],
   startingCash = 0,
+  openOrders: OutstandingOrder[] = [],
 ): PortfolioStateHoldings => {
   const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
   const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
@@ -157,7 +168,12 @@ const getPortfolioStateHoldingsUtil = (
   const cashOnHandTransactions =
     (startingCash !== 0 ? startingCash - investedTotal - transactionFees : 0) + transactionProfitLoss;
 
-  const balance = holdingsBalance + cashOnHandTransactions;
+  // remove cash spent on open orders
+  const spentCashOnOpenOrders = openOrders
+    .filter((d) => d.orderType.type === 'BUY')
+    .reduce((acc, curr) => acc + curr.potentialTotalPrice, 0);
+
+  const balance = holdingsBalance + cashOnHandTransactions - spentCashOnOpenOrders;
   const totalGainsValue = startingCash !== 0 ? balance - startingCash : holdingsBalance - investedTotal;
   const totalGainsPercentage =
     startingCash !== 0 ? calculateGrowth(balance, startingCash) : calculateGrowth(balance, investedTotal);
@@ -172,7 +188,7 @@ const getPortfolioStateHoldingsUtil = (
     numberOfExecutedBuyTransactions,
     numberOfExecutedSellTransactions,
     transactionFees: roundNDigits(transactionFees),
-    cashOnHand: roundNDigits(cashOnHandTransactions),
+    cashOnHand: roundNDigits(cashOnHandTransactions - spentCashOnOpenOrders),
     balance: roundNDigits(balance),
     invested: roundNDigits(investedTotal),
     holdingsBalance: roundNDigits(holdingsBalance),

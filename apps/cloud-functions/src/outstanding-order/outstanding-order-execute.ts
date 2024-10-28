@@ -79,18 +79,23 @@ export const outstandingOrderExecute = async () => {
             // if potentialTotalPrice was 100 and now it's 110, priceDiff is 10
             const priceDiff = currentTotal - order.potentialTotalPrice;
 
+            const potentialTransaction = createTransaction(userData, order, quote.price);
+
             // check if user has enough money
-            if (order.orderType.type === 'BUY' && userData.portfolioState.cashOnHand < priceDiff) {
+            if (
+              order.orderType.type === 'BUY' &&
+              userData.portfolioState.cashOnHand < priceDiff + potentialTransaction.transactionFees
+            ) {
               console.error(`User ${userData.id} does not have enough money to execute order ${order.orderId}`);
               return;
             }
 
             // update user's transactions
             firebaseTransaction.update(userDocumentTransactionHistoryRef(userData.id), {
-              transactions: FieldValue.arrayUnion(createTransaction(userData, order, quote.price)),
+              transactions: FieldValue.arrayUnion(potentialTransaction),
             });
 
-            // delete the order
+            // update the order - close it
             firebaseTransaction.update(outstandingOrderDocRef(order.orderId), {
               status: 'CLOSED',
               closedAt: getCurrentDateDetailsFormat(),
