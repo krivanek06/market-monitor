@@ -71,3 +71,8 @@ export const USER_ALLOWED_DEMO_ACCOUNTS_TOTAL = 300;
  * limit how many symbols can be in a group holding (which are copied from users holdings)
  */
 export const GROUP_HOLDING_LIMIT = 50;
+
+/**
+ * how many outstanding orders can a single user have at once in OPEN state
+ */
+export const OUTSTANDING_ORDERS_MAX_ORDERS = 5;

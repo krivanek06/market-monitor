@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -247,6 +247,7 @@ export class MenuTopNavigationComponent implements OnInit {
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly authenticationService = inject(AuthenticationAccountService);
   private readonly dialog = inject(MatDialog);
+  private readonly document = inject(DOCUMENT);
 
   readonly menuOptions = viewChild('menuOptions', { read: TemplateRef<HTMLElement> });
 
@@ -263,6 +264,17 @@ export class MenuTopNavigationComponent implements OnInit {
     ),
     { initialValue: 'GGFinance' },
   );
+
+  constructor() {
+    // check if dark mode is enabled
+    const val = !!this.authenticationUserStoreService.state.getUserDataNormal()?.settings?.isDarkMode;
+    const darkClass = 'dark-theme';
+    if (val) {
+      this.document.body.classList.add(darkClass);
+    } else {
+      this.document.body.classList.remove(darkClass);
+    }
+  }
 
   ngOnInit(): void {
     // check if url is different than activeLinkSignal

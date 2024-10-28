@@ -5,6 +5,7 @@ import {
   PortfolioState,
   PortfolioStateHoldings,
   UserBase,
+  UserBaseMin,
   UserData,
 } from '@mm/api-types';
 import { getCurrentDateDefaultFormat } from './date-service.util';
@@ -19,6 +20,13 @@ export const transformUserToBase = (user: UserData): UserBase => {
     isAccountActive: user.isAccountActive,
     isDemo: user.isDemo,
     userAccountType: user.userAccountType,
+  };
+};
+
+export const transformUserToBaseMin = (user: UserData): UserBaseMin => {
+  return {
+    id: user.id,
+    personal: user.personal,
   };
 };
 

@@ -1,6 +1,7 @@
 import { Injectable, InjectionToken, effect, inject } from '@angular/core';
-import { GroupApiService, UserApiService } from '@mm/api-client';
+import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
 import {
+  OutstandingOrder,
   PortfolioGrowth,
   PortfolioTransaction,
   SymbolStoreBase,
@@ -39,17 +40,22 @@ type AuthenticationState = {
   portfolioTransactions: PortfolioTransaction[] | null;
   watchList: UserWatchList;
   portfolioGrowth: PortfolioGrowth[] | null;
+  outstandingOrders: {
+    openOrders: OutstandingOrder[];
+    closedOrders: OutstandingOrder[];
+  };
 };
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationUserStoreService {
-  private authenticationAccountService = inject(AuthenticationAccountService);
-  private groupApiService = inject(GroupApiService);
-  private userApiService = inject(UserApiService);
+  private readonly authenticationAccountService = inject(AuthenticationAccountService);
+  private readonly outstandingOrderApiService = inject(OutstandingOrderApiService);
+  private readonly groupApiService = inject(GroupApiService);
+  private readonly userApiService = inject(UserApiService);
 
-  private initialState: AuthenticationState = {
+  private readonly initialState: AuthenticationState = {
     authenticationState: 'LOADING',
     user: null,
     userData: null,
@@ -60,21 +66,25 @@ export class AuthenticationUserStoreService {
       createdDate: getCurrentDateDefaultFormat(),
       data: [],
     },
+    outstandingOrders: {
+      openOrders: [],
+      closedOrders: [],
+    },
   };
 
-  private loadedAuthenticationSource$ = this.authenticationAccountService.getLoadedAuthentication().pipe(
+  private readonly loadedAuthenticationSource$ = this.authenticationAccountService.getLoadedAuthentication().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev === curr),
     tap((loaded) => console.log('AuthenticationUserStoreService loaded', loaded)),
     map((loaded) => ({
-      authenticationState: !!loaded ? ('SUCCESS' as const) : ('FAIL' as const),
+      authenticationState: loaded ? ('SUCCESS' as const) : ('FAIL' as const),
     })),
   );
 
   /**
    * Source used to get user data
    */
-  private userSource$ = this.authenticationAccountService.getUser().pipe(
+  private readonly userSource$ = this.authenticationAccountService.getUser().pipe(
     map((user) => ({
       user: user,
     })),
@@ -83,7 +93,7 @@ export class AuthenticationUserStoreService {
   /**
    * Source used to get user data
    */
-  private userDataSource$ = this.authenticationAccountService.getUserData().pipe(
+  private readonly userDataSource$ = this.authenticationAccountService.getUserData().pipe(
     map((userData) => ({
       userData: userData,
     })),
@@ -92,7 +102,7 @@ export class AuthenticationUserStoreService {
   /**
    * Source used to get user watchList
    */
-  private watchListSource$ = this.authenticationAccountService.getUserData().pipe(
+  private readonly watchListSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
     switchMap((userData) =>
@@ -104,7 +114,7 @@ export class AuthenticationUserStoreService {
   /**
    * Source used to get user portfolio transactions
    */
-  private portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
+  private readonly portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes or changes account type
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id && prev?.userAccountType === curr?.userAccountType),
     switchMap((userData) => (userData ? this.userApiService.getUserPortfolioTransactions(userData.id) : of(null))),
@@ -113,16 +123,40 @@ export class AuthenticationUserStoreService {
     })),
   );
 
-  private userPortfolioGrowthSource$ = this.authenticationAccountService.getUserData().pipe(
+  private readonly userPortfolioGrowthSource$ = this.authenticationAccountService.getUserData().pipe(
     distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
     switchMap((userData) => (userData ? this.userApiService.getUserPortfolioGrowth(userData.id) : of(null))),
     map((data) => ({ portfolioGrowth: data })),
   );
 
+  private readonly userOutstandingOrdersSource$ = this.authenticationAccountService.getUserData().pipe(
+    // prevent duplicate calls only when user id changes
+    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
+    switchMap((userData) =>
+      userData
+        ? combineLatest([
+            this.outstandingOrderApiService.getOutstandingOrdersOpen(userData.id),
+            this.outstandingOrderApiService.getOutstandingOrdersClosed(userData.id),
+          ]).pipe(
+            map((orders) => ({
+              openOrders: orders[0].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+              closedOrders: orders[1].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+            })),
+            map((orders) => ({
+              outstandingOrders: {
+                openOrders: orders.openOrders,
+                closedOrders: orders.closedOrders,
+              },
+            })),
+          )
+        : of({ outstandingOrders: { openOrders: [], closedOrders: [] } }),
+    ),
+  );
+
   /**
    * Source used to get user group data, owner, member, invitations, requested, watched
    */
-  private userGroupDataSource$ = this.authenticationAccountService.getUserData().pipe(
+  private readonly userGroupDataSource$ = this.authenticationAccountService.getUserData().pipe(
     // prevent duplicate calls only when user id changes or groups changes
     distinctUntilChanged(
       (prev, curr) =>
@@ -164,7 +198,7 @@ export class AuthenticationUserStoreService {
     ),
   );
 
-  state = signalSlice({
+  readonly state = signalSlice({
     initialState: this.initialState,
     sources: [
       this.userSource$,
@@ -174,6 +208,7 @@ export class AuthenticationUserStoreService {
       this.userGroupDataSource$,
       this.loadedAuthenticationSource$,
       this.userPortfolioGrowthSource$,
+      this.userOutstandingOrdersSource$,
     ],
     selectors: (state) => ({
       getUser: () => state().user!,

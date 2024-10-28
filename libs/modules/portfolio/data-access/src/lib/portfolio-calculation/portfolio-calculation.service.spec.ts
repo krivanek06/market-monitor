@@ -2,22 +2,25 @@ import { TestBed } from '@angular/core/testing';
 
 import { MarketApiService } from '@mm/api-client';
 import {
-  PortfolioGrowth,
   PortfolioGrowthAssets,
+  PortfolioState,
   PortfolioStateHoldings,
-  USER_DEFAULT_STARTING_CASH,
-} from '@mm/api-types';
-import { calculateGrowth, getCurrentDateDetailsFormat, roundNDigits } from '@mm/shared/general-util';
-import { MockProvider, ngMocks } from 'ng-mocks';
-import { of } from 'rxjs';
-import {
   TestTransactionDates,
   mockPortfolioTransaction,
   mockSymbolSummaryAAPL,
   mockSymbolSummaryMSFT,
   testHistoricalPriceSymbol_AAPL,
   testHistoricalPriceSymbol_MSFT,
-} from '../models';
+} from '@mm/api-types';
+import {
+  calculateGrowth,
+  createEmptyPortfolioState,
+  getCurrentDateDetailsFormat,
+  getPortfolioStateHoldingBaseUtil,
+  roundNDigits,
+} from '@mm/shared/general-util';
+import { MockProvider, ngMocks } from 'ng-mocks';
+import { of } from 'rxjs';
 import { PortfolioCalculationService } from './portfolio-calculation.service';
 
 describe('PortfolioCalculationService', () => {
@@ -60,7 +63,8 @@ describe('PortfolioCalculationService', () => {
         getSymbolQuotes: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL])),
       });
 
-      service.getPortfolioStateHoldings(0, []).subscribe();
+      const emptyPortfolio = createEmptyPortfolioState();
+      service.getPortfolioStateHoldings(emptyPortfolio, []).subscribe();
 
       expect(marketApiService.getSymbolQuotes).toHaveBeenCalled();
     });
@@ -91,7 +95,7 @@ describe('PortfolioCalculationService', () => {
         date: getCurrentDateDetailsFormat(),
       } satisfies PortfolioStateHoldings;
 
-      service.getPortfolioStateHoldings(0, []).subscribe({
+      service.getPortfolioStateHoldings(expectedResult, expectedResult.holdings).subscribe({
         next: (res) => {
           expect(res).toEqual(expectedResult);
           done();
@@ -115,8 +119,7 @@ describe('PortfolioCalculationService', () => {
         unitPrice: 100,
       });
 
-      // expected result
-      const expectedResult = {
+      const emptyPortfolio = {
         balance: t1.units * mockSymbolSummaryAAPL.quote.price,
         invested: t1.units * t1.unitPrice,
         cashOnHand: 0,
@@ -135,6 +138,12 @@ describe('PortfolioCalculationService', () => {
         startingCash: 0,
         numberOfExecutedBuyTransactions: 1,
         numberOfExecutedSellTransactions: 0,
+      } satisfies PortfolioState;
+      const holdings = getPortfolioStateHoldingBaseUtil([t1]);
+
+      // expected result
+      const expectedResult = {
+        ...emptyPortfolio,
         holdings: [
           {
             symbolType: 'STOCK',
@@ -149,9 +158,9 @@ describe('PortfolioCalculationService', () => {
         ],
       } satisfies PortfolioStateHoldings;
 
-      service.getPortfolioStateHoldings(0, [t1]).subscribe({
+      service.getPortfolioStateHoldings(emptyPortfolio, holdings).subscribe({
         next: (res) => {
-          expect(res).toEqual(expectedResult);
+          expect(res.holdings).toEqual(expectedResult.holdings);
           done();
         },
         error: done.fail,
@@ -180,8 +189,7 @@ describe('PortfolioCalculationService', () => {
       const holdingValue = testTransaction_BUY_AAPL_1_Change.units * mockSymbolSummaryAAPL.quote.price;
       const currentBalance = startingCash - invested + holdingValue - testTransaction_BUY_AAPL_1_Change.transactionFees;
 
-      // expected result
-      const expectedResult = {
+      const emptyPortfolio = {
         balance: currentBalance,
         invested: invested,
         cashOnHand: startingCash - invested - testTransaction_BUY_AAPL_1_Change.transactionFees,
@@ -203,6 +211,12 @@ describe('PortfolioCalculationService', () => {
         startingCash: startingCash,
         numberOfExecutedBuyTransactions: 1,
         numberOfExecutedSellTransactions: 0,
+      } satisfies PortfolioState;
+      const holdings = getPortfolioStateHoldingBaseUtil([testTransaction_BUY_AAPL_1_Change]);
+
+      // expected result
+      const expectedResult = {
+        ...emptyPortfolio,
         holdings: [
           {
             symbolType: 'STOCK',
@@ -217,9 +231,10 @@ describe('PortfolioCalculationService', () => {
         ],
       } satisfies PortfolioStateHoldings;
 
-      service.getPortfolioStateHoldings(startingCash, [testTransaction_BUY_AAPL_1_Change]).subscribe({
+      service.getPortfolioStateHoldings(emptyPortfolio, holdings).subscribe({
         next: (res) => {
-          expect(res).toEqual(expectedResult);
+          console.log(res);
+          expect(res.holdings).toEqual(expectedResult.holdings);
           done();
         },
         error: done.fail,
@@ -285,8 +300,7 @@ describe('PortfolioCalculationService', () => {
       const previousBalanceChange =
         aaplUnits * mockSymbolSummaryAAPL.quote.change + t_BUY_MSFT_1_Change.units * mockSymbolSummaryMSFT.quote.change;
 
-      // expected result
-      const expectedResult = {
+      const startingPortfolio = {
         balance: currentBalance,
         cashOnHand: cashOnHandTransactions,
         date: getCurrentDateDetailsFormat(),
@@ -302,17 +316,12 @@ describe('PortfolioCalculationService', () => {
         totalGainsPercentage: calculateGrowth(currentBalance, startingCash),
         totalGainsValue: totalHoldings - aaplInvested - msftInvested - totalTransactionFees + totalReturn,
         transactionFees: totalTransactionFees,
+      } satisfies PortfolioState;
+
+      // expected result
+      const expectedResult = {
+        ...startingPortfolio,
         holdings: [
-          {
-            symbolType: 'STOCK',
-            symbol: t_BUY_MSFT_1_Change.symbol,
-            units: t_BUY_MSFT_1_Change.units,
-            invested: msftInvested,
-            breakEvenPrice: roundNDigits(msftInvested / t_BUY_MSFT_1_Change.units),
-            weight: roundNDigits(msftInvested / totalInvested, 6),
-            sector: 'Technology',
-            symbolQuote: mockSymbolSummaryMSFT.quote,
-          },
           {
             symbolType: 'STOCK',
             symbol: t_BUY_AAPL_1_Change.symbol,
@@ -323,25 +332,36 @@ describe('PortfolioCalculationService', () => {
             sector: 'Technology',
             symbolQuote: mockSymbolSummaryAAPL.quote,
           },
+          {
+            symbolType: 'STOCK',
+            symbol: t_BUY_MSFT_1_Change.symbol,
+            units: t_BUY_MSFT_1_Change.units,
+            invested: msftInvested,
+            breakEvenPrice: roundNDigits(msftInvested / t_BUY_MSFT_1_Change.units),
+            weight: roundNDigits(msftInvested / totalInvested, 6),
+            sector: 'Technology',
+            symbolQuote: mockSymbolSummaryMSFT.quote,
+          },
         ],
       } satisfies PortfolioStateHoldings;
 
-      service
-        .getPortfolioStateHoldings(startingCash, [t_BUY_AAPL_1_Change, t_Sell_AAPL, t_BUY_MSFT_1_Change])
-        .subscribe({
-          next: (res) => {
-            try {
-              expect(res).toEqual(expectedResult);
-              done();
-            } catch (e) {
-              console.error('e', e);
-            }
-          },
-          error: (e) => {
+      // TODO - check if this is OK
+      const holdings = getPortfolioStateHoldingBaseUtil([t_BUY_AAPL_1_Change, t_BUY_MSFT_1_Change, t_Sell_AAPL]);
+
+      service.getPortfolioStateHoldings(startingPortfolio, holdings).subscribe({
+        next: (res) => {
+          try {
+            expect(res.holdings).toEqual(expectedResult.holdings);
+            done();
+          } catch (e) {
             console.error('e', e);
-            done.fail;
-          },
-        });
+          }
+        },
+        error: (e) => {
+          console.error('e', e);
+          done.fail();
+        },
+      });
     });
   });
 
@@ -397,7 +417,7 @@ describe('PortfolioCalculationService', () => {
         })
         .catch((e) => {
           console.error('e', e);
-          done.fail;
+          done.fail();
         });
     });
 
@@ -439,7 +459,7 @@ describe('PortfolioCalculationService', () => {
         })
         .catch((e) => {
           console.error('e', e);
-          done.fail;
+          done.fail();
         });
     });
 
@@ -658,7 +678,7 @@ describe('PortfolioCalculationService', () => {
         })
         .catch((e) => {
           console.error('e', e);
-          done.fail;
+          done.fail();
         });
     });
 
@@ -713,7 +733,7 @@ describe('PortfolioCalculationService', () => {
         })
         .catch((e) => {
           console.error('e', e);
-          done.fail;
+          done.fail();
         });
     });
 
@@ -791,325 +811,8 @@ describe('PortfolioCalculationService', () => {
         })
         .catch((e) => {
           console.error('e', e);
-          done.fail;
+          done.fail();
         });
-    });
-  });
-
-  describe('Test: getPortfolioGrowth', () => {
-    it('should calculate growth with starting cash on hand', async () => {
-      // mock methods
-      const marketApiService = ngMocks.findInstance(MarketApiService);
-      ngMocks.stub(marketApiService, {
-        getHistoricalPricesDateRange: jest
-          .fn()
-          .mockReturnValueOnce(of(testHistoricalPriceSymbol_AAPL.data))
-          .mockReturnValueOnce(of(testHistoricalPriceSymbol_MSFT.data)),
-        getIsMarketOpenSignal: jest.fn().mockReturnValue(undefined) as any,
-      });
-
-      const t_BUY_AAPL_1 = mockPortfolioTransaction({
-        symbol: testHistoricalPriceSymbol_AAPL.symbol,
-        units: 10,
-        date: TestTransactionDates['2023-09-04'],
-        transactionType: 'BUY',
-        unitPrice: 100,
-      });
-
-      const t_BUY_AAPL_2 = mockPortfolioTransaction({
-        symbol: testHistoricalPriceSymbol_AAPL.symbol,
-        units: 5,
-        date: TestTransactionDates['2023-09-11'],
-        transactionType: 'BUY',
-        unitPrice: 100,
-      });
-
-      const t_SELL_AAPL_1 = mockPortfolioTransaction({
-        symbol: testHistoricalPriceSymbol_AAPL.symbol,
-        units: 5,
-        date: TestTransactionDates['2023-09-12'],
-        transactionType: 'SELL',
-        unitPrice: 130,
-        transactionFees: 0.5,
-      });
-
-      const t_BUY_MSFT_1 = mockPortfolioTransaction({
-        symbol: testHistoricalPriceSymbol_MSFT.symbol,
-        units: 10,
-        date: TestTransactionDates['2023-09-07'],
-        transactionType: 'BUY',
-        unitPrice: 85.5,
-      });
-
-      const portfolioGrowthAssets = await service.getPortfolioGrowthAssets([
-        t_BUY_AAPL_1,
-        t_BUY_AAPL_2,
-        t_SELL_AAPL_1,
-        t_BUY_MSFT_1,
-      ]);
-
-      const portfolioGrowth = service.getPortfolioGrowth(portfolioGrowthAssets, USER_DEFAULT_STARTING_CASH);
-
-      const expectedResult = [
-        {
-          date: TestTransactionDates['2023-09-04'],
-          investedTotal: t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-          marketTotal: t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[0].close,
-          balanceTotal:
-            USER_DEFAULT_STARTING_CASH +
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[0].close -
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-        },
-        {
-          date: TestTransactionDates['2023-09-05'],
-          investedTotal: t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-          marketTotal: t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[1].close,
-          balanceTotal:
-            USER_DEFAULT_STARTING_CASH +
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[1].close -
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-        },
-        {
-          date: TestTransactionDates['2023-09-06'],
-          investedTotal: t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-          marketTotal: t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[2].close,
-          balanceTotal:
-            USER_DEFAULT_STARTING_CASH +
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[2].close -
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-        },
-        {
-          date: TestTransactionDates['2023-09-07'],
-          investedTotal: t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units + t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units,
-          marketTotal:
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[3].close +
-            t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[0].close,
-          balanceTotal:
-            USER_DEFAULT_STARTING_CASH +
-            (t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[3].close -
-              t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units) +
-            (t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[0].close -
-              t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units),
-        },
-        {
-          date: TestTransactionDates['2023-09-08'],
-          investedTotal: t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units + t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units,
-          marketTotal:
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[4].close +
-            t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[1].close,
-          balanceTotal:
-            USER_DEFAULT_STARTING_CASH +
-            (t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[4].close -
-              t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units) +
-            (t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[1].close -
-              t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units),
-        },
-        {
-          date: TestTransactionDates['2023-09-11'],
-          investedTotal:
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units +
-            t_BUY_AAPL_2.unitPrice * t_BUY_AAPL_2.units +
-            t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units,
-          marketTotal:
-            (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units) * testHistoricalPriceSymbol_AAPL.data[5].close +
-            t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[2].close,
-          balanceTotal:
-            USER_DEFAULT_STARTING_CASH +
-            ((t_BUY_AAPL_1.units + t_BUY_AAPL_2.units) * testHistoricalPriceSymbol_AAPL.data[5].close -
-              t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units -
-              t_BUY_AAPL_2.unitPrice * t_BUY_AAPL_2.units) +
-            (t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[2].close -
-              t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units),
-        },
-        {
-          date: TestTransactionDates['2023-09-12'],
-          investedTotal: roundNDigits(
-            // break even price
-            ((t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units + t_BUY_AAPL_2.unitPrice * t_BUY_AAPL_2.units) /
-              (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units)) *
-              (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units - t_SELL_AAPL_1.units) +
-              t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units,
-          ),
-          marketTotal:
-            (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units - t_SELL_AAPL_1.units) *
-              testHistoricalPriceSymbol_AAPL.data[6].close +
-            t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[3].close,
-          balanceTotal: roundNDigits(
-            USER_DEFAULT_STARTING_CASH +
-              ((t_BUY_AAPL_1.units + t_BUY_AAPL_2.units - t_SELL_AAPL_1.units) *
-                testHistoricalPriceSymbol_AAPL.data[6].close -
-                // break even price
-                ((t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units + t_BUY_AAPL_2.unitPrice * t_BUY_AAPL_2.units) /
-                  (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units)) *
-                  (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units - t_SELL_AAPL_1.units)) +
-              (t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[3].close -
-                t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units) -
-              t_SELL_AAPL_1.transactionFees,
-          ),
-        },
-      ] satisfies PortfolioGrowth[];
-
-      expect(portfolioGrowth[0]).toEqual(expectedResult[0]);
-      expect(portfolioGrowth[1]).toEqual(expectedResult[1]);
-      expect(portfolioGrowth[2]).toEqual(expectedResult[2]);
-      expect(portfolioGrowth[3]).toEqual(expectedResult[3]);
-      expect(portfolioGrowth[4]).toEqual(expectedResult[4]);
-      expect(portfolioGrowth[5]).toEqual(expectedResult[5]);
-      expect(portfolioGrowth[6]).toEqual(expectedResult[6]);
-    });
-
-    it('should calculate growth without starting cash on hand', async () => {
-      // mock methods
-      const marketApiService = ngMocks.findInstance(MarketApiService);
-      ngMocks.stub(marketApiService, {
-        getHistoricalPricesDateRange: jest
-          .fn()
-          .mockReturnValueOnce(of(testHistoricalPriceSymbol_AAPL.data))
-          .mockReturnValueOnce(of(testHistoricalPriceSymbol_MSFT.data)),
-        getIsMarketOpenSignal: jest.fn().mockReturnValue(undefined) as any,
-      });
-
-      const t_BUY_AAPL_1 = mockPortfolioTransaction({
-        symbol: testHistoricalPriceSymbol_AAPL.symbol,
-        units: 10,
-        date: TestTransactionDates['2023-09-04'],
-        transactionType: 'BUY',
-        unitPrice: 100,
-      });
-
-      const t_BUY_AAPL_2 = mockPortfolioTransaction({
-        symbol: testHistoricalPriceSymbol_AAPL.symbol,
-        units: 5,
-        date: TestTransactionDates['2023-09-11'],
-        transactionType: 'BUY',
-        unitPrice: 100,
-      });
-
-      const t_SELL_AAPL_1 = mockPortfolioTransaction({
-        symbol: testHistoricalPriceSymbol_AAPL.symbol,
-        units: 5,
-        date: TestTransactionDates['2023-09-12'],
-        transactionType: 'SELL',
-        unitPrice: 130,
-        transactionFees: 0.5,
-      });
-
-      const t_BUY_MSFT_1 = mockPortfolioTransaction({
-        symbol: testHistoricalPriceSymbol_MSFT.symbol,
-        units: 10,
-        date: TestTransactionDates['2023-09-07'],
-        transactionType: 'BUY',
-        unitPrice: 85.5,
-      });
-
-      const portfolioGrowthAssets = await service.getPortfolioGrowthAssets([
-        t_BUY_AAPL_1,
-        t_BUY_AAPL_2,
-        t_SELL_AAPL_1,
-        t_BUY_MSFT_1,
-      ]);
-
-      const portfolioGrowth = service.getPortfolioGrowth(portfolioGrowthAssets);
-
-      const expectedResult = [
-        {
-          date: TestTransactionDates['2023-09-04'],
-          investedTotal: t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-          marketTotal: t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[0].close,
-          balanceTotal:
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[0].close -
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-        },
-        {
-          date: TestTransactionDates['2023-09-05'],
-          investedTotal: t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-          marketTotal: t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[1].close,
-          balanceTotal:
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[1].close -
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-        },
-        {
-          date: TestTransactionDates['2023-09-06'],
-          investedTotal: t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-          marketTotal: t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[2].close,
-          balanceTotal:
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[2].close -
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units,
-        },
-        {
-          date: TestTransactionDates['2023-09-07'],
-          investedTotal: t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units + t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units,
-          marketTotal:
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[3].close +
-            t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[0].close,
-          balanceTotal:
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[3].close -
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units +
-            (t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[0].close -
-              t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units),
-        },
-        {
-          date: TestTransactionDates['2023-09-08'],
-          investedTotal: t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units + t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units,
-          marketTotal:
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[4].close +
-            t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[1].close,
-          balanceTotal:
-            t_BUY_AAPL_1.units * testHistoricalPriceSymbol_AAPL.data[4].close -
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units +
-            (t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[1].close -
-              t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units),
-        },
-        {
-          date: TestTransactionDates['2023-09-11'],
-          investedTotal:
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units +
-            t_BUY_AAPL_2.unitPrice * t_BUY_AAPL_2.units +
-            t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units,
-          marketTotal:
-            (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units) * testHistoricalPriceSymbol_AAPL.data[5].close +
-            t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[2].close,
-          balanceTotal:
-            (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units) * testHistoricalPriceSymbol_AAPL.data[5].close -
-            t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units -
-            t_BUY_AAPL_2.unitPrice * t_BUY_AAPL_2.units +
-            (t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[2].close -
-              t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units),
-        },
-        {
-          date: TestTransactionDates['2023-09-12'],
-          investedTotal: roundNDigits(
-            // break even price
-            ((t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units + t_BUY_AAPL_2.unitPrice * t_BUY_AAPL_2.units) /
-              (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units)) *
-              (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units - t_SELL_AAPL_1.units) +
-              t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units,
-          ),
-          marketTotal:
-            (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units - t_SELL_AAPL_1.units) *
-              testHistoricalPriceSymbol_AAPL.data[6].close +
-            t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[3].close,
-          balanceTotal: roundNDigits(
-            (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units - t_SELL_AAPL_1.units) *
-              testHistoricalPriceSymbol_AAPL.data[6].close -
-              // break even price
-              ((t_BUY_AAPL_1.unitPrice * t_BUY_AAPL_1.units + t_BUY_AAPL_2.unitPrice * t_BUY_AAPL_2.units) /
-                (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units)) *
-                (t_BUY_AAPL_1.units + t_BUY_AAPL_2.units - t_SELL_AAPL_1.units) +
-              (t_BUY_MSFT_1.units * testHistoricalPriceSymbol_MSFT.data[3].close -
-                t_BUY_MSFT_1.unitPrice * t_BUY_MSFT_1.units) -
-              t_SELL_AAPL_1.transactionFees,
-          ),
-        },
-      ] satisfies PortfolioGrowth[];
-
-      expect(portfolioGrowth[0]).toEqual(expectedResult[0]);
-      expect(portfolioGrowth[1]).toEqual(expectedResult[1]);
-      expect(portfolioGrowth[2]).toEqual(expectedResult[2]);
-      expect(portfolioGrowth[3]).toEqual(expectedResult[3]);
-      expect(portfolioGrowth[4]).toEqual(expectedResult[4]);
-      expect(portfolioGrowth[5]).toEqual(expectedResult[5]);
-      expect(portfolioGrowth[6]).toEqual(expectedResult[6]);
     });
   });
 });

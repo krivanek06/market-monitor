@@ -42,7 +42,6 @@
       "@mm/shared/data-access": ["libs/shared/data-access/src/index.ts"],
       "@mm/shared/dialog-manager": ["libs/shared/features/dialog-manager/src/index.ts"],
       "@mm/shared/general-util": ["libs/shared/features/general-util/src/index.ts"],
-      "@mm/shared/input-error": ["libs/shared/features/input-error/src/index.ts"],
       "@mm/shared/storage-local": ["libs/shared/features/storage-local/src/index.ts"],
       "@mm/shared/theme-switcher": ["libs/shared/features/theme-switcher/src/index.ts"],
       "@mm/shared/ui": ["libs/shared/ui/src/index.ts"],

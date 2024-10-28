@@ -33,6 +33,6 @@
           "name": "Launch Chrome Debugger",
           "pattern": "listening on localhost:4200"
         }
-      }
+      },
     ]
   }

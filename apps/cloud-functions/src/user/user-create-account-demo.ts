@@ -1,18 +1,13 @@
 import { faker } from '@faker-js/faker';
-import {
-  getHistoricalPricesOnDateCF,
-  getIsMarketOpenCF,
-  getStockHistoricalPricesOnDateCF,
-  getSymbolSummariesCF,
-} from '@mm/api-external';
+import { getHistoricalPricesOnDateCF, getIsMarketOpenCF, getSymbolSummariesCF } from '@mm/api-external';
 import {
   HistoricalPrice,
-  HistoricalPriceSymbol,
+  OutstandingOrder,
+  PortfolioGrowth,
+  PortfolioGrowthAssets,
   PortfolioTransaction,
-  PortfolioTransactionCreate,
   SYMBOL_NOT_FOUND_ERROR,
   SymbolSummary,
-  TRANSACTION_FEE_PRCT,
   USER_ALLOWED_DEMO_ACCOUNTS_PER_IP,
   USER_ALLOWED_DEMO_ACCOUNTS_TOTAL,
   UserAccountEnum,
@@ -22,12 +17,12 @@ import {
   UserPortfolioTransaction,
 } from '@mm/api-types';
 import {
-  calculateGrowth,
-  dateFormatDate,
+  createTransaction,
+  fillOutMissingDatesForDate,
   getCurrentDateDefaultFormat,
   getCurrentDateDetailsFormat,
-  getPortfolioGrowth,
   getPortfolioGrowthAssets,
+  getPortfolioStateHoldingBaseUtil,
   getRandomNumber,
   getTransactionsStartDate,
   getYesterdaysDate,
@@ -103,7 +98,11 @@ export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): P
 export class CreateDemoAccountService {
   private symbolToTransact: SymbolSummary[] = [];
   private watchListSymbols: SymbolSummary[] = [];
-  private symbolHistoricalPrices = new Map<string, HistoricalPrice>();
+  // symbol -> historical (closed) prices
+  private symbolHistoricalPrices = new Map<string, HistoricalPrice[]>();
+
+  private pastDateBuy!: string;
+  private pastDateSell!: string;
 
   constructor() {
     console.log('init CreateDemoAccountService');
@@ -112,22 +111,30 @@ export class CreateDemoAccountService {
   initService = async (transactionLimit = 20, watchListLimit = 30): Promise<void> => {
     this.symbolToTransact = await this.#getRandomSymbolSummaries(transactionLimit);
     this.watchListSymbols = await this.#getRandomSymbolSummaries(watchListLimit);
+
+    this.pastDateBuy = getCurrentDateDetailsFormat(subDays(new Date(), 30));
+    this.pastDateSell = getCurrentDateDetailsFormat(subDays(new Date(), 4));
+
+    console.log(`Selected date for buy: ${this.pastDateBuy}, sell: ${this.pastDateSell}`);
+
+    await this.#preloadHistoricalPrices();
   };
 
   generatePortfolioGrowthData = async (userData: UserData, transactions: PortfolioTransaction[]): Promise<void> => {
-    const yesterDay = getYesterdaysDate();
+    // get start date of each transaction - should be the same for all symbols
     const transactionStart = getTransactionsStartDate(transactions);
 
     // load historical data for each symbol
-    const historicalPricesPromise = await Promise.allSettled(
-      transactionStart.map((d) => getHistoricalPricesOnDateCF(d.symbol, format(d.startDate, 'yyyy-MM-dd'), yesterDay)),
-    );
+    const historicalPricesPromise = transactionStart.map((d) => ({
+      symbol: d.symbol,
+      data: this.symbolHistoricalPrices.get(d.symbol),
+    }));
 
     // filter fulfilled promises
-    const historicalPrices = historicalPricesPromise
-      .filter((d): d is PromiseFulfilledResult<HistoricalPriceSymbol> => d.status === 'fulfilled')
-      .map((d) => d.value)
-      .reduce((acc, curr) => ({ ...acc, [curr.symbol]: curr.data }), {} as { [key: string]: HistoricalPrice[] });
+    const historicalPrices = historicalPricesPromise.reduce(
+      (acc, curr) => ({ ...acc, [curr.symbol]: curr.data! }),
+      {} as { [key: string]: HistoricalPrice[] },
+    );
 
     // get portfolio growth assets
     const portfolioGrowthAssets = getPortfolioGrowthAssets(transactions, historicalPrices);
@@ -136,7 +143,7 @@ export class CreateDemoAccountService {
     const allHolidays = (await getIsMarketOpenCF())?.allHolidays ?? [];
 
     // get portfolio growth data
-    const portfolioGrowth = getPortfolioGrowth(
+    const portfolioGrowth = this.getPortfolioGrowth(
       portfolioGrowthAssets,
       userData.portfolioState.startingCash,
       allHolidays,
@@ -158,26 +165,36 @@ export class CreateDemoAccountService {
     // save all created transactions
     const transactionsToSave: PortfolioTransaction[] = [];
 
-    const pastDateBuy = format(subDays(new Date(), 30), 'yyyy-MM-dd');
-    const pastDateSell = format(subDays(new Date(), 4), 'yyyy-MM-dd');
+    const buyOperations: OutstandingOrder[] = [];
 
     // create BUY transactions for each symbol
-    const buyOperations = this.symbolToTransact.map(
-      (symbol) =>
-        ({
-          date: pastDateBuy,
-          symbol: symbol.id,
-          sector: symbol.profile?.sector ?? 'Unknown',
-          symbolType: 'STOCK',
-          units: getRandomNumber(10, 32),
-          transactionType: 'BUY',
-        }) satisfies PortfolioTransactionCreate,
-    );
+    for (const symbol of this.symbolToTransact) {
+      console.log('Creating transactions for symbol:', symbol.id);
+      const price = this.#getHistoricalPrice(symbol.id, this.pastDateBuy);
+      const units = getRandomNumber(10, 32);
+
+      // create BUY transaction
+      const order = {
+        symbol: symbol.id,
+        sector: symbol.profile?.sector ?? 'Unknown',
+        symbolType: 'STOCK',
+        units: units,
+        createdAt: this.pastDateBuy,
+        displaySymbol: symbol.id,
+        orderId: uuidv4(),
+        orderType: { type: 'BUY' },
+        potentialSymbolPrice: price.close,
+        potentialTotalPrice: price.close * units,
+        userData: userData,
+        status: 'OPEN',
+      } satisfies OutstandingOrder;
+
+      // save data
+      buyOperations.push(order);
+    }
 
     // load all transactions at once
-    const buyTransactions = await Promise.all(
-      buyOperations.map((operation) => this.createPortfolioCreateOperation(operation, userData, transactionsToSave)),
-    );
+    const buyTransactions = buyOperations.map((operation) => this.createPortfolioCreateOperation(operation, userData));
 
     // determine if user has enough cash to buy
     for (const buyTransaction of buyTransactions) {
@@ -200,24 +217,45 @@ export class CreateDemoAccountService {
 
     console.log('Created BUY transactions:', transactionsToSave.length);
 
+    // update user's holdings - calculate break even price
+    const holdingsBase = getPortfolioStateHoldingBaseUtil(transactionsToSave);
+    userData.holdingSnapshot = {
+      data: holdingsBase,
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+    };
+
     // map data into new object to avoid circular reference
-    const sellOperations = transactionsToSave
-      .map((d) => ({ symbol: d.symbol, sector: d.sector, units: d.units }))
-      .map(
-        (operation) =>
-          ({
-            date: pastDateSell,
-            symbol: operation.symbol,
-            sector: operation.sector ?? 'Unknown',
-            symbolType: 'STOCK',
-            units: Math.round(operation.units / 2),
-            transactionType: 'SELL',
-          }) satisfies PortfolioTransactionCreate,
-      );
+    const sellOperations: OutstandingOrder[] = [];
+
+    // create SELL transactions for each symbol
+    for (const transaction of transactionsToSave) {
+      console.log('Creating SELL transactions for symbol:', transaction.symbol);
+      const price = this.#getHistoricalPrice(transaction.symbol, this.pastDateSell);
+      const units = getRandomNumber(10, 32);
+
+      // create SELL transaction
+      const order = {
+        symbol: transaction.symbol,
+        sector: transaction.sector ?? 'Unknown',
+        symbolType: 'STOCK',
+        units: Math.round(transaction.units / 2),
+        orderId: uuidv4(),
+        orderType: { type: 'SELL' },
+        potentialSymbolPrice: price.close,
+        potentialTotalPrice: price.close * units,
+        userData: userData,
+        createdAt: this.pastDateSell,
+        displaySymbol: transaction.symbol,
+        status: 'OPEN',
+      } satisfies OutstandingOrder;
+
+      // save data
+      sellOperations.push(order);
+    }
 
     // load all transactions at once
-    const sellTransactions = await Promise.all(
-      sellOperations.map((operation) => this.createPortfolioCreateOperation(operation, userData, transactionsToSave)),
+    const sellTransactions = sellOperations.map((operation) =>
+      this.createPortfolioCreateOperation(operation, userData),
     );
 
     console.log('Created SELL transactions:', sellTransactions.length);
@@ -233,106 +271,144 @@ export class CreateDemoAccountService {
     return transactionsToSave;
   };
 
-  #getHistoricalPrice = async (symbol: string, date: string): Promise<HistoricalPrice> => {
-    const cacheKey = `${symbol}_${date}`;
-
-    // check if data already loaded
-    const cachedData = this.symbolHistoricalPrices.get(cacheKey);
-    if (cachedData) {
-      return cachedData;
+  /**
+   *
+   * @param portfolioAssets - asset data for every symbol user owned
+   * @param startingCashValue - starting cash value
+   * @param ignoreDates - dates to ignore (holidays)
+   * @returns
+   */
+  getPortfolioGrowth = (
+    portfolioAssets: PortfolioGrowthAssets[],
+    startingCashValue = 0,
+    ignoreDates: string[] = [],
+  ): PortfolioGrowth[] => {
+    // user has no transactions yet
+    if (!portfolioAssets || portfolioAssets.length === 0) {
+      return [];
     }
 
-    // load historical price for symbol on date
-    const symbolPrice = await getStockHistoricalPricesOnDateCF(symbol, dateFormatDate(date));
-    console.log('loaded historical price for symbol:', symbol, 'date:', date);
+    // get soonest date
+    const soonestDate = portfolioAssets.reduce(
+      (acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc),
+      getYesterdaysDate(),
+    );
 
-    // check if symbol exists
-    if (!symbolPrice) {
-      throw new HttpsError('aborted', SYMBOL_NOT_FOUND_ERROR);
+    // generate dates from soonest until today
+    const generatedDates = fillOutMissingDatesForDate(soonestDate, getYesterdaysDate());
+
+    // result of portfolio growth
+    const result: PortfolioGrowth[] = [];
+
+    // accumulate return values, because it is increasing per symbol - {symbol: accumulatedReturn}
+    const accumulatedReturn = new Map<string, number>();
+
+    // loop though all generated dates
+    for (const gDate of generatedDates) {
+      // check if holiday
+      if (ignoreDates.includes(gDate)) {
+        continue;
+      }
+
+      // initial object
+      const portfolioItem: PortfolioGrowth = {
+        date: gDate,
+        investedTotal: 0,
+        marketTotal: 0,
+        balanceTotal: startingCashValue,
+      };
+
+      // loop though all portfolio assets per date
+      for (const portfolioAsset of portfolioAssets) {
+        // find current portfolio asset on this date
+        const currentPortfolioAsset = portfolioAsset.data.find((d) => d.date === gDate);
+
+        // not found
+        if (!currentPortfolioAsset) {
+          continue;
+        }
+
+        // save accumulated return
+        accumulatedReturn.set(portfolioAsset.symbol, currentPortfolioAsset.accumulatedReturn);
+
+        // add values to initial object
+        portfolioItem.marketTotal += currentPortfolioAsset.marketTotal;
+        portfolioItem.investedTotal += currentPortfolioAsset.investedTotal;
+        portfolioItem.balanceTotal += currentPortfolioAsset.marketTotal - currentPortfolioAsset.investedTotal;
+      }
+
+      // add accumulated return to total balance
+      portfolioItem.balanceTotal += Array.from(accumulatedReturn.entries()).reduce((acc, curr) => acc + curr[1], 0);
+
+      // round values
+      portfolioItem.balanceTotal = roundNDigits(portfolioItem.balanceTotal);
+      portfolioItem.marketTotal = roundNDigits(portfolioItem.marketTotal);
+      portfolioItem.investedTotal = roundNDigits(portfolioItem.investedTotal);
+
+      // save result
+      result.push(portfolioItem);
     }
 
-    // save data into cache
-    this.symbolHistoricalPrices.set(cacheKey, symbolPrice);
-    return symbolPrice;
+    return result;
   };
 
-  createPortfolioCreateOperation = async (
-    data: PortfolioTransactionCreate,
-    userData: UserData,
-    userTransactions: PortfolioTransaction[],
-  ): Promise<PortfolioTransaction> => {
-    const symbolPrice = await this.#getHistoricalPrice(data.symbol, data.date);
+  #getHistoricalPrice = (symbol: string, date: string): HistoricalPrice => {
+    const usedDate = format(new Date(date), 'yyyy-MM-dd');
+    // check if data already loaded
+    const cachedData = this.symbolHistoricalPrices.get(symbol);
 
-    // from previous transaction calculate invested and units - currently if I own that symbol
-    const symbolHolding = this.#getCurrentInvestedFromTransactions(data.symbol, userTransactions);
-    const symbolHoldingBreakEvenPrice = roundNDigits(symbolHolding.invested / symbolHolding.units, 2);
+    if (!cachedData) {
+      throw new Error(SYMBOL_NOT_FOUND_ERROR);
+    }
+
+    // check if date is sooner than the first date in the data
+    if (usedDate < cachedData[0].date) {
+      console.log(`Historical price not found for symbol ${symbol} on date ${usedDate}, returning first date`);
+      return cachedData[0];
+    }
+
+    // filter out data on date
+    const data = cachedData.find((d) => d.date === usedDate);
+
+    if (!data) {
+      throw new Error(`Historical price not found for symbol ${symbol} on date ${usedDate}`);
+    }
+
+    return data;
+  };
+
+  /**
+   * preloads historical prices for all symbols that user will transact
+   */
+  #preloadHistoricalPrices = async (): Promise<void> => {
+    const endDateValue = getYesterdaysDate();
+    const dateStart = format(this.pastDateBuy, 'yyyy-MM-dd');
+
+    // load historical prices
+    const historicalPricesPromises = Promise.allSettled(
+      this.symbolToTransact.map((symbol) => getHistoricalPricesOnDateCF(symbol.id, dateStart, endDateValue)),
+    );
+
+    // filter fulfilled promises
+    const historicalPrices = (await historicalPricesPromises)
+      .filter((d) => d.status === 'fulfilled')
+      .map((d) => d.value)
+      .filter((d) => !!d);
+
+    // saved data into cache
+    for (const data of historicalPrices) {
+      this.symbolHistoricalPrices.set(data.symbol, data.data);
+    }
+  };
+
+  createPortfolioCreateOperation = (data: OutstandingOrder, userData: UserData): PortfolioTransaction => {
+    const symbolPrice = this.#getHistoricalPrice(data.symbol, data.createdAt);
 
     // create transaction
-    const transaction = this.#createTransaction(userData, data, symbolPrice, symbolHoldingBreakEvenPrice);
+    const transaction = createTransaction(userData, data, symbolPrice.close);
 
     // return data
     return transaction;
-  };
-
-  #getCurrentInvestedFromTransactions = (
-    symbol: string,
-    userTransactions: PortfolioTransaction[],
-  ): { units: number; invested: number } => {
-    return userTransactions
-      .filter((d) => d.symbol === symbol)
-      .reduce(
-        (acc, curr) => ({
-          ...acc,
-          invested: roundNDigits(
-            acc.invested +
-              (curr.transactionType === 'BUY' ? curr.unitPrice * curr.units : -curr.unitPrice * curr.units),
-          ),
-          units: acc.units + (curr.transactionType === 'BUY' ? curr.units : -curr.units),
-        }),
-        { invested: 0, units: 0 } as { units: number; invested: number },
-      );
-  };
-
-  #createTransaction = (
-    userDocData: UserData,
-    input: PortfolioTransactionCreate,
-    historicalPrice: HistoricalPrice,
-    breakEvenPrice: number,
-  ): PortfolioTransaction => {
-    const isTransactionFeesActive = userDocData.userAccountType === UserAccountEnum.DEMO_TRADING;
-
-    // if custom total value is provided calculate unit price, else use API price
-    const unitPrice = input.customTotalValue
-      ? roundNDigits(input.customTotalValue / input.units)
-      : historicalPrice.close;
-
-    const isSell = input.transactionType === 'SELL';
-    const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
-    const returnChange = isSell ? calculateGrowth(unitPrice, breakEvenPrice) : 0;
-
-    // transaction fees are 0.01% of the transaction value
-    const transactionFeesCalc = isTransactionFeesActive ? ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT : 0;
-    const transactionFees = roundNDigits(transactionFeesCalc, 2);
-
-    const result: PortfolioTransaction = {
-      transactionId: uuidv4(),
-      date: input.date,
-      symbol: input.symbol,
-      units: input.units,
-      transactionType: input.transactionType,
-      userId: userDocData.id,
-      symbolType: input.symbolType,
-      unitPrice,
-      transactionFees,
-      returnChange,
-      returnValue,
-      priceFromDate: historicalPrice.date,
-      sector: input.sector,
-      dateExecuted: getCurrentDateDetailsFormat(),
-      displaySymbol: input.symbol.replace(input.symbolType === 'CRYPTO' ? 'USD' : '', ''),
-    };
-
-    return result;
   };
 
   createRandomUser = (data: {

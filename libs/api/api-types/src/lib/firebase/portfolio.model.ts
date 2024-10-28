@@ -145,7 +145,7 @@ export type PortfolioGrowth = Pick<PortfolioGrowthAssetsDataItem, 'investedTotal
   balanceTotal: number;
 };
 
-export type PortfolioTransactionType = 'BUY' | 'SELL';
+export type PortfolioTransactionType = 'BUY' | 'SELL' | 'SHORT';
 
 export type PortfolioTransaction = SymbolStoreBase & {
   transactionId: string;
@@ -194,12 +194,4 @@ export type PortfolioTransactionCash = {
   transactionId: string;
   date: string;
   amount: number;
-};
-
-export type PortfolioTransactionCreate = SymbolStoreBase & {
-  units: number;
-  date: string;
-  transactionType: PortfolioTransactionType;
-  /** User can add custom total value of this holding and not load from API */
-  customTotalValue?: number;
 };

@@ -33,8 +33,8 @@ export class MarketApiService {
   private readonly cloudflareHistoricalPriceAPI = 'https://get-historical-prices.krivanek1234.workers.dev';
   private readonly cloudflareSymbolSummaryAPI = 'https://get-symbol-summary.krivanek1234.workers.dev';
 
-  private apiCache = inject(ApiCacheService);
-  getIsMarketOpenSignal = toSignal(this.getIsMarketOpen());
+  private readonly apiCache = inject(ApiCacheService);
+  readonly getIsMarketOpenSignal = toSignal(this.getIsMarketOpen());
 
   getSymbolQuotes(symbols: string[] | undefined): Observable<SymbolQuote[]> {
     if (!symbols || symbols.length === 0) {
@@ -180,7 +180,7 @@ export class MarketApiService {
       );
   }
 
-  getNews(newsType: NewsTypes, symbol: string = ''): Observable<News[]> {
+  getNews(newsType: NewsTypes, symbol = ''): Observable<News[]> {
     return this.apiCache
       .getData<
         News[]
@@ -201,10 +201,27 @@ export class MarketApiService {
   }
 
   getIsMarketOpen(): Observable<IsStockMarketOpenExtend> {
-    return this.apiCache.getData<IsStockMarketOpenExtend>(
-      `${this.cloudflareBasicAPI}/?type=market-is-open`,
-      ApiCacheService.validity5Min,
-    );
+    return this.apiCache
+      .getData<IsStockMarketOpenExtend>(`${this.cloudflareBasicAPI}/?type=market-is-open`, ApiCacheService.validity5Min)
+      .pipe(
+        catchError((e) => {
+          console.log(e);
+          return of({
+            allHolidays: [],
+            currentHoliday: [],
+            isTheCryptoMarketOpen: true,
+            isTheStockMarketOpen: false,
+            isTheEuronextMarketOpen: false,
+            isTheForexMarketOpen: false,
+            stockExchangeName: '',
+            stockMarketHolidays: [],
+            stockMarketHours: {
+              closingHour: 'CLOSED',
+              openingHour: 'CLOSED',
+            },
+          } satisfies IsStockMarketOpenExtend);
+        }),
+      );
   }
 
   getMarketCalendarDividends(month: string | number, year: string | number): Observable<CalendarDividend[]> {
@@ -258,6 +275,15 @@ export class MarketApiService {
         ApiCacheService.validity30Min,
       )
       .pipe(map((d) => d[economicType]));
+  }
+
+  isMarketOpenForQuote(type: 'stock' | 'crypto' = 'stock'): boolean {
+    const marketOpen = this.getIsMarketOpenSignal();
+    if (type === 'crypto') {
+      return marketOpen?.isTheCryptoMarketOpen ?? false;
+    }
+
+    return marketOpen?.isTheStockMarketOpen ?? false;
   }
 
   private getSymbolSummariesLong(symbols: string[]): Observable<SymbolSummary[]> {

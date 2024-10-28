@@ -1,3 +1,7 @@
+import { v4 as uuidv4 } from 'uuid';
+
+export const createUUID = (): string => uuidv4();
+
 export const isNumber = (value: string | number | unknown): boolean => {
   return value != null && value !== '' && typeof value === 'number' && !isNaN(Number(value.toString()));
 };
@@ -13,7 +17,7 @@ export const calculateGrowth = (starting?: number, ending?: number) => {
   return roundNDigits(((starting - ending) / Math.abs(ending)) * 100);
 };
 
-export const roundNDigits = (value?: number | null, n: number = 2, isPercent = false): number => {
+export const roundNDigits = (value?: number | null, n = 2, isPercent = false): number => {
   if (value === undefined || value === null || isNaN(value)) {
     return 0;
   }
@@ -145,4 +149,16 @@ export const getObjectKeys = <T extends object>(obj: T) => Object.keys(obj) as (
 export const createNameInitials = (name: string) => {
   const words = name.split(' ').reduce((acc, word) => acc + (word.at(0) ?? '').toUpperCase(), '');
   return `${words}.`;
+};
+
+export const tryJSONParse = <T>(value: string | undefined | null): T | null => {
+  try {
+    if (!value) {
+      return null;
+    }
+
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
 };

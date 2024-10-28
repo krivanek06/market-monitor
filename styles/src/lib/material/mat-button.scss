@@ -69,13 +69,6 @@ button[mat-stroked-button][disabled] {
   background-color: var(--mdc-filled-button-disabled-container-color) !important;
 }
 
-@layer utilities {
-  .g-button-size-lg {
-    min-width: 220px !important;
-    min-height: 50px !important;
-  }
-}
-
 .mat-mdc-button.mat-unthemed {
   color: var(--gray-medium) !important;
 }

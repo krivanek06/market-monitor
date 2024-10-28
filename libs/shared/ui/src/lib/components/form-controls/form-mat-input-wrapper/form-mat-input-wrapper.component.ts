@@ -1,17 +1,5 @@
-import { CommonModule } from '@angular/common';
-import {
-  AfterViewInit,
-  Component,
-  Host,
-  HostListener,
-  Inject,
-  Injector,
-  OnInit,
-  Optional,
-  forwardRef,
-  input,
-  signal,
-} from '@angular/core';
+import { KeyValuePipe, LowerCasePipe, NgClass } from '@angular/common';
+import { Component, Injector, OnInit, forwardRef, inject, input, signal } from '@angular/core';
 import {
   AbstractControl,
   ControlValueAccessor,
@@ -34,74 +22,46 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DefaultImageType } from '@mm/shared/data-access';
 import { DefaultImgDirective } from '../../../directives';
 
 @Component({
   selector: 'app-form-mat-input-wrapper',
   template: `
-    <fieldset [disabled]="disabled()">
-      <ng-container [ngSwitch]="inputType()">
-        <mat-form-field
-          appearance="fill"
-          [ngClass]="{ 'g-form-error': parentFormControl?.touched && parentFormControl?.invalid }"
-        >
-          <!-- label -->
-          <mat-label> {{ inputCaption() }}</mat-label>
+    <mat-form-field [hintLabel]="showErrors ? '' : hintText()" [ngClass]="{ 'g-form-error': showErrors }">
+      <!-- label -->
+      <mat-label> {{ inputCaption() }}</mat-label>
 
-          <!-- textarea -->
-          <textarea
-            #textAreaElement
-            *ngSwitchCase="'TEXTAREA'"
-            [formControl]="internalFormControl"
-            cdkAutosizeMinRows="4"
-            cdkTextareaAutosize
-            matInput
-          >
-          </textarea>
+      <!-- text, number,  email -->
+      <input
+        [formControl]="internalFormControl"
+        [readOnly]="disabled()"
+        [type]="inputType() | lowercase"
+        autocomplete="off"
+        matInput
+        placeholder="enter something"
+      />
 
-          <!-- number -->
-          <ng-container *ngSwitchCase="'NUMBER'">
-            <input
-              [formControl]="internalFormControl"
-              [readOnly]="disabled()"
-              type="number"
-              autocomplete="off"
-              matInput
-            />
-          </ng-container>
-
-          <!-- text, number, time, email -->
-          <input
-            *ngSwitchDefault
-            [formControl]="internalFormControl"
-            [readOnly]="disabled()"
-            [type]="inputType() | lowercase"
-            autocomplete="off"
-            matInput
-          />
-
-          <!-- hint -->
-          <mat-hint *ngIf="hintText()" class="text-wt-gray-medium hidden sm:block" matSuffix>
-            {{ hintText() }}
-          </mat-hint>
-
-          <!-- prefix icon -->
-          <mat-icon *ngIf="prefixIcon()" matPrefix class="icon-prefix">{{ prefixIcon() }}</mat-icon>
-        </mat-form-field>
-      </ng-container>
-    </fieldset>
+      <!-- prefix icon -->
+      @if (prefixIcon()) {
+        <mat-icon matPrefix class="icon-prefix">{{ prefixIcon() }}</mat-icon>
+      }
+    </mat-form-field>
 
     <!-- errors -->
-    <ng-container *ngIf="showErrors">
-      <mat-error *ngFor="let inputError of parentFormControl?.errors | keyvalue" [id]="''">
-        {{ inputError.value.errorText }}
-      </mat-error>
-    </ng-container>
+    @if (showErrors) {
+      @for (inputError of parentControl?.errors | keyvalue; track $index; let i = $index) {
+        <!-- show only first error -->
+        <div class="text-wt-danger -mt-5 text-xs">
+          {{ inputError.value.errorText }}
+        </div>
+      }
+    }
   `,
   standalone: true,
   imports: [
-    CommonModule,
+    KeyValuePipe,
+    LowerCasePipe,
+    NgClass,
     ReactiveFormsModule,
     MatCheckboxModule,
     MatSlideToggleModule,
@@ -125,78 +85,70 @@ import { DefaultImgDirective } from '../../../directives';
     },
   ],
   styles: `
-    mat-form-field.mat-mdc-form-field {
+    mat-form-field {
       width: 100%;
-      height: 60px;
-    }
-
-    fieldset {
-      clear: both;
-    }
-
-    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-      display: none !important;
     }
   `,
+  //changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, ControlValueAccessor {
-  inputCaption = input.required<string>();
-  prefixIcon = input<string | undefined>();
-  inputType = input<'TEXT' | 'NUMBER' | 'PASSWORD' | 'EMAIL' | 'TEXTAREA'>('TEXT');
-  displayImageType = input<DefaultImageType>('default');
+export class FormMatInputWrapperComponent<T extends string | number | null> implements OnInit, ControlValueAccessor {
+  private readonly injector = inject(Injector, {
+    optional: true,
+    host: true,
+  });
 
-  /*
-		disable input source
-	  */
-  disabled = signal(false);
+  readonly inputCaption = input.required<string>();
+  readonly prefixIcon = input<string | undefined>();
+  readonly inputType = input<'TEXT' | 'NUMBER' | 'PASSWORD' | 'EMAIL' | 'TEXTAREA'>('TEXT');
 
-  /*
-		display hint text for input
-	  */
-  hintText = input<string | undefined>();
+  /**
+   * disable input source
+   */
+  readonly disabled = signal(false);
 
-  onChange: (value: T | null) => void = () => {};
-  onTouched = () => {};
-  internalFormControl = new FormControl<T | null>(null);
+  /**
+   * display hint text for input
+   */
+  readonly hintText = input<string>('');
+
+  onChange: (value: T) => void = () => {
+    /** */
+  };
+  onTouched = () => {
+    /** */
+  };
+  readonly internalFormControl = new FormControl<T | null>(null);
 
   // TODO: remove this if possible to get parent validators
-  parentFormControl?: FormControl;
-
-  constructor(@Inject(Injector) @Optional() @Host() private injector: Injector) {}
+  parentControl?: FormControl;
 
   get showErrors(): boolean {
-    return this.parentFormControl ? this.parentFormControl.touched && this.parentFormControl.invalid : false;
-  }
-
-  // todo: refactor this to react when mouse enters and leaves the component
-  @HostListener('mouseup', ['$event'])
-  onTouch() {
-    console.log('touch');
-    // notify parent form control that this control has been touched
-    this.onTouched();
+    return this.parentControl ? this.parentControl.touched && this.parentControl.invalid : false;
   }
 
   ngOnInit(): void {
+    const controlName = this.injector?.get(NgControl) as FormControlName;
+    // access parent form control
+    if (controlName) {
+      this.parentControl = controlName.control;
+      //console.log('parentControl', this.parentControl);
+    }
+
     this.internalFormControl.valueChanges.subscribe((value) => {
-      this.onChange(value);
+      const castValue = (this.inputType() === 'NUMBER' ? Number(value) : value) as T;
+      this.onChange(castValue);
+      this.onTouched();
     });
   }
 
-  ngAfterViewInit(): void {
-    const controlName = this.injector.get(NgControl) as FormControlName;
-
-    // access parent form control
-    if (controlName) {
-      this.parentFormControl = controlName.control;
-    }
-  }
-
   validate(control: AbstractControl<any, any>): ValidationErrors | null {
-    if (!this.parentFormControl) {
-      return null;
+    if (this.parentControl) {
+      return this.parentControl.errors;
     }
-    return this.parentFormControl.errors;
+
+    return control?.errors ?? null;
   }
+
   writeValue(obj: T): void {
     this.internalFormControl.patchValue(obj, { emitEvent: false });
   }
@@ -215,6 +167,10 @@ export class FormMatInputWrapperComponent<T> implements OnInit, AfterViewInit, C
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled.set(isDisabled);
+    if (isDisabled) {
+      this.internalFormControl.disable();
+    } else {
+      this.internalFormControl.enable();
+    }
   }
 }

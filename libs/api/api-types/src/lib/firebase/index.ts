@@ -1,14 +1,10 @@
 export * from './calendar-asset.model';
 export * from './group.model';
 export * from './hall-of-fame.model';
+export * from './outstanding-order.model';
 export * from './portfolio.model';
 export * from './ranking.model';
 export * from './stock-data-modified.model';
 export * from './stock-data.model';
 export * from './symbol.model';
 export * from './user.model';
-
-/**
- * prefix to where CF are deployed
- */
-export const FIREBASE_DEPLOYMENT = 'jhgz46ksfq-uc.a.run.app';

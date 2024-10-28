@@ -702,10 +702,11 @@ export const getIsMarketOpen = async (
     const allHolidays = data.stockMarketHolidays
       .map((holiday) => Object.values(holiday))
       .reduce((acc, val) => acc.concat(val), [])
-      .filter((d) => !isNumber(d)); // filter out years
+      .filter((d) => !isNumber(d)) // filter out years
+      .map((d) => String(d));
 
     // get only the dates
-    const currentHolidayDates = Object.values(currentHoliday);
+    const currentHolidayDates = Object.values(currentHoliday).map((d) => String(d));
 
     const holidaysThisYear = {
       ...data,

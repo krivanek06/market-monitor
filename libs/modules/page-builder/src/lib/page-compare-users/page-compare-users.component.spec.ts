@@ -13,7 +13,6 @@ import {
   UserPortfolioTransaction,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { PageCompareUsersComponent } from '@mm/page-builder';
 import { PortfolioCalculationService, PortfolioChange } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthCompareChartComponent,
@@ -34,6 +33,7 @@ import { UserSearchControlComponent, UserSearchControlComponentMock } from '@mm/
 import { UserDisplayItemComponent, UserDisplayItemComponentMock } from '@mm/user/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { delay, of } from 'rxjs';
+import { PageCompareUsersComponent } from './page-compare-users.component';
 
 describe('PageCompareUsersComponent', () => {
   const searchUsersS = '[data-testid="page-compare-users-search"]';
@@ -182,8 +182,8 @@ describe('PageCompareUsersComponent', () => {
     expect(userApi.getUserById).toHaveBeenCalledWith(usedUser.id);
     expect(userApi.getUserPortfolioTransactions).toHaveBeenCalledWith(usedUser.id);
     expect(calculationService.getPortfolioStateHoldings).toHaveBeenCalledWith(
-      usedUser.portfolioState.startingCash,
-      mockTransactions.transactions,
+      usedUser.portfolioState,
+      usedUser.holdingSnapshot.data,
     );
     expect(userApi.getUserPortfolioGrowth).toHaveBeenCalledWith(usedUser.id);
     expect(calculationService.getPortfolioChange).toHaveBeenCalledWith(portfolioGrowthMock);
