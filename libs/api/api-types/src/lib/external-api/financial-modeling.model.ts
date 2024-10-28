@@ -928,9 +928,9 @@ export type IsStockMarketOpen = {
    * "Martin Luther King, Jr. Day": "2019-01-21",
    * "Washington's Birthday": "2019-02-18",
    */
-  stockMarketHolidays: {
+  stockMarketHolidays: ({
     year: number;
-  } & Record<string, string>[];
+  } & Record<string, string>)[];
 };
 
 export type IsStockMarketOpenExtend = IsStockMarketOpen & {

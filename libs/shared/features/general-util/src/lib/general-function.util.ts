@@ -150,3 +150,15 @@ export const createNameInitials = (name: string) => {
   const words = name.split(' ').reduce((acc, word) => acc + (word.at(0) ?? '').toUpperCase(), '');
   return `${words}.`;
 };
+
+export const tryJSONParse = <T>(value: string | undefined | null): T | null => {
+  try {
+    if (!value) {
+      return null;
+    }
+
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
+};

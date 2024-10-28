@@ -1,5 +1,6 @@
 import { getIsMarketOpen } from '@mm/api-external';
 import { EXPIRATION_TEN_MINUTES, IsStockMarketOpenExtend, RESPONSE_HEADER } from '@mm/api-types';
+import { tryJSONParse } from '@mm/shared/general-util';
 import { isAfter } from 'date-fns';
 import { Env } from './model';
 
@@ -12,18 +13,14 @@ type SavedData = {
 export const getIsMarketOpenWrapper = async (env: Env): Promise<Response> => {
 	// if version differs, invalidate cache
 	const currentVersion = 1;
-	const cacheExpiration = EXPIRATION_TEN_MINUTES;
 
 	// load data from KV
-	const key = 'is_market_open';
-	const cachedData = (await env.get_basic_data.get(key, { type: 'json' })) as SavedData;
+	const cacheKey = 'is_market_open';
+	const cachedDataString = await env.get_basic_data.get(cacheKey);
+	const cachedData = tryJSONParse<SavedData>(cachedDataString);
 
-	// invalidate cache if version differs
-	if (cachedData?.version !== currentVersion) {
-		env.get_basic_data.delete(key);
-	}
-
-	if (cachedData && cachedData?.version === currentVersion) {
+	// check data validity
+	if (cachedData?.version && cachedData.data && cachedData.version === currentVersion) {
 		// format: DD/MM/YYYY HH:MM:SS
 		const marketOpenTime = marketOpenTimeEST();
 		const savedTimeEST = new Date(new Date(cachedData.date).toLocaleString('en', { timeZone: 'EST' }));
@@ -46,7 +43,7 @@ export const getIsMarketOpenWrapper = async (env: Env): Promise<Response> => {
 	} satisfies SavedData;
 
 	// save into cache
-	env.get_basic_data.put(key, JSON.stringify(saveData), { expirationTtl: cacheExpiration });
+	env.get_basic_data.put(cacheKey, JSON.stringify(saveData), { expirationTtl: EXPIRATION_TEN_MINUTES });
 
 	// return stringified data
 	return new Response(JSON.stringify(saveData.data), RESPONSE_HEADER);

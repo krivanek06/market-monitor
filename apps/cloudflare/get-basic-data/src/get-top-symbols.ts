@@ -1,5 +1,5 @@
 import { getMostPerformingStocks } from '@mm/api-external';
-import { MarketTopPerformanceSymbols, RESPONSE_HEADER } from '@mm/api-types';
+import { EXPIRATION_TEN_MINUTES, MarketTopPerformanceSymbols, RESPONSE_HEADER } from '@mm/api-types';
 import { Env } from './model';
 
 export const getTopSymbols = async (env: Env, searchParams: URLSearchParams): Promise<Response> => {
@@ -30,12 +30,8 @@ export const getTopSymbols = async (env: Env, searchParams: URLSearchParams): Pr
 		stockTopLosers: losers.map((d) => d.symbol),
 	};
 
-	// save into cache for 15 minutes
-	const minutes10 = 60 * 15;
-	await env.get_basic_data.put(cacheKey, JSON.stringify(result), { expirationTtl: minutes10 });
-
-	// load summaries
-	// const summaries = await loadSummaries(result);
+	// save into cache for 10 minutes
+	await env.get_basic_data.put(cacheKey, JSON.stringify(result), { expirationTtl: EXPIRATION_TEN_MINUTES });
 
 	// return data
 	return new Response(JSON.stringify(result), RESPONSE_HEADER);

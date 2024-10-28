@@ -201,10 +201,27 @@ export class MarketApiService {
   }
 
   getIsMarketOpen(): Observable<IsStockMarketOpenExtend> {
-    return this.apiCache.getData<IsStockMarketOpenExtend>(
-      `${this.cloudflareBasicAPI}/?type=market-is-open`,
-      ApiCacheService.validity5Min,
-    );
+    return this.apiCache
+      .getData<IsStockMarketOpenExtend>(`${this.cloudflareBasicAPI}/?type=market-is-open`, ApiCacheService.validity5Min)
+      .pipe(
+        catchError((e) => {
+          console.log(e);
+          return of({
+            allHolidays: [],
+            currentHoliday: [],
+            isTheCryptoMarketOpen: true,
+            isTheStockMarketOpen: false,
+            isTheEuronextMarketOpen: false,
+            isTheForexMarketOpen: false,
+            stockExchangeName: '',
+            stockMarketHolidays: [],
+            stockMarketHours: {
+              closingHour: 'CLOSED',
+              openingHour: 'CLOSED',
+            },
+          } satisfies IsStockMarketOpenExtend);
+        }),
+      );
   }
 
   getMarketCalendarDividends(month: string | number, year: string | number): Observable<CalendarDividend[]> {
