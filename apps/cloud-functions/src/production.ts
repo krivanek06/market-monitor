@@ -110,10 +110,13 @@ export const run_scheduler_update_users = onSchedule(
   },
 );
 
+/**
+ * At every 5th minute from 31 through 41 past hour 9 on every day-of-week from Monday through Friday.
+ */
 export const run_scheduler_execute_outstanding_orders = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '31 9 * * 1-5', // 9:31am every weekday
+    schedule: '31-41/5 9 * * 1-5', // 9:31, 9:36, 9:41
     region: region,
     timeZone: 'EST',
   },
