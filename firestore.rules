@@ -17,6 +17,13 @@ service cloud.firestore {
       allow delete: if request.auth.uid == resource.data.ownerUser.id;
     }
 
+    // allow operations into outstanding order
+    match /outstanding_orders/{groupId}/{document=**} {
+      allow create: if true;
+      allow update: if request.auth.uid == resource.data.userData.id;
+      allow delete: if request.auth.uid == resource.data.userData.id;
+    }
+
     // allow reading all
     match /{document=**} {
       allow read: if true;

@@ -14,29 +14,9 @@
   pointer-events: none !important;
 }
 
-.mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__input {
-  color: var(--gray-medium) !important;
-}
-
-input,
-textarea {
-  font-size: 16px !important;
-}
-
-.mdc-text-field--filled:not(.mdc-text-field--disabled) {
-  background-color: var(--gray-light) !important;
-  border: 1px solid var(--gray-light-strong) !important;
-}
-
-::-webkit-input-placeholder {
-  color: var(--gray-medium) !important;
-}
-
 mat-form-field {
   &.g-form-error {
-    .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-      border: 1px solid var(--danger) !important;
-    }
+    border: 1px solid var(--danger) !important;
 
     mat-label {
       color: var(--danger) !important;

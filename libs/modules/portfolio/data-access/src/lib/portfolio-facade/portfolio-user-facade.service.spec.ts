@@ -30,15 +30,15 @@ describe('PortfolioUserFacadeService', () => {
           state: testAuthState,
         }),
         MockProvider(PortfolioCalculationService, {
-          getPortfolioGrowth: jest.fn(),
+          getPortfolioStateHoldings: jest.fn(),
+          getTransactionSymbols: jest.fn(),
           getPortfolioChange: jest.fn(),
           getPortfolioSectorAllocationPieChart: jest.fn(),
           getPortfolioAssetAllocationPieChart: jest.fn(),
-          getPortfolioStateHoldings: jest.fn(),
-          getPortfolioGrowthAssets: jest.fn(),
         }),
         MockProvider(PortfolioCreateOperationService, {
-          createPortfolioCreateOperation: jest.fn(),
+          createOrder: jest.fn(),
+          deleteOrder: jest.fn(),
         }),
         MockProvider(UserApiService, {
           deletePortfolioTransactionForUser: jest.fn(),

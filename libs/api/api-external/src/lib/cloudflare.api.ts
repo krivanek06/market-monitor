@@ -59,6 +59,11 @@ export const getSymbolQuotesCF = async (symbols: string[]): Promise<SymbolQuote[
   }
 };
 
+export const getSymbolQuoteCF = async (symbol: string): Promise<SymbolQuote | null> => {
+  const quote = await getSymbolQuotesCF([symbol]);
+  return quote[0] ?? null;
+};
+
 export const getHistoricalPricesOnDateCF = async (
   symbol: string,
   dateStart: string,

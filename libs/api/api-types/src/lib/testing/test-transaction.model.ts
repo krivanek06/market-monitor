@@ -1,4 +1,6 @@
-import { PortfolioTransaction, SymbolSummary, USER_TEST_1_ID } from '@mm/api-types';
+import { HistoricalPrice } from '../external-api';
+import { PortfolioTransaction, SymbolSummary } from '../firebase';
+import { USER_TEST_1_ID } from './test-user.model';
 
 export const TestTransactionDates = {
   ['2023-09-04']: '2023-09-04',
@@ -91,7 +93,7 @@ export const testHistoricalPriceSymbol_AAPL = {
       volume: 1000,
       close: 11,
     },
-  ],
+  ] satisfies HistoricalPrice[],
 } as const;
 
 export const testHistoricalPriceSymbol_MSFT = {
@@ -118,5 +120,5 @@ export const testHistoricalPriceSymbol_MSFT = {
       volume: 1000,
       close: 31,
     },
-  ],
+  ] satisfies HistoricalPrice[],
 } as const;

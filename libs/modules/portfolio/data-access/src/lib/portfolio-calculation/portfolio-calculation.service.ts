@@ -5,7 +5,9 @@ import {
   HistoricalPriceSymbol,
   PortfolioGrowth,
   PortfolioGrowthAssets,
+  PortfolioState,
   PortfolioStateHolding,
+  PortfolioStateHoldingBase,
   PortfolioStateHoldings,
   PortfolioTransaction,
 } from '@mm/api-types';
@@ -14,10 +16,7 @@ import {
   calculateGrowth,
   dateFormatDate,
   getObjectEntries,
-  getPortfolioGrowth,
   getPortfolioGrowthAssets,
-  getPortfolioStateHoldingBaseUtil,
-  getPortfolioStateHoldingsUtil,
   getTransactionsStartDate,
   getYesterdaysDate,
   roundNDigits,
@@ -32,25 +31,47 @@ import { PortfolioChange } from '../models';
 export class PortfolioCalculationService {
   private readonly marketApiService = inject(MarketApiService);
 
+  /**
+   * recalculate user's portfolio state based on transactions, because the balance (value of investments) can change
+   * in the DB may be outdated data, so we need to recalculate it
+   *
+   * @returns - recalculated user's portfolio state based on transactions
+   */
   getPortfolioStateHoldings(
-    startingCash: number,
-    transactions: PortfolioTransaction[],
+    portfolioState: PortfolioState,
+    holdings: PortfolioStateHoldingBase[],
   ): Observable<PortfolioStateHoldings> {
-    // get partial holdings calculations
-    const holdingsBase = getPortfolioStateHoldingBaseUtil(transactions);
-    const holdingSymbols = holdingsBase.map((d) => d.symbol);
+    const holdingSymbols = holdings.map((d) => d.symbol);
 
-    console.log(`PortfolioGrowthService: getPortfolioState`, holdingSymbols, holdingsBase, transactions);
+    console.log(`PortfolioGrowthService: getPortfolioState`, portfolioState);
 
     // get symbol summaries from API
-    return this.marketApiService
-      .getSymbolQuotes(holdingSymbols)
-      .pipe(map((summaries) => getPortfolioStateHoldingsUtil(transactions, holdingsBase, summaries, startingCash)));
-  }
-
-  getPortfolioGrowth(portfolioAssets: PortfolioGrowthAssets[], startingCashValue = 0): PortfolioGrowth[] {
-    const allHolidays = this.marketApiService.getIsMarketOpenSignal()?.allHolidays ?? [];
-    return getPortfolioGrowth(portfolioAssets, startingCashValue, allHolidays);
+    return this.marketApiService.getSymbolQuotes(holdingSymbols).pipe(
+      map(
+        (quotes) =>
+          quotes
+            .map((quote) => {
+              const holding = holdings.find((d) => d.symbol === quote.symbol);
+              // this should never happen
+              if (!holding) {
+                console.log(`Holding not found for symbol ${quote.symbol}`);
+                return null;
+              }
+              return {
+                ...holding,
+                invested: roundNDigits(holding.invested),
+                breakEvenPrice: roundNDigits(holding.invested / holding.units),
+                weight: roundNDigits(holding.invested / portfolioState.invested, 6),
+                symbolQuote: quote,
+              } satisfies PortfolioStateHolding;
+            })
+            .filter((d) => !!d) as PortfolioStateHolding[],
+      ),
+      map((holdings) => ({
+        ...portfolioState,
+        holdings,
+      })),
+    );
   }
 
   /**

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AuthenticationFormComponent } from '@mm/authentication/authentication-forms';
 
 @Component({
@@ -33,7 +34,7 @@ import { AuthenticationFormComponent } from '@mm/authentication/authentication-f
         <div class="px-5 lg:basis-3/5 lg:pt-[160px]">
           <!--<div class="text-wt-primary mb-10 text-center text-5xl tracking-widest opacity-80">GGFinance</div>-->
           <div
-            class="mx-auto rounded-lg bg-[#02070f] p-4 shadow-lg sm:h-[600px] sm:w-10/12 sm:p-8 lg:w-[520px] xl:w-[620px]"
+            class="relative z-10 mx-auto rounded-lg bg-[#02070f] p-4 shadow-lg sm:h-[600px] sm:w-10/12 sm:p-8 lg:w-[520px] xl:w-[620px]"
           >
             <app-authentication-form />
           </div>
@@ -82,15 +83,15 @@ import { AuthenticationFormComponent } from '@mm/authentication/authentication-f
       background: linear-gradient(315deg, #000000 10%, #040d1c 38%, #001435 98%);
     }
 
-    ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-      background-color: #2c2c2c42 !important;
-      border: 1px solid #2f2f2f !important;
-    }
-
     ::ng-deep .mat-divider {
       border-color: #2f2f2f !important;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageLoginComponent {}
+export class PageLoginComponent {
+  private document = inject(DOCUMENT);
+  constructor() {
+    this.document.body.classList.add('dark-theme');
+  }
+}

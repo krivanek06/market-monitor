@@ -125,7 +125,7 @@ import { RecommendationDirective } from '../../../directives';
     <!-- template render price change -->
     <ng-template #priceChange let-name="name" let-key="key">
       <div class="grid items-center justify-center gap-2">
-        <span>{{ name }}</span>
+        <span class="text-wt-gray-dark">{{ name }}</span>
         <span
           appPercentageIncrease
           [useCurrencySign]="false"

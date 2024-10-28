@@ -86,3 +86,8 @@ export const TRADING_SIMULATOR_MAX_ROUNDS = 250;
  * maximum number of instances of trading simulator a user can create
  */
 export const TRADING_SIMULATOR_MAX_INSTANCES_PER_USER = 5;
+
+/**
+ * how many outstanding orders can a single user have at once in OPEN state
+ */
+export const OUTSTANDING_ORDERS_MAX_ORDERS = 5;

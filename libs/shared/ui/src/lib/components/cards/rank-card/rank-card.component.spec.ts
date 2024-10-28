@@ -10,6 +10,7 @@ describe('RankCardComponent', () => {
       .keep(ClickableDirective)
       .keep(PositionColoringDirective)
       .keep(MatButton)
+      .keep(PositionColoringDirective)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .keep(NoopAnimationsModule);
   });

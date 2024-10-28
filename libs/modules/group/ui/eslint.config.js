@@ -20,7 +20,7 @@ module.exports = [
           'error',
           {
             type: 'attribute',
-            prefix: 'marketMonitor',
+            prefix: 'app',
             style: 'camelCase',
           },
         ],

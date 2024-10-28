@@ -1,6 +1,7 @@
 import { Injectable, InjectionToken, effect, inject } from '@angular/core';
-import { GroupApiService, UserApiService } from '@mm/api-client';
+import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
 import {
+  OutstandingOrder,
   PortfolioGrowth,
   PortfolioTransaction,
   SymbolStoreBase,
@@ -39,6 +40,10 @@ type AuthenticationState = {
   portfolioTransactions: PortfolioTransaction[] | null;
   watchList: UserWatchList;
   portfolioGrowth: PortfolioGrowth[] | null;
+  outstandingOrders: {
+    openOrders: OutstandingOrder[];
+    closedOrders: OutstandingOrder[];
+  };
 };
 
 @Injectable({
@@ -46,6 +51,7 @@ type AuthenticationState = {
 })
 export class AuthenticationUserStoreService {
   private readonly authenticationAccountService = inject(AuthenticationAccountService);
+  private readonly outstandingOrderApiService = inject(OutstandingOrderApiService);
   private readonly groupApiService = inject(GroupApiService);
   private readonly userApiService = inject(UserApiService);
 
@@ -59,6 +65,10 @@ export class AuthenticationUserStoreService {
     watchList: {
       createdDate: getCurrentDateDefaultFormat(),
       data: [],
+    },
+    outstandingOrders: {
+      openOrders: [],
+      closedOrders: [],
     },
   };
 
@@ -119,6 +129,30 @@ export class AuthenticationUserStoreService {
     map((data) => ({ portfolioGrowth: data })),
   );
 
+  private readonly userOutstandingOrdersSource$ = this.authenticationAccountService.getUserData().pipe(
+    // prevent duplicate calls only when user id changes
+    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
+    switchMap((userData) =>
+      userData
+        ? combineLatest([
+            this.outstandingOrderApiService.getOutstandingOrdersOpen(userData.id),
+            this.outstandingOrderApiService.getOutstandingOrdersClosed(userData.id),
+          ]).pipe(
+            map((orders) => ({
+              openOrders: orders[0].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+              closedOrders: orders[1].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+            })),
+            map((orders) => ({
+              outstandingOrders: {
+                openOrders: orders.openOrders,
+                closedOrders: orders.closedOrders,
+              },
+            })),
+          )
+        : of({ outstandingOrders: { openOrders: [], closedOrders: [] } }),
+    ),
+  );
+
   /**
    * Source used to get user group data, owner, member, invitations, requested, watched
    */
@@ -174,6 +208,7 @@ export class AuthenticationUserStoreService {
       this.userGroupDataSource$,
       this.loadedAuthenticationSource$,
       this.userPortfolioGrowthSource$,
+      this.userOutstandingOrdersSource$,
     ],
     selectors: (state) => ({
       getUser: () => state().user!,

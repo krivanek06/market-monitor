@@ -1,9 +1,10 @@
-import { GroupGeneralActions, UserCreateDemoAccountInput } from '@mm/api-types';
-import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
+import { GroupGeneralActions, OutstandingOrder, UserCreateDemoAccountInput } from '@mm/api-types';
+import { onDocumentCreated, onDocumentDeleted, onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { CallableRequest, onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from './group';
 import { groupGeneralActions } from './group/group-general-actions';
+import { onOutstandingOrderCreate, onOutstandingOrderDelete, outstandingOrderExecute } from './outstanding-order';
 import { onTransactionUpdateForUserId } from './portfolio';
 import {
   userCreateAccount,
@@ -73,6 +74,25 @@ export const onTransactionUpdate = onDocumentUpdated('users/{userId}/more_inform
 /** ------------------------------------------ */
 
 /**
+ * OUTSTANDING ORDERS
+ */
+export const on_outstanding_order_create = onDocumentCreated('outstanding_orders/{orderId}', async (event) => {
+  const data = event.data?.data() as OutstandingOrder;
+  if (data) {
+    onOutstandingOrderCreate(data);
+  }
+});
+
+export const on_outstanding_order_delete = onDocumentDeleted('outstanding_orders/{orderId}', async (event) => {
+  const data = event.data?.data() as OutstandingOrder;
+  if (data) {
+    onOutstandingOrderDelete(data);
+  }
+});
+
+/** ------------------------------------------ */
+
+/**
  * every 5 minutes between 22:00 and 23:00
  */
 export const run_scheduler_update_users = onSchedule(
@@ -86,6 +106,23 @@ export const run_scheduler_update_users = onSchedule(
     await measureFunctionExecutionTime(async () => {
       console.log('[Users]: update portfolio');
       await userPortfolioUpdate();
+    });
+  },
+);
+
+/**
+ * At every 5th minute from 31 through 41 past hour 9 on every day-of-week from Monday through Friday.
+ */
+export const run_scheduler_execute_outstanding_orders = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '31-41/5 9 * * 1-5', // 9:31, 9:36, 9:41
+    region: region,
+    timeZone: 'EST',
+  },
+  async () => {
+    await measureFunctionExecutionTime(async () => {
+      await outstandingOrderExecute();
     });
   },
 );

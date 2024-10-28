@@ -4,17 +4,23 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@mm/api-client';
-import { PortfolioTransaction, PortfolioTransactionType, SymbolQuote, USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
+import { OutstandingOrder, PortfolioTransactionType, SymbolQuote, USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
-import { PortfolioStateComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
+import {
+  OutstandingOrderCardDataComponent,
+  PortfolioStateComponent,
+  PortfolioTransactionsTableComponent,
+} from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
@@ -24,7 +30,7 @@ import {
   SectionTitleComponent,
   SortByKeyPipe,
 } from '@mm/shared/ui';
-import { catchError, map, of, startWith, switchMap } from 'rxjs';
+import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-page-trading',
@@ -47,6 +53,9 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
     FormMatInputWrapperComponent,
     ReactiveFormsModule,
     NgClass,
+    OutstandingOrderCardDataComponent,
+    MatTabsModule,
+    MatDividerModule,
   ],
   template: `
     <!-- account state -->
@@ -57,7 +66,7 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
         class="max-md:flex-1 md:basis-2/5 2xl:basis-1/3"
         [titleColor]="ColorScheme.PRIMARY_VAR"
         [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-        [showCashSegment]="authenticationUserService.state.isAccountDemoTrading()"
+        [showCashSegment]="state.isAccountDemoTrading()"
         [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
       />
 
@@ -132,9 +141,31 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
       <div class="grid h-[440px] place-content-center text-center text-lg">Failed to load symbol summary</div>
     }
 
+    @if (state.outstandingOrders().openOrders.length > 0) {
+      <!-- divider -->
+      <div class="mb-3 py-2">
+        <mat-divider />
+      </div>
+
+      <!-- outstanding orders -->
+      <app-section-title title="Open Outstanding Orders" class="mb-4" matIcon="reorder" />
+      <div class="grid gap-x-4 gap-y-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+        @for (order of state.outstandingOrders().openOrders; track order.orderId) {
+          <app-outstanding-order-card-data [order]="order" (deleteClicked)="onOrderRemove(order)" />
+        } @empty {
+          <div class="col-span-5 p-4 text-center">No open orders</div>
+        }
+      </div>
+    }
+
+    <!-- divider -->
+    <div class="my-5">
+      <mat-divider />
+    </div>
+
     <!-- top active -->
     <div class="mb-10 hidden lg:block">
-      <app-section-title title="Top Active" />
+      <app-section-title title="Top Active" matIcon="military_tech" />
 
       <div class="grid grid-cols-3 gap-x-6 gap-y-2 p-4 xl:grid-cols-4 2xl:grid-cols-5">
         @for (item of topPerformanceSignal(); track item.symbol) {
@@ -150,22 +181,24 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
             <app-quote-item data-testid="page-trading-top-active-symbols" [symbolQuote]="item" />
           </div>
         } @empty {
-          <div *ngRange="20" class="g-skeleton h-9"></div>
+          <div *ngRange="20" class="g-skeleton h-10"></div>
         }
       </div>
     </div>
 
-    <!-- transaction history -->
-    <div>
-      <app-portfolio-transactions-table
-        data-testid="page-trading-portfolio-transactions-table"
-        (deleteEmitter)="onTransactionDelete($event)"
-        [showTransactionFees]="authenticationUserService.state.isAccountDemoTrading()"
-        [showActionButton]="authenticationUserService.state.isAccountNormalBasic()"
-        [data]="authenticationUserService.state.portfolioTransactions()"
-        [showSymbolFilter]="true"
-      />
+    <!-- divider -->
+    <div class="mb-6 py-2">
+      <mat-divider />
     </div>
+
+    <!-- transaction history -->
+    <app-portfolio-transactions-table
+      data-testid="page-trading-portfolio-transactions-table"
+      [showTransactionFees]="state.isAccountDemoTrading()"
+      [showActionButton]="state.isAccountNormalBasic()"
+      [data]="state.portfolioTransactions()"
+      [showSymbolFilter]="true"
+    />
   `,
   styles: `
     :host {
@@ -178,9 +211,9 @@ export class PageTradingComponent {
   private readonly marketApiService = inject(MarketApiService);
   private readonly dialog = inject(MatDialog);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
-
-  readonly authenticationUserService = inject(AuthenticationUserStoreService);
+  private readonly authenticationUserService = inject(AuthenticationUserStoreService);
   readonly portfolioUserFacadeService = inject(PortfolioUserFacadeService);
+  readonly state = this.authenticationUserService.state;
 
   /**
    * track the selected holding by user, null if else is selected
@@ -196,7 +229,7 @@ export class PageTradingComponent {
       switchMap((symbol) =>
         this.marketApiService.getSymbolSummary(symbol).pipe(
           map((d) => ({ data: d, state: 'success' as const })),
-          catchError((e) => {
+          catchError(() => {
             this.dialogServiceUtil.showNotificationBar('Error fetching symbol summary', 'error');
             return of({ data: null, state: 'error' as const });
           }),
@@ -207,6 +240,15 @@ export class PageTradingComponent {
     ),
     { initialValue: { data: null, state: 'loading' as const } },
   );
+
+  /**
+   * check if stock market is open, crypto is open all the time
+   */
+  readonly isMarketOpen = computed(() => {
+    const summary = this.symbolSummarySignal();
+    const isCrypto = summary.data?.quote.exchange === 'CRYPTO' ? 'crypto' : 'stock';
+    return this.marketApiService.isMarketOpenForQuote(isCrypto);
+  });
 
   readonly topPerformanceSignal = toSignal(
     this.marketApiService.getMarketTopPerformance().pipe(map((d) => d.stockTopActive)),
@@ -260,27 +302,55 @@ export class PageTradingComponent {
     this.selectedSymbolControl.patchValue(quote.symbol);
   }
 
-  async onTransactionDelete(transaction: PortfolioTransaction) {
-    if (await this.dialogServiceUtil.showConfirmDialog('Please confirm removing transaction')) {
-      this.portfolioUserFacadeService.deletePortfolioOperation(transaction);
-      this.dialogServiceUtil.showNotificationBar('Transaction removed', 'success');
+  async onOrderRemove(order: OutstandingOrder) {
+    if (await this.dialogServiceUtil.showConfirmDialog('Are you sure you want to delete this order?')) {
+      this.portfolioUserFacadeService.deleteOrder(order);
     }
   }
 
-  onOperationClick(transactionType: PortfolioTransactionType): void {
+  async onOperationClick(transactionType: PortfolioTransactionType): Promise<void> {
     const summary = this.symbolSummarySignal().data;
     if (!summary) {
       this.dialogServiceUtil.showNotificationBar('Please select a stock first', 'notification');
       return;
     }
 
-    this.dialog.open(PortfolioTradeDialogComponent, {
-      data: <PortfolioTradeDialogComponentData>{
+    // open dialog
+    const dialogRef = this.dialog.open<
+      PortfolioTradeDialogComponent,
+      PortfolioTradeDialogComponentData,
+      OutstandingOrder | undefined
+    >(PortfolioTradeDialogComponent, {
+      data: {
         transactionType: transactionType,
         quote: summary.quote,
         sector: summary.profile?.sector ?? summary.quote.exchange,
+        userPortfolioStateHolding: this.portfolioUserFacadeService.portfolioStateHolding(),
+        isMarketOpen: this.isMarketOpen(),
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });
+
+    // get data from dialog
+    const dialogData = await firstValueFrom(dialogRef.afterClosed());
+
+    // dialog was closed
+    if (!dialogData) {
+      return;
+    }
+
+    try {
+      // create order
+      const result = this.portfolioUserFacadeService.createOrder(dialogData);
+
+      // show notification
+      if (result.type === 'order') {
+        this.dialogServiceUtil.showNotificationBar('Order created, it will be fulfilled once market opens', 'success');
+      } else {
+        this.dialogServiceUtil.showNotificationBar('Transaction created', 'success');
+      }
+    } catch (e) {
+      this.dialogServiceUtil.handleError(e);
+    }
   }
 }

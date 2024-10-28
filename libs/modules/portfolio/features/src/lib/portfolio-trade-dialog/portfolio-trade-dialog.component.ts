@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgClass, UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -9,14 +9,18 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MarketApiService } from '@mm/api-client';
-import { PortfolioTransactionCreate, PortfolioTransactionType, SymbolQuote, TRANSACTION_FEE_PRCT } from '@mm/api-types';
+import {
+  OutstandingOrder,
+  PortfolioStateHoldings,
+  PortfolioTransactionType,
+  SymbolQuote,
+  TRANSACTION_FEE_PRCT,
+} from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
-import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { minValueValidator, positiveNumberValidator, requiredValidator } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { dateFormatDate, roundNDigits } from '@mm/shared/general-util';
+import { createUUID, getCurrentDateDetailsFormat, roundNDigits, transformUserToBaseMin } from '@mm/shared/general-util';
 import {
   DefaultImgDirective,
   DialogCloseHeaderComponent,
@@ -28,14 +32,19 @@ import { map, startWith } from 'rxjs';
 export type PortfolioTradeDialogComponentData = {
   quote: SymbolQuote;
   transactionType: PortfolioTransactionType;
+  isMarketOpen: boolean;
   sector?: string;
+  userPortfolioStateHolding?: PortfolioStateHoldings;
 };
 
 @Component({
   selector: 'app-portfolio-trade-dialog',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
+    DatePipe,
+    CurrencyPipe,
+    UpperCasePipe,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
@@ -82,12 +91,12 @@ export type PortfolioTradeDialogComponentData = {
             <!-- market open state -->
             <div
               [ngClass]="{
-                'text-wt-danger': !isMarketOpen(),
-                'text-wt-success': isMarketOpen(),
+                'text-wt-danger': !data().isMarketOpen,
+                'text-wt-success': data().isMarketOpen,
               }"
               class="mb-1 text-end text-base"
             >
-              {{ !isMarketOpen() ? 'Market Closed' : 'Market Open' }}
+              {{ !data().isMarketOpen ? 'Market Closed' : 'Market Open' }}
             </div>
 
             <!-- if sell, checkbox to sell all -->
@@ -121,127 +130,120 @@ export type PortfolioTradeDialogComponentData = {
           </div>
         </div>
 
-        @if (!isLoadingSignal()) {
-          <!-- info -->
-          <div class="mb-1 flex flex-col p-3">
-            <!-- execution date -->
-            <div class="g-item-wrapper">
-              <span>Date</span>
-              <span>{{ data().quote.timestamp * 1000 | date: 'MMMM d, y (EEEE)' }}</span>
-            </div>
+        <!-- info -->
+        <div class="mb-1 flex flex-col p-3">
+          <!-- execution date -->
+          <div class="g-item-wrapper">
+            <span>Date</span>
+            <span>{{ data().quote.timestamp * 1000 | date: 'MMMM d, y (EEEE)' }}</span>
+          </div>
 
-            <!-- units owned -->
-            <div class="g-item-wrapper">
-              <span>Owned Units</span>
-              <span>{{ holdingSignal()?.units ?? 0 }}</span>
-            </div>
+          <!-- units owned -->
+          <div class="g-item-wrapper">
+            <span>Owned Units</span>
+            <span>{{ holdingSignal()?.units ?? 0 }}</span>
+          </div>
 
-            <!-- cash on hand -->
-            <div class="g-item-wrapper">
-              <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">Cash on Hand</span>
-              <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">
-                {{ portfolioState()?.cashOnHand | currency }}
-              </span>
-            </div>
+          <!-- cash on hand -->
+          <div class="g-item-wrapper">
+            <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">Cash on Hand</span>
+            <span [ngClass]="{ 'text-wt-danger': insufficientCashErrorSignal() }">
+              {{ data().userPortfolioStateHolding?.cashOnHand ?? 0 | currency }}
+            </span>
+          </div>
 
-            <!-- price -->
-            <div class="g-item-wrapper">
-              <span>Price</span>
-              <span>{{ data().quote.price | currency }}</span>
-            </div>
+          <!-- price -->
+          <div class="g-item-wrapper">
+            <span>Price</span>
+            <span>{{ data().quote.price | currency }}</span>
+          </div>
 
-            <!-- units -->
-            <div class="g-item-wrapper">
-              <div [ngClass]="{ 'text-wt-danger': insufficientUnitsErrorSignal() }">Units</div>
-              <div [ngClass]="{ 'text-wt-danger': insufficientUnitsErrorSignal() }" class="flex items-center gap-4">
-                <!-- remove units -->
-                @if (!useCustomTotalValue) {
-                  <button
-                    data-testid="trade-dialog-decrement-units"
-                    mat-icon-button
-                    type="button"
-                    (click)="onIncreaseUnits(-1)"
-                  >
-                    <mat-icon>remove</mat-icon>
-                  </button>
-                }
-                <!-- units -->
-                @if (data().transactionType === 'BUY') {
-                  <span>{{ form.controls.units.value || 0 }} / {{ maximumUnitsToBuy() }}</span>
-                } @else {
-                  <span>{{ form.controls.units.value || 0 }}</span>
-                }
-                <!-- add units -->
-                @if (!useCustomTotalValue) {
-                  <button
-                    data-testid="trade-dialog-increment-units"
-                    mat-icon-button
-                    type="button"
-                    (click)="onIncreaseUnits(1)"
-                  >
-                    <mat-icon>add</mat-icon>
-                  </button>
-                }
-              </div>
-            </div>
-
-            <!-- custom total value -->
-            @if (useCustomTotalValue) {
-              <div class="g-item-wrapper">
-                <span>Custom Price</span>
-                <span>{{ form.controls.customTotalValue.value | currency }}</span>
-              </div>
-            }
-
-            <!-- calculated total value -->
-            <div class="g-item-wrapper">
-              <div class="space-x-2">
-                <span>Total Value</span>
-                <span>/</span>
-                <span>Fees</span>
-              </div>
-              <div class="space-x-2">
-                <span>{{ data().quote.price * form.controls.units.value | currency }}</span>
-                <span>/</span>
-                <span> ~{{ calculatedFees() | currency }} </span>
-              </div>
+          <!-- units -->
+          <div class="g-item-wrapper">
+            <div [ngClass]="{ 'text-wt-danger': insufficientUnitsErrorSignal() }">Units</div>
+            <div [ngClass]="{ 'text-wt-danger': insufficientUnitsErrorSignal() }" class="flex items-center gap-4">
+              <!-- remove units -->
+              @if (!useCustomTotalValue) {
+                <button
+                  data-testid="trade-dialog-decrement-units"
+                  mat-icon-button
+                  type="button"
+                  (click)="onIncreaseUnits(-1)"
+                >
+                  <mat-icon>remove</mat-icon>
+                </button>
+              }
+              <!-- units -->
+              @if (data().transactionType === 'BUY') {
+                <span>{{ form.controls.units.value || 0 }} / {{ maximumUnitsToBuy() }}</span>
+              } @else {
+                <span>{{ form.controls.units.value || 0 }}</span>
+              }
+              <!-- add units -->
+              @if (!useCustomTotalValue) {
+                <button
+                  data-testid="trade-dialog-increment-units"
+                  mat-icon-button
+                  type="button"
+                  (click)="onIncreaseUnits(1)"
+                >
+                  <mat-icon>add</mat-icon>
+                </button>
+              }
             </div>
           </div>
 
-          <!-- errors -->
-          <div class="mb-7 flex flex-col gap-4">
-            @if (insufficientUnitsErrorSignal() || isSellDisabledZeroUnits()) {
-              <div data-testid="trade-dialog-insufficient-units-error" class="g-banner-error">
-                Insufficient units to sell
-              </div>
-            }
-            @if (insufficientCashErrorSignal()) {
-              <div data-testid="trade-dialog-insufficient-cash-error" class="g-banner-error">
-                Insufficient cash amount on hand
-              </div>
-            }
-          </div>
+          <!-- custom total value -->
+          @if (useCustomTotalValue) {
+            <div class="g-item-wrapper">
+              <span>Custom Price</span>
+              <span>{{ form.controls.customTotalValue.value | currency }}</span>
+            </div>
+          }
 
-          <!-- units / keyboard -->
-          <div class="md:px-3">
-            @if (useCustomTotalValue) {
-              <!-- custom total keyboard -->
-              <app-number-keyboard-control [formControl]="form.controls.customTotalValue" />
-            } @else {
-              <!-- units keyboard -->
-              <app-number-keyboard-control
-                [formControl]="form.controls.units"
-                [enableDecimal]="isSymbolCrypto()"
-                [decimalLimit]="isSymbolCrypto() ? 4 : 0"
-              />
-            }
+          <!-- calculated total value -->
+          <div class="g-item-wrapper">
+            <div class="space-x-2">
+              <span>Total Value</span>
+              <span>/</span>
+              <span>Fees</span>
+            </div>
+            <div class="space-x-2">
+              <span>{{ data().quote.price * form.controls.units.value | currency }}</span>
+              <span>/</span>
+              <span> ~{{ calculatedFees() | currency }} </span>
+            </div>
           </div>
-        } @else {
-          <!-- loader -->
-          <div class="grid place-content-center py-16">
-            <mat-spinner [diameter]="100" />
-          </div>
-        }
+        </div>
+
+        <!-- errors -->
+        <div class="mb-7 flex flex-col gap-4">
+          @if (insufficientUnitsErrorSignal() || isSellDisabledZeroUnits()) {
+            <div data-testid="trade-dialog-insufficient-units-error" class="g-banner-error">
+              Insufficient units to sell
+            </div>
+          }
+          @if (insufficientCashErrorSignal()) {
+            <div data-testid="trade-dialog-insufficient-cash-error" class="g-banner-error">
+              Insufficient cash amount on hand
+            </div>
+          }
+        </div>
+
+        <!-- units / keyboard -->
+        <div class="md:px-3">
+          @if (useCustomTotalValue) {
+            <!-- custom total keyboard -->
+            <app-number-keyboard-control [formControl]="form.controls.customTotalValue" />
+          } @else {
+            <!-- units keyboard -->
+            <app-number-keyboard-control
+              [formControl]="form.controls.units"
+              [enableDecimal]="isSymbolCrypto()"
+              [decimalLimit]="isSymbolCrypto() ? 4 : 0"
+            />
+          }
+        </div>
       </mat-dialog-content>
 
       <div class="my-4">
@@ -272,9 +274,7 @@ export type PortfolioTradeDialogComponentData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioTradeDialogComponent {
-  private readonly dialogRef = inject(MatDialogRef<PortfolioTradeDialogComponent>);
-  private readonly portfolioUserFacadeService = inject(PortfolioUserFacadeService);
-  private readonly marketApiService = inject(MarketApiService);
+  private readonly dialogRef = inject(MatDialogRef<PortfolioTradeDialogComponent, OutstandingOrder | undefined>);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   readonly authenticationUserService = inject(AuthenticationUserStoreService);
   readonly data = signal(inject<PortfolioTradeDialogComponentData>(MAT_DIALOG_DATA));
@@ -293,26 +293,9 @@ export class PortfolioTradeDialogComponent {
   // get holding information for symbol if there is any
   readonly holdingSignal = computed(() => {
     const symbol = this.data().quote.symbol;
-    return this.portfolioUserFacadeService
-      .portfolioStateHolding()
-      ?.holdings.find((holding) => holding.symbol === symbol);
+    return this.data().userPortfolioStateHolding?.holdings.find((holding) => holding.symbol === symbol);
   });
-  readonly portfolioState = this.portfolioUserFacadeService.portfolioStateHolding;
   readonly userDataSignal = this.authenticationUserService.state.getUserData;
-
-  /**
-   * check if stock market is open, crypto is open all the time
-   */
-  readonly isMarketOpen = computed(() => {
-    const marketOpen = this.marketApiService.getIsMarketOpenSignal();
-    const data = this.data();
-
-    if (data.quote.exchange === 'CRYPTO') {
-      return marketOpen?.isTheCryptoMarketOpen ?? false;
-    }
-
-    return marketOpen?.isTheStockMarketOpen ?? false;
-  });
 
   readonly isSymbolCrypto = computed(() => this.data().quote.exchange === 'CRYPTO');
 
@@ -339,7 +322,8 @@ export class PortfolioTradeDialogComponent {
         }
 
         // check if user has enough cash to buy
-        const value = this.form.controls.units.value * data.quote.price > (this.portfolioState()?.cashOnHand ?? 0);
+        const value =
+          this.form.controls.units.value * data.quote.price > (this.data().userPortfolioStateHolding?.cashOnHand ?? 0);
         return value;
       }),
     ),
@@ -358,18 +342,12 @@ export class PortfolioTradeDialogComponent {
     { initialValue: 0 },
   );
 
-  readonly isLoadingSignal = signal<boolean>(false);
-
   readonly disabledSubmit = computed(
-    () =>
-      this.isLoadingSignal() ||
-      this.insufficientUnitsErrorSignal() ||
-      this.insufficientCashErrorSignal() ||
-      this.isSellDisabledZeroUnits(),
+    () => this.insufficientUnitsErrorSignal() || this.insufficientCashErrorSignal() || this.isSellDisabledZeroUnits(),
   );
 
   readonly maximumUnitsToBuy = computed(() => {
-    const cashOnHand = this.portfolioState()?.cashOnHand ?? 0;
+    const cashOnHand = this.data().userPortfolioStateHolding?.cashOnHand ?? 0;
     const price = this.data().quote.price;
     const isCrypto = this.isSymbolCrypto();
 
@@ -406,28 +384,37 @@ export class PortfolioTradeDialogComponent {
 
     // create object
     const data = this.data();
-    const transactionCreate: PortfolioTransactionCreate = {
-      date: dateFormatDate(this.data().quote.timestamp * 1000, 'yyyy-MM-dd HH:mm:ss'),
+
+    // create order
+    const order: OutstandingOrder = {
+      orderId: createUUID(),
+      createdAt: getCurrentDateDetailsFormat(),
       symbol: data.quote.symbol,
-      units: this.form.controls.units.value,
-      customTotalValue: undefined,
-      transactionType: data.transactionType,
+      displaySymbol: data.quote.displaySymbol,
+      sector: data.sector ?? 'Unknown',
       symbolType: data.quote.exchange === 'CRYPTO' ? 'CRYPTO' : 'STOCK',
-      sector: data?.sector ?? 'Unknown',
+      units: this.form.controls.units.value,
+      potentialSymbolPrice: data.quote.price,
+      potentialTotalPrice: roundNDigits(data.quote.price * this.form.controls.units.value),
+      userData: transformUserToBaseMin(this.userDataSignal()),
+      orderType: this.getOrderType(),
+      status: 'OPEN',
     };
 
-    // set loading
-    this.isLoadingSignal.set(true);
+    // close dialog
+    this.dialogRef.close(order);
+  }
 
-    try {
-      await this.portfolioUserFacadeService.createPortfolioOperation(transactionCreate);
-      this.dialogServiceUtil.showNotificationBar('Transaction created', 'success');
-      this.dialogRef.close();
-    } catch (error) {
-      this.dialogServiceUtil.handleError(error);
-    } finally {
-      this.isLoadingSignal.set(false);
+  private getOrderType(): OutstandingOrder['orderType'] {
+    if (this.data().transactionType === 'SELL') {
+      return {
+        type: 'SELL',
+      };
     }
+
+    return {
+      type: 'BUY',
+    };
   }
 
   onActiveTotalValueButtonChange(value: 'UNITS' | 'TOTAL_VALUE'): void {

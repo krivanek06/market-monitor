@@ -27,11 +27,7 @@ import { DefaultImgDirective } from '../../../directives';
 @Component({
   selector: 'app-form-mat-input-wrapper',
   template: `
-    <mat-form-field
-      appearance="fill"
-      [hintLabel]="showErrors ? '' : hintText()"
-      [ngClass]="{ 'g-form-error': showErrors }"
-    >
+    <mat-form-field [hintLabel]="showErrors ? '' : hintText()" [ngClass]="{ 'g-form-error': showErrors }">
       <!-- label -->
       <mat-label> {{ inputCaption() }}</mat-label>
 
@@ -54,7 +50,7 @@ import { DefaultImgDirective } from '../../../directives';
     @if (showErrors) {
       @for (inputError of parentControl?.errors | keyvalue; track $index; let i = $index) {
         <!-- show only first error -->
-        <div class="text-wt-danger -mt-5 text-xs">
+        <div class="text-wt-danger text-xs">
           {{ inputError.value.errorText }}
         </div>
       }

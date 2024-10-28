@@ -18,9 +18,6 @@ export type UserBaseMin = {
   personal: UserPersonalInfo;
 };
 
-/**
- * extended user information, mainly used throughout the dashboard
- */
 export type UserBase = UserBaseMin & {
   /**
    * user portfolio state calculated from transactions in cloud functions at the end of the day

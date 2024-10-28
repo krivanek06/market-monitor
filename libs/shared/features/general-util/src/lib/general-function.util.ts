@@ -1,3 +1,7 @@
+import { v4 as uuidv4 } from 'uuid';
+
+export const createUUID = (): string => uuidv4();
+
 export const isNumber = (value: string | number | unknown): boolean => {
   return value != null && value !== '' && typeof value === 'number' && !isNaN(Number(value.toString()));
 };
@@ -155,4 +159,16 @@ export const generateRandomString = (length = 10): string => {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+};
+
+export const tryJSONParse = <T>(value: string | undefined | null): T | null => {
+  try {
+    if (!value) {
+      return null;
+    }
+
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
 };

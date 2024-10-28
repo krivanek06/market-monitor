@@ -5,6 +5,7 @@ import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/a
 import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { Functions, connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   PreloadAllModules,
@@ -58,6 +59,13 @@ export const appConfig: ApplicationConfig = {
     {
       provide: IS_DEV_TOKEN,
       useValue: !environment.production,
+    },
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: {
+        appearance: 'outline',
+        subscriptSizing: 'dynamic',
+      },
     },
     {
       provide: APP_INITIALIZER,

@@ -1,7 +1,7 @@
 import { firestore } from 'firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
 import { HttpsError } from 'firebase-functions/v2/https';
-import { userDocumentRef } from '../database';
+import { outstandingOrderCollectionByUserRef, userDocumentRef } from '../database';
 
 /**
  * This function is called when a user deletes their account.
@@ -26,6 +26,11 @@ export const userDeleteAccount = async (userAuthId?: string) => {
 
     // delete user's sub collections
     await firestore().recursiveDelete(userDoc.ref);
+
+    // delete user's outstanding orders
+    (await outstandingOrderCollectionByUserRef(userAuthId).get()).docs.forEach((doc) => {
+      firestore().recursiveDelete(doc.ref);
+    });
 
     // delete from auth
     await getAuth().deleteUser(userAuthId);
