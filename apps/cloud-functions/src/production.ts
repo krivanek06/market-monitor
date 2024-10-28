@@ -113,9 +113,9 @@ export const run_scheduler_update_users = onSchedule(
 export const run_scheduler_execute_outstanding_orders = onSchedule(
   {
     timeoutSeconds: 200,
-    schedule: '2 16 * * 1-5', // 16:02 every weekday
+    schedule: '31 9 * * 1-5', // 9:31am every weekday
     region: region,
-    timeZone: 'Europe/Berlin',
+    timeZone: 'EST',
   },
   async () => {
     await measureFunctionExecutionTime(async () => {
