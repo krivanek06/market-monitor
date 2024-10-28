@@ -59,7 +59,7 @@ export class PortfolioCreateOperationService {
 
     // check if market is open
     const marketType = order.sector === 'CRYPTO' ? 'crypto' : 'stock';
-    const isMarketOpen = this.marketApiService.isMarketOpenForQuote(marketType);
+    const isMarketOpen = marketType === 'crypto'; // this.marketApiService.isMarketOpenForQuote(marketType);
 
     // if market is closed, create outstanding order
     if (!isMarketOpen) {

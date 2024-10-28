@@ -1,5 +1,6 @@
 import {
   HistoricalPrice,
+  OutstandingOrder,
   PortfolioGrowthAssets,
   PortfolioGrowthAssetsDataItem,
   PortfolioState,
@@ -145,12 +146,16 @@ export const getPortfolioGrowthAssets = (
 
 /**
  * get partial data for user's current holdings from all previous transactions, where units are more than 0
+ * also, remove units from holdings if there are open SELL orders
  *
  * @param transactions - user's transactions
  * @returns
  */
-export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransaction[]): PortfolioStateHoldingBase[] => {
-  return transactions
+export const getPortfolioStateHoldingBaseUtil = (
+  transactions: PortfolioTransaction[],
+  openOrders: OutstandingOrder[] = [],
+): PortfolioStateHoldingBase[] => {
+  const holdingsBase = transactions
     .reduce((acc, curr) => {
       const existingHolding = acc.find((d) => d.symbol === curr.symbol);
       const isSell = curr.transactionType === 'SELL';
@@ -179,9 +184,24 @@ export const getPortfolioStateHoldingBaseUtil = (transactions: PortfolioTransact
           sector: curr.sector,
           units: curr.units,
           invested: roundNDigits(curr.unitPrice * curr.units),
-          breakEvenPrice: curr.unitPrice,
+          breakEvenPrice: roundNDigits(curr.unitPrice),
         } satisfies PortfolioStateHoldingBase,
       ];
     }, [] as PortfolioStateHoldingBase[])
     .filter((d) => d.units > 0);
+
+  // check open SELL orders and remove units from holdings
+  const holdingsBaseWithOpenOrders = holdingsBase.map((d) => {
+    // user can have multiple open orders for the same symbol
+    const symbolSellOrderUnits = openOrders
+      .filter((o) => o.symbol === d.symbol && o.orderType.type === 'SELL')
+      .reduce((acc, curr) => acc + curr.units, 0);
+
+    return {
+      ...d,
+      units: roundNDigits(d.units - symbolSellOrderUnits),
+    } satisfies PortfolioStateHoldingBase;
+  });
+
+  return holdingsBaseWithOpenOrders;
 };

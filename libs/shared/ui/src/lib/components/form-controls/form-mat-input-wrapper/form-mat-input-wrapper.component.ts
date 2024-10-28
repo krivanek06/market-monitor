@@ -87,7 +87,6 @@ import { DefaultImgDirective } from '../../../directives';
   styles: `
     mat-form-field {
       width: 100%;
-      //border: 1px solid;
     }
   `,
   //changeDetection: ChangeDetectionStrategy.OnPush,

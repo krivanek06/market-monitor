@@ -74,7 +74,7 @@ export const calculateUserPortfolioStateByTransactions = async (userData: UserBa
 
   try {
     // get partial holdings calculations
-    const holdingsBase = getPortfolioStateHoldingBaseUtil(transactionData);
+    const holdingsBase = getPortfolioStateHoldingBaseUtil(transactionData, openOrders);
 
     // get symbol summaries from API
     const partialHoldingSymbols = holdingsBase.map((d) => d.symbol);
@@ -139,12 +139,20 @@ const getPortfolioStateHoldingsUtil = (
   const portfolioStateHolding = symbolQuotes
     .map((quote) => {
       const holding = partialHoldings.find((d) => d.symbol === quote.symbol);
+
+      // user can have multiple open orders for the same symbol
+      const symbolSellOrderUnits = openOrders
+        .filter((d) => d.symbol === quote.symbol && d.orderType.type === 'SELL')
+        .reduce((acc, curr) => acc + curr.units, 0);
+
       if (!holding) {
         console.log(`Holding not found for symbol ${quote.symbol}`);
         return null;
       }
+
       return {
         ...holding,
+        units: roundNDigits(holding.units - symbolSellOrderUnits),
         invested: roundNDigits(holding.invested),
         breakEvenPrice: roundNDigits(holding.invested / holding.units),
         weight: roundNDigits(holding.invested / investedTotal, 6),
