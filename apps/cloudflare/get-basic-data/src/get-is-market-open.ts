@@ -1,21 +1,63 @@
 import { getIsMarketOpen } from '@mm/api-external';
-import { EXPIRATION_TEN_MINUTES, RESPONSE_HEADER } from '@mm/api-types';
+import { EXPIRATION_TEN_MINUTES, IsStockMarketOpenExtend, RESPONSE_HEADER } from '@mm/api-types';
+import { isAfter } from 'date-fns';
 import { Env } from './model';
 
+type SavedData = {
+	data: IsStockMarketOpenExtend;
+	date: string;
+	version: number;
+};
+
 export const getIsMarketOpenWrapper = async (env: Env): Promise<Response> => {
+	// if version differs, invalidate cache
+	const currentVersion = 1;
+	const cacheExpiration = EXPIRATION_TEN_MINUTES;
+
 	// load data from KV
 	const key = 'is_market_open';
-	const cachedData = await env.get_basic_data.get(key);
-	if (cachedData) {
-		return new Response(cachedData, RESPONSE_HEADER);
+	const cachedData = (await env.get_basic_data.get(key, { type: 'json' })) as SavedData;
+
+	// invalidate cache if version differs
+	if (cachedData?.version !== currentVersion) {
+		env.get_basic_data.delete(key);
+	}
+
+	if (cachedData && cachedData?.version === currentVersion) {
+		// format: DD/MM/YYYY HH:MM:SS
+		const marketOpenTime = marketOpenTimeEST();
+		const savedTimeEST = new Date(new Date(cachedData.date).toLocaleString('en', { timeZone: 'EST' }));
+		const currentTimeEST = new Date(new Date().toLocaleString('en', { timeZone: 'EST' }));
+
+		// market is already open & saved time is before market open
+		const shouldRefresh = isAfter(currentTimeEST, marketOpenTime) && isAfter(marketOpenTime, savedTimeEST);
+
+		if (!shouldRefresh) {
+			return new Response(JSON.stringify(cachedData.data), RESPONSE_HEADER);
+		}
 	}
 
 	// load from api
 	const data = await getIsMarketOpen('NASDAQ');
+	const saveData = {
+		data: data!,
+		date: new Date().toISOString(),
+		version: currentVersion,
+	} satisfies SavedData;
 
 	// save into cache
-	env.get_basic_data.put(key, JSON.stringify(data), { expirationTtl: EXPIRATION_TEN_MINUTES });
+	env.get_basic_data.put(key, JSON.stringify(saveData), { expirationTtl: cacheExpiration });
 
 	// return stringified data
-	return new Response(JSON.stringify(data), RESPONSE_HEADER);
+	return new Response(JSON.stringify(saveData.data), RESPONSE_HEADER);
+};
+
+const marketOpenTimeEST = (): Date => {
+	const current = new Date(new Date().toLocaleString('en', { timeZone: 'EST' }));
+	current.setHours(9);
+	current.setMinutes(30);
+	current.setSeconds(0);
+
+	// return 9:30
+	return current;
 };
