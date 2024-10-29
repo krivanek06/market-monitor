@@ -1,25 +1,25 @@
-import { ComponentFixture } from '@angular/core/testing';
+import { mockCreateUser } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { MockBuilder, MockRender } from 'ng-mocks';
 import { ThemeSwitcherComponent } from './theme-switcher.component';
-import { ThemeService } from './theme.service';
 
 describe('ThemeSwitcherComponent', () => {
-  let component: ThemeSwitcherComponent;
-  let fixture: ComponentFixture<ThemeSwitcherComponent>;
+  const testUserData = mockCreateUser();
 
-  let themeServiceMock = {
-    isDarkMode: () => false,
-  } as ThemeService;
-
-  beforeEach(async () => {
-    MockBuilder(ThemeSwitcherComponent).mock(ThemeService, themeServiceMock);
-
-    fixture = MockRender(ThemeSwitcherComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  beforeEach(() => {
+    return MockBuilder(ThemeSwitcherComponent).provide({
+      provide: AuthenticationUserStoreService,
+      useValue: {
+        state: {
+          getUserDataNormal: () => testUserData,
+        } as AuthenticationUserStoreService['state'],
+      },
+    });
   });
 
   it('should create', () => {
+    const fixture = MockRender(ThemeSwitcherComponent);
+    const component = fixture.point.componentInstance;
     expect(component).toBeTruthy();
   });
 });

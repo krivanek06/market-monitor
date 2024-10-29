@@ -414,7 +414,7 @@ describe('PageDashboardComponent', () => {
     expect(worstTransactionsComp).toHaveLength(1);
   });
 
-  it('should display loading state for a DEMO account until data is created on the server', async () => {
+  it('should display loading state for a DEMO account until data is created on the server', () => {
     const userStore = ngMocks.get(AuthenticationUserStoreService);
     const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
 
