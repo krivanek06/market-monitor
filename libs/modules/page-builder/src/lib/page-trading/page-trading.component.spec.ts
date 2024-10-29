@@ -1,8 +1,10 @@
 import { signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { By } from '@angular/platform-browser';
 import { MarketApiService } from '@mm/api-client';
 import {
+  OutstandingOrder,
   PortfolioStateHoldings,
   PortfolioTransaction,
   USER_HOLDINGS_SYMBOL_LIMIT,
@@ -22,6 +24,8 @@ import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
 import {
+  OutstandingOrderCardDataComponent,
+  OutstandingOrderCardDataMockComponent,
   PortfolioStateComponent,
   PortfolioTransactionsTableComponent,
   PortfolioTransactionsTableComponentMock,
@@ -46,6 +50,7 @@ describe('PageTradingComponent', () => {
   const summaryListS = '[data-testid="page-trading-symbol-summary-list"]';
 
   const transactionTableS = '[data-testid="page-trading-portfolio-transactions-table"]';
+  const orderCardS = '[data-testid="page-trading-outstanding-order-card-data"]';
 
   const mockPortfolioState = {
     balance: 1000,
@@ -87,6 +92,7 @@ describe('PageTradingComponent', () => {
       .replace(SymbolSearchBasicComponent, SymbolSearchBasicComponentMock)
       .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
       .replace(DropdownControlComponent, DropdownControlComponentMock)
+      .replace(OutstandingOrderCardDataComponent, OutstandingOrderCardDataMockComponent)
       .provide({
         provide: MatDialog,
         useValue: {
@@ -104,6 +110,7 @@ describe('PageTradingComponent', () => {
               stockTopActive: [quoteNFLXMock, quoteAAPLMock],
             }),
           ),
+          isMarketOpenForQuote: jest.fn().mockReturnValue(true),
           getSymbolSummary: jest.fn().mockImplementation((symbol: string) => {
             switch (symbol) {
               case 'AAPL':
@@ -134,6 +141,10 @@ describe('PageTradingComponent', () => {
             isAccountDemoTrading: () => true,
             isAccountNormalBasic: () => false,
             portfolioTransactions: () => transactionsMock,
+            outstandingOrders: () => ({
+              openOrders: [] as OutstandingOrder[],
+              closedOrders: [] as OutstandingOrder[],
+            }),
           } as AuthenticationUserStoreService['state'],
         },
       })
@@ -141,7 +152,8 @@ describe('PageTradingComponent', () => {
         provide: PortfolioUserFacadeService,
         useValue: {
           portfolioStateHolding: () => mockPortfolioState,
-          deletePortfolioOperation: jest.fn(),
+          deleteOrder: jest.fn(),
+          createOrder: jest.fn(),
         },
       });
   });
@@ -237,9 +249,66 @@ describe('PageTradingComponent', () => {
         transactionType: 'BUY',
         quote: summary!.quote,
         sector: summary!.profile?.sector ?? '',
+        userPortfolioStateHolding: mockPortfolioState,
+        isMarketOpen: true,
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });
+  });
+
+  it('should wait until trade dialog closes and then it should create an order if dialog has data', async () => {
+    const openOrder = {
+      orderId: '1',
+      symbol: 'AAPL',
+    } as OutstandingOrder;
+
+    const dialog = ngMocks.get(MatDialog);
+    ngMocks.stub(dialog, {
+      ...dialog,
+      open: jest.fn().mockReturnValue({
+        afterClosed: jest.fn().mockReturnValue(of(openOrder)),
+      }),
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageTradingComponent);
+    const component = fixture.point.componentInstance;
+    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
+
+    // open dialog
+    component.onOperationClick('BUY');
+
+    // wait for async operations to finish
+    await fixture.whenStable();
+
+    // check if the order is created
+    expect(portfolioUserFacadeService.createOrder).toHaveBeenCalledWith(openOrder);
+  });
+
+  it('should wait until trade dialog closes and then it should not create an order if dialog does not have data', async () => {
+    const dialog = ngMocks.get(MatDialog);
+    ngMocks.stub(dialog, {
+      ...dialog,
+      open: jest.fn().mockReturnValue({
+        afterClosed: jest.fn().mockReturnValue(of(undefined)),
+      }),
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageTradingComponent);
+    const component = fixture.point.componentInstance;
+    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
+
+    // open dialog
+    component.onOperationClick('BUY');
+
+    // wait for async operations to finish
+    await fixture.whenStable();
+
+    // check if the order is created
+    expect(portfolioUserFacadeService.createOrder).not.toHaveBeenCalled();
   });
 
   it('should display SELL button and allow selling a symbol', () => {
@@ -417,40 +486,6 @@ describe('PageTradingComponent', () => {
     expect(component.symbolSummarySignal().state).toBe('success');
   });
 
-  it('should display transaction table', async () => {
-    // render
-    const fixture = MockRender(PageTradingComponent);
-    const component = fixture.point.componentInstance;
-    const authenticationUserService = ngMocks.get(AuthenticationUserStoreService);
-    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
-    const dialogServiceUtil = ngMocks.get(DialogServiceUtil);
-
-    jest.spyOn(dialogServiceUtil, 'showConfirmDialog').mockResolvedValue(true);
-
-    fixture.detectChanges();
-
-    const comp = ngMocks.find<PortfolioTransactionsTableComponentMock>(transactionTableS);
-    const onTransactionDeleteSpy = jest.spyOn(component, 'onTransactionDelete');
-
-    expect(comp).toBeTruthy();
-    expect(comp.componentInstance.data()).toEqual(authenticationUserService.state.portfolioTransactions());
-    expect(comp.componentInstance.showSymbolFilter()).toBeTruthy();
-    expect(comp.componentInstance.showTransactionFees()).toBeTruthy();
-    expect(comp.componentInstance.showActionButton()).toBeFalsy();
-
-    // test emitter
-    comp.componentInstance.deleteEmitter.emit(transactionsMock[0]);
-
-    // Wait for the confirmation dialog to resolve
-    await fixture.whenStable();
-
-    expect(onTransactionDeleteSpy).toHaveBeenCalledWith(transactionsMock[0]);
-
-    // check if the transaction was deleted
-    expect(portfolioUserFacadeService.deletePortfolioOperation).toHaveBeenCalledWith(transactionsMock[0]);
-    expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
-  });
-
   it('should check components if user is normal basic account', () => {
     const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
     ngMocks.stub(authenticationUserStoreService, {
@@ -498,5 +533,170 @@ describe('PageTradingComponent', () => {
     expect(compBuy.componentInstance.disabled).toBeTruthy();
     expect(compSell.componentInstance.disabled).toBeTruthy();
     expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'error');
+  });
+
+  it('should NOT display open orders if there are none', () => {
+    const fixture = MockRender(PageTradingComponent);
+    const component = fixture.point.componentInstance;
+
+    fixture.detectChanges();
+
+    const orderCards = fixture.debugElement.queryAll(By.css(orderCardS));
+
+    expect(orderCards.length).toBe(0);
+    expect(component.state.outstandingOrders().openOrders.length).toBe(0);
+  });
+
+  it('should display open orders if there are any', () => {
+    const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
+    ngMocks.stub(authenticationUserStoreService, {
+      ...authenticationUserStoreService,
+      state: {
+        ...authenticationUserStoreService.state,
+        outstandingOrders: () => ({
+          openOrders: [
+            {
+              orderId: '1',
+              symbol: 'AAPL',
+              units: 10,
+              orderType: { type: 'BUY' },
+              createdAt: '',
+            } as OutstandingOrder,
+            {
+              orderId: '2',
+              symbol: 'MSFT',
+              units: 12,
+              orderType: { type: 'SELL' },
+              createdAt: '',
+            } as OutstandingOrder,
+          ] as OutstandingOrder[],
+          closedOrders: [] as OutstandingOrder[],
+        }),
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageTradingComponent);
+    const component = fixture.point.componentInstance;
+
+    fixture.detectChanges();
+
+    const orderCards = ngMocks.findAll<OutstandingOrderCardDataMockComponent>(orderCardS);
+
+    // check if open orders are displayed
+    expect(orderCards.length).toBe(2);
+    expect(component.state.outstandingOrders().openOrders.length).toBe(2);
+
+    expect(orderCards[0].componentInstance.order()).toEqual(component.state.outstandingOrders().openOrders[0]);
+    expect(orderCards[1].componentInstance.order()).toEqual(component.state.outstandingOrders().openOrders[1]);
+  });
+
+  it('it should remove an open order if user confirms', async () => {
+    const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
+    const dialogServiceUtil = ngMocks.get(DialogServiceUtil);
+
+    // mock open orders
+    ngMocks.stub(authenticationUserStoreService, {
+      ...authenticationUserStoreService,
+      state: {
+        ...authenticationUserStoreService.state,
+        outstandingOrders: () => ({
+          openOrders: [
+            {
+              orderId: '1',
+              symbol: 'AAPL',
+              units: 10,
+              orderType: { type: 'BUY' },
+              createdAt: '',
+            } as OutstandingOrder,
+          ] as OutstandingOrder[],
+          closedOrders: [] as OutstandingOrder[],
+        }),
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    // mock showConfirmDialog to true
+    ngMocks.stub(dialogServiceUtil, {
+      ...dialogServiceUtil,
+      showConfirmDialog: jest.fn().mockResolvedValue(true),
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageTradingComponent);
+    const component = fixture.point.componentInstance;
+    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
+
+    fixture.detectChanges();
+
+    const orderCard = ngMocks.find<OutstandingOrderCardDataMockComponent>(orderCardS);
+    const order = component.state.outstandingOrders().openOrders[0];
+
+    // check if clicking on remove button triggers remove logic
+    const onOrderRemoveSpy = jest.spyOn(component, 'onOrderRemove');
+    orderCard.componentInstance.deleteClicked.emit();
+
+    // wait for async operations to finish
+    await fixture.whenStable();
+
+    // check if the order is removed
+    expect(onOrderRemoveSpy).toHaveBeenCalledWith(order);
+    expect(dialogServiceUtil.showConfirmDialog).toHaveBeenCalledWith(expect.any(String));
+    expect(portfolioUserFacadeService.deleteOrder).toHaveBeenCalledWith(order);
+  });
+
+  it('it should not remove an open order if user does not confirm', async () => {
+    const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
+    const dialogServiceUtil = ngMocks.get(DialogServiceUtil);
+
+    // mock open orders
+    ngMocks.stub(authenticationUserStoreService, {
+      ...authenticationUserStoreService,
+      state: {
+        ...authenticationUserStoreService.state,
+        outstandingOrders: () => ({
+          openOrders: [
+            {
+              orderId: '1',
+              symbol: 'AAPL',
+              units: 10,
+              orderType: { type: 'BUY' },
+              createdAt: '',
+            } as OutstandingOrder,
+          ] as OutstandingOrder[],
+          closedOrders: [] as OutstandingOrder[],
+        }),
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    // mock showConfirmDialog to true
+    ngMocks.stub(dialogServiceUtil, {
+      ...dialogServiceUtil,
+      showConfirmDialog: jest.fn().mockResolvedValue(false),
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageTradingComponent);
+    const component = fixture.point.componentInstance;
+    const portfolioUserFacadeService = ngMocks.get(PortfolioUserFacadeService);
+
+    fixture.detectChanges();
+
+    const orderCard = ngMocks.find<OutstandingOrderCardDataMockComponent>(orderCardS);
+    const order = component.state.outstandingOrders().openOrders[0];
+
+    // check if clicking on remove button triggers remove logic
+    const onOrderRemoveSpy = jest.spyOn(component, 'onOrderRemove');
+    orderCard.componentInstance.deleteClicked.emit();
+
+    // wait for async operations to finish
+    await fixture.whenStable();
+
+    // check if the order is removed
+    expect(onOrderRemoveSpy).toHaveBeenCalledWith(order);
+    expect(dialogServiceUtil.showConfirmDialog).toHaveBeenCalledWith(expect.any(String));
+    expect(portfolioUserFacadeService.deleteOrder).not.toHaveBeenCalled();
   });
 });

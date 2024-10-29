@@ -1,21 +1,29 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { OutstandingOrder } from '@mm/api-types';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { OutstandingOrderCardDataComponent } from './outstanding-order-card-data.component';
 
 describe('OutstandingOrderCardDataComponent', () => {
-  let component: OutstandingOrderCardDataComponent;
-  let fixture: ComponentFixture<OutstandingOrderCardDataComponent>;
+  const exampleOrder = {
+    createdAt: '2021-01-01T00:00:00Z',
+    displaySymbol: 'AAPL',
+    symbol: 'AAPL',
+    sector: 'Technology',
+    orderId: '123',
+    orderType: {
+      type: 'BUY',
+    },
+    status: 'OPEN',
+  } as OutstandingOrder;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [OutstandingOrderCardDataComponent],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(OutstandingOrderCardDataComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  beforeEach(() => {
+    return MockBuilder(OutstandingOrderCardDataComponent);
   });
 
   it('should create', () => {
+    const fixture = MockRender(OutstandingOrderCardDataComponent, {
+      order: exampleOrder,
+    });
+    const component = fixture.point.componentInstance;
     expect(component).toBeTruthy();
   });
 });

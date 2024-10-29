@@ -9,17 +9,16 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MarketApiService } from '@mm/api-client';
 import {
   IsStockMarketOpenExtend,
+  OutstandingOrder,
   PortfolioStateHoldings,
-  PortfolioTransactionCreate,
   TRANSACTION_FEE_PRCT,
   UserAccountEnum,
   mockCreateUser,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
-import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { dateFormatDate, getCurrentDateDetailsFormat, roundNDigits } from '@mm/shared/general-util';
+import { getCurrentDateDetailsFormat, roundNDigits, transformUserToBaseMin } from '@mm/shared/general-util';
 import { NumberKeyboardComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from './portfolio-trade-dialog.component';
@@ -41,6 +40,7 @@ describe('PortfolioTradeDialogComponent', () => {
       name: 'Apple Inc.',
       price: 120.0,
       timestamp: 1630000000,
+      displaySymbol: 'AAPL',
     },
     sector: 'Technology',
   } as PortfolioTradeDialogComponentData;
@@ -93,13 +93,6 @@ describe('PortfolioTradeDialogComponent', () => {
         },
       })
       .provide({
-        provide: PortfolioUserFacadeService,
-        useValue: {
-          portfolioStateHolding: signal(mockPortfolioState),
-          createPortfolioOperation: jest.fn().mockReturnValue(Promise.resolve({} as PortfolioTransactionCreate)),
-        },
-      })
-      .provide({
         provide: DialogServiceUtil,
         useValue: {
           handleError: jest.fn(),
@@ -111,7 +104,6 @@ describe('PortfolioTradeDialogComponent', () => {
         useValue: {
           state: {
             getUserData: () => testUserData,
-            isAccountDemoTrading: () => true,
           } as AuthenticationUserStoreService['state'],
         },
       })
@@ -273,6 +265,11 @@ describe('PortfolioTradeDialogComponent', () => {
     const fixture = MockRender(PortfolioTradeDialogComponent);
     const component = fixture.point.componentInstance;
 
+    component.data.set({
+      ...component.data(),
+      userPortfolioStateHolding: { ...mockPortfolioState, cashOnHand: 1000 },
+    });
+
     // use custom value
     const saveButtonEl = ngMocks.find<MatButton>(saveButtonS);
     const valueKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(valueKeyboardCheckboxS);
@@ -280,9 +277,6 @@ describe('PortfolioTradeDialogComponent', () => {
 
     // trigger CD
     fixture.detectChanges();
-
-    // how many possible units can be bought
-    const possibleUnits = Math.floor(mockPortfolioState.cashOnHand / mockData.quote.price);
 
     // set custom value
     component.form.controls.customTotalValue.setValue(1000);
@@ -292,19 +286,20 @@ describe('PortfolioTradeDialogComponent', () => {
     fixture.detectChanges();
 
     // check if not crypto
-    expect(component.isSymbolCrypto()).not.toBe(true);
+    expect(component.isSymbolCrypto()).toBe(false);
 
     // check if calculated
     expect(component.form.controls.units.value).toBe(calculatedUnits);
 
     // should be error because user does not have enough cash
-    expect(component.insufficientCashErrorSignal()).toBe(true);
+    expect(component.insufficientCashErrorSignal()).toBe(false);
 
     // should have saved button disabled
-    expect(saveButtonEl.nativeElement.disabled).toBe(true);
+    expect(saveButtonEl.nativeElement.disabled).toBe(false);
+    expect(component.disabledSubmit()).toBe(false);
 
     // check how many units can be bought
-    expect(component.maximumUnitsToBuy()).toBe(possibleUnits);
+    expect(component.maximumUnitsToBuy()).toBe(calculatedUnits);
   });
 
   it('should calculate possible units to buy when setting custom value for crypto', () => {
@@ -318,6 +313,7 @@ describe('PortfolioTradeDialogComponent', () => {
         ...component.data().quote,
         exchange: 'CRYPTO',
       },
+      userPortfolioStateHolding: { ...mockPortfolioState, cashOnHand: 1000 },
     });
 
     expect(component.isSymbolCrypto()).toBe(true);
@@ -330,9 +326,6 @@ describe('PortfolioTradeDialogComponent', () => {
     // trigger CD
     fixture.detectChanges();
 
-    // how many possible units can be bought
-    const possibleUnits = roundNDigits(mockPortfolioState.cashOnHand / mockData.quote.price, 4);
-
     // set custom value
     component.form.controls.customTotalValue.setValue(1000);
     const calculatedUnits = roundNDigits(1000 / mockData.quote.price, 4);
@@ -344,13 +337,13 @@ describe('PortfolioTradeDialogComponent', () => {
     expect(component.form.controls.units.value).toBe(calculatedUnits);
 
     // should be error because user does not have enough cash
-    expect(component.insufficientCashErrorSignal()).toBe(true);
+    expect(component.insufficientCashErrorSignal()).toBe(false);
 
     // should have saved button disabled
-    expect(saveButtonEl.nativeElement.disabled).toBe(true);
+    expect(saveButtonEl.nativeElement.disabled).toBe(false);
 
     // check how many units can be bought
-    expect(component.maximumUnitsToBuy()).toBe(possibleUnits);
+    expect(component.maximumUnitsToBuy()).toBe(calculatedUnits);
   });
 
   it('should nullify units and custom value when switching between them', () => {
@@ -580,11 +573,10 @@ describe('PortfolioTradeDialogComponent', () => {
       const fixture = MockRender(PortfolioTradeDialogComponent);
       const component = fixture.point.componentInstance;
 
-      const portfolioService = ngMocks.get(PortfolioUserFacadeService);
-
-      // ser user cash to 0
-      ngMocks.stub(portfolioService, {
-        portfolioStateHolding: signal({ ...mockPortfolioState, cashOnHand: 0 }),
+      component.data.set({
+        ...component.data(),
+        // ser user cash to 0
+        userPortfolioStateHolding: { ...mockPortfolioState, cashOnHand: 0 },
       });
 
       // trigger form change
@@ -608,15 +600,11 @@ describe('PortfolioTradeDialogComponent', () => {
       const fixture = MockRender(PortfolioTradeDialogComponent);
       const component = fixture.point.componentInstance;
 
-      const portfolioService = ngMocks.get(PortfolioUserFacadeService);
-
-      // ser user cash to 0
-      ngMocks.stub(portfolioService, {
-        portfolioStateHolding: signal({ ...mockPortfolioState, cashOnHand: 0 }),
+      component.data.set({
+        ...component.data(),
+        transactionType: 'SELL',
+        userPortfolioStateHolding: { ...mockPortfolioState, cashOnHand: 0 },
       });
-
-      // change transaction type to SELL
-      component.data().transactionType = 'SELL';
 
       // trigger form change
       component.form.controls.units.setValue(10);
@@ -631,52 +619,6 @@ describe('PortfolioTradeDialogComponent', () => {
       const cashErrorEl = fixture.debugElement.query(By.css(insufficientCashErrorS));
 
       expect(cashErrorEl).toBeFalsy();
-    });
-
-    it('should NOT display error on sufficient cash is user is not in DEMO_TRADING mode', () => {
-      const fixture = MockRender(PortfolioTradeDialogComponent);
-      const component = fixture.point.componentInstance;
-
-      const authUser = ngMocks.get(AuthenticationUserStoreService);
-      const portfolioService = ngMocks.get(PortfolioUserFacadeService);
-
-      // check if error dix is present
-      const cashErrorEl = fixture.debugElement.query(By.css(insufficientCashErrorS));
-      const saveButtonEl = fixture.debugElement.query(By.css(saveButtonS));
-
-      // trigger CD
-      fixture.detectChanges();
-
-      expect(cashErrorEl).toBeFalsy();
-      expect(saveButtonEl.nativeElement.disabled).toBe(true);
-
-      // set user to be normal account
-      ngMocks.stub(authUser, {
-        state: {
-          getUserData: () =>
-            mockCreateUser({
-              userAccountType: UserAccountEnum.NORMAL_BASIC,
-            }),
-          isAccountDemoTrading: () => false,
-        } as AuthenticationUserStoreService['state'],
-      });
-
-      // ser user cash to 0
-      ngMocks.stub(portfolioService, {
-        portfolioStateHolding: signal({ ...mockPortfolioState, cashOnHand: 0 }),
-      });
-
-      // trigger form change
-      component.form.controls.units.setValue(8);
-
-      // test new state
-      expect(component.insufficientCashErrorSignal()).toBe(false);
-
-      // trigger CD
-      fixture.detectChanges();
-
-      expect(cashErrorEl).toBeFalsy();
-      expect(saveButtonEl.nativeElement.disabled).toBe(false);
     });
 
     it('should disable submit and show error on not enough units for SELL operation', () => {
@@ -709,6 +651,13 @@ describe('PortfolioTradeDialogComponent', () => {
     it('should disable save button when units reach to 0', () => {
       const fixture = MockRender(PortfolioTradeDialogComponent);
       const component = fixture.point.componentInstance;
+
+      // no holdings
+      component.data.set({
+        ...component.data(),
+        transactionType: 'SELL',
+        userPortfolioStateHolding: { ...mockPortfolioState, cashOnHand: 1000 },
+      });
 
       // check if error dix is present
       const saveButtonEl = fixture.debugElement.query(By.css(saveButtonS));
@@ -803,6 +752,10 @@ describe('PortfolioTradeDialogComponent', () => {
       component.data.update((d) => ({
         ...d,
         transactionType: 'SELL',
+        userPortfolioStateHolding: {
+          ...mockPortfolioState,
+          cashOnHand: 1000,
+        },
       }));
       fixture.detectChanges();
 
@@ -820,7 +773,8 @@ describe('PortfolioTradeDialogComponent', () => {
 
       // check checkbox
       sellAllCheckboxEl.componentInstance.toggle();
-      // todo: maybe not the best, but I want to trigger the 'change' event from checkbox
+
+      // maybe not the best, but I want to trigger the 'change' event from checkbox
       const change = new MatCheckboxChange();
       change.source = sellAllCheckboxEl.componentInstance;
       change.checked = sellAllCheckboxEl.componentInstance.checked;
@@ -862,49 +816,32 @@ describe('PortfolioTradeDialogComponent', () => {
       expect(saveButtonEl.nativeElement.disabled).toBe(true);
     });
 
-    it('should show error message if creating transaction fails', async () => {
-      const dialogUtil = ngMocks.get(DialogServiceUtil);
-      const portfolioService = ngMocks.get(PortfolioUserFacadeService);
-
-      // mock error
-      ngMocks.stub(portfolioService, {
-        createPortfolioOperation: jest.fn().mockRejectedValue('error happened'),
-      });
-
-      ngMocks.flushTestBed();
-
-      const fixture = MockRender(PortfolioTradeDialogComponent);
-      const component = fixture.point.componentInstance;
-
-      // set units
-      component.form.controls.units.setValue(10);
-
-      // trigger CD
-      fixture.detectChanges();
-
-      // submit form
-      await component.onFormSubmit();
-
-      expect(portfolioService.createPortfolioOperation).toHaveBeenCalled();
-      expect(dialogUtil.handleError).toHaveBeenCalled();
-      expect(component.isLoadingSignal()).toBe(false);
-    });
-
     it('should create transaction based on form value', async () => {
       const fixture = MockRender(PortfolioTradeDialogComponent);
       const component = fixture.point.componentInstance;
+      const dialog = ngMocks.get(MatDialogRef);
 
-      const dialogUtil = ngMocks.get(DialogServiceUtil);
-      const portfolioService = ngMocks.get(PortfolioUserFacadeService);
+      component.data.set({
+        ...component.data(),
+        transactionType: 'BUY',
+        userPortfolioStateHolding: { ...mockPortfolioState, cashOnHand: 10_000 },
+      });
 
-      const expectedResult: PortfolioTransactionCreate = {
-        date: dateFormatDate(mockData.quote.timestamp * 1000, 'yyyy-MM-dd HH:mm:ss'),
+      const expectedResult: OutstandingOrder = {
+        createdAt: getCurrentDateDetailsFormat(),
         symbol: mockData.quote.symbol,
         units: 10,
-        customTotalValue: undefined,
-        transactionType: mockData.transactionType,
         symbolType: 'STOCK',
         sector: mockData.sector ?? 'Unknown',
+        displaySymbol: mockData.quote.displaySymbol,
+        orderId: expect.any(String),
+        orderType: {
+          type: 'BUY',
+        },
+        potentialSymbolPrice: mockData.quote.price,
+        potentialTotalPrice: mockData.quote.price * 10,
+        status: 'OPEN',
+        userData: transformUserToBaseMin(testUserData),
       };
 
       // set units
@@ -916,22 +853,23 @@ describe('PortfolioTradeDialogComponent', () => {
       // submit form
       await component.onFormSubmit();
 
-      expect(portfolioService.createPortfolioOperation).toHaveBeenCalled();
-      expect(portfolioService.createPortfolioOperation).toHaveBeenCalledWith(expectedResult);
-      expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
-      expect(component.isLoadingSignal()).toBe(false);
+      expect(component.disabledSubmit()).toBe(false);
+      expect(dialog.close).toHaveBeenCalledWith(expectedResult);
     });
 
     it('should create transaction by clicking on the UI', async () => {
       const fixture = MockRender(PortfolioTradeDialogComponent);
       const component = fixture.point.componentInstance;
-
-      const dialogUtil = ngMocks.get(DialogServiceUtil);
-      const portfolioService = ngMocks.get(PortfolioUserFacadeService);
       const dialogRef = ngMocks.get(MatDialogRef);
 
       const incrementEl = ngMocks.find<MatButton>(incrementUnitsButtonS);
       const saveButtonEl = fixture.debugElement.query(By.css(saveButtonS));
+
+      component.data.set({
+        ...component.data(),
+        transactionType: 'BUY',
+        userPortfolioStateHolding: { ...mockPortfolioState, cashOnHand: 10_000 },
+      });
 
       // set 2 units
       incrementEl.nativeElement.click();
@@ -943,21 +881,25 @@ describe('PortfolioTradeDialogComponent', () => {
       // submit form
       saveButtonEl.nativeElement.click();
 
-      const expectedResult: PortfolioTransactionCreate = {
-        date: dateFormatDate(mockData.quote.timestamp * 1000, 'yyyy-MM-dd HH:mm:ss'),
+      const expectedResult: OutstandingOrder = {
+        createdAt: getCurrentDateDetailsFormat(),
         symbol: mockData.quote.symbol,
         units: 2,
-        customTotalValue: undefined,
-        transactionType: mockData.transactionType,
         symbolType: 'STOCK',
         sector: mockData.sector ?? 'Unknown',
+        displaySymbol: mockData.quote.displaySymbol,
+        orderId: expect.any(String),
+        orderType: {
+          type: 'BUY',
+        },
+        potentialSymbolPrice: mockData.quote.price,
+        potentialTotalPrice: mockData.quote.price * 2,
+        status: 'OPEN',
+        userData: transformUserToBaseMin(testUserData),
       };
 
-      expect(dialogRef.close).toHaveBeenCalled();
-      expect(portfolioService.createPortfolioOperation).toHaveBeenCalled();
-      expect(portfolioService.createPortfolioOperation).toHaveBeenCalledWith(expectedResult);
-      expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
-      expect(component.isLoadingSignal()).toBe(false);
+      expect(component.disabledSubmit()).toBe(false);
+      expect(dialogRef.close).toHaveBeenCalledWith(expectedResult);
     });
   });
 });

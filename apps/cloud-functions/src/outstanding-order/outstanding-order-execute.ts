@@ -58,7 +58,10 @@ export const outstandingOrderExecute = async () => {
       continue;
     }
 
-    console.log(`Executing orders for user ${userData.id}, orders: ${orders.length}`);
+    // log what's happening
+    console.log(
+      `Executing orders for user ${userData.id}, name: ${userData.personal.displayName}, orders: ${orders.length}`,
+    );
 
     // get symbol quotes
     const unsavedQuotes = [...new Set(orders.map((d) => d.symbol))].filter((d) => !symbolQuotesMap.has(d));

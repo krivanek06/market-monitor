@@ -276,7 +276,7 @@ export type PortfolioTradeDialogComponentData = {
 export class PortfolioTradeDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<PortfolioTradeDialogComponent, OutstandingOrder | undefined>);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
-  readonly authenticationUserService = inject(AuthenticationUserStoreService);
+  private readonly authenticationUserService = inject(AuthenticationUserStoreService);
   readonly data = signal(inject<PortfolioTradeDialogComponentData>(MAT_DIALOG_DATA));
 
   readonly form = new FormGroup({
@@ -316,8 +316,8 @@ export class PortfolioTradeDialogComponent {
     this.form.valueChanges.pipe(
       map(() => {
         const data = this.data();
-        // no error if selling or not demo trading account
-        if (data.transactionType === 'SELL' || !this.authenticationUserService.state.isAccountDemoTrading()) {
+        // no error if selling
+        if (data.transactionType === 'SELL') {
           return false;
         }
 
