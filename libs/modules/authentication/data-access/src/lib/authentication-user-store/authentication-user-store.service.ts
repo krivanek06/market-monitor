@@ -245,7 +245,7 @@ export class AuthenticationUserStoreService {
   });
 
   changeUserPersonal(data: Partial<UserData['personal']>): void {
-    this.userApiService.changeUserPersonal(this.state.getUserData(), data);
+    this.userApiService.updateUserPersonal(this.state.getUserData(), data);
   }
 
   resetTransactions(): void {
@@ -278,8 +278,8 @@ export class AuthenticationUserStoreService {
     );
   }
 
-  changeUserSettings(data: Partial<UserData['settings']>): void {
-    this.userApiService.changeUserSettings(this.state.getUserData(), data);
+  updateUserSettings(data: Partial<UserData['settings']>): void {
+    this.userApiService.updateUserSettings(this.state.getUserData(), data);
   }
 
   addSymbolToUserWatchList(data: SymbolStoreBase): void {
@@ -296,5 +296,59 @@ export class AuthenticationUserStoreService {
 
   updateUserData(data: Partial<UserData>): void {
     this.userApiService.updateUser(this.state.getUserData().id, data);
+  }
+
+  addUserPortfolioTransactions(transaction: PortfolioTransaction): void {
+    this.userApiService.addUserPortfolioTransactions(this.state.getUserData().id, transaction);
+  }
+
+  addOutstandingOrder(order: OutstandingOrder): void {
+    const user = this.state.getUserData();
+    // save order
+    this.outstandingOrderApiService.addOutstandingOrder(order);
+
+    // get new portfolio state and holdings
+    const { portfolioState, holdings } = this.outstandingOrderApiService.calculatePortfolioAndHoldingByNewOrder(
+      user.portfolioState,
+      user.holdingSnapshot.data,
+      order,
+    );
+
+    // update user
+    this.userApiService.updateUser(user.id, {
+      portfolioState,
+      holdingSnapshot: {
+        lastModifiedDate: getCurrentDateDefaultFormat(),
+        data: holdings,
+      },
+    });
+  }
+
+  removeOutstandingOrder(order: OutstandingOrder): void {
+    const user = this.state.getUserData();
+
+    // check if user has the order
+    if (order.userData.id !== user.id) {
+      throw new Error('User does not have the order');
+    }
+
+    // save order
+    this.outstandingOrderApiService.deleteOutstandingOrder(order);
+
+    // get new portfolio state and holdings
+    const { portfolioState, holdings } = this.outstandingOrderApiService.calculatePortfolioAndHoldingByOrderDelete(
+      user.portfolioState,
+      user.holdingSnapshot.data,
+      order,
+    );
+
+    // update user
+    this.userApiService.updateUser(user.id, {
+      portfolioState,
+      holdingSnapshot: {
+        lastModifiedDate: getCurrentDateDefaultFormat(),
+        data: holdings,
+      },
+    });
   }
 }

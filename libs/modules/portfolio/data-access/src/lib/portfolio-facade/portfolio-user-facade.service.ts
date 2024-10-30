@@ -1,6 +1,6 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { OUTSTANDING_ORDERS_MAX_ORDERS, OutstandingOrder } from '@mm/api-types';
+import { OutstandingOrder } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { of, switchMap } from 'rxjs';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
@@ -26,19 +26,12 @@ export class PortfolioUserFacadeService {
       switchMap((userData) =>
         userData
           ? this.portfolioCalculationService.getPortfolioStateHoldings(
-              this.authenticationUserService.state.getUserData().portfolioState,
-              this.authenticationUserService.state.getUserData().holdingSnapshot.data,
+              userData.portfolioState,
+              userData.holdingSnapshot.data,
             )
           : of(undefined),
       ),
     ),
-  );
-
-  /**
-   * get portfolio state either saved from DB or recalculated from transactions
-   */
-  readonly portfolioState = computed(
-    () => this.portfolioStateHolding() ?? this.authenticationUserService.state.getUserData().portfolioState,
   );
 
   /**
@@ -47,7 +40,7 @@ export class PortfolioUserFacadeService {
   readonly portfolioGrowth = computed(() => this.authenticationUserService.state.portfolioGrowth());
 
   /**
-   * get distinct symbols from the portfolio transactions
+   * get all distinct symbols from the portfolio transactions that every been transacted
    */
   readonly transactedSymbols = computed(() => {
     const transactions = this.authenticationUserService.state.getUserPortfolioTransactions();
@@ -70,20 +63,10 @@ export class PortfolioUserFacadeService {
   );
 
   createOrder(data: OutstandingOrder) {
-    const userData = this.authenticationUserService.state.getUserData();
-    const orders = this.authenticationUserService.state.outstandingOrders();
-
-    // prevent creating more orders than allowed
-    if (orders.openOrders.length >= OUTSTANDING_ORDERS_MAX_ORDERS) {
-      throw new Error(`You can have maximum ${OUTSTANDING_ORDERS_MAX_ORDERS} outstanding orders`);
-    }
-
-    // create the order
-    return this.portfolioCreateOperationService.createOrder(userData, data);
+    return this.portfolioCreateOperationService.createOrder(data);
   }
 
   deleteOrder(order: OutstandingOrder) {
-    const userData = this.authenticationUserService.state.getUserData();
-    return this.portfolioCreateOperationService.deleteOrder(order, userData);
+    return this.portfolioCreateOperationService.deleteOrder(order);
   }
 }

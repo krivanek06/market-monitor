@@ -68,7 +68,7 @@ import {
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showCashSegment]="stateRef.isAccountDemoTrading()"
-            [portfolioState]="portfolioUserFacadeService.portfolioState()"
+            [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
           />
         </app-general-card>
 
@@ -89,7 +89,7 @@ import {
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showFees]="!!stateRef.isAccountDemoTrading()"
-            [portfolioState]="portfolioUserFacadeService.portfolioState()"
+            [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
           />
         </app-general-card>
       </div>

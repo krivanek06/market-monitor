@@ -64,7 +64,7 @@ export class UserApiService {
     return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchList => !!d));
   }
 
-  changeUserPersonal(currentData: UserData, data: Partial<UserData['personal']>): void {
+  updateUserPersonal(currentData: UserData, data: Partial<UserData['personal']>): void {
     this.updateUser(currentData.id, {
       personal: {
         ...currentData.personal,
@@ -125,7 +125,7 @@ export class UserApiService {
     });
   }
 
-  changeUserSettings(currentData: UserData, data: Partial<UserData['settings']>): void {
+  updateUserSettings(currentData: UserData, data: Partial<UserData['settings']>): void {
     this.updateUser(currentData.id, {
       settings: {
         ...currentData.settings,

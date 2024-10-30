@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { MarketApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
+import { MarketApiService } from '@mm/api-client';
 import {
   DATE_TOO_OLD,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
+  OUTSTANDING_ORDERS_MAX_ORDERS,
   OutstandingOrder,
   PortfolioTransaction,
   TRANSACTION_INPUT_UNITS_INTEGER,
@@ -12,18 +13,17 @@ import {
   USER_NOT_ENOUGH_CASH_ERROR,
   USER_NOT_UNITS_ON_HAND_ERROR,
   UserAccountEnum,
-  UserBaseMin,
   UserData,
 } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { createTransaction, dateGetDetailsInformationFromDate } from '@mm/shared/general-util';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PortfolioCreateOperationService {
-  private readonly userApiService = inject(UserApiService);
+  private readonly authenticationUserService = inject(AuthenticationUserStoreService);
   private readonly marketApiService = inject(MarketApiService);
-  private readonly outstandingOrdersApiService = inject(OutstandingOrderApiService);
 
   /**
    * either creates an order if normal (buy/sell) operation is issued and market is open,
@@ -32,10 +32,7 @@ export class PortfolioCreateOperationService {
    * @param userData - user who creates the order (most likely authenticated user)
    * @param data - create transaction data
    */
-  createOrder(
-    userData: UserData,
-    order: OutstandingOrder,
-  ):
+  createOrder(order: OutstandingOrder):
     | {
         type: 'order';
         data: OutstandingOrder;
@@ -44,9 +41,17 @@ export class PortfolioCreateOperationService {
         type: 'transaction';
         data: PortfolioTransaction;
       } {
+    const userData = this.authenticationUserService.state.getUserData();
+    const orders = this.authenticationUserService.state.outstandingOrders();
+
     // check if the user who creates the order is the same as the user in the order
     if (order.userData.id !== userData.id) {
       throw new Error('User does not have the order');
+    }
+
+    // prevent creating more orders than allowed
+    if (orders.openOrders.length >= OUTSTANDING_ORDERS_MAX_ORDERS) {
+      throw new Error(`You can have maximum ${OUTSTANDING_ORDERS_MAX_ORDERS} outstanding orders`);
     }
 
     // only allow demo trading users to create orders
@@ -63,7 +68,7 @@ export class PortfolioCreateOperationService {
 
     // if market is closed, create outstanding order
     if (!isMarketOpen) {
-      this.outstandingOrdersApiService.addOutstandingOrder(order);
+      this.authenticationUserService.addOutstandingOrder(order);
       return {
         type: 'order',
         data: order,
@@ -74,7 +79,7 @@ export class PortfolioCreateOperationService {
     const transaction = createTransaction(userData, order, order.potentialSymbolPrice);
 
     // update user's transactions
-    this.userApiService.addUserPortfolioTransactions(userData.id, transaction);
+    this.authenticationUserService.addUserPortfolioTransactions(transaction);
 
     // return transaction
     return {
@@ -88,14 +93,16 @@ export class PortfolioCreateOperationService {
    * @param order
    * @param userData
    */
-  deleteOrder(order: OutstandingOrder, userData: UserBaseMin): void {
+  deleteOrder(order: OutstandingOrder): void {
+    const userData = this.authenticationUserService.state.getUserData();
+
     // check if the user who creates the order is the same as the user in the order
     if (order.userData.id !== userData.id) {
       throw new Error('User does not have the order');
     }
 
     // delete the order
-    this.outstandingOrdersApiService.deleteOutstandingOrder(order, userData);
+    this.authenticationUserService.removeOutstandingOrder(order);
   }
 
   /**
