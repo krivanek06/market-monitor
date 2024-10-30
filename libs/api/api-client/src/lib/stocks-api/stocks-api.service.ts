@@ -19,8 +19,8 @@ import { ApiCacheService } from '../utils';
   providedIn: 'root',
 })
 export class StocksApiService {
-  private apiCache = inject(ApiCacheService);
-  private marketApiService = inject(MarketApiService);
+  private readonly apiCache = inject(ApiCacheService);
+  private readonly marketApiService = inject(MarketApiService);
 
   getStockDetails(symbol: string): Observable<StockDetails> {
     return this.marketApiService.getSymbolSummary(symbol).pipe(

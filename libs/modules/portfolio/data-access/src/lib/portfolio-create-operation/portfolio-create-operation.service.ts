@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { MarketApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
+import { MarketApiService } from '@mm/api-client';
 import {
   DATE_TOO_OLD,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
@@ -15,15 +15,15 @@ import {
   UserBaseMin,
   UserData,
 } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { createTransaction, dateGetDetailsInformationFromDate } from '@mm/shared/general-util';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PortfolioCreateOperationService {
-  private readonly userApiService = inject(UserApiService);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly marketApiService = inject(MarketApiService);
-  private readonly outstandingOrdersApiService = inject(OutstandingOrderApiService);
 
   /**
    * either creates an order if normal (buy/sell) operation is issued and market is open,
@@ -63,7 +63,7 @@ export class PortfolioCreateOperationService {
 
     // if market is closed, create outstanding order
     if (!isMarketOpen) {
-      this.outstandingOrdersApiService.addOutstandingOrder(order);
+      this.authenticationUserStoreService.addOutstandingOrder(order);
       return {
         type: 'order',
         data: order,
@@ -74,7 +74,7 @@ export class PortfolioCreateOperationService {
     const transaction = createTransaction(userData, order, order.potentialSymbolPrice);
 
     // update user's transactions
-    this.userApiService.addUserPortfolioTransactions(userData.id, transaction);
+    this.authenticationUserStoreService.addUserPortfolioTransactions(transaction);
 
     // return transaction
     return {
@@ -95,7 +95,7 @@ export class PortfolioCreateOperationService {
     }
 
     // delete the order
-    this.outstandingOrdersApiService.deleteOutstandingOrder(order, userData);
+    this.authenticationUserStoreService.removeOutstandingOrder(order);
   }
 
   /**

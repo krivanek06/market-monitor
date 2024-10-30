@@ -48,7 +48,7 @@ export class ThemeSwitcherComponent {
       }
 
       // save user settings
-      this.authenticationUserStoreService.changeUserSettings({
+      this.authenticationUserStoreService.updateUserSettings({
         isDarkMode: val,
       });
     });

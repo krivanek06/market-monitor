@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MarketApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
+import { MarketApiService } from '@mm/api-client';
 import {
   DATE_TOO_OLD,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
@@ -17,6 +17,7 @@ import {
   UserData,
   mockCreateUser,
 } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { calculateGrowth, roundNDigits } from '@mm/shared/general-util';
 import { format, subYears } from 'date-fns';
 import { MockProvider, ngMocks } from 'ng-mocks';
@@ -41,15 +42,13 @@ describe('PortfolioCreateOperationService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        MockProvider(UserApiService, {
+        MockProvider(AuthenticationUserStoreService, {
           addUserPortfolioTransactions: jest.fn(),
+          addOutstandingOrder: jest.fn(),
+          removeOutstandingOrder: jest.fn(),
         }),
         MockProvider(MarketApiService, {
           isMarketOpenForQuote: jest.fn().mockReturnValue(true),
-        }),
-        MockProvider(OutstandingOrderApiService, {
-          addOutstandingOrder: jest.fn(),
-          deleteOutstandingOrder: jest.fn(),
         }),
       ],
     });
@@ -69,8 +68,7 @@ describe('PortfolioCreateOperationService', () => {
   describe('Test: createOrder', () => {
     describe('Create Transaction - Market is open', () => {
       it('should create a BUY transaction', () => {
-        const userApiService = ngMocks.get(UserApiService);
-        const outstandingOrdersApiService = ngMocks.get(OutstandingOrderApiService);
+        const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
 
         const t1 = {
           symbol: 'AAPL',
@@ -113,13 +111,13 @@ describe('PortfolioCreateOperationService', () => {
           },
         });
 
-        expect(userApiService.addUserPortfolioTransactions).toHaveBeenLastCalledWith(user.id, transaction.data);
-        expect(outstandingOrdersApiService.addOutstandingOrder).not.toHaveBeenCalled();
+        expect(authenticationUserStoreService.addUserPortfolioTransactions).toHaveBeenLastCalledWith(transaction.data);
+        expect(authenticationUserStoreService.addOutstandingOrder).not.toHaveBeenCalled();
       });
 
       it('should create a SELL transaction (1)', () => {
-        const outstandingOrdersApiService = ngMocks.get(OutstandingOrderApiService);
-        const userApiService = ngMocks.get(UserApiService);
+        const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
+
         const t1 = {
           symbol: 'AAPL',
           createdAt: randomDate,
@@ -179,8 +177,8 @@ describe('PortfolioCreateOperationService', () => {
           },
         });
 
-        expect(userApiService.addUserPortfolioTransactions).toHaveBeenLastCalledWith(user.id, result.data);
-        expect(outstandingOrdersApiService.addOutstandingOrder).not.toHaveBeenCalled();
+        expect(authenticationUserStoreService.addUserPortfolioTransactions).toHaveBeenLastCalledWith(result.data);
+        expect(authenticationUserStoreService.addOutstandingOrder).not.toHaveBeenCalled();
       });
 
       it('should create a SELL transaction (2)', () => {
@@ -299,8 +297,7 @@ describe('PortfolioCreateOperationService', () => {
         });
         ngMocks.flushTestBed();
 
-        const userApiService = ngMocks.get(UserApiService);
-        const outstandingOrdersApiService = ngMocks.get(OutstandingOrderApiService);
+        const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
 
         const t1 = {
           createdAt: randomDate,
@@ -343,8 +340,8 @@ describe('PortfolioCreateOperationService', () => {
           },
         });
 
-        expect(userApiService.addUserPortfolioTransactions).not.toHaveBeenCalled();
-        expect(outstandingOrdersApiService.addOutstandingOrder).toHaveBeenLastCalledWith(outstandingOrder.data);
+        expect(authenticationUserStoreService.addUserPortfolioTransactions).not.toHaveBeenCalled();
+        expect(authenticationUserStoreService.addOutstandingOrder).toHaveBeenLastCalledWith(outstandingOrder.data);
       });
 
       it('should create a SELL outstanding order', () => {
@@ -354,8 +351,7 @@ describe('PortfolioCreateOperationService', () => {
         });
         ngMocks.flushTestBed();
 
-        const userApiService = ngMocks.get(UserApiService);
-        const outstandingOrdersApiService = ngMocks.get(OutstandingOrderApiService);
+        const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
 
         const t1 = {
           createdAt: randomDate,
@@ -411,8 +407,8 @@ describe('PortfolioCreateOperationService', () => {
           },
         });
 
-        expect(userApiService.addUserPortfolioTransactions).not.toHaveBeenCalled();
-        expect(outstandingOrdersApiService.addOutstandingOrder).toHaveBeenLastCalledWith(outstandingOrder.data);
+        expect(authenticationUserStoreService.addUserPortfolioTransactions).not.toHaveBeenCalled();
+        expect(authenticationUserStoreService.addOutstandingOrder).toHaveBeenLastCalledWith(outstandingOrder.data);
       });
     });
 
@@ -584,10 +580,10 @@ describe('PortfolioCreateOperationService', () => {
         ...testUserData,
       } satisfies UserData;
 
-      const outstandingOrdersApiService = ngMocks.get(OutstandingOrderApiService);
+      const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
       service.deleteOrder(order, user);
 
-      expect(outstandingOrdersApiService.deleteOutstandingOrder).toHaveBeenLastCalledWith(order, user);
+      expect(authenticationUserStoreService.removeOutstandingOrder).toHaveBeenLastCalledWith(order);
     });
 
     it('should throw error if user deleting someone else order', () => {
@@ -601,10 +597,10 @@ describe('PortfolioCreateOperationService', () => {
         ...testUserData,
       } satisfies UserData;
 
-      const outstandingOrdersApiService = ngMocks.get(OutstandingOrderApiService);
+      const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
       expect(() => service.deleteOrder(order, user)).toThrow(expect.any(Error));
 
-      expect(outstandingOrdersApiService.deleteOutstandingOrder).not.toHaveBeenCalled();
+      expect(authenticationUserStoreService.removeOutstandingOrder).not.toHaveBeenCalled();
     });
   });
 });
