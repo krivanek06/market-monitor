@@ -32,7 +32,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
   template: `
     <div class="m-auto grid gap-y-4 xl:w-11/12">
       <div class="flex w-full flex-col items-start justify-between gap-x-8 gap-y-6 lg:mb-6 lg:flex-row">
-        <div class="flex justify-between gap-x-10 max-lg:w-full">
+        <div class="flex justify-between gap-x-6 max-lg:w-full">
           <!-- title -->
           <app-section-title matIcon="group" title="Groups" class="mt-1" />
 
@@ -57,7 +57,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
         <app-group-search-control (selectedEmitter)="onGroupClick($event)" class="w-full md:w-[500px]" />
       </div>
 
-      @if (groupsSignal(); as groups) {
+      @if (state.userGroupData(); as groups) {
         <!-- invitations - sent / received -->
         @if (groups.groupInvitations.length > 0 || groups.groupRequested.length > 0) {
           <div class="mb-6 grid min-h-[100px] gap-x-6 gap-y-4 lg:grid-cols-2">
@@ -159,19 +159,28 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageGroupsComponent {
-  readonly authenticationUserService = inject(AuthenticationUserStoreService);
-  readonly groupApiService = inject(GroupApiService);
-  readonly dialogServiceUtil = inject(DialogServiceUtil);
-  readonly router = inject(Router);
-  readonly groupsSignal = this.authenticationUserService.state.userGroupData;
+  private readonly authenticationUserService = inject(AuthenticationUserStoreService);
+  private readonly groupApiService = inject(GroupApiService);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly router = inject(Router);
+  readonly state = this.authenticationUserService.state;
 
   readonly isCreateGroupDisabledSignal = computed(
     () =>
-      (this.groupsSignal()?.groupOwner?.length ?? 99) >= GROUP_OWNER_LIMIT ||
-      this.authenticationUserService.state.isDemoAccount(),
+      // user has reached the limit of groups
+      (this.state?.userGroupData()?.groupOwner?.length ?? 99) >= GROUP_OWNER_LIMIT ||
+      // user is a demo account
+      this.authenticationUserService.state.isDemoAccount() ||
+      // user does not have permission to create groups
+      !this.state().userData?.featureAccess?.createGroups,
   );
 
   async onCreateGroupClick() {
+    // disabled functionality
+    if (this.isCreateGroupDisabledSignal()) {
+      return;
+    }
+
     const user = this.authenticationUserService.state.getUserData();
     const groupName = await this.dialogServiceUtil.showInlineInputDialog({
       title: 'Create Group',
