@@ -20,7 +20,7 @@ module.exports = [
           'error',
           {
             type: 'attribute',
-            prefix: 'marketMonitor',
+            prefix: 'app',
             style: 'camelCase',
           },
         ],
@@ -28,7 +28,7 @@ module.exports = [
           'error',
           {
             type: 'element',
-            prefix: 'market-monitor',
+            prefix: 'app',
             style: 'kebab-case',
           },
         ],
