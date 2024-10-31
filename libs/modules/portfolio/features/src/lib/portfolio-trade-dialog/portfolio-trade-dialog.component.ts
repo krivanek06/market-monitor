@@ -70,7 +70,7 @@ export type PortfolioTradeDialogComponentData = {
             <div class="flex flex-col">
               <div class="flex flex-col gap-x-4 md:flex-row md:items-center">
                 <!-- name -->
-                <div class="text-wt-gray-dark text-lg">{{ data().quote.symbol }}</div>
+                <div class="text-wt-gray-dark text-lg">{{ data().quote.displaySymbol }}</div>
                 <span class="hidden md:block">-</span>
                 <!-- operation -->
                 <div
@@ -316,14 +316,18 @@ export class PortfolioTradeDialogComponent {
     this.form.valueChanges.pipe(
       map(() => {
         const data = this.data();
+
         // no error if selling
         if (data.transactionType === 'SELL') {
           return false;
         }
 
+        const cashOnHand = data.userPortfolioStateHolding?.cashOnHand ?? 0;
+        const potentialPay = this.form.controls.units.value * data.quote.price;
+        const potentialFees = this.calculatedFees();
+
         // check if user has enough cash to buy
-        const value =
-          this.form.controls.units.value * data.quote.price > (this.data().userPortfolioStateHolding?.cashOnHand ?? 0);
+        const value = potentialPay + potentialFees > cashOnHand;
         return value;
       }),
     ),
@@ -353,11 +357,18 @@ export class PortfolioTradeDialogComponent {
 
     // if crypto, we can buy fraction of units
     if (isCrypto) {
-      return roundNDigits(cashOnHand / price, 4);
+      // calculate what would be fees if we buy maximum units
+      const potentialFees = roundNDigits(((roundNDigits(cashOnHand / price, 4) * price) / 100) * TRANSACTION_FEE_PRCT);
+      const potentialUnits = roundNDigits((cashOnHand - potentialFees) / price, 4);
+      return potentialUnits;
     }
 
+    // calculate what would be fees if we buy maximum units
+    const potentialFees = roundNDigits(((Math.floor(cashOnHand / price) * price) / 100) * TRANSACTION_FEE_PRCT);
     // prevent fractional units
-    return Math.floor(cashOnHand / price);
+    const potentialUnits = Math.floor((cashOnHand - potentialFees) / price);
+
+    return potentialUnits;
   });
 
   get useCustomTotalValue(): boolean {

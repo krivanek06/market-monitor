@@ -159,10 +159,12 @@ export const getPortfolioStateHoldingBaseUtil = (
     .reduce((acc, curr) => {
       const existingHolding = acc.find((d) => d.symbol === curr.symbol);
       const isSell = curr.transactionType === 'SELL';
+      const isCrypto = curr.sector === 'CRYPTO';
+
       // update existing holding
       if (existingHolding) {
         const newUnits = existingHolding.units + (isSell ? -curr.units : curr.units);
-        existingHolding.units = curr.sector === 'CRYPTO' ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
+        existingHolding.units = isCrypto ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
         existingHolding.invested += roundNDigits(
           isSell ? -(existingHolding.breakEvenPrice * curr.units) : curr.unitPrice * curr.units,
         );
@@ -197,9 +199,10 @@ export const getPortfolioStateHoldingBaseUtil = (
       .filter((o) => o.symbol === d.symbol && o.orderType.type === 'SELL')
       .reduce((acc, curr) => acc + curr.units, 0);
 
+    const newUnits = d.units - symbolSellOrderUnits;
     return {
       ...d,
-      units: roundNDigits(d.units - symbolSellOrderUnits),
+      units: d.sector === 'CRYPTO' ? roundNDigits(newUnits, 4) : Math.floor(newUnits),
     } satisfies PortfolioStateHoldingBase;
   });
 
