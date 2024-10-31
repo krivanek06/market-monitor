@@ -368,7 +368,7 @@ export class CreateDemoAccountService {
     }
 
     // filter out data on date
-    const data = cachedData.find((d) => d.date === usedDate);
+    const data = cachedData.find((d) => d.date >= usedDate);
 
     if (!data) {
       throw new Error(`Historical price not found for symbol ${symbol} on date ${usedDate}`);
