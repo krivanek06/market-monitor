@@ -1,15 +1,15 @@
 import { ComponentFixture } from '@angular/core/testing';
 import { MockBuilder, MockRender } from 'ng-mocks';
-import { NotFoundComponent } from './not-found.component';
+import { PageNotFoundComponent } from './page-not-found.component';
 
 describe('NotFoundComponent', () => {
-  let component: NotFoundComponent;
-  let fixture: ComponentFixture<NotFoundComponent>;
+  let component: PageNotFoundComponent;
+  let fixture: ComponentFixture<PageNotFoundComponent>;
 
   beforeEach(async () => {
-    MockBuilder(NotFoundComponent);
+    MockBuilder(PageNotFoundComponent);
 
-    fixture = MockRender(NotFoundComponent);
+    fixture = MockRender(PageNotFoundComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

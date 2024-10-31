@@ -127,14 +127,14 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuSideNavigationComponent implements OnInit {
-  private router = inject(Router);
-  private authenticationService = inject(AuthenticationAccountService);
-  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly authenticationService = inject(AuthenticationAccountService);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly dialog = inject(MatDialog);
 
-  userData = this.authenticationUserStoreService.state.getUserDataNormal;
+  readonly userData = this.authenticationUserStoreService.state.getUserDataNormal;
 
-  sideNavigation = computed(() => {
+  readonly sideNavigation = computed(() => {
     const userData = this.authenticationUserStoreService.state.getUserData();
     const data = {
       mainNavigation: [
@@ -173,33 +173,28 @@ export class MenuSideNavigationComponent implements OnInit {
         },
       ],
       marketNavigation: [
-        // {
-        //   path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.SEARCH}`,
-        //   title: 'Search',
-        //   icon: 'search',
-        // },
         {
-          path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.STOCK_SCREENER}`,
+          path: ROUTES_MAIN.STOCK_SCREENER,
           title: 'Screener',
           icon: 'query_stats',
         },
         {
-          path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.TOP_PERFORMERS}`,
+          path: ROUTES_MAIN.TOP_PERFORMERS,
           title: 'Performers',
           icon: 'travel_explore',
         },
         {
-          path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.ECONOMICS}`,
+          path: ROUTES_MAIN.ECONOMICS,
           title: 'Economics',
           icon: 'storefront',
         },
         {
-          path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.MARKET_CALENDAR}`,
+          path: ROUTES_MAIN.MARKET_CALENDAR,
           title: 'Calendar',
           icon: 'calendar_month',
         },
         {
-          path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.NEWS}`,
+          path: ROUTES_MAIN.NEWS,
           title: 'News',
           icon: 'newspaper',
         },
@@ -208,7 +203,7 @@ export class MenuSideNavigationComponent implements OnInit {
     return data;
   });
 
-  selectedNavigationPath = signal('');
+  readonly selectedNavigationPath = signal('');
 
   ngOnInit(): void {
     const selectedNavigationPath = this.router.url.split('/')[1]; // ['', 'dashboard']

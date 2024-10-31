@@ -4,3 +4,4 @@ export * from './page-stock-details-news/page-stock-details-news.component';
 export * from './page-stock-details-overview/page-stock-details-overview.component';
 export * from './page-stock-details-ratios/page-stock-details-ratios.component';
 export * from './page-stock-details-trades/page-stock-details-trades.component';
+export * from './page-stock-details.component';

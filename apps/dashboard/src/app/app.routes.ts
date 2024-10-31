@@ -34,11 +34,11 @@ export const appRoutes: Route[] = [
     loadChildren: () => [
       {
         path: ROUTES_MAIN.LOGIN,
-        loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
+        loadComponent: () => import('@mm/page-builder').then((m) => m.PageLoginComponent),
       },
       {
         path: ROUTES_MAIN.NOT_FOUND,
-        loadComponent: () => import('./not-found/not-found.component').then((m) => m.NotFoundComponent),
+        loadComponent: () => import('@mm/page-builder').then((m) => m.PageNotFoundComponent),
       },
       {
         path: '',
@@ -136,58 +136,42 @@ export const appRoutes: Route[] = [
           {
             path: `${ROUTES_MAIN.STOCK_DETAILS}/:symbol`,
             title: 'GGFinance - Stock Details',
-            loadComponent: () => import('./stock-details/stock-details.component').then((m) => m.StockDetailsComponent),
+            loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsComponent),
           },
           {
             path: ROUTES_MAIN.STOCK_SCREENER,
             title: 'GGFinance - Stock Screener',
-            loadComponent: () => import('./market/market-screener.component').then((m) => m.MarketCalendarComponent),
+            loadComponent: () => import('@mm/page-builder').then((m) => m.PageMarketStockScreenerComponent),
+          },
+          {
+            path: ROUTES_MAIN.ECONOMICS,
+            title: 'GGFinance - Economics',
+            loadComponent: () => import('@mm/page-builder').then((m) => m.PageMarketOverviewComponent),
+          },
+          {
+            path: ROUTES_MAIN.NEWS,
+            title: 'GGFinance - News',
+            loadComponent: () => import('./market/market-news.component').then((m) => m.MarketNewsComponent),
+          },
+          {
+            path: ROUTES_MAIN.CRYPTO,
+            title: 'GGFinance - Crypto',
+            loadComponent: () => import('@mm/page-builder').then((m) => m.PageCryptoComponent),
+          },
+          {
+            path: ROUTES_MAIN.MARKET_CALENDAR,
+            title: 'GGFinance -  Calendar',
+            loadComponent: () => import('@mm/page-builder').then((m) => m.PageMarketCalendarComponent),
+          },
+          {
+            path: ROUTES_MAIN.TOP_PERFORMERS,
+            title: 'GGFinance - Top Performers',
+            loadComponent: () => import('@mm/page-builder').then((m) => m.PageMarketTopPerformersComponent),
           },
           {
             path: ROUTES_MAIN.MARKET,
             title: 'GGFinance - Market',
-            loadComponent: () => import('./market/market.component').then((m) => m.MarketComponent),
-            loadChildren: () => [
-              {
-                path: '',
-                redirectTo: ROUTES_MAIN.TOP_PERFORMERS,
-                pathMatch: 'full',
-              },
-              {
-                path: ROUTES_MAIN.STOCK_SCREENER,
-                title: 'GGFinance - Stock Screener',
-                loadComponent: () =>
-                  import('./market/market-screener.component').then((m) => m.MarketCalendarComponent),
-              },
-              {
-                path: ROUTES_MAIN.TOP_PERFORMERS,
-                title: 'GGFinance - Top Performers',
-                loadComponent: () =>
-                  import('./market/market-top-performers.component').then((m) => m.MarketTopPerformersComponent),
-              },
-              {
-                path: ROUTES_MAIN.MARKET_CALENDAR,
-                title: 'GGFinance -  Calendar',
-                loadComponent: () =>
-                  import('./market/market-calendar.component').then((m) => m.MarketCalendarComponent),
-              },
-              {
-                path: ROUTES_MAIN.ECONOMICS,
-                title: 'GGFinance - Economics',
-                loadComponent: () =>
-                  import('./market/market-economics.component').then((m) => m.MarketEconomicsComponent),
-              },
-              {
-                path: ROUTES_MAIN.NEWS,
-                title: 'GGFinance - News',
-                loadComponent: () => import('./market/market-news.component').then((m) => m.MarketNewsComponent),
-              },
-              {
-                path: ROUTES_MAIN.CRYPTO,
-                title: 'GGFinance - Crypto',
-                loadComponent: () => import('@mm/page-builder').then((m) => m.PageCryptoComponent),
-              },
-            ],
+            loadComponent: () => import('@mm/page-builder').then((m) => m.PageMarketComponent),
           },
         ],
       },
