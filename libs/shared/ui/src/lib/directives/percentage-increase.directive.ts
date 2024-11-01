@@ -76,10 +76,11 @@ export class PercentageIncreaseDirective {
   ): void {
     // clear previous view on client side
     this.vr.clear();
+    this.vr.element.nativeElement.innerHTML = '';
 
     // clear previous view
     const childElements = this.vr.element.nativeElement.childNodes;
-    for (let child of childElements) {
+    for (const child of childElements) {
       this.renderer2.removeChild(this.vr.element.nativeElement, child);
     }
 

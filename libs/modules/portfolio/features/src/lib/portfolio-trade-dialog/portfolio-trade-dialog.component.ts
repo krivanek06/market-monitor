@@ -155,7 +155,7 @@ export type PortfolioTradeDialogComponentData = {
           <!-- price -->
           <div class="g-item-wrapper">
             <span>Price</span>
-            <span>{{ data().quote.price | currency }}</span>
+            <span>{{ data().quote.price | currency: 'USD' : 'symbol-narrow' : '0.2-4' }}</span>
           </div>
 
           <!-- units -->
@@ -323,7 +323,7 @@ export class PortfolioTradeDialogComponent {
         }
 
         const cashOnHand = data.userPortfolioStateHolding?.cashOnHand ?? 0;
-        const potentialPay = this.form.controls.units.value * data.quote.price;
+        const potentialPay = roundNDigits(this.form.controls.units.value * data.quote.price);
         const potentialFees = this.calculatedFees();
 
         // check if user has enough cash to buy

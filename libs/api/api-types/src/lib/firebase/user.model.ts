@@ -43,6 +43,11 @@ export type UserBase = UserBaseMin & {
   isTest?: boolean;
 
   /**
+   * if true, user is admin
+   */
+  isAdmin?: boolean;
+
+  /**
    * features that user has access to
    */
   userAccountType: UserAccountEnum;
@@ -91,6 +96,19 @@ export type UserData = UserBase & {
    * additional private info about the user
    */
   userPrivateInfo: UserPrivateInfo;
+  /**
+   * additional feature access for the user
+   */
+  featureAccess?: {
+    /**
+     * if true, user can create groups
+     */
+    createGroups?: boolean;
+    /**
+     * if true, user can create trading simulator
+     */
+    createTradingSimulator?: boolean;
+  };
 };
 
 export type UserDataDemoData = {
