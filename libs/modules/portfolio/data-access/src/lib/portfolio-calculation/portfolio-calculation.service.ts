@@ -60,7 +60,7 @@ export class PortfolioCalculationService {
               return {
                 ...holding,
                 invested: roundNDigits(holding.invested),
-                breakEvenPrice: roundNDigits(holding.invested / holding.units),
+                breakEvenPrice: roundNDigits(holding.invested / holding.units, 4),
                 weight: roundNDigits(holding.invested / portfolioState.invested, 6),
                 symbolQuote: quote,
               } satisfies PortfolioStateHolding;

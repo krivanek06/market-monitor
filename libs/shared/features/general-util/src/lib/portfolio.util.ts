@@ -245,7 +245,7 @@ export const getPortfolioStateHoldingBaseByNewTransactionUtil = (
   // update holding
   holdingCopy.units = isCrypto ? roundNDigits(newHoldingUnits, 4) : Math.floor(newHoldingUnits);
   holdingCopy.invested = roundNDigits(newHoldingInvested);
-  holdingCopy.breakEvenPrice = roundNDigits(newHoldingBreakEvenPrice);
+  holdingCopy.breakEvenPrice = roundNDigits(newHoldingBreakEvenPrice, 4);
 
   // calculate new portfolio values
   const cashOnOrders = openOrders

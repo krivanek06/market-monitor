@@ -146,7 +146,7 @@ const getPortfolioStateHoldingsUtil = (
         ...holding,
         units: roundNDigits(holding.units - symbolSellOrderUnits, 4),
         invested: roundNDigits(holding.invested),
-        breakEvenPrice: roundNDigits(holding.invested / holding.units),
+        breakEvenPrice: roundNDigits(holding.invested / holding.units, 4),
         weight: roundNDigits(holding.invested / investedTotal, 6),
         symbolQuote: quote,
       } satisfies PortfolioStateHolding;
