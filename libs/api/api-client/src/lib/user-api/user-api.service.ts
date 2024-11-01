@@ -12,6 +12,7 @@ import {
   setDoc,
   where,
 } from '@angular/fire/firestore';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import {
   PortfolioGrowth,
   PortfolioTransaction,
@@ -19,6 +20,7 @@ import {
   USER_DEFAULT_STARTING_CASH,
   UserAccountEnum,
   UserBase,
+  UserBaseMin,
   UserData,
   UserPortfolioGrowthData,
   UserPortfolioTransaction,
@@ -35,6 +37,7 @@ import { Observable, filter, map, of } from 'rxjs';
   providedIn: 'root',
 })
 export class UserApiService {
+  private readonly functions = inject(Functions);
   private readonly firestore = inject(Firestore);
   private readonly http = inject(HttpClient);
 
@@ -86,6 +89,10 @@ export class UserApiService {
       portfolioState: {
         ...createEmptyPortfolioState(startingCash),
       },
+      holdingSnapshot: {
+        data: [],
+        lastModifiedDate: '',
+      },
     });
 
     // reset user portfolio growth
@@ -132,6 +139,19 @@ export class UserApiService {
         ...data,
       },
     });
+  }
+
+  /**
+   * THIS ONLY WORKS FOR TESTING FUNCTIONS
+   * run this to recalculate user's portfolio state based on previous transactions
+   *
+   * @param userBase - user whom to recalculate portfolio state
+   * @returns true or false if the recalculation was successful
+   */
+  async recalculateUserPortfolioState(userBase: UserBaseMin): Promise<boolean> {
+    const callable = httpsCallable<string, boolean>(this.functions, 'userRecalculatePortfolioCall');
+    const result = await callable(userBase.id);
+    return result.data;
   }
 
   /**

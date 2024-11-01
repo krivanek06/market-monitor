@@ -1,6 +1,8 @@
-import { onRequest } from 'firebase-functions/v2/https';
+import { CallableRequest, onCall, onRequest } from 'firebase-functions/v2/https';
+import { userDocumentRef } from '../database';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
 import { outstandingOrderExecute } from '../outstanding-order';
+import { recalculateUserPortfolioStateToUser } from '../portfolio';
 import { run_scheduler_once_a_day, run_scheduler_update_users } from '../production';
 import {
   userDeactivateInactiveAccounts,
@@ -19,7 +21,8 @@ type FType =
   | 'test_delete_user_accounts'
   | 'run_scheduler_once_a_day'
   | 'run_scheduler_update_users'
-  | 'run_outstanding_order_execute';
+  | 'run_outstanding_order_execute'
+  | 'recalculate_user_portfolio_state';
 
 export const testing_function = onRequest({ timeoutSeconds: 1200 }, async (req, res) => {
   // prevent running in production
@@ -86,7 +89,7 @@ export const test_reload_database_with_random_data = async (normalUsers: number,
   await testingModifyHallOfFame();
 };
 
-export const test_function = async () => {
+const test_function = async () => {
   console.log('process.env.FUNCTIONS_EMULATOR ', process.env.FUNCTIONS_EMULATOR);
   console.log('process.env.FIRESTORE_EMULATOR_HOST', process.env.FIRESTORE_EMULATOR_HOST);
 
@@ -94,7 +97,7 @@ export const test_function = async () => {
 };
 
 /** do not use in prod, probably not working correctly */
-export const test_delete_user_accounts = async () => {
+const test_delete_user_accounts = async () => {
   console.log('[Users]: deactivate necessary accounts');
   await userDeactivateInactiveAccounts();
 
@@ -104,3 +107,36 @@ export const test_delete_user_accounts = async () => {
   console.log('[Users]: delete old inactive accounts');
   await userDeleteNormalAccounts();
 };
+
+export const userRecalculatePortfolioCall = onCall(
+  {
+    region: 'europe-central2',
+    cors: ['http://localhost:4200/'],
+  },
+  async (request: CallableRequest<string>) => {
+    const authUserId = request.auth?.uid;
+    const userId = request.data;
+
+    console.log(`Recalculate user portfolio state: ${userId}, by: ${authUserId}`);
+
+    if (!authUserId || !userId) {
+      console.error(`User not found: ${authUserId}`);
+      return false;
+    }
+
+    const authUser = (await userDocumentRef(authUserId).get()).data();
+    const user = (await userDocumentRef(userId).get()).data();
+
+    if (!authUser || !user) {
+      console.error(`User not found: ${authUserId}`);
+      return false;
+    }
+
+    if (!authUser.isAdmin) {
+      console.error(`User not authorized: ${authUserId}, name: ${authUser.personal.displayName}`);
+      return false;
+    }
+
+    return recalculateUserPortfolioStateToUser(user);
+  },
+);

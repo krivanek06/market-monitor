@@ -22,7 +22,7 @@ import {
   getCurrentDateDefaultFormat,
   getCurrentDateDetailsFormat,
   getPortfolioGrowthAssets,
-  getPortfolioStateHoldingBaseUtil,
+  getPortfolioStateHoldingBaseByTransactionsUtil,
   getRandomNumber,
   getTransactionsStartDate,
   getYesterdaysDate,
@@ -218,7 +218,7 @@ export class CreateDemoAccountService {
     console.log('Created BUY transactions:', transactionsToSave.length);
 
     // update user's holdings - calculate break even price
-    const holdingsBase = getPortfolioStateHoldingBaseUtil(transactionsToSave);
+    const holdingsBase = getPortfolioStateHoldingBaseByTransactionsUtil(transactionsToSave);
     userData.holdingSnapshot = {
       data: holdingsBase,
       lastModifiedDate: getCurrentDateDefaultFormat(),

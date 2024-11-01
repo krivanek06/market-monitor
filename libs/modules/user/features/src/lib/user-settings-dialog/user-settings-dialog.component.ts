@@ -16,7 +16,7 @@ import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
 import { DialogCloseHeaderComponent } from '@mm/shared/ui';
-import { UploadFileControlComponent } from 'libs/shared/features/upload-file-control/src';
+import { UploadFileControlComponent } from '@mm/shared/upload-file-control';
 import { filterNil } from 'ngxtension/filter-nil';
 import { UserAccountTypeSelectDialogComponent } from '../user-account-type-select-dialog/user-account-type-select-dialog.component';
 
@@ -163,6 +163,11 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
         <div class="mb-4 mt-8 hidden lg:block">
           <mat-divider />
         </div>
+
+        <!-- portfolio recalculations -->
+        @if (userDataNormal()?.isAdmin && isDevActive) {
+          <button (click)="onRecalculateTransaction()" type="button" mat-stroked-button>Recalculate Portfolio</button>
+        }
 
         <!--  Reset Transactions -->
         <button
@@ -356,5 +361,21 @@ export class UserSettingsDialogComponent implements OnInit {
 
     // notify user
     this.dialogServiceUtil.showNotificationBar('Your account has been reset', 'success');
+  }
+
+  @Confirmable('Are you sure you want to recalculate your portfolio?')
+  async onRecalculateTransaction() {
+    if (!this.userDataNormal()?.isAdmin) {
+      this.dialogServiceUtil.showNotificationBar('You are not authorized to perform this action');
+      return;
+    }
+
+    try {
+      this.dialogServiceUtil.showNotificationBar('Recalculating your portfolio');
+      await this.authenticationUserStoreService.recalculateUserPortfolioState();
+      this.dialogServiceUtil.showNotificationBar('Portfolio recalculated', 'success');
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
   }
 }
