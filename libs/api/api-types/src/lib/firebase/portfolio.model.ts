@@ -91,7 +91,6 @@ export type PortfolioStateHoldingBase = SymbolStoreBase & {
 };
 
 export type PortfolioStateHolding = PortfolioStateHoldingBase & {
-  breakEvenPrice: number; // calculated
   weight: number; // calculated
   symbolQuote: SymbolQuote;
 };

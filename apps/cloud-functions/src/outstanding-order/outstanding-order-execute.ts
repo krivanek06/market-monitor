@@ -9,6 +9,7 @@ import {
   userDocumentRef,
   userDocumentTransactionHistoryRef,
 } from '../database';
+import { recalculateUserPortfolioStateToUser } from '../portfolio';
 
 /**
  * load all outstanding orders and try execute them
@@ -110,6 +111,9 @@ export const outstandingOrderExecute = async () => {
           }
         }
       });
+
+      // recalculate user's portfolio state - new transaction appeared
+      recalculateUserPortfolioStateToUser(userData);
     } catch (error) {
       console.error(`Error executing orders for user ${userData.id}: ${error}`);
     }

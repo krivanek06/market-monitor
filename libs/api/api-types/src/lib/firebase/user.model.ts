@@ -43,6 +43,11 @@ export type UserBase = UserBaseMin & {
   isTest?: boolean;
 
   /**
+   * if true, user is admin
+   */
+  isAdmin?: boolean;
+
+  /**
    * features that user has access to
    */
   userAccountType: UserAccountEnum;

@@ -24,11 +24,11 @@ import { LoginUserInput, RegisterUserInput } from '../model';
 })
 export class AuthenticationAccountService {
   private readonly functions = inject(Functions);
-  private auth = inject(Auth);
-  private userApiService = inject(UserApiService);
-  private authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
-  private authenticatedUser$ = new BehaviorSubject<User | null>(null);
-  private loadedAuthentication$ = new Subject<UserData['id'] | null>();
+  private readonly auth = inject(Auth);
+  private readonly userApiService = inject(UserApiService);
+  private readonly authenticatedUserData$ = new BehaviorSubject<UserData | null>(null);
+  private readonly authenticatedUser$ = new BehaviorSubject<User | null>(null);
+  private readonly loadedAuthentication$ = new Subject<UserData['id'] | null>();
 
   constructor() {
     this.initAuthenticationUser();

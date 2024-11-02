@@ -9,7 +9,7 @@ import {
 } from '@mm/api-types';
 import { isSameDay } from 'date-fns';
 import { fillOutMissingDatesForDate, getCurrentDateDefaultFormat, getYesterdaysDate } from './date-service.util';
-import { roundNDigits } from './general-function.util';
+import { calculateGrowth, roundNDigits } from './general-function.util';
 
 export const createEmptyPortfolioState = (startingCash = 0): PortfolioState => ({
   balance: startingCash,
@@ -145,13 +145,13 @@ export const getPortfolioGrowthAssets = (
 };
 
 /**
- * get partial data for user's current holdings from all previous transactions, where units are more than 0
- * also, remove units from holdings if there are open SELL orders
+ * get user's current holdings from all previous transactions and open orders
+ * - remove units from holdings if there are open SELL orders
  *
  * @param transactions - user's transactions
  * @returns
  */
-export const getPortfolioStateHoldingBaseUtil = (
+export const getPortfolioStateHoldingBaseByTransactionsUtil = (
   transactions: PortfolioTransaction[],
   openOrders: OutstandingOrder[] = [],
 ): PortfolioStateHoldingBase[] => {
@@ -159,10 +159,12 @@ export const getPortfolioStateHoldingBaseUtil = (
     .reduce((acc, curr) => {
       const existingHolding = acc.find((d) => d.symbol === curr.symbol);
       const isSell = curr.transactionType === 'SELL';
+      const isCrypto = curr.sector === 'CRYPTO';
+
       // update existing holding
       if (existingHolding) {
         const newUnits = existingHolding.units + (isSell ? -curr.units : curr.units);
-        existingHolding.units = curr.sector === 'CRYPTO' ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
+        existingHolding.units = isCrypto ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
         existingHolding.invested += roundNDigits(
           isSell ? -(existingHolding.breakEvenPrice * curr.units) : curr.unitPrice * curr.units,
         );
@@ -197,11 +199,87 @@ export const getPortfolioStateHoldingBaseUtil = (
       .filter((o) => o.symbol === d.symbol && o.orderType.type === 'SELL')
       .reduce((acc, curr) => acc + curr.units, 0);
 
+    const newUnits = d.units - symbolSellOrderUnits;
     return {
       ...d,
-      units: roundNDigits(d.units - symbolSellOrderUnits),
+      units: d.sector === 'CRYPTO' ? roundNDigits(newUnits, 4) : Math.floor(newUnits),
     } satisfies PortfolioStateHoldingBase;
   });
 
   return holdingsBaseWithOpenOrders;
+};
+
+export const getPortfolioStateHoldingBaseByNewTransactionUtil = (
+  currentPortfolio: PortfolioState,
+  currentHoldings: PortfolioStateHoldingBase[],
+  openOrders: OutstandingOrder[],
+  transaction: PortfolioTransaction,
+): {
+  updatedPortfolio: PortfolioState;
+  updatedHoldings: PortfolioStateHoldingBase[];
+} => {
+  const holding = currentHoldings.find((d) => d.symbol === transaction.symbol);
+  const holdingExists = !!holding;
+
+  // if holding does not exist, create a new one
+  const holdingCopy =
+    holding ??
+    ({
+      symbol: transaction.symbol,
+      sector: transaction.sector,
+      symbolType: transaction.symbolType,
+      breakEvenPrice: 0,
+      invested: 0,
+      units: 0,
+    } satisfies PortfolioStateHoldingBase);
+
+  const isSell = transaction.transactionType === 'SELL';
+  const isCrypto = transaction.symbolType === 'CRYPTO';
+  const totalPrice = roundNDigits(transaction.unitPrice * transaction.units);
+
+  // calculate new holding values
+  const newHoldingUnits = holdingCopy.units + (isSell ? -transaction.units : transaction.units);
+  const newHoldingInvested = holdingCopy.invested + (isSell ? -totalPrice : totalPrice);
+  const newHoldingBreakEvenPrice = newHoldingInvested / newHoldingUnits;
+
+  // update holding
+  holdingCopy.units = isCrypto ? roundNDigits(newHoldingUnits, 4) : Math.floor(newHoldingUnits);
+  holdingCopy.invested = roundNDigits(newHoldingInvested);
+  holdingCopy.breakEvenPrice = roundNDigits(newHoldingBreakEvenPrice, 4);
+
+  // calculate new portfolio values
+  const cashOnOrders = openOrders
+    .filter((d) => d.orderType.type === 'BUY')
+    .reduce((acc, curr) => acc + curr.potentialTotalPrice, 0);
+  const newCashOnHand = currentPortfolio.cashOnHand + (isSell ? totalPrice : -totalPrice) - transaction.transactionFees;
+  const newInvested = currentPortfolio.invested + (isSell ? -totalPrice : totalPrice);
+  const newHoldingsBalance = currentPortfolio.holdingsBalance + (isSell ? -totalPrice : totalPrice);
+  const newNumberOfExecutedBuyTransactions = currentPortfolio.numberOfExecutedBuyTransactions + (isSell ? 0 : 1);
+  const newNumberOfExecutedSellTransactions = currentPortfolio.numberOfExecutedSellTransactions + (isSell ? 1 : 0);
+  // add spent cash on open orders into balance to avoid negative balance
+  const newBalance = newHoldingsBalance + newCashOnHand + cashOnOrders;
+
+  // update portfolio
+  const updatedPortfolio = {
+    ...currentPortfolio,
+    balance: roundNDigits(newBalance),
+    cashOnHand: roundNDigits(newCashOnHand),
+    invested: roundNDigits(newInvested),
+    holdingsBalance: roundNDigits(newHoldingsBalance),
+    numberOfExecutedBuyTransactions: newNumberOfExecutedBuyTransactions,
+    numberOfExecutedSellTransactions: newNumberOfExecutedSellTransactions,
+    totalGainsValue: roundNDigits(newBalance - currentPortfolio.startingCash),
+    totalGainsPercentage: calculateGrowth(newBalance, currentPortfolio.startingCash),
+  } satisfies PortfolioState;
+
+  // update holdings
+  const updatedHoldings = holdingExists
+    ? currentHoldings.map((d) => (d.symbol === transaction.symbol ? holdingCopy : d))
+    : [holdingCopy, ...currentHoldings];
+
+  // return results
+  return {
+    updatedPortfolio,
+    updatedHoldings,
+  };
 };

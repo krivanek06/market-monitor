@@ -7,6 +7,8 @@ import { calculateUserPortfolioStateByTransactions } from '../portfolio';
 /**
  * for each user who is active
  * calculate portfolio state at the end of the day.
+ *
+ * todo - maybe create another function to calculate portfolio state for all users so they can run parallel
  */
 export const userPortfolioUpdate = async (): Promise<number> => {
   // create threshold of today

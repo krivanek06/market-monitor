@@ -85,7 +85,7 @@ export class PageWatchlistComponent {
 
   @Confirmable('Are you sure you want to clear your watchlist?', 'Confirm', true, 'CLEAR')
   onClearWatchList(): void {
-    this.authenticationUserService.clearUserWatchList();
+    this.authenticationUserService.clearWatchList();
     this.dialogServiceUtil.showNotificationBar('Watchlist cleared', 'success');
   }
 }

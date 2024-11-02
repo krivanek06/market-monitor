@@ -3,12 +3,13 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PortfolioState } from '@mm/api-types';
 import { ColorScheme } from '@mm/shared/data-access';
-import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
+import { AddColorDirective, animationValueChange, PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-portfolio-state',
   standalone: true,
   imports: [PercentageIncreaseDirective, AddColorDirective, MatProgressSpinnerModule, CurrencyPipe],
+  animations: [animationValueChange],
   template: `
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
@@ -25,8 +26,8 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 
         <!-- Invested -->
         <div class="@md:flex-col flex justify-between">
-          <div [appAddColor]="titleColor()" class="sm:text-lg">Invested</div>
-          <div [appAddColor]="valueColor()" class="sm:text-lg">
+          <div [appAddColor]="titleColor()" class="sm:text-lg">Holdings</div>
+          <div [appAddColor]="valueColor()" class="sm:text-lg" [@valueChange]="portfolioState()?.holdingsBalance">
             {{ (portfolioState()?.holdingsBalance | currency) ?? 'N/A' }}
           </div>
         </div>
@@ -35,7 +36,7 @@ import { AddColorDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
         @if (showCashSegment()) {
           <div class="@md:flex-col flex justify-between">
             <div [appAddColor]="titleColor()" class="sm:text-lg">Cash</div>
-            <div [appAddColor]="valueColor()" class="sm:text-lg">
+            <div [appAddColor]="valueColor()" class="sm:text-lg" [@valueChange]="portfolioState()?.cashOnHand">
               {{ (portfolioState()?.cashOnHand | currency) ?? 'N/A' }}
             </div>
           </div>

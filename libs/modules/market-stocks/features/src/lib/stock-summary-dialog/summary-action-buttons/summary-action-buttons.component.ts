@@ -123,7 +123,7 @@ export class SummaryActionButtonsComponent {
     }
 
     // save data into fireStore
-    this.authenticationUserService.addSymbolToUserWatchList({
+    this.authenticationUserService.addSymbolToWatchList({
       symbol: this.symbolSummary().id,
       symbolType: 'STOCK',
       sector: this.symbolSummary().profile?.sector ?? 'Unknown',
@@ -141,7 +141,7 @@ export class SummaryActionButtonsComponent {
       return;
     }
     // save data into fireStore
-    this.authenticationUserService.removeSymbolFromUserWatchList({
+    this.authenticationUserService.removeSymbolFromWatchList({
       symbol: this.symbolSummary().id,
       symbolType: 'STOCK',
       sector: this.symbolSummary().profile?.sector ?? 'Unknown',

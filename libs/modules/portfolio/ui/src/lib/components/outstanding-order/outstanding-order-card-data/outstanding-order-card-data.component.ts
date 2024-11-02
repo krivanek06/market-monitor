@@ -1,8 +1,9 @@
 import { CurrencyPipe, DatePipe, NgClass, NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { OutstandingOrder } from '@mm/api-types';
+import { getTransactionFeesBySpending } from '@mm/shared/general-util';
 import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
 
 @Component({
@@ -27,7 +28,7 @@ import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
           <div class="flex items-center justify-between">
             <!-- symbol + order type -->
             <div class="flex gap-2">
-              <div class="text-wt-gray-dark">{{ order().symbol }}</div>
+              <div class="text-wt-gray-dark">{{ order().displaySymbol }}</div>
               <div
                 [ngClass]="{
                   'text-wt-success': order().orderType.type === 'BUY',
@@ -60,8 +61,8 @@ import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
     <ng-template #normalOrderTmp let-order="order">
       <div>
         <div class="g-item-wrapper">
-          <span>Units</span>
-          <span>{{ order.units }}</span>
+          <span>Units / Fees</span>
+          <span>{{ order.units }} / ~{{ potentialFees() | currency }}</span>
         </div>
 
         <div class="g-item-wrapper">
@@ -86,6 +87,8 @@ import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
 export class OutstandingOrderCardDataComponent {
   readonly deleteClicked = output<void>();
   readonly order = input.required<OutstandingOrder>();
+
+  readonly potentialFees = computed(() => getTransactionFeesBySpending(this.order().potentialTotalPrice));
 
   onDelete() {
     this.deleteClicked.emit();

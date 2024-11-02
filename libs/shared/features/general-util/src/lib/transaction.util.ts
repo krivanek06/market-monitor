@@ -59,15 +59,15 @@ export const createTransaction = (
   }
 
   // calculate break even price if SELL order
-  const breakEvenPrice = isSell ? roundNDigits(symbolHolding?.breakEvenPrice ?? 1, 2) : 0;
+  const breakEvenPrice = isSell ? roundNDigits(symbolHolding?.breakEvenPrice ?? 1, 4) : 0;
+
+  // calculate transaction fees
+  const transactionFeesCalc = getTransactionFees(unitPrice, input.units);
+  const transactionFees = roundNDigits(transactionFeesCalc);
 
   // calculate return values if SELL order
   const returnValue = isSell ? roundNDigits((unitPrice - breakEvenPrice) * input.units) : 0;
   const returnChange = isSell ? calculateGrowth(unitPrice, breakEvenPrice) : 0;
-
-  // transaction fees are 0.01% of the transaction value
-  const transactionFeesCalc = ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT;
-  const transactionFees = roundNDigits(transactionFeesCalc, 2);
 
   const result: PortfolioTransaction = {
     transactionId: uuidv4(),
@@ -88,3 +88,8 @@ export const createTransaction = (
 
   return result;
 };
+
+export const getTransactionFeesBySpending = (spending: number) => roundNDigits(spending * TRANSACTION_FEE_PRCT);
+
+export const getTransactionFees = (unitPrice: number, units: number) =>
+  roundNDigits(units * unitPrice * TRANSACTION_FEE_PRCT);

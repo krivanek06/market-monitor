@@ -113,7 +113,7 @@ export class ApiCacheService {
     this.cache.set(url, savingData);
 
     // log
-    console.log('ApiCacheService: save', { [url]: savingData });
+    // console.log('ApiCacheService: save', { [url]: savingData });
   }
 
   /**
@@ -131,7 +131,7 @@ export class ApiCacheService {
 
     // check if data is valid
     if (data.validity < Date.now()) {
-      console.log('ApiCacheService: get', { [url]: 'expired' });
+      // console.log('ApiCacheService: get', { [url]: 'expired' });
       this.cache.delete(url);
       return undefined;
     }

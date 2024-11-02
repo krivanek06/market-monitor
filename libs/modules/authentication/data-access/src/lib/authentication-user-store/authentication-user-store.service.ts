@@ -1,255 +1,64 @@
-import { Injectable, InjectionToken, effect, inject } from '@angular/core';
+import { Injectable, InjectionToken, inject } from '@angular/core';
 import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
 import {
   OutstandingOrder,
-  PortfolioGrowth,
   PortfolioTransaction,
   SymbolStoreBase,
   UserAccountBasicTypes,
-  UserAccountTypes,
   UserData,
-  UserGroupData,
-  UserWatchList,
 } from '@mm/api-types';
-import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
-import { User } from 'firebase/auth';
-import { signalSlice } from 'ngxtension/signal-slice';
-import { combineLatest, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
-import { AuthenticationAccountService } from '../authentication-account/authentication-account.service';
-import { hasUserAccess } from '../model';
+import {
+  getCurrentDateDefaultFormat,
+  getPortfolioStateHoldingBaseByNewTransactionUtil,
+  roundNDigits,
+} from '@mm/shared/general-util';
+import { AuthenticationUserService } from '../authentication-user/authentication-user.service';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationUserStoreService>(
   'AUTHENTICATION_ACCOUNT_TOKEN',
 );
 
-type AuthenticationState = {
-  /**
-   * flag to indicate if authentication is loaded
-   * FAIL - user is not authenticated
-   * SUCCESS - user is authenticated
-   * LOADING - user authentication is loading (no data from firebase)
-   */
-  authenticationState: 'SUCCESS' | 'FAIL' | 'LOADING';
-
-  /**
-   * data of authenticated user
-   */
-  user: User | null;
-  userData: UserData | null;
-  userGroupData: UserGroupData | null;
-  portfolioTransactions: PortfolioTransaction[] | null;
-  watchList: UserWatchList;
-  portfolioGrowth: PortfolioGrowth[] | null;
-  outstandingOrders: {
-    openOrders: OutstandingOrder[];
-    closedOrders: OutstandingOrder[];
-  };
-};
-
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationUserStoreService {
-  private readonly authenticationAccountService = inject(AuthenticationAccountService);
+  private readonly authenticationUserService = inject(AuthenticationUserService);
   private readonly outstandingOrderApiService = inject(OutstandingOrderApiService);
   private readonly groupApiService = inject(GroupApiService);
   private readonly userApiService = inject(UserApiService);
 
-  private readonly initialState: AuthenticationState = {
-    authenticationState: 'LOADING',
-    user: null,
-    userData: null,
-    userGroupData: null,
-    portfolioTransactions: [],
-    portfolioGrowth: [],
-    watchList: {
-      createdDate: getCurrentDateDefaultFormat(),
-      data: [],
-    },
-    outstandingOrders: {
-      openOrders: [],
-      closedOrders: [],
-    },
-  };
+  readonly state = this.authenticationUserService.state;
 
-  private readonly loadedAuthenticationSource$ = this.authenticationAccountService.getLoadedAuthentication().pipe(
-    // prevent duplicate calls only when user id changes
-    distinctUntilChanged((prev, curr) => prev === curr),
-    tap((loaded) => console.log('AuthenticationUserStoreService loaded', loaded)),
-    map((loaded) => ({
-      authenticationState: loaded ? ('SUCCESS' as const) : ('FAIL' as const),
-    })),
-  );
+  updatePersonal(data: Partial<UserData['personal']>): void {
+    const user = this.state.getUserData();
+    this.userApiService.updateUser(user.id, {
+      ...user,
+      personal: {
+        ...user.personal,
+        ...data,
+      },
+    });
+  }
 
-  /**
-   * Source used to get user data
-   */
-  private readonly userSource$ = this.authenticationAccountService.getUser().pipe(
-    map((user) => ({
-      user: user,
-    })),
-  );
-
-  /**
-   * Source used to get user data
-   */
-  private readonly userDataSource$ = this.authenticationAccountService.getUserData().pipe(
-    map((userData) => ({
-      userData: userData,
-    })),
-  );
-
-  /**
-   * Source used to get user watchList
-   */
-  private readonly watchListSource$ = this.authenticationAccountService.getUserData().pipe(
-    // prevent duplicate calls only when user id changes
-    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-    switchMap((userData) =>
-      userData ? this.userApiService.getUserWatchList(userData.id) : of(this.initialState.watchList),
-    ),
-    map((watchList) => ({ watchList: watchList })),
-  );
-
-  /**
-   * Source used to get user portfolio transactions
-   */
-  private readonly portfolioTransactionsSource$ = this.authenticationAccountService.getUserData().pipe(
-    // prevent duplicate calls only when user id changes or changes account type
-    distinctUntilChanged((prev, curr) => prev?.id === curr?.id && prev?.userAccountType === curr?.userAccountType),
-    switchMap((userData) => (userData ? this.userApiService.getUserPortfolioTransactions(userData.id) : of(null))),
-    map((transactions) => ({
-      portfolioTransactions: transactions?.transactions ?? null,
-    })),
-  );
-
-  private readonly userPortfolioGrowthSource$ = this.authenticationAccountService.getUserData().pipe(
-    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-    switchMap((userData) => (userData ? this.userApiService.getUserPortfolioGrowth(userData.id) : of(null))),
-    map((data) => ({ portfolioGrowth: data })),
-  );
-
-  private readonly userOutstandingOrdersSource$ = this.authenticationAccountService.getUserData().pipe(
-    // prevent duplicate calls only when user id changes
-    distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-    switchMap((userData) =>
-      userData
-        ? combineLatest([
-            this.outstandingOrderApiService.getOutstandingOrdersOpen(userData.id),
-            this.outstandingOrderApiService.getOutstandingOrdersClosed(userData.id),
-          ]).pipe(
-            map((orders) => ({
-              openOrders: orders[0].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-              closedOrders: orders[1].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-            })),
-            map((orders) => ({
-              outstandingOrders: {
-                openOrders: orders.openOrders,
-                closedOrders: orders.closedOrders,
-              },
-            })),
-          )
-        : of({ outstandingOrders: { openOrders: [], closedOrders: [] } }),
-    ),
-  );
-
-  /**
-   * Source used to get user group data, owner, member, invitations, requested, watched
-   */
-  private readonly userGroupDataSource$ = this.authenticationAccountService.getUserData().pipe(
-    // prevent duplicate calls only when user id changes or groups changes
-    distinctUntilChanged(
-      (prev, curr) =>
-        prev?.id === curr?.id && // user id changes - user logged in or out
-        prev?.groups.groupOwner.length === curr?.groups.groupOwner.length && // group owner changes
-        prev?.groups.groupMember.length === curr?.groups.groupMember.length && // group member changes
-        prev?.groups.groupInvitations.length === curr?.groups.groupInvitations.length && // group invitations changes
-        prev?.groups.groupRequested.length === curr?.groups.groupRequested.length && // group requested changes
-        prev?.groups.groupWatched.length === curr?.groups.groupWatched.length, // group watched changes
-    ),
-    map((user) => user?.groups),
-    switchMap((groups) =>
-      groups
-        ? combineLatest([
-            this.groupApiService.getGroupsDataByIds(groups.groupMember),
-            this.groupApiService.getGroupsDataByIds(groups.groupOwner),
-            this.groupApiService.getGroupsDataByIds(groups.groupInvitations),
-            this.groupApiService.getGroupsDataByIds(groups.groupRequested),
-            this.groupApiService.getGroupsDataByIds(groups.groupWatched),
-          ]).pipe(
-            map(([groupMember, groupOwner, groupInvitations, groupRequested, groupWatched]) => ({
-              groupMember,
-              groupOwner,
-              groupInvitations,
-              groupRequested,
-              groupWatched,
-            })),
-            map((userGroupData) => ({ userGroupData })),
-          )
-        : of({
-            userGroupData: {
-              groupMember: [],
-              groupOwner: [],
-              groupInvitations: [],
-              groupRequested: [],
-              groupWatched: [],
-            },
-          }),
-    ),
-  );
-
-  readonly state = signalSlice({
-    initialState: this.initialState,
-    sources: [
-      this.userSource$,
-      this.userDataSource$,
-      this.watchListSource$,
-      this.portfolioTransactionsSource$,
-      this.userGroupDataSource$,
-      this.loadedAuthenticationSource$,
-      this.userPortfolioGrowthSource$,
-      this.userOutstandingOrdersSource$,
-    ],
-    selectors: (state) => ({
-      getUser: () => state().user!,
-      getUserData: () => state().userData!,
-      getUserDataNormal: () => state().userData,
-      getUserGroupData: () => state().userGroupData!,
-      isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),
-      getUserPortfolioTransactions: () => state().portfolioTransactions,
-      getUserPortfolioTransactionsBest: () =>
-        (state().portfolioTransactions ?? [])
-          .filter((d) => d.transactionType === 'SELL')
-          .filter((d) => d.returnValue > 0)
-          .sort((a, b) => b.returnValue - a.returnValue)
-          .slice(0, 6),
-      getUserPortfolioTransactionsWorst: () =>
-        (state().portfolioTransactions ?? [])
-          .filter((d) => d.transactionType === 'SELL')
-          .filter((d) => d.returnValue < 0)
-          .sort((a, b) => a.returnValue - b.returnValue)
-          .slice(0, 6),
-
-      userHaveTransactions: () => (state().portfolioTransactions?.length ?? 0) > 0,
-
-      // access computes
-      hasUserAccess: () => (accountType: UserAccountTypes) => hasUserAccess(state().userData!, accountType),
-      isAccountDemoTrading: () => hasUserAccess(state().userData, 'DEMO_TRADING'),
-      isAccountNormalBasic: () => hasUserAccess(state().userData, 'NORMAL_BASIC'),
-      isDemoAccount: () => !!state().userData?.isDemo,
-    }),
-  });
-
-  readonly userDataChange = effect(() => {
-    console.log('AuthenticationUserStoreService update', this.state());
-  });
-
-  changeUserPersonal(data: Partial<UserData['personal']>): void {
-    this.userApiService.updateUserPersonal(this.state.getUserData(), data);
+  updateSettings(data: Partial<UserData['settings']>): void {
+    const user = this.state.getUserData();
+    this.userApiService.updateUser(user.id, {
+      ...user,
+      settings: {
+        ...user.settings,
+        ...data,
+      },
+    });
   }
 
   resetTransactions(): void {
-    this.userApiService.resetTransactions(this.state.getUserData());
+    const user = this.state.getUserData();
+
+    // remove orders
+    this.outstandingOrderApiService.deleteAllOutstandingOrdersForUser(user.id);
+
+    // reset transactions
+    this.userApiService.resetTransactions(user);
   }
 
   changeAccountType(data: UserAccountBasicTypes): void {
@@ -278,45 +87,81 @@ export class AuthenticationUserStoreService {
     );
   }
 
-  updateUserSettings(data: Partial<UserData['settings']>): void {
-    this.userApiService.updateUserSettings(this.state.getUserData(), data);
-  }
-
-  addSymbolToUserWatchList(data: SymbolStoreBase): void {
+  addSymbolToWatchList(data: SymbolStoreBase): void {
     this.userApiService.addToUserWatchList(this.state.getUserData().id, data);
   }
 
-  removeSymbolFromUserWatchList(data: SymbolStoreBase): void {
+  removeSymbolFromWatchList(data: SymbolStoreBase): void {
     this.userApiService.removeFromUserWatchList(this.state.getUserData().id, data);
   }
 
-  clearUserWatchList(): void {
+  clearWatchList(): void {
     this.userApiService.clearUserWatchList(this.state.getUserData().id);
   }
 
-  updateUserData(data: Partial<UserData>): void {
-    this.userApiService.updateUser(this.state.getUserData().id, data);
+  recalculatePortfolioState(): Promise<boolean> {
+    return this.userApiService.recalculateUserPortfolioState(this.state.getUserData());
   }
 
-  addUserPortfolioTransactions(transaction: PortfolioTransaction): void {
-    this.userApiService.addUserPortfolioTransactions(this.state.getUserData().id, transaction);
-  }
-
-  addOutstandingOrder(order: OutstandingOrder): void {
+  addPortfolioTransactions(transaction: PortfolioTransaction): void {
     const user = this.state.getUserData();
-    // save order
-    this.outstandingOrderApiService.addOutstandingOrder(order);
+    const openOrders = this.state.outstandingOrders().openOrders;
+    const openOrdersSymbols = openOrders.map((d) => d.symbol);
 
-    // get new portfolio state and holdings
-    const { portfolioState, holdings } = this.outstandingOrderApiService.calculatePortfolioAndHoldingByNewOrder(
+    // save transaction
+    this.userApiService.addUserPortfolioTransactions(this.state.getUserData().id, transaction);
+
+    // recalculate portfolio state
+    const { updatedPortfolio, updatedHoldings } = getPortfolioStateHoldingBaseByNewTransactionUtil(
       user.portfolioState,
       user.holdingSnapshot.data,
-      order,
+      openOrders,
+      transaction,
+    );
+
+    // remove holdings with 0 units if it's not in open orders
+    const updatedHoldingsFiltered = updatedHoldings.filter(
+      (holding) => holding.units > 0 || openOrdersSymbols.includes(holding.symbol),
     );
 
     // update user
     this.userApiService.updateUser(user.id, {
-      portfolioState,
+      portfolioState: updatedPortfolio,
+      holdingSnapshot: {
+        lastModifiedDate: getCurrentDateDefaultFormat(),
+        data: updatedHoldingsFiltered,
+      },
+    });
+  }
+
+  addOutstandingOrder(order: OutstandingOrder): void {
+    const user = this.state.getUserData();
+
+    // save order
+    this.outstandingOrderApiService.addOutstandingOrder(order);
+
+    // what type of order is it
+    const isBuy = order.orderType.type === 'BUY';
+    const isSell = order.orderType.type === 'SELL';
+
+    // subtract the cash from the user if BUY order
+    const cashOnHand = isBuy
+      ? roundNDigits(user.portfolioState.cashOnHand - order.potentialTotalPrice)
+      : user.portfolioState.cashOnHand;
+
+    // update holdings
+    const holdings = user.holdingSnapshot.data.map((holding) => ({
+      ...holding,
+      // remove owned units if SELL order
+      units: holding.symbol === order.symbol && isSell ? holding.units - order.units : holding.units,
+    }));
+
+    // update user
+    this.userApiService.updateUser(user.id, {
+      portfolioState: {
+        ...user.portfolioState,
+        cashOnHand,
+      },
       holdingSnapshot: {
         lastModifiedDate: getCurrentDateDefaultFormat(),
         data: holdings,
@@ -335,16 +180,27 @@ export class AuthenticationUserStoreService {
     // save order
     this.outstandingOrderApiService.deleteOutstandingOrder(order);
 
-    // get new portfolio state and holdings
-    const { portfolioState, holdings } = this.outstandingOrderApiService.calculatePortfolioAndHoldingByOrderDelete(
-      user.portfolioState,
-      user.holdingSnapshot.data,
-      order,
-    );
+    // what type of order is it
+    const isBuy = order.orderType.type === 'BUY';
+    const isSell = order.orderType.type === 'SELL';
+
+    // add the cash back to the user if BUY order
+    const cashOnHand = isBuy
+      ? roundNDigits(user.portfolioState.cashOnHand + order.potentialTotalPrice)
+      : user.portfolioState.cashOnHand;
+
+    // update holdings - add back the units if SELL order
+    const holdings = user.holdingSnapshot.data.map((holding) => ({
+      ...holding,
+      units: holding.symbol === order.symbol && isSell ? holding.units + order.units : holding.units,
+    }));
 
     // update user
     this.userApiService.updateUser(user.id, {
-      portfolioState,
+      portfolioState: {
+        ...user.portfolioState,
+        cashOnHand,
+      },
       holdingSnapshot: {
         lastModifiedDate: getCurrentDateDefaultFormat(),
         data: holdings,

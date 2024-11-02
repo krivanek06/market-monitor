@@ -16,7 +16,7 @@ import {
   calculateGrowth,
   createEmptyPortfolioState,
   getCurrentDateDetailsFormat,
-  getPortfolioStateHoldingBaseUtil,
+  getPortfolioStateHoldingBaseByTransactionsUtil,
   roundNDigits,
 } from '@mm/shared/general-util';
 import { MockProvider, ngMocks } from 'ng-mocks';
@@ -139,7 +139,7 @@ describe('PortfolioCalculationService', () => {
         numberOfExecutedBuyTransactions: 1,
         numberOfExecutedSellTransactions: 0,
       } satisfies PortfolioState;
-      const holdings = getPortfolioStateHoldingBaseUtil([t1]);
+      const holdings = getPortfolioStateHoldingBaseByTransactionsUtil([t1]);
 
       // expected result
       const expectedResult = {
@@ -212,7 +212,7 @@ describe('PortfolioCalculationService', () => {
         numberOfExecutedBuyTransactions: 1,
         numberOfExecutedSellTransactions: 0,
       } satisfies PortfolioState;
-      const holdings = getPortfolioStateHoldingBaseUtil([testTransaction_BUY_AAPL_1_Change]);
+      const holdings = getPortfolioStateHoldingBaseByTransactionsUtil([testTransaction_BUY_AAPL_1_Change]);
 
       // expected result
       const expectedResult = {
@@ -346,7 +346,11 @@ describe('PortfolioCalculationService', () => {
       } satisfies PortfolioStateHoldings;
 
       // TODO - check if this is OK
-      const holdings = getPortfolioStateHoldingBaseUtil([t_BUY_AAPL_1_Change, t_BUY_MSFT_1_Change, t_Sell_AAPL]);
+      const holdings = getPortfolioStateHoldingBaseByTransactionsUtil([
+        t_BUY_AAPL_1_Change,
+        t_BUY_MSFT_1_Change,
+        t_Sell_AAPL,
+      ]);
 
       service.getPortfolioStateHoldings(startingPortfolio, holdings).subscribe({
         next: (res) => {

@@ -9,18 +9,19 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {
-  OutstandingOrder,
-  PortfolioStateHoldings,
-  PortfolioTransactionType,
-  SymbolQuote,
-  TRANSACTION_FEE_PRCT,
-} from '@mm/api-types';
+import { OutstandingOrder, PortfolioStateHoldings, PortfolioTransactionType, SymbolQuote } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
 import { minValueValidator, positiveNumberValidator, requiredValidator } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { createUUID, getCurrentDateDetailsFormat, roundNDigits, transformUserToBaseMin } from '@mm/shared/general-util';
+import {
+  createUUID,
+  getCurrentDateDetailsFormat,
+  getTransactionFees,
+  getTransactionFeesBySpending,
+  roundNDigits,
+  transformUserToBaseMin,
+} from '@mm/shared/general-util';
 import {
   DefaultImgDirective,
   DialogCloseHeaderComponent,
@@ -70,7 +71,7 @@ export type PortfolioTradeDialogComponentData = {
             <div class="flex flex-col">
               <div class="flex flex-col gap-x-4 md:flex-row md:items-center">
                 <!-- name -->
-                <div class="text-wt-gray-dark text-lg">{{ data().quote.symbol }}</div>
+                <div class="text-wt-gray-dark text-lg">{{ data().quote.displaySymbol }}</div>
                 <span class="hidden md:block">-</span>
                 <!-- operation -->
                 <div
@@ -155,7 +156,7 @@ export type PortfolioTradeDialogComponentData = {
           <!-- price -->
           <div class="g-item-wrapper">
             <span>Price</span>
-            <span>{{ data().quote.price | currency }}</span>
+            <span>{{ data().quote.price | currency: 'USD' : 'symbol-narrow' : '0.2-4' }}</span>
           </div>
 
           <!-- units -->
@@ -316,14 +317,18 @@ export class PortfolioTradeDialogComponent {
     this.form.valueChanges.pipe(
       map(() => {
         const data = this.data();
+
         // no error if selling
         if (data.transactionType === 'SELL') {
           return false;
         }
 
+        const cashOnHand = data.userPortfolioStateHolding?.cashOnHand ?? 0;
+        const potentialPay = roundNDigits(this.form.controls.units.value * data.quote.price);
+        const potentialFees = this.calculatedFees();
+
         // check if user has enough cash to buy
-        const value =
-          this.form.controls.units.value * data.quote.price > (this.data().userPortfolioStateHolding?.cashOnHand ?? 0);
+        const value = potentialPay + potentialFees > cashOnHand;
         return value;
       }),
     ),
@@ -337,7 +342,7 @@ export class PortfolioTradeDialogComponent {
   readonly calculatedFees = toSignal(
     this.form.controls.units.valueChanges.pipe(
       startWith(this.form.controls.units.value),
-      map((units) => roundNDigits(((units * this.data().quote.price) / 100) * TRANSACTION_FEE_PRCT)),
+      map((units) => getTransactionFees(this.data().quote.price, units)),
     ),
     { initialValue: 0 },
   );
@@ -351,13 +356,16 @@ export class PortfolioTradeDialogComponent {
     const price = this.data().quote.price;
     const isCrypto = this.isSymbolCrypto();
 
+    // calculate what would be fees if we buy maximum units
+    const potentialFees = getTransactionFeesBySpending(cashOnHand);
+
     // if crypto, we can buy fraction of units
     if (isCrypto) {
-      return roundNDigits(cashOnHand / price, 4);
+      return roundNDigits((cashOnHand - potentialFees) / price, 4);
     }
 
     // prevent fractional units
-    return Math.floor(cashOnHand / price);
+    return Math.floor((cashOnHand - potentialFees) / price);
   });
 
   get useCustomTotalValue(): boolean {

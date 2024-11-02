@@ -79,7 +79,7 @@ export class PortfolioCreateOperationService {
     const transaction = createTransaction(userData, order, order.potentialSymbolPrice);
 
     // update user's transactions
-    this.authenticationUserService.addUserPortfolioTransactions(transaction);
+    this.authenticationUserService.addPortfolioTransactions(transaction);
 
     // return transaction
     return {

@@ -11,14 +11,19 @@ import {
   IsStockMarketOpenExtend,
   OutstandingOrder,
   PortfolioStateHoldings,
-  TRANSACTION_FEE_PRCT,
   UserAccountEnum,
   mockCreateUser,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { getCurrentDateDetailsFormat, roundNDigits, transformUserToBaseMin } from '@mm/shared/general-util';
+import {
+  getCurrentDateDetailsFormat,
+  getTransactionFees,
+  getTransactionFeesBySpending,
+  roundNDigits,
+  transformUserToBaseMin,
+} from '@mm/shared/general-util';
 import { NumberKeyboardComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from './portfolio-trade-dialog.component';
@@ -118,15 +123,6 @@ describe('PortfolioTradeDialogComponent', () => {
     ngMocks.autoSpy('reset');
   });
 
-  beforeAll(() => {
-    // freezing time - no longer necessary, just keeping as example
-    jest.useFakeTimers().setSystemTime(new Date(getCurrentDateDetailsFormat()));
-  });
-
-  afterAll(() => {
-    jest.useRealTimers();
-  });
-
   it('should create', () => {
     const fixture = MockRender(PortfolioTradeDialogComponent);
     expect(fixture.point.componentInstance).toBeDefined();
@@ -194,7 +190,7 @@ describe('PortfolioTradeDialogComponent', () => {
     // todo - check when keyboard emit value it is set to units
   });
 
-  it('should remain on Custom Value keyboard if clicking multiple times', async () => {
+  it('should remain on Custom Value keyboard if clicking multiple times', () => {
     const fixture = MockRender(PortfolioTradeDialogComponent);
     const component = fixture.point.componentInstance;
 
@@ -281,6 +277,7 @@ describe('PortfolioTradeDialogComponent', () => {
     // set custom value
     component.form.controls.customTotalValue.setValue(1000);
     const calculatedUnits = Math.floor(1000 / mockData.quote.price);
+    const fees = getTransactionFees(mockData.quote.price, calculatedUnits);
 
     // trigger CD
     fixture.detectChanges();
@@ -299,6 +296,7 @@ describe('PortfolioTradeDialogComponent', () => {
     expect(component.disabledSubmit()).toBe(false);
 
     // check how many units can be bought
+    expect(component.calculatedFees()).toBe(fees);
     expect(component.maximumUnitsToBuy()).toBe(calculatedUnits);
   });
 
@@ -307,13 +305,14 @@ describe('PortfolioTradeDialogComponent', () => {
     const component = fixture.point.componentInstance;
 
     // set data to crypto
+    const cashTotal = 1100;
     component.data.set({
       ...component.data(),
       quote: {
         ...component.data().quote,
         exchange: 'CRYPTO',
       },
-      userPortfolioStateHolding: { ...mockPortfolioState, cashOnHand: 1000 },
+      userPortfolioStateHolding: { ...mockPortfolioState, cashOnHand: cashTotal },
     });
 
     expect(component.isSymbolCrypto()).toBe(true);
@@ -327,8 +326,13 @@ describe('PortfolioTradeDialogComponent', () => {
     fixture.detectChanges();
 
     // set custom value
-    component.form.controls.customTotalValue.setValue(1000);
-    const calculatedUnits = roundNDigits(1000 / mockData.quote.price, 4);
+    const spending = 800;
+    component.form.controls.customTotalValue.setValue(spending);
+
+    const feesSpending = getTransactionFeesBySpending(spending);
+    const feesTotal = getTransactionFeesBySpending(cashTotal);
+    const calculatedUnits = roundNDigits(spending / mockData.quote.price, 4);
+    const maxUnits = roundNDigits((1100 - feesTotal) / mockData.quote.price, 4);
 
     // trigger CD
     fixture.detectChanges();
@@ -336,14 +340,68 @@ describe('PortfolioTradeDialogComponent', () => {
     // check if calculated
     expect(component.form.controls.units.value).toBe(calculatedUnits);
 
-    // should be error because user does not have enough cash
+    // should not be error
     expect(component.insufficientCashErrorSignal()).toBe(false);
 
     // should have saved button disabled
     expect(saveButtonEl.nativeElement.disabled).toBe(false);
 
+    // check fees
+    expect(component.calculatedFees()).toBe(feesSpending);
+
     // check how many units can be bought
-    expect(component.maximumUnitsToBuy()).toBe(calculatedUnits);
+    expect(component.maximumUnitsToBuy()).toBe(maxUnits);
+  });
+
+  it('should disable save button on BUY operation if we spend the full cash on hand, because fees would overflow by cash', () => {
+    const fixture = MockRender(PortfolioTradeDialogComponent);
+    const component = fixture.point.componentInstance;
+
+    // set data to crypto
+    const cashTotal = 1100;
+    component.data.set({
+      ...component.data(),
+      quote: {
+        ...component.data().quote,
+        exchange: 'CRYPTO',
+      },
+      userPortfolioStateHolding: { ...mockPortfolioState, cashOnHand: cashTotal },
+    });
+
+    expect(component.isSymbolCrypto()).toBe(true);
+
+    // use custom value
+    const saveButtonEl = ngMocks.find<MatButton>(saveButtonS);
+    const valueKeyboardCheckboxEl = ngMocks.find<MatCheckbox>(valueKeyboardCheckboxS);
+    valueKeyboardCheckboxEl.nativeElement.click();
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // set custom value
+    component.form.controls.customTotalValue.setValue(cashTotal);
+
+    const feesTotal = getTransactionFeesBySpending(cashTotal);
+    const calculatedUnits = roundNDigits(cashTotal / mockData.quote.price, 4);
+    const maxUnits = roundNDigits((1100 - feesTotal) / mockData.quote.price, 4);
+
+    // trigger CD
+    fixture.detectChanges();
+
+    // check if calculated
+    expect(component.form.controls.units.value).toBe(calculatedUnits);
+
+    // should not be error
+    expect(component.insufficientCashErrorSignal()).toBe(true);
+
+    // should have saved button disabled
+    expect(saveButtonEl.nativeElement.disabled).toBe(true);
+
+    // check fees
+    expect(component.calculatedFees()).toBe(feesTotal);
+
+    // check how many units can be bought
+    expect(component.maximumUnitsToBuy()).toBe(maxUnits);
   });
 
   it('should nullify units and custom value when switching between them', () => {
@@ -399,7 +457,7 @@ describe('PortfolioTradeDialogComponent', () => {
       const component = fixture.point.componentInstance;
 
       const newUnits = 10;
-      const expectedFees = roundNDigits(((newUnits * mockData.quote.price) / 100) * TRANSACTION_FEE_PRCT);
+      const expectedFees = getTransactionFees(mockData.quote.price, newUnits);
 
       // test initial value
       expect(component.calculatedFees()).toBe(0);

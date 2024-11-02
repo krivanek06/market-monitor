@@ -65,7 +65,7 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
         data-testid="page-trading-portfolio-state"
         class="max-md:flex-1 md:basis-2/5 2xl:basis-1/3"
         [titleColor]="ColorScheme.PRIMARY_VAR"
-        [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+        [valueColor]="ColorScheme.GRAY_DARK_VAR"
         [showCashSegment]="state.isAccountDemoTrading()"
         [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
       />

@@ -12,11 +12,10 @@ import {
   setDoc,
   where,
 } from '@angular/fire/firestore';
-import { OutstandingOrder, PortfolioState, PortfolioStateHoldingBase } from '@mm/api-types';
+import { OutstandingOrder } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { roundNDigits } from '@mm/shared/general-util';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -55,85 +54,18 @@ export class OutstandingOrderApiService {
   }
 
   /**
-   * based on the NEW order, calculate the new portfolio state and holdings
-   * - when order is BUY - subtract cash
-   * - when order is SELL - remove units from holding
-   *
-   * @param portfolioState - user's current portfolio state
-   * @param currentHoldings - user's current holdings
-   * @param order
-   * @returns
+   * delete all outstanding orders for a user - used when resetting the user portfolio
    */
-  calculatePortfolioAndHoldingByNewOrder(
-    portfolioState: PortfolioState,
-    currentHoldings: PortfolioStateHoldingBase[],
-    order: OutstandingOrder,
-  ): {
-    portfolioState: PortfolioState;
-    holdings: PortfolioStateHoldingBase[];
-  } {
-    // what type of order is it
-    const isBuy = order.orderType.type === 'BUY';
-    const isSell = order.orderType.type === 'SELL';
+  async deleteAllOutstandingOrdersForUser(userId: string) {
+    // get all orders
+    const orders = await firstValueFrom(
+      rxCollectionData(query(this.outstandingOrdersCollection(), where('userData.id', '==', userId))),
+    );
 
-    // subtract the cash from the user if BUY order
-    const cashOnHand = isBuy
-      ? roundNDigits(portfolioState.cashOnHand - order.potentialTotalPrice)
-      : portfolioState.cashOnHand;
-
-    // update holdings
-    const holdings = currentHoldings.map((holding) => ({
-      ...holding,
-      // remove owned units if SELL order
-      units: holding.symbol === order.symbol && isSell ? holding.units - order.units : holding.units,
-    }));
-
-    return {
-      portfolioState: {
-        ...portfolioState,
-        cashOnHand,
-      },
-      holdings,
-    };
-  }
-
-  /**
-   * based on the DELETED order, calculate the new portfolio state and holdings
-   * - when order is BUY - add cash back
-   * - when order is SELL - add units to holding back
-   *
-   * @param portfolioState - user's current portfolio state
-   * @param currentHoldings - user's current holdings
-   * @param order
-   * @returns
-   */
-  calculatePortfolioAndHoldingByOrderDelete(
-    portfolioState: PortfolioState,
-    currentHoldings: PortfolioStateHoldingBase[],
-    order: OutstandingOrder,
-  ) {
-    // what type of order is it
-    const isBuy = order.orderType.type === 'BUY';
-    const isSell = order.orderType.type === 'SELL';
-
-    // add the cash back to the user if BUY order
-    const cashOnHand = isBuy
-      ? roundNDigits(portfolioState.cashOnHand + order.potentialTotalPrice)
-      : portfolioState.cashOnHand;
-
-    // update holdings - add back the units if SELL order
-    const holdings = currentHoldings.map((holding) => ({
-      ...holding,
-      units: holding.symbol === order.symbol && isSell ? holding.units + order.units : holding.units,
-    }));
-
-    return {
-      portfolioState: {
-        ...portfolioState,
-        cashOnHand,
-      },
-      holdings,
-    };
+    // delete all orders
+    orders.forEach((order) => {
+      deleteDoc(this.getOutstandingOrderDocRef(order.orderId));
+    });
   }
 
   private getOutstandingOrderDocRef(orderId: string): DocumentReference<OutstandingOrder> {
