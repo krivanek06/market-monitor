@@ -2,8 +2,8 @@ import { CurrencyPipe, DatePipe, NgClass, NgTemplateOutlet } from '@angular/comm
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { OutstandingOrder, TRANSACTION_FEE_PRCT } from '@mm/api-types';
-import { roundNDigits } from '@mm/shared/general-util';
+import { OutstandingOrder } from '@mm/api-types';
+import { getTransactionFeesBySpending } from '@mm/shared/general-util';
 import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
 
 @Component({
@@ -88,9 +88,7 @@ export class OutstandingOrderCardDataComponent {
   readonly deleteClicked = output<void>();
   readonly order = input.required<OutstandingOrder>();
 
-  readonly potentialFees = computed(() =>
-    roundNDigits((this.order().potentialTotalPrice / 100) * TRANSACTION_FEE_PRCT),
-  );
+  readonly potentialFees = computed(() => getTransactionFeesBySpending(this.order().potentialTotalPrice));
 
   onDelete() {
     this.deleteClicked.emit();

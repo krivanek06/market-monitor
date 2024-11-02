@@ -1,5 +1,3 @@
-import { TestBed } from '@angular/core/testing';
-
 import { MarketApiService } from '@mm/api-client';
 import {
   DATE_TOO_OLD,
@@ -7,7 +5,6 @@ import {
   HistoricalPrice,
   OUTSTANDING_ORDERS_MAX_ORDERS,
   OutstandingOrder,
-  TRANSACTION_FEE_PRCT,
   TRANSACTION_INPUT_UNITS_INTEGER,
   TRANSACTION_INPUT_UNITS_POSITIVE,
   USER_HOLDINGS_SYMBOL_LIMIT,
@@ -19,15 +16,13 @@ import {
   mockCreateUser,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { calculateGrowth, roundNDigits } from '@mm/shared/general-util';
+import { calculateGrowth, getTransactionFees, roundNDigits } from '@mm/shared/general-util';
 import { format, subYears } from 'date-fns';
-import { MockProvider, ngMocks } from 'ng-mocks';
+import { MockBuilder, MockRender, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
 import { PortfolioCreateOperationService } from './portfolio-create-operation.service';
 
 describe('PortfolioCreateOperationService', () => {
-  let service: PortfolioCreateOperationService;
-
   // April 5, 2024 - Friday -> random date
   const randomDate = '2024-04-05';
   const randomSymboLPrice: HistoricalPrice = {
@@ -41,9 +36,10 @@ describe('PortfolioCreateOperationService', () => {
   });
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        MockProvider(AuthenticationUserStoreService, {
+    return MockBuilder(PortfolioCreateOperationService)
+      .provide({
+        provide: AuthenticationUserStoreService,
+        useValue: {
           addUserPortfolioTransactions: jest.fn(),
           addOutstandingOrder: jest.fn(),
           removeOutstandingOrder: jest.fn(),
@@ -54,19 +50,15 @@ describe('PortfolioCreateOperationService', () => {
               closedOrders: [] as OutstandingOrder[],
             }),
           } as AuthenticationUserStoreService['state'],
-        }),
-        MockProvider(MarketApiService, {
+        },
+      })
+      .provide({
+        provide: MarketApiService,
+        useValue: {
           isMarketOpenForQuote: jest.fn().mockReturnValue(true),
-        }),
-      ],
-    });
-    service = TestBed.inject(PortfolioCreateOperationService);
-
-    // mock response
-    const stocksApiService = TestBed.inject(MarketApiService);
-    ngMocks.stub(stocksApiService, {
-      getHistoricalPricesOnDate: jest.fn().mockReturnValue(of(randomSymboLPrice)),
-    });
+          getHistoricalPricesOnDate: jest.fn().mockReturnValue(of(randomSymboLPrice)),
+        },
+      });
   });
 
   afterEach(() => {
@@ -75,12 +67,14 @@ describe('PortfolioCreateOperationService', () => {
   });
 
   it('should be created', () => {
+    const service = MockRender(PortfolioCreateOperationService);
     expect(service).toBeTruthy();
   });
 
   describe('Test: createOrder', () => {
     describe('Create Transaction - Market is open', () => {
       it('should create a BUY transaction', () => {
+        const service = MockRender(PortfolioCreateOperationService);
         const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
 
         const t1 = {
@@ -97,7 +91,7 @@ describe('PortfolioCreateOperationService', () => {
           potentialSymbolPrice: randomSymboLPrice.close,
         } as OutstandingOrder;
 
-        const transaction = service.createOrder(t1);
+        const transaction = service.componentInstance.createOrder(t1);
 
         expect(transaction).toMatchObject({
           type: 'transaction',
@@ -171,12 +165,14 @@ describe('PortfolioCreateOperationService', () => {
 
         ngMocks.flushTestBed();
 
+        const service = MockRender(PortfolioCreateOperationService);
+
         const breakEvenPrice = user.holdingSnapshot.data[0].breakEvenPrice;
         const returnValue = roundNDigits((randomSymboLPrice.close - breakEvenPrice) * t1.units);
         const returnChange = calculateGrowth(randomSymboLPrice.close, breakEvenPrice);
-        const transactionFeesCalc = roundNDigits(((t1.units * randomSymboLPrice.close) / 100) * TRANSACTION_FEE_PRCT);
+        const transactionFeesCalc = getTransactionFees(randomSymboLPrice.close, t1.units);
 
-        const result = service.createOrder(t1);
+        const result = service.componentInstance.createOrder(t1);
         expect(result).toMatchObject({
           type: 'transaction',
           data: {
@@ -246,13 +242,14 @@ describe('PortfolioCreateOperationService', () => {
         });
 
         ngMocks.flushTestBed();
+        const service = MockRender(PortfolioCreateOperationService);
 
         const breakEvenPrice = user.holdingSnapshot.data[0].breakEvenPrice;
         const returnValue = roundNDigits((randomSymboLPrice.close - breakEvenPrice) * t1.units);
         const returnChange = calculateGrowth(randomSymboLPrice.close, breakEvenPrice);
-        const transactionFeesCalc = roundNDigits(((t1.units * randomSymboLPrice.close) / 100) * TRANSACTION_FEE_PRCT);
+        const transactionFeesCalc = getTransactionFees(randomSymboLPrice.close, t1.units);
 
-        expect(service.createOrder(t1)).toMatchObject({
+        expect(service.componentInstance.createOrder(t1)).toMatchObject({
           type: 'transaction',
           data: {
             date: expect.any(String),
@@ -271,6 +268,7 @@ describe('PortfolioCreateOperationService', () => {
       });
 
       it('should create a BUY transaction over holding limit if user already has the symbol in holdings', () => {
+        const service = MockRender(PortfolioCreateOperationService);
         const t1 = {
           createdAt: randomDate,
           units: 10,
@@ -300,7 +298,7 @@ describe('PortfolioCreateOperationService', () => {
           },
         } satisfies UserData;
 
-        expect(service.createOrder(t1)).toMatchObject({
+        expect(service.componentInstance.createOrder(t1)).toMatchObject({
           type: 'transaction',
           data: {
             date: expect.any(String),
@@ -359,8 +357,9 @@ describe('PortfolioCreateOperationService', () => {
         });
 
         ngMocks.flushTestBed();
+        const service = MockRender(PortfolioCreateOperationService);
 
-        const outstandingOrder = service.createOrder(t1);
+        const outstandingOrder = service.componentInstance.createOrder(t1);
 
         expect(outstandingOrder).toMatchObject({
           type: 'order',
@@ -433,8 +432,9 @@ describe('PortfolioCreateOperationService', () => {
         });
 
         ngMocks.flushTestBed();
+        const service = MockRender(PortfolioCreateOperationService);
 
-        const outstandingOrder = service.createOrder(t1);
+        const outstandingOrder = service.componentInstance.createOrder(t1);
 
         expect(outstandingOrder).toMatchObject({
           type: 'order',
@@ -458,6 +458,7 @@ describe('PortfolioCreateOperationService', () => {
 
     describe('Error states', () => {
       it('should throw error if units are negative or zero', () => {
+        const service = MockRender(PortfolioCreateOperationService);
         const t1 = {
           createdAt: randomDate,
           units: 0,
@@ -479,11 +480,12 @@ describe('PortfolioCreateOperationService', () => {
           },
         } as OutstandingOrder;
 
-        expect(() => service.createOrder(t1)).toThrow(TRANSACTION_INPUT_UNITS_POSITIVE);
-        expect(() => service.createOrder(t2)).toThrow(TRANSACTION_INPUT_UNITS_POSITIVE);
+        expect(() => service.componentInstance.createOrder(t1)).toThrow(TRANSACTION_INPUT_UNITS_POSITIVE);
+        expect(() => service.componentInstance.createOrder(t2)).toThrow(TRANSACTION_INPUT_UNITS_POSITIVE);
       });
 
       it('should throw error if units are non integer values for not crypto', () => {
+        const service = MockRender(PortfolioCreateOperationService);
         const t1 = {
           createdAt: randomDate,
           units: 10.5,
@@ -496,7 +498,7 @@ describe('PortfolioCreateOperationService', () => {
           },
         } as OutstandingOrder;
 
-        expect(() => service.createOrder(t1)).toThrow(TRANSACTION_INPUT_UNITS_INTEGER);
+        expect(() => service.componentInstance.createOrder(t1)).toThrow(TRANSACTION_INPUT_UNITS_INTEGER);
       });
 
       it('should throw error if user wants to buy symbol over holding limit', () => {
@@ -535,7 +537,10 @@ describe('PortfolioCreateOperationService', () => {
           } as AuthenticationUserStoreService['state'],
         });
 
-        expect(() => service.createOrder(t1)).toThrow(USER_HOLDING_LIMIT_ERROR);
+        ngMocks.flushTestBed();
+        const service = MockRender(PortfolioCreateOperationService);
+
+        expect(() => service.componentInstance.createOrder(t1)).toThrow(USER_HOLDING_LIMIT_ERROR);
       });
 
       it('should throw an error if user wants to create more outstanding orders than the limit', () => {
@@ -558,12 +563,16 @@ describe('PortfolioCreateOperationService', () => {
           } as AuthenticationUserStoreService['state'],
         });
 
-        expect(() => service.createOrder(t1)).toThrow(
+        ngMocks.flushTestBed();
+        const service = MockRender(PortfolioCreateOperationService);
+
+        expect(() => service.componentInstance.createOrder(t1)).toThrow(
           `You can have maximum ${OUTSTANDING_ORDERS_MAX_ORDERS} outstanding orders`,
         );
       });
 
       it('should throw error if loading data older than (HISTORICAL_PRICE_RESTRICTION_YEARS)', () => {
+        const service = MockRender(PortfolioCreateOperationService);
         const t1 = {
           createdAt: format(subYears(new Date(), HISTORICAL_PRICE_RESTRICTION_YEARS + 1), 'yyyy-MM-dd'),
           units: 10,
@@ -576,7 +585,7 @@ describe('PortfolioCreateOperationService', () => {
           },
         } as OutstandingOrder;
 
-        expect(() => service.createOrder(t1)).toThrow(DATE_TOO_OLD);
+        expect(() => service.componentInstance.createOrder(t1)).toThrow(DATE_TOO_OLD);
       });
 
       it('should throw error if user does not have enough cash for BUY operation when using DEMO_TRADING Account', () => {
@@ -609,7 +618,10 @@ describe('PortfolioCreateOperationService', () => {
           } as AuthenticationUserStoreService['state'],
         });
 
-        expect(() => service.createOrder(t1)).toThrow(USER_NOT_ENOUGH_CASH_ERROR);
+        ngMocks.flushTestBed();
+        const service = MockRender(PortfolioCreateOperationService);
+
+        expect(() => service.componentInstance.createOrder(t1)).toThrow(USER_NOT_ENOUGH_CASH_ERROR);
       });
 
       it('should throw error if user does not have enough units on hand for SELL operation', () => {
@@ -651,16 +663,20 @@ describe('PortfolioCreateOperationService', () => {
           } as AuthenticationUserStoreService['state'],
         });
 
+        ngMocks.flushTestBed();
+        const service = MockRender(PortfolioCreateOperationService);
+
         // not enough units
-        expect(() => service.createOrder(t1)).toThrow(USER_NOT_UNITS_ON_HAND_ERROR);
+        expect(() => service.componentInstance.createOrder(t1)).toThrow(USER_NOT_UNITS_ON_HAND_ERROR);
         // does not exist
-        expect(() => service.createOrder(t1)).toThrow(USER_NOT_UNITS_ON_HAND_ERROR);
+        expect(() => service.componentInstance.createOrder(t1)).toThrow(USER_NOT_UNITS_ON_HAND_ERROR);
       });
     });
   });
 
   describe('Test: deleteOrder', () => {
     it('should delete an outstanding order', () => {
+      const service = MockRender(PortfolioCreateOperationService);
       const order = {
         userData: {
           id: testUserData.id,
@@ -669,12 +685,13 @@ describe('PortfolioCreateOperationService', () => {
 
       const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
 
-      service.deleteOrder(order);
+      service.componentInstance.deleteOrder(order);
 
       expect(authenticationUserStoreService.removeOutstandingOrder).toHaveBeenLastCalledWith(order);
     });
 
     it('should throw error if user deleting someone else order', () => {
+      const service = MockRender(PortfolioCreateOperationService);
       const order = {
         userData: {
           id: 'INVALID ID', // invalid id
@@ -683,7 +700,7 @@ describe('PortfolioCreateOperationService', () => {
 
       const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
 
-      expect(() => service.deleteOrder(order)).toThrow(expect.any(Error));
+      expect(() => service.componentInstance.deleteOrder(order)).toThrow(expect.any(Error));
 
       expect(authenticationUserStoreService.removeOutstandingOrder).not.toHaveBeenCalled();
     });

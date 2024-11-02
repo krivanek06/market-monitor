@@ -62,7 +62,7 @@ export const createTransaction = (
   const breakEvenPrice = isSell ? roundNDigits(symbolHolding?.breakEvenPrice ?? 1, 4) : 0;
 
   // calculate transaction fees
-  const transactionFeesCalc = ((input.units * unitPrice) / 100) * TRANSACTION_FEE_PRCT;
+  const transactionFeesCalc = getTransactionFees(unitPrice, input.units);
   const transactionFees = roundNDigits(transactionFeesCalc);
 
   // calculate return values if SELL order
@@ -88,3 +88,8 @@ export const createTransaction = (
 
   return result;
 };
+
+export const getTransactionFeesBySpending = (spending: number) => roundNDigits(spending * TRANSACTION_FEE_PRCT);
+
+export const getTransactionFees = (unitPrice: number, units: number) =>
+  roundNDigits(units * unitPrice * TRANSACTION_FEE_PRCT);

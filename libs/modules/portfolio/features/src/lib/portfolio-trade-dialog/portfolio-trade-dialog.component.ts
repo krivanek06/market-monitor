@@ -9,18 +9,19 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {
-  OutstandingOrder,
-  PortfolioStateHoldings,
-  PortfolioTransactionType,
-  SymbolQuote,
-  TRANSACTION_FEE_PRCT,
-} from '@mm/api-types';
+import { OutstandingOrder, PortfolioStateHoldings, PortfolioTransactionType, SymbolQuote } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
 import { minValueValidator, positiveNumberValidator, requiredValidator } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { createUUID, getCurrentDateDetailsFormat, roundNDigits, transformUserToBaseMin } from '@mm/shared/general-util';
+import {
+  createUUID,
+  getCurrentDateDetailsFormat,
+  getTransactionFees,
+  getTransactionFeesBySpending,
+  roundNDigits,
+  transformUserToBaseMin,
+} from '@mm/shared/general-util';
 import {
   DefaultImgDirective,
   DialogCloseHeaderComponent,
@@ -341,7 +342,7 @@ export class PortfolioTradeDialogComponent {
   readonly calculatedFees = toSignal(
     this.form.controls.units.valueChanges.pipe(
       startWith(this.form.controls.units.value),
-      map((units) => roundNDigits(((units * this.data().quote.price) / 100) * TRANSACTION_FEE_PRCT)),
+      map((units) => getTransactionFees(this.data().quote.price, units)),
     ),
     { initialValue: 0 },
   );
@@ -355,20 +356,16 @@ export class PortfolioTradeDialogComponent {
     const price = this.data().quote.price;
     const isCrypto = this.isSymbolCrypto();
 
+    // calculate what would be fees if we buy maximum units
+    const potentialFees = getTransactionFeesBySpending(cashOnHand);
+
     // if crypto, we can buy fraction of units
     if (isCrypto) {
-      // calculate what would be fees if we buy maximum units
-      const potentialFees = roundNDigits(((roundNDigits(cashOnHand / price, 4) * price) / 100) * TRANSACTION_FEE_PRCT);
-      const potentialUnits = roundNDigits((cashOnHand - potentialFees) / price, 4);
-      return potentialUnits;
+      return roundNDigits((cashOnHand - potentialFees) / price, 4);
     }
 
-    // calculate what would be fees if we buy maximum units
-    const potentialFees = roundNDigits(((Math.floor(cashOnHand / price) * price) / 100) * TRANSACTION_FEE_PRCT);
     // prevent fractional units
-    const potentialUnits = Math.floor((cashOnHand - potentialFees) / price);
-
-    return potentialUnits;
+    return Math.floor((cashOnHand - potentialFees) / price);
   });
 
   get useCustomTotalValue(): boolean {

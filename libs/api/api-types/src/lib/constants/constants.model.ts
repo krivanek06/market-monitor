@@ -38,9 +38,9 @@ export const HALL_OF_FAME_PORTFOLIO_DAILY_BEST_LIMIT = 12;
 export const HISTORICAL_PRICE_RESTRICTION_YEARS = 6;
 
 /**
- * users with trading account have a fee prct
+ * users with trading account have a fee prct - 0.1% of transaction value
  */
-export const TRANSACTION_FEE_PRCT = 0.1;
+export const TRANSACTION_FEE_PRCT = 0.001;
 
 /**
  * number in days when a user account is considered in-active
