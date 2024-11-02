@@ -51,8 +51,8 @@ describe('SummaryActionButtonsComponent', () => {
         .provide({
           provide: AUTHENTICATION_ACCOUNT_TOKEN,
           useValue: {
-            addSymbolToUserWatchList: jest.fn(),
-            removeSymbolFromUserWatchList: jest.fn(),
+            addSymbolToWatchList: jest.fn(),
+            removeSymbolFromWatchList: jest.fn(),
             state: {
               getUserData: () => userMock,
               isSymbolInWatchList: () => (symbol: string) => false,
@@ -156,7 +156,7 @@ describe('SummaryActionButtonsComponent', () => {
   });
 
   it('should add symbol into watchlist', () => {
-    let authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
+    const authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
 
     // prevent warning
     ngMocks.flushTestBed();
@@ -185,17 +185,17 @@ describe('SummaryActionButtonsComponent', () => {
     ngMocks.click(addWatchlist);
 
     // check if the function is called
-    expect(authUserService.addSymbolToUserWatchList).toHaveBeenCalledWith({
+    expect(authUserService.addSymbolToWatchList).toHaveBeenCalledWith({
       symbolType: 'STOCK',
       symbol: mockSymbolSummary.id,
       sector: mockSymbolSummary.profile?.sector,
     });
-    expect(authUserService.removeSymbolFromUserWatchList).not.toHaveBeenCalled();
+    expect(authUserService.removeSymbolFromWatchList).not.toHaveBeenCalled();
     expect(dialog.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
   });
 
   it('should remove symbol into watchlist', () => {
-    let authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
+    const authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
     ngMocks.stub(authUserService, {
       ...authUserService,
       state: {
@@ -242,12 +242,12 @@ describe('SummaryActionButtonsComponent', () => {
     ngMocks.click(removeWatchlist);
 
     // check if the function is called
-    expect(authUserService.removeSymbolFromUserWatchList).toHaveBeenCalledWith({
+    expect(authUserService.removeSymbolFromWatchList).toHaveBeenCalledWith({
       symbolType: 'STOCK',
       symbol: mockSymbolSummary.id,
       sector: mockSymbolSummary.profile?.sector,
     });
-    expect(authUserService.addSymbolToUserWatchList).not.toHaveBeenCalled();
+    expect(authUserService.addSymbolToWatchList).not.toHaveBeenCalled();
     expect(dialog.showNotificationBar).toHaveBeenCalledWith(expect.any(String));
   });
 
@@ -262,7 +262,7 @@ describe('SummaryActionButtonsComponent', () => {
         }) as SymbolStoreBase,
     );
 
-    let authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
+    const authUserService = ngMocks.get(AUTHENTICATION_ACCOUNT_TOKEN);
     ngMocks.stub(authUserService, {
       ...authUserService,
       state: {
@@ -295,6 +295,6 @@ describe('SummaryActionButtonsComponent', () => {
     ngMocks.click(addWatchlist);
 
     expect(dialog.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'error');
-    expect(authUserService.addSymbolToUserWatchList).not.toHaveBeenCalled();
+    expect(authUserService.addSymbolToWatchList).not.toHaveBeenCalled();
   });
 });

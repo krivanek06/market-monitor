@@ -29,8 +29,26 @@ export class AuthenticationUserStoreService {
 
   readonly state = this.authenticationUserService.state;
 
-  changeUserPersonal(data: Partial<UserData['personal']>): void {
-    this.userApiService.updateUserPersonal(this.state.getUserData(), data);
+  updatePersonal(data: Partial<UserData['personal']>): void {
+    const user = this.state.getUserData();
+    this.userApiService.updateUser(user.id, {
+      ...user,
+      personal: {
+        ...user.personal,
+        ...data,
+      },
+    });
+  }
+
+  updateSettings(data: Partial<UserData['settings']>): void {
+    const user = this.state.getUserData();
+    this.userApiService.updateUser(user.id, {
+      ...user,
+      settings: {
+        ...user.settings,
+        ...data,
+      },
+    });
   }
 
   resetTransactions(): void {
@@ -69,31 +87,23 @@ export class AuthenticationUserStoreService {
     );
   }
 
-  updateUserSettings(data: Partial<UserData['settings']>): void {
-    this.userApiService.updateUserSettings(this.state.getUserData(), data);
-  }
-
-  addSymbolToUserWatchList(data: SymbolStoreBase): void {
+  addSymbolToWatchList(data: SymbolStoreBase): void {
     this.userApiService.addToUserWatchList(this.state.getUserData().id, data);
   }
 
-  removeSymbolFromUserWatchList(data: SymbolStoreBase): void {
+  removeSymbolFromWatchList(data: SymbolStoreBase): void {
     this.userApiService.removeFromUserWatchList(this.state.getUserData().id, data);
   }
 
-  clearUserWatchList(): void {
+  clearWatchList(): void {
     this.userApiService.clearUserWatchList(this.state.getUserData().id);
   }
 
-  updateUserData(data: Partial<UserData>): void {
-    this.userApiService.updateUser(this.state.getUserData().id, data);
-  }
-
-  recalculateUserPortfolioState(): Promise<boolean> {
+  recalculatePortfolioState(): Promise<boolean> {
     return this.userApiService.recalculateUserPortfolioState(this.state.getUserData());
   }
 
-  addUserPortfolioTransactions(transaction: PortfolioTransaction): void {
+  addPortfolioTransactions(transaction: PortfolioTransaction): void {
     const user = this.state.getUserData();
     const openOrders = this.state.outstandingOrders().openOrders;
     const openOrdersSymbols = openOrders.map((d) => d.symbol);

@@ -67,15 +67,6 @@ export class UserApiService {
     return rxDocData(this.getUserWatchlistDocRef(userId)).pipe(filter((d): d is UserWatchList => !!d));
   }
 
-  updateUserPersonal(currentData: UserData, data: Partial<UserData['personal']>): void {
-    this.updateUser(currentData.id, {
-      personal: {
-        ...currentData.personal,
-        ...data,
-      },
-    });
-  }
-
   resetTransactions(userBase: UserBase): void {
     const startingCash = userBase.userAccountType === UserAccountEnum.DEMO_TRADING ? USER_DEFAULT_STARTING_CASH : 0;
 
@@ -129,15 +120,6 @@ export class UserApiService {
     setDoc(this.getUserPortfolioGrowthDocRef(userBase.id), {
       lastModifiedDate: '',
       data: [],
-    });
-  }
-
-  updateUserSettings(currentData: UserData, data: Partial<UserData['settings']>): void {
-    this.updateUser(currentData.id, {
-      settings: {
-        ...currentData.settings,
-        ...data,
-      },
     });
   }
 

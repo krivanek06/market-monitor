@@ -256,7 +256,7 @@ export class UserSettingsDialogComponent implements OnInit {
 
     // update url
     this.userImageControl.valueChanges.pipe(filterNil()).subscribe((imgUrl) =>
-      this.authenticationUserStoreService.changeUserPersonal({
+      this.authenticationUserStoreService.updatePersonal({
         photoURL: imgUrl,
       }),
     );
@@ -311,7 +311,7 @@ export class UserSettingsDialogComponent implements OnInit {
     }
 
     // update display name
-    this.authenticationUserStoreService.changeUserPersonal({
+    this.authenticationUserStoreService.updatePersonal({
       displayName: displayName,
       displayNameLowercase: displayName.toLowerCase(),
     });
@@ -333,7 +333,7 @@ export class UserSettingsDialogComponent implements OnInit {
     }
 
     // update initials
-    this.authenticationUserStoreService.changeUserPersonal({
+    this.authenticationUserStoreService.updatePersonal({
       displayNameInitials: initials,
     });
 
@@ -372,7 +372,7 @@ export class UserSettingsDialogComponent implements OnInit {
 
     try {
       this.dialogServiceUtil.showNotificationBar('Recalculating your portfolio');
-      await this.authenticationUserStoreService.recalculateUserPortfolioState();
+      await this.authenticationUserStoreService.recalculatePortfolioState();
       this.dialogServiceUtil.showNotificationBar('Portfolio recalculated', 'success');
     } catch (error) {
       this.dialogServiceUtil.handleError(error);

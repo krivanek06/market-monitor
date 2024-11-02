@@ -40,7 +40,7 @@ describe('PortfolioCreateOperationService', () => {
       .provide({
         provide: AuthenticationUserStoreService,
         useValue: {
-          addUserPortfolioTransactions: jest.fn(),
+          addPortfolioTransactions: jest.fn(),
           addOutstandingOrder: jest.fn(),
           removeOutstandingOrder: jest.fn(),
           state: {
@@ -110,7 +110,7 @@ describe('PortfolioCreateOperationService', () => {
           },
         });
 
-        expect(authenticationUserStoreService.addUserPortfolioTransactions).toHaveBeenLastCalledWith(transaction.data);
+        expect(authenticationUserStoreService.addPortfolioTransactions).toHaveBeenLastCalledWith(transaction.data);
         expect(authenticationUserStoreService.addOutstandingOrder).not.toHaveBeenCalled();
       });
 
@@ -190,7 +190,7 @@ describe('PortfolioCreateOperationService', () => {
           },
         });
 
-        expect(authenticationUserStoreService.addUserPortfolioTransactions).toHaveBeenLastCalledWith(result.data);
+        expect(authenticationUserStoreService.addPortfolioTransactions).toHaveBeenLastCalledWith(result.data);
         expect(authenticationUserStoreService.addOutstandingOrder).not.toHaveBeenCalled();
       });
 
@@ -376,7 +376,7 @@ describe('PortfolioCreateOperationService', () => {
           },
         });
 
-        expect(authenticationUserStoreService.addUserPortfolioTransactions).not.toHaveBeenCalled();
+        expect(authenticationUserStoreService.addPortfolioTransactions).not.toHaveBeenCalled();
         expect(authenticationUserStoreService.addOutstandingOrder).toHaveBeenLastCalledWith(outstandingOrder.data);
       });
 
@@ -451,8 +451,8 @@ describe('PortfolioCreateOperationService', () => {
           },
         });
 
-        expect(authenticationUserStoreService.addUserPortfolioTransactions).not.toHaveBeenCalled();
         expect(authenticationUserStoreService.addOutstandingOrder).toHaveBeenLastCalledWith(outstandingOrder.data);
+        expect(authenticationUserStoreService.addPortfolioTransactions).not.toHaveBeenCalled();
       });
     });
 
