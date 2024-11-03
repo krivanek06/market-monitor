@@ -39,6 +39,7 @@ export const mockCreateGroupData = (data: Partial<GroupData> = {}): GroupData =>
       lastTransactionDate: null,
       previousBalanceChange: 0,
       previousBalanceChangePercentage: 0,
+      transactionProfit: 0,
     },
     systemRank: {},
     ...data,

@@ -1,8 +1,6 @@
 import { inject, Injectable, InjectionToken } from '@angular/core';
 import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
 import {
-  OUTSTANDING_ORDER_MAX_ALLOWED,
-  OUTSTANDING_ORDERS_MAX_ORDERS,
   OutstandingOrder,
   PortfolioTransaction,
   SymbolStoreBase,
@@ -149,12 +147,6 @@ export class AuthenticationUserStoreService {
    */
   addOutstandingOrder(order: OutstandingOrder): void {
     const user = this.state.getUserData();
-    const orders = this.state.outstandingOrders();
-
-    // prevent creating more orders than allowed
-    if (orders.openOrders.length >= OUTSTANDING_ORDERS_MAX_ORDERS) {
-      throw new Error(OUTSTANDING_ORDER_MAX_ALLOWED);
-    }
 
     // save order
     this.outstandingOrderApiService.addOutstandingOrder(order);
@@ -190,11 +182,6 @@ export class AuthenticationUserStoreService {
 
   removeOutstandingOrder(order: OutstandingOrder): void {
     const user = this.state.getUserData();
-
-    // check if user has the order
-    if (order.userData.id !== user.id) {
-      throw new Error('User does not have the order');
-    }
 
     // save order
     this.outstandingOrderApiService.deleteOutstandingOrder(order);

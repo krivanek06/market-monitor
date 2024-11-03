@@ -27,6 +27,7 @@ export const createEmptyPortfolioState = (startingCash = 0): PortfolioState => (
   lastTransactionDate: null,
   previousBalanceChange: 0,
   previousBalanceChangePercentage: 0,
+  transactionProfit: 0,
 });
 
 /**
@@ -209,6 +210,15 @@ export const getPortfolioStateHoldingBaseByTransactionsUtil = (
   return holdingsBaseWithOpenOrders;
 };
 
+/**
+ * make sure to run portfolio validation before calling this function
+ *
+ * @param currentPortfolio - current portfolio state
+ * @param currentHoldings - current holdings for the user
+ * @param openOrders - open orders for the user
+ * @param transaction - newly created transaction
+ * @returns - updated portfolio and holdings
+ */
 export const getPortfolioStateHoldingBaseByNewTransactionUtil = (
   currentPortfolio: PortfolioState,
   currentHoldings: PortfolioStateHoldingBase[],
@@ -251,11 +261,20 @@ export const getPortfolioStateHoldingBaseByNewTransactionUtil = (
   const cashOnOrders = openOrders
     .filter((d) => d.orderType.type === 'BUY')
     .reduce((acc, curr) => acc + curr.potentialTotalPrice, 0);
-  const newCashOnHand = currentPortfolio.cashOnHand + (isSell ? totalPrice : -totalPrice) - transaction.transactionFees;
+
   const newInvested = currentPortfolio.invested + (isSell ? -totalPrice : totalPrice);
   const newHoldingsBalance = currentPortfolio.holdingsBalance + (isSell ? -totalPrice : totalPrice);
   const newNumberOfExecutedBuyTransactions = currentPortfolio.numberOfExecutedBuyTransactions + (isSell ? 0 : 1);
   const newNumberOfExecutedSellTransactions = currentPortfolio.numberOfExecutedSellTransactions + (isSell ? 1 : 0);
+  const newTransactionFees = currentPortfolio.transactionFees + transaction.transactionFees;
+
+  const newCashOnHand =
+    currentPortfolio.startingCash -
+    newInvested -
+    cashOnOrders +
+    currentPortfolio.transactionProfit -
+    newTransactionFees;
+
   // add spent cash on open orders into balance to avoid negative balance
   const newBalance = newHoldingsBalance + newCashOnHand + cashOnOrders;
 
@@ -270,6 +289,8 @@ export const getPortfolioStateHoldingBaseByNewTransactionUtil = (
     numberOfExecutedSellTransactions: newNumberOfExecutedSellTransactions,
     totalGainsValue: roundNDigits(newBalance - currentPortfolio.startingCash),
     totalGainsPercentage: calculateGrowth(newBalance, currentPortfolio.startingCash),
+    transactionFees: roundNDigits(newTransactionFees),
+    transactionProfit: roundNDigits(currentPortfolio.transactionProfit + transaction.returnValue),
   } satisfies PortfolioState;
 
   // update holdings

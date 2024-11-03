@@ -162,7 +162,7 @@ const getPortfolioStateHoldingsUtil = (
   const holdingsBalance = portfolioStateHolding.reduce((acc, curr) => acc + curr.symbolQuote.price * curr.units, 0);
 
   // calculate profit/loss from created transactions
-  const transactionProfitLoss = transactions.reduce(
+  const transactionsProfit = transactions.reduce(
     // prevent NaN, undefined and Infinity
     (acc, curr) => acc + (isFinite(curr.returnValue) ? curr.returnValue : 0),
     0,
@@ -175,7 +175,7 @@ const getPortfolioStateHoldingsUtil = (
 
   // current cash on hand
   const cashOnHandTransactions =
-    startingCash - investedTotal + transactionProfitLoss - spentCashOnOpenOrders - transactionFees;
+    startingCash - investedTotal + transactionsProfit - spentCashOnOpenOrders - transactionFees;
 
   const balance = holdingsBalance + cashOnHandTransactions + spentCashOnOpenOrders;
   const totalGainsValue = balance - startingCash;
@@ -191,6 +191,7 @@ const getPortfolioStateHoldingsUtil = (
     numberOfExecutedBuyTransactions,
     numberOfExecutedSellTransactions,
     transactionFees: roundNDigits(transactionFees),
+    transactionProfit: roundNDigits(transactionsProfit),
     cashOnHand: roundNDigits(cashOnHandTransactions),
     balance: roundNDigits(balance),
     invested: roundNDigits(investedTotal),

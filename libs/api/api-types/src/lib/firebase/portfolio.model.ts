@@ -42,6 +42,12 @@ export type PortfolioState = {
   transactionFees: number;
 
   /**
+   * calculated based on SELL transactions
+   * note: transaction fees are excluded
+   */
+  transactionProfit: number;
+
+  /**
    * calculated from holdings and balance
    */
   totalGainsValue: number;

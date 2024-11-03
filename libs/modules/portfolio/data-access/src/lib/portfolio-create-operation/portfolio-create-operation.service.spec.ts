@@ -4,6 +4,7 @@ import {
   HISTORICAL_PRICE_RESTRICTION_YEARS,
   HistoricalPrice,
   OUTSTANDING_ORDERS_MAX_ORDERS,
+  OUTSTANDING_ORDER_MAX_ALLOWED,
   OutstandingOrder,
   TRANSACTION_INPUT_UNITS_INTEGER,
   TRANSACTION_INPUT_UNITS_POSITIVE,
@@ -548,9 +549,17 @@ describe('PortfolioCreateOperationService', () => {
           userData: {
             id: testUserData.id,
           },
+          symbolType: 'STOCK',
+          units: 10,
+          symbol: 'AAPL',
+          orderType: {
+            type: 'BUY',
+          },
         } as OutstandingOrder;
 
         const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
+        const marketAPI = ngMocks.get(MarketApiService);
+
         ngMocks.stub(authenticationUserStoreService, {
           ...authenticationUserStoreService,
           state: {
@@ -563,12 +572,16 @@ describe('PortfolioCreateOperationService', () => {
           } as AuthenticationUserStoreService['state'],
         });
 
+        // make market closed
+        ngMocks.stub(marketAPI, {
+          isMarketOpenForQuote: jest.fn().mockReturnValue(false),
+        });
+
         ngMocks.flushTestBed();
         const service = MockRender(PortfolioCreateOperationService);
 
-        expect(() => service.componentInstance.createOrder(t1)).toThrow(
-          `You can have maximum ${OUTSTANDING_ORDERS_MAX_ORDERS} outstanding orders`,
-        );
+        expect(() => service.componentInstance.createOrder(t1)).toThrow(OUTSTANDING_ORDER_MAX_ALLOWED);
+        expect(authenticationUserStoreService.addOutstandingOrder).not.toHaveBeenCalled();
       });
 
       it('should throw error if loading data older than (HISTORICAL_PRICE_RESTRICTION_YEARS)', () => {

@@ -1,8 +1,6 @@
 import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
 import {
   mockCreateUser,
-  OUTSTANDING_ORDER_MAX_ALLOWED,
-  OUTSTANDING_ORDERS_MAX_ORDERS,
   OutstandingOrder,
   PortfolioState,
   PortfolioStateHoldingBase,
@@ -335,42 +333,6 @@ describe('AuthenticationUserStoreService', () => {
     });
   });
 
-  it('should not add an order if user has more than allowed limit', () => {
-    const sellOrder = {
-      symbol: 'AAPL',
-      units: 5,
-      potentialTotalPrice: 500,
-      orderType: {
-        type: 'SELL',
-      },
-    } as OutstandingOrder;
-
-    const outstandingOrderApiService = ngMocks.get(OutstandingOrderApiService);
-    const userApiService = ngMocks.get(UserApiService);
-    const authenticationUserService = ngMocks.get(AuthenticationUserService);
-
-    ngMocks.stub(authenticationUserService, {
-      ...authenticationUserService,
-      state: {
-        ...authenticationUserService.state,
-        outstandingOrders: () => ({
-          openOrders: Array.from({ length: OUTSTANDING_ORDERS_MAX_ORDERS }, () => ({})),
-          closedOrders: [] as OutstandingOrder[],
-        }),
-      } as AuthenticationUserService['state'],
-    });
-
-    ngMocks.flushTestBed();
-
-    const service = MockRender(AuthenticationUserStoreService);
-
-    expect(() => service.componentInstance.addOutstandingOrder(sellOrder)).toThrow(OUTSTANDING_ORDER_MAX_ALLOWED);
-
-    //const user = service.componentInstance.state.getUserData();
-    expect(outstandingOrderApiService.addOutstandingOrder).not.toHaveBeenCalled();
-    expect(userApiService.updateUser).not.toHaveBeenCalled();
-  });
-
   it('should remove outstanding order - BUY order', () => {
     const buyOrder = {
       symbol: 'AAPL',
@@ -441,23 +403,5 @@ describe('AuthenticationUserStoreService', () => {
         data: [{ symbol: 'AAPL', units: 15 }], // 15 + 5
       },
     });
-  });
-
-  it('should remove outstanding order - throw error if order does not belong to user', () => {
-    const order = {
-      symbol: 'AAPL',
-      units: 10,
-      potentialTotalPrice: 500,
-      orderType: {
-        type: 'BUY',
-      },
-      userData: {
-        id: 'otherUser',
-      },
-    } as OutstandingOrder;
-
-    const service = MockRender(AuthenticationUserStoreService);
-
-    expect(() => service.componentInstance.removeOutstandingOrder(order)).toThrow('User does not have the order');
   });
 });
