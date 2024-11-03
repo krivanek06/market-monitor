@@ -1,6 +1,8 @@
-import { Injectable, InjectionToken, inject } from '@angular/core';
+import { inject, Injectable, InjectionToken } from '@angular/core';
 import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
 import {
+  OUTSTANDING_ORDER_MAX_ALLOWED,
+  OUTSTANDING_ORDERS_MAX_ORDERS,
   OutstandingOrder,
   PortfolioTransaction,
   SymbolStoreBase,
@@ -103,6 +105,12 @@ export class AuthenticationUserStoreService {
     return this.userApiService.recalculateUserPortfolioState(this.state.getUserData());
   }
 
+  /**
+   * adds a transaction to the user's portfolio - updates the user's portfolio state and holdings
+   * don't forget to VALIDATE transaction before calling this function
+   *
+   * @param transaction - transaction to add to the portfolio
+   */
   addPortfolioTransactions(transaction: PortfolioTransaction): void {
     const user = this.state.getUserData();
     const openOrders = this.state.outstandingOrders().openOrders;
@@ -134,8 +142,19 @@ export class AuthenticationUserStoreService {
     });
   }
 
+  /**
+   * Creates an outstanding order for the user - updates the user's portfolio state and holdings
+   * Don't forget to VALIDATE order before calling this function
+   * @param order
+   */
   addOutstandingOrder(order: OutstandingOrder): void {
     const user = this.state.getUserData();
+    const orders = this.state.outstandingOrders();
+
+    // prevent creating more orders than allowed
+    if (orders.openOrders.length >= OUTSTANDING_ORDERS_MAX_ORDERS) {
+      throw new Error(OUTSTANDING_ORDER_MAX_ALLOWED);
+    }
 
     // save order
     this.outstandingOrderApiService.addOutstandingOrder(order);

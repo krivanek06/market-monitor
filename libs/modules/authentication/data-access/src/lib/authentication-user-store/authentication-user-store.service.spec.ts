@@ -1,6 +1,8 @@
 import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
 import {
   mockCreateUser,
+  OUTSTANDING_ORDER_MAX_ALLOWED,
+  OUTSTANDING_ORDERS_MAX_ORDERS,
   OutstandingOrder,
   PortfolioState,
   PortfolioStateHoldingBase,
@@ -331,6 +333,42 @@ describe('AuthenticationUserStoreService', () => {
         data: [{ symbol: 'AAPL', units: 5 }], // 10 - 5
       },
     });
+  });
+
+  it('should not add an order if user has more than allowed limit', () => {
+    const sellOrder = {
+      symbol: 'AAPL',
+      units: 5,
+      potentialTotalPrice: 500,
+      orderType: {
+        type: 'SELL',
+      },
+    } as OutstandingOrder;
+
+    const outstandingOrderApiService = ngMocks.get(OutstandingOrderApiService);
+    const userApiService = ngMocks.get(UserApiService);
+    const authenticationUserService = ngMocks.get(AuthenticationUserService);
+
+    ngMocks.stub(authenticationUserService, {
+      ...authenticationUserService,
+      state: {
+        ...authenticationUserService.state,
+        outstandingOrders: () => ({
+          openOrders: Array.from({ length: OUTSTANDING_ORDERS_MAX_ORDERS }, () => ({})),
+          closedOrders: [] as OutstandingOrder[],
+        }),
+      } as AuthenticationUserService['state'],
+    });
+
+    ngMocks.flushTestBed();
+
+    const service = MockRender(AuthenticationUserStoreService);
+
+    expect(() => service.componentInstance.addOutstandingOrder(sellOrder)).toThrow(OUTSTANDING_ORDER_MAX_ALLOWED);
+
+    //const user = service.componentInstance.state.getUserData();
+    expect(outstandingOrderApiService.addOutstandingOrder).not.toHaveBeenCalled();
+    expect(userApiService.updateUser).not.toHaveBeenCalled();
   });
 
   it('should remove outstanding order - BUY order', () => {

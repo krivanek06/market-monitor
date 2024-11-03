@@ -3,7 +3,6 @@ import { MarketApiService } from '@mm/api-client';
 import {
   DATE_TOO_OLD,
   HISTORICAL_PRICE_RESTRICTION_YEARS,
-  OUTSTANDING_ORDERS_MAX_ORDERS,
   OutstandingOrder,
   PortfolioTransaction,
   TRANSACTION_INPUT_UNITS_INTEGER,
@@ -42,22 +41,6 @@ export class PortfolioCreateOperationService {
         data: PortfolioTransaction;
       } {
     const userData = this.authenticationUserService.state.getUserData();
-    const orders = this.authenticationUserService.state.outstandingOrders();
-
-    // check if the user who creates the order is the same as the user in the order
-    if (order.userData.id !== userData.id) {
-      throw new Error('User does not have the order');
-    }
-
-    // prevent creating more orders than allowed
-    if (orders.openOrders.length >= OUTSTANDING_ORDERS_MAX_ORDERS) {
-      throw new Error(`You can have maximum ${OUTSTANDING_ORDERS_MAX_ORDERS} outstanding orders`);
-    }
-
-    // only allow demo trading users to create orders
-    if (userData.userAccountType !== UserAccountEnum.DEMO_TRADING) {
-      throw new Error('User does not have the order');
-    }
 
     // check if operation validity - throws error if invalid
     this.checkTransactionOperationDataValidity(userData, order);
@@ -120,6 +103,16 @@ export class PortfolioCreateOperationService {
    * @param userData - user who wants to create the transaction
    */
   private checkTransactionOperationDataValidity(userData: UserData, order: OutstandingOrder): void {
+    // check if the user who creates the order is the same as the user in the order
+    if (order.userData.id !== userData.id) {
+      throw new Error('User does not have the order');
+    }
+
+    // only allow demo trading users to create orders
+    if (userData.userAccountType !== UserAccountEnum.DEMO_TRADING) {
+      throw new Error('User does not have the order');
+    }
+
     // negative units
     if (order.units <= 0) {
       throw new Error(TRANSACTION_INPUT_UNITS_POSITIVE);
