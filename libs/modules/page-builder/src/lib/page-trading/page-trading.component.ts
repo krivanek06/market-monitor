@@ -19,12 +19,14 @@ import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from
 import {
   OutstandingOrderCardDataComponent,
   PortfolioStateComponent,
+  PortfolioStateTransactionsComponent,
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
   FormMatInputWrapperComponent,
+  GeneralCardComponent,
   QuoteItemComponent,
   RangeDirective,
   SectionTitleComponent,
@@ -56,21 +58,56 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
     OutstandingOrderCardDataComponent,
     MatTabsModule,
     MatDividerModule,
+    GeneralCardComponent,
+    PortfolioStateTransactionsComponent,
   ],
   template: `
     <!-- account state -->
     <div class="mb-12 flex flex-col justify-between gap-8 md:flex-row">
-      <!-- account state -->
-      <app-portfolio-state
-        data-testid="page-trading-portfolio-state"
-        class="max-md:flex-1 md:basis-2/5 2xl:basis-1/3"
-        [titleColor]="ColorScheme.PRIMARY_VAR"
-        [valueColor]="ColorScheme.GRAY_DARK_VAR"
-        [showCashSegment]="state.isAccountDemoTrading()"
-        [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
-      />
+      <app-general-card title="Account" class="max-md:flex-1 md:basis-2/4 2xl:basis-2/5">
+        <div class="flex gap-x-6">
+          <!-- account state -->
+          <app-portfolio-state
+            data-testid="page-trading-portfolio-state"
+            class="w-full"
+            [titleColor]="ColorScheme.GRAY_DARK_VAR"
+            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+            [showCashSegment]="state.isAccountDemoTrading()"
+            [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
+          />
+          <!-- portfolio transactions -->
+          <app-portfolio-state-transactions
+            data-testid="page-trading-portfolio-state-transactions"
+            class="w-full"
+            [titleColor]="ColorScheme.GRAY_DARK_VAR"
+            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+            [showFees]="true"
+            [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
+          />
+        </div>
+      </app-general-card>
 
-      <div class="flex flex-col gap-6 max-md:flex-1 md:basis-3/5 lg:basis-2/5 2xl:basis-1/3">
+      <div class="flex flex-col gap-4 max-md:flex-1 md:basis-2/4 xl:basis-2/5 2xl:basis-1/3">
+        <!-- opening hours -->
+        <div class="flex justify-between text-lg">
+          <div class="text-lg">
+            Stock Market -
+            <span
+              [ngClass]="{
+                'text-wt-success': isMarketOpen(),
+                'text-wt-danger': !isMarketOpen(),
+              }"
+            >
+              {{ isMarketOpen() ? 'Open' : 'Closed' }}
+            </span>
+          </div>
+
+          <div>
+            [{{ marketOpenData()?.stockMarketHoursLocal?.openingHour }} -
+            {{ marketOpenData()?.stockMarketHoursLocal?.closingHour }}]
+          </div>
+        </div>
+
         <!-- search -->
         <app-symbol-search-basic
           data-testid="page-trading-symbol-search-basic"
@@ -218,6 +255,7 @@ export class PageTradingComponent {
   private readonly authenticationUserService = inject(AuthenticationUserStoreService);
   readonly portfolioUserFacadeService = inject(PortfolioUserFacadeService);
   readonly state = this.authenticationUserService.state;
+  readonly marketOpenData = this.marketApiService.getIsMarketOpenSignal;
 
   /**
    * track the selected holding by user, null if else is selected

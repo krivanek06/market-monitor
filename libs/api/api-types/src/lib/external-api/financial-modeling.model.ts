@@ -913,8 +913,8 @@ export type TreasuryRates = {
 export type IsStockMarketOpen = {
   stockExchangeName: string;
   stockMarketHours: {
-    openingHour: 'CLOSED' | 'OPEN';
-    closingHour: 'CLOSED' | 'OPEN';
+    openingHour: string;
+    closingHour: string;
   };
   isTheStockMarketOpen: boolean;
   isTheEuronextMarketOpen: boolean;
@@ -942,6 +942,14 @@ export type IsStockMarketOpenExtend = IsStockMarketOpen & {
    * array of all holidays from API (last 3 years and future few years)
    */
   allHolidays: string[];
+
+  /**
+   * localized stock market hours from `stockMarketHours`
+   */
+  stockMarketHoursLocal: {
+    openingHour: string;
+    closingHour: string;
+  };
 };
 
 export const financialEconomicTypesConst = [

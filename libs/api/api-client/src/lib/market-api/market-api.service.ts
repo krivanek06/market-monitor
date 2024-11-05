@@ -20,7 +20,7 @@ import {
   SymbolSummary,
   TreasureDataBySections,
 } from '@mm/api-types';
-import { chunk } from '@mm/shared/general-util';
+import { chunk, convertETToLocalTime } from '@mm/shared/general-util';
 import { isBefore } from 'date-fns';
 import { Observable, catchError, forkJoin, map, mergeMap, of, reduce, switchMap } from 'rxjs';
 import { ApiCacheService } from '../utils';
@@ -204,6 +204,13 @@ export class MarketApiService {
     return this.apiCache
       .getData<IsStockMarketOpenExtend>(`${this.cloudflareBasicAPI}/?type=market-is-open`, ApiCacheService.validity5Min)
       .pipe(
+        map((d) => ({
+          ...d,
+          stockMarketHoursLocal: {
+            openingHour: convertETToLocalTime(d.stockMarketHours.openingHour),
+            closingHour: convertETToLocalTime(d.stockMarketHours.closingHour),
+          },
+        })),
         catchError((e) => {
           console.log(e);
           return of({
@@ -216,8 +223,12 @@ export class MarketApiService {
             stockExchangeName: '',
             stockMarketHolidays: [],
             stockMarketHours: {
-              closingHour: 'CLOSED',
-              openingHour: 'CLOSED',
+              closingHour: '',
+              openingHour: '',
+            },
+            stockMarketHoursLocal: {
+              closingHour: '',
+              openingHour: '',
             },
           } satisfies IsStockMarketOpenExtend);
         }),

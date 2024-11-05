@@ -70,6 +70,7 @@ export const formatLargeNumber = (
   value?: string | number | null | unknown,
   isPercent = false,
   showDollarSign = false,
+  roundOnThousand = true,
 ): string => {
   if (!value || (!isNumber(value) && typeof value !== 'number')) {
     return 'N/A';
@@ -82,26 +83,27 @@ export const formatLargeNumber = (
     return `${rounded}%`;
   }
 
+  const castedVal = Math.abs(castedValue);
+  const thousand = 1_000;
+  const million = 1_000_000;
+  const billion = 1_000_000_000;
+  const trillion = 1_000_000_000_000;
+
   let symbol = '';
-  if (Math.abs(castedValue) >= 1000) {
-    castedValue = castedValue / 1000;
+  if (castedVal >= thousand && castedVal < million && roundOnThousand) {
+    castedValue = castedValue / thousand;
     symbol = 'K';
-  }
-
-  if (Math.abs(castedValue) >= 1000) {
-    castedValue = castedValue / 1000;
+  } else if (castedVal >= million && castedVal < billion) {
+    castedValue = castedValue / million;
     symbol = 'M';
-  }
-
-  if (Math.abs(castedValue) >= 1000) {
-    castedValue = castedValue / 1000;
+  } else if (castedVal >= billion && castedVal < trillion) {
+    castedValue = castedValue / billion;
     symbol = 'B';
-  }
-
-  if (Math.abs(castedValue) >= 1000) {
-    castedValue = castedValue / 1000;
+  } else if (castedVal >= trillion) {
+    castedValue = castedValue / trillion;
     symbol = 'T';
   }
+
   let result = castedValue.toFixed(2) + symbol;
 
   if (showDollarSign) {

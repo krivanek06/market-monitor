@@ -13,6 +13,7 @@ import {
   PortfolioHoldingsTableCardComponent,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
+  PortfolioStateOtherComponent,
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
   PortfolioTransactionChartComponent,
@@ -54,70 +55,86 @@ import {
     MatProgressSpinner,
     PortfolioTransactionsItemComponent,
     PortfolioHoldingsTableCardComponent,
+    PortfolioStateOtherComponent,
   ],
   template: `
-    <div class="mb-6 grid gap-8 sm:mb-8 xl:grid-cols-3">
-      <div
-        class="flex flex-row gap-4 max-sm:overflow-x-scroll sm:grid sm:grid-cols-2 md:gap-6 lg:grid-cols-4 xl:col-span-2"
-      >
-        <!-- portfolio state -->
-        <app-general-card class="min-h-[210px] max-sm:min-w-[315px] sm:col-span-2" title="Account">
-          <app-portfolio-state
-            data-testid="page-dashboard-portfolio-state"
-            [showSpinner]="!portfolioUserFacadeService.portfolioStateHolding() || showLoadingState()"
-            [titleColor]="ColorScheme.GRAY_DARK_VAR"
-            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-            [showCashSegment]="stateRef.isAccountDemoTrading()"
-            [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
-          />
-        </app-general-card>
+    <div class="mb-6 flex flex-col gap-8 2xl:flex-row">
+      <div class="basis-5/12">
+        <div
+          class="flex flex-row justify-around gap-4 gap-y-4 max-2xl:overflow-x-scroll md:gap-x-4 lg:pt-2 2xl:grid 2xl:grid-cols-2"
+        >
+          <!-- portfolio state -->
+          <app-general-card class="min-h-[210px] max-2xl:min-w-[600px] 2xl:col-span-2" title="Account">
+            <div class="flex gap-x-6">
+              <app-portfolio-state
+                class="basis-3/5"
+                data-testid="page-dashboard-portfolio-state"
+                [showSpinner]="!portfolioUserFacadeService.portfolioStateHolding() || showLoadingState()"
+                [titleColor]="ColorScheme.GRAY_DARK_VAR"
+                [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+                [showCashSegment]="stateRef.isAccountDemoTrading()"
+                [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
+              />
 
-        <!-- portfolio risk -->
-        <app-general-card class="min-h-[210px] max-sm:min-w-[275px]" title="Risk">
-          <app-portfolio-state-risk
-            data-testid="page-dashboard-portfolio-risk"
-            [portfolioRisk]="stateRef.getUserData().portfolioRisk"
-            [titleColor]="ColorScheme.GRAY_DARK_VAR"
-            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-          />
-        </app-general-card>
+              <app-portfolio-state-other
+                class="basis-2/5"
+                data-testid="page-dashboard-portfolio-other"
+                [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
+                [openOrders]="stateRef.outstandingOrders().openOrders"
+                [hallOfFameRank]="stateRef.getUserData().systemRank?.portfolioTotalGainsPercentage?.rank"
+                [titleColor]="ColorScheme.GRAY_DARK_VAR"
+                [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+              />
+            </div>
+          </app-general-card>
 
-        <!-- portfolio transactions -->
-        <app-general-card class="min-h-[210px] max-sm:min-w-[275px]" title="Transactions">
-          <app-portfolio-state-transactions
-            data-testid="page-dashboard-portfolio-transactions"
-            [titleColor]="ColorScheme.GRAY_DARK_VAR"
-            [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
-            [showFees]="!!stateRef.isAccountDemoTrading()"
-            [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
-          />
-        </app-general-card>
+          <!-- portfolio risk -->
+          <app-general-card class="min-h-[210px] max-2xl:min-w-[275px]" title="Risk">
+            <app-portfolio-state-risk
+              data-testid="page-dashboard-portfolio-risk"
+              [portfolioRisk]="stateRef.getUserData().portfolioRisk"
+              [titleColor]="ColorScheme.GRAY_DARK_VAR"
+              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+            />
+          </app-general-card>
+
+          <!-- portfolio transactions -->
+          <app-general-card class="min-h-[210px] max-2xl:min-w-[275px]" title="Transactions">
+            <app-portfolio-state-transactions
+              data-testid="page-dashboard-portfolio-transactions"
+              [titleColor]="ColorScheme.GRAY_DARK_VAR"
+              [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
+              [showFees]="!!stateRef.isAccountDemoTrading()"
+              [portfolioState]="portfolioUserFacadeService.portfolioStateHolding()"
+            />
+          </app-general-card>
+        </div>
       </div>
 
-      <!-- portfolio change -->
-      <app-portfolio-period-change
-        data-testid="page-dashboard-period-change"
-        [portfolioChange]="portfolioUserFacadeService.portfolioChange()"
-        class="lg:pt-2"
-      />
-    </div>
-
-    <!-- portfolio growth chart -->
-    <div class="mb-10">
-      @if (showLoadingState()) {
-        <div class="g-skeleton mt-6 h-[380px]"></div>
-      } @else {
-        <app-portfolio-growth-chart
-          data-testid="page-dashboard-portfolio-growth-chart"
-          headerTitle="Portfolio Growth"
-          chartType="balance"
-          [data]="{
-            values: portfolioUserFacadeService.portfolioGrowth(),
-          }"
-          [startCash]="stateRef.getUserData().portfolioState.startingCash"
-          [heightPx]="350"
+      <div class="basis-7/12">
+        <!-- portfolio change -->
+        <app-portfolio-period-change
+          data-testid="page-dashboard-period-change"
+          [portfolioChange]="portfolioUserFacadeService.portfolioChange()"
+          class="mb-2"
         />
-      }
+
+        <!-- portfolio growth chart -->
+        @if (showLoadingState()) {
+          <div class="g-skeleton mt-6 h-[380px]"></div>
+        } @else {
+          <app-portfolio-growth-chart
+            data-testid="page-dashboard-portfolio-growth-chart"
+            headerTitle="Portfolio Growth"
+            chartType="balance"
+            [data]="{
+              values: portfolioUserFacadeService.portfolioGrowth(),
+            }"
+            [startCash]="stateRef.getUserData().portfolioState.startingCash"
+            [heightPx]="350"
+          />
+        }
+      </div>
     </div>
 
     <div class="mb-8 grid grid-cols-1 gap-x-10 xl:grid-cols-2">

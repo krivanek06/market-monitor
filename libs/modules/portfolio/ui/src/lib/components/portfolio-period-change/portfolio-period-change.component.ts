@@ -8,7 +8,7 @@ import { PercentageIncreaseDirective } from '@mm/shared/ui';
   imports: [PercentageIncreaseDirective],
   template: `
     <div class="@container">
-      <div class="@md:grid-cols-2 @3xl:grid-cols-6 grid gap-x-6 gap-y-2">
+      <div class="@md:grid-cols-2 @xl:grid-cols-4 grid gap-x-6 gap-y-2">
         <!-- daily -->
         <div>
           <div class="@md:flex-col flex flex-row justify-between gap-1">
@@ -92,52 +92,6 @@ import { PercentageIncreaseDirective } from '@mm/shared/ui';
                 [changeValues]="{
                   changePercentage: portfolioChange()['1_month']?.valuePrct,
                   change: portfolioChange()['1_month']?.value,
-                }"
-              ></div>
-            } @else {
-              <!-- no data -->
-              <div class="text-wt-gray-medium @sm:text-lg text-center text-base">N/A</div>
-            }
-          </div>
-        </div>
-
-        <!-- quarterly -->
-        <div>
-          <div class="@md:flex-col flex flex-row justify-between gap-1">
-            <!-- name: weekly -->
-            <div class="text-wt-gray-dark @sm:text-lg whitespace-nowrap text-center text-base">Quarterly</div>
-            <!-- change: weekly -->
-            @if (portfolioChange()['3_month']) {
-              <div
-                class="justify-center text-center text-base"
-                appPercentageIncrease
-                [useCurrencySign]="true"
-                [changeValues]="{
-                  changePercentage: portfolioChange()['3_month']?.valuePrct,
-                  change: portfolioChange()['3_month']?.value,
-                }"
-              ></div>
-            } @else {
-              <!-- no data -->
-              <div class="text-wt-gray-medium @sm:text-lg text-center text-base">N/A</div>
-            }
-          </div>
-        </div>
-
-        <!-- half year -->
-        <div>
-          <div class="@md:flex-col flex flex-row justify-between gap-1">
-            <!-- name: weekly -->
-            <div class="text-wt-gray-dark @sm:text-lg whitespace-nowrap text-center text-base">Half Year</div>
-            <!-- change: weekly -->
-            @if (portfolioChange()['6_month']) {
-              <div
-                class="justify-center text-center text-base"
-                appPercentageIncrease
-                [useCurrencySign]="true"
-                [changeValues]="{
-                  changePercentage: portfolioChange()['6_month']?.valuePrct,
-                  change: portfolioChange()['6_month']?.value,
                 }"
               ></div>
             } @else {
