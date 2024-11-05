@@ -17,7 +17,11 @@ import {
   UserData,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { createTransaction, dateGetDetailsInformationFromDate } from '@mm/shared/general-util';
+import {
+  createTransaction,
+  dateGetDetailsInformationFromDate,
+  getTransactionFeesBySpending,
+} from '@mm/shared/general-util';
 
 @Injectable({
   providedIn: 'root',
@@ -143,7 +147,8 @@ export class PortfolioCreateOperationService {
     }
 
     // calculate total value
-    const totalValue = order.potentialTotalPrice;
+    const potentialFees = getTransactionFeesBySpending(order.potentialTotalPrice);
+    const totalValue = order.potentialTotalPrice + potentialFees;
 
     // BUY order
     if (order.orderType.type === 'BUY') {
