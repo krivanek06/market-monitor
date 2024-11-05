@@ -1,5 +1,10 @@
 import { faker } from '@faker-js/faker';
-import { getHistoricalPricesOnDateCF, getIsMarketOpenCF, getSymbolSummariesCF } from '@mm/api-external';
+import {
+  getHistoricalPricesOnDateCF,
+  getIsMarketOpenCF,
+  getSymbolQuotesCF,
+  getSymbolSummariesCF,
+} from '@mm/api-external';
 import {
   HistoricalPrice,
   OutstandingOrder,
@@ -26,6 +31,7 @@ import {
   getTransactionsStartDate,
   getYesterdaysDate,
   roundNDigits,
+  transformPortfolioStateHoldingToPortfolioState,
 } from '@mm/shared/general-util';
 import { format, subDays } from 'date-fns';
 import { UserRecord, getAuth } from 'firebase-admin/auth';
@@ -34,10 +40,12 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   userCollectionDemoAccountRef,
   userDocumentPortfolioGrowthRef,
+  userDocumentRef,
   userDocumentTransactionHistoryRef,
   userDocumentWatchListRef,
 } from '../database';
-import { recalculateUserPortfolioStateToUser } from '../portfolio';
+import { getPortfolioStateHoldingsUtil } from '../portfolio';
+import { userPortfolioRisk } from '../portfolio/portfolio-risk-evaluation';
 import { isFirebaseEmulator } from '../utils';
 import { userCreate } from './user-create-account';
 
@@ -222,9 +230,8 @@ export class CreateDemoAccountService {
     console.log('Created BUY transactions:', transactionsToSave.length);
 
     // update user's holdings - calculate break even price
-    const holdingsBase = getPortfolioStateHoldingBaseByTransactionsUtil(transactionsToSave);
     userData.holdingSnapshot = {
-      data: holdingsBase,
+      data: getPortfolioStateHoldingBaseByTransactionsUtil(transactionsToSave),
       lastModifiedDate: getCurrentDateDefaultFormat(),
     };
 
@@ -274,13 +281,35 @@ export class CreateDemoAccountService {
 
     // re-run holdings calculation with new SELL transactions
     const holdingsBaseUpdate = getPortfolioStateHoldingBaseByTransactionsUtil(transactionsToSave);
-    userData.holdingSnapshot = {
-      data: holdingsBaseUpdate,
-      lastModifiedDate: getCurrentDateDefaultFormat(),
-    };
 
-    // update user data - holdings
-    recalculateUserPortfolioStateToUser(userData);
+    // get symbol summaries from API
+    const partialHoldingSymbols = holdingsBaseUpdate.map((d) => d.symbol);
+    console.log(`Receiving symbol quotes for ${partialHoldingSymbols.length} symbols`);
+    const symbolQuotes = partialHoldingSymbols.length > 0 ? await getSymbolQuotesCF(partialHoldingSymbols) : [];
+    console.log(`Received symbol quotes for ${symbolQuotes.length} symbols`);
+
+    // get portfolio state
+    const portfolioStateHoldings = getPortfolioStateHoldingsUtil(transactionsToSave, holdingsBaseUpdate, symbolQuotes);
+
+    // remove holdings
+    const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
+
+    // calculation risk of investment
+    const portfolioRisk = await userPortfolioRisk(portfolioStateHoldings);
+
+    // update user
+    userDocumentRef(userData.id).update({
+      portfolioState: portfolioState,
+      holdingSnapshot: {
+        data: holdingsBaseUpdate,
+        lastModifiedDate: getCurrentDateDefaultFormat(),
+      },
+    } satisfies Partial<UserData>);
+
+    // update portfolio risk
+    userDocumentRef(userData.id).update({
+      portfolioRisk: portfolioRisk,
+    } satisfies Partial<UserData>);
 
     return transactionsToSave;
   };

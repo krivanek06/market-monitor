@@ -113,7 +113,7 @@ export const calculateUserPortfolioStateByTransactions = async (userData: UserBa
  * @param symbolSummaries - loaded summaries for user's holdings
  * @returns
  */
-const getPortfolioStateHoldingsUtil = (
+export const getPortfolioStateHoldingsUtil = (
   transactions: PortfolioTransaction[],
   partialHoldings: PortfolioStateHoldingBase[],
   symbolQuotes: SymbolQuote[],
