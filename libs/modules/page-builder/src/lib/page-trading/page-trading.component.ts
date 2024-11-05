@@ -64,12 +64,12 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
   template: `
     <!-- account state -->
     <div class="mb-12 flex flex-col justify-between gap-8 md:flex-row">
-      <app-general-card title="Account" class="max-md:flex-1 md:basis-2/4 2xl:basis-2/5">
+      <app-general-card title="Account" class="max-md:flex-1 md:basis-2/4 2xl:basis-5/12">
         <div class="flex gap-x-6">
           <!-- account state -->
           <app-portfolio-state
             data-testid="page-trading-portfolio-state"
-            class="w-full"
+            class="w-full sm:basis-3/5"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showCashSegment]="state.isAccountDemoTrading()"
@@ -78,7 +78,7 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
           <!-- portfolio transactions -->
           <app-portfolio-state-transactions
             data-testid="page-trading-portfolio-state-transactions"
-            class="w-full"
+            class="hidden w-full basis-2/5 sm:block"
             [titleColor]="ColorScheme.GRAY_DARK_VAR"
             [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             [showFees]="true"
@@ -159,7 +159,7 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
             [errorFromParent]="!symbolSummary.priceChange['5D']"
           />
           <div
-            class="lg:basis-2/5"
+            class="lg:-mt-4 lg:basis-2/5"
             [ngClass]="{
               'opacity-65': !symbolSummary.priceChange['5D'],
             }"

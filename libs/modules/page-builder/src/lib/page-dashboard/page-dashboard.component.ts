@@ -61,7 +61,7 @@ import {
     <div class="mb-6 flex flex-col gap-8 2xl:flex-row">
       <div class="basis-5/12">
         <div
-          class="flex flex-row justify-around gap-4 gap-y-4 max-2xl:overflow-x-scroll md:gap-x-4 lg:pt-2 2xl:grid 2xl:grid-cols-2"
+          class="flex flex-row justify-around gap-4 gap-y-4 max-xl:overflow-x-scroll md:gap-x-4 lg:pt-2 2xl:grid 2xl:grid-cols-2"
         >
           <!-- portfolio state -->
           <app-general-card class="min-h-[210px] max-2xl:min-w-[600px] 2xl:col-span-2" title="Account">
@@ -121,7 +121,7 @@ import {
 
         <!-- portfolio growth chart -->
         @if (showLoadingState()) {
-          <div class="g-skeleton mt-6 h-[380px]"></div>
+          <div class="g-skeleton mt-6 h-[350px]"></div>
         } @else {
           <app-portfolio-growth-chart
             data-testid="page-dashboard-portfolio-growth-chart"

@@ -6,7 +6,6 @@ import {
   PortfolioGrowth,
   PortfolioGrowthAssets,
   PortfolioTransaction,
-  SYMBOL_NOT_FOUND_ERROR,
   SymbolSummary,
   USER_ALLOWED_DEMO_ACCOUNTS_PER_IP,
   USER_ALLOWED_DEMO_ACCOUNTS_TOTAL,
@@ -38,6 +37,7 @@ import {
   userDocumentTransactionHistoryRef,
   userDocumentWatchListRef,
 } from '../database';
+import { recalculateUserPortfolioStateToUser } from '../portfolio';
 import { isFirebaseEmulator } from '../utils';
 import { userCreate } from './user-create-account';
 
@@ -87,6 +87,8 @@ export const userCreateAccountDemo = async (data: UserCreateDemoAccountInput): P
   // generate transactions in async
   demoService.generateTransactionsForRandomSymbols(newUser).then((transactions) => {
     console.log('Generated transactions, user:', newUser.personal.displayName);
+    // save holdings
+
     // create portfolio growth data
     demoService.generatePortfolioGrowthData(newUser, transactions);
     console.log('Generated portfolio growth, user:', newUser.personal.displayName);
@@ -194,7 +196,9 @@ export class CreateDemoAccountService {
     }
 
     // load all transactions at once
-    const buyTransactions = buyOperations.map((operation) => this.createPortfolioCreateOperation(operation, userData));
+    const buyTransactions = buyOperations
+      .map((operation) => this.createPortfolioCreateOperation(operation, userData))
+      .filter((d) => !!d);
 
     // determine if user has enough cash to buy
     for (const buyTransaction of buyTransactions) {
@@ -254,9 +258,9 @@ export class CreateDemoAccountService {
     }
 
     // load all transactions at once
-    const sellTransactions = sellOperations.map((operation) =>
-      this.createPortfolioCreateOperation(operation, userData),
-    );
+    const sellTransactions = sellOperations
+      .map((operation) => this.createPortfolioCreateOperation(operation, userData))
+      .filter((d) => !!d);
 
     console.log('Created SELL transactions:', sellTransactions.length);
 
@@ -267,6 +271,16 @@ export class CreateDemoAccountService {
     await userDocumentTransactionHistoryRef(userData.id).update({
       transactions: transactionsToSave,
     } satisfies UserPortfolioTransaction);
+
+    // re-run holdings calculation with new SELL transactions
+    const holdingsBaseUpdate = getPortfolioStateHoldingBaseByTransactionsUtil(transactionsToSave);
+    userData.holdingSnapshot = {
+      data: holdingsBaseUpdate,
+      lastModifiedDate: getCurrentDateDefaultFormat(),
+    };
+
+    // update user data - holdings
+    recalculateUserPortfolioStateToUser(userData);
 
     return transactionsToSave;
   };
@@ -358,7 +372,7 @@ export class CreateDemoAccountService {
     const cachedData = this.symbolHistoricalPrices.get(symbol);
 
     if (!cachedData) {
-      throw new Error(SYMBOL_NOT_FOUND_ERROR);
+      throw new Error(`Historical price not found for symbol ${symbol} on date ${usedDate}`);
     }
 
     // check if date is sooner than the first date in the data
@@ -401,14 +415,19 @@ export class CreateDemoAccountService {
     }
   };
 
-  createPortfolioCreateOperation = (data: OutstandingOrder, userData: UserData): PortfolioTransaction => {
-    const symbolPrice = this.#getHistoricalPrice(data.symbol, data.createdAt);
+  createPortfolioCreateOperation = (data: OutstandingOrder, userData: UserData): PortfolioTransaction | null => {
+    try {
+      const symbolPrice = this.#getHistoricalPrice(data.symbol, data.createdAt);
 
-    // create transaction
-    const transaction = createTransaction(userData, data, symbolPrice.close);
+      // create transaction
+      const transaction = createTransaction(userData, data, symbolPrice.close);
 
-    // return data
-    return transaction;
+      // return data
+      return transaction;
+    } catch (err) {
+      console.log('Error creating transaction:', err);
+      return null;
+    }
   };
 
   createRandomUser = (data: {
