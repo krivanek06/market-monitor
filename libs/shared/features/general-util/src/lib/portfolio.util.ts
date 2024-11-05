@@ -275,7 +275,11 @@ export const getPortfolioStateHoldingBaseByNewTransactionUtil = (
   const newTransactionProfit = currentPortfolio.transactionProfit + transaction.returnValue;
 
   const newCashOnHand =
-    currentPortfolio.startingCash - newInvested - cashOnOrders + newTransactionProfit - newTransactionFees;
+    currentPortfolio.startingCash -
+    newInvested -
+    cashOnOrders +
+    currentPortfolio.transactionProfit - // don't account current transaction profit
+    newTransactionFees;
 
   // add spent cash on open orders into balance to avoid negative balance
   const newBalance = newHoldingsBalance + newCashOnHand + cashOnOrders;

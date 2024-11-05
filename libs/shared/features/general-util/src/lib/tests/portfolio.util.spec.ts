@@ -661,8 +661,7 @@ describe('PortfolioUtil', () => {
       // calculated results
       const resultCashOnHand = roundNDigits(
         portfolio.startingCash -
-          holdings[0].invested +
-          newTransaction.returnValue -
+          holdings[0].invested -
           newTransaction.transactionFees -
           openOrders[0].potentialTotalPrice,
       );

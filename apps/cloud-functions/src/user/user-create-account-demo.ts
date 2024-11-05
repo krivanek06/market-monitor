@@ -294,9 +294,6 @@ export class CreateDemoAccountService {
     // remove holdings
     const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
 
-    // calculation risk of investment
-    const portfolioRisk = await userPortfolioRisk(portfolioStateHoldings);
-
     // update user
     userDocumentRef(userData.id).update({
       portfolioState: portfolioState,
@@ -306,10 +303,14 @@ export class CreateDemoAccountService {
       },
     } satisfies Partial<UserData>);
 
-    // update portfolio risk
-    userDocumentRef(userData.id).update({
-      portfolioRisk: portfolioRisk,
-    } satisfies Partial<UserData>);
+    // calculation risk of investment but don't wait for it
+    userPortfolioRisk(portfolioStateHoldings).then((portfolioRisk) => {
+      console.log('Portfolio risk calculated');
+      // update portfolio risk
+      userDocumentRef(userData.id).update({
+        portfolioRisk: portfolioRisk,
+      } satisfies Partial<UserData>);
+    });
 
     return transactionsToSave;
   };
