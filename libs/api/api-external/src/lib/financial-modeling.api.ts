@@ -712,6 +712,10 @@ export const getIsMarketOpen = async (
       ...data,
       currentHoliday: currentHolidayDates,
       allHolidays: allHolidays,
+      stockMarketHoursLocal: {
+        closingHour: '',
+        openingHour: '',
+      },
     } satisfies IsStockMarketOpenExtend;
 
     return holidaysThisYear;

@@ -82,5 +82,6 @@ export const transformPortfolioStateHoldingToPortfolioState = (holding: Portfoli
     startingCash: holding.startingCash,
     previousBalanceChange: roundNDigits(holding.previousBalanceChange),
     previousBalanceChangePercentage: holding.previousBalanceChangePercentage,
+    transactionProfit: holding.transactionProfit,
   };
 };

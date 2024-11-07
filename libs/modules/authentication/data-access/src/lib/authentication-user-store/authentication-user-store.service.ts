@@ -1,4 +1,4 @@
-import { Injectable, InjectionToken, inject } from '@angular/core';
+import { inject, Injectable, InjectionToken } from '@angular/core';
 import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
 import {
   OutstandingOrder,
@@ -103,6 +103,12 @@ export class AuthenticationUserStoreService {
     return this.userApiService.recalculateUserPortfolioState(this.state.getUserData());
   }
 
+  /**
+   * adds a transaction to the user's portfolio - updates the user's portfolio state and holdings
+   * don't forget to VALIDATE transaction before calling this function
+   *
+   * @param transaction - transaction to add to the portfolio
+   */
   addPortfolioTransactions(transaction: PortfolioTransaction): void {
     const user = this.state.getUserData();
     const openOrders = this.state.outstandingOrders().openOrders;
@@ -134,6 +140,11 @@ export class AuthenticationUserStoreService {
     });
   }
 
+  /**
+   * Creates an outstanding order for the user - updates the user's portfolio state and holdings
+   * Don't forget to VALIDATE order before calling this function
+   * @param order
+   */
   addOutstandingOrder(order: OutstandingOrder): void {
     const user = this.state.getUserData();
 
@@ -171,11 +182,6 @@ export class AuthenticationUserStoreService {
 
   removeOutstandingOrder(order: OutstandingOrder): void {
     const user = this.state.getUserData();
-
-    // check if user has the order
-    if (order.userData.id !== user.id) {
-      throw new Error('User does not have the order');
-    }
 
     // save order
     this.outstandingOrderApiService.deleteOutstandingOrder(order);

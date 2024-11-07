@@ -254,6 +254,7 @@ export const calculateGroupMembersPortfolioState = (
             acc.numberOfExecutedSellTransactions + curr.numberOfExecutedSellTransactions,
           startingCash: acc.startingCash + curr.startingCash,
           transactionFees: acc.transactionFees + curr.transactionFees,
+          transactionProfit: acc.transactionProfit + curr.transactionProfit,
           date: getCurrentDateDefaultFormat(),
 
           // ignore these

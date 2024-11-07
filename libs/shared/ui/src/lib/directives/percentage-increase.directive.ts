@@ -34,6 +34,7 @@ export class PercentageIncreaseDirective {
    */
   readonly changeValues = input<ChangeValues>();
   readonly currentValues = input<CurrentValues>();
+  readonly roundValOnThousands = input(true);
   /**
    * if true, it will display the currency sign inside ()
    */
@@ -53,7 +54,7 @@ export class PercentageIncreaseDirective {
   readonly currentValuesEffect = effect(() => {
     const currentValues = this.currentValues();
 
-    if (!currentValues || !currentValues.valueToCompare) {
+    if (currentValues === undefined || currentValues.valueToCompare === undefined) {
       return;
     }
     const value = currentValues.value - currentValues.valueToCompare;
@@ -144,7 +145,8 @@ export class PercentageIncreaseDirective {
       const sign = this.useCurrencySign() ? '$' : '';
 
       const changeSpan = this.renderer2.createElement('span');
-      const text = `${sign} ${formatLargeNumber(change)}`;
+
+      const text = `${sign} ${formatLargeNumber(change, false, false, this.roundValOnThousands())}`;
       const changeText =
         !!changesPercentage && !hidePercentage
           ? this.renderer2.createText(`(${text})`)

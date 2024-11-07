@@ -91,6 +91,7 @@ describe('PortfolioCalculationService', () => {
         totalGainsPercentage: 0,
         totalGainsValue: 0,
         transactionFees: 0,
+        transactionProfit: 0,
         holdings: [],
         date: getCurrentDateDetailsFormat(),
       } satisfies PortfolioStateHoldings;
@@ -138,6 +139,7 @@ describe('PortfolioCalculationService', () => {
         startingCash: 0,
         numberOfExecutedBuyTransactions: 1,
         numberOfExecutedSellTransactions: 0,
+        transactionProfit: 0,
       } satisfies PortfolioState;
       const holdings = getPortfolioStateHoldingBaseByTransactionsUtil([t1]);
 
@@ -211,6 +213,7 @@ describe('PortfolioCalculationService', () => {
         startingCash: startingCash,
         numberOfExecutedBuyTransactions: 1,
         numberOfExecutedSellTransactions: 0,
+        transactionProfit: 0,
       } satisfies PortfolioState;
       const holdings = getPortfolioStateHoldingBaseByTransactionsUtil([testTransaction_BUY_AAPL_1_Change]);
 
@@ -316,6 +319,7 @@ describe('PortfolioCalculationService', () => {
         totalGainsPercentage: calculateGrowth(currentBalance, startingCash),
         totalGainsValue: totalHoldings - aaplInvested - msftInvested - totalTransactionFees + totalReturn,
         transactionFees: totalTransactionFees,
+        transactionProfit: profit,
       } satisfies PortfolioState;
 
       // expected result

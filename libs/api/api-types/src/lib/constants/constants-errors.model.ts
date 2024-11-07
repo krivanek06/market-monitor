@@ -1,4 +1,4 @@
-import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT } from './constants.model';
+import { GROUP_MEMBER_LIMIT, GROUP_OWNER_LIMIT, OUTSTANDING_ORDERS_MAX_ORDERS } from './constants.model';
 
 // general
 export const GENERAL_NOT_SUFFICIENT_PERMISSIONS_ERROR = 'Not sufficient permissions';
@@ -40,3 +40,6 @@ export const GROUPS_USER_ALREADY_INVITED_ERROR = 'User already invited';
 export const GROUP_IS_FULL_ERROR = 'Group is full';
 export const GROUP_USER_IS_OWNER_ERROR = 'User is owner';
 export const GROUP_CLOSED = 'Group is closed';
+
+// orders
+export const OUTSTANDING_ORDER_MAX_ALLOWED = `You can have maximum ${OUTSTANDING_ORDERS_MAX_ORDERS} outstanding orders`;

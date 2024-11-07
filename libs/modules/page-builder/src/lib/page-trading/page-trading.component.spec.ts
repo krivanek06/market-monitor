@@ -27,6 +27,7 @@ import {
   OutstandingOrderCardDataComponent,
   OutstandingOrderCardDataMockComponent,
   PortfolioStateComponent,
+  PortfolioStateTransactionsComponent,
   PortfolioTransactionsTableComponent,
   PortfolioTransactionsTableComponentMock,
 } from '@mm/portfolio/ui';
@@ -38,6 +39,7 @@ import { PageTradingComponent } from './page-trading.component';
 
 describe('PageTradingComponent', () => {
   const portfolioStateS = '[data-testid="page-trading-portfolio-state"]';
+  const portfolioStateTransactionsS = '[data-testid="page-trading-portfolio-state-transactions"]';
   const searchBasicS = '[data-testid="page-trading-symbol-search-basic"]';
 
   const buttonBuy = '[data-testid="page-trading-buy-button"]';
@@ -110,6 +112,12 @@ describe('PageTradingComponent', () => {
               stockTopActive: [quoteNFLXMock, quoteAAPLMock],
             }),
           ),
+          getIsMarketOpenSignal: () => ({
+            stockMarketHoursLocal: {
+              openingHour: '',
+              closingHour: '',
+            },
+          }),
           isMarketOpenForQuote: jest.fn().mockReturnValue(true),
           getSymbolSummary: jest.fn().mockImplementation((symbol: string) => {
             switch (symbol) {
@@ -201,10 +209,14 @@ describe('PageTradingComponent', () => {
     fixture.detectChanges();
 
     const comp = ngMocks.find<PortfolioStateComponent>(portfolioStateS);
+    const transactions = ngMocks.find<PortfolioStateTransactionsComponent>(portfolioStateTransactionsS);
 
     expect(comp).toBeTruthy();
     expect(comp.componentInstance.portfolioState).toBe(portfolioUserFacadeService.portfolioStateHolding());
     expect(comp.componentInstance.showCashSegment).toBeTruthy();
+
+    expect(transactions.componentInstance.portfolioState).toBe(portfolioUserFacadeService.portfolioStateHolding());
+    expect(transactions.componentInstance.showFees).toBeTruthy();
   });
 
   it('should display symbol search component', () => {
@@ -505,8 +517,12 @@ describe('PageTradingComponent', () => {
 
     const portfolioStateComp = ngMocks.find<PortfolioStateComponent>(portfolioStateS);
     const transactionTable = ngMocks.find<PortfolioTransactionsTableComponentMock>(transactionTableS);
+    const portfolioStateTransComp = ngMocks.find<PortfolioStateTransactionsComponent>(portfolioStateTransactionsS);
 
     expect(portfolioStateComp.componentInstance.showCashSegment).toBeFalsy();
+    expect(portfolioStateTransComp.componentInstance.portfolioState).toEqual(
+      portfolioStateComp.componentInstance.portfolioState,
+    );
     expect(transactionTable.componentInstance.showActionButton()).toBeTruthy();
     expect(transactionTable.componentInstance.showTransactionFees()).toBeFalsy();
   });

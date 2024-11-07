@@ -404,22 +404,4 @@ describe('AuthenticationUserStoreService', () => {
       },
     });
   });
-
-  it('should remove outstanding order - throw error if order does not belong to user', () => {
-    const order = {
-      symbol: 'AAPL',
-      units: 10,
-      potentialTotalPrice: 500,
-      orderType: {
-        type: 'BUY',
-      },
-      userData: {
-        id: 'otherUser',
-      },
-    } as OutstandingOrder;
-
-    const service = MockRender(AuthenticationUserStoreService);
-
-    expect(() => service.componentInstance.removeOutstandingOrder(order)).toThrow('User does not have the order');
-  });
 });

@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {
+  OutstandingOrder,
   PortfolioGrowth,
   PortfolioGrowthAssets,
   PortfolioStateHoldings,
@@ -21,6 +22,7 @@ import {
   PortfolioHoldingsTableCardComponentMock,
   PortfolioPeriodChangeComponent,
   PortfolioStateComponent,
+  PortfolioStateOtherComponent,
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
   PortfolioTransactionsTableComponent,
@@ -36,6 +38,7 @@ describe('PageDashboardComponent', () => {
   const portfolioStateS = '[data-testid="page-dashboard-portfolio-state"]';
   const portfolioRiskS = '[data-testid="page-dashboard-portfolio-risk"]';
   const portfolioTransactionsS = '[data-testid="page-dashboard-portfolio-transactions"]';
+  const portfolioOtherS = '[data-testid="page-dashboard-portfolio-other"]';
 
   const growthChartBalanceS = '[data-testid="page-dashboard-portfolio-growth-chart"]';
   const growthChartMarketS = '[data-testid="page-dashboard-investment-growth-chart"]';
@@ -139,6 +142,10 @@ describe('PageDashboardComponent', () => {
             getUserPortfolioTransactionsBest: () => [] as PortfolioTransaction[],
             getUserPortfolioTransactionsWorst: () => [] as PortfolioTransaction[],
             getUserPortfolioTransactions: () => mockTransactions,
+            outstandingOrders: () => ({
+              openOrders: [] as OutstandingOrder[],
+              closedOrders: [] as OutstandingOrder[],
+            }),
           } as AuthenticationUserStoreService['state'],
         },
       })
@@ -180,6 +187,15 @@ describe('PageDashboardComponent', () => {
     expect(comp).toBeTruthy();
     expect(comp.componentInstance.portfolioState).toEqual(mockPortfolioState);
     expect(comp.componentInstance.showCashSegment).toBe(true);
+  });
+
+  it('should display PortfolioStateOtherComponent component', () => {
+    const fixture = MockRender(PageDashboardComponent);
+    fixture.detectChanges();
+
+    const comp = ngMocks.find<PortfolioStateOtherComponent>(portfolioOtherS);
+    expect(comp).toBeTruthy();
+    expect(comp.componentInstance.portfolioState).toEqual(mockPortfolioState);
   });
 
   it('should display PortfolioStateRiskComponent component', () => {
