@@ -1,7 +1,9 @@
 import { inject, Injectable } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { TradingSimulatorApiService } from '@mm/api-client';
 import { TradingSimulator, TradingSimulatorSymbol } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { distinctUntilChanged, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,6 +11,26 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 export class TradingSimulatorFacadeService {
   private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+
+  readonly authUserTradingSimulatorOwner = toSignal(
+    toObservable(this.authenticationUserStoreService.state.getUserDataNormal).pipe(
+      distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
+      switchMap((userData) =>
+        userData ? this.tradingSimulatorApiService.getTradingSimulatorByOwner(userData.id) : [],
+      ),
+    ),
+    { initialValue: [] },
+  );
+
+  readonly authUserTradingSimulatorParticipant = toSignal(
+    toObservable(this.authenticationUserStoreService.state.getUserDataNormal).pipe(
+      distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
+      switchMap((userData) =>
+        userData ? this.tradingSimulatorApiService.getTradingSimulatorByParticipant(userData.id) : [],
+      ),
+    ),
+    { initialValue: [] },
+  );
 
   createTradingSimulator(data: {
     tradingSimulator: TradingSimulator;

@@ -768,6 +768,7 @@ export class TradingSimulatorFormComponent {
       symbolAvailable: formData.symbolsHistoricalData.length,
       symbols: formData.symbolsHistoricalData.map((d) => d.symbol),
       currentParticipants: 0,
+      participants: [],
       cashStartingValue: formData.startingCash,
       cashAdditionalIssued: formData.cashIssuedEnabled ? formData.cashIssued : [],
       marginTrading: formData.marginTradingEnabled ? formData.marginTrading : null,

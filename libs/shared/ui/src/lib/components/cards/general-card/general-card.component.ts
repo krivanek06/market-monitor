@@ -1,18 +1,26 @@
-import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { NgClass, NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, contentChild, Directive, inject, input, TemplateRef } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
+@Directive({
+  selector: '[appGeneralCardActionContent]',
+  standalone: true,
+})
+export class GeneralCardActionContentDirective {
+  readonly tpl = inject(TemplateRef);
+}
+
 @Component({
   selector: 'app-general-card',
   standalone: true,
-  imports: [NgClass, MatCardModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [NgClass, MatCardModule, MatIconModule, MatProgressSpinnerModule, NgTemplateOutlet],
   template: `
     <mat-card appearance="outlined" [class]="additionalClasses() + ' ' + 'h-full shadow-md'">
       <!-- title -->
       @if (title()) {
-        <mat-card-header [ngClass]="{ 'justify-center': titleCenter() }">
+        <mat-card-header>
           <mat-card-title class="flex items-center gap-2">
             @if (titleImgUrl()) {
               <img appDefaultImg [src]="titleImgUrl()" />
@@ -53,6 +61,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
           </div>
         }
       </mat-card-content>
+
+      <!-- action button -->
+      @if (contentAction()) {
+        <mat-card-actions>
+          <ng-container [ngTemplateOutlet]="contentAction()?.tpl ?? null" />
+        </mat-card-actions>
+      }
     </mat-card>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,6 +90,8 @@ export class GeneralCardComponent {
   readonly titleSize = input<'lg' | 'base'>('base');
   readonly matIcon = input<string | undefined>();
   readonly additionalClasses = input('');
-  readonly titleCenter = input(false);
+  //readonly showActionSection = input(false);
   readonly showLoadingState = input(false);
+
+  readonly contentAction = contentChild(GeneralCardActionContentDirective);
 }

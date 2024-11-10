@@ -45,12 +45,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
       <!-- top index quotes -->
       @if (marketTopIndexQuotes(); as marketTopIndexQuotes) {
         @for (index of marketTopIndexQuotes; track index.name) {
-          <app-general-card
-            [title]="index.name"
-            [titleCenter]="true"
-            additionalClasses="min-w-max px-6 py-3"
-            titleScale="large"
-          >
+          <app-general-card [title]="index.name" additionalClasses="min-w-max px-6 py-3" titleScale="large">
             <div class="flex items-center justify-center gap-3 text-base">
               <span>{{ index.summary.quote.price | number: '1.2-2' }}</span>
               <span

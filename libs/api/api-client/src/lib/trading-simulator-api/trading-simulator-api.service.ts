@@ -45,6 +45,16 @@ export class TradingSimulatorApiService {
     initialValue: { live: [], open: [], historical: [] },
   });
 
+  getTradingSimulatorByOwner(ownerId: string): Observable<TradingSimulator[]> {
+    return rxCollectionData(query(this.getTradingSimulatorCollection(), where('owner.id', '==', ownerId)));
+  }
+
+  getTradingSimulatorByParticipant(participantId: string): Observable<TradingSimulator[]> {
+    return rxCollectionData(
+      query(this.getTradingSimulatorCollection(), where('participants', 'array-contains', participantId)),
+    );
+  }
+
   getTradingSimulatorById(id: string): Observable<TradingSimulator | undefined> {
     return rxDocData(this.getTradingSimulatorDocRef(id));
   }

@@ -92,6 +92,11 @@ export type TradingSimulator = TradingSimulatorBase & {
   symbols: string[];
 
   /**
+   * userIds who are participating in the trading simulator
+   */
+  participants: string[];
+
+  /**
    * possible to add more cash to the participating users
    */
   cashAdditionalIssued: {
