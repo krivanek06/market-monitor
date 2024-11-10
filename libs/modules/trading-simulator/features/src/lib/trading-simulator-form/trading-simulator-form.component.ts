@@ -746,6 +746,7 @@ export class TradingSimulatorFormComponent {
 
   private getTradingSimulatorFormData(): TradingSimulator {
     const formData = this.form.getRawValue();
+    const formDataMore = this.formData();
 
     const existing = this.existingTradingSimulator();
 
@@ -762,6 +763,8 @@ export class TradingSimulatorFormComponent {
       oneRoundDurationSeconds: formData.roundIntervalSeconds,
       state: 'draft',
       startDateTime: formData.startTime?.toISOString() ?? currentTimeRoundedTo10Minutes,
+      endDateTime: formDataMore.endTime?.toISOString() ?? currentTimeRoundedTo10Minutes,
+      totalTimeSeconds: formDataMore.totalTimeSeconds,
       symbolAvailable: formData.symbolsHistoricalData.length,
       symbols: formData.symbolsHistoricalData.map((d) => d.symbol),
       currentParticipants: 0,

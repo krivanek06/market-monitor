@@ -26,6 +26,16 @@ export type TradingSimulatorBase = {
   startDateTime: string;
 
   /**
+   * date when this simulation will end - format: 'YYYY-MM-DDTHH:mm:ss' (new Date().toISOString())
+   */
+  endDateTime: string;
+
+  /**
+   * total time in seconds how long the trading simulator will be active
+   */
+  totalTimeSeconds: number;
+
+  /**
    * code that is needed to join the trading simulator
    * if empty, then anybody can join it
    */
