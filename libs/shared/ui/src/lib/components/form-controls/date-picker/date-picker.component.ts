@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, forwardRef, inject, input, signal, viewChild } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { NgxMatTimepickerComponent, NgxMatTimepickerModule } from 'ngx-mat-timepicker';
 import { filterNil } from 'ngxtension/filter-nil';
-import { combineLatest, map, of, startWith, switchMap, tap } from 'rxjs';
+import { map, of, startWith, switchMap, tap } from 'rxjs';
 
 export interface InputTypeDateTimePickerConfig {
   minDate?: Date | string;
@@ -72,7 +72,9 @@ export interface InputTypeDateTimePickerConfig {
           'border-wt-danger': hasError(),
         }"
       >
-        <span [ngClass]="{ 'text-wt-danger': hasError() }">{{ displayDateString() }}</span>
+        <span [ngClass]="{ 'text-wt-danger': hasError() }">
+          {{ displayDateString() ?? 'Please select a date' }}
+        </span>
         <mat-icon [color]="hasError() ? 'warn' : ''">calendar_month</mat-icon>
       </button>
 
@@ -119,6 +121,7 @@ export class DatePickerComponent implements ControlValueAccessor {
   readonly hasError = input(false);
   readonly type = input<'date' | 'datetime'>('date');
   readonly showCancelDate = input(true);
+  readonly roundToNear = input<null | '10_MINUTES' | 'QUARTER'>(null);
 
   readonly isDisabled = signal(false);
 
@@ -130,27 +133,7 @@ export class DatePickerComponent implements ControlValueAccessor {
   /** selected time in format: HH:mm */
   readonly selectedTime = new FormControl<string | null>(null);
 
-  readonly displayDateString = toSignal(
-    combineLatest([
-      this.selectedDate.valueChanges.pipe(startWith(this.selectedDate.value)),
-      this.selectedTime.valueChanges.pipe(startWith(this.selectedTime.value)),
-    ]).pipe(
-      map(([date, time]) => {
-        const type = this.type();
-
-        if (!date) {
-          return 'Please select a date';
-        }
-
-        if (type === 'date') {
-          return this.datePipe.transform(date, 'dd. MMMM, YYYY');
-        }
-
-        return `${time}, ${this.datePipe.transform(date, 'dd. MMMM, YYYY')}`;
-      }),
-    ),
-    { initialValue: 'Please select a date' },
-  );
+  readonly displayDateString = signal<string | null>(null);
 
   defaultDateFilter: DateFilterFn<any> = (d: Date) => true;
 
@@ -196,10 +179,31 @@ export class DatePickerComponent implements ControlValueAccessor {
                 ),
               ),
         ),
-        tap(console.log),
+        map((date) => {
+          if (!date) {
+            return null;
+          }
+
+          if (this.roundToNear() === '10_MINUTES') {
+            const minutes = date.getMinutes();
+            const roundedMinutes = Math.round(minutes / 10) * 10;
+            date.setMinutes(roundedMinutes);
+          }
+
+          if (this.roundToNear() === 'QUARTER') {
+            const minutes = date.getMinutes();
+            const roundedMinutes = Math.round(minutes / 15) * 15;
+            date.setMinutes(roundedMinutes);
+          }
+
+          return date;
+        }),
         takeUntilDestroyed(),
       )
-      .subscribe((res) => this.onChange(res));
+      .subscribe((res) => {
+        this.onChange(res);
+        this.displayDateString.set(this.formatDate(res));
+      });
   }
 
   onDateToggle(): void {
@@ -247,5 +251,19 @@ export class DatePickerComponent implements ControlValueAccessor {
 
   setDisabledState(isDisabled: boolean): void {
     this.isDisabled.set(isDisabled);
+  }
+
+  private formatDate(date: Date | null): string | null {
+    const type = this.type();
+
+    if (!date) {
+      return 'Please select a date';
+    }
+
+    if (type === 'date') {
+      return this.datePipe.transform(date, 'dd. MMMM, YYYY');
+    }
+
+    return `${this.datePipe.transform(date, 'HH:mm dd. MMMM, YYYY')}`;
   }
 }

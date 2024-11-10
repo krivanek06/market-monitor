@@ -49,6 +49,10 @@ export class TradingSimulatorApiService {
     return rxDocData(this.getTradingSimulatorDocRef(id));
   }
 
+  addTradingSimulator(data: TradingSimulator): void {
+    setDoc(this.getTradingSimulatorDocRef(data.id), data);
+  }
+
   updateTradingSimulatorById(id: string, data: Partial<TradingSimulator>): void {
     setDoc(this.getTradingSimulatorDocRef(id), data, { merge: true });
   }

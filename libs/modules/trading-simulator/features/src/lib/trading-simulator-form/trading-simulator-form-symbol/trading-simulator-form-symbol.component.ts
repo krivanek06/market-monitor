@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, forwardRef, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  forwardRef,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   ControlValueAccessor,
@@ -13,7 +23,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarketApiService } from '@mm/api-client';
-import { STOCK_SYMBOLS, SymbolHistoricalPeriods } from '@mm/api-types';
+import { STOCK_SYMBOLS, SymbolHistoricalPeriods, TradingSimulatorSymbol } from '@mm/api-types';
 import {
   GenericChartSeries,
   intervalValidator,
@@ -29,10 +39,7 @@ import {
   SliderControlComponent,
   SliderControlConfig,
 } from '@mm/shared/ui';
-import { filterNil } from 'ngxtension/filter-nil';
-import { catchError, filter, firstValueFrom, of } from 'rxjs';
-
-export type TradingSimulatorFormData = { symbol: string; historicalData: { day: number; price: number }[] };
+import { catchError, firstValueFrom, of } from 'rxjs';
 
 @Component({
   selector: 'app-trading-simulator-form-symbol',
@@ -146,7 +153,7 @@ export type TradingSimulatorFormData = { symbol: string; historicalData: { day: 
           <app-form-mat-input-wrapper
             inputCaption="Units to issue"
             inputType="NUMBER"
-            [formControl]="group.controls.value"
+            [formControl]="group.controls.units"
             class="flex-1"
           />
 
@@ -182,6 +189,8 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   /** whether to display remove button */
   readonly disabledRemove = input<boolean>(false);
 
+  // todo - on editing patch values to the form
+
   readonly marketChange = input<
     {
       startingRound?: number;
@@ -213,7 +222,7 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
     unitsAdditionalIssued: new FormArray<
       FormGroup<{
         issuedOnRound: FormControl<number>;
-        value: FormControl<number>;
+        units: FormControl<number>;
       }>
     >([]),
     /** possible to multiply every historical value by N times */
@@ -265,7 +274,7 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
       opacity: 0.8,
       data: Array.from(
         { length: maxRounds },
-        (_, i) => data.unitsAdditionalIssued?.find((d) => d.issuedOnRound === i + 1)?.value ?? null,
+        (_, i) => data.unitsAdditionalIssued?.find((d) => d.issuedOnRound === i + 1)?.units ?? null,
       ),
     };
 
@@ -275,31 +284,42 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   /** available symbols to choose from */
   readonly STOCK_SYMBOLS = STOCK_SYMBOLS;
 
-  constructor() {
+  readonly formDataEffect = effect(() => {
+    const historicalDataModified = this.formDataChartSeries().at(0)?.data as number[];
+    const formData = this.formData();
+    const maxRounds = this.maximumRounds();
+
+    if (!this.form.valid) {
+      return;
+    }
+
+    const data: TradingSimulatorSymbol = {
+      symbol: formData.symbol ?? 'Unknown',
+      unitsCurrentlyAvailable: formData.unitsAvailableOnStart ?? 0,
+      unitsAvailableOnStart: formData.unitsAvailableOnStart ?? 0,
+      unitsAdditionalIssued:
+        formData.unitsAdditionalIssued?.map((d) => ({
+          issuedOnRound: d.issuedOnRound ?? 0,
+          units: d.units ?? 0,
+        })) ?? [],
+      // save modified historical data
+      historicalDataModified: Array.from({ length: historicalDataModified.length }, (_, i) => ({
+        round: i + 1,
+        price: historicalDataModified[i],
+      })),
+      // save original historical data
+      historicalDataOriginal: Array.from({ length: maxRounds }, (_, i) => ({
+        round: i + 1,
+        price: formData.historicalData?.at(i)?.price ?? 0,
+      })),
+    };
+
     // notify the parent component about the change
-    this.form.valueChanges
-      .pipe(
-        filterNil(),
-        filter(() => this.form.valid),
-        takeUntilDestroyed(),
-      )
-      .subscribe((res) => {
-        console.log('form value', res);
-        const historicalDataModified = this.formDataChartSeries().at(0)?.data as number[];
+    this.onChange(data);
+    this.onTouched();
+  });
 
-        const data: TradingSimulatorFormData = {
-          symbol: res.symbol ?? 'Unknown',
-          historicalData: Array.from({ length: historicalDataModified.length }, (_, i) => ({
-            day: i + 1,
-            price: historicalDataModified[i],
-          })),
-        };
-
-        // notify the parent component about the change
-        this.onChange(data);
-        this.onTouched();
-      });
-
+  constructor() {
     // disable the unitsAvailableOnStart when unitsInfinity is checked
     this.form.controls.unitsInfinity.valueChanges.pipe(takeUntilDestroyed()).subscribe((res) => {
       if (res) {
@@ -316,7 +336,7 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
     this.fillFormData();
   }
 
-  onChange: (value: TradingSimulatorFormData) => void = () => {
+  onChange: (value: TradingSimulatorSymbol) => void = () => {
     /** */
   };
   onTouched = () => {
@@ -330,7 +350,7 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
         nonNullable: true,
         validators: [positiveNumberValidator, requiredValidator],
       }),
-      value: new FormControl<number>(100, {
+      units: new FormControl<number>(100, {
         nonNullable: true,
         validators: [positiveNumberValidator, requiredValidator],
       }),
@@ -373,7 +393,7 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
     this.loadingSymbolData.set(false);
   }
 
-  writeValue(obj: TradingSimulatorFormData): void {
+  writeValue(obj: TradingSimulatorSymbol): void {
     console.log('writeValue', obj);
   }
 

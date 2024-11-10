@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { TradingSimulatorApiService } from '@mm/api-client';
+import { TradingSimulator, TradingSimulatorSymbol } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 
 @Injectable({
@@ -9,15 +10,27 @@ export class TradingSimulatorFacadeService {
   private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
 
-  createTradingSimulator(data: any): void {
+  createTradingSimulator(data: {
+    tradingSimulator: TradingSimulator;
+    tradingSimulatorSymbol: TradingSimulatorSymbol[];
+  }): void {
+    // save trading simulator
+    this.tradingSimulatorApiService.addTradingSimulator(data.tradingSimulator);
+
+    // save trading simulator symbols
+    data.tradingSimulatorSymbol.forEach((symbol) => {
+      this.tradingSimulatorApiService.setTradingSimulatorByIdSymbol(data.tradingSimulator.id, symbol);
+    });
+  }
+
+  updateTradingSimulator(data: {
+    tradingSimulator: TradingSimulator;
+    tradingSimulatorSymbol: TradingSimulatorSymbol[];
+  }): void {
     // todo
   }
 
-  updateTradingSimulatorById(id: string, data: any): void {
-    // todo
-  }
-
-  deleteTradingSimulatorById(id: string): void {
+  deleteTradingSimulator(id: string): void {
     // todo - check if owner is deleting it
   }
 

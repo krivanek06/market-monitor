@@ -6,17 +6,26 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDivider } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { TradingSimulatorApiService } from '@mm/api-client';
-import { TRADING_SIMULATOR_MAX_ROUNDS, TradingSimulator } from '@mm/api-types';
+import { Router } from '@angular/router';
+import { TRADING_SIMULATOR_MAX_ROUNDS, TradingSimulator, TradingSimulatorSymbol } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import {
   intervalValidator,
   maxLengthValidator,
   minLengthValidator,
   positiveNumberValidator,
   requiredValidator,
+  ROUTES_MAIN,
 } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { generateRandomString, getCurrentDateDefaultFormat } from '@mm/shared/general-util';
+import {
+  createUUID,
+  generateRandomString,
+  getCurrentDateAndTimeRoundedTo,
+  getCurrentDateDefaultFormat,
+  getCurrentDateDetailsFormat,
+  transformUserToBaseMin,
+} from '@mm/shared/general-util';
 import {
   DatePickerComponent,
   DateReadablePipe,
@@ -29,13 +38,11 @@ import {
   SliderControlConfig,
   TruncatePipe,
 } from '@mm/shared/ui';
+import { TradingSimulatorFacadeService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorInfoButtonComponent } from '@mm/trading-simulator/ui';
 import { addSeconds } from 'date-fns';
 import { map, startWith } from 'rxjs';
-import {
-  TradingSimulatorFormData,
-  TradingSimulatorFormSymbolComponent,
-} from './trading-simulator-form-symbol/trading-simulator-form-symbol.component';
+import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-symbol/trading-simulator-form-symbol.component';
 
 @Component({
   selector: 'app-trading-simulator-form',
@@ -82,6 +89,7 @@ import {
             [inputTypeDateTimePickerConfig]="startTimeConfig"
             [formControl]="form.controls.startTime"
             type="datetime"
+            roundToNear="10_MINUTES"
             [hasError]="form.controls.startTime.touched && form.controls.startTime.invalid"
           />
 
@@ -107,6 +115,7 @@ import {
           <app-form-mat-input-wrapper
             inputCaption="starting cash"
             hintText="Starting cash for each user in the simulator"
+            inputType="NUMBER"
             [formControl]="form.controls.startingCash"
           />
 
@@ -425,8 +434,10 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingSimulatorFormComponent {
-  private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
+  private readonly tradingSimulatorFacadeService = inject(TradingSimulatorFacadeService);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly router = inject(Router);
 
   readonly constFields = {
     maxRounds: TRADING_SIMULATOR_MAX_ROUNDS,
@@ -505,22 +516,63 @@ export class TradingSimulatorFormComponent {
       }),
     }),
 
-    /** modify the return of symbols historical data - imitate market crashes, bubbles, etc. */
-    returnChange: new FormArray<
-      FormGroup<{
-        from: FormControl<string>;
-        to: FormControl<string>;
-        returnChange: FormControl<number>;
-      }>
-    >([]),
-
     // symbols - start with some default symbols
-    symbolsHistoricalData: new FormArray<FormControl<TradingSimulatorFormData>>([
-      new FormControl({ symbol: '', historicalData: [] }, { nonNullable: true }),
-      new FormControl({ symbol: '', historicalData: [] }, { nonNullable: true }),
-      new FormControl({ symbol: '', historicalData: [] }, { nonNullable: true }),
-      new FormControl({ symbol: '', historicalData: [] }, { nonNullable: true }),
-      new FormControl({ symbol: '', historicalData: [] }, { nonNullable: true }),
+    symbolsHistoricalData: new FormArray<FormControl<TradingSimulatorSymbol>>([
+      new FormControl(
+        {
+          symbol: '',
+          unitsAvailableOnStart: 0,
+          unitsCurrentlyAvailable: 0,
+          unitsAdditionalIssued: [],
+          historicalDataModified: [],
+          historicalDataOriginal: [],
+        },
+        { nonNullable: true },
+      ),
+      new FormControl(
+        {
+          symbol: '',
+          unitsAvailableOnStart: 0,
+          unitsCurrentlyAvailable: 0,
+          unitsAdditionalIssued: [],
+          historicalDataModified: [],
+          historicalDataOriginal: [],
+        },
+        { nonNullable: true },
+      ),
+      new FormControl(
+        {
+          symbol: '',
+          unitsAvailableOnStart: 0,
+          unitsCurrentlyAvailable: 0,
+          unitsAdditionalIssued: [],
+          historicalDataModified: [],
+          historicalDataOriginal: [],
+        },
+        { nonNullable: true },
+      ),
+      new FormControl(
+        {
+          symbol: '',
+          unitsAvailableOnStart: 0,
+          unitsCurrentlyAvailable: 0,
+          unitsAdditionalIssued: [],
+          historicalDataModified: [],
+          historicalDataOriginal: [],
+        },
+        { nonNullable: true },
+      ),
+      new FormControl(
+        {
+          symbol: '',
+          unitsAvailableOnStart: 0,
+          unitsCurrentlyAvailable: 0,
+          unitsAdditionalIssued: [],
+          historicalDataModified: [],
+          historicalDataOriginal: [],
+        },
+        { nonNullable: true },
+      ),
     ]),
   });
 
@@ -583,7 +635,7 @@ export class TradingSimulatorFormComponent {
 
   onSubmit(): void {
     this.form.markAllAsTouched();
-    console.log('form', this.form.value);
+    const userData = this.authenticationUserStoreService.state.getUserData();
 
     // invalid form
     if (this.form.invalid) {
@@ -591,19 +643,47 @@ export class TradingSimulatorFormComponent {
       return;
     }
 
-    // update the existing trading simulator
-    if (this.existingTradingSimulator()) {
+    if (!userData.featureAccess?.createTradingSimulator) {
+      this.dialogServiceUtil.showNotificationBar('You do not have access to create trading simulator', 'error');
       return;
     }
 
-    // todo - create a new trading simulator
+    const tradingSimulator = this.getTradingSimulatorFormData();
+    const tradingSimulatorSymbol = this.getTradingSimulatorSymbolData();
+
+    if (this.existingTradingSimulator()) {
+      // update the existing trading simulator
+      this.tradingSimulatorFacadeService.updateTradingSimulator({
+        tradingSimulator,
+        tradingSimulatorSymbol,
+      });
+
+      // notify user
+      this.dialogServiceUtil.showNotificationBar('Trading simulator updated', 'success');
+    } else {
+      // create a new trading simulator
+      this.tradingSimulatorFacadeService.createTradingSimulator({
+        tradingSimulator,
+        tradingSimulatorSymbol,
+      });
+
+      // notify user
+      this.dialogServiceUtil.showNotificationBar('Trading simulator created', 'success');
+
+      // route to trading simulator
+      this.router.navigateByUrl(ROUTES_MAIN.TRADING_SIMULATOR);
+    }
   }
 
   onAddSymbol(): void {
     // create form group for symbol
-    const symbolForm: TradingSimulatorFormData = {
+    const symbolForm: TradingSimulatorSymbol = {
       symbol: '',
-      historicalData: [],
+      unitsAvailableOnStart: 0,
+      unitsCurrentlyAvailable: 0,
+      unitsAdditionalIssued: [],
+      historicalDataModified: [],
+      historicalDataOriginal: [],
     };
 
     // create control
@@ -614,7 +694,6 @@ export class TradingSimulatorFormComponent {
   }
 
   onRemoveSymbol(index: number): void {
-    console.log('remove symbol', index);
     this.form.controls.symbolsHistoricalData.removeAt(index);
   }
 
@@ -662,8 +741,52 @@ export class TradingSimulatorFormComponent {
   }
 
   onRemoveIssuedCash(index: number): void {
-    // remove the form group from the form array
     this.form.controls.cashIssued.removeAt(index);
+  }
+
+  private getTradingSimulatorFormData(): TradingSimulator {
+    const formData = this.form.getRawValue();
+
+    const existing = this.existingTradingSimulator();
+
+    const currentTimeRoundedTo10Minutes = getCurrentDateAndTimeRoundedTo('10_MINUTES');
+    const user = this.authenticationUserStoreService.state.getUserData();
+
+    const result: TradingSimulator = {
+      id: existing?.id ?? createUUID(),
+      name: formData.name,
+      createdDate: existing?.createdDate ?? getCurrentDateDetailsFormat(),
+      updatedDate: getCurrentDateDetailsFormat(),
+      invitationCode: formData.invitationCode,
+      maximumRounds: formData.maximumRounds,
+      oneRoundDurationSeconds: formData.roundIntervalSeconds,
+      state: 'draft',
+      startDateTime: formData.startTime?.toISOString() ?? currentTimeRoundedTo10Minutes,
+      symbolAvailable: formData.symbolsHistoricalData.length,
+      symbols: formData.symbolsHistoricalData.map((d) => d.symbol),
+      currentParticipants: 0,
+      cashStartingValue: formData.startingCash,
+      cashAdditionalIssued: formData.cashIssuedEnabled ? formData.cashIssued : [],
+      marginTrading: formData.marginTradingEnabled ? formData.marginTrading : null,
+      marketChange: formData.marketChange,
+      owner: transformUserToBaseMin(user),
+    };
+
+    return result;
+  }
+
+  private getTradingSimulatorSymbolData(): TradingSimulatorSymbol[] {
+    return this.form.getRawValue().symbolsHistoricalData.map(
+      (d) =>
+        ({
+          symbol: d.symbol,
+          unitsAvailableOnStart: d.unitsAvailableOnStart,
+          unitsCurrentlyAvailable: d.unitsAvailableOnStart,
+          unitsAdditionalIssued: d.unitsAdditionalIssued,
+          historicalDataModified: d.historicalDataModified,
+          historicalDataOriginal: d.historicalDataOriginal,
+        }) satisfies TradingSimulatorSymbol,
+    );
   }
 
   private changeFormMarketChangeValidation(enabled: boolean): void {

@@ -16,6 +16,11 @@ export type TradingSimulatorBase = {
   createdDate: string;
 
   /**
+   * date when this simulation was last updated
+   */
+  updatedDate: string;
+
+  /**
    * date when this simulation will start - format: 'YYYY-MM-DDTHH:mm:ss' (new Date().toISOString())
    */
   startDateTime: string;
@@ -34,8 +39,8 @@ export type TradingSimulatorBase = {
   /**
    * state of the trading simulator
    *
-   * draft - admin is setting up the trading simulator, not yet visible for public
-   * live - trading simulator is live and users can play it
+   * draft - user is setting up the trading simulator, not yet visible for public
+   * live - trading simulator is live, visible for public, and users can join
    * started - trading simulator is started and users can't join it anymore
    * finished - trading simulator is finished and users can't play it anymore
    */
@@ -60,6 +65,11 @@ export type TradingSimulatorBase = {
    * how many symbols are available in the trading simulator -> symbols.length()
    */
   symbolAvailable: number;
+
+  /**
+   * person who created the trading simulator
+   */
+  owner: UserBaseMin;
 };
 
 /**
@@ -87,22 +97,26 @@ export type TradingSimulator = TradingSimulatorBase & {
    * modify the return of symbols historical data
    * imitate market crashes, bubbles, etc.
    */
-  returnChange: {
-    modifiedOnRound: number[];
-    returnChange: number; // example: 11.5 is 11.5%
+  marketChange: {
+    /** on which round to influence prices */
+    startingRound: number;
+    /** on which round to stop influencing prices */
+    endingRound: number;
+    /** how much in % to influence market */
+    valueChange: number;
   }[];
 
   /**
    * possible to enable margin trading for users
    */
-  marginTrading?: {
+  marginTrading: {
     /** number of days (periods) how often a $$ amount should be subtracted from an user */
     subtractPeriodDays: number;
     /** amount (in %) of the borrowing value to subtract from the user */
     subtractInterestRate: number;
     /** rate which user can take out margin, example: 3 -> 3:1 */
     marginConversionRate: number;
-  };
+  } | null;
 };
 
 /**
@@ -163,10 +177,18 @@ export type TradingSimulatorSymbol = {
   }[];
 
   /**
+   * original historical data of a symbol
+   */
+  historicalDataOriginal: {
+    round: number;
+    price: number;
+  }[];
+
+  /**
    * modified historical data of a symbol (calculated when setting up the trading simulator)
    */
   historicalDataModified: {
-    day: number;
+    round: number;
     price: number;
   }[];
 };

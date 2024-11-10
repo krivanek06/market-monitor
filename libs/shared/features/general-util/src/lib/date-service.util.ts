@@ -120,6 +120,29 @@ export const generateDatesArrayForMonth = (data: { year: number; month: number }
   return datesArrayFormatted;
 };
 
+export const getCurrentDateAndTimeRoundedTo = (roundTo: '10_MINUTES' | 'QUARTER' | 'HOUR'): string => {
+  const date = new Date();
+  const minutes = date.getMinutes();
+  const hours = date.getHours();
+  const seconds = date.getSeconds();
+
+  if (roundTo === '10_MINUTES') {
+    const roundedMinutes = Math.round(minutes / 10) * 10;
+    date.setMinutes(roundedMinutes, 0, 0);
+  }
+
+  if (roundTo === 'QUARTER') {
+    const roundedMinutes = Math.round(minutes / 15) * 15;
+    date.setMinutes(roundedMinutes, 0, 0);
+  }
+
+  if (roundTo === 'HOUR') {
+    date.setMinutes(0, 0, 0);
+  }
+
+  return dateFormatDate(date);
+};
+
 /**
  * based on provided array of objects, it will fill out missing dates for
  * the current month

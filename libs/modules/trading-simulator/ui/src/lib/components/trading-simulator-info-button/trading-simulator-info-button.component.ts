@@ -31,12 +31,7 @@ export class TradingSimulatorInfoButtonComponent {
         {
           title: 'Start Date',
           description:
-            'The date and time when the trading simulator will start. When users will be able to trade symbols',
-        },
-        {
-          title: 'End Date',
-          description:
-            'The date and time when the trading simulator will end. When users will no longer be able to trade symbols',
+            'The date and time when the trading simulator will start. When users will be able to trade symbols. Time is rounded to the nearest 10 minutes',
         },
         {
           title: 'Total Time',
