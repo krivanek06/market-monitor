@@ -540,17 +540,20 @@ export const searchTicker = async (symbolPrefix: string | undefined, isCrypto = 
     return [];
   }
 
-  const stockExchange = 'NASDAQ,NYSE,AMEX';
   const cryptoExchange = 'CRYPTO';
-  const usedExchange = isCrypto ? cryptoExchange : stockExchange;
+
   const prefixUppercase = symbolPrefix.toUpperCase();
-  const url = `${FINANCIAL_MODELING_URL}/v3/search-ticker?query=${prefixUppercase}&limit=12&exchange=${usedExchange}&apikey=${FINANCIAL_MODELING_KEY}`;
+  let url = `${FINANCIAL_MODELING_URL}/v3/search-ticker?query=${prefixUppercase}&limit=10&apikey=${FINANCIAL_MODELING_KEY}`;
+
+  if (isCrypto) {
+    url += `&exchange=${cryptoExchange}`;
+  }
 
   const response = await fetch(url);
   const data = (await response.json()) as TickerSearch[];
 
   // check if symbol contains any of the ignored symbols
-  const filteredResponse = filterOutSymbols(data);
+  const filteredResponse = filterOutSymbols(data).filter((d) => d.currency === 'USD');
   return filteredResponse;
 };
 
