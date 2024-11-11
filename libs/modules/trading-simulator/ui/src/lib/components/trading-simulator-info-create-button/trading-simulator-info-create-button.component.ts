@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { InfoSectionComponent, InfoSectionData } from '@mm/shared/ui';
 
 @Component({
-  selector: 'app-trading-simulator-create-info-button',
+  selector: 'app-trading-simulator-info-create-button',
   standalone: true,
   imports: [InfoSectionComponent],
   template: `<app-info-section infoDisplay="dialog" [infoData]="info" />`,
@@ -13,13 +13,7 @@ import { InfoSectionComponent, InfoSectionData } from '@mm/shared/ui';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TradingSimulatorCreateInfoButtonComponent {
-  /**
-   * all - display all fields
-   * partial - don't display invitation code, issued units, and some other fields
-   */
-  readonly displayInfo = input<'all' | 'partial'>('partial');
-
+export class TradingSimulatorInfoCreateButtonComponent {
   readonly info: InfoSectionData[] = [
     {
       title: 'Basic Information',
