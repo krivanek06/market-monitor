@@ -124,7 +124,7 @@ export const appRoutes: Route[] = [
                 loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorCreateComponent),
               },
               {
-                path: ROUTES_TRADING_SIMULATOR.EDIT,
+                path: `${ROUTES_TRADING_SIMULATOR.EDIT}/:id`,
                 loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorEditComponent),
               },
               {

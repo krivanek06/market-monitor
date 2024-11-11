@@ -1,4 +1,4 @@
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { TradingSimulator, TradingSimulatorParticipatingUsers } from '@mm/api-types';
 import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent } from '@mm/shared/ui';
@@ -6,7 +6,7 @@ import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent } from '@mm/
 @Component({
   selector: 'app-trading-simulator-info-overview-button',
   standalone: true,
-  imports: [InfoButtonComponent, DatePipe, DateReadablePipe, CurrencyPipe, DefaultImgDirective],
+  imports: [InfoButtonComponent, DatePipe, DateReadablePipe, CurrencyPipe, DefaultImgDirective, UpperCasePipe],
   template: `
     <app-info-button infoDisplay="dialog" [useCustomContent]="true">
       <!-- basic info -->
@@ -18,12 +18,8 @@ import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent } from '@mm/
         </div>
 
         <div class="g-item-wrapper">
-          <span>Rounds</span>
-          <div class="space-x-1">
-            <span>{{ tradingSimulator().oneRoundDurationSeconds | dateReadable: 'seconds' }}</span>
-            <span>/</span>
-            <span>{{ tradingSimulator().maximumRounds }}</span>
-          </div>
+          <span>State</span>
+          <span>{{ tradingSimulator().state | uppercase }}</span>
         </div>
 
         <div class="g-item-wrapper">
@@ -32,8 +28,12 @@ import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent } from '@mm/
         </div>
 
         <div class="g-item-wrapper">
-          <span>State</span>
-          <span>{{ tradingSimulator().state }}</span>
+          <span>Rounds</span>
+          <div class="space-x-1">
+            <span>{{ tradingSimulator().oneRoundDurationSeconds | dateReadable: 'seconds' }}</span>
+            <span>/</span>
+            <span>{{ tradingSimulator().maximumRounds }}</span>
+          </div>
         </div>
 
         <div class="g-item-wrapper">

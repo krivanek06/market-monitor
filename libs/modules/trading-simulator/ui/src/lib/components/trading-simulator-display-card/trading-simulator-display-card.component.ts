@@ -1,5 +1,5 @@
-import { DatePipe, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { DatePipe, NgClass, UpperCasePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TradingSimulator, TradingSimulatorParticipatingUsers, UserBaseMin } from '@mm/api-types';
@@ -23,19 +23,29 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
     GeneralCardTitleRightDirective,
     DatePipe,
     DateReadablePipe,
-    NgClass,
     TruncatePipe,
     TradingSimulatorInfoOverviewButtonComponent,
+    UpperCasePipe,
+    NgClass,
   ],
   template: `
     <app-general-card [title]="tradingSimulator().name | truncate: 25">
       <!-- title right -->
       <ng-template appGeneralCardTitleRight>
-        <div>
+        <div class="flex gap-2">
+          <!-- edit -->
+          @if (tradingSimulator().owner.id === authUser().id) {
+            <button (click)="onEdit()" mat-flat-button type="button" class="w-[100px]">
+              <mat-icon>edit</mat-icon>
+              <span>Edit</span>
+            </button>
+          }
+
+          <!-- join/leave -->
           @if (isUserJoined()) {
-            <button mat-stroked-button type="button" color="warn" class="w-[100px]">Leave</button>
+            <button (click)="onLeave()" mat-stroked-button type="button" color="warn" class="w-[100px]">Leave</button>
           } @else {
-            <button mat-stroked-button type="button" color="accent" class="w-[100px]">Join</button>
+            <button (click)="onJoin()" mat-stroked-button type="button" color="accent" class="w-[100px]">Join</button>
           }
         </div>
       </ng-template>
@@ -48,12 +58,16 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
         </div>
 
         <div class="g-item-wrapper">
-          <span>Rounds</span>
-          <div class="space-x-1">
-            <span>{{ tradingSimulator().oneRoundDurationSeconds | dateReadable: 'seconds' }}</span>
-            <span>/</span>
-            <span>{{ tradingSimulator().maximumRounds }}</span>
-          </div>
+          <span>State</span>
+          <span
+            [ngClass]="{
+              'text-wt-accent-2': tradingSimulator().state === 'draft',
+              'text-wt-success': tradingSimulator().state === 'live' || tradingSimulator().state === 'started',
+              'text-wt-danger': tradingSimulator().state === 'finished',
+            }"
+          >
+            {{ tradingSimulator().state | uppercase }}
+          </span>
         </div>
 
         <div class="g-item-wrapper">
@@ -62,8 +76,12 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
         </div>
 
         <div class="g-item-wrapper">
-          <span>State</span>
-          <span>{{ tradingSimulator().state }}</span>
+          <span>Rounds</span>
+          <div class="space-x-1">
+            <span>{{ tradingSimulator().oneRoundDurationSeconds | dateReadable: 'seconds' }}</span>
+            <span>/</span>
+            <span>{{ tradingSimulator().maximumRounds }}</span>
+          </div>
         </div>
 
         <div class="g-item-wrapper">
@@ -85,7 +103,7 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
             [tradingSimulator]="tradingSimulator()"
             [participantUsers]="participantUsers()?.data ?? []"
           />
-          <button mat-stroked-button type="button" color="primary" class="w-[100px]">Visit</button>
+          <button (click)="onVisit()" mat-stroked-button type="button" color="primary" class="w-[100px]">Visit</button>
         </div>
       </ng-template>
     </app-general-card>
@@ -98,6 +116,11 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingSimulatorDisplayCardComponent {
+  readonly leaveClicked = output<void>();
+  readonly joinClicked = output<void>();
+  readonly visitClicked = output<void>();
+  readonly editClicked = output<void>();
+
   readonly tradingSimulator = input.required<TradingSimulator>();
   readonly participantUsers = input<TradingSimulatorParticipatingUsers>();
 
@@ -105,4 +128,20 @@ export class TradingSimulatorDisplayCardComponent {
   readonly authUser = input.required<UserBaseMin>();
 
   readonly isUserJoined = computed(() => this.tradingSimulator().participants.includes(this.authUser().id));
+
+  onJoin() {
+    this.joinClicked.emit();
+  }
+
+  onLeave() {
+    this.leaveClicked.emit();
+  }
+
+  onVisit() {
+    this.visitClicked.emit();
+  }
+
+  onEdit() {
+    this.editClicked.emit();
+  }
 }
