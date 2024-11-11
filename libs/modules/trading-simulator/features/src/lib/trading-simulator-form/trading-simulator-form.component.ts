@@ -150,7 +150,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           <app-form-mat-input-wrapper
             inputCaption="Subtract period days"
             inputType="NUMBER"
-            [formControl]="form.controls.marginTrading.controls.subtractPeriodDays"
+            [formControl]="form.controls.marginTrading.controls.subtractPeriodRounds"
           />
 
           <!-- subtract interest rate -->
@@ -349,7 +349,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           @if (formData().marginTradingEnabled) {
             <div class="g-item-wrapper">
               <span>Subtract period</span>
-              <span>{{ formData().marginTrading?.subtractPeriodDays }}</span>
+              <span>{{ formData().marginTrading?.subtractPeriodRounds }}</span>
             </div>
 
             <div class="g-item-wrapper">
@@ -502,7 +502,7 @@ export class TradingSimulatorFormComponent {
     // margin trading
     marginTradingEnabled: new FormControl<boolean>(true, { nonNullable: true }),
     marginTrading: new FormGroup({
-      subtractPeriodDays: new FormControl(7, {
+      subtractPeriodRounds: new FormControl(7, {
         validators: [requiredValidator, positiveNumberValidator],
         nonNullable: true,
       }),
@@ -844,8 +844,8 @@ export class TradingSimulatorFormComponent {
 
   private changeFormMarginTradingValidation(enabled: boolean): void {
     if (enabled) {
-      this.form.controls.marginTrading.controls.subtractPeriodDays.enable();
-      this.form.controls.marginTrading.controls.subtractPeriodDays.setValidators([
+      this.form.controls.marginTrading.controls.subtractPeriodRounds.enable();
+      this.form.controls.marginTrading.controls.subtractPeriodRounds.setValidators([
         requiredValidator,
         positiveNumberValidator,
       ]);
@@ -863,8 +863,8 @@ export class TradingSimulatorFormComponent {
         positiveNumberValidator,
       ]);
     } else {
-      this.form.controls.marginTrading.controls.subtractPeriodDays.disable();
-      this.form.controls.marginTrading.controls.subtractPeriodDays.clearValidators();
+      this.form.controls.marginTrading.controls.subtractPeriodRounds.disable();
+      this.form.controls.marginTrading.controls.subtractPeriodRounds.clearValidators();
 
       this.form.controls.marginTrading.controls.subtractInterestRate.disable();
       this.form.controls.marginTrading.controls.subtractInterestRate.clearValidators();
@@ -874,7 +874,7 @@ export class TradingSimulatorFormComponent {
     }
 
     // update form validation
-    this.form.controls.marginTrading.controls.subtractPeriodDays.updateValueAndValidity();
+    this.form.controls.marginTrading.controls.subtractPeriodRounds.updateValueAndValidity();
     this.form.controls.marginTrading.controls.subtractInterestRate.updateValueAndValidity();
     this.form.controls.marginTrading.controls.marginConversionRate.updateValueAndValidity();
   }

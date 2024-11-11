@@ -36,13 +36,7 @@ export class TradingSimulatorFacadeService {
     tradingSimulator: TradingSimulator;
     tradingSimulatorSymbol: TradingSimulatorSymbol[];
   }): void {
-    // save trading simulator
-    this.tradingSimulatorApiService.addTradingSimulator(data.tradingSimulator);
-
-    // save trading simulator symbols
-    data.tradingSimulatorSymbol.forEach((symbol) => {
-      this.tradingSimulatorApiService.setTradingSimulatorByIdSymbol(data.tradingSimulator.id, symbol);
-    });
+    this.tradingSimulatorApiService.createTradingSimulator(data);
   }
 
   updateTradingSimulator(data: {

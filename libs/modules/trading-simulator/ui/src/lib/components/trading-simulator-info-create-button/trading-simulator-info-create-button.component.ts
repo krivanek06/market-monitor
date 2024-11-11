@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { InfoSectionComponent, InfoSectionData } from '@mm/shared/ui';
+import { InfoButtonComponent, InfoSectionData } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-trading-simulator-info-create-button',
   standalone: true,
-  imports: [InfoSectionComponent],
-  template: `<app-info-section infoDisplay="dialog" [infoData]="info" />`,
+  imports: [InfoButtonComponent],
+  template: `<app-info-button infoDisplay="dialog" [infoData]="info" />`,
   styles: `
     :host {
       display: block;

@@ -15,18 +15,14 @@ export type InfoSectionData = {
 };
 
 @Component({
-  selector: 'app-info-section',
+  selector: 'app-info-button',
   standalone: true,
   imports: [MatButtonModule, MatDialogModule, NgTemplateOutlet, MatIconModule],
   template: `
-    @if (infoDisplay() === 'dialog') {
-      <button mat-stroked-button type="button" (click)="onOpenDialog()" class="w-full">
-        <mat-icon>info</mat-icon>
-        {{ buttonLabel() }}
-      </button>
-    } @else {
-      <ng-template [ngTemplateOutlet]="infoList" />
-    }
+    <button mat-stroked-button type="button" (click)="onOpenDialog()" class="w-full">
+      <mat-icon>info</mat-icon>
+      {{ buttonLabel() }}
+    </button>
 
     <ng-template #infoList>
       <div class="w-full lg:min-w-[700px]">
@@ -40,23 +36,27 @@ export type InfoSectionData = {
         </div>
 
         <mat-dialog-content>
-          @for (item of infoData(); track $index) {
-            <div class="mb-2 p-3">
-              <div class="text-wt-primary text-lg">{{ item.title }}</div>
+          @if (useCustomContent()) {
+            <ng-content />
+          } @else {
+            @for (item of infoData(); track $index) {
+              <div class="mb-2 p-3">
+                <div class="text-wt-primary text-lg">{{ item.title }}</div>
 
-              <!-- description -->
-              @if (item.description) {
-                <div class="mb-4 text-sm" [innerText]="item.description"></div>
-              }
+                <!-- description -->
+                @if (item.description) {
+                  <div class="mb-4 text-sm" [innerText]="item.description"></div>
+                }
 
-              <!-- items -->
-              @for (info of item.info; track $index) {
-                <div class="g-item-wrapper">
-                  <span class="min-w-[160px] max-w-[160px]">{{ info.title }}</span>
-                  <span class="flex-1">{{ info.description }}</span>
-                </div>
-              }
-            </div>
+                <!-- items -->
+                @for (info of item.info; track $index) {
+                  <div class="g-item-wrapper">
+                    <span class="min-w-[160px] max-w-[160px]">{{ info.title }}</span>
+                    <span class="flex-1">{{ info.description }}</span>
+                  </div>
+                }
+              </div>
+            }
           }
         </mat-dialog-content>
         <mat-dialog-actions>
@@ -74,12 +74,13 @@ export type InfoSectionData = {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InfoSectionComponent {
+export class InfoButtonComponent {
   private readonly dialog = inject(MatDialog);
-
-  readonly infoDisplay = input<'dialog' | 'list'>('dialog');
   readonly buttonLabel = input<string>('Info');
-  readonly infoData = input.required<InfoSectionData[]>();
+  readonly infoData = input<InfoSectionData[]>();
+
+  /** set to true if parent uses ng-content to display anything */
+  readonly useCustomContent = input<boolean>(false);
 
   readonly infoList = viewChild('infoList', { read: TemplateRef<HTMLElement> });
 

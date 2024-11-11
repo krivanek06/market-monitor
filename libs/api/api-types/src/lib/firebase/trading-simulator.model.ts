@@ -1,5 +1,5 @@
 import { DataDocsWrapper } from '../constants';
-import { PortfolioGrowth, PortfolioStateHoldingBase, PortfolioTransaction, SymbolStoreBase } from './portfolio.model';
+import { PortfolioGrowth, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
 import { UserBase, UserBaseMin } from './user.model';
 
 export type TradingSimulatorBase = {
@@ -125,8 +125,8 @@ export type TradingSimulator = TradingSimulatorBase & {
    * possible to enable margin trading for users
    */
   marginTrading: {
-    /** number of days (periods) how often a $$ amount should be subtracted from an user */
-    subtractPeriodDays: number;
+    /** number of rounds (periods) how often a $$ amount should be subtracted from an user */
+    subtractPeriodRounds: number;
     /** amount (in %) of the borrowing value to subtract from the user */
     subtractInterestRate: number;
     /** rate which user can take out margin, example: 3 -> 3:1 */
@@ -139,6 +139,11 @@ export type TradingSimulator = TradingSimulatorBase & {
  */
 export type TradingSimulatorParticipant = {
   userData: UserBaseMin;
+
+  /**
+   * current state of the user's portfolio
+   */
+  portfolioState: PortfolioState;
 
   /**
    * current user symbol holdings
@@ -206,113 +211,6 @@ export type TradingSimulatorSymbol = {
     round: number;
     price: number;
   }[];
-};
-
-/**
- * data about open orders from users
- */
-export type TradingSimulatorOrder = SymbolStoreBase & {
-  /** document ID */
-  orderId: string;
-
-  /** data of the user who created the order */
-  userData: UserBaseMin;
-
-  /** modified symbol ID */
-  displaySymbol?: string;
-
-  /** units to transact */
-  units: number;
-
-  /**
-   * status of the order
-   * open - order is active and waiting for the price to reach the desired value
-   * closed - order was fulfilled by the system
-   */
-  status: 'open' | 'closed';
-
-  /**
-   * when the order was created
-   * format: 'YYYY-MM-DDTHH:mm:ss' (new Date().toISOString())
-   */
-  createdAt: string;
-
-  /**
-   * when the order was closed (fulfilled by the system)
-   * format: 'YYYY-MM-DDTHH:mm:ss' (new Date().toISOString())
-   */
-  closedAt: string;
-
-  /**
-   * range between: 1 - maximumRounds
-   */
-  createdOnRound: number;
-  closedOnRound: number;
-
-  /** type of order */
-  orderType:
-    | {
-        /** normal market BUY order */
-        type: 'BUY';
-
-        /**
-         * (Optional) - don't buy immediately, but wait until the price of the symbol goes ABOVE this value
-         */
-        buyOrder?: number;
-
-        /**
-         * (Optional) - maximum price to buy the shares. If price goes above this value, the order is canceled
-         * only used when 'buyOrder' is defined
-         */
-        buyLimitOrder?: number;
-      }
-    | {
-        /** normal market SELL order */
-        type: 'SELL';
-
-        /**
-         * (Optional) - don't sell immediately, but wait until the price of the symbol goes BELOW this value
-         */
-        stopOrder?: number;
-
-        /**
-         * (Optional) - minimum price to sell the shares. If price goes below this value, the order is canceled
-         * only used when 'stopOrder' is defined
-         */
-        stopLimitOrder?: number;
-      }
-    | {
-        // idea: borrow -> sell -> buy -> return
-        type: 'SHORT';
-
-        /**
-         * price of the symbol when the user shorted it
-         */
-        shortedPrice: number;
-
-        /**
-         * (Optional) - trigger market SHORT order if the price of the symbol goes BELOW this value
-         */
-        shortOrder?: number;
-
-        /**
-         * interest that the user must pay for shorting the symbol
-         * example: 5.53 is 5.53%
-         */
-        interestRatePrct: number;
-
-        /**
-         * how often (in days) the interest is subtracted from the user
-         */
-        interestRatePeriodDays: number;
-
-        /**
-         * percentage value of the margin rate, if the user is is LOSS and the margin rate is reached, the user's position is closed
-         * example: 50 is 50%
-         * default: 50
-         */
-        marginRatePrct: number;
-      };
 };
 
 /**
