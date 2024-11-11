@@ -4,7 +4,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { DialogCloseHeaderComponent } from '../../headers';
 
 export type InfoSectionData = {
   title: string;
@@ -18,7 +17,7 @@ export type InfoSectionData = {
 @Component({
   selector: 'app-info-section',
   standalone: true,
-  imports: [MatButtonModule, MatDialogModule, NgTemplateOutlet, MatIconModule, DialogCloseHeaderComponent],
+  imports: [MatButtonModule, MatDialogModule, NgTemplateOutlet, MatIconModule],
   template: `
     @if (infoDisplay() === 'dialog') {
       <button mat-stroked-button type="button" (click)="onOpenDialog()" class="w-full">

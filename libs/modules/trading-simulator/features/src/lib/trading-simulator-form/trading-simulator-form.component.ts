@@ -39,7 +39,7 @@ import {
   TruncatePipe,
 } from '@mm/shared/ui';
 import { TradingSimulatorFacadeService } from '@mm/trading-simulator/data-access';
-import { TradingSimulatorInfoButtonComponent } from '@mm/trading-simulator/ui';
+import { TradingSimulatorCreateInfoButtonComponent } from '@mm/trading-simulator/ui';
 import { addSeconds } from 'date-fns';
 import { map, startWith } from 'rxjs';
 import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-symbol/trading-simulator-form-symbol.component';
@@ -63,7 +63,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
     GeneralCardComponent,
     DateReadablePipe,
     TruncatePipe,
-    TradingSimulatorInfoButtonComponent,
+    TradingSimulatorCreateInfoButtonComponent,
     TradingSimulatorFormSymbolComponent,
   ],
   template: `
@@ -77,7 +77,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           titleSize="base"
           class="mb-4"
         >
-          <app-trading-simulator-info-button class="w-[160px]" />
+          <app-trading-simulator-create-info-button class="w-[160px]" />
         </app-section-title>
 
         <div class="grid grid-cols-2 gap-x-6 gap-y-2">
