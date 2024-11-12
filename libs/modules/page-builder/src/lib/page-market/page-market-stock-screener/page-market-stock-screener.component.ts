@@ -12,6 +12,7 @@ import { SymbolSearchBasicComponent, SymbolSummaryDialogComponent } from '@mm/ma
 import { StockScreenerFormControlComponent, StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { RangeDirective, ScrollNearEndDirective, SectionTitleComponent } from '@mm/shared/ui';
+import { filterNil } from 'ngxtension/filter-nil';
 import { BehaviorSubject, catchError, exhaustMap, map, of, scan, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
@@ -79,9 +80,7 @@ export class PageMarketStockScreenerComponent {
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly dialog = inject(MatDialog);
 
-  readonly screenerFormControl = new FormControl<StockScreenerValues>(STOCK_SCREENER_DEFAULT_VALUES, {
-    nonNullable: true,
-  });
+  readonly screenerFormControl = new FormControl<StockScreenerValues | null>(null);
 
   /**
    * will emit incremented number every time user scrolls near end
@@ -90,7 +89,9 @@ export class PageMarketStockScreenerComponent {
   readonly screenerResults = toSignal(
     this.screenerFormControl.valueChanges.pipe(
       // start with the current value
-      startWith(this.screenerFormControl.value),
+      startWith(STOCK_SCREENER_DEFAULT_VALUES),
+      // filter out null values
+      filterNil(),
       // reset display items on form change
       tap(() => this.displayItems$.next([0, this.screenerDefault])),
       switchMap((screenerForm) =>
@@ -154,7 +155,7 @@ export class PageMarketStockScreenerComponent {
   );
 
   onFormReset(): void {
-    this.screenerFormControl.reset(STOCK_SCREENER_DEFAULT_VALUES);
+    this.screenerFormControl.reset(null);
   }
 
   onQuoteClick(summary: SymbolQuote): void {

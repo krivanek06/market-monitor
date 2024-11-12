@@ -32,52 +32,50 @@ import { PageStockDetailsTradesComponent } from './page-stock-details-trades/pag
     PageStockDetailsRatiosComponent,
   ],
   template: `
-    <section>
-      @if (symbolDetails(); as symbolDetails) {
-        @if (symbolDetails.action === 'loading') {
-          <div class="grid min-h-screen min-w-full place-content-center pb-[15%]">
-            <mat-spinner />
-          </div>
-        } @else if (symbolDetails.action === 'loaded') {
-          <div class="mb-6 flex items-center justify-between">
-            <button type="button" mat-stroked-button class="mt-2 min-w-[120px]" (click)="onHomeClick()">
-              <mat-icon>home</mat-icon>
-              Home
-            </button>
+    @if (symbolDetails(); as symbolDetails) {
+      @if (symbolDetails.action === 'loading') {
+        <div class="grid min-h-screen min-w-full place-content-center pb-[15%]">
+          <mat-spinner />
+        </div>
+      } @else if (symbolDetails.action === 'loaded') {
+        <div class="mb-6 flex justify-between">
+          <button type="button" mat-stroked-button class="mt-2 min-w-[120px]" (click)="onHomeClick()">
+            <mat-icon>home</mat-icon>
+            Home
+          </button>
 
-            <!-- main navigation -->
-            <app-tab-select-control
-              class="w-full md:w-[450px] xl:w-auto"
-              [formControl]="routesStockDetailsControl"
-              [displayOptions]="routesStockDetails"
-              screenLayoutSplit="LAYOUT_XL"
-            />
-          </div>
+          <!-- main navigation -->
+          <app-tab-select-control
+            class="w-full md:w-[450px] xl:w-auto"
+            [formControl]="routesStockDetailsControl"
+            [displayOptions]="routesStockDetails"
+            screenLayoutSplit="LAYOUT_XL"
+          />
+        </div>
 
-          <!-- child routes -->
-          @switch (routesStockDetailsControl.value) {
-            @case (ROUTES_STOCK_DETAILS.OVERVIEW) {
-              <app-page-details-overview [stockDetailsSignal]="symbolDetails.data.stockDetails" />
-            }
-            @case (ROUTES_STOCK_DETAILS.FINANCIALS) {
-              <app-page-stock-details-financials [stockDetailsSignal]="symbolDetails.data.stockDetails" />
-            }
+        <!-- child routes -->
+        @switch (routesStockDetailsControl.value) {
+          @case (ROUTES_STOCK_DETAILS.OVERVIEW) {
+            <app-page-details-overview [stockDetailsSignal]="symbolDetails.data.stockDetails" />
+          }
+          @case (ROUTES_STOCK_DETAILS.FINANCIALS) {
+            <app-page-stock-details-financials [stockDetailsSignal]="symbolDetails.data.stockDetails" />
+          }
 
-            @case (ROUTES_STOCK_DETAILS.RATIOS) {
-              <app-page-stock-details-ratios [stockDetailsSignal]="symbolDetails.data.stockDetails" />
-            }
+          @case (ROUTES_STOCK_DETAILS.RATIOS) {
+            <app-page-stock-details-ratios [stockDetailsSignal]="symbolDetails.data.stockDetails" />
+          }
 
-            @case (ROUTES_STOCK_DETAILS.TRADES) {
-              <app-page-stock-details-trades [stockDetailsSignal]="symbolDetails.data.stockDetails" />
-            }
+          @case (ROUTES_STOCK_DETAILS.TRADES) {
+            <app-page-stock-details-trades [stockDetailsSignal]="symbolDetails.data.stockDetails" />
+          }
 
-            @case (ROUTES_STOCK_DETAILS.NEWS) {
-              <app-page-stock-details-news [stockDetailsSignal]="symbolDetails.data.stockDetails" />
-            }
+          @case (ROUTES_STOCK_DETAILS.NEWS) {
+            <app-page-stock-details-news [stockDetailsSignal]="symbolDetails.data.stockDetails" />
           }
         }
       }
-    </section>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `

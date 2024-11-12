@@ -104,7 +104,7 @@ export class StockScreenerFormControlComponent implements OnInit, ControlValueAc
     industry: new FormControl<StockIndustryTypes | null>(null),
     sector: new FormControl<StockSectorTypes | null>(null),
     exchange: new FormControl<StockExchangeTypes | null>(null),
-    marketCap: new FormControl<StockScreenerArray | null>(STOCK_SCREENER_MARKET_CAP[1].value),
+    marketCap: new FormControl<StockScreenerArray | null>(null),
     price: new FormControl<StockScreenerArray | null>(null),
     volume: new FormControl<StockScreenerArray | null>(null),
     dividends: new FormControl<StockScreenerArray | null>(null),
@@ -120,7 +120,11 @@ export class StockScreenerFormControlComponent implements OnInit, ControlValueAc
     });
   }
 
-  writeValue(obj: StockScreenerValues): void {
+  writeValue(obj: StockScreenerValues | null): void {
+    if (!obj) {
+      this.screenerFormGroup.reset({}, { emitEvent: false });
+      return;
+    }
     this.screenerFormGroup.patchValue(obj, { emitEvent: false });
   }
   /**
