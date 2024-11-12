@@ -35,12 +35,12 @@ export const appRoutes: Routes = [
             title: 'Top Performers',
             loadComponent: () => import('@mm/page-builder').then((m) => m.PageMarketTopPerformersComponent),
           },
+          {
+            path: `${ROUTES_MAIN.STOCK_DETAILS}/:symbol`,
+            title: 'Stock Details',
+            loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsComponent),
+          },
         ],
-      },
-      {
-        path: `${ROUTES_MAIN.STOCK_DETAILS}/:symbol`,
-        title: 'Stock Details',
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageStockDetailsComponent),
       },
       {
         path: '**',

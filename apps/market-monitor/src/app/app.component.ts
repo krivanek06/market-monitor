@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
   imports: [RouterModule],
   selector: 'app-root',
   template: `
-    <main class="g-screen-size-default min-h-screen">
+    <main class="min-h-screen">
       <router-outlet />
     </main>
   `,

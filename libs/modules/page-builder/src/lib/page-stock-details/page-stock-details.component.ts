@@ -38,12 +38,7 @@ import { PageStockDetailsTradesComponent } from './page-stock-details-trades/pag
           <mat-spinner />
         </div>
       } @else if (symbolDetails.action === 'loaded') {
-        <div class="mb-6 flex justify-between">
-          <button type="button" mat-stroked-button class="mt-2 min-w-[120px]" (click)="onHomeClick()">
-            <mat-icon>home</mat-icon>
-            Home
-          </button>
-
+        <div class="mb-6 flex justify-end">
           <!-- main navigation -->
           <app-tab-select-control
             class="w-full md:w-[450px] xl:w-auto"
@@ -142,8 +137,4 @@ export class PageStockDetailsComponent {
       }
     });
   });
-
-  onHomeClick(): void {
-    this.router.navigate(['']);
-  }
 }
