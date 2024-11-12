@@ -1,5 +1,15 @@
 import { DOCUMENT } from '@angular/common';
-import { AfterViewInit, Directive, ElementRef, HostListener, OnInit, inject, input, model } from '@angular/core';
+import {
+  AfterViewInit,
+  Directive,
+  ElementRef,
+  HostListener,
+  OnInit,
+  inject,
+  input,
+  model,
+  output,
+} from '@angular/core';
 
 @Directive({
   selector: '[appScrollNearEnd]',
@@ -13,6 +23,7 @@ export class ScrollNearEndDirective implements OnInit, AfterViewInit {
    * will emit incremented number every time user scrolls near end
    */
   readonly nearEnd = model<number>(0);
+  readonly nearEndEmitter = output<number>();
 
   /**
    * threshold in PX when to emit before page end scroll
@@ -67,6 +78,7 @@ export class ScrollNearEndDirective implements OnInit, AfterViewInit {
     if (scrollToBottom < this.threshold()) {
       console.log('%c [ScrollNearEndDirective]: emit', 'color: #bada55; font-size: 16px');
       this.nearEnd.set(this.nearEnd() + 1);
+      this.nearEndEmitter.emit(this.nearEnd());
     }
   }
 }

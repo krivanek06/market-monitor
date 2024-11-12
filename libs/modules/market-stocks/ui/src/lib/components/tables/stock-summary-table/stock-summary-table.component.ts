@@ -242,13 +242,15 @@ import {
       <!-- Row shown when there is no matching data. -->
       <tr class="mat-row" *matNoDataRow>
         <td class="mat-cell" colspan="13">
-          <div *ngIf="!showLoadingSkeletonSignal()" class="g-table-empty">No data has been found</div>
+          @if (!showLoadingSkeleton() && !showLoadingSkeletonManual()) {
+            <div class="g-table-empty">No data has been found</div>
+          }
         </td>
       </tr>
     </table>
 
     <!-- skeleton -->
-    <div *ngIf="showLoadingSkeletonSignal()">
+    <div *ngIf="showLoadingSkeleton() || showLoadingSkeletonManual()">
       <div *ngRange="symbolSkeletonLoaders() || 10" class="g-skeleton mb-1 h-12"></div>
     </div>
   `,
@@ -268,12 +270,12 @@ import {
   `,
 })
 export class StockSummaryTableComponent {
-  itemClickedEmitter = output<SymbolQuote>();
-  sort = viewChild(MatSort);
-  symbolQuotes = input.required<SymbolQuote[] | null | undefined>();
-  symbolSkeletonLoaders = input<number>(10);
+  readonly itemClickedEmitter = output<SymbolQuote>();
+  readonly sort = viewChild(MatSort);
+  readonly symbolQuotes = input.required<SymbolQuote[] | null | undefined>();
+  readonly symbolSkeletonLoaders = input<number>(10);
 
-  tableEffect = effect(() => {
+  readonly tableEffect = effect(() => {
     const summaries = this.symbolQuotes();
 
     // keep loading state
@@ -289,21 +291,22 @@ export class StockSummaryTableComponent {
       // update table
       this.dataSource.sort = this.sort() ?? null;
       this.dataSource._updateChangeSubscription();
-      this.showLoadingSkeletonSignal.set(false);
+      this.showLoadingSkeleton.set(false);
     });
   });
 
-  showLoadingSkeletonSignal = signal(true);
+  readonly showLoadingSkeleton = signal(true);
+  readonly showLoadingSkeletonManual = input<boolean>(false);
 
-  displayInfoMobile = signal(false);
+  readonly displayInfoMobile = signal(false);
 
   toggleDisplayedValues(): void {
     this.displayInfoMobile.set(!this.displayInfoMobile());
   }
 
-  dataSource: MatTableDataSource<SymbolQuote> = new MatTableDataSource([] as SymbolQuote[]);
+  readonly dataSource: MatTableDataSource<SymbolQuote> = new MatTableDataSource([] as SymbolQuote[]);
 
-  displayedColumns: string[] = [
+  readonly displayedColumns: string[] = [
     'symbol',
     'marketCap',
     'price',

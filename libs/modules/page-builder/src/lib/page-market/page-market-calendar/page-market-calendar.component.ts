@@ -17,7 +17,7 @@ import {
   EarningsItemComponent,
   EarningsItemsDialogComponent,
 } from '@mm/market-stocks/ui';
-import { InputSource, RouterManagement } from '@mm/shared/data-access';
+import { InputSource } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { fillOutMissingDatesForMonth, generateDatesArrayForMonth, groupValuesByDate } from '@mm/shared/general-util';
 import {
@@ -119,7 +119,7 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
     }
   `,
 })
-export class PageMarketCalendarComponent implements OnInit, RouterManagement {
+export class PageMarketCalendarComponent implements OnInit {
   private readonly marketApiService = inject(MarketApiService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
