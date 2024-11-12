@@ -149,8 +149,11 @@ export class PageMarketCalendarComponent {
   readonly calendarDataEarningsSignal = computed(() =>
     this.resolveCalendarType<CalendarStockEarning>(this.calendarDataSignal(), 'eps'),
   );
-  private calendarDataSignal = toSignal(
-    combineLatest([this.currentDateRangeControl.valueChanges, this.calendarTypeFormControl.valueChanges]).pipe(
+  private readonly calendarDataSignal = toSignal(
+    combineLatest([
+      this.currentDateRangeControl.valueChanges.pipe(startWith(this.currentDateRangeControl.value)),
+      this.calendarTypeFormControl.valueChanges.pipe(startWith(this.calendarTypeFormControl.value)),
+    ]).pipe(
       tap(() => {
         this.loadingSignal.set(true);
       }),
