@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-not-found',
+  selector: 'app-page-not-found',
   standalone: true,
   imports: [MatButtonModule, RouterModule, MatIconModule],
   template: `
@@ -29,4 +29,4 @@ import { RouterModule } from '@angular/router';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotFoundComponent {}
+export class PageNotFoundComponent {}

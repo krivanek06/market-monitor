@@ -6,19 +6,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MarketApiService, StocksApiService } from '@mm/api-client';
-import {
-  PageStockDetailsFinancialsComponent,
-  PageStockDetailsNewsComponent,
-  PageStockDetailsOverviewComponent,
-  PageStockDetailsRatiosComponent,
-  PageStockDetailsTradesComponent,
-} from '@mm/page-builder';
 import { LabelValue, ROUTES_STOCK_DETAILS } from '@mm/shared/data-access';
 import { TabSelectControlComponent } from '@mm/shared/ui';
 import { catchError, filter, forkJoin, map, startWith, switchMap } from 'rxjs';
+import { PageStockDetailsFinancialsComponent } from './page-stock-details-financials/page-stock-details-financials.component';
+import { PageStockDetailsNewsComponent } from './page-stock-details-news/page-stock-details-news.component';
+import { PageStockDetailsOverviewComponent } from './page-stock-details-overview/page-stock-details-overview.component';
+import { PageStockDetailsRatiosComponent } from './page-stock-details-ratios/page-stock-details-ratios.component';
+import { PageStockDetailsTradesComponent } from './page-stock-details-trades/page-stock-details-trades.component';
 
 @Component({
-  selector: 'app-stock-details',
+  selector: 'app-page-stock-details',
   standalone: true,
   imports: [
     RouterModule,
@@ -83,7 +81,7 @@ import { catchError, filter, forkJoin, map, startWith, switchMap } from 'rxjs';
     }
   `,
 })
-export class StockDetailsComponent {
+export class PageStockDetailsComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly stocksApiService = inject(StocksApiService);

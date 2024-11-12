@@ -8,6 +8,7 @@ export * from './page-hall-of-fame/page-hall-of-fame.component';
 export * from './page-login/page-login.component';
 export * from './page-market';
 export * from './page-menu/page-menu.component';
+export * from './page-not-found/page-not-found.component';
 export * from './page-search/page-search.component';
 export * from './page-stock-details';
 export * from './page-trading/page-trading.component';

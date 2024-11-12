@@ -179,27 +179,27 @@ export class MenuSideNavigationComponent implements OnInit {
         //   icon: 'search',
         // },
         {
-          path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.STOCK_SCREENER}`,
+          path: ROUTES_MAIN.STOCK_SCREENER,
           title: 'Screener',
           icon: 'query_stats',
         },
         {
-          path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.TOP_PERFORMERS}`,
+          path: ROUTES_MAIN.TOP_PERFORMERS,
           title: 'Performers',
           icon: 'travel_explore',
         },
         {
-          path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.ECONOMICS}`,
+          path: ROUTES_MAIN.ECONOMICS,
           title: 'Economics',
           icon: 'storefront',
         },
         {
-          path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.MARKET_CALENDAR}`,
+          path: ROUTES_MAIN.MARKET_CALENDAR,
           title: 'Calendar',
           icon: 'calendar_month',
         },
         {
-          path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.NEWS}`,
+          path: ROUTES_MAIN.NEWS,
           title: 'News',
           icon: 'newspaper',
         },
