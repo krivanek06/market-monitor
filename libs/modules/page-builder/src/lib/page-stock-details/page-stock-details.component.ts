@@ -39,7 +39,12 @@ import { PageStockDetailsTradesComponent } from './page-stock-details-trades/pag
             <mat-spinner />
           </div>
         } @else if (symbolDetails.action === 'loaded') {
-          <div class="mb-6 flex justify-end">
+          <div class="mb-6 flex items-center justify-between">
+            <button type="button" mat-stroked-button class="mt-2 min-w-[120px]" (click)="onHomeClick()">
+              <mat-icon>home</mat-icon>
+              Home
+            </button>
+
             <!-- main navigation -->
             <app-tab-select-control
               class="w-full md:w-[450px] xl:w-auto"
@@ -77,7 +82,7 @@ import { PageStockDetailsTradesComponent } from './page-stock-details-trades/pag
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
-      @apply mt-4 block;
+      display: block;
     }
   `,
 })
