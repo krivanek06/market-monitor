@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { DASHBOARD_VERSION_TOKEN } from '@mm/api-types';
 import { AuthenticationFormComponent } from '@mm/authentication/authentication-forms';
 
 @Component({
@@ -7,6 +8,7 @@ import { AuthenticationFormComponent } from '@mm/authentication/authentication-f
   standalone: true,
   imports: [AuthenticationFormComponent],
   template: `
+    <span class="absolute left-0 top-0 hidden md:block">Version: {{ version }}</span>
     <section class="c-wrapper">
       <div class="mx-auto flex min-h-lvh max-w-[1660px] flex-col gap-y-10 lg:flex-row">
         <!-- left side -->
@@ -91,6 +93,7 @@ import { AuthenticationFormComponent } from '@mm/authentication/authentication-f
 })
 export class PageLoginComponent {
   private document = inject(DOCUMENT);
+  readonly version = inject(DASHBOARD_VERSION_TOKEN);
   constructor() {
     this.document.body.classList.add('dark-theme');
   }

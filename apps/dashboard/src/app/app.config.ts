@@ -16,6 +16,7 @@ import {
   withPreloading,
   withViewTransitions,
 } from '@angular/router';
+import { DASHBOARD_VERSION_TOKEN } from '@mm/api-types';
 import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { environment } from '../environments/environment';
@@ -55,6 +56,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: AUTHENTICATION_ACCOUNT_TOKEN,
       useExisting: AuthenticationUserStoreService,
+    },
+    {
+      provide: DASHBOARD_VERSION_TOKEN,
+      useValue: environment.version,
     },
     {
       provide: IS_DEV_TOKEN,
