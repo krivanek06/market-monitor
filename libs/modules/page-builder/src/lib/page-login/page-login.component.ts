@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { DASHBOARD_VERSION_TOKEN } from '@mm/api-types';
+import { DASHBOARD_VERSION_TOKEN } from '@mm/api-client';
 import { AuthenticationFormComponent } from '@mm/authentication/authentication-forms';
 
 @Component({

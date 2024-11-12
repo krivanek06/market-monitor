@@ -16,7 +16,7 @@ import {
   withPreloading,
   withViewTransitions,
 } from '@angular/router';
-import { DASHBOARD_VERSION_TOKEN } from '@mm/api-types';
+import { DASHBOARD_VERSION_TOKEN } from '@mm/api-client';
 import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { environment } from '../environments/environment';
