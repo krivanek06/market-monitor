@@ -673,7 +673,7 @@ export const getStockScreening = async (values: StockScreenerValues): Promise<St
   const searchParams = getStockScreeningSearchParams(values);
   const searchParamsValues = String(searchParams).length > 0 ? `${searchParams}&` : '';
 
-  const url = `${FINANCIAL_MODELING_URL}/v3/stock-screener?${searchParamsValues}limit=300&apikey=${FINANCIAL_MODELING_KEY}`;
+  const url = `${FINANCIAL_MODELING_URL}/v3/stock-screener?${searchParamsValues}limit=300&isActivelyTrading=true&apikey=${FINANCIAL_MODELING_KEY}`;
   const response = await fetch(url);
   const data = (await response.json()) as StockScreenerResults[];
 

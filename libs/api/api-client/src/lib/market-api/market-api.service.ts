@@ -22,7 +22,7 @@ import {
 } from '@mm/api-types';
 import { chunk, convertETToLocalTime } from '@mm/shared/general-util';
 import { isBefore } from 'date-fns';
-import { Observable, catchError, forkJoin, map, mergeMap, of, reduce, switchMap } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ApiCacheService } from '../utils';
 
 @Injectable({
@@ -145,39 +145,12 @@ export class MarketApiService {
       );
   }
 
-  getStockScreening(screeningValue: StockScreenerValues): Observable<SymbolQuote[]> {
-    return this.apiCache
-      .postData<
-        StockScreenerResults[],
-        StockScreenerValues
-      >('https://get-stock-screening.krivanek1234.workers.dev', screeningValue, ApiCacheService.validity5Min)
-      .pipe(
-        map((stockScreeningResults) => {
-          // create multiple requests
-          const checkSize = 40;
-          const symbolsChunks = stockScreeningResults
-            .map((data) => data.symbol)
-            .reduce((acc, symbol, index) => {
-              // if (index % checkSize === 0) then create new array with symbol else add symbol to last array
-              return index % checkSize === 0
-                ? [...acc, [symbol]]
-                : [...acc.slice(0, -1), [...acc[acc.length - 1], symbol]];
-            }, [] as string[][]);
-
-          return symbolsChunks;
-        }),
-        // load summaries for chunks
-        switchMap((symbolsChunks) =>
-          // return empty array on error
-          forkJoin(symbolsChunks.map((chunk) => this.getSymbolQuotes(chunk).pipe(catchError(() => [])))),
-        ),
-        // flatten
-        mergeMap((d) => d),
-        // sort by ID
-        map((d) => d.slice().sort((a, b) => a.symbol.localeCompare(b.symbol))),
-        // Combine all summaries into a single array and emit only once
-        reduce((acc, curr) => [...acc, ...curr], [] as SymbolQuote[]),
-      );
+  getStockScreening(screeningValue: StockScreenerValues): Observable<StockScreenerResults[]> {
+    return this.apiCache.postData<StockScreenerResults[], StockScreenerValues>(
+      'https://get-stock-screening.krivanek1234.workers.dev',
+      screeningValue,
+      ApiCacheService.validity5Min,
+    );
   }
 
   getNews(newsType: NewsTypes, symbol = ''): Observable<News[]> {

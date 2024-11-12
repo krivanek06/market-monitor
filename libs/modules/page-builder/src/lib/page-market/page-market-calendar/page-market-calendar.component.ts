@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@mm/api-client';
 import { CalendarAssetDataTypes, CalendarDividend, CalendarStockEarning } from '@mm/api-types';
 import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
@@ -17,7 +16,7 @@ import {
   EarningsItemComponent,
   EarningsItemsDialogComponent,
 } from '@mm/market-stocks/ui';
-import { InputSource, RouterManagement } from '@mm/shared/data-access';
+import { InputSource } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { fillOutMissingDatesForMonth, generateDatesArrayForMonth, groupValuesByDate } from '@mm/shared/general-util';
 import {
@@ -119,10 +118,8 @@ import { Observable, combineLatest, filter, map, startWith, switchMap, take, tap
     }
   `,
 })
-export class PageMarketCalendarComponent implements OnInit, RouterManagement {
+export class PageMarketCalendarComponent {
   private readonly marketApiService = inject(MarketApiService);
-  private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
   private readonly dialog = inject(MatDialog);
 
   readonly currentDateRangeControl = new FormControl<CalendarRange>(CalendarRageToday, { nonNullable: true });
@@ -152,16 +149,13 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
   readonly calendarDataEarningsSignal = computed(() =>
     this.resolveCalendarType<CalendarStockEarning>(this.calendarDataSignal(), 'eps'),
   );
-
-  ngOnInit(): void {
-    this.loadQueryParams();
-  }
-
-  private calendarDataSignal = toSignal(
-    combineLatest([this.currentDateRangeControl.valueChanges, this.calendarTypeFormControl.valueChanges]).pipe(
-      tap(([dateRange, calendarType]) => {
+  private readonly calendarDataSignal = toSignal(
+    combineLatest([
+      this.currentDateRangeControl.valueChanges.pipe(startWith(this.currentDateRangeControl.value)),
+      this.calendarTypeFormControl.valueChanges.pipe(startWith(this.calendarTypeFormControl.value)),
+    ]).pipe(
+      tap(() => {
         this.loadingSignal.set(true);
-        this.updateQueryParams(calendarType, dateRange);
       }),
       switchMap(([dateRange, calendarType]) =>
         this.resolveCalendarAPICall(calendarType, dateRange.month, dateRange.year).pipe(
@@ -223,38 +217,6 @@ export class PageMarketCalendarComponent implements OnInit, RouterManagement {
 
   onDividendClick(data: CalendarDividend): void {
     this.showStockSummary(data.symbol);
-  }
-
-  loadQueryParams(): void {
-    const type = this.route.snapshot.queryParams?.['type'];
-    const year = Number(this.route.snapshot.queryParams?.['year']);
-    const month = Number(this.route.snapshot.queryParams?.['month']);
-    const selectedType = this.calendarTypeInputSource.find((e) => e.value === type);
-
-    // all of them must be present
-    if (!type || !selectedType || isNaN(year) || isNaN(month)) {
-      // trigger value change for both
-      this.calendarTypeFormControl.setValue(this.calendarTypeInputSource[0].value);
-      this.currentDateRangeControl.setValue(CalendarRageToday);
-      return;
-    }
-
-    this.calendarTypeFormControl.setValue(selectedType.value);
-    this.currentDateRangeControl.setValue({
-      year,
-      month,
-    });
-  }
-
-  updateQueryParams(data: (typeof this.calendarTypeInputSource)[number]['value'], range: CalendarRange): void {
-    this.router.navigate([], {
-      queryParams: {
-        type: data,
-        month: range.month,
-        year: range.year,
-      },
-      queryParamsHandling: 'merge',
-    });
   }
 
   private showStockSummary(symbol: string): void {

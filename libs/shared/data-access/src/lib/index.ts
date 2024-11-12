@@ -7,6 +7,5 @@ export * from './form-controls.model';
 export * from './generic-chart.model';
 export * from './injection.token.model';
 export * from './name-value.model';
-export * from './router.model';
 export * from './screen-layout.model';
 export * from './value-present-item.model';

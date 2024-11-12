@@ -1,24 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
-import { ActivatedRoute, Router } from '@angular/router';
 import { MarketApiService } from '@mm/api-client';
 import { StockScreenerValues, SymbolQuote } from '@mm/api-types';
-import {
-  STOCK_SCREENER_DEFAULT_VALUES,
-  getScreenerInputIndexByKey,
-  getScreenerInputValueByKey,
-} from '@mm/market-stocks/data-access';
+import { STOCK_SCREENER_DEFAULT_VALUES } from '@mm/market-stocks/data-access';
 import { SymbolSearchBasicComponent, SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { StockScreenerFormControlComponent, StockSummaryTableComponent } from '@mm/market-stocks/ui';
-import { RouterManagement } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { RangeDirective, ScrollNearEndDirective, SectionTitleComponent } from '@mm/shared/ui';
-import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
+import { filterNil } from 'ngxtension/filter-nil';
+import { BehaviorSubject, catchError, exhaustMap, map, of, scan, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-page-market-stock-screener',
@@ -56,28 +51,21 @@ import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
       </div>
 
       <div class="mt-8 flex items-center justify-between">
-        <h3>Total found: {{ screenerResults().isLoading ? 'Loading...' : screenerResults().data.length }}</h3>
+        <h3>Total found: {{ screenerResults().isLoading ? 'Loading...' : screenerResults().total }}</h3>
 
         <button (click)="onFormReset()" mat-stroked-button color="warn">Reset Form</button>
       </div>
     </section>
 
     <!-- table of results -->
-    @if (!screenerResults().isLoading) {
-      <section class="mt-6">
-        <app-stock-summary-table
-          appScrollNearEnd
-          [(nearEnd)]="maxScreenerResults"
-          (itemClickedEmitter)="onQuoteClick($event)"
-          [symbolQuotes]="screenerResults().data | slice: 0 : maxScreenerResults() * screenerDefault"
-        />
-      </section>
-    } @else {
-      <!-- loading screen -->
-      <div class="mt-12">
-        <div *ngRange="20" class="g-skeleton mb-1 h-14"></div>
-      </div>
-    }
+    <app-stock-summary-table
+      appScrollNearEnd
+      (nearEndEmitter)="onNearEnd()"
+      (itemClickedEmitter)="onQuoteClick($event)"
+      [symbolQuotes]="screenerResults().data"
+      [showLoadingSkeletonManual]="screenerResults().isLoading"
+      [symbolSkeletonLoaders]="screenerDefault"
+    />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -86,53 +74,88 @@ import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
     }
   `,
 })
-export class PageMarketStockScreenerComponent implements OnInit, RouterManagement {
+export class PageMarketStockScreenerComponent {
   readonly screenerDefault = 30;
   private readonly marketApiService = inject(MarketApiService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly dialog = inject(MatDialog);
-  private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
 
-  readonly screenerFormControl = new FormControl<StockScreenerValues>(STOCK_SCREENER_DEFAULT_VALUES, {
-    nonNullable: true,
-  });
+  readonly screenerFormControl = new FormControl<StockScreenerValues | null>(null);
 
   /**
    * will emit incremented number every time user scrolls near end
    */
-  readonly maxScreenerResults = signal(1);
+  readonly displayItems$ = new BehaviorSubject<[number, number]>([0, this.screenerDefault]);
   readonly screenerResults = toSignal(
     this.screenerFormControl.valueChanges.pipe(
-      tap((formValue) => {
-        // set max results to 1
-        this.maxScreenerResults.set(1);
-        // update url
-        this.updateQueryParams(formValue);
-      }),
-      switchMap((values) =>
-        this.marketApiService.getStockScreening(values).pipe(
-          map((data) => ({
-            data: data,
-            isLoading: false,
-          })),
-          startWith({ data: [], isLoading: true }),
+      // start with the current value
+      startWith(STOCK_SCREENER_DEFAULT_VALUES),
+      // filter out null values
+      filterNil(),
+      // reset display items on form change
+      tap(() => this.displayItems$.next([0, this.screenerDefault])),
+      switchMap((screenerForm) =>
+        this.marketApiService.getStockScreening(screenerForm).pipe(
+          switchMap((screenerResults) =>
+            this.displayItems$.pipe(
+              map((displayItemsLimit) => {
+                const [start, end] = displayItemsLimit;
+
+                // no more results
+                if (screenerResults.length < start) {
+                  return [];
+                }
+
+                // only a few results left
+                if (screenerResults.length < end) {
+                  return screenerResults.slice(start);
+                }
+
+                // return the next batch
+                return screenerResults.slice(start, end);
+              }),
+              // get the symbols
+              map((batch) => batch.map((quote) => quote.symbol)),
+              // load quote data from API
+              exhaustMap((symbols) =>
+                this.marketApiService.getSymbolQuotes(symbols).pipe(
+                  map((quotes) => ({
+                    total: screenerResults.length,
+                    data: quotes,
+                    isLoading: false as const,
+                  })),
+                  // display loading screen when loading more quotes
+                  startWith({ data: [], total: screenerResults.length, isLoading: true as const }),
+                  catchError((err) => {
+                    this.dialogServiceUtil.handleError(err);
+                    return of({ data: [], total: 0, isLoading: false as const });
+                  }),
+                ),
+              ),
+            ),
+          ),
+          scan(
+            (acc, data) => ({
+              data: [...acc.data, ...data.data],
+              isLoading: data.isLoading,
+              total: data.total,
+            }),
+            {
+              total: 0,
+              data: [] as SymbolQuote[],
+              isLoading: false,
+            },
+          ),
+          // display loading screen on form change
+          startWith({ data: [], total: 0, isLoading: true as const }),
         ),
       ),
-      catchError(() => {
-        this.dialogServiceUtil.showNotificationBar('Error loading screener results', 'error');
-        return of({ data: [], isLoading: false });
-      }),
     ),
-    { initialValue: { data: [], isLoading: true } },
+    { initialValue: { data: [], total: 0, isLoading: true } },
   );
 
-  ngOnInit(): void {
-    this.loadQueryParams();
-  }
-
   onFormReset(): void {
-    this.screenerFormControl.reset(STOCK_SCREENER_DEFAULT_VALUES);
+    this.screenerFormControl.reset(null);
   }
 
   onQuoteClick(summary: SymbolQuote): void {
@@ -144,46 +167,8 @@ export class PageMarketStockScreenerComponent implements OnInit, RouterManagemen
     });
   }
 
-  /**
-   * method triggers the this.screenerFormControl.valueChanges observable
-   */
-  loadQueryParams(): void {
-    const queryParamSection = this.route.snapshot.queryParams?.['sections'];
-    if (queryParamSection) {
-      const sections = queryParamSection.split('_') as string[];
-      const formValue = sections.reduce((acc, section) => {
-        const [key, valueIndex] = section.split(':') as [keyof StockScreenerValues, string];
-        const value = getScreenerInputValueByKey(key, Number(valueIndex));
-
-        return { ...acc, [key]: value };
-      }, {} as StockScreenerValues);
-
-      this.screenerFormControl.setValue(formValue);
-    } else {
-      this.screenerFormControl.setValue(STOCK_SCREENER_DEFAULT_VALUES);
-    }
-  }
-
-  updateQueryParams(formValue: StockScreenerValues): void {
-    // creates a string to save into query params: sections=marketCap:1_price:3_
-    const dataToSave = Object.entries(formValue)
-      .reduce((acc, [key, value]) => {
-        const castedKey = key as keyof StockScreenerValues;
-        const keyIndex = getScreenerInputIndexByKey(castedKey, value);
-
-        const result = value ? `${castedKey}:${[keyIndex]}` : '';
-        return [...acc, result];
-      }, [] as string[])
-      // filter out empty strings
-      .filter((value) => value)
-      // join with underscore
-      .join('_');
-
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        sections: dataToSave,
-      },
-    });
+  onNearEnd() {
+    const prev = this.displayItems$.value[1];
+    this.displayItems$.next([prev, prev + this.screenerDefault]);
   }
 }

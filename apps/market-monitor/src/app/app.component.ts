@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
   imports: [RouterModule],
   selector: 'app-root',
   template: `
-    <main class="min-h-screen min-w-full">
+    <main class="min-h-screen">
       <router-outlet />
     </main>
   `,

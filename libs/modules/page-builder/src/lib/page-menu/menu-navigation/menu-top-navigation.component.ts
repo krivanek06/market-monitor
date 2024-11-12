@@ -1,14 +1,5 @@
-import { CommonModule, DOCUMENT } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  TemplateRef,
-  inject,
-  output,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { DOCUMENT, NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, TemplateRef, inject, output, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -27,15 +18,13 @@ import { filter, map, startWith } from 'rxjs';
   selector: 'app-menu-top-navigation',
   standalone: true,
   imports: [
-    CommonModule,
+    NgClass,
     RouterModule,
     MatIconModule,
-    DefaultImgDirective,
     MatButtonModule,
-    UserAccountTypeDirective,
-    UserSettingsDialogComponent,
     MatDialogModule,
-    HelpDialogComponent,
+    UserAccountTypeDirective,
+    DefaultImgDirective,
     SymbolSearchBasicComponent,
   ],
   template: `
@@ -241,7 +230,7 @@ import { filter, map, startWith } from 'rxjs';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MenuTopNavigationComponent implements OnInit {
+export class MenuTopNavigationComponent {
   readonly menuClickEmitter = output<void>();
   private readonly router = inject(Router);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
@@ -254,7 +243,16 @@ export class MenuTopNavigationComponent implements OnInit {
   readonly userDataSignal = this.authenticationUserStoreService.state.userData;
 
   readonly ROUTES_MAIN = ROUTES_MAIN;
-  readonly activeLinkSignal = signal<ROUTES_MAIN>(ROUTES_MAIN.DASHBOARD);
+  readonly activeLinkSignal = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationStart),
+      map((event) => event.url),
+      startWith(this.router.url),
+      map((url) => url.replace('/', '') as string),
+    ),
+    { initialValue: '' },
+  );
+
   readonly pageName = toSignal(
     this.router.events.pipe(
       filter((event) => event instanceof NavigationStart),
@@ -276,18 +274,11 @@ export class MenuTopNavigationComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-    // check if url is different than activeLinkSignal
-    const url = this.router.url.replace('/', '') as ROUTES_MAIN;
-    this.activeLinkSignal.set(url);
-  }
-
   onMenuClick() {
     this.menuClickEmitter.emit();
   }
 
   onNavClick(navigation: ROUTES_MAIN) {
-    this.activeLinkSignal.set(navigation);
     this.router.navigate([navigation]);
   }
 

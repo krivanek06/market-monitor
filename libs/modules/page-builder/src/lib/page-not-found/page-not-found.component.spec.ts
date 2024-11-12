@@ -2,7 +2,7 @@ import { ComponentFixture } from '@angular/core/testing';
 import { MockBuilder, MockRender } from 'ng-mocks';
 import { PageNotFoundComponent } from './page-not-found.component';
 
-describe('NotFoundComponent', () => {
+describe('PageNotFoundComponent', () => {
   let component: PageNotFoundComponent;
   let fixture: ComponentFixture<PageNotFoundComponent>;
 

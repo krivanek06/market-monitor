@@ -29,7 +29,6 @@ import { PageMarketTopPerformersComponent } from './page-market-top-performers/p
       [displayOptions]="marketTabs"
       screenLayoutSplit="LAYOUT_LG"
     />
-
     <section>
       <!-- child routes -->
       @switch (currentRouteControl.value) {

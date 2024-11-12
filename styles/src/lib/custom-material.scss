@@ -59,6 +59,11 @@ $mat-theming-dark: mat.m2-define-dark-theme(
   )
 );
 
+:root {
+  // display labels in input forms
+  --mat-form-field-filled-label-display: block;
+}
+
 // @include mat.typography-hierarchy($custom-typography);
 // @include mat.button-typography($custom-typography);
 @include mat.all-component-themes($mat-theming-light);
