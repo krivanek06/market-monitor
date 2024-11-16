@@ -8,7 +8,7 @@ import { distinctUntilChanged, switchMap } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class TradingSimulatorStateService {
+export class TradingSimulatorStoreService {
   private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
 
