@@ -1,5 +1,6 @@
 import { DataDocsWrapper } from '../constants';
 import { PortfolioGrowth, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
+import { RankingItem } from './ranking.model';
 import { UserBase, UserBaseMin } from './user.model';
 
 export type TradingSimulatorBase = {
@@ -239,7 +240,10 @@ export type TradingSimulatorLatestData = {
 /**
  * user ranking in the trading simulator, updates on each next round
  */
-export type TradingSimulatorUserRanking = DataDocsWrapper<UserBase>;
+export type TradingSimulatorUserRanking = DataDocsWrapper<{
+  user: UserBase;
+  rank: RankingItem;
+}>;
 
 /**
  * users who will be participating in the trading simulator
