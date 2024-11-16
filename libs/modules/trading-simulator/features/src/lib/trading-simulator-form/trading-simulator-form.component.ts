@@ -38,7 +38,7 @@ import {
   SliderControlConfig,
   TruncatePipe,
 } from '@mm/shared/ui';
-import { TradingSimulatorFacadeService } from '@mm/trading-simulator/data-access';
+import { TradingSimulatorStateService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorInfoCreateButtonComponent } from '@mm/trading-simulator/ui';
 import { addSeconds } from 'date-fns';
 import { map, startWith } from 'rxjs';
@@ -434,7 +434,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingSimulatorFormComponent {
-  private readonly tradingSimulatorFacadeService = inject(TradingSimulatorFacadeService);
+  private readonly tradingSimulatorStateService = inject(TradingSimulatorStateService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly router = inject(Router);
@@ -653,7 +653,7 @@ export class TradingSimulatorFormComponent {
 
     if (this.existingTradingSimulator()) {
       // update the existing trading simulator
-      this.tradingSimulatorFacadeService.updateTradingSimulator({
+      this.tradingSimulatorStateService.updateTradingSimulator({
         tradingSimulator,
         tradingSimulatorSymbol,
       });
@@ -662,7 +662,7 @@ export class TradingSimulatorFormComponent {
       this.dialogServiceUtil.showNotificationBar('Trading simulator updated', 'success');
     } else {
       // create a new trading simulator
-      this.tradingSimulatorFacadeService.createTradingSimulator({
+      this.tradingSimulatorStateService.createTradingSimulator({
         tradingSimulator,
         tradingSimulatorSymbol,
       });

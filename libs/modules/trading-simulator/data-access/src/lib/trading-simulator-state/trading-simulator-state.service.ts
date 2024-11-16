@@ -8,10 +8,13 @@ import { distinctUntilChanged, switchMap } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class TradingSimulatorFacadeService {
+export class TradingSimulatorStateService {
   private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
 
+  /**
+   * get trading simulators where the user is the owner
+   */
   readonly authUserTradingSimulatorOwner = toSignal(
     toObservable(this.authenticationUserStoreService.state.getUserDataNormal).pipe(
       distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
@@ -22,6 +25,9 @@ export class TradingSimulatorFacadeService {
     { initialValue: [] },
   );
 
+  /**
+   * get trading simulators where the user is a participant
+   */
   readonly authUserTradingSimulatorParticipant = toSignal(
     toObservable(this.authenticationUserStoreService.state.getUserDataNormal).pipe(
       distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
@@ -55,13 +61,6 @@ export class TradingSimulatorFacadeService {
   }
 
   leaveTradingSimulator(id: string): void {
-    // todo
-  }
-
-  /**
-   * each trading simulator can be played either in groups or by yourself
-   */
-  playTradingSimulatorByYourself(id: string): void {
     // todo
   }
 }
