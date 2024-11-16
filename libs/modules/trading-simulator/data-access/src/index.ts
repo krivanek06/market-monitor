@@ -1,1 +1,1 @@
-export * from './lib/trading-simulator-store/trading-simulator-store.service';
+export * from './lib/trading-simulator-facade/trading-simulator-facade.service';

@@ -5,7 +5,7 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { SectionTitleComponent } from '@mm/shared/ui';
-import { TradingSimulatorStoreService } from '@mm/trading-simulator/data-access';
+import { TradingSimulatorFacadeService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
 
 @Component({
@@ -42,12 +42,12 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingSimulatorComponent {
-  private readonly tradingSimulatorStoreService = inject(TradingSimulatorStoreService);
+  private readonly tradingSimulatorFacadeService = inject(TradingSimulatorFacadeService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly router = inject(Router);
 
-  readonly mySimulations = this.tradingSimulatorStoreService.state.authUserOwner;
+  readonly mySimulations = this.tradingSimulatorFacadeService.authUserOwner;
   readonly userData = this.authenticationUserStoreService.state.getUserData;
 
   async onJoinSimulator(simulator: TradingSimulator) {
