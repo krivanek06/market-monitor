@@ -18,7 +18,6 @@ import {
   TradingSimulator,
   TradingSimulatorLatestData,
   TradingSimulatorParticipant,
-  TradingSimulatorParticipatingUsers,
   TradingSimulatorSymbol,
   TradingSimulatorTransactionAggregation,
   TradingSimulatorUserRanking,
@@ -103,12 +102,6 @@ export class TradingSimulatorApiService {
     );
   }
 
-  getTradingSimulatorByIdParticipatingUsers(id: string): Observable<TradingSimulatorParticipatingUsers> {
-    return rxDocData(this.getTradingSimulatorParticipatingUsers(id)).pipe(
-      map((data) => data ?? { data: [], lastModifiedDate: '' }),
-    );
-  }
-
   createTradingSimulator(data: {
     tradingSimulator: TradingSimulator;
     tradingSimulatorSymbol: TradingSimulatorSymbol[];
@@ -119,12 +112,6 @@ export class TradingSimulatorApiService {
     // save trading simulator symbols
     data.tradingSimulatorSymbol.forEach((symbol) => {
       setDoc(this.getTradingSimulatorSymbolDocRef(data.tradingSimulator.id, symbol.symbol), symbol);
-    });
-
-    // create participating users document
-    setDoc(this.getTradingSimulatorParticipatingUsers(data.tradingSimulator.id), {
-      lastModifiedDate: new Date().toISOString(),
-      data: [],
     });
 
     // create user ranking document
@@ -139,12 +126,6 @@ export class TradingSimulatorApiService {
       worstTransaction: [],
       lastTransactions: [],
     });
-  }
-
-  private getTradingSimulatorParticipatingUsers(id: string): DocumentReference<TradingSimulatorParticipatingUsers> {
-    return doc(this.getTradingSimulatorMoreInformationCollection(id), 'participating_users').withConverter(
-      assignTypesClient<TradingSimulatorParticipatingUsers>(),
-    );
   }
 
   private getTradingSimulatorUserRanking(id: string): DocumentReference<TradingSimulatorUserRanking> {

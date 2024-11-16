@@ -246,11 +246,6 @@ export type TradingSimulatorUserRanking = DataDocsWrapper<{
 }>;
 
 /**
- * users who will be participating in the trading simulator
- */
-export type TradingSimulatorParticipatingUsers = DataDocsWrapper<UserBaseMin>;
-
-/**
  * aggregations of the trading simulator example:
  * - which symbol was how many times bought/sold
  * - which user had the best return
@@ -267,7 +262,6 @@ export type TradingSimulatorAggregations = {
  *   -- collection: more_information
  *     -- document: TradingSimulatorTransactionAggregation
  *     -- document: TradingSimulatorUserRanking
- *     -- document: TradingSimulatorParticipatingUsers
  *
  *   -- collection: orders
  *     -- document: TradingSimulatorOrder

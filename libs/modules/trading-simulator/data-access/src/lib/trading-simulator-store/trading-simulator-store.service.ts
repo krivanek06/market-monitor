@@ -1,9 +1,35 @@
 import { inject, Injectable } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { TradingSimulatorApiService } from '@mm/api-client';
-import { TradingSimulator, TradingSimulatorSymbol } from '@mm/api-types';
+import {
+  TradingSimulator,
+  TradingSimulatorParticipant,
+  TradingSimulatorSymbol,
+  TradingSimulatorTransactionAggregation,
+  TradingSimulatorUserRanking,
+} from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { distinctUntilChanged, switchMap } from 'rxjs';
+
+type TradingSimulatorState = {
+  /** trading simulators where the user is the owner */
+  authUserOwner: TradingSimulator[];
+  /** trading simulators where the user is a participant */
+  authUserParticipant: TradingSimulator[];
+
+  /**
+   * listening on data updates when navigating on trading simulator details page
+   */
+  simulator: TradingSimulator | null;
+  simulatorSymbols: TradingSimulatorSymbol[];
+  simulatorAggregation: TradingSimulatorTransactionAggregation | null;
+  simulatorUserRanking: TradingSimulatorUserRanking | null;
+
+  /**
+   * possible to select a participant in the trading simulator
+   */
+  selectedParticipant: TradingSimulatorParticipant | null;
+};
 
 @Injectable({
   providedIn: 'root',

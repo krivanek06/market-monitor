@@ -1,6 +1,6 @@
 import { CurrencyPipe, DatePipe, UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { TradingSimulator, TradingSimulatorParticipatingUsers } from '@mm/api-types';
+import { TradingSimulator, UserBaseMin } from '@mm/api-types';
 import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent } from '@mm/shared/ui';
 
 @Component({
@@ -124,5 +124,5 @@ import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent } from '@mm/
 })
 export class TradingSimulatorInfoOverviewButtonComponent {
   readonly tradingSimulator = input.required<TradingSimulator>();
-  readonly participantUsers = input<TradingSimulatorParticipatingUsers['data']>([]);
+  readonly participantUsers = input<UserBaseMin[]>([]);
 }

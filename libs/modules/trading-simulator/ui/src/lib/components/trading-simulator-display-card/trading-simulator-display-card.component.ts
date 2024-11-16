@@ -2,7 +2,7 @@ import { DatePipe, NgClass, UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { TradingSimulator, TradingSimulatorParticipatingUsers, UserBaseMin } from '@mm/api-types';
+import { TradingSimulator, UserBaseMin } from '@mm/api-types';
 import {
   DateReadablePipe,
   GeneralCardActionContentDirective,
@@ -101,7 +101,7 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
           <app-trading-simulator-info-overview-button
             class="w-[120px]"
             [tradingSimulator]="tradingSimulator()"
-            [participantUsers]="participantUsers()?.data ?? []"
+            [participantUsers]="participantUsers() ?? []"
           />
           <button (click)="onVisit()" mat-stroked-button type="button" color="primary" class="w-[100px]">Visit</button>
         </div>
@@ -122,7 +122,7 @@ export class TradingSimulatorDisplayCardComponent {
   readonly editClicked = output<void>();
 
   readonly tradingSimulator = input.required<TradingSimulator>();
-  readonly participantUsers = input<TradingSimulatorParticipatingUsers>();
+  readonly participantUsers = input<UserBaseMin[]>();
 
   /** authenticated user */
   readonly authUser = input.required<UserBaseMin>();
