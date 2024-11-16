@@ -41,11 +41,11 @@ export class TradingSimulatorApiService {
     initialValue: { live: [], open: [], historical: [] },
   });
 
-  getTradingSimulatorByOwner(ownerId: string): Observable<TradingSimulator[]> {
+  getTradingSimulatorByOwner(ownerId?: string): Observable<TradingSimulator[]> {
     return rxCollectionData(query(this.getTradingSimulatorCollection(), where('owner.id', '==', ownerId)));
   }
 
-  getTradingSimulatorByParticipant(participantId: string): Observable<TradingSimulator[]> {
+  getTradingSimulatorByParticipant(participantId?: string): Observable<TradingSimulator[]> {
     return rxCollectionData(
       query(this.getTradingSimulatorCollection(), where('participants', 'array-contains', participantId)),
     );
@@ -90,7 +90,7 @@ export class TradingSimulatorApiService {
     setDoc(this.getTradingSimulatorOrderDocRef(id, data.orderId), data, { merge: true });
   }
 
-  getTradingSimulatorByIdTransactions(id: string): Observable<TradingSimulatorTransactionAggregation> {
+  getTradingSimulatorByIdTransactionAggregation(id: string): Observable<TradingSimulatorTransactionAggregation> {
     return rxDocData(this.getTradingSimulatorTransactions(id)).pipe(
       map((data) => data ?? { bestTransaction: [], worstTransaction: [], lastTransactions: [] }),
     );

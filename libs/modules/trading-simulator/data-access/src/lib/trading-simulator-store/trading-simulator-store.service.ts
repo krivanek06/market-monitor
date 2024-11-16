@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { effect, inject, Injectable } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { TradingSimulatorApiService } from '@mm/api-client';
 import {
   TradingSimulator,
@@ -9,7 +9,8 @@ import {
   TradingSimulatorUserRanking,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { distinctUntilChanged, switchMap } from 'rxjs';
+import { signalSlice } from 'ngxtension/signal-slice';
+import { map, merge, Observable, switchMap } from 'rxjs';
 
 type TradingSimulatorState = {
   /** trading simulators where the user is the owner */
@@ -22,13 +23,8 @@ type TradingSimulatorState = {
    */
   simulator: TradingSimulator | null;
   simulatorSymbols: TradingSimulatorSymbol[];
-  simulatorAggregation: TradingSimulatorTransactionAggregation | null;
+  simulatorTransactions: TradingSimulatorTransactionAggregation | null;
   simulatorUserRanking: TradingSimulatorUserRanking | null;
-
-  /**
-   * possible to select a participant in the trading simulator
-   */
-  selectedParticipant: TradingSimulatorParticipant | null;
 };
 
 @Injectable({
@@ -38,31 +34,73 @@ export class TradingSimulatorStoreService {
   private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
 
+  private readonly initialState: TradingSimulatorState = {
+    authUserOwner: [],
+    authUserParticipant: [],
+    simulator: null,
+    simulatorSymbols: [],
+    simulatorTransactions: null,
+    simulatorUserRanking: null,
+  };
+
   /**
    * get trading simulators where the user is the owner
    */
-  readonly authUserTradingSimulatorOwner = toSignal(
-    toObservable(this.authenticationUserStoreService.state.getUserDataNormal).pipe(
-      distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-      switchMap((userData) =>
-        userData ? this.tradingSimulatorApiService.getTradingSimulatorByOwner(userData.id) : [],
-      ),
+  readonly authUserOwner$ = toObservable(this.authenticationUserStoreService.state.getUserDataNormal).pipe(
+    switchMap((userData) =>
+      this.tradingSimulatorApiService
+        .getTradingSimulatorByOwner(userData?.id)
+        .pipe(map((authUserOwner) => ({ authUserOwner }))),
     ),
-    { initialValue: [] },
   );
 
   /**
    * get trading simulators where the user is a participant
    */
-  readonly authUserTradingSimulatorParticipant = toSignal(
-    toObservable(this.authenticationUserStoreService.state.getUserDataNormal).pipe(
-      distinctUntilChanged((prev, curr) => prev?.id === curr?.id),
-      switchMap((userData) =>
-        userData ? this.tradingSimulatorApiService.getTradingSimulatorByParticipant(userData.id) : [],
+  readonly authUserParticipant$ = toObservable(this.authenticationUserStoreService.state.getUserDataNormal).pipe(
+    switchMap((userData) =>
+      this.tradingSimulatorApiService.getTradingSimulatorByParticipant(userData?.id).pipe(
+        map((authUserParticipant) => ({
+          authUserParticipant,
+        })),
       ),
     ),
-    { initialValue: [] },
   );
+
+  readonly state = signalSlice({
+    initialState: this.initialState,
+    sources: [this.authUserParticipant$, this.authUserOwner$],
+    //selectors:
+    actionSources: {
+      setSimulatorId: (state, action$: Observable<string>) =>
+        action$.pipe(
+          switchMap((selectedId) =>
+            merge(
+              // load simulator data
+              this.tradingSimulatorApiService
+                .getTradingSimulatorById(selectedId)
+                .pipe(map((simulator) => ({ simulator }))),
+              // load symbols for the selected simulator
+              this.tradingSimulatorApiService
+                .getTradingSimulatorByIdSymbols(selectedId)
+                .pipe(map((simulatorSymbols) => ({ simulatorSymbols }))),
+              // load aggregation data for the selected simulator
+              this.tradingSimulatorApiService
+                .getTradingSimulatorByIdTransactionAggregation(selectedId)
+                .pipe(map((simulatorTransactions) => ({ simulatorTransactions }))),
+              // load user ranking for the selected simulator
+              this.tradingSimulatorApiService
+                .getTradingSimulatorByIdUserRanking(selectedId)
+                .pipe(map((simulatorUserRanking) => ({ simulatorUserRanking }))),
+            ),
+          ),
+        ),
+    },
+  });
+
+  stateEffect = effect(() => {
+    console.log('TradingSimulatorStoreService', this.state());
+  });
 
   createTradingSimulator(data: {
     tradingSimulator: TradingSimulator;
@@ -88,5 +126,9 @@ export class TradingSimulatorStoreService {
 
   leaveTradingSimulator(id: string): void {
     // todo
+  }
+
+  getParticipantData(userId: string): TradingSimulatorParticipant {
+    throw new Error('Method not implemented.');
   }
 }

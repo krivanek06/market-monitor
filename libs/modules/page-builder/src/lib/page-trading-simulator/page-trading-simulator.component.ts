@@ -47,7 +47,7 @@ export class PageTradingSimulatorComponent {
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly router = inject(Router);
 
-  readonly mySimulations = this.tradingSimulatorStoreService.authUserTradingSimulatorOwner;
+  readonly mySimulations = this.tradingSimulatorStoreService.state.authUserOwner;
   readonly userData = this.authenticationUserStoreService.state.getUserData;
 
   async onJoinSimulator(simulator: TradingSimulator) {
