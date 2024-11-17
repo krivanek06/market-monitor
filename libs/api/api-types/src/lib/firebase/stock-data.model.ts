@@ -90,5 +90,4 @@ export const SymbolHistoricalPeriodsArrayPreload = [
   SymbolHistoricalPeriods.month,
   SymbolHistoricalPeriods.sixMonths,
   SymbolHistoricalPeriods.year,
-  SymbolHistoricalPeriods.fiveYears,
 ];

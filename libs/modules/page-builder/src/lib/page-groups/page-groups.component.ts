@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -17,7 +16,6 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
   selector: 'app-page-groups',
   standalone: true,
   imports: [
-    CommonModule,
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
@@ -159,13 +157,13 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageGroupsComponent {
-  authenticationUserService = inject(AuthenticationUserStoreService);
-  groupApiService = inject(GroupApiService);
-  dialogServiceUtil = inject(DialogServiceUtil);
-  router = inject(Router);
-  groupsSignal = this.authenticationUserService.state.userGroupData;
+  readonly authenticationUserService = inject(AuthenticationUserStoreService);
+  readonly groupApiService = inject(GroupApiService);
+  readonly dialogServiceUtil = inject(DialogServiceUtil);
+  readonly router = inject(Router);
+  readonly groupsSignal = this.authenticationUserService.state.userGroupData;
 
-  isCreateGroupDisabledSignal = computed(
+  readonly isCreateGroupDisabledSignal = computed(
     () =>
       (this.groupsSignal()?.groupOwner?.length ?? 99) >= GROUP_OWNER_LIMIT ||
       this.authenticationUserService.state.isDemoAccount(),

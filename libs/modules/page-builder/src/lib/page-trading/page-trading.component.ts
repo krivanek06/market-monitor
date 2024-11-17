@@ -94,17 +94,17 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
             Stock Market -
             <span
               [ngClass]="{
-                'text-wt-success': isMarketOpen(),
-                'text-wt-danger': !isMarketOpen(),
+                'text-wt-success': marketIsOpen(),
+                'text-wt-danger': !marketIsOpen(),
               }"
             >
-              {{ isMarketOpen() ? 'Open' : 'Closed' }}
+              {{ marketIsOpen() ? 'Open' : 'Closed' }}
             </span>
           </div>
 
+          <!-- market hours -->
           <div>
-            [{{ marketOpenData()?.stockMarketHoursLocal?.openingHour }} -
-            {{ marketOpenData()?.stockMarketHoursLocal?.closingHour }}]
+            {{ marketOpenRange() }}
           </div>
         </div>
 
@@ -156,12 +156,12 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
             [symbol]="symbolSummary.id"
             [title]="'Historical Price: ' + symbolSummary.quote.displaySymbol"
             [chartHeightPx]="400"
-            [errorFromParent]="!symbolSummary.priceChange['5D']"
+            [errorFromParent]="isSymbolInvalid()"
           />
           <div
             class="lg:-mt-4 lg:basis-2/5"
             [ngClass]="{
-              'opacity-65': !symbolSummary.priceChange['5D'],
+              'opacity-65': isSymbolInvalid(),
             }"
           >
             <app-symbol-summary-list data-testid="page-trading-symbol-summary-list" [symbolSummary]="symbolSummary" />
@@ -286,11 +286,23 @@ export class PageTradingComponent {
   /**
    * check if stock market is open, crypto is open all the time
    */
-  readonly isMarketOpen = computed(() => {
+  readonly marketIsOpen = computed(() => {
     const summary = this.symbolSummarySignal();
     const isCrypto = summary.data?.quote.exchange === 'CRYPTO' ? 'crypto' : 'stock';
     return this.marketApiService.isMarketOpenForQuote(isCrypto);
   });
+
+  readonly marketOpenRange = computed(() => {
+    const local = this.marketOpenData()?.stockMarketHoursLocal;
+    if (!local?.openingHour || !local?.closingHour) {
+      return '';
+    }
+    return `${local.openingHour} - ${local.closingHour}`;
+  });
+
+  readonly isSymbolInvalid = computed(
+    () => !this.symbolSummarySignal()?.data?.priceChange['5D'] && !this.symbolSummarySignal()?.data?.priceChange['1D'],
+  );
 
   readonly topPerformanceSignal = toSignal(
     this.marketApiService.getMarketTopPerformance().pipe(map((d) => d.stockTopActive)),
@@ -369,7 +381,7 @@ export class PageTradingComponent {
         quote: summary.quote,
         sector: summary.profile?.sector ?? summary.quote.exchange,
         userPortfolioStateHolding: this.portfolioUserFacadeService.portfolioStateHolding(),
-        isMarketOpen: this.isMarketOpen(),
+        isMarketOpen: this.marketIsOpen(),
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });

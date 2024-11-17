@@ -400,6 +400,7 @@ describe('PageTradingComponent', () => {
 
     const compBuy = ngMocks.find<HTMLButtonElement>(buttonBuy);
     const compSell = ngMocks.find<HTMLButtonElement>(buttonSell);
+    const interactiveChartComp = ngMocks.find<AssetPriceChartInteractiveComponent>(interactiveChartS);
 
     expect(component.symbolSummarySignal().state).toBe('success');
 
@@ -408,6 +409,8 @@ describe('PageTradingComponent', () => {
     expect(compSell.componentInstance.disabled).toBeTruthy();
 
     expect(component.allowActionButtons()).toBeFalsy();
+    expect(component.isSymbolInvalid()).toBeTruthy();
+    expect(interactiveChartComp.componentInstance.errorFromParent).toBeTruthy();
   });
 
   it('should disable BUY/SELL buttons while loading symbol summary', () => {
@@ -475,6 +478,7 @@ describe('PageTradingComponent', () => {
     expect(comp.componentInstance.imageName).toBe('MSFT');
     expect(comp.componentInstance.symbol).toBe('MSFT');
     expect(comp.componentInstance.title).toBe('Historical Price: MSFT');
+    expect(comp.componentInstance.errorFromParent).toBeFalsy();
   });
 
   it('should display symbol summary list', () => {
@@ -496,6 +500,7 @@ describe('PageTradingComponent', () => {
     expect(component.symbolSummarySignal()?.data?.id).toBe('MSFT');
     expect(comp.componentInstance.symbolSummary).toBe(component.symbolSummarySignal().data);
     expect(component.symbolSummarySignal().state).toBe('success');
+    expect(component.isSymbolInvalid()).toBeFalsy();
   });
 
   it('should check components if user is normal basic account', () => {
@@ -548,6 +553,7 @@ describe('PageTradingComponent', () => {
     expect(component.symbolSummarySignal().data).toBe(null);
     expect(compBuy.componentInstance.disabled).toBeTruthy();
     expect(compSell.componentInstance.disabled).toBeTruthy();
+    expect(component.isSymbolInvalid()).toBeTruthy();
     expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'error');
   });
 
