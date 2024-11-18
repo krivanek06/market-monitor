@@ -1,6 +1,14 @@
-import { TradingSimulatorGeneralActions, TradingSimulatorGeneralActionsByType, USER_HAS_DEMO_ACCOUNT_ERROR, USER_INCORRECT_ACCOUNT_TYPE_ERROR, USER_NOT_FOUND_ERROR, UserAccountEnum } from '@mm/api-types';
-import { userDocumentRef } from '../database';
+import {
+  DATA_NOT_FOUND_ERROR,
+  TradingSimulator,
+  TradingSimulatorGeneralActions,
+  TradingSimulatorGeneralActionsByType,
+  USER_HAS_DEMO_ACCOUNT_ERROR,
+  USER_NOT_FOUND_ERROR,
+  UserData,
+} from '@mm/api-types';
 import { HttpsError } from 'firebase-functions/https';
+import { tradingSimulatorDocRef, userDocumentRef } from '../database';
 
 export const tradingSimulatorGeneralActions = async (
   userAuthId: string | undefined,
@@ -11,12 +19,16 @@ export const tradingSimulatorGeneralActions = async (
   }
 
   const authUserData = (await userDocumentRef(userAuthId).get()).data();
-  const tradingSimulator =
-
+  const tradingSimulator = (await tradingSimulatorDocRef(data.simulatorId).get()).data();
 
   // check if auth user exists
   if (!authUserData) {
     throw new HttpsError('not-found', USER_NOT_FOUND_ERROR);
+  }
+
+  // check if trading simulator exists
+  if (!tradingSimulator) {
+    throw new HttpsError('not-found', DATA_NOT_FOUND_ERROR);
   }
 
   // demo account can not be added to the group
@@ -25,14 +37,38 @@ export const tradingSimulatorGeneralActions = async (
   }
 
   if (data.type === 'joinSimulator') {
-    return joinSimulator(userAuthId, data);
+    return joinSimulator(authUserData, tradingSimulator, data);
   }
 
   if (data.type === 'leaveSimulator') {
-    return leaveSimulator(userAuthId, data);
+    return leaveSimulator(authUserData, tradingSimulator);
   }
 };
 
-const joinSimulator = async (userAuthId: string, data: TradingSimulatorGeneralActionsByType<'joinSimulator'>) => {};
+const joinSimulator = async (
+  user: UserData,
+  simulator: TradingSimulator,
+  data: TradingSimulatorGeneralActionsByType<'joinSimulator'>,
+) => {
+  // check if user is already a participant
+  if (simulator.participants.includes(user.id)) {
+    return;
+  }
 
-const leaveSimulator = async (userAuthId: string, data: any) => {};
+  // check if provided invitation code is correct
+  if (simulator.invitationCode !== data.invitationCode) {
+    throw new HttpsError('permission-denied', 'Invalid invitation code');
+  }
+
+  // add user to the participants
+  await tradingSimulatorDocRef(simulator.id).update({
+    participants: [...simulator.participants, user.id],
+  });
+};
+
+const leaveSimulator = async (user: UserData, simulator: TradingSimulator) => {
+  // remove user from the participants
+  await tradingSimulatorDocRef(simulator.id).update({
+    participants: simulator.participants.filter((participant) => participant !== user.id),
+  });
+};

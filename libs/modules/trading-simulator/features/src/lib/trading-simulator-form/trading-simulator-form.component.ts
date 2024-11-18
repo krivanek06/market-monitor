@@ -651,25 +651,16 @@ export class TradingSimulatorFormComponent {
     const tradingSimulator = this.getTradingSimulatorFormData();
     const tradingSimulatorSymbol = this.getTradingSimulatorSymbolData();
 
-    if (this.existingTradingSimulator()) {
-      // update the existing trading simulator
-      this.tradingSimulatorApiService.upsertTradingSimulator({
-        tradingSimulator,
-        tradingSimulatorSymbol,
-      });
+    // update trading simulator
+    this.tradingSimulatorApiService.upsertTradingSimulator({
+      tradingSimulator,
+      tradingSimulatorSymbol,
+    });
 
-      // notify user
-      this.dialogServiceUtil.showNotificationBar('Trading simulator updated', 'success');
-    } else {
-      // create a new trading simulator
-      this.tradingSimulatorApiService.upsertTradingSimulator({
-        tradingSimulator,
-        tradingSimulatorSymbol,
-      });
+    // notify user
+    this.dialogServiceUtil.showNotificationBar(`Trading simulator ${tradingSimulator.name} updated`, 'success');
 
-      // notify user
-      this.dialogServiceUtil.showNotificationBar('Trading simulator created', 'success');
-
+    if (!this.existingTradingSimulator()) {
       // route to trading simulator
       this.router.navigateByUrl(ROUTES_MAIN.TRADING_SIMULATOR);
     }

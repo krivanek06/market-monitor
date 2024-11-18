@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   addDoc,
+  arrayUnion,
   collection,
   CollectionReference,
   doc,
@@ -13,16 +14,18 @@ import {
   setDoc,
   where,
 } from '@angular/fire/firestore';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import {
   PortfolioTransaction,
   TradingSimulator,
+  TradingSimulatorGeneralActions,
   TradingSimulatorLatestData,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
   TradingSimulatorTransactionAggregation,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { orderBy } from 'firebase/firestore';
+import { orderBy, updateDoc } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { combineLatest, map, Observable, shareReplay } from 'rxjs';
 
@@ -31,6 +34,7 @@ import { combineLatest, map, Observable, shareReplay } from 'rxjs';
 })
 export class TradingSimulatorApiService {
   private readonly firestore = inject(Firestore);
+  private readonly functions = inject(Functions);
 
   readonly tradingSimulatorLatestData = toSignal(
     rxDocData(this.getTradingSimulatorLatestDataDocRef()).pipe(
@@ -101,12 +105,23 @@ export class TradingSimulatorApiService {
     });
   }
 
-  updateTradingSimulatorByIdParticipantById(id: string, participant: TradingSimulatorParticipant): void {
-    setDoc(this.getTradingSimulatorParticipantsDocRef(id, participant.userData.id), participant, { merge: true });
+  addTradingSimulatorByIdTransaction(id: string, data: PortfolioTransaction): void {
+    // add transaction to transaction collection
+    addDoc(this.getTradingSimulatorTransactionsCollection(id), data);
+
+    // add transaction to the participant data
+    updateDoc(this.getTradingSimulatorParticipantsDocRef(id, data.userId), {
+      transactions: arrayUnion(data),
+    });
   }
 
-  addTradingSimulatorByIdTransaction(id: string, data: PortfolioTransaction): void {
-    addDoc(this.getTradingSimulatorTransactionsCollection(id), data);
+  async tradingSimulatorAction(data: TradingSimulatorGeneralActions): Promise<void> {
+    const callable = httpsCallable<TradingSimulatorGeneralActions, void>(
+      this.functions,
+      'tradingSimulatorGeneralActionsCall',
+    );
+    const res = await callable(data);
+    return res.data;
   }
 
   getTradingSimulatorByIdTransactionAggregation(id: string): Observable<TradingSimulatorTransactionAggregation> {
