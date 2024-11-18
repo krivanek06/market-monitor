@@ -8,23 +8,23 @@ import {
   DocumentData,
   DocumentReference,
   Firestore,
+  limit,
   query,
   setDoc,
   where,
 } from '@angular/fire/firestore';
 import {
-  OutstandingOrder,
   PortfolioTransaction,
   TradingSimulator,
   TradingSimulatorLatestData,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
   TradingSimulatorTransactionAggregation,
-  TradingSimulatorUserRanking,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
+import { orderBy } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
-import { map, Observable, shareReplay } from 'rxjs';
+import { combineLatest, map, Observable, shareReplay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -32,19 +32,30 @@ import { map, Observable, shareReplay } from 'rxjs';
 export class TradingSimulatorApiService {
   private readonly firestore = inject(Firestore);
 
-  readonly tradingSimulatorLatestData$ = rxDocData(this.getTradingSimulatorLatestDataDocRef()).pipe(
-    map((data) => data ?? { live: [], open: [], historical: [] }),
-    shareReplay({ refCount: false, bufferSize: 1 }),
+  readonly tradingSimulatorLatestData = toSignal(
+    rxDocData(this.getTradingSimulatorLatestDataDocRef()).pipe(
+      map((data) => data ?? { live: [], open: [], historical: [] }),
+      shareReplay({ refCount: false, bufferSize: 1 }),
+    ),
+    {
+      initialValue: { live: [], open: [], historical: [] },
+    },
   );
 
-  readonly tradingSimulatorLatestData = toSignal(this.tradingSimulatorLatestData$, {
-    initialValue: { live: [], open: [], historical: [] },
-  });
-
+  /**
+   *
+   * @param ownerId - the id of the owner
+   * @returns all trading simulators where the user is the owner
+   */
   getTradingSimulatorByOwner(ownerId?: string): Observable<TradingSimulator[]> {
     return rxCollectionData(query(this.getTradingSimulatorCollection(), where('owner.id', '==', ownerId)));
   }
 
+  /**
+   *
+   * @param participantId - the id of the participant
+   * @returns all trading simulators where the user is a participant
+   */
   getTradingSimulatorByParticipant(participantId?: string): Observable<TradingSimulator[]> {
     return rxCollectionData(
       query(this.getTradingSimulatorCollection(), where('participants', 'array-contains', participantId)),
@@ -55,12 +66,19 @@ export class TradingSimulatorApiService {
     return rxDocData(this.getTradingSimulatorDocRef(id));
   }
 
-  updateTradingSimulatorById(id: string, data: Partial<TradingSimulator>): void {
-    setDoc(this.getTradingSimulatorDocRef(id), data, { merge: true });
-  }
-
   getTradingSimulatorByIdSymbols(id: string): Observable<TradingSimulatorSymbol[]> {
     return rxCollectionData(this.getTradingSimulatorSymbolsCollection(id));
+  }
+
+  /**
+   *
+   * @param id - the id of the trading simulator
+   * @returns top 15 participants by balance
+   */
+  getTradingSimulatorByIdTopParticipants(id: string): Observable<TradingSimulatorParticipant[]> {
+    return rxCollectionData(
+      query(this.getTradingSimulatorParticipantsCollection(id), orderBy('portfolioState.balance', 'desc'), limit(15)),
+    );
   }
 
   getTradingSimulatorByIdParticipantById(
@@ -70,39 +88,7 @@ export class TradingSimulatorApiService {
     return rxDocData(this.getTradingSimulatorParticipantsDocRef(id, participantId));
   }
 
-  updateTradingSimulatorByIdParticipantById(id: string, participant: TradingSimulatorParticipant): void {
-    setDoc(this.getTradingSimulatorParticipantsDocRef(id, participant.userData.id), participant, { merge: true });
-  }
-
-  getTradingSimulatorByIdOpenOrders(id: string): Observable<OutstandingOrder[]> {
-    return rxCollectionData(query(this.getTradingSimulatorOrdersCollection(id), where('status', '==', 'open')));
-  }
-
-  addTradingSimulatorByIdOpenOrder(id: string, data: OutstandingOrder): void {
-    addDoc(this.getTradingSimulatorOrdersCollection(id), data);
-  }
-
-  addTradingSimulatorByIdTransaction(id: string, data: PortfolioTransaction): void {
-    addDoc(this.getTradingSimulatorTransactionsCollection(id), data);
-  }
-
-  updateTradingSimulatorByIdOpenOrder(id: string, data: OutstandingOrder): void {
-    setDoc(this.getTradingSimulatorOrderDocRef(id, data.orderId), data, { merge: true });
-  }
-
-  getTradingSimulatorByIdTransactionAggregation(id: string): Observable<TradingSimulatorTransactionAggregation> {
-    return rxDocData(this.getTradingSimulatorTransactions(id)).pipe(
-      map((data) => data ?? { bestTransaction: [], worstTransaction: [], lastTransactions: [] }),
-    );
-  }
-
-  getTradingSimulatorByIdUserRanking(id: string): Observable<TradingSimulatorUserRanking> {
-    return rxDocData(this.getTradingSimulatorUserRanking(id)).pipe(
-      map((data) => data ?? { data: [], lastModifiedDate: '' }),
-    );
-  }
-
-  createTradingSimulator(data: {
+  upsertTradingSimulator(data: {
     tradingSimulator: TradingSimulator;
     tradingSimulatorSymbol: TradingSimulatorSymbol[];
   }): void {
@@ -113,40 +99,47 @@ export class TradingSimulatorApiService {
     data.tradingSimulatorSymbol.forEach((symbol) => {
       setDoc(this.getTradingSimulatorSymbolDocRef(data.tradingSimulator.id, symbol.symbol), symbol);
     });
-
-    // create user ranking document
-    setDoc(this.getTradingSimulatorUserRanking(data.tradingSimulator.id), {
-      lastModifiedDate: new Date().toISOString(),
-      data: [],
-    });
-
-    // create transactions aggregation document
-    setDoc(this.getTradingSimulatorTransactions(data.tradingSimulator.id), {
-      bestTransaction: [],
-      worstTransaction: [],
-      lastTransactions: [],
-    });
   }
 
-  private getTradingSimulatorUserRanking(id: string): DocumentReference<TradingSimulatorUserRanking> {
-    return doc(this.getTradingSimulatorMoreInformationCollection(id), 'user_ranking').withConverter(
-      assignTypesClient<TradingSimulatorUserRanking>(),
+  updateTradingSimulatorByIdParticipantById(id: string, participant: TradingSimulatorParticipant): void {
+    setDoc(this.getTradingSimulatorParticipantsDocRef(id, participant.userData.id), participant, { merge: true });
+  }
+
+  addTradingSimulatorByIdTransaction(id: string, data: PortfolioTransaction): void {
+    addDoc(this.getTradingSimulatorTransactionsCollection(id), data);
+  }
+
+  getTradingSimulatorByIdTransactionAggregation(id: string): Observable<TradingSimulatorTransactionAggregation> {
+    const latestTransactions = rxCollectionData(
+      query(this.getTradingSimulatorTransactionsCollection(id), orderBy('dateExecuted', 'desc'), limit(25)),
     );
-  }
 
-  private getTradingSimulatorTransactions(id: string): DocumentReference<TradingSimulatorTransactionAggregation> {
-    return doc(this.getTradingSimulatorMoreInformationCollection(id), 'transactions').withConverter(
-      assignTypesClient<TradingSimulatorTransactionAggregation>(),
+    const bestTransaction = rxCollectionData(
+      query(
+        this.getTradingSimulatorTransactionsCollection(id),
+        where('transactionType', '==', 'SELL'),
+        orderBy('returnChange', 'desc'),
+        limit(10),
+      ),
     );
-  }
 
-  private getTradingSimulatorOrderDocRef(id: string, orderId: string): DocumentReference<OutstandingOrder> {
-    return doc(this.getTradingSimulatorOrdersCollection(id), orderId);
-  }
+    const worstTransaction = rxCollectionData(
+      query(
+        this.getTradingSimulatorTransactionsCollection(id),
+        where('transactionType', '==', 'SELL'),
+        orderBy('returnChange', 'desc'),
+        limit(10),
+      ),
+    );
 
-  private getTradingSimulatorOrdersCollection(id: string): CollectionReference<OutstandingOrder, DocumentData> {
-    return collection(this.getTradingSimulatorDocRef(id), 'orders').withConverter(
-      assignTypesClient<OutstandingOrder>(),
+    return combineLatest([latestTransactions, bestTransaction, worstTransaction]).pipe(
+      map(([lastTransactions, bestTransaction, worstTransaction]) => {
+        return {
+          bestTransaction,
+          worstTransaction,
+          lastTransactions,
+        };
+      }),
     );
   }
 
@@ -181,10 +174,6 @@ export class TradingSimulatorApiService {
     return collection(this.getTradingSimulatorDocRef(id), 'transactions').withConverter(
       assignTypesClient<PortfolioTransaction>(),
     );
-  }
-
-  private getTradingSimulatorMoreInformationCollection(id: string): CollectionReference<DocumentData, DocumentData> {
-    return collection(this.getTradingSimulatorDocRef(id), 'more_information');
   }
 
   private getTradingSimulatorDocRef(id: string): DocumentReference<TradingSimulator> {

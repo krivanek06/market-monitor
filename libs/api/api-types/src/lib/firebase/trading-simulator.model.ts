@@ -1,7 +1,5 @@
-import { DataDocsWrapper } from '../constants';
-import { PortfolioGrowth, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
-import { RankingItem } from './ranking.model';
-import { UserBase, UserBaseMin } from './user.model';
+import { PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
+import { UserBaseMin } from './user.model';
 
 export type TradingSimulatorBase = {
   id: string;
@@ -154,7 +152,7 @@ export type TradingSimulatorParticipant = {
   /**
    * user's portfolio growth data - updated on every next round
    */
-  portfolioGrowth: PortfolioGrowth[];
+  // portfolioGrowth: PortfolioGrowth[];
 
   /**
    * user's last N executed portfolio transactions
@@ -238,14 +236,6 @@ export type TradingSimulatorLatestData = {
 };
 
 /**
- * user ranking in the trading simulator, updates on each next round
- */
-export type TradingSimulatorUserRanking = DataDocsWrapper<{
-  user: UserBase;
-  rank: RankingItem;
-}>;
-
-/**
  * aggregations of the trading simulator example:
  * - which symbol was how many times bought/sold
  * - which user had the best return
@@ -259,13 +249,6 @@ export type TradingSimulatorAggregations = {
  *
  * collection: trading_simulator
  * - document: TradingSimulator
- *   -- collection: more_information
- *     -- document: TradingSimulatorTransactionAggregation
- *     -- document: TradingSimulatorUserRanking
- *
- *   -- collection: orders
- *     -- document: TradingSimulatorOrder
- *
  *   -- collection: transactions
  *     -- document: PortfolioTransaction
  *
@@ -278,11 +261,17 @@ export type TradingSimulatorAggregations = {
 
 // todo - if shorting is possible and I want to close my position, what to do if units are not available ??
 
-export type TradingSimulatorGeneralActions = { groupId: string } & (
+export type TradingSimulatorGeneralActions = { simulatorId: string } & (
   | {
       type: 'joinSimulator';
+      invitationCode: string;
     }
   | {
       type: 'leaveSimulator';
     }
 );
+
+export type TradingSimulatorGeneralActionsByType<T extends TradingSimulatorGeneralActions['type']> = Extract<
+  TradingSimulatorGeneralActions,
+  { type: T }
+>;

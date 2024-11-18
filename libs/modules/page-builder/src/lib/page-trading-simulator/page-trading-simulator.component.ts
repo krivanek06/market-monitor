@@ -1,12 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { TradingSimulatorApiService } from '@mm/api-client';
 import { TradingSimulator } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { SectionTitleComponent } from '@mm/shared/ui';
-import { TradingSimulatorFacadeService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-page-trading-simulator',
@@ -42,12 +44,17 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingSimulatorComponent {
-  private readonly tradingSimulatorFacadeService = inject(TradingSimulatorFacadeService);
+  private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly router = inject(Router);
 
-  readonly mySimulations = this.tradingSimulatorFacadeService.authUserOwner;
+  readonly mySimulations = toSignal(
+    toObservable(this.authenticationUserStoreService.state.getUserDataNormal).pipe(
+      switchMap((userData) => this.tradingSimulatorApiService.getTradingSimulatorByOwner(userData?.id)),
+    ),
+    { initialValue: [] },
+  );
   readonly userData = this.authenticationUserStoreService.state.getUserData;
 
   async onJoinSimulator(simulator: TradingSimulator) {
