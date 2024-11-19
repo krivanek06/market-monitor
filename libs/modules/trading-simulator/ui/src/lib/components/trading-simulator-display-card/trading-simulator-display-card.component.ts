@@ -33,8 +33,9 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
       <!-- title right -->
       <ng-template appGeneralCardTitleRight>
         <div class="flex gap-2">
-          <!-- edit -->
+          <!-- owner buttons -->
           @if (tradingSimulator().owner.id === authUser().id) {
+            <!-- edit -->
             <button (click)="onEdit()" mat-flat-button type="button" class="w-[100px]">
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
@@ -42,10 +43,12 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
           }
 
           <!-- join/leave -->
-          @if (isUserJoined()) {
-            <button (click)="onLeave()" mat-stroked-button type="button" color="warn" class="w-[100px]">Leave</button>
-          } @else {
-            <button (click)="onJoin()" mat-stroked-button type="button" color="accent" class="w-[100px]">Join</button>
+          @if (tradingSimulator().state === 'live' || tradingSimulator().state === 'started') {
+            @if (isUserJoined()) {
+              <button (click)="onLeave()" mat-stroked-button type="button" color="warn" class="w-[100px]">Leave</button>
+            } @else {
+              <button (click)="onJoin()" mat-stroked-button type="button" color="accent" class="w-[100px]">Join</button>
+            }
           }
         </div>
       </ng-template>

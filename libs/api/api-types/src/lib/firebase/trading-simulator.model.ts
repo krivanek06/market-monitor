@@ -177,11 +177,21 @@ export type TradingSimulatorSymbol = {
   unitsAvailableOnStart: number;
 
   /**
+   * if true, then the symbol has unlimited units
+   */
+  unitsInfinity: boolean;
+
+  /**
    * every time a transaction happens, this value is updated
    * default is the same as 'unitsAvailableOnStart'
    * should never be negative
    */
   unitsCurrentlyAvailable: number;
+
+  /**
+   * by how much to multiply the original price
+   */
+  priceMultiplication: number;
 
   /**
    * possible to issue more shares of a specific symbol
@@ -198,18 +208,12 @@ export type TradingSimulatorSymbol = {
   /**
    * original historical data of a symbol
    */
-  historicalDataOriginal: {
-    round: number;
-    price: number;
-  }[];
+  historicalDataOriginal: number[];
 
   /**
    * modified historical data of a symbol (calculated when setting up the trading simulator)
    */
-  historicalDataModified: {
-    round: number;
-    price: number;
-  }[];
+  historicalDataModified: number[];
 };
 
 /**

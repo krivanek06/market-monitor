@@ -25,10 +25,14 @@ service cloud.firestore {
     }
 
     // allow operations for trading simulator
-    match /trading_simulator/{document=**} {
+    match /trading_simulator/{simulatorId}/{document=**} {
       allow create: if userFeatureAccess("createTradingSimulator");
-      allow update: if request.auth.uid == resource.data.owner.id && userFeatureAccess("createTradingSimulator");
-      allow delete: if request.auth.uid == resource.data.owner.id && userFeatureAccess("createTradingSimulator");
+      allow update: if getOwnerId() && userFeatureAccess("createTradingSimulator");
+      allow delete: if getOwnerId() && userFeatureAccess("createTradingSimulator");
+
+      function getOwnerId() {
+        return request.auth.uid == get(/databases/$(database)/documents/trading_simulator/$(simulatorId)).data.owner.id;
+      }
     }
 
     // allow reading all

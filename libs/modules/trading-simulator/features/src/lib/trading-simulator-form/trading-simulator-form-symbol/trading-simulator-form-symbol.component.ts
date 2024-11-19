@@ -15,8 +15,10 @@ import {
   FormArray,
   FormControl,
   FormGroup,
+  NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
+  Validator,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -27,6 +29,7 @@ import { STOCK_SYMBOLS, SymbolHistoricalPeriods, TradingSimulatorSymbol } from '
 import {
   GenericChartSeries,
   intervalValidator,
+  minValueValidator,
   positiveNumberValidator,
   requiredValidator,
 } from '@mm/shared/data-access';
@@ -131,10 +134,13 @@ import { catchError, firstValueFrom, of } from 'rxjs';
         />
 
         <!-- add additional units -->
-        <button mat-stroked-button color="primary" (click)="onAddAdditionalUnits()">
-          <mat-icon>add</mat-icon>
-          Additional units
-        </button>
+        <!-- TODO: no additional units, not sure how to implement this -->
+        @if (false) {
+          <button mat-stroked-button color="primary" (click)="onAddAdditionalUnits()">
+            <mat-icon>add</mat-icon>
+            Additional units
+          </button>
+        }
       </div>
     </div>
 
@@ -176,10 +182,15 @@ import { catchError, firstValueFrom, of } from 'rxjs';
       useExisting: forwardRef(() => TradingSimulatorFormSymbolComponent),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => TradingSimulatorFormSymbolComponent),
+      multi: true,
+    },
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor {
+export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor, Validator {
   private readonly marketApiService = inject(MarketApiService);
 
   readonly removeSymbol = output<void>();
@@ -188,8 +199,6 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
 
   /** whether to display remove button */
   readonly disabledRemove = input<boolean>(false);
-
-  // todo - on editing patch values to the form
 
   readonly marketChange = input<
     {
@@ -215,8 +224,11 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   readonly form = new FormGroup({
     symbol: new FormControl<string>('', { nonNullable: true }),
     /** original historical data pulled from the internet */
-    historicalData: new FormControl<{ date: string; price: number }[]>([], { nonNullable: true }),
-    unitsAvailableOnStart: new FormControl<number>(1000, { nonNullable: true, validators: [positiveNumberValidator] }),
+    historicalData: new FormControl<number[]>([], { nonNullable: true }),
+    unitsAvailableOnStart: new FormControl<number>(1000, {
+      nonNullable: true,
+      validators: [positiveNumberValidator, minValueValidator(1)],
+    }),
     unitsInfinity: new FormControl<boolean>(false, { nonNullable: true }),
     /** possible to issue more shares of a specific symbol */
     unitsAdditionalIssued: new FormArray<
@@ -236,16 +248,14 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   readonly formData = toSignal(this.form.valueChanges, { initialValue: this.form.value });
   readonly formDataChartSeries = computed(() => {
     const data = this.formData();
+
     const maxRounds = this.maximumRounds();
     const marketChange = this.marketChange();
 
     const multiply = data.priceMultiplication ?? 1;
 
     // multiply the historical data by the price multiplication
-    const multipliedData = Array.from(
-      { length: maxRounds },
-      (_, i) => (data.historicalData?.at(i)?.price ?? 0) * multiply,
-    );
+    const multipliedData = Array.from({ length: maxRounds }, (_, i) => (data.historicalData?.at(i) ?? 0) * multiply);
 
     // apply market change
     const multipliedDataWithMarketChange = marketChange.reduce((acc, { startingRound, endingRound, valueChange }) => {
@@ -289,29 +299,24 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
     const formData = this.formData();
     const maxRounds = this.maximumRounds();
 
-    if (!this.form.valid) {
-      return;
-    }
-
     const data: TradingSimulatorSymbol = {
       symbol: formData.symbol ?? 'Unknown',
       unitsCurrentlyAvailable: formData.unitsAvailableOnStart ?? 0,
       unitsAvailableOnStart: formData.unitsAvailableOnStart ?? 0,
+      priceMultiplication: formData.priceMultiplication ?? 1,
+      unitsInfinity: formData.unitsInfinity ?? false,
       unitsAdditionalIssued:
         formData.unitsAdditionalIssued?.map((d) => ({
           issuedOnRound: d.issuedOnRound ?? 0,
           units: d.units ?? 0,
         })) ?? [],
       // save modified historical data
-      historicalDataModified: Array.from({ length: historicalDataModified.length }, (_, i) => ({
-        round: i + 1,
-        price: historicalDataModified[i],
-      })),
+      historicalDataModified: Array.from(
+        { length: historicalDataModified.length },
+        (_, i) => historicalDataModified[i],
+      ),
       // save original historical data
-      historicalDataOriginal: Array.from({ length: maxRounds }, (_, i) => ({
-        round: i + 1,
-        price: formData.historicalData?.at(i)?.price ?? 0,
-      })),
+      historicalDataOriginal: Array.from({ length: maxRounds }, (_, i) => formData.historicalData?.at(i) ?? 0),
     };
 
     // notify the parent component about the change
@@ -324,16 +329,15 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
     this.form.controls.unitsInfinity.valueChanges.pipe(takeUntilDestroyed()).subscribe((res) => {
       if (res) {
         this.form.controls.unitsAvailableOnStart.disable();
+        this.form.controls.unitsAvailableOnStart.patchValue(0);
       } else {
         this.form.controls.unitsAvailableOnStart.enable();
+        this.form.controls.unitsAvailableOnStart.patchValue(1000);
       }
 
       // update the form value
       this.form.controls.unitsInfinity.updateValueAndValidity({ emitEvent: false });
     });
-
-    // fill the form with random data
-    this.fillFormData();
   }
 
   onChange: (value: TradingSimulatorSymbol) => void = () => {
@@ -384,7 +388,7 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
       await firstValueFrom(
         this.marketApiService.getHistoricalPrices(s1, SymbolHistoricalPeriods.year).pipe(catchError(() => of([]))),
       )
-    ).map((d) => ({ date: d.date, price: d.close }));
+    ).map((d) => d.close);
 
     // set the form data
     this.form.patchValue({ historicalData });
@@ -394,7 +398,17 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   }
 
   writeValue(obj: TradingSimulatorSymbol): void {
-    console.log('writeValue', obj);
+    if (obj.symbol === '') {
+      this.fillFormData();
+    } else {
+      this.form.patchValue({
+        historicalData: obj.historicalDataOriginal,
+        symbol: obj.symbol,
+        unitsInfinity: obj.unitsInfinity,
+        unitsAvailableOnStart: obj.unitsAvailableOnStart,
+        priceMultiplication: obj.priceMultiplication,
+      });
+    }
   }
 
   registerOnChange(fn: TradingSimulatorFormSymbolComponent['onChange']): void {
@@ -406,6 +420,14 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
    */
   registerOnTouched(fn: TradingSimulatorFormSymbolComponent['onTouched']): void {
     this.onTouched = fn;
+  }
+
+  /**
+   * Validator function for the form
+   */
+  validate() {
+    this.form.markAllAsTouched();
+    return this.form.valid ? null : { invalidForm: { valid: false, message: 'Symbol form fields are invalid' } };
   }
 
   /**

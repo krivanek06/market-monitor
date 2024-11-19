@@ -5,13 +5,17 @@ import {
   arrayUnion,
   collection,
   CollectionReference,
+  deleteDoc,
   doc,
   DocumentData,
   DocumentReference,
   Firestore,
+  getDocs,
   limit,
+  orderBy,
   query,
   setDoc,
+  updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
@@ -25,7 +29,6 @@ import {
   TradingSimulatorTransactionAggregation,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { orderBy, updateDoc } from 'firebase/firestore';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
 import { combineLatest, map, Observable, shareReplay } from 'rxjs';
 
@@ -92,12 +95,20 @@ export class TradingSimulatorApiService {
     return rxDocData(this.getTradingSimulatorParticipantsDocRef(id, participantId));
   }
 
-  upsertTradingSimulator(data: {
+  async upsertTradingSimulator(data: {
     tradingSimulator: TradingSimulator;
     tradingSimulatorSymbol: TradingSimulatorSymbol[];
-  }): void {
+  }): Promise<void> {
     // save trading simulator
     setDoc(this.getTradingSimulatorDocRef(data.tradingSimulator.id), data.tradingSimulator);
+
+    // get all symbols
+    const snapshot = await getDocs(this.getTradingSimulatorSymbolsCollection(data.tradingSimulator.id));
+
+    // remove previous symbols
+    for (const doc of snapshot.docs) {
+      await deleteDoc(doc.ref);
+    }
 
     // save trading simulator symbols
     data.tradingSimulatorSymbol.forEach((symbol) => {

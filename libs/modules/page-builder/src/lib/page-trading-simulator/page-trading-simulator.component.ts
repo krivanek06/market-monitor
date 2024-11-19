@@ -67,8 +67,6 @@ export class PageTradingSimulatorComponent {
       return;
     }
 
-    console.log('invitationCode', invitationCode);
-
     if (invitationCode !== simulator.invitationCode) {
       this.dialogServiceUtil.showNotificationBar('Invalid invitation code', 'error');
       return;

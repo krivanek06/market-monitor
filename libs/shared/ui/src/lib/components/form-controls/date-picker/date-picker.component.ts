@@ -233,6 +233,7 @@ export class DatePickerComponent implements ControlValueAccessor {
     }
     const formattedDate = new Date(value);
     this.selectedDate.patchValue(formattedDate, { emitEvent: false });
+    this.displayDateString.set(this.formatDate(formattedDate));
   }
 
   /**

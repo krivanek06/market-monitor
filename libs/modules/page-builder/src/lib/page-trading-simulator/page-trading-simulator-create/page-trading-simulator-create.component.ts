@@ -9,6 +9,8 @@ import { TradingSimulatorFormComponent } from '@mm/trading-simulator/features';
   styles: `
     :host {
       display: block;
+      max-width: 1320px;
+      margin: 0 auto;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

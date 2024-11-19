@@ -1,11 +1,7 @@
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TradingSimulatorApiService } from '@mm/api-client';
-import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { ROUTES_MAIN } from '@mm/shared/data-access';
-import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { delay, map, of, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
+import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulator-base.component';
 
 @Component({
   selector: 'app-page-trading-simulator-details',
@@ -25,34 +21,7 @@ import { delay, map, of, switchMap } from 'rxjs';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageTradingSimulatorDetailsComponent {
-  private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
-  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private readonly dialogServiceUtil = inject(DialogServiceUtil);
-  private readonly router = inject(Router);
-
-  private readonly simulatorId$ = inject(ActivatedRoute).params.pipe(map((params) => params['id'] as string));
-
-  readonly simulatorData = toSignal(
-    this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorApiService.getTradingSimulatorById(selectedId)),
-    ),
-  );
-
-  readonly simulatorDataSymbols = toSignal(
-    this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorApiService.getTradingSimulatorByIdSymbols(selectedId)),
-    ),
-  );
-
-  readonly simulatorDataTransactions = toSignal(
-    this.simulatorId$.pipe(
-      switchMap((selectedId) =>
-        this.tradingSimulatorApiService.getTradingSimulatorByIdTransactionAggregation(selectedId),
-      ),
-    ),
-  );
-
+export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBaseComponent {
   readonly simulatorDataTopParticipants = toSignal(
     this.simulatorId$.pipe(
       switchMap((selectedId) => this.tradingSimulatorApiService.getTradingSimulatorByIdTopParticipants(selectedId)),
@@ -71,25 +40,10 @@ export class PageTradingSimulatorDetailsComponent {
   );
 
   constructor() {
-    // check if simulator exists
-    of(null)
-      .pipe(
-        delay(3000),
-        map(() => this.simulatorData()),
-      )
-      .subscribe((res) => {
-        if (!res) {
-          this.dialogServiceUtil.showNotificationBar('Trading simulator not found', 'error');
-          this.router.navigateByUrl(ROUTES_MAIN.TRADING_SIMULATOR);
-        }
-      });
+    super();
 
-    // log changes
     effect(() => {
       console.log('PageTradingSimulatorDetailsComponent', {
-        simulatorData: this.simulatorData(),
-        simulatorDataSymbols: this.simulatorDataSymbols(),
-        simulatorDataTransactions: this.simulatorDataTransactions(),
         simulatorDataTopParticipants: this.simulatorDataTopParticipants(),
         simulatorDataParticipant: this.simulatorDataParticipant(),
       });

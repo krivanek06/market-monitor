@@ -17,6 +17,7 @@ import {
   positiveNumberValidator,
   requiredValidator,
   ROUTES_MAIN,
+  ROUTES_TRADING_SIMULATOR,
 } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
@@ -41,6 +42,7 @@ import {
 } from '@mm/shared/ui';
 import { TradingSimulatorInfoCreateButtonComponent } from '@mm/trading-simulator/ui';
 import { addSeconds } from 'date-fns';
+import { effectOnceIf } from 'ngxtension/effect-once-if';
 import { map, startWith } from 'rxjs';
 import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-symbol/trading-simulator-form-symbol.component';
 
@@ -133,45 +135,47 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
         </div>
 
         <!-- margin trading -->
-        <app-section-title
-          title="Margin trading"
-          description="Setup margin trading for this simulator"
-          titleSize="base"
-          class="mb-4"
-        >
-          <mat-checkbox [formControl]="form.controls.marginTradingEnabled" color="primary">
-            Margin Trading
-          </mat-checkbox>
-        </app-section-title>
+        @if (false) {
+          <app-section-title
+            title="Margin trading"
+            description="Setup margin trading for this simulator"
+            titleSize="base"
+            class="mb-4"
+          >
+            <mat-checkbox [formControl]="form.controls.marginTradingEnabled" color="primary">
+              Margin Trading
+            </mat-checkbox>
+          </app-section-title>
 
-        <!-- margin trading form -->
-        <div class="flex gap-4 *:flex-1">
-          <!-- subtract period days -->
-          <app-form-mat-input-wrapper
-            inputCaption="Subtract period days"
-            inputType="NUMBER"
-            [formControl]="form.controls.marginTrading.controls.subtractPeriodRounds"
-          />
+          <!-- margin trading form -->
+          <div class="flex gap-4 *:flex-1">
+            <!-- subtract period days -->
+            <app-form-mat-input-wrapper
+              inputCaption="Subtract period days"
+              inputType="NUMBER"
+              [formControl]="form.controls.marginTrading.controls.subtractPeriodRounds"
+            />
 
-          <!-- subtract interest rate -->
-          <app-form-mat-input-wrapper
-            inputCaption="Subtract interest rate"
-            inputType="NUMBER"
-            [formControl]="form.controls.marginTrading.controls.subtractInterestRate"
-          />
+            <!-- subtract interest rate -->
+            <app-form-mat-input-wrapper
+              inputCaption="Subtract interest rate"
+              inputType="NUMBER"
+              [formControl]="form.controls.marginTrading.controls.subtractInterestRate"
+            />
 
-          <!-- margin conversion rate -->
-          <app-form-mat-input-wrapper
-            inputCaption="Margin conversion rate"
-            inputType="NUMBER"
-            [formControl]="form.controls.marginTrading.controls.marginConversionRate"
-          />
-        </div>
+            <!-- margin conversion rate -->
+            <app-form-mat-input-wrapper
+              inputCaption="Margin conversion rate"
+              inputType="NUMBER"
+              [formControl]="form.controls.marginTrading.controls.marginConversionRate"
+            />
+          </div>
 
-        <!-- divider -->
-        <div class="my-3">
-          <mat-divider />
-        </div>
+          <!-- divider -->
+          <div class="my-3">
+            <mat-divider />
+          </div>
+        }
 
         <!-- issued cash -->
         <app-section-title
@@ -345,26 +349,28 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
         </app-general-card>
 
         <!-- margin trading -->
-        <app-general-card title="Margin Trading">
-          @if (formData().marginTradingEnabled) {
-            <div class="g-item-wrapper">
-              <span>Subtract period</span>
-              <span>{{ formData().marginTrading?.subtractPeriodRounds }}</span>
-            </div>
+        @if (false) {
+          <app-general-card title="Margin Trading">
+            @if (formData().marginTradingEnabled) {
+              <div class="g-item-wrapper">
+                <span>Subtract period</span>
+                <span>{{ formData().marginTrading?.subtractPeriodRounds }}</span>
+              </div>
 
-            <div class="g-item-wrapper">
-              <span>Interest rate</span>
-              <span>{{ formData().marginTrading?.subtractInterestRate }}</span>
-            </div>
+              <div class="g-item-wrapper">
+                <span>Interest rate</span>
+                <span>{{ formData().marginTrading?.subtractInterestRate }}</span>
+              </div>
 
-            <div class="g-item-wrapper">
-              <span>Margin Rate</span>
-              <span>{{ formData().marginTrading?.marginConversionRate }}:1</span>
-            </div>
-          } @else {
-            <div class="p-2 text-center">Margin trading disabled</div>
-          }
-        </app-general-card>
+              <div class="g-item-wrapper">
+                <span>Margin Rate</span>
+                <span>{{ formData().marginTrading?.marginConversionRate }}:1</span>
+              </div>
+            } @else {
+              <div class="p-2 text-center">Margin trading disabled</div>
+            }
+          </app-general-card>
+        }
 
         <!-- issued cash -->
         <app-general-card title="Issued Cash">
@@ -427,8 +433,6 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
   styles: `
     :host {
       display: block;
-      max-width: 1180px;
-      margin: 0 auto;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -448,7 +452,10 @@ export class TradingSimulatorFormComponent {
   /**
    * provide an existing trading simulator to edit it
    */
-  readonly existingTradingSimulator = input<TradingSimulator | null>();
+  readonly existingTradingSimulator = input<{
+    simulator: TradingSimulator;
+    simulatorSymbols: TradingSimulatorSymbol[];
+  } | null>();
 
   readonly form = new FormGroup({
     name: new FormControl('', {
@@ -500,7 +507,7 @@ export class TradingSimulatorFormComponent {
     >([]),
 
     // margin trading
-    marginTradingEnabled: new FormControl<boolean>(true, { nonNullable: true }),
+    marginTradingEnabled: new FormControl<boolean>(false, { nonNullable: true }),
     marginTrading: new FormGroup({
       subtractPeriodRounds: new FormControl(7, {
         validators: [requiredValidator, positiveNumberValidator],
@@ -523,9 +530,11 @@ export class TradingSimulatorFormComponent {
           symbol: '',
           unitsAvailableOnStart: 0,
           unitsCurrentlyAvailable: 0,
+          priceMultiplication: 1,
           unitsAdditionalIssued: [],
           historicalDataModified: [],
           historicalDataOriginal: [],
+          unitsInfinity: true,
         },
         { nonNullable: true },
       ),
@@ -534,9 +543,11 @@ export class TradingSimulatorFormComponent {
           symbol: '',
           unitsAvailableOnStart: 0,
           unitsCurrentlyAvailable: 0,
+          priceMultiplication: 1,
           unitsAdditionalIssued: [],
           historicalDataModified: [],
           historicalDataOriginal: [],
+          unitsInfinity: true,
         },
         { nonNullable: true },
       ),
@@ -545,9 +556,11 @@ export class TradingSimulatorFormComponent {
           symbol: '',
           unitsAvailableOnStart: 0,
           unitsCurrentlyAvailable: 0,
+          priceMultiplication: 1,
           unitsAdditionalIssued: [],
           historicalDataModified: [],
           historicalDataOriginal: [],
+          unitsInfinity: true,
         },
         { nonNullable: true },
       ),
@@ -556,9 +569,11 @@ export class TradingSimulatorFormComponent {
           symbol: '',
           unitsAvailableOnStart: 0,
           unitsCurrentlyAvailable: 0,
+          priceMultiplication: 1,
           unitsAdditionalIssued: [],
           historicalDataModified: [],
           historicalDataOriginal: [],
+          unitsInfinity: true,
         },
         { nonNullable: true },
       ),
@@ -567,9 +582,11 @@ export class TradingSimulatorFormComponent {
           symbol: '',
           unitsAvailableOnStart: 0,
           unitsCurrentlyAvailable: 0,
+          priceMultiplication: 1,
           unitsAdditionalIssued: [],
           historicalDataModified: [],
           historicalDataOriginal: [],
+          unitsInfinity: true,
         },
         { nonNullable: true },
       ),
@@ -610,6 +627,14 @@ export class TradingSimulatorFormComponent {
       ),
     ),
     { requireSync: true },
+  );
+
+  // check if we have existing trading simulator
+  readonly existingSimulatorEffect = effectOnceIf(
+    () => this.existingTradingSimulator(),
+    (existing) => {
+      this.patchValuesToTheForm(existing);
+    },
   );
 
   constructor() {
@@ -660,21 +685,23 @@ export class TradingSimulatorFormComponent {
     // notify user
     this.dialogServiceUtil.showNotificationBar(`Trading simulator ${tradingSimulator.name} updated`, 'success');
 
-    if (!this.existingTradingSimulator()) {
-      // route to trading simulator
-      this.router.navigateByUrl(ROUTES_MAIN.TRADING_SIMULATOR);
-    }
+    // route to trading simulator editing
+    this.router.navigateByUrl(
+      `${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.EDIT}/${tradingSimulator.id}`,
+    );
   }
 
-  onAddSymbol(): void {
+  onAddSymbol(data?: TradingSimulatorSymbol): void {
     // create form group for symbol
     const symbolForm: TradingSimulatorSymbol = {
-      symbol: '',
-      unitsAvailableOnStart: 0,
-      unitsCurrentlyAvailable: 0,
-      unitsAdditionalIssued: [],
-      historicalDataModified: [],
-      historicalDataOriginal: [],
+      symbol: data?.symbol ?? '',
+      priceMultiplication: data?.priceMultiplication ?? 1,
+      unitsAvailableOnStart: data?.unitsAvailableOnStart ?? 0,
+      unitsCurrentlyAvailable: data?.unitsAvailableOnStart ?? 0,
+      unitsAdditionalIssued: data?.unitsAdditionalIssued ?? [],
+      historicalDataModified: data?.historicalDataModified ?? [],
+      historicalDataOriginal: data?.historicalDataOriginal ?? [],
+      unitsInfinity: data?.unitsInfinity ?? true,
     };
 
     // create control
@@ -739,7 +766,7 @@ export class TradingSimulatorFormComponent {
     const formData = this.form.getRawValue();
     const formDataMore = this.formData();
 
-    const existing = this.existingTradingSimulator();
+    const existing = this.existingTradingSimulator()?.simulator;
 
     const currentTimeRoundedTo10Minutes = getCurrentDateAndTimeRoundedTo('10_MINUTES');
     const user = this.authenticationUserStoreService.state.getUserData();
@@ -780,6 +807,8 @@ export class TradingSimulatorFormComponent {
           unitsAdditionalIssued: d.unitsAdditionalIssued,
           historicalDataModified: d.historicalDataModified,
           historicalDataOriginal: d.historicalDataOriginal,
+          priceMultiplication: d.priceMultiplication,
+          unitsInfinity: d.unitsInfinity,
         }) satisfies TradingSimulatorSymbol,
     );
   }
@@ -868,5 +897,54 @@ export class TradingSimulatorFormComponent {
     this.form.controls.marginTrading.controls.subtractPeriodRounds.updateValueAndValidity();
     this.form.controls.marginTrading.controls.subtractInterestRate.updateValueAndValidity();
     this.form.controls.marginTrading.controls.marginConversionRate.updateValueAndValidity();
+  }
+
+  private patchValuesToTheForm(existing: {
+    simulator: TradingSimulator;
+    simulatorSymbols: TradingSimulatorSymbol[];
+  }): void {
+    this.form.patchValue(
+      {
+        name: existing.simulator.name,
+        startTime: new Date(existing.simulator.startDateTime),
+        maximumRounds: existing.simulator.maximumRounds,
+        roundIntervalSeconds: existing.simulator.oneRoundDurationSeconds,
+        startingCash: existing.simulator.cashStartingValue,
+        invitationCode: existing.simulator.invitationCode,
+        marginTradingEnabled: !!existing.simulator.marginTrading,
+        cashIssuedEnabled: !!existing.simulator.cashAdditionalIssued.length,
+        marketChangeEnabled: !!existing.simulator.marketChange.length,
+        marginTrading: {
+          subtractPeriodRounds: existing.simulator.marginTrading?.subtractPeriodRounds,
+          subtractInterestRate: existing.simulator.marginTrading?.subtractInterestRate,
+          marginConversionRate: existing.simulator.marginTrading?.marginConversionRate,
+        },
+      },
+      { emitEvent: false },
+    );
+
+    // patch issued cash
+    existing.simulator.cashAdditionalIssued.forEach((cash) => {
+      this.onAddIssuedCash();
+      this.form.controls.cashIssued.controls.at(-1)?.patchValue(cash, {
+        emitEvent: false,
+      });
+    });
+
+    // patch market change
+    existing.simulator.marketChange.forEach((change) => {
+      this.onAddMarketChange();
+      this.form.controls.marketChange.controls.at(-1)?.patchValue(change, {
+        emitEvent: false,
+      });
+    });
+
+    // remove existing symbols (default values)
+    this.form.controls.symbolsHistoricalData.clear();
+
+    // patch symbols
+    existing.simulatorSymbols.forEach((symbol) => {
+      this.onAddSymbol(symbol);
+    });
   }
 }

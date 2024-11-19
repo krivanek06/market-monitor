@@ -80,29 +80,29 @@ export class TradingSimulatorInfoCreateButtonComponent {
         },
       ],
     },
-    {
-      title: 'Margin Trading',
-      description: `
-        Example of how margin trading works with the following configuration: \n
-        Subtract Period: 5, Interest Rate: 6, Margin Rate: 4\n
-        User with 1000$ can borrow maximum 4x (margin rate) = 4000cash.
-        Every 5 (period) days, 6% (interest rate) of the borrowed amount will be subtracted from the user's account until the user fully repays the borrowed amount.
-        However when user's cash balance falls below 750$ (1/margin rate), the margin is automatically repaid.
-        `,
-      info: [
-        {
-          title: 'Subtract Period',
-          description: 'Periods (in days), how frequently a cash amount will be subtracted from the user account',
-        },
-        {
-          title: 'Interest Rate',
-          description: 'The interest rate that will be applied to the cash amount the the user has borrowed',
-        },
-        {
-          title: 'Margin Rate',
-          description: 'The percentage of the borrowed amount that the user must have in cash in their account',
-        },
-      ],
-    },
+    // {
+    //   title: 'Margin Trading',
+    //   description: `
+    //     Example of how margin trading works with the following configuration: \n
+    //     Subtract Period: 5, Interest Rate: 6, Margin Rate: 4\n
+    //     User with 1000$ can borrow maximum 4x (margin rate) = 4000cash.
+    //     Every 5 (period) days, 6% (interest rate) of the borrowed amount will be subtracted from the user's account until the user fully repays the borrowed amount.
+    //     However when user's cash balance falls below 750$ (1/margin rate), the margin is automatically repaid.
+    //     `,
+    //   info: [
+    //     {
+    //       title: 'Subtract Period',
+    //       description: 'Periods (in days), how frequently a cash amount will be subtracted from the user account',
+    //     },
+    //     {
+    //       title: 'Interest Rate',
+    //       description: 'The interest rate that will be applied to the cash amount the the user has borrowed',
+    //     },
+    //     {
+    //       title: 'Margin Rate',
+    //       description: 'The percentage of the borrowed amount that the user must have in cash in their account',
+    //     },
+    //   ],
+    // },
   ];
 }
