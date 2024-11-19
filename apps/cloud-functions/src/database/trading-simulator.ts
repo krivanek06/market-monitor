@@ -1,14 +1,17 @@
 import {
   TradingSimulator,
+  TradingSimulatorAggregations,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
-  TradingSimulatorTransactionAggregation,
 } from '@mm/api-types';
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './assign-type';
 
 const tradingSimulatorCollectionRef = () =>
   firestore().collection('trading_simulator').withConverter(assignTypes<TradingSimulator>());
+
+const tradingSimulatorMoreInformationCollectionRef = (id: string) =>
+  tradingSimulatorDocRef(id).collection('more_information');
 
 export const tradingSimulatorDocRef = (id: string) => tradingSimulatorCollectionRef().doc(id);
 
@@ -24,7 +27,7 @@ export const tradingSimulatorSymbolsCollectionRef = (id: string) =>
 export const tradingSimulatorSymbolDocRef = (id: string, symbol: string) =>
   tradingSimulatorSymbolsCollectionRef(id).doc(symbol);
 
-export const tradingSimulatorTransactionsCollectionRef = (id: string) =>
-  tradingSimulatorDocRef(id)
-    .collection('transactions')
-    .withConverter(assignTypes<TradingSimulatorTransactionAggregation>());
+export const tradingSimulatorAggregationDocRef = (id: string) =>
+  tradingSimulatorMoreInformationCollectionRef(id)
+    .doc('aggregations')
+    .withConverter(assignTypes<TradingSimulatorAggregations>());

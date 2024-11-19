@@ -44,3 +44,4 @@ export const GROUP_CLOSED = 'Group is closed';
 // orders
 export const OUTSTANDING_ORDER_MAX_ALLOWED = `You can have maximum ${OUTSTANDING_ORDERS_MAX_ORDERS} outstanding orders`;
 export const DATA_NOT_FOUND_ERROR = 'Data not found';
+export const SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL = 'Not enough units to sell';

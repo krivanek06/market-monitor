@@ -301,7 +301,6 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
 
     const data: TradingSimulatorSymbol = {
       symbol: formData.symbol ?? 'Unknown',
-      unitsCurrentlyAvailable: formData.unitsAvailableOnStart ?? 0,
       unitsAvailableOnStart: formData.unitsAvailableOnStart ?? 0,
       priceMultiplication: formData.priceMultiplication ?? 1,
       unitsInfinity: formData.unitsInfinity ?? false,

@@ -1,4 +1,4 @@
-import { PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
+import { PortfolioGrowth, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
 import { UserBaseMin } from './user.model';
 
 export type TradingSimulatorBase = {
@@ -150,9 +150,9 @@ export type TradingSimulatorParticipant = {
   holdings: PortfolioStateHoldingBase[];
 
   /**
-   * user's portfolio growth data - updated on every next round
+   * user's portfolio growth data - updated when simulator closes
    */
-  // portfolioGrowth: PortfolioGrowth[];
+  portfolioGrowth: PortfolioGrowth[];
 
   /**
    * user's last N executed portfolio transactions
@@ -180,13 +180,6 @@ export type TradingSimulatorSymbol = {
    * if true, then the symbol has unlimited units
    */
   unitsInfinity: boolean;
-
-  /**
-   * every time a transaction happens, this value is updated
-   * default is the same as 'unitsAvailableOnStart'
-   * should never be negative
-   */
-  unitsCurrentlyAvailable: number;
 
   /**
    * by how much to multiply the original price
@@ -217,20 +210,6 @@ export type TradingSimulatorSymbol = {
 };
 
 /**
- * transaction container
- */
-export type TradingSimulatorTransactionAggregation = {
-  /** best return transaction (only SELL transactions) */
-  bestTransaction: PortfolioTransaction[];
-
-  /** worst return transaction (only SELL transactions) */
-  worstTransaction: PortfolioTransaction[];
-
-  /** last N transactions of whatever user */
-  lastTransactions: PortfolioTransaction[];
-};
-
-/**
  * some aggregations of the trading simulator
  */
 export type TradingSimulatorLatestData = {
@@ -242,19 +221,49 @@ export type TradingSimulatorLatestData = {
 /**
  * aggregations of the trading simulator example:
  * - which symbol was how many times bought/sold
- * - which user had the best return
+ * - which users had the best return
+ * - which users had the worst return
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+
 export type TradingSimulatorAggregations = {
-  // todo - implement it
+  /** statistics about available symbols */
+  symbolAggregations: Record<
+    string,
+    {
+      buyOperations: number;
+      boughtUnits: number;
+      investedTotal: number;
+
+      sellOperations: number;
+      soldUnits: number;
+      soldTotal: number;
+
+      /**
+       * every time a transaction happens, this value is updated
+       * default is the same as 'unitsAvailableOnStart'
+       * should never be negative
+       */
+      unitsCurrentlyAvailable: number;
+      unitsInfinity: boolean;
+    }
+  >;
+
+  /** best return transaction (only SELL transactions) */
+  bestTransactions: PortfolioTransaction[];
+
+  /** worst return transaction (only SELL transactions) */
+  worstTransactions: PortfolioTransaction[];
+
+  /** last N transactions of whatever user */
+  lastTransactions: PortfolioTransaction[];
 };
 
 /**
  *
  * collection: trading_simulator
  * - document: TradingSimulator
- *   -- collection: transactions
- *     -- document: PortfolioTransaction
+ *   -- collection: more_information
+ *     -- document: aggregations: TradingSimulatorAggregations
  *
  *   -- collection: participants (each user one document)
  *    -- documents: TradingSimulatorParticipant
@@ -263,8 +272,6 @@ export type TradingSimulatorAggregations = {
  *    -- documents: TradingSimulatorSymbol
  */
 
-// todo - if shorting is possible and I want to close my position, what to do if units are not available ??
-
 export type TradingSimulatorGeneralActions = { simulatorId: string } & (
   | {
       type: 'joinSimulator';
@@ -272,6 +279,10 @@ export type TradingSimulatorGeneralActions = { simulatorId: string } & (
     }
   | {
       type: 'leaveSimulator';
+    }
+  | {
+      type: 'addTransaction';
+      transaction: PortfolioTransaction;
     }
 );
 

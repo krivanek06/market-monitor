@@ -529,7 +529,6 @@ export class TradingSimulatorFormComponent {
         {
           symbol: '',
           unitsAvailableOnStart: 0,
-          unitsCurrentlyAvailable: 0,
           priceMultiplication: 1,
           unitsAdditionalIssued: [],
           historicalDataModified: [],
@@ -542,7 +541,6 @@ export class TradingSimulatorFormComponent {
         {
           symbol: '',
           unitsAvailableOnStart: 0,
-          unitsCurrentlyAvailable: 0,
           priceMultiplication: 1,
           unitsAdditionalIssued: [],
           historicalDataModified: [],
@@ -555,7 +553,6 @@ export class TradingSimulatorFormComponent {
         {
           symbol: '',
           unitsAvailableOnStart: 0,
-          unitsCurrentlyAvailable: 0,
           priceMultiplication: 1,
           unitsAdditionalIssued: [],
           historicalDataModified: [],
@@ -568,7 +565,6 @@ export class TradingSimulatorFormComponent {
         {
           symbol: '',
           unitsAvailableOnStart: 0,
-          unitsCurrentlyAvailable: 0,
           priceMultiplication: 1,
           unitsAdditionalIssued: [],
           historicalDataModified: [],
@@ -581,7 +577,6 @@ export class TradingSimulatorFormComponent {
         {
           symbol: '',
           unitsAvailableOnStart: 0,
-          unitsCurrentlyAvailable: 0,
           priceMultiplication: 1,
           unitsAdditionalIssued: [],
           historicalDataModified: [],
@@ -697,7 +692,6 @@ export class TradingSimulatorFormComponent {
       symbol: data?.symbol ?? '',
       priceMultiplication: data?.priceMultiplication ?? 1,
       unitsAvailableOnStart: data?.unitsAvailableOnStart ?? 0,
-      unitsCurrentlyAvailable: data?.unitsAvailableOnStart ?? 0,
       unitsAdditionalIssued: data?.unitsAdditionalIssued ?? [],
       historicalDataModified: data?.historicalDataModified ?? [],
       historicalDataOriginal: data?.historicalDataOriginal ?? [],
@@ -803,7 +797,6 @@ export class TradingSimulatorFormComponent {
         ({
           symbol: d.symbol,
           unitsAvailableOnStart: d.unitsAvailableOnStart,
-          unitsCurrentlyAvailable: d.unitsAvailableOnStart,
           unitsAdditionalIssued: d.unitsAdditionalIssued,
           historicalDataModified: d.historicalDataModified,
           historicalDataOriginal: d.historicalDataOriginal,

@@ -30,9 +30,7 @@ export abstract class PageTradingSimulatorBaseComponent {
 
   readonly simulatorDataTransactions = toSignal(
     this.simulatorId$.pipe(
-      switchMap((selectedId) =>
-        this.tradingSimulatorApiService.getTradingSimulatorByIdTransactionAggregation(selectedId),
-      ),
+      switchMap((selectedId) => this.tradingSimulatorApiService.getTradingSimulatorByIdTransactions(selectedId)),
     ),
   );
 
