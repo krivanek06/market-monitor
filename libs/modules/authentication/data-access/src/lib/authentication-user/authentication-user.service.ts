@@ -9,7 +9,7 @@ import {
   UserGroupData,
   UserWatchList,
 } from '@mm/api-types';
-import { getCurrentDateDefaultFormat } from '@mm/shared/general-util';
+import { getCurrentDateDefaultFormat, transformUserToBaseMin } from '@mm/shared/general-util';
 import { User } from 'firebase/auth';
 import { signalSlice } from 'ngxtension/signal-slice';
 import { combineLatest, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
@@ -207,6 +207,7 @@ export class AuthenticationUserService {
     selectors: (state) => ({
       getUser: () => state().user!,
       getUserData: () => state().userData!,
+      getUserBaseMin: () => transformUserToBaseMin(state().userData!),
       getUserDataNormal: () => state().userData,
       getUserGroupData: () => state().userGroupData!,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),

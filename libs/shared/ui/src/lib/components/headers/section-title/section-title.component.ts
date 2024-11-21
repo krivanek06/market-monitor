@@ -9,24 +9,27 @@ import { MatIconModule } from '@angular/material/icon';
   template: `
     <div class="flex items-center justify-between gap-x-10">
       <!-- left side -->
-      <div class="flex-1">
-        <h2
-          class="text-wt-primary flex items-center gap-4"
-          [ngClass]="{
-            'text-lg': titleSize() === 'lg',
-            'text-base': titleSize() === 'base',
-            'text-xl': titleSize() === 'xl',
-          }"
-        >
-          @if (matIcon()) {
-            <mat-icon color="primary">{{ matIcon() }}</mat-icon>
-          }
-          {{ title() }}
-        </h2>
-
-        @if (description()) {
-          <p class="text-wt-gray-medium text-sm">{{ description() }}</p>
+      <div class="flex flex-1 items-center gap-3">
+        @if (matIcon()) {
+          <mat-icon color="primary">{{ matIcon() }}</mat-icon>
         }
+
+        <div>
+          <h2
+            class="text-wt-primary"
+            [ngClass]="{
+              'text-lg': titleSize() === 'lg',
+              'text-base': titleSize() === 'base',
+              'text-xl': titleSize() === 'xl',
+            }"
+          >
+            {{ title() }}
+          </h2>
+
+          @if (description()) {
+            <p class="text-wt-gray-medium text-sm">{{ description() }}</p>
+          }
+        </div>
       </div>
 
       <!-- right side -->

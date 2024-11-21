@@ -1,14 +1,42 @@
 import { CurrencyPipe, DatePipe, UpperCasePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { TradingSimulator, UserBaseMin } from '@mm/api-types';
-import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent } from '@mm/shared/ui';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent, SectionTitleComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-trading-simulator-info-overview-button',
   standalone: true,
-  imports: [InfoButtonComponent, DatePipe, DateReadablePipe, CurrencyPipe, DefaultImgDirective, UpperCasePipe],
+  imports: [
+    InfoButtonComponent,
+    DatePipe,
+    DateReadablePipe,
+    CurrencyPipe,
+    DefaultImgDirective,
+    UpperCasePipe,
+    MatIconModule,
+    SectionTitleComponent,
+  ],
   template: `
     <app-info-button infoDisplay="dialog" [useCustomContent]="true">
+      <!-- private into -->
+      @if (userData().id === tradingSimulator().owner.id) {
+        <app-section-title
+          matIcon="lock"
+          titleSize="base"
+          title="Private Information"
+          description="this section is only visible for the owner of the trading simulator"
+          class="mb-4"
+        />
+
+        <!-- invitation code -->
+        <div class="g-item-wrapper mb-3">
+          <span>Invitation Code</span>
+          <span>{{ tradingSimulator().invitationCode }}</span>
+        </div>
+      }
+
       <!-- basic info -->
       <div class="text-wt-primary mb-2">Basic Info</div>
       <div class="mb-4 grid grid-cols-2">
@@ -61,7 +89,7 @@ import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent } from '@mm/
       </div>
 
       <!-- Margin -->
-      <div class="text-wt-primary mb-2">Margin Trading</div>
+      <!--<div class="text-wt-primary mb-2">Margin Trading</div>
       <div class="mb-4 grid grid-cols-3 gap-x-4">
         @if (tradingSimulator().marginTrading) {
           <div class="g-item-wrapper">
@@ -81,7 +109,7 @@ import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent } from '@mm/
         } @else {
           <div class="border-wt-border col-span-3 border-b p-2 text-center">No margin trading</div>
         }
-      </div>
+      </div>-->
 
       <!-- Cash Issued -->
       <div class="text-wt-primary mb-2">Cash Issued</div>
@@ -123,6 +151,10 @@ import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent } from '@mm/
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingSimulatorInfoOverviewButtonComponent {
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+
   readonly tradingSimulator = input.required<TradingSimulator>();
   readonly participantUsers = input<UserBaseMin[]>([]);
+
+  readonly userData = this.authenticationUserStoreService.state.getUserData;
 }

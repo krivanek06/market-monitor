@@ -73,10 +73,10 @@ export class TradingSimulatorService {
   }
 
   simulatorStateChangeGoLive(simulator: TradingSimulator) {
-    const userData = this.authenticationUserStoreService.state.getUserData();
+    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
 
     // check if user is the owner
-    if (simulator.owner.id !== userData.id) {
+    if (simulator.owner.id !== userBase.id) {
       throw new Error('Only the owner can change the state of the simulator');
     }
 
@@ -90,10 +90,10 @@ export class TradingSimulatorService {
   }
 
   simulatorStateChangeDraft(simulator: TradingSimulator) {
-    const userData = this.authenticationUserStoreService.state.getUserData();
+    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
 
     // check if user is the owner
-    if (simulator.owner.id !== userData.id) {
+    if (simulator.owner.id !== userBase.id) {
       throw new Error('Only the owner can change the state of the simulator');
     }
 
@@ -112,7 +112,7 @@ export class TradingSimulatorService {
   }
 
   simulatorStateChangeStart(simulator: TradingSimulator) {
-    const userData = this.authenticationUserStoreService.state.getUserData();
+    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
 
     // check if simulator already started
     if (simulator.state === 'started') {
@@ -125,7 +125,7 @@ export class TradingSimulatorService {
     }
 
     // check if user is the owner
-    if (simulator.owner.id !== userData.id) {
+    if (simulator.owner.id !== userBase.id) {
       throw new Error('Only the owner can start the simulator');
     }
 
@@ -140,10 +140,10 @@ export class TradingSimulatorService {
   }
 
   joinSimulator(simulator: TradingSimulator, invitationCode: string) {
-    const user = this.authenticationUserStoreService.state.getUserData();
+    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
 
     // check if user is already a participant
-    if (simulator.participants.includes(user.id)) {
+    if (simulator.participants.includes(userBase.id)) {
       throw new Error('User is already a participant');
     }
 
@@ -158,19 +158,19 @@ export class TradingSimulatorService {
     }
 
     // add user to participants
-    this.tradingSimulatorApiService.joinSimulator(simulator, user);
+    this.tradingSimulatorApiService.joinSimulator(simulator, userBase);
   }
 
   leaveSimulator(simulator: TradingSimulator) {
-    const user = this.authenticationUserStoreService.state.getUserData();
+    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
 
     // check if user is a participant
-    if (!simulator.participants.includes(user.id)) {
+    if (!simulator.participants.includes(userBase.id)) {
       return;
     }
 
     // remove user from participants
-    this.tradingSimulatorApiService.leaveSimulator(simulator, user);
+    this.tradingSimulatorApiService.leaveSimulator(simulator, userBase);
   }
 
   async addTransaction(
