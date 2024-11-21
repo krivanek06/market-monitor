@@ -7,10 +7,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDivider } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { TradingSimulatorApiService } from '@mm/api-client';
 import { TRADING_SIMULATOR_MAX_ROUNDS, TradingSimulator, TradingSimulatorSymbol } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import {
+  dateTimeInFuture,
   intervalValidator,
   maxLengthValidator,
   minLengthValidator,
@@ -19,7 +19,7 @@ import {
   ROUTES_MAIN,
   ROUTES_TRADING_SIMULATOR,
 } from '@mm/shared/data-access';
-import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { Confirmable, DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
   createUUID,
   generateRandomString,
@@ -40,6 +40,7 @@ import {
   SliderControlConfig,
   TruncatePipe,
 } from '@mm/shared/ui';
+import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorInfoCreateButtonComponent } from '@mm/trading-simulator/ui';
 import { addSeconds } from 'date-fns';
 import { effectOnceIf } from 'ngxtension/effect-once-if';
@@ -87,13 +88,19 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           <app-form-mat-input-wrapper inputCaption="name" [formControl]="form.controls.name" />
 
           <!-- start time -->
-          <app-date-picker
-            [inputTypeDateTimePickerConfig]="startTimeConfig"
-            [formControl]="form.controls.startTime"
-            type="datetime"
-            roundToNear="10_MINUTES"
-            [hasError]="form.controls.startTime.touched && form.controls.startTime.invalid"
-          />
+          <div>
+            @let invalid = form.controls.startTime.touched && form.controls.startTime.invalid;
+            <app-date-picker
+              [inputTypeDateTimePickerConfig]="startTimeConfig"
+              [formControl]="form.controls.startTime"
+              type="datetime"
+              roundToNear="10_MINUTES"
+              [hasError]="invalid"
+            />
+            @if (invalid) {
+              <div class="text-wt-danger pl-2 text-xs">Date must be in the future</div>
+            }
+          </div>
 
           <!-- maximum round -->
           <app-form-mat-input-wrapper
@@ -184,7 +191,11 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           titleSize="base"
           class="mb-4"
         >
-          <mat-checkbox [formControl]="form.controls.cashIssuedEnabled" color="primary">Issue Cash</mat-checkbox>
+          <!-- add issued cash -->
+          <button mat-stroked-button color="primary" (click)="onAddIssuedCash()">
+            <mat-icon>add</mat-icon>
+            add cash
+          </button>
         </app-section-title>
 
         <!-- issued cash form -->
@@ -208,29 +219,11 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
               />
 
               <!-- delete -->
-              <button
-                mat-icon-button
-                (click)="onRemoveIssuedCash(i)"
-                color="warn"
-                [disabled]="!form.controls.cashIssuedEnabled.value"
-              >
+              <button mat-icon-button (click)="onRemoveIssuedCash(i)" color="warn">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
           }
-        </div>
-
-        <!-- add issued cash -->
-        <div class="flex justify-end">
-          <button
-            mat-stroked-button
-            color="primary"
-            (click)="onAddIssuedCash()"
-            [disabled]="!form.controls.cashIssuedEnabled.value"
-          >
-            <mat-icon>add</mat-icon>
-            add cash
-          </button>
         </div>
 
         <!-- divider -->
@@ -245,7 +238,11 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           titleSize="base"
           class="mb-4"
         >
-          <mat-checkbox [formControl]="form.controls.marketChangeEnabled" color="primary">Market Change</mat-checkbox>
+          <!-- add market change -->
+          <button mat-stroked-button color="primary" (click)="onAddMarketChange()">
+            <mat-icon>add</mat-icon>
+            add market change
+          </button>
         </app-section-title>
 
         <!-- market change form -->
@@ -277,34 +274,23 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
               />
 
               <!-- delete -->
-              <button
-                mat-icon-button
-                (click)="onRemoveMarketChange(i)"
-                color="warn"
-                [disabled]="!form.controls.marketChangeEnabled.value"
-              >
+              <button mat-icon-button (click)="onRemoveMarketChange(i)" color="warn">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
           }
         </div>
-
-        <!-- add market change -->
-        <div class="flex justify-end">
-          <button
-            mat-stroked-button
-            color="primary"
-            (click)="onAddMarketChange()"
-            [disabled]="!form.controls.marketChangeEnabled.value"
-          >
-            <mat-icon>add</mat-icon>
-            add market change
-          </button>
-        </div>
       </form>
 
       <!-- right side - explanation -->
       <div class="flex flex-col gap-3 pt-4">
+        <!-- not live warning -->
+        @if (existingTradingSimulator()?.simulator?.state === 'draft') {
+          <div class="rounded-md bg-gray-700 p-4 text-center text-yellow-600">
+            This simulator is not live. It will not be visible to other users.
+          </div>
+        }
+
         <!-- basic information -->
         <app-general-card title="Basic Information">
           <div class="g-item-wrapper">
@@ -377,21 +363,20 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           <div class="grid grid-cols-2 gap-y-2">
             <div class="text-wt-gray-dark">Selected day</div>
             <div class="text-wt-gray-dark">Issued value</div>
-            @if (formData().cashIssuedEnabled) {
-              @for (item of formData().cashIssued; track $index) {
-                <div>{{ item.issuedOnRound }}</div>
-                <div>{{ item.value }}</div>
-              } @empty {
-                <div class="col-span-2 p-2 text-center">No issued cash</div>
-              }
-            } @else {
-              <div class="col-span-2 p-2 text-center">Cash issuing disabled</div>
+            @for (item of formData().cashIssued; track $index) {
+              <div>{{ item.issuedOnRound }}</div>
+              <div>{{ item.value }}</div>
+            } @empty {
+              <div class="col-span-2 p-2 text-center">No issued cash</div>
             }
           </div>
         </app-general-card>
 
         <!-- submit button -->
-        <button type="button" mat-flat-button color="primary" (click)="onSubmit()" class="w-full">Submit</button>
+        <div class="flex flex-col gap-4 lg:flex-row">
+          <button type="button" mat-flat-button (click)="onDraftSave()" class="w-full">Save as Draft</button>
+          <button type="button" mat-stroked-button color="accent" (click)="onLiveSave()" class="w-full">GO Live</button>
+        </div>
       </div>
     </div>
 
@@ -438,7 +423,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingSimulatorFormComponent {
-  private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
+  private readonly tradingSimulatorService = inject(TradingSimulatorService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly router = inject(Router);
@@ -463,7 +448,10 @@ export class TradingSimulatorFormComponent {
       validators: [requiredValidator, maxLengthValidator(50), minLengthValidator(6)],
     }),
     // when to start the trading simulator
-    startTime: new FormControl<null | Date>(null, { nonNullable: true, validators: [requiredValidator] }),
+    startTime: new FormControl<null | Date>(null, {
+      nonNullable: true,
+      validators: [requiredValidator, dateTimeInFuture],
+    }),
     // how many rounds to play
     maximumRounds: new FormControl(100, {
       nonNullable: true,
@@ -483,7 +471,6 @@ export class TradingSimulatorFormComponent {
     }),
 
     // cash issuing
-    cashIssuedEnabled: new FormControl<boolean>(true, { nonNullable: true }),
     cashIssued: new FormArray<
       FormGroup<{
         /** how much cash to issue */
@@ -494,7 +481,6 @@ export class TradingSimulatorFormComponent {
     >([]),
 
     // market change - crash or positive value
-    marketChangeEnabled: new FormControl<boolean>(true, { nonNullable: true }),
     marketChange: new FormArray<
       FormGroup<{
         /** on which round to influence prices */
@@ -641,49 +627,18 @@ export class TradingSimulatorFormComponent {
     this.form.controls.marginTradingEnabled.valueChanges.pipe(takeUntilDestroyed()).subscribe((enabled) => {
       this.changeFormMarginTradingValidation(enabled);
     });
-
-    // listen on cash issued enabled state
-    this.form.controls.cashIssuedEnabled.valueChanges.pipe(takeUntilDestroyed()).subscribe((enabled) => {
-      this.changeFormCashIssuedValidation(enabled);
-    });
-
-    // listen on market change enabled state
-    this.form.controls.marketChangeEnabled.valueChanges.pipe(takeUntilDestroyed()).subscribe((enabled) => {
-      this.changeFormMarketChangeValidation(enabled);
-    });
   }
 
-  onSubmit(): void {
-    this.form.markAllAsTouched();
-    const userData = this.authenticationUserStoreService.state.getUserData();
+  @Confirmable(
+    'Confirm saving the draft state. Simulator will not be visible to other users, you can still edit the simulator',
+  )
+  onDraftSave(): void {
+    this.onSubmit('draft');
+  }
 
-    // invalid form
-    if (this.form.invalid) {
-      this.dialogServiceUtil.showNotificationBar('Please fill in all required fields', 'error');
-      return;
-    }
-
-    if (!userData.featureAccess?.createTradingSimulator) {
-      this.dialogServiceUtil.showNotificationBar('You do not have access to create trading simulator', 'error');
-      return;
-    }
-
-    const tradingSimulator = this.getTradingSimulatorFormData();
-    const tradingSimulatorSymbol = this.getTradingSimulatorSymbolData();
-
-    // update trading simulator
-    this.tradingSimulatorApiService.upsertTradingSimulator({
-      tradingSimulator,
-      tradingSimulatorSymbol,
-    });
-
-    // notify user
-    this.dialogServiceUtil.showNotificationBar(`Trading simulator ${tradingSimulator.name} updated`, 'success');
-
-    // route to trading simulator editing
-    this.router.navigateByUrl(
-      `${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.EDIT}/${tradingSimulator.id}`,
-    );
+  @Confirmable('Confirm going live with the simulator. Simulator will be visible to other users')
+  onLiveSave(): void {
+    this.onSubmit('live');
   }
 
   onAddSymbol(data?: TradingSimulatorSymbol): void {
@@ -756,6 +711,49 @@ export class TradingSimulatorFormComponent {
     this.form.controls.cashIssued.removeAt(index);
   }
 
+  private onSubmit(state: 'live' | 'draft'): void {
+    this.form.markAllAsTouched();
+    const userData = this.authenticationUserStoreService.state.getUserData();
+
+    // invalid form
+    if (this.form.invalid) {
+      this.dialogServiceUtil.showNotificationBar('Please fill in all required fields', 'error');
+      return;
+    }
+
+    if (!userData.featureAccess?.createTradingSimulator) {
+      this.dialogServiceUtil.showNotificationBar('You do not have access to create trading simulator', 'error');
+      return;
+    }
+
+    const tradingSimulator = this.getTradingSimulatorFormData();
+    const tradingSimulatorSymbol = this.getTradingSimulatorSymbolData();
+
+    // notify user
+    this.dialogServiceUtil.showNotificationBar(`Updating ${tradingSimulator.name} simulator`);
+
+    // update trading simulator
+    this.tradingSimulatorService.upsertTradingSimulator({
+      tradingSimulator,
+      tradingSimulatorSymbol,
+    });
+
+    // notify user
+    this.dialogServiceUtil.showNotificationBar(`Trading simulator ${tradingSimulator.name} updated`, 'success');
+
+    if (state === 'draft') {
+      // route to trading simulator editing
+      this.router.navigateByUrl(
+        `${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.EDIT}/${tradingSimulator.id}`,
+      );
+    } else {
+      // change state
+      this.tradingSimulatorService.simulatorStateChangeGoLive(tradingSimulator);
+      // route to trading simulator
+      this.router.navigateByUrl(ROUTES_MAIN.TRADING_SIMULATOR);
+    }
+  }
+
   private getTradingSimulatorFormData(): TradingSimulator {
     const formData = this.form.getRawValue();
     const formDataMore = this.formData();
@@ -782,7 +780,7 @@ export class TradingSimulatorFormComponent {
       currentParticipants: 0,
       participants: [],
       cashStartingValue: formData.startingCash,
-      cashAdditionalIssued: formData.cashIssuedEnabled ? formData.cashIssued : [],
+      cashAdditionalIssued: formData.cashIssued,
       marginTrading: formData.marginTradingEnabled ? formData.marginTrading : null,
       marketChange: formData.marketChange,
       owner: transformUserToBaseMin(user),
@@ -804,55 +802,6 @@ export class TradingSimulatorFormComponent {
           unitsInfinity: d.unitsInfinity,
         }) satisfies TradingSimulatorSymbol,
     );
-  }
-
-  private changeFormMarketChangeValidation(enabled: boolean): void {
-    if (enabled) {
-      this.form.controls.marketChange.enable();
-      this.form.controls.marketChange.controls.forEach((control) => {
-        control.controls.startingRound.enable();
-        control.controls.endingRound.enable();
-        control.controls.valueChange.enable();
-      });
-    } else {
-      this.form.controls.marketChange.disable();
-      this.form.controls.marketChange.controls.forEach((control) => {
-        // reset to default values
-        control.controls.startingRound.patchValue(1);
-        control.controls.endingRound.patchValue(1);
-        control.controls.valueChange.patchValue(10);
-        // disable the form group
-        control.controls.startingRound.disable();
-        control.controls.endingRound.disable();
-        control.controls.valueChange.disable();
-      });
-    }
-
-    // update form validation
-    this.form.controls.marketChange.updateValueAndValidity();
-  }
-
-  private changeFormCashIssuedValidation(enabled: boolean): void {
-    if (enabled) {
-      this.form.controls.cashIssued.enable();
-      this.form.controls.cashIssued.controls.forEach((control) => {
-        control.controls.value.enable();
-        control.controls.issuedOnRound.enable();
-      });
-    } else {
-      this.form.controls.cashIssued.disable();
-      this.form.controls.cashIssued.controls.forEach((control) => {
-        // reset to default values
-        control.controls.value.patchValue(1000);
-        control.controls.issuedOnRound.patchValue(1);
-        // disable the form group
-        control.controls.value.disable();
-        control.controls.issuedOnRound.disable();
-      });
-    }
-
-    // update form validation
-    this.form.controls.cashIssued.updateValueAndValidity();
   }
 
   private changeFormMarginTradingValidation(enabled: boolean): void {
@@ -905,8 +854,6 @@ export class TradingSimulatorFormComponent {
         startingCash: existing.simulator.cashStartingValue,
         invitationCode: existing.simulator.invitationCode,
         marginTradingEnabled: !!existing.simulator.marginTrading,
-        cashIssuedEnabled: !!existing.simulator.cashAdditionalIssued.length,
-        marketChangeEnabled: !!existing.simulator.marketChange.length,
         marginTrading: {
           subtractPeriodRounds: existing.simulator.marginTrading?.subtractPeriodRounds,
           subtractInterestRate: existing.simulator.marginTrading?.subtractInterestRate,

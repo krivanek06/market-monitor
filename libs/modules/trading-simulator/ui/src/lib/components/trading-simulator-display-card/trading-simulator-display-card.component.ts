@@ -2,7 +2,7 @@ import { DatePipe, NgClass, UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { TradingSimulator, UserBaseMin } from '@mm/api-types';
+import { TRADING_SIMULATOR_PARTICIPANTS_LIMIT, TradingSimulator, UserBaseMin } from '@mm/api-types';
 import {
   DateReadablePipe,
   GeneralCardActionContentDirective,
@@ -34,21 +34,11 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
       <ng-template appGeneralCardTitleRight>
         <div class="flex gap-2">
           <!-- owner buttons -->
-          @if (tradingSimulator().owner.id === authUser().id) {
-            <!-- edit -->
-            <button (click)="onEdit()" mat-flat-button type="button" class="w-[100px]">
-              <mat-icon>edit</mat-icon>
-              <span>Edit</span>
+          @if (tradingSimulator().state !== 'draft') {
+            <button (click)="onStats()" mat-flat-button type="button">
+              statistics
+              <mat-icon iconPositionEnd>chevron_right</mat-icon>
             </button>
-          }
-
-          <!-- join/leave -->
-          @if (tradingSimulator().state === 'live' || tradingSimulator().state === 'started') {
-            @if (isUserJoined()) {
-              <button (click)="onLeave()" mat-stroked-button type="button" color="warn" class="w-[100px]">Leave</button>
-            } @else {
-              <button (click)="onJoin()" mat-stroked-button type="button" color="accent" class="w-[100px]">Join</button>
-            }
           }
         </div>
       </ng-template>
@@ -94,19 +84,42 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
 
         <div class="g-item-wrapper border-wt-border border-b">
           <span>Participants</span>
-          <span>{{ tradingSimulator().currentParticipants }}</span>
+          <span>{{ tradingSimulator().currentParticipants }} / {{ TRADING_SIMULATOR_PARTICIPANTS_LIMIT }}</span>
         </div>
       </div>
 
       <!-- action buttons -->
       <ng-template appGeneralCardActionContent>
-        <div class="flex w-full justify-between gap-4">
+        <div class="flex w-full justify-end gap-2 p-2">
+          <!-- info -->
           <app-trading-simulator-info-overview-button
             class="w-[120px]"
             [tradingSimulator]="tradingSimulator()"
             [participantUsers]="participantUsers() ?? []"
           />
-          <button (click)="onVisit()" mat-stroked-button type="button" color="primary" class="w-[100px]">Visit</button>
+
+          <!-- owner buttons -->
+          @if (tradingSimulator().owner.id === authUser().id) {
+            @if (tradingSimulator().state === 'draft') {
+              <!-- edit -->
+              <button (click)="onEdit()" mat-flat-button type="button" class="w-[100px]">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+            }
+          }
+
+          @if (tradingSimulator().state === 'live' || tradingSimulator().state === 'started') {
+            <!-- join -->
+            @if (!isUserJoined()) {
+              <button (click)="onJoin()" mat-stroked-button type="button" color="accent" class="w-[100px]">Join</button>
+            } @else {
+              <!-- visit -->
+              <button (click)="onVisit()" mat-stroked-button type="button" color="primary" class="w-[100px]">
+                Visit
+              </button>
+            }
+          }
         </div>
       </ng-template>
     </app-general-card>
@@ -119,10 +132,10 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingSimulatorDisplayCardComponent {
-  readonly leaveClicked = output<void>();
   readonly joinClicked = output<void>();
   readonly visitClicked = output<void>();
   readonly editClicked = output<void>();
+  readonly statsClicked = output<void>();
 
   readonly tradingSimulator = input.required<TradingSimulator>();
   readonly participantUsers = input<UserBaseMin[]>();
@@ -132,12 +145,10 @@ export class TradingSimulatorDisplayCardComponent {
 
   readonly isUserJoined = computed(() => this.tradingSimulator().participants.includes(this.authUser().id));
 
+  readonly TRADING_SIMULATOR_PARTICIPANTS_LIMIT = TRADING_SIMULATOR_PARTICIPANTS_LIMIT;
+
   onJoin() {
     this.joinClicked.emit();
-  }
-
-  onLeave() {
-    this.leaveClicked.emit();
   }
 
   onVisit() {
@@ -146,5 +157,9 @@ export class TradingSimulatorDisplayCardComponent {
 
   onEdit() {
     this.editClicked.emit();
+  }
+
+  onStats() {
+    this.statsClicked.emit();
   }
 }

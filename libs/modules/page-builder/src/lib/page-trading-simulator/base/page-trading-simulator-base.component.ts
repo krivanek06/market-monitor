@@ -1,14 +1,14 @@
 import { effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TradingSimulatorApiService } from '@mm/api-client';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { delay, map, of, switchMap } from 'rxjs';
 
 export abstract class PageTradingSimulatorBaseComponent {
-  protected readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
+  protected readonly tradingSimulatorService = inject(TradingSimulatorService);
   protected readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   protected readonly dialogServiceUtil = inject(DialogServiceUtil);
   protected readonly router = inject(Router);
@@ -17,20 +17,18 @@ export abstract class PageTradingSimulatorBaseComponent {
   readonly authState = this.authenticationUserStoreService.state;
 
   readonly simulatorData = toSignal(
-    this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorApiService.getTradingSimulatorById(selectedId)),
-    ),
+    this.simulatorId$.pipe(switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorById(selectedId))),
   );
 
   readonly simulatorDataSymbols = toSignal(
     this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorApiService.getTradingSimulatorByIdSymbols(selectedId)),
+      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorByIdSymbols(selectedId)),
     ),
   );
 
   readonly simulatorDataTransactions = toSignal(
     this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorApiService.getTradingSimulatorByIdTransactions(selectedId)),
+      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorByIdTransactions(selectedId)),
     ),
   );
 

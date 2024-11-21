@@ -1,5 +1,4 @@
 import { inject, Injectable } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import {
   addDoc,
   arrayUnion,
@@ -11,6 +10,7 @@ import {
   DocumentReference,
   Firestore,
   getDocs,
+  increment,
   limit,
   orderBy,
   query,
@@ -19,38 +19,26 @@ import {
   where,
 } from '@angular/fire/firestore';
 import {
-  DATA_NOT_FOUND_ERROR,
+  FieldValuePartial,
   PortfolioTransaction,
-  SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL,
   TradingSimulator,
   TradingSimulatorAggregations,
-  TradingSimulatorLatestData,
+  TradingSimulatorAggregationSymbols,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
-  USER_NOT_ENOUGH_CASH_ERROR,
-  USER_NOT_UNITS_ON_HAND_ERROR,
   UserBaseMin,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
 import { createEmptyPortfolioState, roundNDigits } from '@mm/shared/general-util';
+import { filterNil } from 'ngxtension/filter-nil';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
-import { combineLatest, firstValueFrom, map, Observable, shareReplay } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TradingSimulatorApiService {
   private readonly firestore = inject(Firestore);
-
-  readonly tradingSimulatorLatestData = toSignal(
-    rxDocData(this.getTradingSimulatorLatestDataDocRef()).pipe(
-      map((data) => data ?? { live: [], open: [], historical: [] }),
-      shareReplay({ refCount: false, bufferSize: 1 }),
-    ),
-    {
-      initialValue: { live: [], open: [], historical: [] },
-    },
-  );
 
   /**
    *
@@ -98,6 +86,18 @@ export class TradingSimulatorApiService {
     return rxDocData(this.getTradingSimulatorParticipantsDocRef(id, participantId));
   }
 
+  getTradingSimulatorAggregationSymbols(id: string): Observable<TradingSimulatorAggregationSymbols> {
+    return rxDocData(this.getTradingSimulatorAggregationSymbolsDocRef(id)).pipe(filterNil());
+  }
+
+  getTradingSimulatorAggregation(id: string): Observable<TradingSimulatorAggregations> {
+    return rxDocData(this.getTradingSimulatorAggregationDocRef(id)).pipe(filterNil());
+  }
+
+  updateTradingSimulator(id: string, data: Partial<TradingSimulator>): void {
+    updateDoc(this.getTradingSimulatorDocRef(id), data);
+  }
+
   async upsertTradingSimulator(data: {
     tradingSimulator: TradingSimulator;
     tradingSimulatorSymbol: TradingSimulatorSymbol[];
@@ -118,12 +118,9 @@ export class TradingSimulatorApiService {
       setDoc(this.getTradingSimulatorSymbolDocRef(data.tradingSimulator.id, symbol.symbol), symbol);
     });
 
-    // create aggregation document
-    setDoc(this.getTradingSimulatorAggregationDocRef(data.tradingSimulator.id), {
-      bestTransactions: [],
-      worstTransactions: [],
-      lastTransactions: [],
-      symbolAggregations: data.tradingSimulatorSymbol.reduce(
+    // create aggregation document for symbols
+    setDoc(this.getTradingSimulatorAggregationSymbolsDocRef(data.tradingSimulator.id), {
+      ...data.tradingSimulatorSymbol.reduce(
         (acc, curr) => ({
           ...acc,
           [curr.symbol]: {
@@ -135,24 +132,14 @@ export class TradingSimulatorApiService {
             soldTotal: 0,
             unitsCurrentlyAvailable: curr.unitsAvailableOnStart,
             unitsInfinity: curr.unitsInfinity,
-          } satisfies TradingSimulatorAggregations['symbolAggregations'][0],
+          },
         }),
-        {} satisfies TradingSimulatorAggregations['symbolAggregations'],
+        {} as TradingSimulatorAggregationSymbols,
       ),
     });
   }
 
-  joinSimulator(simulator: TradingSimulator, user: UserBaseMin, invitationCode: string) {
-    // check if user is already a participant
-    if (simulator.participants.includes(user.id)) {
-      return;
-    }
-
-    // check if provided invitation code is correct
-    if (simulator.invitationCode !== invitationCode) {
-      throw new Error('Invalid invitation code');
-    }
-
+  joinSimulator(simulator: TradingSimulator, user: UserBaseMin) {
     // add user to the participants
     updateDoc(this.getTradingSimulatorDocRef(simulator.id), {
       participants: arrayUnion(user.id),
@@ -189,39 +176,8 @@ export class TradingSimulatorApiService {
     participant: TradingSimulatorParticipant,
     transaction: PortfolioTransaction,
   ) {
-    const aggregation = await firstValueFrom(rxDocData(this.getTradingSimulatorAggregationDocRef(simulator.id)));
-    const symbolData = aggregation?.symbolAggregations[transaction.symbol];
+    // todo - make this as a transaction
 
-    // check if symbol exists
-    if (!symbolData || !aggregation) {
-      throw new Error(DATA_NOT_FOUND_ERROR);
-    }
-
-    // BUY order
-    if (transaction.transactionType === 'BUY') {
-      const totalValue = transaction.units * transaction.unitPrice + transaction.transactionFees;
-
-      // check if user has enough cash on hand if BUY and cashAccountActive
-      if (participant.portfolioState.cashOnHand < totalValue) {
-        throw new Error(USER_NOT_ENOUGH_CASH_ERROR);
-      }
-
-      // check if there is enough units to buy
-      if (symbolData.unitsCurrentlyAvailable < transaction.units) {
-        throw new Error(SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL);
-      }
-    }
-
-    // SELL order
-    else if (transaction.transactionType === 'SELL') {
-      // check if user has any holdings of that symbol
-      const symbolHoldings = participant.holdings.find((d) => d.symbol === transaction.symbol);
-
-      // check if user has enough units on hand if SELL
-      if ((symbolHoldings?.units ?? -1) < transaction.units) {
-        throw new Error(USER_NOT_UNITS_ON_HAND_ERROR);
-      }
-    }
     // add transaction to the participant data
     updateDoc(this.getTradingSimulatorParticipantsDocRef(simulator.id, participant.userData.id), {
       transactions: arrayUnion(transaction),
@@ -230,25 +186,18 @@ export class TradingSimulatorApiService {
     // add transaction to the transaction collection
     addDoc(this.getTradingSimulatorTransactionsCollection(simulator.id), transaction);
 
-    // update aggregation
+    // update symbol data
     const isSell = transaction.transactionType === 'SELL';
-    updateDoc(this.getTradingSimulatorAggregationDocRef(simulator.id), {
-      symbolAggregations: {
-        ...aggregation.symbolAggregations,
-        [transaction.symbol]: {
-          ...symbolData,
-          boughtUnits: isSell ? symbolData.boughtUnits : symbolData.boughtUnits + transaction.units,
-          soldUnits: isSell ? symbolData.soldUnits + transaction.units : symbolData.soldUnits,
-          investedTotal: isSell
-            ? symbolData.investedTotal
-            : roundNDigits(symbolData.investedTotal + transaction.units * transaction.unitPrice),
-          buyOperations: isSell ? symbolData.buyOperations : symbolData.buyOperations + 1,
-          sellOperations: isSell ? symbolData.sellOperations + 1 : symbolData.sellOperations,
-          soldTotal: roundNDigits(symbolData.soldTotal + transaction.returnValue),
-          unitsCurrentlyAvailable:
-            symbolData.unitsCurrentlyAvailable + (isSell ? transaction.units : -transaction.units),
-        } satisfies TradingSimulatorAggregations['symbolAggregations'][0],
-      },
+    updateDoc(this.getTradingSimulatorAggregationSymbolsDocRef(simulator.id), {
+      [transaction.symbol]: {
+        boughtUnits: increment(isSell ? 0 : transaction.units),
+        soldUnits: increment(isSell ? transaction.units : 0),
+        investedTotal: increment(isSell ? 0 : roundNDigits(transaction.units * transaction.unitPrice)),
+        buyOperations: increment(isSell ? 0 : 1),
+        sellOperations: increment(isSell ? 1 : 0),
+        soldTotal: increment(roundNDigits(transaction.returnValue)),
+        unitsCurrentlyAvailable: increment(isSell ? transaction.units : -transaction.units),
+      } satisfies FieldValuePartial<TradingSimulatorAggregationSymbols[0]>,
     });
   }
 
@@ -329,18 +278,20 @@ export class TradingSimulatorApiService {
     );
   }
 
+  private getTradingSimulatorAggregationSymbolsDocRef(
+    id: string,
+  ): DocumentReference<TradingSimulatorAggregationSymbols> {
+    return doc(this.getTradingSimulatorMoreInformationCollection(id), 'aggregation_symbols').withConverter(
+      assignTypesClient<TradingSimulatorAggregationSymbols>(),
+    );
+  }
+
   private getTradingSimulatorMoreInformationCollection(id: string): CollectionReference<DocumentData> {
     return collection(this.getTradingSimulatorDocRef(id), 'more_information');
   }
 
   private getTradingSimulatorDocRef(id: string): DocumentReference<TradingSimulator> {
     return doc(this.getTradingSimulatorCollection(), id);
-  }
-
-  private getTradingSimulatorLatestDataDocRef(): DocumentReference<TradingSimulatorLatestData> {
-    return doc(collection(this.firestore, 'aggregations'), 'trading_simulator_latest_data').withConverter(
-      assignTypesClient<TradingSimulatorLatestData>(),
-    );
   }
 
   private getTradingSimulatorCollection(): CollectionReference<TradingSimulator, DocumentData> {

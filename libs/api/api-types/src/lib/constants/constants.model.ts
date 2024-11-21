@@ -73,9 +73,9 @@ export const USER_ALLOWED_DEMO_ACCOUNTS_TOTAL = 300;
 export const GROUP_HOLDING_LIMIT = 50;
 
 /**
- * limit the number of users who can play the trading simulator in multiplayer mode
+ * limit the number of users who can play the trading simulator
  */
-export const TRADING_SIMULATOR_MULTIPLAYER_USER_LIMIT = 50;
+export const TRADING_SIMULATOR_PARTICIPANTS_LIMIT = 50;
 
 /**
  * maximum number of rounds in the trading simulator can handle

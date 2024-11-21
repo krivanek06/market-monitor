@@ -22,7 +22,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DefaultImgDirective } from '../../../directives';
 
 @Component({
   selector: 'app-form-mat-input-wrapper',
@@ -74,7 +73,6 @@ import { DefaultImgDirective } from '../../../directives';
     FormsModule,
     MatSliderModule,
     MatButtonModule,
-    DefaultImgDirective,
   ],
   providers: [
     {

@@ -24,14 +24,14 @@ import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulato
 export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBaseComponent {
   readonly simulatorDataTopParticipants = toSignal(
     this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorApiService.getTradingSimulatorByIdTopParticipants(selectedId)),
+      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorByIdTopParticipants(selectedId)),
     ),
   );
 
   readonly simulatorDataParticipant = toSignal(
     this.simulatorId$.pipe(
       switchMap((selectedId) =>
-        this.tradingSimulatorApiService.getTradingSimulatorByIdParticipantById(
+        this.tradingSimulatorService.getTradingSimulatorByIdParticipantById(
           selectedId,
           this.authenticationUserStoreService.state.getUser().uid,
         ),

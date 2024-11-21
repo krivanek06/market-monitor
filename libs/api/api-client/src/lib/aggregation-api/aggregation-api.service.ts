@@ -1,11 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { CollectionReference, DocumentData, DocumentReference, Firestore, collection } from '@angular/fire/firestore';
+import {
+  CollectionReference,
+  DocumentData,
+  DocumentReference,
+  Firestore,
+  collection,
+  doc,
+  updateDoc,
+} from '@angular/fire/firestore';
 import { HallOfFameGroups, HallOfFameUsers, TradingSimulatorLatestData } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { doc } from 'firebase/firestore';
 import { docData as rxDocData } from 'rxfire/firestore';
-import { map, shareReplay } from 'rxjs';
+import { Observable, map, shareReplay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -36,6 +43,18 @@ export class AggregationApiService {
   readonly hallOfFameGroups = toSignal(this.hallOfFameGroups$, {
     initialValue: this.defaultValue,
   });
+
+  getTradingSimulatorLatestData(): Observable<TradingSimulatorLatestData> {
+    return rxDocData(this.getTradingSimulatorLatestDataDocRef()).pipe(
+      map((data) => data ?? { live: [], started: [], historical: [] }),
+    );
+  }
+
+  updateTradingSimulatorLatestData(data: Partial<TradingSimulatorLatestData> | DocumentData) {
+    updateDoc(this.getTradingSimulatorLatestDataDocRef(), {
+      ...data,
+    });
+  }
 
   private getHallOfFameGroupsDocRef(): DocumentReference<HallOfFameGroups> {
     return doc(this.getAggregationCollectionRef(), 'hall_of_fame_groups').withConverter(

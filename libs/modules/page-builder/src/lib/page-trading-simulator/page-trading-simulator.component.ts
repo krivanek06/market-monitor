@@ -1,23 +1,38 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { TradingSimulatorApiService } from '@mm/api-client';
 import { TradingSimulator } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
-import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { Confirmable, DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { SectionTitleComponent } from '@mm/shared/ui';
+import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
-import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-page-trading-simulator',
   standalone: true,
-  imports: [TradingSimulatorDisplayCardComponent, SectionTitleComponent],
+  imports: [TradingSimulatorDisplayCardComponent, SectionTitleComponent, MatButtonModule, MatIconModule],
   template: `
     <div class="grid grid-cols-3 gap-x-10">
       <div class="col-span-2">
-        <app-section-title title="My Simulations" class="mb-4" />
+        <div class="flex items-center justify-between">
+          <app-section-title title="My Simulations" class="mb-4" />
+
+          <!-- create button -->
+          <button
+            (click)="onCreateSimulator()"
+            [disabled]="!isCreatingSimulatorEnabled()"
+            class="h-10"
+            type="button"
+            mat-stroked-button
+            color="primary"
+          >
+            <mat-icon>add</mat-icon>
+            create simulator
+          </button>
+        </div>
 
         <div class="grid grid-cols-2 gap-4">
           @for (item of mySimulations(); track item.id) {
@@ -44,18 +59,19 @@ import { switchMap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingSimulatorComponent {
-  private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
+  private readonly tradingSimulatorService = inject(TradingSimulatorService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly router = inject(Router);
 
-  readonly mySimulations = toSignal(
-    toObservable(this.authenticationUserStoreService.state.getUserDataNormal).pipe(
-      switchMap((userData) => this.tradingSimulatorApiService.getTradingSimulatorByOwner(userData?.id)),
-    ),
-    { initialValue: [] },
-  );
+  readonly mySimulations = this.tradingSimulatorService.simulatorsByOwner;
   readonly userData = this.authenticationUserStoreService.state.getUserData;
+
+  readonly isCreatingSimulatorEnabled = computed(
+    () =>
+      // check if user has permissions to create a new simulator
+      this.userData().featureAccess?.createTradingSimulator,
+  );
 
   async onJoinSimulator(simulator: TradingSimulator) {
     const invitationCode = await this.dialogServiceUtil.showInlineInputDialog({
@@ -67,22 +83,12 @@ export class PageTradingSimulatorComponent {
       return;
     }
 
-    if (invitationCode !== simulator.invitationCode) {
-      this.dialogServiceUtil.showNotificationBar('Invalid invitation code', 'error');
-      return;
-    }
-
-    // todo join simulator
+    this.tradingSimulatorService.joinSimulator(simulator, invitationCode);
   }
 
-  async onLeaveSimulator(simulator: TradingSimulator) {
-    if (!(await this.dialogServiceUtil.showConfirmDialog('Are you sure you want to leave this trading simulator?'))) {
-      return;
-    }
-
-    console.log('leaving simulator', simulator);
-
-    // todo leave simulator
+  @Confirmable('Are you sure you want to leave this trading simulator?')
+  onLeaveSimulator(simulator: TradingSimulator) {
+    this.tradingSimulatorService.leaveSimulator(simulator);
   }
 
   onVisitSimulator(simulator: TradingSimulator) {
@@ -91,5 +97,9 @@ export class PageTradingSimulatorComponent {
 
   onEditSimulator(simulator: TradingSimulator) {
     this.router.navigateByUrl(`${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.EDIT}/${simulator.id}`);
+  }
+
+  onCreateSimulator() {
+    this.router.navigateByUrl(`${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.CREATE}`);
   }
 }

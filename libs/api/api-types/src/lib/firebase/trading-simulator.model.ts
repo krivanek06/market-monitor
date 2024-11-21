@@ -214,39 +214,38 @@ export type TradingSimulatorSymbol = {
  */
 export type TradingSimulatorLatestData = {
   live: TradingSimulatorBase[];
-  open: TradingSimulatorBase[];
+  started: TradingSimulatorBase[];
   historical: TradingSimulatorBase[];
 };
 
+/** statistics about available symbols */
+export type TradingSimulatorAggregationSymbols = {
+  [K in string]: {
+    buyOperations: number;
+    boughtUnits: number;
+    investedTotal: number;
+
+    sellOperations: number;
+    soldUnits: number;
+    soldTotal: number;
+
+    /**
+     * every time a transaction happens, this value is updated
+     * default is the same as 'unitsAvailableOnStart'
+     * should never be negative
+     */
+    unitsCurrentlyAvailable: number;
+    unitsInfinity: boolean;
+  };
+};
+
 /**
- * aggregations of the trading simulator example:
- * - which symbol was how many times bought/sold
- * - which users had the best return
- * - which users had the worst return
+ * aggregation data about the trading simulator
+ * calculated once simulator is finished
  */
-
 export type TradingSimulatorAggregations = {
-  /** statistics about available symbols */
-  symbolAggregations: Record<
-    string,
-    {
-      buyOperations: number;
-      boughtUnits: number;
-      investedTotal: number;
-
-      sellOperations: number;
-      soldUnits: number;
-      soldTotal: number;
-
-      /**
-       * every time a transaction happens, this value is updated
-       * default is the same as 'unitsAvailableOnStart'
-       * should never be negative
-       */
-      unitsCurrentlyAvailable: number;
-      unitsInfinity: boolean;
-    }
-  >;
+  /** copied data from TradingSimulatorAggregationSymbols */
+  symbolStatistics: TradingSimulatorAggregationSymbols;
 
   /** best return transaction (only SELL transactions) */
   bestTransactions: PortfolioTransaction[];
@@ -264,12 +263,16 @@ export type TradingSimulatorAggregations = {
  * - document: TradingSimulator
  *   -- collection: more_information
  *     -- document: aggregations: TradingSimulatorAggregations
+ *     -- document: aggregation_symbols: TradingSimulatorAggregationSymbols
  *
  *   -- collection: participants (each user one document)
  *    -- documents: TradingSimulatorParticipant
  *
  *   -- collection: symbols (each symbol one document)
  *    -- documents: TradingSimulatorSymbol
+ *
+ *   -- collection: transactions
+ *    -- documents: PortfolioTransaction
  */
 
 export type TradingSimulatorGeneralActions = { simulatorId: string } & (

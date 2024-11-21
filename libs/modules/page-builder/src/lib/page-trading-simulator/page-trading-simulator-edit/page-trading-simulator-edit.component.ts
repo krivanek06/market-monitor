@@ -14,13 +14,6 @@ import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulato
         <!-- title -->
         <app-section-title title="Edit Trading Simulator" class="mb-4" />
 
-        <!-- action buttons -->
-        TODO action buttons
-        - play button if state is active
-        - change state buttons 
-          - if active -> draft 
-          - if draft -> active
-
         <!-- trading simulator form -->
         <app-trading-simulator-form [existingTradingSimulator]="formData" />
       }

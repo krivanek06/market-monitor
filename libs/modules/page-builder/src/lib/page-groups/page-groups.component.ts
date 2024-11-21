@@ -37,7 +37,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
           <!-- create new group -->
           <div>
             <button
-              [disabled]="isCreateGroupDisabledSignal()"
+              [disabled]="!isCreateGroupEnabled()"
               mat-stroked-button
               data-testid="page-groups-create-group"
               type="button"
@@ -163,19 +163,19 @@ export class PageGroupsComponent {
   private readonly router = inject(Router);
   readonly state = this.authenticationUserService.state;
 
-  readonly isCreateGroupDisabledSignal = computed(
+  readonly isCreateGroupEnabled = computed(
     () =>
-      // user has reached the limit of groups
-      (this.state?.userGroupData()?.groupOwner?.length ?? 99) >= GROUP_OWNER_LIMIT ||
-      // user is a demo account
-      this.authenticationUserService.state.isDemoAccount() ||
-      // user does not have permission to create groups
-      !this.state().userData?.featureAccess?.createGroups,
+      // user hasn't reached the limit of groups
+      (this.state?.userGroupData()?.groupOwner?.length ?? 99) < GROUP_OWNER_LIMIT &&
+      // user is not demo account
+      !this.authenticationUserService.state.isDemoAccount() &&
+      // user has permission to create groups
+      this.state().userData?.featureAccess?.createGroups,
   );
 
   async onCreateGroupClick() {
     // disabled functionality
-    if (this.isCreateGroupDisabledSignal()) {
+    if (!this.isCreateGroupEnabled()) {
       return;
     }
 
