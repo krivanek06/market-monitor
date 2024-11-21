@@ -1,12 +1,14 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { RouterModule } from '@angular/router';
+import { GuardsCheckEnd, GuardsCheckStart, NavigationCancel, Router, RouterModule } from '@angular/router';
 import { DialogServiceModule } from '@mm/shared/dialog-manager';
+import { delay, filter, map } from 'rxjs';
 import { MenuSideNavigationComponent } from './menu-navigation/menu-side-navigation.component';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
 
@@ -14,7 +16,6 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
   selector: 'app-page-menu',
   standalone: true,
   imports: [
-    NgClass,
     MatButtonModule,
     MatIconModule,
     RouterModule,
@@ -25,6 +26,8 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
     MenuSideNavigationComponent,
     // do not remove - allows showing dialogs sub child routes
     DialogServiceModule,
+    MatProgressSpinnerModule,
+    NgClass,
   ],
   template: `
     <mat-drawer-container autosize class="h-full min-h-[100vh]">
@@ -46,8 +49,20 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
         </header>
 
         <div class="c-content-wrapper">
+          <!-- spinner -->
+          <div
+            class="grid w-full place-content-center pt-[20%]"
+            [ngClass]="{
+              hidden: !isRouterGuardActive(),
+            }"
+          >
+            <mat-spinner />
+          </div>
+
           <!-- content -->
-          <router-outlet />
+          <div [ngClass]="{ hidden: isRouterGuardActive() }">
+            <router-outlet />
+          </div>
 
           <!-- footer for additional space on bottom -->
           <footer class="h-12 w-full"></footer>
@@ -88,6 +103,19 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageMenuComponent {
+  private readonly router = inject(Router);
+
+  readonly isRouterGuardActive = toSignal(
+    this.router.events.pipe(
+      filter(
+        (event) =>
+          event instanceof GuardsCheckStart || event instanceof GuardsCheckEnd || event instanceof NavigationCancel,
+      ),
+      map((event) => event instanceof GuardsCheckStart),
+      // wait some time to redraw the screen and just then remove the spinner
+      delay(100),
+    ),
+  );
   readonly isOpen = signal<boolean>(false);
 
   toggleMatDrawerExpandedView(): void {

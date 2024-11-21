@@ -2,10 +2,9 @@ import { effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
-import { delay, map, of, switchMap } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 
 export abstract class PageTradingSimulatorBaseComponent {
   protected readonly tradingSimulatorService = inject(TradingSimulatorService);
@@ -33,19 +32,6 @@ export abstract class PageTradingSimulatorBaseComponent {
   );
 
   constructor() {
-    // check if simulator exists
-    of(null)
-      .pipe(
-        delay(3000),
-        map(() => this.simulatorData()),
-      )
-      .subscribe((res) => {
-        if (!res) {
-          this.dialogServiceUtil.showNotificationBar('Trading simulator not found', 'error');
-          this.router.navigateByUrl(ROUTES_MAIN.TRADING_SIMULATOR);
-        }
-      });
-
     // log changes
     effect(() => {
       console.log('PageTradingSimulatorBaseComponent', {

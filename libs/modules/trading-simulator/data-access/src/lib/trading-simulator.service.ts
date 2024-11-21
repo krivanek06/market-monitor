@@ -16,7 +16,7 @@ import {
   USER_NOT_UNITS_ON_HAND_ERROR,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { firstValueFrom, map } from 'rxjs';
+import { firstValueFrom, map, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -41,7 +41,11 @@ export class TradingSimulatorService {
     ),
   );
 
-  getTradingSimulatorById(simulatorId: string) {
+  getTradingSimulatorById(simulatorId: string): Observable<TradingSimulator | undefined> {
+    if (!simulatorId) {
+      return of(undefined);
+    }
+
     return this.tradingSimulatorApiService.getTradingSimulatorById(simulatorId);
   }
 

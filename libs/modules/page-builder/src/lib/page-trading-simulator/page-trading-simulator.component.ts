@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { TradingSimulator } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
-import { Confirmable, DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { SectionTitleComponent } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
@@ -17,8 +17,8 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
   template: `
     <div class="grid grid-cols-3 gap-x-10">
       <div class="col-span-2">
-        <div class="flex items-center justify-between">
-          <app-section-title title="My Simulations" class="mb-4" />
+        <div class="mb-4 flex items-center justify-between">
+          <app-section-title title="My Simulations" />
 
           <!-- create button -->
           <button
@@ -38,9 +38,9 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
           @for (item of mySimulations(); track item.id) {
             <app-trading-simulator-display-card
               (editClicked)="onEditSimulator(item)"
-              (leaveClicked)="onLeaveSimulator(item)"
               (joinClicked)="onJoinSimulator(item)"
               (visitClicked)="onVisitSimulator(item)"
+              (statsClicked)="onStatisticsClicked(item)"
               [tradingSimulator]="item"
               [authUser]="userData()"
             />
@@ -86,20 +86,19 @@ export class PageTradingSimulatorComponent {
     this.tradingSimulatorService.joinSimulator(simulator, invitationCode);
   }
 
-  @Confirmable('Are you sure you want to leave this trading simulator?')
-  onLeaveSimulator(simulator: TradingSimulator) {
-    this.tradingSimulatorService.leaveSimulator(simulator);
+  onCreateSimulator() {
+    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.CREATE]);
   }
 
   onVisitSimulator(simulator: TradingSimulator) {
-    this.router.navigateByUrl(`${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.DETAILS}/${simulator.id}`);
+    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.DETAILS, simulator.id]);
   }
 
   onEditSimulator(simulator: TradingSimulator) {
-    this.router.navigateByUrl(`${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.EDIT}/${simulator.id}`);
+    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.EDIT, simulator.id]);
   }
 
-  onCreateSimulator() {
-    this.router.navigateByUrl(`${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.CREATE}`);
+  onStatisticsClicked(simulator: TradingSimulator) {
+    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.STATISTICS, simulator.id]);
   }
 }

@@ -40,4 +40,5 @@ export enum ROUTES_TRADING_SIMULATOR {
   CREATE = 'create',
   EDIT = 'edit',
   DETAILS = 'details',
+  STATISTICS = 'statistics',
 }
