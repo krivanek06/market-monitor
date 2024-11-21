@@ -14,6 +14,7 @@ export * from './page-stock-details';
 export * from './page-trading-simulator/page-trading-simulator-create/page-trading-simulator-create.component';
 export * from './page-trading-simulator/page-trading-simulator-details/page-trading-simulator-details.component';
 export * from './page-trading-simulator/page-trading-simulator-edit/page-trading-simulator-edit.component';
+export * from './page-trading-simulator/page-trading-simulator-statistics/page-trading-simulator-statistics.component';
 export * from './page-trading-simulator/page-trading-simulator.component';
 export * from './page-trading/page-trading.component';
 export * from './page-watchlist/page-watchlist.component';

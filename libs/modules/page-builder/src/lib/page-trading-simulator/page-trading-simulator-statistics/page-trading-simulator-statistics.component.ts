@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-trading-simulator-statistics',
+  selector: 'app-page-trading-simulator-statistics',
   standalone: true,
   imports: [],
   template: `<p>trading-simulator-statistics works!</p>`,
@@ -12,4 +12,4 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TradingSimulatorStatisticsComponent {}
+export class PageTradingSimulatorStatisticsComponent {}
