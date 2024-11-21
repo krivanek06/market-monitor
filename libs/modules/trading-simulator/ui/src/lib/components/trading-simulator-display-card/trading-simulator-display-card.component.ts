@@ -90,7 +90,7 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
 
       <!-- action buttons -->
       <ng-template appGeneralCardActionContent>
-        <div class="flex w-full justify-end gap-2 p-2">
+        <div class="flex w-full justify-between gap-2 p-2">
           <!-- info -->
           <app-trading-simulator-info-overview-button
             class="w-[120px]"
@@ -107,17 +107,23 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
                 <span>Edit</span>
               </button>
             }
-          }
-
-          @if (tradingSimulator().state === 'live' || tradingSimulator().state === 'started') {
-            <!-- join -->
-            @if (!isUserJoined()) {
-              <button (click)="onJoin()" mat-stroked-button type="button" color="accent" class="w-[100px]">Join</button>
-            } @else {
-              <!-- visit -->
-              <button (click)="onVisit()" mat-stroked-button type="button" color="primary" class="w-[100px]">
-                Visit
-              </button>
+            @if (tradingSimulator().state === 'live') {
+              <!-- draft -->
+              <button (click)="onDraft()" mat-stroked-button color="warn" type="button">Change to Draft</button>
+            }
+          } @else {
+            @if (tradingSimulator().state === 'live') {
+              <!-- join -->
+              @if (!isUserJoined()) {
+                <button (click)="onJoin()" mat-stroked-button type="button" color="accent" class="w-[100px]">
+                  Join
+                </button>
+              } @else {
+                <!-- visit -->
+                <button (click)="onVisit()" mat-stroked-button type="button" color="primary" class="w-[100px]">
+                  Visit
+                </button>
+              }
             }
           }
         </div>
@@ -136,6 +142,7 @@ export class TradingSimulatorDisplayCardComponent {
   readonly visitClicked = output<void>();
   readonly editClicked = output<void>();
   readonly statsClicked = output<void>();
+  readonly draftClicked = output<void>();
 
   readonly tradingSimulator = input.required<TradingSimulator>();
   readonly participantUsers = input<UserBaseMin[]>();
@@ -161,5 +168,9 @@ export class TradingSimulatorDisplayCardComponent {
 
   onStats() {
     this.statsClicked.emit();
+  }
+
+  onDraft() {
+    this.draftClicked.emit();
   }
 }

@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { TradingSimulator } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
-import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { Confirmable, DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { SectionTitleComponent } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
@@ -40,6 +40,7 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
               (editClicked)="onEditSimulator(item)"
               (joinClicked)="onJoinSimulator(item)"
               (visitClicked)="onVisitSimulator(item)"
+              (draftClicked)="onDraftSimulator(item)"
               (statsClicked)="onStatisticsClicked(item)"
               [tradingSimulator]="item"
               [authUser]="userData()"
@@ -84,6 +85,11 @@ export class PageTradingSimulatorComponent {
     }
 
     this.tradingSimulatorService.joinSimulator(simulator, invitationCode);
+  }
+
+  @Confirmable('Changing to draft you can configure the simulator, but it will be hidden for users')
+  onDraftSimulator(simulator: TradingSimulator) {
+    this.tradingSimulatorService.simulatorStateChangeDraft(simulator);
   }
 
   onCreateSimulator() {

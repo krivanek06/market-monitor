@@ -111,8 +111,8 @@ export class TradingSimulatorService {
 
     // remove simulator from the aggregation list
     this.aggregationApiService.updateTradingSimulatorLatestData({
-      live: arrayRemove(simulator),
-    } satisfies FieldValuePartial<TradingSimulatorLatestData>);
+      live: this.tradingSimulatorLatestData().live.filter((d) => d.id !== simulator.id),
+    } satisfies Partial<TradingSimulatorLatestData>);
   }
 
   simulatorStateChangeStart(simulator: TradingSimulator) {
@@ -175,6 +175,23 @@ export class TradingSimulatorService {
 
     // remove user from participants
     this.tradingSimulatorApiService.leaveSimulator(simulator, userBase);
+  }
+
+  deleteSimulator(simulator: TradingSimulator) {
+    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
+
+    // check if user is the owner
+    if (simulator.owner.id !== userBase.id) {
+      throw new Error('Only the owner can delete the simulator');
+    }
+
+    // check if simulator is in draft state
+    if (simulator.state !== 'draft') {
+      throw new Error('Simulator must be in draft state');
+    }
+
+    // remove simulator
+    return this.tradingSimulatorApiService.deleteSimulator(simulator);
   }
 
   async addTransaction(

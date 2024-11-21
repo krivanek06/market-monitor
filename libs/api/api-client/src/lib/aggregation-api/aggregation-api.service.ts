@@ -7,7 +7,7 @@ import {
   Firestore,
   collection,
   doc,
-  updateDoc,
+  setDoc,
 } from '@angular/fire/firestore';
 import { HallOfFameGroups, HallOfFameUsers, TradingSimulatorLatestData } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
@@ -51,9 +51,13 @@ export class AggregationApiService {
   }
 
   updateTradingSimulatorLatestData(data: Partial<TradingSimulatorLatestData> | DocumentData) {
-    updateDoc(this.getTradingSimulatorLatestDataDocRef(), {
-      ...data,
-    });
+    setDoc(
+      this.getTradingSimulatorLatestDataDocRef(),
+      {
+        ...data,
+      },
+      { merge: true },
+    );
   }
 
   private getHallOfFameGroupsDocRef(): DocumentReference<HallOfFameGroups> {

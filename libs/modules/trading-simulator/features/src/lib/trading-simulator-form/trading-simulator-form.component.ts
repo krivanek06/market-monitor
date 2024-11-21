@@ -620,13 +620,15 @@ export class TradingSimulatorFormComponent {
 
   constructor() {
     this.form.valueChanges.subscribe((res) => {
-      console.log('create ', res);
+      console.log('form change ', res);
     });
 
     // listen on margin trading enabled sate
-    this.form.controls.marginTradingEnabled.valueChanges.pipe(takeUntilDestroyed()).subscribe((enabled) => {
-      this.changeFormMarginTradingValidation(enabled);
-    });
+    this.form.controls.marginTradingEnabled.valueChanges
+      .pipe(startWith(this.form.controls.marginTradingEnabled.value), takeUntilDestroyed())
+      .subscribe((enabled) => {
+        this.changeFormMarginTradingValidation(enabled);
+      });
   }
 
   @Confirmable(
@@ -711,7 +713,7 @@ export class TradingSimulatorFormComponent {
     this.form.controls.cashIssued.removeAt(index);
   }
 
-  private onSubmit(state: 'live' | 'draft'): void {
+  private async onSubmit(state: 'live' | 'draft') {
     this.form.markAllAsTouched();
     const userData = this.authenticationUserStoreService.state.getUserData();
 
@@ -721,6 +723,7 @@ export class TradingSimulatorFormComponent {
       return;
     }
 
+    // check if user has access
     if (!userData.featureAccess?.createTradingSimulator) {
       this.dialogServiceUtil.showNotificationBar('You do not have access to create trading simulator', 'error');
       return;
@@ -733,7 +736,7 @@ export class TradingSimulatorFormComponent {
     this.dialogServiceUtil.showNotificationBar(`Updating ${tradingSimulator.name} simulator`);
 
     // update trading simulator
-    this.tradingSimulatorService.upsertTradingSimulator({
+    await this.tradingSimulatorService.upsertTradingSimulator({
       tradingSimulator,
       tradingSimulatorSymbol,
     });
@@ -853,7 +856,7 @@ export class TradingSimulatorFormComponent {
         roundIntervalSeconds: existing.simulator.oneRoundDurationSeconds,
         startingCash: existing.simulator.cashStartingValue,
         invitationCode: existing.simulator.invitationCode,
-        marginTradingEnabled: !!existing.simulator.marginTrading,
+        marginTradingEnabled: !!existing.simulator.marginTrading?.subtractPeriodRounds,
         marginTrading: {
           subtractPeriodRounds: existing.simulator.marginTrading?.subtractPeriodRounds,
           subtractInterestRate: existing.simulator.marginTrading?.subtractInterestRate,

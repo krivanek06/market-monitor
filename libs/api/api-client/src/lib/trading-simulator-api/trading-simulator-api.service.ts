@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import {
-  addDoc,
   arrayUnion,
   collection,
   CollectionReference,
@@ -17,6 +16,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from '@angular/fire/firestore';
 import {
   FieldValuePartial,
@@ -102,41 +102,44 @@ export class TradingSimulatorApiService {
     tradingSimulator: TradingSimulator;
     tradingSimulatorSymbol: TradingSimulatorSymbol[];
   }): Promise<void> {
-    // save trading simulator
-    setDoc(this.getTradingSimulatorDocRef(data.tradingSimulator.id), data.tradingSimulator);
+    const batch = writeBatch(this.firestore);
 
-    // get all symbols
+    // save trading simulator document
+    batch.set(this.getTradingSimulatorDocRef(data.tradingSimulator.id), data.tradingSimulator);
+
+    // get all existing symbols
     const snapshot = await getDocs(this.getTradingSimulatorSymbolsCollection(data.tradingSimulator.id));
 
-    // remove previous symbols
-    for (const doc of snapshot.docs) {
-      await deleteDoc(doc.ref);
-    }
+    // queue deletions of previous symbols
+    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
 
-    // save trading simulator symbols
+    // add new symbols to the batch
     data.tradingSimulatorSymbol.forEach((symbol) => {
-      setDoc(this.getTradingSimulatorSymbolDocRef(data.tradingSimulator.id, symbol.symbol), symbol);
+      batch.set(this.getTradingSimulatorSymbolDocRef(data.tradingSimulator.id, symbol.symbol), symbol);
     });
 
     // create aggregation document for symbols
-    setDoc(this.getTradingSimulatorAggregationSymbolsDocRef(data.tradingSimulator.id), {
-      ...data.tradingSimulatorSymbol.reduce(
-        (acc, curr) => ({
-          ...acc,
-          [curr.symbol]: {
-            buyOperations: 0,
-            boughtUnits: 0,
-            investedTotal: 0,
-            sellOperations: 0,
-            soldUnits: 0,
-            soldTotal: 0,
-            unitsCurrentlyAvailable: curr.unitsAvailableOnStart,
-            unitsInfinity: curr.unitsInfinity,
-          },
-        }),
-        {} as TradingSimulatorAggregationSymbols,
-      ),
-    });
+    const aggregationData = data.tradingSimulatorSymbol.reduce(
+      (acc, curr) => ({
+        ...acc,
+        [curr.symbol]: {
+          buyOperations: 0,
+          boughtUnits: 0,
+          investedTotal: 0,
+          sellOperations: 0,
+          soldUnits: 0,
+          soldTotal: 0,
+          unitsCurrentlyAvailable: curr.unitsAvailableOnStart,
+          unitsInfinity: curr.unitsInfinity,
+        },
+      }),
+      {} as TradingSimulatorAggregationSymbols,
+    );
+
+    batch.set(this.getTradingSimulatorAggregationSymbolsDocRef(data.tradingSimulator.id), aggregationData);
+
+    // commit the batch
+    await batch.commit();
   }
 
   joinSimulator(simulator: TradingSimulator, user: UserBaseMin) {
@@ -165,6 +168,35 @@ export class TradingSimulatorApiService {
     deleteDoc(this.getTradingSimulatorParticipantsDocRef(simulator.id, user.id));
   }
 
+  async deleteSimulator(simulator: TradingSimulator) {
+    const batch = writeBatch(this.firestore);
+
+    // remove all participants
+    for (const participant of simulator.participants) {
+      batch.delete(this.getTradingSimulatorParticipantsDocRef(simulator.id, participant));
+    }
+
+    // remove all symbols
+    const symbolsData = await getDocs(this.getTradingSimulatorSymbolsCollection(simulator.id));
+    symbolsData.docs.forEach((doc) => batch.delete(doc.ref));
+
+    // remove all transactions
+    const transactionData = await getDocs(this.getTradingSimulatorTransactionsCollection(simulator.id));
+    transactionData.docs.forEach((doc) => batch.delete(doc.ref));
+
+    // remove symbol aggregation
+    batch.delete(this.getTradingSimulatorAggregationSymbolsDocRef(simulator.id));
+
+    // remove additional aggregation data
+    batch.delete(this.getTradingSimulatorAggregationDocRef(simulator.id));
+
+    // remove simulator document
+    batch.delete(this.getTradingSimulatorDocRef(simulator.id));
+
+    // commit the batch
+    await batch.commit();
+  }
+
   /**
    *
    * @param simulator - the trading simulator
@@ -176,19 +208,19 @@ export class TradingSimulatorApiService {
     participant: TradingSimulatorParticipant,
     transaction: PortfolioTransaction,
   ) {
-    // todo - make this as a transaction
+    const batch = writeBatch(this.firestore);
 
     // add transaction to the participant data
-    updateDoc(this.getTradingSimulatorParticipantsDocRef(simulator.id, participant.userData.id), {
+    batch.update(this.getTradingSimulatorParticipantsDocRef(simulator.id, participant.userData.id), {
       transactions: arrayUnion(transaction),
     });
 
     // add transaction to the transaction collection
-    addDoc(this.getTradingSimulatorTransactionsCollection(simulator.id), transaction);
+    batch.set(doc(this.getTradingSimulatorTransactionsCollection(simulator.id)), transaction);
 
     // update symbol data
     const isSell = transaction.transactionType === 'SELL';
-    updateDoc(this.getTradingSimulatorAggregationSymbolsDocRef(simulator.id), {
+    batch.update(this.getTradingSimulatorAggregationSymbolsDocRef(simulator.id), {
       [transaction.symbol]: {
         boughtUnits: increment(isSell ? 0 : transaction.units),
         soldUnits: increment(isSell ? transaction.units : 0),

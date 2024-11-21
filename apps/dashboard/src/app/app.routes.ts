@@ -1,11 +1,11 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Route, Router } from '@angular/router';
+import { TradingSimulatorApiService } from '@mm/api-client';
 import { UserAccountEnum } from '@mm/api-types';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { featureFlagGuard } from '@mm/authentication/feature-access-directive';
 import { IS_DEV_TOKEN, ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { map, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
@@ -131,18 +131,25 @@ export const appRoutes: Route[] = [
                 canActivate: [
                   (route: ActivatedRouteSnapshot) => {
                     const authService = inject(AuthenticationUserStoreService);
-                    const tradingSimulatorService = inject(TradingSimulatorService);
+                    const tradingSimulatorApiService = inject(TradingSimulatorApiService);
                     const router = inject(Router);
                     const dialogServiceUtil = inject(DialogServiceUtil);
                     const user = authService.state().userData;
 
                     const simulatorId = String(route.paramMap.get('id'));
 
-                    return tradingSimulatorService.getTradingSimulatorById(simulatorId).pipe(
+                    return tradingSimulatorApiService.getTradingSimulatorById(simulatorId).pipe(
                       map((simulator) => {
                         // check if simulator exists
                         if (!simulator) {
                           dialogServiceUtil.showNotificationBar('Trading simulator not found', 'error');
+                          router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
+                          return false;
+                        }
+
+                        // check if simulator is in draft state
+                        if (simulator.state !== 'draft') {
+                          dialogServiceUtil.showNotificationBar('Trading simulator is not in draft state', 'error');
                           router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
                           return false;
                         }
@@ -166,12 +173,12 @@ export const appRoutes: Route[] = [
                 canActivate: [
                   (route: ActivatedRouteSnapshot) => {
                     const dialogServiceUtil = inject(DialogServiceUtil);
-                    const tradingSimulatorService = inject(TradingSimulatorService);
+                    const tradingSimulatorApiService = inject(TradingSimulatorApiService);
                     const router = inject(Router);
 
                     const simulatorId = String(route.paramMap.get('id'));
 
-                    return tradingSimulatorService.getTradingSimulatorById(simulatorId).pipe(
+                    return tradingSimulatorApiService.getTradingSimulatorById(simulatorId).pipe(
                       map((simulator) => {
                         // check if simulator exists
                         if (!simulator) {
@@ -192,12 +199,12 @@ export const appRoutes: Route[] = [
                 canActivate: [
                   (route: ActivatedRouteSnapshot) => {
                     const dialogServiceUtil = inject(DialogServiceUtil);
-                    const tradingSimulatorService = inject(TradingSimulatorService);
+                    const tradingSimulatorApiService = inject(TradingSimulatorApiService);
                     const router = inject(Router);
 
                     const simulatorId = String(route.paramMap.get('id'));
 
-                    return tradingSimulatorService.getTradingSimulatorById(simulatorId).pipe(
+                    return tradingSimulatorApiService.getTradingSimulatorById(simulatorId).pipe(
                       map((simulator) => {
                         // check if simulator exists
                         if (!simulator) {
