@@ -36,8 +36,8 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
           <!-- owner buttons -->
           @if (tradingSimulator().state !== 'draft') {
             <button (click)="onStats()" mat-flat-button type="button">
-              statistics
               <mat-icon iconPositionEnd>chevron_right</mat-icon>
+              statistics
             </button>
           }
         </div>

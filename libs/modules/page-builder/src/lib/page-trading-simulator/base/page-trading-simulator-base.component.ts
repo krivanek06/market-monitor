@@ -1,4 +1,4 @@
-import { effect, inject } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
@@ -15,19 +15,21 @@ export abstract class PageTradingSimulatorBaseComponent {
   protected readonly simulatorId$ = inject(ActivatedRoute).params.pipe(map((params) => params['id'] as string));
   readonly authState = this.authenticationUserStoreService.state;
 
+  readonly isAuthUserOwner = computed(() => this.simulatorData()?.owner.id === this.authState.getUserData().id);
+
   readonly simulatorData = toSignal(
     this.simulatorId$.pipe(switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorById(selectedId))),
   );
 
-  readonly simulatorDataSymbols = toSignal(
+  readonly simulatorSymbols = toSignal(
     this.simulatorId$.pipe(
       switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorByIdSymbols(selectedId)),
     ),
   );
 
-  readonly simulatorDataTransactions = toSignal(
+  readonly simulatorAggregation = toSignal(
     this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorByIdTransactions(selectedId)),
+      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorAggregations(selectedId)),
     ),
   );
 
@@ -36,8 +38,8 @@ export abstract class PageTradingSimulatorBaseComponent {
     effect(() => {
       console.log('PageTradingSimulatorBaseComponent', {
         simulatorData: this.simulatorData(),
-        simulatorDataSymbols: this.simulatorDataSymbols(),
-        simulatorDataTransactions: this.simulatorDataTransactions(),
+        simulatorDataSymbols: this.simulatorSymbols(),
+        simulatorAggregation: this.simulatorAggregation(),
       });
     });
   }

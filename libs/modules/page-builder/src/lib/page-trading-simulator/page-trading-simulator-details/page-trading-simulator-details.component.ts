@@ -22,13 +22,14 @@ import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulato
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBaseComponent {
-  readonly simulatorDataTopParticipants = toSignal(
+  readonly topParticipants = toSignal(
     this.simulatorId$.pipe(
       switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorByIdTopParticipants(selectedId)),
     ),
   );
 
-  readonly simulatorDataParticipant = toSignal(
+  /** my data */
+  readonly participant = toSignal(
     this.simulatorId$.pipe(
       switchMap((selectedId) =>
         this.tradingSimulatorService.getTradingSimulatorByIdParticipantById(
@@ -44,8 +45,8 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
 
     effect(() => {
       console.log('PageTradingSimulatorDetailsComponent', {
-        simulatorDataTopParticipants: this.simulatorDataTopParticipants(),
-        simulatorDataParticipant: this.simulatorDataParticipant(),
+        topParticipants: this.topParticipants(),
+        participant: this.participant(),
       });
     });
   }

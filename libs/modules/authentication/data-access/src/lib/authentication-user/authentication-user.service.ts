@@ -207,7 +207,7 @@ export class AuthenticationUserService {
     selectors: (state) => ({
       getUser: () => state().user!,
       getUserData: () => state().userData!,
-      getUserBaseMin: () => transformUserToBaseMin(state().userData!),
+      getUserDataMin: () => transformUserToBaseMin(state().userData!),
       getUserDataNormal: () => state().userData,
       getUserGroupData: () => state().userGroupData!,
       isSymbolInWatchList: () => (symbol: string) => !!state.watchList().data.find((d) => d.symbol === symbol),

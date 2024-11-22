@@ -90,8 +90,46 @@ export class TradingSimulatorApiService {
     return rxDocData(this.getTradingSimulatorAggregationSymbolsDocRef(id)).pipe(filterNil());
   }
 
-  getTradingSimulatorAggregation(id: string): Observable<TradingSimulatorAggregations> {
+  getTradingSimulatorAggregations(id: string): Observable<TradingSimulatorAggregations> {
     return rxDocData(this.getTradingSimulatorAggregationDocRef(id)).pipe(filterNil());
+  }
+
+  getTradingSimulatorByIdTransactions(id: string): Observable<{
+    bestTransactions: PortfolioTransaction[];
+    worstTransactions: PortfolioTransaction[];
+    lastTransactions: PortfolioTransaction[];
+  }> {
+    const latestTransactions$ = rxCollectionData(
+      query(this.getTradingSimulatorTransactionsCollection(id), orderBy('date', 'desc'), limit(25)),
+    );
+
+    const bestTransactions$ = rxCollectionData(
+      query(
+        this.getTradingSimulatorTransactionsCollection(id),
+        where('transactionType', '==', 'SELL'),
+        orderBy('returnChange', 'desc'),
+        limit(10),
+      ),
+    );
+
+    const worstTransactions$ = rxCollectionData(
+      query(
+        this.getTradingSimulatorTransactionsCollection(id),
+        where('transactionType', '==', 'SELL'),
+        orderBy('returnChange', 'desc'),
+        limit(10),
+      ),
+    );
+
+    return combineLatest([latestTransactions$, bestTransactions$, worstTransactions$]).pipe(
+      map(([lastTransactions, bestTransactions, worstTransactions]) => {
+        return {
+          bestTransactions,
+          worstTransactions,
+          lastTransactions,
+        };
+      }),
+    );
   }
 
   updateTradingSimulator(id: string, data: Partial<TradingSimulator>): void {
@@ -231,44 +269,6 @@ export class TradingSimulatorApiService {
         unitsCurrentlyAvailable: increment(isSell ? transaction.units : -transaction.units),
       } satisfies FieldValuePartial<TradingSimulatorAggregationSymbols[0]>,
     });
-  }
-
-  getTradingSimulatorByIdTransactions(id: string): Observable<{
-    bestTransactions: PortfolioTransaction[];
-    worstTransactions: PortfolioTransaction[];
-    lastTransactions: PortfolioTransaction[];
-  }> {
-    const latestTransactions$ = rxCollectionData(
-      query(this.getTradingSimulatorTransactionsCollection(id), orderBy('date', 'desc'), limit(25)),
-    );
-
-    const bestTransactions$ = rxCollectionData(
-      query(
-        this.getTradingSimulatorTransactionsCollection(id),
-        where('transactionType', '==', 'SELL'),
-        orderBy('returnChange', 'desc'),
-        limit(10),
-      ),
-    );
-
-    const worstTransactions$ = rxCollectionData(
-      query(
-        this.getTradingSimulatorTransactionsCollection(id),
-        where('transactionType', '==', 'SELL'),
-        orderBy('returnChange', 'desc'),
-        limit(10),
-      ),
-    );
-
-    return combineLatest([latestTransactions$, bestTransactions$, worstTransactions$]).pipe(
-      map(([lastTransactions, bestTransactions, worstTransactions]) => {
-        return {
-          bestTransactions,
-          worstTransactions,
-          lastTransactions,
-        };
-      }),
-    );
   }
 
   private getTradingSimulatorParticipantsDocRef(

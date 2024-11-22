@@ -1,7 +1,7 @@
 import { PortfolioGrowth, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
 import { UserBaseMin } from './user.model';
 
-export type TradingSimulatorBase = {
+export type TradingSimulator = {
   id: string;
 
   /**
@@ -76,15 +76,16 @@ export type TradingSimulatorBase = {
   symbolAvailable: number;
 
   /**
+   * default is false, when the trading simulator is finished, then CF should calculate the statistics
+   * and set this value to true
+   */
+  statisticsGenerated: boolean;
+
+  /**
    * person who created the trading simulator
    */
   owner: UserBaseMin;
-};
 
-/**
- * data about the trading simulator
- */
-export type TradingSimulator = TradingSimulatorBase & {
   /**
    * original symbols that are used in the trading simulator
    */
@@ -213,9 +214,9 @@ export type TradingSimulatorSymbol = {
  * some aggregations of the trading simulator
  */
 export type TradingSimulatorLatestData = {
-  live: TradingSimulatorBase[];
-  started: TradingSimulatorBase[];
-  historical: TradingSimulatorBase[];
+  live: TradingSimulator[];
+  started: TradingSimulator[];
+  historical: TradingSimulator[];
 };
 
 /** statistics about available symbols */
@@ -274,22 +275,3 @@ export type TradingSimulatorAggregations = {
  *   -- collection: transactions
  *    -- documents: PortfolioTransaction
  */
-
-export type TradingSimulatorGeneralActions = { simulatorId: string } & (
-  | {
-      type: 'joinSimulator';
-      invitationCode: string;
-    }
-  | {
-      type: 'leaveSimulator';
-    }
-  | {
-      type: 'addTransaction';
-      transaction: PortfolioTransaction;
-    }
-);
-
-export type TradingSimulatorGeneralActionsByType<T extends TradingSimulatorGeneralActions['type']> = Extract<
-  TradingSimulatorGeneralActions,
-  { type: T }
->;

@@ -26,7 +26,6 @@ import {
   getCurrentDateAndTimeRoundedTo,
   getCurrentDateDefaultFormat,
   getCurrentDateDetailsFormat,
-  transformUserToBaseMin,
 } from '@mm/shared/general-util';
 import {
   DatePickerComponent,
@@ -764,7 +763,7 @@ export class TradingSimulatorFormComponent {
     const existing = this.existingTradingSimulator()?.simulator;
 
     const currentTimeRoundedTo10Minutes = getCurrentDateAndTimeRoundedTo('10_MINUTES');
-    const user = this.authenticationUserStoreService.state.getUserData();
+    const user = this.authenticationUserStoreService.state.getUserDataMin();
 
     const result: TradingSimulator = {
       id: existing?.id ?? createUUID(),
@@ -786,7 +785,8 @@ export class TradingSimulatorFormComponent {
       cashAdditionalIssued: formData.cashIssued,
       marginTrading: formData.marginTradingEnabled ? formData.marginTrading : null,
       marketChange: formData.marketChange,
-      owner: transformUserToBaseMin(user),
+      owner: user,
+      statisticsGenerated: false,
     };
 
     return result;

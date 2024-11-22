@@ -9,6 +9,7 @@ import {
   SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL,
   TRADING_SIMULATOR_PARTICIPANTS_LIMIT,
   TradingSimulator,
+  TradingSimulatorAggregations,
   TradingSimulatorLatestData,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
@@ -16,7 +17,8 @@ import {
   USER_NOT_UNITS_ON_HAND_ERROR,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { firstValueFrom, map, Observable, of } from 'rxjs';
+import { filterNil } from 'ngxtension/filter-nil';
+import { combineLatest, firstValueFrom, map, Observable, of, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -27,9 +29,16 @@ export class TradingSimulatorService {
   private readonly aggregationApiService = inject(AggregationApiService);
 
   readonly tradingSimulatorLatestData = toSignal(
-    this.aggregationApiService
-      .getTradingSimulatorLatestData()
-      .pipe(map((data) => data ?? ({ live: [], started: [], historical: [] } satisfies TradingSimulatorLatestData))),
+    this.aggregationApiService.getTradingSimulatorLatestData().pipe(
+      map(
+        (data) =>
+          ({
+            live: data.live ?? [],
+            started: data.started ?? [],
+            historical: data.historical ?? [],
+          }) satisfies TradingSimulatorLatestData,
+      ),
+    ),
     {
       initialValue: { live: [], started: [], historical: [] },
     },
@@ -53,12 +62,25 @@ export class TradingSimulatorService {
     return this.tradingSimulatorApiService.getTradingSimulatorByIdSymbols(simulatorId);
   }
 
-  getTradingSimulatorAggregationSymbols(simulatorId: string) {
-    return this.tradingSimulatorApiService.getTradingSimulatorAggregationSymbols(simulatorId);
-  }
-
-  getTradingSimulatorByIdTransactions(simulatorId: string) {
-    return this.tradingSimulatorApiService.getTradingSimulatorByIdTransactions(simulatorId);
+  getTradingSimulatorAggregations(simulatorId: string): Observable<TradingSimulatorAggregations> {
+    return this.getTradingSimulatorById(simulatorId).pipe(
+      filterNil(),
+      switchMap((simulator) =>
+        simulator.statisticsGenerated
+          ? // load already aggregated data
+            this.tradingSimulatorApiService.getTradingSimulatorAggregations(simulatorId)
+          : // listen on real-time data
+            combineLatest([
+              this.tradingSimulatorApiService.getTradingSimulatorAggregationSymbols(simulatorId),
+              this.tradingSimulatorApiService.getTradingSimulatorByIdTransactions(simulatorId),
+            ]).pipe(
+              map(([symbolStatistics, transactions]) => ({
+                symbolStatistics,
+                ...transactions,
+              })),
+            ),
+      ),
+    );
   }
 
   getTradingSimulatorByIdTopParticipants(simulatorId: string) {
@@ -77,7 +99,7 @@ export class TradingSimulatorService {
   }
 
   simulatorStateChangeGoLive(simulator: TradingSimulator) {
-    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
+    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
 
     // check if user is the owner
     if (simulator.owner.id !== userBase.id) {
@@ -94,7 +116,7 @@ export class TradingSimulatorService {
   }
 
   simulatorStateChangeDraft(simulator: TradingSimulator) {
-    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
+    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
 
     // check if user is the owner
     if (simulator.owner.id !== userBase.id) {
@@ -116,7 +138,7 @@ export class TradingSimulatorService {
   }
 
   simulatorStateChangeStart(simulator: TradingSimulator) {
-    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
+    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
 
     // check if simulator already started
     if (simulator.state === 'started') {
@@ -143,8 +165,31 @@ export class TradingSimulatorService {
     } satisfies FieldValuePartial<TradingSimulatorLatestData>);
   }
 
+  simulatorStateChangeFinish(simulator: TradingSimulator) {
+    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
+
+    // check if user is the owner
+    if (simulator.owner.id !== userBase.id) {
+      throw new Error('Only the owner can delete the simulator');
+    }
+
+    // check if simulator is in started state
+    if (simulator.state !== 'started') {
+      throw new Error('Simulator must be in draft state');
+    }
+
+    // change state to started
+    this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, { state: 'finished' });
+
+    // add simulator to the aggregation list
+    this.aggregationApiService.updateTradingSimulatorLatestData({
+      live: arrayRemove(simulator),
+      started: arrayUnion(simulator),
+    } satisfies FieldValuePartial<TradingSimulatorLatestData>);
+  }
+
   joinSimulator(simulator: TradingSimulator, invitationCode: string) {
-    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
+    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
 
     // check if user is already a participant
     if (simulator.participants.includes(userBase.id)) {
@@ -166,7 +211,7 @@ export class TradingSimulatorService {
   }
 
   leaveSimulator(simulator: TradingSimulator) {
-    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
+    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
 
     // check if user is a participant
     if (!simulator.participants.includes(userBase.id)) {
@@ -178,16 +223,16 @@ export class TradingSimulatorService {
   }
 
   deleteSimulator(simulator: TradingSimulator) {
-    const userBase = this.authenticationUserStoreService.state.getUserBaseMin();
+    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
 
     // check if user is the owner
     if (simulator.owner.id !== userBase.id) {
       throw new Error('Only the owner can delete the simulator');
     }
 
-    // check if simulator is in draft state
-    if (simulator.state !== 'draft') {
-      throw new Error('Simulator must be in draft state');
+    // check if simulator is in draft state or finished
+    if (simulator.state !== 'draft' && simulator.state !== 'finished') {
+      throw new Error('Simulator must be in draft or finished state');
     }
 
     // remove simulator

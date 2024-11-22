@@ -10,3 +10,5 @@ export type FieldValueConverter<T> = {
 export type FieldValuePartial<T> = {
   [K in keyof Partial<T>]: FieldValue;
 };
+
+export type ExtractedType<K extends { type: string }, T extends K['type']> = Extract<K, { type: T }>;

@@ -48,7 +48,7 @@ import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulato
 export class PageTradingSimulatorEditComponent extends PageTradingSimulatorBaseComponent {
   readonly formData = computed(() => {
     const simulator = this.simulatorData();
-    const simulatorSymbols = this.simulatorDataSymbols();
+    const simulatorSymbols = this.simulatorSymbols();
 
     if (!simulator || !simulatorSymbols) {
       return null;
