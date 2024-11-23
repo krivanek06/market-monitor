@@ -168,6 +168,7 @@ export enum UserAccountEnum {
 }
 
 export type UserAccountTypes = keyof typeof UserAccountEnum;
+export type UserFeatureAccessKeys = keyof NonNullable<UserData['featureAccess']>;
 
 /**
  * picked account types user can choose from by default, others can added by the system

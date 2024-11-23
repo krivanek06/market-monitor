@@ -17,6 +17,7 @@ import {
   USER_NOT_UNITS_ON_HAND_ERROR,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { getCurrentDateDetailsFormat } from '@mm/shared/general-util';
 import { filterNil } from 'ngxtension/filter-nil';
 import { combineLatest, firstValueFrom, map, Observable, of, switchMap } from 'rxjs';
 
@@ -63,7 +64,7 @@ export class TradingSimulatorService {
   }
 
   getTradingSimulatorAggregations(simulatorId: string): Observable<TradingSimulatorAggregations> {
-    return this.getTradingSimulatorById(simulatorId).pipe(
+    return this.tradingSimulatorApiService.getTradingSimulatorById(simulatorId).pipe(
       filterNil(),
       switchMap((simulator) =>
         simulator.statisticsGenerated
@@ -156,7 +157,10 @@ export class TradingSimulatorService {
     }
 
     // change state to started
-    this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, { state: 'started' });
+    this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, {
+      state: 'started',
+      startDateTime: getCurrentDateDetailsFormat(),
+    });
 
     // add simulator to the aggregation list
     this.aggregationApiService.updateTradingSimulatorLatestData({
@@ -179,7 +183,10 @@ export class TradingSimulatorService {
     }
 
     // change state to started
-    this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, { state: 'finished' });
+    this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, {
+      state: 'finished',
+      endDateTime: getCurrentDateDetailsFormat(),
+    });
 
     // add simulator to the aggregation list
     this.aggregationApiService.updateTradingSimulatorLatestData({

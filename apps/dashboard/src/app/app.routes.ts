@@ -1,11 +1,10 @@
 import { inject } from '@angular/core';
-import { ActivatedRouteSnapshot, Route, Router } from '@angular/router';
-import { TradingSimulatorApiService } from '@mm/api-client';
+import { Route, Router } from '@angular/router';
 import { UserAccountEnum } from '@mm/api-types';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { featureFlagGuard } from '@mm/authentication/feature-access-directive';
+import { featureFlagGuard, userAccountTypeGuard } from '@mm/authentication/feature-access-directive';
 import { IS_DEV_TOKEN, ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
-import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { tradingSimulatorEditGuard, tradingSimulatorExistsGuard } from '@mm/trading-simulator/data-access';
 import { map, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
@@ -90,18 +89,21 @@ export const appRoutes: Route[] = [
             path: ROUTES_MAIN.HALL_OF_FAME,
             title: 'GGFinance - Ranking',
             loadComponent: () => import('@mm/page-builder').then((m) => m.PageHallOfFameComponent),
-            canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
+            canActivate: [userAccountTypeGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
           },
           {
             path: ROUTES_MAIN.COMPARE_USERS,
             title: 'GGFinance - Compare Users',
             loadComponent: () => import('@mm/page-builder').then((m) => m.PageCompareUsersComponent),
-            canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
+            canActivate: [userAccountTypeGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
           },
           {
             path: ROUTES_MAIN.GROUPS,
             title: 'GGFinance - Groups',
-            canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
+            canActivate: [
+              userAccountTypeGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD),
+              featureFlagGuard('createGroups'),
+            ],
             loadChildren: () => [
               {
                 path: '',
@@ -124,100 +126,22 @@ export const appRoutes: Route[] = [
               {
                 path: ROUTES_TRADING_SIMULATOR.CREATE,
                 loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorCreateComponent),
+                canActivate: [featureFlagGuard('createTradingSimulator')],
               },
               {
                 path: `${ROUTES_TRADING_SIMULATOR.EDIT}/:id`,
                 loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorEditComponent),
-                canActivate: [
-                  (route: ActivatedRouteSnapshot) => {
-                    const authService = inject(AuthenticationUserStoreService);
-                    const tradingSimulatorApiService = inject(TradingSimulatorApiService);
-                    const router = inject(Router);
-                    const dialogServiceUtil = inject(DialogServiceUtil);
-                    const user = authService.state().userData;
-
-                    const simulatorId = String(route.paramMap.get('id'));
-
-                    return tradingSimulatorApiService.getTradingSimulatorById(simulatorId).pipe(
-                      map((simulator) => {
-                        // check if simulator exists
-                        if (!simulator) {
-                          dialogServiceUtil.showNotificationBar('Trading simulator not found', 'error');
-                          router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
-                          return false;
-                        }
-
-                        // check if simulator is in draft state
-                        if (simulator.state !== 'draft') {
-                          dialogServiceUtil.showNotificationBar('Trading simulator is not in draft state', 'error');
-                          router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
-                          return false;
-                        }
-
-                        // check if user is the owner
-                        if (user && user?.id !== simulator.owner.id) {
-                          dialogServiceUtil.showNotificationBar('You are not the owner of this simulator', 'error');
-                          router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
-                          return false;
-                        }
-
-                        return true;
-                      }),
-                    );
-                  },
-                ],
+                canActivate: [tradingSimulatorEditGuard],
               },
               {
                 path: `${ROUTES_TRADING_SIMULATOR.DETAILS}/:id`,
                 loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorDetailsComponent),
-                canActivate: [
-                  (route: ActivatedRouteSnapshot) => {
-                    const dialogServiceUtil = inject(DialogServiceUtil);
-                    const tradingSimulatorApiService = inject(TradingSimulatorApiService);
-                    const router = inject(Router);
-
-                    const simulatorId = String(route.paramMap.get('id'));
-
-                    return tradingSimulatorApiService.getTradingSimulatorById(simulatorId).pipe(
-                      map((simulator) => {
-                        // check if simulator exists
-                        if (!simulator) {
-                          dialogServiceUtil.showNotificationBar('Trading simulator not found', 'error');
-                          router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
-                          return false;
-                        }
-
-                        return true;
-                      }),
-                    );
-                  },
-                ],
+                canActivate: [tradingSimulatorExistsGuard],
               },
               {
                 path: `${ROUTES_TRADING_SIMULATOR.STATISTICS}/:id`,
                 loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorStatisticsComponent),
-                canActivate: [
-                  (route: ActivatedRouteSnapshot) => {
-                    const dialogServiceUtil = inject(DialogServiceUtil);
-                    const tradingSimulatorApiService = inject(TradingSimulatorApiService);
-                    const router = inject(Router);
-
-                    const simulatorId = String(route.paramMap.get('id'));
-
-                    return tradingSimulatorApiService.getTradingSimulatorById(simulatorId).pipe(
-                      map((simulator) => {
-                        // check if simulator exists
-                        if (!simulator) {
-                          dialogServiceUtil.showNotificationBar('Trading simulator not found', 'error');
-                          router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
-                          return false;
-                        }
-
-                        return true;
-                      }),
-                    );
-                  },
-                ],
+                canActivate: [tradingSimulatorExistsGuard],
               },
             ],
           },
