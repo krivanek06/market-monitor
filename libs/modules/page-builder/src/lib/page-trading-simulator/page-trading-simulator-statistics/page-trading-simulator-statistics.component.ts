@@ -5,6 +5,7 @@ import { SectionTitleComponent } from '@mm/shared/ui';
 import {
   TradingSimulatorSymbolPriceChartComponent,
   TradingSimulatorSymbolPriceChartLegendComponent,
+  TradingSimulatorSymbolStatTableComponent,
 } from '@mm/trading-simulator/ui';
 import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulator-base.component';
 import { PageTradingSimulatorStatisticsButtonsComponent } from './components/page-trading-simulator-statistics-buttons.component';
@@ -19,6 +20,7 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
     SectionTitleComponent,
     TradingSimulatorSymbolPriceChartComponent,
     TradingSimulatorSymbolPriceChartLegendComponent,
+    TradingSimulatorSymbolStatTableComponent,
   ],
   template: `
     <div class="grid grid-cols-4 gap-x-10">
@@ -43,7 +45,7 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
 
         <!-- display charts of symbols -->
         @if (simulatorData(); as simulatorData) {
-          <div class="grid grid-cols-3 gap-x-6 gap-y-3">
+          <div class="mb-6 grid grid-cols-3 gap-x-6 gap-y-3">
             @for (symbol of simulatorSymbols(); track symbol.symbol) {
               <app-trading-simulator-symbol-price-chart
                 [simulator]="simulatorData"
@@ -55,12 +57,20 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
             }
           </div>
         }
+
+        <!-- symbol statistics -->
+        <app-section-title
+          title="Symbol Statistics"
+          description="Data updates in real time as participants create transactions"
+          class="mb-3 pl-3"
+          titleSize="lg"
+        />
+        <app-trading-simulator-symbol-stat-table [data]="simulatorAggregation()?.symbolStatistics" />
       </div>
       <div>right side - user ranking</div>
     </div>
 
-    <!-- display participants when stats are generated -->
-    @if (simulatorData()?.statisticsGenerated) {}
+    <!-- display participants -->
 
     <!-- display transactions -->
   `,

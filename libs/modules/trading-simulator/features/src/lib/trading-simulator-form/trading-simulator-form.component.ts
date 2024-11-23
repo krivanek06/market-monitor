@@ -775,6 +775,7 @@ export class TradingSimulatorFormComponent {
       oneRoundDurationMinutes: formData.roundIntervalMin,
       state: 'draft',
       startDateTime: formData.startTime?.toISOString() ?? currentTimeRoundedTo10Minutes,
+      nextRoundTime: formData.startTime?.toISOString() ?? currentTimeRoundedTo10Minutes,
       endDateTime: formDataMore.endTime?.toISOString() ?? currentTimeRoundedTo10Minutes,
       totalTimeMinutes: formDataMore.totalTimeMinutes,
       symbolAvailable: formData.symbolsHistoricalData.length,

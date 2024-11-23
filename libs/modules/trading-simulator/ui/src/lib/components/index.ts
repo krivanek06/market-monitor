@@ -3,3 +3,4 @@ export * from './trading-simulator-info-create-button/trading-simulator-info-cre
 export * from './trading-simulator-info-overview-button/trading-simulator-info-overview-button.component';
 export * from './trading-simulator-symbol-price-chart/trading-simulator-symbol-price-chart-legend/trading-simulator-symbol-price-chart-legend.component';
 export * from './trading-simulator-symbol-price-chart/trading-simulator-symbol-price-chart.component';
+export * from './trading-simulator-symbol-stat-table/trading-simulator-symbol-stat-table.component';

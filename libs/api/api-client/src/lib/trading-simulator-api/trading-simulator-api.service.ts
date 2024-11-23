@@ -169,6 +169,8 @@ export class TradingSimulatorApiService {
           soldTotal: 0,
           unitsCurrentlyAvailable: curr.unitsAvailableOnStart,
           unitsInfinity: curr.unitsInfinity,
+          symbol: curr.symbol,
+          unitsTotalAvailable: curr.unitsAvailableOnStart,
         },
       }),
       {} as TradingSimulatorAggregationSymbols,

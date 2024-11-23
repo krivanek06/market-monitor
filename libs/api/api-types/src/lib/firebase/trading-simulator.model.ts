@@ -20,14 +20,19 @@ export type TradingSimulator = {
   updatedDate: string;
 
   /**
-   * date when this simulation will start - format: 'YYYY-MM-DDTHH:mm:ss' (new Date().toISOString())
+   * date when this simulation will start - format: 'YYYY-MM-DDTHH:mm:ss'
    */
   startDateTime: string;
 
   /**
-   * date when this simulation will end - format: 'YYYY-MM-DDTHH:mm:ss' (new Date().toISOString())
+   * date when this simulation will end - format: 'YYYY-MM-DDTHH:mm:ss'
    */
   endDateTime: string;
+
+  /**
+   * date when the next round will start - format: 'YYYY-MM-DDTHH:mm:ss'
+   */
+  nextRoundTime: string;
 
   /**
    * total time in seconds how long the trading simulator will be active
@@ -229,6 +234,7 @@ export type TradingSimulatorLatestData = {
 /** statistics about available symbols */
 export type TradingSimulatorAggregationSymbols = {
   [K in string]: {
+    symbol: string;
     buyOperations: number;
     boughtUnits: number;
     investedTotal: number;
@@ -243,6 +249,10 @@ export type TradingSimulatorAggregationSymbols = {
      * should never be negative
      */
     unitsCurrentlyAvailable: number;
+    /**
+     * how many units are available in total
+     */
+    unitsTotalAvailable: number;
     unitsInfinity: boolean;
   };
 };
