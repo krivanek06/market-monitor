@@ -50,7 +50,9 @@ export class PageTradingSimulatorEditComponent extends PageTradingSimulatorBaseC
     const simulator = this.simulatorData();
     const simulatorSymbols = this.simulatorSymbols();
 
-    if (!simulator || !simulatorSymbols) {
+    console.log('simulatorSymbols', simulatorSymbols);
+
+    if (!simulator || simulatorSymbols.length === 0) {
       return null;
     }
 

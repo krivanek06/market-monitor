@@ -22,8 +22,8 @@ import {
   FieldValuePartial,
   PortfolioTransaction,
   TradingSimulator,
-  TradingSimulatorAggregations,
   TradingSimulatorAggregationSymbols,
+  TradingSimulatorAggregationTransactions,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
   UserBaseMin,
@@ -32,7 +32,7 @@ import { assignTypesClient } from '@mm/shared/data-access';
 import { createEmptyPortfolioState, roundNDigits } from '@mm/shared/general-util';
 import { filterNil } from 'ngxtension/filter-nil';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
-import { combineLatest, map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -90,46 +90,8 @@ export class TradingSimulatorApiService {
     return rxDocData(this.getTradingSimulatorAggregationSymbolsDocRef(id)).pipe(filterNil());
   }
 
-  getTradingSimulatorAggregations(id: string): Observable<TradingSimulatorAggregations> {
-    return rxDocData(this.getTradingSimulatorAggregationDocRef(id)).pipe(filterNil());
-  }
-
-  getTradingSimulatorByIdTransactions(id: string): Observable<{
-    bestTransactions: PortfolioTransaction[];
-    worstTransactions: PortfolioTransaction[];
-    lastTransactions: PortfolioTransaction[];
-  }> {
-    const latestTransactions$ = rxCollectionData(
-      query(this.getTradingSimulatorTransactionsCollection(id), orderBy('date', 'desc'), limit(25)),
-    );
-
-    const bestTransactions$ = rxCollectionData(
-      query(
-        this.getTradingSimulatorTransactionsCollection(id),
-        where('transactionType', '==', 'SELL'),
-        orderBy('returnChange', 'desc'),
-        limit(10),
-      ),
-    );
-
-    const worstTransactions$ = rxCollectionData(
-      query(
-        this.getTradingSimulatorTransactionsCollection(id),
-        where('transactionType', '==', 'SELL'),
-        orderBy('returnChange', 'desc'),
-        limit(10),
-      ),
-    );
-
-    return combineLatest([latestTransactions$, bestTransactions$, worstTransactions$]).pipe(
-      map(([lastTransactions, bestTransactions, worstTransactions]) => {
-        return {
-          bestTransactions,
-          worstTransactions,
-          lastTransactions,
-        };
-      }),
-    );
+  getTradingSimulatorAggregationTransactions(id: string): Observable<TradingSimulatorAggregationTransactions> {
+    return rxDocData(this.getTradingSimulatorAggregationTransactionsDocRef(id)).pipe(filterNil());
   }
 
   updateTradingSimulator(id: string, data: Partial<TradingSimulator>): void {
@@ -177,6 +139,13 @@ export class TradingSimulatorApiService {
     );
 
     batch.set(this.getTradingSimulatorAggregationSymbolsDocRef(data.tradingSimulator.id), aggregationData);
+
+    // create aggregation document for transactions
+    batch.set(this.getTradingSimulatorAggregationTransactionsDocRef(data.tradingSimulator.id), {
+      bestTransactions: [],
+      lastTransactions: [],
+      worstTransactions: [],
+    });
 
     // commit the batch
     await batch.commit();
@@ -228,7 +197,7 @@ export class TradingSimulatorApiService {
     batch.delete(this.getTradingSimulatorAggregationSymbolsDocRef(simulator.id));
 
     // remove additional aggregation data
-    batch.delete(this.getTradingSimulatorAggregationDocRef(simulator.id));
+    batch.delete(this.getTradingSimulatorAggregationTransactionsDocRef(simulator.id));
 
     // remove simulator document
     batch.delete(this.getTradingSimulatorDocRef(simulator.id));
@@ -306,9 +275,11 @@ export class TradingSimulatorApiService {
     );
   }
 
-  private getTradingSimulatorAggregationDocRef(id: string): DocumentReference<TradingSimulatorAggregations> {
-    return doc(this.getTradingSimulatorMoreInformationCollection(id), 'aggregations').withConverter(
-      assignTypesClient<TradingSimulatorAggregations>(),
+  private getTradingSimulatorAggregationTransactionsDocRef(
+    id: string,
+  ): DocumentReference<TradingSimulatorAggregationTransactions> {
+    return doc(this.getTradingSimulatorMoreInformationCollection(id), 'aggregation_transactions').withConverter(
+      assignTypesClient<TradingSimulatorAggregationTransactions>(),
     );
   }
 

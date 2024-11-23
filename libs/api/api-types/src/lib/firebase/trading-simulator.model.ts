@@ -163,7 +163,7 @@ export type TradingSimulatorParticipant = {
   holdings: PortfolioStateHoldingBase[];
 
   /**
-   * user's portfolio growth data - updated when simulator closes
+   * user's portfolio growth data
    */
   portfolioGrowth: PortfolioGrowth[];
 
@@ -261,10 +261,7 @@ export type TradingSimulatorAggregationSymbols = {
  * aggregation data about the trading simulator
  * calculated once simulator is finished
  */
-export type TradingSimulatorAggregations = {
-  /** copied data from TradingSimulatorAggregationSymbols */
-  symbolStatistics: TradingSimulatorAggregationSymbols;
-
+export type TradingSimulatorAggregationTransactions = {
   /** best return transaction (only SELL transactions) */
   bestTransactions: PortfolioTransaction[];
 
@@ -280,7 +277,7 @@ export type TradingSimulatorAggregations = {
  * collection: trading_simulator
  * - document: TradingSimulator
  *   -- collection: more_information
- *     -- document: aggregations: TradingSimulatorAggregations
+ *     -- document: aggregations_transactions TradingSimulatorAggregationTransactions
  *     -- document: aggregation_symbols: TradingSimulatorAggregationSymbols
  *
  *   -- collection: participants (each user one document)

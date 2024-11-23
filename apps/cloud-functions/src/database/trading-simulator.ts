@@ -1,7 +1,8 @@
 import {
   PortfolioTransaction,
   TradingSimulator,
-  TradingSimulatorAggregations,
+  TradingSimulatorAggregationSymbols,
+  TradingSimulatorAggregationTransactions,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
 } from '@mm/api-types';
@@ -31,7 +32,12 @@ export const tradingSimulatorTransactionsCollectionRef = (id: string) =>
 export const tradingSimulatorSymbolDocRef = (id: string, symbol: string) =>
   tradingSimulatorSymbolsCollectionRef(id).doc(symbol);
 
-export const tradingSimulatorAggregationDocRef = (id: string) =>
+export const tradingSimulatorAggregationSymbolsDocRef = (id: string) =>
   tradingSimulatorMoreInformationCollectionRef(id)
-    .doc('aggregations')
-    .withConverter(assignTypes<TradingSimulatorAggregations>());
+    .doc('aggregation_symbols')
+    .withConverter(assignTypes<TradingSimulatorAggregationSymbols>());
+
+export const tradingSimulatorAggregationTransactionsDocRef = (id: string) =>
+  tradingSimulatorMoreInformationCollectionRef(id)
+    .doc('aggregation_transactions')
+    .withConverter(assignTypes<TradingSimulatorAggregationTransactions>());

@@ -21,38 +21,6 @@ export abstract class PageTradingSimulatorBaseComponent {
     this.simulatorId$.pipe(switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorById(selectedId))),
   );
 
-  /** checks every 1s if the round has already started */
-  // readonly simulatorCurrentRound = toSignal(
-  //   toObservable(this.simulatorData).pipe(
-  //     switchMap((simulator) =>
-  //       simulator
-  //         ? timer(0, 1000).pipe(
-  //             map((timeValue) => {
-  //               const currentDate = addSeconds(simulator.startDateTime, timeValue);
-
-  //               // simulator hasn't yet started
-  //               if (isBefore(currentDate, new Date())) {
-  //                 return 0;
-  //               }
-
-  //               // check if simulator has ended
-  //               if (isBefore(simulator.endDateTime, currentDate)) {
-  //                 return TRADING_SIMULATOR_MAX_ROUNDS;
-  //               }
-
-  //               // simulator has started - calculate current round
-  //               const round = Math.floor(
-  //                 differenceInIm(currentDate, new Date()) / simulator.oneRoundDurationMinutes,
-  //               );
-  //               return round;
-  //             }),
-  //           )
-  //         : of(0),
-  //     ),
-  //   ),
-  //   { initialValue: 0 },
-  // );
-
   readonly simulatorSymbols = toSignal(
     this.simulatorId$.pipe(
       switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorByIdSymbols(selectedId)),
@@ -60,9 +28,15 @@ export abstract class PageTradingSimulatorBaseComponent {
     { initialValue: [] },
   );
 
-  readonly simulatorAggregation = toSignal(
+  readonly simulatorAggregationTransactions = toSignal(
     this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorAggregations(selectedId)),
+      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorAggregationTransactions(selectedId)),
+    ),
+  );
+
+  readonly simulatorAggregationSymbols = toSignal(
+    this.simulatorId$.pipe(
+      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorAggregationSymbols(selectedId)),
     ),
   );
 
@@ -72,7 +46,8 @@ export abstract class PageTradingSimulatorBaseComponent {
       console.log('PageTradingSimulatorBaseComponent', {
         simulatorData: this.simulatorData(),
         simulatorDataSymbols: this.simulatorSymbols(),
-        simulatorAggregation: this.simulatorAggregation(),
+        simulatorAggregationTransactions: this.simulatorAggregationTransactions(),
+        simulatorAggregationSymbols: this.simulatorAggregationSymbols(),
       });
     });
   }

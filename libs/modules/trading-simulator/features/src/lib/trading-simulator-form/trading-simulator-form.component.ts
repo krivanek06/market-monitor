@@ -292,6 +292,13 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
 
         <!-- basic information -->
         <app-general-card title="Basic Information">
+          @if (existingTradingSimulator()) {
+            <div class="g-item-wrapper">
+              <span>ID</span>
+              <span>{{ existingTradingSimulator()?.simulator?.id }}</span>
+            </div>
+          }
+
           <div class="g-item-wrapper">
             <span>Name</span>
             <span>{{ formData().name | truncate: 25 }}</span>

@@ -9,7 +9,6 @@ import {
   SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL,
   TRADING_SIMULATOR_PARTICIPANTS_LIMIT,
   TradingSimulator,
-  TradingSimulatorAggregations,
   TradingSimulatorLatestData,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
@@ -18,8 +17,7 @@ import {
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { getCurrentDateDetailsFormat } from '@mm/shared/general-util';
-import { filterNil } from 'ngxtension/filter-nil';
-import { combineLatest, firstValueFrom, map, Observable, of, switchMap } from 'rxjs';
+import { firstValueFrom, map, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -63,25 +61,12 @@ export class TradingSimulatorService {
     return this.tradingSimulatorApiService.getTradingSimulatorByIdSymbols(simulatorId);
   }
 
-  getTradingSimulatorAggregations(simulatorId: string): Observable<TradingSimulatorAggregations> {
-    return this.tradingSimulatorApiService.getTradingSimulatorById(simulatorId).pipe(
-      filterNil(),
-      switchMap((simulator) =>
-        simulator.statisticsGenerated
-          ? // load already aggregated data
-            this.tradingSimulatorApiService.getTradingSimulatorAggregations(simulatorId)
-          : // listen on real-time data
-            combineLatest([
-              this.tradingSimulatorApiService.getTradingSimulatorAggregationSymbols(simulatorId),
-              this.tradingSimulatorApiService.getTradingSimulatorByIdTransactions(simulatorId),
-            ]).pipe(
-              map(([symbolStatistics, transactions]) => ({
-                symbolStatistics,
-                ...transactions,
-              })),
-            ),
-      ),
-    );
+  getTradingSimulatorAggregationSymbols(simulatorId: string) {
+    return this.tradingSimulatorApiService.getTradingSimulatorAggregationSymbols(simulatorId);
+  }
+
+  getTradingSimulatorAggregationTransactions(simulatorId: string) {
+    return this.tradingSimulatorApiService.getTradingSimulatorAggregationTransactions(simulatorId);
   }
 
   getTradingSimulatorByIdTopParticipants(simulatorId: string) {

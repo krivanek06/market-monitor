@@ -35,7 +35,6 @@ import {
 } from '@mm/shared/data-access';
 import { getRandomElement } from '@mm/shared/general-util';
 import {
-  DatePickerComponent,
   DefaultImgDirective,
   FormMatInputWrapperComponent,
   GenericChartComponent,
@@ -51,7 +50,6 @@ import { catchError, firstValueFrom, of } from 'rxjs';
     MatIconModule,
     ReactiveFormsModule,
     MatButtonModule,
-    DatePickerComponent,
     DefaultImgDirective,
     MatTooltipModule,
     GenericChartComponent,
@@ -134,13 +132,15 @@ import { catchError, firstValueFrom, of } from 'rxjs';
         />
 
         <!-- add additional units -->
-        <!-- TODO: no additional units, not sure how to implement this -->
-        @if (false) {
-          <button mat-stroked-button color="primary" (click)="onAddAdditionalUnits()">
-            <mat-icon>add</mat-icon>
-            Additional units
-          </button>
-        }
+        <button
+          mat-stroked-button
+          color="primary"
+          [disabled]="form.controls.unitsInfinity.value"
+          (click)="onAddAdditionalUnits()"
+        >
+          <mat-icon>add</mat-icon>
+          Additional units
+        </button>
       </div>
     </div>
 
@@ -327,9 +327,14 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
     // disable the unitsAvailableOnStart when unitsInfinity is checked
     this.form.controls.unitsInfinity.valueChanges.pipe(takeUntilDestroyed()).subscribe((res) => {
       if (res) {
+        // disable the control
         this.form.controls.unitsAvailableOnStart.disable();
         this.form.controls.unitsAvailableOnStart.patchValue(0);
+
+        // remove additional units
+        this.form.controls.unitsAdditionalIssued.clear();
       } else {
+        // enable the control
         this.form.controls.unitsAvailableOnStart.enable();
         this.form.controls.unitsAvailableOnStart.patchValue(1000);
       }
@@ -346,14 +351,14 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
     /** */
   };
 
-  onAddAdditionalUnits() {
+  onAddAdditionalUnits(issuedOnRound = 1, units = 100) {
     // create control
     const unitsAdditionalIssued = new FormGroup({
-      issuedOnRound: new FormControl<number>(1, {
+      issuedOnRound: new FormControl<number>(issuedOnRound, {
         nonNullable: true,
         validators: [positiveNumberValidator, requiredValidator],
       }),
-      units: new FormControl<number>(100, {
+      units: new FormControl<number>(units, {
         nonNullable: true,
         validators: [positiveNumberValidator, requiredValidator],
       }),
@@ -399,15 +404,20 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   writeValue(obj: TradingSimulatorSymbol): void {
     if (obj.symbol === '') {
       this.fillFormData();
-    } else {
-      this.form.patchValue({
-        historicalData: obj.historicalDataOriginal,
-        symbol: obj.symbol,
-        unitsInfinity: obj.unitsInfinity,
-        unitsAvailableOnStart: obj.unitsAvailableOnStart,
-        priceMultiplication: obj.priceMultiplication,
-      });
+      return;
     }
+
+    // set the form data
+    this.form.patchValue({
+      historicalData: obj.historicalDataOriginal,
+      symbol: obj.symbol,
+      unitsInfinity: obj.unitsInfinity,
+      unitsAvailableOnStart: obj.unitsAvailableOnStart,
+      priceMultiplication: obj.priceMultiplication,
+    });
+
+    // set additional units
+    obj.unitsAdditionalIssued.forEach((d) => this.onAddAdditionalUnits(d.issuedOnRound, d.units));
   }
 
   registerOnChange(fn: TradingSimulatorFormSymbolComponent['onChange']): void {
