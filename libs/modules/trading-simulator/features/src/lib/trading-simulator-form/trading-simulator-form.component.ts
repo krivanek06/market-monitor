@@ -41,7 +41,7 @@ import {
 } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorInfoCreateButtonComponent } from '@mm/trading-simulator/ui';
-import { addSeconds } from 'date-fns';
+import { addMinutes } from 'date-fns';
 import { effectOnceIf } from 'ngxtension/effect-once-if';
 import { map, startWith } from 'rxjs';
 import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-symbol/trading-simulator-form-symbol.component';
@@ -112,11 +112,11 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           <!-- round interval -->
           <app-form-mat-input-wrapper
             inputCaption="round interval"
-            hintText="On round interval in seconds, from {{ constFields.roundIntervalSecondsMin }} to {{
-              constFields.roundIntervalSecondsMax
+            hintText="On round interval in minuted, from {{ constFields.roundIntervalMin }} to {{
+              constFields.roundIntervalMax
             }}"
             inputType="NUMBER"
-            [formControl]="form.controls.roundIntervalSeconds"
+            [formControl]="form.controls.roundIntervalMin"
           />
 
           <!-- starting cash -->
@@ -309,7 +309,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
 
           <div class="g-item-wrapper">
             <span>Total time</span>
-            <span>{{ formData().totalTimeSeconds | dateReadable: 'seconds' }}</span>
+            <span>{{ formData().totalTimeMinutes | dateReadable: 'minutes' }}</span>
           </div>
 
           <div class="g-item-wrapper">
@@ -319,7 +319,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
 
           <div class="g-item-wrapper">
             <span>Round interval (sec)</span>
-            <span>{{ formData().roundIntervalSeconds }}</span>
+            <span>{{ formData().roundIntervalMin }}</span>
           </div>
 
           <div class="g-item-wrapper">
@@ -429,8 +429,8 @@ export class TradingSimulatorFormComponent {
 
   readonly constFields = {
     maxRounds: TRADING_SIMULATOR_MAX_ROUNDS,
-    roundIntervalSecondsMin: 10,
-    roundIntervalSecondsMax: 3600,
+    roundIntervalMin: 1,
+    roundIntervalMax: 3600,
   } as const;
 
   /**
@@ -457,9 +457,9 @@ export class TradingSimulatorFormComponent {
       validators: [requiredValidator, positiveNumberValidator, intervalValidator(1, TRADING_SIMULATOR_MAX_ROUNDS)],
     }),
     // how much time to (in seconds) to wait between rounds
-    roundIntervalSeconds: new FormControl(10, {
+    roundIntervalMin: new FormControl(10, {
       nonNullable: true,
-      validators: [requiredValidator, positiveNumberValidator, intervalValidator(10, 3600)],
+      validators: [requiredValidator, positiveNumberValidator, intervalValidator(1, 3600)],
     }),
     // code to join the trading simulator
     invitationCode: new FormControl(generateRandomString(6), { nonNullable: true, validators: [requiredValidator] }),
@@ -580,9 +580,9 @@ export class TradingSimulatorFormComponent {
       map((data) => ({
         ...data,
         endTime: data.startTime
-          ? addSeconds(data.startTime, (data.maximumRounds ?? 1) * (data.roundIntervalSeconds ?? 10))
+          ? addMinutes(data.startTime, (data.maximumRounds ?? 1) * (data.roundIntervalMin ?? 10))
           : null,
-        totalTimeSeconds: (data.maximumRounds ?? 1) * (data.roundIntervalSeconds ?? 10),
+        totalTimeMinutes: (data.maximumRounds ?? 1) * (data.roundIntervalMin ?? 10),
       })),
     ),
     { requireSync: true },
@@ -772,11 +772,11 @@ export class TradingSimulatorFormComponent {
       updatedDate: getCurrentDateDetailsFormat(),
       invitationCode: formData.invitationCode,
       maximumRounds: formData.maximumRounds,
-      oneRoundDurationSeconds: formData.roundIntervalSeconds,
+      oneRoundDurationMinutes: formData.roundIntervalMin,
       state: 'draft',
       startDateTime: formData.startTime?.toISOString() ?? currentTimeRoundedTo10Minutes,
       endDateTime: formDataMore.endTime?.toISOString() ?? currentTimeRoundedTo10Minutes,
-      totalTimeSeconds: formDataMore.totalTimeSeconds,
+      totalTimeMinutes: formDataMore.totalTimeMinutes,
       symbolAvailable: formData.symbolsHistoricalData.length,
       symbols: formData.symbolsHistoricalData.map((d) => d.symbol),
       currentParticipants: 0,
@@ -787,6 +787,7 @@ export class TradingSimulatorFormComponent {
       marketChange: formData.marketChange,
       owner: user,
       statisticsGenerated: false,
+      currentRound: 0,
     };
 
     return result;
@@ -853,7 +854,7 @@ export class TradingSimulatorFormComponent {
         name: existing.simulator.name,
         startTime: new Date(existing.simulator.startDateTime),
         maximumRounds: existing.simulator.maximumRounds,
-        roundIntervalSeconds: existing.simulator.oneRoundDurationSeconds,
+        roundIntervalMin: existing.simulator.oneRoundDurationMinutes,
         startingCash: existing.simulator.cashStartingValue,
         invitationCode: existing.simulator.invitationCode,
         marginTradingEnabled: !!existing.simulator.marginTrading?.subtractPeriodRounds,

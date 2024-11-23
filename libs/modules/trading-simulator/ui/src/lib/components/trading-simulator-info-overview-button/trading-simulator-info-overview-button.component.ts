@@ -58,7 +58,7 @@ import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent, SectionTitl
         <div class="g-item-wrapper">
           <span>Rounds</span>
           <div class="space-x-1">
-            <span>{{ tradingSimulator().oneRoundDurationSeconds | dateReadable: 'seconds' }}</span>
+            <span>{{ tradingSimulator().oneRoundDurationMinutes | dateReadable: 'minutes' }}</span>
             <span>/</span>
             <span>{{ tradingSimulator().maximumRounds }}</span>
           </div>
@@ -66,7 +66,7 @@ import { DateReadablePipe, DefaultImgDirective, InfoButtonComponent, SectionTitl
 
         <div class="g-item-wrapper">
           <span>Total Time</span>
-          <span>{{ tradingSimulator().totalTimeSeconds | dateReadable: 'seconds' }}</span>
+          <span>{{ tradingSimulator().totalTimeMinutes | dateReadable: 'minutes' }}</span>
         </div>
 
         <div class="g-item-wrapper">

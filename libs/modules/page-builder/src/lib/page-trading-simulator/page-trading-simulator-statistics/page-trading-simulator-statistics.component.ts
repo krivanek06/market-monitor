@@ -21,40 +21,46 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
     TradingSimulatorSymbolPriceChartLegendComponent,
   ],
   template: `
-    <div class="mb-6 flex items-center justify-between">
-      <app-section-title title="Simulator Statistics: {{ simulatorData()?.name }}" />
+    <div class="grid grid-cols-4 gap-x-10">
+      <div class="col-span-3">
+        <div class="mb-6 flex items-center justify-between">
+          <app-section-title title="Simulator Statistics: {{ simulatorData()?.name }}" />
 
-      <!-- buttons to the owner -->
-      @if (isAuthUserOwner()) {
+          <!-- buttons to the owner -->
+          @if (isAuthUserOwner()) {
+            @if (simulatorData(); as simulatorData) {
+              <app-page-trading-simulator-statistics-buttons [simulatorData]="simulatorData" />
+            }
+          }
+        </div>
+
+        <!-- round info -->
+        <div class="mb-4 flex justify-between">
+          <div>Current Round: {{ simulatorData()?.currentRound }}</div>
+
+          <app-trading-simulator-symbol-price-chart-legend [isOwner]="isAuthUserOwner()" />
+        </div>
+
+        <!-- display charts of symbols -->
         @if (simulatorData(); as simulatorData) {
-          <app-page-trading-simulator-statistics-buttons [simulatorData]="simulatorData" />
-        }
-      }
-    </div>
-
-    <!-- round info -->
-    <div class="mb-4 flex justify-between">
-      <div>Current Round: {{ simulatorCurrentRound() }}</div>
-
-      <app-trading-simulator-symbol-price-chart-legend [isOwner]="isAuthUserOwner()" />
-    </div>
-
-    <!-- display charts of symbols -->
-    @if (simulatorData(); as simulatorData) {
-      <div class="grid grid-cols-3 gap-x-6 gap-y-3">
-        @for (symbol of simulatorSymbols(); track symbol.symbol) {
-          <app-trading-simulator-symbol-price-chart
-            [simulator]="simulatorData"
-            [simulatorSymbol]="symbol"
-            [currentRound]="simulatorCurrentRound()"
-            [authUser]="authUserData()"
-            [heightPx]="225"
-          />
+          <div class="grid grid-cols-3 gap-x-6 gap-y-3">
+            @for (symbol of simulatorSymbols(); track symbol.symbol) {
+              <app-trading-simulator-symbol-price-chart
+                [simulator]="simulatorData"
+                [simulatorSymbol]="symbol"
+                [currentRound]="simulatorData.currentRound"
+                [authUser]="authUserData()"
+                [heightPx]="200"
+              />
+            }
+          </div>
         }
       </div>
-    }
+      <div>right side - user ranking</div>
+    </div>
 
-    <!-- display participants -->
+    <!-- display participants when stats are generated -->
+    @if (simulatorData()?.statisticsGenerated) {}
 
     <!-- display transactions -->
   `,

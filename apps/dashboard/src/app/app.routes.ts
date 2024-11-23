@@ -100,10 +100,7 @@ export const appRoutes: Route[] = [
           {
             path: ROUTES_MAIN.GROUPS,
             title: 'GGFinance - Groups',
-            canActivate: [
-              userAccountTypeGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD),
-              featureFlagGuard('createGroups'),
-            ],
+            canActivate: [userAccountTypeGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
             loadChildren: () => [
               {
                 path: '',

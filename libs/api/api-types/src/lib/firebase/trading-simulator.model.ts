@@ -32,7 +32,7 @@ export type TradingSimulator = {
   /**
    * total time in seconds how long the trading simulator will be active
    */
-  totalTimeSeconds: number;
+  totalTimeMinutes: number;
 
   /**
    * code that is needed to join the trading simulator
@@ -44,6 +44,13 @@ export type TradingSimulator = {
    * how many users participate in the trading simulator
    */
   currentParticipants: number;
+
+  /**
+   * current round of the trading simulator
+   * - range: 0 - maximumRounds
+   * - probably incremented by CF or manually by the admin
+   */
+  currentRound: number;
 
   /**
    * state of the trading simulator
@@ -58,7 +65,7 @@ export type TradingSimulator = {
   /**
    * how many seconds one round lasts
    */
-  oneRoundDurationSeconds: number;
+  oneRoundDurationMinutes: number;
 
   /**
    * how many rounds are in the trading simulator until it ends
