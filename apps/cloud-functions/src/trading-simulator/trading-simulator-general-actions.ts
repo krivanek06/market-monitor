@@ -3,6 +3,8 @@ import {
   FieldValuePartial,
   TRADING_SIMULATOR_PARTICIPANTS_LIMIT,
   TradingSimulator,
+  TradingSimulatorAggregationParticipants,
+  TradingSimulatorAggregationParticipantsData,
   TradingSimulatorGeneralActions,
   TradingSimulatorGeneralActionsType,
   USER_NOT_FOUND_ERROR,
@@ -11,7 +13,12 @@ import {
 import { createEmptyPortfolioState, transformUserToBaseMin } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError } from 'firebase-functions/https';
-import { tradingSimulatorDocRef, tradingSimulatorParticipantsCollectionRef, userDocumentRef } from '../database';
+import {
+  tradingSimulatorAggregationParticipantsDocRef,
+  tradingSimulatorDocRef,
+  tradingSimulatorParticipantsCollectionRef,
+  userDocumentRef,
+} from '../database';
 
 export const tradingSimulatorGeneralActions = async (
   userAuthId: string | undefined,
@@ -80,6 +87,20 @@ const joinSimulator = async (
       transactions: [],
       portfolioGrowth: [],
     });
+
+  // add user to the participants ranking doc
+  tradingSimulatorAggregationParticipantsDocRef(simulator.id).set({
+    userRanking: FieldValue.arrayUnion({
+      userData: user,
+      rank: {
+        date: '0',
+        rank: 0,
+        rankPrevious: 0,
+        rankChange: null,
+      },
+      portfolioState: createEmptyPortfolioState(simulator.cashStartingValue),
+    } satisfies TradingSimulatorAggregationParticipantsData),
+  } satisfies FieldValuePartial<TradingSimulatorAggregationParticipants>);
 };
 
 const leaveSimulator = async (
@@ -92,6 +113,9 @@ const leaveSimulator = async (
     return;
   }
 
+  const participantsRanking =
+    (await tradingSimulatorAggregationParticipantsDocRef(simulator.id).get()).data()?.userRanking ?? [];
+
   // update simulator data
   tradingSimulatorDocRef(simulator.id).update({
     participants: FieldValue.arrayRemove(user.id),
@@ -100,4 +124,9 @@ const leaveSimulator = async (
 
   // remove user from participants
   tradingSimulatorParticipantsCollectionRef(simulator.id).doc(user.id).delete();
+
+  // remove user from the participants ranking doc
+  tradingSimulatorAggregationParticipantsDocRef(simulator.id).set({
+    userRanking: participantsRanking.filter((participant) => participant.userData.id !== user.id),
+  });
 };

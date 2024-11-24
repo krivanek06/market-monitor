@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { TradingSimulatorParticipant } from '@mm/api-types';
+import { TradingSimulatorAggregationParticipantsData } from '@mm/api-types';
 import {
   DefaultImgDirective,
   LargeNumberFormatterPipe,
@@ -56,6 +56,6 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingSimulatorParticipantItemComponent {
-  readonly participant = input.required<TradingSimulatorParticipant>();
+  readonly participant = input.required<TradingSimulatorAggregationParticipantsData>();
   readonly position = input.required<number>();
 }

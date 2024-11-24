@@ -22,12 +22,6 @@ import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulato
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBaseComponent {
-  readonly topParticipants = toSignal(
-    this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorByIdTopParticipants(selectedId)),
-    ),
-  );
-
   /** my data */
   readonly participant = toSignal(
     this.simulatorId$.pipe(
@@ -45,7 +39,6 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
 
     effect(() => {
       console.log('PageTradingSimulatorDetailsComponent', {
-        topParticipants: this.topParticipants(),
         participant: this.participant(),
       });
     });

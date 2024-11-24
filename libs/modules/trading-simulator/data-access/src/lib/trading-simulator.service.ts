@@ -59,8 +59,8 @@ export class TradingSimulatorService {
     return this.tradingSimulatorApiService.getTradingSimulatorAggregationTransactions(simulatorId);
   }
 
-  getTradingSimulatorByIdTopParticipants(simulatorId: string) {
-    return this.tradingSimulatorApiService.getTradingSimulatorByIdTopParticipants(simulatorId);
+  getTradingSimulatorAggregationParticipants(simulatorId: string) {
+    return this.tradingSimulatorApiService.getTradingSimulatorAggregationParticipants(simulatorId);
   }
 
   getTradingSimulatorByIdParticipantById(simulatorId: string, participantId: string) {

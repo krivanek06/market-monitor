@@ -1,6 +1,7 @@
 import {
   PortfolioTransaction,
   TradingSimulator,
+  TradingSimulatorAggregationParticipants,
   TradingSimulatorAggregationSymbols,
   TradingSimulatorAggregationTransactions,
   TradingSimulatorParticipant,
@@ -41,3 +42,8 @@ export const tradingSimulatorAggregationTransactionsDocRef = (id: string) =>
   tradingSimulatorMoreInformationCollectionRef(id)
     .doc('aggregation_transactions')
     .withConverter(assignTypes<TradingSimulatorAggregationTransactions>());
+
+export const tradingSimulatorAggregationParticipantsDocRef = (id: string) =>
+  tradingSimulatorMoreInformationCollectionRef(id)
+    .doc('aggregation_participants')
+    .withConverter(assignTypes<TradingSimulatorAggregationParticipants>());

@@ -1,5 +1,6 @@
 import { ExtractedType } from '../ts-utils';
 import { PortfolioGrowth, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
+import { RankingItem } from './ranking.model';
 import { UserBaseMin } from './user.model';
 
 export type TradingSimulator = {
@@ -248,6 +249,22 @@ export type TradingSimulatorAggregationSymbols = {
     unitsInfinity: boolean;
   };
 };
+
+/**
+ * data updated on every new round
+ */
+export type TradingSimulatorAggregationParticipants = {
+  userRanking: {
+    userData: UserBaseMin;
+    rank: RankingItem;
+    /**
+     * copied data from TradingSimulatorParticipant
+     */
+    portfolioState: PortfolioState;
+  }[];
+};
+
+export type TradingSimulatorAggregationParticipantsData = TradingSimulatorAggregationParticipants['userRanking'][0];
 
 /**
  * aggregation data about the trading simulator

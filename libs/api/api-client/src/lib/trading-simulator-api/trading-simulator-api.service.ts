@@ -3,7 +3,6 @@ import {
   arrayUnion,
   collection,
   CollectionReference,
-  deleteDoc,
   doc,
   DocumentData,
   DocumentReference,
@@ -11,7 +10,6 @@ import {
   getDocs,
   increment,
   limit,
-  orderBy,
   query,
   updateDoc,
   where,
@@ -22,12 +20,13 @@ import {
   FieldValuePartial,
   PortfolioTransaction,
   TradingSimulator,
+  TradingSimulatorAggregationParticipants,
+  TradingSimulatorAggregationParticipantsData,
   TradingSimulatorAggregationSymbols,
   TradingSimulatorAggregationTransactions,
   TradingSimulatorGeneralActions,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
-  UserBaseMin,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
 import { roundNDigits } from '@mm/shared/general-util';
@@ -76,10 +75,8 @@ export class TradingSimulatorApiService {
    * @param id - the id of the trading simulator
    * @returns top 15 participants by balance
    */
-  getTradingSimulatorByIdTopParticipants(id: string): Observable<TradingSimulatorParticipant[]> {
-    return rxCollectionData(
-      query(this.getTradingSimulatorParticipantsCollection(id), orderBy('portfolioState.balance', 'desc'), limit(15)),
-    );
+  getTradingSimulatorAggregationParticipants(id: string): Observable<TradingSimulatorAggregationParticipantsData[]> {
+    return rxDocData(this.getTradingSimulatorAggregationParticipantsDocRef(id)).pipe(map((d) => d?.userRanking ?? []));
   }
 
   getTradingSimulatorByIdParticipantById(
@@ -177,16 +174,6 @@ export class TradingSimulatorApiService {
     return callable(data);
   }
 
-  leaveSimulator(simulator: TradingSimulator, user: UserBaseMin) {
-    // remove user from the participants
-    updateDoc(this.getTradingSimulatorDocRef(simulator.id), {
-      participants: simulator.participants.filter((participant) => participant !== user.id),
-    });
-
-    // remove user from the participant data
-    deleteDoc(this.getTradingSimulatorParticipantsDocRef(simulator.id, user.id));
-  }
-
   async deleteSimulator(simulator: TradingSimulator) {
     const batch = writeBatch(this.firestore);
 
@@ -208,6 +195,9 @@ export class TradingSimulatorApiService {
 
     // remove additional aggregation data
     batch.delete(this.getTradingSimulatorAggregationTransactionsDocRef(simulator.id));
+
+    // remove additional participant aggregation data
+    batch.delete(this.getTradingSimulatorAggregationParticipantsDocRef(simulator.id));
 
     // remove simulator document
     batch.delete(this.getTradingSimulatorDocRef(simulator.id));
@@ -290,6 +280,14 @@ export class TradingSimulatorApiService {
   ): DocumentReference<TradingSimulatorAggregationTransactions> {
     return doc(this.getTradingSimulatorMoreInformationCollection(id), 'aggregation_transactions').withConverter(
       assignTypesClient<TradingSimulatorAggregationTransactions>(),
+    );
+  }
+
+  private getTradingSimulatorAggregationParticipantsDocRef(
+    id: string,
+  ): DocumentReference<TradingSimulatorAggregationParticipants> {
+    return doc(this.getTradingSimulatorMoreInformationCollection(id), 'aggregation_participants').withConverter(
+      assignTypesClient<TradingSimulatorAggregationParticipants>(),
     );
   }
 

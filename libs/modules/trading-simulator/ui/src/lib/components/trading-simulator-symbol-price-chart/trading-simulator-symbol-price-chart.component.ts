@@ -11,7 +11,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
   imports: [HighchartsChartModule, DefaultImgDirective],
   template: `
     <div class="flex items-center gap-3">
-      <img [src]="simulatorSymbol().symbol" appDefaultImg imageType="symbol" class="h-6 w-6" />
+      <img [src]="simulatorSymbol().symbol" appDefaultImg imageType="symbol" class="h-5 w-5" />
       <div class="text-wt-primary text-sm">{{ simulatorSymbol().symbol }}</div>
     </div>
     <highcharts-chart
@@ -59,7 +59,7 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
       noData: {
         style: {
           fontWeight: 'bold',
-          fontSize: '15px',
+          fontSize: '14px',
           color: '#868686',
         },
       },
@@ -100,13 +100,6 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
       },
       title: {
         text: '',
-        align: 'left',
-        y: 0,
-        floating: true,
-        style: {
-          color: ColorScheme.GRAY_MEDIUM_VAR,
-          fontSize: '13px',
-        },
       },
       subtitle: undefined,
       scrollbar: {
@@ -124,11 +117,11 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
         backgroundColor: ColorScheme.BACKGROUND_DASHBOARD_VAR,
         xDateFormat: '%A, %b %e, %Y',
         style: {
-          fontSize: '16px',
+          fontSize: '14px',
           color: ColorScheme.GRAY_DARK_VAR,
         },
         shared: true,
-        headerFormat: `<div style="font-size: 14px">Symbol: <span style="color: ${ColorScheme.PRIMARY_VAR}">{point.key}</span></div><br/>`,
+        headerFormat: `<div style="font-size: 12px">Round: <span style="color: ${ColorScheme.PRIMARY_VAR}">{point.key}</span></div><br/>`,
         pointFormatter: function () {
           const name = this.series.name;
           const value = formatValueIntoCurrency(this.y);

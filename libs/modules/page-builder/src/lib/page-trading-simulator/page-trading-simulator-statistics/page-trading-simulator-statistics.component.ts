@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { PortfolioTransactionsItemComponent } from '@mm/portfolio/ui';
 import { DateReadablePipe, GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
 import {
-  TradingSimulatorParticipantCardComponent,
   TradingSimulatorParticipantItemComponent,
   TradingSimulatorSymbolPriceChartComponent,
   TradingSimulatorSymbolPriceChartLegendComponent,
@@ -14,7 +13,8 @@ import {
 } from '@mm/trading-simulator/ui';
 import { switchMap } from 'rxjs';
 import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulator-base.component';
-import { PageTradingSimulatorStatisticsButtonsComponent } from './components/page-trading-simulator-statistics-buttons.component';
+import { PageTradingSimulatorStatisticsButtonsComponent } from './components/page-trading-simulator-statistics-buttons/page-trading-simulator-statistics-buttons.component';
+import { PageTradingSimulatorStatisticsInfoComponent } from './components/page-trading-simulator-statistics-info/page-trading-simulator-statistics-info.component';
 
 @Component({
   selector: 'app-page-trading-simulator-statistics',
@@ -29,7 +29,7 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
     TradingSimulatorSymbolStatTableComponent,
     TradingSimulatorParticipantItemComponent,
     PortfolioTransactionsItemComponent,
-    TradingSimulatorParticipantCardComponent,
+    PageTradingSimulatorStatisticsInfoComponent,
     GeneralCardComponent,
     SlicePipe,
     RangeDirective,
@@ -47,7 +47,12 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
             <app-page-trading-simulator-statistics-buttons [simulatorData]="simulatorData" />
           </div>
 
-          <!-- round info -->
+          <!-- simulator info -->
+          <div class="mb-6">
+            <app-page-trading-simulator-statistics-info [tradingSimulator]="simulatorData" />
+          </div>
+
+          <!-- symbol info -->
           <div class="mb-4 flex justify-between">
             <app-section-title
               title="Symbol Price Movement"
@@ -87,35 +92,16 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
 
         <!-- right side -->
         <div>
-          <!-- basic information -->
-          <app-general-card class="mb-4" title="Basic Information">
-            <div class="g-item-wrapper">
-              <div>Current Round</div>
-              <div>{{ simulatorData.currentRound }} / {{ simulatorData.maximumRounds }}</div>
-            </div>
-
-            <div class="g-item-wrapper">
-              <div>Round Remaining</div>
-              <div>4min 22 sec.</div>
-            </div>
-
-            <div class="g-item-wrapper">
-              <div>Round Duration</div>
-              <div>{{ simulatorData.oneRoundDurationMinutes | dateReadable: 'minutes' }}</div>
-            </div>
-
-            <div class="g-item-wrapper">
-              <div>Total Participants</div>
-              <div>{{ simulatorData.currentParticipants }}</div>
-            </div>
-          </app-general-card>
-
           <!-- participant ranking -->
-          <app-section-title title="Participant Ranking" class="mb-3" titleSize="lg" />
+          <app-section-title title="Participant Ranking" matIcon="people" class class="mb-3" titleSize="lg" />
           <div class="flex flex-col gap-2">
-            @for (participant of topParticipants(); track participant.userData.id; let i = $index) {
-              <app-trading-simulator-participant-item [participant]="participant" [position]="i + 1" />
-            } @empty {
+            @if (participantRanking(); as participantRanking) {
+              @for (participant of participantRanking; track participant.userData.id; let i = $index) {
+                <app-trading-simulator-participant-item [participant]="participant" [position]="i + 1" />
+              } @empty {
+                <div class="p-4 text-center">No participants</div>
+              }
+            } @else {
               <div *ngRange="simulatorData.currentParticipants" class="g-skeleton h-10"></div>
             }
           </div>
@@ -123,12 +109,8 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
       </div>
 
       <!-- display participants -->
-      <app-section-title title="Top Participants" matIcon="people" class="mb-3" titleSize="lg" />
-      <div class="mb-6 grid grid-cols-4 gap-x-6 gap-y-4">
-        @for (participant of topParticipants() | slice: 0 : 8; track participant.userData.id; let i = $index) {
-          <app-trading-simulator-participant-card [participant]="participant" [position]="i + 1" />
-        }
-      </div>
+      <app-section-title title="Compare Participants" matIcon="people" class="mb-3" titleSize="lg" />
+      TODO TODO
 
       <!-- display transactions -->
       <app-section-title title="Transaction History" matIcon="history" class="mb-3" titleSize="lg" />
@@ -147,9 +129,9 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingSimulatorStatisticsComponent extends PageTradingSimulatorBaseComponent {
-  readonly topParticipants = toSignal(
+  readonly participantRanking = toSignal(
     this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorByIdTopParticipants(selectedId)),
+      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorAggregationParticipants(selectedId)),
     ),
   );
 }

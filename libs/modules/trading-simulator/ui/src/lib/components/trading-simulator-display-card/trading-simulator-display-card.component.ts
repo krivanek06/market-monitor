@@ -10,7 +10,6 @@ import {
   GeneralCardTitleRightDirective,
   TruncatePipe,
 } from '@mm/shared/ui';
-import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulator-info-overview-button/trading-simulator-info-overview-button.component';
 
 @Component({
   selector: 'app-trading-simulator-display-card',
@@ -24,7 +23,6 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
     DatePipe,
     DateReadablePipe,
     TruncatePipe,
-    TradingSimulatorInfoOverviewButtonComponent,
     UpperCasePipe,
     NgClass,
   ],
@@ -91,13 +89,6 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
       <!-- action buttons -->
       <ng-template appGeneralCardActionContent>
         <div class="flex w-full justify-between gap-2 p-2">
-          <!-- info -->
-          <app-trading-simulator-info-overview-button
-            class="w-[120px]"
-            [tradingSimulator]="tradingSimulator()"
-            [participantUsers]="participantUsers() ?? []"
-          />
-
           <!-- owner buttons -->
           @if (tradingSimulator().owner.id === authUser().id) {
             @if (tradingSimulator().state === 'draft') {
@@ -139,7 +130,6 @@ export class TradingSimulatorDisplayCardComponent {
   readonly draftClicked = output<void>();
 
   readonly tradingSimulator = input.required<TradingSimulator>();
-  readonly participantUsers = input<UserBaseMin[]>();
 
   /** authenticated user */
   readonly authUser = input.required<UserBaseMin>();
