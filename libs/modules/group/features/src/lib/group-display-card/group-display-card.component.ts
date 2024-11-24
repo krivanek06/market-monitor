@@ -18,7 +18,6 @@ import { ClickableDirective } from '@mm/shared/ui';
     MatRippleModule,
     MatIconModule,
     PortfolioBalancePieChartComponent,
-    ClickableDirective,
   ],
   template: `
     <mat-card

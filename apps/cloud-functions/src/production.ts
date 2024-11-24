@@ -1,9 +1,10 @@
-import { GroupGeneralActions, UserCreateDemoAccountInput } from '@mm/api-types';
+import { GroupGeneralActions, TradingSimulatorGeneralActions, UserCreateDemoAccountInput } from '@mm/api-types';
 import { CallableRequest, onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from './group';
 import { groupGeneralActions } from './group/group-general-actions';
 import { outstandingOrderExecute } from './outstanding-order';
+import { tradingSimulatorGeneralActions } from './trading-simulator/trading-simulator-general-actions';
 import {
   userCreateAccount,
   userCreateAccountDemo,
@@ -57,6 +58,20 @@ export const groupGeneralActionsCall = onCall(
     cors: allowedUrl,
   },
   (request: CallableRequest<GroupGeneralActions>) => groupGeneralActions(request.auth?.uid, request.data),
+);
+
+/** ------------------------------------------ */
+/**
+ * TRADING SIMULATOR
+ */
+
+export const tradingSimulatorActionCall = onCall(
+  {
+    region: region,
+    cors: allowedUrl,
+  },
+  (request: CallableRequest<TradingSimulatorGeneralActions>) =>
+    tradingSimulatorGeneralActions(request.auth?.uid, request.data),
 );
 
 /** ------------------------------------------ */

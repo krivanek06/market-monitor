@@ -113,12 +113,7 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
             }
           } @else {
             @if (tradingSimulator().state === 'live') {
-              <!-- join -->
-              @if (!isUserJoined()) {
-                <button (click)="onJoin()" mat-stroked-button type="button" color="accent" class="w-[100px]">
-                  Join
-                </button>
-              } @else {
+              @if (isUserJoined()) {
                 <!-- visit -->
                 <button (click)="onVisit()" mat-stroked-button type="button" color="primary" class="w-[100px]">
                   Visit
@@ -138,7 +133,6 @@ import { TradingSimulatorInfoOverviewButtonComponent } from '../trading-simulato
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingSimulatorDisplayCardComponent {
-  readonly joinClicked = output<void>();
   readonly visitClicked = output<void>();
   readonly editClicked = output<void>();
   readonly statsClicked = output<void>();
@@ -153,10 +147,6 @@ export class TradingSimulatorDisplayCardComponent {
   readonly isUserJoined = computed(() => this.tradingSimulator().participants.includes(this.authUser().id));
 
   readonly TRADING_SIMULATOR_PARTICIPANTS_LIMIT = TRADING_SIMULATOR_PARTICIPANTS_LIMIT;
-
-  onJoin() {
-    this.joinClicked.emit();
-  }
 
   onVisit() {
     this.visitClicked.emit();

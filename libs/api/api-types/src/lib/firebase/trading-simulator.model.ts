@@ -1,3 +1,4 @@
+import { ExtractedType } from '../ts-utils';
 import { PortfolioGrowth, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
 import { UserBaseMin } from './user.model';
 
@@ -222,15 +223,6 @@ export type TradingSimulatorSymbol = {
   historicalDataModified: number[];
 };
 
-/**
- * some aggregations of the trading simulator
- */
-export type TradingSimulatorLatestData = {
-  live: TradingSimulator[];
-  started: TradingSimulator[];
-  historical: TradingSimulator[];
-};
-
 /** statistics about available symbols */
 export type TradingSimulatorAggregationSymbols = {
   [K in string]: {
@@ -271,6 +263,33 @@ export type TradingSimulatorAggregationTransactions = {
   /** last N transactions of whatever user */
   lastTransactions: PortfolioTransaction[];
 };
+
+export type TradingSimulatorGeneralActions = { simulatorId: string } & (
+  | {
+      type: 'participantJoinSimulator';
+      invitationCode: string;
+    }
+  | {
+      type: 'participantLeaveSimulator';
+    }
+  | {
+      /**
+       * will increment the current round by 1
+       */
+      type: 'nextRound';
+    }
+  | {
+      /**
+       * will generate statistics for the trading simulator if it's finished
+       */
+      type: 'generateStatistics';
+    }
+);
+
+export type TradingSimulatorGeneralActionsType<T extends TradingSimulatorGeneralActions['type']> = ExtractedType<
+  TradingSimulatorGeneralActions,
+  T
+>;
 
 /**
  *

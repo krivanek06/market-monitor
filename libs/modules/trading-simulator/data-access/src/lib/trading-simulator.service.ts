@@ -1,15 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { arrayRemove, arrayUnion } from '@angular/fire/firestore';
-import { AggregationApiService, TradingSimulatorApiService } from '@mm/api-client';
+import { TradingSimulatorApiService } from '@mm/api-client';
 import {
   DATA_NOT_FOUND_ERROR,
-  FieldValuePartial,
   PortfolioTransaction,
   SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL,
   TRADING_SIMULATOR_PARTICIPANTS_LIMIT,
   TradingSimulator,
-  TradingSimulatorLatestData,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
   USER_NOT_ENOUGH_CASH_ERROR,
@@ -17,7 +14,7 @@ import {
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { getCurrentDateDetailsFormat } from '@mm/shared/general-util';
-import { firstValueFrom, map, Observable, of } from 'rxjs';
+import { firstValueFrom, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -25,23 +22,10 @@ import { firstValueFrom, map, Observable, of } from 'rxjs';
 export class TradingSimulatorService {
   private readonly tradingSimulatorApiService = inject(TradingSimulatorApiService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private readonly aggregationApiService = inject(AggregationApiService);
 
-  readonly tradingSimulatorLatestData = toSignal(
-    this.aggregationApiService.getTradingSimulatorLatestData().pipe(
-      map(
-        (data) =>
-          ({
-            live: data.live ?? [],
-            started: data.started ?? [],
-            historical: data.historical ?? [],
-          }) satisfies TradingSimulatorLatestData,
-      ),
-    ),
-    {
-      initialValue: { live: [], started: [], historical: [] },
-    },
-  );
+  readonly tradingSimulatorLatestData = toSignal(this.tradingSimulatorApiService.getTradingSimulatorLatestData(), {
+    initialValue: { live: [], started: [], historical: [] },
+  });
 
   readonly simulatorsByOwner = toSignal(
     this.tradingSimulatorApiService.getTradingSimulatorByOwner(
@@ -81,6 +65,18 @@ export class TradingSimulatorService {
     tradingSimulator: TradingSimulator;
     tradingSimulatorSymbol: TradingSimulatorSymbol[];
   }) {
+    const userData = this.authenticationUserStoreService.state.getUserData();
+
+    // check if user has privileges
+    if (!userData.featureAccess?.createTradingSimulator) {
+      throw new Error('User does not have privileges to create a simulator');
+    }
+
+    // check if user is the owner
+    if (data.tradingSimulator.owner.id !== userData.id) {
+      throw new Error('Only the owner can update the simulator');
+    }
+
     return this.tradingSimulatorApiService.upsertTradingSimulator(data);
   }
 
@@ -94,11 +90,6 @@ export class TradingSimulatorService {
 
     // change state to live
     this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, { state: 'live' });
-
-    // add simulator to the aggregation list
-    this.aggregationApiService.updateTradingSimulatorLatestData({
-      live: arrayUnion(simulator),
-    } satisfies FieldValuePartial<TradingSimulatorLatestData>);
   }
 
   simulatorStateChangeDraft(simulator: TradingSimulator) {
@@ -116,11 +107,6 @@ export class TradingSimulatorService {
 
     // change state to draft
     this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, { state: 'draft' });
-
-    // remove simulator from the aggregation list
-    this.aggregationApiService.updateTradingSimulatorLatestData({
-      live: this.tradingSimulatorLatestData().live.filter((d) => d.id !== simulator.id),
-    } satisfies Partial<TradingSimulatorLatestData>);
   }
 
   simulatorStateChangeStart(simulator: TradingSimulator) {
@@ -146,12 +132,6 @@ export class TradingSimulatorService {
       state: 'started',
       startDateTime: getCurrentDateDetailsFormat(),
     });
-
-    // add simulator to the aggregation list
-    this.aggregationApiService.updateTradingSimulatorLatestData({
-      live: arrayRemove(simulator),
-      started: arrayUnion(simulator),
-    } satisfies FieldValuePartial<TradingSimulatorLatestData>);
   }
 
   simulatorStateChangeFinish(simulator: TradingSimulator) {
@@ -172,12 +152,6 @@ export class TradingSimulatorService {
       state: 'finished',
       endDateTime: getCurrentDateDetailsFormat(),
     });
-
-    // add simulator to the aggregation list
-    this.aggregationApiService.updateTradingSimulatorLatestData({
-      live: arrayRemove(simulator),
-      started: arrayUnion(simulator),
-    } satisfies FieldValuePartial<TradingSimulatorLatestData>);
   }
 
   joinSimulator(simulator: TradingSimulator, invitationCode: string) {
@@ -198,8 +172,12 @@ export class TradingSimulatorService {
       throw new Error('Invalid invitation code');
     }
 
-    // add user to participants
-    this.tradingSimulatorApiService.joinSimulator(simulator, userBase);
+    // join simulator
+    return this.tradingSimulatorApiService.simulatorCreateAction({
+      type: 'participantJoinSimulator',
+      simulatorId: simulator.id,
+      invitationCode,
+    });
   }
 
   leaveSimulator(simulator: TradingSimulator) {
@@ -211,7 +189,10 @@ export class TradingSimulatorService {
     }
 
     // remove user from participants
-    this.tradingSimulatorApiService.leaveSimulator(simulator, userBase);
+    return this.tradingSimulatorApiService.simulatorCreateAction({
+      type: 'participantLeaveSimulator',
+      simulatorId: simulator.id,
+    });
   }
 
   deleteSimulator(simulator: TradingSimulator) {

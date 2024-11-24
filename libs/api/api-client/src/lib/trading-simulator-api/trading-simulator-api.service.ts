@@ -13,32 +13,35 @@ import {
   limit,
   orderBy,
   query,
-  setDoc,
   updateDoc,
   where,
   writeBatch,
 } from '@angular/fire/firestore';
+import { Functions } from '@angular/fire/functions';
 import {
   FieldValuePartial,
   PortfolioTransaction,
   TradingSimulator,
   TradingSimulatorAggregationSymbols,
   TradingSimulatorAggregationTransactions,
+  TradingSimulatorGeneralActions,
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
   UserBaseMin,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { createEmptyPortfolioState, roundNDigits } from '@mm/shared/general-util';
+import { roundNDigits } from '@mm/shared/general-util';
+import { httpsCallable } from 'firebase/functions';
 import { filterNil } from 'ngxtension/filter-nil';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
-import { Observable } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TradingSimulatorApiService {
   private readonly firestore = inject(Firestore);
+  private readonly functions = inject(Functions);
 
   /**
    *
@@ -92,6 +95,24 @@ export class TradingSimulatorApiService {
 
   getTradingSimulatorAggregationTransactions(id: string): Observable<TradingSimulatorAggregationTransactions> {
     return rxDocData(this.getTradingSimulatorAggregationTransactionsDocRef(id)).pipe(filterNil());
+  }
+
+  getTradingSimulatorLatestData() {
+    const liveSimulator$ = rxCollectionData(query(this.getTradingSimulatorCollection(), where('state', '==', 'live')));
+    const startedSimulator$ = rxCollectionData(
+      query(this.getTradingSimulatorCollection(), where('state', '==', 'started')),
+    );
+    const historicalSimulator$ = rxCollectionData(
+      query(this.getTradingSimulatorCollection(), where('state', '==', 'finished'), limit(5)),
+    );
+
+    return combineLatest([liveSimulator$, startedSimulator$, historicalSimulator$]).pipe(
+      map(([live, started, historical]) => ({
+        live,
+        started,
+        historical,
+      })),
+    );
   }
 
   updateTradingSimulator(id: string, data: Partial<TradingSimulator>): void {
@@ -151,20 +172,9 @@ export class TradingSimulatorApiService {
     await batch.commit();
   }
 
-  joinSimulator(simulator: TradingSimulator, user: UserBaseMin) {
-    // add user to the participants
-    updateDoc(this.getTradingSimulatorDocRef(simulator.id), {
-      participants: arrayUnion(user.id),
-    });
-
-    // add user to the participant data
-    setDoc(this.getTradingSimulatorParticipantsDocRef(simulator.id, user.id), {
-      userData: user,
-      portfolioState: createEmptyPortfolioState(simulator.cashStartingValue),
-      holdings: [],
-      transactions: [],
-      portfolioGrowth: [],
-    });
+  simulatorCreateAction(data: TradingSimulatorGeneralActions) {
+    const callable = httpsCallable<TradingSimulatorGeneralActions, void>(this.functions, 'tradingSimulatorActionCall');
+    return callable(data);
   }
 
   leaveSimulator(simulator: TradingSimulator, user: UserBaseMin) {

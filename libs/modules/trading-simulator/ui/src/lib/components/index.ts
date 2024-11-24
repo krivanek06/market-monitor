@@ -1,4 +1,5 @@
 export * from './trading-simulator-display-card/trading-simulator-display-card.component';
+export * from './trading-simulator-display-item/trading-simulator-display-item.component';
 export * from './trading-simulator-info-create-button/trading-simulator-info-create-button.component';
 export * from './trading-simulator-info-overview-button/trading-simulator-info-overview-button.component';
 export * from './trading-simulator-participant-card/trading-simulator-participant-card.component';

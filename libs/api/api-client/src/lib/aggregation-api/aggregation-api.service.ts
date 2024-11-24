@@ -7,12 +7,11 @@ import {
   Firestore,
   collection,
   doc,
-  setDoc,
 } from '@angular/fire/firestore';
-import { HallOfFameGroups, HallOfFameUsers, TradingSimulatorLatestData } from '@mm/api-types';
+import { HallOfFameGroups, HallOfFameUsers } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
 import { docData as rxDocData } from 'rxfire/firestore';
-import { Observable, map, shareReplay } from 'rxjs';
+import { map, shareReplay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -44,22 +43,6 @@ export class AggregationApiService {
     initialValue: this.defaultValue,
   });
 
-  getTradingSimulatorLatestData(): Observable<TradingSimulatorLatestData> {
-    return rxDocData(this.getTradingSimulatorLatestDataDocRef()).pipe(
-      map((data) => data ?? { live: [], started: [], historical: [] }),
-    );
-  }
-
-  updateTradingSimulatorLatestData(data: Partial<TradingSimulatorLatestData> | DocumentData) {
-    setDoc(
-      this.getTradingSimulatorLatestDataDocRef(),
-      {
-        ...data,
-      },
-      { merge: true },
-    );
-  }
-
   private getHallOfFameGroupsDocRef(): DocumentReference<HallOfFameGroups> {
     return doc(this.getAggregationCollectionRef(), 'hall_of_fame_groups').withConverter(
       assignTypesClient<HallOfFameGroups>(),
@@ -69,12 +52,6 @@ export class AggregationApiService {
   private getHallOfFameUsersDocRef(): DocumentReference<HallOfFameUsers> {
     return doc(this.getAggregationCollectionRef(), 'hall_of_fame_users').withConverter(
       assignTypesClient<HallOfFameUsers>(),
-    );
-  }
-
-  private getTradingSimulatorLatestDataDocRef(): DocumentReference<TradingSimulatorLatestData> {
-    return doc(this.getAggregationCollectionRef(), 'trading_simulator_latest_data').withConverter(
-      assignTypesClient<TradingSimulatorLatestData>(),
     );
   }
 

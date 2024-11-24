@@ -35,11 +35,6 @@ service cloud.firestore {
       }
     }
 
-    // allow to modify aggregation - trading_simulator_latest_data
-    match /aggregations/trading_simulator_latest_data {
-      allow write: if true;
-    }
-
     // allow reading all
     match /{document=**} {
       allow read: if true;
