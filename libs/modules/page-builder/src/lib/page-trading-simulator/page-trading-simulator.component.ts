@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { TradingSimulator } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
-import { Confirmable, DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { Confirmable } from '@mm/shared/dialog-manager';
 import { SectionTitleComponent } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorDisplayCardComponent, TradingSimulatorDisplayItemComponent } from '@mm/trading-simulator/ui';
@@ -44,11 +44,23 @@ import { TradingSimulatorDisplayCardComponent, TradingSimulatorDisplayItemCompon
 
         <!-- simulators by the owner -->
         <div class="grid grid-cols-2 gap-4">
-          @for (item of mySimulations(); track item.id) {
+          @for (item of simulatorsByOwner(); track item.id) {
             <app-trading-simulator-display-card
               (editClicked)="onEditSimulator(item)"
               (visitClicked)="onVisitSimulator(item)"
               (draftClicked)="onDraftSimulator(item)"
+              (statsClicked)="onStatisticsClicked(item)"
+              [tradingSimulator]="item"
+              [authUser]="userData()"
+            />
+          }
+        </div>
+
+        <!-- simulators by the owner -->
+        <div class="grid grid-cols-2 gap-4">
+          @for (item of simulatorsByParticipant(); track item.id) {
+            <app-trading-simulator-display-card
+              (visitClicked)="onVisitSimulator(item)"
               (statsClicked)="onStatisticsClicked(item)"
               [tradingSimulator]="item"
               [authUser]="userData()"
@@ -135,10 +147,10 @@ import { TradingSimulatorDisplayCardComponent, TradingSimulatorDisplayItemCompon
 export class PageTradingSimulatorComponent {
   private readonly tradingSimulatorService = inject(TradingSimulatorService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly router = inject(Router);
 
-  readonly mySimulations = this.tradingSimulatorService.simulatorsByOwner;
+  readonly simulatorsByOwner = this.tradingSimulatorService.simulatorsByOwner;
+  readonly simulatorsByParticipant = this.tradingSimulatorService.simulatorByParticipant;
   readonly userData = this.authenticationUserStoreService.state.getUserData;
   readonly tradingSimulatorLatestData = this.tradingSimulatorService.tradingSimulatorLatestData;
 

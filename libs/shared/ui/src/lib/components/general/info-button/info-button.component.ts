@@ -1,4 +1,3 @@
-import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, TemplateRef, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -17,9 +16,9 @@ export type InfoSectionData = {
 @Component({
   selector: 'app-info-button',
   standalone: true,
-  imports: [MatButtonModule, MatDialogModule, NgTemplateOutlet, MatIconModule],
+  imports: [MatButtonModule, MatDialogModule, MatIconModule],
   template: `
-    <button mat-stroked-button type="button" (click)="onOpenDialog()" class="w-full">
+    <button mat-stroked-button type="button" (click)="onOpenDialog()" class="w-full min-w-[120px]">
       <mat-icon>info</mat-icon>
       {{ buttonLabel() }}
     </button>

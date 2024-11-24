@@ -33,6 +33,12 @@ export class TradingSimulatorService {
     ),
   );
 
+  readonly simulatorByParticipant = toSignal(
+    this.tradingSimulatorApiService.getTradingSimulatorByParticipant(
+      this.authenticationUserStoreService.state.getUserData().id,
+    ),
+  );
+
   getTradingSimulatorById(simulatorId: string): Observable<TradingSimulator | undefined> {
     if (!simulatorId) {
       return of(undefined);
