@@ -1,4 +1,4 @@
-import { SlicePipe } from '@angular/common';
+import { CurrencyPipe, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,6 +34,7 @@ import { PageTradingSimulatorStatisticsInfoComponent } from './components/page-t
     SlicePipe,
     RangeDirective,
     DateReadablePipe,
+    CurrencyPipe,
   ],
   template: `
     @if (simulatorData(); as simulatorData) {
@@ -77,17 +78,6 @@ import { PageTradingSimulatorStatisticsInfoComponent } from './components/page-t
               <div *ngRange="simulatorData.symbolAvailable" class="g-skeleton h-[185px]"></div>
             }
           </div>
-
-          <!-- symbol statistics -->
-          <app-section-title
-            title="Symbol Statistics"
-            description="Data updates in real time as participants create transactions"
-            class="mb-3 pl-3"
-            titleSize="lg"
-          />
-          <app-general-card>
-            <app-trading-simulator-symbol-stat-table [data]="simulatorAggregationSymbols()" />
-          </app-general-card>
         </div>
 
         <!-- right side -->
@@ -105,6 +95,47 @@ import { PageTradingSimulatorStatisticsInfoComponent } from './components/page-t
               <div *ngRange="simulatorData.currentParticipants" class="g-skeleton h-10"></div>
             }
           </div>
+        </div>
+
+        <!-- left -->
+        <div class="col-span-3">
+          <!-- symbol statistics -->
+          <app-section-title
+            title="Symbol Statistics"
+            description="Data updates in real time as participants create transactions"
+            class="mb-3 pl-3"
+            titleSize="lg"
+          />
+          <app-general-card>
+            <app-trading-simulator-symbol-stat-table [data]="simulatorAggregationSymbols()" />
+          </app-general-card>
+        </div>
+
+        <div>
+          <!-- additional cash -->
+          <app-section-title
+            title="Cash Issued"
+            description="Additional cash issued to participants"
+            titleSize="lg"
+            class="mb-3"
+          />
+          <app-general-card>
+            <div class="grid grid-cols-2">
+              @for (item of simulatorData.cashAdditionalIssued; track $index) {
+                <div class="g-item-wrapper">
+                  <span>Round</span>
+                  <span>{{ item.issuedOnRound }}</span>
+                </div>
+
+                <div class="g-item-wrapper border-wt-border border-b">
+                  <span>Cash</span>
+                  <span>{{ item.value | currency }}</span>
+                </div>
+              } @empty {
+                <div class="border-wt-border col-span-2 border-b p-2 pb-4 text-center">No cash issued</div>
+              }
+            </div>
+          </app-general-card>
         </div>
       </div>
 

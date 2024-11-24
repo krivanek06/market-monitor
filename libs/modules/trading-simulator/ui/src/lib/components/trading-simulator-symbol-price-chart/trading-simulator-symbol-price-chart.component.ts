@@ -46,7 +46,7 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
     const pricesOwnerVisible = isOwner ? symbol.historicalDataModified.slice(currentRound).map((price) => price) : [];
     const pricesDisplay = [...pricesPubliclyVisible, ...pricesOwnerVisible];
 
-    // todo - check if data is updating
+    // todo - DISPLAY ISSUED UNITS
 
     return {
       chart: {

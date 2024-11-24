@@ -88,7 +88,7 @@ import {
 
       <!-- action buttons -->
       <ng-template appGeneralCardActionContent>
-        <div class="flex w-full justify-between gap-2 p-2">
+        <div class="flex w-full justify-end gap-2 p-2">
           <!-- owner buttons -->
           @if (tradingSimulator().owner.id === authUser().id) {
             @if (tradingSimulator().state === 'draft') {
@@ -97,10 +97,6 @@ import {
                 <mat-icon>edit</mat-icon>
                 <span>Edit</span>
               </button>
-            }
-            @if (tradingSimulator().state === 'live') {
-              <!-- draft -->
-              <button (click)="onDraft()" mat-stroked-button color="warn" type="button">Change to Draft</button>
             }
           } @else {
             @if (tradingSimulator().state === 'live') {
@@ -127,7 +123,6 @@ export class TradingSimulatorDisplayCardComponent {
   readonly visitClicked = output<void>();
   readonly editClicked = output<void>();
   readonly statsClicked = output<void>();
-  readonly draftClicked = output<void>();
 
   readonly tradingSimulator = input.required<TradingSimulator>();
 
@@ -148,9 +143,5 @@ export class TradingSimulatorDisplayCardComponent {
 
   onStats() {
     this.statsClicked.emit();
-  }
-
-  onDraft() {
-    this.draftClicked.emit();
   }
 }
