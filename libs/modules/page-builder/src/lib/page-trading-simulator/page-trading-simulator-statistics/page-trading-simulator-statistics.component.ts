@@ -1,9 +1,12 @@
+import { SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { SectionTitleComponent } from '@mm/shared/ui';
+import { PortfolioTransactionsItemComponent } from '@mm/portfolio/ui';
+import { GeneralCardComponent, SectionTitleComponent } from '@mm/shared/ui';
 import {
+  TradingSimulatorParticipantCardComponent,
   TradingSimulatorParticipantItemComponent,
   TradingSimulatorSymbolPriceChartComponent,
   TradingSimulatorSymbolPriceChartLegendComponent,
@@ -25,9 +28,13 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
     TradingSimulatorSymbolPriceChartLegendComponent,
     TradingSimulatorSymbolStatTableComponent,
     TradingSimulatorParticipantItemComponent,
+    PortfolioTransactionsItemComponent,
+    TradingSimulatorParticipantCardComponent,
+    GeneralCardComponent,
+    SlicePipe,
   ],
   template: `
-    <div class="grid grid-cols-4 gap-x-10">
+    <div class="mb-6 grid grid-cols-4 gap-x-10">
       <div class="col-span-3">
         <div class="mb-6 flex items-center justify-between">
           <app-section-title title="Simulator Statistics: {{ simulatorData()?.name }}" />
@@ -56,7 +63,7 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
                 [simulatorSymbol]="symbol"
                 [currentRound]="simulatorData.currentRound"
                 [authUser]="authUserData()"
-                [heightPx]="200"
+                [heightPx]="185"
               />
             }
           </div>
@@ -69,7 +76,9 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
           class="mb-3 pl-3"
           titleSize="lg"
         />
-        <app-trading-simulator-symbol-stat-table [data]="simulatorAggregationSymbols()" />
+        <app-general-card>
+          <app-trading-simulator-symbol-stat-table [data]="simulatorAggregationSymbols()" />
+        </app-general-card>
       </div>
 
       <!-- right side -->
@@ -84,8 +93,20 @@ import { PageTradingSimulatorStatisticsButtonsComponent } from './components/pag
     </div>
 
     <!-- display participants -->
+    <app-section-title title="Top Participants" matIcon="people" class="mb-3" />
+    <div class="mb-6 grid grid-cols-4 gap-x-6 gap-y-4">
+      @for (participant of topParticipants() | slice: 0 : 8; track participant.userData.id; let i = $index) {
+        <app-trading-simulator-participant-card [participant]="participant" [position]="i + 1" />
+      }
+    </div>
 
     <!-- display transactions -->
+    <app-section-title title="Transaction History" matIcon="history" class="mb-3" />
+    <div class="grid grid-cols-3 gap-x-4">
+      <app-general-card title="Last Transactions"> </app-general-card>
+      <app-general-card title="Best Transactions"> </app-general-card>
+      <app-general-card title="Worst Transactions"> </app-general-card>
+    </div>
   `,
   styles: `
     :host {

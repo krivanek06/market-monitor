@@ -109,7 +109,7 @@ import {
                   </div>
                 }
               </div>
-              <span class="block text-sm md:hidden"> {{ row.date | date: 'MMM d, y' }}</span>
+              <span class="block text-sm md:hidden"> {{ row.date | date: 'HH:mm, MMM d, y' }}</span>
             </div>
           </div>
         </td>
@@ -146,8 +146,22 @@ import {
       <ng-container matColumnDef="totalValue">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Total Value</th>
         <td mat-cell *matCellDef="let row">
-          <div class="text-wt-gray-dark max-sm:mr-3 max-sm:text-end">
-            {{ row.unitPrice * row.units | currency }}
+          <div class="flex flex-col max-sm:mr-3 max-sm:items-end">
+            <!-- value on desktop -->
+            <div class="text-wt-gray-dark max-sm:text-end">
+              {{ row.unitPrice * row.units | currency }}
+            </div>
+
+            <!-- total return -->
+            <div
+              appPercentageIncrease
+              [useCurrencySign]="true"
+              class="text-sm sm:hidden"
+              [changeValues]="{
+                change: row.returnValue,
+                changePercentage: row.returnChange,
+              }"
+            ></div>
           </div>
         </td>
       </ng-container>
@@ -183,16 +197,8 @@ import {
           <div
             appPercentageIncrease
             [useCurrencySign]="true"
-            [changeValues]="{ changePercentage: row.returnChange }"
+            [changeValues]="{ changePercentage: row.returnChange, change: row.returnValue }"
           ></div>
-        </td>
-      </ng-container>
-
-      <!-- return -->
-      <ng-container matColumnDef="return">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Return $</th>
-        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
-          <div appPercentageIncrease [useCurrencySign]="true" [changeValues]="{ change: row.returnValue }"></div>
         </td>
       </ng-container>
 
@@ -200,7 +206,7 @@ import {
       <ng-container matColumnDef="date">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Date</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
-          {{ row.date | date: 'MMM. d, y' }}
+          {{ row.date | date: 'HH:mm, MMM. d, y' }}
         </td>
       </ng-container>
 
@@ -296,7 +302,7 @@ export class PortfolioTransactionsTableComponent {
       console.log(value);
       const original = this.data() ?? [];
       // decide which data to show based on the filter
-      const filtered = !!value ? original.filter((d) => d.symbol === value) : original;
+      const filtered = value ? original.filter((d) => d.symbol === value) : original;
       // reverse transactions to show the latest first
       this.dataSource.data = filtered.reduce((acc, curr) => [curr, ...acc], [] as PortfolioTransactionMore[]);
       this.dataSource._updateChangeSubscription();
@@ -331,16 +337,7 @@ export class PortfolioTransactionsTableComponent {
   });
 
   readonly dataSource = new MatTableDataSource<PortfolioTransactionMore>([]);
-  displayedColumns: string[] = [
-    'symbol',
-    'transactionType',
-    'totalValue',
-    'unitPrice',
-    'units',
-    'return',
-    'returnPrct',
-    'date',
-  ];
+  displayedColumns: string[] = ['symbol', 'transactionType', 'totalValue', 'unitPrice', 'units', 'returnPrct', 'date'];
 
   readonly paginator = viewChild(MatPaginator);
 
@@ -379,8 +376,6 @@ export class PortfolioTransactionsTableComponent {
         case 'date':
           return compare(a.date, b.date, isAsc);
         case 'returnPrct':
-          return compare(a.returnChange, b.returnChange, isAsc);
-        case 'return':
           return compare(a.returnValue, b.returnValue, isAsc);
         default: {
           return 0;
