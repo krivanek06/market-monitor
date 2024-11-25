@@ -247,6 +247,13 @@ export type TradingSimulatorAggregationSymbols = {
      */
     unitsTotalAvailable: number;
     unitsInfinity: boolean;
+
+    /**
+     * symbol price to the current round
+     * - updated on every new round
+     * - start with 0 while the trading simulator hasn't started
+     */
+    currentPrice: number;
   };
 };
 
@@ -294,12 +301,6 @@ export type TradingSimulatorGeneralActions = { simulatorId: string } & (
        * will increment the current round by 1
        */
       type: 'nextRound';
-    }
-  | {
-      /**
-       * will generate statistics for the trading simulator if it's finished
-       */
-      type: 'generateStatistics';
     }
 );
 

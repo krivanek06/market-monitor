@@ -8,8 +8,6 @@ import {
 import {
   HistoricalPrice,
   OutstandingOrder,
-  PortfolioGrowth,
-  PortfolioGrowthAssets,
   PortfolioTransaction,
   SymbolSummary,
   USER_ALLOWED_DEMO_ACCOUNTS_PER_IP,
@@ -22,15 +20,15 @@ import {
 } from '@mm/api-types';
 import {
   createTransaction,
-  fillOutMissingDatesForDate,
   getCurrentDateDefaultFormat,
   getCurrentDateDetailsFormat,
+  getPortfolioGrowth,
   getPortfolioGrowthAssets,
   getPortfolioStateHoldingBaseByTransactionsUtil,
+  getPortfolioStateHoldingsUtil,
   getRandomNumber,
   getTransactionsStartDate,
   getYesterdaysDate,
-  roundNDigits,
   transformPortfolioStateHoldingToPortfolioState,
 } from '@mm/shared/general-util';
 import { format, subDays } from 'date-fns';
@@ -44,7 +42,6 @@ import {
   userDocumentTransactionHistoryRef,
   userDocumentWatchListRef,
 } from '../database';
-import { getPortfolioStateHoldingsUtil } from '../portfolio';
 import { userPortfolioRisk } from '../portfolio/portfolio-risk-evaluation';
 import { isFirebaseEmulator } from '../utils';
 import { userCreate } from './user-create-account';
@@ -153,7 +150,7 @@ export class CreateDemoAccountService {
     const allHolidays = (await getIsMarketOpenCF())?.allHolidays ?? [];
 
     // get portfolio growth data
-    const portfolioGrowth = this.getPortfolioGrowth(
+    const portfolioGrowth = getPortfolioGrowth(
       portfolioGrowthAssets,
       userData.portfolioState.startingCash,
       allHolidays,
@@ -289,7 +286,7 @@ export class CreateDemoAccountService {
     console.log(`Received symbol quotes for ${symbolQuotes.length} symbols`);
 
     // get portfolio state
-    const portfolioStateHoldings = getPortfolioStateHoldingsUtil(transactionsToSave, holdingsBaseUpdate, symbolQuotes);
+    const portfolioStateHoldings = getPortfolioStateHoldingsUtil(transactionsToSave, symbolQuotes);
 
     // remove holdings
     const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
@@ -313,87 +310,6 @@ export class CreateDemoAccountService {
     });
 
     return transactionsToSave;
-  };
-
-  /**
-   *
-   * @param portfolioAssets - asset data for every symbol user owned
-   * @param startingCashValue - starting cash value
-   * @param ignoreDates - dates to ignore (holidays)
-   * @returns
-   */
-  getPortfolioGrowth = (
-    portfolioAssets: PortfolioGrowthAssets[],
-    startingCashValue = 0,
-    ignoreDates: string[] = [],
-  ): PortfolioGrowth[] => {
-    // user has no transactions yet
-    if (!portfolioAssets || portfolioAssets.length === 0) {
-      return [];
-    }
-
-    // get soonest date
-    const soonestDate = portfolioAssets.reduce(
-      (acc, curr) => (curr.data[0].date < acc ? curr.data[0].date : acc),
-      getYesterdaysDate(),
-    );
-
-    // generate dates from soonest until today
-    const generatedDates = fillOutMissingDatesForDate(soonestDate, getYesterdaysDate());
-
-    // result of portfolio growth
-    const result: PortfolioGrowth[] = [];
-
-    // accumulate return values, because it is increasing per symbol - {symbol: accumulatedReturn}
-    const accumulatedReturn = new Map<string, number>();
-
-    // loop though all generated dates
-    for (const gDate of generatedDates) {
-      // check if holiday
-      if (ignoreDates.includes(gDate)) {
-        continue;
-      }
-
-      // initial object
-      const portfolioItem: PortfolioGrowth = {
-        date: gDate,
-        investedTotal: 0,
-        marketTotal: 0,
-        balanceTotal: startingCashValue,
-      };
-
-      // loop though all portfolio assets per date
-      for (const portfolioAsset of portfolioAssets) {
-        // find current portfolio asset on this date
-        const currentPortfolioAsset = portfolioAsset.data.find((d) => d.date === gDate);
-
-        // not found
-        if (!currentPortfolioAsset) {
-          continue;
-        }
-
-        // save accumulated return
-        accumulatedReturn.set(portfolioAsset.symbol, currentPortfolioAsset.accumulatedReturn);
-
-        // add values to initial object
-        portfolioItem.marketTotal += currentPortfolioAsset.marketTotal;
-        portfolioItem.investedTotal += currentPortfolioAsset.investedTotal;
-        portfolioItem.balanceTotal += currentPortfolioAsset.marketTotal - currentPortfolioAsset.investedTotal;
-      }
-
-      // add accumulated return to total balance
-      portfolioItem.balanceTotal += Array.from(accumulatedReturn.entries()).reduce((acc, curr) => acc + curr[1], 0);
-
-      // round values
-      portfolioItem.balanceTotal = roundNDigits(portfolioItem.balanceTotal);
-      portfolioItem.marketTotal = roundNDigits(portfolioItem.marketTotal);
-      portfolioItem.investedTotal = roundNDigits(portfolioItem.investedTotal);
-
-      // save result
-      result.push(portfolioItem);
-    }
-
-    return result;
   };
 
   #getHistoricalPrice = (symbol: string, date: string): HistoricalPrice => {

@@ -147,6 +147,7 @@ export class TradingSimulatorApiService {
           sellOperations: 0,
           soldUnits: 0,
           soldTotal: 0,
+          currentPrice: curr.historicalDataModified.at(0) ?? 0,
           unitsCurrentlyAvailable: curr.unitsAvailableOnStart,
           unitsInfinity: curr.unitsInfinity,
           symbol: curr.symbol,
@@ -222,6 +223,8 @@ export class TradingSimulatorApiService {
     // add transaction to the participant data
     batch.update(this.getTradingSimulatorParticipantsDocRef(simulator.id, participant.userData.id), {
       transactions: arrayUnion(transaction),
+      // todo - update portfolio state
+      // todo - update holdings
     });
 
     // add transaction to the transaction collection

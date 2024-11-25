@@ -96,7 +96,7 @@ export class PageTradingSimulatorStatisticsButtonsComponent {
     }
   }
 
-  @Confirmable('Are you sure you want to finish the simulator?')
+  @Confirmable('Are you sure you want to finish the simulator?', 'Finish', true, 'FINISH')
   onFinish() {
     try {
       // finish the simulator
@@ -109,7 +109,7 @@ export class PageTradingSimulatorStatisticsButtonsComponent {
     }
   }
 
-  @Confirmable('Are you sure you want to delete the simulator?')
+  @Confirmable('Are you sure you want to delete the simulator?', 'Delete', true, 'DELETE')
   onDelete() {
     // delete the simulator
     this.tradingSimulatorService.deleteSimulator(this.simulatorData());
@@ -149,13 +149,16 @@ export class PageTradingSimulatorStatisticsButtonsComponent {
     }
   }
 
-  @Confirmable('Please confirm leaving the simulator')
+  @Confirmable('Please confirm leaving the simulator', 'Confirm', true, 'LEAVE')
   onLeave() {
     this.tradingSimulatorService.leaveSimulator(this.simulatorData());
     this.dialogServiceUtil.showNotificationBar('You have left the simulator', 'success');
   }
 
-  onNextRound() {
-    console.log('next round');
+  @Confirmable('Are you sure you want to start the next round?')
+  async onNextRound() {
+    this.dialogServiceUtil.showNotificationBar('Incrementing next round...');
+    await this.tradingSimulatorService.incrementToNextRound(this.simulatorData());
+    this.dialogServiceUtil.showNotificationBar('Next round started', 'success');
   }
 }

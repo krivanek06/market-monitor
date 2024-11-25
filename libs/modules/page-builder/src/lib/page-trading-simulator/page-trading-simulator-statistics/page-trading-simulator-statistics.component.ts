@@ -41,7 +41,7 @@ import { PageTradingSimulatorStatisticsParticipantDataComponent } from './compon
   template: `
     @if (simulatorData(); as simulatorData) {
       <div class="mb-6 flex items-center justify-between">
-        <app-section-title title="Simulator Statistics: {{ simulatorData.name }}" />
+        <app-section-title title="Simulator: {{ simulatorData.name }}" />
 
         <!-- buttons to the owner -->
         <app-page-trading-simulator-statistics-buttons [simulatorData]="simulatorData" />

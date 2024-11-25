@@ -25,7 +25,6 @@ import { PortfolioHoldingsTableComponent } from '../tables';
     NgTemplateOutlet,
     GeneralCardComponent,
     PortfolioHoldingsTableComponent,
-    SymbolSummaryDialogComponent,
     ShowMoreButtonComponent,
     MatIconModule,
   ],

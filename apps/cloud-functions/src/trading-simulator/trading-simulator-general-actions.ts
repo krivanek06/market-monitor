@@ -19,6 +19,7 @@ import {
   tradingSimulatorParticipantsCollectionRef,
   userDocumentRef,
 } from '../database';
+import { tradingSimulatorOnNextRound } from './trading-simulator-next-round';
 
 export const tradingSimulatorGeneralActions = async (
   userAuthId: string | undefined,
@@ -48,6 +49,10 @@ export const tradingSimulatorGeneralActions = async (
 
   if (data.type === 'participantLeaveSimulator') {
     return leaveSimulator(authUserData, simulator, data);
+  }
+
+  if (data.type === 'nextRound') {
+    return tradingSimulatorOnNextRoundManual(authUserData, simulator);
   }
 };
 
@@ -129,4 +134,18 @@ const leaveSimulator = async (
   tradingSimulatorAggregationParticipantsDocRef(simulator.id).set({
     userRanking: participantsRanking.filter((participant) => participant.userData.id !== user.id),
   });
+};
+
+const tradingSimulatorOnNextRoundManual = async (user: UserBaseMin, simulator: TradingSimulator) => {
+  // check if user is the owner
+  if (simulator.owner.id !== user.id) {
+    throw new HttpsError('permission-denied', 'Only the owner can start the next round');
+  }
+
+  // check if simulator is in started state
+  if (simulator.state !== 'started') {
+    throw new HttpsError('failed-precondition', 'Simulator must be in started state');
+  }
+
+  return tradingSimulatorOnNextRound(simulator);
 };

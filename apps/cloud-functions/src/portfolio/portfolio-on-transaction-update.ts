@@ -1,21 +1,9 @@
 import { getSymbolQuotesCF } from '@mm/api-external';
+import { UserBase, UserData } from '@mm/api-types';
 import {
-  OutstandingOrder,
-  PortfolioStateHolding,
-  PortfolioStateHoldingBase,
-  PortfolioStateHoldings,
-  PortfolioTransaction,
-  SymbolQuote,
-  USER_DEFAULT_STARTING_CASH,
-  UserBase,
-  UserData,
-} from '@mm/api-types';
-import {
-  calculateGrowth,
   getCurrentDateDefaultFormat,
-  getCurrentDateDetailsFormat,
   getPortfolioStateHoldingBaseByTransactionsUtil,
-  roundNDigits,
+  getPortfolioStateHoldingsUtil,
   transformPortfolioStateHoldingToPortfolioState,
 } from '@mm/shared/general-util';
 import {
@@ -74,12 +62,7 @@ export const calculateUserPortfolioStateByTransactions = async (userData: UserBa
     const symbolQuotes = partialHoldingSymbols.length > 0 ? await getSymbolQuotesCF(partialHoldingSymbols) : [];
 
     // get portfolio state
-    const portfolioStateHoldings = getPortfolioStateHoldingsUtil(
-      transactionData,
-      holdingsBase,
-      symbolQuotes,
-      openOrders,
-    );
+    const portfolioStateHoldings = getPortfolioStateHoldingsUtil(transactionData, symbolQuotes, openOrders);
 
     // remove holdings
     const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
@@ -102,111 +85,4 @@ export const calculateUserPortfolioStateByTransactions = async (userData: UserBa
   } catch (e) {
     console.warn(`Error for user: ${userData.personal.displayName}, ${userData.id}: ${e}`);
   }
-};
-
-/**
- * calculates user's portfolio based on provided data. Used in Cloud Functions and on FE
- *
- * @param accountType - user's account type
- * @param transactions - user's transactions
- * @param partialHoldings - user's data for current holdings
- * @param symbolSummaries - loaded summaries for user's holdings
- * @returns
- */
-export const getPortfolioStateHoldingsUtil = (
-  transactions: PortfolioTransaction[],
-  partialHoldings: PortfolioStateHoldingBase[],
-  symbolQuotes: SymbolQuote[],
-  openOrders: OutstandingOrder[] = [],
-): PortfolioStateHoldings => {
-  const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
-  const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
-  const transactionFees = transactions.reduce((acc, curr) => acc + curr.transactionFees, 0);
-  const startingCash = USER_DEFAULT_STARTING_CASH;
-
-  // value that user invested in all assets
-  const investedTotal = partialHoldings.reduce((acc, curr) => acc + curr.invested, 0);
-
-  // user's holdings with summary data
-  const portfolioStateHolding = symbolQuotes
-    .map((quote) => {
-      const holding = partialHoldings.find((d) => d.symbol === quote.symbol);
-
-      // user can have multiple open orders for the same symbol
-      const symbolSellOrderUnits = openOrders
-        .filter((d) => d.symbol === quote.symbol && d.orderType.type === 'SELL')
-        .reduce((acc, curr) => acc + curr.units, 0);
-
-      if (!holding) {
-        console.log(`Holding not found for symbol ${quote.symbol}`);
-        return null;
-      }
-
-      return {
-        ...holding,
-        units: roundNDigits(holding.units - symbolSellOrderUnits, 4),
-        invested: roundNDigits(holding.invested),
-        breakEvenPrice: roundNDigits(holding.invested / holding.units, 4),
-        weight: roundNDigits(holding.invested / investedTotal, 6),
-        symbolQuote: quote,
-      } satisfies PortfolioStateHolding;
-    })
-    .filter((d) => !!d) as PortfolioStateHolding[];
-
-  // sort holdings by balance
-  const portfolioStateHoldingSortedByBalance = [...portfolioStateHolding].sort(
-    (a, b) => b.symbolQuote.price * b.units - a.symbolQuote.price * a.units,
-  );
-
-  // value of all assets
-  const holdingsBalance = portfolioStateHolding.reduce((acc, curr) => acc + curr.symbolQuote.price * curr.units, 0);
-
-  // calculate profit/loss from created transactions
-  const transactionsProfit = transactions.reduce(
-    // prevent NaN, undefined and Infinity
-    (acc, curr) => acc + (isFinite(curr.returnValue) ? curr.returnValue : 0),
-    0,
-  );
-
-  // remove cash spent on open orders
-  const spentCashOnOpenOrders = openOrders
-    .filter((d) => d.orderType.type === 'BUY')
-    .reduce((acc, curr) => acc + curr.potentialTotalPrice, 0);
-
-  // current cash on hand
-  const cashOnHandTransactions =
-    startingCash - investedTotal + transactionsProfit - spentCashOnOpenOrders - transactionFees;
-
-  const balance = holdingsBalance + cashOnHandTransactions + spentCashOnOpenOrders;
-  const totalGainsValue = balance - startingCash;
-  const totalGainsPercentage = calculateGrowth(balance, startingCash);
-  const firstTransactionDate = transactions.length > 0 ? transactions[0].date : null;
-  const lastTransactionDate = transactions.length > 0 ? transactions[transactions.length - 1].date : null;
-
-  // calculate daily portfolio change
-  const balanceChange = portfolioStateHolding.reduce((acc, curr) => acc + curr.symbolQuote.change * curr.units, 0);
-  const balanceChangePrct = holdingsBalance === 0 ? 0 : calculateGrowth(balance, balance - balanceChange);
-
-  const result: PortfolioStateHoldings = {
-    numberOfExecutedBuyTransactions,
-    numberOfExecutedSellTransactions,
-    transactionFees: roundNDigits(transactionFees),
-    transactionProfit: roundNDigits(transactionsProfit),
-    cashOnHand: roundNDigits(cashOnHandTransactions),
-    balance: roundNDigits(balance),
-    invested: roundNDigits(investedTotal),
-    holdingsBalance: roundNDigits(holdingsBalance),
-    totalGainsValue: roundNDigits(totalGainsValue),
-    totalGainsPercentage: roundNDigits(totalGainsPercentage, 4),
-    startingCash: roundNDigits(startingCash),
-    firstTransactionDate,
-    lastTransactionDate,
-    date: getCurrentDateDetailsFormat(),
-    // calculate data for previous portfolio
-    previousBalanceChange: balanceChange,
-    previousBalanceChangePercentage: balanceChangePrct,
-    holdings: portfolioStateHoldingSortedByBalance,
-  };
-
-  return result;
 };

@@ -14,11 +14,7 @@ import {
   PortfolioStateTransactionsComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
-import {
-  getPortfolioGrowthAssets,
-  getPortfolioStateHoldingBaseByTransactionsUtil,
-  roundNDigits,
-} from '@mm/shared/general-util';
+import { getPortfolioStateHoldingBaseByTransactionsUtil, roundNDigits } from '@mm/shared/general-util';
 import { GeneralCardComponent, SectionTitleComponent } from '@mm/shared/ui';
 
 @Component({
@@ -112,9 +108,9 @@ export class PageTradingSimulatorStatisticsParticipantDataComponent {
     );
   });
 
-  readonly portfolioGrowthAssets = computed(() =>
-    getPortfolioGrowthAssets(this.participant().transactions, this.historicalPricesToCurrentRound()),
-  );
+  // readonly portfolioGrowthAssets = computed(() =>
+  //   getPortfolioGrowthAssets(this.participant().transactions, this.historicalPricesToCurrentRound()),
+  // );
   readonly portfolioHolding = computed(() => {
     const pricesToSymbols = this.historicalPricesToCurrentRound();
     const participant = this.participant();
@@ -144,7 +140,7 @@ export class PageTradingSimulatorStatisticsParticipantDataComponent {
         simulatorData: this.simulatorData(),
         simulatorSymbols: this.simulatorSymbols(),
         historicalPricesToCurrentRound: this.historicalPricesToCurrentRound(),
-        portfolioGrowthAssets: this.portfolioGrowthAssets(),
+        //portfolioGrowthAssets: this.portfolioGrowthAssets(),
         portfolioHolding: this.portfolioHolding(),
       });
     });

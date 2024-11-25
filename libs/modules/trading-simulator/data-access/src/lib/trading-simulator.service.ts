@@ -137,6 +137,7 @@ export class TradingSimulatorService {
     this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, {
       state: 'started',
       startDateTime: getCurrentDateDetailsFormat(),
+      currentRound: 1,
     });
   }
 
@@ -157,6 +158,7 @@ export class TradingSimulatorService {
     this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, {
       state: 'finished',
       endDateTime: getCurrentDateDetailsFormat(),
+      currentRound: simulator.maximumRounds,
     });
   }
 
@@ -216,6 +218,26 @@ export class TradingSimulatorService {
 
     // remove simulator
     return this.tradingSimulatorApiService.deleteSimulator(simulator);
+  }
+
+  incrementToNextRound(simulator: TradingSimulator) {
+    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
+
+    // check if user is the owner
+    if (simulator.owner.id !== userBase.id) {
+      throw new Error('Only the owner can increment to the next round');
+    }
+
+    // check if simulator is in started state
+    if (simulator.state !== 'started') {
+      throw new Error('Simulator must be in started state');
+    }
+
+    // increment to the next round
+    return this.tradingSimulatorApiService.simulatorCreateAction({
+      type: 'nextRound',
+      simulatorId: simulator.id,
+    });
   }
 
   async addTransaction(
