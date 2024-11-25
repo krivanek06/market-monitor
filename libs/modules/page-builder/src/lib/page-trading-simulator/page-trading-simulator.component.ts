@@ -46,7 +46,6 @@ import { TradingSimulatorDisplayCardComponent, TradingSimulatorDisplayItemCompon
           @for (item of simulatorsByOwner(); track item.id) {
             <app-trading-simulator-display-card
               (editClicked)="onEditSimulator(item)"
-              (visitClicked)="onVisitSimulator(item)"
               (statsClicked)="onStatisticsClicked(item)"
               [tradingSimulator]="item"
               [authUser]="userData()"
@@ -58,7 +57,6 @@ import { TradingSimulatorDisplayCardComponent, TradingSimulatorDisplayItemCompon
         <div class="grid grid-cols-2 gap-4">
           @for (item of simulatorsByParticipant(); track item.id) {
             <app-trading-simulator-display-card
-              (visitClicked)="onVisitSimulator(item)"
               (statsClicked)="onStatisticsClicked(item)"
               [tradingSimulator]="item"
               [authUser]="userData()"
@@ -160,10 +158,6 @@ export class PageTradingSimulatorComponent {
 
   onCreateSimulator() {
     this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.CREATE]);
-  }
-
-  onVisitSimulator(simulator: TradingSimulator) {
-    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.DETAILS, simulator.id]);
   }
 
   onEditSimulator(simulator: TradingSimulator) {

@@ -37,6 +37,12 @@ import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
         }
         @case ('started') {
           @if (isAuthUserOwner()) {
+            <!-- next round -->
+            <button mat-stroked-button type="button" color="primary" (click)="onNextRound()">
+              <mat-icon iconPositionEnd>arrow_forward_ios</mat-icon>
+              Next Round
+            </button>
+
             <!-- finish button -->
             <button mat-stroked-button type="button" color="warn" (click)="onFinish()">
               <mat-icon iconPositionEnd>stop</mat-icon>
@@ -147,5 +153,9 @@ export class PageTradingSimulatorStatisticsButtonsComponent {
   onLeave() {
     this.tradingSimulatorService.leaveSimulator(this.simulatorData());
     this.dialogServiceUtil.showNotificationBar('You have left the simulator', 'success');
+  }
+
+  onNextRound() {
+    console.log('next round');
   }
 }

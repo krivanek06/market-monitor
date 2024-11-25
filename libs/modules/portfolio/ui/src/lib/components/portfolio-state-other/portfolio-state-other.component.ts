@@ -11,7 +11,7 @@ import { AddColorDirective } from '@mm/shared/ui';
   template: `
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
-        <!-- Alpha -->
+        <!-- invested -->
         <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Invested</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
@@ -19,7 +19,7 @@ import { AddColorDirective } from '@mm/shared/ui';
           </div>
         </div>
 
-        <!-- Volatility -->
+        <!-- locked cash -->
         <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Locked Cash</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
@@ -27,7 +27,7 @@ import { AddColorDirective } from '@mm/shared/ui';
           </div>
         </div>
 
-        <!-- Beta -->
+        <!-- open / sell orders -->
         <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Orders B/S</div>
           <div [appAddColor]="valueColor()" class="space-x-1 sm:text-lg">
@@ -37,7 +37,7 @@ import { AddColorDirective } from '@mm/shared/ui';
           </div>
         </div>
 
-        <!-- Sharp Ratio -->
+        <!-- rank -->
         <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Ranking</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">

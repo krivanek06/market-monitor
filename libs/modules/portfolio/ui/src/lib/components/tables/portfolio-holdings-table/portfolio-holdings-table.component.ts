@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -29,7 +29,6 @@ import {
   selector: 'app-portfolio-holdings-table',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     MatSortModule,
     DefaultImgDirective,
@@ -39,6 +38,9 @@ import {
     MatChipsModule,
     MatPaginatorModule,
     RangeDirective,
+    CurrencyPipe,
+    DecimalPipe,
+    PercentPipe,
   ],
   template: `
     <table

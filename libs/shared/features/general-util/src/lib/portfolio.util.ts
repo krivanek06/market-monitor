@@ -1,5 +1,4 @@
 import {
-  HistoricalPrice,
   OutstandingOrder,
   PortfolioGrowthAssets,
   PortfolioGrowthAssetsDataItem,
@@ -39,7 +38,7 @@ export const createEmptyPortfolioState = (startingCash = 0): PortfolioState => (
  */
 export const getPortfolioGrowthAssets = (
   transactions: PortfolioTransaction[],
-  historicalPrices: { [key: string]: HistoricalPrice[] },
+  historicalPrices: { [key: string]: { close: number; date: string }[] },
 ): PortfolioGrowthAssets[] => {
   const symbols = Object.keys(historicalPrices);
 

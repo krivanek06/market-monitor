@@ -3,13 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TRADING_SIMULATOR_PARTICIPANTS_LIMIT, TradingSimulator, UserBaseMin } from '@mm/api-types';
-import {
-  DateReadablePipe,
-  GeneralCardActionContentDirective,
-  GeneralCardComponent,
-  GeneralCardTitleRightDirective,
-  TruncatePipe,
-} from '@mm/shared/ui';
+import { DateReadablePipe, GeneralCardComponent, GeneralCardTitleRightDirective, TruncatePipe } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-trading-simulator-display-card',
@@ -18,7 +12,6 @@ import {
     GeneralCardComponent,
     MatButtonModule,
     MatIconModule,
-    GeneralCardActionContentDirective,
     GeneralCardTitleRightDirective,
     DatePipe,
     DateReadablePipe,
@@ -31,6 +24,17 @@ import {
       <!-- title right -->
       <ng-template appGeneralCardTitleRight>
         <div class="flex gap-2">
+          <!-- owner buttons -->
+          @if (tradingSimulator().owner.id === authUser().id) {
+            @if (tradingSimulator().state === 'draft') {
+              <!-- edit -->
+              <button (click)="onEdit()" mat-flat-button type="button" class="w-[100px]">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+            }
+          }
+
           <!-- owner buttons -->
           @if (tradingSimulator().state !== 'draft') {
             <button (click)="onStats()" mat-flat-button type="button">
@@ -85,31 +89,6 @@ import {
           <span>{{ tradingSimulator().currentParticipants }} / {{ TRADING_SIMULATOR_PARTICIPANTS_LIMIT }}</span>
         </div>
       </div>
-
-      <!-- action buttons -->
-      <ng-template appGeneralCardActionContent>
-        <div class="flex w-full justify-end gap-2 p-2">
-          <!-- owner buttons -->
-          @if (tradingSimulator().owner.id === authUser().id) {
-            @if (tradingSimulator().state === 'draft') {
-              <!-- edit -->
-              <button (click)="onEdit()" mat-flat-button type="button" class="w-[100px]">
-                <mat-icon>edit</mat-icon>
-                <span>Edit</span>
-              </button>
-            }
-          } @else {
-            @if (tradingSimulator().state === 'live') {
-              @if (isUserJoined()) {
-                <!-- visit -->
-                <button (click)="onVisit()" mat-stroked-button type="button" color="primary" class="w-[100px]">
-                  Visit
-                </button>
-              }
-            }
-          }
-        </div>
-      </ng-template>
     </app-general-card>
   `,
   styles: `
@@ -120,7 +99,6 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradingSimulatorDisplayCardComponent {
-  readonly visitClicked = output<void>();
   readonly editClicked = output<void>();
   readonly statsClicked = output<void>();
 
@@ -132,10 +110,6 @@ export class TradingSimulatorDisplayCardComponent {
   readonly isUserJoined = computed(() => this.tradingSimulator().participants.includes(this.authUser().id));
 
   readonly TRADING_SIMULATOR_PARTICIPANTS_LIMIT = TRADING_SIMULATOR_PARTICIPANTS_LIMIT;
-
-  onVisit() {
-    this.visitClicked.emit();
-  }
 
   onEdit() {
     this.editClicked.emit();

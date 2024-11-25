@@ -407,7 +407,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           [maximumRounds]="form.controls.maximumRounds.value"
           [marketChange]="form.controls.marketChange.value"
           (removeSymbol)="onRemoveSymbol(i)"
-          [disabledRemove]="form.controls.symbolsHistoricalData.controls.length <= 5"
+          [disabledRemove]="form.controls.symbolsHistoricalData.controls.length <= 6"
         />
         <mat-divider />
       }
@@ -464,9 +464,9 @@ export class TradingSimulatorFormComponent {
       validators: [requiredValidator, positiveNumberValidator, intervalValidator(1, TRADING_SIMULATOR_MAX_ROUNDS)],
     }),
     // how much time to (in seconds) to wait between rounds
-    roundIntervalMin: new FormControl(10, {
+    roundIntervalMin: new FormControl(5, {
       nonNullable: true,
-      validators: [requiredValidator, positiveNumberValidator, intervalValidator(1, 3600)],
+      validators: [requiredValidator, positiveNumberValidator, intervalValidator(5, 3600)],
     }),
     // code to join the trading simulator
     invitationCode: new FormControl(generateRandomString(6), { nonNullable: true, validators: [requiredValidator] }),
@@ -517,6 +517,18 @@ export class TradingSimulatorFormComponent {
 
     // symbols - start with some default symbols
     symbolsHistoricalData: new FormArray<FormControl<TradingSimulatorSymbol>>([
+      new FormControl(
+        {
+          symbol: '',
+          unitsAvailableOnStart: 0,
+          priceMultiplication: 1,
+          unitsAdditionalIssued: [],
+          historicalDataModified: [],
+          historicalDataOriginal: [],
+          unitsInfinity: true,
+        },
+        { nonNullable: true },
+      ),
       new FormControl(
         {
           symbol: '',

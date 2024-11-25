@@ -47,6 +47,7 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
     const pricesDisplay = [...pricesPubliclyVisible, ...pricesOwnerVisible];
 
     // todo - DISPLAY ISSUED UNITS
+    // todo - display current price on current round and available units
 
     return {
       chart: {
@@ -92,7 +93,7 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
         plotLines: [
           {
             color: ColorScheme.GRAY_MEDIUM_VAR,
-            value: currentRound - 1,
+            value: currentRound,
           },
         ],
         type: 'category',
@@ -137,7 +138,7 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
           name: symbol.symbol,
           zones: [
             {
-              value: currentRound - 1,
+              value: currentRound,
               color: ColorScheme.ACCENT_1_VAR,
             },
             {

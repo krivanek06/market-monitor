@@ -2,9 +2,7 @@ import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import {
   PortfolioAssetChartComponent,
@@ -16,18 +14,11 @@ import {
   PortfolioStateOtherComponent,
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
-  PortfolioTransactionChartComponent,
   PortfolioTransactionsItemComponent,
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
-import {
-  FormMatInputWrapperComponent,
-  GeneralCardComponent,
-  GenericChartComponent,
-  PieChartComponent,
-  SectionTitleComponent,
-} from '@mm/shared/ui';
+import { GeneralCardComponent, PieChartComponent } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-page-dashboard',
@@ -37,22 +28,16 @@ import {
     PortfolioStateComponent,
     GeneralCardComponent,
     PortfolioPeriodChangeComponent,
-    GenericChartComponent,
     PortfolioStateTransactionsComponent,
     PortfolioStateRiskComponent,
     GeneralCardComponent,
-    SymbolSummaryDialogComponent,
     MatDialogModule,
-    FormMatInputWrapperComponent,
-    PortfolioTransactionChartComponent,
-    SectionTitleComponent,
     PortfolioTransactionsTableComponent,
     PieChartComponent,
     PortfolioGrowthChartComponent,
     PortfolioChangeChartComponent,
     PortfolioAssetChartComponent,
     MatButtonModule,
-    MatProgressSpinner,
     PortfolioTransactionsItemComponent,
     PortfolioHoldingsTableCardComponent,
     PortfolioStateOtherComponent,
