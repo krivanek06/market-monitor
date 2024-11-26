@@ -72,7 +72,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
       [symbol]: {
         ...data,
         price: symbolsData.find((d) => d.symbol === symbol)?.historicalDataModified.at(simulator.currentRound) ?? 0,
-      },
+      } satisfies TradingSimulatorAggregationSymbols[0],
     }),
     {} as TradingSimulatorAggregationSymbols,
   );
@@ -82,7 +82,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
     ([symbol, data]) =>
       ({
         symbol,
-        price: data.currentPrice,
+        price: data.price,
       }) as SymbolQuote,
   );
 
@@ -105,6 +105,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
 
       return {
         ...participant,
+        portfolioState,
         holdings,
         portfolioGrowth,
       };

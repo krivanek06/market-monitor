@@ -31,9 +31,9 @@ import { AddColorDirective } from '@mm/shared/ui';
         <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Orders B/S</div>
           <div [appAddColor]="valueColor()" class="space-x-1 sm:text-lg">
-            <span>{{ openBuyOrders()?.length }}</span>
+            <span>{{ openBuyOrders()?.length ?? 0 }}</span>
             <span>/</span>
-            <span>{{ openSellOrders()?.length }}</span>
+            <span>{{ openSellOrders()?.length ?? 0 }}</span>
           </div>
         </div>
 

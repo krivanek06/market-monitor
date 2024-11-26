@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import {
-  arrayUnion,
   collection,
   CollectionReference,
   doc,
@@ -8,7 +7,6 @@ import {
   DocumentReference,
   Firestore,
   getDocs,
-  increment,
   limit,
   query,
   updateDoc,
@@ -17,7 +15,6 @@ import {
 } from '@angular/fire/firestore';
 import { Functions } from '@angular/fire/functions';
 import {
-  FieldValuePartial,
   PortfolioTransaction,
   TradingSimulator,
   TradingSimulatorAggregationParticipants,
@@ -29,7 +26,6 @@ import {
   TradingSimulatorSymbol,
 } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { roundNDigits } from '@mm/shared/general-util';
 import { httpsCallable } from 'firebase/functions';
 import { filterNil } from 'ngxtension/filter-nil';
 import { collectionData as rxCollectionData, docData as rxDocData } from 'rxfire/firestore';
@@ -147,7 +143,7 @@ export class TradingSimulatorApiService {
           sellOperations: 0,
           soldUnits: 0,
           soldTotal: 0,
-          currentPrice: curr.historicalDataModified.at(0) ?? 0,
+          price: curr.historicalDataModified.at(0) ?? 0,
           unitsCurrentlyAvailable: curr.unitsAvailableOnStart,
           unitsInfinity: curr.unitsInfinity,
           symbol: curr.symbol,
@@ -205,44 +201,6 @@ export class TradingSimulatorApiService {
 
     // commit the batch
     await batch.commit();
-  }
-
-  /**
-   *
-   * @param simulator - the trading simulator
-   * @param participant - the participating user who makes a transaction
-   * @param transaction - the transaction to add to the simulator
-   */
-  async addTransaction(
-    simulator: TradingSimulator,
-    participant: TradingSimulatorParticipant,
-    transaction: PortfolioTransaction,
-  ) {
-    const batch = writeBatch(this.firestore);
-
-    // add transaction to the participant data
-    batch.update(this.getTradingSimulatorParticipantsDocRef(simulator.id, participant.userData.id), {
-      transactions: arrayUnion(transaction),
-      // todo - update portfolio state
-      // todo - update holdings
-    });
-
-    // add transaction to the transaction collection
-    batch.set(doc(this.getTradingSimulatorTransactionsCollection(simulator.id)), transaction);
-
-    // update symbol data
-    const isSell = transaction.transactionType === 'SELL';
-    batch.update(this.getTradingSimulatorAggregationSymbolsDocRef(simulator.id), {
-      [transaction.symbol]: {
-        boughtUnits: increment(isSell ? 0 : transaction.units),
-        soldUnits: increment(isSell ? transaction.units : 0),
-        investedTotal: increment(isSell ? 0 : roundNDigits(transaction.units * transaction.unitPrice)),
-        buyOperations: increment(isSell ? 0 : 1),
-        sellOperations: increment(isSell ? 1 : 0),
-        soldTotal: increment(roundNDigits(transaction.returnValue)),
-        unitsCurrentlyAvailable: increment(isSell ? transaction.units : -transaction.units),
-      } satisfies FieldValuePartial<TradingSimulatorAggregationSymbols[0]>,
-    });
   }
 
   private getTradingSimulatorParticipantsDocRef(

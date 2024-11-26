@@ -1,20 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TradingSimulatorApiService } from '@mm/api-client';
-import {
-  DATA_NOT_FOUND_ERROR,
-  PortfolioTransaction,
-  SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL,
-  TRADING_SIMULATOR_PARTICIPANTS_LIMIT,
-  TradingSimulator,
-  TradingSimulatorParticipant,
-  TradingSimulatorSymbol,
-  USER_NOT_ENOUGH_CASH_ERROR,
-  USER_NOT_UNITS_ON_HAND_ERROR,
-} from '@mm/api-types';
+import { OutstandingOrder, TradingSimulator, TradingSimulatorSymbol } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { getCurrentDateDetailsFormat } from '@mm/shared/general-util';
-import { firstValueFrom, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -163,24 +153,6 @@ export class TradingSimulatorService {
   }
 
   joinSimulator(simulator: TradingSimulator, invitationCode: string) {
-    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
-
-    // check if user is already a participant
-    if (simulator.participants.includes(userBase.id)) {
-      throw new Error('User is already a participant');
-    }
-
-    // check if there is space to join
-    if (simulator.currentParticipants >= TRADING_SIMULATOR_PARTICIPANTS_LIMIT) {
-      throw new Error('Simulator is full');
-    }
-
-    // check if provided invitation code is correct
-    if (simulator.invitationCode !== invitationCode) {
-      throw new Error('Invalid invitation code');
-    }
-
-    // join simulator
     return this.tradingSimulatorApiService.simulatorCreateAction({
       type: 'participantJoinSimulator',
       simulatorId: simulator.id,
@@ -189,14 +161,6 @@ export class TradingSimulatorService {
   }
 
   leaveSimulator(simulator: TradingSimulator) {
-    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
-
-    // check if user is a participant
-    if (!simulator.participants.includes(userBase.id)) {
-      return;
-    }
-
-    // remove user from participants
     return this.tradingSimulatorApiService.simulatorCreateAction({
       type: 'participantLeaveSimulator',
       simulatorId: simulator.id,
@@ -221,67 +185,17 @@ export class TradingSimulatorService {
   }
 
   incrementToNextRound(simulator: TradingSimulator) {
-    const userBase = this.authenticationUserStoreService.state.getUserDataMin();
-
-    // check if user is the owner
-    if (simulator.owner.id !== userBase.id) {
-      throw new Error('Only the owner can increment to the next round');
-    }
-
-    // check if simulator is in started state
-    if (simulator.state !== 'started') {
-      throw new Error('Simulator must be in started state');
-    }
-
-    // increment to the next round
     return this.tradingSimulatorApiService.simulatorCreateAction({
       type: 'nextRound',
       simulatorId: simulator.id,
     });
   }
 
-  async addTransaction(
-    simulator: TradingSimulator,
-    participant: TradingSimulatorParticipant,
-    transaction: PortfolioTransaction,
-  ) {
-    const symbolAggregation = await firstValueFrom(
-      this.tradingSimulatorApiService.getTradingSimulatorAggregationSymbols(simulator.id),
-    );
-    const symbolData = symbolAggregation[transaction.symbol];
-
-    // check if symbol exists
-    if (!symbolData) {
-      throw new Error(DATA_NOT_FOUND_ERROR);
-    }
-
-    // BUY order
-    if (transaction.transactionType === 'BUY') {
-      const totalValue = transaction.units * transaction.unitPrice + transaction.transactionFees;
-
-      // check if user has enough cash on hand if BUY and cashAccountActive
-      if (participant.portfolioState.cashOnHand < totalValue) {
-        throw new Error(USER_NOT_ENOUGH_CASH_ERROR);
-      }
-
-      // check if there is enough units to buy
-      if (symbolData.unitsCurrentlyAvailable < transaction.units) {
-        throw new Error(SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL);
-      }
-    }
-
-    // SELL order
-    else if (transaction.transactionType === 'SELL') {
-      // check if user has any holdings of that symbol
-      const symbolHoldings = participant.holdings.find((d) => d.symbol === transaction.symbol);
-
-      // check if user has enough units on hand if SELL
-      if ((symbolHoldings?.units ?? -1) < transaction.units) {
-        throw new Error(USER_NOT_UNITS_ON_HAND_ERROR);
-      }
-    }
-
-    // save transaction
-    this.tradingSimulatorApiService.addTransaction(simulator, participant, transaction);
+  async createOutstandingOrder(simulator: TradingSimulator, order: OutstandingOrder) {
+    this.tradingSimulatorApiService.simulatorCreateAction({
+      type: 'createOutstandingOrder',
+      simulatorId: simulator.id,
+      order,
+    });
   }
 }

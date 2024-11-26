@@ -150,13 +150,22 @@ export class PageTradingSimulatorStatisticsButtonsComponent {
   }
 
   @Confirmable('Please confirm leaving the simulator', 'Confirm', true, 'LEAVE')
-  onLeave() {
-    this.tradingSimulatorService.leaveSimulator(this.simulatorData());
-    this.dialogServiceUtil.showNotificationBar('You have left the simulator', 'success');
+  async onLeave() {
+    try {
+      this.dialogServiceUtil.showNotificationBar('You are leaving the simulator');
+      await this.tradingSimulatorService.leaveSimulator(this.simulatorData());
+      this.dialogServiceUtil.showNotificationBar('You have left the simulator', 'success');
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
   }
 
-  @Confirmable('Are you sure you want to start the next round?')
   async onNextRound() {
+    const message = `Confirm going to round: ${this.simulatorData().currentRound + 1}`;
+    if (!(await this.dialogServiceUtil.showConfirmDialog(message))) {
+      return;
+    }
+
     this.dialogServiceUtil.showNotificationBar('Incrementing next round...');
     await this.tradingSimulatorService.incrementToNextRound(this.simulatorData());
     this.dialogServiceUtil.showNotificationBar('Next round started', 'success');

@@ -24,14 +24,7 @@ import {
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import {
-  FormMatInputWrapperComponent,
-  GeneralCardComponent,
-  QuoteItemComponent,
-  RangeDirective,
-  SectionTitleComponent,
-  SortByKeyPipe,
-} from '@mm/shared/ui';
+import { GeneralCardComponent, QuoteItemComponent, RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
 import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
 
 @Component({
@@ -46,13 +39,10 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
     AssetPriceChartInteractiveComponent,
     SymbolSummaryListComponent,
     PortfolioTransactionsTableComponent,
-    PortfolioTradeDialogComponent,
     MatTooltipModule,
-    SortByKeyPipe,
     QuoteItemComponent,
     RangeDirective,
     SectionTitleComponent,
-    FormMatInputWrapperComponent,
     ReactiveFormsModule,
     NgClass,
     OutstandingOrderCardDataComponent,
@@ -378,10 +368,18 @@ export class PageTradingComponent {
     >(PortfolioTradeDialogComponent, {
       data: {
         transactionType: transactionType,
-        quote: summary.quote,
+        quote: {
+          symbol: summary.id,
+          displaySymbol: summary.quote.displaySymbol,
+          price: summary.quote.price,
+          name: summary.quote.name,
+          exchange: summary.quote.exchange,
+          timestamp: summary.quote.timestamp,
+        },
         sector: summary.profile?.sector ?? summary.quote.exchange,
         userPortfolioStateHolding: this.portfolioUserFacadeService.portfolioStateHolding(),
         isMarketOpen: this.marketIsOpen(),
+        userData: this.authenticationUserService.state.getUserDataMin(),
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });

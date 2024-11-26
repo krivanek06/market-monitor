@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -16,7 +17,7 @@ import { animationValueChange, DefaultImgDirective } from '@mm/shared/ui';
 @Component({
   selector: 'app-trading-simulator-symbol-stat-table',
   standalone: true,
-  imports: [MatTableModule, DefaultImgDirective],
+  imports: [MatTableModule, DefaultImgDirective, CurrencyPipe],
   template: `
     <table mat-table [dataSource]="dataSource" matSort [trackBy]="identity">
       <!-- symbol -->
@@ -27,6 +28,16 @@ import { animationValueChange, DefaultImgDirective } from '@mm/shared/ui';
             <img appDefaultImg imageType="symbol" [src]="row.symbol" class="h-7 w-7" />
             <span class="text-wt-primary">{{ row.symbol }}</span>
           </div>
+        </td>
+      </ng-container>
+
+      <!-- price -->
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef>Price</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="text-wt-gray-dark">
+            {{ row.price | currency }}
+          </span>
         </td>
       </ng-container>
 
@@ -138,6 +149,7 @@ export class TradingSimulatorSymbolStatTableComponent {
 
   readonly displayedColumns: string[] = [
     'symbol',
+    'price',
     'unitsCurrentlyAvailable',
     'unitsTotalAvailable',
     'buyOperations',

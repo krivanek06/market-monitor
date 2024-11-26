@@ -1,4 +1,10 @@
-import { OutstandingOrder, PortfolioTransaction, TRANSACTION_FEE_PRCT, UserData } from '@mm/api-types';
+import {
+  OutstandingOrder,
+  PortfolioStateHoldingBase,
+  PortfolioTransaction,
+  TRANSACTION_FEE_PRCT,
+  UserBaseMin,
+} from '@mm/api-types';
 import { isBefore } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import { getCurrentDateDetailsFormat } from './date-service.util';
@@ -41,7 +47,8 @@ export const getTransactionsStartDate = (
  * @returns
  */
 export const createTransaction = (
-  { id: userId, holdingSnapshot }: UserData,
+  { id: userId }: UserBaseMin,
+  holdings: PortfolioStateHoldingBase[],
   input: OutstandingOrder,
   currentPrice: number,
 ): PortfolioTransaction => {
@@ -51,7 +58,7 @@ export const createTransaction = (
   const unitPrice = currentPrice;
 
   // from holdings get break even price
-  const symbolHolding = holdingSnapshot.data.find((d) => d.symbol === input.symbol);
+  const symbolHolding = holdings.find((d) => d.symbol === input.symbol);
 
   // on sell order, holdings must exists
   if (isSell && !symbolHolding) {

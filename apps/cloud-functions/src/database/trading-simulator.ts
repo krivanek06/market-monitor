@@ -30,6 +30,9 @@ export const tradingSimulatorSymbolsCollectionRef = (id: string) =>
 export const tradingSimulatorTransactionsCollectionRef = (id: string) =>
   tradingSimulatorDocRef(id).collection('transactions').withConverter(assignTypes<PortfolioTransaction>());
 
+export const tradingSimulatorTransactionsRef = (id: string, transactionId: string) =>
+  tradingSimulatorTransactionsCollectionRef(id).doc(transactionId);
+
 export const tradingSimulatorSymbolDocRef = (id: string, symbol: string) =>
   tradingSimulatorSymbolsCollectionRef(id).doc(symbol);
 

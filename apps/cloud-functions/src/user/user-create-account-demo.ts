@@ -361,12 +361,12 @@ export class CreateDemoAccountService {
     }
   };
 
-  createPortfolioCreateOperation = (data: OutstandingOrder, userData: UserData): PortfolioTransaction | null => {
+  createPortfolioCreateOperation = (order: OutstandingOrder, userData: UserData): PortfolioTransaction | null => {
     try {
-      const symbolPrice = this.#getHistoricalPrice(data.symbol, data.createdAt);
+      const symbolPrice = this.#getHistoricalPrice(order.symbol, order.createdAt);
 
       // create transaction
-      const transaction = createTransaction(userData, data, symbolPrice.close);
+      const transaction = createTransaction(userData, userData.holdingSnapshot.data, order, symbolPrice.close);
 
       // return data
       return transaction;

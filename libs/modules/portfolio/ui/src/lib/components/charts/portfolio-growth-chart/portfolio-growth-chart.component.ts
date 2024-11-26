@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowth, USER_DEFAULT_STARTING_CASH } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
 import { DateRangeSliderComponent, DateRangeSliderValues, filterDataByDateRange } from '@mm/shared/ui';
+import { format } from 'date-fns';
 import { SeriesOptionsType } from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { map } from 'rxjs';
@@ -14,15 +15,17 @@ import { map } from 'rxjs';
   standalone: true,
   imports: [HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule],
   template: `
-    <div class="flex flex-col items-center justify-between gap-x-3 sm:flex-row">
-      <!-- select chart title -->
-      <div class="text-wt-primary text-lg">{{ headerTitle() }}</div>
+    @if (displayHeader()) {
+      <div class="flex flex-col items-center justify-between gap-x-3 sm:flex-row">
+        <!-- select chart title -->
+        <div class="text-wt-primary text-lg">{{ headerTitle() }}</div>
 
-      <!-- date range -->
-      @if ((data().values ?? []).length > 0) {
-        <app-date-range-slider class="w-full max-sm:px-4 sm:w-[450px]" [formControl]="sliderControl" />
-      }
-    </div>
+        <!-- date range -->
+        @if ((data()?.values ?? []).length > 0) {
+          <app-date-range-slider class="w-full max-sm:px-4 sm:w-[450px]" [formControl]="sliderControl" />
+        }
+      </div>
+    }
 
     <!-- chart -->
     @if ((chartOptionsSignal().series?.length ?? 0) > 0) {
@@ -48,14 +51,28 @@ import { map } from 'rxjs';
 })
 export class PortfolioGrowthChartComponent extends ChartConstructor {
   readonly headerTitle = input<string>('');
-  readonly data = input.required<{
+  readonly data = input<{
     values: PortfolioGrowth[] | null;
     currentCash?: number[];
   }>();
 
   readonly startCash = input(USER_DEFAULT_STARTING_CASH);
   readonly displayLegend = input(false);
+  readonly displayHeader = input(true);
   readonly chartType = input<'all' | 'marketValue' | 'balance'>('all');
+
+  /**
+   * put on false only if PortfolioGrowth.date is not date format
+   * - used in trading simulator where we have rounds: 1, 2, 3, ...
+   */
+  readonly dataValueIsDate = input(true);
+
+  readonly categories = computed(() => {
+    const dataValueIsDate = this.dataValueIsDate();
+    const data = this.data()?.values ?? [];
+
+    return dataValueIsDate ? data.map((d) => format(d.date, 'EEEE, MMM d, y')) : data.map((_, i) => `Round ${i + 1}`);
+  });
 
   readonly sliderControl = new FormControl<DateRangeSliderValues>(
     {
@@ -68,7 +85,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
 
   readonly initSliderEffect = effect(() => {
     const dataValues = this.data();
-    const values = dataValues.values ?? [];
+    const values = dataValues?.values ?? [];
 
     // create slider values
     const sliderValuesInput: DateRangeSliderValues = {
@@ -87,8 +104,8 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         const startCash = this.startCash();
 
         // filter out by valid dates
-        const inputValues = filterDataByDateRange(dataValues.values ?? [], sliderValues);
-        const seriesDataUpdate = this.createChartSeries(inputValues, dataValues.currentCash ?? [], startCash);
+        const inputValues = filterDataByDateRange(dataValues?.values ?? [], sliderValues);
+        const seriesDataUpdate = this.createChartSeries(inputValues, dataValues?.currentCash ?? [], startCash);
 
         // create chart
         return this.initChart(seriesDataUpdate);
@@ -144,7 +161,8 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
             font: '10px Trebuchet MS, Verdana, sans-serif',
           },
         },
-        type: 'datetime',
+        type: 'category',
+        categories: this.categories(),
       },
       title: {
         text: '',
@@ -191,7 +209,6 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         padding: 11,
         enabled: true,
         backgroundColor: ColorScheme.BACKGROUND_DASHBOARD_VAR,
-        xDateFormat: '%A, %b %e, %Y',
         style: {
           fontSize: '16px',
           color: ColorScheme.GRAY_DARK_VAR,
@@ -236,13 +253,10 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
   }
 
   private createChartSeries(data: PortfolioGrowth[], currentCash: number[], startingCash: number): SeriesOptionsType[] {
-    const marketTotalValue = data.map((point) => [new Date(point.date).getTime(), point.marketTotal]);
-    const breakEvenValue = data.map((point) => [new Date(point.date).getTime(), point.investedTotal]);
-    const balanceTotal = data.map((point) => [new Date(point.date).getTime(), point.balanceTotal]);
-    const threshold = data.map((point, index) => [
-      new Date(point.date).getTime(),
-      currentCash.at(index) ?? startingCash,
-    ]);
+    const marketTotalValue = data.map((point) => [point.marketTotal]);
+    const breakEvenValue = data.map((point) => [point.investedTotal]);
+    const balanceTotal = data.map((point) => [point.balanceTotal]);
+    const threshold = data.map((point, index) => [currentCash.at(index) ?? startingCash]);
 
     // get points when investment value change from previous day
     const investmentChangePoints: [number, number][] = [];

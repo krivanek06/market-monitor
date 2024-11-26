@@ -50,11 +50,11 @@ import { PageTradingSimulatorStatisticsParticipantDataComponent } from './compon
       <!-- participant data -->
       @if (participant(); as participant) {
         <div class="mb-6">
-          <app-section-title title="My Data" class="mb-3" />
           <app-page-trading-simulator-statistics-participant-data
             [participant]="participant"
             [simulatorData]="simulatorData"
             [simulatorSymbols]="simulatorSymbols()"
+            [symbolAggregations]="simulatorAggregationSymbols()"
           />
         </div>
       }
@@ -79,7 +79,6 @@ import { PageTradingSimulatorStatisticsParticipantDataComponent } from './compon
               <app-trading-simulator-symbol-price-chart
                 [simulator]="simulatorData"
                 [simulatorSymbol]="symbol"
-                [currentRound]="simulatorData.currentRound"
                 [authUser]="authUserData()"
                 [heightPx]="185"
               />

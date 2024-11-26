@@ -1,4 +1,5 @@
 import { ExtractedType } from '../ts-utils';
+import { OutstandingOrder } from './outstanding-order.model';
 import { PortfolioGrowth, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
 import { RankingItem } from './ranking.model';
 import { UserBaseMin } from './user.model';
@@ -253,9 +254,12 @@ export type TradingSimulatorAggregationSymbols = {
      * - updated on every new round
      * - start with 0 while the trading simulator hasn't started
      */
-    currentPrice: number;
+    price: number;
   };
 };
+
+export type TradingSimulatorAggregationSymbolsData =
+  TradingSimulatorAggregationSymbols[keyof TradingSimulatorAggregationSymbols];
 
 /**
  * data updated on every new round
@@ -301,6 +305,10 @@ export type TradingSimulatorGeneralActions = { simulatorId: string } & (
        * will increment the current round by 1
        */
       type: 'nextRound';
+    }
+  | {
+      type: 'createOutstandingOrder';
+      order: OutstandingOrder;
     }
 );
 

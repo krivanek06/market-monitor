@@ -9,8 +9,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { OutstandingOrder, PortfolioStateHoldings, PortfolioTransactionType, SymbolQuote } from '@mm/api-types';
-import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { OutstandingOrder, PortfolioStateHoldings, PortfolioTransactionType, UserBaseMin } from '@mm/api-types';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
 import { minValueValidator, positiveNumberValidator, requiredValidator } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
@@ -20,7 +19,6 @@ import {
   getTransactionFees,
   getTransactionFeesBySpending,
   roundNDigits,
-  transformUserToBaseMin,
 } from '@mm/shared/general-util';
 import {
   DefaultImgDirective,
@@ -31,11 +29,33 @@ import {
 import { map, startWith } from 'rxjs';
 
 export type PortfolioTradeDialogComponentData = {
-  quote: SymbolQuote;
+  quote: {
+    price: number;
+    symbol: string;
+    displaySymbol: string;
+    /** name of the company */
+    name?: string;
+
+    /**
+     * current time when the data was last update - data from Quotes
+     */
+    timestamp?: number;
+
+    /**
+     * data from trading simulator instead of timestamp
+     */
+    currentRound?: number;
+
+    exchange: string;
+  };
   transactionType: PortfolioTransactionType;
   isMarketOpen: boolean;
   sector?: string;
   userPortfolioStateHolding?: PortfolioStateHoldings;
+  /**
+   * user who is performing the trade
+   */
+  userData: UserBaseMin;
 };
 
 @Component({
@@ -83,7 +103,9 @@ export type PortfolioTradeDialogComponentData = {
                   {{ data().transactionType | uppercase }} <span class="max-lg:hidden">Operation</span>
                 </div>
               </div>
-              <div class="hidden md:block">{{ data().quote.name }}</div>
+              @if (data().quote.name) {
+                <div class="hidden md:block">{{ data().quote.name }}</div>
+              }
             </div>
           </div>
 
@@ -134,10 +156,20 @@ export type PortfolioTradeDialogComponentData = {
         <!-- info -->
         <div class="mb-1 flex flex-col p-3">
           <!-- execution date -->
-          <div class="g-item-wrapper">
-            <span>Date</span>
-            <span>{{ data().quote.timestamp * 1000 | date: 'MMMM d, y (EEEE)' }}</span>
-          </div>
+          @if (data().quote.timestamp; as timestamp) {
+            <div class="g-item-wrapper">
+              <span>Date</span>
+              <span>{{ timestamp * 1000 | date: 'MMMM d, y (EEEE)' }}</span>
+            </div>
+          }
+
+          <!-- round -->
+          @if (data().quote.currentRound; as round) {
+            <div class="g-item-wrapper">
+              <span>Round</span>
+              <span>{{ round }}</span>
+            </div>
+          }
 
           <!-- units owned -->
           <div class="g-item-wrapper">
@@ -277,7 +309,6 @@ export type PortfolioTradeDialogComponentData = {
 export class PortfolioTradeDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<PortfolioTradeDialogComponent, OutstandingOrder | undefined>);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
-  private readonly authenticationUserService = inject(AuthenticationUserStoreService);
   readonly data = signal(inject<PortfolioTradeDialogComponentData>(MAT_DIALOG_DATA));
 
   readonly form = new FormGroup({
@@ -296,7 +327,6 @@ export class PortfolioTradeDialogComponent {
     const symbol = this.data().quote.symbol;
     return this.data().userPortfolioStateHolding?.holdings.find((holding) => holding.symbol === symbol);
   });
-  readonly userDataSignal = this.authenticationUserService.state.getUserData;
 
   readonly isSymbolCrypto = computed(() => this.data().quote.exchange === 'CRYPTO');
 
@@ -404,7 +434,7 @@ export class PortfolioTradeDialogComponent {
       units: this.form.controls.units.value,
       potentialSymbolPrice: data.quote.price,
       potentialTotalPrice: roundNDigits(data.quote.price * this.form.controls.units.value),
-      userData: transformUserToBaseMin(this.userDataSignal()),
+      userData: data.userData,
       orderType: this.getOrderType(),
       status: 'OPEN',
     };

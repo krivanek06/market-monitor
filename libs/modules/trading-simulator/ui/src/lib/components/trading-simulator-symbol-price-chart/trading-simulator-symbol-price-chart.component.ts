@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { TradingSimulator, TradingSimulatorSymbol, UserBaseMin } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
@@ -8,11 +9,18 @@ import { HighchartsChartModule } from 'highcharts-angular';
 @Component({
   selector: 'app-trading-simulator-symbol-price-chart',
   standalone: true,
-  imports: [HighchartsChartModule, DefaultImgDirective],
+  imports: [HighchartsChartModule, DefaultImgDirective, CurrencyPipe],
   template: `
-    <div class="flex items-center gap-3">
-      <img [src]="simulatorSymbol().symbol" appDefaultImg imageType="symbol" class="h-5 w-5" />
-      <div class="text-wt-primary text-sm">{{ simulatorSymbol().symbol }}</div>
+    <div class="flex items-center justify-between">
+      <!-- name + image -->
+      <div class="flex items-center gap-3">
+        <img [src]="simulatorSymbol().symbol" appDefaultImg imageType="symbol" class="h-5 w-5" />
+        <div class="text-wt-primary text-sm">{{ simulatorSymbol().symbol }}</div>
+      </div>
+      <!-- current price -->
+      <div class="text-wt-gray-medium text-sm">
+        {{ currentPrice() | currency }}
+      </div>
     </div>
     <highcharts-chart
       [Highcharts]="Highcharts"
@@ -31,13 +39,16 @@ import { HighchartsChartModule } from 'highcharts-angular';
 export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor {
   readonly simulator = input.required<TradingSimulator>();
   readonly simulatorSymbol = input.required<TradingSimulatorSymbol>();
-  readonly currentRound = input.required<number>();
   readonly authUser = input.required<UserBaseMin>();
+  readonly currentPrice = computed(() => {
+    const currentRound = this.simulator().currentRound;
+    return this.simulatorSymbol().historicalDataModified.at(currentRound - 1) ?? 0;
+  });
 
   readonly chartOptionsSignal = computed(() => {
     const simulator = this.simulator();
     const symbol = this.simulatorSymbol();
-    const currentRound = this.currentRound();
+    const currentRound = simulator.currentRound;
     const authUser = this.authUser();
 
     const isOwner = authUser.id === simulator.owner.id;
