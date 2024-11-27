@@ -191,8 +191,8 @@ export class TradingSimulatorService {
     });
   }
 
-  async createOutstandingOrder(simulator: TradingSimulator, order: OutstandingOrder) {
-    this.tradingSimulatorApiService.simulatorCreateAction({
+  createOutstandingOrder(simulator: TradingSimulator, order: OutstandingOrder) {
+    return this.tradingSimulatorApiService.simulatorCreateAction({
       type: 'createOutstandingOrder',
       simulatorId: simulator.id,
       order,

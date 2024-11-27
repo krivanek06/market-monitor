@@ -177,8 +177,10 @@ import { firstValueFrom } from 'rxjs';
 
                   <div class="space-x-1">
                     <span class="text-wt-gray-dark">{{ item.value.price | currency }}</span>
-                    <span> | </span>
-                    <span>{{ item.value.unitsInfinity ? 'Unlimited' : item.value.unitsCurrentlyAvailable }}</span>
+                    @if (data?.operation === 'BUY') {
+                      <span> | </span>
+                      <span>{{ item.value.unitsInfinity ? 'Unlimited' : item.value.unitsCurrentlyAvailable }}</span>
+                    }
                   </div>
                 </div>
               </button>
@@ -263,7 +265,6 @@ export class PageTradingSimulatorStatisticsParticipantDataComponent {
   }
 
   async onOperationClick(operation: PortfolioTransactionType) {
-    console.log('onOperationClick', operation);
     const templateRef = this.symbolTradeRef();
 
     if (!templateRef) {

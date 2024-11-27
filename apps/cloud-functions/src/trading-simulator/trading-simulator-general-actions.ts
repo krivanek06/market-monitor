@@ -1,7 +1,11 @@
 import {
   DATA_NOT_FOUND_ERROR,
+  FieldValueAll,
   FieldValuePartial,
   SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL,
+  SIMULATOR_PARTICIPANT_DIFFERENT_USER,
+  SIMULATOR_PARTICIPANT_NOT_FOUND,
+  SYMBOL_NOT_FOUND_ERROR,
   TRADING_SIMULATOR_PARTICIPANTS_LIMIT,
   TradingSimulator,
   TradingSimulatorAggregationParticipants,
@@ -188,16 +192,16 @@ const createOutstandingOrder = async (
     const symbolData = symbolAggregation?.[data.order.symbol];
 
     if (!symbolData) {
-      throw new HttpsError('not-found', 'Symbol not found');
+      throw new HttpsError('not-found', SYMBOL_NOT_FOUND_ERROR);
     }
 
     if (!participant) {
-      throw new HttpsError('not-found', 'Participant not found');
+      throw new HttpsError('not-found', SIMULATOR_PARTICIPANT_NOT_FOUND);
     }
 
     // check if the user who creates the order is the same as the user in the order
     if (data.order.userData.id !== participant.userData.id) {
-      throw new Error('User does not have the order');
+      throw new HttpsError('aborted', SIMULATOR_PARTICIPANT_DIFFERENT_USER);
     }
 
     const transactionFees = getTransactionFees(symbolData.price, data.order.units);
@@ -207,23 +211,23 @@ const createOutstandingOrder = async (
     if (data.order.orderType.type === 'BUY') {
       // check if user has enough cash on hand if BUY and cashAccountActive
       if (participant.portfolioState.cashOnHand < totalValue) {
-        throw new Error(USER_NOT_ENOUGH_CASH_ERROR);
+        throw new HttpsError('aborted', USER_NOT_ENOUGH_CASH_ERROR);
       }
 
       // check if there is enough units to buy
-      if (symbolData.unitsInfinity && symbolData.unitsCurrentlyAvailable < data.order.units) {
-        throw new Error(SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL);
+      if (!symbolData.unitsInfinity && symbolData.unitsCurrentlyAvailable < data.order.units) {
+        throw new HttpsError('aborted', SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL);
       }
     }
 
     // SELL order
     else if (data.order.orderType.type === 'SELL') {
       // check if user has any holdings of that symbol
-      const symbolHoldings = participant.holdings.find((d) => d.symbol === transaction.symbol);
+      const symbolHoldings = participant.holdings.find((d) => d.symbol === symbolData.symbol);
 
       // check if user has enough units on hand if SELL
       if ((symbolHoldings?.units ?? -1) < data.order.units) {
-        throw new Error(USER_NOT_UNITS_ON_HAND_ERROR);
+        throw new HttpsError('aborted', USER_NOT_UNITS_ON_HAND_ERROR);
       }
     }
 
@@ -253,23 +257,25 @@ const createOutstandingOrder = async (
     const isSell = transaction.transactionType === 'SELL';
     firebaseTransaction.update(aggregationSymbolRef, {
       [transaction.symbol]: {
-        boughtUnits: FieldValue.increment(isSell ? 0 : transaction.units),
-        soldUnits: FieldValue.increment(isSell ? transaction.units : 0),
-        investedTotal: FieldValue.increment(isSell ? 0 : roundNDigits(transaction.units * transaction.unitPrice)),
-        buyOperations: FieldValue.increment(isSell ? 0 : 1),
-        sellOperations: FieldValue.increment(isSell ? 1 : 0),
-        soldTotal: FieldValue.increment(roundNDigits(transaction.returnValue)),
+        boughtUnits: symbolData.boughtUnits + (isSell ? 0 : transaction.units),
+        soldUnits: symbolData.soldUnits + (isSell ? transaction.units : 0),
+        buyOperations: symbolData.buyOperations + (isSell ? 0 : 1),
+        sellOperations: symbolData.sellOperations + (isSell ? 1 : 0),
+        soldTotal: roundNDigits(symbolData.soldTotal + (isSell ? transaction.units * transaction.unitPrice : 0)),
+        investedTotal: roundNDigits(
+          symbolData.investedTotal + (isSell ? 0 : transaction.units * transaction.unitPrice),
+        ),
         // change only if not infinite units
         unitsCurrentlyAvailable: symbolData.unitsInfinity
           ? symbolData.unitsCurrentlyAvailable
-          : FieldValue.increment(isSell ? -transaction.units : transaction.units),
+          : symbolData.unitsCurrentlyAvailable + (isSell ? transaction.units : -transaction.units),
 
         // keep old value unchanged
         price: symbolData.price,
         symbol: symbolData.symbol,
         unitsInfinity: symbolData.unitsInfinity,
         unitsTotalAvailable: symbolData.unitsTotalAvailable,
-      } satisfies FieldValuePartial<TradingSimulatorAggregationSymbolsData>,
+      } satisfies FieldValueAll<TradingSimulatorAggregationSymbolsData>,
     });
   });
 };

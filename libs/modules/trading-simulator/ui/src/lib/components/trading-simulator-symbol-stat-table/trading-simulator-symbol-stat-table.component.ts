@@ -12,12 +12,12 @@ import {
 } from '@angular/core';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TradingSimulatorAggregationSymbols } from '@mm/api-types';
-import { animationValueChange, DefaultImgDirective } from '@mm/shared/ui';
+import { animationValueChange, DefaultImgDirective, LargeNumberFormatterPipe } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-trading-simulator-symbol-stat-table',
   standalone: true,
-  imports: [MatTableModule, DefaultImgDirective, CurrencyPipe],
+  imports: [MatTableModule, DefaultImgDirective, CurrencyPipe, LargeNumberFormatterPipe],
   template: `
     <table mat-table [dataSource]="dataSource" matSort [trackBy]="identity">
       <!-- symbol -->
@@ -45,7 +45,10 @@ import { animationValueChange, DefaultImgDirective } from '@mm/shared/ui';
       <ng-container matColumnDef="unitsCurrentlyAvailable">
         <th mat-header-cell *matHeaderCellDef>Available</th>
         <td mat-cell *matCellDef="let row">
-          <span class="text-wt-gray-dark">
+          <span
+            [class.text-wt-gray-dark]="row.unitsInfinity || row.unitsCurrentlyAvailable > 0"
+            [class.text-wt-danger]="!row.unitsInfinity && row.unitsCurrentlyAvailable === 0"
+          >
             {{ row.unitsInfinity ? 'Unlimited' : row.unitsCurrentlyAvailable }}
           </span>
         </td>
@@ -95,7 +98,7 @@ import { animationValueChange, DefaultImgDirective } from '@mm/shared/ui';
       <ng-container matColumnDef="investedTotal">
         <th mat-header-cell *matHeaderCellDef>Invested Total</th>
         <td mat-cell *matCellDef="let row">
-          <span [@valueChange]="row.investedTotal">{{ row.investedTotal }}</span>
+          <span [@valueChange]="row.investedTotal">{{ row.investedTotal | largeNumberFormatter: false : true }}</span>
         </td>
       </ng-container>
 
@@ -103,7 +106,7 @@ import { animationValueChange, DefaultImgDirective } from '@mm/shared/ui';
       <ng-container matColumnDef="soldTotal">
         <th mat-header-cell *matHeaderCellDef>Sold Total</th>
         <td mat-cell *matCellDef="let row">
-          <span [@valueChange]="row.soldTotal">{{ row.soldTotal }}</span>
+          <span [@valueChange]="row.soldTotal">{{ row.soldTotal | largeNumberFormatter: false : true }}</span>
         </td>
       </ng-container>
 

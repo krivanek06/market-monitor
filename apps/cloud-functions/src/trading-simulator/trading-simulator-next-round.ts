@@ -28,9 +28,9 @@ import {
  * - increments round
  * - update each participant's portfolio
  * - recalculate user ranking
- * - increment available cash for each participant - TODO
- * - increment issued units for symbol if issued on that round - TODO
- * - check if it is the last round then - remove transaction collection
+ * - TODO: increment available cash for each participant
+ * - TODO: increment issued units for symbol if issued on that round
+ * - TODO: check if it is the last round then - remove transaction collection
  */
 export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) => {
   const transactionCollectionRef = tradingSimulatorTransactionsCollectionRef(simulator.id);

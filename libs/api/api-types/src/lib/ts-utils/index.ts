@@ -3,7 +3,7 @@ import { FieldValue } from 'firebase/firestore';
 export * from './omit-strict.util';
 export * from './one-of.util';
 
-export type FieldValueConverter<T> = {
+export type FieldValueAll<T> = {
   [K in keyof T]: FieldValue | T[K];
 };
 
