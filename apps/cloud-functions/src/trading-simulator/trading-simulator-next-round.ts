@@ -30,7 +30,9 @@ import {
  * - recalculate user ranking
  * - TODO: increment available cash for each participant
  * - TODO: increment issued units for symbol if issued on that round
- * - TODO: check if it is the last round then - remove transaction collection
+ * - TODO: check if it is the last round then
+ *    - TODO: remove transaction collection
+ *    - TODO: (optional) make transaction aggregation data: on which round how many transaction for each symbol happened
  */
 export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) => {
   const transactionCollectionRef = tradingSimulatorTransactionsCollectionRef(simulator.id);
@@ -110,7 +112,19 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
         portfolioGrowth,
       };
     })
-    .sort((a, b) => b.portfolioState.balance - a.portfolioState.balance);
+    .sort((a, b) => b.portfolioState.balance - a.portfolioState.balance)
+    .map(
+      (participant, index) =>
+        ({
+          ...participant,
+          rank: {
+            rank: index + 1,
+            rankPrevious: participantsRanking[participant.userData.id] ?? 0,
+            rankChange: (participantsRanking[participant.userData.id] ?? 0) - (index + 1),
+            date: String(nextRound),
+          },
+        }) satisfies TradingSimulatorParticipant,
+    );
 
   // update aggregation data
   tradingSimulatorAggregationTransactionsDocRef(simulator.id).set({
@@ -136,20 +150,16 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
         portfolioState: participant.portfolioState,
         holdings: participant.holdings,
         portfolioGrowth: FieldValue.arrayUnion(participant.portfolioGrowth.at(-1)),
+        rank: participant.rank,
       } satisfies FieldValuePartial<TradingSimulatorParticipant>);
   }
 
   // recalculate user ranking
   tradingSimulatorAggregationParticipantsDocRef(simulator.id).set({
-    userRanking: participantsUpdatedSorted.map((participant, index) => ({
+    userRanking: participantsUpdatedSorted.map((participant) => ({
       userData: participant.userData,
       portfolioState: participant.portfolioState,
-      rank: {
-        rank: index + 1,
-        rankPrevious: participantsRanking[participant.userData.id] ?? 0,
-        rankChange: (participantsRanking[participant.userData.id] ?? 0) - (index + 1),
-        date: String(nextRound),
-      },
+      rank: participant.rank,
     })),
   });
 };

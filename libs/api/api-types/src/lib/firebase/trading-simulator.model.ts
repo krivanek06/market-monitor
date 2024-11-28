@@ -156,6 +156,11 @@ export type TradingSimulatorParticipant = {
   userData: UserBaseMin;
 
   /**
+   * rank of the user in the trading simulator
+   */
+  rank: RankingItem;
+
+  /**
    * current state of the user's portfolio
    */
   portfolioState: PortfolioState;

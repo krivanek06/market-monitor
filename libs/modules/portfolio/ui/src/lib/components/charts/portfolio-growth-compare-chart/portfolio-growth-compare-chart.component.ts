@@ -1,39 +1,52 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { PortfolioGrowth, UserBase } from '@mm/api-types';
+import { PortfolioGrowth, UserBaseMin } from '@mm/api-types';
 import { ChartConstructor, ColorScheme, GenericChartSeries } from '@mm/shared/data-access';
 import {
   fillOutMissingDatesForDate,
   formatValueIntoCurrency,
   getCurrentDateDefaultFormat,
 } from '@mm/shared/general-util';
-import { DateRangeSliderComponent, DateRangeSliderValues } from '@mm/shared/ui';
+import {
+  DateRangeSliderComponent,
+  DateRangeSliderValues,
+  filterDataByDateRange,
+  filterDataByIndexRange,
+  SectionTitleComponent,
+} from '@mm/shared/ui';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { map } from 'rxjs';
 
 export type PortfolioGrowthCompareChartData = {
   portfolioGrowth: PortfolioGrowth[];
-  userBase: UserBase;
+  userData: UserBaseMin;
 };
 
 @Component({
   selector: 'app-portfolio-growth-compare-chart',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule],
+  imports: [HighchartsChartModule, DateRangeSliderComponent, ReactiveFormsModule, SectionTitleComponent],
   template: `
-    <!-- time slider -->
-    <div class="flex justify-end">
+    <div class="mb-2 flex flex-col items-center lg:flex-row lg:justify-between">
+      <!-- title -->
+      @if (title()) {
+        <app-section-title matIcon="compare_arrows" [title]="title()" titleSize="lg" />
+      }
+
+      <!-- time slider -->
       @if (dateRangeControl.value.dates.length > 0) {
-        <app-date-range-slider class="hidden w-[550px] md:block" [formControl]="dateRangeControl" />
+        <app-date-range-slider
+          class="hidden w-[550px] md:block"
+          [formControl]="dateRangeControl"
+          [filterType]="filterType()"
+        />
       }
     </div>
 
     <!-- chart -->
     @if (chartOptionsSignal() && dateRangeControl.value.dates.length > 0) {
       <highcharts-chart
-        *ngIf="isHighcharts()"
         [Highcharts]="Highcharts"
         [options]="chartOptionsSignal()"
         [callbackFunction]="chartCallback"
@@ -56,7 +69,7 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
   /**
    * data range control for chart zoom
    */
-  dateRangeControl = new FormControl<DateRangeSliderValues>(
+  readonly dateRangeControl = new FormControl<DateRangeSliderValues>(
     {
       dates: [],
       currentMinDateIndex: 0,
@@ -65,26 +78,39 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
     { nonNullable: true },
   );
 
-  data = input.required<PortfolioGrowthCompareChartData[]>();
+  readonly data = input.required<PortfolioGrowthCompareChartData[]>();
+  readonly title = input<string>('');
 
-  dateRangeControlEffect = effect(() => {
+  /**
+   * date - filter by date,
+   * round - filter by index
+   */
+  readonly filterType = input<'date' | 'round'>('date');
+
+  readonly dateRangeControlEffect = effect(() => {
+    const filterType = this.filterType();
+    const dataValues = this.data();
+
     // get the default date - today
     const defaultDate = getCurrentDateDefaultFormat();
 
     // find the data with minimum date
-    const dataMinimalDate = this.data()
+    const dataMinimalDate = dataValues
       .filter((d) => d.portfolioGrowth.length > 1)
       .map((d) => d.portfolioGrowth.map((e) => e.date))
       .reduce((acc, curr) => (acc < curr[0] ? acc : curr[0]), defaultDate);
 
     // find the data with maximum date
-    const dataMaximalDate = this.data()
+    const dataMaximalDate = dataValues
       .filter((d) => d.portfolioGrowth.length > 1)
       .map((d) => d.portfolioGrowth.map((e) => e.date))
       .reduce((acc, curr) => (acc > (curr.at(-1) ?? defaultDate) ? acc : (curr.at(-1) ?? defaultDate)), defaultDate);
 
     // each user can have different starting and ending date (if inactive) and date gap may exists - may be empty
-    const dateInterval = fillOutMissingDatesForDate(dataMinimalDate, dataMaximalDate);
+    const dateInterval =
+      filterType === 'date'
+        ? fillOutMissingDatesForDate(dataMinimalDate, dataMaximalDate)
+        : Array.from({ length: dataValues.at(0)?.portfolioGrowth.length ?? 0 }, (_, i) => String(i));
 
     untracked(() => {
       // set the date range
@@ -99,23 +125,23 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
   /**
    * create chart options only when date range triggers, otherwise chart is not created
    */
-  chartOptionsSignal = toSignal(
+  readonly chartOptionsSignal = toSignal(
     this.dateRangeControl.valueChanges.pipe(
       map((dateRange) => {
         const data = this.data();
+        const filterType = this.filterType();
+
+        // determine how to filter date, either by date or index
+        const compareFn = filterType === 'date' ? filterDataByDateRange : filterDataByIndexRange;
+
         if (!data || !dateRange) {
           return this.initChart([]);
         }
 
-        const { currentMinDateIndex, currentMaxDateIndex, dates } = dateRange;
-
-        const startDate = dates[currentMinDateIndex];
-        const endDate = dates[currentMaxDateIndex];
-
         // filter the data based on the date range
         const filteredData = data.map((d) => ({
-          userBase: d.userBase,
-          portfolioGrowth: d.portfolioGrowth.filter((d) => d.date >= startDate && d.date <= endDate),
+          userData: d.userData,
+          portfolioGrowth: compareFn(d.portfolioGrowth, dateRange),
         }));
 
         return this.initChart(filteredData);
@@ -125,6 +151,19 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
   );
 
   private initChart(data: PortfolioGrowthCompareChartData[]): Highcharts.Options {
+    const isDate = this.filterType() === 'date';
+
+    const series = data.map(
+      (d) =>
+        ({
+          type: 'line',
+          name: `${d.userData.personal.displayName}`,
+          data: isDate
+            ? d.portfolioGrowth.map((point) => [Date.parse(point.date), point.balanceTotal])
+            : d.portfolioGrowth.map((d) => d.balanceTotal),
+        }) satisfies GenericChartSeries<'line'>,
+    );
+
     return {
       chart: {
         type: 'line',
@@ -162,7 +201,8 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
       xAxis: {
         visible: true,
         crosshair: true,
-        type: 'datetime',
+        type: isDate ? 'datetime' : 'category',
+        categories: isDate ? undefined : data.at(0)?.portfolioGrowth.map((d) => `Round ${d.date}`),
         dateTimeLabelFormats: {
           day: '%e of %b',
         },
@@ -247,14 +287,7 @@ export class PortfolioGrowthCompareChartComponent extends ChartConstructor {
           enableMouseTracking: true,
         },
       },
-      series: data.map(
-        (d) =>
-          ({
-            type: 'line',
-            name: `${d.userBase.personal.displayName}`,
-            data: d.portfolioGrowth.map((point) => [Date.parse(point.date), point.balanceTotal]),
-          }) satisfies GenericChartSeries<'line'>,
-      ),
+      series: series,
     };
   }
 }

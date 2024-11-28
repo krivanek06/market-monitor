@@ -4,7 +4,12 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowth, USER_DEFAULT_STARTING_CASH } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
-import { DateRangeSliderComponent, DateRangeSliderValues, filterDataByDateRange } from '@mm/shared/ui';
+import {
+  DateRangeSliderComponent,
+  DateRangeSliderValues,
+  filterDataByDateRange,
+  filterDataByIndexRange,
+} from '@mm/shared/ui';
 import { format } from 'date-fns';
 import { SeriesOptionsType } from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -62,6 +67,13 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
   readonly chartType = input<'all' | 'marketValue' | 'balance'>('all');
 
   /**
+   * type of filter to use to compare date value
+   * - date - compare by date
+   * - round - compare by normal <= >= etc
+   */
+  readonly filterType = input<'date' | 'round'>('date');
+
+  /**
    * put on false only if PortfolioGrowth.date is not date format
    * - used in trading simulator where we have rounds: 1, 2, 3, ...
    */
@@ -102,9 +114,15 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
       map((sliderValues) => {
         const dataValues = this.data();
         const startCash = this.startCash();
+        const filterType = this.filterType();
+        const displayHeader = this.displayHeader();
 
         // filter out by valid dates
-        const inputValues = filterDataByDateRange(dataValues?.values ?? [], sliderValues);
+        const compareFn = filterType === 'date' ? filterDataByDateRange : filterDataByIndexRange;
+        const inputValues = displayHeader
+          ? compareFn(dataValues?.values ?? [], sliderValues)
+          : (dataValues?.values ?? []);
+
         const seriesDataUpdate = this.createChartSeries(inputValues, dataValues?.currentCash ?? [], startCash);
 
         // create chart

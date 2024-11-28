@@ -1,4 +1,6 @@
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { TradingSimulatorAggregationParticipantsData } from '@mm/api-types';
 import {
   DefaultImgDirective,
@@ -10,7 +12,14 @@ import {
 @Component({
   selector: 'app-trading-simulator-participant-item',
   standalone: true,
-  imports: [DefaultImgDirective, PositionColoringDirective, PercentageIncreaseDirective, LargeNumberFormatterPipe],
+  imports: [
+    DefaultImgDirective,
+    PositionColoringDirective,
+    PercentageIncreaseDirective,
+    LargeNumberFormatterPipe,
+    NgClass,
+    MatIconModule,
+  ],
   template: `
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
@@ -30,6 +39,20 @@ import {
 
         <!-- name -->
         <span class="text-wt-primary">{{ participant().userData.personal.displayNameInitials }}</span>
+
+        @if (participant().rank.rankChange; as rankChange) {
+          <div>|</div>
+          <div class="flex items-center gap-1">
+            <span [ngClass]="{ 'text-wt-success': rankChange > 0, 'text-wt-danger': rankChange < 0 }">
+              {{ participant().rank.rankChange }}
+            </span>
+            @if (rankChange > 0) {
+              <mat-icon color="accent" class="scale-150">arrow_drop_up</mat-icon>
+            } @else if (rankChange < 0) {
+              <mat-icon color="warn" class="scale-150">arrow_drop_down</mat-icon>
+            }
+          </div>
+        }
       </div>
 
       <!-- percentage increase -->

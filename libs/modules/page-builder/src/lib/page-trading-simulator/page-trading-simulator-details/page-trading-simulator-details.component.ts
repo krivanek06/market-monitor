@@ -1,11 +1,19 @@
 import { CurrencyPipe, NgClass, SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { PortfolioTransactionsItemComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
+import { UserBaseMin } from '@mm/api-types';
+import {
+  PortfolioGrowthCompareChartComponent,
+  PortfolioTransactionsItemComponent,
+  PortfolioTransactionsTableComponent,
+} from '@mm/portfolio/ui';
+import { InputSource } from '@mm/shared/data-access';
 import {
   DateReadablePipe,
+  DropdownControlComponent,
   GeneralCardComponent,
   RangeDirective,
   SectionTitleComponent,
@@ -17,7 +25,8 @@ import {
   TradingSimulatorSymbolPriceChartLegendComponent,
   TradingSimulatorSymbolStatTableComponent,
 } from '@mm/trading-simulator/ui';
-import { switchMap } from 'rxjs';
+import { filterNil } from 'ngxtension/filter-nil';
+import { first, forkJoin, iif, of, switchMap } from 'rxjs';
 import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulator-base.component';
 import { PageTradingSimulatorDetailsButtonsComponent } from './components/page-trading-simulator-details-buttons/page-trading-simulator-details-buttons.component';
 import { PageTradingSimulatorDetailsInfoComponent } from './components/page-trading-simulator-details-info/page-trading-simulator-details-info.component';
@@ -42,10 +51,13 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
     RangeDirective,
     DateReadablePipe,
     CurrencyPipe,
+    PortfolioGrowthCompareChartComponent,
     PortfolioTransactionsTableComponent,
     PageTradingSimulatorDetailsParticipantDataComponent,
     NgClass,
     SortReversePipe,
+    DropdownControlComponent,
+    ReactiveFormsModule,
   ],
   template: `
     @if (simulatorData(); as simulatorData) {
@@ -117,21 +129,39 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
 
       <!-- participant ranking -->
       <app-section-title title="Participant Ranking" matIcon="people" class class="mb-3" titleSize="lg" />
-      <div class="flex flex-col gap-2">
-        @if (participantRanking(); as participantRanking) {
-          @for (participant of participantRanking; track participant.userData.id; let i = $index) {
-            <app-trading-simulator-participant-item [participant]="participant" [position]="i + 1" />
-          } @empty {
-            <div class="p-4 text-center">No participants</div>
+      <app-general-card class="mb-6">
+        <div class="grid gap-x-6 gap-y-4 p-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          @if (participantRanking(); as participantRanking) {
+            @for (participant of participantRanking; track participant.userData.id; let i = $index) {
+              <button mat-stroked-button (click)="onParticipantClick(participant.userData)" class="h-12 p-2">
+                <app-trading-simulator-participant-item
+                  [participant]="participant"
+                  [position]="participant.rank.rank"
+                />
+              </button>
+            } @empty {
+              <div class="min-h-[200px] p-4 text-center">No participants</div>
+            }
+          } @else {
+            <div *ngRange="simulatorData.currentParticipants" class="g-skeleton h-10"></div>
           }
-        } @else {
-          <div *ngRange="simulatorData.currentParticipants" class="g-skeleton h-10"></div>
-        }
-      </div>
+        </div>
+      </app-general-card>
 
-      <!-- display participants -->
-      <app-section-title title="Compare Participants" matIcon="people" class="mb-3" titleSize="lg" />
-      TODO TODO
+      <!-- participant compare -->
+      <div class="mb-4 flex items-center justify-between">
+        <!-- title -->
+        <app-section-title matIcon="compare_arrows" title="Compare Participants" titleSize="lg" />
+
+        <app-dropdown-control
+          inputCaption="Select Participants"
+          [inputSource]="participantsInputSource()"
+          [formControl]="selectedParticipantsControl"
+          class="w-[400px]"
+          inputType="MULTISELECT"
+        />
+      </div>
+      <app-portfolio-growth-compare-chart filterType="round" [data]="selectedParticipants()" />
 
       <!-- display transactions -->
       <div class="grid grid-cols-3 gap-x-4">
@@ -152,7 +182,7 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
               let last = $last
             ) {
               <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
-                <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+                <app-portfolio-transactions-item dateType="round" [displayUser]="true" [transaction]="item" />
               </div>
             }
           </app-general-card>
@@ -165,7 +195,7 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
               let last = $last
             ) {
               <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
-                <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+                <app-portfolio-transactions-item dateType="round" [displayUser]="true" [transaction]="item" />
               </div>
             }
           </app-general-card>
@@ -181,6 +211,8 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBaseComponent {
+  readonly selectedParticipantsControl = new FormControl<UserBaseMin[]>([], { nonNullable: true });
+
   /** participating user data - may not exists if user is only a spectator */
   readonly participant = toSignal(
     this.simulatorId$.pipe(
@@ -199,6 +231,46 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
     ),
   );
 
+  /** dropdown of participants in the simulator */
+  readonly participantsInputSource = computed(() =>
+    this.participantRanking()?.map(
+      (d) =>
+        ({
+          caption: d.userData.personal.displayName,
+          image: d.userData.personal.photoURL,
+          value: d.userData,
+          imageType: 'default',
+        }) satisfies InputSource<UserBaseMin>,
+    ),
+  );
+
+  readonly selectedParticipants = toSignal(
+    this.simulatorId$.pipe(
+      switchMap((selectedId) =>
+        this.selectedParticipantsControl.valueChanges.pipe(
+          switchMap((participants) =>
+            iif(
+              () => participants.length > 0,
+              forkJoin(
+                participants.map((p) =>
+                  this.tradingSimulatorService
+                    .getTradingSimulatorByIdParticipantById(selectedId, p.id)
+                    .pipe(first(), filterNil()),
+                ),
+              ),
+              of([]),
+            ),
+          ),
+        ),
+      ),
+    ),
+    { initialValue: [] },
+  );
+
+  selectedParticipantsww = effect(() => console.log('selectedParticipants', this.selectedParticipants()));
+
+  // todo - reduce number of users to be display on smaller screen and add a "show more" button
+
   readonly displayedColumnsTransactionTable = [
     'symbol',
     'transactionType',
@@ -210,4 +282,8 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
     'rounds',
     'returnPrctOnly',
   ];
+
+  onParticipantClick(participant: UserBaseMin) {
+    console.log('onParticipantClick', participant);
+  }
 }

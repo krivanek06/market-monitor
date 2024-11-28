@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, forwardRef, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { addDays, isAfter, isBefore, subDays } from 'date-fns';
@@ -25,6 +25,18 @@ export const filterDataByDateRange = <T extends { date: string }>(
     (d) =>
       isBefore(subDays(new Date(d.date), 1), new Date(dateRange.dates[dateRange.currentMaxDateIndex])) &&
       isAfter(addDays(new Date(d.date), 1), new Date(dateRange.dates[dateRange.currentMinDateIndex])),
+  );
+};
+
+export const filterDataByIndexRange = <T extends { date: string }>(
+  data: T[],
+  dateRange: DateRangeSliderValues | null,
+): T[] => {
+  if (!dateRange) {
+    return data;
+  }
+  return data.filter(
+    (d) => Number(d.date) <= dateRange.currentMaxDateIndex && Number(d.date) >= dateRange.currentMinDateIndex,
   );
 };
 
@@ -58,7 +70,11 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
           <!-- min value -->
           <span class="text-wt-gray-medium text-xs max-sm:hidden">
             <!-- current date -->
-            {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
+            @if (filterType() === 'date') {
+              {{ values.dates | getDataByIndex: values.currentMinDateIndex | date: 'MMM d, y' }}
+            } @else {
+              Round: {{ values.dates | getDataByIndex: values.currentMinDateIndex }}
+            }
           </span>
 
           <!-- slider -->
@@ -78,7 +94,11 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
           <!-- max value -->
           <span class="text-wt-gray-medium text-xs max-sm:hidden">
             <!-- current date -->
-            {{ values.dates | getDataByIndex: values.currentMaxDateIndex | date: 'MMM d, y' }}
+            @if (filterType() === 'date') {
+              {{ values.dates | getDataByIndex: values.currentMaxDateIndex | date: 'MMM d, y' }}
+            } @else {
+              Round: {{ values.dates | getDataByIndex: values.currentMaxDateIndex }}
+            }
           </span>
         </div>
       </div>
@@ -100,6 +120,11 @@ export const filterDataByTimestamp = <T extends [number, ...number[]]>(
 })
 export class DateRangeSliderComponent implements ControlValueAccessor {
   readonly dateRangeSignal = signal<DateRangeSliderValues | null>(null);
+  /**
+   * date - filter by date,
+   * round - filter by index
+   */
+  readonly filterType = input<'date' | 'round'>('date');
 
   onChange: (data: DateRangeSliderValues) => void = () => {};
   onTouched = () => {};

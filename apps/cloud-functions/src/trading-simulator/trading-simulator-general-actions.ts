@@ -114,6 +114,12 @@ const joinSimulator = async (
       holdings: [],
       transactions: [],
       portfolioGrowth: [],
+      rank: {
+        rank: 0,
+        rankPrevious: 0,
+        rankChange: null,
+        date: '0',
+      },
     });
 
   // add user to the participants ranking doc

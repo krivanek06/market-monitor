@@ -14,7 +14,6 @@ import {
   UserData,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioCalculationService, PortfolioChange } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthCompareChartComponent,
@@ -29,12 +28,9 @@ import { GenericChartSeries, InputSource } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
   DropdownControlComponent,
-  FormMatInputWrapperComponent,
   GeneralCardComponent,
   PieChartComponent,
   SectionTitleComponent,
-  ShowMoreButtonComponent,
-  SortByKeyPipe,
 } from '@mm/shared/ui';
 import { UserSearchControlComponent } from '@mm/user/features';
 import { UserDisplayItemComponent } from '@mm/user/ui';
@@ -57,13 +53,9 @@ import { Subject, catchError, forkJoin, map, merge, of, pipe, scan, startWith, s
     PortfolioStateTransactionsTableComponent,
     GeneralCardComponent,
     PieChartComponent,
-    FormMatInputWrapperComponent,
     PortfolioHoldingsTableCardComponent,
     MatDialogModule,
-    SymbolSummaryDialogComponent,
     PortfolioTransactionsTableComponent,
-    SortByKeyPipe,
-    ShowMoreButtonComponent,
     MatButtonModule,
     MatIconModule,
     DropdownControlComponent,
@@ -104,7 +96,6 @@ import { Subject, catchError, forkJoin, map, merge, of, pipe, scan, startWith, s
 
     <!-- compare portfolio chart -->
     <div class="mb-10">
-      <app-section-title title="Portfolio Compare" />
       @if (selectedUsersData().isLoading) {
         <!-- loading skeleton -->
         <div data-testid="page-compare-loading" class="g-skeleton mt-6 h-[385px]"></div>
@@ -112,6 +103,7 @@ import { Subject, catchError, forkJoin, map, merge, of, pipe, scan, startWith, s
         <!-- chart -->
         <app-portfolio-growth-compare-chart
           data-testid="page-compare-portfolio-growth-compare-chart"
+          title="Portfolio Compare Chart"
           [heightPx]="400"
           [data]="selectedUsersData().data"
         />
