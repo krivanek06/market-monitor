@@ -13,30 +13,30 @@ import {
 } from '@mm/trading-simulator/ui';
 import { switchMap } from 'rxjs';
 import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulator-base.component';
-import { PageTradingSimulatorStatisticsButtonsComponent } from './components/page-trading-simulator-statistics-buttons/page-trading-simulator-statistics-buttons.component';
-import { PageTradingSimulatorStatisticsInfoComponent } from './components/page-trading-simulator-statistics-info/page-trading-simulator-statistics-info.component';
-import { PageTradingSimulatorStatisticsParticipantDataComponent } from './components/page-trading-simulator-statistics-participant-data/page-trading-simulator-statistics-participant-data.component';
+import { PageTradingSimulatorDetailsButtonsComponent } from './components/page-trading-simulator-details-buttons/page-trading-simulator-details-buttons.component';
+import { PageTradingSimulatorDetailsInfoComponent } from './components/page-trading-simulator-details-info/page-trading-simulator-details-info.component';
+import { PageTradingSimulatorDetailsParticipantDataComponent } from './components/page-trading-simulator-details-participant-data/page-trading-simulator-details-participant-data.component';
 
 @Component({
-  selector: 'app-page-trading-simulator-statistics',
+  selector: 'app-page-trading-simulator-details',
   standalone: true,
   imports: [
     MatIconModule,
     MatButtonModule,
-    PageTradingSimulatorStatisticsButtonsComponent,
+    PageTradingSimulatorDetailsButtonsComponent,
     SectionTitleComponent,
     TradingSimulatorSymbolPriceChartComponent,
     TradingSimulatorSymbolPriceChartLegendComponent,
     TradingSimulatorSymbolStatTableComponent,
     TradingSimulatorParticipantItemComponent,
     PortfolioTransactionsItemComponent,
-    PageTradingSimulatorStatisticsInfoComponent,
+    PageTradingSimulatorDetailsInfoComponent,
     GeneralCardComponent,
     SlicePipe,
     RangeDirective,
     DateReadablePipe,
     CurrencyPipe,
-    PageTradingSimulatorStatisticsParticipantDataComponent,
+    PageTradingSimulatorDetailsParticipantDataComponent,
   ],
   template: `
     @if (simulatorData(); as simulatorData) {
@@ -44,13 +44,13 @@ import { PageTradingSimulatorStatisticsParticipantDataComponent } from './compon
         <app-section-title title="Simulator: {{ simulatorData.name }}" />
 
         <!-- buttons to the owner -->
-        <app-page-trading-simulator-statistics-buttons [simulatorData]="simulatorData" />
+        <app-page-trading-simulator-details-buttons [simulatorData]="simulatorData" />
       </div>
 
       <!-- participant data -->
       @if (participant(); as participant) {
         <div class="mb-6">
-          <app-page-trading-simulator-statistics-participant-data
+          <app-page-trading-simulator-details-participant-data
             [participant]="participant"
             [simulatorData]="simulatorData"
             [simulatorSymbols]="simulatorSymbols()"
@@ -102,7 +102,7 @@ import { PageTradingSimulatorStatisticsParticipantDataComponent } from './compon
         <!-- right side -->
         <div>
           <!-- simulator info -->
-          <app-page-trading-simulator-statistics-info [tradingSimulator]="simulatorData" />
+          <app-page-trading-simulator-details-info [tradingSimulator]="simulatorData" />
         </div>
       </div>
 
@@ -140,7 +140,7 @@ import { PageTradingSimulatorStatisticsParticipantDataComponent } from './compon
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageTradingSimulatorStatisticsComponent extends PageTradingSimulatorBaseComponent {
+export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBaseComponent {
   /** participating user data - may not exists if user is only a spectator */
   readonly participant = toSignal(
     this.simulatorId$.pipe(

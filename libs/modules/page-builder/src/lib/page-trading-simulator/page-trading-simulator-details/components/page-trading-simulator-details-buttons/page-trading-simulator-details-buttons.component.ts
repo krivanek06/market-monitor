@@ -9,7 +9,7 @@ import { Confirmable, DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 
 @Component({
-  selector: 'app-page-trading-simulator-statistics-buttons',
+  selector: 'app-page-trading-simulator-details-buttons',
   standalone: true,
   imports: [MatButtonModule, MatIconModule],
   template: `
@@ -69,7 +69,7 @@ import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageTradingSimulatorStatisticsButtonsComponent {
+export class PageTradingSimulatorDetailsButtonsComponent {
   protected readonly tradingSimulatorService = inject(TradingSimulatorService);
   protected readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   protected readonly dialogServiceUtil = inject(DialogServiceUtil);

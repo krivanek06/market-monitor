@@ -131,8 +131,8 @@ export const appRoutes: Route[] = [
                 canActivate: [tradingSimulatorEditGuard],
               },
               {
-                path: `${ROUTES_TRADING_SIMULATOR.STATISTICS}/:id`,
-                loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorStatisticsComponent),
+                path: `${ROUTES_TRADING_SIMULATOR.DETAILS}/:id`,
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorDetailsComponent),
                 canActivate: [tradingSimulatorExistsGuard],
               },
             ],

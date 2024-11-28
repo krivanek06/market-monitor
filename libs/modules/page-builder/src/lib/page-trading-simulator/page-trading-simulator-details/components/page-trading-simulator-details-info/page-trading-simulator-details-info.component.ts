@@ -4,7 +4,7 @@ import { TradingSimulator } from '@mm/api-types';
 import { DateReadablePipe, GeneralCardComponent } from '@mm/shared/ui';
 
 @Component({
-  selector: 'app-page-trading-simulator-statistics-info',
+  selector: 'app-page-trading-simulator-details-info',
   standalone: true,
   imports: [GeneralCardComponent, DateReadablePipe, DatePipe, CurrencyPipe],
   template: `
@@ -79,7 +79,7 @@ import { DateReadablePipe, GeneralCardComponent } from '@mm/shared/ui';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageTradingSimulatorStatisticsInfoComponent {
+export class PageTradingSimulatorDetailsInfoComponent {
   readonly tradingSimulator = input.required<TradingSimulator>();
 
   // todo - every one second calculated round remaining time

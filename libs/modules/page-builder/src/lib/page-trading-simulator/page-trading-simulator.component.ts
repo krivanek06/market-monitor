@@ -165,6 +165,6 @@ export class PageTradingSimulatorComponent {
   }
 
   onStatisticsClicked(simulator: TradingSimulator) {
-    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.STATISTICS, simulator.id]);
+    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.DETAILS, simulator.id]);
   }
 }

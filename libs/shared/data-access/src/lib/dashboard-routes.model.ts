@@ -39,5 +39,5 @@ export enum ROUTES_GROUP {
 export enum ROUTES_TRADING_SIMULATOR {
   CREATE = 'create',
   EDIT = 'edit',
-  STATISTICS = 'statistics',
+  DETAILS = 'details',
 }

@@ -1,4 +1,4 @@
-import { CurrencyPipe, KeyValuePipe, NgClass } from '@angular/common';
+import { CurrencyPipe, KeyValuePipe, NgClass, SlicePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -25,11 +25,13 @@ import {
 } from '@mm/api-types';
 import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
 import {
+  PortfolioBalancePieChartComponent,
   PortfolioGrowthChartComponent,
   PortfolioHoldingsTableComponent,
   PortfolioStateComponent,
   PortfolioStateOtherComponent,
   PortfolioStateTransactionsComponent,
+  PortfolioTransactionsItemComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
@@ -39,7 +41,7 @@ import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
-  selector: 'app-page-trading-simulator-statistics-participant-data',
+  selector: 'app-page-trading-simulator-details-participant-data',
   standalone: true,
   imports: [
     GeneralCardComponent,
@@ -55,6 +57,9 @@ import { firstValueFrom } from 'rxjs';
     NgClass,
     CurrencyPipe,
     MatDialogModule,
+    PortfolioTransactionsItemComponent,
+    SlicePipe,
+    PortfolioBalancePieChartComponent,
   ],
   template: `
     <div class="flex items-center justify-between">
@@ -147,11 +152,18 @@ import { firstValueFrom } from 'rxjs';
           />
         </app-general-card>
       </div>
-      <div>
-        <!-- transactions -->
-        <app-section-title title="My Last Transactions" matIcon="history" class="mb-3" titleSize="lg" />
-        my last transaction
+      <div class="self-center">
+        <!-- chart -->
+        <app-portfolio-balance-pie-chart [heightPx]="250" [data]="participant().portfolioState" />
       </div>
+    </div>
+
+    <!-- transactions -->
+    <app-section-title title="My Last Transactions" matIcon="history" class="mb-3" titleSize="lg" />
+    <div>
+      @for (item of participant().transactions | slice: 0 : 5; track item.transactionId) {
+        <app-portfolio-transactions-item [transaction]="item" dateType="round" />
+      }
     </div>
 
     <!-- symbol template to trade -->
@@ -197,7 +209,7 @@ import { firstValueFrom } from 'rxjs';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageTradingSimulatorStatisticsParticipantDataComponent {
+export class PageTradingSimulatorDetailsParticipantDataComponent {
   protected readonly tradingSimulatorService = inject(TradingSimulatorService);
   protected readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly matDialog = inject(MatDialog);
