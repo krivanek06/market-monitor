@@ -220,7 +220,6 @@ import { Subject, catchError, forkJoin, map, merge, of, pipe, scan, startWith, s
         <app-portfolio-transactions-table
           data-testid="page-compare-transaction-table"
           [showSymbolFilter]="true"
-          [showTransactionFees]="true"
           [data]="selectedUser()?.userTransactions"
         />
       </div>

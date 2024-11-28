@@ -225,8 +225,6 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
     <!-- transaction history -->
     <app-portfolio-transactions-table
       data-testid="page-trading-portfolio-transactions-table"
-      [showTransactionFees]="state.isAccountDemoTrading()"
-      [showActionButton]="state.isAccountNormalBasic()"
       [data]="state.portfolioTransactions()"
       [showSymbolFilter]="true"
     />

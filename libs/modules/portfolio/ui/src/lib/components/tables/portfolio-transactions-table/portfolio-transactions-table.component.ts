@@ -18,7 +18,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioTransaction, PortfolioTransactionMore } from '@mm/api-types';
 import { InputSource } from '@mm/shared/data-access';
-import { compare, insertIntoArray } from '@mm/shared/general-util';
+import { compare } from '@mm/shared/general-util';
 import {
   BubblePaginationDirective,
   DefaultImgDirective,
@@ -102,12 +102,6 @@ import {
                 </div>
                 <!-- units -->
                 <div class="text-wt-gray-medium block text-sm sm:hidden">[{{ row.units }}]</div>
-                <!-- user -->
-                @if (showUser()) {
-                  <div class="block lg:hidden">
-                    <img class="h-6 w-6 rounded-full" appDefaultImg [src]="row.userPhotoURL" />
-                  </div>
-                }
               </div>
               <span class="block text-sm md:hidden"> {{ row.date | date: 'HH:mm, MMM d, y' }}</span>
             </div>
@@ -210,22 +204,18 @@ import {
         </td>
       </ng-container>
 
-      <!-- action -->
-      <ng-container matColumnDef="action">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Action</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          <div class="flex items-center gap-2">
-            <button type="button" mat-icon-button color="warn" (click)="onDeleteClick(row)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
+      <!-- rounds -->
+      <ng-container matColumnDef="rounds">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Round</th>
+        <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
+          {{ row.date }}
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns()" class="hidden sm:contents"></tr>
       <tr
         mat-row
-        *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"
+        *matRowDef="let row; columns: displayedColumns(); let even = even; let odd = odd"
         [ngClass]="{ 'bg-wt-gray-light': even }"
       ></tr>
 
@@ -238,13 +228,13 @@ import {
     </table>
 
     <!-- pagination -->
-    <div class="relative">
+    <div class="relative mt-2">
       <mat-paginator
         appBubblePagination
         showFirstLastButtons
         [length]="dataSource.filteredData.length"
         [appCustomLength]="dataSource.filteredData.length"
-        [pageSize]="18"
+        [pageSize]="pageSize()"
       />
     </div>
   `,
@@ -260,17 +250,7 @@ export class PortfolioTransactionsTableComponent {
 
   readonly data = input<PortfolioTransactionMore[] | null>();
   readonly showSymbolFilter = input(false);
-  readonly showTransactionFees = input(false);
-
-  /**
-   * Whether to show the action button column - delete button
-   */
-  readonly showActionButton = input(false);
-
-  /**
-   * Whether to show the user column
-   */
-  readonly showUser = input(false);
+  readonly pageSize = input(18);
 
   readonly showActionBarComp = computed(() => this.showSymbolFilter() && (this.data()?.length ?? 0) > 15);
 
@@ -297,9 +277,21 @@ export class PortfolioTransactionsTableComponent {
   );
   readonly tableSymbolFilterControl = new FormControl<string | null>(null);
 
+  readonly displayedColumns = input<string[]>([
+    'symbol',
+    'transactionType',
+    'totalValue',
+    'unitPrice',
+    'units',
+    'transactionFees',
+    'returnPrct',
+    'date',
+    // user, rounds
+  ]);
+
   constructor() {
+    // filter items in the table on symbol change
     this.tableSymbolFilterControl.valueChanges.subscribe((value) => {
-      console.log(value);
       const original = this.data() ?? [];
       // decide which data to show based on the filter
       const filtered = value ? original.filter((d) => d.symbol === value) : original;
@@ -317,27 +309,16 @@ export class PortfolioTransactionsTableComponent {
     untracked(() => {
       this.dataSource.data = sortedDataByDate;
       this.dataSource._updateChangeSubscription();
+
+      // reset filter on data change
+      this.tableSymbolFilterControl.setValue('', { emitEvent: false });
     });
   });
 
   readonly tableInitEffect = effect(() => {
     this.dataSource.paginator = this.paginator() ?? null;
   });
-
-  displayedColumnsEffect = effect(() => {
-    if (this.showTransactionFees() && !this.displayedColumns.includes('transactionFees')) {
-      this.displayedColumns = insertIntoArray(this.displayedColumns, 5, 'transactionFees');
-    }
-    if (this.showActionButton() && !this.displayedColumns.includes('action')) {
-      this.displayedColumns = [...this.displayedColumns, 'action'];
-    }
-    if (this.showUser() && !this.displayedColumns.includes('user')) {
-      this.displayedColumns = insertIntoArray(this.displayedColumns, 2, 'user');
-    }
-  });
-
   readonly dataSource = new MatTableDataSource<PortfolioTransactionMore>([]);
-  displayedColumns: string[] = ['symbol', 'transactionType', 'totalValue', 'unitPrice', 'units', 'returnPrct', 'date'];
 
   readonly paginator = viewChild(MatPaginator);
 

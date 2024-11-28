@@ -1,4 +1,4 @@
-import { CurrencyPipe, KeyValuePipe, NgClass, SlicePipe } from '@angular/common';
+import { CurrencyPipe, KeyValuePipe, NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -32,6 +32,7 @@ import {
   PortfolioStateOtherComponent,
   PortfolioStateTransactionsComponent,
   PortfolioTransactionsItemComponent,
+  PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
@@ -58,7 +59,7 @@ import { firstValueFrom } from 'rxjs';
     CurrencyPipe,
     MatDialogModule,
     PortfolioTransactionsItemComponent,
-    SlicePipe,
+    PortfolioTransactionsTableComponent,
     PortfolioBalancePieChartComponent,
   ],
   template: `
@@ -140,7 +141,7 @@ import { firstValueFrom } from 'rxjs';
       </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-x-4">
+    <div class="mb-12 grid grid-cols-3 gap-x-4">
       <div class="col-span-2">
         <!-- holdings -->
         <app-section-title title="My Holdings" matIcon="show_chart" titleSize="lg" class="mb-3" />
@@ -159,11 +160,34 @@ import { firstValueFrom } from 'rxjs';
     </div>
 
     <!-- transactions -->
-    <app-section-title title="My Last Transactions" matIcon="history" class="mb-3" titleSize="lg" />
-    <div>
-      @for (item of participant().transactions | slice: 0 : 5; track item.transactionId) {
-        <app-portfolio-transactions-item [transaction]="item" dateType="round" />
-      }
+    <div class="grid grid-cols-3 gap-x-4">
+      <app-portfolio-transactions-table
+        [data]="transactionState().lastOnes"
+        [showSymbolFilter]="true"
+        [pageSize]="15"
+        [displayedColumns]="displayedColumnsTransactionTable"
+        class="col-span-2"
+      />
+
+      <div class="grid gap-y-6 lg:pt-6">
+        <!-- best transactions -->
+        <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
+          @for (item of transactionState().best; track item.transactionId; let last = $last) {
+            <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+              <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+            </div>
+          }
+        </app-general-card>
+
+        <!-- worst transactions -->
+        <app-general-card title="Worst Returns" matIcon="trending_down" class="flex-1">
+          @for (item of transactionState().worst; track item.transactionId; let last = $last) {
+            <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+              <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+            </div>
+          }
+        </app-general-card>
+      </div>
     </div>
 
     <!-- symbol template to trade -->
@@ -240,6 +264,34 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
   // readonly portfolioGrowthAssets = computed(() =>
   //   getPortfolioGrowthAssets(this.participant().transactions, this.historicalPricesToCurrentRound()),
   // );
+
+  readonly displayedColumnsTransactionTable = [
+    'symbol',
+    'transactionType',
+    'totalValue',
+    'unitPrice',
+    'units',
+    'transactionFees',
+    'rounds',
+    'returnPrct',
+  ];
+
+  readonly transactionState = computed(() => {
+    const transactions = this.participant().transactions;
+
+    return {
+      latest: transactions.at(-1),
+      lastOnes: transactions,
+      best: transactions
+        .filter((d) => d.returnValue > 0)
+        .sort((a, b) => b.returnValue - a.returnValue)
+        .slice(0, 5),
+      worst: transactions
+        .filter((d) => d.returnValue < 0)
+        .sort((a, b) => a.returnValue - b.returnValue)
+        .slice(0, 5),
+    };
+  });
 
   readonly portfolioHolding = computed(() => {
     const pricesToSymbols = this.historicalPricesToCurrentRound();

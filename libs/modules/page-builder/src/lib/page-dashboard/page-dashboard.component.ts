@@ -207,7 +207,6 @@ import { GeneralCardComponent, PieChartComponent } from '@mm/shared/ui';
             'xl:col-span-2': hasEnoughTransactions(),
             'xl:col-span-3': !hasEnoughTransactions(),
           }"
-          [showTransactionFees]="!!stateRef.isAccountDemoTrading()"
           [data]="stateRef.portfolioTransactions()"
           [showSymbolFilter]="true"
         />
