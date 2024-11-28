@@ -1,10 +1,16 @@
-import { CurrencyPipe, SlicePipe } from '@angular/common';
+import { CurrencyPipe, NgClass, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { PortfolioTransactionsItemComponent } from '@mm/portfolio/ui';
-import { DateReadablePipe, GeneralCardComponent, RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
+import { PortfolioTransactionsItemComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
+import {
+  DateReadablePipe,
+  GeneralCardComponent,
+  RangeDirective,
+  SectionTitleComponent,
+  SortReversePipe,
+} from '@mm/shared/ui';
 import {
   TradingSimulatorParticipantItemComponent,
   TradingSimulatorSymbolPriceChartComponent,
@@ -36,7 +42,10 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
     RangeDirective,
     DateReadablePipe,
     CurrencyPipe,
+    PortfolioTransactionsTableComponent,
     PageTradingSimulatorDetailsParticipantDataComponent,
+    NgClass,
+    SortReversePipe,
   ],
   template: `
     @if (simulatorData(); as simulatorData) {
@@ -125,11 +134,42 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
       TODO TODO
 
       <!-- display transactions -->
-      <app-section-title title="Transaction History" matIcon="history" class="mb-3" titleSize="lg" />
       <div class="grid grid-cols-3 gap-x-4">
-        <app-general-card title="Last Transactions"> </app-general-card>
-        <app-general-card title="Best Transactions"> </app-general-card>
-        <app-general-card title="Worst Transactions"> </app-general-card>
+        <app-portfolio-transactions-table
+          [data]="simulatorAggregationTransactions()?.lastTransactions | sortReverse"
+          [showSymbolFilter]="true"
+          [pageSize]="15"
+          [displayedColumns]="displayedColumnsTransactionTable"
+          class="col-span-2"
+        />
+
+        <div class="grid gap-y-6 lg:pt-6">
+          <!-- best transactions -->
+          <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
+            @for (
+              item of simulatorAggregationTransactions()?.bestTransactions | slice: 0 : 5;
+              track item.transactionId;
+              let last = $last
+            ) {
+              <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+                <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+              </div>
+            }
+          </app-general-card>
+
+          <!-- worst transactions -->
+          <app-general-card title="Worst Returns" matIcon="trending_down" class="flex-1">
+            @for (
+              item of simulatorAggregationTransactions()?.worstTransactions | slice: 0 : 5;
+              track item.transactionId;
+              let last = $last
+            ) {
+              <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+                <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+              </div>
+            }
+          </app-general-card>
+        </div>
       </div>
     }
   `,
@@ -158,4 +198,16 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
       switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorAggregationParticipants(selectedId)),
     ),
   );
+
+  readonly displayedColumnsTransactionTable = [
+    'symbol',
+    'transactionType',
+    'user',
+    'totalValue',
+    'unitPrice',
+    'units',
+    'transactionFees',
+    'rounds',
+    'returnPrctOnly',
+  ];
 }

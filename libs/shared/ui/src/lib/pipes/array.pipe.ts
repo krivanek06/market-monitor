@@ -54,7 +54,7 @@ export class SortByKeyPipe<T> implements PipeTransform {
   standalone: true,
 })
 export class SortReversePipe<T> implements PipeTransform {
-  transform(values: (T extends any[] ? T[] : 'Do not other than array') | null): T[] {
+  transform(values: (T extends unknown[] ? T[] : 'Do not other than array') | null): T[] {
     if (!values || typeof values === 'string') {
       return [];
     }

@@ -53,7 +53,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
   const nextRound = simulator.currentRound + 1;
 
   // load transactions
-  const lastTransactions = await transactionCollectionRef.orderBy('date', 'desc').limit(100).get();
+  const lastTransactions = await transactionCollectionRef.orderBy('dateExecuted', 'desc').limit(100).get();
   const bestTransactions = await transactionCollectionRef
     .where('returnValue', '>', 0)
     .orderBy('returnValue', 'desc')

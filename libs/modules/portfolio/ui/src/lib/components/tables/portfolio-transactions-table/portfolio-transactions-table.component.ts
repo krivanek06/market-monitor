@@ -196,6 +196,18 @@ import {
         </td>
       </ng-container>
 
+      <!-- return only -->
+      <ng-container matColumnDef="returnPrctOnly">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Return %</th>
+        <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
+          <div
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [changeValues]="{ changePercentage: row.returnChange }"
+          ></div>
+        </td>
+      </ng-container>
+
       <!-- date -->
       <ng-container matColumnDef="date">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Date</th>
@@ -206,7 +218,7 @@ import {
 
       <!-- rounds -->
       <ng-container matColumnDef="rounds">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Round</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden md:table-cell">Round</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           {{ row.date }}
         </td>
@@ -286,7 +298,7 @@ export class PortfolioTransactionsTableComponent {
     'transactionFees',
     'returnPrct',
     'date',
-    // user, rounds
+    // user, rounds, returnPrctOnly
   ]);
 
   constructor() {

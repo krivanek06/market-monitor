@@ -2,6 +2,7 @@ import {
   OutstandingOrder,
   PortfolioStateHoldingBase,
   PortfolioTransaction,
+  PortfolioTransactionMore,
   TRANSACTION_FEE_PRCT,
   UserBaseMin,
 } from '@mm/api-types';
@@ -94,6 +95,22 @@ export const createTransaction = (
   };
 
   return result;
+};
+
+export const createTransactionMoreInfo = (
+  userBaseMin: UserBaseMin,
+  holdings: PortfolioStateHoldingBase[],
+  input: OutstandingOrder,
+  currentPrice: number,
+): PortfolioTransactionMore => {
+  const transaction = createTransaction(userBaseMin, holdings, input, currentPrice);
+
+  return {
+    ...transaction,
+    userDisplayName: userBaseMin.personal.displayName,
+    userPhotoURL: userBaseMin.personal.photoURL,
+    userDisplayNameInitials: userBaseMin.personal.displayNameInitials,
+  };
 };
 
 export const getTransactionFeesBySpending = (spending: number) => roundNDigits(spending * TRANSACTION_FEE_PRCT);

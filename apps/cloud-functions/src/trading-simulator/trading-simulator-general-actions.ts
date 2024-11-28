@@ -21,7 +21,7 @@ import {
 } from '@mm/api-types';
 import {
   createEmptyPortfolioState,
-  createTransaction,
+  createTransactionMoreInfo,
   getPortfolioStateHoldingBaseByNewTransactionUtil,
   getTransactionFees,
   roundNDigits,
@@ -232,7 +232,12 @@ const createOutstandingOrder = async (
     }
 
     // transform to transaction
-    const transaction = createTransaction(participant.userData, participant.holdings, data.order, symbolData.price);
+    const transaction = createTransactionMoreInfo(
+      participant.userData,
+      participant.holdings,
+      data.order,
+      symbolData.price,
+    );
     transaction.date = String(simulator.currentRound);
 
     // recalculate portfolio state
