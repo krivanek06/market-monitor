@@ -26,7 +26,7 @@ import { DefaultImgDirective } from '../../../directives';
     MatButtonModule,
   ],
   template: `
-    <mat-form-field>
+    <mat-form-field [hintLabel]="hintText()">
       <!-- label -->
       <mat-label> {{ inputCaption() }}</mat-label>
 
@@ -194,6 +194,8 @@ export class DropdownControlComponent<T> implements ControlValueAccessor {
    * inside mat-select-trigger
    */
   readonly internalSelectValue = signal<InputSource<T> | undefined | null>(undefined);
+
+  readonly hintText = input<string>('');
 
   /**
    * data which are displayed in MatOption for autocomplete

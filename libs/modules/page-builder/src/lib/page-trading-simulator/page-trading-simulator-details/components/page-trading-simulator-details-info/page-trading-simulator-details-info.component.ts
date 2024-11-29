@@ -18,7 +18,12 @@ import { DateReadablePipe, GeneralCardComponent } from '@mm/shared/ui';
 
         <div class="g-item-wrapper">
           <div>Round Remaining</div>
-          <div>{{ remainingTimeSeconds() | dateReadable: 'seconds' }}</div>
+          <div>{{ (remainingTimeSeconds() | dateReadable: 'seconds') || 0 }}</div>
+        </div>
+
+        <div class="g-item-wrapper">
+          <div>Next Round</div>
+          <div>{{ tradingSimulator().nextRoundTime | date: 'HH:mm MMM d, y' }}</div>
         </div>
 
         <div class="g-item-wrapper">
@@ -32,23 +37,23 @@ import { DateReadablePipe, GeneralCardComponent } from '@mm/shared/ui';
         </div>
 
         <div class="g-item-wrapper">
-          <span>Start</span>
-          <span>{{ tradingSimulator().startDateTime | date: 'HH:mm MMM d, y' }}</span>
+          <div>Start</div>
+          <div>{{ tradingSimulator().startDateTime | date: 'HH:mm MMM d, y' }}</div>
         </div>
 
         <div class="g-item-wrapper">
-          <span>End</span>
-          <span>{{ tradingSimulator().endDateTime | date: 'HH:mm MMM d, y' }}</span>
+          <div>End</div>
+          <div>{{ tradingSimulator().endDateTime | date: 'HH:mm MMM d, y' }}</div>
         </div>
 
         <div class="g-item-wrapper">
-          <span>Total Time</span>
-          <span>{{ tradingSimulator().totalTimeMinutes | dateReadable: 'minutes' }}</span>
+          <div>Total Time</div>
+          <div>{{ tradingSimulator().totalTimeMinutes | dateReadable: 'minutes' }}</div>
         </div>
 
         <div class="g-item-wrapper">
-          <span>Starting Cash</span>
-          <span>{{ tradingSimulator().cashStartingValue | currency }}</span>
+          <div>Starting Cash</div>
+          <div>{{ tradingSimulator().cashStartingValue | currency }}</div>
         </div>
       </app-general-card>
 
@@ -57,13 +62,13 @@ import { DateReadablePipe, GeneralCardComponent } from '@mm/shared/ui';
         <div class="grid grid-cols-2">
           @for (item of tradingSimulator().cashAdditionalIssued; track $index) {
             <div class="g-item-wrapper">
-              <span>Round</span>
-              <span>{{ item.issuedOnRound }}</span>
+              <div>Round</div>
+              <div>{{ item.issuedOnRound }}</div>
             </div>
 
             <div class="g-item-wrapper border-wt-border border-b">
-              <span>Cash</span>
-              <span>{{ item.value | currency }}</span>
+              <div>Cash</div>
+              <div>{{ item.value | currency }}</div>
             </div>
           } @empty {
             <div class="border-wt-border col-span-2 border-b p-2 pb-4 text-center">No cash issued</div>

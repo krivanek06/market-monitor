@@ -134,7 +134,8 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
     // round to nearest because may be some time differences when this is updated and when CF runs to update it again
     nextRoundTime: roundToNearestMinutes(addMinutes(new Date(), simulator.oneRoundDurationMinutes), {
       // casting should be ok because it expects a {Unit extends number}
-      nearestTo: simulator.oneRoundDurationMinutes as any,
+      nearestTo: 5,
+      roundingMethod: 'floor', // round down
     }).toString(),
     currentRound: FieldValue.increment(1),
   } satisfies FieldValuePartial<TradingSimulator>);

@@ -70,7 +70,7 @@ import { firstValueFrom } from 'rxjs';
         <span>{{ simulatorData().currentRound }}</span>
         <span>|</span>
         <span class="text-wt-gray-dark">Remaining:</span>
-        <span>{{ remainingTimeSeconds() | dateReadable: 'seconds' }}</span>
+        <span>{{ (remainingTimeSeconds() | dateReadable: 'seconds') || 0 }}</span>
       </div>
 
       <div class="child:w-[180px] flex gap-4">

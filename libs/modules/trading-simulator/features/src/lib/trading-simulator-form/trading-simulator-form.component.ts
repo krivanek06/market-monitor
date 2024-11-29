@@ -11,6 +11,7 @@ import { TRADING_SIMULATOR_MAX_ROUNDS, TradingSimulator, TradingSimulatorSymbol 
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import {
   dateTimeInFuture,
+  InputSource,
   intervalValidator,
   maxLengthValidator,
   minLengthValidator,
@@ -30,6 +31,7 @@ import {
 import {
   DatePickerComponent,
   DateReadablePipe,
+  DropdownControlComponent,
   FormMatInputWrapperComponent,
   GeneralCardComponent,
   InputTypeDateTimePickerConfig,
@@ -67,6 +69,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
     TruncatePipe,
     TradingSimulatorInfoCreateButtonComponent,
     TradingSimulatorFormSymbolComponent,
+    DropdownControlComponent,
   ],
   template: `
     <div class="grid grid-cols-3 gap-x-10">
@@ -110,12 +113,12 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           />
 
           <!-- round interval -->
-          <app-form-mat-input-wrapper
+          <app-dropdown-control
             inputCaption="round interval"
             hintText="On round interval in minuted, from {{ constFields.roundIntervalMin }} to {{
               constFields.roundIntervalMax
             }}"
-            inputType="NUMBER"
+            [inputSource]="tradingSimulatorRoundIntervalInputSource"
             [formControl]="form.controls.roundIntervalMin"
           />
 
@@ -440,6 +443,37 @@ export class TradingSimulatorFormComponent {
     roundIntervalMax: 3600,
   } as const;
 
+  readonly tradingSimulatorRoundIntervalInputSource = [
+    {
+      caption: '5 min',
+      value: 5,
+    },
+    {
+      caption: '10 min',
+      value: 10,
+    },
+    {
+      caption: '15 min',
+      value: 15,
+    },
+    {
+      caption: '20 min',
+      value: 20,
+    },
+    {
+      caption: '30 min',
+      value: 30,
+    },
+    {
+      caption: '1 hour',
+      value: 60,
+    },
+    {
+      caption: '2 hour',
+      value: 120,
+    },
+  ] as const satisfies InputSource<number>[];
+
   /**
    * provide an existing trading simulator to edit it
    */
@@ -466,7 +500,7 @@ export class TradingSimulatorFormComponent {
     // how much time to (in seconds) to wait between rounds
     roundIntervalMin: new FormControl(5, {
       nonNullable: true,
-      validators: [requiredValidator, positiveNumberValidator, intervalValidator(5, 3600)],
+      validators: [requiredValidator, positiveNumberValidator],
     }),
     // code to join the trading simulator
     invitationCode: new FormControl(generateRandomString(6), { nonNullable: true, validators: [requiredValidator] }),
