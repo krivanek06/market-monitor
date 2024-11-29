@@ -18,7 +18,7 @@ import { DateReadablePipe, GeneralCardComponent } from '@mm/shared/ui';
 
         <div class="g-item-wrapper">
           <div>Round Remaining</div>
-          <div>4min 22 sec.</div>
+          <div>{{ remainingTimeSeconds() | dateReadable: 'seconds' }}</div>
         </div>
 
         <div class="g-item-wrapper">
@@ -81,6 +81,5 @@ import { DateReadablePipe, GeneralCardComponent } from '@mm/shared/ui';
 })
 export class PageTradingSimulatorDetailsInfoComponent {
   readonly tradingSimulator = input.required<TradingSimulator>();
-
-  // todo - every one second calculated round remaining time
+  readonly remainingTimeSeconds = input<number>(0);
 }

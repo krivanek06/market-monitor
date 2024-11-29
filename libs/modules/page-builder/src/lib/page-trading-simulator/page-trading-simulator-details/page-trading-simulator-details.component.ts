@@ -1,6 +1,6 @@
 import { CurrencyPipe, NgClass, SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, effect, untracked } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,8 +25,9 @@ import {
   TradingSimulatorSymbolPriceChartLegendComponent,
   TradingSimulatorSymbolStatTableComponent,
 } from '@mm/trading-simulator/ui';
+import { addSeconds, differenceInSeconds } from 'date-fns';
 import { filterNil } from 'ngxtension/filter-nil';
-import { first, forkJoin, iif, of, switchMap } from 'rxjs';
+import { first, forkJoin, iif, map, of, switchMap, timer } from 'rxjs';
 import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulator-base.component';
 import { PageTradingSimulatorDetailsButtonsComponent } from './components/page-trading-simulator-details-buttons/page-trading-simulator-details-buttons.component';
 import { PageTradingSimulatorDetailsInfoComponent } from './components/page-trading-simulator-details-info/page-trading-simulator-details-info.component';
@@ -76,6 +77,7 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
             [simulatorData]="simulatorData"
             [simulatorSymbols]="simulatorSymbols()"
             [symbolAggregations]="simulatorAggregationSymbols()"
+            [remainingTimeSeconds]="remainingTimeSeconds()"
           />
         </div>
       }
@@ -123,7 +125,10 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
         <!-- right side -->
         <div>
           <!-- simulator info -->
-          <app-page-trading-simulator-details-info [tradingSimulator]="simulatorData" />
+          <app-page-trading-simulator-details-info
+            [tradingSimulator]="simulatorData"
+            [remainingTimeSeconds]="remainingTimeSeconds()"
+          />
         </div>
       </div>
 
@@ -161,7 +166,9 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
           inputType="MULTISELECT"
         />
       </div>
-      <app-portfolio-growth-compare-chart filterType="round" [data]="selectedParticipants()" />
+      <div class="mb-8">
+        <app-portfolio-growth-compare-chart filterType="round" [data]="selectedParticipants()" />
+      </div>
 
       <!-- display transactions -->
       <div class="grid grid-cols-3 gap-x-4">
@@ -170,6 +177,7 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
           [showSymbolFilter]="true"
           [pageSize]="15"
           [displayedColumns]="displayedColumnsTransactionTable"
+          title="Transaction History - Last 100"
           class="col-span-2"
         />
 
@@ -225,10 +233,22 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
     ),
   );
 
+  readonly remainingTimeSeconds = toSignal(
+    toObservable(this.simulatorData).pipe(
+      switchMap((simulatorData) =>
+        simulatorData
+          ? timer(0, 1000).pipe(map(() => differenceInSeconds(simulatorData?.nextRoundTime, new Date())))
+          : of(0),
+      ),
+    ),
+    { initialValue: 0 },
+  );
+
   readonly participantRanking = toSignal(
     this.simulatorId$.pipe(
       switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorAggregationParticipants(selectedId)),
     ),
+    { initialValue: [] },
   );
 
   /** dropdown of participants in the simulator */
@@ -267,9 +287,45 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
     { initialValue: [] },
   );
 
-  selectedParticipantsww = effect(() => console.log('selectedParticipants', this.selectedParticipants()));
+  /**
+   * add top N participants (and myself if I am a participant) into the compare chart
+   */
+  readonly displayParticipantsInCompareChart = effect(() => {
+    const participant = this.participant();
+    const participants = this.participantRanking();
+    const selectedParticipants = this.selectedParticipantsControl.value;
+
+    console.log('edkooooo', addSeconds(new Date(), 3).toString());
+
+    console.log({
+      participant,
+      participants,
+    });
+
+    untracked(() => {
+      // set the selected participants to the top 5 users - using 1 because ignoring the current user
+      if (selectedParticipants.length <= 1) {
+        console.log('displayParticipantsInCompareChart adding participants');
+        // top users except the current user
+        const topUsers = participants
+          .filter((d) => d.userData.id !== participant?.userData.id)
+          .slice(0, 5)
+          .map((d) => d.userData);
+
+        // set the selected participants
+        this.selectedParticipantsControl.patchValue(topUsers);
+      }
+
+      // add current user if not there
+      if (participant?.userData && !selectedParticipants.find((d) => d.id === participant?.userData.id)) {
+        console.log('displayParticipantsInCompareChart adding myself');
+        this.selectedParticipantsControl.patchValue([...selectedParticipants, participant.userData]);
+      }
+    });
+  });
 
   // todo - reduce number of users to be display on smaller screen and add a "show more" button
+  // todo - display top 5 users in the compare chart + myself as participant
 
   readonly displayedColumnsTransactionTable = [
     'symbol',

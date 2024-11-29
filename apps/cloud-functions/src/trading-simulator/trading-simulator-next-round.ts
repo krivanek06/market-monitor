@@ -6,12 +6,8 @@ import {
   TradingSimulatorAggregationSymbols,
   TradingSimulatorParticipant,
 } from '@mm/api-types';
-import {
-  getCurrentDateDetailsFormat,
-  getPortfolioStateHoldingsUtil,
-  transformPortfolioStateHoldingToPortfolioState,
-} from '@mm/shared/general-util';
-import { addMinutes } from 'date-fns';
+import { getPortfolioStateHoldingsUtil, transformPortfolioStateHoldingToPortfolioState } from '@mm/shared/general-util';
+import { addMinutes, roundToNearestMinutes } from 'date-fns';
 import { FieldValue } from 'firebase-admin/firestore';
 import {
   tradingSimulatorAggregationParticipantsDocRef,
@@ -135,7 +131,11 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
 
   // update simulator data
   tradingSimulatorDocRef(simulator.id).update({
-    nextRoundTime: getCurrentDateDetailsFormat(addMinutes(simulator.nextRoundTime, simulator.oneRoundDurationMinutes)),
+    // round to nearest because may be some time differences when this is updated and when CF runs to update it again
+    nextRoundTime: roundToNearestMinutes(addMinutes(new Date(), simulator.oneRoundDurationMinutes), {
+      // casting should be ok because it expects a {Unit extends number}
+      nearestTo: simulator.oneRoundDurationMinutes as any,
+    }).toString(),
     currentRound: FieldValue.increment(1),
   } satisfies FieldValuePartial<TradingSimulator>);
 

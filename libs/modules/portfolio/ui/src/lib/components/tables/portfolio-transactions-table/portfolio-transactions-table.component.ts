@@ -49,7 +49,7 @@ import {
   template: `
     <!-- title -->
     <app-section-title
-      title="Transaction History"
+      [title]="title()"
       matIcon="history"
       class="mb-5"
       [ngClass]="{
@@ -263,6 +263,7 @@ export class PortfolioTransactionsTableComponent {
   readonly data = input<PortfolioTransactionMore[] | null>();
   readonly showSymbolFilter = input(false);
   readonly pageSize = input(18);
+  readonly title = input<string>('Transaction History');
 
   readonly showActionBarComp = computed(() => this.showSymbolFilter() && (this.data()?.length ?? 0) > 15);
 

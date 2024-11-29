@@ -37,7 +37,7 @@ import {
 import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { getPortfolioStateHoldingBaseByTransactionsUtil, roundNDigits } from '@mm/shared/general-util';
-import { GeneralCardComponent, SectionTitleComponent } from '@mm/shared/ui';
+import { DateReadablePipe, GeneralCardComponent, SectionTitleComponent } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { firstValueFrom } from 'rxjs';
 
@@ -61,10 +61,17 @@ import { firstValueFrom } from 'rxjs';
     PortfolioTransactionsItemComponent,
     PortfolioTransactionsTableComponent,
     PortfolioBalancePieChartComponent,
+    DateReadablePipe,
   ],
   template: `
     <div class="flex items-center justify-between">
-      <div class="text-wt-gray-medium text-xl">Round: {{ simulatorData().currentRound }} | Remaining: TODO TODO</div>
+      <div class="space-x-2 text-xl">
+        <span class="text-wt-gray-dark">Round:</span>
+        <span>{{ simulatorData().currentRound }}</span>
+        <span>|</span>
+        <span class="text-wt-gray-dark">Remaining:</span>
+        <span>{{ remainingTimeSeconds() | dateReadable: 'seconds' }}</span>
+      </div>
 
       <div class="child:w-[180px] flex gap-4">
         <button
@@ -242,6 +249,7 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
   readonly simulatorData = input.required<TradingSimulator>();
   readonly simulatorSymbols = input.required<TradingSimulatorSymbol[]>();
   readonly symbolAggregations = input<TradingSimulatorAggregationSymbols>();
+  readonly remainingTimeSeconds = input<number>(0);
 
   readonly symbolTradeRef = viewChild<TemplateRef<HTMLElement>>('symbolTradeRef');
 
