@@ -233,7 +233,7 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
   readonly remainingTimeSeconds = toSignal(
     toObservable(this.simulatorData).pipe(
       switchMap((simulatorData) =>
-        simulatorData
+        simulatorData && simulatorData.state === 'started'
           ? timer(0, 1000).pipe(map(() => differenceInSeconds(simulatorData?.nextRoundTime, new Date())))
           : of(0),
       ),

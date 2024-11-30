@@ -23,7 +23,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
           {{ currentPrice() | currency }}
         </div>
 
-        @if (previousPrice() !== 0) {
+        @if (previousPrice() !== 0 && this.simulator().currentRound >= 2) {
           <div
             appPercentageIncrease
             [useCurrencySign]="true"
@@ -55,7 +55,8 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
   readonly authUser = input.required<UserBaseMin>();
   readonly currentPrice = computed(() => {
     const currentRound = this.simulator().currentRound;
-    return this.simulatorSymbol().historicalDataModified.at(currentRound - 1) ?? 0;
+    const usedCurrentRound = currentRound === 0 ? 0 : currentRound - 1;
+    return this.simulatorSymbol().historicalDataModified.at(usedCurrentRound) ?? 0;
   });
   readonly previousPrice = computed(() => {
     const currentRound = this.simulator().currentRound;

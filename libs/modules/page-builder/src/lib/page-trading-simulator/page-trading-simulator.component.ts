@@ -22,115 +22,133 @@ import { TradingSimulatorDisplayCardComponent, TradingSimulatorDisplayItemCompon
     MatDividerModule,
   ],
   template: `
-    <div class="grid grid-cols-3 gap-x-10">
-      <div class="col-span-2">
-        <div class="mb-4 flex items-center justify-between">
-          <app-section-title title="My Simulations" />
+    <div class="grid gap-6">
+      <!-- user has privileges -->
 
-          <!-- create button -->
-          <button
-            (click)="onCreateSimulator()"
-            [disabled]="!isCreatingSimulatorEnabled()"
-            class="h-10"
-            type="button"
-            mat-stroked-button
-            color="primary"
-          >
-            <mat-icon>add</mat-icon>
-            create simulator
-          </button>
+      @if (userData().featureAccess?.createTradingSimulator) {
+        <div>
+          <div class="mb-4 flex items-center justify-between">
+            <app-section-title title="My Created Simulations" />
+
+            <!-- create button -->
+            <button
+              (click)="onCreateSimulator()"
+              [disabled]="!isCreatingSimulatorEnabled()"
+              class="h-10"
+              type="button"
+              mat-stroked-button
+              color="primary"
+            >
+              <mat-icon>add</mat-icon>
+              create simulator
+            </button>
+          </div>
+
+          <!-- simulators by the owner -->
+          <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            @for (item of simulatorsByOwner(); track item.id) {
+              <app-trading-simulator-display-card
+                (editClicked)="onEditSimulator(item)"
+                (statsClicked)="onStatisticsClicked(item)"
+                [tradingSimulator]="item"
+                [authUser]="userData()"
+              />
+            }
+          </div>
+        </div>
+      }
+
+      <div>
+        <mat-divider />
+      </div>
+
+      <!-- simulator the user is participating in -->
+      @if ((simulatorsByParticipant()?.length ?? 0) > 0) {
+        <div>
+          <app-section-title title="My Simulations" class="mb-3" titleSize="lg" />
+
+          <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            @for (item of simulatorsByParticipant(); track item.id) {
+              <app-trading-simulator-display-card
+                (statsClicked)="onStatisticsClicked(item)"
+                [tradingSimulator]="item"
+                [authUser]="userData()"
+              />
+            }
+          </div>
         </div>
 
-        <!-- simulators by the owner -->
-        <div class="grid grid-cols-2 gap-4">
-          @for (item of simulatorsByOwner(); track item.id) {
+        <div>
+          <mat-divider />
+        </div>
+      }
+
+      <!-- all running simulators -->
+      <div>
+        <app-section-title
+          title="Running Simulators: {{ tradingSimulatorLatestData().started.length }}"
+          class="mb-3"
+          titleSize="lg"
+        />
+
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          @for (item of tradingSimulatorLatestData().started; track item.id) {
             <app-trading-simulator-display-card
-              (editClicked)="onEditSimulator(item)"
               (statsClicked)="onStatisticsClicked(item)"
               [tradingSimulator]="item"
               [authUser]="userData()"
             />
-          }
-        </div>
-
-        <!-- simulators by the owner -->
-        <div class="grid grid-cols-2 gap-4">
-          @for (item of simulatorsByParticipant(); track item.id) {
-            <app-trading-simulator-display-card
-              (statsClicked)="onStatisticsClicked(item)"
-              [tradingSimulator]="item"
-              [authUser]="userData()"
-            />
+          } @empty {
+            <div class="p-6 text-center">No running simulators</div>
           }
         </div>
       </div>
 
-      <!-- right side -->
       <div>
-        <!-- running simulators -->
-        <div class="min-h-[200px]">
-          <app-section-title
-            title="Running Simulators: {{ tradingSimulatorLatestData().started.length }}"
-            class="mb-3"
-            titleSize="lg"
-          />
-          <div>
-            @for (item of tradingSimulatorLatestData().started; track item.id) {
-              <app-trading-simulator-display-item
-                (itemClicked)="onStatisticsClicked(item)"
-                [tradingSimulator]="item"
-                [clickable]="true"
-              />
-            } @empty {
-              <div class="p-6 text-center">No running simulators</div>
-            }
-          </div>
-        </div>
+        <mat-divider />
+      </div>
 
-        <div class="py-4">
-          <mat-divider />
-        </div>
+      <!-- all live simulators -->
+      <div>
+        <app-section-title
+          title="Upcoming Simulators: {{ tradingSimulatorLatestData().live.length }}"
+          class="mb-3"
+          titleSize="lg"
+        />
 
-        <!-- live simulators -->
-        <div class="min-h-[200px]">
-          <app-section-title
-            title="Upcoming Simulators: {{ tradingSimulatorLatestData().live.length }}"
-            class="mb-3"
-            titleSize="lg"
-          />
-          <div>
-            @for (item of tradingSimulatorLatestData().live; track item.id) {
-              <app-trading-simulator-display-item
-                (itemClicked)="onStatisticsClicked(item)"
-                [tradingSimulator]="item"
-                [clickable]="true"
-              />
-            } @empty {
-              <div class="p-6 text-center">No running simulators</div>
-            }
-          </div>
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          @for (item of tradingSimulatorLatestData().live; track item.id) {
+            <app-trading-simulator-display-card
+              (statsClicked)="onStatisticsClicked(item)"
+              [tradingSimulator]="item"
+              [authUser]="userData()"
+            />
+          } @empty {
+            <div class="p-6 text-center">No upcoming simulators</div>
+          }
         </div>
+      </div>
 
-        <div class="py-4">
+      @if (tradingSimulatorLatestData().historical.length > 0) {
+        <div>
           <mat-divider />
         </div>
 
         <!-- historical simulators -->
-        <div class="min-h-[200px]">
+        <div>
           <app-section-title title="Ended Simulators" class="mb-3" titleSize="lg" />
-          <div>
+
+          <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             @for (item of tradingSimulatorLatestData().historical; track item.id) {
-              <app-trading-simulator-display-item
-                (itemClicked)="onStatisticsClicked(item)"
+              <app-trading-simulator-display-card
+                (statsClicked)="onStatisticsClicked(item)"
                 [tradingSimulator]="item"
-                [clickable]="true"
+                [authUser]="userData()"
               />
-            } @empty {
-              <div class="p-6 text-center">No running simulators</div>
             }
           </div>
         </div>
-      </div>
+      }
     </div>
   `,
   styles: `

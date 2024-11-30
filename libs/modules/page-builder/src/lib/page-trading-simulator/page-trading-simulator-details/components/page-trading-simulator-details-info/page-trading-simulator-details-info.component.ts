@@ -17,7 +17,7 @@ import { DateReadablePipe, GeneralCardComponent } from '@mm/shared/ui';
         </div>
 
         <div class="g-item-wrapper">
-          <div>Round Remaining</div>
+          <div>Remaining</div>
           <div>{{ (remainingTimeSeconds() | dateReadable: 'seconds') || 0 }}</div>
         </div>
 
