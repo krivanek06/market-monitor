@@ -69,6 +69,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
       ...acc,
       [symbol]: {
         ...data,
+        pricePrevious: data.price,
         price: symbolsData.find((d) => d.symbol === symbol)?.historicalDataModified.at(simulator.currentRound) ?? 0,
       } satisfies TradingSimulatorAggregationSymbols[0],
     }),

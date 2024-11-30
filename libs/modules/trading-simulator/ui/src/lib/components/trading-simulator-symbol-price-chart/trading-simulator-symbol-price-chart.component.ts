@@ -3,13 +3,13 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { TradingSimulator, TradingSimulatorSymbol, UserBaseMin } from '@mm/api-types';
 import { ChartConstructor, ColorScheme } from '@mm/shared/data-access';
 import { formatValueIntoCurrency } from '@mm/shared/general-util';
-import { DefaultImgDirective } from '@mm/shared/ui';
+import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 @Component({
   selector: 'app-trading-simulator-symbol-price-chart',
   standalone: true,
-  imports: [HighchartsChartModule, DefaultImgDirective, CurrencyPipe],
+  imports: [HighchartsChartModule, DefaultImgDirective, CurrencyPipe, PercentageIncreaseDirective],
   template: `
     <div class="flex items-center justify-between">
       <!-- name + image -->
@@ -18,8 +18,21 @@ import { HighchartsChartModule } from 'highcharts-angular';
         <div class="text-wt-primary text-sm">{{ simulatorSymbol().symbol }}</div>
       </div>
       <!-- current price -->
-      <div class="text-wt-gray-medium text-sm">
-        {{ currentPrice() | currency }}
+      <div class="flex items-center gap-2 text-sm">
+        <div class="text-wt-gray-medium">
+          {{ currentPrice() | currency }}
+        </div>
+
+        @if (previousPrice() !== 0) {
+          <div
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [currentValues]="{
+              value: currentPrice(),
+              valueToCompare: previousPrice(),
+            }"
+          ></div>
+        }
       </div>
     </div>
     <highcharts-chart
@@ -43,6 +56,10 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
   readonly currentPrice = computed(() => {
     const currentRound = this.simulator().currentRound;
     return this.simulatorSymbol().historicalDataModified.at(currentRound - 1) ?? 0;
+  });
+  readonly previousPrice = computed(() => {
+    const currentRound = this.simulator().currentRound;
+    return this.simulatorSymbol().historicalDataModified.at(currentRound - 2) ?? 0;
   });
 
   readonly chartOptionsSignal = computed(() => {

@@ -260,6 +260,7 @@ export type TradingSimulatorAggregationSymbols = {
      * - start with 0 while the trading simulator hasn't started
      */
     price: number;
+    pricePrevious: number;
   };
 };
 

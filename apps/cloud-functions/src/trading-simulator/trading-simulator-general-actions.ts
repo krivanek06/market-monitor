@@ -283,6 +283,7 @@ const createOutstandingOrder = async (
 
         // keep old value unchanged
         price: symbolData.price,
+        pricePrevious: symbolData.pricePrevious,
         symbol: symbolData.symbol,
         unitsInfinity: symbolData.unitsInfinity,
         unitsTotalAvailable: symbolData.unitsTotalAvailable,

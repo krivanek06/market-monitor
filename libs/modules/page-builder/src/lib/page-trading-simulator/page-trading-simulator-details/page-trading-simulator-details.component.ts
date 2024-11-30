@@ -1,4 +1,4 @@
-import { CurrencyPipe, NgClass, SlicePipe } from '@angular/common';
+import { NgClass, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, untracked } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -12,7 +12,6 @@ import {
 } from '@mm/portfolio/ui';
 import { InputSource } from '@mm/shared/data-access';
 import {
-  DateReadablePipe,
   DropdownControlComponent,
   GeneralCardComponent,
   RangeDirective,
@@ -50,8 +49,6 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
     GeneralCardComponent,
     SlicePipe,
     RangeDirective,
-    DateReadablePipe,
-    CurrencyPipe,
     PortfolioGrowthCompareChartComponent,
     PortfolioTransactionsTableComponent,
     PageTradingSimulatorDetailsParticipantDataComponent,
