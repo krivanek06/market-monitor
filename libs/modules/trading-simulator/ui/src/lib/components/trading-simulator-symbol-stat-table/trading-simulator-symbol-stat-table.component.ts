@@ -11,7 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { TradingSimulatorAggregationSymbols } from '@mm/api-types';
+import { TradingSimulatorAggregationSymbols, TradingSimulatorAggregationSymbolsData } from '@mm/api-types';
 import { animationValueChange, DefaultImgDirective, LargeNumberFormatterPipe } from '@mm/shared/ui';
 
 @Component({
@@ -135,13 +135,12 @@ export class TradingSimulatorSymbolStatTableComponent {
 
   private readonly cd = inject(ChangeDetectorRef);
 
-  readonly dataSource = new MatTableDataSource<TradingSimulatorAggregationSymbols[0]>([]);
+  readonly dataSource = new MatTableDataSource<TradingSimulatorAggregationSymbolsData>([]);
 
   readonly tableEffect = effect(() => {
     const data = this.data();
     const modifiedData = Object.values(data ?? {}).sort((a, b) => a.symbol.localeCompare(b.symbol));
 
-    console.log('table new', modifiedData);
     untracked(() => {
       this.dataSource.data = modifiedData;
 
@@ -163,8 +162,8 @@ export class TradingSimulatorSymbolStatTableComponent {
     'soldTotal',
   ];
 
-  identity: TrackByFunction<TradingSimulatorAggregationSymbols[0]> = (
+  identity: TrackByFunction<TradingSimulatorAggregationSymbolsData> = (
     index: number,
-    item: TradingSimulatorAggregationSymbols[0],
+    item: TradingSimulatorAggregationSymbolsData,
   ) => item.symbol;
 }

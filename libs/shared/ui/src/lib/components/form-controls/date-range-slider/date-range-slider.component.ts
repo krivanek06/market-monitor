@@ -36,7 +36,7 @@ export const filterDataByIndexRange = <T extends { date: string }>(
     return data;
   }
   return data.filter(
-    (d) => Number(d.date) <= dateRange.currentMaxDateIndex && Number(d.date) >= dateRange.currentMinDateIndex,
+    (d) => Number(d.date) <= dateRange.currentMaxDateIndex + 1 && Number(d.date) > dateRange.currentMinDateIndex,
   );
 };
 

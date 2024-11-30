@@ -9,6 +9,16 @@ import { DateReadablePipe, GeneralCardComponent } from '@mm/shared/ui';
   imports: [GeneralCardComponent, DateReadablePipe, DatePipe, CurrencyPipe],
   template: `
     <div class="grid gap-3">
+      <!-- admin info -->
+      @if (isAuthUserOwner()) {
+        <app-general-card title="Admin Information">
+          <div class="g-item-wrapper">
+            <div>Code</div>
+            <div>{{ tradingSimulator().invitationCode }}</div>
+          </div>
+        </app-general-card>
+      }
+
       <!-- info 1 -->
       <app-general-card title="Simulator Information">
         <div class="g-item-wrapper">
@@ -86,5 +96,6 @@ import { DateReadablePipe, GeneralCardComponent } from '@mm/shared/ui';
 })
 export class PageTradingSimulatorDetailsInfoComponent {
   readonly tradingSimulator = input.required<TradingSimulator>();
+  readonly isAuthUserOwner = input<boolean>(false);
   readonly remainingTimeSeconds = input<number>(0);
 }

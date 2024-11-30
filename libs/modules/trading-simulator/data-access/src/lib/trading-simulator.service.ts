@@ -3,7 +3,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { TradingSimulatorApiService } from '@mm/api-client';
 import { OutstandingOrder, TradingSimulator, TradingSimulatorSymbol } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { getCurrentDateDetailsFormat } from '@mm/shared/general-util';
 import { Observable, of } from 'rxjs';
 
 @Injectable({
@@ -124,14 +123,13 @@ export class TradingSimulatorService {
     }
 
     // change state to started
-    this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, {
-      state: 'started',
-      startDateTime: getCurrentDateDetailsFormat(),
-      currentRound: 1,
+    return this.tradingSimulatorApiService.simulatorCreateAction({
+      type: 'nextRound',
+      simulatorId: simulator.id,
     });
   }
 
-  simulatorStateChangeFinish(simulator: TradingSimulator) {
+  async simulatorStateChangeFinish(simulator: TradingSimulator) {
     const userBase = this.authenticationUserStoreService.state.getUserDataMin();
 
     // check if user is the owner
@@ -144,11 +142,15 @@ export class TradingSimulatorService {
       throw new Error('Simulator must be in draft state');
     }
 
-    // change state to started
-    this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, {
-      state: 'finished',
-      endDateTime: getCurrentDateDetailsFormat(),
+    // set current round to maximum rounds
+    await this.tradingSimulatorApiService.updateTradingSimulator(simulator.id, {
       currentRound: simulator.maximumRounds,
+    });
+
+    // finish the simulator
+    return this.tradingSimulatorApiService.simulatorCreateAction({
+      type: 'nextRound',
+      simulatorId: simulator.id,
     });
   }
 

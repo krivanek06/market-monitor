@@ -4,10 +4,12 @@ import {
   SymbolQuote,
   TradingSimulator,
   TradingSimulatorAggregationSymbols,
+  TradingSimulatorAggregationSymbolsData,
   TradingSimulatorParticipant,
 } from '@mm/api-types';
 import { getPortfolioStateHoldingsUtil, transformPortfolioStateHoldingToPortfolioState } from '@mm/shared/general-util';
 import { addMinutes, roundToNearestMinutes } from 'date-fns';
+import { firestore } from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import {
   tradingSimulatorAggregationParticipantsDocRef,
@@ -24,13 +26,18 @@ import {
  * - increments round
  * - update each participant's portfolio
  * - recalculate user ranking
- * - TODO: increment available cash for each participant
- * - TODO: increment issued units for symbol if issued on that round
- * - TODO: check if it is the last round then
- *    - TODO: remove transaction collection
+ * - increment available cash for each participant
+ * - increment issued units for symbol if issued on that round
+ * - check if it is the last round then
+ *    - remove transaction collection
  *    - TODO: (optional) make transaction aggregation data: on which round how many transaction for each symbol happened
  */
 export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) => {
+  // prevent running this function if the simulator is finished
+  if (simulator.state === 'finished') {
+    return;
+  }
+
   const transactionCollectionRef = tradingSimulatorTransactionsCollectionRef(simulator.id);
   const symbolsData = (await tradingSimulatorSymbolsCollectionRef(simulator.id).get()).docs.map((doc) => doc.data());
   const aggregationSymbol = (await tradingSimulatorAggregationSymbolsDocRef(simulator.id).get()).data();
@@ -48,6 +55,29 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
     {} as { [K in string]: number },
   );
 
+  const isFistRound = simulator.state === 'live' && simulator.currentRound === 0;
+  const isLastRound = simulator.state === 'started' && simulator.currentRound === simulator.maximumRounds;
+
+  // check if the last round is over
+  if (isLastRound) {
+    // update simulator data
+    await tradingSimulatorDocRef(simulator.id).update({
+      // round to nearest because may be some time differences when this is updated and when CF runs to update it again
+      nextRoundTime: roundToNearestMinutes(addMinutes(new Date(), simulator.oneRoundDurationMinutes), {
+        // casting should be ok because it expects a {Unit extends number}
+        nearestTo: 5,
+        roundingMethod: 'floor', // round down
+      }).toString(),
+      state: 'finished',
+      endDateTime: new Date().toString(),
+    } satisfies FieldValuePartial<TradingSimulator>);
+
+    // remove all transactions
+    firestore().recursiveDelete(transactionCollectionRef);
+
+    return;
+  }
+
   const nextRound = simulator.currentRound + 1;
 
   // load transactions
@@ -64,17 +94,24 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
     .get();
 
   // update symbol prices
-  const symbolPricesUpdated = Object.entries(aggregationSymbol ?? {}).reduce(
-    (acc, [symbol, data]) => ({
+  const symbolPricesUpdated = Object.entries(aggregationSymbol ?? {}).reduce((acc, [symbol, data]) => {
+    const symbolSavedData = symbolsData.find((d) => d.symbol === symbol);
+    const issuedUnits = symbolSavedData?.unitsAdditionalIssued ?? [];
+
+    return {
       ...acc,
       [symbol]: {
         ...data,
+        // save the previous price
         pricePrevious: data.price,
-        price: symbolsData.find((d) => d.symbol === symbol)?.historicalDataModified.at(simulator.currentRound) ?? 0,
-      } satisfies TradingSimulatorAggregationSymbols[0],
-    }),
-    {} as TradingSimulatorAggregationSymbols,
-  );
+        // get the price from the historical data
+        price: symbolSavedData?.historicalDataModified.at(nextRound - 1) ?? 0,
+        // increment available units if issued on that round
+        unitsCurrentlyAvailable:
+          data.unitsCurrentlyAvailable + (issuedUnits.find((d) => d.issuedOnRound === nextRound)?.units ?? 0),
+      } satisfies TradingSimulatorAggregationSymbolsData,
+    };
+  }, {} as TradingSimulatorAggregationSymbols);
 
   // I need this format to make some calculations, but data is not stored in DB
   const symbolPriceQuoteFormat = Object.entries(symbolPricesUpdated).map(
@@ -85,12 +122,24 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
       }) as SymbolQuote,
   );
 
+  // get additional cash issued on all previous rounds
+  const additionalCashOnRound = simulator.cashAdditionalIssued
+    .filter((d) => d.issuedOnRound <= nextRound)
+    .reduce((acc, curr) => acc + curr.value, 0);
+
   // update each participant data
   const participantsUpdatedSorted = participants
     .map((participant) => {
+      // create a portfolio holding from transactions
       const portfolioStateHolding = getPortfolioStateHoldingsUtil(participant.transactions, symbolPriceQuoteFormat, []);
 
+      // convert to a  portfolio state
       const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHolding);
+
+      // add additional cash to the portfolio
+      portfolioState.cashOnHand += additionalCashOnRound;
+      portfolioState.balance += additionalCashOnRound;
+
       const portfolioGrowth = [
         ...participant.portfolioGrowth,
         {
@@ -121,15 +170,18 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
         }) satisfies TradingSimulatorParticipant,
     );
 
+  // create a bulk writer
+  const bulk = firestore().bulkWriter();
+
   // update aggregation data
-  tradingSimulatorAggregationTransactionsDocRef(simulator.id).set({
+  bulk.set(tradingSimulatorAggregationTransactionsDocRef(simulator.id), {
     bestTransactions: bestTransactions.docs.map((doc) => doc.data()),
     worstTransactions: worstTransactions.docs.map((doc) => doc.data()),
     lastTransactions: lastTransactions.docs.map((doc) => doc.data()),
   });
 
   // update simulator data
-  tradingSimulatorDocRef(simulator.id).update({
+  bulk.update(tradingSimulatorDocRef(simulator.id), {
     // round to nearest because may be some time differences when this is updated and when CF runs to update it again
     nextRoundTime: roundToNearestMinutes(addMinutes(new Date(), simulator.oneRoundDurationMinutes), {
       // casting should be ok because it expects a {Unit extends number}
@@ -137,28 +189,44 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
       roundingMethod: 'floor', // round down
     }).toString(),
     currentRound: FieldValue.increment(1),
+    // update the start date time if it is the first round
+    startDateTime: isFistRound ? new Date().toString() : simulator.startDateTime,
+    // update the state if it is the first round
+    state: isFistRound ? 'started' : simulator.state,
   } satisfies FieldValuePartial<TradingSimulator>);
 
   // update prices for each symbol
-  tradingSimulatorAggregationSymbolsDocRef(simulator.id).update(symbolPricesUpdated);
+  bulk.update(tradingSimulatorAggregationSymbolsDocRef(simulator.id), symbolPricesUpdated);
 
   // update each participant's data
   for (const participant of participantsUpdatedSorted) {
-    tradingSimulatorParticipantsCollectionRef(simulator.id)
-      .doc(participant.userData.id)
-      .update({
-        portfolioState: participant.portfolioState,
-        portfolioGrowth: FieldValue.arrayUnion(participant.portfolioGrowth.at(-1)),
-        rank: participant.rank,
-      } satisfies FieldValuePartial<TradingSimulatorParticipant>);
+    bulk.update(tradingSimulatorParticipantsCollectionRef(simulator.id).doc(participant.userData.id), {
+      portfolioState: participant.portfolioState,
+      portfolioGrowth: FieldValue.arrayUnion(participant.portfolioGrowth.at(-1)),
+      rank: participant.rank,
+    } satisfies FieldValuePartial<TradingSimulatorParticipant>);
   }
 
   // recalculate user ranking
-  tradingSimulatorAggregationParticipantsDocRef(simulator.id).set({
+  bulk.set(tradingSimulatorAggregationParticipantsDocRef(simulator.id), {
     userRanking: participantsUpdatedSorted.map((participant) => ({
       userData: participant.userData,
       portfolioState: participant.portfolioState,
       rank: participant.rank,
     })),
   });
+
+  // Listen for success and error events
+  bulk.onWriteError((error) => {
+    console.error('Error writing document: ', {
+      cause: error.cause,
+      code: error.code,
+      message: error.message,
+    });
+    console.log('==================');
+    return false;
+  });
+
+  // commit write operations
+  await bulk.close();
 };

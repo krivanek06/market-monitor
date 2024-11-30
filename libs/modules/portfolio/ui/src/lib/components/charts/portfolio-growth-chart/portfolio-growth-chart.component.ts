@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PortfolioGrowth, USER_DEFAULT_STARTING_CASH } from '@mm/api-types';
@@ -26,8 +26,12 @@ import { map } from 'rxjs';
         <div class="text-wt-primary text-lg">{{ headerTitle() }}</div>
 
         <!-- date range -->
-        @if ((data()?.values ?? []).length > 0) {
-          <app-date-range-slider class="w-full max-sm:px-4 sm:w-[450px]" [formControl]="sliderControl" />
+        @if ((data()?.values ?? []).length > 4) {
+          <app-date-range-slider
+            class="w-full max-sm:px-4 sm:w-[450px]"
+            [formControl]="sliderControl"
+            [filterType]="filterType()"
+          />
         }
       </div>
     }
@@ -64,6 +68,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
   readonly startCash = input(USER_DEFAULT_STARTING_CASH);
   readonly displayLegend = input(false);
   readonly displayHeader = input(true);
+  readonly displayThreshold = input(true);
   readonly chartType = input<'all' | 'marketValue' | 'balance'>('all');
 
   /**
@@ -72,19 +77,6 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
    * - round - compare by normal <= >= etc
    */
   readonly filterType = input<'date' | 'round'>('date');
-
-  /**
-   * put on false only if PortfolioGrowth.date is not date format
-   * - used in trading simulator where we have rounds: 1, 2, 3, ...
-   */
-  readonly dataValueIsDate = input(true);
-
-  readonly categories = computed(() => {
-    const dataValueIsDate = this.dataValueIsDate();
-    const data = this.data()?.values ?? [];
-
-    return dataValueIsDate ? data.map((d) => format(d.date, 'EEEE, MMM d, y')) : data.map((_, i) => `Round ${i + 1}`);
-  });
 
   readonly sliderControl = new FormControl<DateRangeSliderValues>(
     {
@@ -116,23 +108,35 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         const startCash = this.startCash();
         const filterType = this.filterType();
         const displayHeader = this.displayHeader();
+        const isDate = filterType === 'date';
 
         // filter out by valid dates
-        const compareFn = filterType === 'date' ? filterDataByDateRange : filterDataByIndexRange;
+        const compareFn = isDate ? filterDataByDateRange : filterDataByIndexRange;
         const inputValues = displayHeader
           ? compareFn(dataValues?.values ?? [], sliderValues)
           : (dataValues?.values ?? []);
 
-        const seriesDataUpdate = this.createChartSeries(inputValues, dataValues?.currentCash ?? [], startCash);
+        // filter out current cash values
+        const currentCash = (dataValues?.currentCash ?? []).slice(
+          sliderValues.currentMinDateIndex,
+          sliderValues.currentMaxDateIndex + 1,
+        );
+        // create series data
+        const seriesDataUpdate = this.createChartSeries(inputValues, currentCash, startCash);
+
+        // create categories
+        const categories = isDate
+          ? inputValues.map((d) => format(d.date, 'EEEE, MMM d, y'))
+          : inputValues.map((d) => `Round ${d.date}`);
 
         // create chart
-        return this.initChart(seriesDataUpdate);
+        return this.initChart(seriesDataUpdate, categories);
       }),
     ),
-    { initialValue: this.initChart([]) },
+    { initialValue: this.initChart([], []) },
   );
 
-  private initChart(data: SeriesOptionsType[]): Highcharts.Options {
+  private initChart(data: SeriesOptionsType[], categories: string[]): Highcharts.Options {
     return {
       chart: {
         type: 'area',
@@ -180,7 +184,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
           },
         },
         type: 'category',
-        categories: this.categories(),
+        categories: categories,
       },
       title: {
         text: '',
@@ -371,7 +375,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
         zIndex: 10,
         yAxis: 0,
         opacity: 0.3,
-        visible: this.chartType() === 'all' || this.chartType() === 'balance',
+        visible: (this.chartType() === 'all' || this.chartType() === 'balance') && this.displayThreshold(),
         showInLegend: true,
         fillColor: {
           linearGradient: {

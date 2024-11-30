@@ -1,6 +1,7 @@
 import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -41,6 +42,7 @@ export type TradingSimulatorParticipantDialogComponentData = {
     PortfolioTransactionsItemComponent,
     MatDividerModule,
     NgClass,
+    MatButtonModule,
   ],
   template: `
     <app-dialog-close-header title="Participant: {{ participantData()?.userData?.personal?.displayName }}" />
@@ -90,13 +92,11 @@ export type TradingSimulatorParticipantDialogComponentData = {
         <div class="mb-6">
           <app-portfolio-growth-chart
             chartType="balance"
-            [data]="{
-              values: participant.portfolioGrowth,
-            }"
+            [data]="portfolioGrowthData()"
             [startCash]="data.simulator.cashStartingValue"
             [heightPx]="320"
             [displayHeader]="false"
-            [dataValueIsDate]="false"
+            filterType="round"
           />
         </div>
 
@@ -146,6 +146,10 @@ export type TradingSimulatorParticipantDialogComponentData = {
         </div>
       }
     </mat-dialog-content>
+
+    <div class="py-2">
+      <mat-divider />
+    </div>
 
     <mat-dialog-actions>
       <div class="g-mat-dialog-actions-end">
@@ -200,6 +204,22 @@ export class TradingSimulatorParticipantDialogComponent {
           } as SymbolQuote,
         }) satisfies PortfolioStateHolding,
     );
+  });
+
+  readonly portfolioGrowthData = computed(() => {
+    const participant = this.participantData();
+    const simulator = this.data.simulator;
+
+    return {
+      values: participant?.portfolioGrowth ?? [],
+      currentCash:
+        participant?.portfolioGrowth.reduce((acc, _, i) => {
+          const newCashIssue = simulator.cashAdditionalIssued
+            .filter((d) => d.issuedOnRound <= i + 1)
+            .reduce((acc, curr) => acc + curr.value, 0);
+          return [...acc, simulator.cashStartingValue + newCashIssue];
+        }, [] as number[]) ?? [],
+    };
   });
 
   readonly transactionState = computed(() => {

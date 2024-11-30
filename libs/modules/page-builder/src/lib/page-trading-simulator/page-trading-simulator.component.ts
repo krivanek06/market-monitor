@@ -98,7 +98,7 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
               [authUser]="userData()"
             />
           } @empty {
-            <div class="p-6 text-center">No running simulators</div>
+            <div class="p-6 text-center md:col-span-2 xl:col-span-3">No running simulators</div>
           }
         </div>
       </div>
@@ -123,7 +123,7 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
               [authUser]="userData()"
             />
           } @empty {
-            <div class="p-6 text-center">No upcoming simulators</div>
+            <div class="p-6 text-center md:col-span-2 xl:col-span-3">No upcoming simulators</div>
           }
         </div>
       </div>

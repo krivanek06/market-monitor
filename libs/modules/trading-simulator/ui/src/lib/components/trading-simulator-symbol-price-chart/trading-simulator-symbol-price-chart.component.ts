@@ -60,6 +60,11 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
   });
   readonly previousPrice = computed(() => {
     const currentRound = this.simulator().currentRound;
+
+    // prevent overflow
+    if (currentRound < 2 || this.simulator().state !== 'started') {
+      return 0;
+    }
     return this.simulatorSymbol().historicalDataModified.at(currentRound - 2) ?? 0;
   });
 

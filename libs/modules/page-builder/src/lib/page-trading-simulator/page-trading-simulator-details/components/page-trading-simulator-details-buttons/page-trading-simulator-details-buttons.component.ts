@@ -97,10 +97,13 @@ export class PageTradingSimulatorDetailsButtonsComponent {
   }
 
   @Confirmable('Are you sure you want to finish the simulator?', 'Finish', true, 'FINISH')
-  onFinish() {
+  async onFinish() {
     try {
+      // notify user
+      this.dialogServiceUtil.showNotificationBar('Finishing the simulator, wait for the process to complete...');
+
       // finish the simulator
-      this.tradingSimulatorService.simulatorStateChangeFinish(this.simulatorData());
+      await this.tradingSimulatorService.simulatorStateChangeFinish(this.simulatorData());
 
       // notify user
       this.dialogServiceUtil.showNotificationBar('Simulator finished', 'success');
@@ -110,15 +113,22 @@ export class PageTradingSimulatorDetailsButtonsComponent {
   }
 
   @Confirmable('Are you sure you want to delete the simulator?', 'Delete', true, 'DELETE')
-  onDelete() {
-    // delete the simulator
-    this.tradingSimulatorService.deleteSimulator(this.simulatorData());
-
-    // navigate to the trading simulator page
-    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
-
+  async onDelete() {
     // notify user
-    this.dialogServiceUtil.showNotificationBar('Simulator deleted');
+    this.dialogServiceUtil.showNotificationBar('Deleting Trading Simulator...');
+
+    try {
+      // delete the simulator
+      await this.tradingSimulatorService.deleteSimulator(this.simulatorData());
+
+      // navigate to the trading simulator page
+      this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
+
+      // notify user
+      this.dialogServiceUtil.showNotificationBar('Trading Simulator Deleted', 'success');
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
   }
 
   @Confirmable('Changing to draft you can configure the simulator, but it will be hidden for users')

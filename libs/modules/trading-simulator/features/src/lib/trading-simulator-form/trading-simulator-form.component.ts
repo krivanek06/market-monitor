@@ -503,7 +503,10 @@ export class TradingSimulatorFormComponent {
       validators: [requiredValidator, positiveNumberValidator],
     }),
     // code to join the trading simulator
-    invitationCode: new FormControl(generateRandomString(6), { nonNullable: true, validators: [requiredValidator] }),
+    invitationCode: new FormControl(generateRandomString(6), {
+      nonNullable: true,
+      validators: [maxLengthValidator(20)],
+    }),
     // cash value user starts with
     startingCash: new FormControl(30_000, {
       nonNullable: true,
@@ -696,6 +699,11 @@ export class TradingSimulatorFormComponent {
   }
 
   onAddSymbol(data?: TradingSimulatorSymbol): void {
+    if (this.form.controls.symbolsHistoricalData.controls.length >= 10) {
+      this.dialogServiceUtil.showNotificationBar('You can add up to 10 symbols', 'error');
+      return;
+    }
+
     // create form group for symbol
     const symbolForm: TradingSimulatorSymbol = {
       symbol: data?.symbol ?? '',

@@ -130,6 +130,7 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
           <app-page-trading-simulator-details-info
             [tradingSimulator]="simulatorData"
             [remainingTimeSeconds]="remainingTimeSeconds()"
+            [isAuthUserOwner]="isAuthUserOwner()"
           />
         </div>
       </div>

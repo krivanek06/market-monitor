@@ -171,9 +171,9 @@ const tradingSimulatorOnNextRoundManual = async (user: UserBaseMin, simulator: T
     throw new HttpsError('permission-denied', 'Only the owner can start the next round');
   }
 
-  // check if simulator is in started state
-  if (simulator.state !== 'started') {
-    throw new HttpsError('failed-precondition', 'Simulator must be in started state');
+  // check if simulator hasn't finished yet
+  if (simulator.state === 'finished') {
+    throw new HttpsError('failed-precondition', 'Simulator has already finished');
   }
 
   return tradingSimulatorOnNextRound(simulator);
@@ -255,10 +255,19 @@ const createOutstandingOrder = async (
       transaction,
     );
 
+    // get additional cash issued on all previous rounds
+    const additionalCashOnRound = simulator.cashAdditionalIssued
+      .filter((d) => d.issuedOnRound <= simulator.currentRound)
+      .reduce((acc, curr) => acc + curr.value, 0);
+
     // add transaction to the participant data
     firebaseTransaction.update(participantRef, {
       transactions: FieldValue.arrayUnion(transaction),
-      portfolioState: updatedPortfolio,
+      portfolioState: {
+        ...updatedPortfolio,
+        balance: roundNDigits(updatedPortfolio.balance + additionalCashOnRound),
+        cashOnHand: roundNDigits(updatedPortfolio.cashOnHand + additionalCashOnRound),
+      },
     } satisfies FieldValuePartial<TradingSimulatorParticipant>);
 
     // add transaction to the transaction collection

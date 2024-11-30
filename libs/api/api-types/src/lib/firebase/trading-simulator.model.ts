@@ -64,8 +64,8 @@ export type TradingSimulator = {
    * state of the trading simulator
    *
    * draft - user is setting up the trading simulator, not yet visible for public
-   * live - trading simulator is live, visible for public, and users can join
-   * started - trading simulator is started and users can't join it anymore
+   * live - trading simulator is live, visible for public, and users can join, but hasn't started yet
+   * started - trading simulator has started and users can't join it anymore
    * finished - trading simulator is finished and users can't play it anymore
    */
   state: 'draft' | 'live' | 'started' | 'finished';

@@ -137,13 +137,10 @@ import { firstValueFrom } from 'rxjs';
       <div class="basis-3/5">
         <app-portfolio-growth-chart
           chartType="balance"
-          [data]="{
-            values: participant().portfolioGrowth,
-          }"
-          [startCash]="simulatorData().cashStartingValue"
+          filterType="round"
+          [data]="portfolioGrowthData()"
           [heightPx]="320"
-          [displayHeader]="false"
-          [dataValueIsDate]="false"
+          [displayLegend]="true"
         />
       </div>
     </div>
@@ -285,17 +282,36 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
           ...holding,
           weight: roundNDigits(holding.invested / portfolio.invested, 2),
           symbolQuote: {
+            previousClose: symbolAggregations[holding.symbol].pricePrevious,
             price: symbolAggregations[holding.symbol].price,
           } as SymbolQuote,
         }) satisfies PortfolioStateHolding,
     );
   });
 
+  readonly portfolioGrowthData = computed(() => {
+    const participant = this.participant();
+    const simulator = this.simulatorData();
+
+    return {
+      values: participant.portfolioGrowth,
+      currentCash: participant.portfolioGrowth.reduce((acc, _, i) => {
+        const newCashIssue = simulator.cashAdditionalIssued
+          .filter((d) => d.issuedOnRound <= i + 1)
+          .reduce((acc, curr) => acc + curr.value, 0);
+        return [...acc, simulator.cashStartingValue + newCashIssue];
+      }, [] as number[]),
+    };
+  });
+
+  /**
+   * disable trading symbols if simulator is not live and current round is 0 or remaining time is approaching 0
+   */
   readonly disabledTradingSymbols = computed(() => {
     const simulator = this.simulatorData();
     const remainingTime = this.remainingTimeSeconds();
 
-    return (simulator.state !== 'live' && simulator.currentRound === 0) || remainingTime <= 0;
+    return (simulator.state !== 'live' && simulator.currentRound === 0) || remainingTime <= 3;
   });
 
   readonly ColorScheme = ColorScheme;

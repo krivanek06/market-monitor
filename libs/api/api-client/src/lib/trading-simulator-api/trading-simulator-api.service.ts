@@ -109,8 +109,8 @@ export class TradingSimulatorApiService {
     );
   }
 
-  updateTradingSimulator(id: string, data: Partial<TradingSimulator>): void {
-    updateDoc(this.getTradingSimulatorDocRef(id), data);
+  updateTradingSimulator(id: string, data: Partial<TradingSimulator>) {
+    return updateDoc(this.getTradingSimulatorDocRef(id), data);
   }
 
   async upsertTradingSimulator(data: {
