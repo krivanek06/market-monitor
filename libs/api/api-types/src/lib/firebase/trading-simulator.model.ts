@@ -1,6 +1,6 @@
 import { ExtractedType } from '../ts-utils';
 import { OutstandingOrder } from './outstanding-order.model';
-import { PortfolioGrowth, PortfolioState, PortfolioStateHoldingBase, PortfolioTransaction } from './portfolio.model';
+import { PortfolioGrowth, PortfolioState, PortfolioTransaction } from './portfolio.model';
 import { RankingItem } from './ranking.model';
 import { UserBaseMin } from './user.model';
 
@@ -164,11 +164,6 @@ export type TradingSimulatorParticipant = {
    * current state of the user's portfolio
    */
   portfolioState: PortfolioState;
-
-  /**
-   * current user symbol holdings
-   */
-  holdings: PortfolioStateHoldingBase[];
 
   /**
    * user's portfolio growth data

@@ -90,7 +90,6 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
     .map((participant) => {
       const portfolioStateHolding = getPortfolioStateHoldingsUtil(participant.transactions, symbolPriceQuoteFormat, []);
 
-      const holdings = portfolioStateHolding.holdings;
       const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHolding);
       const portfolioGrowth = [
         ...participant.portfolioGrowth,
@@ -105,7 +104,6 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
       return {
         ...participant,
         portfolioState,
-        holdings,
         portfolioGrowth,
       };
     })
@@ -150,7 +148,6 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
       .doc(participant.userData.id)
       .update({
         portfolioState: participant.portfolioState,
-        holdings: participant.holdings,
         portfolioGrowth: FieldValue.arrayUnion(participant.portfolioGrowth.at(-1)),
         rank: participant.rank,
       } satisfies FieldValuePartial<TradingSimulatorParticipant>);

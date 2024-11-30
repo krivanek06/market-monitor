@@ -23,6 +23,7 @@ import {
   createEmptyPortfolioState,
   createTransactionMoreInfo,
   getPortfolioStateHoldingBaseByNewTransactionUtil,
+  getPortfolioStateHoldingBaseByTransactionsUtil,
   getTransactionFees,
   roundNDigits,
   transformUserToBaseMin,
@@ -111,7 +112,6 @@ const joinSimulator = async (
     .set({
       userData: user,
       portfolioState: createEmptyPortfolioState(simulator.cashStartingValue),
-      holdings: [],
       transactions: [],
       portfolioGrowth: [],
       rank: {
@@ -210,6 +210,7 @@ const createOutstandingOrder = async (
       throw new HttpsError('aborted', SIMULATOR_PARTICIPANT_DIFFERENT_USER);
     }
 
+    const participantHoldings = getPortfolioStateHoldingBaseByTransactionsUtil(participant.transactions);
     const transactionFees = getTransactionFees(symbolData.price, data.order.units);
     const totalValue = data.order.units * symbolData.price + transactionFees;
 
@@ -229,7 +230,7 @@ const createOutstandingOrder = async (
     // SELL order
     else if (data.order.orderType.type === 'SELL') {
       // check if user has any holdings of that symbol
-      const symbolHoldings = participant.holdings.find((d) => d.symbol === symbolData.symbol);
+      const symbolHoldings = participantHoldings.find((d) => d.symbol === symbolData.symbol);
 
       // check if user has enough units on hand if SELL
       if ((symbolHoldings?.units ?? -1) < data.order.units) {
@@ -240,16 +241,16 @@ const createOutstandingOrder = async (
     // transform to transaction
     const transaction = createTransactionMoreInfo(
       participant.userData,
-      participant.holdings,
+      participantHoldings,
       data.order,
       symbolData.price,
     );
     transaction.date = String(simulator.currentRound);
 
     // recalculate portfolio state
-    const { updatedPortfolio, updatedHoldings } = getPortfolioStateHoldingBaseByNewTransactionUtil(
+    const { updatedPortfolio } = getPortfolioStateHoldingBaseByNewTransactionUtil(
       participant.portfolioState,
-      participant.holdings,
+      participantHoldings,
       [],
       transaction,
     );
@@ -257,7 +258,6 @@ const createOutstandingOrder = async (
     // add transaction to the participant data
     firebaseTransaction.update(participantRef, {
       transactions: FieldValue.arrayUnion(transaction),
-      holdings: updatedHoldings,
       portfolioState: updatedPortfolio,
     } satisfies FieldValuePartial<TradingSimulatorParticipant>);
 

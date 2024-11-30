@@ -1,8 +1,9 @@
 import { NgClass, SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { UserBaseMin } from '@mm/api-types';
 import {
@@ -11,6 +12,7 @@ import {
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { InputSource } from '@mm/shared/data-access';
+import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import {
   DropdownControlComponent,
   GeneralCardComponent,
@@ -18,6 +20,10 @@ import {
   SectionTitleComponent,
   SortReversePipe,
 } from '@mm/shared/ui';
+import {
+  TradingSimulatorParticipantDialogComponent,
+  TradingSimulatorParticipantDialogComponentData,
+} from '@mm/trading-simulator/features';
 import {
   TradingSimulatorParticipantItemComponent,
   TradingSimulatorSymbolPriceChartComponent,
@@ -72,7 +78,6 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
           <app-page-trading-simulator-details-participant-data
             [participant]="participant"
             [simulatorData]="simulatorData"
-            [simulatorSymbols]="simulatorSymbols()"
             [symbolAggregations]="simulatorAggregationSymbols()"
             [remainingTimeSeconds]="remainingTimeSeconds()"
           />
@@ -216,6 +221,7 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBaseComponent {
+  private readonly dialog = inject(MatDialog);
   readonly selectedParticipantsControl = new FormControl<UserBaseMin[]>([], { nonNullable: true });
 
   /** participating user data - may not exists if user is only a spectator */
@@ -337,6 +343,12 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
   ];
 
   onParticipantClick(participant: UserBaseMin) {
-    console.log('onParticipantClick', participant);
+    this.dialog.open(TradingSimulatorParticipantDialogComponent, {
+      data: <TradingSimulatorParticipantDialogComponentData>{
+        simulator: this.simulatorData(),
+        participantId: participant.id,
+      },
+      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
+    });
   }
 }

@@ -44,7 +44,7 @@ export class TradingSimulatorApiService {
    * @param ownerId - the id of the owner
    * @returns all trading simulators where the user is the owner
    */
-  getTradingSimulatorByOwner(ownerId?: string): Observable<TradingSimulator[]> {
+  getTradingSimulatorsByOwner(ownerId?: string): Observable<TradingSimulator[]> {
     return rxCollectionData(query(this.getTradingSimulatorCollection(), where('owner.id', '==', ownerId)));
   }
 
@@ -53,7 +53,7 @@ export class TradingSimulatorApiService {
    * @param participantId - the id of the participant
    * @returns all trading simulators where the user is a participant
    */
-  getTradingSimulatorByParticipant(participantId?: string): Observable<TradingSimulator[]> {
+  getTradingSimulatorsByParticipant(participantId?: string): Observable<TradingSimulator[]> {
     return rxCollectionData(
       query(this.getTradingSimulatorCollection(), where('participants', 'array-contains', participantId)),
     );

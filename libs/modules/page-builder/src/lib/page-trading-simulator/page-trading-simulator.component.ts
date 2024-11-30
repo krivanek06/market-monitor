@@ -163,7 +163,7 @@ export class PageTradingSimulatorComponent {
   private readonly router = inject(Router);
 
   readonly simulatorsByOwner = this.tradingSimulatorService.simulatorsByOwner;
-  readonly simulatorsByParticipant = this.tradingSimulatorService.simulatorByParticipant;
+  readonly simulatorsByParticipant = this.tradingSimulatorService.simulatorsByParticipant;
   readonly userData = this.authenticationUserStoreService.state.getUserData;
   readonly tradingSimulatorLatestData = this.tradingSimulatorService.tradingSimulatorLatestData;
 

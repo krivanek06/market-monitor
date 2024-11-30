@@ -21,7 +21,6 @@ import {
   TradingSimulatorAggregationSymbols,
   TradingSimulatorAggregationSymbolsData,
   TradingSimulatorParticipant,
-  TradingSimulatorSymbol,
 } from '@mm/api-types';
 import {
   PortfolioBalancePieChartComponent,
@@ -248,31 +247,10 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
 
   readonly participant = input.required<TradingSimulatorParticipant>();
   readonly simulatorData = input.required<TradingSimulator>();
-  readonly simulatorSymbols = input.required<TradingSimulatorSymbol[]>();
   readonly symbolAggregations = input<TradingSimulatorAggregationSymbols>();
   readonly remainingTimeSeconds = input<number>(0);
 
   readonly symbolTradeRef = viewChild<TemplateRef<HTMLElement>>('symbolTradeRef');
-
-  private readonly historicalPricesToCurrentRound = computed(() => {
-    const simulatorSymbols = this.simulatorSymbols();
-    const currentRound = this.simulatorData().currentRound;
-
-    return simulatorSymbols.reduce(
-      (curr, acc) => ({
-        ...curr,
-        [acc.symbol]: acc.historicalDataModified
-          .slice(0, currentRound)
-          .map((price, date) => ({ close: price, date: String(date) })),
-      }),
-      {} as Record<string, { close: number; date: string }[]>,
-    );
-  });
-
-  // todo - uncommented because it fails , formatting date and no date but rounds
-  // readonly portfolioGrowthAssets = computed(() =>
-  //   getPortfolioGrowthAssets(this.participant().transactions, this.historicalPricesToCurrentRound()),
-  // );
 
   readonly displayedColumnsTransactionTable = [
     'symbol',
@@ -303,10 +281,14 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
   });
 
   readonly portfolioHolding = computed(() => {
-    const pricesToSymbols = this.historicalPricesToCurrentRound();
+    const symbolAggregations = this.symbolAggregations();
     const participant = this.participant();
     const transactions = participant.transactions;
     const portfolio = participant.portfolioState;
+
+    if (!symbolAggregations) {
+      return [];
+    }
 
     return getPortfolioStateHoldingBaseByTransactionsUtil(transactions).map(
       (holding) =>
@@ -314,7 +296,7 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
           ...holding,
           weight: roundNDigits(holding.invested / portfolio.invested, 2),
           symbolQuote: {
-            price: pricesToSymbols[holding.symbol].at(-1)?.close ?? 0,
+            price: symbolAggregations[holding.symbol].price,
           } as SymbolQuote,
         }) satisfies PortfolioStateHolding,
     );
@@ -329,9 +311,6 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
       console.log('PageTradingSimulatorStatisticsParticipantDataComponent', {
         participant: this.participant(),
         simulatorData: this.simulatorData(),
-        simulatorSymbols: this.simulatorSymbols(),
-        historicalPricesToCurrentRound: this.historicalPricesToCurrentRound(),
-        // portfolioGrowthAssets: this.portfolioGrowthAssets(),
         portfolioHolding: this.portfolioHolding(),
       });
     });

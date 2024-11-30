@@ -18,13 +18,13 @@ export class TradingSimulatorService {
   });
 
   readonly simulatorsByOwner = toSignal(
-    this.tradingSimulatorApiService.getTradingSimulatorByOwner(
+    this.tradingSimulatorApiService.getTradingSimulatorsByOwner(
       this.authenticationUserStoreService.state.getUserData().id,
     ),
   );
 
-  readonly simulatorByParticipant = toSignal(
-    this.tradingSimulatorApiService.getTradingSimulatorByParticipant(
+  readonly simulatorsByParticipant = toSignal(
+    this.tradingSimulatorApiService.getTradingSimulatorsByParticipant(
       this.authenticationUserStoreService.state.getUserData().id,
     ),
   );
