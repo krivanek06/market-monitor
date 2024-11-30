@@ -15,11 +15,12 @@ import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
-import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
 import {
   OutstandingOrderCardDataComponent,
   PortfolioStateComponent,
   PortfolioStateTransactionsComponent,
+  PortfolioTradeDialogComponent,
+  PortfolioTradeDialogComponentData,
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';

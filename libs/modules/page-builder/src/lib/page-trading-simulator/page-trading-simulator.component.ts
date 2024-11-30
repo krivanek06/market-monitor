@@ -8,7 +8,7 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
 import { SectionTitleComponent } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
-import { TradingSimulatorDisplayCardComponent, TradingSimulatorDisplayItemComponent } from '@mm/trading-simulator/ui';
+import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
 
 @Component({
   selector: 'app-page-trading-simulator',
@@ -18,7 +18,6 @@ import { TradingSimulatorDisplayCardComponent, TradingSimulatorDisplayItemCompon
     SectionTitleComponent,
     MatButtonModule,
     MatIconModule,
-    TradingSimulatorDisplayItemComponent,
     MatDividerModule,
   ],
   template: `
@@ -56,11 +55,11 @@ import { TradingSimulatorDisplayCardComponent, TradingSimulatorDisplayItemCompon
             }
           </div>
         </div>
-      }
 
-      <div>
-        <mat-divider />
-      </div>
+        <div>
+          <mat-divider />
+        </div>
+      }
 
       <!-- simulator the user is participating in -->
       @if ((simulatorsByParticipant()?.length ?? 0) > 0) {

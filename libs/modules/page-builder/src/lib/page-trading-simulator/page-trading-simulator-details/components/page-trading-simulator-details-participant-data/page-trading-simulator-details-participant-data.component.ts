@@ -23,7 +23,6 @@ import {
   TradingSimulatorParticipant,
   TradingSimulatorSymbol,
 } from '@mm/api-types';
-import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
 import {
   PortfolioBalancePieChartComponent,
   PortfolioGrowthChartComponent,
@@ -31,6 +30,8 @@ import {
   PortfolioStateComponent,
   PortfolioStateOtherComponent,
   PortfolioStateTransactionsComponent,
+  PortfolioTradeDialogComponent,
+  PortfolioTradeDialogComponentData,
   PortfolioTransactionsItemComponent,
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
