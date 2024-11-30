@@ -75,8 +75,8 @@ import { firstValueFrom } from 'rxjs';
 
       <div class="child:w-[180px] flex gap-4">
         <button
-          data-testid="page-trading-buy-button"
           (click)="onOperationClick('BUY')"
+          [disabled]="disabledTradingSymbols()"
           mat-stroked-button
           color="accent"
           type="button"
@@ -84,8 +84,8 @@ import { firstValueFrom } from 'rxjs';
           BUY
         </button>
         <button
-          data-testid="page-trading-sell-button"
           (click)="onOperationClick('SELL')"
+          [disabled]="disabledTradingSymbols()"
           mat-stroked-button
           color="warn"
           type="button"
@@ -252,17 +252,6 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
 
   readonly symbolTradeRef = viewChild<TemplateRef<HTMLElement>>('symbolTradeRef');
 
-  readonly displayedColumnsTransactionTable = [
-    'symbol',
-    'transactionType',
-    'totalValue',
-    'unitPrice',
-    'units',
-    'transactionFees',
-    'rounds',
-    'returnPrct',
-  ];
-
   readonly transactionState = computed(() => {
     const transactions = this.participant().transactions;
 
@@ -302,9 +291,26 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
     );
   });
 
+  readonly disabledTradingSymbols = computed(() => {
+    const simulator = this.simulatorData();
+    const remainingTime = this.remainingTimeSeconds();
+
+    return (simulator.state !== 'live' && simulator.currentRound === 0) || remainingTime <= 0;
+  });
+
   readonly ColorScheme = ColorScheme;
 
   readonly displayedColumns = ['symbol', 'price', 'bep', 'balance', 'invested', 'totalChange', 'portfolio'];
+  readonly displayedColumnsTransactionTable = [
+    'symbol',
+    'transactionType',
+    'totalValue',
+    'unitPrice',
+    'units',
+    'transactionFees',
+    'rounds',
+    'returnPrct',
+  ];
 
   constructor() {
     effect(() => {
