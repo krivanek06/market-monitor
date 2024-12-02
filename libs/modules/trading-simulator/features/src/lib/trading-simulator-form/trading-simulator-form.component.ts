@@ -485,7 +485,7 @@ export class TradingSimulatorFormComponent {
   readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [requiredValidator, maxLengthValidator(50), minLengthValidator(6)],
+      validators: [requiredValidator, maxLengthValidator(24), minLengthValidator(6)],
     }),
     // when to start the trading simulator
     startTime: new FormControl<null | Date>(null, {

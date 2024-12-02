@@ -241,12 +241,18 @@ export type TradingSimulatorAggregationSymbols = {
      * every time a transaction happens, this value is updated
      * default is the same as 'unitsAvailableOnStart'
      * should never be negative
+     * can be 0 if unitsInfinity is true
      */
     unitsCurrentlyAvailable: number;
     /**
      * how many units are available in total
+     * can be 0 if unitsInfinity is true
      */
     unitsTotalAvailable: number;
+
+    /**
+     * if true, then the symbol has unlimited units
+     */
     unitsInfinity: boolean;
 
     /**

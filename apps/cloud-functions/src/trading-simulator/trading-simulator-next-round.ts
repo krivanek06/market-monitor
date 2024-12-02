@@ -94,7 +94,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
     .get();
 
   // update symbol prices
-  const symbolPricesUpdated = Object.entries(aggregationSymbol ?? {}).reduce((acc, [symbol, data]) => {
+  const symbolAggregationUpdate = Object.entries(aggregationSymbol ?? {}).reduce((acc, [symbol, data]) => {
     const symbolSavedData = symbolsData.find((d) => d.symbol === symbol);
     const issuedUnits = symbolSavedData?.unitsAdditionalIssued ?? [];
 
@@ -109,12 +109,14 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
         // increment available units if issued on that round
         unitsCurrentlyAvailable:
           data.unitsCurrentlyAvailable + (issuedUnits.find((d) => d.issuedOnRound === nextRound)?.units ?? 0),
+        unitsTotalAvailable:
+          data.unitsTotalAvailable + (issuedUnits.find((d) => d.issuedOnRound === nextRound)?.units ?? 0),
       } satisfies TradingSimulatorAggregationSymbolsData,
     };
   }, {} as TradingSimulatorAggregationSymbols);
 
   // I need this format to make some calculations, but data is not stored in DB
-  const symbolPriceQuoteFormat = Object.entries(symbolPricesUpdated).map(
+  const symbolPriceQuoteFormat = Object.entries(symbolAggregationUpdate).map(
     ([symbol, data]) =>
       ({
         symbol,
@@ -196,7 +198,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
   } satisfies FieldValuePartial<TradingSimulator>);
 
   // update prices for each symbol
-  bulk.update(tradingSimulatorAggregationSymbolsDocRef(simulator.id), symbolPricesUpdated);
+  bulk.update(tradingSimulatorAggregationSymbolsDocRef(simulator.id), symbolAggregationUpdate);
 
   // update each participant's data
   for (const participant of participantsUpdatedSorted) {

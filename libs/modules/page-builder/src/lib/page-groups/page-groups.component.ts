@@ -106,7 +106,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
 
         <!-- no group message -->
         @if (groups.groupOwner.length === 0 && groups.groupMember.length === 0) {
-          <div class="text-wt-gray-medium mt-[250px] text-center text-2xl">
+          <div class="text-wt-gray-medium mt-[250px] text-center text-xl">
             You are not a member of any group. You can create a new group or search for existing groups.
           </div>
         }

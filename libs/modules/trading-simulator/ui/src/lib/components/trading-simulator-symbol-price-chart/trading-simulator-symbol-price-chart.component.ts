@@ -11,7 +11,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
   standalone: true,
   imports: [HighchartsChartModule, DefaultImgDirective, CurrencyPipe, PercentageIncreaseDirective],
   template: `
-    <div class="flex items-center justify-between">
+    <div class="mb-2 flex items-center justify-between">
       <!-- name + image -->
       <div class="flex items-center gap-3">
         <img [src]="simulatorSymbol().symbol" appDefaultImg imageType="symbol" class="h-5 w-5" />
@@ -19,7 +19,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
       </div>
       <!-- current price -->
       <div class="flex items-center gap-2 text-sm">
-        <div class="text-wt-gray-medium">
+        <div class="text-wt-gray-dark">
           {{ currentPrice() | currency }}
         </div>
 
@@ -35,6 +35,8 @@ import { HighchartsChartModule } from 'highcharts-angular';
         }
       </div>
     </div>
+
+    <!-- chart -->
     <highcharts-chart
       [Highcharts]="Highcharts"
       [options]="chartOptionsSignal()"
@@ -71,17 +73,35 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
   readonly chartOptionsSignal = computed(() => {
     const simulator = this.simulator();
     const symbol = this.simulatorSymbol();
-    const currentRound = simulator.currentRound;
     const authUser = this.authUser();
 
+    const currentRound = simulator.currentRound;
     const isOwner = authUser.id === simulator.owner.id;
     const categories = Array.from({ length: simulator.maximumRounds }).map((_, i) => String(i + 1));
-    const pricesPubliclyVisible = symbol.historicalDataModified.slice(0, currentRound).map((price) => price);
-    const pricesOwnerVisible = isOwner ? symbol.historicalDataModified.slice(currentRound).map((price) => price) : [];
-    const pricesDisplay = [...pricesPubliclyVisible, ...pricesOwnerVisible];
 
-    // todo - DISPLAY ISSUED UNITS
-    // todo - display current price on current round and available units
+    // create an array of issued units on specific round
+    const issuedUnitsOnRound = Array.from({ length: symbol.historicalDataModified.length }).map((_, i) => {
+      const units = symbol.unitsAdditionalIssued.find((d) => d.issuedOnRound === i + 1)?.units ?? 0;
+      return units;
+    });
+
+    // units everybody sees up to the current round
+    const issuedUnitsPubliclyVisible = issuedUnitsOnRound.slice(0, currentRound);
+
+    // units only the owner sees from the current round
+    const issuedUnitsOwnerVisible = isOwner ? issuedUnitsOnRound.slice(currentRound) : [];
+
+    // prices everybody sees up to the current round
+    const pricesPubliclyVisible = symbol.historicalDataModified.slice(0, currentRound);
+
+    // prices only the owner sees from the current round
+    const pricesOwnerVisible = isOwner ? symbol.historicalDataModified.slice(currentRound) : [];
+
+    // combine data
+    const pricesDisplay = [...pricesPubliclyVisible, ...pricesOwnerVisible];
+    const issuedUnitsDisplay = [...issuedUnitsPubliclyVisible, ...issuedUnitsOwnerVisible];
+
+    console.log({ symbol, pricesDisplay, issuedUnitsDisplay });
 
     return {
       chart: {
@@ -105,6 +125,22 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
           },
           gridLineColor: ColorScheme.GRAY_LIGHT_STRONG_VAR,
           opposite: false,
+          gridLineWidth: 1,
+          tickPixelInterval: 30,
+          minorGridLineWidth: 0,
+          labels: {
+            style: {
+              color: ColorScheme.GRAY_MEDIUM_VAR,
+              font: '10px Trebuchet MS, Verdana, sans-serif',
+            },
+          },
+        },
+        {
+          title: {
+            text: '',
+          },
+          gridLineColor: ColorScheme.GRAY_LIGHT_STRONG_VAR,
+          opposite: true,
           gridLineWidth: 1,
           tickPixelInterval: 30,
           minorGridLineWidth: 0,
@@ -159,7 +195,7 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
         headerFormat: `<div style="font-size: 12px">Round: <span style="color: ${ColorScheme.PRIMARY_VAR}">{point.key}</span></div><br/>`,
         pointFormatter: function () {
           const name = this.series.name;
-          const value = formatValueIntoCurrency(this.y);
+          const value = name.toLocaleLowerCase() === 'price' ? formatValueIntoCurrency(this.y) : this.y;
 
           return `<p><span style="color: ${this.color};">● ${name}: </span><span>${value}</span></p><br/>`;
         },
@@ -169,7 +205,26 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
           type: 'line',
           data: pricesDisplay,
           zoneAxis: 'x',
-          name: symbol.symbol,
+          yAxis: 0,
+          name: 'Price',
+          zones: [
+            {
+              value: currentRound,
+              color: ColorScheme.ACCENT_1_VAR,
+            },
+            {
+              color: ColorScheme.ACCENT_2_VAR,
+            },
+          ],
+        },
+        {
+          type: 'column',
+          data: issuedUnitsDisplay,
+          zoneAxis: 'x',
+          yAxis: 1,
+          opacity: 0.65,
+          borderColor: ColorScheme.GRAY_DARK_VAR,
+          name: 'Units',
           zones: [
             {
               value: currentRound,
