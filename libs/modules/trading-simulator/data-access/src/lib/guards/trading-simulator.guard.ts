@@ -43,7 +43,7 @@ export const tradingSimulatorEditGuard: CanActivateFn = (route: ActivatedRouteSn
   );
 };
 
-export const tradingSimulatorExistsGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+export const tradingSimulatorDetailsGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const dialogServiceUtil = inject(DialogServiceUtil);
   const tradingSimulatorApiService = inject(TradingSimulatorApiService);
   const router = inject(Router);
@@ -55,6 +55,13 @@ export const tradingSimulatorExistsGuard: CanActivateFn = (route: ActivatedRoute
       // check if simulator exists
       if (!simulator) {
         dialogServiceUtil.showNotificationBar('Trading simulator not found', 'error');
+        router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
+        return false;
+      }
+
+      // check if not in draft state
+      if (simulator.state === 'draft') {
+        dialogServiceUtil.showNotificationBar('Trading simulator is in draft state', 'error');
         router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
         return false;
       }

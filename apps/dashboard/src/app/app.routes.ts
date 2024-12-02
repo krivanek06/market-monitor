@@ -4,7 +4,7 @@ import { UserAccountEnum } from '@mm/api-types';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { featureFlagGuard, userAccountTypeGuard } from '@mm/authentication/feature-access-directive';
 import { IS_DEV_TOKEN, ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
-import { tradingSimulatorEditGuard, tradingSimulatorExistsGuard } from '@mm/trading-simulator/data-access';
+import { tradingSimulatorDetailsGuard, tradingSimulatorEditGuard } from '@mm/trading-simulator/data-access';
 import { map, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
@@ -133,7 +133,7 @@ export const appRoutes: Route[] = [
               {
                 path: `${ROUTES_TRADING_SIMULATOR.DETAILS}/:id`,
                 loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorDetailsComponent),
-                canActivate: [tradingSimulatorExistsGuard],
+                canActivate: [tradingSimulatorDetailsGuard],
               },
             ],
           },

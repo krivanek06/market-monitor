@@ -68,8 +68,10 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
       <div class="mb-6 flex items-center justify-between">
         <app-section-title title="Simulator: {{ simulatorData.name }}" />
 
-        <!-- buttons to the owner -->
-        <app-page-trading-simulator-details-buttons [simulatorData]="simulatorData" />
+        <!-- buttons to interact -->
+        @if (!isUserDemoAccount()) {
+          <app-page-trading-simulator-details-buttons [simulatorData]="simulatorData" />
+        }
       </div>
 
       <!-- participant data -->
@@ -224,6 +226,7 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
 export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBaseComponent {
   private readonly dialog = inject(MatDialog);
   readonly selectedParticipantsControl = new FormControl<UserBaseMin[]>([], { nonNullable: true });
+  readonly isUserDemoAccount = this.authenticationUserStoreService.state.isDemoAccount;
 
   /** participating user data - may not exists if user is only a spectator */
   readonly participant = toSignal(
