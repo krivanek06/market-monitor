@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -26,8 +26,10 @@ import { MatIconModule } from '@angular/material/icon';
             {{ title() }}
           </h2>
 
-          @if (description()) {
-            <p class="text-wt-gray-medium text-sm">{{ description() }}</p>
+          @if (descriptionDisplay().length > 0) {
+            @for (desc of descriptionDisplay(); track $index) {
+              <p class="text-wt-gray-medium text-sm">{{ desc }}</p>
+            }
           }
         </div>
       </div>
@@ -49,5 +51,11 @@ export class SectionTitleComponent {
   readonly matIcon = input<string | undefined>();
   readonly title = input.required<string>();
   readonly titleSize = input<'xl' | 'lg' | 'base'>('xl');
-  readonly description = input<string | undefined>();
+  readonly description = input<string | string[] | undefined>();
+
+  readonly descriptionDisplay = computed(() => {
+    const description = this.description();
+
+    return Array.isArray(description) ? description : [description];
+  });
 }

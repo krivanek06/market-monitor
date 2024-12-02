@@ -197,6 +197,11 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
 
   readonly maximumRounds = input<number>(100);
 
+  /**
+   * symbols that are already selected in other forms to prevent duplicates
+   */
+  readonly alreadySelectedSymbol = input<string[]>([]);
+
   /** whether to display remove button */
   readonly disabledRemove = input<boolean>(false);
 
@@ -377,7 +382,13 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   }
 
   onChangeSymbol() {
-    const [s1] = getRandomElement(STOCK_SYMBOLS, 1);
+    // get many random elements
+    const symbols = getRandomElement(STOCK_SYMBOLS, 10);
+
+    // find first that is not yet selected
+    const s1 = symbols.find((s) => !this.alreadySelectedSymbol().includes(s));
+
+    // set the form data
     this.form.patchValue({ symbol: s1 });
   }
 
@@ -402,8 +413,11 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   }
 
   writeValue(obj: TradingSimulatorSymbol): void {
-    if (obj.symbol === '') {
-      this.fillFormData();
+    if (obj.historicalDataOriginal.length === 0) {
+      // save the symbol
+      this.form.patchValue({ symbol: obj.symbol });
+      // get the historical data
+      this.onChangeHistoricalData();
       return;
     }
 
@@ -437,14 +451,5 @@ export class TradingSimulatorFormSymbolComponent implements ControlValueAccessor
   validate() {
     this.form.markAllAsTouched();
     return this.form.valid ? null : { invalidForm: { valid: false, message: 'Symbol form fields are invalid' } };
-  }
-
-  /**
-   * generate data into the form, when the component is initialized
-   * use 2 random symbols - one for the symbol and one for the historical data
-   */
-  private async fillFormData(): Promise<void> {
-    this.onChangeSymbol();
-    this.onChangeHistoricalData();
   }
 }

@@ -397,7 +397,10 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
     <!-- symbol select -->
     <app-section-title
       title="Select Symbols"
-      description="Select what symbols are available in the trading simulator"
+      [description]="[
+        'Select what symbols are available in the trading simulator.',
+        'Keep in mind that these historical prices are random, they do not represent the actual price movement for the selected symbol.',
+      ]"
       titleSize="base"
       class="mb-4"
     />
@@ -411,6 +414,7 @@ import { TradingSimulatorFormSymbolComponent } from './trading-simulator-form-sy
           [marketChange]="form.controls.marketChange.value"
           (removeSymbol)="onRemoveSymbol(i)"
           [disabledRemove]="form.controls.symbolsHistoricalData.controls.length <= 6"
+          [alreadySelectedSymbol]="alreadySelectedSymbol()"
         />
         <mat-divider />
       }
@@ -553,80 +557,7 @@ export class TradingSimulatorFormComponent {
     }),
 
     // symbols - start with some default symbols
-    symbolsHistoricalData: new FormArray<FormControl<TradingSimulatorSymbol>>([
-      new FormControl(
-        {
-          symbol: '',
-          unitsAvailableOnStart: 0,
-          priceMultiplication: 1,
-          unitsAdditionalIssued: [],
-          historicalDataModified: [],
-          historicalDataOriginal: [],
-          unitsInfinity: true,
-        },
-        { nonNullable: true },
-      ),
-      new FormControl(
-        {
-          symbol: '',
-          unitsAvailableOnStart: 0,
-          priceMultiplication: 1,
-          unitsAdditionalIssued: [],
-          historicalDataModified: [],
-          historicalDataOriginal: [],
-          unitsInfinity: true,
-        },
-        { nonNullable: true },
-      ),
-      new FormControl(
-        {
-          symbol: '',
-          unitsAvailableOnStart: 0,
-          priceMultiplication: 1,
-          unitsAdditionalIssued: [],
-          historicalDataModified: [],
-          historicalDataOriginal: [],
-          unitsInfinity: true,
-        },
-        { nonNullable: true },
-      ),
-      new FormControl(
-        {
-          symbol: '',
-          unitsAvailableOnStart: 0,
-          priceMultiplication: 1,
-          unitsAdditionalIssued: [],
-          historicalDataModified: [],
-          historicalDataOriginal: [],
-          unitsInfinity: true,
-        },
-        { nonNullable: true },
-      ),
-      new FormControl(
-        {
-          symbol: '',
-          unitsAvailableOnStart: 0,
-          priceMultiplication: 1,
-          unitsAdditionalIssued: [],
-          historicalDataModified: [],
-          historicalDataOriginal: [],
-          unitsInfinity: true,
-        },
-        { nonNullable: true },
-      ),
-      new FormControl(
-        {
-          symbol: '',
-          unitsAvailableOnStart: 0,
-          priceMultiplication: 1,
-          unitsAdditionalIssued: [],
-          historicalDataModified: [],
-          historicalDataOriginal: [],
-          unitsInfinity: true,
-        },
-        { nonNullable: true },
-      ),
-    ]),
+    symbolsHistoricalData: new FormArray<FormControl<TradingSimulatorSymbol>>([]),
   });
 
   /** put form into signal, better for change detection */
@@ -642,6 +573,16 @@ export class TradingSimulatorFormComponent {
       })),
     ),
     { requireSync: true },
+  );
+
+  /**
+   * keep track of already selected symbols to prevent duplicates
+   */
+  readonly alreadySelectedSymbol = toSignal(
+    this.form.controls.symbolsHistoricalData.valueChanges.pipe(map((symbols) => symbols.map((d) => d.symbol))),
+    {
+      initialValue: [],
+    },
   );
 
   /** prevent selecting dates in the past */
@@ -684,6 +625,14 @@ export class TradingSimulatorFormComponent {
       .subscribe((enabled) => {
         this.changeFormMarginTradingValidation(enabled);
       });
+
+    // add symbols
+    this.onAddSymbol(undefined, 'AAPL');
+    this.onAddSymbol(undefined, 'MSFT');
+    this.onAddSymbol(undefined, 'GOOGL');
+    this.onAddSymbol(undefined, 'AMZN');
+    this.onAddSymbol(undefined, 'TSLA');
+    this.onAddSymbol(undefined, 'META');
   }
 
   @Confirmable(
@@ -698,7 +647,14 @@ export class TradingSimulatorFormComponent {
     this.onSubmit('live');
   }
 
-  onAddSymbol(data?: TradingSimulatorSymbol): void {
+  /**
+   *
+   * @param data - symbol data already stored (used in editing)
+   * @param symbol - add a random symbol to the form
+   * @returns
+   */
+  onAddSymbol(data?: TradingSimulatorSymbol, symbol = ''): void {
+    // prevent adding more than 10 symbols
     if (this.form.controls.symbolsHistoricalData.controls.length >= 10) {
       this.dialogServiceUtil.showNotificationBar('You can add up to 10 symbols', 'error');
       return;
@@ -706,7 +662,7 @@ export class TradingSimulatorFormComponent {
 
     // create form group for symbol
     const symbolForm: TradingSimulatorSymbol = {
-      symbol: data?.symbol ?? '',
+      symbol: data?.symbol ?? symbol,
       priceMultiplication: data?.priceMultiplication ?? 1,
       unitsAvailableOnStart: data?.unitsAvailableOnStart ?? 0,
       unitsAdditionalIssued: data?.unitsAdditionalIssued ?? [],
