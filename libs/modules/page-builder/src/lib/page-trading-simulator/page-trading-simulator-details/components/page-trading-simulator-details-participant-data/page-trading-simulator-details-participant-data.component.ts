@@ -151,7 +151,7 @@ import { firstValueFrom } from 'rxjs';
     <div class="mb-12 grid gap-x-4 xl:grid-cols-3">
       <div class="xl:col-span-2">
         <!-- holdings -->
-        <app-section-title title="My Holdings" matIcon="show_chart" titleSize="lg" class="mb-3" />
+        <app-section-title title="My Holdings" matIcon="show_chart" class="mb-3" />
         <app-general-card additionalClasses="min-h-[300px]">
           <app-portfolio-holdings-table
             [portfolioState]="participant().portfolioState"
@@ -200,7 +200,7 @@ import { firstValueFrom } from 'rxjs';
     <!-- symbol template to trade -->
     <ng-template #symbolTradeRef let-data>
       <div class="w-[360px]">
-        <app-section-title title="Choose a symbol" class="mb-3" titleSize="lg">
+        <app-section-title title="Choose a symbol" class="mb-3">
           <div
             [ngClass]="{
               'text-wt-success': data?.operation === 'BUY',

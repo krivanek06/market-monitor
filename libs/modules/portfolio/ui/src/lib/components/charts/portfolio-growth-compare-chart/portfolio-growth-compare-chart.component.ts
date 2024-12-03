@@ -31,7 +31,7 @@ export type PortfolioGrowthCompareChartData = {
     <div class="mb-2 flex flex-col items-center lg:flex-row lg:justify-between">
       <!-- title -->
       @if (title()) {
-        <app-section-title matIcon="compare_arrows" [title]="title()" titleSize="lg" />
+        <app-section-title matIcon="compare_arrows" [title]="title()" />
       }
 
       <!-- time slider -->

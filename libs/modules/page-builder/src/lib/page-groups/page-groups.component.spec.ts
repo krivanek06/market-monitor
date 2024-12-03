@@ -8,6 +8,7 @@ import {
   GROUP_TEST_ID_3,
   GroupData,
   UserAccountEnum,
+  UserData,
   UserGroupData,
   mockCreateGroupData,
   mockCreateUser,
@@ -17,7 +18,7 @@ import { GroupDisplayCardComponent, GroupSearchControlComponent } from '@mm/grou
 import { GroupDisplayItemComponent } from '@mm/group/ui';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { waitSeconds } from '@mm/shared/general-util';
-import { ClickableDirective } from '@mm/shared/ui';
+import { ClickableDirective, GeneralCardComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PageGroupsComponent } from './page-groups.component';
 
@@ -37,6 +38,9 @@ describe('PageGroupsComponent', () => {
       groupMember: [GROUP_TEST_ID_1],
       groupRequested: [GROUP_TEST_ID_3],
       groupWatched: [],
+    },
+    featureAccess: {
+      createGroups: true,
     },
   });
 
@@ -64,10 +68,12 @@ describe('PageGroupsComponent', () => {
       .keep(GroupDisplayItemComponent)
       .keep(ClickableDirective)
       .keep(GroupDisplayCardComponent)
+      .keep(GeneralCardComponent)
       .provide({
         provide: AuthenticationUserStoreService,
         useValue: {
           state: {
+            userData: () => groupDataOwnerMock,
             getUserData: () => groupDataOwnerMock,
             getUserDataNormal: () => groupDataOwnerMock,
             isDemoAccount: () => false,
@@ -117,19 +123,11 @@ describe('PageGroupsComponent', () => {
     expect(fixture).toBeTruthy();
   });
 
-  it('should have isCreateGroupDisabledSignal as false', () => {
+  it('should have isCreateGroupDisabledSignal as true', () => {
     const fixture = MockRender(PageGroupsComponent);
     const component = fixture.point.componentInstance;
 
-    expect(component.isCreateGroupDisabledSignal()).toBe(false);
-  });
-
-  it('should have defined groupsSignal', () => {
-    const fixture = MockRender(PageGroupsComponent);
-    const component = fixture.point.componentInstance;
-
-    expect(component.groupsSignal).toBeDefined();
-    expect(component.groupsSignal()?.groupOwner[0]).toEqual(groupDataT1Mock);
+    expect(component.isCreateGroupEnabled()).toBe(true);
   });
 
   it('should open create group dialog', () => {
@@ -251,8 +249,8 @@ describe('PageGroupsComponent', () => {
     ngMocks.click(createGroupS);
 
     // check if the function is called
-    expect(component.groupsSignal()?.groupOwner.length).toBe(6);
-    expect(component.isCreateGroupDisabledSignal()).toBe(true);
+    expect(ngMocks.findAll(myGroupsS).length).toBe(6);
+    expect(component.isCreateGroupEnabled()).toBe(false);
     expect(createGroupEl.nativeElement.disabled).toBeTruthy();
     expect(onCreateGroupClickSpy).not.toHaveBeenCalled();
     expect(dialogServiceUtil.showInlineInputDialog).not.toHaveBeenCalled();
@@ -293,10 +291,88 @@ describe('PageGroupsComponent', () => {
     ngMocks.click(createGroupS);
 
     // check if the function is called
-    expect(component.isCreateGroupDisabledSignal()).toBe(true);
+    expect(component.isCreateGroupEnabled()).toBe(false);
     expect(createGroupEl.nativeElement.disabled).toBeTruthy();
     expect(onCreateGroupClickSpy).not.toHaveBeenCalled();
     expect(dialogServiceUtil.showInlineInputDialog).not.toHaveBeenCalled();
+  });
+
+  it('should not open create group dialog if user is does not have feature access', () => {
+    const dialogServiceUtil = ngMocks.findInstance(DialogServiceUtil);
+    const authService = ngMocks.findInstance(AuthenticationUserStoreService);
+
+    // Set user as demo account
+    ngMocks.stub(authService, {
+      state: {
+        ...authService.state,
+        userData: () =>
+          ({
+            ...mockCreateUser(),
+            featureAccess: {
+              createGroups: false,
+            },
+          }) as UserData,
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+
+    fixture.detectChanges();
+
+    const component = fixture.point.componentInstance;
+
+    const onCreateGroupClickSpy = jest.spyOn(component, 'onCreateGroupClick');
+    const createGroupEl = ngMocks.find<HTMLElement>(createGroupS);
+
+    // Click on create group button
+    ngMocks.click(createGroupS);
+
+    // check if the function is called
+    expect(component.isCreateGroupEnabled()).toBe(false);
+    expect(createGroupEl.nativeElement.disabled).toBeTruthy();
+    expect(onCreateGroupClickSpy).not.toHaveBeenCalled();
+    expect(dialogServiceUtil.showInlineInputDialog).not.toHaveBeenCalled();
+  });
+
+  it('should enable creating groups if user has permission and is not demo account', () => {
+    const authService = ngMocks.findInstance(AuthenticationUserStoreService);
+
+    // Set user with many groups
+    ngMocks.stub(authService, {
+      ...authService,
+      state: {
+        ...authService.state,
+        userGroupData: () =>
+          ({
+            groupOwner: [],
+            groupInvitations: [],
+            groupMember: [],
+            groupRequested: [],
+            groupWatched: [],
+          }) as UserGroupData,
+        isDemoAccount: () => false,
+        userData: () =>
+          ({
+            ...mockCreateUser(),
+            featureAccess: {
+              createGroups: true,
+            },
+          }) as UserData,
+      },
+    } as any);
+
+    // remove warning , allow mocking services before rendering
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(PageGroupsComponent);
+    const component = fixture.point.componentInstance;
+
+    fixture.detectChanges();
+
+    expect(component.isCreateGroupEnabled()).toBe(true);
   });
 
   it('should redirect to group page on group click', () => {
@@ -481,6 +557,7 @@ describe('PageGroupsComponent', () => {
     // Set user with many groups
     ngMocks.stub(authService, {
       state: {
+        ...authService.state,
         userGroupData: () =>
           ({
             groupOwner: [],
@@ -489,7 +566,6 @@ describe('PageGroupsComponent', () => {
             groupRequested: [],
             groupWatched: [],
           }) as UserGroupData,
-        isDemoAccount: () => false,
       } as AuthenticationUserStoreService['state'],
     });
 

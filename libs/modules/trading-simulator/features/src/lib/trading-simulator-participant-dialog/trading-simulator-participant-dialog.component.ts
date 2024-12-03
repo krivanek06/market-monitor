@@ -13,7 +13,6 @@ import {
   PortfolioStateOtherComponent,
   PortfolioStateTransactionsComponent,
   PortfolioTransactionsItemComponent,
-  PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
 import { getPortfolioStateHoldingBaseByTransactionsUtil, roundNDigits } from '@mm/shared/general-util';
@@ -105,7 +104,7 @@ export type TradingSimulatorParticipantDialogComponentData = {
 
         <!-- holdings -->
         <div class="mb-6">
-          <app-section-title title="Holdings" matIcon="show_chart" titleSize="lg" class="mb-3" />
+          <app-section-title title="Holdings" matIcon="show_chart" class="mb-3" />
           <app-portfolio-holdings-table
             [portfolioState]="participant.portfolioState"
             [holdings]="participantDataHoldings()"
@@ -121,7 +120,7 @@ export type TradingSimulatorParticipantDialogComponentData = {
         <div class="divide-wt-border grid grid-cols-2 divide-x-2">
           <div class="px-6 py-2">
             <!-- best transactions -->
-            <app-section-title title="Best Returns" matIcon="trending_up" titleSize="lg" class="mb-3" />
+            <app-section-title title="Best Returns" matIcon="trending_up" class="mb-3" />
             @for (item of transactionState().best; track item.transactionId; let last = $last) {
               <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
                 <app-portfolio-transactions-item dateType="round" [transaction]="item" />
@@ -135,7 +134,7 @@ export type TradingSimulatorParticipantDialogComponentData = {
 
           <div class="px-6 py-2">
             <!-- worst transactions -->
-            <app-section-title title="Worst Returns" matIcon="trending_down" titleSize="lg" class="mb-3" />
+            <app-section-title title="Worst Returns" matIcon="trending_down" class="mb-3" />
             @for (item of transactionState().worst; track item.transactionId; let last = $last) {
               <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
                 <app-portfolio-transactions-item dateType="round" [transaction]="item" />

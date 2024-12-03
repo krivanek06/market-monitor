@@ -1,4 +1,4 @@
-import { CurrencyPipe, PercentPipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { OutstandingOrder, PortfolioState } from '@mm/api-types';
 import { ColorScheme } from '@mm/shared/data-access';
@@ -7,7 +7,7 @@ import { AddColorDirective } from '@mm/shared/ui';
 @Component({
   selector: 'app-portfolio-state-other',
   standalone: true,
-  imports: [AddColorDirective, CurrencyPipe, PercentPipe],
+  imports: [AddColorDirective, CurrencyPipe],
   template: `
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">

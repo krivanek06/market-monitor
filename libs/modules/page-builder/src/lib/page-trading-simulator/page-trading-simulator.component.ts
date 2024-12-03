@@ -64,7 +64,7 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
       <!-- simulator the user is participating in -->
       @if ((simulatorsByParticipant()?.length ?? 0) > 0) {
         <div>
-          <app-section-title title="My Simulations" class="mb-3" titleSize="lg" />
+          <app-section-title title="My Simulations" class="mb-3" />
 
           <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             @for (item of simulatorsByParticipant(); track item.id) {
@@ -84,11 +84,7 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
 
       <!-- all running simulators -->
       <div>
-        <app-section-title
-          title="Running Simulators: {{ tradingSimulatorLatestData().started.length }}"
-          class="mb-3"
-          titleSize="lg"
-        />
+        <app-section-title title="Running Simulators: {{ tradingSimulatorLatestData().started.length }}" class="mb-3" />
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           @for (item of tradingSimulatorLatestData().started; track item.id) {
@@ -109,11 +105,7 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
 
       <!-- all live simulators -->
       <div>
-        <app-section-title
-          title="Upcoming Simulators: {{ tradingSimulatorLatestData().live.length }}"
-          class="mb-3"
-          titleSize="lg"
-        />
+        <app-section-title title="Upcoming Simulators: {{ tradingSimulatorLatestData().live.length }}" class="mb-3" />
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           @for (item of tradingSimulatorLatestData().live; track item.id) {
@@ -135,7 +127,7 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
 
         <!-- historical simulators -->
         <div>
-          <app-section-title title="Ended Simulators" class="mb-3" titleSize="lg" />
+          <app-section-title title="Ended Simulators" class="mb-3" />
 
           <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             @for (item of tradingSimulatorLatestData().historical; track item.id) {

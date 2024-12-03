@@ -57,7 +57,7 @@ import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
       </div>
     </app-general-card>
 
-    <!-- normal order -->
+    <!-- normal order - IN FUTURE THERE WILL BE OTHER DIFFERENT ORDERS -->
     <ng-template #normalOrderTmp let-order="order">
       <div>
         <div class="g-item-wrapper">

@@ -1,7 +1,7 @@
 export default {
   displayName: 'features',
   preset: '../../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../../jest.setup.js'],
   coverageDirectory: '../../../../coverage/libs/modules/trading-simulator/features',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

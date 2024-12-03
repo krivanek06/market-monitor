@@ -1,9 +1,9 @@
-import { MockBuilder, MockRender } from 'ng-mocks';
+import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS } from 'ng-mocks';
 import { PortfolioStateOtherComponent } from './portfolio-state-other.component';
 
 describe('PortfolioStateOtherComponent', () => {
   beforeEach(() => {
-    MockBuilder(PortfolioStateOtherComponent);
+    return MockBuilder(PortfolioStateOtherComponent).keep(NG_MOCKS_ROOT_PROVIDERS);
   });
 
   it('should create', () => {

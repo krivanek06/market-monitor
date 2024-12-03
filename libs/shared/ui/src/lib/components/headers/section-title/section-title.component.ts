@@ -20,7 +20,6 @@ import { MatIconModule } from '@angular/material/icon';
             [ngClass]="{
               'text-lg': titleSize() === 'lg',
               'text-base': titleSize() === 'base',
-              'text-xl': titleSize() === 'xl',
             }"
           >
             {{ title() }}
@@ -50,7 +49,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class SectionTitleComponent {
   readonly matIcon = input<string | undefined>();
   readonly title = input.required<string>();
-  readonly titleSize = input<'xl' | 'lg' | 'base'>('xl');
+  readonly titleSize = input<'lg' | 'base'>('lg');
   readonly description = input<string | string[] | undefined>();
 
   readonly descriptionDisplay = computed(() => {

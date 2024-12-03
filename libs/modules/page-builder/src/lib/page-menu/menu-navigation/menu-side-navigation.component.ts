@@ -1,10 +1,11 @@
 import { NgClass, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationStart, Router, RouterModule } from '@angular/router';
 import { UserAccountEnum } from '@mm/api-types';
 import {
   AuthenticationAccountService,
@@ -15,6 +16,7 @@ import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, HelpDialogComponent } from '@mm/shared/ui';
 import { UserSettingsDialogComponent } from '@mm/user/features';
+import { filter, map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-menu-side-navigation',
@@ -62,7 +64,6 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
             <a
               [routerLink]="main.path"
               routerLinkActive="bg-wt-gray-light-strong text-wt-primary"
-              (click)="onNavigationClick(main.path)"
               class="hover:bg-wt-gray-light-strong text-wt-gray-dark flex h-12 max-w-[90%] items-center gap-3 rounded-xl"
               [ngClass]="{
                 'pl-5': selectedNavigationPath() !== main.path,
@@ -90,7 +91,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MenuSideNavigationComponent implements OnInit {
+export class MenuSideNavigationComponent {
   private readonly router = inject(Router);
   private readonly authenticationService = inject(AuthenticationAccountService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
@@ -172,16 +173,15 @@ export class MenuSideNavigationComponent implements OnInit {
     return data;
   });
 
-  readonly selectedNavigationPath = signal('');
-
-  ngOnInit(): void {
-    const selectedNavigationPath = this.router.url.split('/')[1]; // ['', 'dashboard']
-    this.selectedNavigationPath.set(selectedNavigationPath);
-  }
-
-  onNavigationClick(path: string) {
-    this.selectedNavigationPath.set(path);
-  }
+  readonly selectedNavigationPath = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationStart),
+      map((event) => event.url),
+      startWith(this.router.url),
+      map((url) => url.replace('/', '') as string),
+    ),
+    { initialValue: '' },
+  );
 
   async onLogout() {
     await this.router.navigate([ROUTES_MAIN.LOGIN]);

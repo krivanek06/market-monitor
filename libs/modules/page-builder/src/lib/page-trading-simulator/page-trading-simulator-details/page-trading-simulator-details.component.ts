@@ -45,7 +45,7 @@ import { PageTradingSimulatorDetailsParticipantsDisplayComponent } from './compo
   template: `
     @if (simulatorData(); as simulatorData) {
       <div class="mb-6 flex flex-col justify-between gap-y-4 md:flex-row md:items-center">
-        <app-section-title title="Simulator: {{ simulatorData.name }}" />
+        <app-section-title title="Simulator: {{ simulatorData.name }}" matIcon="sports_esports" />
 
         <!-- buttons to interact -->
         @if (!isUserDemoAccount()) {
@@ -72,7 +72,6 @@ import { PageTradingSimulatorDetailsParticipantsDisplayComponent } from './compo
           <div class="mb-4 flex flex-col justify-between gap-y-4 md:flex-row">
             <app-section-title
               title="Symbol Price Movement"
-              titleSize="lg"
               description="Charts indicates how the prices of each symbol have changed over time."
             />
 
@@ -98,7 +97,6 @@ import { PageTradingSimulatorDetailsParticipantsDisplayComponent } from './compo
             title="Symbol Statistics"
             description="Data updates in real time as participants create transactions"
             class="mb-3 pl-3"
-            titleSize="lg"
           />
           <app-general-card>
             <app-trading-simulator-symbol-stat-table [data]="simulatorAggregationSymbols()" />

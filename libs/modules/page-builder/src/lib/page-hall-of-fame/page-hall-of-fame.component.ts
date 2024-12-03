@@ -60,7 +60,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
     </div>
 
     <!-- best users -->
-    <div class="mb-10 flex justify-around gap-4 max-xl:overflow-x-scroll">
+    <div class="mb-10 flex justify-around gap-4 max-2xl:overflow-x-scroll">
       @for (user of hallOfFameUsers().bestPortfolio | slice: 0 : topUsersLimit; track user.item.id; let i = $index) {
         <app-rank-card
           data-testid="hall-of-fame-user-rank-card"
@@ -94,7 +94,7 @@ import { UserDisplayItemComponent } from '@mm/user/ui';
       }
     </div>
 
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-4 flex items-center justify-between gap-x-10">
       <!-- search users -->
       <app-user-search-control
         data-testid="hall-of-fame-user-search-control"

@@ -30,7 +30,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
   template: `
     <div class="m-auto grid gap-y-4 xl:w-11/12">
       <div class="flex w-full flex-col items-start justify-between gap-x-8 gap-y-6 lg:mb-6 lg:flex-row">
-        <div class="flex justify-between gap-x-6 max-lg:w-full">
+        <div class="flex justify-between gap-x-4 max-lg:w-full">
           <!-- title -->
           <app-section-title matIcon="group" title="Groups" class="mt-1" />
 
@@ -168,9 +168,9 @@ export class PageGroupsComponent {
       // user hasn't reached the limit of groups
       (this.state?.userGroupData()?.groupOwner?.length ?? 99) < GROUP_OWNER_LIMIT &&
       // user is not demo account
-      !this.authenticationUserService.state.isDemoAccount() &&
+      !this.state.isDemoAccount() &&
       // user has permission to create groups
-      this.state().userData?.featureAccess?.createGroups,
+      this.state.userData()?.featureAccess?.createGroups,
   );
 
   async onCreateGroupClick() {
@@ -179,7 +179,7 @@ export class PageGroupsComponent {
       return;
     }
 
-    const user = this.authenticationUserService.state.getUserData();
+    const user = this.state.getUserData();
     const groupName = await this.dialogServiceUtil.showInlineInputDialog({
       title: 'Create Group',
       description: 'Please enter a name for the group',
@@ -211,7 +211,7 @@ export class PageGroupsComponent {
       secondaryButtonText: 'Decline',
       secondaryButtonColor: 'warn',
     });
-    const user = this.authenticationUserService.state.getUserData();
+    const user = this.state.getUserData();
 
     try {
       // accept user
@@ -259,7 +259,7 @@ export class PageGroupsComponent {
         // remove request
         this.groupApiService.removeRequestToJoinGroup({
           groupId: groupData.id,
-          userId: this.authenticationUserService.state.getUserData().id,
+          userId: this.state.getUserData().id,
         });
       }
     } catch (error) {

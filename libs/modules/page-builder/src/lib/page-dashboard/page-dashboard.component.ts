@@ -138,33 +138,32 @@ import { GeneralCardComponent, PieChartComponent } from '@mm/shared/ui';
       </div>
     </div>
 
-    <div class="mb-6 grid gap-x-6 xl:grid-cols-3">
+    <div class="mb-6 grid gap-x-6 xl:grid-cols-2">
       <!-- portfolio growth chart -->
-      <app-portfolio-growth-chart
-        data-testid="page-dashboard-investment-growth-chart"
-        headerTitle="Invested / Market"
-        chartType="marketValue"
-        [data]="{
-          values: portfolioUserFacadeService.portfolioGrowth(),
-        }"
-        [heightPx]="320"
-        class="xl:col-span-2"
-      />
+      @if (showLoadingState()) {
+        <div class="g-skeleton mt-6 h-[320px]"></div>
+      } @else {
+        <app-portfolio-growth-chart
+          data-testid="page-dashboard-investment-growth-chart"
+          headerTitle="Invested / Market"
+          chartType="marketValue"
+          [data]="{
+            values: portfolioUserFacadeService.portfolioGrowth(),
+          }"
+          [heightPx]="320"
+        />
+      }
 
-      <!-- portfolio sector allocation -->
-      <div class="max-xl:hidden">
-        @if (portfolioUserFacadeService.portfolioStateHolding()) {
-          <app-pie-chart
-            data-testid="page-dashboard-portfolio-sector-allocation"
-            class="mt-4"
-            chartTitle="Sector Allocation"
-            [heightPx]="280"
-            [series]="portfolioUserFacadeService.portfolioSectorAllocationPieChart()"
-          />
-        } @else {
-          <div class="g-skeleton mt-10 h-[280px]"></div>
-        }
-      </div>
+      <!-- portfolio change chart -->
+      @if (showLoadingState()) {
+        <div class="g-skeleton mt-6 h-[320px]"></div>
+      } @else {
+        <app-portfolio-change-chart
+          data-testid="page-portfolio-change-chart"
+          [data]="portfolioUserFacadeService.portfolioGrowth()"
+          [heightPx]="320"
+        />
+      }
     </div>
 
     <!-- portfolio assets chart -->

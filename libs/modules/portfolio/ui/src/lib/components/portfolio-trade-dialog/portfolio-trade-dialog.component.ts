@@ -10,7 +10,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { OutstandingOrder, PortfolioStateHoldings, PortfolioTransactionType, UserBaseMin } from '@mm/api-types';
-import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
 import { minValueValidator, positiveNumberValidator, requiredValidator } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import {
@@ -20,12 +19,7 @@ import {
   getTransactionFeesBySpending,
   roundNDigits,
 } from '@mm/shared/general-util';
-import {
-  DefaultImgDirective,
-  DialogCloseHeaderComponent,
-  FormMatInputWrapperComponent,
-  NumberKeyboardComponent,
-} from '@mm/shared/ui';
+import { DefaultImgDirective, NumberKeyboardComponent } from '@mm/shared/ui';
 import { map, startWith } from 'rxjs';
 
 export type PortfolioTradeDialogComponentData = {
@@ -69,16 +63,13 @@ export type PortfolioTradeDialogComponentData = {
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
-    DialogCloseHeaderComponent,
     MatDividerModule,
     ReactiveFormsModule,
-    FormMatInputWrapperComponent,
     DefaultImgDirective,
     MatCheckboxModule,
     MatTooltipModule,
     NumberKeyboardComponent,
     MatProgressSpinnerModule,
-    UserAccountTypeDirective,
   ],
   template: `
     <!-- form -->

@@ -1,7 +1,7 @@
 export default {
   displayName: 'trading-simulator-data-access',
   preset: '../../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  setupFilesAfterEnv: ['../../../../jest.setup.js'],
   coverageDirectory: '../../../../coverage/libs/modules/trading-simulator/data-access',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

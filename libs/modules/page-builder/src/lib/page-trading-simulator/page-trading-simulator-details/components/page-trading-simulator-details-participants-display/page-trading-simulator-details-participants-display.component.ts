@@ -38,7 +38,7 @@ import { first, forkJoin, iif, of, switchMap } from 'rxjs';
   ],
   template: `
     <!-- participant ranking -->
-    <app-section-title title="Participant Ranking" matIcon="people" class class="mb-3" titleSize="lg" />
+    <app-section-title title="Participant Ranking" matIcon="people" class class="mb-3" />
     <app-general-card class="mb-6">
       <div class="grid gap-x-6 gap-y-4 p-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         @for (participant of displayParticipants().participants; track participant.userData.id; let i = $index) {
@@ -65,7 +65,7 @@ import { first, forkJoin, iif, of, switchMap } from 'rxjs';
     <!-- participant compare select -->
     <div class="mb-4 flex items-center justify-between max-md:hidden">
       <!-- title -->
-      <app-section-title matIcon="compare_arrows" title="Compare Participants" titleSize="lg" />
+      <app-section-title matIcon="compare_arrows" title="Compare Participants" />
 
       <app-dropdown-control
         inputCaption="Select Participants"

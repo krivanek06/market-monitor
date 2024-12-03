@@ -33,14 +33,14 @@ import { PageTradingSimulatorDetailsInfoComponent } from '../page-trading-simula
               <mat-icon iconPositionEnd>play_arrow</mat-icon>
               Start
             </button>
+          }
+
+          @if (!isUserJoined()) {
+            <!-- join -->
+            <button (click)="onJoin()" mat-stroked-button type="button" color="accent">Join Simulator</button>
           } @else {
-            @if (!isUserJoined()) {
-              <!-- join -->
-              <button (click)="onJoin()" mat-stroked-button type="button" color="accent">Join Simulator</button>
-            } @else {
-              <!-- leave -->
-              <button (click)="onLeave()" mat-stroked-button type="button" color="warn">Leave Simulator</button>
-            }
+            <!-- leave -->
+            <button (click)="onLeave()" mat-stroked-button type="button" color="warn">Leave Simulator</button>
           }
         }
         @case ('started') {
