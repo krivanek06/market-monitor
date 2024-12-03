@@ -126,7 +126,7 @@ export class PortfolioGrowthChartComponent extends ChartConstructor {
 
         // create categories
         const categories = isDate
-          ? inputValues.map((d) => format(d.date, 'EEEE, MMM d, y'))
+          ? inputValues.map((d) => format(d.date, 'EEE, MMM d, y'))
           : inputValues.map((d) => `Round ${d.date}`);
 
         // create chart

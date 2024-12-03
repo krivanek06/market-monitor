@@ -33,13 +33,13 @@ import { BehaviorSubject, catchError, exhaustMap, map, of, scan, startWith, swit
     SectionTitleComponent,
   ],
   template: `
-    <section class="mx-auto mb-10 md:w-11/12 md:pt-4 lg:w-10/12 xl:w-9/12">
+    <section class="mx-auto mb-10 md:w-11/12 md:pt-4 lg:w-11/12 2xl:w-10/12">
       <!-- specific search -->
-      <div class="mb-4 md:hidden">
+      <div class="mb-6 md:hidden">
         <app-section-title title="Basic Search" matIcon="search" class="mb-3" />
         <app-symbol-search-basic />
 
-        <div class="pt-4">
+        <div class="pt-6">
           <mat-divider />
         </div>
       </div>

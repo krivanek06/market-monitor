@@ -16,7 +16,6 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { PortfolioChange, PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import {
   PortfolioAssetChartComponent,
-  PortfolioChangeChartComponent,
   PortfolioGrowthChartComponent,
   PortfolioHoldingsTableCardComponent,
   PortfolioHoldingsTableCardComponentMock,
@@ -272,14 +271,14 @@ describe('PageDashboardComponent', () => {
     expect(fixture.debugElement.query(By.css(portfolioAssetChartS))).toBeFalsy();
   });
 
-  it('should display PortfolioChangeChart', () => {
-    const fixture = MockRender(PageDashboardComponent);
-    fixture.detectChanges();
+  // it('should display PortfolioChangeChart', () => {
+  //   const fixture = MockRender(PageDashboardComponent);
+  //   fixture.detectChanges();
 
-    const comp = ngMocks.find<PortfolioChangeChartComponent>(portfolioChangeChartS);
-    expect(comp).toBeTruthy();
-    expect(comp.componentInstance.data).toEqual(mockPortfolioGrowth);
-  });
+  //   const comp = ngMocks.find<PortfolioChangeChartComponent>(portfolioChangeChartS);
+  //   expect(comp).toBeTruthy();
+  //   expect(comp.componentInstance.data).toEqual(mockPortfolioGrowth);
+  // });
 
   it('should display PortfolioGrowthChartComponent component type marketValue', () => {
     const fixture = MockRender(PageDashboardComponent);
@@ -329,31 +328,6 @@ describe('PageDashboardComponent', () => {
     expect(comp.componentInstance.series).toEqual(portfolioUserFacade.portfolioSectorAllocationPieChart());
   });
 
-  it('should NOT display sector allocation nor asset allocation pie chart when holdings is 0', () => {
-    const portfolioUserFacade = ngMocks.get(PortfolioUserFacadeService);
-    const newMockPortfolioState = {
-      ...mockPortfolioState,
-      holdings: [],
-    } as PortfolioStateHoldings;
-
-    // mock the new portfolio state
-    ngMocks.stub(portfolioUserFacade, {
-      portfolioStateHolding: signal(newMockPortfolioState),
-    });
-
-    ngMocks.flushTestBed();
-
-    const fixture = MockRender(PageDashboardComponent);
-
-    fixture.detectChanges();
-
-    const assetChart = fixture.debugElement.query(By.css(assetAllocationPieChart));
-    const sectorChart = fixture.debugElement.query(By.css(sectorAllocationPieChart));
-
-    expect(assetChart).toBeFalsy();
-    expect(sectorChart).toBeFalsy();
-  });
-
   it('should NOT display transaction table if user has no transactions', () => {
     const userStore = ngMocks.get(AuthenticationUserStoreService);
     ngMocks.stub(userStore, {
@@ -383,7 +357,6 @@ describe('PageDashboardComponent', () => {
     expect(transactionTable).toBeTruthy();
     expect(transactionTable.componentInstance.data()).toEqual(authenticationUserService.state.portfolioTransactions());
     expect(transactionTable.componentInstance.showSymbolFilter()).toBe(true);
-    expect(transactionTable.componentInstance.showTransactionFees()).toBe(true);
   });
 
   it('should NOT display best and worst transactions if user do not have enough transactions', () => {

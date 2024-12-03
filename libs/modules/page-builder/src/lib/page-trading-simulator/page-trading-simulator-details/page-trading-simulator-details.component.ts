@@ -119,45 +119,43 @@ import { PageTradingSimulatorDetailsParticipantsDisplayComponent } from './compo
       <!-- participants -->
       <app-page-trading-simulator-details-participants-display [simulator]="simulatorData" />
 
-      <!-- display transactions -->
-      <div class="grid gap-4 xl:grid-cols-3">
-        <app-portfolio-transactions-table
-          [data]="simulatorAggregationTransactions()?.lastTransactions | sortReverse"
-          [showSymbolFilter]="true"
-          [pageSize]="15"
-          [displayedColumns]="displayedColumnsTransactionTable"
-          title="Transaction History - Last 100"
-          class="max-md:hidden xl:col-span-2"
-        />
+      <div class="mb-6 grid gap-x-6 gap-y-6 md:grid-cols-2">
+        <!-- best transactions -->
+        <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
+          @for (
+            item of simulatorAggregationTransactions()?.bestTransactions | slice: 0 : 5;
+            track item.transactionId;
+            let last = $last
+          ) {
+            <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+              <app-portfolio-transactions-item dateType="round" [displayUser]="true" [transaction]="item" />
+            </div>
+          }
+        </app-general-card>
 
-        <div class="grid gap-x-6 gap-y-6 md:grid-cols-2 lg:pt-6 xl:grid-cols-1">
-          <!-- best transactions -->
-          <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
-            @for (
-              item of simulatorAggregationTransactions()?.bestTransactions | slice: 0 : 5;
-              track item.transactionId;
-              let last = $last
-            ) {
-              <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
-                <app-portfolio-transactions-item dateType="round" [displayUser]="true" [transaction]="item" />
-              </div>
-            }
-          </app-general-card>
-
-          <!-- worst transactions -->
-          <app-general-card title="Worst Returns" matIcon="trending_down" class="flex-1">
-            @for (
-              item of simulatorAggregationTransactions()?.worstTransactions | slice: 0 : 5;
-              track item.transactionId;
-              let last = $last
-            ) {
-              <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
-                <app-portfolio-transactions-item dateType="round" [displayUser]="true" [transaction]="item" />
-              </div>
-            }
-          </app-general-card>
-        </div>
+        <!-- worst transactions -->
+        <app-general-card title="Worst Returns" matIcon="trending_down" class="flex-1">
+          @for (
+            item of simulatorAggregationTransactions()?.worstTransactions | slice: 0 : 5;
+            track item.transactionId;
+            let last = $last
+          ) {
+            <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+              <app-portfolio-transactions-item dateType="round" [displayUser]="true" [transaction]="item" />
+            </div>
+          }
+        </app-general-card>
       </div>
+
+      <!-- display transactions -->
+      <app-portfolio-transactions-table
+        [data]="simulatorAggregationTransactions()?.lastTransactions | sortReverse"
+        [showSymbolFilter]="true"
+        [pageSize]="15"
+        [displayedColumns]="displayedColumnsTransactionTable"
+        title="Transaction History - Last 100"
+        class="max-md:hidden xl:col-span-2"
+      />
     }
   `,
   styles: `

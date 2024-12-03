@@ -295,7 +295,7 @@ export class PortfolioTransactionsTableComponent {
     'transactionType',
     'totalValue',
     'unitPrice',
-    'units',
+    //'units',
     'transactionFees',
     'returnPrct',
     'date',

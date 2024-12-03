@@ -106,7 +106,6 @@ export class PortfolioHoldingsTableCardComponent {
     'dailyValueChange',
     'portfolio',
     'marketCap',
-    'yearlyRange',
   ]);
 
   /**
