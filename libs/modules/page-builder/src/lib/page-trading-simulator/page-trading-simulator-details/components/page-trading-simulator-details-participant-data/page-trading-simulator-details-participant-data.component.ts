@@ -34,10 +34,10 @@ import {
   PortfolioTransactionsItemComponent,
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
-import { ColorScheme } from '@mm/shared/data-access';
+import { ColorScheme, SCREEN_LAYOUT_VALUES } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { getPortfolioStateHoldingBaseByTransactionsUtil, roundNDigits } from '@mm/shared/general-util';
-import { DateReadablePipe, GeneralCardComponent, SectionTitleComponent } from '@mm/shared/ui';
+import { DateReadablePipe, GeneralCardComponent, SectionTitleComponent, windowResizeListener } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { firstValueFrom } from 'rxjs';
 
@@ -64,7 +64,9 @@ import { firstValueFrom } from 'rxjs';
     DateReadablePipe,
   ],
   template: `
-    <div class="flex items-center justify-between">
+    <!-- header -->
+    <div class="flex flex-col items-center justify-between gap-y-4 max-xl:mb-3 sm:flex-row">
+      <!-- info -->
       <div class="space-x-2 text-xl">
         <span class="text-wt-gray-dark">Round:</span>
         <span>{{ simulatorData().currentRound }}</span>
@@ -73,6 +75,7 @@ import { firstValueFrom } from 'rxjs';
         <span>{{ (remainingTimeSeconds() | dateReadable: 'seconds') || 0 }}</span>
       </div>
 
+      <!-- trading buttons -->
       <div class="child:w-[180px] flex gap-4">
         <button
           (click)="onOperationClick('BUY')"
@@ -95,13 +98,14 @@ import { firstValueFrom } from 'rxjs';
       </div>
     </div>
 
-    <div class="mb-4 flex items-center gap-x-8 gap-y-4">
-      <div class="basis-2/5">
+    <!-- user info -->
+    <div class="mb-4 grid items-center gap-x-8 gap-y-4 xl:grid-cols-5">
+      <div class="xl:col-span-2">
         <app-general-card title="Account">
-          <div class="flex gap-x-6 p-2">
+          <div class="grid gap-x-6 gap-y-4 p-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
             <!-- portfolio state -->
             <app-portfolio-state
-              class="basis-3/5"
+              class="xl:col-span-3"
               [showSpinner]="!participant()"
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
@@ -111,42 +115,41 @@ import { firstValueFrom } from 'rxjs';
 
             <!-- additional info -->
             <app-portfolio-state-transactions
-              class="basis-2/5"
+              class="xl:col-span-2"
               [showFees]="true"
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
               [portfolioState]="participant().portfolioState"
             />
-          </div>
-          <div class="flex gap-x-6 p-2">
+
+            <!-- other info -->
             <app-portfolio-state-other
-              class="basis-3/5"
+              class="max-xs:hidden xl:col-span-3"
               data-testid="page-dashboard-portfolio-other"
               [portfolioState]="participant().portfolioState"
               [hallOfFameRank]="2"
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
               [valueColor]="ColorScheme.GRAY_MEDIUM_VAR"
             />
-            <!-- keep empty div for styling -->
-            <div class="basis-2/5"></div>
           </div>
         </app-general-card>
       </div>
 
       <!-- portfolio growth chart -->
-      <div class="basis-3/5">
+      <div class="xl:col-span-3">
         <app-portfolio-growth-chart
           chartType="balance"
           filterType="round"
           [data]="portfolioGrowthData()"
           [heightPx]="320"
-          [displayLegend]="true"
+          [displayLegend]="windowResize() >= SCREEN_LAYOUT_VALUES.LAYOUT_MD"
         />
       </div>
     </div>
 
-    <div class="mb-12 grid grid-cols-3 gap-x-4">
-      <div class="col-span-2">
+    <!-- holdings -->
+    <div class="mb-12 grid gap-x-4 xl:grid-cols-3">
+      <div class="xl:col-span-2">
         <!-- holdings -->
         <app-section-title title="My Holdings" matIcon="show_chart" titleSize="lg" class="mb-3" />
         <app-general-card additionalClasses="min-h-[300px]">
@@ -157,23 +160,23 @@ import { firstValueFrom } from 'rxjs';
           />
         </app-general-card>
       </div>
-      <div class="self-center">
+      <div class="self-center max-xl:hidden">
         <!-- chart -->
         <app-portfolio-balance-pie-chart [heightPx]="250" [data]="participant().portfolioState" />
       </div>
     </div>
 
     <!-- transactions -->
-    <div class="grid grid-cols-3 gap-x-4">
+    <div class="grid gap-x-4 xl:grid-cols-3">
       <app-portfolio-transactions-table
         [data]="transactionState().lastOnes"
         [showSymbolFilter]="true"
         [pageSize]="15"
         [displayedColumns]="displayedColumnsTransactionTable"
-        class="col-span-2"
+        class="xl:col-span-2"
       />
 
-      <div class="grid gap-y-6 lg:pt-6">
+      <div class="hidden gap-y-6 lg:pt-6 xl:grid">
         <!-- best transactions -->
         <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
           @for (item of transactionState().best; track item.transactionId; let last = $last) {
@@ -248,6 +251,9 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
   readonly remainingTimeSeconds = input<number>(0);
 
   readonly symbolTradeRef = viewChild<TemplateRef<HTMLElement>>('symbolTradeRef');
+
+  readonly windowResize = windowResizeListener();
+  readonly SCREEN_LAYOUT_VALUES = SCREEN_LAYOUT_VALUES;
 
   readonly transactionState = computed(() => {
     const transactions = this.participant().transactions;

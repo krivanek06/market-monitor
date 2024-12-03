@@ -56,61 +56,61 @@ import { animationValueChange, DefaultImgDirective, LargeNumberFormatterPipe } f
 
       <!-- units total available -->
       <ng-container matColumnDef="unitsTotalAvailable">
-        <th mat-header-cell *matHeaderCellDef>Total</th>
-        <td mat-cell *matCellDef="let row">
+        <th mat-header-cell *matHeaderCellDef class="max-sm:hidden">Total</th>
+        <td mat-cell *matCellDef="let row" class="max-sm:hidden">
           {{ row.unitsInfinity ? 'Unlimited' : row.unitsTotalAvailable }}
         </td>
       </ng-container>
 
       <!-- buy operations -->
       <ng-container matColumnDef="buyOperations">
-        <th mat-header-cell *matHeaderCellDef>Buys</th>
-        <td mat-cell *matCellDef="let row">
+        <th mat-header-cell *matHeaderCellDef class="max-sm:hidden">Buys</th>
+        <td mat-cell *matCellDef="let row" class="max-sm:hidden">
           <span [@valueChange]="row.buyOperations">{{ row.buyOperations }}</span>
         </td>
       </ng-container>
 
       <!-- sell operations -->
       <ng-container matColumnDef="sellOperations">
-        <th mat-header-cell *matHeaderCellDef>Sells</th>
-        <td mat-cell *matCellDef="let row">
+        <th mat-header-cell *matHeaderCellDef class="max-sm:hidden">Sells</th>
+        <td mat-cell *matCellDef="let row" class="max-sm:hidden">
           <span [@valueChange]="row.sellOperations">{{ row.sellOperations }}</span>
         </td>
       </ng-container>
 
       <!-- bought units -->
       <ng-container matColumnDef="boughtUnits">
-        <th mat-header-cell *matHeaderCellDef>Bought Units</th>
-        <td mat-cell *matCellDef="let row">
+        <th mat-header-cell *matHeaderCellDef class="max-md:hidden">Bought Units</th>
+        <td mat-cell *matCellDef="let row" class="max-md:hidden">
           <span [@valueChange]="row.boughtUnits">{{ row.boughtUnits }}</span>
         </td>
       </ng-container>
 
       <!-- sold units -->
       <ng-container matColumnDef="soldUnits">
-        <th mat-header-cell *matHeaderCellDef>Sold Units</th>
-        <td mat-cell *matCellDef="let row">
+        <th mat-header-cell *matHeaderCellDef class="max-md:hidden">Sold Units</th>
+        <td mat-cell *matCellDef="let row" class="max-md:hidden">
           <span [@valueChange]="row.soldUnits">{{ row.soldUnits }}</span>
         </td>
       </ng-container>
 
       <!-- invested total -->
       <ng-container matColumnDef="investedTotal">
-        <th mat-header-cell *matHeaderCellDef>Invested Total</th>
-        <td mat-cell *matCellDef="let row">
+        <th mat-header-cell *matHeaderCellDef class="max-lg:hidden">Invested Total</th>
+        <td mat-cell *matCellDef="let row" class="max-lg:hidden">
           <span [@valueChange]="row.investedTotal">{{ row.investedTotal | largeNumberFormatter: false : true }}</span>
         </td>
       </ng-container>
 
       <!-- sold total -->
       <ng-container matColumnDef="soldTotal">
-        <th mat-header-cell *matHeaderCellDef>Sold Total</th>
-        <td mat-cell *matCellDef="let row">
+        <th mat-header-cell *matHeaderCellDef class="max-lg:hidden">Sold Total</th>
+        <td mat-cell *matCellDef="let row" class="max-lg:hidden">
           <span [@valueChange]="row.soldTotal">{{ row.soldTotal | largeNumberFormatter: false : true }}</span>
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"></tr>
 
       <!-- Row shown when there is no matching data. -->

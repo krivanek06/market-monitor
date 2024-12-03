@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { WINDOW } from '@mm/api-client';
 import { TradingSimulator, UserBaseMin } from '@mm/api-types';
 import { PortfolioGrowthCompareChartComponent } from '@mm/portfolio/ui';
 import { InputSource, SCREEN_LAYOUT_VALUES } from '@mm/shared/data-access';
@@ -13,6 +12,7 @@ import {
   GeneralCardComponent,
   SectionTitleComponent,
   ShowMoreButtonComponent,
+  windowResizeListener,
 } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import {
@@ -21,7 +21,7 @@ import {
 } from '@mm/trading-simulator/features';
 import { TradingSimulatorParticipantItemComponent } from '@mm/trading-simulator/ui';
 import { filterNil } from 'ngxtension/filter-nil';
-import { debounceTime, first, forkJoin, fromEvent, iif, map, of, startWith, switchMap } from 'rxjs';
+import { first, forkJoin, iif, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-page-trading-simulator-details-participants-display',
@@ -63,7 +63,7 @@ import { debounceTime, first, forkJoin, fromEvent, iif, map, of, startWith, swit
     </app-general-card>
 
     <!-- participant compare select -->
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-4 flex items-center justify-between max-md:hidden">
       <!-- title -->
       <app-section-title matIcon="compare_arrows" title="Compare Participants" titleSize="lg" />
 
@@ -77,7 +77,7 @@ import { debounceTime, first, forkJoin, fromEvent, iif, map, of, startWith, swit
     </div>
 
     <!-- compare chart -->
-    <div class="mb-8">
+    <div class="mb-8 max-md:hidden">
       <app-portfolio-growth-compare-chart filterType="round" [data]="selectedParticipants()" />
     </div>
   `,
@@ -89,7 +89,6 @@ import { debounceTime, first, forkJoin, fromEvent, iif, map, of, startWith, swit
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingSimulatorDetailsParticipantsDisplayComponent {
-  private readonly window = inject(WINDOW);
   private readonly dialog = inject(MatDialog);
   private readonly tradingSimulatorService = inject(TradingSimulatorService);
 
@@ -140,15 +139,7 @@ export class PageTradingSimulatorDetailsParticipantsDisplayComponent {
     { initialValue: [] },
   );
 
-  private readonly windowWidth = toSignal(
-    fromEvent(this.window, 'resize').pipe(
-      debounceTime(100),
-      map(() => this.window.innerWidth),
-      startWith(this.window.innerWidth),
-      takeUntilDestroyed(),
-    ),
-    { initialValue: this.window.innerWidth },
-  );
+  private readonly windowWidth = windowResizeListener();
 
   readonly displayParticipants = computed(() => {
     const participants = this.participants();

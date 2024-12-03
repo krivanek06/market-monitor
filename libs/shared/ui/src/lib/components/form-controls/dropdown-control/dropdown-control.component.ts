@@ -33,17 +33,19 @@ import { DefaultImgDirective } from '../../../directives';
       @switch (inputType()) {
         @case ('SELECT_SOURCE_WRAPPER') {
           <mat-select [disableRipple]="disabled()" [disabled]="disabled()" [value]="internalSelectValue()?.value">
-            <mat-select-trigger class="flex items-center gap-2">
-              @if (internalSelectValue()?.image; as selectedOptionImage) {
-                <img
-                  appDefaultImg
-                  [imageType]="displayImageType()"
-                  [src]="selectedOptionImage"
-                  alt="Option image"
-                  class="h-8 w-8"
-                />
-              }
-              {{ internalSelectValue()?.caption }}
+            <mat-select-trigger>
+              <div class="flex items-center gap-2">
+                @if (internalSelectValue()?.image; as selectedOptionImage) {
+                  <img
+                    appDefaultImg
+                    [imageType]="displayImageType()"
+                    [src]="selectedOptionImage"
+                    alt="Option image"
+                    class="h-8 w-8"
+                  />
+                }
+                {{ internalSelectValue()?.caption }}
+              </div>
             </mat-select-trigger>
             @for (source of inputSourceWrapper(); track source.name) {
               <mat-optgroup [label]="source.name">

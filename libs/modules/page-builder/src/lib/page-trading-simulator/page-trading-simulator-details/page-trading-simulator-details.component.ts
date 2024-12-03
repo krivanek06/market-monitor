@@ -44,7 +44,7 @@ import { PageTradingSimulatorDetailsParticipantsDisplayComponent } from './compo
   ],
   template: `
     @if (simulatorData(); as simulatorData) {
-      <div class="mb-6 flex items-center justify-between">
+      <div class="mb-6 flex flex-col justify-between gap-y-4 md:flex-row md:items-center">
         <app-section-title title="Simulator: {{ simulatorData.name }}" />
 
         <!-- buttons to interact -->
@@ -65,11 +65,11 @@ import { PageTradingSimulatorDetailsParticipantsDisplayComponent } from './compo
         </div>
       }
 
-      <div class="mb-6 grid grid-cols-4 gap-x-10">
+      <div class="mb-6 grid gap-x-10 xl:grid-cols-4">
         <!-- left side -->
         <div class="col-span-3">
           <!-- symbol info -->
-          <div class="mb-4 flex justify-between">
+          <div class="mb-4 flex flex-col justify-between gap-y-4 md:flex-row">
             <app-section-title
               title="Symbol Price Movement"
               titleSize="lg"
@@ -80,7 +80,7 @@ import { PageTradingSimulatorDetailsParticipantsDisplayComponent } from './compo
           </div>
 
           <!-- display charts of symbols -->
-          <div class="mb-6 grid grid-cols-3 gap-x-6 gap-y-3">
+          <div class="mb-6 grid gap-x-6 gap-y-3 md:grid-cols-2 lg:grid-cols-3">
             @for (symbol of simulatorSymbols(); track symbol.symbol) {
               <app-trading-simulator-symbol-price-chart
                 [simulator]="simulatorData"
@@ -106,7 +106,7 @@ import { PageTradingSimulatorDetailsParticipantsDisplayComponent } from './compo
         </div>
 
         <!-- right side -->
-        <div>
+        <div class="max-xl:hidden">
           <!-- simulator info -->
           <app-page-trading-simulator-details-info
             [tradingSimulator]="simulatorData"
@@ -120,17 +120,17 @@ import { PageTradingSimulatorDetailsParticipantsDisplayComponent } from './compo
       <app-page-trading-simulator-details-participants-display [simulator]="simulatorData" />
 
       <!-- display transactions -->
-      <div class="grid grid-cols-3 gap-x-4">
+      <div class="grid gap-4 xl:grid-cols-3">
         <app-portfolio-transactions-table
           [data]="simulatorAggregationTransactions()?.lastTransactions | sortReverse"
           [showSymbolFilter]="true"
           [pageSize]="15"
           [displayedColumns]="displayedColumnsTransactionTable"
           title="Transaction History - Last 100"
-          class="col-span-2"
+          class="max-md:hidden xl:col-span-2"
         />
 
-        <div class="grid gap-y-6 lg:pt-6">
+        <div class="grid gap-x-6 gap-y-6 md:grid-cols-2 lg:pt-6 xl:grid-cols-1">
           <!-- best transactions -->
           <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
             @for (

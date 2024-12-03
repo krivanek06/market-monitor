@@ -7,13 +7,21 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
+import { PageTradingSimulatorDetailsInfoComponent } from '../page-trading-simulator-details-info/page-trading-simulator-details-info.component';
 
 @Component({
   selector: 'app-page-trading-simulator-details-buttons',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule],
+  imports: [MatButtonModule, MatIconModule, PageTradingSimulatorDetailsInfoComponent],
   template: `
     <div class="flex justify-end gap-x-4">
+      <!-- info button on smaller screen -->
+      <app-page-trading-simulator-details-info
+        class="w-[160px] xl:hidden"
+        [tradingSimulator]="simulatorData()"
+        [isAuthUserOwner]="isAuthUserOwner()"
+      />
+
       @switch (simulatorData().state) {
         @case ('live') {
           @if (isAuthUserOwner()) {
