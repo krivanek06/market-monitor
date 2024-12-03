@@ -195,7 +195,13 @@ export class TradingSimulatorSymbolPriceChartComponent extends ChartConstructor 
         headerFormat: `<div style="font-size: 12px">Round: <span style="color: ${ColorScheme.PRIMARY_VAR}">{point.key}</span></div><br/>`,
         pointFormatter: function () {
           const name = this.series.name;
-          const value = name.toLocaleLowerCase() === 'price' ? formatValueIntoCurrency(this.y) : this.y;
+          const nameLower = name.toLocaleLowerCase();
+          const value = nameLower === 'price' ? formatValueIntoCurrency(this.y) : this.y;
+
+          // do not show units if 0
+          if (nameLower === 'units' && this.y === 0) {
+            return '';
+          }
 
           return `<p><span style="color: ${this.color};">● ${name}: </span><span>${value}</span></p><br/>`;
         },

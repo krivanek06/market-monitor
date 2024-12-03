@@ -1,42 +1,23 @@
 import { NgClass, SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { UserBaseMin } from '@mm/api-types';
+import { PortfolioTransactionsItemComponent, PortfolioTransactionsTableComponent } from '@mm/portfolio/ui';
+import { GeneralCardComponent, RangeDirective, SectionTitleComponent, SortReversePipe } from '@mm/shared/ui';
 import {
-  PortfolioGrowthCompareChartComponent,
-  PortfolioTransactionsItemComponent,
-  PortfolioTransactionsTableComponent,
-} from '@mm/portfolio/ui';
-import { InputSource } from '@mm/shared/data-access';
-import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import {
-  DropdownControlComponent,
-  GeneralCardComponent,
-  RangeDirective,
-  SectionTitleComponent,
-  SortReversePipe,
-} from '@mm/shared/ui';
-import {
-  TradingSimulatorParticipantDialogComponent,
-  TradingSimulatorParticipantDialogComponentData,
-} from '@mm/trading-simulator/features';
-import {
-  TradingSimulatorParticipantItemComponent,
   TradingSimulatorSymbolPriceChartComponent,
   TradingSimulatorSymbolPriceChartLegendComponent,
   TradingSimulatorSymbolStatTableComponent,
 } from '@mm/trading-simulator/ui';
-import { addSeconds, differenceInSeconds } from 'date-fns';
-import { filterNil } from 'ngxtension/filter-nil';
-import { first, forkJoin, iif, map, of, switchMap, timer } from 'rxjs';
+import { differenceInSeconds } from 'date-fns';
+import { map, of, switchMap, timer } from 'rxjs';
 import { PageTradingSimulatorBaseComponent } from '../base/page-trading-simulator-base.component';
 import { PageTradingSimulatorDetailsButtonsComponent } from './components/page-trading-simulator-details-buttons/page-trading-simulator-details-buttons.component';
 import { PageTradingSimulatorDetailsInfoComponent } from './components/page-trading-simulator-details-info/page-trading-simulator-details-info.component';
 import { PageTradingSimulatorDetailsParticipantDataComponent } from './components/page-trading-simulator-details-participant-data/page-trading-simulator-details-participant-data.component';
+import { PageTradingSimulatorDetailsParticipantsDisplayComponent } from './components/page-trading-simulator-details-participants-display/page-trading-simulator-details-participants-display.component';
 
 @Component({
   selector: 'app-page-trading-simulator-details',
@@ -49,18 +30,16 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
     TradingSimulatorSymbolPriceChartComponent,
     TradingSimulatorSymbolPriceChartLegendComponent,
     TradingSimulatorSymbolStatTableComponent,
-    TradingSimulatorParticipantItemComponent,
+    PageTradingSimulatorDetailsParticipantsDisplayComponent,
     PortfolioTransactionsItemComponent,
     PageTradingSimulatorDetailsInfoComponent,
     GeneralCardComponent,
     SlicePipe,
     RangeDirective,
-    PortfolioGrowthCompareChartComponent,
     PortfolioTransactionsTableComponent,
     PageTradingSimulatorDetailsParticipantDataComponent,
     NgClass,
     SortReversePipe,
-    DropdownControlComponent,
     ReactiveFormsModule,
   ],
   template: `
@@ -137,43 +116,8 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
         </div>
       </div>
 
-      <!-- participant ranking -->
-      <app-section-title title="Participant Ranking" matIcon="people" class class="mb-3" titleSize="lg" />
-      <app-general-card class="mb-6">
-        <div class="grid gap-x-6 gap-y-4 p-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          @if (participantRanking(); as participantRanking) {
-            @for (participant of participantRanking; track participant.userData.id; let i = $index) {
-              <button mat-stroked-button (click)="onParticipantClick(participant.userData)" class="h-12 p-2">
-                <app-trading-simulator-participant-item
-                  [participant]="participant"
-                  [position]="participant.rank.rank"
-                />
-              </button>
-            } @empty {
-              <div class="min-h-[200px] p-4 text-center">No participants</div>
-            }
-          } @else {
-            <div *ngRange="simulatorData.currentParticipants" class="g-skeleton h-10"></div>
-          }
-        </div>
-      </app-general-card>
-
-      <!-- participant compare -->
-      <div class="mb-4 flex items-center justify-between">
-        <!-- title -->
-        <app-section-title matIcon="compare_arrows" title="Compare Participants" titleSize="lg" />
-
-        <app-dropdown-control
-          inputCaption="Select Participants"
-          [inputSource]="participantsInputSource()"
-          [formControl]="selectedParticipantsControl"
-          class="w-[400px]"
-          inputType="MULTISELECT"
-        />
-      </div>
-      <div class="mb-8">
-        <app-portfolio-growth-compare-chart filterType="round" [data]="selectedParticipants()" />
-      </div>
+      <!-- participants -->
+      <app-page-trading-simulator-details-participants-display [simulator]="simulatorData" />
 
       <!-- display transactions -->
       <div class="grid grid-cols-3 gap-x-4">
@@ -224,8 +168,6 @@ import { PageTradingSimulatorDetailsParticipantDataComponent } from './component
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBaseComponent {
-  private readonly dialog = inject(MatDialog);
-  readonly selectedParticipantsControl = new FormControl<UserBaseMin[]>([], { nonNullable: true });
   readonly isUserDemoAccount = this.authenticationUserStoreService.state.isDemoAccount;
 
   /** participating user data - may not exists if user is only a spectator */
@@ -251,89 +193,6 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
     { initialValue: 0 },
   );
 
-  readonly participantRanking = toSignal(
-    this.simulatorId$.pipe(
-      switchMap((selectedId) => this.tradingSimulatorService.getTradingSimulatorAggregationParticipants(selectedId)),
-    ),
-    { initialValue: [] },
-  );
-
-  /** dropdown of participants in the simulator */
-  readonly participantsInputSource = computed(() =>
-    this.participantRanking()?.map(
-      (d) =>
-        ({
-          caption: d.userData.personal.displayName,
-          image: d.userData.personal.photoURL,
-          value: d.userData,
-          imageType: 'default',
-        }) satisfies InputSource<UserBaseMin>,
-    ),
-  );
-
-  readonly selectedParticipants = toSignal(
-    this.simulatorId$.pipe(
-      switchMap((selectedId) =>
-        this.selectedParticipantsControl.valueChanges.pipe(
-          switchMap((participants) =>
-            iif(
-              () => participants.length > 0,
-              forkJoin(
-                participants.map((p) =>
-                  this.tradingSimulatorService
-                    .getTradingSimulatorByIdParticipantById(selectedId, p.id)
-                    .pipe(first(), filterNil()),
-                ),
-              ),
-              of([]),
-            ),
-          ),
-        ),
-      ),
-    ),
-    { initialValue: [] },
-  );
-
-  /**
-   * add top N participants (and myself if I am a participant) into the compare chart
-   */
-  readonly displayParticipantsInCompareChart = effect(() => {
-    const participant = this.participant();
-    const participants = this.participantRanking();
-    const selectedParticipants = this.selectedParticipantsControl.value;
-
-    console.log('edkooooo', addSeconds(new Date(), 3).toString());
-
-    console.log({
-      participant,
-      participants,
-    });
-
-    untracked(() => {
-      // set the selected participants to the top 5 users - using 1 because ignoring the current user
-      if (selectedParticipants.length <= 1) {
-        console.log('displayParticipantsInCompareChart adding participants');
-        // top users except the current user
-        const topUsers = participants
-          .filter((d) => d.userData.id !== participant?.userData.id)
-          .slice(0, 5)
-          .map((d) => d.userData);
-
-        // set the selected participants
-        this.selectedParticipantsControl.patchValue(topUsers);
-      }
-
-      // add current user if not there
-      if (participant?.userData && !selectedParticipants.find((d) => d.id === participant?.userData.id)) {
-        console.log('displayParticipantsInCompareChart adding myself');
-        this.selectedParticipantsControl.patchValue([...selectedParticipants, participant.userData]);
-      }
-    });
-  });
-
-  // todo - reduce number of users to be display on smaller screen and add a "show more" button
-  // todo - display top 5 users in the compare chart + myself as participant
-
   readonly displayedColumnsTransactionTable = [
     'symbol',
     'transactionType',
@@ -345,14 +204,4 @@ export class PageTradingSimulatorDetailsComponent extends PageTradingSimulatorBa
     'rounds',
     'returnPrctOnly',
   ];
-
-  onParticipantClick(participant: UserBaseMin) {
-    this.dialog.open(TradingSimulatorParticipantDialogComponent, {
-      data: <TradingSimulatorParticipantDialogComponentData>{
-        simulator: this.simulatorData(),
-        participantId: participant.id,
-      },
-      panelClass: [SCREEN_DIALOGS.DIALOG_BIG],
-    });
-  }
 }

@@ -8,7 +8,6 @@ import { UserApiService } from '@mm/api-client';
 import { GROUP_HOLDING_LIMIT, GROUP_MEMBER_LIMIT, PortfolioGrowth, UserBase } from '@mm/api-types';
 import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@mm/group/features';
 import { GroupDisplayInfoComponent, GroupMemberPortfolioHoldingChartComponent } from '@mm/group/ui';
-import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
   PortfolioBalancePieChartComponent,
@@ -18,7 +17,6 @@ import {
   PortfolioStateComponent,
   PortfolioTransactionChartComponent,
   PortfolioTransactionsItemComponent,
-  PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
@@ -29,7 +27,6 @@ import {
   PositionCardComponent,
   SectionTitleComponent,
   ShowMoreButtonComponent,
-  SortByKeyPipe,
 } from '@mm/shared/ui';
 import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@mm/user/features';
 import { UserDisplayItemComponent } from '@mm/user/ui';
@@ -55,15 +52,11 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     UserDisplayItemComponent,
     PortfolioHoldingsTableCardComponent,
     MatIconModule,
-    SortByKeyPipe,
     SectionTitleComponent,
     GroupUserHasRoleDirective,
-    UserDetailsDialogComponent,
     GeneralCardComponent,
-    SymbolSummaryDialogComponent,
     PieChartComponent,
     GenericChartComponent,
-    PortfolioTransactionsTableComponent,
     PortfolioTransactionChartComponent,
     MatButtonModule,
     ShowMoreButtonComponent,

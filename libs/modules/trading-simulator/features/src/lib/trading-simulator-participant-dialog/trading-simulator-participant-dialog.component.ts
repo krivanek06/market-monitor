@@ -38,7 +38,6 @@ export type TradingSimulatorParticipantDialogComponentData = {
     PortfolioHoldingsTableComponent,
     PortfolioStateOtherComponent,
     MatProgressSpinnerModule,
-    PortfolioTransactionsTableComponent,
     PortfolioTransactionsItemComponent,
     MatDividerModule,
     NgClass,
@@ -127,6 +126,10 @@ export type TradingSimulatorParticipantDialogComponentData = {
               <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
                 <app-portfolio-transactions-item dateType="round" [transaction]="item" />
               </div>
+            } @empty {
+              <div class="py-2">
+                <div class="g-table-empty">No data has been found</div>
+              </div>
             }
           </div>
 
@@ -136,6 +139,10 @@ export type TradingSimulatorParticipantDialogComponentData = {
             @for (item of transactionState().worst; track item.transactionId; let last = $last) {
               <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
                 <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+              </div>
+            } @empty {
+              <div class="py-2">
+                <div class="g-table-empty">No data has been found</div>
               </div>
             }
           </div>
