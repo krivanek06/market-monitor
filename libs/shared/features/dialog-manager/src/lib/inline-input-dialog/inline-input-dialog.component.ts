@@ -28,12 +28,12 @@ export type InlineInputDialogComponentData = {
       <form [formGroup]="inputValueForm">
         <mat-form-field class="w-full">
           <mat-label>Enter Value</mat-label>
-          <input matInput formControlName="value" (keydown.space)="$event.preventDefault()" />
+          <input matInput [formControl]="inputValueForm.controls.value" (keydown.space)="$event.preventDefault()" />
         </mat-form-field>
 
         <!-- error messages -->
         @if (inputValueForm.touched && inputValueForm.invalid) {
-          <div class="px-2">
+          <div class="-mt-5 px-2">
             @if (inputValueForm.controls.value.hasError('required')) {
               <mat-error>Value is required</mat-error>
             }
@@ -67,18 +67,14 @@ export type InlineInputDialogComponentData = {
     :host {
       display: block;
     }
-
-    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-      display: none;
-    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InlineInputDialogComponent {
-  private dialogRef = inject(MatDialogRef<InlineInputDialogComponent, InlineInputDialogComponentData>);
-  data = inject<InlineInputDialogComponentData>(MAT_DIALOG_DATA);
+  private readonly dialogRef = inject(MatDialogRef<InlineInputDialogComponent, InlineInputDialogComponentData>);
+  readonly data = inject<InlineInputDialogComponentData>(MAT_DIALOG_DATA);
 
-  inputValueForm = new FormGroup({
+  readonly inputValueForm = new FormGroup({
     value: new FormControl<string>('', {
       validators: [Validators.required, Validators.minLength(4), Validators.maxLength(30)],
     }),

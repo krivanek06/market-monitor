@@ -11,6 +11,13 @@ import {
 import { getCurrentDateDefaultFormat } from './date-service.util';
 import { roundNDigits } from './general-function.util';
 
+export const transformUserToBaseMin = (user: UserData): UserBaseMin => {
+  return {
+    id: user.id,
+    personal: user.personal,
+  };
+};
+
 export const transformUserToBase = (user: UserData): UserBase => {
   return {
     id: user.id,
@@ -20,13 +27,6 @@ export const transformUserToBase = (user: UserData): UserBase => {
     isAccountActive: user.isAccountActive,
     isDemo: user.isDemo,
     userAccountType: user.userAccountType,
-  };
-};
-
-export const transformUserToBaseMin = (user: UserData): UserBaseMin => {
-  return {
-    id: user.id,
-    personal: user.personal,
   };
 };
 

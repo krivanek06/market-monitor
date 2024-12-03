@@ -2,7 +2,7 @@
   "name": "modules-group-data-access",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/modules/group/data-access/src",
-  "prefix": "market-monitor",
+  "prefix": "app",
   "projectType": "library",
   "tags": [],
   "targets": {

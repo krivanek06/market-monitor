@@ -7,4 +7,5 @@ export * from './ranking.model';
 export * from './stock-data-modified.model';
 export * from './stock-data.model';
 export * from './symbol.model';
+export * from './trading-simulator.model';
 export * from './user.model';

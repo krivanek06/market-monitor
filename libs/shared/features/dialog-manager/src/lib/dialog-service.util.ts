@@ -77,6 +77,11 @@ export class DialogServiceUtil {
       return;
     }
 
+    if (code.startsWith('permission-denied')) {
+      this.showNotificationBar('Permission denied, please contact support', 'error');
+      return;
+    }
+
     // remove the word FirebaseError:
     this.showNotificationBar(message, 'error');
   }

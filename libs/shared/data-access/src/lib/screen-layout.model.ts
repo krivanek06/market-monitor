@@ -7,6 +7,7 @@ export enum SCREEN_LAYOUT {
 }
 
 export enum SCREEN_LAYOUT_VALUES {
+  LAYOUT_XS = 475,
   LAYOUT_SM = 640,
   LAYOUT_MD = 768,
   LAYOUT_LG = 1024,

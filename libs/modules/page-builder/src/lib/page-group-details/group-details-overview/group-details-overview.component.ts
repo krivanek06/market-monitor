@@ -8,7 +8,6 @@ import { UserApiService } from '@mm/api-client';
 import { GROUP_HOLDING_LIMIT, GROUP_MEMBER_LIMIT, PortfolioGrowth, UserBase } from '@mm/api-types';
 import { GroupInvitationsManagerComponent, GroupUserHasRoleDirective } from '@mm/group/features';
 import { GroupDisplayInfoComponent, GroupMemberPortfolioHoldingChartComponent } from '@mm/group/ui';
-import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
   PortfolioBalancePieChartComponent,
@@ -18,7 +17,6 @@ import {
   PortfolioStateComponent,
   PortfolioTransactionChartComponent,
   PortfolioTransactionsItemComponent,
-  PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
@@ -29,7 +27,6 @@ import {
   PositionCardComponent,
   SectionTitleComponent,
   ShowMoreButtonComponent,
-  SortByKeyPipe,
 } from '@mm/shared/ui';
 import { UserDetailsDialogComponent, UserDetailsDialogComponentData } from '@mm/user/features';
 import { UserDisplayItemComponent } from '@mm/user/ui';
@@ -55,15 +52,11 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
     UserDisplayItemComponent,
     PortfolioHoldingsTableCardComponent,
     MatIconModule,
-    SortByKeyPipe,
     SectionTitleComponent,
     GroupUserHasRoleDirective,
-    UserDetailsDialogComponent,
     GeneralCardComponent,
-    SymbolSummaryDialogComponent,
     PieChartComponent,
     GenericChartComponent,
-    PortfolioTransactionsTableComponent,
     PortfolioTransactionChartComponent,
     MatButtonModule,
     ShowMoreButtonComponent,
@@ -240,65 +233,40 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
 
       <!-- transactions -->
       @if (groupDetailsSignal.groupTransactionsData.length > 0) {
-        <div>
-          @defer (on idle) {
-            <mat-tab-group class="hidden lg:block" mat-stretch-tabs="false" mat-align-tabs="end">
-              <!-- last transactions -->
-              <mat-tab label="Last Transactions">
-                <app-portfolio-transactions-table
-                  [showTransactionFees]="true"
-                  [showUser]="true"
-                  [data]="groupDetailsSignal.groupTransactionsData"
-                />
-              </mat-tab>
-              <!-- best / worst transactions -->
-              <mat-tab label="Top Transactions">
-                <div class="flex gap-4">
-                  <!-- best returns -->
-                  <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
-                    @for (
-                      item of groupDetailsSignal.groupTransactionsDataBest | slice: 0 : 12;
-                      track item.transactionId;
-                      let last = $last
-                    ) {
-                      <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
-                        <app-portfolio-transactions-item [transaction]="item" [displayUser]="true" />
-                      </div>
-                    }
-                  </app-general-card>
-
-                  <!-- worst returns -->
-                  <app-general-card title="Worst Returns" matIcon="trending_down" class="flex-1">
-                    @for (
-                      item of groupDetailsSignal.groupTransactionsDataWorst | slice: 0 : 12;
-                      track item.transactionId;
-                      let last = $last
-                    ) {
-                      <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
-                        <app-portfolio-transactions-item [transaction]="item" [displayUser]="true" />
-                      </div>
-                    }
-                  </app-general-card>
+        @defer (on idle) {
+          <div class="grid grid-cols-2 gap-4">
+            <!-- best returns -->
+            <app-general-card title="Best Returns" matIcon="trending_up" class="max-lg:hidden">
+              @for (
+                item of groupDetailsSignal.groupTransactionsDataBest | slice: 0 : 12;
+                track item.transactionId;
+                let last = $last
+              ) {
+                <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+                  <app-portfolio-transactions-item [transaction]="item" [displayUser]="true" />
                 </div>
-              </mat-tab>
-            </mat-tab-group>
+              }
+            </app-general-card>
 
-            <!-- transaction table on smaller screen -->
-            <app-portfolio-transactions-table
-              class="block lg:hidden"
-              [showTransactionFees]="true"
-              [showUser]="true"
-              [data]="groupDetailsSignal.groupTransactionsData"
-            />
-          } @loading (minimum 1s) {
-            <div class="mb-4 flex justify-end gap-2">
-              <div class="g-skeleton h-10 w-[220px]"></div>
-              <div class="g-skeleton h-10 w-[220px]"></div>
-            </div>
-            <div class="g-skeleton mb-2 h-10 w-[220px]"></div>
-            <div class="g-skeleton h-[600px]"></div>
-          }
-        </div>
+            <!-- worst returns -->
+            <app-general-card title="Worst Returns" matIcon="trending_down" class="max-lg:hidden">
+              @for (
+                item of groupDetailsSignal.groupTransactionsDataWorst | slice: 0 : 12;
+                track item.transactionId;
+                let last = $last
+              ) {
+                <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+                  <app-portfolio-transactions-item [transaction]="item" [displayUser]="true" />
+                </div>
+              }
+            </app-general-card>
+          </div>
+        } @loading (minimum 1s) {
+          <div class="grid grid-cols-2 gap-4">
+            <div class="g-skeleton h-[750px]"></div>
+            <div class="g-skeleton h-[750px]"></div>
+          </div>
+        }
       }
     }
   `,
@@ -384,6 +352,8 @@ export class GroupDetailsOverviewComponent extends PageGroupsBaseComponent {
       ? this.groupDetailsSignal()?.groupMembersData
       : this.groupDetailsSignal()?.groupMembersData?.slice(0, this.displayLimitInitial),
   );
+
+  readonly displayedColumns = ['symbol', 'transactionType', 'totalValue', 'unitPrice', 'units', 'returnPrct', 'date'];
 
   onMemberClick(member: UserBase): void {
     this.dialog.open(UserDetailsDialogComponent, {

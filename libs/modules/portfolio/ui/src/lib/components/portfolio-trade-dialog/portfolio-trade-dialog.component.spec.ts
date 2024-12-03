@@ -38,6 +38,10 @@ describe('PortfolioTradeDialogComponent', () => {
   const incrementUnitsButtonS = '[data-testid="trade-dialog-increment-units"]';
   const decrementUnitsButtonS = '[data-testid="trade-dialog-decrement-units"]';
 
+  const testUserData = mockCreateUser({
+    userAccountType: UserAccountEnum.DEMO_TRADING,
+  });
+
   const mockData = {
     transactionType: 'BUY',
     quote: {
@@ -48,11 +52,8 @@ describe('PortfolioTradeDialogComponent', () => {
       displaySymbol: 'AAPL',
     },
     sector: 'Technology',
+    userData: transformUserToBaseMin(testUserData),
   } as PortfolioTradeDialogComponentData;
-
-  const testUserData = mockCreateUser({
-    userAccountType: UserAccountEnum.DEMO_TRADING,
-  });
 
   const mockPortfolioState = {
     balance: 1000,

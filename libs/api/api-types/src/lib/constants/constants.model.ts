@@ -73,6 +73,21 @@ export const USER_ALLOWED_DEMO_ACCOUNTS_TOTAL = 300;
 export const GROUP_HOLDING_LIMIT = 50;
 
 /**
+ * limit the number of users who can play the trading simulator
+ */
+export const TRADING_SIMULATOR_PARTICIPANTS_LIMIT = 50;
+
+/**
+ * maximum number of rounds in the trading simulator can handle
+ */
+export const TRADING_SIMULATOR_MAX_ROUNDS = 250;
+
+/**
+ * maximum number of instances of trading simulator a user can create
+ */
+export const TRADING_SIMULATOR_MAX_INSTANCES_PER_USER = 5;
+
+/**
  * how many outstanding orders can a single user have at once in OPEN state
  */
 export const OUTSTANDING_ORDERS_MAX_ORDERS = 5;

@@ -83,7 +83,7 @@ export const outstandingOrderExecute = async () => {
             // if potentialTotalPrice was 100 and now it's 110, priceDiff is 10
             const priceDiff = currentTotal - order.potentialTotalPrice;
 
-            const potentialTransaction = createTransaction(userData, order, quote.price);
+            const potentialTransaction = createTransaction(userData, userData.holdingSnapshot.data, order, quote.price);
 
             // check if user has enough money
             if (

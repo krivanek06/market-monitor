@@ -1,21 +1,15 @@
-import { TestBed } from '@angular/core/testing';
-
-import { MockProvider } from 'ng-mocks';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { MarketApiService } from '../market-api/market-api.service';
 import { ApiCacheService } from '../utils';
 import { StocksApiService } from './stocks-api.service';
 
 describe('StocksApiService', () => {
-  let service: StocksApiService;
-
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [MockProvider(ApiCacheService), MockProvider(MarketApiService)],
-    });
-    service = TestBed.inject(StocksApiService);
+    return MockBuilder(StocksApiService).mock(ApiCacheService).mock(MarketApiService);
   });
 
   it('should be created', () => {
+    const service = MockRender(StocksApiService);
     expect(service).toBeTruthy();
   });
 });

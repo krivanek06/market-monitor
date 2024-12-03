@@ -5,7 +5,7 @@ import { PageGroupsComponent } from '@mm/page-builder';
   selector: 'app-groups',
   standalone: true,
   imports: [PageGroupsComponent],
-  template: `<app-page-groups />`,
+  template: ` <app-page-groups /> `,
   styles: `
     :host {
       display: block;
@@ -13,4 +13,4 @@ import { PageGroupsComponent } from '@mm/page-builder';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GroupsComponent {}
+export class groupsComponent {}

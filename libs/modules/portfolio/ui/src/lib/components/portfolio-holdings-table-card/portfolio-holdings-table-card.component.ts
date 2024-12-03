@@ -25,7 +25,6 @@ import { PortfolioHoldingsTableComponent } from '../tables';
     NgTemplateOutlet,
     GeneralCardComponent,
     PortfolioHoldingsTableComponent,
-    SymbolSummaryDialogComponent,
     ShowMoreButtonComponent,
     MatIconModule,
   ],
@@ -107,7 +106,6 @@ export class PortfolioHoldingsTableCardComponent {
     'dailyValueChange',
     'portfolio',
     'marketCap',
-    'yearlyRange',
   ]);
 
   /**

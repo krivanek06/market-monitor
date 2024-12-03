@@ -1,4 +1,4 @@
-import { CurrencyPipe, PercentPipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { OutstandingOrder, PortfolioState } from '@mm/api-types';
 import { ColorScheme } from '@mm/shared/data-access';
@@ -7,11 +7,11 @@ import { AddColorDirective } from '@mm/shared/ui';
 @Component({
   selector: 'app-portfolio-state-other',
   standalone: true,
-  imports: [AddColorDirective, CurrencyPipe, PercentPipe],
+  imports: [AddColorDirective, CurrencyPipe],
   template: `
     <div class="@container">
       <div class="@lg:w-full @md:grid @md:grid-cols-2 gap-4">
-        <!-- Alpha -->
+        <!-- invested -->
         <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Invested</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
@@ -19,7 +19,7 @@ import { AddColorDirective } from '@mm/shared/ui';
           </div>
         </div>
 
-        <!-- Volatility -->
+        <!-- locked cash -->
         <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Locked Cash</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">
@@ -27,17 +27,17 @@ import { AddColorDirective } from '@mm/shared/ui';
           </div>
         </div>
 
-        <!-- Beta -->
+        <!-- open / sell orders -->
         <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Orders B/S</div>
           <div [appAddColor]="valueColor()" class="space-x-1 sm:text-lg">
-            <span>{{ openBuyOrders()?.length }}</span>
+            <span>{{ openBuyOrders()?.length ?? 0 }}</span>
             <span>/</span>
-            <span>{{ openSellOrders()?.length }}</span>
+            <span>{{ openSellOrders()?.length ?? 0 }}</span>
           </div>
         </div>
 
-        <!-- Sharp Ratio -->
+        <!-- rank -->
         <div class="@md:flex-col flex justify-between">
           <div [appAddColor]="titleColor()" class="sm:text-lg">Ranking</div>
           <div [appAddColor]="valueColor()" class="sm:text-lg">

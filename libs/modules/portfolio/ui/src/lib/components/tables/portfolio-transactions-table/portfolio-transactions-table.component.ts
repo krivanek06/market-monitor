@@ -18,7 +18,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PortfolioTransaction, PortfolioTransactionMore } from '@mm/api-types';
 import { InputSource } from '@mm/shared/data-access';
-import { compare, insertIntoArray } from '@mm/shared/general-util';
+import { compare } from '@mm/shared/general-util';
 import {
   BubblePaginationDirective,
   DefaultImgDirective,
@@ -49,7 +49,7 @@ import {
   template: `
     <!-- title -->
     <app-section-title
-      title="Transaction History"
+      [title]="title()"
       matIcon="history"
       class="mb-5"
       [ngClass]="{
@@ -102,14 +102,8 @@ import {
                 </div>
                 <!-- units -->
                 <div class="text-wt-gray-medium block text-sm sm:hidden">[{{ row.units }}]</div>
-                <!-- user -->
-                @if (showUser()) {
-                  <div class="block lg:hidden">
-                    <img class="h-6 w-6 rounded-full" appDefaultImg [src]="row.userPhotoURL" />
-                  </div>
-                }
               </div>
-              <span class="block text-sm md:hidden"> {{ row.date | date: 'MMM d, y' }}</span>
+              <span class="block text-sm md:hidden"> {{ row.date | date: 'HH:mm, MMM d, y' }}</span>
             </div>
           </div>
         </td>
@@ -146,8 +140,22 @@ import {
       <ng-container matColumnDef="totalValue">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Total Value</th>
         <td mat-cell *matCellDef="let row">
-          <div class="text-wt-gray-dark max-sm:mr-3 max-sm:text-end">
-            {{ row.unitPrice * row.units | currency }}
+          <div class="flex flex-col max-sm:mr-3 max-sm:items-end">
+            <!-- value on desktop -->
+            <div class="text-wt-gray-dark max-sm:text-end">
+              {{ row.unitPrice * row.units | currency }}
+            </div>
+
+            <!-- total return -->
+            <div
+              appPercentageIncrease
+              [useCurrencySign]="true"
+              class="text-sm sm:hidden"
+              [changeValues]="{
+                change: row.returnValue,
+                changePercentage: row.returnChange,
+              }"
+            ></div>
           </div>
         </td>
       </ng-container>
@@ -183,16 +191,20 @@ import {
           <div
             appPercentageIncrease
             [useCurrencySign]="true"
-            [changeValues]="{ changePercentage: row.returnChange }"
+            [changeValues]="{ changePercentage: row.returnChange, change: row.returnValue }"
           ></div>
         </td>
       </ng-container>
 
-      <!-- return -->
-      <ng-container matColumnDef="return">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Return $</th>
+      <!-- return only -->
+      <ng-container matColumnDef="returnPrctOnly">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Return %</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
-          <div appPercentageIncrease [useCurrencySign]="true" [changeValues]="{ change: row.returnValue }"></div>
+          <div
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [changeValues]="{ changePercentage: row.returnChange }"
+          ></div>
         </td>
       </ng-container>
 
@@ -200,26 +212,22 @@ import {
       <ng-container matColumnDef="date">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Date</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
-          {{ row.date | date: 'MMM. d, y' }}
+          {{ row.date | date: 'HH:mm, MMM. d, y' }}
         </td>
       </ng-container>
 
-      <!-- action -->
-      <ng-container matColumnDef="action">
-        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Action</th>
-        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          <div class="flex items-center gap-2">
-            <button type="button" mat-icon-button color="warn" (click)="onDeleteClick(row)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
+      <!-- rounds -->
+      <ng-container matColumnDef="rounds">
+        <th mat-header-cell *matHeaderCellDef class="hidden md:table-cell">Round</th>
+        <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
+          {{ row.date }}
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="hidden sm:contents"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns()" class="hidden sm:contents"></tr>
       <tr
         mat-row
-        *matRowDef="let row; columns: displayedColumns; let even = even; let odd = odd"
+        *matRowDef="let row; columns: displayedColumns(); let even = even; let odd = odd"
         [ngClass]="{ 'bg-wt-gray-light': even }"
       ></tr>
 
@@ -232,13 +240,13 @@ import {
     </table>
 
     <!-- pagination -->
-    <div class="relative">
+    <div class="relative mt-2">
       <mat-paginator
         appBubblePagination
         showFirstLastButtons
         [length]="dataSource.filteredData.length"
         [appCustomLength]="dataSource.filteredData.length"
-        [pageSize]="18"
+        [pageSize]="pageSize()"
       />
     </div>
   `,
@@ -254,17 +262,8 @@ export class PortfolioTransactionsTableComponent {
 
   readonly data = input<PortfolioTransactionMore[] | null>();
   readonly showSymbolFilter = input(false);
-  readonly showTransactionFees = input(false);
-
-  /**
-   * Whether to show the action button column - delete button
-   */
-  readonly showActionButton = input(false);
-
-  /**
-   * Whether to show the user column
-   */
-  readonly showUser = input(false);
+  readonly pageSize = input(18);
+  readonly title = input<string>('Transaction History');
 
   readonly showActionBarComp = computed(() => this.showSymbolFilter() && (this.data()?.length ?? 0) > 15);
 
@@ -291,12 +290,24 @@ export class PortfolioTransactionsTableComponent {
   );
   readonly tableSymbolFilterControl = new FormControl<string | null>(null);
 
+  readonly displayedColumns = input<string[]>([
+    'symbol',
+    'transactionType',
+    'totalValue',
+    'unitPrice',
+    //'units',
+    'transactionFees',
+    'returnPrct',
+    'date',
+    // user, rounds, returnPrctOnly
+  ]);
+
   constructor() {
+    // filter items in the table on symbol change
     this.tableSymbolFilterControl.valueChanges.subscribe((value) => {
-      console.log(value);
       const original = this.data() ?? [];
       // decide which data to show based on the filter
-      const filtered = !!value ? original.filter((d) => d.symbol === value) : original;
+      const filtered = value ? original.filter((d) => d.symbol === value) : original;
       // reverse transactions to show the latest first
       this.dataSource.data = filtered.reduce((acc, curr) => [curr, ...acc], [] as PortfolioTransactionMore[]);
       this.dataSource._updateChangeSubscription();
@@ -311,36 +322,16 @@ export class PortfolioTransactionsTableComponent {
     untracked(() => {
       this.dataSource.data = sortedDataByDate;
       this.dataSource._updateChangeSubscription();
+
+      // reset filter on data change
+      this.tableSymbolFilterControl.setValue('', { emitEvent: false });
     });
   });
 
   readonly tableInitEffect = effect(() => {
     this.dataSource.paginator = this.paginator() ?? null;
   });
-
-  displayedColumnsEffect = effect(() => {
-    if (this.showTransactionFees() && !this.displayedColumns.includes('transactionFees')) {
-      this.displayedColumns = insertIntoArray(this.displayedColumns, 5, 'transactionFees');
-    }
-    if (this.showActionButton() && !this.displayedColumns.includes('action')) {
-      this.displayedColumns = [...this.displayedColumns, 'action'];
-    }
-    if (this.showUser() && !this.displayedColumns.includes('user')) {
-      this.displayedColumns = insertIntoArray(this.displayedColumns, 2, 'user');
-    }
-  });
-
   readonly dataSource = new MatTableDataSource<PortfolioTransactionMore>([]);
-  displayedColumns: string[] = [
-    'symbol',
-    'transactionType',
-    'totalValue',
-    'unitPrice',
-    'units',
-    'return',
-    'returnPrct',
-    'date',
-  ];
 
   readonly paginator = viewChild(MatPaginator);
 
@@ -379,8 +370,6 @@ export class PortfolioTransactionsTableComponent {
         case 'date':
           return compare(a.date, b.date, isAsc);
         case 'returnPrct':
-          return compare(a.returnChange, b.returnChange, isAsc);
-        case 'return':
           return compare(a.returnValue, b.returnValue, isAsc);
         default: {
           return 0;

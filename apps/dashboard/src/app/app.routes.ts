@@ -2,8 +2,9 @@ import { inject } from '@angular/core';
 import { Route, Router } from '@angular/router';
 import { UserAccountEnum } from '@mm/api-types';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { featureFlagGuard } from '@mm/authentication/feature-access-directive';
-import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
+import { featureFlagGuard, userAccountTypeGuard } from '@mm/authentication/feature-access-directive';
+import { IS_DEV_TOKEN, ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
+import { tradingSimulatorDetailsGuard, tradingSimulatorEditGuard } from '@mm/trading-simulator/data-access';
 import { map, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
@@ -88,26 +89,51 @@ export const appRoutes: Route[] = [
             path: ROUTES_MAIN.HALL_OF_FAME,
             title: 'GGFinance - Ranking',
             loadComponent: () => import('@mm/page-builder').then((m) => m.PageHallOfFameComponent),
-            canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
+            canActivate: [userAccountTypeGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
           },
           {
             path: ROUTES_MAIN.COMPARE_USERS,
             title: 'GGFinance - Compare Users',
             loadComponent: () => import('@mm/page-builder').then((m) => m.PageCompareUsersComponent),
-            canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
+            canActivate: [userAccountTypeGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
           },
           {
             path: ROUTES_MAIN.GROUPS,
             title: 'GGFinance - Groups',
-            canActivate: [featureFlagGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
+            canActivate: [userAccountTypeGuard(UserAccountEnum.DEMO_TRADING, ROUTES_MAIN.DASHBOARD)],
             loadChildren: () => [
               {
                 path: '',
-                loadComponent: () => import('./groups/groups.component').then((m) => m.GroupsComponent),
+                loadComponent: () => import('./groups/groups.component').then((m) => m.groupsComponent),
               },
               {
                 path: ':id',
                 loadComponent: () => import('@mm/page-builder').then((m) => m.PageGroupDetailsComponent),
+              },
+            ],
+          },
+          {
+            path: ROUTES_MAIN.TRADING_SIMULATOR,
+            title: 'GGFinance - Trading Simulator',
+            loadChildren: () => [
+              {
+                path: '',
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorComponent),
+              },
+              {
+                path: ROUTES_TRADING_SIMULATOR.CREATE,
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorCreateComponent),
+                canActivate: [featureFlagGuard('createTradingSimulator')],
+              },
+              {
+                path: `${ROUTES_TRADING_SIMULATOR.EDIT}/:id`,
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorEditComponent),
+                canActivate: [tradingSimulatorEditGuard],
+              },
+              {
+                path: `${ROUTES_TRADING_SIMULATOR.DETAILS}/:id`,
+                loadComponent: () => import('@mm/page-builder').then((m) => m.PageTradingSimulatorDetailsComponent),
+                canActivate: [tradingSimulatorDetailsGuard],
               },
             ],
           },

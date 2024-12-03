@@ -1,12 +1,10 @@
-import { DOCUMENT, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, TemplateRef, inject, output, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, inject, model, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { NavigationStart, Router, RouterModule } from '@angular/router';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
@@ -18,166 +16,47 @@ import { filter, map, startWith } from 'rxjs';
   selector: 'app-menu-top-navigation',
   standalone: true,
   imports: [
-    NgClass,
     RouterModule,
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
-    UserAccountTypeDirective,
     DefaultImgDirective,
     SymbolSearchBasicComponent,
   ],
   template: `
-    <div class="bg-wt-background-present w-full p-2 shadow-md">
-      <nav class="mx-auto flex w-full max-w-[1620px] items-center gap-4 pb-1 pl-3 sm:pl-8 sm:pr-4">
+    <div class="bg-wt-background-present w-full shadow-md">
+      <nav class="mx-auto flex w-full max-w-[1620px] items-center gap-4 p-2 sm:pl-8 sm:pr-4">
         <!-- mobile screen -->
-        <div class="flex items-center gap-x-2 xl:hidden">
+        <div class="flex items-center gap-x-2">
           <!-- menu button -->
           <button type="button" mat-icon-button (click)="onMenuClick()">
             <mat-icon>menu</mat-icon>
           </button>
 
           <!-- page title -->
-          <span class="text-wt-primary mt-1 text-lg">{{ pageName() }}</span>
+          <div class="text-wt-primary text-lg">{{ pageName() }}</div>
         </div>
 
-        <!-- dashboard -->
-        <a
-          (click)="onNavClick(ROUTES_MAIN.DASHBOARD)"
-          class="g-clickable-hover"
-          [ngClass]="{ 'c-active': activeLinkSignal() === ROUTES_MAIN.DASHBOARD }"
-        >
-          <div class="flex items-center gap-2">
-            <mat-icon>dashboard</mat-icon>
-            <span>Dashboard</span>
-          </div>
-        </a>
-
-        <!-- watchlist -->
-        <a
-          (click)="onNavClick(ROUTES_MAIN.WATCHLIST)"
-          class="g-clickable-hover"
-          [ngClass]="{ 'c-active': activeLinkSignal() === ROUTES_MAIN.WATCHLIST }"
-        >
-          <div class="flex items-center gap-2">
-            <mat-icon>monitoring</mat-icon>
-            <span>Watchlist</span>
-          </div>
-        </a>
-
-        <!-- trading -->
-        <a
-          (click)="onNavClick(ROUTES_MAIN.TRADING)"
-          class="g-clickable-hover"
-          [ngClass]="{ 'c-active': activeLinkSignal() === ROUTES_MAIN.TRADING }"
-        >
-          <div class="flex items-center gap-2">
-            <mat-icon>attach_money</mat-icon>
-            <span>Trading</span>
-          </div>
-        </a>
-
-        <!-- groups -->
-        <a
-          *appUserAccountType="'DEMO_TRADING'"
-          (click)="onNavClick(ROUTES_MAIN.GROUPS)"
-          class="g-clickable-hover"
-          [ngClass]="{ 'c-active': activeLinkSignal() === ROUTES_MAIN.GROUPS }"
-        >
-          <div class="flex items-center gap-2">
-            <mat-icon>group</mat-icon>
-            <span>Groups</span>
-          </div>
-        </a>
-
-        <!-- hall of fame -->
-        <a
-          *appUserAccountType="'DEMO_TRADING'"
-          (click)="onNavClick(ROUTES_MAIN.HALL_OF_FAME)"
-          class="g-clickable-hover"
-          [ngClass]="{ 'c-active': activeLinkSignal() === ROUTES_MAIN.HALL_OF_FAME }"
-        >
-          <div class="flex items-center gap-2">
-            <mat-icon>military_tech</mat-icon>
-            <span>Ranking</span>
-          </div>
-        </a>
-
-        <!-- screener -->
-        <a
-          *appUserAccountType="'NORMAL_BASIC'"
-          (click)="onNavClick(ROUTES_MAIN.STOCK_SCREENER)"
-          class="g-clickable-hover"
-          [ngClass]="{ 'c-active': activeLinkSignal() === ROUTES_MAIN.STOCK_SCREENER }"
-        >
-          <div class="flex items-center gap-2">
-            <mat-icon>search</mat-icon>
-            <span>Screener</span>
-          </div>
-        </a>
-
-        <!-- market -->
-        <a
-          *appUserAccountType="'DEMO_TRADING'"
-          (click)="onNavClick(ROUTES_MAIN.COMPARE_USERS)"
-          class="g-clickable-hover"
-          [ngClass]="{ 'c-active': activeLinkSignal() === ROUTES_MAIN.COMPARE_USERS }"
-        >
-          <div class="flex items-center gap-2">
-            <mat-icon>diversity_3</mat-icon>
-            <span>Compare</span>
-          </div>
-        </a>
-
-        <!-- market -->
-        <a
-          (click)="onNavClick(ROUTES_MAIN.MARKET)"
-          class="g-clickable-hover"
-          [ngClass]="{ 'c-active': activeLinkSignal() === ROUTES_MAIN.MARKET }"
-        >
-          <div class="flex items-center gap-2">
-            <mat-icon>travel_explore</mat-icon>
-            <span>Market</span>
-          </div>
-        </a>
-
-        <div class="flex flex-1 justify-end">
-          <!-- small screen -->
-          <div class="text-wt-gray-medium pr-4 md:hidden">
-            @if (userDataSignal(); as userDataSignal) {
-              <div class="flex items-center gap-3">
-                <img
-                  appDefaultImg
-                  class="h-6 w-6 rounded-full"
-                  [src]="userDataSignal.personal.photoURL"
-                  [alt]="userDataSignal.personal.displayName"
-                />
-                <span>{{ userDataSignal.personal.displayNameInitials }}</span>
-              </div>
-            }
-          </div>
-
+        <div class="flex flex-1 items-center justify-end">
           <!-- search -->
-          <app-symbol-search-basic class="mt-2 hidden w-[475px] scale-90 md:block xl:-mr-6 xl:w-[400px]" />
+          <app-symbol-search-basic class="hidden w-[475px] scale-90 md:block xl:-mr-6 xl:w-[450px]" />
 
-          <div class="hidden items-center gap-1 xl:flex">
-            <!-- display logged in person -->
-            @if (userDataSignal(); as userDataSignal) {
-              <div class="relative mx-2 mt-2">
-                <button mat-button class="h-11 px-4" (click)="onMoreOptionsClick()">
-                  <div class="flex items-center gap-3">
-                    <img
-                      appDefaultImg
-                      class="h-8 w-8 rounded-full"
-                      [src]="userDataSignal.personal.photoURL"
-                      [alt]="userDataSignal.personal.displayName"
-                    />
-                    <span>{{ userDataSignal.personal.displayNameInitials }}</span>
-                  </div>
-                </button>
-              </div>
-            }
-          </div>
+          <!-- user menu -->
+          @if (userDataSignal(); as userDataSignal) {
+            <div class="relative mx-2">
+              <button mat-button class="h-11 px-4" (click)="onMoreOptionsClick()">
+                <div class="flex items-center gap-3">
+                  <img
+                    appDefaultImg
+                    class="h-8 w-8 rounded-full"
+                    [src]="userDataSignal.personal.photoURL"
+                    [alt]="userDataSignal.personal.displayName"
+                  />
+                  <span>{{ userDataSignal.personal.displayNameInitials }}</span>
+                </div>
+              </button>
+            </div>
+          }
         </div>
       </nav>
     </div>
@@ -215,43 +94,20 @@ import { filter, map, startWith } from 'rxjs';
   styles: `
     :host {
       display: block;
-
-      a {
-        @apply hover:bg-wt-gray-light-strong hidden rounded-md px-4 py-3 text-sm xl:block;
-
-        &.c-active {
-          border-bottom: 2px solid var(--primary) !important;
-          > * {
-            color: var(--primary) !important;
-          }
-        }
-      }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuTopNavigationComponent {
-  readonly menuClickEmitter = output<void>();
+  readonly menuClick = model<boolean>();
   private readonly router = inject(Router);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly authenticationService = inject(AuthenticationAccountService);
   private readonly dialog = inject(MatDialog);
-  private readonly document = inject(DOCUMENT);
 
   readonly menuOptions = viewChild('menuOptions', { read: TemplateRef<HTMLElement> });
 
   readonly userDataSignal = this.authenticationUserStoreService.state.userData;
-
-  readonly ROUTES_MAIN = ROUTES_MAIN;
-  readonly activeLinkSignal = toSignal(
-    this.router.events.pipe(
-      filter((event) => event instanceof NavigationStart),
-      map((event) => event.url),
-      startWith(this.router.url),
-      map((url) => url.replace('/', '') as string),
-    ),
-    { initialValue: '' },
-  );
 
   readonly pageName = toSignal(
     this.router.events.pipe(
@@ -263,23 +119,8 @@ export class MenuTopNavigationComponent {
     { initialValue: 'GGFinance' },
   );
 
-  constructor() {
-    // check if dark mode is enabled
-    const val = !!this.authenticationUserStoreService.state.getUserDataNormal()?.settings?.isDarkMode;
-    const darkClass = 'dark-theme';
-    if (val) {
-      this.document.body.classList.add(darkClass);
-    } else {
-      this.document.body.classList.remove(darkClass);
-    }
-  }
-
   onMenuClick() {
-    this.menuClickEmitter.emit();
-  }
-
-  onNavClick(navigation: ROUTES_MAIN) {
-    this.router.navigate([navigation]);
+    this.menuClick.set(!this.menuClick());
   }
 
   onSettingClick() {
@@ -313,6 +154,10 @@ export class MenuTopNavigationComponent {
 
     if (route.includes(ROUTES_MAIN.WATCHLIST)) {
       return 'Watchlist';
+    }
+
+    if (route.includes(ROUTES_MAIN.TRADING_SIMULATOR)) {
+      return 'Trading Simulator';
     }
 
     if (route.includes(ROUTES_MAIN.TRADING)) {

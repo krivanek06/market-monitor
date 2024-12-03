@@ -16,8 +16,10 @@
 
 mat-form-field {
   &.g-form-error {
-    .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-      border: 1px solid var(--danger) !important;
+    border: 1px solid var(--danger) !important;
+
+    mat-label {
+      color: var(--danger) !important;
     }
   }
 }

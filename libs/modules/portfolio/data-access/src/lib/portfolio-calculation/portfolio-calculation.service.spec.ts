@@ -349,7 +349,6 @@ describe('PortfolioCalculationService', () => {
         ],
       } satisfies PortfolioStateHoldings;
 
-      // TODO - check if this is OK
       const holdings = getPortfolioStateHoldingBaseByTransactionsUtil([
         t_BUY_AAPL_1_Change,
         t_BUY_MSFT_1_Change,

@@ -1,6 +1,5 @@
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { SlicePipe } from '@angular/common';
-import { Component, input } from '@angular/core';
+import { NgTemplateOutlet, SlicePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -24,12 +23,7 @@ import { GroupSearchControlComponent, GroupSearchControlComponentMock } from '@m
 import { PortfolioRankTableComponent } from '@mm/portfolio/ui';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import {
-  RankCardComponent,
-  RankCardComponentMock,
-  ScrollWrapperComponent,
-  ShowMoreButtonComponent,
-} from '@mm/shared/ui';
+import { GeneralCardComponent, RankCardComponent, RankCardComponentMock, ShowMoreButtonComponent } from '@mm/shared/ui';
 import {
   UserDetailsDialogComponent,
   UserSearchControlComponent,
@@ -38,15 +32,6 @@ import {
 import { UserDisplayItemComponent, UserDisplayItemComponentMock } from '@mm/user/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PageHallOfFameComponent } from './page-hall-of-fame.component';
-
-@Component({
-  selector: 'app-scroll-wrapper',
-  standalone: true,
-  template: `<ng-content />`,
-})
-class ScrollWrapperComponentMock {
-  heightPx = input<number>(300);
-}
 
 describe('PageHallOfFameComponent', () => {
   const userRankCardS = '[data-testid="hall-of-fame-user-rank-card"]';
@@ -150,7 +135,8 @@ describe('PageHallOfFameComponent', () => {
       .keep(NoopAnimationsModule)
       .keep(ShowMoreButtonComponent)
       .keep(SlicePipe)
-      .replace(ScrollWrapperComponent, ScrollWrapperComponentMock)
+      .keep(NgTemplateOutlet)
+      .keep(GeneralCardComponent)
       .replace(RankCardComponent, RankCardComponentMock)
       .replace(UserSearchControlComponent, UserSearchControlComponentMock)
       .replace(GroupSearchControlComponent, GroupSearchControlComponentMock)

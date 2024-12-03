@@ -8,14 +8,7 @@ import { ClickableDirective, DefaultImgDirective, PositionColoringDirective } fr
 @Component({
   selector: 'app-rank-card',
   standalone: true,
-  imports: [
-    NgClass,
-    MatRippleModule,
-    ClickableDirective,
-    MatIconModule,
-    PositionColoringDirective,
-    DefaultImgDirective,
-  ],
+  imports: [NgClass, MatRippleModule, MatIconModule, PositionColoringDirective, DefaultImgDirective],
   template: `
     <div
       matRipple

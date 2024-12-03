@@ -22,7 +22,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DefaultImgDirective } from '../../../directives';
 
 @Component({
   selector: 'app-form-mat-input-wrapper',
@@ -38,7 +37,6 @@ import { DefaultImgDirective } from '../../../directives';
         [type]="inputType() | lowercase"
         autocomplete="off"
         matInput
-        placeholder="enter something"
       />
 
       <!-- prefix icon -->
@@ -51,7 +49,7 @@ import { DefaultImgDirective } from '../../../directives';
     @if (showErrors) {
       @for (inputError of parentControl?.errors | keyvalue; track $index; let i = $index) {
         <!-- show only first error -->
-        <div class="text-wt-danger -mt-5 text-xs">
+        <div class="text-wt-danger text-xs">
           {{ inputError.value.errorText }}
         </div>
       }
@@ -75,7 +73,6 @@ import { DefaultImgDirective } from '../../../directives';
     FormsModule,
     MatSliderModule,
     MatButtonModule,
-    DefaultImgDirective,
   ],
   providers: [
     {

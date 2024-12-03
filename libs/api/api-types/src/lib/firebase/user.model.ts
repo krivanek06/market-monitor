@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { DataDocsWrapper } from './../constants/generic.model';
+import { DataDocsWrapper } from '../constants';
 import {
   PortfolioGrowth,
   PortfolioRisk,
@@ -168,6 +168,7 @@ export enum UserAccountEnum {
 }
 
 export type UserAccountTypes = keyof typeof UserAccountEnum;
+export type UserFeatureAccessKeys = keyof NonNullable<UserData['featureAccess']>;
 
 /**
  * picked account types user can choose from by default, others can added by the system

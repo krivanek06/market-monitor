@@ -92,7 +92,7 @@ import { AuthenticationFormComponent } from '@mm/authentication/authentication-f
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageLoginComponent {
-  private document = inject(DOCUMENT);
+  private readonly document = inject(DOCUMENT);
   readonly version = inject(DASHBOARD_VERSION_TOKEN);
   constructor() {
     this.document.body.classList.add('dark-theme');

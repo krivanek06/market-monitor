@@ -16,7 +16,6 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
     MatIconModule,
     PercentageIncreaseDirective,
     MatRippleModule,
-    ClickableDirective,
   ],
   template: `
     <div
@@ -96,19 +95,19 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
   ],
 })
 export class GroupDisplayItemComponent {
-  clickableDirective = inject(ClickableDirective);
-  groupData = input.required<GroupBase>();
+  readonly clickableDirective = inject(ClickableDirective);
+  readonly groupData = input.required<GroupBase>();
 
   /**
    * whether to show daily portfolio change or total portfolio change
    */
-  showDailyPortfolioChange = input(false);
+  readonly showDailyPortfolioChange = input(false);
 
-  changePercentage = computed(() =>
+  readonly changePercentage = computed(() =>
     this.showDailyPortfolioChange()
       ? this.groupData().portfolioState.previousBalanceChangePercentage
       : this.groupData().portfolioState.totalGainsPercentage,
   );
 
-  memberLimit = GROUP_MEMBER_LIMIT;
+  readonly memberLimit = GROUP_MEMBER_LIMIT;
 }

@@ -1,10 +1,12 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   TrackByFunction,
   computed,
   effect,
+  inject,
   input,
   output,
   signal,
@@ -29,7 +31,6 @@ import {
   selector: 'app-portfolio-holdings-table',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     MatSortModule,
     DefaultImgDirective,
@@ -39,6 +40,9 @@ import {
     MatChipsModule,
     MatPaginatorModule,
     RangeDirective,
+    CurrencyPipe,
+    DecimalPipe,
+    PercentPipe,
   ],
   template: `
     <table
@@ -243,6 +247,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioHoldingsTableComponent {
+  private readonly cd = inject(ChangeDetectorRef);
   readonly symbolClicked = output<string>();
 
   /**
@@ -287,8 +292,17 @@ export class PortfolioHoldingsTableComponent {
 
     untracked(() => {
       this.dataSource.data = sorted;
-      this.dataSource.paginator = this.paginator() ?? null;
-      this.dataSource.sort = this.sort() ?? null;
+
+      if (!this.dataSource.paginator) {
+        this.dataSource.paginator = this.paginator() ?? null;
+      }
+
+      if (!this.dataSource.sort) {
+        this.dataSource.sort = this.sort() ?? null;
+      }
+
+      // table is not updated when row data updates
+      this.cd.markForCheck();
     });
   });
 

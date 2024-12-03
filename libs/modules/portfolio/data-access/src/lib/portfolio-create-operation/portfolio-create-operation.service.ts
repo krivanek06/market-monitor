@@ -71,7 +71,7 @@ export class PortfolioCreateOperationService {
     }
 
     // create transaction
-    const transaction = createTransaction(userData, order, order.potentialSymbolPrice);
+    const transaction = createTransaction(userData, userData.holdingSnapshot.data, order, order.potentialSymbolPrice);
 
     // update user's transactions
     this.authenticationUserService.addPortfolioTransactions(transaction);

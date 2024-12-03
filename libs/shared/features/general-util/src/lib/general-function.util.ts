@@ -153,6 +153,16 @@ export const createNameInitials = (name: string) => {
   return `${words}.`;
 };
 
+export const generateRandomString = (length = 10): string => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 export const tryJSONParse = <T>(value: string | undefined | null): T | null => {
   try {
     if (!value) {

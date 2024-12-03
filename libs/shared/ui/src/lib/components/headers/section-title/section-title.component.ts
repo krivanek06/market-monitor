@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -9,24 +9,28 @@ import { MatIconModule } from '@angular/material/icon';
   template: `
     <div class="flex items-center justify-between gap-x-10">
       <!-- left side -->
-      <div class="flex-1">
-        <h2
-          class="text-wt-primary flex items-center gap-4"
-          [ngClass]="{
-            'text-lg': titleSize() === 'lg',
-            'text-base': titleSize() === 'base',
-            'text-xl': titleSize() === 'xl',
-          }"
-        >
-          @if (matIcon()) {
-            <mat-icon color="primary">{{ matIcon() }}</mat-icon>
-          }
-          {{ title() }}
-        </h2>
-
-        @if (description()) {
-          <p class="text-wt-gray-medium text-sm">{{ description() }}</p>
+      <div class="flex flex-1 items-center gap-3">
+        @if (matIcon()) {
+          <mat-icon color="primary">{{ matIcon() }}</mat-icon>
         }
+
+        <div>
+          <h2
+            class="text-wt-primary"
+            [ngClass]="{
+              'text-lg': titleSize() === 'lg',
+              'text-base': titleSize() === 'base',
+            }"
+          >
+            {{ title() }}
+          </h2>
+
+          @if (descriptionDisplay().length > 0) {
+            @for (desc of descriptionDisplay(); track $index) {
+              <p class="text-wt-gray-medium text-sm">{{ desc }}</p>
+            }
+          }
+        </div>
       </div>
 
       <!-- right side -->
@@ -45,6 +49,12 @@ import { MatIconModule } from '@angular/material/icon';
 export class SectionTitleComponent {
   readonly matIcon = input<string | undefined>();
   readonly title = input.required<string>();
-  readonly titleSize = input<'xl' | 'lg' | 'base'>('xl');
-  readonly description = input<string | undefined>();
+  readonly titleSize = input<'lg' | 'base'>('lg');
+  readonly description = input<string | string[] | undefined>();
+
+  readonly descriptionDisplay = computed(() => {
+    const description = this.description();
+
+    return Array.isArray(description) ? description : [description];
+  });
 }

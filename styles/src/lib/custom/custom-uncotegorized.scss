@@ -3,7 +3,11 @@
 }
 
 .g-banner-default {
-  @apply bg-wt-gray-dark rounded-lg p-4 text-center text-lg;
+  @apply bg-wt-gray-light rounded-lg p-4 text-center text-lg;
+}
+
+.g-banner-default-small {
+  @apply bg-wt-gray-light rounded-lg p-2 text-center text-sm;
 }
 
 .g-skeleton {

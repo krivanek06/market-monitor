@@ -1,5 +1,15 @@
 import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
-import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  FormControl,
+  FormGroup,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validator,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { LoginUserInput } from '@mm/authentication/data-access';
 import { FormMatInputWrapperComponent } from '@mm/shared/ui';
@@ -11,10 +21,14 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
   template: `
     <form [formGroup]="formGroup" class="flex flex-col gap-6" (ngSubmit)="onSubmit()">
       <!-- email -->
-      <app-form-mat-input-wrapper formControlName="email" inputCaption="Email" inputType="EMAIL" />
+      <app-form-mat-input-wrapper [formControl]="formGroup.controls.email" inputCaption="Email" inputType="EMAIL" />
 
       <!-- password -->
-      <app-form-mat-input-wrapper formControlName="password" inputCaption="Password" inputType="PASSWORD" />
+      <app-form-mat-input-wrapper
+        [formControl]="formGroup.controls.password"
+        inputCaption="Password"
+        inputType="PASSWORD"
+      />
 
       <!-- submit -->
       <button mat-stroked-button color="primary" class="w-full" type="submit">Login</button>
@@ -32,9 +46,14 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
       useExisting: forwardRef(() => FormLoginComponent),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => FormLoginComponent),
+      multi: true,
+    },
   ],
 })
-export class FormLoginComponent implements ControlValueAccessor {
+export class FormLoginComponent implements ControlValueAccessor, Validator {
   readonly formGroup = new FormGroup({
     email: new FormControl('', {
       nonNullable: true,
@@ -44,8 +63,12 @@ export class FormLoginComponent implements ControlValueAccessor {
     }),
   });
 
-  onChange: (value: LoginUserInput) => void = () => {};
-  onTouched = () => {};
+  onChange: (value: LoginUserInput) => void = () => {
+    /** */
+  };
+  onTouched = () => {
+    /** */
+  };
 
   onSubmit(): void {
     this.formGroup.markAllAsTouched();
@@ -68,7 +91,9 @@ export class FormLoginComponent implements ControlValueAccessor {
     });
   }
 
-  writeValue(obj: LoginUserInput): void {}
+  writeValue(obj: LoginUserInput): void {
+    //this.formGroup.setValue(obj);
+  }
 
   /**
    * Register Component's ControlValueAccessor onChange callback
@@ -82,5 +107,13 @@ export class FormLoginComponent implements ControlValueAccessor {
    */
   registerOnTouched(fn: FormLoginComponent['onTouched']): void {
     this.onTouched = fn;
+  }
+
+  validate(control: AbstractControl): ValidationErrors | null {
+    return this.formGroup.errors;
+  }
+
+  registerOnValidatorChange?(fn: () => void): void {
+    //throw new Error('Method not implemented.');
   }
 }

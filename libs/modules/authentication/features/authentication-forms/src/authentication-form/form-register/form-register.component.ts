@@ -1,6 +1,14 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, forwardRef, inject } from '@angular/core';
-import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  FormControl,
+  FormGroup,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+  ValidationErrors,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { RegisterUserInput } from '@mm/authentication/data-access';
 import { emailValidator, maxLengthValidator, minLengthValidator, requiredValidator } from '@mm/shared/data-access';
@@ -10,17 +18,25 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
 @Component({
   selector: 'app-form-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormMatInputWrapperComponent, MatButtonModule],
+  imports: [ReactiveFormsModule, FormMatInputWrapperComponent, MatButtonModule],
   template: `
     <form [formGroup]="formGroup" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
       <!-- email -->
-      <app-form-mat-input-wrapper formControlName="email" inputCaption="Email" inputType="EMAIL" />
+      <app-form-mat-input-wrapper [formControl]="formGroup.controls.email" inputCaption="Email" inputType="EMAIL" />
 
       <!-- password1 -->
-      <app-form-mat-input-wrapper formControlName="password1" inputCaption="Password" inputType="PASSWORD" />
+      <app-form-mat-input-wrapper
+        [formControl]="formGroup.controls.password1"
+        inputCaption="Password"
+        inputType="PASSWORD"
+      />
 
       <!-- password2 -->
-      <app-form-mat-input-wrapper formControlName="password2" inputCaption="Password" inputType="PASSWORD" />
+      <app-form-mat-input-wrapper
+        [formControl]="formGroup.controls.password2"
+        inputCaption="Password"
+        inputType="PASSWORD"
+      />
 
       <!-- submit -->
       <button mat-stroked-button class="w-full" color="primary" type="submit">Register</button>
@@ -38,12 +54,17 @@ import { FormMatInputWrapperComponent } from '@mm/shared/ui';
       useExisting: forwardRef(() => FormRegisterComponent),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => FormRegisterComponent),
+      multi: true,
+    },
   ],
 })
 export class FormRegisterComponent implements ControlValueAccessor {
-  private dialogServiceUtil = inject(DialogServiceUtil);
+  private readonly dialogServiceUtil = inject(DialogServiceUtil);
 
-  formGroup = new FormGroup({
+  readonly formGroup = new FormGroup({
     email: new FormControl('', {
       validators: [emailValidator, requiredValidator, maxLengthValidator(30)],
       nonNullable: true,
@@ -62,6 +83,10 @@ export class FormRegisterComponent implements ControlValueAccessor {
   onTouched = () => {};
 
   onSubmit(): void {
+    // mark all controls as touched
+    this.formGroup.markAllAsTouched();
+
+    // form is invalid
     if (this.formGroup.invalid) {
       return;
     }
@@ -100,5 +125,13 @@ export class FormRegisterComponent implements ControlValueAccessor {
    */
   registerOnTouched(fn: FormRegisterComponent['onTouched']): void {
     this.onTouched = fn;
+  }
+
+  validate(control: AbstractControl): ValidationErrors | null {
+    return this.formGroup.errors;
+  }
+
+  registerOnValidatorChange?(fn: () => void): void {
+    //throw new Error('Method not implemented.');
   }
 }

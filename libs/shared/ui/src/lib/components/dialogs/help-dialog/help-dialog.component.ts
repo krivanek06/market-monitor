@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -8,7 +7,7 @@ import { DialogCloseHeaderComponent } from '../../headers';
 @Component({
   selector: 'app-help-dialog',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatDialogModule, DialogCloseHeaderComponent, MatButtonModule, MatIconModule],
+  imports: [MatIconModule, MatDialogModule, DialogCloseHeaderComponent, MatButtonModule, MatIconModule],
   template: `
     <app-dialog-close-header title="Help Section" />
 

@@ -124,6 +124,20 @@ export const emailValidator: CustomInputValidatorFn = (control) => {
   };
 };
 
+export const dateTimeInFuture: CustomInputValidatorFn = (control) => {
+  const date = new Date(control.value);
+
+  if (date > new Date()) {
+    return null;
+  }
+
+  return {
+    dateTimeInFuture: {
+      errorText: 'Date must be in the future',
+    },
+  };
+};
+
 export const phoneNumberFieldValidator: CustomInputValidatorFn = (control) => {
   if (!control.value) {
     return null;

@@ -15,23 +15,17 @@ import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
-import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
 import {
   OutstandingOrderCardDataComponent,
   PortfolioStateComponent,
   PortfolioStateTransactionsComponent,
+  PortfolioTradeDialogComponent,
+  PortfolioTradeDialogComponentData,
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import {
-  FormMatInputWrapperComponent,
-  GeneralCardComponent,
-  QuoteItemComponent,
-  RangeDirective,
-  SectionTitleComponent,
-  SortByKeyPipe,
-} from '@mm/shared/ui';
+import { GeneralCardComponent, QuoteItemComponent, RangeDirective, SectionTitleComponent } from '@mm/shared/ui';
 import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
 
 @Component({
@@ -46,13 +40,10 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
     AssetPriceChartInteractiveComponent,
     SymbolSummaryListComponent,
     PortfolioTransactionsTableComponent,
-    PortfolioTradeDialogComponent,
     MatTooltipModule,
-    SortByKeyPipe,
     QuoteItemComponent,
     RangeDirective,
     SectionTitleComponent,
-    FormMatInputWrapperComponent,
     ReactiveFormsModule,
     NgClass,
     OutstandingOrderCardDataComponent,
@@ -235,8 +226,6 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
     <!-- transaction history -->
     <app-portfolio-transactions-table
       data-testid="page-trading-portfolio-transactions-table"
-      [showTransactionFees]="state.isAccountDemoTrading()"
-      [showActionButton]="state.isAccountNormalBasic()"
       [data]="state.portfolioTransactions()"
       [showSymbolFilter]="true"
     />
@@ -378,10 +367,18 @@ export class PageTradingComponent {
     >(PortfolioTradeDialogComponent, {
       data: {
         transactionType: transactionType,
-        quote: summary.quote,
+        quote: {
+          symbol: summary.id,
+          displaySymbol: summary.quote.displaySymbol,
+          price: summary.quote.price,
+          name: summary.quote.name,
+          exchange: summary.quote.exchange,
+          timestamp: summary.quote.timestamp,
+        },
         sector: summary.profile?.sector ?? summary.quote.exchange,
         userPortfolioStateHolding: this.portfolioUserFacadeService.portfolioStateHolding(),
         isMarketOpen: this.marketIsOpen(),
+        userData: this.authenticationUserService.state.getUserDataMin(),
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });

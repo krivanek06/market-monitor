@@ -53,5 +53,9 @@ module.exports = {
     require('tailwindcss/nesting')(require('postcss-nesting')),
     require('autoprefixer'),
     require('tailwindcss'),
+    function ({ addVariant }) {
+      addVariant('child', '& > *');
+      addVariant('child-hover', '& > *:hover');
+    },
   ],
 };

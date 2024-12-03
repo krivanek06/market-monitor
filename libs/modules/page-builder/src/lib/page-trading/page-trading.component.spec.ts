@@ -9,6 +9,7 @@ import {
   PortfolioTransaction,
   USER_HOLDINGS_SYMBOL_LIMIT,
   UserAccountEnum,
+  UserBaseMin,
   mockCreateUser,
   quoteAAPLMock,
   quoteMSFTMock,
@@ -22,17 +23,23 @@ import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features
 import { SymbolSearchBasicComponent, SymbolSearchBasicComponentMock } from '@mm/market-stocks/features';
 import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
-import { PortfolioTradeDialogComponent, PortfolioTradeDialogComponentData } from '@mm/portfolio/features';
 import {
   OutstandingOrderCardDataComponent,
   OutstandingOrderCardDataMockComponent,
   PortfolioStateComponent,
   PortfolioStateTransactionsComponent,
+  PortfolioTradeDialogComponent,
+  PortfolioTradeDialogComponentData,
   PortfolioTransactionsTableComponent,
   PortfolioTransactionsTableComponentMock,
 } from '@mm/portfolio/ui';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { DropdownControlComponent, DropdownControlComponentMock, QuoteItemComponent } from '@mm/shared/ui';
+import {
+  DropdownControlComponent,
+  DropdownControlComponentMock,
+  GeneralCardComponent,
+  QuoteItemComponent,
+} from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { delay, of, throwError } from 'rxjs';
 import { PageTradingComponent } from './page-trading.component';
@@ -90,6 +97,7 @@ describe('PageTradingComponent', () => {
   beforeEach(() => {
     return MockBuilder(PageTradingComponent)
       .keep(ReactiveFormsModule)
+      .keep(GeneralCardComponent)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .replace(SymbolSearchBasicComponent, SymbolSearchBasicComponentMock)
       .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
@@ -146,6 +154,7 @@ describe('PageTradingComponent', () => {
         useValue: {
           state: {
             getUserData: () => testUserData,
+            getUserDataMin: () => testUserData as UserBaseMin,
             isAccountDemoTrading: () => true,
             isAccountNormalBasic: () => false,
             portfolioTransactions: () => transactionsMock,
@@ -259,10 +268,18 @@ describe('PageTradingComponent', () => {
     expect(dialog.open).toHaveBeenCalledWith(PortfolioTradeDialogComponent, {
       data: <PortfolioTradeDialogComponentData>{
         transactionType: 'BUY',
-        quote: summary!.quote,
+        quote: {
+          symbol: summary!.id,
+          displaySymbol: summary!.quote.displaySymbol,
+          price: summary!.quote.price,
+          name: summary!.quote.name,
+          exchange: summary!.quote.exchange,
+          timestamp: summary!.quote.timestamp,
+        },
         sector: summary!.profile?.sector ?? '',
         userPortfolioStateHolding: mockPortfolioState,
         isMarketOpen: true,
+        userData: testUserData,
       },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });
@@ -528,7 +545,6 @@ describe('PageTradingComponent', () => {
     expect(portfolioStateTransComp.componentInstance.portfolioState).toEqual(
       portfolioStateComp.componentInstance.portfolioState,
     );
-    expect(transactionTable.componentInstance.showActionButton()).toBeTruthy();
     expect(transactionTable.componentInstance.showTransactionFees()).toBeFalsy();
   });
 

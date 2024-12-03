@@ -30,7 +30,11 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
             @if (displayUser()) {
               <div>|</div>
               <!-- date -->
-              <div class="text-wt-gray-medium">{{ transaction().date | date: 'MMM. d, y' }}</div>
+              @if (dateType() === 'date') {
+                <div class="text-wt-gray-medium text-sm">{{ transaction().date | date: 'MMM d, y' }}</div>
+              } @else if (dateType() === 'round') {
+                <div class="text-wt-gray-medium text-sm">Round: {{ transaction().date }}</div>
+              }
             }
           </div>
 
@@ -47,25 +51,36 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
             </div>
           } @else {
             <!-- date -->
-            <div class="text-wt-gray-medium text-sm">{{ transaction().date | date: 'MMMM d, y' }}</div>
+            @if (dateType() === 'date') {
+              <div class="text-wt-gray-medium text-sm">{{ transaction().date | date: 'MMMM d, y' }}</div>
+            } @else if (dateType() === 'round') {
+              <div class="text-wt-gray-medium text-sm">Round: {{ transaction().date }}</div>
+            }
           }
         </div>
       </div>
 
       <!-- total & return -->
       <div class="flex flex-col items-end">
-        <!-- total return -->
-        <div
-          appPercentageIncrease
-          [useCurrencySign]="true"
-          [changeValues]="{
-            change: transaction().returnValue,
-            changePercentage: transaction().returnChange,
-          }"
-        ></div>
+        @if (transaction().returnValue) {
+          <!-- total return -->
+          <div
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [changeValues]="{
+              change: transaction().returnValue,
+              changePercentage: transaction().returnChange,
+            }"
+          ></div>
+        }
 
         <!-- value transacted -->
-        <div class="flex items-center gap-2 text-sm">
+        <div
+          class="flex items-center gap-2"
+          [ngClass]="{
+            'text-sm': transaction().returnValue !== 0,
+          }"
+        >
           <div class="text-wt-gray-dark">{{ transaction().units * transaction().unitPrice | currency }}</div>
           <div class="text-wt-gray-medium">({{ transaction().units }})</div>
         </div>
@@ -86,4 +101,6 @@ export class PortfolioTransactionsItemComponent {
    * whether to display user who made the transaction
    */
   readonly displayUser = input<boolean>(false);
+
+  readonly dateType = input<'date' | 'round'>('date');
 }

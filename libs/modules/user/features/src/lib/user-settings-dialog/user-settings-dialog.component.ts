@@ -288,7 +288,7 @@ export class UserSettingsDialogComponent implements OnInit {
 
   onChangePassword(): void {
     this.dialog.open(ChangePasswordDialogComponent, {
-      panelClass: [SCREEN_DIALOGS.DIALOG_MEDIUM],
+      panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });
   }
 

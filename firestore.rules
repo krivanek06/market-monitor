@@ -12,16 +12,27 @@ service cloud.firestore {
 
     // allow group owners to modify their groups
     match /groups/{groupId}/{document=**} {
-      allow create: if true;
+      allow create: if userFeatureAccess("createGroups");
       allow update: if request.auth.uid == resource.data.ownerUser.id;
       allow delete: if request.auth.uid == resource.data.ownerUser.id;
     }
 
-    // allow operations into outstanding order
-    match /outstanding_orders/{groupId}/{document=**} {
+    // allow operations for outstanding order
+    match /outstanding_orders/{document=**} {
       allow create: if true;
       allow update: if request.auth.uid == resource.data.userData.id;
       allow delete: if request.auth.uid == resource.data.userData.id;
+    }
+
+    // allow operations for trading simulator
+    match /trading_simulator/{simulatorId}/{document=**} {
+      allow create: if userFeatureAccess("createTradingSimulator");
+      allow update: if getOwnerId() && userFeatureAccess("createTradingSimulator");
+      allow delete: if getOwnerId() && userFeatureAccess("createTradingSimulator");
+
+      function getOwnerId() {
+        return request.auth.uid == get(/databases/$(database)/documents/trading_simulator/$(simulatorId)).data.owner.id;
+      }
     }
 
     // allow reading all
@@ -32,6 +43,12 @@ service cloud.firestore {
     // deny write for all document
     match /{document=**} {
       allow write: if false;
+    }
+
+    // Unified function to check user feature access
+    function userFeatureAccess(featureName) {
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return userDoc.data.featureAccess[featureName] == true;
     }
   }
 }

@@ -1,10 +1,11 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { NgClass, NgTemplateOutlet, TitleCasePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationStart, Router, RouterModule } from '@angular/router';
 import { UserAccountEnum } from '@mm/api-types';
 import {
   AuthenticationAccountService,
@@ -15,23 +16,24 @@ import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, HelpDialogComponent } from '@mm/shared/ui';
 import { UserSettingsDialogComponent } from '@mm/user/features';
+import { filter, map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-menu-side-navigation',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     MatIconModule,
     MatButtonModule,
-    UserSettingsDialogComponent,
-    HelpDialogComponent,
     MatDialogModule,
     DefaultImgDirective,
     MatDividerModule,
+    NgClass,
+    TitleCasePipe,
+    NgTemplateOutlet,
   ],
   template: `
-    <div class="mb-2 flex items-center gap-2 p-6">
+    <div class="mb-2 flex items-center gap-2 px-3 py-6">
       <!-- avatar -->
       <img appDefaultImg [src]="userData()?.personal?.photoURL" alt="User Image" class="h-8 w-8 rounded-full" />
       <!-- name -->
@@ -41,9 +43,7 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
     <!-- main navigation -->
     <div class="flex flex-col">
       <div class="mb-2 ml-4">Main</div>
-      <ng-container
-        *ngTemplateOutlet="navigationBlock; context: { navigation: sideNavigation().mainNavigation }"
-      ></ng-container>
+      <ng-container *ngTemplateOutlet="navigationBlock; context: { navigation: sideNavigation().mainNavigation }" />
     </div>
 
     <div class="py-5">
@@ -53,64 +53,29 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
     <!-- market navigation -->
     <div class="flex flex-col">
       <div class="mb-2 ml-4">Market</div>
-      <ng-container
-        *ngTemplateOutlet="navigationBlock; context: { navigation: sideNavigation().marketNavigation }"
-      ></ng-container>
-    </div>
-
-    <div class="py-5">
-      <mat-divider />
-    </div>
-
-    <!-- other navigation -->
-    <div class="mb-8 flex flex-col">
-      <div class="mb-2 ml-4">Other</div>
-
-      <!-- settings -->
-      <div class="text-wt-gray-dark grid gap-2">
-        <a (click)="onSettings()" class="c-link">
-          <mat-icon>settings</mat-icon>
-          <div class="text-base">Settings</div>
-        </a>
-      </div>
-
-      <!-- help -->
-      <div class="text-wt-gray-dark grid gap-2">
-        <a (click)="onHelp()" class="c-link">
-          <mat-icon>help</mat-icon>
-          <div class="text-base">Help</div>
-        </a>
-      </div>
-
-      <!-- logout -->
-      <div class="text-wt-gray-dark grid gap-2">
-        <a (click)="onLogout()" class="c-link">
-          <mat-icon>logout</mat-icon>
-          <div class="text-base">Logout</div>
-        </a>
-      </div>
+      <ng-container *ngTemplateOutlet="navigationBlock; context: { navigation: sideNavigation().marketNavigation }" />
     </div>
 
     <!-- navigation helper -->
     <ng-template #navigationBlock let-navigation="navigation">
       <div class="grid gap-2">
         @for (main of navigation; track main.path) {
-          <a
-            *ngIf="!main.hidden"
-            [routerLink]="main.path"
-            routerLinkActive="bg-wt-gray-light-strong text-wt-primary"
-            (click)="onNavigationClick(main.path)"
-            class="hover:bg-wt-gray-light-strong text-wt-gray-dark flex h-12 max-w-[90%] items-center gap-3 rounded-xl"
-            [ngClass]="{
-              'pl-5': selectedNavigationPath() !== main.path,
-            }"
-          >
-            @if (selectedNavigationPath() === main.path) {
-              <div class="bg-wt-primary h-full w-3"></div>
-            }
-            <mat-icon>{{ main.icon }}</mat-icon>
-            <div class="text-base">{{ main.title | titlecase }}</div>
-          </a>
+          @if (!main.hidden) {
+            <a
+              [routerLink]="main.path"
+              routerLinkActive="bg-wt-gray-light-strong text-wt-primary"
+              class="hover:bg-wt-gray-light-strong text-wt-gray-dark flex h-12 max-w-[90%] items-center gap-3 rounded-xl"
+              [ngClass]="{
+                'pl-5': selectedNavigationPath() !== main.path,
+              }"
+            >
+              @if (selectedNavigationPath() === main.path) {
+                <div class="bg-wt-primary h-full w-3"></div>
+              }
+              <mat-icon>{{ main.icon }}</mat-icon>
+              <div class="text-base">{{ main.title | titlecase }}</div>
+            </a>
+          }
         }
       </div>
     </ng-template>
@@ -126,15 +91,15 @@ import { UserSettingsDialogComponent } from '@mm/user/features';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MenuSideNavigationComponent implements OnInit {
-  private router = inject(Router);
-  private authenticationService = inject(AuthenticationAccountService);
-  private authenticationUserStoreService = inject(AuthenticationUserStoreService);
-  private dialog = inject(MatDialog);
+export class MenuSideNavigationComponent {
+  private readonly router = inject(Router);
+  private readonly authenticationService = inject(AuthenticationAccountService);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly dialog = inject(MatDialog);
 
-  userData = this.authenticationUserStoreService.state.getUserDataNormal;
+  readonly userData = this.authenticationUserStoreService.state.getUserDataNormal;
 
-  sideNavigation = computed(() => {
+  readonly sideNavigation = computed(() => {
     const userData = this.authenticationUserStoreService.state.getUserData();
     const data = {
       mainNavigation: [
@@ -171,13 +136,13 @@ export class MenuSideNavigationComponent implements OnInit {
           icon: 'diversity_3',
           hidden: !hasUserAccess(userData, UserAccountEnum.DEMO_TRADING),
         },
+        {
+          path: ROUTES_MAIN.TRADING_SIMULATOR,
+          title: 'Trading Simulator',
+          icon: 'sports_esports',
+        },
       ],
       marketNavigation: [
-        // {
-        //   path: `${ROUTES_MAIN.MARKET}/${ROUTES_MAIN.SEARCH}`,
-        //   title: 'Search',
-        //   icon: 'search',
-        // },
         {
           path: ROUTES_MAIN.STOCK_SCREENER,
           title: 'Screener',
@@ -208,17 +173,15 @@ export class MenuSideNavigationComponent implements OnInit {
     return data;
   });
 
-  selectedNavigationPath = signal('');
-
-  ngOnInit(): void {
-    const selectedNavigationPath = this.router.url.split('/')[1]; // ['', 'dashboard']
-    this.selectedNavigationPath.set(selectedNavigationPath);
-  }
-
-  onNavigationClick(path: string) {
-    console.log('path', path);
-    this.selectedNavigationPath.set(path);
-  }
+  readonly selectedNavigationPath = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationStart),
+      map((event) => event.url),
+      startWith(this.router.url),
+      map((url) => url.replace('/', '') as string),
+    ),
+    { initialValue: '' },
+  );
 
   async onLogout() {
     await this.router.navigate([ROUTES_MAIN.LOGIN]);

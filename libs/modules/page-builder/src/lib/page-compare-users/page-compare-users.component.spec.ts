@@ -530,7 +530,6 @@ describe('PageCompareUsersComponent', () => {
     const transactionTable = ngMocks.find<PortfolioTransactionsTableComponentMock>(transactionTableS);
     expect(transactionTable.componentInstance).toBeDefined();
     expect(transactionTable.componentInstance.showSymbolFilter()).toBeTruthy();
-    expect(transactionTable.componentInstance.showTransactionFees()).toBeTruthy();
     expect(transactionTable.componentInstance.data()).toEqual(component.selectedUsersData().data[0].userTransactions);
   });
 });

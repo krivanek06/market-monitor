@@ -1,12 +1,17 @@
-import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DOCUMENT, NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { RouterModule } from '@angular/router';
+import { GuardsCheckEnd, GuardsCheckStart, NavigationCancel, Router, RouterModule } from '@angular/router';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { SCREEN_LAYOUT_VALUES } from '@mm/shared/data-access';
 import { DialogServiceModule } from '@mm/shared/dialog-manager';
+import { windowResizeListener } from '@mm/shared/ui';
+import { delay, filter, map } from 'rxjs';
 import { MenuSideNavigationComponent } from './menu-navigation/menu-side-navigation.component';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
 
@@ -14,7 +19,6 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
   selector: 'app-page-menu',
   standalone: true,
   imports: [
-    NgClass,
     MatButtonModule,
     MatIconModule,
     RouterModule,
@@ -25,16 +29,18 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
     MenuSideNavigationComponent,
     // do not remove - allows showing dialogs sub child routes
     DialogServiceModule,
+    MatProgressSpinnerModule,
+    NgClass,
   ],
   template: `
     <mat-drawer-container autosize class="h-full min-h-[100vh]">
       <!-- side nav -->
       <mat-drawer
-        mode="over"
+        [mode]="useSidePanelModeOver() ? 'over' : 'side'"
         [opened]="isOpen()"
-        class="block w-5/12 min-w-[275px] sm:min-w-[375px] md:w-3/12 xl:hidden"
+        (closed)="isOpen.set(false)"
+        class="fixed block w-5/12 max-sm:min-w-[350px] md:w-[300px]"
         role="navigation"
-        (closed)="toggleMatDrawerExpandedView()"
       >
         <app-menu-side-navigation />
       </mat-drawer>
@@ -42,12 +48,24 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
       <mat-drawer-content class="overflow-x-clip">
         <!-- top navigation on big screen -->
         <header>
-          <app-menu-top-navigation (menuClickEmitter)="toggleMatDrawerExpandedView()" />
+          <app-menu-top-navigation [(menuClick)]="isOpen" />
         </header>
 
         <div class="c-content-wrapper">
+          <!-- spinner -->
+          <div
+            class="grid w-full place-content-center pt-[20%]"
+            [ngClass]="{
+              hidden: !isRouterGuardActive(),
+            }"
+          >
+            <mat-spinner />
+          </div>
+
           <!-- content -->
-          <router-outlet />
+          <div [ngClass]="{ hidden: isRouterGuardActive() }">
+            <router-outlet />
+          </div>
 
           <!-- footer for additional space on bottom -->
           <footer class="h-12 w-full"></footer>
@@ -58,6 +76,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
   styles: `
     :host {
       display: block;
+      overflow-x: clip;
     }
 
     .mat-drawer:not(.mat-drawer-side) {
@@ -87,9 +106,33 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageMenuComponent {
-  readonly isOpen = signal<boolean>(false);
+  private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
+  private readonly document = inject(DOCUMENT);
+  private readonly router = inject(Router);
 
-  toggleMatDrawerExpandedView(): void {
-    this.isOpen.set(!this.isOpen());
+  readonly isRouterGuardActive = toSignal(
+    this.router.events.pipe(
+      filter(
+        (event) =>
+          event instanceof GuardsCheckStart || event instanceof GuardsCheckEnd || event instanceof NavigationCancel,
+      ),
+      map((event) => event instanceof GuardsCheckStart),
+      // wait some time to redraw the screen and just then remove the spinner
+      delay(100),
+    ),
+  );
+  readonly isOpen = signal<boolean>(true);
+  readonly windowResize = windowResizeListener();
+  readonly useSidePanelModeOver = computed(() => this.windowResize() <= SCREEN_LAYOUT_VALUES.LAYOUT_XL);
+
+  constructor() {
+    // check if dark mode is enabled
+    const val = !!this.authenticationUserStoreService.state.getUserDataNormal()?.settings?.isDarkMode;
+    const darkClass = 'dark-theme';
+    if (val) {
+      this.document.body.classList.add(darkClass);
+    } else {
+      this.document.body.classList.remove(darkClass);
+    }
   }
 }

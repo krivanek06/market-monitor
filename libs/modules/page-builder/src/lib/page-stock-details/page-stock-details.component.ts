@@ -72,12 +72,12 @@ import { PageStockDetailsTradesComponent } from './page-stock-details-trades/pag
       }
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
       display: block;
     }
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageStockDetailsComponent {
   private readonly router = inject(Router);

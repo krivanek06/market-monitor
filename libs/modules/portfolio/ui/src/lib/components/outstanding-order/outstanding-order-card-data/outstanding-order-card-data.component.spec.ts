@@ -1,4 +1,6 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { OutstandingOrder } from '@mm/api-types';
+import { GeneralCardComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender } from 'ng-mocks';
 import { OutstandingOrderCardDataComponent } from './outstanding-order-card-data.component';
 
@@ -16,7 +18,7 @@ describe('OutstandingOrderCardDataComponent', () => {
   } as OutstandingOrder;
 
   beforeEach(() => {
-    return MockBuilder(OutstandingOrderCardDataComponent);
+    return MockBuilder(OutstandingOrderCardDataComponent).keep(NgTemplateOutlet).keep(GeneralCardComponent);
   });
 
   it('should create', () => {

@@ -18,8 +18,8 @@ import {
   DialogCloseHeaderComponent,
   FormMatInputWrapperComponent,
 } from '@mm/shared/ui';
+import { UploadFileControlComponent } from '@mm/shared/upload-file-control';
 import { UserDisplayItemComponent } from '@mm/user/ui';
-import { UploadFileControlComponent } from 'libs/shared/features/upload-file-control/src';
 import { filterNil } from 'ngxtension/filter-nil';
 import { map, take } from 'rxjs';
 
@@ -56,7 +56,7 @@ export type GroupSettingsDialogComponentData = {
           <div class="min-w-[200px]">
             <app-upload-file-control
               folder="groups"
-              formControlName="uploadedImage"
+              [formControl]="form.controls.uploadedImage"
               (uploadedFilesEmitter)="onNewImageUpload($event)"
               [fileName]="groupDataSignal()?.id"
             />
@@ -71,12 +71,16 @@ export type GroupSettingsDialogComponentData = {
             </div>
 
             <!-- group name -->
-            <app-form-mat-input-wrapper formControlName="groupName" inputCaption="Group Name" inputType="TEXT" />
+            <app-form-mat-input-wrapper
+              [formControl]="form.controls.groupName"
+              inputCaption="Group Name"
+              inputType="TEXT"
+            />
 
             <!-- is public -->
             <mat-checkbox
               color="primary"
-              formControlName="isPublic"
+              [formControl]="form.controls.isPublic"
               matTooltip="If selected people can request be member of a group"
             >
               Is Group Public

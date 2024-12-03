@@ -91,7 +91,7 @@ export class AssetPriceChartComponent extends ChartConstructor {
             return dateFormatDate(date, 'HH:mm, MMM d');
           }
 
-          return dateFormatDate(date, 'MMMM d, y');
+          return dateFormatDate(date, 'MMM d, y');
         }),
         labels: {
           rotation: -12,

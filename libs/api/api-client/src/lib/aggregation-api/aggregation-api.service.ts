@@ -1,9 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { CollectionReference, DocumentData, DocumentReference, Firestore, collection } from '@angular/fire/firestore';
+import {
+  CollectionReference,
+  DocumentData,
+  DocumentReference,
+  Firestore,
+  collection,
+  doc,
+} from '@angular/fire/firestore';
 import { HallOfFameGroups, HallOfFameUsers } from '@mm/api-types';
 import { assignTypesClient } from '@mm/shared/data-access';
-import { doc } from 'firebase/firestore';
 import { docData as rxDocData } from 'rxfire/firestore';
 import { map, shareReplay } from 'rxjs';
 
