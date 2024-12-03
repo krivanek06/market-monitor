@@ -10,7 +10,7 @@ import {
 import { firestore } from 'firebase-admin';
 import { assignTypes } from './assign-type';
 
-const tradingSimulatorCollectionRef = () =>
+export const tradingSimulatorCollectionRef = () =>
   firestore().collection('trading_simulator').withConverter(assignTypes<TradingSimulator>());
 
 const tradingSimulatorMoreInformationCollectionRef = (id: string) =>

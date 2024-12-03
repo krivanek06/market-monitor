@@ -5,6 +5,7 @@ import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from './group';
 import { groupGeneralActions } from './group/group-general-actions';
 import { outstandingOrderExecute } from './outstanding-order';
 import { tradingSimulatorGeneralActions } from './trading-simulator/trading-simulator-general-actions';
+import { tradingSimulatorStateVerification } from './trading-simulator/trading-simulator-state-verification';
 import {
   userCreateAccount,
   userCreateAccountDemo,
@@ -107,6 +108,21 @@ export const run_scheduler_execute_outstanding_orders = onSchedule(
   async () => {
     await measureFunctionExecutionTime(async () => {
       await outstandingOrderExecute();
+    });
+  },
+);
+
+export const run_scheduler_frequent = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '*/5 * * * *', // every 5 minutes
+    region: region,
+    timeZone: 'Europe/Berlin',
+  },
+  async () => {
+    await measureFunctionExecutionTime(async () => {
+      // check if the simulator should start or increment the round
+      await tradingSimulatorStateVerification();
     });
   },
 );
