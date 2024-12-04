@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -26,14 +26,12 @@ import {
   PercentageIncreaseDirective,
   ProgressCurrencyComponent,
   RangeDirective,
-  TruncatePipe,
 } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-stock-summary-table',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     MatRippleModule,
     MatIconModule,
@@ -44,10 +42,12 @@ import {
     RangeDirective,
     PercentageIncreaseDirective,
     MatPaginatorModule,
-    TruncatePipe,
     MatChipsModule,
     MatSortModule,
     MatTooltipModule,
+    DecimalPipe,
+    CurrencyPipe,
+    NgClass,
   ],
   template: `
     <div class="mb-4 flex justify-end sm:hidden">
@@ -109,7 +109,7 @@ import {
       <ng-container matColumnDef="priceMobile">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
         <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
-          <ng-container *ngIf="!displayInfoMobile()">
+          @if (!displayInfoMobile()) {
             <div class="text-wt-gray-medium flex justify-end text-base">
               {{ row.price | currency }}
             </div>
@@ -122,7 +122,7 @@ import {
                 changePercentage: row.changesPercentage,
               }"
             ></div>
-          </ng-container>
+          }
         </td>
       </ng-container>
 
@@ -130,7 +130,7 @@ import {
       <ng-container matColumnDef="infoMobile">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
         <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
-          <ng-container *ngIf="displayInfoMobile()">
+          @if (displayInfoMobile()) {
             <div class="xs:grid-cols-2 xs:text-center grid grid-cols-1 gap-x-4 pl-5">
               <!-- market cap -->
               <div>
@@ -153,7 +153,7 @@ import {
                 <span> {{ row.eps ? (row.eps | number: '1.2-2') : 'N/A' }}</span>
               </div>
             </div>
-          </ng-container>
+          }
         </td>
       </ng-container>
 
@@ -250,9 +250,11 @@ import {
     </table>
 
     <!-- skeleton -->
-    <div *ngIf="showLoadingSkeleton() || showLoadingSkeletonManual()">
-      <div *ngRange="symbolSkeletonLoaders() || 10" class="g-skeleton mb-1 h-12"></div>
-    </div>
+    @if (showLoadingSkeleton() || showLoadingSkeletonManual()) {
+      <div>
+        <div *ngRange="symbolSkeletonLoaders() || 10" class="g-skeleton mb-1 h-12"></div>
+      </div>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `

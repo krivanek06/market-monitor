@@ -1,5 +1,4 @@
 import { OverlayModule } from '@angular/cdk/overlay';
-import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -22,7 +21,7 @@ import { MarketApiService } from '@mm/api-client';
 import { SymbolQuote } from '@mm/api-types';
 import { SymbolSearchService } from '@mm/market-stocks/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { DefaultImgDirective, ElementFocusDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
+import { ElementFocusDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
 import { filter, map, of, startWith, switchMap } from 'rxjs';
 import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-summary-dialog.component';
 
@@ -30,7 +29,6 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
   selector: 'app-symbol-search-basic',
   standalone: true,
   imports: [
-    NgClass,
     OverlayModule,
     QuoteItemComponent,
     MatButtonModule,
@@ -39,7 +37,6 @@ import { SymbolSummaryDialogComponent } from '../stock-summary-dialog/symbol-sum
     RangeDirective,
     MatFormFieldModule,
     MatInputModule,
-    DefaultImgDirective,
     MatRadioModule,
   ],
   template: `

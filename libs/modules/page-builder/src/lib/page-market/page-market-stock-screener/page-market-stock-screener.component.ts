@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -11,7 +10,7 @@ import { STOCK_SCREENER_DEFAULT_VALUES } from '@mm/market-stocks/data-access';
 import { SymbolSearchBasicComponent, SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { StockScreenerFormControlComponent, StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { RangeDirective, ScrollNearEndDirective, SectionTitleComponent } from '@mm/shared/ui';
+import { ScrollNearEndDirective, SectionTitleComponent } from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
 import { BehaviorSubject, catchError, exhaustMap, map, of, scan, startWith, switchMap, tap } from 'rxjs';
 
@@ -19,11 +18,9 @@ import { BehaviorSubject, catchError, exhaustMap, map, of, scan, startWith, swit
   selector: 'app-page-market-stock-screener',
   standalone: true,
   imports: [
-    CommonModule,
     StockScreenerFormControlComponent,
     ReactiveFormsModule,
     StockSummaryTableComponent,
-    RangeDirective,
     ScrollNearEndDirective,
     MatDialogModule,
     MatButtonModule,

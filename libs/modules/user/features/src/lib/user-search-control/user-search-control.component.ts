@@ -8,7 +8,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { AggregationApiService, UserApiService } from '@mm/api-client';
 import { UserData } from '@mm/api-types';
-import { DefaultImgDirective, RangeDirective } from '@mm/shared/ui';
 import { UserDisplayItemComponent } from '@mm/user/ui';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, of, startWith, switchMap } from 'rxjs';
 
@@ -21,8 +20,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, map, of, startW
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule,
-    RangeDirective,
-    DefaultImgDirective,
     MatIconModule,
     UserDisplayItemComponent,
   ],

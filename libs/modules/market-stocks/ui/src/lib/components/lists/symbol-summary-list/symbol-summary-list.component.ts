@@ -8,7 +8,6 @@ import {
   PercentageIncreaseDirective,
   PriceChangeItemSelectorPipe,
 } from '@mm/shared/ui';
-import { RecommendationDirective } from '../../../directives';
 
 @Component({
   selector: 'app-symbol-summary-list',
@@ -17,7 +16,6 @@ import { RecommendationDirective } from '../../../directives';
     CommonModule,
     LargeNumberFormatterPipe,
     PercentageIncreaseDirective,
-    RecommendationDirective,
     MatChipsModule,
     PriceChangeItemSelectorPipe,
     DefaultImgDirective,

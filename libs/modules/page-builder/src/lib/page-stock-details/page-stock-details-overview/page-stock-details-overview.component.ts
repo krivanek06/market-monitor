@@ -10,8 +10,6 @@ import {
   EarningsEstimationChartComponent,
   RevenueEstimationChartComponent,
   StockEnterpriseChartComponent,
-  StockEsgDataTableComponent,
-  StockKeyExecutivesTableComponent,
   StockPeersListComponent,
   StockPriceTargetTableComponent,
   StockRatingTableComponent,
@@ -20,13 +18,7 @@ import {
   SymbolSummaryListComponent,
 } from '@mm/market-stocks/ui';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import {
-  GeneralCardComponent,
-  GenericChartComponent,
-  PriceChangeItemsComponent,
-  SortByKeyPipe,
-  WordsUpPipe,
-} from '@mm/shared/ui';
+import { GeneralCardComponent, GenericChartComponent, SortByKeyPipe, WordsUpPipe } from '@mm/shared/ui';
 import { of, switchMap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
 
@@ -38,13 +30,10 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     GeneralCardComponent,
     StockRatingTableComponent,
     StockRecommendationChartComponent,
-    StockEsgDataTableComponent,
     EarningsEstimationChartComponent,
     RevenueEstimationChartComponent,
-    StockKeyExecutivesTableComponent,
     StockUpgradesDowngradesTableComponent,
     StockPriceTargetTableComponent,
-    PriceChangeItemsComponent,
     AssetPriceChartInteractiveComponent,
     SymbolSummaryListComponent,
     StockEnterpriseChartComponent,

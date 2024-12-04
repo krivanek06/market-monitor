@@ -15,14 +15,7 @@ import { switchMap } from 'rxjs';
 @Component({
   selector: 'app-page-watchlist',
   standalone: true,
-  imports: [
-    StockSummaryTableComponent,
-    SymbolSummaryDialogComponent,
-    MatDialogModule,
-    MatIconModule,
-    SectionTitleComponent,
-    MatButtonModule,
-  ],
+  imports: [StockSummaryTableComponent, MatDialogModule, MatIconModule, SectionTitleComponent, MatButtonModule],
   template: `
     <div class="mb-10 flex items-center justify-between">
       <app-section-title [title]="pageTitle()" matIcon="monitoring" />

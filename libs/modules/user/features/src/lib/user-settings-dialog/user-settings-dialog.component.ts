@@ -32,8 +32,6 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
     UploadFileControlComponent,
     ReactiveFormsModule,
     MatTooltipModule,
-    UserAccountTypeSelectDialogComponent,
-    ChangePasswordDialogComponent,
     UserAccountTypeDirective,
     ThemeSwitcherComponent,
     DatePipe,

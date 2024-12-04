@@ -39,7 +39,7 @@ import { filter, map, startWith } from 'rxjs';
 
         <div class="flex flex-1 items-center justify-end">
           <!-- search -->
-          <app-symbol-search-basic class="hidden w-[475px] scale-90 md:block xl:-mr-6 xl:w-[450px]" />
+          <app-symbol-search-basic class="-mr-6 hidden w-[475px] scale-90 md:block xl:w-[450px]" />
 
           <!-- user menu -->
           @if (userDataSignal(); as userDataSignal) {

@@ -12,14 +12,7 @@ import {
 @Component({
   selector: 'app-user-display-item',
   standalone: true,
-  imports: [
-    CommonModule,
-    DefaultImgDirective,
-    LargeNumberFormatterPipe,
-    MatIconModule,
-    PercentageIncreaseDirective,
-    ClickableDirective,
-  ],
+  imports: [CommonModule, DefaultImgDirective, LargeNumberFormatterPipe, MatIconModule, PercentageIncreaseDirective],
   template: `
     <div class="flex gap-4">
       <img appDefaultImg [src]="userData().personal.photoURL" alt="User Image" class="h-14 w-14 rounded-md" />

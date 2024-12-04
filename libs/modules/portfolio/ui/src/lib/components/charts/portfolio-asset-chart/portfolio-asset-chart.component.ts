@@ -20,7 +20,6 @@ import {
 import {
   DateRangeSliderComponent,
   DateRangeSliderValues,
-  DefaultImgDirective,
   DropdownControlComponent,
   filterDataByTimestamp,
 } from '@mm/shared/ui';
@@ -34,7 +33,6 @@ import { from, map, share, startWith, switchMap } from 'rxjs';
   imports: [
     ReactiveFormsModule,
     NgClass,
-    DefaultImgDirective,
     MatButtonModule,
     HighchartsChartModule,
     DateRangeSliderComponent,

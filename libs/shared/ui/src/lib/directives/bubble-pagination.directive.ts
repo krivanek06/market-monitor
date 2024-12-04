@@ -165,13 +165,17 @@ export class BubblePaginationDirective {
     const nextButtonDefault = nativeElement.querySelector('button.mat-mdc-paginator-navigation-next');
 
     // remove 'items per page'
-    this.ren.setStyle(itemsPerPage, 'display', 'none');
+    if (itemsPerPage) {
+      this.ren.setStyle(itemsPerPage, 'display', 'none');
+    }
 
     // style text of how many elements are currently displayed
-    this.ren.setStyle(howManyDisplayedEl, 'position', 'absolute');
-    this.ren.setStyle(howManyDisplayedEl, 'color', '#919191');
-    this.ren.setStyle(howManyDisplayedEl, 'font-size', '14px');
-    this.ren.setStyle(howManyDisplayedEl, 'left', '-20px');
+    if (howManyDisplayedEl) {
+      this.ren.setStyle(howManyDisplayedEl, 'position', 'absolute');
+      this.ren.setStyle(howManyDisplayedEl, 'color', '#919191');
+      this.ren.setStyle(howManyDisplayedEl, 'font-size', '14px');
+      this.ren.setStyle(howManyDisplayedEl, 'left', '-20px');
+    }
 
     // check whether to remove left & right default arrow
     if (isScreenLarger('LAYOUT_MD')) {

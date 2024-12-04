@@ -13,7 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MarketApiService } from '@mm/api-client';
 import { AvailableQuotes, SymbolQuote } from '@mm/api-types';
-import { DefaultImgDirective, QuoteItemComponent, RangeDirective } from '@mm/shared/ui';
+import { QuoteItemComponent } from '@mm/shared/ui';
 import { combineLatest, map, switchMap } from 'rxjs';
 
 @Component({
@@ -26,8 +26,6 @@ import { combineLatest, map, switchMap } from 'rxjs';
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule,
-    RangeDirective,
-    DefaultImgDirective,
     MatDividerModule,
     MatIconModule,
     QuoteItemComponent,

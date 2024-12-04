@@ -2,12 +2,12 @@ import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { SymbolQuote } from '@mm/api-types';
 import { DefaultImgDirective, PercentageIncreaseDirective } from '../../../directives';
-import { LargeNumberFormatterPipe, TruncatePipe } from '../../../pipes';
+import { TruncatePipe } from '../../../pipes';
 
 @Component({
   selector: 'app-quote-item',
   standalone: true,
-  imports: [CurrencyPipe, PercentageIncreaseDirective, LargeNumberFormatterPipe, TruncatePipe, DefaultImgDirective],
+  imports: [CurrencyPipe, PercentageIncreaseDirective, TruncatePipe, DefaultImgDirective],
   template: `
     <!-- first line -->
     <div class="@container flex items-center justify-between">

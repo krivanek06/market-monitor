@@ -7,18 +7,14 @@ import { MarketApiService } from '@mm/api-client';
 import { INDEXES_DEFAULT, INDEXES_DEFAULT_SYMBOLS, SYMBOL_SP500, SymbolQuote } from '@mm/api-types';
 import { AssetPriceChartInteractiveComponent, QuoteSearchBasicComponent } from '@mm/market-general/features';
 import {
-  FlattenArrayPipe,
   GeneralCardComponent,
   GenericChartComponent,
-  MultiplyDtaPipe,
   PercentageIncreaseDirective,
   RangeDirective,
   SectionTitleComponent,
-  SortReversePipe,
 } from '@mm/shared/ui';
 import { map } from 'rxjs';
 import { economicData, treasuryData } from './page-market-overview-model';
-import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skeleton.component';
 
 @Component({
   selector: 'app-page-market-overview',
@@ -32,11 +28,7 @@ import { PageMarketOverviewSkeletonComponent } from './page-market-overview-skel
     MatButtonModule,
     GeneralCardComponent,
     PercentageIncreaseDirective,
-    PageMarketOverviewSkeletonComponent,
     RangeDirective,
-    FlattenArrayPipe,
-    SortReversePipe,
-    MultiplyDtaPipe,
     SectionTitleComponent,
     RangeDirective,
   ],

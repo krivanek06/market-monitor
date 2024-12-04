@@ -9,7 +9,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { AggregationApiService, GroupApiService } from '@mm/api-client';
 import { GroupData } from '@mm/api-types';
 import { GroupDisplayItemComponent } from '@mm/group/ui';
-import { DefaultImgDirective, RangeDirective } from '@mm/shared/ui';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs';
 
 @Component({
@@ -21,8 +20,6 @@ import { catchError, debounceTime, distinctUntilChanged, filter, map, startWith,
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule,
-    RangeDirective,
-    DefaultImgDirective,
     MatIconModule,
     GroupDisplayItemComponent,
   ],

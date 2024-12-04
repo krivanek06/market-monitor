@@ -21,7 +21,7 @@ export class MarkerDirective {}
 @Component({
   selector: 'app-calendar-wrapper',
   standalone: true,
-  imports: [CommonModule, RangeDirective, MatButtonModule, MatIconModule, MarkerDirective],
+  imports: [CommonModule, RangeDirective, MatButtonModule, MatIconModule],
   template: `
     <div class="mb-10 flex flex-col justify-between gap-y-5 lg:flex-row lg:px-6">
       <div class="flex items-center gap-10">

@@ -12,12 +12,7 @@ import { GroupApiService } from '@mm/api-client';
 import { GroupMember } from '@mm/api-types';
 import { maxLengthValidator, minLengthValidator, requiredValidator } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import {
-  ArrayExcludePipe,
-  DefaultImgDirective,
-  DialogCloseHeaderComponent,
-  FormMatInputWrapperComponent,
-} from '@mm/shared/ui';
+import { ArrayExcludePipe, DialogCloseHeaderComponent, FormMatInputWrapperComponent } from '@mm/shared/ui';
 import { UploadFileControlComponent } from '@mm/shared/upload-file-control';
 import { UserDisplayItemComponent } from '@mm/user/ui';
 import { filterNil } from 'ngxtension/filter-nil';
@@ -40,7 +35,6 @@ export type GroupSettingsDialogComponentData = {
     ReactiveFormsModule,
     FormMatInputWrapperComponent,
     MatCheckboxModule,
-    DefaultImgDirective,
     DialogCloseHeaderComponent,
     UserDisplayItemComponent,
     UploadFileControlComponent,

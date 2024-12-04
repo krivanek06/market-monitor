@@ -37,7 +37,6 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { AuthenticationNewAccountTypeChooseDialogComponent } from './authentication-new-account-type-choose-dialog/authentication-new-account-type-choose-dialog.component';
 import { FormLoginComponent } from './form-login/form-login.component';
 import { FormRegisterComponent } from './form-register/form-register.component';
 
@@ -55,7 +54,6 @@ import { FormRegisterComponent } from './form-register/form-register.component';
     MatProgressSpinnerModule,
     MatDialogModule,
     MatTooltipModule,
-    AuthenticationNewAccountTypeChooseDialogComponent,
     DatePipe,
   ],
   template: `

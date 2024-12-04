@@ -9,7 +9,7 @@ import { ClickableDirective, PositionColoringDirective } from '../../../directiv
 @Component({
   selector: 'app-position-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatRippleModule, MatIconModule, PositionColoringDirective, ClickableDirective],
+  imports: [CommonModule, MatCardModule, MatRippleModule, MatIconModule, PositionColoringDirective],
   template: `
     <mat-card
       appearance="outlined"

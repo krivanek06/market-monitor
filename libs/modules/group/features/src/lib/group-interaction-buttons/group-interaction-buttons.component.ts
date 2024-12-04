@@ -26,10 +26,8 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    UserSearchDialogComponent,
     MatDialogModule,
     GroupUserHasRoleDirective,
-    GroupSettingsDialogComponent,
     MatDialogModule,
   ],
   template: `

@@ -1,4 +1,4 @@
-import { DatePipe, NgClass, UpperCasePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -9,7 +9,6 @@ import {
   DefaultImgDirective,
   GeneralCardActionContentDirective,
   GeneralCardComponent,
-  GeneralCardTitleRightDirective,
   TruncatePipe,
 } from '@mm/shared/ui';
 
@@ -20,11 +19,9 @@ import {
     GeneralCardComponent,
     MatButtonModule,
     MatIconModule,
-    GeneralCardTitleRightDirective,
     DatePipe,
     DateReadablePipe,
     TruncatePipe,
-    UpperCasePipe,
     NgClass,
     GeneralCardActionContentDirective,
     MatCardModule,

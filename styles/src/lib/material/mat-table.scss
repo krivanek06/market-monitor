@@ -121,3 +121,7 @@ table.g-table-smaller-font {
 .mdc-data-table__header-cell {
   color: var(--gray-medium) !important;
 }
+
+.mat-mdc-paginator-page-size {
+  display: none !important;
+}

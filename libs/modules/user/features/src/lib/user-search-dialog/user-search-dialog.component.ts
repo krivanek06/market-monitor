@@ -8,7 +8,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { UserData } from '@mm/api-types';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { DialogCloseHeaderComponent } from '@mm/shared/ui';
 import { UserDisplayItemComponent } from '@mm/user/ui';
 import { filterNil } from 'ngxtension/filter-nil';
 import { Subject, map, merge, scan } from 'rxjs';
@@ -29,7 +28,6 @@ export type UserSearchDialogData = {
   standalone: true,
   imports: [
     CommonModule,
-    DialogCloseHeaderComponent,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,

@@ -11,7 +11,6 @@ import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthChartComponent,
   PortfolioHoldingsTableCardComponent,
-  PortfolioHoldingsTableComponent,
   PortfolioStateComponent,
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
@@ -19,7 +18,7 @@ import {
 } from '@mm/portfolio/ui';
 import { ColorScheme, LabelValue } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { DefaultImgDirective, SectionTitleComponent, TabSelectControlComponent } from '@mm/shared/ui';
+import { DefaultImgDirective, TabSelectControlComponent } from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
 import { map, startWith, switchMap, tap } from 'rxjs';
 
@@ -37,14 +36,12 @@ export type UserDetailsDialogComponentData = {
     MatDividerModule,
     DefaultImgDirective,
     MatProgressSpinnerModule,
-    SectionTitleComponent,
     PortfolioStateTransactionsComponent,
     PortfolioStateRiskComponent,
     PortfolioStateComponent,
     TabSelectControlComponent,
     DatePipe,
     PortfolioTransactionsTableComponent,
-    PortfolioHoldingsTableComponent,
     PortfolioGrowthChartComponent,
     PortfolioHoldingsTableCardComponent,
   ],
