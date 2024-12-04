@@ -9,8 +9,11 @@ export default defineConfig({
   ssr: { target: 'webworker', noExternal: true },
   plugins: [
     qwikNxVite(),
-    qwikCity(),
+    qwikCity({
+      routesDir: 'apps/website/src/routes',
+    }),
     qwikVite({
+      srcDir: 'apps/website/src',
       client: {
         outDir: '../../dist/apps/website',
       },
@@ -31,13 +34,5 @@ export default defineConfig({
     headers: {
       'Cache-Control': 'public, max-age=600',
     },
-  },
-  test: {
-    globals: true,
-    cache: {
-      dir: '../../node_modules/.vitest',
-    },
-    environment: 'node',
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
   },
 });
