@@ -1,13 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
+// custom material scss
+@use '../../../styles/src/lib/custom-material';
+@use '../../../styles/src/lib/global.scss';
+@use '../../../styles/src/lib/variables.scss';
 
+/* You can add global styles to this file, and also import other style files */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-// custom material scss
-@import '../../../styles/src/lib/custom-material';
-@import '../../../styles/src/lib/global.scss';
-@import '../../../styles/src/lib/variables.scss';
 
 body {
   height: 100%;

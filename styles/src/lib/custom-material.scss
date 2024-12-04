@@ -2,27 +2,27 @@
 //@import '@angular/material/theming';
 
 // custom styles
-@import './material/mat-table.scss';
-@import './material/mat-form-field.scss';
-@import './material/mat-select.scss';
-@import './material/mat-button.scss';
-@import './material/mat-dialog.scss';
-@import './material/mat-date-picker.scss';
-@import './material/mat-radio.scss';
-@import './material/mat-input.scss';
-@import './material/mat-list.scss';
-@import './material/mat-tab.scss';
-@import './material/mat-menu.scss';
-@import './material/mat-chip.scss';
-@import './material/mat-card.scss';
-@import './material/mat-checkbox.scss';
-@import './material/mat-paginator.scss';
-@import './material/mat-slider.scss';
-@import './material/mat-tooltip.scss';
-@import 'material/mat-drawer.scss';
+@use './material/mat-table.scss' as *;
+@use './material/mat-form-field.scss' as *;
+@use './material/mat-select.scss' as *;
+@use './material/mat-button.scss' as *;
+@use './material/mat-dialog.scss' as *;
+@use './material/mat-date-picker.scss' as *;
+@use './material/mat-radio.scss' as *;
+@use './material/mat-input.scss' as *;
+@use './material/mat-list.scss' as *;
+@use './material/mat-tab.scss' as *;
+@use './material/mat-menu.scss' as *;
+@use './material/mat-chip.scss' as *;
+@use './material/mat-card.scss' as *;
+@use './material/mat-checkbox.scss' as *;
+@use './material/mat-paginator.scss' as *;
+@use './material/mat-slider.scss' as *;
+@use './material/mat-tooltip.scss' as *;
+@use './material/mat-drawer.scss' as *;
 
 // COLOR PALETTE GENERATOR - http://mcg.mbitson.com/
-@import './material/mat-custom-colors.scss';
+@use './material/mat-custom-colors.scss' as *;
 
 @include mat.core();
 
@@ -35,8 +35,7 @@ $mat-theming-light: mat.m2-define-light-theme(
       accent: mat.m2-define-palette($custom-success),
       warn: mat.m2-define-palette($custom-warn),
     ),
-    typography:
-      mat.m2-define-typography-config(
+    typography: mat.m2-define-typography-config(
         $font-family: 'system-ui',
       ),
     density: -3,
@@ -51,8 +50,7 @@ $mat-theming-dark: mat.m2-define-dark-theme(
       accent: mat.m2-define-palette($custom-success),
       warn: mat.m2-define-palette($custom-warn),
     ),
-    typography:
-      mat.m2-define-typography-config(
+    typography: mat.m2-define-typography-config(
         $font-family: 'system-ui',
       ),
     density: -3,
