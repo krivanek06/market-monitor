@@ -5,12 +5,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { StockOwnershipHoldersTableComponent, StockOwnershipInstitutionalListComponent } from '@mm/market-stocks/ui';
 import { InputSource } from '@mm/shared/data-access';
 import { dateFormatDate } from '@mm/shared/general-util';
-import {
-  DropdownControlComponent,
-  FormMatInputWrapperComponent,
-  GeneralCardComponent,
-  RangeDirective,
-} from '@mm/shared/ui';
+import { DropdownControlComponent, GeneralCardComponent, RangeDirective } from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
 import { catchError, filter, of, startWith, switchMap, tap } from 'rxjs';
 import { PageStockDetailsBase } from '../page-stock-details-base';
@@ -23,7 +18,6 @@ import { PageStockDetailsBase } from '../page-stock-details-base';
     StockOwnershipInstitutionalListComponent,
     StockOwnershipHoldersTableComponent,
     GeneralCardComponent,
-    FormMatInputWrapperComponent,
     ReactiveFormsModule,
     RangeDirective,
     DropdownControlComponent,
