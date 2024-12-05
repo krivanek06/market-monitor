@@ -1,5 +1,5 @@
-import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { DatePipe, NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -14,11 +14,12 @@ import {
   PortfolioStateComponent,
   PortfolioStateRiskComponent,
   PortfolioStateTransactionsComponent,
+  PortfolioTransactionsItemComponent,
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
-import { ColorScheme, LabelValue } from '@mm/shared/data-access';
+import { ColorScheme } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { DefaultImgDirective, TabSelectControlComponent } from '@mm/shared/ui';
+import { DefaultImgDirective, SectionTitleComponent } from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
 import { map, startWith, switchMap, tap } from 'rxjs';
 
@@ -39,11 +40,13 @@ export type UserDetailsDialogComponentData = {
     PortfolioStateTransactionsComponent,
     PortfolioStateRiskComponent,
     PortfolioStateComponent,
-    TabSelectControlComponent,
     DatePipe,
     PortfolioTransactionsTableComponent,
     PortfolioGrowthChartComponent,
     PortfolioHoldingsTableCardComponent,
+    PortfolioTransactionsItemComponent,
+    SectionTitleComponent,
+    NgClass,
   ],
   template: `
     <div class="flex items-center justify-between p-4">
@@ -58,13 +61,6 @@ export type UserDetailsDialogComponentData = {
             </div>
           </div>
         }
-
-        <!-- tabs -->
-        <app-tab-select-control
-          class="-mb-3 hidden lg:block"
-          [displayOptions]="displayOptions"
-          [(selectedValueSignal)]="selectedValue"
-        />
       </div>
 
       <!-- close -->
@@ -122,44 +118,91 @@ export type UserDetailsDialogComponentData = {
         </div>
 
         <div class="md:p-4">
-          @if (selectedValue() === 'portfolio') {
-            <!-- portfolio growth charts -->
-            @if (portfolioGrowth().state === 'loaded') {
-              <app-portfolio-growth-chart
-                data-testid="user-details-portfolio-growth-chart"
-                headerTitle="Portfolio Growth"
-                chartType="balance"
-                [displayLegend]="true"
-                [data]="{
-                  values: portfolioGrowth().data,
-                }"
-                [heightPx]="375"
-                class="mb-6"
-              />
-            } @else {
-              <div class="grid h-[400px] place-content-center">
-                <mat-spinner />
-              </div>
-            }
-
-            <!-- holding table -->
-            <div class="mb-6 max-sm:pl-2">
-              <app-portfolio-holdings-table-card
-                data-testid="user-details-portfolio-holdings-table-card"
-                [displayedColumns]="displayedColumns"
-                [portfolioStateHolding]="portfolioStateHolding()"
-                [showInCard]="false"
-              />
-            </div>
-          } @else if (selectedValue() === 'transactions') {
-            <!-- transaction -->
-            <div class="pt-3">
-              <app-portfolio-transactions-table
-                data-testid="user-details-portfolio-transactions-table"
-                [data]="portfolioTransactions()"
-              />
+          <!-- portfolio growth charts -->
+          @if (portfolioGrowth().state === 'loaded') {
+            <app-portfolio-growth-chart
+              data-testid="user-details-portfolio-growth-chart"
+              headerTitle="Portfolio Growth"
+              chartType="balance"
+              [displayLegend]="true"
+              [data]="{
+                values: portfolioGrowth().data,
+              }"
+              [heightPx]="375"
+              class="mb-6"
+            />
+          } @else {
+            <div class="grid h-[400px] place-content-center">
+              <mat-spinner />
             </div>
           }
+
+          <div class="mb-6">
+            <mat-divider />
+          </div>
+
+          <!-- holding table -->
+          <div class="mb-6 max-sm:pl-2">
+            <app-portfolio-holdings-table-card
+              data-testid="user-details-portfolio-holdings-table-card"
+              [displayedColumns]="displayedColumns"
+              [portfolioStateHolding]="portfolioStateHolding()"
+              [showInCard]="false"
+              [initialItemsLimit]="8"
+            />
+          </div>
+
+          <div class="mb-6">
+            <mat-divider />
+          </div>
+
+          <!-- best and worst transactions -->
+          <div class="divide-wt-border mb-6 grid gap-y-4 md:grid-cols-2 md:divide-x-2">
+            <div class="py-2 md:pr-6">
+              <!-- best transactions -->
+              <app-section-title title="Best Returns" matIcon="trending_up" class="mb-3" titleSize="base" />
+              @for (item of portfolioTransactions().best; track item.transactionId; let last = $last) {
+                <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+                  <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+                </div>
+              } @empty {
+                <div class="py-2">
+                  <div class="g-table-empty">No data has been found</div>
+                </div>
+              }
+            </div>
+
+            <div class="py-2 md:hidden">
+              <mat-divider />
+            </div>
+
+            <div class="py-2 md:pl-6">
+              <!-- worst transactions -->
+              <app-section-title title="Worst Returns" matIcon="trending_down" class="mb-3" titleSize="base" />
+              @for (item of portfolioTransactions().worst; track item.transactionId; let last = $last) {
+                <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
+                  <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+                </div>
+              } @empty {
+                <div class="py-2">
+                  <div class="g-table-empty">No data has been found</div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="mb-6 max-md:hidden">
+            <mat-divider />
+          </div>
+
+          <!-- transaction history -->
+          <div class="max-md:hidden">
+            <app-portfolio-transactions-table
+              data-testid="user-details-portfolio-transactions-table"
+              titleSize="base"
+              [data]="portfolioTransactions().transactions"
+            />
+          </div>
         </div>
       } @else {
         <div class="grid h-[400px] place-content-center">
@@ -191,19 +234,33 @@ export class UserDetailsDialogComponent {
     }),
     filterNil(),
   );
-  private readonly portfolioTransactions$ = this.userData$.pipe(
-    map((userData) => userData),
-    filterNil(),
-    switchMap((userData) =>
-      this.userApiService
-        .getUserPortfolioTransactions(userData.id)
-        .pipe(map((transactions) => transactions.transactions)),
-    ),
-  );
 
   readonly userDataSignal = toSignal(this.userData$);
 
-  readonly portfolioTransactions = toSignal(this.portfolioTransactions$);
+  readonly portfolioTransactions = toSignal(
+    this.userData$.pipe(
+      map((userData) => userData),
+      filterNil(),
+      switchMap((userData) =>
+        this.userApiService.getUserPortfolioTransactions(userData.id).pipe(
+          map((transactions) => ({
+            transactions: transactions.transactions,
+            best: transactions.transactions
+              .filter((d) => d.returnValue > 0)
+              .sort((a, b) => b.returnValue - a.returnValue)
+              .slice(0, 5),
+            worst: transactions.transactions
+              .filter((d) => d.returnValue < 0)
+              .sort((a, b) => a.returnValue - b.returnValue)
+              .slice(0, 5),
+          })),
+        ),
+      ),
+    ),
+    {
+      initialValue: { transactions: [], best: [], worst: [] },
+    },
+  );
 
   readonly portfolioStateHolding = toSignal(
     this.userData$.pipe(
@@ -230,20 +287,7 @@ export class UserDetailsDialogComponent {
 
   readonly ColorScheme = ColorScheme;
 
-  readonly displayOptions: LabelValue<'portfolio' | 'transactions'>[] = [
-    {
-      label: 'Portfolio',
-      value: 'portfolio',
-    },
-    {
-      label: 'Transactions',
-      value: 'transactions',
-    },
-  ];
-
   readonly displayedColumns = ['symbol', 'price', 'balance', 'invested', 'totalChange', 'portfolio', 'marketCap'];
-
-  readonly selectedValue = signal<'portfolio' | 'transactions'>('portfolio');
 
   onDialogClose() {
     this.dialogRef.close();

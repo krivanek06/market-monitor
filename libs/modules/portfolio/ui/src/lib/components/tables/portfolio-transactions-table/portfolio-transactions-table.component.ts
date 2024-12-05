@@ -52,6 +52,7 @@ import {
       [title]="title()"
       matIcon="history"
       class="mb-5"
+      [titleSize]="titleSize()"
       [ngClass]="{
         'lg:-mb-10': showActionBarComp(),
       }"
@@ -263,6 +264,7 @@ export class PortfolioTransactionsTableComponent {
   readonly data = input<PortfolioTransactionMore[] | null>();
   readonly showSymbolFilter = input(false);
   readonly pageSize = input(18);
+  readonly titleSize = input<'lg' | 'base'>('lg');
   readonly title = input<string>('Transaction History');
 
   readonly showActionBarComp = computed(() => this.showSymbolFilter() && (this.data()?.length ?? 0) > 15);
@@ -295,7 +297,7 @@ export class PortfolioTransactionsTableComponent {
     'transactionType',
     'totalValue',
     'unitPrice',
-    //'units',
+    'units',
     'transactionFees',
     'returnPrct',
     'date',
