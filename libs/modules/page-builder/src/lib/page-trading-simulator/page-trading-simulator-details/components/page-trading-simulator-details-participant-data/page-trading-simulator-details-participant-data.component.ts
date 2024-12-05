@@ -37,7 +37,13 @@ import {
 import { ColorScheme, SCREEN_LAYOUT_VALUES } from '@mm/shared/data-access';
 import { DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { getPortfolioStateHoldingBaseByTransactionsUtil, roundNDigits } from '@mm/shared/general-util';
-import { DateReadablePipe, GeneralCardComponent, SectionTitleComponent, windowResizeListener } from '@mm/shared/ui';
+import {
+  DateReadablePipe,
+  GeneralCardComponent,
+  InArrayPipe,
+  SectionTitleComponent,
+  windowResizeListener,
+} from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { firstValueFrom } from 'rxjs';
 
@@ -62,6 +68,7 @@ import { firstValueFrom } from 'rxjs';
     PortfolioTransactionsTableComponent,
     PortfolioBalancePieChartComponent,
     DateReadablePipe,
+    InArrayPipe,
   ],
   template: `
     <!-- header -->
@@ -156,7 +163,7 @@ import { firstValueFrom } from 'rxjs';
           <app-portfolio-holdings-table
             [portfolioState]="participant().portfolioState"
             [holdings]="portfolioHolding()"
-            [displayedColumns]="displayedColumns"
+            [displayedColumns]="displayedColumnsHoldings"
           />
         </app-general-card>
       </div>
@@ -214,7 +221,13 @@ import { firstValueFrom } from 'rxjs';
         @if (symbolAggregations(); as symbolAggregations) {
           <div class="grid gap-2">
             @for (item of symbolAggregations | keyvalue; track item.key) {
-              <button [matDialogClose]="item.value" mat-button class="w-full rounded-lg p-3" type="button">
+              <button
+                [disabled]="data?.operation === 'SELL' && !(portfolioHoldingSymbols() | inArray: item.key)"
+                [matDialogClose]="item.value"
+                mat-button
+                class="w-full rounded-lg p-3"
+                type="button"
+              >
                 <div class="flex justify-between">
                   <div class="text-wt-primary">{{ item.key }}</div>
 
@@ -295,6 +308,8 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
     );
   });
 
+  readonly portfolioHoldingSymbols = computed(() => this.portfolioHolding().map((d) => d.symbol));
+
   readonly portfolioGrowthData = computed(() => {
     const participant = this.participant();
     const simulator = this.simulatorData();
@@ -322,7 +337,7 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
 
   readonly ColorScheme = ColorScheme;
 
-  readonly displayedColumns = ['symbol', 'price', 'bep', 'balance', 'invested', 'totalChange', 'portfolio'];
+  readonly displayedColumnsHoldings = ['symbol', 'price', 'bep', 'balance', 'invested', 'onlyValue', 'portfolio'];
   readonly displayedColumnsTransactionTable = [
     'symbol',
     'transactionType',

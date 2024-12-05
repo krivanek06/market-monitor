@@ -28,7 +28,7 @@ import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationS
     RangeDirective,
   ],
   template: `
-    <div class="m-auto grid gap-y-4 xl:w-11/12">
+    <div class="grid gap-y-4">
       <div class="flex w-full flex-col items-start justify-between gap-x-8 gap-y-6 lg:mb-6 lg:flex-row">
         <div class="flex justify-between gap-x-4 max-lg:w-full">
           <!-- title -->

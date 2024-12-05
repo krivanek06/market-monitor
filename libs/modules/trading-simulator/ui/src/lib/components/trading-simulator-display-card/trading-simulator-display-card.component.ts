@@ -58,45 +58,47 @@ import {
       </mat-card-title>
 
       <!-- content -->
-      <div class="grid grid-cols-2">
-        <div class="g-item-wrapper">
-          <span>Start</span>
-          <span>{{ tradingSimulator().startDateTime | date: 'HH:mm MMM d, y' }}</span>
-        </div>
+      <div class="@container">
+        <div class="@sm:grid-cols-2 grid">
+          <div class="g-item-wrapper">
+            <span>Start</span>
+            <span>{{ tradingSimulator().startDateTime | date: 'HH:mm MMM d, y' }}</span>
+          </div>
 
-        <div class="g-item-wrapper">
-          <span>Round</span>
-          <span
-            >{{ tradingSimulator().currentRound }} /
-            {{ tradingSimulator().maximumRounds }}
-            [{{ tradingSimulator().oneRoundDurationMinutes | dateReadable: 'minutes' }}]
-          </span>
-        </div>
+          <div class="g-item-wrapper">
+            <span>Round</span>
+            <span
+              >{{ tradingSimulator().currentRound }} /
+              {{ tradingSimulator().maximumRounds }}
+              [{{ tradingSimulator().oneRoundDurationMinutes | dateReadable: 'minutes' }}]
+            </span>
+          </div>
 
-        <div class="g-item-wrapper">
-          <span>End</span>
-          <span>{{ tradingSimulator().endDateTime | date: 'HH:mm MMM d, y' }}</span>
-        </div>
+          <div class="g-item-wrapper">
+            <span>End</span>
+            <span>{{ tradingSimulator().endDateTime | date: 'HH:mm MMM d, y' }}</span>
+          </div>
 
-        <div class="g-item-wrapper">
-          <span>Participants</span>
-          <span>{{ tradingSimulator().currentParticipants }} / {{ TRADING_SIMULATOR_PARTICIPANTS_LIMIT }}</span>
-        </div>
+          <div class="g-item-wrapper">
+            <span>Participants</span>
+            <span>{{ tradingSimulator().currentParticipants }} / {{ TRADING_SIMULATOR_PARTICIPANTS_LIMIT }}</span>
+          </div>
 
-        <div class="g-item-wrapper">
-          <span>Total Time</span>
-          <span>{{ tradingSimulator().totalTimeMinutes | dateReadable: 'minutes' }}</span>
-        </div>
+          <div class="g-item-wrapper">
+            <span>Total Time</span>
+            <span>{{ tradingSimulator().totalTimeMinutes | dateReadable: 'minutes' }}</span>
+          </div>
 
-        <div class="g-item-wrapper border-wt-border border-b">
-          <div class="flex items-center gap-2">
-            <img appDefaultImg [src]="tradingSimulator().owner.personal.photoURL" class="h-5 w-5 rounded-lg" />
-            <span>{{ tradingSimulator().owner.personal.displayName }}</span>
+          <div class="g-item-wrapper border-wt-border border-b">
+            <div class="flex items-center gap-2">
+              <img appDefaultImg [src]="tradingSimulator().owner.personal.photoURL" class="h-5 w-5 rounded-lg" />
+              <span>{{ tradingSimulator().owner.personal.displayName }}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- title right -->
+      <!-- action buttons -->
       <ng-template appGeneralCardActionContent>
         <div class="flex w-full justify-end gap-2">
           <!-- owner buttons -->
@@ -112,7 +114,7 @@ import {
 
           <!-- owner buttons -->
           @if (tradingSimulator().state !== 'draft') {
-            <button (click)="onStats()" mat-stroked-button color="accent" type="button">
+            <button (click)="onStats()" mat-stroked-button color="primary" type="button">
               <mat-icon iconPositionEnd>chevron_right</mat-icon>
               statistics
             </button>

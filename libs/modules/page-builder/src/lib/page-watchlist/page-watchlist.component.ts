@@ -10,7 +10,7 @@ import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { StockSummaryTableComponent } from '@mm/market-stocks/ui';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { SectionTitleComponent } from '@mm/shared/ui';
-import { switchMap } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-page-watchlist',
@@ -58,7 +58,11 @@ export class PageWatchlistComponent {
    */
   readonly userWatchListSymbolsSignal = toSignal(
     toObservable(this.watchList).pipe(
-      switchMap((watchList) => this.marketApiService.getSymbolQuotes(watchList.data.map((d) => d.symbol))),
+      switchMap((watchList) =>
+        this.marketApiService
+          .getSymbolQuotes(watchList.data.map((d) => d.symbol))
+          .pipe(map((quotes) => quotes.sort((a, b) => b.marketCap - a.marketCap))),
+      ),
     ),
   );
 

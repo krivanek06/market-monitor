@@ -154,6 +154,38 @@ import {
         </td>
       </ng-container>
 
+      <!-- only change -->
+      <ng-container matColumnDef="onlyChange">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Change +/-</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [currentValues]="{
+              value: row.symbolQuote.price * row.units,
+              valueToCompare: row.breakEvenPrice * row.units,
+              hideValue: true,
+            }"
+          ></div>
+        </td>
+      </ng-container>
+
+      <!-- only value -->
+      <ng-container matColumnDef="onlyValue">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Change +/-</th>
+        <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
+          <div
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [currentValues]="{
+              value: row.symbolQuote.price * row.units,
+              valueToCompare: row.breakEvenPrice * row.units,
+              hidePercentage: true,
+            }"
+          ></div>
+        </td>
+      </ng-container>
+
       <!-- invested -->
       <ng-container matColumnDef="invested">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Invested</th>
@@ -273,6 +305,8 @@ export class PortfolioHoldingsTableComponent {
     'balance',
     'invested',
     'totalChange',
+    //'onlyChange',
+    //'onlyValue',
     'dailyValueChange',
     //'units',
     'portfolio',

@@ -1,5 +1,5 @@
 import { DOCUMENT, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -98,7 +98,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
       }
 
       @screen xl {
-        padding: 28px 24px 40px 24px;
+        padding: 28px 32px 40px 32px;
         max-width: 1560px;
       }
     }
@@ -123,7 +123,16 @@ export class PageMenuComponent {
   );
   readonly isOpen = signal<boolean>(true);
   readonly windowResize = windowResizeListener();
-  readonly useSidePanelModeOver = computed(() => this.windowResize() <= SCREEN_LAYOUT_VALUES.LAYOUT_XL);
+  readonly useSidePanelModeOver = computed(() => this.windowResize() < SCREEN_LAYOUT_VALUES.LAYOUT_2XL);
+
+  readonly windowResizeEffect = effect(() => {
+    const windowResize = this.windowResize();
+
+    // open side panel if screen is bigger than 2xl
+    if (windowResize >= SCREEN_LAYOUT_VALUES.LAYOUT_2XL) {
+      this.isOpen.set(true);
+    }
+  });
 
   constructor() {
     // check if dark mode is enabled

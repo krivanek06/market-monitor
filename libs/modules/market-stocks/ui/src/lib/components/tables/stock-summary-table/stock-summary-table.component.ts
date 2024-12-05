@@ -8,18 +8,15 @@ import {
   output,
   signal,
   untracked,
-  viewChild,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SymbolQuote } from '@mm/api-types';
-import { compare } from '@mm/shared/general-util';
 import {
   DefaultImgDirective,
   LargeNumberFormatterPipe,
@@ -43,7 +40,6 @@ import {
     PercentageIncreaseDirective,
     MatPaginatorModule,
     MatChipsModule,
-    MatSortModule,
     MatTooltipModule,
     DecimalPipe,
     CurrencyPipe,
@@ -58,17 +54,10 @@ import {
       </div>
     </div>
 
-    <table
-      matSort
-      mat-table
-      (matSortChange)="sortData($event)"
-      [dataSource]="dataSource"
-      class="table-hover"
-      [trackBy]="identity"
-    >
+    <table mat-table [dataSource]="dataSource" class="table-hover" [trackBy]="identity">
       <!-- image & name -->
       <ng-container matColumnDef="symbol">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Symbol</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Symbol</th>
         <td mat-cell *matCellDef="let row">
           <!-- logo + symbol -->
           <div class="flex items-center gap-2">
@@ -83,7 +72,7 @@ import {
 
       <!-- price desktop -->
       <ng-container matColumnDef="price">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Price +/-</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Price +/-</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           <div class="text-wt-gray-medium text-base">
             {{ row.price | currency }}
@@ -93,7 +82,7 @@ import {
 
       <!-- price change desktop -->
       <ng-container matColumnDef="priceChange">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Daily %</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Daily %</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           <div
             appPercentageIncrease
@@ -107,7 +96,7 @@ import {
 
       <!-- price mobile -->
       <ng-container matColumnDef="priceMobile">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
+        <th mat-header-cell *matHeaderCellDef class="hidden"></th>
         <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
           @if (!displayInfoMobile()) {
             <div class="text-wt-gray-medium flex justify-end text-base">
@@ -128,7 +117,7 @@ import {
 
       <!-- info mobile -->
       <ng-container matColumnDef="infoMobile">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden"></th>
+        <th mat-header-cell *matHeaderCellDef class="hidden"></th>
         <td mat-cell *matCellDef="let row" class="table-cell sm:hidden">
           @if (displayInfoMobile()) {
             <div class="xs:grid-cols-2 xs:text-center grid grid-cols-1 gap-x-4 pl-5">
@@ -159,7 +148,7 @@ import {
 
       <!-- volume -->
       <ng-container matColumnDef="volume">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Volume +/-</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">Volume +/-</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
           <div class="text-wt-gray-medium text-base">
             {{ row.volume | largeNumberFormatter }}
@@ -193,7 +182,7 @@ import {
 
       <!-- Market Cap -->
       <ng-container matColumnDef="marketCap">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Market Cap.</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Market Cap.</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           {{ row.marketCap | largeNumberFormatter }}
         </td>
@@ -201,7 +190,7 @@ import {
 
       <!-- shares -->
       <ng-container matColumnDef="shares">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">Shares</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden md:table-cell">Shares</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           {{ row.sharesOutstanding | largeNumberFormatter }}
         </td>
@@ -209,7 +198,7 @@ import {
 
       <!-- PE -->
       <ng-container matColumnDef="pe">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">PE</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">PE</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           {{ row.pe ? (row.pe | number: '1.2-2') : 'N/A' }}
         </td>
@@ -217,7 +206,7 @@ import {
 
       <!-- EPS -->
       <ng-container matColumnDef="eps">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden md:table-cell">EPS</th>
+        <th mat-header-cell *matHeaderCellDef class="hidden md:table-cell">EPS</th>
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           {{ row.eps ? (row.eps | number: '1.2-2') : 'N/A' }}
         </td>
@@ -273,7 +262,6 @@ import {
 })
 export class StockSummaryTableComponent {
   readonly itemClickedEmitter = output<SymbolQuote>();
-  readonly sort = viewChild(MatSort);
   readonly symbolQuotes = input.required<SymbolQuote[] | null | undefined>();
   readonly symbolSkeletonLoaders = input<number>(10);
 
@@ -286,12 +274,9 @@ export class StockSummaryTableComponent {
     }
 
     untracked(() => {
-      // sort data by market cap
-      const newData = summaries.slice().sort((a, b) => compare(a.marketCap, b.marketCap, false));
-      this.dataSource.data = newData;
+      this.dataSource.data = summaries;
 
       // update table
-      this.dataSource.sort = this.sort() ?? null;
       this.dataSource._updateChangeSubscription();
       this.showLoadingSkeleton.set(false);
     });
@@ -327,37 +312,5 @@ export class StockSummaryTableComponent {
 
   onItemClicked(item: SymbolQuote): void {
     this.itemClickedEmitter.emit(item);
-  }
-
-  sortData(sort: Sort) {
-    const data = this.dataSource.data.slice();
-    if (!sort.active || sort.direction === '') {
-      this.dataSource.data = data;
-      return;
-    }
-
-    this.dataSource.data = data.sort((a, b) => {
-      const isAsc = sort.direction === 'asc';
-      switch (sort.active) {
-        case 'symbol':
-          return compare(a.symbol, b.symbol, isAsc);
-        case 'marketCap':
-          return compare(a.marketCap, b.marketCap, isAsc);
-        case 'price':
-          return compare(a.price, b.price, isAsc);
-        case 'priceChange':
-          return compare(a.changesPercentage, b.changesPercentage, isAsc);
-        case 'volume':
-          return compare(a.volume, b.volume, isAsc);
-        case 'shares':
-          return compare(a.sharesOutstanding, b.sharesOutstanding, isAsc);
-        case 'pe':
-          return compare(a.pe, b.pe, isAsc);
-        case 'eps':
-          return compare(a.eps, b.eps, isAsc);
-        default:
-          return 0;
-      }
-    });
   }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, TemplateRef, inject, model, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, model, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -6,9 +6,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { NavigationStart, Router, RouterModule } from '@angular/router';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
-import { ROUTES_MAIN } from '@mm/shared/data-access';
+import { ROUTES_MAIN, SCREEN_LAYOUT_VALUES } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { DefaultImgDirective, HelpDialogComponent } from '@mm/shared/ui';
+import { DefaultImgDirective, HelpDialogComponent, windowResizeListener } from '@mm/shared/ui';
 import { UserSettingsDialogComponent } from '@mm/user/features';
 import { filter, map, startWith } from 'rxjs';
 
@@ -28,10 +28,12 @@ import { filter, map, startWith } from 'rxjs';
       <nav class="mx-auto flex w-full max-w-[1620px] items-center gap-4 p-2 sm:pl-8 sm:pr-4">
         <!-- mobile screen -->
         <div class="flex items-center gap-x-2">
-          <!-- menu button -->
-          <button type="button" mat-icon-button (click)="onMenuClick()">
-            <mat-icon>menu</mat-icon>
-          </button>
+          @if (displaySidePanelButton()) {
+            <!-- menu button -->
+            <button type="button" mat-icon-button (click)="onMenuClick()">
+              <mat-icon>menu</mat-icon>
+            </button>
+          }
 
           <!-- page title -->
           <div class="text-wt-primary text-lg">{{ pageName() }}</div>
@@ -108,6 +110,8 @@ export class MenuTopNavigationComponent {
   readonly menuOptions = viewChild('menuOptions', { read: TemplateRef<HTMLElement> });
 
   readonly userDataSignal = this.authenticationUserStoreService.state.userData;
+  readonly windowResize = windowResizeListener();
+  readonly displaySidePanelButton = computed(() => this.windowResize() < SCREEN_LAYOUT_VALUES.LAYOUT_2XL);
 
   readonly pageName = toSignal(
     this.router.events.pipe(
