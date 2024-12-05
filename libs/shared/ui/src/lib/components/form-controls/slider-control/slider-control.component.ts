@@ -65,7 +65,9 @@ export class SliderControlComponent implements ControlValueAccessor {
 
       untracked(() => {
         // set the default value
-        this.sliderControl.setValue(config.min, { emitEvent: false });
+        if (this.sliderControl.value === 1) {
+          this.sliderControl.setValue(config.min, { emitEvent: false });
+        }
       });
     });
 
