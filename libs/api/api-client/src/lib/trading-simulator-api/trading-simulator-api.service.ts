@@ -179,6 +179,7 @@ export class TradingSimulatorApiService {
     batch.set(this.getTradingSimulatorDocRef(data.tradingSimulator.id), {
       ...data.tradingSimulator,
       // keep existing participants
+      currentParticipants: data.existingSimulator.participants.length,
       participants: data.existingSimulator.participants,
     });
 
