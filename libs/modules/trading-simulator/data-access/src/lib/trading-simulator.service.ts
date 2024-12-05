@@ -56,7 +56,7 @@ export class TradingSimulatorService {
     return this.tradingSimulatorApiService.getTradingSimulatorByIdParticipantById(simulatorId, participantId);
   }
 
-  upsertTradingSimulator(data: {
+  createTradingSimulatorPlay(data: {
     tradingSimulator: TradingSimulator;
     tradingSimulatorSymbol: TradingSimulatorSymbol[];
   }) {
@@ -72,7 +72,27 @@ export class TradingSimulatorService {
       throw new Error('Only the owner can update the simulator');
     }
 
-    return this.tradingSimulatorApiService.upsertTradingSimulator(data);
+    return this.tradingSimulatorApiService.createTradingSimulatorPlay(data);
+  }
+
+  updateTradingSimulatorPlay(data: {
+    tradingSimulator: TradingSimulator;
+    tradingSimulatorSymbol: TradingSimulatorSymbol[];
+    existingSimulator: TradingSimulator;
+  }) {
+    const userData = this.authenticationUserStoreService.state.getUserData();
+
+    // check if user has privileges
+    if (!userData.featureAccess?.createTradingSimulator) {
+      throw new Error('User does not have privileges to create a simulator');
+    }
+
+    // check if user is the owner
+    if (data.tradingSimulator.owner.id !== userData.id) {
+      throw new Error('Only the owner can update the simulator');
+    }
+
+    return this.tradingSimulatorApiService.updateTradingSimulatorPlay(data);
   }
 
   simulatorStateChangeGoLive(simulator: TradingSimulator) {

@@ -751,25 +751,39 @@ export class TradingSimulatorFormComponent {
     // notify user
     this.dialogServiceUtil.showNotificationBar(`Updating ${tradingSimulator.name} simulator`);
 
-    // update trading simulator
-    await this.tradingSimulatorService.upsertTradingSimulator({
-      tradingSimulator,
-      tradingSimulatorSymbol,
-    });
+    try {
+      const existingTradingSimulator = this.existingTradingSimulator();
+      if (existingTradingSimulator) {
+        // update trading simulator
+        await this.tradingSimulatorService.updateTradingSimulatorPlay({
+          tradingSimulator,
+          tradingSimulatorSymbol,
+          existingSimulator: existingTradingSimulator.simulator,
+        });
+      } else {
+        // create trading simulator
+        await this.tradingSimulatorService.createTradingSimulatorPlay({
+          tradingSimulator,
+          tradingSimulatorSymbol,
+        });
+      }
 
-    // notify user
-    this.dialogServiceUtil.showNotificationBar(`Trading simulator ${tradingSimulator.name} updated`, 'success');
+      // notify user
+      this.dialogServiceUtil.showNotificationBar(`Trading simulator ${tradingSimulator.name} updated`, 'success');
 
-    if (state === 'draft') {
-      // route to trading simulator editing
-      this.router.navigateByUrl(
-        `${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.EDIT}/${tradingSimulator.id}`,
-      );
-    } else {
-      // change state
-      this.tradingSimulatorService.simulatorStateChangeGoLive(tradingSimulator);
-      // route to trading simulator
-      this.router.navigateByUrl(ROUTES_MAIN.TRADING_SIMULATOR);
+      if (state === 'draft') {
+        // route to trading simulator editing
+        this.router.navigateByUrl(
+          `${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.EDIT}/${tradingSimulator.id}`,
+        );
+      } else {
+        // change state
+        this.tradingSimulatorService.simulatorStateChangeGoLive(tradingSimulator);
+        // route to trading simulator
+        this.router.navigateByUrl(ROUTES_MAIN.TRADING_SIMULATOR);
+      }
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
     }
   }
 

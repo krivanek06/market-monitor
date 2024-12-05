@@ -113,20 +113,14 @@ export class TradingSimulatorApiService {
     return updateDoc(this.getTradingSimulatorDocRef(id), data);
   }
 
-  async upsertTradingSimulator(data: {
+  async createTradingSimulatorPlay(data: {
     tradingSimulator: TradingSimulator;
     tradingSimulatorSymbol: TradingSimulatorSymbol[];
-  }): Promise<void> {
+  }) {
     const batch = writeBatch(this.firestore);
 
     // save trading simulator document
     batch.set(this.getTradingSimulatorDocRef(data.tradingSimulator.id), data.tradingSimulator);
-
-    // get all existing symbols
-    const snapshot = await getDocs(this.getTradingSimulatorSymbolsCollection(data.tradingSimulator.id));
-
-    // queue deletions of previous symbols
-    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
 
     // add new symbols to the batch
     data.tradingSimulatorSymbol.forEach((symbol) => {
@@ -155,6 +149,73 @@ export class TradingSimulatorApiService {
       {} as TradingSimulatorAggregationSymbols,
     );
 
+    // save aggregation data
+    batch.set(this.getTradingSimulatorAggregationSymbolsDocRef(data.tradingSimulator.id), aggregationData);
+
+    // create aggregation document for transactions
+    batch.set(this.getTradingSimulatorAggregationTransactionsDocRef(data.tradingSimulator.id), {
+      bestTransactions: [],
+      lastTransactions: [],
+      worstTransactions: [],
+    });
+
+    // create user ranking aggregation document
+    batch.set(this.getTradingSimulatorAggregationParticipantsDocRef(data.tradingSimulator.id), {
+      userRanking: [],
+    });
+
+    // commit the batch
+    await batch.commit();
+  }
+
+  async updateTradingSimulatorPlay(data: {
+    tradingSimulator: TradingSimulator;
+    tradingSimulatorSymbol: TradingSimulatorSymbol[];
+    existingSimulator: TradingSimulator;
+  }): Promise<void> {
+    const batch = writeBatch(this.firestore);
+
+    // save trading simulator document
+    batch.set(this.getTradingSimulatorDocRef(data.tradingSimulator.id), {
+      ...data.tradingSimulator,
+      // keep existing participants
+      participants: data.existingSimulator.participants,
+    });
+
+    // get all existing symbols
+    const snapshot = await getDocs(this.getTradingSimulatorSymbolsCollection(data.tradingSimulator.id));
+
+    // queue deletions of previous symbols
+    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+
+    // add new symbols to the batch
+    data.tradingSimulatorSymbol.forEach((symbol) => {
+      batch.set(this.getTradingSimulatorSymbolDocRef(data.tradingSimulator.id, symbol.symbol), symbol);
+    });
+
+    // update aggregation document for symbols - symbols changed
+    const aggregationData = data.tradingSimulatorSymbol.reduce(
+      (acc, curr) => ({
+        ...acc,
+        [curr.symbol]: {
+          buyOperations: 0,
+          boughtUnits: 0,
+          investedTotal: 0,
+          sellOperations: 0,
+          soldUnits: 0,
+          soldTotal: 0,
+          price: curr.historicalDataModified.at(0) ?? 0,
+          pricePrevious: 0,
+          unitsCurrentlyAvailable: curr.unitsAvailableOnStart,
+          unitsInfinity: curr.unitsInfinity,
+          symbol: curr.symbol,
+          unitsTotalAvailable: curr.unitsAvailableOnStart,
+        } satisfies TradingSimulatorAggregationSymbolsData,
+      }),
+      {} as TradingSimulatorAggregationSymbols,
+    );
+
+    // save aggregation data
     batch.set(this.getTradingSimulatorAggregationSymbolsDocRef(data.tradingSimulator.id), aggregationData);
 
     // create aggregation document for transactions
@@ -188,6 +249,10 @@ export class TradingSimulatorApiService {
     // remove all transactions
     const transactionData = await getDocs(this.getTradingSimulatorTransactionsCollection(simulator.id));
     transactionData.docs.forEach((doc) => batch.delete(doc.ref));
+
+    // remove all participants
+    const participantsData = await getDocs(this.getTradingSimulatorParticipantsCollection(simulator.id));
+    participantsData.docs.forEach((doc) => batch.delete(doc.ref));
 
     // remove symbol aggregation
     batch.delete(this.getTradingSimulatorAggregationSymbolsDocRef(simulator.id));

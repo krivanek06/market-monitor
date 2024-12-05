@@ -100,16 +100,18 @@ const joinSimulator = async (
     throw new HttpsError('permission-denied', 'Invalid invitation code');
   }
 
-  // update simulator data
-  tradingSimulatorDocRef(simulator.id).update({
-    participants: FieldValue.arrayUnion(user.id),
-    currentParticipants: FieldValue.increment(1),
-  } satisfies FieldValuePartial<TradingSimulator>);
+  // get firestore instance
+  const db = firestore();
 
-  // add user to participants
-  tradingSimulatorParticipantsCollectionRef(simulator.id)
-    .doc(user.id)
-    .set({
+  return db.runTransaction(async (firebaseTransaction) => {
+    // update simulator data
+    firebaseTransaction.update(tradingSimulatorDocRef(simulator.id), {
+      participants: FieldValue.arrayUnion(user.id),
+      currentParticipants: FieldValue.increment(1),
+    } satisfies FieldValuePartial<TradingSimulator>);
+
+    // add user to participants
+    firebaseTransaction.set(tradingSimulatorParticipantsCollectionRef(simulator.id).doc(user.id), {
       userData: user,
       portfolioState: createEmptyPortfolioState(simulator.cashStartingValue),
       transactions: [],
@@ -122,19 +124,20 @@ const joinSimulator = async (
       },
     });
 
-  // add user to the participants ranking doc
-  tradingSimulatorAggregationParticipantsDocRef(simulator.id).set({
-    userRanking: FieldValue.arrayUnion({
-      userData: user,
-      rank: {
-        date: '0',
-        rank: 0,
-        rankPrevious: 0,
-        rankChange: null,
-      },
-      portfolioState: createEmptyPortfolioState(simulator.cashStartingValue),
-    } satisfies TradingSimulatorAggregationParticipantsData),
-  } satisfies FieldValuePartial<TradingSimulatorAggregationParticipants>);
+    // add user to the participants ranking doc
+    firebaseTransaction.update(tradingSimulatorAggregationParticipantsDocRef(simulator.id), {
+      userRanking: FieldValue.arrayUnion({
+        userData: user,
+        rank: {
+          date: '0',
+          rank: 0,
+          rankPrevious: 0,
+          rankChange: null,
+        },
+        portfolioState: createEmptyPortfolioState(simulator.cashStartingValue),
+      } satisfies TradingSimulatorAggregationParticipantsData),
+    } satisfies FieldValuePartial<TradingSimulatorAggregationParticipants>);
+  });
 };
 
 const leaveSimulator = async (
@@ -146,22 +149,27 @@ const leaveSimulator = async (
   if (!simulator.participants.includes(user.id)) {
     throw new HttpsError('not-found', 'User is not a participant');
   }
+  // get firestore instance
+  const db = firestore();
 
-  const participantsRanking =
-    (await tradingSimulatorAggregationParticipantsDocRef(simulator.id).get()).data()?.userRanking ?? [];
+  return db.runTransaction(async (firebaseTransaction) => {
+    const participantsRanking =
+      (await firebaseTransaction.get(tradingSimulatorAggregationParticipantsDocRef(simulator.id))).data()
+        ?.userRanking ?? [];
 
-  // update simulator data
-  tradingSimulatorDocRef(simulator.id).update({
-    participants: FieldValue.arrayRemove(user.id),
-    currentParticipants: FieldValue.increment(-1),
-  } satisfies FieldValuePartial<TradingSimulator>);
+    // update simulator data
+    firebaseTransaction.update(tradingSimulatorDocRef(simulator.id), {
+      participants: FieldValue.arrayRemove(user.id),
+      currentParticipants: FieldValue.increment(-1),
+    } satisfies FieldValuePartial<TradingSimulator>);
 
-  // remove user from participants
-  tradingSimulatorParticipantsCollectionRef(simulator.id).doc(user.id).delete();
+    // remove user from participants
+    firebaseTransaction.delete(tradingSimulatorParticipantsCollectionRef(simulator.id).doc(user.id));
 
-  // remove user from the participants ranking doc
-  tradingSimulatorAggregationParticipantsDocRef(simulator.id).set({
-    userRanking: participantsRanking.filter((participant) => participant.userData.id !== user.id),
+    // remove user from the participants ranking doc
+    firebaseTransaction.update(tradingSimulatorAggregationParticipantsDocRef(simulator.id), {
+      userRanking: participantsRanking.filter((participant) => participant.userData.id !== user.id),
+    });
   });
 };
 
