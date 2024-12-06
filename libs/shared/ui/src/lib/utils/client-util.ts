@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { WINDOW } from '@mm/api-client';
-import { debounceTime, fromEvent, map, startWith } from 'rxjs';
+import { auditTime, fromEvent, map, startWith } from 'rxjs';
 
 /**
  *
@@ -12,7 +12,7 @@ export const windowResizeListener = () => {
 
   return toSignal(
     fromEvent(windowRef, 'resize').pipe(
-      debounceTime(100),
+      auditTime(100),
       map(() => windowRef.innerWidth),
       startWith(windowRef.innerWidth),
       takeUntilDestroyed(),
