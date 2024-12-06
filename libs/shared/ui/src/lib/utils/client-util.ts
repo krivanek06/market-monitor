@@ -12,7 +12,7 @@ export const windowResizeListener = () => {
 
   return toSignal(
     fromEvent(windowRef, 'resize').pipe(
-      auditTime(100),
+      auditTime(300),
       map(() => windowRef.innerWidth),
       startWith(windowRef.innerWidth),
       takeUntilDestroyed(),
