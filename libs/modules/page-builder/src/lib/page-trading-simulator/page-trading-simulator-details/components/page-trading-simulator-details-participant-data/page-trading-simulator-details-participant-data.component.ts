@@ -42,7 +42,7 @@ import {
   GeneralCardComponent,
   InArrayPipe,
   SectionTitleComponent,
-  windowResizeListener,
+  WINDOW_RESIZE_LISTENER,
 } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { firstValueFrom } from 'rxjs';
@@ -265,7 +265,7 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
 
   readonly symbolTradeRef = viewChild<TemplateRef<HTMLElement>>('symbolTradeRef');
 
-  readonly windowResize = windowResizeListener();
+  readonly windowResize = inject(WINDOW_RESIZE_LISTENER);
   readonly SCREEN_LAYOUT_VALUES = SCREEN_LAYOUT_VALUES;
 
   readonly transactionState = computed(() => {

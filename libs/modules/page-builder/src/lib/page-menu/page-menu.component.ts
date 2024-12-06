@@ -10,7 +10,7 @@ import { GuardsCheckEnd, GuardsCheckStart, NavigationCancel, Router, RouterModul
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { SCREEN_LAYOUT_VALUES } from '@mm/shared/data-access';
 import { DialogServiceModule } from '@mm/shared/dialog-manager';
-import { windowResizeListener } from '@mm/shared/ui';
+import { WINDOW_RESIZE_LISTENER } from '@mm/shared/ui';
 import { delay, filter, map } from 'rxjs';
 import { MenuSideNavigationComponent } from './menu-navigation/menu-side-navigation.component';
 import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigation.component';
@@ -122,7 +122,7 @@ export class PageMenuComponent {
     ),
   );
   readonly isOpen = signal<boolean>(true);
-  readonly windowResize = windowResizeListener();
+  readonly windowResize = inject(WINDOW_RESIZE_LISTENER);
   readonly useSidePanelModeOver = computed(() => this.windowResize() < SCREEN_LAYOUT_VALUES.LAYOUT_2XL);
 
   readonly windowResizeEffect = effect(() => {

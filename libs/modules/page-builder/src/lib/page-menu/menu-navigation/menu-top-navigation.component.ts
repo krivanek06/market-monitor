@@ -8,7 +8,7 @@ import { AuthenticationAccountService, AuthenticationUserStoreService } from '@m
 import { SymbolSearchBasicComponent } from '@mm/market-stocks/features';
 import { ROUTES_MAIN, SCREEN_LAYOUT_VALUES } from '@mm/shared/data-access';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { DefaultImgDirective, HelpDialogComponent, windowResizeListener } from '@mm/shared/ui';
+import { DefaultImgDirective, HelpDialogComponent, WINDOW_RESIZE_LISTENER } from '@mm/shared/ui';
 import { UserSettingsDialogComponent } from '@mm/user/features';
 import { filter, map, startWith } from 'rxjs';
 
@@ -110,7 +110,7 @@ export class MenuTopNavigationComponent {
   readonly menuOptions = viewChild('menuOptions', { read: TemplateRef<HTMLElement> });
 
   readonly userDataSignal = this.authenticationUserStoreService.state.userData;
-  readonly windowResize = windowResizeListener();
+  readonly windowResize = inject(WINDOW_RESIZE_LISTENER);
   readonly displaySidePanelButton = computed(() => this.windowResize() < SCREEN_LAYOUT_VALUES.LAYOUT_2XL);
 
   readonly pageName = toSignal(

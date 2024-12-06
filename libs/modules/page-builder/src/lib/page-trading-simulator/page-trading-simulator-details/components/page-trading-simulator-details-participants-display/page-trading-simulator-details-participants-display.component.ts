@@ -12,7 +12,7 @@ import {
   GeneralCardComponent,
   SectionTitleComponent,
   ShowMoreButtonComponent,
-  windowResizeListener,
+  WINDOW_RESIZE_LISTENER,
 } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import {
@@ -139,7 +139,7 @@ export class PageTradingSimulatorDetailsParticipantsDisplayComponent {
     { initialValue: [] },
   );
 
-  private readonly windowWidth = windowResizeListener();
+  private readonly windowWidth = inject(WINDOW_RESIZE_LISTENER);
 
   readonly displayParticipants = computed(() => {
     const participants = this.participants();
