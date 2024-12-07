@@ -7,7 +7,11 @@ import {
   TradingSimulatorAggregationSymbolsData,
   TradingSimulatorParticipant,
 } from '@mm/api-types';
-import { getPortfolioStateHoldingsUtil, transformPortfolioStateHoldingToPortfolioState } from '@mm/shared/general-util';
+import {
+  getCurrentDateIOSFormat,
+  getPortfolioStateHoldingsUtil,
+  transformPortfolioStateHoldingToPortfolioState,
+} from '@mm/shared/general-util';
 import { addMinutes, roundToNearestMinutes } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -69,7 +73,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
         roundingMethod: 'floor', // round down
       }).toString(),
       state: 'finished',
-      endDateTime: new Date().toString(),
+      endDateTime: getCurrentDateIOSFormat(),
     } satisfies FieldValuePartial<TradingSimulator>);
 
     // remove all transactions
@@ -192,7 +196,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
     }).toString(),
     currentRound: FieldValue.increment(1),
     // update the start date time if it is the first round
-    startDateTime: isFistRound ? new Date().toString() : simulator.startDateTime,
+    startDateTime: isFistRound ? getCurrentDateIOSFormat() : simulator.startDateTime,
     // update the state if it is the first round
     state: isFistRound ? 'started' : simulator.state,
   } satisfies FieldValuePartial<TradingSimulator>);

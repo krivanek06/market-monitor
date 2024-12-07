@@ -7,7 +7,7 @@ import {
 	StockMetricsHistoricalAPI,
 	StockMetricsHistoricalBasic,
 } from '@mm/api-types';
-import { dateFormatDate } from '@mm/shared/general-util';
+import { dateFormatDate, getCurrentDateIOSFormat } from '@mm/shared/general-util';
 import { Env } from './model';
 
 export const getStockHistoricalMetricWrapper = async (env: Env, symbol: string, searchParams: URLSearchParams): Promise<Response> => {
@@ -67,7 +67,7 @@ const getStockHistoricalMetrics = async (symbol: string): Promise<StockMetricsHi
 			keyMetrics: keyMetricsYear,
 			ratios: ratiosYear,
 		},
-		lastUpdate: new Date().toISOString(),
+		lastUpdate: getCurrentDateIOSFormat(),
 	};
 
 	// return data

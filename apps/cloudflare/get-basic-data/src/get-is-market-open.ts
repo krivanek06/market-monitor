@@ -1,6 +1,6 @@
 import { getIsMarketOpen } from '@mm/api-external';
 import { EXPIRATION_TEN_MINUTES, IsStockMarketOpenExtend, RESPONSE_HEADER } from '@mm/api-types';
-import { tryJSONParse } from '@mm/shared/general-util';
+import { getCurrentDateIOSFormat, tryJSONParse } from '@mm/shared/general-util';
 import { isAfter } from 'date-fns';
 import { Env } from './model';
 
@@ -38,7 +38,7 @@ export const getIsMarketOpenWrapper = async (env: Env): Promise<Response> => {
 	const data = await getIsMarketOpen('NASDAQ');
 	const saveData = {
 		data: data!,
-		date: new Date().toISOString(),
+		date: getCurrentDateIOSFormat(),
 		version: currentVersion,
 	} satisfies SavedData;
 

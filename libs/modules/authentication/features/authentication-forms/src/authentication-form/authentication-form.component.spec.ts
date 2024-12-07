@@ -17,6 +17,7 @@ import {
 } from '@mm/authentication/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { getCurrentDateIOSFormat } from '@mm/shared/general-util';
 import { LocalStorageData, StorageLocalService } from '@mm/shared/storage-local';
 import { UserCredential } from 'firebase/auth';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
@@ -404,7 +405,7 @@ describe('AuthenticationFormComponent', () => {
         demoAccount: {
           email: userDemoMock.userData.personal.email,
           password: userDemoMock.password,
-          createdDate: new Date().toISOString(),
+          createdDate: getCurrentDateIOSFormat(),
         },
       } as LocalStorageData),
     });
@@ -459,7 +460,7 @@ describe('AuthenticationFormComponent', () => {
         demoAccount: {
           email: userDemoMock.userData.personal.email,
           password: userDemoMock.password,
-          createdDate: new Date().toISOString(),
+          createdDate: getCurrentDateIOSFormat(),
         },
       } as LocalStorageData),
     });

@@ -19,6 +19,7 @@ import {
 } from '@mm/authentication/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { getCurrentDateIOSFormat } from '@mm/shared/general-util';
 import { StorageLocalService } from '@mm/shared/storage-local';
 import { addDays, isAfter } from 'date-fns';
 import { filterNil } from 'ngxtension/filter-nil';
@@ -196,7 +197,7 @@ export class AuthenticationFormComponent {
                   this.storageLocalService.saveDataLocal('demoAccount', {
                     email: result.userData.personal.email,
                     password: result.password,
-                    createdDate: new Date().toString(),
+                    createdDate: getCurrentDateIOSFormat(),
                   }),
                 ),
                 switchMap(() =>

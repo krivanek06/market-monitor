@@ -78,6 +78,10 @@ export const getCurrentDateDetailsFormat = (date = new Date()): string => {
   return dateFormatDate(date, 'yyyy-MM-dd HH:mm:ss');
 };
 
+export const getCurrentDateIOSFormat = (date = new Date()): string => {
+  return dateFormatDate(date, 'yyyy-MM-ddTHH:mm:ss');
+};
+
 export const getYesterdaysDate = (): string => {
   return dateFormatDate(subDays(new Date(), 1));
 };

@@ -1,3 +1,4 @@
+import { getCurrentDateIOSFormat } from '@mm/shared/general-util';
 import { tradingSimulatorCollectionRef } from '../database';
 import { tradingSimulatorOnNextRound } from './trading-simulator-next-round';
 
@@ -9,13 +10,13 @@ export const tradingSimulatorStateVerification = async () => {
   // load all started simulators
   const simulatorsStarted = await tradingSimulatorCollectionRef()
     .where('state', '==', 'started')
-    .where('nextRoundTime', '<=', new Date().toISOString())
+    .where('nextRoundTime', '<=', getCurrentDateIOSFormat())
     .get();
 
   // simulators that should start
   const simulatorsShouldStart = await tradingSimulatorCollectionRef()
     .where('state', '==', 'live')
-    .where('startDateTime', '<=', new Date().toISOString())
+    .where('startDateTime', '<=', getCurrentDateIOSFormat())
     .get();
 
   // increment the round
