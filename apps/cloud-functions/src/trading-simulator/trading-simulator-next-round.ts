@@ -71,7 +71,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
         // casting should be ok because it expects a {Unit extends number}
         nearestTo: 5,
         roundingMethod: 'floor', // round down
-      }).toString(),
+      }).toISOString(),
       state: 'finished',
       endDateTime: getCurrentDateIOSFormat(),
     } satisfies FieldValuePartial<TradingSimulator>);
@@ -193,7 +193,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
       // casting should be ok because it expects a {Unit extends number}
       nearestTo: 5,
       roundingMethod: 'floor', // round down
-    }).toString(),
+    }).toISOString(),
     currentRound: FieldValue.increment(1),
     // update the start date time if it is the first round
     startDateTime: isFistRound ? getCurrentDateIOSFormat() : simulator.startDateTime,
