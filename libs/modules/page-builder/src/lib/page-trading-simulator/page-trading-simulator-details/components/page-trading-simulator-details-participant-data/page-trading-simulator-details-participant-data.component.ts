@@ -155,8 +155,8 @@ import { firstValueFrom } from 'rxjs';
     </div>
 
     <!-- holdings -->
-    <div class="mb-12 grid gap-x-4 xl:grid-cols-3">
-      <div class="xl:col-span-2">
+    <div class="mb-12 flex gap-x-4">
+      <div class="xl:basis-9/12">
         <!-- holdings -->
         <app-section-title title="My Holdings" matIcon="show_chart" class="mb-3" />
         <app-general-card additionalClasses="min-h-[300px]">
@@ -167,9 +167,13 @@ import { firstValueFrom } from 'rxjs';
           />
         </app-general-card>
       </div>
-      <div class="self-center max-xl:hidden">
+      <div class="basis-3/12 self-center max-xl:hidden">
         <!-- chart -->
-        <app-portfolio-balance-pie-chart [heightPx]="250" [data]="participant().portfolioState" />
+        <app-portfolio-balance-pie-chart
+          [dataLabelsEnabled]="false"
+          [heightPx]="220"
+          [data]="participant().portfolioState"
+        />
       </div>
     </div>
 
