@@ -2,9 +2,10 @@ import { CurrencyPipe, DatePipe, NgClass, NgTemplateOutlet } from '@angular/comm
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { OutstandingOrder } from '@mm/api-types';
+import { IsStockMarketOpenExtend, OutstandingOrder } from '@mm/api-types';
 import { getTransactionFeesBySpending } from '@mm/shared/general-util';
 import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
+import { roundToNearestMinutes } from 'date-fns';
 
 @Component({
   selector: 'app-outstanding-order-card-data',
@@ -61,6 +62,11 @@ import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
     <ng-template #normalOrderTmp let-order="order">
       <div>
         <div class="g-item-wrapper">
+          <span>Executes At</span>
+          <span>{{ executionTime() | date: 'HH:mm MMM d, y' }}</span>
+        </div>
+
+        <div class="g-item-wrapper">
           <span>Units / Fees</span>
           <span>{{ order.units }} / ~{{ potentialFees() | currency }}</span>
         </div>
@@ -87,8 +93,32 @@ import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
 export class OutstandingOrderCardDataComponent {
   readonly deleteClicked = output<void>();
   readonly order = input.required<OutstandingOrder>();
+  readonly marketOpen = input<IsStockMarketOpenExtend>();
 
   readonly potentialFees = computed(() => getTransactionFeesBySpending(this.order().potentialTotalPrice));
+  readonly executionTime = computed(() => {
+    const marketOpen = this.marketOpen();
+
+    // not provided market data
+    if (!marketOpen) {
+      return '';
+    }
+
+    const now = new Date();
+
+    // market hasn't opened yet
+    if (!marketOpen.isTheStockMarketOpen) {
+      const openingHour = marketOpen.stockMarketHoursLocal.openingHour;
+      // format opening hour to date
+      const [hour, minute] = openingHour.split(':').map(Number);
+      const openingDate = new Date(now);
+      openingDate.setHours(hour, minute, 0, 0);
+      return openingDate.toString();
+    }
+
+    // market is open, round to nearest 5 minutes
+    return roundToNearestMinutes(now, { nearestTo: 5 });
+  });
 
   onDelete() {
     this.deleteClicked.emit();

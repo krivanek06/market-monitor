@@ -1,9 +1,15 @@
-import { GroupGeneralActions, TradingSimulatorGeneralActions, UserCreateDemoAccountInput } from '@mm/api-types';
+import {
+  GroupGeneralActions,
+  OutstandingOrder,
+  TradingSimulatorGeneralActions,
+  UserCreateDemoAccountInput,
+} from '@mm/api-types';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { CallableRequest, onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from './group';
 import { groupGeneralActions } from './group/group-general-actions';
-import { outstandingOrderExecute } from './outstanding-order';
+import { outstandingOrderExecute, outstandingOrdersExecuteAll } from './outstanding-order';
 import { tradingSimulatorGeneralActions } from './trading-simulator/trading-simulator-general-actions';
 import { tradingSimulatorStateVerification } from './trading-simulator/trading-simulator-state-verification';
 import {
@@ -76,6 +82,23 @@ export const tradingSimulatorActionCall = onCall(
 );
 
 /** ------------------------------------------ */
+/**
+ * OUTSTANDING ORDERS
+ */
+
+export const outstandingOrderNewDocument = onDocumentCreated('outstanding_orders/{docId}', async (event) => {
+  await measureFunctionExecutionTime(async () => {
+    const snapshot = event.data;
+    if (!snapshot) {
+      console.log('No data associated with the event');
+      return;
+    }
+    const data = snapshot.data() as OutstandingOrder;
+    await outstandingOrderExecute(data);
+  });
+});
+
+/** ------------------------------------------ */
 
 /**
  * every 5 minutes between 22:00 and 23:00
@@ -95,23 +118,6 @@ export const run_scheduler_update_users = onSchedule(
   },
 );
 
-/**
- * At every 5th minute from 31 through 41 past hour 9 on every day-of-week from Monday through Friday.
- */
-export const run_scheduler_execute_outstanding_orders = onSchedule(
-  {
-    timeoutSeconds: 200,
-    schedule: '31-41/5 9 * * 1-5', // 9:31, 9:36, 9:41
-    region: region,
-    timeZone: 'EST',
-  },
-  async () => {
-    await measureFunctionExecutionTime(async () => {
-      await outstandingOrderExecute();
-    });
-  },
-);
-
 export const run_scheduler_frequent = onSchedule(
   {
     timeoutSeconds: 200,
@@ -123,6 +129,9 @@ export const run_scheduler_frequent = onSchedule(
     await measureFunctionExecutionTime(async () => {
       // check if the simulator should start or increment the round
       await tradingSimulatorStateVerification();
+
+      // check if there is any open order to execute
+      await outstandingOrdersExecuteAll();
     });
   },
 );

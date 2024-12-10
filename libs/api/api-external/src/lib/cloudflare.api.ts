@@ -91,7 +91,9 @@ export const getHistoricalPricesOnDateCF = async (
   }
 };
 
-export const getIsMarketOpenCF = async (): Promise<IsStockMarketOpenExtend | undefined> => {
+export const getIsMarketOpenCF = async (): Promise<
+  Omit<IsStockMarketOpenExtend, 'stockMarketHoursLocal'> | undefined
+> => {
   const url = `https://get-basic-data.krivanek1234.workers.dev/?type=market-is-open`;
   try {
     const response = await fetch(url, {

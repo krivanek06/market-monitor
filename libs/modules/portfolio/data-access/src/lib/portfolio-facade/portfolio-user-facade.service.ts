@@ -1,10 +1,10 @@
-import { Injectable, computed, inject } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { OutstandingOrder } from '@mm/api-types';
+import { OUTSTANDING_ORDER_MAX_ALLOWED, OUTSTANDING_ORDERS_MAX_ORDERS, OutstandingOrder } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
+import { checkTransactionOperationDataValidity } from '@mm/shared/general-util';
 import { of, switchMap } from 'rxjs';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
-import { PortfolioCreateOperationService } from '../portfolio-create-operation/portfolio-create-operation.service';
 
 /**
  * service for authenticated user to perform portfolio operations
@@ -15,7 +15,6 @@ import { PortfolioCreateOperationService } from '../portfolio-create-operation/p
 export class PortfolioUserFacadeService {
   private readonly authenticationUserService = inject(AuthenticationUserStoreService);
   private readonly portfolioCalculationService = inject(PortfolioCalculationService);
-  private readonly portfolioCreateOperationService = inject(PortfolioCreateOperationService);
 
   /**
    * on every transaction change, recalculate the portfolio state
@@ -62,11 +61,32 @@ export class PortfolioUserFacadeService {
     this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.portfolioStateHolding()?.holdings ?? []),
   );
 
-  createOrder(data: OutstandingOrder) {
-    return this.portfolioCreateOperationService.createOrder(data);
+  createOrder(order: OutstandingOrder) {
+    const userData = this.authenticationUserService.state.getUserData();
+    const orders = this.authenticationUserService.state.outstandingOrders();
+
+    // check if operation validity - throws error if invalid
+    checkTransactionOperationDataValidity(userData, order);
+
+    // prevent creating more orders than allowed
+    if (orders.openOrders.length >= OUTSTANDING_ORDERS_MAX_ORDERS) {
+      throw new Error(OUTSTANDING_ORDER_MAX_ALLOWED);
+    }
+
+    this.authenticationUserService.addOutstandingOrder(order);
+
+    return order;
   }
 
   deleteOrder(order: OutstandingOrder) {
-    return this.portfolioCreateOperationService.deleteOrder(order);
+    const userData = this.authenticationUserService.state.getUserData();
+
+    // check if the user who creates the order is the same as the user in the order
+    if (order.userData.id !== userData.id) {
+      throw new Error('User does not have the order');
+    }
+
+    // delete the order
+    this.authenticationUserService.removeOutstandingOrder(order);
   }
 }

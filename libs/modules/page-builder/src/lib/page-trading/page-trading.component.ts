@@ -177,11 +177,12 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
 
       <!-- outstanding orders -->
       <app-section-title title="Open Outstanding Orders" class="mb-4" matIcon="reorder" />
-      <div class="grid gap-x-4 gap-y-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+      <div class="grid gap-x-4 gap-y-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         @for (order of state.outstandingOrders().openOrders; track order.orderId) {
           <app-outstanding-order-card-data
             data-testid="page-trading-outstanding-order-card-data"
             [order]="order"
+            [marketOpen]="marketOpenData()"
             (deleteClicked)="onOrderRemove(order)"
           />
         } @empty {
@@ -393,14 +394,10 @@ export class PageTradingComponent {
 
     try {
       // create order
-      const result = this.portfolioUserFacadeService.createOrder(dialogData);
+      this.portfolioUserFacadeService.createOrder(dialogData);
 
       // show notification
-      if (result.type === 'order') {
-        this.dialogServiceUtil.showNotificationBar('Order created, it will be fulfilled once market opens', 'success');
-      } else {
-        this.dialogServiceUtil.showNotificationBar('Transaction created', 'success');
-      }
+      this.dialogServiceUtil.showNotificationBar('Order created, it will be fulfilled soon', 'success');
     } catch (e) {
       this.dialogServiceUtil.handleError(e);
     }
