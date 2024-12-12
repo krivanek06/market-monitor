@@ -40,7 +40,7 @@ import { first, forkJoin, iif, of, switchMap } from 'rxjs';
     <!-- participant ranking -->
     <app-section-title title="Participant Ranking" matIcon="people" class class="mb-3" />
     <app-general-card class="mb-6">
-      <div class="grid gap-x-6 gap-y-4 p-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <div class="grid gap-x-6 gap-y-4 p-4 lg:grid-cols-2 xl:grid-cols-3">
         @for (participant of displayParticipants().participants; track participant.userData.id; let i = $index) {
           <button mat-stroked-button (click)="onParticipantClick(participant.userData)" class="h-12 p-2">
             <app-trading-simulator-participant-item [participant]="participant" [position]="participant.rank.rank" />

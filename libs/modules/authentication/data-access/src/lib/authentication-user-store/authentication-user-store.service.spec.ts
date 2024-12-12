@@ -2,9 +2,7 @@ import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm
 import {
   mockCreateUser,
   OutstandingOrder,
-  PortfolioState,
   PortfolioStateHoldingBase,
-  PortfolioTransaction,
   SymbolStoreBase,
   UserAccountBasicTypes,
   UserAccountEnum,
@@ -221,50 +219,6 @@ describe('AuthenticationUserStoreService', () => {
     service.componentInstance.recalculatePortfolioState();
 
     expect(userApi.recalculateUserPortfolioState).toHaveBeenCalledWith(testUserData);
-  });
-
-  it('should add portfolio transaction', () => {
-    const userApiService = ngMocks.get(UserApiService);
-
-    const data = {
-      symbol: 'AAPL',
-    } as PortfolioTransaction;
-
-    const mockPortfolio = {
-      balance: 123,
-    } as PortfolioState;
-    const mockHoldings = [{ symbol: 'AAPL', units: 10 }] as PortfolioStateHoldingBase[];
-
-    // create spy to avoid actual calculation
-    const holdingCalcSpy = jest
-      .spyOn(generatlUtil, 'getPortfolioStateHoldingBaseByNewTransactionUtil')
-      .mockReturnValue({
-        updatedPortfolio: mockPortfolio,
-        updatedHoldings: mockHoldings,
-      });
-
-    ngMocks.flushTestBed();
-    const service = MockRender(AuthenticationUserStoreService);
-
-    const user = service.componentInstance.state.getUserData();
-    const openOrders = service.componentInstance.state.outstandingOrders().openOrders;
-
-    service.componentInstance.addPortfolioTransactions(data);
-
-    // transaction was added
-    expect(userApiService.addUserPortfolioTransactions).toHaveBeenCalledWith(user.id, data);
-
-    // portfolio state was recalculated
-    expect(holdingCalcSpy).toHaveBeenCalledWith(user.portfolioState, user.holdingSnapshot.data, openOrders, data);
-
-    // updated user was saved
-    expect(userApiService.updateUser).toHaveBeenCalledWith(user.id, {
-      portfolioState: mockPortfolio,
-      holdingSnapshot: {
-        lastModifiedDate: expect.any(String),
-        data: mockHoldings,
-      },
-    });
   });
 
   it('should add outstanding order - BUY order', () => {

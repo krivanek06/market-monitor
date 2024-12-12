@@ -27,7 +27,7 @@
     {
       "codebase": "cloud-functions",
       "source": "dist/apps/cloud-functions",
-      "runtime": "nodejs18",
+      "runtime": "nodejs20",
       "ignore": ["*.local"]
     }
   ],

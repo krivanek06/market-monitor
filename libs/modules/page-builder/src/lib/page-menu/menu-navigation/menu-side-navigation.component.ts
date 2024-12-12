@@ -84,10 +84,6 @@ import { filter, map, startWith } from 'rxjs';
     :host {
       display: block;
     }
-
-    .c-link {
-      @apply hover:bg-wt-gray-light-strong flex h-12 max-w-[90%] cursor-pointer items-center gap-3 rounded-e-xl pl-5;
-    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -24,7 +24,7 @@
         "bundle": true,
         "thirdParty": false,
         "dependenciesFieldType": "dependencies",
-        "target": "node18",
+        "target": "node20",
         "format": ["esm"],
         "esbuildOptions": {
           "logLevel": "info",

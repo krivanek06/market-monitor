@@ -1,7 +1,7 @@
 import { CallableRequest, onCall, onRequest } from 'firebase-functions/v2/https';
 import { userDocumentRef } from '../database';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
-import { outstandingOrderExecute } from '../outstanding-order';
+import { outstandingOrdersExecuteAll } from '../outstanding-order';
 import { recalculateUserPortfolioStateToUser } from '../portfolio';
 import { run_scheduler_once_a_day, run_scheduler_update_users } from '../production';
 import {
@@ -59,7 +59,7 @@ export const testing_function = onRequest({ timeoutSeconds: 1200 }, async (req, 
     } else if (functionType === 'run_scheduler_update_users') {
       await run_scheduler_update_users(req, res);
     } else if (functionType === 'run_outstanding_order_execute') {
-      await outstandingOrderExecute();
+      await outstandingOrdersExecuteAll();
     }
   });
 });

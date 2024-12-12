@@ -78,7 +78,7 @@ export type PortfolioStateExecution = Pick<
 export type SymbolStoreBase = {
   symbolType: SymbolType;
   symbol: string;
-  sector: string;
+  sector: 'CRYPTO' | 'STOCK' | ({} & string);
 };
 
 export type PortfolioStateHoldingBase = SymbolStoreBase & {

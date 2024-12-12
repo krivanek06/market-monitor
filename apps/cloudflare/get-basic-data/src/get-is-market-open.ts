@@ -1,5 +1,5 @@
 import { getIsMarketOpen } from '@mm/api-external';
-import { EXPIRATION_TEN_MINUTES, IsStockMarketOpenExtend, RESPONSE_HEADER } from '@mm/api-types';
+import { EXPIRATION_ONE_HOUR, IsStockMarketOpenExtend, RESPONSE_HEADER } from '@mm/api-types';
 import { getCurrentDateIOSFormat, tryJSONParse } from '@mm/shared/general-util';
 import { isAfter } from 'date-fns';
 import { Env } from './model';
@@ -43,7 +43,7 @@ export const getIsMarketOpenWrapper = async (env: Env): Promise<Response> => {
 	} satisfies SavedData;
 
 	// save into cache
-	env.get_basic_data.put(cacheKey, JSON.stringify(saveData), { expirationTtl: EXPIRATION_TEN_MINUTES });
+	env.get_basic_data.put(cacheKey, JSON.stringify(saveData), { expirationTtl: EXPIRATION_ONE_HOUR });
 
 	// return stringified data
 	return new Response(JSON.stringify(saveData.data), RESPONSE_HEADER);

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -60,7 +60,7 @@ import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
     }
 
     <!-- simulator the user is participating in -->
-    @if ((simulatorsByParticipant()?.length ?? 0) > 0) {
+    @if (simulatorsByParticipant().length > 0) {
       <div class="mb-6">
         <app-section-title title="My Simulations" description="Simulators that you are participating in" class="mb-3" />
 
@@ -152,9 +152,26 @@ export class PageTradingSimulatorComponent {
   private readonly router = inject(Router);
 
   readonly simulatorsByOwner = this.tradingSimulatorService.simulatorsByOwner;
-  readonly simulatorsByParticipant = this.tradingSimulatorService.simulatorsByParticipant;
   readonly userData = this.authenticationUserStoreService.state.getUserData;
-  readonly tradingSimulatorLatestData = this.tradingSimulatorService.tradingSimulatorLatestData;
+  readonly tradingSimulatorLatestData = computed(() => {
+    const tradingSimulatorLatestData = this.tradingSimulatorService.tradingSimulatorLatestData();
+    const userData = this.userData();
+
+    return {
+      live: (tradingSimulatorLatestData.live ?? []).filter((simulator) => simulator.owner.id !== userData.id),
+      started: (tradingSimulatorLatestData.started ?? []).filter((simulator) => simulator.owner.id !== userData.id),
+      historical: (tradingSimulatorLatestData.historical ?? []).filter(
+        (simulator) => simulator.owner.id !== userData.id,
+      ),
+    };
+  });
+
+  readonly simulatorsByParticipant = computed(() => {
+    const simulatorsByParticipant = this.tradingSimulatorService.simulatorsByParticipant() ?? [];
+    const userData = this.userData();
+
+    return simulatorsByParticipant.filter((simulator) => simulator.owner.id !== userData.id);
+  });
 
   onCreateSimulator() {
     this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.CREATE]);

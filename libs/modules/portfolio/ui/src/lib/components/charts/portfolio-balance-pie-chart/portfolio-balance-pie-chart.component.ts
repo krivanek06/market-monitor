@@ -27,6 +27,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortfolioBalancePieChartComponent extends ChartConstructor {
+  readonly dataLabelsEnabled = input(true);
   readonly data = input.required<PortfolioState>();
 
   readonly chartOptionSignal = computed(() => this.initChart(this.data()));
@@ -76,7 +77,7 @@ export class PortfolioBalancePieChartComponent extends ChartConstructor {
           size: '100%',
           innerSize: '80%',
           dataLabels: {
-            enabled: true,
+            enabled: this.dataLabelsEnabled(),
             crop: false,
             style: {
               //fontWeight: 'bold',
@@ -104,7 +105,6 @@ export class PortfolioBalancePieChartComponent extends ChartConstructor {
         shared: true,
         headerFormat: '',
         pointFormatter: function () {
-          const that = this as any;
           const value = formatValueIntoCurrency(this.y);
           return `<span style="font-weight: bold; color: ${this.color}">● ${this.name}: </span><span>${value} </span><br/>`;
         },
