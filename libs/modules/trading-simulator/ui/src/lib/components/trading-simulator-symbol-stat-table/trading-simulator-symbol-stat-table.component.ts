@@ -153,7 +153,7 @@ export class TradingSimulatorSymbolStatTableComponent {
     'symbol',
     'price',
     'unitsCurrentlyAvailable',
-    'unitsTotalAvailable',
+    // 'unitsTotalAvailable',
     'buyOperations',
     'sellOperations',
     'boughtUnits',

@@ -156,7 +156,7 @@ import {
 
       <!-- only change -->
       <ng-container matColumnDef="onlyChange">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Change +/-</th>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Total +/-</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           <div
             appPercentageIncrease
@@ -172,7 +172,7 @@ import {
 
       <!-- only value -->
       <ng-container matColumnDef="onlyValue">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Change +/-</th>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden sm:table-cell">Total +/-</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
           <div
             appPercentageIncrease

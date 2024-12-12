@@ -156,7 +156,7 @@ import { firstValueFrom } from 'rxjs';
 
     <!-- holdings -->
     <div class="mb-12 flex gap-x-4">
-      <div class="xl:basis-9/12">
+      <div class="basis-[100%] xl:basis-[80%]">
         <!-- holdings -->
         <app-section-title title="My Holdings" matIcon="show_chart" class="mb-3" />
         <app-general-card additionalClasses="min-h-[300px]">
@@ -167,7 +167,7 @@ import { firstValueFrom } from 'rxjs';
           />
         </app-general-card>
       </div>
-      <div class="basis-3/12 self-center max-xl:hidden">
+      <div class="self-center max-xl:hidden xl:basis-[20%]">
         <!-- chart -->
         <app-portfolio-balance-pie-chart
           [dataLabelsEnabled]="false"
@@ -341,7 +341,7 @@ export class PageTradingSimulatorDetailsParticipantDataComponent {
 
   readonly ColorScheme = ColorScheme;
 
-  readonly displayedColumnsHoldings = ['symbol', 'price', 'bep', 'balance', 'invested', 'onlyValue', 'portfolio'];
+  readonly displayedColumnsHoldings = ['symbol', 'price', 'bep', 'balance', 'invested', 'totalChange', 'portfolio'];
   readonly displayedColumnsTransactionTable = [
     'symbol',
     'transactionType',
