@@ -74,7 +74,7 @@ export const outstandingOrdersExecuteAll = async () => {
   }
 };
 
-const outstandingOrderGetQuotes = async (orders: OutstandingOrder[], cached = new Map<string, SymbolQuote>()) => {
+const outstandingOrderGetQuotes = async (orders: OutstandingOrder[], cached: Map<string, SymbolQuote>) => {
   // get unsaved quotes
   const unsavedQuotes = [...new Set(orders.map((d) => d.symbol))].filter((d) => !cached.has(d));
   // load quotes
@@ -94,10 +94,15 @@ const outstandingOrderExecuteForUserId = async (
   orders: OutstandingOrder[],
   symbolQuotesMap: Map<string, SymbolQuote>,
 ) => {
+  if (orders.length === 0) {
+    return;
+  }
+
   // check if all orders belong to a single user
   const userIds = [...new Set(orders.map((d) => d.userData.id))];
   if (userIds.length > 1) {
-    console.error(`[OUTSTANDING_ORDER]: Orders belong to multiple users: ${userIds}`);
+    const distinctUserIds = [...new Set(userIds)];
+    console.error(`[OUTSTANDING_ORDER]: Orders belong to multiple users: ${distinctUserIds.join(', ')}`);
     return;
   }
 
@@ -120,43 +125,45 @@ const outstandingOrderExecuteForUserId = async (
   console.log(`[OUTSTANDING_ORDER]: Executing orders for user ${userData.id}, orders: ${orders.length}`);
 
   // execute orders as one transaction
-  try {
-    await db.runTransaction(async (firebaseTransaction) => {
-      for (const order of orders) {
-        const quote = symbolQuotesMap.get(order.symbol);
+  for (const order of orders) {
+    const quote = symbolQuotesMap.get(order.symbol);
 
-        // check if quote is available and is from today
-        if (!quote) {
-          console.error(`[OUTSTANDING_ORDER]: Failed to get quote for symbol ${order.symbol}`);
-          return;
-        }
+    // check if quote is available and is from today
+    if (!quote) {
+      console.error(`[OUTSTANDING_ORDER]: Failed to get quote for symbol ${order.symbol}`);
+      continue;
+    }
 
-        // problems when market opens and executing and order immediately may have yesterday's quote
-        const quoteDate = new Date(quote.timestamp * 1000);
-        if (!isSameDay(quoteDate, new Date())) {
-          console.error(`[OUTSTANDING_ORDER]: Symbol ${order.symbol} is not from today, timestamp: ${quote.timestamp}`);
-          return;
-        }
+    // problem: check if quote is from today (when market opens some quotes are from yesterday)
+    const quoteDate = new Date(quote.timestamp * 1000);
+    if (!isSameDay(quoteDate, new Date())) {
+      console.error(`[OUTSTANDING_ORDER]: Symbol ${order.symbol} is not from today, timestamp: ${quote.timestamp}`);
+      continue;
+    }
 
-        // calculate the new current total of the order
-        const currentTotal = order.units * quote.price;
-        // if potentialTotalPrice was 100 and now it's 110, priceDiff is 10
-        const priceDiff = currentTotal - order.potentialTotalPrice;
+    // calculate the new current total of the order
+    const currentTotal = order.units * quote.price;
 
-        const potentialTransaction = createTransaction(userData, userData.holdingSnapshot.data, order, quote.price);
+    // if potentialTotalPrice was 100 and now it's 110, priceDiff is 10
+    const priceDiff = currentTotal - order.potentialTotalPrice;
 
-        // make some validations here
-        checkTransactionOperationDataValidity(userData, order);
+    // create transaction
+    const potentialTransaction = createTransaction(userData, userData.holdingSnapshot.data, order, quote.price);
 
-        // check if user has enough money
-        if (
-          order.orderType.type === 'BUY' &&
-          userData.portfolioState.cashOnHand < priceDiff + potentialTransaction.transactionFees
-        ) {
-          console.error(`[OUTSTANDING_ORDER]: User ${userData.id} not enough money, order ${order.orderId}`);
-          return;
-        }
+    // make some validations here
+    checkTransactionOperationDataValidity(userData, order);
 
+    // check if user has enough money
+    if (
+      order.orderType.type === 'BUY' &&
+      userData.portfolioState.cashOnHand < priceDiff + potentialTransaction.transactionFees
+    ) {
+      console.error(`[OUTSTANDING_ORDER]: User ${userData.id} not enough money, order ${order.orderId}`);
+      continue;
+    }
+
+    try {
+      await db.runTransaction(async (firebaseTransaction) => {
         // update user's transactions
         firebaseTransaction.update(userDocumentTransactionHistoryRef(userData.id), {
           transactions: FieldValue.arrayUnion(potentialTransaction),
@@ -164,14 +171,13 @@ const outstandingOrderExecuteForUserId = async (
 
         // delete the order - close it
         firebaseTransaction.delete(outstandingOrderDocRef(order.orderId));
-      }
-    });
-
-    // recalculate user's portfolio state - new transaction appeared
-    await recalculateUserPortfolioStateToUser(userData);
-  } catch (error) {
-    console.error(`[OUTSTANDING_ORDER]: Error executing orders for user ${userData.id}: ${error}`);
+      });
+    } catch (error) {
+      console.error(`[OUTSTANDING_ORDER]: Failed to execute order ${order.orderId}`);
+      console.error(error);
+    }
   }
-};
 
-// todo - may happen that price changed so much that user may be in negative cash
+  // recalculate user's portfolio state - new transaction appeared
+  await recalculateUserPortfolioStateToUser(userData);
+};

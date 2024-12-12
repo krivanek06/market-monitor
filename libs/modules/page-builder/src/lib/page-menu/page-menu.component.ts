@@ -39,7 +39,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
         [mode]="useSidePanelModeOver() ? 'over' : 'side'"
         [opened]="isOpen()"
         (closed)="isOpen.set(false)"
-        class="fixed block w-5/12 max-sm:min-w-[350px] md:w-[300px]"
+        class="fixed block min-w-[280px] md:w-[300px]"
         role="navigation"
       >
         <app-menu-side-navigation />

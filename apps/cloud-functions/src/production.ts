@@ -118,6 +118,26 @@ export const run_scheduler_update_users = onSchedule(
   },
 );
 
+/**
+ * At every 5th minute from 31 through 41 past hour 9 on every day-of-week from Monday through Friday.
+ */
+export const run_scheduler_execute_outstanding_orders = onSchedule(
+  {
+    timeoutSeconds: 200,
+    schedule: '31-41/5 9 * * 1-5', // 9:31, 9:36, 9:41
+    region: region,
+    timeZone: 'EST',
+  },
+  async () => {
+    await measureFunctionExecutionTime(async () => {
+      await outstandingOrdersExecuteAll();
+    });
+  },
+);
+
+/**
+ * every 5 minutes on the hour every day
+ */
 export const run_scheduler_frequent = onSchedule(
   {
     timeoutSeconds: 200,
@@ -129,9 +149,6 @@ export const run_scheduler_frequent = onSchedule(
     await measureFunctionExecutionTime(async () => {
       // check if the simulator should start or increment the round
       await tradingSimulatorStateVerification();
-
-      // check if there is any open order to execute
-      await outstandingOrdersExecuteAll();
     });
   },
 );
