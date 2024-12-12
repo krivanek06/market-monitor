@@ -1,7 +1,6 @@
 import {
-  DATE_TOO_OLD,
-  HISTORICAL_PRICE_RESTRICTION_YEARS,
   OutstandingOrder,
+  PortfolioState,
   PortfolioStateHoldingBase,
   PortfolioTransaction,
   PortfolioTransactionMore,
@@ -12,13 +11,11 @@ import {
   USER_HOLDINGS_SYMBOL_LIMIT,
   USER_NOT_ENOUGH_CASH_ERROR,
   USER_NOT_UNITS_ON_HAND_ERROR,
-  UserAccountEnum,
   UserBaseMin,
-  UserData,
 } from '@mm/api-types';
 import { isBefore } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
-import { dateGetDetailsInformationFromDate, getCurrentDateDetailsFormat } from './date-service.util';
+import { getCurrentDateDetailsFormat } from './date-service.util';
 import { calculateGrowth, roundNDigits } from './general-function.util';
 
 /**
@@ -142,17 +139,11 @@ export const getTransactionFees = (unitPrice: number, units: number) =>
  * @param currentPrice - current price of the symbol
  * @param userData - user who wants to create the transaction
  */
-export const checkTransactionOperationDataValidity = (userData: UserData, order: OutstandingOrder): void => {
-  // check if the user who creates the order is the same as the user in the order
-  if (order.userData.id !== userData.id) {
-    throw new Error('User does not have the order');
-  }
-
-  // only allow demo trading users to create orders
-  if (userData.userAccountType !== UserAccountEnum.DEMO_TRADING) {
-    throw new Error('User does not have the order');
-  }
-
+export const checkTransactionOperationDataValidity = (
+  portfolioState: PortfolioState,
+  holdingSnapshot: PortfolioStateHoldingBase[],
+  order: OutstandingOrder,
+): void => {
   // negative units
   if (order.units <= 0) {
     throw new Error(TRANSACTION_INPUT_UNITS_POSITIVE);
@@ -163,15 +154,6 @@ export const checkTransactionOperationDataValidity = (userData: UserData, order:
     throw new Error(TRANSACTION_INPUT_UNITS_INTEGER);
   }
 
-  // get year data form input and today
-  const { year: inputYear } = dateGetDetailsInformationFromDate(order.createdAt);
-  const { year: todayYear } = dateGetDetailsInformationFromDate(new Date());
-
-  // prevent loading more than N year of asset data - just in case
-  if (todayYear - inputYear > HISTORICAL_PRICE_RESTRICTION_YEARS) {
-    throw new Error(DATE_TOO_OLD);
-  }
-
   // calculate total value
   const potentialFees = getTransactionFeesBySpending(order.potentialTotalPrice);
   const totalValue = order.potentialTotalPrice + potentialFees;
@@ -179,20 +161,20 @@ export const checkTransactionOperationDataValidity = (userData: UserData, order:
   // BUY order
   if (order.orderType.type === 'BUY') {
     // check if user has enough cash on hand if BUY and cashAccountActive
-    if (userData.portfolioState.cashOnHand < totalValue) {
+    if (portfolioState.cashOnHand < totalValue) {
       throw new Error(USER_NOT_ENOUGH_CASH_ERROR);
     }
 
     // check if user can buy this symbol - will not go over limit
-    const hasInHolding = userData.holdingSnapshot.data.find((d) => d.symbol === order.symbol);
-    if (!hasInHolding && userData.holdingSnapshot.data.length >= USER_HOLDINGS_SYMBOL_LIMIT) {
+    const hasInHolding = holdingSnapshot.find((d) => d.symbol === order.symbol);
+    if (!hasInHolding && holdingSnapshot.length >= USER_HOLDINGS_SYMBOL_LIMIT) {
       throw new Error(USER_HOLDING_LIMIT_ERROR);
     }
   }
   // SELL order
   else if (order.orderType.type === 'SELL') {
     // check if user has any holdings of that symbol
-    const symbolHoldings = userData.holdingSnapshot.data.find((d) => d.symbol === order.symbol);
+    const symbolHoldings = holdingSnapshot.find((d) => d.symbol === order.symbol);
 
     // check if user has enough units on hand if SELL
     if ((symbolHoldings?.units ?? -1) < order.units) {

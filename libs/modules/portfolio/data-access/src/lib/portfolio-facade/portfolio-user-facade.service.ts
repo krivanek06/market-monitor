@@ -66,16 +66,15 @@ export class PortfolioUserFacadeService {
     const orders = this.authenticationUserService.state.outstandingOrders();
 
     // check if operation validity - throws error if invalid
-    checkTransactionOperationDataValidity(userData, order);
+    checkTransactionOperationDataValidity(userData.portfolioState, userData.holdingSnapshot.data, order);
 
     // prevent creating more orders than allowed
     if (orders.openOrders.length >= OUTSTANDING_ORDERS_MAX_ORDERS) {
       throw new Error(OUTSTANDING_ORDER_MAX_ALLOWED);
     }
 
+    // add the order
     this.authenticationUserService.addOutstandingOrder(order);
-
-    return order;
   }
 
   deleteOrder(order: OutstandingOrder) {

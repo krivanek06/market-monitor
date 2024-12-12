@@ -137,7 +137,7 @@ export const tradingSimulatorOnNextRound = async (simulator: TradingSimulator) =
   const participantsUpdatedSorted = participants
     .map((participant) => {
       // create a portfolio holding from transactions
-      const portfolioStateHolding = getPortfolioStateHoldingsUtil(participant.transactions, symbolPriceQuoteFormat, []);
+      const portfolioStateHolding = getPortfolioStateHoldingsUtil(participant.transactions, symbolPriceQuoteFormat);
 
       // convert to a  portfolio state
       const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHolding);

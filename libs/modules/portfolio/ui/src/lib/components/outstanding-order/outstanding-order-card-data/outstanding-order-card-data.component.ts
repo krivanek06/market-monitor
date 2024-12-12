@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { IsStockMarketOpenExtend, OutstandingOrder } from '@mm/api-types';
 import { getTransactionFeesBySpending } from '@mm/shared/general-util';
 import { DefaultImgDirective, GeneralCardComponent } from '@mm/shared/ui';
-import { roundToNearestMinutes } from 'date-fns';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-outstanding-order-card-data',
@@ -63,7 +63,7 @@ import { roundToNearestMinutes } from 'date-fns';
       <div>
         <div class="g-item-wrapper">
           <span>Executes At</span>
-          <span>{{ executionTime() | date: 'HH:mm MMM d, y' }}</span>
+          <span>{{ executionTime() }}</span>
         </div>
 
         <div class="g-item-wrapper">
@@ -98,6 +98,7 @@ export class OutstandingOrderCardDataComponent {
   readonly potentialFees = computed(() => getTransactionFeesBySpending(this.order().potentialTotalPrice));
   readonly executionTime = computed(() => {
     const marketOpen = this.marketOpen();
+    const order = this.order();
 
     // not provided market data
     if (!marketOpen) {
@@ -107,17 +108,17 @@ export class OutstandingOrderCardDataComponent {
     const now = new Date();
 
     // market hasn't opened yet
-    if (!marketOpen.isTheStockMarketOpen) {
+    if (order.symbolType !== 'CRYPTO' && !marketOpen.isTheStockMarketOpen) {
       const openingHour = marketOpen.stockMarketHoursLocal.openingHour;
       // format opening hour to date
       const [hour, minute] = openingHour.split(':').map(Number);
       const openingDate = new Date(now);
       openingDate.setHours(hour, minute, 0, 0);
-      return openingDate.toString();
+      return format(openingDate.toString(), 'HH:mm MMM d, y');
     }
 
     // market is open, round to nearest 5 minutes
-    return roundToNearestMinutes(now, { nearestTo: 5 });
+    return 'Soon...';
   });
 
   onDelete() {

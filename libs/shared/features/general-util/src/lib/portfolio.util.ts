@@ -178,7 +178,11 @@ export const getPortfolioStateHoldingBaseByTransactionsUtil = (
         existingHolding.invested += roundNDigits(
           isSell ? -(existingHolding.breakEvenPrice * curr.units) : curr.unitPrice * curr.units,
         );
-        existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units);
+
+        if (!isSell) {
+          existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units);
+        }
+
         return acc;
       }
 
@@ -220,63 +224,19 @@ export const getPortfolioStateHoldingBaseByTransactionsUtil = (
 };
 
 /**
- * make sure to run portfolio validation before calling this function
  *
  * @param currentPortfolio - current portfolio state
- * @param currentHoldings - current holdings for the user
- * @param openOrders - open orders for the user
  * @param transaction - newly created transaction
- * @returns - updated portfolio and holdings
+ * @returns - updated portfolio by new transaction
  */
-export const getPortfolioStateHoldingBaseByNewTransactionUtil = (
+export const getPortfolioStateByNewTransactionUtil = (
   currentPortfolio: PortfolioState,
-  currentHoldings: PortfolioStateHoldingBase[],
-  openOrders: OutstandingOrder[],
   transaction: PortfolioTransaction,
-): {
-  updatedPortfolio: PortfolioState;
-  updatedHoldings: PortfolioStateHoldingBase[];
-} => {
-  const holding = currentHoldings.find((d) => d.symbol === transaction.symbol);
-  const holdingExists = !!holding;
-
-  // if holding does not exist, create a new one
-  const holdingCopy =
-    holding ??
-    ({
-      symbol: transaction.symbol,
-      sector: transaction.sector,
-      symbolType: transaction.symbolType,
-      breakEvenPrice: 0,
-      invested: 0,
-      units: 0,
-    } satisfies PortfolioStateHoldingBase);
-
+): PortfolioState => {
   const isSell = transaction.transactionType === 'SELL';
-  const isCrypto = transaction.symbolType === 'CRYPTO';
   const totalPrice = roundNDigits(transaction.unitPrice * transaction.units);
 
-  // calculate new holding values
-  const newHoldingUnits = holdingCopy.units + (isSell ? -transaction.units : transaction.units);
-  const newHoldingInvested = holdingCopy.invested + (isSell ? -totalPrice : totalPrice);
-  const newHoldingBreakEvenPrice = newHoldingInvested / newHoldingUnits;
-
-  // update holding
-  holdingCopy.units = isCrypto ? roundNDigits(newHoldingUnits, 4) : Math.floor(newHoldingUnits);
-  holdingCopy.invested = roundNDigits(newHoldingInvested);
-  holdingCopy.breakEvenPrice = roundNDigits(newHoldingBreakEvenPrice, 4);
-
-  // calculate new portfolio values
-  const cashOnOrders = openOrders
-    .filter((d) => d.orderType.type === 'BUY')
-    .reduce((acc, curr) => acc + curr.potentialTotalPrice, 0);
-
-  // update holdings
-  const updatedHoldings = holdingExists
-    ? currentHoldings.map((d) => (d.symbol === transaction.symbol ? holdingCopy : d))
-    : [holdingCopy, ...currentHoldings];
-
-  const newInvested = roundNDigits(updatedHoldings.reduce((acc, curr) => acc + curr.invested, 0));
+  const newInvested = currentPortfolio.invested + (isSell ? -totalPrice : totalPrice);
   const newHoldingsBalance = currentPortfolio.holdingsBalance + (isSell ? -totalPrice : totalPrice);
   const newNumberOfExecutedBuyTransactions = currentPortfolio.numberOfExecutedBuyTransactions + (isSell ? 0 : 1);
   const newNumberOfExecutedSellTransactions = currentPortfolio.numberOfExecutedSellTransactions + (isSell ? 1 : 0);
@@ -284,14 +244,10 @@ export const getPortfolioStateHoldingBaseByNewTransactionUtil = (
   const newTransactionProfit = currentPortfolio.transactionProfit + transaction.returnValue;
 
   const newCashOnHand =
-    currentPortfolio.startingCash -
-    newInvested -
-    cashOnOrders +
-    currentPortfolio.transactionProfit - // don't account current transaction profit
-    newTransactionFees;
+    currentPortfolio.startingCash - newInvested + currentPortfolio.transactionProfit - newTransactionFees;
 
   // add spent cash on open orders into balance to avoid negative balance
-  const newBalance = newHoldingsBalance + newCashOnHand + cashOnOrders;
+  const newBalance = newHoldingsBalance + newCashOnHand;
 
   // update portfolio
   const updatedPortfolio = {
@@ -309,10 +265,7 @@ export const getPortfolioStateHoldingBaseByNewTransactionUtil = (
   } satisfies PortfolioState;
 
   // return results
-  return {
-    updatedPortfolio,
-    updatedHoldings,
-  };
+  return updatedPortfolio;
 };
 
 /**

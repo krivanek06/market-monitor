@@ -1,17 +1,7 @@
 import { inject, Injectable, InjectionToken } from '@angular/core';
 import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
-import {
-  OutstandingOrder,
-  PortfolioTransaction,
-  SymbolStoreBase,
-  UserAccountBasicTypes,
-  UserData,
-} from '@mm/api-types';
-import {
-  getCurrentDateDefaultFormat,
-  getPortfolioStateHoldingBaseByNewTransactionUtil,
-  roundNDigits,
-} from '@mm/shared/general-util';
+import { OutstandingOrder, SymbolStoreBase, UserAccountBasicTypes, UserData } from '@mm/api-types';
+import { getCurrentDateDefaultFormat, roundNDigits } from '@mm/shared/general-util';
 import { AuthenticationUserService } from '../authentication-user/authentication-user.service';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationUserStoreService>(
@@ -101,43 +91,6 @@ export class AuthenticationUserStoreService {
 
   recalculatePortfolioState(): Promise<boolean> {
     return this.userApiService.recalculateUserPortfolioState(this.state.getUserData());
-  }
-
-  /**
-   * adds a transaction to the user's portfolio - updates the user's portfolio state and holdings
-   * don't forget to VALIDATE transaction before calling this function
-   *
-   * @param transaction - transaction to add to the portfolio
-   */
-  addPortfolioTransactions(transaction: PortfolioTransaction): void {
-    const user = this.state.getUserData();
-    const openOrders = this.state.outstandingOrders().openOrders;
-    const openOrdersSymbols = openOrders.map((d) => d.symbol);
-
-    // save transaction
-    this.userApiService.addUserPortfolioTransactions(this.state.getUserData().id, transaction);
-
-    // recalculate portfolio state
-    const { updatedPortfolio, updatedHoldings } = getPortfolioStateHoldingBaseByNewTransactionUtil(
-      user.portfolioState,
-      user.holdingSnapshot.data,
-      openOrders,
-      transaction,
-    );
-
-    // remove holdings with 0 units if it's not in open orders
-    const updatedHoldingsFiltered = updatedHoldings.filter(
-      (holding) => holding.units > 0 || openOrdersSymbols.includes(holding.symbol),
-    );
-
-    // update user
-    this.userApiService.updateUser(user.id, {
-      portfolioState: updatedPortfolio,
-      holdingSnapshot: {
-        lastModifiedDate: getCurrentDateDefaultFormat(),
-        data: updatedHoldingsFiltered,
-      },
-    });
   }
 
   /**

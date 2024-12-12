@@ -15,7 +15,7 @@ import {
   createEmptyPortfolioState,
   getPortfolioGrowth,
   getPortfolioGrowthAssets,
-  getPortfolioStateHoldingBaseByNewTransactionUtil,
+  getPortfolioStateByNewTransactionUtil,
   getPortfolioStateHoldingBaseByTransactionsUtil,
 } from '../portfolio.util';
 
@@ -502,7 +502,7 @@ describe('PortfolioUtil', () => {
       });
 
       // get result
-      const result = getPortfolioStateHoldingBaseByNewTransactionUtil(portfolio, holdings, openOrders, newTransaction);
+      const result = getPortfolioStateByNewTransactionUtil(portfolio, holdings, openOrders, newTransaction);
 
       // calculated results
       const resultCashOnHand = roundNDigits(
@@ -565,14 +565,14 @@ describe('PortfolioUtil', () => {
       });
 
       // create multiple results
-      const tmpRes1 = getPortfolioStateHoldingBaseByNewTransactionUtil(portfolio, holdings, openOrders, buyT1);
-      const tmpRes2 = getPortfolioStateHoldingBaseByNewTransactionUtil(
+      const tmpRes1 = getPortfolioStateByNewTransactionUtil(portfolio, holdings, openOrders, buyT1);
+      const tmpRes2 = getPortfolioStateByNewTransactionUtil(
         tmpRes1.updatedPortfolio,
         tmpRes1.updatedHoldings,
         openOrders,
         sellT1,
       );
-      const result = getPortfolioStateHoldingBaseByNewTransactionUtil(
+      const result = getPortfolioStateByNewTransactionUtil(
         tmpRes2.updatedPortfolio,
         tmpRes2.updatedHoldings,
         openOrders,
@@ -659,7 +659,7 @@ describe('PortfolioUtil', () => {
       });
 
       // get result
-      const result = getPortfolioStateHoldingBaseByNewTransactionUtil(portfolio, holdings, openOrders, newTransaction);
+      const result = getPortfolioStateByNewTransactionUtil(portfolio, holdings, openOrders, newTransaction);
 
       // calculated results
       const resultCashOnHand = roundNDigits(

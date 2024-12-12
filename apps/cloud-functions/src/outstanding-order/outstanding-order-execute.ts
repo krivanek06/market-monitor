@@ -1,6 +1,6 @@
 import { getIsMarketOpenCF, getSymbolQuotesCF } from '@mm/api-external';
 import { OutstandingOrder, SymbolQuote } from '@mm/api-types';
-import { checkTransactionOperationDataValidity, createTransaction } from '@mm/shared/general-util';
+import { createTransaction } from '@mm/shared/general-util';
 import { isSameDay } from 'date-fns';
 import { firestore } from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -149,9 +149,6 @@ const outstandingOrderExecuteForUserId = async (
 
     // create transaction
     const potentialTransaction = createTransaction(userData, userData.holdingSnapshot.data, order, quote.price);
-
-    // make some validations here
-    checkTransactionOperationDataValidity(userData, order);
 
     // check if user has enough money
     if (

@@ -14,17 +14,15 @@ import {
   TradingSimulatorGeneralActions,
   TradingSimulatorGeneralActionsType,
   TradingSimulatorParticipant,
-  USER_NOT_ENOUGH_CASH_ERROR,
   USER_NOT_FOUND_ERROR,
-  USER_NOT_UNITS_ON_HAND_ERROR,
   UserBaseMin,
 } from '@mm/api-types';
 import {
+  checkTransactionOperationDataValidity,
   createEmptyPortfolioState,
   createTransactionMoreInfo,
-  getPortfolioStateHoldingBaseByNewTransactionUtil,
+  getPortfolioStateByNewTransactionUtil,
   getPortfolioStateHoldingBaseByTransactionsUtil,
-  getTransactionFees,
   roundNDigits,
   transformUserToBaseMin,
 } from '@mm/shared/general-util';
@@ -219,30 +217,15 @@ const createOutstandingOrder = async (
     }
 
     const participantHoldings = getPortfolioStateHoldingBaseByTransactionsUtil(participant.transactions);
-    const transactionFees = getTransactionFees(symbolData.price, data.order.units);
-    const totalValue = data.order.units * symbolData.price + transactionFees;
+
+    // check for some validation
+    checkTransactionOperationDataValidity(participant.portfolioState, participantHoldings, data.order);
 
     // BUY order
     if (data.order.orderType.type === 'BUY') {
-      // check if user has enough cash on hand if BUY and cashAccountActive
-      if (participant.portfolioState.cashOnHand < totalValue) {
-        throw new HttpsError('aborted', USER_NOT_ENOUGH_CASH_ERROR);
-      }
-
       // check if there is enough units to buy
       if (!symbolData.unitsInfinity && symbolData.unitsCurrentlyAvailable < data.order.units) {
         throw new HttpsError('aborted', SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL);
-      }
-    }
-
-    // SELL order
-    else if (data.order.orderType.type === 'SELL') {
-      // check if user has any holdings of that symbol
-      const symbolHoldings = participantHoldings.find((d) => d.symbol === symbolData.symbol);
-
-      // check if user has enough units on hand if SELL
-      if ((symbolHoldings?.units ?? -1) < data.order.units) {
-        throw new HttpsError('aborted', USER_NOT_UNITS_ON_HAND_ERROR);
       }
     }
 
@@ -256,12 +239,16 @@ const createOutstandingOrder = async (
     transaction.date = String(simulator.currentRound);
 
     // recalculate portfolio state
-    const { updatedPortfolio } = getPortfolioStateHoldingBaseByNewTransactionUtil(
-      participant.portfolioState,
-      participantHoldings,
-      [],
+    const updatedPortfolio = getPortfolioStateByNewTransactionUtil(participant.portfolioState, transaction);
+
+    // calculate holdings again with the new transaction
+    const updatedHoldingsInvested = getPortfolioStateHoldingBaseByTransactionsUtil([
+      ...participant.transactions,
       transaction,
-    );
+    ]).reduce((acc, curr) => acc + curr.invested, 0);
+
+    // update invested value - incorrect number is calculated by getPortfolioStateByNewTransactionUtil
+    updatedPortfolio.invested = updatedHoldingsInvested;
 
     // get additional cash issued on all previous rounds
     const additionalCashOnRound = simulator.cashAdditionalIssued
