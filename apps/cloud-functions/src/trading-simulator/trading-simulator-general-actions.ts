@@ -2,6 +2,7 @@ import {
   DATA_NOT_FOUND_ERROR,
   FieldValueAll,
   FieldValuePartial,
+  PortfolioTransactionMore,
   SIMULATOR_NOT_ENOUGH_UNITS_TO_SELL,
   SIMULATOR_PARTICIPANT_DIFFERENT_USER,
   SIMULATOR_PARTICIPANT_NOT_FOUND,
@@ -21,8 +22,8 @@ import {
   checkTransactionOperationDataValidity,
   createEmptyPortfolioState,
   createTransactionMoreInfo,
-  getPortfolioStateByNewTransactionUtil,
   getPortfolioStateHoldingBaseByTransactionsUtil,
+  recalculatePortfolioStateByTransactions,
   roundNDigits,
   transformUserToBaseMin,
 } from '@mm/shared/general-util';
@@ -230,25 +231,17 @@ const createOutstandingOrder = async (
     }
 
     // transform to transaction
-    const transaction = createTransactionMoreInfo(
-      participant.userData,
-      participantHoldings,
-      data.order,
-      symbolData.price,
-    );
-    transaction.date = String(simulator.currentRound);
+    const transaction = {
+      ...createTransactionMoreInfo(participant.userData, participantHoldings, data.order, symbolData.price),
+      date: String(simulator.currentRound),
+    } satisfies PortfolioTransactionMore;
 
     // recalculate portfolio state
-    const updatedPortfolio = getPortfolioStateByNewTransactionUtil(participant.portfolioState, transaction);
-
-    // calculate holdings again with the new transaction
-    const updatedHoldingsInvested = getPortfolioStateHoldingBaseByTransactionsUtil([
-      ...participant.transactions,
+    const updatedPortfolio = recalculatePortfolioStateByTransactions(
+      participant.portfolioState,
       transaction,
-    ]).reduce((acc, curr) => acc + curr.invested, 0);
-
-    // update invested value - incorrect number is calculated by getPortfolioStateByNewTransactionUtil
-    updatedPortfolio.invested = updatedHoldingsInvested;
+      participant.transactions,
+    );
 
     // get additional cash issued on all previous rounds
     const additionalCashOnRound = simulator.cashAdditionalIssued

@@ -301,7 +301,7 @@ export class CreateDemoAccountService {
     } satisfies Partial<UserData>);
 
     // calculation risk of investment but don't wait for it
-    userPortfolioRisk(portfolioStateHoldings).then((portfolioRisk) => {
+    userPortfolioRisk(portfolioStateHoldings.holdings).then((portfolioRisk) => {
       console.log('Portfolio risk calculated');
       // update portfolio risk
       userDocumentRef(userData.id).update({

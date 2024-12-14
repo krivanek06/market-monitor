@@ -4,7 +4,6 @@ import {
   PortfolioGrowth,
   PortfolioGrowthAssets,
   PortfolioState,
-  PortfolioStateHoldingBase,
   testHistoricalPriceSymbol_AAPL,
   testHistoricalPriceSymbol_MSFT,
   TestTransactionDates,
@@ -15,8 +14,8 @@ import {
   createEmptyPortfolioState,
   getPortfolioGrowth,
   getPortfolioGrowthAssets,
-  getPortfolioStateByNewTransactionUtil,
   getPortfolioStateHoldingBaseByTransactionsUtil,
+  recalculatePortfolioStateByTransactions,
 } from '../portfolio.util';
 
 describe('PortfolioUtil', () => {
@@ -425,7 +424,7 @@ describe('PortfolioUtil', () => {
           symbol: 'AAPL',
           sector: 'Technology',
           units: 15,
-          invested: 1650,
+          invested: 1810,
           breakEvenPrice: 110,
         },
         {
@@ -471,7 +470,7 @@ describe('PortfolioUtil', () => {
           symbol: 'AAPL',
           sector: 'Technology',
           units: 10,
-          invested: 1650,
+          invested: 1810,
           breakEvenPrice: 110,
         },
         {
@@ -486,11 +485,9 @@ describe('PortfolioUtil', () => {
     });
   });
 
-  describe('test: getPortfolioStateHoldingBaseByNewTransactionUtil()', () => {
-    it('should return values for empty portfolio, no open orders, no holdings', () => {
+  describe('test: recalculatePortfolioStateByTransactions()', () => {
+    it('should return values for empty portfolio', () => {
       const portfolio = createEmptyPortfolioState();
-      const holdings = [] as PortfolioStateHoldingBase[];
-      const openOrders = [] as OutstandingOrder[];
       const newTransaction = mockPortfolioTransaction({
         symbol: 'AAPL',
         units: 10,
@@ -502,7 +499,7 @@ describe('PortfolioUtil', () => {
       });
 
       // get result
-      const result = getPortfolioStateByNewTransactionUtil(portfolio, holdings, openOrders, newTransaction);
+      const result = recalculatePortfolioStateByTransactions(portfolio, newTransaction, []);
 
       // calculated results
       const resultCashOnHand = roundNDigits(
@@ -511,7 +508,7 @@ describe('PortfolioUtil', () => {
       const resultHoldingsBalance = roundNDigits(newTransaction.units * newTransaction.unitPrice);
 
       // check portfolio state
-      expect(result.updatedPortfolio).toEqual({
+      expect(result).toEqual({
         ...portfolio,
         cashOnHand: resultCashOnHand,
         holdingsBalance: resultHoldingsBalance,
@@ -521,24 +518,10 @@ describe('PortfolioUtil', () => {
         transactionFees: newTransaction.transactionFees,
         totalGainsValue: roundNDigits(resultCashOnHand + resultHoldingsBalance), // subtracted fees
       } satisfies PortfolioState);
-
-      // check holdings
-      expect(result.updatedHoldings).toEqual([
-        {
-          symbol: newTransaction.symbol,
-          units: newTransaction.units,
-          sector: newTransaction.sector,
-          symbolType: newTransaction.symbolType,
-          invested: roundNDigits(newTransaction.units * newTransaction.unitPrice),
-          breakEvenPrice: newTransaction.unitPrice,
-        } satisfies PortfolioStateHoldingBase,
-      ]);
     });
 
     it('should update holding and portfolio for multiple transactions', () => {
       const portfolio = createEmptyPortfolioState(10_000);
-      const holdings = [] as PortfolioStateHoldingBase[];
-      const openOrders = [] as OutstandingOrder[];
       const buyT1 = mockPortfolioTransaction({
         symbol: 'AAPL',
         units: 10,
@@ -565,19 +548,44 @@ describe('PortfolioUtil', () => {
       });
 
       // create multiple results
-      const tmpRes1 = getPortfolioStateByNewTransactionUtil(portfolio, holdings, openOrders, buyT1);
-      const tmpRes2 = getPortfolioStateByNewTransactionUtil(
-        tmpRes1.updatedPortfolio,
-        tmpRes1.updatedHoldings,
-        openOrders,
-        sellT1,
+      const tmpRes1 = recalculatePortfolioStateByTransactions(portfolio, buyT1, []);
+
+      // verify first transaction
+      const tmpRes1Total = buyT1.units * buyT1.unitPrice;
+      const tmpRes1CashOnHand = roundNDigits(portfolio.startingCash - tmpRes1Total - buyT1.transactionFees);
+      expect(tmpRes1).toEqual({
+        ...portfolio,
+        cashOnHand: tmpRes1CashOnHand,
+        holdingsBalance: roundNDigits(tmpRes1Total),
+        invested: roundNDigits(tmpRes1Total),
+        balance: roundNDigits(tmpRes1CashOnHand + tmpRes1Total),
+        numberOfExecutedBuyTransactions: 1,
+        transactionFees: buyT1.transactionFees,
+        totalGainsValue: roundNDigits(tmpRes1CashOnHand + tmpRes1Total - portfolio.startingCash),
+        totalGainsPercentage: calculateGrowth(tmpRes1CashOnHand + tmpRes1Total, portfolio.startingCash),
+      } satisfies PortfolioState);
+
+      const tmpRes2 = recalculatePortfolioStateByTransactions(tmpRes1, sellT1, [buyT1]);
+
+      // verify second transaction
+      const tmpRes2Total = buyT1.units * buyT1.unitPrice - sellT1.units * sellT1.unitPrice;
+      const tmpRes2CashOnHand = roundNDigits(
+        portfolio.startingCash - tmpRes2Total - buyT1.transactionFees - sellT1.transactionFees,
       );
-      const result = getPortfolioStateByNewTransactionUtil(
-        tmpRes2.updatedPortfolio,
-        tmpRes2.updatedHoldings,
-        openOrders,
-        buyT2,
-      );
+      expect(tmpRes2).toEqual({
+        ...portfolio,
+        cashOnHand: tmpRes2CashOnHand,
+        holdingsBalance: roundNDigits(tmpRes2Total),
+        invested: roundNDigits(tmpRes2Total),
+        balance: roundNDigits(tmpRes2CashOnHand + tmpRes2Total),
+        numberOfExecutedBuyTransactions: 1,
+        numberOfExecutedSellTransactions: 1,
+        transactionFees: buyT1.transactionFees + sellT1.transactionFees,
+        totalGainsValue: roundNDigits(tmpRes2CashOnHand + tmpRes2Total - portfolio.startingCash),
+        totalGainsPercentage: calculateGrowth(tmpRes2CashOnHand + tmpRes2Total, portfolio.startingCash),
+      } satisfies PortfolioState);
+
+      const result = recalculatePortfolioStateByTransactions(tmpRes2, buyT2, [buyT1, sellT1]);
 
       // calculated results
       const expectedCashOnHand = roundNDigits(
@@ -595,7 +603,7 @@ describe('PortfolioUtil', () => {
       const expectedBalance = roundNDigits(expectedCashOnHand + expectedHoldingsBalance);
 
       // check portfolio state
-      expect(result.updatedPortfolio).toEqual({
+      expect(result).toEqual({
         ...portfolio,
         cashOnHand: expectedCashOnHand,
         holdingsBalance: expectedHoldingsBalance,
@@ -607,36 +615,12 @@ describe('PortfolioUtil', () => {
         totalGainsValue: roundNDigits(expectedBalance - portfolio.startingCash),
         totalGainsPercentage: calculateGrowth(expectedBalance, portfolio.startingCash),
       } satisfies PortfolioState);
-
-      // check holdings
-      expect(result.updatedHoldings).toEqual([
-        {
-          symbol: buyT2.symbol,
-          units: buyT1.units - sellT1.units + buyT2.units,
-          sector: buyT2.sector,
-          symbolType: buyT2.symbolType,
-          invested: expectedHoldingsBalance,
-          breakEvenPrice: roundNDigits(expectedHoldingsBalance / (buyT1.units - sellT1.units + buyT2.units)),
-        } satisfies PortfolioStateHoldingBase,
-      ]);
     });
 
     it('should reduce cash on hand by open orders', () => {
       const portfolio = {
         ...createEmptyPortfolioState(10_000),
-        invested: 500,
-        holdingsBalance: 1000,
       } satisfies PortfolioState;
-      const holdings = [
-        {
-          symbol: 'AAPL',
-          invested: 1000,
-          breakEvenPrice: 100,
-          units: 10,
-          symbolType: 'STOCK',
-          sector: 'Technology',
-        },
-      ] as PortfolioStateHoldingBase[];
       const openOrders = [
         {
           displaySymbol: 'MSFT',
@@ -649,54 +633,36 @@ describe('PortfolioUtil', () => {
       ] as OutstandingOrder[];
       const newTransaction = mockPortfolioTransaction({
         symbol: 'AAPL',
-        units: 5,
+        units: 0,
         sector: 'Technology',
         symbolType: 'STOCK',
-        transactionFees: 3.25,
-        transactionType: 'SELL',
-        unitPrice: 100,
-        returnValue: 500,
+        transactionFees: 0,
+        transactionType: 'BUY',
+        unitPrice: 0,
+        returnValue: 0,
       });
 
       // get result
-      const result = getPortfolioStateByNewTransactionUtil(portfolio, holdings, openOrders, newTransaction);
+      const result = recalculatePortfolioStateByTransactions(portfolio, newTransaction, [], openOrders);
 
       // calculated results
-      const resultCashOnHand = roundNDigits(
-        portfolio.startingCash -
-          holdings[0].invested -
-          newTransaction.transactionFees -
-          openOrders[0].potentialTotalPrice,
-      );
-      const resultHoldingsBalance = roundNDigits(newTransaction.units * newTransaction.unitPrice);
-      const resultBalance = resultCashOnHand + resultHoldingsBalance + openOrders[0].potentialTotalPrice;
+      const resultCashOnHand = roundNDigits(portfolio.startingCash - openOrders[0].potentialTotalPrice);
+      const resultBalance = resultCashOnHand + openOrders[0].potentialTotalPrice;
 
       // check portfolio state
-      expect(result.updatedPortfolio).toEqual({
+      expect(result).toEqual({
         ...portfolio,
         cashOnHand: resultCashOnHand,
-        holdingsBalance: resultHoldingsBalance,
+        holdingsBalance: 0,
         invested: portfolio.invested,
         balance: roundNDigits(resultBalance),
-        numberOfExecutedBuyTransactions: 0,
-        numberOfExecutedSellTransactions: 1,
+        numberOfExecutedBuyTransactions: 1,
+        numberOfExecutedSellTransactions: 0,
         totalGainsValue: roundNDigits(resultBalance - portfolio.startingCash),
         totalGainsPercentage: calculateGrowth(resultBalance, portfolio.startingCash),
         transactionFees: newTransaction.transactionFees,
         transactionProfit: newTransaction.returnValue,
       } satisfies PortfolioState);
-
-      // check holdings
-      expect(result.updatedHoldings).toEqual([
-        {
-          symbol: newTransaction.symbol,
-          units: newTransaction.units,
-          sector: newTransaction.sector,
-          symbolType: newTransaction.symbolType,
-          invested: roundNDigits(newTransaction.units * newTransaction.unitPrice),
-          breakEvenPrice: newTransaction.unitPrice,
-        } satisfies PortfolioStateHoldingBase,
-      ]);
     });
   });
 

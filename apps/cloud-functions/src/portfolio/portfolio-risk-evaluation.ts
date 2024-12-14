@@ -2,7 +2,7 @@ import { getHistoricalPricesCF, getTreasuryRates } from '@mm/api-external';
 import {
   HistoricalPrice,
   PortfolioRisk,
-  PortfolioStateHoldings,
+  PortfolioStateHolding,
   SYMBOL_SP500,
   SymbolHistoricalPeriods,
 } from '@mm/api-types';
@@ -20,9 +20,9 @@ type SymbolReturns = {
  */
 const symbolReturnMap = new Map<string, SymbolReturns>();
 
-export const userPortfolioRisk = async (portfolioState: PortfolioStateHoldings): Promise<PortfolioRisk> => {
+export const userPortfolioRisk = async (holdings: PortfolioStateHolding[]): Promise<PortfolioRisk> => {
   // user has no holdings
-  if (portfolioState.holdings.length === 0) {
+  if (holdings.length === 0) {
     return createEmptyPortfolioRisk();
   }
 
@@ -32,14 +32,14 @@ export const userPortfolioRisk = async (portfolioState: PortfolioStateHoldings):
     const riskFreeRate = treasureData.at(0)?.month3 ?? 4.5; // fallback 4.5% treasury
 
     // preload all symbol data and save to cache
-    const symbolDataPromises = portfolioState.holdings.map((holding) => getSymbolPricesAndReturn(holding.symbol));
+    const symbolDataPromises = holdings.map((holding) => getSymbolPricesAndReturn(holding.symbol));
     await Promise.all(symbolDataPromises);
 
     // calculate metrics
-    const { beta, alpha, sharpe } = await calculateMetricsForAllHoldings(portfolioState, sp500Data, riskFreeRate);
+    const { beta, alpha, sharpe } = await calculateMetricsForAllHoldings(holdings, sp500Data, riskFreeRate);
 
     // calculate portfolio volatility
-    const volatility = await calculatePortfolioVolatility(portfolioState);
+    const volatility = await calculatePortfolioVolatility(holdings);
 
     return {
       beta,
@@ -55,7 +55,7 @@ export const userPortfolioRisk = async (portfolioState: PortfolioStateHoldings):
 };
 
 export const calculateMetricsForAllHoldings = async (
-  portfolioState: PortfolioStateHoldings,
+  holdings: PortfolioStateHolding[],
   sp500Data: SymbolReturns,
   riskFreeRate: number,
 ): Promise<{
@@ -73,7 +73,7 @@ export const calculateMetricsForAllHoldings = async (
     sharpe: 0,
   };
 
-  for (const holding of portfolioState.holdings) {
+  for (const holding of holdings) {
     const symbolData = await getSymbolPricesAndReturn(holding.symbol);
 
     const [sp500DataSlice, symbolDataSlice] = createSymbolReturnSlices(sp500Data, symbolData);
@@ -153,9 +153,9 @@ const getSymbolPricesAndReturn = async (symbol: string): Promise<SymbolReturns> 
   }
 };
 
-const calculatePortfolioVolatility = async (portfolioState: PortfolioStateHoldings): Promise<number> => {
+const calculatePortfolioVolatility = async (holdings: PortfolioStateHolding[]): Promise<number> => {
   // Assuming holdings is an array of { symbol, weight }
-  const totalWeights = portfolioState.holdings.reduce((total, holding) => total + holding.weight, 0);
+  const totalWeights = holdings.reduce((total, holding) => total + holding.weight, 0);
 
   // happens when no holdings
   if (totalWeights === 0) {
@@ -165,12 +165,12 @@ const calculatePortfolioVolatility = async (portfolioState: PortfolioStateHoldin
   let portfolioVariance = 0;
 
   // Calculate portfolio variance
-  for (let i = 0; i < portfolioState.holdings.length; i++) {
-    for (let j = 0; j < portfolioState.holdings.length; j++) {
-      const weightI = portfolioState.holdings[i].weight;
-      const weightJ = portfolioState.holdings[j].weight;
-      const symbolReturnI = await getSymbolPricesAndReturn(portfolioState.holdings[i].symbol);
-      const symbolReturnJ = await getSymbolPricesAndReturn(portfolioState.holdings[j].symbol);
+  for (let i = 0; i < holdings.length; i++) {
+    for (let j = 0; j < holdings.length; j++) {
+      const weightI = holdings[i].weight;
+      const weightJ = holdings[j].weight;
+      const symbolReturnI = await getSymbolPricesAndReturn(holdings[i].symbol);
+      const symbolReturnJ = await getSymbolPricesAndReturn(holdings[j].symbol);
 
       // make sure both data are the same length
       const [symbolReturnISlice, symbolReturnJSlice] = createSymbolReturnSlices(symbolReturnI, symbolReturnJ);

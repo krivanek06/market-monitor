@@ -68,7 +68,7 @@ export const calculateUserPortfolioStateByTransactions = async (userData: UserBa
     const portfolioState = transformPortfolioStateHoldingToPortfolioState(portfolioStateHoldings);
 
     // calculation risk of investment
-    const portfolioRisk = await userPortfolioRisk(portfolioStateHoldings);
+    const portfolioRisk = await userPortfolioRisk(portfolioStateHoldings.holdings);
 
     // log
     console.log(
