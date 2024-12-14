@@ -12,6 +12,7 @@ import { accountDescription } from '@mm/api-types';
 import { ChangePasswordDialogComponent } from '@mm/authentication/authentication-forms';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { UserAccountTypeDirective } from '@mm/authentication/feature-access-directive';
+import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import { IS_DEV_TOKEN, ROUTES_MAIN } from '@mm/shared/data-access';
 import { Confirmable, DialogServiceUtil, SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
 import { ThemeSwitcherComponent } from '@mm/shared/theme-switcher';
@@ -216,6 +217,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
 export class UserSettingsDialogComponent implements OnInit {
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly authenticationAccountService = inject(AuthenticationAccountService);
+  private readonly portfolioUserFacadeService = inject(PortfolioUserFacadeService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
@@ -355,7 +357,7 @@ export class UserSettingsDialogComponent implements OnInit {
     }
 
     // perform operation
-    this.authenticationUserStoreService.resetTransactions();
+    this.portfolioUserFacadeService.resetTransactions();
 
     // notify user
     this.dialogServiceUtil.showNotificationBar('Your account has been reset', 'success');
@@ -370,7 +372,7 @@ export class UserSettingsDialogComponent implements OnInit {
 
     try {
       this.dialogServiceUtil.showNotificationBar('Recalculating your portfolio');
-      await this.authenticationUserStoreService.recalculatePortfolioState();
+      await this.portfolioUserFacadeService.recalculatePortfolioState();
       this.dialogServiceUtil.showNotificationBar('Portfolio recalculated', 'success');
     } catch (error) {
       this.dialogServiceUtil.handleError(error);

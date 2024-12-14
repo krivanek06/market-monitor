@@ -175,9 +175,7 @@ export const getPortfolioStateHoldingBaseByTransactionsUtil = (
       if (existingHolding) {
         const newUnits = existingHolding.units + (isSell ? -curr.units : curr.units);
         existingHolding.units = isCrypto ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
-        existingHolding.invested += roundNDigits(
-          isSell ? -(existingHolding.breakEvenPrice * curr.units) : curr.unitPrice * curr.units,
-        );
+        existingHolding.invested += roundNDigits(curr.unitPrice * curr.units * (isSell ? -1 : 1));
 
         if (!isSell) {
           existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units);
@@ -226,28 +224,48 @@ export const getPortfolioStateHoldingBaseByTransactionsUtil = (
 /**
  *
  * @param currentPortfolio - current portfolio state
- * @param transaction - newly created transaction
+ * @param newTransaction - newly created transaction
+ * @param previousTransactions - all previous transactions
  * @returns - updated portfolio by new transaction
  */
-export const getPortfolioStateByNewTransactionUtil = (
+export const recalculatePortfolioStateByTransactions = (
   currentPortfolio: PortfolioState,
-  transaction: PortfolioTransaction,
+  newTransaction: PortfolioTransaction,
+  previousTransactions: PortfolioTransaction[],
+  orders: OutstandingOrder[] = [],
 ): PortfolioState => {
-  const isSell = transaction.transactionType === 'SELL';
-  const totalPrice = roundNDigits(transaction.unitPrice * transaction.units);
+  const isSell = newTransaction.transactionType === 'SELL';
+  const totalPrice = roundNDigits(newTransaction.unitPrice * newTransaction.units);
 
-  const newInvested = currentPortfolio.invested + (isSell ? -totalPrice : totalPrice);
+  // calculate if transaction was profit or loss and add into the balanace
+  const newInvestedDiff = currentPortfolio.invested + (isSell ? -totalPrice : totalPrice);
+
+  // calculate total invested value based on all transactions
+  const newInvested = getPortfolioStateHoldingBaseByTransactionsUtil([...previousTransactions, newTransaction]).reduce(
+    (acc, curr) => acc + curr.invested,
+    0,
+  );
+
   const newHoldingsBalance = currentPortfolio.holdingsBalance + (isSell ? -totalPrice : totalPrice);
   const newNumberOfExecutedBuyTransactions = currentPortfolio.numberOfExecutedBuyTransactions + (isSell ? 0 : 1);
   const newNumberOfExecutedSellTransactions = currentPortfolio.numberOfExecutedSellTransactions + (isSell ? 1 : 0);
-  const newTransactionFees = currentPortfolio.transactionFees + transaction.transactionFees;
-  const newTransactionProfit = currentPortfolio.transactionProfit + transaction.returnValue;
+  const newTransactionFees = currentPortfolio.transactionFees + newTransaction.transactionFees;
+  const newTransactionProfit = currentPortfolio.transactionProfit + newTransaction.returnValue;
+
+  // remove cash spent on open orders
+  const spentCashOnOpenOrders = orders
+    .filter((d) => d.orderType.type === 'BUY')
+    .reduce((acc, curr) => acc + curr.potentialTotalPrice, 0);
 
   const newCashOnHand =
-    currentPortfolio.startingCash - newInvested + currentPortfolio.transactionProfit - newTransactionFees;
+    currentPortfolio.startingCash -
+    newInvestedDiff +
+    currentPortfolio.transactionProfit -
+    newTransactionFees -
+    spentCashOnOpenOrders;
 
   // add spent cash on open orders into balance to avoid negative balance
-  const newBalance = newHoldingsBalance + newCashOnHand;
+  const newBalance = newHoldingsBalance + newCashOnHand + spentCashOnOpenOrders;
 
   // update portfolio
   const updatedPortfolio = {
@@ -362,11 +380,11 @@ export const getPortfolioStateHoldingsUtil = (
   transactions: PortfolioTransaction[],
   symbolQuotes: SymbolQuote[],
   openOrders: OutstandingOrder[] = [],
+  startingCash = USER_DEFAULT_STARTING_CASH,
 ): PortfolioStateHoldings => {
   const numberOfExecutedBuyTransactions = transactions.filter((t) => t.transactionType === 'BUY').length;
   const numberOfExecutedSellTransactions = transactions.filter((t) => t.transactionType === 'SELL').length;
   const transactionFees = transactions.reduce((acc, curr) => acc + curr.transactionFees, 0);
-  const startingCash = USER_DEFAULT_STARTING_CASH;
   const partialHoldings = getPortfolioStateHoldingBaseByTransactionsUtil(transactions);
 
   // value that user invested in all assets
