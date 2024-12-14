@@ -192,7 +192,7 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
     }
 
     <!-- divider -->
-    <div class="my-5">
+    <div class="my-5 max-lg:hidden">
       <mat-divider />
     </div>
 
@@ -200,7 +200,7 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
     <div class="mb-10 hidden lg:block">
       <app-section-title title="Top Active" matIcon="military_tech" />
 
-      <div class="grid grid-cols-3 gap-x-6 gap-y-2 p-4 xl:grid-cols-4 2xl:grid-cols-5">
+      <div class="grid grid-cols-3 gap-x-6 gap-y-2 p-4 xl:grid-cols-4">
         @for (item of topPerformanceSignal(); track item.symbol) {
           <div
             data-testid="page-trading-top-active-symbols-wrapper"
@@ -214,7 +214,7 @@ import { catchError, firstValueFrom, map, of, startWith, switchMap } from 'rxjs'
             <app-quote-item data-testid="page-trading-top-active-symbols" [symbolQuote]="item" />
           </div>
         } @empty {
-          <div *ngRange="20" class="g-skeleton h-10"></div>
+          <div *ngRange="16" class="g-skeleton h-10"></div>
         }
       </div>
     </div>
@@ -295,7 +295,7 @@ export class PageTradingComponent {
   );
 
   readonly topPerformanceSignal = toSignal(
-    this.marketApiService.getMarketTopPerformance().pipe(map((d) => d.stockTopActive)),
+    this.marketApiService.getMarketTopPerformance().pipe(map((d) => d.stockTopActive.slice(0, 16))),
   );
 
   /**
