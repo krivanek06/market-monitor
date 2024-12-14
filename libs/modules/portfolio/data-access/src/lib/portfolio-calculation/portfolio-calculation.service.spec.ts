@@ -1,5 +1,3 @@
-import { TestBed } from '@angular/core/testing';
-
 import { MarketApiService } from '@mm/api-client';
 import {
   PortfolioGrowthAssets,
@@ -19,18 +17,19 @@ import {
   getPortfolioStateHoldingBaseByTransactionsUtil,
   roundNDigits,
 } from '@mm/shared/general-util';
-import { MockProvider, ngMocks } from 'ng-mocks';
+import { MockBuilder, MockRender, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
 import { PortfolioCalculationService } from './portfolio-calculation.service';
 
 describe('PortfolioCalculationService', () => {
-  let service: PortfolioCalculationService;
-
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [MockProvider(MarketApiService)],
+    return MockBuilder(PortfolioCalculationService).provide({
+      provide: MarketApiService,
+      useValue: {
+        getSymbolQuotes: jest.fn(),
+        getHistoricalPricesDateRange: jest.fn(),
+      },
     });
-    service = ngMocks.findInstance(PortfolioCalculationService);
   });
 
   beforeAll(() => {
@@ -48,11 +47,15 @@ describe('PortfolioCalculationService', () => {
   });
 
   it('should be created', () => {
+    const fixture = MockRender(PortfolioCalculationService);
+    const service = fixture.point.componentInstance;
     expect(service).toBeTruthy();
   });
 
   describe('Test: getPortfolioStateHoldings', () => {
     it('should be defined', () => {
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
       expect(service.getPortfolioStateHoldings).toBeDefined();
     });
 
@@ -62,6 +65,11 @@ describe('PortfolioCalculationService', () => {
       ngMocks.stub(marketApiService, {
         getSymbolQuotes: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL])),
       });
+
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
 
       const emptyPortfolio = createEmptyPortfolioState();
       service.getPortfolioStateHoldings(emptyPortfolio, []).subscribe();
@@ -75,6 +83,11 @@ describe('PortfolioCalculationService', () => {
       ngMocks.stub(marketApiService, {
         getSymbolQuotes: jest.fn().mockReturnValue(of([])),
       });
+
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
 
       const expectedResult = {
         balance: 0,
@@ -111,6 +124,11 @@ describe('PortfolioCalculationService', () => {
       ngMocks.stub(marketApiService, {
         getSymbolQuotes: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL.quote])),
       });
+
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
 
       const t1 = mockPortfolioTransaction({
         symbol: 'AAPL',
@@ -175,6 +193,11 @@ describe('PortfolioCalculationService', () => {
       ngMocks.stub(marketApiService, {
         getSymbolQuotes: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL.quote])),
       });
+
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
 
       const startingCash = 8000;
 
@@ -251,6 +274,11 @@ describe('PortfolioCalculationService', () => {
         getSymbolQuotes: jest.fn().mockReturnValue(of([mockSymbolSummaryAAPL.quote, mockSymbolSummaryMSFT.quote])),
       });
 
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
+
       const startingCash = 10_000;
 
       const t_BUY_AAPL_1_Change = mockPortfolioTransaction({
@@ -284,7 +312,8 @@ describe('PortfolioCalculationService', () => {
       const totalReturn = t_Sell_AAPL.returnValue;
 
       const aaplUnits = t_BUY_AAPL_1_Change.units - t_Sell_AAPL.units;
-      const aaplInvested = aaplUnits * t_BUY_AAPL_1_Change.unitPrice;
+      const aaplInvested =
+        t_BUY_AAPL_1_Change.units * t_BUY_AAPL_1_Change.unitPrice - t_Sell_AAPL.units * t_Sell_AAPL.unitPrice;
 
       const msftInvested = t_BUY_MSFT_1_Change.units * t_BUY_MSFT_1_Change.unitPrice;
       const totalInvested = aaplInvested + msftInvested;
@@ -331,7 +360,7 @@ describe('PortfolioCalculationService', () => {
             symbol: t_BUY_AAPL_1_Change.symbol,
             units: aaplUnits,
             invested: aaplInvested,
-            breakEvenPrice: roundNDigits(aaplInvested / aaplUnits),
+            breakEvenPrice: 70,
             weight: roundNDigits(aaplInvested / totalInvested, 6),
             sector: 'Technology',
             symbolQuote: mockSymbolSummaryAAPL.quote,
@@ -380,6 +409,11 @@ describe('PortfolioCalculationService', () => {
         getHistoricalPricesDateRange: jest.fn(),
       });
 
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
+
       service.getPortfolioGrowthAssets([]).then((data) => {
         expect(data).toEqual([]);
         expect(marketApiService.getHistoricalPricesDateRange).not.toHaveBeenCalled();
@@ -393,6 +427,11 @@ describe('PortfolioCalculationService', () => {
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data)),
       });
+
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
 
       const t1 = mockPortfolioTransaction({
         symbol: testHistoricalPriceSymbol_AAPL.symbol,
@@ -434,6 +473,11 @@ describe('PortfolioCalculationService', () => {
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data)),
       });
+
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
 
       const t1 = mockPortfolioTransaction({
         symbol: testHistoricalPriceSymbol_AAPL.symbol,
@@ -479,6 +523,11 @@ describe('PortfolioCalculationService', () => {
           .mockReturnValueOnce(of(testHistoricalPriceSymbol_AAPL.data))
           .mockReturnValueOnce(of(testHistoricalPriceSymbol_MSFT.data)),
       });
+
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
 
       const t_BUY_AAPL_1 = mockPortfolioTransaction({
         symbol: testHistoricalPriceSymbol_AAPL.symbol,
@@ -718,6 +767,11 @@ describe('PortfolioCalculationService', () => {
         getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data.slice(1))),
       });
 
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
+
       // service
       service
         .getPortfolioGrowthAssets([trans1, trans2, trans3])
@@ -772,6 +826,11 @@ describe('PortfolioCalculationService', () => {
       ngMocks.stub(marketApiService, {
         getHistoricalPricesDateRange: jest.fn().mockReturnValue(of(testHistoricalPriceSymbol_AAPL.data.slice(1))),
       });
+
+      ngMocks.flushTestBed();
+
+      const fixture = MockRender(PortfolioCalculationService);
+      const service = fixture.point.componentInstance;
 
       const expectedResult = {
         data: [

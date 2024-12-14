@@ -1,4 +1,5 @@
 import { signal } from '@angular/core';
+import { OutstandingOrderApiService, UserApiService } from '@mm/api-client';
 import {
   mockCreateUser,
   OutstandingOrder,
@@ -14,14 +15,24 @@ import { MockBuilder, MockRender, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
 import { PortfolioChange } from '../models';
 import { PortfolioCalculationService } from '../portfolio-calculation/portfolio-calculation.service';
-import { PortfolioCreateOperationService } from '../portfolio-create-operation/portfolio-create-operation.service';
 import { PortfolioUserFacadeService } from './portfolio-user-facade.service';
 
+import * as generatlUtil from '@mm/shared/general-util';
+
+jest.mock('@mm/shared/general-util');
+jest.spyOn(generatlUtil, 'getCurrentDateDefaultFormat').mockReturnValue('2022-10-20');
+jest.spyOn(generatlUtil, 'roundNDigits').mockImplementation((value) => Number(value));
+
 describe('PortfolioUserFacadeService', () => {
-  const testUserData = mockCreateUser();
+  const testUserData = mockCreateUser({
+    holdingSnapshot: {
+      lastModifiedDate: '2022-10-20',
+      data: [{ symbol: 'AAPL', units: 10 }] as PortfolioStateHoldingBase[],
+    },
+  });
 
   beforeEach(() => {
-    return MockBuilder(AuthenticationUserStoreService)
+    return MockBuilder(PortfolioUserFacadeService)
       .provide({
         provide: AuthenticationUserStoreService,
         useValue: {
@@ -29,6 +40,13 @@ describe('PortfolioUserFacadeService', () => {
             getUserData: () => testUserData,
             getUserPortfolioTransactions: () => [] as PortfolioTransaction[],
             portfolioGrowth: () => [] as PortfolioGrowth[],
+            outstandingOrders: () => ({
+              openOrders: [
+                { orderId: '1', symbol: 'AAPL' },
+                { orderId: '2', symbol: 'MSFT' },
+              ] as OutstandingOrder[],
+              closedOrders: [] as OutstandingOrder[],
+            }),
           } as AuthenticationUserStoreService['state'],
         },
       })
@@ -43,10 +61,19 @@ describe('PortfolioUserFacadeService', () => {
         },
       })
       .provide({
-        provide: PortfolioCreateOperationService,
+        provide: UserApiService,
         useValue: {
-          createOrder: jest.fn().mockReturnValue(of({})),
-          deleteOrder: jest.fn().mockReturnValue(of({})),
+          recalculateUserPortfolioState: jest.fn(),
+          resetTransactions: jest.fn(),
+          updateUser: jest.fn(),
+        },
+      })
+      .provide({
+        provide: OutstandingOrderApiService,
+        useValue: {
+          deleteAllOutstandingOrdersForUser: jest.fn(),
+          addOutstandingOrder: jest.fn(),
+          deleteOutstandingOrder: jest.fn(),
         },
       });
   });
@@ -268,25 +295,163 @@ describe('PortfolioUserFacadeService', () => {
     );
   });
 
-  it('should call createOrder', () => {
+  it('should reset transactions', () => {
     const service = MockRender(PortfolioUserFacadeService);
-    const portfolioCreateOperationService = ngMocks.get(PortfolioCreateOperationService);
+    const outstandingOrderApi = ngMocks.get(OutstandingOrderApiService);
+    const userApi = ngMocks.get(UserApiService);
 
-    const order = { orderId: '123' } as OutstandingOrder;
+    service.componentInstance.resetTransactions();
 
-    service.componentInstance.createOrder(order);
-    expect(portfolioCreateOperationService.createOrder).toHaveBeenCalledWith(order);
-    expect(portfolioCreateOperationService.deleteOrder).not.toHaveBeenCalled();
+    expect(outstandingOrderApi.deleteAllOutstandingOrdersForUser).toHaveBeenCalledWith(testUserData.id);
+    expect(userApi.resetTransactions).toHaveBeenCalledWith(testUserData);
   });
 
-  it('should call deleteOrder', () => {
+  it('should recalculate user portfolio state', () => {
     const service = MockRender(PortfolioUserFacadeService);
-    const portfolioCreateOperationService = ngMocks.get(PortfolioCreateOperationService);
+    const userApi = ngMocks.get(UserApiService);
 
-    const order = { orderId: '123' } as OutstandingOrder;
+    service.componentInstance.recalculatePortfolioState();
 
-    service.componentInstance.deleteOrder(order);
-    expect(portfolioCreateOperationService.deleteOrder).toHaveBeenCalledWith(order);
-    expect(portfolioCreateOperationService.createOrder).not.toHaveBeenCalled();
+    expect(userApi.recalculateUserPortfolioState).toHaveBeenCalledWith(testUserData);
+  });
+
+  it('should add outstanding order - BUY order', () => {
+    const buyOrder = {
+      symbol: 'AAPL',
+      units: 10,
+      potentialTotalPrice: 500,
+      orderType: {
+        type: 'BUY',
+      },
+    } as OutstandingOrder;
+
+    const service = MockRender(PortfolioUserFacadeService);
+    const outstandingOrderApiService = ngMocks.get(OutstandingOrderApiService);
+    const userApiService = ngMocks.get(UserApiService);
+
+    service.componentInstance.createOrder(buyOrder);
+
+    const user = testUserData;
+
+    // check if the order was added
+    expect(outstandingOrderApiService.addOutstandingOrder).toHaveBeenCalledWith(buyOrder);
+
+    // check if user updated
+    expect(userApiService.updateUser).toHaveBeenCalledWith(user.id, {
+      portfolioState: {
+        ...user.portfolioState,
+        cashOnHand: testUserData.portfolioState.startingCash - 500,
+      },
+      holdingSnapshot: {
+        ...user.holdingSnapshot,
+        lastModifiedDate: expect.any(String),
+      },
+    });
+  });
+
+  it('should add outstanding order - SELL order', () => {
+    const sellOrder = {
+      symbol: 'AAPL',
+      units: 5,
+      potentialTotalPrice: 500,
+      orderType: {
+        type: 'SELL',
+      },
+    } as OutstandingOrder;
+
+    const service = MockRender(PortfolioUserFacadeService);
+    const outstandingOrderApiService = ngMocks.get(OutstandingOrderApiService);
+    const userApiService = ngMocks.get(UserApiService);
+
+    service.componentInstance.createOrder(sellOrder);
+
+    const user = testUserData;
+
+    // check if the order was added
+    expect(outstandingOrderApiService.addOutstandingOrder).toHaveBeenCalledWith(sellOrder);
+
+    // check if user updated
+    expect(userApiService.updateUser).toHaveBeenCalledWith(user.id, {
+      portfolioState: {
+        ...user.portfolioState,
+      },
+      holdingSnapshot: {
+        ...user.holdingSnapshot,
+        data: [{ symbol: 'AAPL', units: 5 }], // 10 - 5
+        lastModifiedDate: expect.any(String),
+      },
+    });
+  });
+
+  it('should remove outstanding order - BUY order', () => {
+    const buyOrder = {
+      symbol: 'AAPL',
+      units: 10,
+      potentialTotalPrice: 500,
+      orderType: {
+        type: 'BUY',
+      },
+      userData: {
+        id: testUserData.id,
+      },
+    } as OutstandingOrder;
+
+    const service = MockRender(PortfolioUserFacadeService);
+    const outstandingOrderApiService = ngMocks.get(OutstandingOrderApiService);
+    const userApiService = ngMocks.get(UserApiService);
+
+    service.componentInstance.deleteOrder(buyOrder);
+
+    const user = testUserData;
+
+    // check if the order was removed
+    expect(outstandingOrderApiService.deleteOutstandingOrder).toHaveBeenCalledWith(buyOrder);
+
+    // check if user updated
+    expect(userApiService.updateUser).toHaveBeenCalledWith(user.id, {
+      portfolioState: {
+        ...user.portfolioState,
+        cashOnHand: testUserData.portfolioState.startingCash + 500, // 1000 + 500
+      },
+      holdingSnapshot: {
+        ...user.holdingSnapshot,
+      },
+    });
+  });
+
+  it('should remove outstanding order - SELL order', () => {
+    const sellOrder = {
+      symbol: 'AAPL',
+      units: 5,
+      potentialTotalPrice: 500,
+      orderType: {
+        type: 'SELL',
+      },
+      userData: {
+        id: testUserData.id,
+      },
+    } as OutstandingOrder;
+
+    const service = MockRender(PortfolioUserFacadeService);
+    const outstandingOrderApiService = ngMocks.get(OutstandingOrderApiService);
+    const userApiService = ngMocks.get(UserApiService);
+
+    service.componentInstance.deleteOrder(sellOrder);
+
+    const user = testUserData;
+
+    // check if the order was removed
+    expect(outstandingOrderApiService.deleteOutstandingOrder).toHaveBeenCalledWith(sellOrder);
+
+    // check if user updated
+    expect(userApiService.updateUser).toHaveBeenCalledWith(user.id, {
+      portfolioState: {
+        ...user.portfolioState,
+      },
+      holdingSnapshot: {
+        ...user.holdingSnapshot,
+        data: [{ symbol: 'AAPL', units: 15 }], // 15 + 5
+      },
+    });
   });
 });

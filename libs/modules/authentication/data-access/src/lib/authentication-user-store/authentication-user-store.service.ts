@@ -1,7 +1,6 @@
 import { inject, Injectable, InjectionToken } from '@angular/core';
-import { GroupApiService, OutstandingOrderApiService, UserApiService } from '@mm/api-client';
-import { OutstandingOrder, SymbolStoreBase, UserAccountBasicTypes, UserData } from '@mm/api-types';
-import { getCurrentDateDefaultFormat, roundNDigits } from '@mm/shared/general-util';
+import { GroupApiService, UserApiService } from '@mm/api-client';
+import { SymbolStoreBase, UserAccountBasicTypes, UserData } from '@mm/api-types';
 import { AuthenticationUserService } from '../authentication-user/authentication-user.service';
 
 export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationUserStoreService>(
@@ -13,7 +12,6 @@ export const AUTHENTICATION_ACCOUNT_TOKEN = new InjectionToken<AuthenticationUse
 })
 export class AuthenticationUserStoreService {
   private readonly authenticationUserService = inject(AuthenticationUserService);
-  private readonly outstandingOrderApiService = inject(OutstandingOrderApiService);
   private readonly groupApiService = inject(GroupApiService);
   private readonly userApiService = inject(UserApiService);
 
@@ -39,16 +37,6 @@ export class AuthenticationUserStoreService {
         ...data,
       },
     });
-  }
-
-  resetTransactions(): void {
-    const user = this.state.getUserData();
-
-    // remove orders
-    this.outstandingOrderApiService.deleteAllOutstandingOrdersForUser(user.id);
-
-    // reset transactions
-    this.userApiService.resetTransactions(user);
   }
 
   changeAccountType(data: UserAccountBasicTypes): void {
@@ -87,83 +75,5 @@ export class AuthenticationUserStoreService {
 
   clearWatchList(): void {
     this.userApiService.clearUserWatchList(this.state.getUserData().id);
-  }
-
-  recalculatePortfolioState(): Promise<boolean> {
-    return this.userApiService.recalculateUserPortfolioState(this.state.getUserData());
-  }
-
-  /**
-   * Creates an outstanding order for the user - updates the user's portfolio state and holdings
-   * Don't forget to VALIDATE order before calling this function
-   * @param order
-   */
-  addOutstandingOrder(order: OutstandingOrder): void {
-    const user = this.state.getUserData();
-
-    // save order
-    this.outstandingOrderApiService.addOutstandingOrder(order);
-
-    // what type of order is it
-    const isBuy = order.orderType.type === 'BUY';
-    const isSell = order.orderType.type === 'SELL';
-
-    // subtract the cash from the user if BUY order
-    const cashOnHand = isBuy
-      ? roundNDigits(user.portfolioState.cashOnHand - order.potentialTotalPrice)
-      : user.portfolioState.cashOnHand;
-
-    // update holdings
-    const holdings = user.holdingSnapshot.data.map((holding) => ({
-      ...holding,
-      // remove owned units if SELL order
-      units: holding.symbol === order.symbol && isSell ? holding.units - order.units : holding.units,
-    }));
-
-    // update user
-    this.userApiService.updateUser(user.id, {
-      portfolioState: {
-        ...user.portfolioState,
-        cashOnHand,
-      },
-      holdingSnapshot: {
-        lastModifiedDate: getCurrentDateDefaultFormat(),
-        data: holdings,
-      },
-    });
-  }
-
-  removeOutstandingOrder(order: OutstandingOrder): void {
-    const user = this.state.getUserData();
-
-    // save order
-    this.outstandingOrderApiService.deleteOutstandingOrder(order);
-
-    // what type of order is it
-    const isBuy = order.orderType.type === 'BUY';
-    const isSell = order.orderType.type === 'SELL';
-
-    // add the cash back to the user if BUY order
-    const cashOnHand = isBuy
-      ? roundNDigits(user.portfolioState.cashOnHand + order.potentialTotalPrice)
-      : user.portfolioState.cashOnHand;
-
-    // update holdings - add back the units if SELL order
-    const holdings = user.holdingSnapshot.data.map((holding) => ({
-      ...holding,
-      units: holding.symbol === order.symbol && isSell ? holding.units + order.units : holding.units,
-    }));
-
-    // update user
-    this.userApiService.updateUser(user.id, {
-      portfolioState: {
-        ...user.portfolioState,
-        cashOnHand,
-      },
-      holdingSnapshot: {
-        lastModifiedDate: getCurrentDateDefaultFormat(),
-        data: holdings,
-      },
-    });
   }
 }

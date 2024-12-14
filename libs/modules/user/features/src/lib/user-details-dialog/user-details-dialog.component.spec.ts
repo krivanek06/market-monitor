@@ -3,7 +3,6 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { By } from '@angular/platform-browser';
 import { UserApiService } from '@mm/api-client';
 import {
   mockCreateUser,
@@ -23,7 +22,6 @@ import {
   PortfolioTransactionsTableComponentMock,
 } from '@mm/portfolio/ui';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
-import { TabSelectControlComponent } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
 import { UserDetailsDialogComponent } from './user-details-dialog.component';
@@ -55,7 +53,6 @@ describe('UserDetailsDialogComponent', () => {
     return MockBuilder(UserDetailsDialogComponent)
       .keep(MatButtonModule)
       .keep(MatDialogModule)
-      .keep(TabSelectControlComponent)
       .keep(NoopAnimationsModule)
       .keep(PortfolioStateTransactionsComponent)
       .keep(PortfolioStateComponent)
@@ -114,16 +111,6 @@ describe('UserDetailsDialogComponent', () => {
     const component = fixture.componentInstance;
 
     expect(component.ColorScheme).toBeTruthy();
-    expect(component.displayOptions).toEqual([
-      {
-        label: 'Portfolio',
-        value: 'portfolio',
-      },
-      {
-        label: 'Transactions',
-        value: 'transactions',
-      },
-    ]);
     expect(component.displayedColumns).toEqual([
       'symbol',
       'price',
@@ -133,7 +120,6 @@ describe('UserDetailsDialogComponent', () => {
       'portfolio',
       'marketCap',
     ]);
-    expect(component.selectedValue()).toEqual('portfolio');
   });
 
   it('should load data from API based on userId', () => {
@@ -149,29 +135,7 @@ describe('UserDetailsDialogComponent', () => {
     });
   });
 
-  it('should change tabs on click', () => {
-    const fixture = MockRender(UserDetailsDialogComponent);
-    const component = fixture.componentInstance;
-
-    fixture.detectChanges();
-
-    const tabSelectControl = ngMocks.findInstance(TabSelectControlComponent);
-
-    // check if tab select exists
-    expect(tabSelectControl).toBeTruthy();
-    expect(component.selectedValue()).toEqual('portfolio');
-    expect(tabSelectControl.selectedValueSignal()).toEqual(component.selectedValue());
-    expect(tabSelectControl.displayOptions()).toEqual(component.displayOptions);
-
-    // change tab
-    tabSelectControl.selectedValueSignal.set('transactions');
-    fixture.detectChanges();
-
-    // check if changed
-    expect(component.selectedValue()).toEqual('transactions');
-  });
-
-  it('should display component for the "portfolio" tab', () => {
+  it('should display component', () => {
     const fixture = MockRender(UserDetailsDialogComponent);
     const component = fixture.componentInstance;
 
@@ -208,35 +172,10 @@ describe('UserDetailsDialogComponent', () => {
     expect(holdingTable.componentInstance.displayedColumns()).toEqual(component.displayedColumns);
     expect(holdingTable.componentInstance.portfolioStateHolding()).toEqual(mockPortfolioHolding);
 
-    // should not display transaction table
-    expect(fixture.debugElement.query(By.css(transactionTableS))).toBeFalsy();
-  });
-
-  it('should display component for the "transaction" tab', () => {
-    const fixture = MockRender(UserDetailsDialogComponent);
-    const component = fixture.componentInstance;
-
-    fixture.detectChanges();
-
-    // find tab select control
-    const tabSelectControl = ngMocks.findInstance(TabSelectControlComponent);
-
-    // initially transaction table is hidden
-    expect(fixture.debugElement.query(By.css(transactionTableS))).toBeFalsy();
-
-    // change tab
-    tabSelectControl.selectedValueSignal.set('transactions');
-    fixture.detectChanges();
-
-    // check transaction table
+    // should display transaction table
     const transactionTable = ngMocks.find<PortfolioTransactionsTableComponentMock>(transactionTableS);
     expect(transactionTable).toBeTruthy();
     expect(transactionTable.componentInstance.data()).toEqual(mockTransactions.transactions);
-    expect(component.selectedValue()).toEqual('transactions');
-
-    // check if components under portfolio tab are hidden
-    expect(fixture.debugElement.query(By.css(portfolioGrowthChartS))).toBeFalsy();
-    expect(fixture.debugElement.query(By.css(portfolioHoldingTableCard))).toBeFalsy();
   });
 
   it('should close dialog on close button click', () => {

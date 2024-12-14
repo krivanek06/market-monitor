@@ -114,7 +114,11 @@ export class OutstandingOrderCardDataComponent {
       const [hour, minute] = openingHour.split(':').map(Number);
       const openingDate = new Date(now);
       openingDate.setHours(hour, minute, 0, 0);
-      return format(openingDate.toString(), 'HH:mm MMM d, y');
+      try {
+        return format(openingDate.toString(), 'HH:mm MMM d, y');
+      } catch (error) {
+        return 'Next Working Day';
+      }
     }
 
     // market is open, round to nearest 5 minutes

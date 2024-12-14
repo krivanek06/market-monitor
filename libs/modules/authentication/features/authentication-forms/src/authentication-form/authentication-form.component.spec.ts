@@ -548,7 +548,7 @@ describe('AuthenticationFormComponent', () => {
     expect(router.navigate).not.toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
   });
 
-  it('should create an account on google login if user does exist', async () => {
+  it('should create an account on google login if user does exist', () => {
     // create component
     const fixture = MockRender(AuthenticationFormComponent);
     const component = fixture.point.componentInstance;
@@ -564,6 +564,8 @@ describe('AuthenticationFormComponent', () => {
     const googleLoginButton = ngMocks.find<MatButton>(googleLoginButtonS);
     googleLoginButton.nativeElement.click();
 
+    fixture.detectChanges();
+
     // check if correct services are called
     expect(openSelectAccountTypeSpy).toHaveBeenCalledTimes(1);
     expect(authenticationAccountService.signInGoogle).toHaveBeenCalledTimes(1);
@@ -577,7 +579,7 @@ describe('AuthenticationFormComponent', () => {
     });
   });
 
-  it('should not create an account on google login if user already exists', async () => {
+  it('should not create an account on google login if user already exists', () => {
     // stub service that user already exists
     const authenticationAccountService = ngMocks.get(AuthenticationAccountService);
     ngMocks.stub(authenticationAccountService, {
@@ -599,6 +601,8 @@ describe('AuthenticationFormComponent', () => {
     // click on google login button
     const googleLoginButton = ngMocks.find<MatButton>(googleLoginButtonS);
     googleLoginButton.nativeElement.click();
+
+    fixture.detectChanges();
 
     // check if correct services are called
     expect(openSelectAccountTypeSpy).not.toHaveBeenCalled();
