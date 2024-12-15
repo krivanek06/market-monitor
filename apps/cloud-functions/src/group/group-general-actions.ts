@@ -19,6 +19,7 @@ import {
   UserData,
 } from '@mm/api-types';
 import { getCurrentDateDefaultFormat, transformUserToGroupMember } from '@mm/shared/general-util';
+import { firestore } from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError } from 'firebase-functions/v2/https';
 import {
@@ -400,19 +401,22 @@ const requestMembershipDecline = async (authUserData: UserData, groupData: Group
 /** Deleting group and all subcollection */
 const deleteGroup = async (authUserData: UserData, groupData: GroupData) => {
   // check if owner match request user id
-  if (groupData.ownerUserId !== authUserData.id) {
+  if (groupData.ownerUserId !== authUserData.id && !authUserData.isAdmin) {
     throw new HttpsError('failed-precondition', GROUP_USER_NOT_OWNER);
   }
 
+  // create batch operations
+  const batch = firestore().batch();
+
   // remove group from owner
-  await userDocumentRef(authUserData.id).update({
+  batch.update(userDocumentRef(authUserData.id), {
     'groups.groupOwner': FieldValue.arrayRemove(groupData.id),
   });
 
   // remove group all users even if there is a bug, remove all data
   const userIds = [...groupData.memberUserIds, ...groupData.memberInvitedUserIds, ...groupData.memberRequestUserIds];
   for await (const userId of userIds) {
-    await userDocumentRef(userId).update({
+    batch.update(userDocumentRef(userId), {
       'groups.groupInvitations': FieldValue.arrayRemove(groupData.id),
       'groups.groupMember': FieldValue.arrayRemove(groupData.id),
       'groups.groupRequested': FieldValue.arrayRemove(groupData.id),
@@ -420,10 +424,13 @@ const deleteGroup = async (authUserData: UserData, groupData: GroupData) => {
   }
 
   // delete every sub collection
-  (await groupCollectionMoreInformationRef(groupData.id).listDocuments()).forEach((doc) => doc.delete());
+  (await groupCollectionMoreInformationRef(groupData.id).listDocuments()).forEach((doc) => batch.delete(doc));
 
   // delete group
-  await groupDocumentRef(groupData.id).delete();
+  batch.delete(groupDocumentRef(groupData.id));
+
+  // commit batch
+  await batch.commit();
 
   // return removed group
   return groupData;

@@ -15,6 +15,7 @@ import {
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import {
+  AdminGeneralActions,
   PortfolioGrowth,
   PortfolioTransaction,
   SymbolStoreBase,
@@ -206,6 +207,11 @@ export class UserApiService {
 
   getUserPortfolioGrowth(userId: string): Observable<PortfolioGrowth[]> {
     return rxDocData(this.getUserPortfolioGrowthDocRef(userId)).pipe(map((d) => d?.data ?? []));
+  }
+
+  fireAdminAction(action: AdminGeneralActions) {
+    const callable = httpsCallable<AdminGeneralActions, void>(this.functions, 'adminActionCall');
+    return callable(action);
   }
 
   /* private */

@@ -1,3 +1,4 @@
+export * from './admin.model';
 export * from './calendar-asset.model';
 export * from './group.model';
 export * from './hall-of-fame.model';

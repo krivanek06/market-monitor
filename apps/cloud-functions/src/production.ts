@@ -1,4 +1,5 @@
 import {
+  AdminGeneralActions,
   GroupGeneralActions,
   OutstandingOrder,
   TradingSimulatorGeneralActions,
@@ -7,11 +8,10 @@ import {
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { CallableRequest, onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from './group';
-import { groupGeneralActions } from './group/group-general-actions';
+import { adminGeneralActions } from './admin';
+import { groupGeneralActions, groupHallOfFame, groupPortfolioRank, groupUpdateData } from './group';
 import { outstandingOrderExecute, outstandingOrdersExecuteAll } from './outstanding-order';
-import { tradingSimulatorGeneralActions } from './trading-simulator/trading-simulator-general-actions';
-import { tradingSimulatorStateVerification } from './trading-simulator/trading-simulator-state-verification';
+import { tradingSimulatorGeneralActions, tradingSimulatorStateVerification } from './trading-simulator';
 import {
   userCreateAccount,
   userCreateAccountDemo,
@@ -27,9 +27,20 @@ const region = 'europe-central2';
 const allowedUrl = ['https://dashboard.ggfinance.io', 'http://localhost:4200/']; // in the future maybe configure this -> ['https://dashboard.ggfinance.io', 'http://localhost:4200/'];
 
 /**
+ * admin
+ */
+export const adminActionCall = onCall(
+  {
+    region: region,
+    cors: allowedUrl,
+  },
+  (request: CallableRequest<AdminGeneralActions>) => adminGeneralActions(request.auth?.uid, request.data),
+);
+
+/** ------------------------------------------ */
+/**
  * USERS
  */
-
 export const userCreateAccountCall = onCall(
   {
     region: region,

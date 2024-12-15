@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/d
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
-import { GroupApiService } from '@mm/api-client';
+import { GroupApiService, UserApiService } from '@mm/api-client';
 import { GROUP_MEMBER_LIMIT, GroupDetails, UserData } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { ROUTES_MAIN } from '@mm/shared/data-access';
@@ -217,6 +217,22 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
       </div>
     }
 
+    <!-- admin buttons -->
+    @if (userData().isAdmin) {
+      <button
+        [disabled]="isDemoAccount()"
+        (click)="onGroupDeleteByAdminClick()"
+        type="button"
+        mat-flat-button
+        color="warn"
+        class="w-[220px] max-lg:hidden"
+        [matTooltip]="tooltips.tooltipDelete"
+      >
+        <mat-icon>delete</mat-icon>
+        Delete - Admin
+      </button>
+    }
+
     <!-- options - displayed on mobile -->
     @if (!data || !data.hideOptions) {
       <div class="flex w-full justify-end lg:hidden">
@@ -232,10 +248,6 @@ import { GroupUserHasRoleDirective } from '../group-user-role-directive/group-us
       display: flex;
       gap: 16px;
     }
-
-    button {
-      @apply h-10 max-lg:w-[220px];
-    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -244,6 +256,7 @@ export class GroupInteractionButtonsComponent {
   private readonly router = inject(Router);
   private readonly authenticationUserService = inject(AuthenticationUserStoreService);
   private readonly groupApiService = inject(GroupApiService);
+  private readonly userApiService = inject(UserApiService);
   private readonly dialogServiceUtil = inject(DialogServiceUtil);
 
   /**
@@ -458,5 +471,27 @@ export class GroupInteractionButtonsComponent {
       data: { hideOptions: true, groupDetails: this.groupDetailsUsed() },
       panelClass: [SCREEN_DIALOGS.DIALOG_SMALL],
     });
+  }
+
+  @Confirmable('Are you sure you want to delete this group?', 'Confirm', true, 'DELETE')
+  async onGroupDeleteByAdminClick() {
+    try {
+      // show notification
+      this.dialogServiceUtil.showNotificationBar('Deleting group', 'notification');
+
+      // delete group
+      await this.userApiService.fireAdminAction({
+        type: 'adminDeleteGroup',
+        groupId: this.groupDetailsUsed().groupData.id,
+      });
+
+      // show notification
+      this.dialogServiceUtil.showNotificationBar('Group has been deleted', 'success');
+
+      // redirect user to the groups page
+      this.router.navigateByUrl(ROUTES_MAIN.GROUPS);
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
   }
 }
