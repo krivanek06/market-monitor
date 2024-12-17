@@ -39,4 +39,4 @@ admin.firestore().settings({
 export * from './production';
 
 // -------- Testing ---------
-// export * from './testing-functions';
+export * from './testing-functions';

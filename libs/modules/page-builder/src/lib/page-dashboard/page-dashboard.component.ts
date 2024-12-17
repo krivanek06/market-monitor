@@ -18,7 +18,6 @@ import {
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
-import { getCurrentDateIOSFormat } from '@mm/shared/general-util';
 import { GeneralCardComponent, PieChartComponent } from '@mm/shared/ui';
 
 @Component({
@@ -241,10 +240,6 @@ export class PageDashboardComponent {
   readonly hasEnoughTransactions = computed(
     () => (this.stateRef.portfolioTransactions()?.length ?? 0) > this.transactionLimit,
   );
-
-  constructor() {
-    console.log('getCurrentDateIOSFormat', getCurrentDateIOSFormat());
-  }
 
   readonly showLoadingState = computed(() => {
     const userData = this.stateRef.getUserData();

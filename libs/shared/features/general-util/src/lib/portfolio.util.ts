@@ -174,11 +174,20 @@ export const getPortfolioStateHoldingBaseByTransactionsUtil = (
       // update existing holding
       if (existingHolding) {
         const newUnits = existingHolding.units + (isSell ? -curr.units : curr.units);
-        existingHolding.units = isCrypto ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
-        existingHolding.invested += roundNDigits(curr.unitPrice * curr.units * (isSell ? -1 : 1));
 
-        if (!isSell) {
-          existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units);
+        if (newUnits !== 0) {
+          // update holding
+          existingHolding.units = isCrypto ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
+          existingHolding.invested += roundNDigits(curr.unitPrice * curr.units * (isSell ? -1 : 1));
+
+          if (!isSell) {
+            existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units);
+          }
+        } else {
+          // remove holding if units are 0
+          existingHolding.units = 0;
+          existingHolding.invested = 0;
+          existingHolding.breakEvenPrice = 0;
         }
 
         return acc;
