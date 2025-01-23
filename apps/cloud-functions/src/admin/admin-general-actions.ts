@@ -59,6 +59,13 @@ const adminResetUserTransactions = async (
       portfolioState: {
         ...createEmptyPortfolioState(startingCash),
       },
+      portfolioRisk: {
+        alpha: 0,
+        beta: 0,
+        sharpe: 0,
+        volatility: 0,
+        date: '',
+      },
       holdingSnapshot: {
         data: [],
         lastModifiedDate: '',
