@@ -452,7 +452,7 @@ export class GroupInteractionButtonsComponent {
       this.dialogServiceUtil.showNotificationBar('Group has been deleted', 'success');
 
       // redirect user to the groups page
-      this.router.navigateByUrl(ROUTES_MAIN.GROUPS);
+      this.router.navigateByUrl(`${ROUTES_MAIN.APP}/${ROUTES_MAIN.GROUPS}`);
     } catch (error) {
       this.dialogServiceUtil.handleError(error);
     }
@@ -489,7 +489,7 @@ export class GroupInteractionButtonsComponent {
       this.dialogServiceUtil.showNotificationBar('Group has been deleted', 'success');
 
       // redirect user to the groups page
-      this.router.navigateByUrl(ROUTES_MAIN.GROUPS);
+      this.router.navigateByUrl(`${ROUTES_MAIN.APP}/${ROUTES_MAIN.GROUPS}`);
     } catch (error) {
       this.dialogServiceUtil.handleError(error);
     }

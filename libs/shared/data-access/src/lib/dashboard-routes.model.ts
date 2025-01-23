@@ -1,4 +1,5 @@
 export enum ROUTES_MAIN {
+  APP = 'app',
   DASHBOARD = 'dashboard',
   LOGIN = 'login',
   TRADING = 'trading',

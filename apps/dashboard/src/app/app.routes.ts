@@ -1,28 +1,28 @@
-import { inject } from '@angular/core';
-import { Route, Router } from '@angular/router';
+import { inject, Injectable } from '@angular/core';
+import { PreloadingStrategy, Route, Router } from '@angular/router';
+import { RenderMode, ServerRoute } from '@angular/ssr';
 import { UserAccountEnum } from '@mm/api-types';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { featureFlagGuard, userAccountTypeGuard } from '@mm/authentication/feature-access-directive';
 import { IS_DEV_TOKEN, ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
 import { tradingSimulatorDetailsGuard, tradingSimulatorEditGuard } from '@mm/trading-simulator/data-access';
-import { map, take, tap } from 'rxjs';
+import { map, Observable, of, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
   {
     path: '',
-    loadComponent: () => import('./app-loading/app-loading.component').then((m) => m.AppLoadingComponent),
-    canMatch: [
-      () => {
-        const authState = inject(AuthenticationUserStoreService).state();
-        const isDev = inject(IS_DEV_TOKEN);
-
-        // show only when loading auth state and in production
-        return authState.authenticationState === 'LOADING' && !isDev;
-      },
-    ],
+    loadComponent: () => import('./marketing/marketing-initial.component').then((m) => m.MarketingInitialComponent),
   },
   {
-    path: '',
+    path: ROUTES_MAIN.LOGIN,
+    loadComponent: () => import('@mm/page-builder').then((m) => m.PageLoginComponent),
+  },
+  {
+    path: ROUTES_MAIN.NOT_FOUND,
+    loadComponent: () => import('@mm/page-builder').then((m) => m.PageNotFoundComponent),
+  },
+  {
+    path: ROUTES_MAIN.APP,
     canMatch: [
       () => {
         const authState = inject(AuthenticationUserStoreService).state();
@@ -34,12 +34,17 @@ export const appRoutes: Route[] = [
     ],
     loadChildren: () => [
       {
-        path: ROUTES_MAIN.LOGIN,
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageLoginComponent),
-      },
-      {
-        path: ROUTES_MAIN.NOT_FOUND,
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageNotFoundComponent),
+        path: '',
+        loadComponent: () => import('./app-loading/app-loading.component').then((m) => m.AppLoadingComponent),
+        canMatch: [
+          () => {
+            const authState = inject(AuthenticationUserStoreService).state();
+            const isDev = inject(IS_DEV_TOKEN);
+
+            // show only when loading auth state and in production
+            return authState.authenticationState === 'LOADING' && !isDev;
+          },
+        ],
       },
       {
         path: '',
@@ -180,6 +185,10 @@ export const appRoutes: Route[] = [
         ],
       },
       {
+        path: ROUTES_MAIN.NOT_FOUND,
+        loadComponent: () => import('@mm/page-builder').then((m) => m.PageNotFoundComponent),
+      },
+      {
         path: '**',
         redirectTo: ROUTES_MAIN.NOT_FOUND,
       },
@@ -190,3 +199,100 @@ export const appRoutes: Route[] = [
     redirectTo: '',
   },
 ];
+
+export const serverRoutes: ServerRoute[] = [
+  // prerender
+  {
+    path: '',
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: ROUTES_MAIN.NOT_FOUND,
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: ROUTES_MAIN.LOGIN,
+    renderMode: RenderMode.Prerender,
+  },
+
+  // client rendering
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.DASHBOARD}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.WATCHLIST}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.TRADING}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.HALL_OF_FAME}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.COMPARE_USERS}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.GROUPS}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.TRADING_SIMULATOR}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.STOCK_DETAILS}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.STOCK_SCREENER}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.ECONOMICS}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.NEWS}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.CRYPTO}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.MARKET_CALENDAR}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.TOP_PERFORMERS}`,
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.MARKET}`,
+    renderMode: RenderMode.Client,
+  },
+];
+
+@Injectable({ providedIn: 'root' })
+export class CustomPreloadingStrategy extends PreloadingStrategy {
+  private routesToPreload: Route[] = [];
+
+  preload(route: Route, load: () => Observable<any>): Observable<any> {
+    // Check if the route is marked for on-demand preloading
+    if (route.data?.['preloadOnNavigate'] && this.routesToPreload.includes(route)) {
+      console.log('preload', route.data?.['preloadOnNavigate']);
+      return load(); // Preload the route
+    }
+    return of(null); // Skip preloading
+  }
+
+  // Called when navigation to the specified route occurs
+  markForPreload(route: Route): void {
+    this.routesToPreload.push(route);
+  }
+}

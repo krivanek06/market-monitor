@@ -6,6 +6,7 @@ import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } f
 import { Functions, connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   PreloadAllModules,
@@ -21,7 +22,6 @@ import { AUTHENTICATION_ACCOUNT_TOKEN, AuthenticationUserStoreService } from '@m
 import { IS_DEV_TOKEN } from '@mm/shared/data-access';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
   providers: [

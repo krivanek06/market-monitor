@@ -28,7 +28,7 @@ export abstract class PageGroupsBaseComponent {
         this.groupApiService.getGroupDetailsById(id).pipe(
           catchError(() => {
             this.dialogServiceUtil.showNotificationBar('Group not found', 'error');
-            this.router.navigateByUrl(ROUTES_MAIN.NOT_FOUND);
+            this.router.navigateByUrl(`${ROUTES_MAIN.APP}/${ROUTES_MAIN.NOT_FOUND}`);
             return EMPTY;
           }),
         ),

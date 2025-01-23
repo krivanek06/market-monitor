@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MarketApiService, StocksApiService } from '@mm/api-client';
-import { LabelValue, ROUTES_STOCK_DETAILS } from '@mm/shared/data-access';
+import { LabelValue, ROUTES_MAIN, ROUTES_STOCK_DETAILS } from '@mm/shared/data-access';
 import { TabSelectControlComponent } from '@mm/shared/ui';
 import { catchError, filter, forkJoin, map, startWith, switchMap } from 'rxjs';
 import { PageStockDetailsFinancialsComponent } from './page-stock-details-financials/page-stock-details-financials.component';
@@ -133,7 +133,7 @@ export class PageStockDetailsComponent {
 
     untracked(() => {
       if (symbolDetails.action === 'error') {
-        this.router.navigate(['/']);
+        this.router.navigate([ROUTES_MAIN.APP, ROUTES_MAIN.NOT_FOUND]);
       }
     });
   });

@@ -340,8 +340,8 @@ export class AuthenticationFormComponent {
       if (state.action === 'success') {
         // display success message
         this.dialogServiceUtil.showNotificationBar('Successfully logged in', 'success');
-        // navigate to dashboard
-        this.router.navigate([ROUTES_MAIN.DASHBOARD]);
+        // navigate to the app
+        this.router.navigate([ROUTES_MAIN.APP]);
       } else if (state.action === 'success-demo-account') {
         // display success message
         this.dialogServiceUtil.showNotificationBar(
@@ -349,8 +349,8 @@ export class AuthenticationFormComponent {
           'notification',
           10_000,
         );
-        // navigate to dashboard
-        this.router.navigate([ROUTES_MAIN.DASHBOARD]);
+        // navigate to the app
+        this.router.navigate([ROUTES_MAIN.APP]);
       } else if (state.action === 'error') {
         this.dialogServiceUtil.handleError(state.error);
       } else if (state.action === 'error-demo-already-active') {
