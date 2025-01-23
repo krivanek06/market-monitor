@@ -170,7 +170,7 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
 
         <!--  Reset Transactions -->
         <button
-          [disabled]="userDataNormal()?.isTest"
+          [disabled]="userDataNormal()?.isTest || userDataNormal()?.isDemo"
           (click)="onResetTransactions()"
           [matTooltip]="actionButtonTooltips.resetTransactions"
           type="button"
