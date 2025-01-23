@@ -242,10 +242,8 @@ export class PageDashboardComponent {
   );
 
   readonly showLoadingState = computed(() => {
-    const userData = this.stateRef.getUserData();
     const portfolioGrowth = this.portfolioUserFacadeService.portfolioGrowth();
 
-    // data not yet loaded or user has demo account but data is not yet created
-    return !portfolioGrowth || (userData.isDemo && (portfolioGrowth ?? []).length === 0);
+    return !portfolioGrowth;
   });
 }
