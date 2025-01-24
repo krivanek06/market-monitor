@@ -16,7 +16,6 @@
     "baseUrl": ".",
     "strict": true,
     "paths": {
-      "@mm/marketing": ["libs/modules/marketing/src/index.ts"],
       "@mm/api-client": ["libs/api/api-client/src/index.ts"],
       "@mm/api-external": ["libs/api/api-external/src/index.ts"],
       "@mm/api-types": ["libs/api/api-types/src/index.ts"],
@@ -36,6 +35,7 @@
       "@mm/market-stocks/data-access": ["libs/modules/market-stocks/data-access/src/index.ts"],
       "@mm/market-stocks/features": ["libs/modules/market-stocks/features/src/index.ts"],
       "@mm/market-stocks/ui": ["libs/modules/market-stocks/ui/src/index.ts"],
+      "@mm/marketing": ["libs/modules/marketing/src/index.ts"],
       "@mm/page-builder": ["libs/modules/page-builder/src/index.ts"],
       "@mm/portfolio/data-access": ["libs/modules/portfolio/data-access/src/index.ts"],
       "@mm/portfolio/features": ["libs/modules/portfolio/features/src/index.ts"],

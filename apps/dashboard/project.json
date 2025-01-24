@@ -103,7 +103,8 @@
       "options": {
         "outputPath": "dist/apps/dashboard/server",
         "main": "apps/dashboard/src/server.ts",
-        "tsConfig": "apps/dashboard/tsconfig.server.json"
+        "tsConfig": "apps/dashboard/tsconfig.server.json",
+        "assets": ["apps/dashboard/src/favicon.ico", "apps/dashboard/src/assets"]
       },
       "configurations": {
         "production": {
