@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "strict": true,
     "paths": {
+      "@mm/marketing": ["libs/modules/marketing/src/index.ts"],
       "@mm/api-client": ["libs/api/api-client/src/index.ts"],
       "@mm/api-external": ["libs/api/api-external/src/index.ts"],
       "@mm/api-types": ["libs/api/api-types/src/index.ts"],

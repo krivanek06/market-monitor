@@ -23,15 +23,15 @@ export const appRoutes: Route[] = [
   },
   {
     path: ROUTES_MAIN.APP,
-    canMatch: [
-      () => {
-        const authState = inject(AuthenticationUserStoreService).state();
-        const isDev = inject(IS_DEV_TOKEN);
+    // canMatch: [
+    //   () => {
+    //     const authState = inject(AuthenticationUserStoreService).state();
+    //     const isDev = inject(IS_DEV_TOKEN);
 
-        // show only when not loading auth state or in dev (faster page reload)
-        return authState.authenticationState !== 'LOADING' || isDev;
-      },
-    ],
+    //     // show only when not loading auth state or in dev (faster page reload)
+    //     return authState.authenticationState !== 'LOADING' || isDev;
+    //   },
+    // ],
     loadChildren: () => [
       {
         path: '',
