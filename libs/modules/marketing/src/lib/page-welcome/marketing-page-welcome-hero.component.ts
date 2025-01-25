@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MarketingTextModificatorComponent } from '../components/marketing-text-modificator.component';
+import { MarketingTextModificatorComponent } from '../components';
 
 @Component({
   selector: 'app-marketing-welcome-page-hero',
@@ -8,7 +8,7 @@ import { MarketingTextModificatorComponent } from '../components/marketing-text-
   template: `
     <section class="-mt-10 grid h-screen place-content-center gap-y-12">
       <h1
-        class="animate-in fade-in zoom-in duration-2000 lg:font-outline-2 z-10 inline-block text-center text-8xl max-md:text-cyan-800 md:bg-gradient-to-b md:from-cyan-500 md:to-black md:bg-clip-text md:text-transparent lg:-mt-20"
+        class="animate-in fade-in zoom-in duration-2000 lg:font-outline-2 z-10 inline-block text-center text-6xl max-md:text-cyan-800 md:bg-gradient-to-b md:from-cyan-500 md:to-black md:bg-clip-text md:text-transparent lg:-mt-20"
       >
         <app-marketing-text-modificator originalText="GGFinance" />
       </h1>

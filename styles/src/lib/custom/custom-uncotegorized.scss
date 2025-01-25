@@ -15,6 +15,10 @@
   background-color: var(--gray-medium) !important;
 }
 
+.g-section-title {
+  @apply mb-10 text-center text-3xl capitalize text-cyan-600 md:mb-16;
+}
+
 .g-border-bottom {
   border-bottom: 1px solid var(--border) !important;
   border-bottom-right-radius: 0 !important;

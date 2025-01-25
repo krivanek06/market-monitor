@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { PageMarketingComponent } from '@mm/page-builder';
 
 @Component({
@@ -12,4 +13,10 @@ import { PageMarketingComponent } from '@mm/page-builder';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MarketingInitialComponent {}
+export class MarketingInitialComponent {
+  private readonly document = inject(DOCUMENT);
+
+  constructor() {
+    this.document.body.classList.add('dark-theme');
+  }
+}
