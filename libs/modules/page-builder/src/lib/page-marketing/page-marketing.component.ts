@@ -1,8 +1,9 @@
 import { NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
-  MarketingPageWelcomeMarketMonitorComponent,
   MarketingPageWelcomeHeroComponent,
+  MarketingPageWelcomeInvestmentAccountComponent,
+  MarketingPageWelcomeMarketMonitorComponent,
   MarketingSvgOneComponent,
 } from '@mm/marketing';
 
@@ -13,6 +14,7 @@ import {
     MarketingSvgOneComponent,
     MarketingPageWelcomeHeroComponent,
     MarketingPageWelcomeMarketMonitorComponent,
+    MarketingPageWelcomeInvestmentAccountComponent,
   ],
   template: `
     <div class="relative min-h-[100vh] overflow-x-clip bg-black">
@@ -25,6 +27,7 @@ import {
         [ngSrc]="imageUrl"
         width="1980"
         height="1080"
+        priority
         class="absolute top-0 w-[100%] object-cover opacity-30"
       />
 
@@ -37,6 +40,7 @@ import {
         </div>
         <div class="relative mb-16 p-4 md:mb-[160px] md:p-10">
           <!-- TODO - investment account -->
+          <app-marketing-page-welcome-investment-account />
         </div>
         <div class="relative mb-6 p-4 md:p-10">
           <!-- SVG - about us -->
@@ -46,7 +50,6 @@ import {
         <footer class="h-12 bg-black"></footer>
       </div>
     </div>
-    <img alt="hero background image" [src]="imageUrl" class="h-[200px] w-[200px] object-cover" />
   `,
   styles: `
     :host {
