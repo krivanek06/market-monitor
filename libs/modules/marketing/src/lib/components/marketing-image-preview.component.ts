@@ -55,7 +55,7 @@ import { MarketingBasicCardComponent } from './marketing-basic-card.component';
                 height="200"
                 class="h-full min-w-[200px] cursor-pointer rounded-lg object-cover transition-all duration-300 hover:scale-105 hover:brightness-100"
                 [ngClass]="{
-                  'outline outline-2 outline-cyan-600 brightness-100': i === selectedImageIndex(),
+                  'outline-wt-primary outline outline-2 brightness-100': i === selectedImageIndex(),
                   'brightness-75': i !== selectedImageIndex(),
                 }"
               />

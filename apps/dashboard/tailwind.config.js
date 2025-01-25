@@ -14,7 +14,7 @@ module.exports = {
         // base: 'clamp(1rem, 0.19vw + 0.85rem, 1.19rem)',
         // lg: 'clamp(1rem, 0.19vw + 1rem, 1.25rem)',
         // xl: 'clamp(1.56rem, 0.55vw + 1.2rem, 2rem)',
-        '2xl': 'clamp(1.95rem, 0.87vw + 1.5rem, 2.75rem)',
+        '2xl': 'clamp(1.85rem, 0.87vw + 1.15rem, 2.5rem)',
         '3xl': 'clamp(2.44rem, 1vw + 2.55rem, 3rem)',
         //'4xl': 'clamp(3.05rem, 1.97vw + 2.56rem, 5rem)',
         '5xl': 'clamp(3.81rem, 2.88vw + 3rem, 6.25rem)',

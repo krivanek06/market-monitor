@@ -12,20 +12,20 @@ import { investmentAccountImages } from '../models';
 
       <div class="mb-8 grid gap-x-4 gap-y-8 pt-4 md:mb-16 md:grid-cols-3 lg:px-10">
         <app-marketing-basic-card>
-          <h3 class="mb-2 w-full text-center text-xl text-cyan-600">Portfolio Growth</h3>
+          <h3 class="text-wt-primary mb-2 w-full text-center text-xl">Portfolio Growth</h3>
           <p class="p-4 text-center text-lg text-gray-300">
             Monitor your portfolio against indexes, see in-depth details of your holdings and view your last
             transactions
           </p>
         </app-marketing-basic-card>
         <app-marketing-basic-card>
-          <h3 class="mb-2 w-full text-center text-xl text-cyan-600">Investment Risk</h3>
+          <h3 class="text-wt-primary mb-2 w-full text-center text-xl">Investment Risk</h3>
           <p class="p-4 text-center text-lg text-gray-300">
             Have you ever wondered how risky your portfolio is? Use us to see your portfolio's risk and how it compares
           </p>
         </app-marketing-basic-card>
         <app-marketing-basic-card>
-          <h3 class="mb-2 w-full text-center text-xl text-cyan-600">Allocations & Transactions</h3>
+          <h3 class="text-wt-primary mb-2 w-full text-center text-xl">Allocations & Transactions</h3>
           <p class="p-4 text-center text-lg text-gray-300">
             See your portfolio's allocation, your transactions, and your performance over time.
           </p>
