@@ -1,7 +1,7 @@
 import { NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
-  MarketingPageMarketMonitorComponent,
+  MarketingPageWelcomeMarketMonitorComponent,
   MarketingPageWelcomeHeroComponent,
   MarketingSvgOneComponent,
 } from '@mm/marketing';
@@ -12,7 +12,7 @@ import {
     NgOptimizedImage,
     MarketingSvgOneComponent,
     MarketingPageWelcomeHeroComponent,
-    MarketingPageMarketMonitorComponent,
+    MarketingPageWelcomeMarketMonitorComponent,
   ],
   template: `
     <div class="relative min-h-[100vh] overflow-x-clip bg-black">
@@ -33,7 +33,7 @@ import {
           <app-marketing-welcome-page-hero />
         </div>
         <div class="relative mb-16 p-4 sm:px-10 md:mb-[140px] md:p-10">
-          <app-marketing-page-market-monitor />
+          <app-marketing-page-welcome-market-monitor />
         </div>
         <div class="relative mb-16 p-4 md:mb-[160px] md:p-10">
           <!-- TODO - investment account -->

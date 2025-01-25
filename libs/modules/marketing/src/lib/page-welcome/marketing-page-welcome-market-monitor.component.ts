@@ -10,7 +10,7 @@ import { tap } from 'rxjs';
 import { MarketingBasicCardComponent } from '../components';
 
 @Component({
-  selector: 'app-marketing-page-market-monitor',
+  selector: 'app-marketing-page-welcome-market-monitor',
   imports: [
     QuoteItemComponent,
     RangeDirective,
@@ -83,7 +83,7 @@ import { MarketingBasicCardComponent } from '../components';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MarketingPageMarketMonitorComponent {
+export class MarketingPageWelcomeMarketMonitorComponent {
   private readonly marketApiService = inject(MarketApiService);
   readonly symbols = ['AAPL', 'GOOGL', 'AMZN', 'MSFT', 'TSLA', 'META', 'NVDA', 'PYPL'];
 
