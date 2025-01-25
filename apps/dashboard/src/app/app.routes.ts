@@ -11,7 +11,14 @@ import { map, Observable, of, take, tap } from 'rxjs';
 export const appRoutes: Route[] = [
   {
     path: '',
-    loadComponent: () => import('./marketing/marketing-initial.component').then((m) => m.MarketingInitialComponent),
+    loadComponent: () => import('./marketing/marketing-base.component').then((m) => m.MarketingBaseComponent),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () => import('./marketing/marketing-welcome.component').then((m) => m.MarketingWelcomeComponent),
+      },
+    ],
   },
   {
     path: ROUTES_MAIN.LOGIN,
@@ -23,15 +30,6 @@ export const appRoutes: Route[] = [
   },
   {
     path: ROUTES_MAIN.APP,
-    // canMatch: [
-    //   () => {
-    //     const authState = inject(AuthenticationUserStoreService).state();
-    //     const isDev = inject(IS_DEV_TOKEN);
-
-    //     // show only when not loading auth state or in dev (faster page reload)
-    //     return authState.authenticationState !== 'LOADING' || isDev;
-    //   },
-    // ],
     loadChildren: () => [
       {
         path: '',

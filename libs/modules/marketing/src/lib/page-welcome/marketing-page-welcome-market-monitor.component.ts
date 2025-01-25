@@ -42,7 +42,7 @@ import { MarketingBasicCardComponent } from '../components';
           @for (summary of symbolSummaries.value(); track summary.id) {
             <div
               (click)="selectedSummary.set(summary)"
-              class="cursor-pointer rounded-lg border-solid px-4 py-2 text-sm transition-all duration-300 hover:scale-105 hover:bg-gray-900 hover:outline-dashed hover:outline-2 hover:outline-cyan-800"
+              class="cursor-pointer rounded-lg border-solid px-4 py-2 text-lg transition-all duration-300 hover:scale-105 hover:bg-gray-900 hover:outline-dashed hover:outline-2 hover:outline-cyan-800"
               [ngClass]="{
                 'bg-gray-900 outline-dashed outline-2 outline-cyan-800': selectedSummary()?.id === summary.id,
               }"
@@ -70,7 +70,7 @@ import { MarketingBasicCardComponent } from '../components';
               <app-symbol-summary-list [symbolSummary]="selectedSummary" />
             </app-marketing-basic-card>
           } @else {
-            <div class="g-skeleton h-[390px]"></div>
+            <div class="g-skeleton h-[470px]"></div>
           }
         </div>
       </div>

@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { delay, expand, of, switchMap, take } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { delay, expand, of, Subject, switchMap, take } from 'rxjs';
 
 @Component({
   selector: 'app-marketing-text-modificator',
   imports: [],
-  template: `<span>{{ displayText() }}</span>`,
+  template: `<span (mouseenter)="onMouseEnter()">{{ displayText() || originalText() }}</span>`,
   styles: `
     :host {
       display: block;
@@ -18,31 +18,37 @@ export class MarketingTextModificatorComponent {
   readonly LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   readonly totalIterations = 50;
 
+  private readonly triggerTextMsh$ = new Subject<string>();
+
   readonly displayText = toSignal(
-    toObservable(this.originalText).pipe(
+    this.triggerTextMsh$.pipe(
       switchMap((originalText) =>
         of(originalText).pipe(
           expand((previousTitle, index) => {
-            // last iterations - complete the original text
-            if (index + originalText.length >= this.totalIterations) {
-              const letterIndex = previousTitle.length - (this.totalIterations - index);
-              const letter = originalText.at(letterIndex);
-              const newRandomTitle =
-                previousTitle.slice(0, letterIndex) + letter + previousTitle.slice(letterIndex + 1);
-              return of(newRandomTitle).pipe(delay(30));
-            }
+            // check if last iterations
+            const isLastIteration = index + originalText.length >= this.totalIterations;
 
-            // random letter - replace one letter in the title
-            const letter = this.LETTERS[Math.floor(Math.random() * 26)];
-            const letterIndex = Math.floor(Math.random() * previousTitle.length);
+            const letterIndex = isLastIteration
+              ? previousTitle.length - (this.totalIterations - index)
+              : Math.floor(Math.random() * previousTitle.length);
+
+            const letter = isLastIteration
+              ? originalText.at(letterIndex)
+              : this.LETTERS[Math.floor(Math.random() * 26)];
+
+            // create random title or back to original
             const newRandomTitle = previousTitle.slice(0, letterIndex) + letter + previousTitle.slice(letterIndex + 1);
 
-            return of(newRandomTitle).pipe(delay(30));
+            // return new title
+            return of(newRandomTitle).pipe(delay(45));
           }),
           take(this.totalIterations + 1),
         ),
       ),
     ),
-    { initialValue: this.originalText() },
   );
+
+  onMouseEnter(): void {
+    this.triggerTextMsh$.next(this.originalText());
+  }
 }

@@ -174,7 +174,7 @@ export class MenuSideNavigationComponent {
       filter((event) => event instanceof NavigationStart),
       map((event) => event.url),
       startWith(this.router.url),
-      map((url) => url.replace('/', '') as string),
+      map((url) => url.replace('/app/', '') as string),
     ),
     { initialValue: '' },
   );

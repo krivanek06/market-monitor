@@ -1,14 +1,15 @@
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 import { MarketingTextModificatorComponent } from '../components';
 
 @Component({
   selector: 'app-marketing-welcome-page-hero',
-  imports: [MatButtonModule, MarketingTextModificatorComponent],
+  imports: [MatButtonModule, MarketingTextModificatorComponent, RouterLink],
   template: `
     <section class="-mt-10 grid h-screen place-content-center gap-y-12">
       <h1
-        class="animate-in fade-in zoom-in duration-2000 lg:font-outline-2 z-10 inline-block text-center text-6xl max-md:text-cyan-800 md:bg-gradient-to-b md:from-cyan-500 md:to-black md:bg-clip-text md:text-transparent lg:-mt-20"
+        class="animate-in fade-in zoom-in duration-2000 lg:font-outline-2 max-md:text-wt-primary z-10 inline-block text-center text-5xl md:bg-gradient-to-b md:from-cyan-500 md:to-black md:bg-clip-text md:text-transparent lg:-mt-20"
       >
         <app-marketing-text-modificator originalText="GGFinance" />
       </h1>
@@ -25,7 +26,13 @@ import { MarketingTextModificatorComponent } from '../components';
       </div>
 
       <div class="z-10 mx-auto flex flex-col items-center gap-x-8 gap-y-8 sm:flex-row">
-        <button mat-stroked-button color="primary" type="button" class="h-14 w-[220px] text-lg">
+        <button
+          mat-stroked-button
+          routerLink="/app/dashboard"
+          color="primary"
+          type="button"
+          class="h-14 w-[220px] text-lg"
+        >
           <span>Dashboard</span>
         </button>
       </div>

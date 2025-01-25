@@ -2,11 +2,12 @@ import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterLink } from '@angular/router';
 import { PercentageIncreaseDirective } from '@mm/shared/ui';
 
 @Component({
   selector: 'app-marketing-page-early-investing',
-  imports: [MatButtonModule, MatIconModule, NgOptimizedImage, PercentageIncreaseDirective, CurrencyPipe],
+  imports: [MatButtonModule, MatIconModule, NgOptimizedImage, PercentageIncreaseDirective, CurrencyPipe, RouterLink],
   template: `
     <section>
       <div class="g-section-title">Support Early Investing</div>
@@ -27,7 +28,7 @@ import { PercentageIncreaseDirective } from '@mm/shared/ui';
 
       <!-- >redirect dashboard button -->
       <div class="my-20 grid place-content-center md:mb-[140px]">
-        <button mat-stroked-button color="primary" (click)="onDashboardClick()" class="h-14">
+        <button mat-stroked-button routerLink="/app/dashboard" color="primary" class="h-14">
           <div class="flex min-w-[200px] items-center justify-center gap-4 text-lg">
             <span>Dashboard</span>
             <mat-icon>open_in_new</mat-icon>
@@ -106,6 +107,4 @@ export class MarketingPageEarlyInvestingComponent {
       currentCash: 30_000 * (1 + Math.random() * 0.5),
     }))
     .sort((a, b) => b.currentCash - a.currentCash);
-
-  onDashboardClick() {}
 }
