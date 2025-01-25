@@ -270,21 +270,25 @@ export const getPreviousDate = (date: DateInput): string => {
  * @returns converted ET time to local time - '09:30 a.m. ET' -> '15:30' Slovakia time
  */
 export const convertETToLocalTime = (timeET: string): string => {
-  // Define the time format based on the input '09:30 a.m. ET'
-  const timeFormat = 'hh:mm a';
+  try {
+    // Define the time format based on the input '09:30 a.m. ET'
+    const timeFormat = 'hh:mm a';
 
-  // Parse the input string using date-fns
-  const parsedTime = parse(timeET.replace('ET', '').trim(), timeFormat, new Date());
+    // Parse the input string using date-fns
+    const parsedTime = parse(timeET.replace('ET', '').trim(), timeFormat, new Date());
 
-  // Convert to UTC, assuming input time is in Eastern Time
-  const utcTime = fromZonedTime(parsedTime, 'America/New_York');
+    // Convert to UTC, assuming input time is in Eastern Time
+    const utcTime = fromZonedTime(parsedTime, 'America/New_York');
 
-  // Get the user's local timezone
-  const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // Get the user's local timezone
+    const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  // Convert UTC time to user's local time
-  const localTime = toZonedTime(utcTime, localTimeZone);
+    // Convert UTC time to user's local time
+    const localTime = toZonedTime(utcTime, localTimeZone);
 
-  // Format the output in Slovakian time format
-  return tzFormat(localTime, 'HH:mm', { timeZone: localTimeZone });
+    // Format the output in Slovakian time format
+    return tzFormat(localTime, 'HH:mm', { timeZone: localTimeZone });
+  } catch {
+    return '';
+  }
 };

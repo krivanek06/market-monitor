@@ -1,5 +1,14 @@
 import { NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, inject, NgZone, Renderer2, viewChild } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  NgZone,
+  Renderer2,
+  viewChild,
+} from '@angular/core';
 import {
   MarketingPageAboutUsComponent,
   MarketingPageEarlyInvestingComponent,
@@ -141,19 +150,22 @@ export class PageMarketingComponent {
   readonly imageUrl = 'assets/application/hero-6.webp';
 
   constructor() {
-    this.ngZone.runOutsideAngular(() => {
-      this.renderer.listen('document', 'mousemove', (event) => {
-        const { pageX, pageY } = event;
-        const blobRef = this.blobRef();
+    // move blob only on client, outside of angular
+    afterNextRender(() => {
+      this.ngZone.runOutsideAngular(() => {
+        this.renderer.listen('document', 'mousemove', (event) => {
+          const { pageX, pageY } = event;
+          const blobRef = this.blobRef();
 
-        // move blob
-        blobRef.nativeElement.animate(
-          {
-            left: `${pageX}px`,
-            top: `${pageY}px`,
-          },
-          { duration: 20000, fill: 'forwards' },
-        );
+          // move blob
+          blobRef.nativeElement.animate(
+            {
+              left: `${pageX}px`,
+              top: `${pageY}px`,
+            },
+            { duration: 20000, fill: 'forwards' },
+          );
+        });
       });
     });
   }
