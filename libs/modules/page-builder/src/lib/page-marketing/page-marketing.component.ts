@@ -7,6 +7,7 @@ import {
   MarketingPageWelcomeInvestmentAccountComponent,
   MarketingPageWelcomeMarketMonitorComponent,
   MarketingSvgOneComponent,
+  MarketingSvgTwoComponent,
 } from '@mm/marketing';
 
 @Component({
@@ -14,6 +15,7 @@ import {
   imports: [
     NgOptimizedImage,
     MarketingSvgOneComponent,
+    MarketingSvgTwoComponent,
     MarketingPageWelcomeHeroComponent,
     MarketingPageWelcomeMarketMonitorComponent,
     MarketingPageWelcomeInvestmentAccountComponent,
@@ -22,7 +24,7 @@ import {
   ],
   template: `
     <div class="relative min-h-[100vh] overflow-x-clip bg-black">
-      <app-marketing-svg-one additionalClassed="absolute right-[-100px] top-[250px]" />
+      <app-marketing-svg-two addClass="absolute right-[-100px] top-[250px]" />
       <!-- blob that follows mouse  -->
       <!--<div id="blob" ref={blobRef} class="hidden"></div>-->
 
@@ -43,17 +45,24 @@ import {
           <app-marketing-page-welcome-market-monitor />
         </div>
         <div class="relative mb-16 p-4 md:mb-[160px] md:p-10">
+          <app-marketing-svg-two addClass="absolute left-[-500px] top-[300px] hidden md:block" />
+          <app-marketing-svg-one addClass="absolute left-0 top-[-40px] h-[175px] w-[175px] opacity-25" />
+          <app-marketing-svg-one addClass="absolute left-[120px] top-[120px] h-[175px] w-[175px] opacity-25" />
           <app-marketing-page-welcome-investment-account />
         </div>
         <div class="relative mb-6 p-4 md:p-10">
+          <app-marketing-svg-one addClass="absolute right-0 top-[-40px] h-[175px] w-[175px] opacity-25" />
+          <app-marketing-svg-one addClass="absolute right-[160px] top-[225px] h-[175px] w-[175px] opacity-25" />
           <app-marketing-page-early-investing />
         </div>
         <div class="relative mb-6 p-4 md:p-10">
+          <app-marketing-svg-one addClass="absolute left-0 top-[-40px] h-[175px] w-[175px] opacity-25" />
+          <app-marketing-svg-one addClass="absolute right-[160px] top-[225px] h-[175px] w-[175px] opacity-25" />
           <app-marketing-page-about-us />
         </div>
 
         <!-- TODO - about us -->
-        <footer class="h-12 bg-black"></footer>
+        <footer class="h-6 bg-black"></footer>
       </div>
     </div>
   `,
