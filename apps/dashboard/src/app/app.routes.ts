@@ -1,12 +1,12 @@
-import { inject, Injectable } from '@angular/core';
-import { PreloadingStrategy, Route, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { Route, Router } from '@angular/router';
 import { RenderMode, ServerRoute } from '@angular/ssr';
 import { UserAccountEnum } from '@mm/api-types';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { featureFlagGuard, userAccountTypeGuard } from '@mm/authentication/feature-access-directive';
 import { IS_DEV_TOKEN, ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
 import { tradingSimulatorDetailsGuard, tradingSimulatorEditGuard } from '@mm/trading-simulator/data-access';
-import { map, Observable, of, take, tap } from 'rxjs';
+import { map, take, tap } from 'rxjs';
 
 export const appRoutes: Route[] = [
   {
@@ -29,21 +29,20 @@ export const appRoutes: Route[] = [
     loadComponent: () => import('@mm/page-builder').then((m) => m.PageNotFoundComponent),
   },
   {
+    path: 'loading',
+    loadComponent: () => import('./app-loading/app-loading.component').then((m) => m.AppLoadingComponent),
+    canMatch: [
+      () => {
+        const authState = inject(AuthenticationUserStoreService).state();
+
+        // show only when loading auth state and in production
+        return authState.authenticationState === 'LOADING';
+      },
+    ],
+  },
+  {
     path: ROUTES_MAIN.APP,
     loadChildren: () => [
-      {
-        path: '',
-        loadComponent: () => import('./app-loading/app-loading.component').then((m) => m.AppLoadingComponent),
-        canMatch: [
-          () => {
-            const authState = inject(AuthenticationUserStoreService).state();
-            const isDev = inject(IS_DEV_TOKEN);
-
-            // show only when loading auth state and in production
-            return authState.authenticationState === 'LOADING' && !isDev;
-          },
-        ],
-      },
       {
         path: '',
         loadComponent: () => import('@mm/page-builder').then((m) => m.PageMenuComponent),
@@ -52,6 +51,7 @@ export const appRoutes: Route[] = [
             const authentication = inject(AuthenticationAccountService);
             const authenticationState = inject(AuthenticationUserStoreService);
             const router = inject(Router);
+            const isDev = inject(IS_DEV_TOKEN);
 
             // check if user already loaded
             if (authenticationState.state().authenticationState === 'SUCCESS' && authenticationState.state().userData) {
@@ -59,12 +59,17 @@ export const appRoutes: Route[] = [
               return true;
             }
 
-            // listen on user loaded
-            return authentication.getLoadedAuthentication().pipe(
-              tap(() => console.log('CHECK REDIRECT DASHBOARD')),
-              take(1),
-              map((isLoaded) => (isLoaded ? true : router.navigate([ROUTES_MAIN.LOGIN]))),
-            );
+            // ignore loading page on dev
+            if (isDev) {
+              return authentication.getLoadedAuthentication().pipe(
+                tap((e) => console.log('CHECK REDIRECT DASHBOARD', e)),
+                take(1),
+                map((isLoaded) => (isLoaded ? true : router.navigate([ROUTES_MAIN.LOGIN]))),
+              );
+            }
+
+            // go to loading page on refresh
+            return router.navigate(['loading']);
           },
         ],
         loadChildren: () => [
@@ -214,6 +219,10 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   // client rendering
+  // {
+  //   path: ROUTES_MAIN.APP,
+  //   renderMode: RenderMode.Client,
+  // },
   {
     path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.DASHBOARD}`,
     renderMode: RenderMode.Client,
@@ -275,22 +284,3 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
 ];
-
-@Injectable({ providedIn: 'root' })
-export class CustomPreloadingStrategy extends PreloadingStrategy {
-  private routesToPreload: Route[] = [];
-
-  preload(route: Route, load: () => Observable<any>): Observable<any> {
-    // Check if the route is marked for on-demand preloading
-    if (route.data?.['preloadOnNavigate'] && this.routesToPreload.includes(route)) {
-      console.log('preload', route.data?.['preloadOnNavigate']);
-      return load(); // Preload the route
-    }
-    return of(null); // Skip preloading
-  }
-
-  // Called when navigation to the specified route occurs
-  markForPreload(route: Route): void {
-    this.routesToPreload.push(route);
-  }
-}

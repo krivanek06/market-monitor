@@ -61,12 +61,12 @@ import { MarketingBasicCardComponent } from '../components';
             @defer (on viewport) {
               <app-asset-price-chart-interactive [symbol]="selectedSummary.id" [chartHeightPx]="420" />
             } @placeholder {
-              <div class="g-skeleton h-[420px]"></div>
+              <div class="g-skeleton h-[470px]"></div>
             } @loading (minimum 1s) {
-              <div class="g-skeleton h-[420px]"></div>
+              <div class="g-skeleton h-[470px]"></div>
             }
           } @else {
-            <div class="g-skeleton h-[420px]"></div>
+            <div class="g-skeleton h-[470px]"></div>
           }
         </div>
         <!-- summary -->
