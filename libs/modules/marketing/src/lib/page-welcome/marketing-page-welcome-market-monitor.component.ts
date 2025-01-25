@@ -58,7 +58,13 @@ import { MarketingBasicCardComponent } from '../components';
         <!-- historical chart -->
         <div class="xl:col-span-2">
           @if (selectedSummary(); as selectedSummary) {
-            <app-asset-price-chart-interactive [symbol]="selectedSummary.id" [chartHeightPx]="420" />
+            @defer (on viewport) {
+              <app-asset-price-chart-interactive [symbol]="selectedSummary.id" [chartHeightPx]="420" />
+            } @placeholder {
+              <div class="g-skeleton h-[420px]"></div>
+            } @loading (minimum 1s) {
+              <div class="g-skeleton h-[420px]"></div>
+            }
           } @else {
             <div class="g-skeleton h-[420px]"></div>
           }

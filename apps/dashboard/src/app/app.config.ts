@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { APP_INITIALIZER, ApplicationConfig, inject, provideZoneChangeDetection } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
@@ -30,7 +30,7 @@ export const appConfig: ApplicationConfig = {
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
     provideFunctions(() => getFunctions()),
-    provideHttpClient(),
+    provideHttpClient(withFetch()),
     provideRouter(
       appRoutes,
       // this is in place of scrollPositionRestoration: 'disabled',
