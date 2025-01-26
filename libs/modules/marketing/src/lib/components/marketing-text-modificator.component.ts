@@ -23,9 +23,10 @@ export class MarketingTextModificatorComponent {
   readonly displayText = toSignal(
     this.triggerTextMsh$.pipe(
       switchMap((originalText) =>
-        from(this.shuffleText(originalText)).pipe(concatMap((text) => of(text).pipe(delay(50)))),
+        from(this.shuffleText(originalText)).pipe(concatMap((text) => of(text).pipe(delay(60)))),
       ),
     ),
+    { initialValue: '' },
   );
 
   private shuffleText(originalText: string) {
@@ -71,6 +72,11 @@ export class MarketingTextModificatorComponent {
   }
 
   onMouseEnter(): void {
+    // prevent trigger while running
+    if (this.displayText() !== '' && this.displayText() !== this.originalText()) {
+      return;
+    }
+
     this.triggerTextMsh$.next(this.originalText());
   }
 }
