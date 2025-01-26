@@ -20,7 +20,7 @@ import { URL_GITHUB, URL_INSTAGRAM, URL_LINKED_IN } from '../models';
       </a>
 
       <!-- github -->
-      <a [href]="URL_GITHUB" target="_blank" rel="noopener noreferrer">
+      <a [href]="URL_GITHUB" target="_blank" rel="noopener noreferrer" class="pl-4">
         <svg
           viewBox="0 0 32 32"
           class="fill-wt-gray-medium hover:fill-wt-primary h-12 w-12 cursor-pointer transition-all duration-700"

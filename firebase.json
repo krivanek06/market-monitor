@@ -13,7 +13,7 @@
     },
     {
       "target": "dashboard-prod",
-      "public": "./dist/apps/dashboard",
+      "public": "./dist/apps/dashboard/browser",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
