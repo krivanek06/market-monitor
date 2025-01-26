@@ -219,68 +219,8 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   // client rendering
-  // {
-  //   path: ROUTES_MAIN.APP,
-  //   renderMode: RenderMode.Client,
-  // },
   {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.DASHBOARD}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.WATCHLIST}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.TRADING}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.HALL_OF_FAME}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.COMPARE_USERS}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.GROUPS}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.TRADING_SIMULATOR}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.STOCK_DETAILS}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.STOCK_SCREENER}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.ECONOMICS}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.NEWS}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.CRYPTO}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.MARKET_CALENDAR}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.TOP_PERFORMERS}`,
-    renderMode: RenderMode.Client,
-  },
-  {
-    path: `${ROUTES_MAIN.APP}/${ROUTES_MAIN.MARKET}`,
+    path: ROUTES_MAIN.APP,
     renderMode: RenderMode.Client,
   },
 ];

@@ -30,6 +30,12 @@ export function app(): express.Express {
     }),
   );
 
+  // this allows us to skip over SSR for the app routes
+  server.get(/^\/app/, (req, res) => {
+    const path = join(__dirname, '../browser/index.html');
+    res.sendFile(path);
+  });
+
   // All regular routes use the Angular engine
   server.get('*', (req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
