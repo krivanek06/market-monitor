@@ -9,6 +9,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
   standalone: true,
   imports: [HighchartsChartModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { ngSkipHydration: 'true' },
   styles: `
     :host {
       display: block;

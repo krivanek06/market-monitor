@@ -30,7 +30,7 @@ export class AppLoadingComponent {
         map((state) => state.authenticationState),
         filter((state) => state !== 'LOADING'),
         delay(2000), // keep the loading screen for 2s
-        map((isLoaded) => (isLoaded === 'SUCCESS' ? ROUTES_MAIN.DASHBOARD : ROUTES_MAIN.LOGIN)),
+        map((isLoaded) => (isLoaded === 'SUCCESS' ? `${ROUTES_MAIN.APP}/${ROUTES_MAIN.DASHBOARD}` : ROUTES_MAIN.LOGIN)),
         takeUntilDestroyed(),
       )
       .subscribe((direction) => {

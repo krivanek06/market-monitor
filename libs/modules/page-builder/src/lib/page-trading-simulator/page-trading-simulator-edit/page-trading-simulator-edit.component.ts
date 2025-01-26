@@ -78,7 +78,7 @@ export class PageTradingSimulatorEditComponent extends PageTradingSimulatorBaseC
       await this.tradingSimulatorService.deleteSimulator(simulator);
 
       // redirect to the trading simulator page
-      await this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
+      await this.router.navigate([ROUTES_MAIN.APP, ROUTES_MAIN.TRADING_SIMULATOR]);
 
       // show a success message
       this.dialogServiceUtil.showNotificationBar('Trading Simulator Deleted', 'success');

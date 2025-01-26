@@ -15,6 +15,10 @@
   background-color: var(--gray-medium) !important;
 }
 
+.g-section-title {
+  @apply text-wt-primary mb-10 text-center text-3xl capitalize md:mb-16;
+}
+
 .g-border-bottom {
   border-bottom: 1px solid var(--border) !important;
   border-bottom-right-radius: 0 !important;
@@ -87,4 +91,17 @@ h2 {
   pointer-events: none;
   opacity: 0.5;
   background: var(--gray-dark);
+}
+
+/* add the code bellow */
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }

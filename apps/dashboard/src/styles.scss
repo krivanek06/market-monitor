@@ -6,6 +6,7 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css?family=Prociono:400,700');
 /* You can add global styles to this file, and also import other style files */ // custom material scss
 
 body {
@@ -15,4 +16,8 @@ body {
   font-family: system-ui;
   background-color: var(--background-dashboard);
   color: var(--gray-medium);
+}
+
+body.marketing-styles {
+  font-family: Prociono, sans-serif !important;
 }

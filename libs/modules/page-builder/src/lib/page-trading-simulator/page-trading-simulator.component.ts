@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TradingSimulator } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { ROUTES_MAIN, ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
+import { ROUTES_TRADING_SIMULATOR } from '@mm/shared/data-access';
 import { SectionTitleComponent } from '@mm/shared/ui';
 import { TradingSimulatorService } from '@mm/trading-simulator/data-access';
 import { TradingSimulatorDisplayCardComponent } from '@mm/trading-simulator/ui';
@@ -150,6 +150,7 @@ export class PageTradingSimulatorComponent {
   private readonly tradingSimulatorService = inject(TradingSimulatorService);
   private readonly authenticationUserStoreService = inject(AuthenticationUserStoreService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly simulatorsByOwner = this.tradingSimulatorService.simulatorsByOwner;
   readonly userData = this.authenticationUserStoreService.state.getUserData;
@@ -174,14 +175,18 @@ export class PageTradingSimulatorComponent {
   });
 
   onCreateSimulator() {
-    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.CREATE]);
+    this.router.navigate([ROUTES_TRADING_SIMULATOR.CREATE], { relativeTo: this.route });
   }
 
   onEditSimulator(simulator: TradingSimulator) {
-    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.EDIT, simulator.id]);
+    this.router.navigate([ROUTES_TRADING_SIMULATOR.EDIT, simulator.id], {
+      relativeTo: this.route,
+    });
   }
 
   onStatisticsClicked(simulator: TradingSimulator) {
-    this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR, ROUTES_TRADING_SIMULATOR.DETAILS, simulator.id]);
+    this.router.navigate([ROUTES_TRADING_SIMULATOR.DETAILS, simulator.id], {
+      relativeTo: this.route,
+    });
   }
 }

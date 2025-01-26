@@ -130,7 +130,7 @@ export class PageTradingSimulatorDetailsButtonsComponent {
       await this.tradingSimulatorService.deleteSimulator(this.simulatorData());
 
       // navigate to the trading simulator page
-      this.router.navigate([ROUTES_MAIN.TRADING_SIMULATOR]);
+      this.router.navigate([ROUTES_MAIN.APP, ROUTES_MAIN.TRADING_SIMULATOR]);
 
       // notify user
       this.dialogServiceUtil.showNotificationBar('Trading Simulator Deleted', 'success');

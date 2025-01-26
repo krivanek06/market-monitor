@@ -773,14 +773,17 @@ export class TradingSimulatorFormComponent {
 
       if (state === 'draft') {
         // route to trading simulator editing
-        this.router.navigateByUrl(
-          `${ROUTES_MAIN.TRADING_SIMULATOR}/${ROUTES_TRADING_SIMULATOR.EDIT}/${tradingSimulator.id}`,
-        );
+        this.router.navigate([
+          ROUTES_MAIN.APP,
+          ROUTES_MAIN.TRADING_SIMULATOR,
+          ROUTES_TRADING_SIMULATOR.EDIT,
+          tradingSimulator.id,
+        ]);
       } else {
         // change state
         this.tradingSimulatorService.simulatorStateChangeGoLive(tradingSimulator);
         // route to trading simulator
-        this.router.navigateByUrl(ROUTES_MAIN.TRADING_SIMULATOR);
+        this.router.navigate([ROUTES_MAIN.APP, ROUTES_MAIN.TRADING_SIMULATOR]);
       }
     } catch (error) {
       this.dialogServiceUtil.handleError(error);

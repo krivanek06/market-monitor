@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { Route, Router } from '@angular/router';
+import { RenderMode, ServerRoute } from '@angular/ssr';
 import { UserAccountEnum } from '@mm/api-types';
 import { AuthenticationAccountService, AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { featureFlagGuard, userAccountTypeGuard } from '@mm/authentication/feature-access-directive';
@@ -10,37 +11,38 @@ import { map, take, tap } from 'rxjs';
 export const appRoutes: Route[] = [
   {
     path: '',
-    loadComponent: () => import('./app-loading/app-loading.component').then((m) => m.AppLoadingComponent),
-    canMatch: [
-      () => {
-        const authState = inject(AuthenticationUserStoreService).state();
-        const isDev = inject(IS_DEV_TOKEN);
-
-        // show only when loading auth state and in production
-        return authState.authenticationState === 'LOADING' && !isDev;
+    loadComponent: () => import('./marketing/marketing-base.component').then((m) => m.MarketingBaseComponent),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () => import('./marketing/marketing-welcome.component').then((m) => m.MarketingWelcomeComponent),
       },
     ],
   },
   {
-    path: '',
+    path: ROUTES_MAIN.LOGIN,
+    loadComponent: () => import('@mm/page-builder').then((m) => m.PageLoginComponent),
+  },
+  {
+    path: ROUTES_MAIN.NOT_FOUND,
+    loadComponent: () => import('@mm/page-builder').then((m) => m.PageNotFoundComponent),
+  },
+  {
+    path: 'loading',
+    loadComponent: () => import('./app-loading/app-loading.component').then((m) => m.AppLoadingComponent),
     canMatch: [
       () => {
         const authState = inject(AuthenticationUserStoreService).state();
-        const isDev = inject(IS_DEV_TOKEN);
 
-        // show only when not loading auth state or in dev (faster page reload)
-        return authState.authenticationState !== 'LOADING' || isDev;
+        // show only when loading auth state and in production
+        return authState.authenticationState === 'LOADING';
       },
     ],
+  },
+  {
+    path: ROUTES_MAIN.APP,
     loadChildren: () => [
-      {
-        path: ROUTES_MAIN.LOGIN,
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageLoginComponent),
-      },
-      {
-        path: ROUTES_MAIN.NOT_FOUND,
-        loadComponent: () => import('@mm/page-builder').then((m) => m.PageNotFoundComponent),
-      },
       {
         path: '',
         loadComponent: () => import('@mm/page-builder').then((m) => m.PageMenuComponent),
@@ -49,6 +51,7 @@ export const appRoutes: Route[] = [
             const authentication = inject(AuthenticationAccountService);
             const authenticationState = inject(AuthenticationUserStoreService);
             const router = inject(Router);
+            const isDev = inject(IS_DEV_TOKEN);
 
             // check if user already loaded
             if (authenticationState.state().authenticationState === 'SUCCESS' && authenticationState.state().userData) {
@@ -56,12 +59,17 @@ export const appRoutes: Route[] = [
               return true;
             }
 
-            // listen on user loaded
-            return authentication.getLoadedAuthentication().pipe(
-              tap(() => console.log('CHECK REDIRECT DASHBOARD')),
-              take(1),
-              map((isLoaded) => (isLoaded ? true : router.navigate([ROUTES_MAIN.LOGIN]))),
-            );
+            // ignore loading page on dev
+            if (isDev) {
+              return authentication.getLoadedAuthentication().pipe(
+                tap((e) => console.log('CHECK REDIRECT DASHBOARD', e)),
+                take(1),
+                map((isLoaded) => (isLoaded ? true : router.navigate([ROUTES_MAIN.LOGIN]))),
+              );
+            }
+
+            // go to loading page on refresh
+            return router.navigate(['loading']);
           },
         ],
         loadChildren: () => [
@@ -180,6 +188,10 @@ export const appRoutes: Route[] = [
         ],
       },
       {
+        path: ROUTES_MAIN.NOT_FOUND,
+        loadComponent: () => import('@mm/page-builder').then((m) => m.PageNotFoundComponent),
+      },
+      {
         path: '**',
         redirectTo: ROUTES_MAIN.NOT_FOUND,
       },
@@ -188,5 +200,27 @@ export const appRoutes: Route[] = [
   {
     path: '**',
     redirectTo: '',
+  },
+];
+
+export const serverRoutes: ServerRoute[] = [
+  // prerender
+  {
+    path: '',
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: ROUTES_MAIN.NOT_FOUND,
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: ROUTES_MAIN.LOGIN,
+    renderMode: RenderMode.Prerender,
+  },
+
+  // client rendering
+  {
+    path: ROUTES_MAIN.APP,
+    renderMode: RenderMode.Client,
   },
 ];

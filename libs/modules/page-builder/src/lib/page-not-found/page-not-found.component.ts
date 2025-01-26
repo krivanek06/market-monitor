@@ -16,7 +16,7 @@ import { RouterModule } from '@angular/router';
         <div class="text-wt-primary text-center text-lg">
           <button mat-flat-button type="button" color="primary" class="h-11">
             <mat-icon>arrow_back</mat-icon>
-            <a routerLink="/">Go to Home</a>
+            <a routerLink="/app">Go to Home</a>
           </button>
         </div>
       </div>

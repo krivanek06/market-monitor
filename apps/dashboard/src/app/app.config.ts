@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { APP_INITIALIZER, ApplicationConfig, inject, provideZoneChangeDetection } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
@@ -6,6 +6,7 @@ import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } f
 import { Functions, connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+import { provideClientHydration, withEventReplay, withIncrementalHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   PreloadAllModules,
@@ -24,11 +25,12 @@ import { appRoutes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideClientHydration(withEventReplay(), withIncrementalHydration()),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
     provideFunctions(() => getFunctions()),
-    provideHttpClient(),
+    provideHttpClient(withFetch()),
     provideRouter(
       appRoutes,
       // this is in place of scrollPositionRestoration: 'disabled',

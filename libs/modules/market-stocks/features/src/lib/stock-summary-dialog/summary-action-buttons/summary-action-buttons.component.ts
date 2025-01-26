@@ -159,6 +159,6 @@ export class SummaryActionButtonsComponent {
     this.dialogRef.closeAll();
 
     // routing kept here, because component is used in multiple places
-    this.route.navigateByUrl(`${ROUTES_MAIN.STOCK_DETAILS}/${this.symbolSummary().id}`);
+    this.route.navigate([ROUTES_MAIN.APP, ROUTES_MAIN.STOCK_DETAILS, this.symbolSummary().id]);
   }
 }

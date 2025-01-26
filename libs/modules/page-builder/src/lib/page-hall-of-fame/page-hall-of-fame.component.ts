@@ -319,7 +319,7 @@ export class PageHallOfFameComponent {
   }
 
   onGroupClick(group: GroupBase) {
-    this.router.navigateByUrl(`/${ROUTES_MAIN.GROUPS}/${group.id}`);
+    this.router.navigate([ROUTES_MAIN.APP, ROUTES_MAIN.GROUPS, group.id]);
   }
 
   onShowBestToggle() {

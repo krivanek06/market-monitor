@@ -9,6 +9,7 @@ import { GROUP_OWNER_LIMIT, GroupData } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { GroupDisplayCardComponent, GroupSearchControlComponent } from '@mm/group/features';
 import { GroupDisplayItemComponent } from '@mm/group/ui';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { GeneralCardComponent, RangeDirective, SectionTitleComponent, animationShowItemLeft } from '@mm/shared/ui';
 
@@ -268,6 +269,6 @@ export class PageGroupsComponent {
   }
 
   onGroupClick(group: GroupData): void {
-    this.router.navigate(['groups', group.id]);
+    this.router.navigate([ROUTES_MAIN.APP, ROUTES_MAIN.GROUPS, group.id]);
   }
 }
