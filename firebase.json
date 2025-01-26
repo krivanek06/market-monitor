@@ -1,19 +1,8 @@
 {
   "hosting": [
     {
-      "target": "market-monitor-prod",
-      "public": "./dist/apps/market-monitor",
-      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-      "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ]
-    },
-    {
       "target": "dashboard-prod",
-      "public": "./dist/apps/dashboard",
+      "public": "./dist/apps/dashboard/browser",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
