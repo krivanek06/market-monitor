@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { delay, expand, of, Subject, switchMap, take } from 'rxjs';
+import { concatMap, delay, from, of, Subject, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-marketing-text-modificator',
@@ -23,30 +23,52 @@ export class MarketingTextModificatorComponent {
   readonly displayText = toSignal(
     this.triggerTextMsh$.pipe(
       switchMap((originalText) =>
-        of(originalText).pipe(
-          expand((previousTitle, index) => {
-            // check if last iterations
-            const isLastIteration = index + originalText.length >= this.totalIterations;
-
-            const letterIndex = isLastIteration
-              ? previousTitle.length - (this.totalIterations - index)
-              : Math.floor(Math.random() * previousTitle.length);
-
-            const letter = isLastIteration
-              ? originalText.at(letterIndex)
-              : this.LETTERS[Math.floor(Math.random() * 26)];
-
-            // create random title or back to original
-            const newRandomTitle = previousTitle.slice(0, letterIndex) + letter + previousTitle.slice(letterIndex + 1);
-
-            // return new title
-            return of(newRandomTitle).pipe(delay(45));
-          }),
-          take(this.totalIterations + 1),
-        ),
+        from(this.shuffleText(originalText)).pipe(concatMap((text) => of(text).pipe(delay(50)))),
       ),
     ),
   );
+
+  private shuffleText(originalText: string) {
+    // create masked text => XXXX
+    const maskedText = originalText
+      .split('')
+      .map((d) => (d === ' ' ? ' ' : 'X'))
+      .join('');
+
+    // from original => XXXX
+    const mask1 = originalText.split('').map((_, index) => {
+      const beginning = maskedText.slice(0, index + 1);
+      const rest = originalText.slice(index + 1);
+      return beginning + rest;
+    });
+
+    // from XXXX => some kind of mesh
+    const mask2 = Array.from({ length: originalText.length * 3 }).reduce(
+      (acc: string[], _, index) => {
+        const prevWord = acc.at(-1) as string;
+        const letterIndexToReplace = index % originalText.length;
+        const randomLetter = this.LETTERS[Math.floor(Math.random() * 26)];
+
+        return [
+          ...acc,
+          prevWord.slice(0, letterIndexToReplace) + randomLetter + prevWord.slice(letterIndexToReplace + 1),
+        ];
+      },
+      [mask1[mask1.length - 1]] as string[],
+    );
+
+    // from some kind of mesh => XXXX
+    const mask3 = mask2[mask2.length - 1].split('').map((_, index) => {
+      return maskedText.slice(0, index + 1) + mask2[mask2.length - 1].slice(index + 1);
+    });
+
+    // from XXX => original
+    const mask4 = mask3[mask3.length - 1].split('').map((_, index) => {
+      return originalText.slice(0, index + 1) + mask3[mask3.length - 1].slice(index + 1);
+    });
+
+    return [...mask1, ...mask2, ...mask3, ...mask4];
+  }
 
   onMouseEnter(): void {
     this.triggerTextMsh$.next(this.originalText());
