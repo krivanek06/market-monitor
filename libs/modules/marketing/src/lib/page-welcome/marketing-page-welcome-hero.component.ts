@@ -26,13 +26,7 @@ import { MarketingTextModificatorComponent } from '../components';
       </div>
 
       <div class="z-10 mx-auto flex flex-col items-center gap-x-8 gap-y-8 sm:flex-row">
-        <button
-          mat-stroked-button
-          routerLink="/app/dashboard"
-          color="primary"
-          type="button"
-          class="h-14 w-[220px] text-lg"
-        >
+        <button mat-stroked-button routerLink="/app" color="primary" type="button" class="h-14 w-[220px] text-lg">
           <span>Dashboard</span>
         </button>
       </div>

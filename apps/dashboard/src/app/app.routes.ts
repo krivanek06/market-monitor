@@ -35,6 +35,10 @@ export const appRoutes: Route[] = [
       () => {
         const authState = inject(AuthenticationUserStoreService).state();
 
+        if (authState.authenticationState === 'FAIL') {
+          return inject(Router).navigate([ROUTES_MAIN.LOGIN]);
+        }
+
         // show only when loading auth state and in production
         return authState.authenticationState === 'LOADING';
       },
