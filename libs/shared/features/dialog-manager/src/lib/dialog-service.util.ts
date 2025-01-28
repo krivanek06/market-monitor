@@ -82,6 +82,11 @@ export class DialogServiceUtil {
       return;
     }
 
+    if (String(code).includes('auth')) {
+      this.showNotificationBar('Problem with authentication', 'error');
+      return;
+    }
+
     // remove the word FirebaseError:
     this.showNotificationBar(message, 'error');
   }
@@ -89,7 +94,7 @@ export class DialogServiceUtil {
   showNotificationBar(
     message: string,
     type: 'success' | 'error' | 'notification' = 'notification',
-    duration: number = 4000,
+    duration = 4000,
   ): void {
     if (!this.snackBar) {
       console.warn('DialogService.snackBar not initialized');
@@ -110,9 +115,9 @@ export class DialogServiceUtil {
 
   async showConfirmDialog(
     dialogTitle: string,
-    confirmButton: string = 'Confirm',
-    showCancelButton: boolean = true,
-    showTextWord: string = '',
+    confirmButton = 'Confirm',
+    showCancelButton = true,
+    showTextWord = '',
   ): Promise<boolean> {
     if (!this.matDialog) {
       console.warn('DialogService.matDialog not initialized');

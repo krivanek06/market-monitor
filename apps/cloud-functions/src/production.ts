@@ -24,7 +24,7 @@ import {
 import { measureFunctionExecutionTime } from './utils';
 
 const region = 'europe-central2';
-const allowedUrl = ['https://dashboard.ggfinance.io', 'http://localhost:4200/']; // in the future maybe configure this -> ['https://dashboard.ggfinance.io', 'http://localhost:4200/'];
+const allowedUrl = ['https://ggfinance.io', 'http://localhost:4200/']; // in the future maybe configure this -> ['https://dashboard.ggfinance.io', 'http://localhost:4200/'];
 
 /**
  * admin
