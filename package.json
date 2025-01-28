@@ -5,6 +5,7 @@
   "scripts": {
     "mmd:serve": "nx run dashboard:serve",
     "mmd:serve-ssr": "nx run dashboard:serve-ssr",
+    "mmd:build-prerender": "nx run dashboard:prerender",
     "mmd:build": "nx run dashboard:build:production && nx run dashboard:server:production",
     "mmd:source-map": "nx run dashboard:build --configuration development && npx source-map-explorer dist/apps/dashboard/*.js",
     "mmd:deploy": "firebase deploy --only hosting:dashboard-prod",

@@ -143,7 +143,7 @@
     "prerender": {
       "executor": "@angular-devkit/build-angular:prerender",
       "options": {
-        "routes": ["/"]
+        "routes": ["/", "/login", "/not-found"]
       },
       "configurations": {
         "development": {
