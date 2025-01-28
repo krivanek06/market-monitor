@@ -65,10 +65,20 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
         @if (transaction().returnValue) {
           <!-- total return -->
           <div
+            class="max-xs:hidden"
             appPercentageIncrease
             [useCurrencySign]="true"
             [changeValues]="{
               change: transaction().returnValue,
+              changePercentage: transaction().returnChange,
+            }"
+          ></div>
+
+          <div
+            class="xs:hidden"
+            appPercentageIncrease
+            [useCurrencySign]="true"
+            [changeValues]="{
               changePercentage: transaction().returnChange,
             }"
           ></div>

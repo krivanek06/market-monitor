@@ -45,7 +45,7 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
               </span>
             </div>
 
-            <!-- portfolio -->
+            <!-- open groups -->
             @if (!groupData().isClosed) {
               <!-- total portfolio change -->
               <div
@@ -56,10 +56,10 @@ import { ClickableDirective, DefaultImgDirective, PercentageIncreaseDirective } 
                   changePercentage: changePercentage(),
                 }"
               ></div>
+            } @else {
+              <!-- closed group display message -->
+              <div class="text-wt-danger">(Closed)</div>
             }
-
-            <!-- closed group display message -->
-            <div *ngIf="groupData().isClosed" class="text-wt-danger">(Closed)</div>
           </div>
           <div class="flex items-center gap-4">
             <!-- owner -->

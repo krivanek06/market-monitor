@@ -89,7 +89,7 @@ import { MenuTopNavigationComponent } from './menu-navigation/menu-top-navigatio
 
     .c-content-wrapper {
       height: auto;
-      padding: 24px 20px 40px 20px;
+      padding: 20px 16px 40px 16px;
       max-width: 100%;
       margin: auto;
 

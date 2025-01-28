@@ -190,7 +190,7 @@ import { GeneralCardComponent, PieChartComponent } from '@mm/shared/ui';
 
     <!-- best / worst -->
     @if (hasEnoughTransactions()) {
-      <div class="mb-10 grid gap-4 md:grid-cols-2">
+      <div class="mb-10 hidden grid-cols-2 gap-4 md:grid">
         <!-- best transactions -->
         <app-general-card title="Best Returns" matIcon="trending_up" class="flex-1">
           @for (item of stateRef.getUserPortfolioTransactionsBest(); track item.transactionId; let last = $last) {

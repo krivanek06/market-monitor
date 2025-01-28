@@ -147,14 +147,24 @@ import {
               {{ row.unitPrice * row.units | currency }}
             </div>
 
-            <!-- total return -->
+            <!-- sm screen -->
             <div
               appPercentageIncrease
               [useCurrencySign]="true"
-              class="text-sm sm:hidden"
+              class="xs:max-sm:flex hidden text-sm"
               [changeValues]="{
                 change: row.returnValue,
                 changePercentage: row.returnChange,
+              }"
+            ></div>
+
+            <!-- xs screen -->
+            <div
+              appPercentageIncrease
+              [useCurrencySign]="true"
+              class="xs:hidden text-sm"
+              [changeValues]="{
+                change: row.returnValue,
               }"
             ></div>
           </div>

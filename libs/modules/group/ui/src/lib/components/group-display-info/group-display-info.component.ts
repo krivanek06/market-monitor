@@ -38,6 +38,7 @@ import { DefaultImgDirective, PercentageIncreaseDirective } from '@mm/shared/ui'
             change: groupData().portfolioState.totalGainsValue,
             changePercentage: groupData().portfolioState.totalGainsPercentage,
           }"
+          class="max-sm:hidden"
         ></div>
       }
     </div>

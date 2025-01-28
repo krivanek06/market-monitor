@@ -101,7 +101,7 @@ export type UserDetailsDialogComponentData = {
         <!-- display portfolio -->
         <div class="divide-wt-border flex flex-row divide-x-2 p-2">
           <!-- portfolio state -->
-          <div class="px-4 py-2 max-lg:flex-1 lg:basis-[40%]">
+          <div class="py-2 max-lg:flex-1 sm:px-4 lg:basis-[40%]">
             <app-portfolio-state
               data-testid="user-details-portfolio-state"
               [titleColor]="ColorScheme.GRAY_DARK_VAR"
@@ -181,7 +181,7 @@ export type UserDetailsDialogComponentData = {
               <app-section-title title="Best Returns" matIcon="trending_up" class="mb-3" titleSize="base" />
               @for (item of portfolioTransactions().best; track item.transactionId; let last = $last) {
                 <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
-                  <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+                  <app-portfolio-transactions-item [transaction]="item" />
                 </div>
               } @empty {
                 <div class="py-2">
@@ -199,7 +199,7 @@ export type UserDetailsDialogComponentData = {
               <app-section-title title="Worst Returns" matIcon="trending_down" class="mb-3" titleSize="base" />
               @for (item of portfolioTransactions().worst; track item.transactionId; let last = $last) {
                 <div class="py-2" [ngClass]="{ 'g-border-bottom': !last }">
-                  <app-portfolio-transactions-item dateType="round" [transaction]="item" />
+                  <app-portfolio-transactions-item [transaction]="item" />
                 </div>
               } @empty {
                 <div class="py-2">

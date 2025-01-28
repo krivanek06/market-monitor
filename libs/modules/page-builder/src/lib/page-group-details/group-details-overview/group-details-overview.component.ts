@@ -216,7 +216,7 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       }
 
       <!-- holding table -->
-      <div class="mb-10">
+      <div class="mb-10 max-sm:hidden">
         <app-portfolio-holdings-table-card
           [maximumHoldingLimit]="GROUP_HOLDING_LIMIT"
           [portfolioStateHolding]="groupPortfolioStateHolding()"
