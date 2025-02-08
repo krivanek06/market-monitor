@@ -83,7 +83,9 @@ export type UserData = UserBase & {
   /**
    * data about current holdings, calculated from previous transactions
    */
-  holdingSnapshot: DataDocsWrapper<PortfolioStateHoldingBase>;
+  holdingSnapshot: DataDocsWrapper<PortfolioStateHoldingBase> & {
+    symbols: string[];
+  };
   /**
    * only available for DEMO_TRADING users
    */

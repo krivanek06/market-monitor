@@ -123,6 +123,7 @@ export class PortfolioUserFacadeService {
       holdingSnapshot: {
         lastModifiedDate: getCurrentDateDefaultFormat(),
         data: holdings,
+        symbols: holdings.map((h) => h.symbol),
       },
     });
   }
@@ -162,6 +163,7 @@ export class PortfolioUserFacadeService {
       holdingSnapshot: {
         lastModifiedDate: getCurrentDateDefaultFormat(),
         data: holdings,
+        symbols: holdings.map((h) => h.symbol),
       },
     });
   }

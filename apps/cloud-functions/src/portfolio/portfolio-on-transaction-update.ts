@@ -29,6 +29,7 @@ export const recalculateUserPortfolioStateToUser = async (user: UserData): Promi
     holdingSnapshot: {
       data: holdingsBase,
       lastModifiedDate: getCurrentDateDefaultFormat(),
+      symbols: holdingsBase.map((h) => h.symbol),
     },
   } satisfies Partial<UserData>);
 

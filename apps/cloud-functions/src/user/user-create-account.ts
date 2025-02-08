@@ -113,6 +113,7 @@ const createNewUser = (id: string, personal: UserPersonalInfo, additional: Creat
     holdingSnapshot: {
       lastModifiedDate: getCurrentDateDefaultFormat(),
       data: [],
+      symbols: [],
     },
     isAccountActive: true,
     isDemo: !!additional.isDemo,

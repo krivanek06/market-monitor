@@ -69,6 +69,7 @@ const adminResetUserTransactions = async (
       holdingSnapshot: {
         data: [],
         lastModifiedDate: '',
+        symbols: [],
       },
     } satisfies Partial<UserData>);
 

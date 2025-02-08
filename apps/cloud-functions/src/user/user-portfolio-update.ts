@@ -45,6 +45,7 @@ export const userPortfolioUpdate = async (): Promise<number> => {
         holdingSnapshot: {
           data: holdingsBase,
           lastModifiedDate: getCurrentDateDefaultFormat(),
+          symbols: holdingsBase.map((h) => h.symbol),
         },
         dates: {
           ...user.dates,

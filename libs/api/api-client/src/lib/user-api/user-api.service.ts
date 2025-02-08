@@ -91,6 +91,7 @@ export class UserApiService {
       holdingSnapshot: {
         data: [],
         lastModifiedDate: '',
+        symbols: [],
       },
     });
 
