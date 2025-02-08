@@ -22,7 +22,6 @@ import {
   USER_DEFAULT_STARTING_CASH,
   UserAccountEnum,
   UserBase,
-  UserBaseMin,
   UserData,
   UserPortfolioGrowthData,
   UserPortfolioTransaction,
@@ -91,6 +90,7 @@ export class UserApiService {
       holdingSnapshot: {
         data: [],
         lastModifiedDate: '',
+        symbols: [],
       },
     });
 
@@ -129,19 +129,6 @@ export class UserApiService {
       lastModifiedDate: '',
       data: [],
     });
-  }
-
-  /**
-   * THIS ONLY WORKS FOR TESTING FUNCTIONS
-   * run this to recalculate user's portfolio state based on previous transactions
-   *
-   * @param userBase - user whom to recalculate portfolio state
-   * @returns true or false if the recalculation was successful
-   */
-  async recalculateUserPortfolioState(userBase: UserBaseMin): Promise<boolean> {
-    const callable = httpsCallable<string, boolean>(this.functions, 'userRecalculatePortfolioCall');
-    const result = await callable(userBase.id);
-    return result.data;
   }
 
   /**

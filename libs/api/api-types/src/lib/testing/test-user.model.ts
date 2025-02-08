@@ -54,6 +54,7 @@ export const mockCreateUser = (data: Partial<UserData> = {}): UserData => {
     holdingSnapshot: {
       lastModifiedDate: format(new Date(), 'yyyy-MM-dd'),
       data: [],
+      symbols: [],
     },
     isAccountActive: true,
     accountCreatedDate: format(new Date(), 'yyyy-MM-dd'),

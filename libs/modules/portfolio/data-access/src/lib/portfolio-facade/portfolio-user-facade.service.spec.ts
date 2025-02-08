@@ -102,6 +102,7 @@ describe('PortfolioUserFacadeService', () => {
       holdingSnapshot: {
         data: [{ symbol: 'AAPL', units: 1, invested: 1 }] as PortfolioStateHoldingBase[],
         lastModifiedDate: '',
+        symbol: ['AAPL'],
       },
     };
 
@@ -304,15 +305,6 @@ describe('PortfolioUserFacadeService', () => {
 
     expect(outstandingOrderApi.deleteAllOutstandingOrdersForUser).toHaveBeenCalledWith(testUserData.id);
     expect(userApi.resetTransactions).toHaveBeenCalledWith(testUserData);
-  });
-
-  it('should recalculate user portfolio state', () => {
-    const service = MockRender(PortfolioUserFacadeService);
-    const userApi = ngMocks.get(UserApiService);
-
-    service.componentInstance.recalculatePortfolioState();
-
-    expect(userApi.recalculateUserPortfolioState).toHaveBeenCalledWith(testUserData);
   });
 
   it('should add outstanding order - BUY order', () => {

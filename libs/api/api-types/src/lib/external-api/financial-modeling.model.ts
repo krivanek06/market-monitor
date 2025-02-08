@@ -952,6 +952,15 @@ export type IsStockMarketOpenExtend = IsStockMarketOpen & {
   };
 };
 
+export type CalendarStockSplit = {
+  symbol: string;
+  date: string; // YYYY-MM-DD
+  // increase number of stocks for the user to own
+  numerator: number;
+  // decrease number of stocks for the user to own
+  denominator: number;
+};
+
 export const financialEconomicTypesConst = [
   'GDP',
   'realGDP',

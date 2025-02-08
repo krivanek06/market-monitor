@@ -8,6 +8,10 @@ export type AdminGeneralActions =
   | {
       type: 'adminDeleteGroup';
       groupId: string;
+    }
+  | {
+      type: 'adminRecalculateUserPortfolioGrowth';
+      userId: string;
     };
 
 export type AdminGeneralActionsType<T extends AdminGeneralActions['type']> = ExtractedType<AdminGeneralActions, T>;

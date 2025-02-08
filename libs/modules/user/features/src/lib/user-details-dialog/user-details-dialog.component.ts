@@ -19,10 +19,11 @@ import {
   PortfolioTransactionsTableComponent,
 } from '@mm/portfolio/ui';
 import { ColorScheme } from '@mm/shared/data-access';
-import { Confirmable, DialogServiceUtil } from '@mm/shared/dialog-manager';
+import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { DefaultImgDirective, SectionTitleComponent } from '@mm/shared/ui';
 import { filterNil } from 'ngxtension/filter-nil';
 import { map, startWith, switchMap, tap } from 'rxjs';
+import { UserDetailsDialogAdminComponent } from './user-details-dialog-admin/user-details-dialog-admin.component';
 
 export type UserDetailsDialogComponentData = {
   userId: string;
@@ -48,6 +49,7 @@ export type UserDetailsDialogComponentData = {
     PortfolioTransactionsItemComponent,
     SectionTitleComponent,
     NgClass,
+    UserDetailsDialogAdminComponent,
   ],
   template: `
     <div class="flex items-center justify-between p-4">
@@ -78,23 +80,11 @@ export type UserDetailsDialogComponentData = {
 
     <mat-dialog-content class="md:h-[75vh]">
       <!-- check if myself if an admin -->
-      @if (authUserData().isAdmin) {
-        <div>
-          <mat-divider />
-        </div>
-
-        <!-- display action buttons -->
-        <div class="mb-2 p-4">
-          <app-section-title title="Admin Actions" class="mb-3" />
-          <div class="flex items-center gap-4">
-            <button mat-stroked-button color="warn" (click)="onResetTransactionsByAdmin()">
-              Reset Transactions - Admin
-            </button>
-          </div>
-        </div>
-      }
-
       @if (userDataSignal(); as userData) {
+        @if (authUserData().isAdmin) {
+          <app-user-details-dialog-admin [authUserData]="authUserData()" [selectedUserData]="userData" />
+        }
+
         <div class="pb-2">
           <mat-divider />
         </div>
@@ -311,24 +301,5 @@ export class UserDetailsDialogComponent {
 
   onDialogClose() {
     this.dialogRef.close();
-  }
-
-  @Confirmable('Are you sure you want to reset transactions?', 'Confirm', true, 'CONFIRM')
-  async onResetTransactionsByAdmin() {
-    try {
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('Resetting User Transactions', 'notification');
-
-      // perform action
-      await this.userApiService.fireAdminAction({
-        type: 'adminResetUserTransactions',
-        userId: this.data.userId,
-      });
-
-      // show notification
-      this.dialogServiceUtil.showNotificationBar('User Transactions Reset Successfully', 'success');
-    } catch (error) {
-      this.dialogServiceUtil.handleError(error);
-    }
   }
 }

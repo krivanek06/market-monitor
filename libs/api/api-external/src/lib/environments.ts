@@ -1,6 +1,7 @@
 // environments
 export const FINANCIAL_MODELING_KEY = '645c1db245d983df8a2d31bc39b92c32';
-export const FINANCIAL_MODELING_URL = 'https://financialmodelingprep.com/api';
+export const FINANCIAL_MODELING_URL = 'https://financialmodelingprep.com';
+export const FINANCIAL_MODELING_URL_API = 'https://financialmodelingprep.com/api';
 
 /*
  https://finnhub.io/docs/api - 60 requests / minute

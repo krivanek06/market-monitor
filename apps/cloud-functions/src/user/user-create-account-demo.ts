@@ -230,6 +230,7 @@ export class CreateDemoAccountService {
     userData.holdingSnapshot = {
       data: getPortfolioStateHoldingBaseByTransactionsUtil(transactionsToSave),
       lastModifiedDate: getCurrentDateDefaultFormat(),
+      symbols: transactionsToSave.map((d) => d.symbol),
     };
 
     // map data into new object to avoid circular reference
@@ -297,6 +298,7 @@ export class CreateDemoAccountService {
       holdingSnapshot: {
         data: holdingsBaseUpdate,
         lastModifiedDate: getCurrentDateDefaultFormat(),
+        symbols: holdingsBaseUpdate.map((h) => h.symbol),
       },
     } satisfies Partial<UserData>);
 
