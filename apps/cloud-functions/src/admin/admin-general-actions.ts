@@ -49,6 +49,10 @@ export const adminGeneralActions = async (userAuthId: string | undefined, data: 
   if (data.type === 'adminRecalculateUserPortfolioGrowth') {
     return adminRecalculateUserPortfolioGrowth(authUser, data);
   }
+
+  if (data.type === 'adminRecalculatePortfolioState') {
+    return adminRecalculatePortfolioState(authUser, data);
+  }
 };
 
 const adminResetUserTransactions = async (
@@ -98,6 +102,46 @@ const adminResetUserTransactions = async (
       data: [],
       lastModifiedDate: '',
     });
+  });
+};
+
+const adminRecalculatePortfolioState = async (
+  authUser: UserData,
+  data: AdminGeneralActionsType<'adminRecalculatePortfolioState'>,
+) => {
+  // get firestore instance
+  const db = firestore();
+
+  return db.runTransaction(async (firebaseTransaction) => {
+    // load user data
+    const user = (await firebaseTransaction.get(userDocumentRef(data.userId))).data();
+
+    if (!user) {
+      console.error(`User: ${data.userId} not found`);
+      return;
+    }
+
+    const portfolioByTransactions = await calculateUserPortfolioStateByTransactions(user);
+
+    if (!portfolioByTransactions) {
+      console.error(`Error calculating user portfolio state: ${user.id}, ${user.personal.displayName}`);
+      return false;
+    }
+
+    // update user
+    userDocumentRef(user.id).update({
+      portfolioState: portfolioByTransactions.portfolioState,
+      holdingSnapshot: {
+        data: portfolioByTransactions.holdingsBase,
+        lastModifiedDate: getCurrentDateDefaultFormat(),
+        symbols: portfolioByTransactions.holdingsBase.map((h) => h.symbol),
+      },
+    } satisfies Partial<UserData>);
+
+    // update portfolio risk
+    userDocumentRef(user.id).update({
+      portfolioRisk: portfolioByTransactions.portfolioRisk,
+    } satisfies Partial<UserData>);
   });
 };
 

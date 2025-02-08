@@ -27,8 +27,13 @@ import { SectionTitleComponent } from '@mm/shared/ui';
 
       <div class="flex items-center gap-4">
         <button mat-stroked-button color="warn" (click)="onResetTransactionsByAdmin()">Reset Transactions</button>
+
         <button mat-stroked-button color="primary" (click)="onRecalculatePortfolioByAdmin()">
-          Recalculate Portfolio
+          Recalculate Portfolio Growth
+        </button>
+
+        <button mat-stroked-button color="primary" (click)="onRecalculatePortfolioStateByAdmin()">
+          Recalculate Portfolio State
         </button>
       </div>
     </div>
@@ -83,6 +88,29 @@ export class UserDetailsDialogAdminComponent {
       // perform action
       await this.userApiService.fireAdminAction({
         type: 'adminRecalculateUserPortfolioGrowth',
+        userId: this.selectedUserData().id,
+      });
+
+      // show notification
+      this.dialogServiceUtil.showNotificationBar('Recalculated Successfully', 'success');
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
+  }
+
+  @Confirmable('Are you sure you want to recalculate portfolio state?', 'Confirm', true, 'CONFIRM')
+  async onRecalculatePortfolioStateByAdmin() {
+    if (!this.authUserData().isAdmin) {
+      return;
+    }
+
+    try {
+      // show notification
+      this.dialogServiceUtil.showNotificationBar('Recalculating portfolio growth', 'notification');
+
+      // perform action
+      await this.userApiService.fireAdminAction({
+        type: 'adminRecalculatePortfolioState',
         userId: this.selectedUserData().id,
       });
 
