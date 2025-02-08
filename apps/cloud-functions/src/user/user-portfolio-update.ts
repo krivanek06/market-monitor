@@ -1,4 +1,5 @@
-import { PortfolioGrowth, UserData } from '@mm/api-types';
+import { getCalendarStockSplitTomorrow } from '@mm/api-external';
+import { CalendarStockSplit, PortfolioGrowth, PortfolioStateHoldingBase, UserData } from '@mm/api-types';
 import { getCurrentDateDefaultFormat, waitSeconds } from '@mm/shared/general-util';
 import { FieldValue } from 'firebase-admin/firestore';
 import { userCollectionActiveAccountRef, userDocumentPortfolioGrowthRef, userDocumentRef } from '../database';
@@ -18,6 +19,7 @@ export const userPortfolioUpdate = async (): Promise<number> => {
   const userToUpdate = userCollectionActiveAccountRef().where('dates.portfolioGrowthDate', '!=', today).limit(100);
 
   const users = await userToUpdate.get();
+  const stockSplits = await getCalendarStockSplitTomorrow();
 
   console.log('Loaded: ', users.docs.length);
 
@@ -38,14 +40,15 @@ export const userPortfolioUpdate = async (): Promise<number> => {
       }
 
       const { portfolioState, portfolioRisk, holdingsBase } = data;
+      const holdingsBaseUpdate = getAdjustedHoldingToStockSplits(holdingsBase, stockSplits);
 
       // update user
       userDocumentRef(user.id).update({
         portfolioState: portfolioState,
         holdingSnapshot: {
-          data: holdingsBase,
+          data: holdingsBaseUpdate,
           lastModifiedDate: getCurrentDateDefaultFormat(),
-          symbols: holdingsBase.map((h) => h.symbol),
+          symbols: holdingsBaseUpdate.map((h) => h.symbol),
         },
         dates: {
           ...user.dates,
@@ -74,4 +77,28 @@ export const userPortfolioUpdate = async (): Promise<number> => {
   }
 
   return users.docs.length;
+};
+
+const getAdjustedHoldingToStockSplits = (
+  holdingsBase: PortfolioStateHoldingBase[],
+  stockSplits: CalendarStockSplit[],
+): PortfolioStateHoldingBase[] => {
+  return holdingsBase.map((holding) => {
+    const stockSplit = stockSplits.find((s) => s.symbol === holding.symbol);
+
+    // if holding is crypto or no stock split found
+    if (holding.symbolType === 'CRYPTO' || !stockSplit) {
+      return holding;
+    }
+
+    // calculate new units
+    const ratio = stockSplit.numerator / stockSplit.denominator;
+    const newUnits = Math.floor(holding.units * ratio);
+
+    return {
+      ...holding,
+      // prevent holding units from less than 1
+      units: newUnits < 1 ? 1 : newUnits,
+    };
+  });
 };

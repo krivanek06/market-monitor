@@ -102,6 +102,7 @@ describe('PortfolioUserFacadeService', () => {
       holdingSnapshot: {
         data: [{ symbol: 'AAPL', units: 1, invested: 1 }] as PortfolioStateHoldingBase[],
         lastModifiedDate: '',
+        symbol: ['AAPL'],
       },
     };
 
