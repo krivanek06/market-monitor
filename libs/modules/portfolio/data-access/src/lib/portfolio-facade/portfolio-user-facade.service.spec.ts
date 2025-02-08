@@ -307,15 +307,6 @@ describe('PortfolioUserFacadeService', () => {
     expect(userApi.resetTransactions).toHaveBeenCalledWith(testUserData);
   });
 
-  it('should recalculate user portfolio state', () => {
-    const service = MockRender(PortfolioUserFacadeService);
-    const userApi = ngMocks.get(UserApiService);
-
-    service.componentInstance.recalculatePortfolioState();
-
-    expect(userApi.recalculateUserPortfolioState).toHaveBeenCalledWith(testUserData);
-  });
-
   it('should add outstanding order - BUY order', () => {
     const buyOrder = {
       symbol: 'AAPL',

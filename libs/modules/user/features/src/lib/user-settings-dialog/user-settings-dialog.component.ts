@@ -163,11 +163,6 @@ import { UserAccountTypeSelectDialogComponent } from '../user-account-type-selec
           <mat-divider />
         </div>
 
-        <!-- portfolio recalculations -->
-        @if (userDataNormal()?.isAdmin && isDevActive) {
-          <button (click)="onRecalculateTransaction()" type="button" mat-stroked-button>Recalculate Portfolio</button>
-        }
-
         <!--  Reset Transactions -->
         <button
           [disabled]="userDataNormal()?.isTest || userDataNormal()?.isDemo"
@@ -366,21 +361,5 @@ export class UserSettingsDialogComponent implements OnInit {
 
     // notify user
     this.dialogServiceUtil.showNotificationBar('Your account has been reset', 'success');
-  }
-
-  @Confirmable('Are you sure you want to recalculate your portfolio?')
-  async onRecalculateTransaction() {
-    if (!this.userDataNormal()?.isAdmin) {
-      this.dialogServiceUtil.showNotificationBar('You are not authorized to perform this action');
-      return;
-    }
-
-    try {
-      this.dialogServiceUtil.showNotificationBar('Recalculating your portfolio');
-      await this.portfolioUserFacadeService.recalculatePortfolioState();
-      this.dialogServiceUtil.showNotificationBar('Portfolio recalculated', 'success');
-    } catch (error) {
-      this.dialogServiceUtil.handleError(error);
-    }
   }
 }

@@ -1,8 +1,6 @@
-import { CallableRequest, onCall, onRequest } from 'firebase-functions/v2/https';
-import { userDocumentRef } from '../database';
+import { onRequest } from 'firebase-functions/v2/https';
 import { groupHallOfFame, groupPortfolioRank, groupUpdateData } from '../group';
 import { outstandingOrdersExecuteAll } from '../outstanding-order';
-import { recalculateUserPortfolioStateToUser } from '../portfolio';
 import { run_scheduler_once_a_day, run_scheduler_update_users } from '../production';
 import {
   userDeactivateInactiveAccounts,
@@ -107,37 +105,3 @@ const test_delete_user_accounts = async () => {
   console.log('[Users]: delete old inactive accounts');
   await userDeleteNormalAccounts();
 };
-
-// todo - remove this , deployed in admin seciton
-export const userRecalculatePortfolioCall = onCall(
-  {
-    region: 'europe-central2',
-    cors: ['http://localhost:4200/'],
-  },
-  async (request: CallableRequest<string>) => {
-    const authUserId = request.auth?.uid;
-    const userId = request.data;
-
-    console.log(`Recalculate user portfolio state: ${userId}, by: ${authUserId}`);
-
-    if (!authUserId || !userId) {
-      console.error(`User not found: ${authUserId}`);
-      return false;
-    }
-
-    const authUser = (await userDocumentRef(authUserId).get()).data();
-    const user = (await userDocumentRef(userId).get()).data();
-
-    if (!authUser || !user) {
-      console.error(`User not found: ${authUserId}`);
-      return false;
-    }
-
-    if (!authUser.isAdmin) {
-      console.error(`User not authorized: ${authUserId}, name: ${authUser.personal.displayName}`);
-      return false;
-    }
-
-    return recalculateUserPortfolioStateToUser(user);
-  },
-);

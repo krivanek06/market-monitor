@@ -68,11 +68,6 @@ export class PortfolioUserFacadeService {
     this.portfolioCalculationService.getPortfolioAssetAllocationPieChart(this.portfolioStateHolding()?.holdings ?? []),
   );
 
-  recalculatePortfolioState(): Promise<boolean> {
-    const userData = this.authenticationUserService.state.getUserData();
-    return this.userApiService.recalculateUserPortfolioState(userData);
-  }
-
   resetTransactions(): void {
     const userData = this.authenticationUserService.state.getUserData();
 
