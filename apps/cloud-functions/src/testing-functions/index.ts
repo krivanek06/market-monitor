@@ -108,6 +108,7 @@ const test_delete_user_accounts = async () => {
   await userDeleteNormalAccounts();
 };
 
+// todo - remove this , deployed in admin seciton
 export const userRecalculatePortfolioCall = onCall(
   {
     region: 'europe-central2',

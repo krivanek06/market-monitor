@@ -344,7 +344,12 @@ export class UserSettingsDialogComponent implements OnInit {
     );
   }
 
-  @Confirmable('Are you sure you want to reset your account? Your trading history & groups will be removed')
+  @Confirmable(
+    'Confirm resetting your account. Your trading history & groups will be removed',
+    'Confirm',
+    true,
+    'CONFIRM',
+  )
   onResetTransactions(): void {
     // notify user
     this.dialogServiceUtil.showNotificationBar('Sending request to reset your account');
