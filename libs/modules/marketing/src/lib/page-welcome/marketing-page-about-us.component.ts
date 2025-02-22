@@ -25,10 +25,10 @@ import { MarketingSocialsEduardComponent } from '../components';
       </p>
       <div class="mb-10 text-center text-xl text-gray-300 [&>*]:mb-2">
         <div>Schools where <span class="text-wt-primary">GGFinance</span> is used are:</div>
-        <div>Univezita Komenského v Bratislave</div>
-        <div>Ekonimická Univerzita v Bratislave</div>
-        <!-- <div>Prešovská univerzita v Prešove</div>
-        <div>Univerzita Mateja Bela v Banskej Bystrici</div> -->
+        <div>Univerzita Komenského v Bratislave</div>
+        <div>Ekonomická Univerzita v Bratislave</div>
+        <div>Prešovská univerzita v Prešove</div>
+        <div>Univerzita Mateja Bela v Banskej Bystrici</div>
       </div>
     </section>
   `,
