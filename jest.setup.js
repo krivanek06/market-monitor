@@ -1,4 +1,5 @@
 // Error: zone-testing.js is needed for the fakeAsync()
+import 'cross-fetch/polyfill';
 import 'zone.js';
 import 'zone.js/testing';
 
