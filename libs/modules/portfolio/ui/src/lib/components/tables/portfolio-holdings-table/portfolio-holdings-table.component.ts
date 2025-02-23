@@ -77,17 +77,25 @@ import {
         <td mat-cell *matCellDef="let row" class="hidden md:table-cell">
           <div class="flex flex-row gap-2">
             <div class="text-wt-gray-dark">
-              {{ row.symbolQuote.price | currency }}
+              @if (row.symbolQuote.exchange === 'CRYPTO') {
+                {{ '$' + row.symbolQuote.price }}
+              } @else {
+                {{ row.symbolQuote.price | currency }}
+              }
             </div>
-            <div
-              appPercentageIncrease
-              [useCurrencySign]="true"
-              [currentValues]="{
-                value: row.symbolQuote.price * row.units,
-                valueToCompare: row.symbolQuote.previousClose * row.units,
-                hideValue: true,
-              }"
-            ></div>
+
+            <!-- hide on small numbers, incorrect percentage calculation -->
+            @if (row.symbolQuote.price > 0.1) {
+              <div
+                appPercentageIncrease
+                [useCurrencySign]="true"
+                [currentValues]="{
+                  value: row.symbolQuote.price * row.units,
+                  valueToCompare: row.symbolQuote.previousClose * row.units,
+                  hideValue: true,
+                }"
+              ></div>
+            }
           </div>
         </td>
       </ng-container>
@@ -112,7 +120,7 @@ import {
       <ng-container matColumnDef="bep">
         <th mat-header-cell *matHeaderCellDef class="hidden lg:table-cell">BEP +/-</th>
         <td mat-cell *matCellDef="let row" class="text-wt-gray-dark hidden lg:table-cell">
-          {{ row.breakEvenPrice | currency }}
+          {{ row.breakEvenPrice < 0.1 ? '<0.1' : (row.breakEvenPrice | currency) }}
         </td>
       </ng-container>
 
@@ -122,7 +130,7 @@ import {
         <td mat-cell *matCellDef="let row" class="table-cell">
           <div class="flex flex-col">
             <div class="text-wt-gray-dark max-sm:text-end">
-              {{ row.symbolQuote.price * row.units | currency }}
+              {{ row.symbolQuote.price * row.units < 0.1 ? '<0.1' : (row.symbolQuote.price * row.units | currency) }}
             </div>
             <!-- mobile -->
             <div
@@ -190,7 +198,7 @@ import {
       <ng-container matColumnDef="invested">
         <th mat-header-cell mat-sort-header *matHeaderCellDef class="hidden lg:table-cell">Invested</th>
         <td mat-cell *matCellDef="let row" class="hidden lg:table-cell">
-          {{ row.invested | currency }}
+          {{ row.invested < 0.1 ? '<0.1' : (row.invested | currency) }}
         </td>
       </ng-container>
 

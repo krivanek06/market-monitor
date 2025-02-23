@@ -61,7 +61,7 @@ export class PortfolioCalculationService {
                 ...holding,
                 invested: roundNDigits(holding.invested),
                 breakEvenPrice:
-                  holding.units !== 0 ? roundNDigits(holding.invested / holding.units, 4) : holding.breakEvenPrice,
+                  holding.units !== 0 ? roundNDigits(holding.invested / holding.units, 6) : holding.breakEvenPrice,
                 weight: roundNDigits(holding.invested / portfolioState.invested, 6),
                 symbolQuote: quote,
               } satisfies PortfolioStateHolding;

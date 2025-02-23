@@ -74,7 +74,7 @@ export const createTransaction = (
   }
 
   // calculate break even price if SELL order
-  const breakEvenPrice = isSell ? roundNDigits(symbolHolding?.breakEvenPrice ?? 1, 4) : 0;
+  const breakEvenPrice = isSell ? (symbolHolding?.breakEvenPrice ?? 1) : 0;
 
   // calculate transaction fees
   const transactionFeesCalc = getTransactionFees(unitPrice, input.units);

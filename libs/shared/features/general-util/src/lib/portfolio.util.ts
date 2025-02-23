@@ -178,10 +178,10 @@ export const getPortfolioStateHoldingBaseByTransactionsUtil = (
         if (newUnits !== 0) {
           // update holding
           existingHolding.units = isCrypto ? roundNDigits(newUnits, 4) : roundNDigits(newUnits);
-          existingHolding.invested += roundNDigits(curr.unitPrice * curr.units * (isSell ? -1 : 1));
+          existingHolding.invested += roundNDigits(curr.unitPrice * curr.units * (isSell ? -1 : 1), 4);
 
           if (!isSell) {
-            existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units);
+            existingHolding.breakEvenPrice = roundNDigits(existingHolding.invested / existingHolding.units, 6);
           }
         } else {
           // remove holding if units are 0
@@ -206,8 +206,8 @@ export const getPortfolioStateHoldingBaseByTransactionsUtil = (
           symbol: curr.symbol,
           sector: curr.sector,
           units: curr.units,
-          invested: roundNDigits(curr.unitPrice * curr.units),
-          breakEvenPrice: roundNDigits(curr.unitPrice),
+          invested: roundNDigits(curr.unitPrice * curr.units, 6),
+          breakEvenPrice: roundNDigits(curr.unitPrice, 6),
         } satisfies PortfolioStateHoldingBase,
       ];
     }, [] as PortfolioStateHoldingBase[])
@@ -418,7 +418,7 @@ export const getPortfolioStateHoldingsUtil = (
         ...holding,
         units: roundNDigits(holding.units - symbolSellOrderUnits, 4),
         invested: roundNDigits(holding.invested),
-        breakEvenPrice: roundNDigits(holding.invested / holding.units, 4),
+        breakEvenPrice: roundNDigits(holding.invested / holding.units, 6),
         weight: roundNDigits(holding.invested / investedTotal, 6),
         symbolQuote: quote,
       } satisfies PortfolioStateHolding;

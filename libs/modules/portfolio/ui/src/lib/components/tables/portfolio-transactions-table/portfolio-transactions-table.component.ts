@@ -175,7 +175,11 @@ import {
       <ng-container matColumnDef="unitPrice">
         <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell">Unit Price</th>
         <td mat-cell *matCellDef="let row" class="hidden sm:table-cell">
-          <span class="text-wt-gray-dark">{{ row.unitPrice | currency }}</span>
+          @if (row.sector === 'CRYPTO') {
+            <span class="text-wt-gray-dark">{{ '$' + row.unitPrice }}</span>
+          } @else {
+            <span class="text-wt-gray-dark">{{ row.unitPrice | currency }}</span>
+          }
         </td>
       </ng-container>
 
