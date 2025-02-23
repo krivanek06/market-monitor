@@ -16,6 +16,7 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { PortfolioCalculationService, PortfolioChange } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthCompareChartComponent,
+  PortfolioGrowthCompareChartComponentMock,
   PortfolioHoldingsTableCardComponent,
   PortfolioHoldingsTableCardComponentMock,
   PortfolioPeriodChangeTableComponent,
@@ -28,7 +29,13 @@ import {
 import { GenericChartSeries, InputSource } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { waitSeconds } from '@mm/shared/general-util';
-import { DropdownControlComponent, DropdownControlComponentMock, GeneralCardComponent } from '@mm/shared/ui';
+import {
+  DropdownControlComponent,
+  DropdownControlComponentMock,
+  GeneralCardComponent,
+  PieChartComponent,
+  PieChartComponentMock,
+} from '@mm/shared/ui';
 import { UserSearchControlComponent, UserSearchControlComponentMock } from '@mm/user/features';
 import { UserDisplayItemComponent, UserDisplayItemComponentMock } from '@mm/user/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
@@ -95,6 +102,8 @@ describe('PageCompareUsersComponent', () => {
       .replace(DropdownControlComponent, DropdownControlComponentMock)
       .replace(PortfolioHoldingsTableCardComponent, PortfolioHoldingsTableCardComponentMock)
       .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
+      .replace(PortfolioGrowthCompareChartComponent, PortfolioGrowthCompareChartComponentMock)
+      .replace(PieChartComponent, PieChartComponentMock)
       .provide({
         provide: AuthenticationUserStoreService,
         useValue: {
@@ -386,7 +395,7 @@ describe('PageCompareUsersComponent', () => {
 
     const compareChart = ngMocks.find<PortfolioGrowthCompareChartComponent>(portfolioCompareChartS);
     expect(compareChart.componentInstance).toBeDefined();
-    expect(compareChart.componentInstance.data).toEqual(component.selectedUsersData().data);
+    expect(compareChart.componentInstance.data()).toEqual(component.selectedUsersData().data);
   });
 
   it('should display portfolio state table', async () => {

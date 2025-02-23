@@ -8,6 +8,7 @@ import {
   PortfolioGrowthAssets,
   PortfolioStateHoldings,
   PortfolioTransaction,
+  USER_DEFAULT_STARTING_CASH,
   UserAccountEnum,
   mockCreateUser,
   quoteAAPLMock,
@@ -16,8 +17,11 @@ import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { PortfolioChange, PortfolioUserFacadeService } from '@mm/portfolio/data-access';
 import {
   PortfolioAssetChartComponent,
+  PortfolioAssetChartComponentMock,
   PortfolioChangeChartComponent,
+  PortfolioChangeChartComponentMock,
   PortfolioGrowthChartComponent,
+  PortfolioGrowthChartComponentMock,
   PortfolioHoldingsTableCardComponent,
   PortfolioHoldingsTableCardComponentMock,
   PortfolioPeriodChangeComponent,
@@ -28,7 +32,7 @@ import {
   PortfolioTransactionsTableComponent,
   PortfolioTransactionsTableComponentMock,
 } from '@mm/portfolio/ui';
-import { GeneralCardComponent, PieChartComponent } from '@mm/shared/ui';
+import { GeneralCardComponent, PieChartComponent, PieChartComponentMock } from '@mm/shared/ui';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { PageDashboardComponent } from './page-dashboard.component';
 
@@ -130,6 +134,10 @@ describe('PageDashboardComponent', () => {
       .keep(NoopAnimationsModule)
       .replace(PortfolioHoldingsTableCardComponent, PortfolioHoldingsTableCardComponentMock)
       .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
+      .replace(PortfolioGrowthChartComponent, PortfolioGrowthChartComponentMock)
+      .replace(PieChartComponent, PieChartComponentMock)
+      .replace(PortfolioChangeChartComponent, PortfolioChangeChartComponentMock)
+      .replace(PortfolioAssetChartComponent, PortfolioAssetChartComponentMock)
       .keep(GeneralCardComponent)
       .provide({
         provide: AuthenticationUserStoreService,
@@ -238,11 +246,11 @@ describe('PageDashboardComponent', () => {
 
     const comp = ngMocks.find<PortfolioGrowthChartComponent>(growthChartBalanceS);
     expect(comp).toBeTruthy();
-    expect(comp.componentInstance.data).toEqual({
+    expect(comp.componentInstance.data()).toEqual({
       values: mockPortfolioGrowth,
     });
-    expect(comp.componentInstance.startCash).toEqual(mockPortfolioState.startingCash);
-    expect(comp.componentInstance.chartType).toBe('balance');
+    expect(comp.componentInstance.startCash()).toEqual(mockPortfolioState.startingCash);
+    expect(comp.componentInstance.chartType()).toBe('balance');
   });
 
   it('should display PortfolioAssetChart', () => {
@@ -262,7 +270,7 @@ describe('PageDashboardComponent', () => {
 
     const comp = ngMocks.find<PortfolioAssetChartComponent>(portfolioAssetChartS);
     expect(comp).toBeTruthy();
-    expect(comp.componentInstance.data).toEqual(mockTransactions);
+    expect(comp.componentInstance.data()).toEqual(mockTransactions);
   });
 
   it('should NOT display PortfolioAssetChart if not enough data', () => {
@@ -278,7 +286,7 @@ describe('PageDashboardComponent', () => {
 
     const comp = ngMocks.find<PortfolioChangeChartComponent>(portfolioChangeChartS);
     expect(comp).toBeTruthy();
-    expect(comp.componentInstance.data).toEqual(mockPortfolioGrowth);
+    expect(comp.componentInstance.data()).toEqual(mockPortfolioGrowth);
   });
 
   it('should display PortfolioGrowthChartComponent component type marketValue', () => {
@@ -287,11 +295,11 @@ describe('PageDashboardComponent', () => {
 
     const comp = ngMocks.find<PortfolioGrowthChartComponent>(growthChartMarketS);
     expect(comp).toBeTruthy();
-    expect(comp.componentInstance.data).toEqual({
+    expect(comp.componentInstance.data()).toEqual({
       values: mockPortfolioGrowth,
     });
-    expect(comp.componentInstance.startCash).toBeUndefined();
-    expect(comp.componentInstance.chartType).toBe('marketValue');
+    expect(comp.componentInstance.startCash()).toEqual(USER_DEFAULT_STARTING_CASH);
+    expect(comp.componentInstance.chartType()).toBe('marketValue');
   });
 
   it('should display PortfolioHoldingsTableCardComponent component', () => {
@@ -313,8 +321,8 @@ describe('PageDashboardComponent', () => {
 
     const comp = ngMocks.find<PieChartComponent>(assetAllocationPieChart);
     expect(comp).toBeTruthy();
-    expect(comp.componentInstance.chartTitle).toEqual('Asset Allocation');
-    expect(comp.componentInstance.series).toEqual(portfolioUserFacade.portfolioAssetAllocationPieChart());
+    expect(comp.componentInstance.chartTitle()).toEqual('Asset Allocation');
+    expect(comp.componentInstance.series()).toEqual(portfolioUserFacade.portfolioAssetAllocationPieChart());
   });
 
   // it('should display Sector Allocation Pie Chart', () => {

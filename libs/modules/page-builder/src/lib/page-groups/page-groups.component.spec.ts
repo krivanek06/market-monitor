@@ -16,6 +16,7 @@ import {
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { GroupDisplayCardComponent, GroupSearchControlComponent } from '@mm/group/features';
 import { GroupDisplayItemComponent } from '@mm/group/ui';
+import { ROUTES_MAIN } from '@mm/shared/data-access';
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { waitSeconds } from '@mm/shared/general-util';
 import { ClickableDirective, GeneralCardComponent } from '@mm/shared/ui';
@@ -389,7 +390,7 @@ describe('PageGroupsComponent', () => {
 
     // check if the function is called
     expect(onGroupSearchSpy).toHaveBeenCalledWith(groupDataT1Mock);
-    expect(router.navigate).toHaveBeenCalledWith(['groups', groupDataT1Mock.id]);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP, ROUTES_MAIN.GROUPS, groupDataT1Mock.id]);
   });
 
   it('should display received invitations and show confirmation dialog', () => {
@@ -503,6 +504,9 @@ describe('PageGroupsComponent', () => {
     const fixture = MockRender(PageGroupsComponent);
     fixture.detectChanges();
 
+    // check if function is called
+    const onSentRequestClickListener = jest.spyOn(fixture.point.componentInstance, 'onSentRequestClick');
+
     // get all received invitations instances
     const sentInvitations = ngMocks.findInstances(sentInvitationsS, GroupDisplayItemComponent);
 
@@ -516,6 +520,7 @@ describe('PageGroupsComponent', () => {
     await waitSeconds(0.5);
 
     // check if the function is called
+    expect(onSentRequestClickListener).toHaveBeenCalledWith(groupDataT2Mock);
     expect(groupApiService.removeRequestToJoinGroup).toHaveBeenCalledWith({
       groupId: groupDataT2Mock.id,
       userId: groupDataOwnerMock.id,
@@ -538,6 +543,9 @@ describe('PageGroupsComponent', () => {
     const fixture = MockRender(PageGroupsComponent);
     fixture.detectChanges();
 
+    // check if function is called
+    const onSentRequestClickListener = jest.spyOn(fixture.point.componentInstance, 'onSentRequestClick');
+
     // get all received invitations instances
     const sentInvitations = ngMocks.findInstances(sentInvitationsS, GroupDisplayItemComponent);
 
@@ -549,6 +557,8 @@ describe('PageGroupsComponent', () => {
 
     // check if the function is called
     expect(groupApiService.removeRequestToJoinGroup).not.toHaveBeenCalled();
+    expect(dialogService.showNotificationBar).not.toHaveBeenCalled();
+    expect(onSentRequestClickListener).toHaveBeenCalledWith(groupDataT2Mock);
   });
 
   it('should not show send and received invitations if both are empty', () => {
@@ -600,7 +610,7 @@ describe('PageGroupsComponent', () => {
     // Click on accept invitation button
     myGroups[0].clickableDirective.itemClicked.emit();
 
-    expect(router.navigate).toHaveBeenCalledWith(['groups', groupDataT1Mock.id]);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP, ROUTES_MAIN.GROUPS, groupDataT1Mock.id]);
   });
 
   it('should display groups that user is member of', () => {
@@ -617,6 +627,6 @@ describe('PageGroupsComponent', () => {
     // Click on accept invitation button
     memberOfGroups[0].clickableDirective.itemClicked.emit();
 
-    expect(router.navigate).toHaveBeenCalledWith(['groups', groupDataT1Mock.id]);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP, ROUTES_MAIN.GROUPS, groupDataT1Mock.id]);
   });
 });
