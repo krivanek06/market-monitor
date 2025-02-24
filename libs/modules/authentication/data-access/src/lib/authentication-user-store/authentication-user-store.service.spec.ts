@@ -29,7 +29,8 @@ describe('AuthenticationUserStoreService', () => {
     },
     holdingSnapshot: {
       lastModifiedDate: '2022-10-20',
-      data: [{ symbol: 'AAPL', units: 10 }] as PortfolioStateHoldingBase[],
+      data: [] as PortfolioStateHoldingBase[],
+      symbols: [] as string[],
     },
   } satisfies UserData;
 
