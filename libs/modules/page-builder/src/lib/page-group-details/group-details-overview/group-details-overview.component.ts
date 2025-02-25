@@ -216,12 +216,12 @@ import { PageGroupsBaseComponent } from '../page-groups-base.component';
       }
 
       <!-- holding table -->
-      <div class="mb-10 max-sm:hidden">
+      <app-general-card class="mb-10 max-sm:hidden">
         <app-portfolio-holdings-table-card
           [maximumHoldingLimit]="GROUP_HOLDING_LIMIT"
           [portfolioStateHolding]="groupPortfolioStateHolding()"
         />
-      </div>
+      </app-general-card>
 
       <!-- transaction chart -->
       @if (groupDetailsSignal.groupPortfolioSnapshotsData.length > 5) {

@@ -136,7 +136,7 @@ describe('SummaryActionButtonsComponent', () => {
 
     ngMocks.click(redirect);
 
-    expect(router.navigateByUrl).toHaveBeenCalledWith(`${ROUTES_MAIN.STOCK_DETAILS}/${mockSymbolSummary.id}`);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP, ROUTES_MAIN.STOCK_DETAILS, mockSymbolSummary.id]);
     expect(onDetailsRedirectSpy).toHaveBeenCalled();
     expect(dialogRef.closeAll).toHaveBeenCalled();
     expect(viewPort.scrollToPosition).toHaveBeenCalledWith([0, 0]);

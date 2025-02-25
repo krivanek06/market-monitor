@@ -82,12 +82,17 @@ export type UserDetailsDialogComponentData = {
       <!-- check if myself if an admin -->
       @if (userDataSignal(); as userData) {
         @if (authUserData().isAdmin) {
-          <app-user-details-dialog-admin [authUserData]="authUserData()" [selectedUserData]="userData" />
+          <app-user-details-dialog-admin
+            data-testid="user-details-dialog-admin-controller"
+            [authUserData]="authUserData()"
+            [selectedUserData]="userData"
+          />
         }
 
         <div class="pb-2">
           <mat-divider />
         </div>
+
         <!-- display portfolio -->
         <div class="divide-wt-border flex flex-row divide-x-2 p-2">
           <!-- portfolio state -->
@@ -155,7 +160,6 @@ export type UserDetailsDialogComponentData = {
               data-testid="user-details-portfolio-holdings-table-card"
               [displayedColumns]="displayedColumns"
               [portfolioStateHolding]="portfolioStateHolding()"
-              [showInCard]="false"
               [initialItemsLimit]="8"
             />
           </div>

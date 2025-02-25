@@ -131,7 +131,6 @@ describe('SymbolSearchBasicComponent', () => {
 
     // find radio buttons
     const radioGroup = ngMocks.find<MatRadioGroup>(fixture.debugElement, searchRadioGroupS);
-    const a = radioGroup.childNodes;
     // check if we have radio group
     expect(radioGroup).toBeTruthy();
     // todo - not sure why 4, should be 3

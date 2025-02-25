@@ -182,11 +182,12 @@ import { GeneralCardComponent, PieChartComponent } from '@mm/shared/ui';
     }
 
     <!-- holding -->
-    <app-portfolio-holdings-table-card
-      class="mb-6"
-      data-testid="page-dashboard-portfolio-holdings-table"
-      [portfolioStateHolding]="portfolioUserFacadeService.portfolioStateHolding()"
-    />
+    <app-general-card class="mb-6">
+      <app-portfolio-holdings-table-card
+        data-testid="page-dashboard-portfolio-holdings-table"
+        [portfolioStateHolding]="portfolioUserFacadeService.portfolioStateHolding()"
+      />
+    </app-general-card>
 
     <!-- best / worst -->
     @if (hasEnoughTransactions()) {
