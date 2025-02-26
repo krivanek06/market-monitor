@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { OutstandingOrder } from '@mm/api-types';
+import { IsStockMarketOpenExtend, OutstandingOrder } from '@mm/api-types';
 
 @Component({
   selector: 'app-outstanding-order-card-data',
@@ -16,4 +16,5 @@ import { OutstandingOrder } from '@mm/api-types';
 export class OutstandingOrderCardDataMockComponent {
   readonly deleteClicked = output<void>();
   readonly order = input.required<OutstandingOrder>();
+  readonly marketOpen = input<IsStockMarketOpenExtend>();
 }

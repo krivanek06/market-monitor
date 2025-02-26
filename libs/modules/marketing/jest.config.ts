@@ -1,7 +1,7 @@
 export default {
   displayName: 'marketing',
   preset: '../../../jest.preset.js',
-  setupFilesAfterEnv: ['../../../../jest.setup.js'],
+  setupFilesAfterEnv: ['../../../jest.setup.js'],
   coverageDirectory: '../../../coverage/libs/modules/marketing',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [

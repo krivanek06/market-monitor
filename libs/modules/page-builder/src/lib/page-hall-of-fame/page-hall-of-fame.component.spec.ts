@@ -167,6 +167,7 @@ describe('PageHallOfFameComponent', () => {
         provide: Router,
         useValue: {
           navigateByUrl: jest.fn(),
+          navigate: jest.fn(),
         },
       });
   });
@@ -266,7 +267,7 @@ describe('PageHallOfFameComponent', () => {
     // search group
     groupSearchControl.componentInstance.selectedEmitter.emit(randomGroup);
     expect(onGroupClickSpy).toHaveBeenCalledWith(randomGroup);
-    expect(router.navigateByUrl).toHaveBeenCalledWith(`/${ROUTES_MAIN.GROUPS}/${randomGroup.id}`);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP, ROUTES_MAIN.GROUPS, 'Group_123']);
   });
 
   it('should display daily top users and button to toggle', () => {
