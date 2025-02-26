@@ -19,7 +19,10 @@ import {
   summaryNFLXMock,
 } from '@mm/api-types';
 import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
-import { AssetPriceChartInteractiveComponent } from '@mm/market-general/features';
+import {
+  AssetPriceChartInteractiveComponent,
+  AssetPriceChartInteractiveComponentMock,
+} from '@mm/market-general/features';
 import { SymbolSearchBasicComponent, SymbolSearchBasicComponentMock } from '@mm/market-stocks/features';
 import { SymbolSummaryListComponent } from '@mm/market-stocks/ui';
 import { PortfolioUserFacadeService } from '@mm/portfolio/data-access';
@@ -103,6 +106,7 @@ describe('PageTradingComponent', () => {
       .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
       .replace(DropdownControlComponent, DropdownControlComponentMock)
       .replace(OutstandingOrderCardDataComponent, OutstandingOrderCardDataMockComponent)
+      .replace(AssetPriceChartInteractiveComponent, AssetPriceChartInteractiveComponentMock)
       .provide({
         provide: MatDialog,
         useValue: {
@@ -417,7 +421,7 @@ describe('PageTradingComponent', () => {
 
     const compBuy = ngMocks.find<HTMLButtonElement>(buttonBuy);
     const compSell = ngMocks.find<HTMLButtonElement>(buttonSell);
-    const interactiveChartComp = ngMocks.find<AssetPriceChartInteractiveComponent>(interactiveChartS);
+    const interactiveChartComp = ngMocks.find<AssetPriceChartInteractiveComponentMock>(interactiveChartS);
 
     expect(component.symbolSummarySignal().state).toBe('success');
 
@@ -480,22 +484,22 @@ describe('PageTradingComponent', () => {
 
     fixture.detectChanges();
 
-    const comp = ngMocks.find<AssetPriceChartInteractiveComponent>(interactiveChartS);
+    const comp = ngMocks.find<AssetPriceChartInteractiveComponentMock>(interactiveChartS);
 
     expect(comp).toBeTruthy();
-    expect(comp.componentInstance.imageName).toBe('AAPL');
-    expect(comp.componentInstance.symbol).toBe('AAPL');
-    expect(comp.componentInstance.title).toBe('Historical Price: AAPL');
+    expect(comp.componentInstance.imageName()).toBe('AAPL');
+    expect(comp.componentInstance.symbol()).toBe('AAPL');
+    expect(comp.componentInstance.title()).toBe('Historical Price: AAPL');
 
     // update symbol summary
     component.selectedSymbolControl.setValue('MSFT');
 
     fixture.detectChanges();
 
-    expect(comp.componentInstance.imageName).toBe('MSFT');
-    expect(comp.componentInstance.symbol).toBe('MSFT');
-    expect(comp.componentInstance.title).toBe('Historical Price: MSFT');
-    expect(comp.componentInstance.errorFromParent).toBeFalsy();
+    expect(comp.componentInstance.imageName()).toBe('MSFT');
+    expect(comp.componentInstance.symbol()).toBe('MSFT');
+    expect(comp.componentInstance.title()).toBe('Historical Price: MSFT');
+    expect(comp.componentInstance.errorFromParent()).toBeFalsy();
   });
 
   it('should display symbol summary list', () => {
@@ -620,6 +624,8 @@ describe('PageTradingComponent', () => {
 
     fixture.detectChanges();
 
+    const marketApi = ngMocks.get(MarketApiService);
+
     const orderCards = ngMocks.findAll<OutstandingOrderCardDataMockComponent>(orderCardS);
 
     // check if open orders are displayed
@@ -628,6 +634,8 @@ describe('PageTradingComponent', () => {
 
     expect(orderCards[0].componentInstance.order()).toEqual(component.state.outstandingOrders().openOrders[0]);
     expect(orderCards[1].componentInstance.order()).toEqual(component.state.outstandingOrders().openOrders[1]);
+    expect(orderCards[0].componentInstance.marketOpen()).toEqual(marketApi.getIsMarketOpenSignal());
+    expect(orderCards[1].componentInstance.marketOpen()).toEqual(marketApi.getIsMarketOpenSignal());
   });
 
   it('it should remove an open order if user confirms', async () => {

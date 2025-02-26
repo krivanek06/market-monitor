@@ -200,12 +200,12 @@ import { Subject, catchError, forkJoin, map, merge, of, pipe, scan, startWith, s
       </div>
 
       <!-- table -->
-      <div class="mb-10">
+      <app-general-card class="mb-10">
         <app-portfolio-holdings-table-card
           data-testid="page-compare-holding-table-card"
           [portfolioStateHolding]="selectedUser()?.portfolioState"
         />
-      </div>
+      </app-general-card>
 
       <!-- transaction history -->
       <div class="mb-4">

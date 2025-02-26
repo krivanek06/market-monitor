@@ -3,6 +3,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { By } from '@angular/platform-browser';
 import { UserApiService } from '@mm/api-client';
 import {
   mockCreateUser,
@@ -10,9 +11,11 @@ import {
   UserPortfolioGrowthData,
   UserPortfolioTransaction,
 } from '@mm/api-types';
+import { AuthenticationUserStoreService } from '@mm/authentication/data-access';
 import { PortfolioCalculationService } from '@mm/portfolio/data-access';
 import {
   PortfolioGrowthChartComponent,
+  PortfolioGrowthChartComponentMock,
   PortfolioHoldingsTableCardComponent,
   PortfolioHoldingsTableCardComponentMock,
   PortfolioStateComponent,
@@ -24,6 +27,7 @@ import {
 import { DialogServiceUtil } from '@mm/shared/dialog-manager';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
+import { UserDetailsDialogAdminComponent } from './user-details-dialog-admin/user-details-dialog-admin.component';
 import { UserDetailsDialogComponent } from './user-details-dialog.component';
 
 describe('UserDetailsDialogComponent', () => {
@@ -35,6 +39,7 @@ describe('UserDetailsDialogComponent', () => {
   const portfolioHoldingTableCard = '[data-testid="user-details-portfolio-holdings-table-card"]';
   const transactionTableS = '[data-testid="user-details-portfolio-transactions-table"]';
   const loadingSpinnerS = '[data-testid="user-details-dialog-loading-spinner"]';
+  const userDetailsDialogAdminS = '[data-testid="user-details-dialog-admin-controller"]';
 
   const mockUser = mockCreateUser();
   const mockTransactions = {
@@ -57,10 +62,12 @@ describe('UserDetailsDialogComponent', () => {
       .keep(PortfolioStateTransactionsComponent)
       .keep(PortfolioStateComponent)
       .keep(PortfolioStateRiskComponent)
+      .keep(UserDetailsDialogAdminComponent)
       .keep(MAT_DIALOG_DATA)
       .keep(NG_MOCKS_ROOT_PROVIDERS)
       .replace(PortfolioHoldingsTableCardComponent, PortfolioHoldingsTableCardComponentMock)
       .replace(PortfolioTransactionsTableComponent, PortfolioTransactionsTableComponentMock)
+      .replace(PortfolioGrowthChartComponent, PortfolioGrowthChartComponentMock)
       .provide({
         provide: MatDialogRef,
         useValue: {
@@ -85,6 +92,14 @@ describe('UserDetailsDialogComponent', () => {
         provide: PortfolioCalculationService,
         useValue: {
           getPortfolioStateHoldings: jest.fn().mockReturnValue(of(mockPortfolioHolding)),
+        },
+      })
+      .provide({
+        provide: AuthenticationUserStoreService,
+        useValue: {
+          state: {
+            getUserData: () => mockUser,
+          } as AuthenticationUserStoreService['state'],
         },
       })
       .provide({
@@ -127,7 +142,11 @@ describe('UserDetailsDialogComponent', () => {
     const component = fixture.componentInstance;
 
     expect(component.userDataSignal()).toEqual(mockUser);
-    expect(component.portfolioTransactions()).toEqual(mockTransactions.transactions);
+    expect(component.portfolioTransactions()).toEqual({
+      best: [],
+      worst: [],
+      transactions: mockTransactions.transactions,
+    });
     expect(component.portfolioStateHolding()).toEqual(mockPortfolioHolding);
     expect(component.portfolioGrowth()).toEqual({
       data: mockPortfolioGrowths,
@@ -161,8 +180,8 @@ describe('UserDetailsDialogComponent', () => {
     // check portfolio growth chart
     const portfolioGrowthChart = ngMocks.find<PortfolioGrowthChartComponent>(portfolioGrowthChartS);
     expect(portfolioGrowthChart).toBeTruthy();
-    expect(portfolioGrowthChart.componentInstance.chartType).toEqual('balance');
-    expect(portfolioGrowthChart.componentInstance.data).toEqual({
+    expect(portfolioGrowthChart.componentInstance.chartType()).toEqual('balance');
+    expect(portfolioGrowthChart.componentInstance.data()).toEqual({
       values: mockPortfolioGrowths,
     });
 
@@ -188,5 +207,39 @@ describe('UserDetailsDialogComponent', () => {
     ngMocks.click(closeDialogButtonS);
 
     expect(dialogRef.close).toHaveBeenCalled();
+  });
+
+  it('should not display admin controllers if user is not admin', () => {
+    const fixture = MockRender(UserDetailsDialogComponent);
+    const component = fixture.componentInstance;
+
+    fixture.detectChanges();
+
+    expect(fixture.debugElement.query(By.css(userDetailsDialogAdminS))).toBeFalsy();
+  });
+
+  it('should display admin controllers if user is admin', () => {
+    const authenticationUserStoreService = ngMocks.get(AuthenticationUserStoreService);
+    const userAdmin = { ...mockUser, isAdmin: true };
+
+    ngMocks.stub(authenticationUserStoreService, {
+      state: {
+        getUserData: () => userAdmin,
+      } as AuthenticationUserStoreService['state'],
+    });
+
+    ngMocks.flushTestBed();
+
+    const fixture = MockRender(UserDetailsDialogComponent);
+    const component = fixture.componentInstance;
+
+    fixture.detectChanges();
+
+    expect(fixture.debugElement.query(By.css(userDetailsDialogAdminS))).toBeTruthy();
+
+    const userDetailsDialogAdminComponent = ngMocks.find<UserDetailsDialogAdminComponent>(userDetailsDialogAdminS);
+
+    expect(userDetailsDialogAdminComponent.componentInstance.authUserData()).toEqual(userAdmin);
+    expect(userDetailsDialogAdminComponent.componentInstance.selectedUserData()).toEqual(mockUser);
   });
 });

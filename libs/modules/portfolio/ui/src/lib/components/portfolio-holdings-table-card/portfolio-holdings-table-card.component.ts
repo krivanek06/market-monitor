@@ -1,4 +1,3 @@
-import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -15,57 +14,42 @@ import { MatIconModule } from '@angular/material/icon';
 import { PortfolioStateHoldings, USER_HOLDINGS_SYMBOL_LIMIT } from '@mm/api-types';
 import { SymbolSummaryDialogComponent } from '@mm/market-stocks/features';
 import { SCREEN_DIALOGS } from '@mm/shared/dialog-manager';
-import { GeneralCardComponent, ShowMoreButtonComponent } from '@mm/shared/ui';
+import { ShowMoreButtonComponent } from '@mm/shared/ui';
 import { PortfolioHoldingsTableComponent } from '../tables';
 
 @Component({
   selector: 'app-portfolio-holdings-table-card',
   standalone: true,
-  imports: [
-    NgTemplateOutlet,
-    GeneralCardComponent,
-    PortfolioHoldingsTableComponent,
-    ShowMoreButtonComponent,
-    MatIconModule,
-  ],
+  imports: [PortfolioHoldingsTableComponent, ShowMoreButtonComponent, MatIconModule],
   template: `
-    @if (showInCard()) {
-      <app-general-card [title]="cardTitle()" matIcon="show_chart">
-        <ng-container *ngTemplateOutlet="content" />
-      </app-general-card>
-    } @else {
-      <h2 class="text-wt-primary mb-2 flex items-center gap-2 text-base">
-        <mat-icon color="primary">show_chart</mat-icon>
-        {{ cardTitle() }}
-      </h2>
-      <ng-container *ngTemplateOutlet="content" />
+    <h2 class="text-wt-primary mb-2 flex items-center gap-2 text-base">
+      <mat-icon color="primary">show_chart</mat-icon>
+      {{ cardTitle() }}
+    </h2>
+
+    <!-- invisible el - use if to prevent immediate camera scroll -->
+    @if (selectedHoldingsToggle()) {
+      <div data-testid="portfolio-holding-table-card-start" #startSection></div>
     }
 
-    <ng-template #content>
-      <!-- invisible el - use if to prevent immediate camera scroll -->
-      @if (selectedHoldingsToggle()) {
-        <div data-testid="portfolio-holding-table-card-start" #startSection></div>
-      }
+    <!-- table -->
+    <app-portfolio-holdings-table
+      data-testid="portfolio-holding-table-card-table"
+      (symbolClicked)="onSummaryClick($event)"
+      [holdings]="selectedHoldings()"
+      [portfolioState]="portfolioStateHolding()"
+      [displayedColumns]="displayedColumns()"
+    />
 
-      <!-- table -->
-      <app-portfolio-holdings-table
-        data-testid="portfolio-holding-table-card-table"
-        (symbolClicked)="onSummaryClick($event)"
-        [holdings]="selectedHoldings()"
-        [portfolioState]="portfolioStateHolding()"
-        [displayedColumns]="displayedColumns()"
+    <!-- show more holding button -->
+    <div class="flex justify-end">
+      <app-show-more-button
+        data-testid="portfolio-holding-table-card-show-more"
+        [(showMoreToggle)]="selectedHoldingsToggle"
+        [itemsLimit]="initialItemsLimit()"
+        [itemsTotal]="(portfolioStateHolding()?.holdings ?? []).length"
       />
-
-      <!-- show more holding button -->
-      <div class="flex justify-end">
-        <app-show-more-button
-          data-testid="portfolio-holding-table-card-show-more"
-          [(showMoreToggle)]="selectedHoldingsToggle"
-          [itemsLimit]="initialItemsLimit()"
-          [itemsTotal]="(portfolioStateHolding()?.holdings ?? []).length"
-        />
-      </div>
-    </ng-template>
+    </div>
   `,
   styles: `
     :host {
@@ -90,11 +74,6 @@ export class PortfolioHoldingsTableCardComponent {
    * maximum number of holdings that can be in the table
    */
   readonly maximumHoldingLimit = input(USER_HOLDINGS_SYMBOL_LIMIT);
-
-  /**
-   * show the card the content
-   */
-  readonly showInCard = input(true);
 
   readonly displayedColumns = input<string[]>([
     'symbol',

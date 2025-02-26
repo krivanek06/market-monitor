@@ -28,6 +28,7 @@ describe('PortfolioUserFacadeService', () => {
     holdingSnapshot: {
       lastModifiedDate: '2022-10-20',
       data: [{ symbol: 'AAPL', units: 10 }] as PortfolioStateHoldingBase[],
+      symbols: ['AAPL'],
     },
   });
 
@@ -102,7 +103,7 @@ describe('PortfolioUserFacadeService', () => {
       holdingSnapshot: {
         data: [{ symbol: 'AAPL', units: 1, invested: 1 }] as PortfolioStateHoldingBase[],
         lastModifiedDate: '',
-        symbol: ['AAPL'],
+        symbols: ['AAPL'],
       },
     };
 

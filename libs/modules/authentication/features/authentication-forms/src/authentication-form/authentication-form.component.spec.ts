@@ -23,10 +23,10 @@ import { UserCredential } from 'firebase/auth';
 import { MockBuilder, MockRender, NG_MOCKS_ROOT_PROVIDERS, ngMocks } from 'ng-mocks';
 import { of } from 'rxjs';
 import { AuthenticationFormComponent } from './authentication-form.component';
+import { FormLoginComponentMock } from './form-login/form-login-mock.component';
 import { FormLoginComponent } from './form-login/form-login.component';
-import { FormLoginComponentMock } from './form-login/form-login.mock.component';
+import { FormRegisterMockComponent } from './form-register/form-register-mock.component';
 import { FormRegisterComponent } from './form-register/form-register.component';
-import { FormRegisterMockComponent } from './form-register/form-register.mock.component';
 
 describe('AuthenticationFormComponent', () => {
   const loginFormS = '[data-testid="auth-form-login-form"]';
@@ -193,7 +193,7 @@ describe('AuthenticationFormComponent', () => {
     });
 
     // check if user is redirected
-    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP]);
     expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
   });
 
@@ -287,7 +287,7 @@ describe('AuthenticationFormComponent', () => {
       data: userMockAuth,
     });
     expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
-    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP]);
   });
 
   it('should not register user if error happens', async () => {
@@ -382,7 +382,7 @@ describe('AuthenticationFormComponent', () => {
       data: userMockAuth,
     });
     expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'notification', 10000);
-    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP]);
 
     // check if demo account is saved in local storage
     expect(storageLocalService.saveDataLocal).toHaveBeenCalledWith('demoAccount', {
@@ -438,7 +438,7 @@ describe('AuthenticationFormComponent', () => {
       data: userMockAuth,
     });
     expect(dialogServiceUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
-    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP]);
     // check that demo account does exist
     expect(component.demoAccount()).toEqual({
       email: userDemoMock.userData.personal.email,
@@ -545,7 +545,7 @@ describe('AuthenticationFormComponent', () => {
     });
     expect(dialogUtil.handleError).toHaveBeenCalledWith(expect.any(Error));
     expect(dialogUtil.showNotificationBar).not.toHaveBeenCalledWith(expect.any(String), 'success');
-    expect(router.navigate).not.toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
+    expect(router.navigate).not.toHaveBeenCalledWith([ROUTES_MAIN.APP]);
   });
 
   it('should create an account on google login if user does exist', () => {
@@ -572,7 +572,7 @@ describe('AuthenticationFormComponent', () => {
     expect(store.changeAccountType).toHaveBeenCalledTimes(1);
     expect(store.changeAccountType).toHaveBeenCalledWith(UserAccountEnum.DEMO_TRADING);
     expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
-    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP]);
     expect(component.userAuthenticationState()).toEqual({
       action: 'success',
       data: userMockAuth,
@@ -609,7 +609,7 @@ describe('AuthenticationFormComponent', () => {
     expect(authenticationAccountService.signInGoogle).toHaveBeenCalledTimes(1);
     expect(store.changeAccountType).not.toHaveBeenCalled();
     expect(dialogUtil.showNotificationBar).toHaveBeenCalledWith(expect.any(String), 'success');
-    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.DASHBOARD]);
+    expect(router.navigate).toHaveBeenCalledWith([ROUTES_MAIN.APP]);
     expect(component.userAuthenticationState()).toEqual({
       action: 'success',
       data: userMockAuth,

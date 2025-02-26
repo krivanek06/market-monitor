@@ -1,12 +1,7 @@
 import { DialogServiceModule } from './dialog-service.module';
 import { DialogServiceUtil } from './dialog-service.util';
 
-export function Confirmable(
-  dialogTitle: string,
-  confirmButton: string = 'Confirm',
-  cancelButton: boolean = true,
-  showTextWord: string = '',
-) {
+export function Confirmable(dialogTitle: string, confirmButton = 'Confirm', cancelButton = true, showTextWord = '') {
   return function (target: any, key: string | symbol, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
     descriptor.value = function (...args: any[]) {
