@@ -26,13 +26,30 @@ import { SectionTitleComponent } from '@mm/shared/ui';
       </div>
 
       <div class="flex items-center gap-4">
-        <button mat-stroked-button color="warn" (click)="onResetTransactionsByAdmin()">Reset Transactions</button>
+        <button
+          data-testid="reset-transactions-by-admin"
+          mat-stroked-button
+          color="warn"
+          (click)="onResetTransactionsByAdmin()"
+        >
+          Reset Transactions
+        </button>
 
-        <button mat-stroked-button color="primary" (click)="onRecalculatePortfolioByAdmin()">
+        <button
+          data-testid="recalculate-portfolio-growth"
+          mat-stroked-button
+          color="primary"
+          (click)="onRecalculatePortfolioByAdmin()"
+        >
           Recalculate Portfolio Growth
         </button>
 
-        <button mat-stroked-button color="primary" (click)="onRecalculatePortfolioStateByAdmin()">
+        <button
+          data-testid="recalculate-portfolio-state"
+          mat-stroked-button
+          color="primary"
+          (click)="onRecalculatePortfolioStateByAdmin()"
+        >
           Recalculate Portfolio State
         </button>
       </div>
