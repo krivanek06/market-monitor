@@ -231,6 +231,7 @@ describe('PageGroupsComponent', () => {
             groupRequested: [],
             groupWatched: [],
           }) as UserGroupData,
+        userData: () => mockCreateUser(),
       } as AuthenticationUserStoreService['state'],
     });
 
@@ -251,7 +252,7 @@ describe('PageGroupsComponent', () => {
 
     // check if the function is called
     expect(ngMocks.findAll(myGroupsS).length).toBe(6);
-    expect(component.isCreateGroupEnabled()).toBe(false);
+    expect(component.isCreateGroupEnabled()).toBeFalsy();
     expect(createGroupEl.nativeElement.disabled).toBeTruthy();
     expect(onCreateGroupClickSpy).not.toHaveBeenCalled();
     expect(dialogServiceUtil.showInlineInputDialog).not.toHaveBeenCalled();
@@ -273,6 +274,10 @@ describe('PageGroupsComponent', () => {
             groupWatched: [],
           }) as UserGroupData,
         isDemoAccount: () => true,
+        userData: () =>
+          mockCreateUser({
+            isDemo: true,
+          }),
       } as AuthenticationUserStoreService['state'],
     });
 
@@ -292,10 +297,10 @@ describe('PageGroupsComponent', () => {
     ngMocks.click(createGroupS);
 
     // check if the function is called
-    expect(component.isCreateGroupEnabled()).toBe(false);
     expect(createGroupEl.nativeElement.disabled).toBeTruthy();
     expect(onCreateGroupClickSpy).not.toHaveBeenCalled();
     expect(dialogServiceUtil.showInlineInputDialog).not.toHaveBeenCalled();
+    expect(component.isCreateGroupEnabled()).toBeFalsy();
   });
 
   it('should not open create group dialog if user is does not have feature access', () => {
