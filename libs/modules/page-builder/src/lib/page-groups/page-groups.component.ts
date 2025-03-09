@@ -167,9 +167,9 @@ export class PageGroupsComponent {
   readonly isCreateGroupEnabled = computed(
     () =>
       // user hasn't reached the limit of groups
-      (this.state?.userGroupData()?.groupOwner?.length ?? 99) < GROUP_OWNER_LIMIT &&
-      // user is not demo account
-      !this.state.isDemoAccount() &&
+      ((this.state?.userGroupData()?.groupOwner?.length ?? 0) < GROUP_OWNER_LIMIT &&
+        // user is not demo account
+        !this.state.isDemoAccount()) ||
       // user has permission to create groups
       this.state.userData()?.featureAccess?.createGroups,
   );
@@ -193,13 +193,17 @@ export class PageGroupsComponent {
       return;
     }
 
-    // create group
-    await this.groupApiService.createGroup(user, {
-      groupName,
-    });
+    try {
+      // create group
+      await this.groupApiService.createGroup(user, {
+        groupName,
+      });
 
-    // notify user
-    this.dialogServiceUtil.showNotificationBar('Group has been created', 'success');
+      // notify user
+      this.dialogServiceUtil.showNotificationBar('Group has been created', 'success');
+    } catch (error) {
+      this.dialogServiceUtil.handleError(error);
+    }
   }
 
   /**

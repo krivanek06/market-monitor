@@ -12,9 +12,14 @@ service cloud.firestore {
 
     // allow group owners to modify their groups
     match /groups/{groupId}/{document=**} {
-      allow create: if userFeatureAccess("createGroups");
+      // allow creating groups if user has access or at least 1
+      allow create: if userFeatureAccess("createGroups") || canCreateOneGroup();
       allow update: if request.auth.uid == resource.data.ownerUser.id;
       allow delete: if request.auth.uid == resource.data.ownerUser.id;
+
+      function canCreateOneGroup() {
+        return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.groups.groupOwner.size() == 0
+      }
     }
 
     // allow operations for outstanding order

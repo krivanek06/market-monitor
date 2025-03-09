@@ -9,6 +9,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from '@angular/fire/firestore';
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { faker } from '@faker-js/faker';
@@ -191,19 +192,21 @@ export class GroupApiService {
       throw new Error(USER_HAS_DEMO_ACCOUNT_ERROR);
     }
 
-    // check limit
-    if (userData.groups.groupOwner.length >= GROUP_OWNER_LIMIT) {
+    // if no permission allow only the limit of groups
+    if (!userData.featureAccess?.createGroups && userData.groups.groupOwner.length >= GROUP_OWNER_LIMIT) {
       throw new Error(GROUP_OWNER_LIMIT_ERROR);
     }
 
     // create group
     const newGroup = this.createGroupData(input, userBase);
 
+    const batch = writeBatch(this.firestore);
+
     // save new group
-    setDoc(this.getGroupDocRef(newGroup.id), newGroup);
+    batch.set(this.getGroupDocRef(newGroup.id), newGroup);
 
     // create additional documents for group
-    setDoc(this.getGroupPortfolioTransactionDocRef(newGroup.id), {
+    batch.set(this.getGroupPortfolioTransactionDocRef(newGroup.id), {
       lastModifiedDate: getCurrentDateDefaultFormat(),
       data: [],
       transactionBestReturn: [],
@@ -211,31 +214,34 @@ export class GroupApiService {
     });
 
     // create members collection
-    setDoc(this.getGroupMembersDocRef(newGroup.id), {
+    batch.set(this.getGroupMembersDocRef(newGroup.id), {
       lastModifiedDate: getCurrentDateDefaultFormat(),
       data: [groupMembers],
     });
 
     // create portfolio snapshots collection
-    setDoc(this.getGroupPortfolioSnapshotsDocRef(newGroup.id), {
+    batch.set(this.getGroupPortfolioSnapshotsDocRef(newGroup.id), {
       lastModifiedDate: getCurrentDateDefaultFormat(),
       data: [],
     });
 
     // create holding snapshots collection
-    setDoc(this.getGroupHoldingSnapshotsDocRef(newGroup.id), {
+    batch.set(this.getGroupHoldingSnapshotsDocRef(newGroup.id), {
       lastModifiedDate: getCurrentDateDefaultFormat(),
       data: [],
     });
 
     // update owner's data
-    this.userApiService.updateUser(userData.id, {
+    batch.update(this.userApiService.getUserDocRef(userData.id), {
       groups: {
         ...userData.groups,
         groupOwner: [...userData.groups.groupOwner, newGroup.id],
         groupMember: [...userData.groups.groupMember, newGroup.id],
       },
-    });
+    } satisfies Partial<UserData>);
+
+    // commit batch
+    await batch.commit();
 
     return newGroup;
   }

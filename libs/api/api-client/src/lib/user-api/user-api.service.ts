@@ -210,7 +210,7 @@ export class UserApiService {
 
   /* private */
 
-  private getUserDocRef(userId: string): DocumentReference<UserData> {
+  getUserDocRef(userId: string): DocumentReference<UserData> {
     return doc(this.userCollection(), userId);
   }
 

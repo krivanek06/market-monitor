@@ -5,8 +5,9 @@ export const GROUP_MEMBER_LIMIT = 50;
 
 /**
  * how many groups a user can create
+ * if value changed, firebase rules must be updated
  */
-export const GROUP_OWNER_LIMIT = 5;
+export const GROUP_OWNER_LIMIT = 1;
 
 /**
  * how many symbols a user can have in their holdings
